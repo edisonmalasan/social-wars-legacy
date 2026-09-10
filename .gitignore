@@ -1,0 +1,11 @@
+.idea/
+__pycache__/
+.vs/
+*.lnk
+saves/
+new_assets/
+tools/unit_patch_storage.json
+auctions/auctions.json
+build/bundle
+build/dist
+build/work
