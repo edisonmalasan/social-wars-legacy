@@ -9,3 +9,5 @@ auctions/auctions.json
 build/bundle
 build/dist
 build/work
+
+temp
