@@ -168,12 +168,11 @@ Branch names describe the technical work, not the raw OpenSpec change name.
  
 Examples: 
  
-- `docs/browser-runtime-validation-proposal` 
-- `spike/browser-runtime-containment` 
+- `docs/.....-proposal` 
 - `feat/quest-progress-api` 
 - `fix/duplicate-xp-award` 
-- `docs/browser-runtime-spec-sync` 
-- `chore/archive-browser-runtime-validation` 
+- `docs/....-spec-sync` 
+- `chore/archive-...-validation` 
  
 Do not use the OpenSpec change ID as the branch name unless it is also the clearest technical description. 
  

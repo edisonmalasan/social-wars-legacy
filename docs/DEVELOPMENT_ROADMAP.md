@@ -4256,7 +4256,6 @@ Everything that does not directly support it should generally wait.
 
 The first sequence therefore is:
 
-```text
 M0 Preservation
     ↓
 M1 Protocol Discovery
@@ -4270,7 +4269,6 @@ M4 Initial Asset Conversion
 M5 Godot Foundation
     ↓
 M6 Flash-Free Town Vertical Slice
-```
 
 **M6 is the first major victory.**
 
