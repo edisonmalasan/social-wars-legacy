@@ -160,6 +160,7 @@ The first major target is a real town rendered in Godot without executing Flash,
 - Do not use destructive Git operations unless explicitly authorized.
 - Do not rewrite history unless explicitly required.
 - Preserve repository history for legacy material wherever practical.
+- Always close/delete the branch after PR merge
 
 ## Source of truth
 
@@ -240,18 +241,23 @@ For each migrated feature:
 
 Do not mark a legacy feature replaced until parity has been verified or an approved spec explicitly changes its behavior.
 
-## Multi-agent development
+## Orchestration mode
 
-- Determine file/domain ownership before parallel edits.
-- Do not have multiple agents modify the same files unless intentionally coordinated.
-- Respect dependency order between migration tasks.
-- Do not parallelize dependent work merely for speed.
-- Review upstream agent output before building dependent work on it.
-- Use OpenSpec changes and recorded fixtures as shared coordination artifacts.
-- Keep each agent's scope narrow enough that its diff can be independently reviewed.
+For nontrivial OpenSpec changes, the root Codex agent acts as the orchestrator.
 
-For dependent work:
-
-    A → B → C
-
-Do not start B until A's required interface/output is stable enough to depend on.
+- Use real Codex subagents when work can be divided into concrete, independent tasks without overlapping file ownership.
+- The root orchestrator owns the active OpenSpec artifacts and task status.
+- Implementation subagents must not independently edit `proposal.md`, `design.md`, specs, or `tasks.md` unless explicitly assigned that responsibility.
+- Assign each worker a bounded task, owned files/directories, requirements, dependencies, and required verification.
+- Do not parallelize tasks that depend on unfinished interfaces or behavior.
+- Do not have multiple agents edit the same files unless intentionally coordinated.
+- Worker agents must report files changed, checks run, results, and unresolved concerns.
+- The root orchestrator must review worker diffs/results before accepting them.
+- After implementation, use a separate verification pass or verifier subagent to compare the actual implementation against the active OpenSpec artifacts.
+- Do not trust checked task boxes as evidence; inspect the implementation.
+- Run OpenSpec strict validation and the installed OpenSpec verification workflow before considering the change complete.
+- Any unresolved CRITICAL verification issue blocks completion.
+- Any unresolved WARNING blocks completion unless explicitly accepted by the user or active specification.
+- If verification fails, create bounded repair tasks, delegate when useful, then rerun verification.
+- Only the root orchestrator may declare the OpenSpec change complete.
+- Worker subagents should not spawn additional subagents unless the root explicitly authorizes nested delegation.
