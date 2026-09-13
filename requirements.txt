@@ -1,1 +1,27 @@
-flask
+# Verified source runtime: Windows x64 CPython 3.9.13.
+# Exact graph and verification evidence: docs/legacy-baseline.md.
+# Direct imports; Flask retains the legacy private debughelpers import.
+Flask==2.2.5
+requests==2.32.5
+jsonpatch==1.33
+
+# Flask transitives, including Windows / Python <3.10 dependencies.
+Werkzeug==2.2.3
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+itsdangerous==2.2.0
+click==8.1.8
+colorama==0.4.6
+importlib-metadata==8.7.1
+zipp==3.23.1
+
+# Requests transitives.
+certifi==2026.7.22
+charset-normalizer==3.5.1
+idna==3.19
+urllib3==2.6.3
+
+# jsonpatch transitive.
+jsonpointer==3.0.0
+
+# PyInstaller is build-only and intentionally outside this source-runtime lock.

@@ -63,7 +63,9 @@ python -m compileall -q .
 
 Important:
 
-- The legacy dependency manifest is currently incomplete and must be fixed during baseline preservation before claiming clean-machine reproducibility.
+- The source-runtime manifest is fully pinned and verified only on Windows x64 CPython 3.9.13; see `docs/legacy-baseline.md` for interpreter provenance, two clean installs, and contained root HTTP evidence.
+- Executed package consistency check: `python -m pip --isolated check`.
+- Run startup and syntax checks in a disposable source copy to contain saves and bytecode; the verified HTTP smoke requests only `http://127.0.0.1:5055/` without a browser or Flash execution.
 - No verified automated test, lint, or type-check command exists in the current legacy baseline yet.
 - Do not invent commands in this file.
 - When Godot, compatibility API, Server v1, or test tooling is added, update this section with commands that were actually executed successfully.

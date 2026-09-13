@@ -13,10 +13,10 @@ provenance.
   explicit stub, disabled branch, commented route, or TODO describing missing
   behavior.
 - **Compatibility risk:** a dependency, platform, protocol, or security boundary
-  may prevent reliable operation or safe exposure; runtime impact has not been
-  reproduced here.
-- **Unverified static inference:** inspection suggests a defect, but no runnable
-  legacy environment was available to exercise the path.
+  may prevent reliable operation or safe exposure; unverified impacts are
+  identified below and narrow dependency/startup verification is recorded separately.
+- **Unverified static inference:** inspection suggests a defect, but the affected
+  path has not been exercised. Root HTTP startup alone does not verify gameplay.
 
 ## Source-confirmed incomplete or disabled behavior
 
@@ -36,10 +36,10 @@ not claims about every player-visible symptom.
 
 | Risk | Baseline evidence | Status |
 | --- | --- | --- |
-| Incomplete dependency manifest | [`requirements.txt`](../requirements.txt) declares only unpinned `flask`, while [`server.py`](../server.py#L1-L6) imports `requests` and [`get_game_config.py`](../get_game_config.py#L1-L9) imports `jsonpatch`. PyInstaller is invoked only by the build scripts ([`build/build.bat`](../build/build.bat#L17-L35)). | Source-confirmed manifest gap; exact compatible versions remain unverified. |
-| Flask-version coupling | [`server.py`](../server.py#L31-L34) imports `attach_enctype_error_multidict` from Flask's internal `flask.debughelpers` module. | Compatibility risk with unpinned Flask releases; no failure was reproduced here. |
+| Historical incomplete dependency manifest | At the baseline, `requirements.txt` declared only unpinned `flask`, while [`server.py`](../server.py#L1-L6) imports `requests` and [`get_game_config.py`](../get_game_config.py#L1-L9) imports `jsonpatch`. PyInstaller is invoked only by the build scripts ([`build/build.bat`](../build/build.bat#L17-L35)). | Historical gap resolved by the current [16-distribution exact source-runtime lock](../requirements.txt); two fresh installs and pip checks passed on Windows x64 CPython 3.9.13. PyInstaller/build reproduction remains unverified. |
+| Flask-version coupling | [`server.py`](../server.py#L31-L34) imports `attach_enctype_error_multidict` from Flask's internal `flask.debughelpers` module. | Private helper import and root HTTP startup verified with Flask 2.2.5 / Werkzeug 2.2.3. Other version combinations and Flask-dependent gameplay paths remain unverified. |
 | Obsolete Flash/browser runtime | The [Windows/Flash guide](../FLASH.md) and [Linux guide](../LINUX.md) require legacy Flash-capable browser configurations. | Security and platform compatibility risk. Use only in an isolated preservation environment; do not make Flash a modern runtime dependency. |
-| Relative writable paths | [`bundle.py`](../bundle.py#L16-L23) defines `mods/`, `saves/`, and `auctions/` relative to `.`, and [`sessions.py`](../sessions.py#L40-L68) creates/reads `saves/`. | Starting from a different working directory or without write permission can change or prevent persistence; not runtime-tested here. |
+| Relative writable paths | [`bundle.py`](../bundle.py#L16-L23) defines `mods/`, `saves/`, and `auctions/` relative to `.`, and [`sessions.py`](../sessions.py#L40-L68) creates/reads `saves/`. | Disposable repository-root startup created an empty saves directory; other working directories, permission failures, and player-save persistence remain unverified. |
 | Development-only server/session settings | [`server.py`](../server.py#L335-L339) uses Flask's built-in server and a literal session secret while binding to loopback by default. | Suitable only as preserved local behavior; external exposure has not been tested and is not supported by this document. |
 
 ## Unverified static inferences
@@ -57,15 +57,32 @@ not claims about every player-visible symptom.
   temporary-file/replace or backup step; interruption and corruption behavior
   were not tested.
 
-## Runtime verification unavailable
+## Narrow runtime verification (2026-09-14)
 
-On 2026-09-13, `python` and `python3` resolved only to Microsoft Store app aliases
-and each returned exit code 9009; `py` was not installed. Consequently the server,
-source startup, save paths, Flask compatibility, Flash bootstrap, and suspected
-failures above were not executed. Clean-machine reproduction remains open until
-the dependency-lock change supplies pinned dependencies and a runnable
-environment, followed by an explicit smoke test.
+The 2026-09-13 attempt found only Microsoft Store aliases (exit 9009) and no
+`py` launcher. This historical host limitation was bypassed with an extracted
+official Python Software Foundation NuGet CPython 3.9.13 AMD64 distribution,
+without changing global interpreter configuration. The exact tested clean source
+commit was `fe8904a474af3960f999f080d0f2d2a03b55070f`, exported to a disposable
+copy with only the candidate lock overlaid; the lock was not yet committed.
+The host reported `Windows-10-10.0.19045-SP0`.
 
-This document must be updated when a finding is actually reproduced: record the
-environment and test evidence, then move it out of the unverified category rather
-than silently strengthening the historical claim.
+Both newly created environments installed all 16 exact runtime pins, passed
+`python -m pip --isolated check`, and produced identical normalized inventories.
+The private Flask helper import succeeded. In the disposable source copy,
+`python -m compileall -q .` exited 0 and `python server.py` returned HTTP 200
+from `http://127.0.0.1:5055/`. The harness terminated only its own child and
+verified the port was released. Existing source-file hashes were unchanged;
+generated state was 13 bytecode files and an empty saves directory, all outside
+the worktree. No Flash, SWF, Ruffle, or browser execution occurred.
+
+See [the verified baseline evidence](legacy-baseline.md#verified-source-runtime-lock-2026-09-14)
+for exact interpreter/download hashes, dependency inventory, commands, response
+fingerprint, logs, setup retries, and limitations. The manifest/startup gap is
+resolved for this exact target; no reproduced gameplay defect or security fix
+is claimed. Save migrations, client bootstrap, other Python versions/platforms,
+and historical packaged builds remain unverified. This older preservation
+runtime is not a production recommendation; no security audit was performed.
+
+Update each finding when its affected path is actually reproduced, recording
+the environment and evidence rather than strengthening static claims silently.
