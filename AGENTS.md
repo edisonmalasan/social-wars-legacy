@@ -151,6 +151,7 @@ The first major target is a real town rendered in Godot without executing Flash,
 - Branch naming: `<type>/<short-kebab-description>`, e.g. `feat/protocol-recorder`
 - Keep branches scoped to one coherent feature or migration unit.
 - Do not merge, force-push, or rewrite shared history unless the task explicitly authorizes it.
+- If a branch is already merged via PR make sure to close/delete the branch
 
 ### Git safety
 
