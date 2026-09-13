@@ -1,28 +1,28 @@
 # Social Wars Modernization & Flash-Free Reconstruction Roadmap
 
-> **Project:** Social Wars Legacy Reconstruction  
-> **Primary Goal:** Reconstruct the existing Social Wars implementation into a modern, maintainable, Flash-free client/server game while preserving the behavior, content, saves, assets, and historical implementation contained in the current repository.
->
-> **Core Strategy:** Preservation-first reconstruction.
->
-> The existing repository will **not** be thrown away or treated merely as obsolete code.
->
-> It will serve as:
->
-> - Reference implementation
-> - Behavioral specification
-> - Protocol specification
-> - Preservation dataset
-> - Save-game corpus
-> - Content database
-> - Asset archive
-> - Regression oracle
-> - Migration source
-> - Historical documentation
->
-> The modern version will progressively replace Flash/SWF functionality with a Godot client while preserving the existing Python server until behavioral parity has been verified.
->
-> Only after the new client is substantially functional should the backend be modernized into an authoritative production architecture backed by PostgreSQL.
+**Project:** Social Wars Legacy Reconstruction  
+**Primary Goal:** Reconstruct the existing Social Wars implementation into a modern, maintainable, Flash-free client/server game while preserving the behavior, content, saves, assets, and historical implementation contained in the current repository.
+
+**Core Strategy:** Preservation-first reconstruction.
+
+The existing repository will **not** be thrown away or treated merely as obsolete code.
+
+It will serve as:
+
+- Reference implementation
+- Behavioral specification
+- Protocol specification
+- Preservation dataset
+- Save-game corpus
+- Content database
+- Asset archive
+- Regression oracle
+- Migration source
+- Historical documentation
+
+The modern version will progressively replace Flash/SWF functionality with a Godot client while preserving the existing Python server until behavioral parity has been verified.
+
+Only after the new client is substantially functional should the backend be modernized into an authoritative production architecture backed by PostgreSQL.
 
 ---
 
@@ -30,9 +30,9 @@
 
 ## Project Status
 
-> This section is maintained by the root Codex orchestrator.
->
-> It is a progress ledger, not the source of truth for specified behavior.
+This section is maintained by the root Codex orchestrator.
+
+It is a progress ledger, not the source of truth for specified behavior.
 
 - **Current milestone:** M0 — Preservation
 - **Roadmap cursor:** M0 / lock and verify legacy Python dependencies
@@ -3541,7 +3541,7 @@ new multiplayer functionality
 
 The first problem to solve is:
 
-> Can the existing Social Wars game be faithfully reconstructed and played through a modern client with no Flash dependency?
+Can the existing Social Wars game be faithfully reconstructed and played through a modern client with no Flash dependency?
 
 Everything else follows from that.
 
@@ -3937,7 +3937,7 @@ Do **not** make PostgreSQL or the backend rewrite the first visible result.
 
 The first major target should be:
 
-> Launch the Godot client on a computer with no Flash runtime, load one real existing Social Wars save, and faithfully render the town, buildings, units, resources, camera, and basic selection using preserved legacy data.
+Launch the Godot client on a computer with no Flash runtime, load one real existing Social Wars save, and faithfully render the town, buildings, units, resources, camera, and basic selection using preserved legacy data.
 
 Once that works, the project has proven that the Flash client can actually be replaced.
 
@@ -3947,7 +3947,7 @@ Once that works, the project has proven that the Flash client can actually be re
 
 The most important idea guiding the project is:
 
-> **The existing Social Wars repository is not obsolete code that should simply be replaced. It is the reference implementation, behavioral specification, protocol specification, preservation dataset, save corpus, content source, asset archive, and regression oracle for the reconstruction.**
+**The existing Social Wars repository is not obsolete code that should simply be replaced. It is the reference implementation, behavioral specification, protocol specification, preservation dataset, save corpus, content source, asset archive, and regression oracle for the reconstruction.**
 
 The correct migration therefore is not:
 
@@ -4248,7 +4248,7 @@ advanced deployment infrastructure
 
 The engineering team or coding agent should treat the following as the immediate mission:
 
-> **Preserve and instrument the legacy implementation, then build the smallest Godot vertical slice capable of loading and displaying a real Social Wars town from an existing save without executing Flash or SWF content.**
+**Preserve and instrument the legacy implementation, then build the smallest Godot vertical slice capable of loading and displaying a real Social Wars town from an existing save without executing Flash or SWF content.**
 
 Everything before that target should directly support it.
 
@@ -4275,4 +4275,3 @@ M6 Flash-Free Town Vertical Slice
 **M6 is the first major victory.**
 
 Do not allow backend modernization, infrastructure work, or unrelated redesign to delay reaching it.
-
