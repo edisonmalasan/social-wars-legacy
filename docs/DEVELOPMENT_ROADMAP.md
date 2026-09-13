@@ -37,16 +37,16 @@ It is a progress ledger, not the source of truth for specified behavior.
 - **Current milestone:** M0 — Preservation
 - **Roadmap cursor:** M0 / lock and verify legacy Python dependencies
 - **Active OpenSpec change:** `lock-legacy-python-runtime-dependencies`
-- **Lifecycle stage:** PROPOSED
-- **Change status:** PLANNING COMPLETE — 0/8 implementation tasks complete
-- **Current objective:** Begin Apply for the approved pinned legacy Python 3.9 source-runtime dependency graph and contained clean-environment verification on a separate implementation branch.
+- **Lifecycle stage:** APPLY
+- **Change status:** IMPLEMENTING — 0/8 implementation tasks complete
+- **Current objective:** Apply the approved pinned legacy Python 3.9 source-runtime dependency graph and execute contained clean-environment verification on `test/legacy-python-runtime-reproducibility`.
 - **Last completed change:** `document-legacy-environment` — archived as `2026-09-13-document-legacy-environment`
 - **Next eligible objective:** Apply `lock-legacy-python-runtime-dependencies`; do not begin later M0 work first.
-- **Blocking issues:** None at proposal time. Apply must obtain an isolated runnable Windows x64 CPython 3.9 interpreter because the current host exposes only non-runnable Store aliases; failure to find a compatible fully pinned graph without source changes is blocking.
+- **Blocking issues:** No confirmed blocker. Apply is obtaining an isolated runnable Windows x64 CPython 3.9 interpreter; failure to find a compatible fully pinned graph without source changes will block the change.
 - **Last OpenSpec validation:** PASS — `openspec validate lock-legacy-python-runtime-dependencies --strict --json` validated the active change with no issues (2026-09-13)
 - **Last implementation verification:** PASS — independent Orca verification task `task_2bd7178d0838` / dispatch `ctx_a69cf0b2617f` plus root final checks (2026-09-13); no CRITICAL or WARNING findings
 - **Last verified commit:** `2a89a7270c538c7c178151a8eb22cea295d3d91b`
-- **Last updated:** 2026-09-13
+- **Last updated:** 2026-09-14
 
 ### Status values
 
