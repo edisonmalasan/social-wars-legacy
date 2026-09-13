@@ -37,15 +37,15 @@ It is a progress ledger, not the source of truth for specified behavior.
 - **Current milestone:** M0 — Preservation
 - **Roadmap cursor:** M0 / lock and verify legacy Python dependencies
 - **Active OpenSpec change:** `lock-legacy-python-runtime-dependencies`
-- **Lifecycle stage:** APPLY
-- **Change status:** VERIFIED — 8/8 implementation tasks complete
-- **Current objective:** Commit, push, review, and merge the verified Apply stage through its remote implementation branch and PR.
+- **Lifecycle stage:** SYNC
+- **Change status:** SYNCING — Apply verified and merged; syncing the approved capability delta into the main OpenSpec specifications
+- **Current objective:** Validate and merge the `legacy-runtime-reproducibility` main specification through the dedicated Spec Sync PR.
 - **Last completed change:** `document-legacy-environment` — archived as `2026-09-13-document-legacy-environment`
-- **Next eligible objective:** Merge the verified Apply stage, then sync the `legacy-runtime-reproducibility` delta specification before archive; do not begin later M0 work first.
+- **Next eligible objective:** Archive `lock-legacy-python-runtime-dependencies` after the Spec Sync PR merges; do not begin later M0 work first.
 - **Blocking issues:** None.
 - **Last OpenSpec validation:** PASS — `openspec validate lock-legacy-python-runtime-dependencies --strict --json` validated the active change with no issues (2026-09-14)
 - **Last implementation verification:** PASS — independent Orca verification task `task_88423198a58c` / dispatch `ctx_85555e872905` plus root final checks (2026-09-14); no CRITICAL or WARNING findings
-- **Last verified commit:** `fe8904a474af3960f999f080d0f2d2a03b55070f` plus the reviewed six-file Apply diff
+- **Last verified commit:** `2127cc1ea7966e17f698a23113062d96e7bb1d96` (Apply merge commit)
 - **Last updated:** 2026-09-14
 
 ### Status values
