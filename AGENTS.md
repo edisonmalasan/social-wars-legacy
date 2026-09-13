@@ -261,3 +261,47 @@ For nontrivial OpenSpec changes, the root Codex agent acts as the orchestrator.
 - If verification fails, create bounded repair tasks, delegate when useful, then rerun verification.
 - Only the root orchestrator may declare the OpenSpec change complete.
 - Worker subagents should not spawn additional subagents unless the root explicitly authorizes nested delegation.
+
+### Subagent
+
+- Default to at most two active subagents per root session.
+- Preferred roles are:
+  1. implementation agent
+  2. verification agent
+- The root agent remains the orchestrator and owns OpenSpec artifacts, architectural decisions, integration, and final acceptance.
+- Do not spawn additional agents merely because work can technically be parallelized.
+- Prefer sequential delegation when the verifier depends on implementation output.
+- Spawn additional agents beyond this default only when the task has clearly independent workstreams and the expected benefit outweighs duplicated context/token cost.
+- Give subagents only the context necessary for their assigned task; do not require every subagent to rediscover the entire repository.
+
+### OpenSpec bootstrap and resume
+
+The root orchestrator must support both bootstrap and resume workflows.
+
+Before creating a new OpenSpec change:
+
+- Inspect `openspec/changes/` and the project status recorded in the development roadmap.
+- If a relevant active change already exists, resume it instead of creating a duplicate.
+- If a completed but unverified or unarchived change exists, finish its verification/lifecycle before creating another dependent change.
+- If no active change exists, use the development roadmap and current repository state to determine the smallest coherent next change.
+- Use OpenSpec exploration before proposing a new change when repository investigation, legacy behavior, architecture, dependencies, or scope need confirmation.
+- Exploration must not implement code.
+- After exploration is sufficiently resolved, create the change with the installed OpenSpec propose workflow.
+- Validate the generated change before implementation.
+- Do not create an OpenSpec change for the entire development roadmap. The roadmap is the program-level plan; OpenSpec changes are bounded implementation units.
+- Do not skip ahead to a later roadmap milestone while required exit criteria or dependencies of the current milestone remain incomplete.
+- Default to completing one OpenSpec change per orchestration run unless the user explicitly requests continuous milestone execution.
+
+### Development roadmap ownership
+
+The development roadmap contains a root-orchestrator-owned `Project Status` block.
+
+- Only the root orchestrator may update the roadmap's `Project Status` block.
+- Implementation and verification subagents must not modify the roadmap unless explicitly assigned.
+- Treat the status block as a progress ledger, not as the behavioral source of truth.
+- OpenSpec specs and active change artifacts remain the source of truth for specified behavior.
+- Repository implementation and tests provide implementation evidence.
+- Reconcile the roadmap status against Git, OpenSpec, and the repository before trusting stale status from a previous session.
+- Update project status whenever the active change enters a meaningful lifecycle transition: proposed, implementing, verifying, blocked, verified, archived, or completed.
+- Record blockers and unresolved verification findings rather than hiding them.
+- After archiving a verified change, update the roadmap cursor to the next eligible objective but do not automatically begin that change unless the current orchestration request allows it.
