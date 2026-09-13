@@ -26,9 +26,12 @@
 
 ---
 
+<!-- ORCHESTRATOR_STATUS_START -->
+
 ## Project Status
 
 > This section is maintained by the root Codex orchestrator.
+>
 > It is a progress ledger, not the source of truth for specified behavior.
 
 - **Current milestone:** M0 — Preservation
@@ -52,6 +55,8 @@
 Exceptional state:
 
 `BLOCKED`
+
+<!-- ORCHESTRATOR_STATUS_END -->
 
 ---
 
