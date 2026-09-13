@@ -38,14 +38,14 @@ It is a progress ledger, not the source of truth for specified behavior.
 - **Roadmap cursor:** M0 / lock and verify legacy Python dependencies
 - **Active OpenSpec change:** `lock-legacy-python-runtime-dependencies`
 - **Lifecycle stage:** APPLY
-- **Change status:** IMPLEMENTING — 0/8 implementation tasks complete
-- **Current objective:** Apply the approved pinned legacy Python 3.9 source-runtime dependency graph and execute contained clean-environment verification on `test/legacy-python-runtime-reproducibility`.
+- **Change status:** VERIFIED — 8/8 implementation tasks complete
+- **Current objective:** Commit, push, review, and merge the verified Apply stage through its remote implementation branch and PR.
 - **Last completed change:** `document-legacy-environment` — archived as `2026-09-13-document-legacy-environment`
-- **Next eligible objective:** Apply `lock-legacy-python-runtime-dependencies`; do not begin later M0 work first.
-- **Blocking issues:** No confirmed blocker. Apply is obtaining an isolated runnable Windows x64 CPython 3.9 interpreter; failure to find a compatible fully pinned graph without source changes will block the change.
-- **Last OpenSpec validation:** PASS — `openspec validate lock-legacy-python-runtime-dependencies --strict --json` validated the active change with no issues (2026-09-13)
-- **Last implementation verification:** PASS — independent Orca verification task `task_2bd7178d0838` / dispatch `ctx_a69cf0b2617f` plus root final checks (2026-09-13); no CRITICAL or WARNING findings
-- **Last verified commit:** `2a89a7270c538c7c178151a8eb22cea295d3d91b`
+- **Next eligible objective:** Merge the verified Apply stage, then sync the `legacy-runtime-reproducibility` delta specification before archive; do not begin later M0 work first.
+- **Blocking issues:** None.
+- **Last OpenSpec validation:** PASS — `openspec validate lock-legacy-python-runtime-dependencies --strict --json` validated the active change with no issues (2026-09-14)
+- **Last implementation verification:** PASS — independent Orca verification task `task_88423198a58c` / dispatch `ctx_85555e872905` plus root final checks (2026-09-14); no CRITICAL or WARNING findings
+- **Last verified commit:** `fe8904a474af3960f999f080d0f2d2a03b55070f` plus the reviewed six-file Apply diff
 - **Last updated:** 2026-09-14
 
 ### Status values
