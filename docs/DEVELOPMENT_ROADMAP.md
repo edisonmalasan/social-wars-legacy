@@ -45,7 +45,7 @@ It is a progress ledger, not the source of truth for specified behavior.
 - **Blocking issues:** None.
 - **Last OpenSpec validation:** PASS — strict archived-change and main-spec validation passed with no issues, and `openspec doctor --json` reported a healthy root (2026-09-14)
 - **Last implementation verification:** PASS — independent Orca verification task `task_88423198a58c` / dispatch `ctx_85555e872905` plus root final checks (2026-09-14); no CRITICAL or WARNING findings
-- **Last verified commit:** `ad7863699f92f44417b14c1b9ab1112e9dcd4c47` (Spec Sync merge commit; archive diff verified separately)
+- **Last verified commit:** `be51295e1a12e4e949efab6984452de4018c9bbc` (archive commit; strict archived-change and main-spec validation PASS)
 - **Last updated:** 2026-09-14
 
 ### Status values
