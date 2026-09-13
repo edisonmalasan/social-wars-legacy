@@ -41,6 +41,10 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 
 :flashlight: [Flash Continuation](FLASH.md) documentation
 
+:bookmark_tabs: [Legacy environment baseline](docs/legacy-baseline.md)
+
+:warning: [Known legacy bugs and limitations](docs/known-legacy-bugs.md)
+
 ## On archives and accessibility to digital heritage
 
 - [Exemption to PCCPSACT](https://www.federalregister.gov/documents/2018/10/26/2018-23241/exemption-to-prohibition-on-circumvention-of-copyright-protection-systems-for-access-control), exemptions to the provision of the Digital Millennium Copyright Act (“DMCA”). 

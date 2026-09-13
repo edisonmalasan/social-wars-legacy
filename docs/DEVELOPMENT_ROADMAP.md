@@ -35,18 +35,18 @@
 > It is a progress ledger, not the source of truth for specified behavior.
 
 - **Current milestone:** M0 — Preservation
-- **Roadmap cursor:** Bootstrap / determine first bounded M0 change
+- **Roadmap cursor:** M0 / lock and verify legacy Python dependencies
 - **Active OpenSpec change:** None
-- **Lifecycle stage:** BOOTSTRAP
-- **Change status:** NOT_STARTED
-- **Current objective:** Establish the first preservation change from the roadmap and verified repository state.
-- **Last completed change:** None
-- **Next eligible objective:** Determine during OpenSpec exploration.
-- **Blocking issues:** None known
-- **Last OpenSpec validation:** Not run
-- **Last implementation verification:** Not run
-- **Last verified commit:** None
-- **Last updated:** YYYY-MM-DD
+- **Lifecycle stage:** ARCHIVED
+- **Change status:** COMPLETED
+- **Current objective:** Await the next bounded OpenSpec change for legacy Python dependency locking and clean-environment verification.
+- **Last completed change:** `document-legacy-environment` — archived as `2026-09-13-document-legacy-environment`
+- **Next eligible objective:** Lock and verify the legacy Python dependencies.
+- **Blocking issues:** None for the completed documentation change. The current host has no runnable Python interpreter, so clean-machine runtime reproduction remains explicitly unverified pending the dependency-lock change.
+- **Last OpenSpec validation:** PASS — `openspec validate --archived --strict --json` validated both archived changes (2026-09-13)
+- **Last implementation verification:** PASS — independent Orca verification task `task_2bd7178d0838` / dispatch `ctx_a69cf0b2617f` plus root final checks (2026-09-13); no CRITICAL or WARNING findings
+- **Last verified commit:** `e8c98a03c902eba70323538dc5d4eaba2f2927a1`
+- **Last updated:** 2026-09-13
 
 ### Status values
 
