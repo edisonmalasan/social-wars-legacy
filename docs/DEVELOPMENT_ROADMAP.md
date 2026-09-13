@@ -53,8 +53,6 @@ Exceptional state:
 
 `BLOCKED`
 
-<!-- ORCHESTRATOR_STATUS_END -->
-
 ---
 
 # 1. Final Strategic Direction
