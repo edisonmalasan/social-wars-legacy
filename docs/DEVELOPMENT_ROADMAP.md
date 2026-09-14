@@ -36,12 +36,12 @@ It is a progress ledger, not the source of truth for specified behavior.
 
 - **Current milestone:** M2 — Behavioral Tooling
 - **Roadmap cursor:** M2 / implement command replay
-- **Active OpenSpec change:** None
-- **Lifecycle stage:** ARCHIVED
-- **Change status:** ARCHIVED — `implement-legacy-village-state-diff` is archived as `2026-09-15-implement-legacy-village-state-diff`; Apply PR #22 merged as `dc9f960`, spec-sync PR #23 merged as `c3ddfc7`, independent Orca verification PASS with no CRITICAL or WARNING findings, and strict validation PASS
-- **Current objective:** Reconcile and propose one bounded legacy command-replay change before implementation.
+- **Active OpenSpec change:** `implement-contained-legacy-command-replay`
+- **Lifecycle stage:** PROPOSED
+- **Change status:** PROPOSED — complete planning artifacts grounded in read-only Orca exploration task `task_a115d198ea16` / dispatch `ctx_50dabb6dbe40`; strict change/all validation PASS
+- **Current objective:** Strictly validate and merge the bounded contained-command-replay proposal, then apply it on a fresh implementation branch.
 - **Last completed change:** `implement-legacy-village-state-diff` — archived as `2026-09-15-implement-legacy-village-state-diff`; last verified implementation commit `dc9f960`
-- **Next eligible objective:** Implement the smallest coherent offline legacy command-replay runner using recorded command transactions and structural state comparison; endpoint and command catalogs remain subsequent work.
+- **Next eligible objective:** Apply, independently verify, sync, and archive `implement-contained-legacy-command-replay`; endpoint and command catalogs remain subsequent work.
 - **Blocking issues:** None for command-replay exploration; authentic progressed-player saves remain unavailable and unverified, so they must not be synthesized or claimed as parity evidence.
 - **Last OpenSpec validation:** PASS — `implement-legacy-village-state-diff` and all current specs validated strictly at proposal (2026-09-14)
 - **Last implementation verification:** PASS — independent Orca verification task `task_38325d773274` / dispatch `ctx_cf9ee1f5be1f` plus root final checks (2026-09-14); no CRITICAL or WARNING findings
