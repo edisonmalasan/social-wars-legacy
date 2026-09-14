@@ -37,15 +37,15 @@ It is a progress ledger, not the source of truth for specified behavior.
 - **Current milestone:** M0 — Preservation
 - **Roadmap cursor:** M0 / build SHA-256 asset manifest
 - **Active OpenSpec change:** `build-legacy-asset-hash-manifest`
-- **Lifecycle stage:** PROPOSED
-- **Change status:** PROPOSED — planning artifacts complete, strict validation passed, 0/8 implementation tasks complete
-- **Current objective:** Review and merge the bounded legacy asset-integrity proposal through its dedicated remote branch and PR.
+- **Lifecycle stage:** IMPLEMENTING
+- **Change status:** IMPLEMENTING — proposal PR #9 merged with strict validation passing; 0/8 implementation tasks complete
+- **Current objective:** Implement the approved deterministic legacy Git-blob asset manifest and its focused verification evidence on the dedicated Apply branch.
 - **Last completed change:** `lock-legacy-python-runtime-dependencies` — archived as `2026-09-14-lock-legacy-python-runtime-dependencies`
-- **Next eligible objective:** Apply `build-legacy-asset-hash-manifest` after its proposal PR merges; do not begin canonical save fixtures or later M0 work first.
+- **Next eligible objective:** Independently verify `build-legacy-asset-hash-manifest` after root review; do not begin canonical save fixtures or later M0 work first.
 - **Blocking issues:** None.
 - **Last OpenSpec validation:** PASS — `openspec validate build-legacy-asset-hash-manifest --strict --json` reported no issues (2026-09-14)
 - **Last implementation verification:** PASS — independent Orca verification task `task_88423198a58c` / dispatch `ctx_85555e872905` plus root final checks (2026-09-14); no CRITICAL or WARNING findings
-- **Last verified commit:** `b47eba9f0a711899ff6eb1d3747634bc13541e5f` (proposal base on updated `main`)
+- **Last verified commit:** `01683c4667e34b2a41fea9f3017d643b02e5ca10` (merged proposal on `main`)
 - **Last updated:** 2026-09-14
 
 ### Status values
