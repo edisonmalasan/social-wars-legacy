@@ -36,14 +36,14 @@ It is a progress ledger, not the source of truth for specified behavior.
 
 - **Current milestone:** M1 — Protocol Discovery
 - **Roadmap cursor:** M1 / implement the legacy protocol recorder
-- **Active OpenSpec change:** None
-- **Lifecycle stage:** ARCHIVED
-- **Change status:** ARCHIVED — `capture-fresh-legacy-save-fixtures` archived as `2026-09-14-capture-fresh-legacy-save-fixtures` after Apply PR #14 and spec-sync PR #15
-- **Current objective:** Reconcile the protocol-recording boundary and propose the smallest behavior-preserving legacy request recorder change.
+- **Active OpenSpec change:** `record-legacy-command-transactions`
+- **Lifecycle stage:** PROPOSED
+- **Change status:** PROPOSED — planning artifacts complete for the bounded `command.php` transaction recorder; implementation tasks 0/7
+- **Current objective:** Review and merge the strictly validated proposal, then begin Apply only in a later turn under the OpenSpec planning boundary.
 - **Last completed change:** `capture-fresh-legacy-save-fixtures` — archived as `2026-09-14-capture-fresh-legacy-save-fixtures`
-- **Next eligible objective:** Implement the legacy protocol recorder without changing legacy behavior; authentic early-, mid-, late-game, and stress-town player-save acquisition remains a separate preservation gap.
-- **Blocking issues:** None for protocol-recorder planning; the absent authentic progressed-player corpus remains explicitly unavailable and unverified.
-- **Last OpenSpec validation:** PASS — archived change and all main specs validated strictly after sync (2026-09-14)
+- **Next eligible objective:** Apply `record-legacy-command-transactions` after its proposal PR is merged; authentic early-, mid-, late-game, and stress-town player-save acquisition remains a separate preservation gap.
+- **Blocking issues:** None for the bounded command-recorder proposal; the absent authentic progressed-player corpus remains explicitly unavailable and unverified.
+- **Last OpenSpec validation:** PASS — `record-legacy-command-transactions` validated strictly with all planning artifacts complete (2026-09-14)
 - **Last implementation verification:** PASS — independent Orca verification task `task_dbe1abe6b472` / dispatch `ctx_28247b935e42` plus root final checks (2026-09-14); no CRITICAL or WARNING findings
 - **Last verified commit:** `7dc4f937191b402e5bb51c627cb424f43fee9fc0` (merged and validated specification sync on `main`)
 - **Last updated:** 2026-09-14
