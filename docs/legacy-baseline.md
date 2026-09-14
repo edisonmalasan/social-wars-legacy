@@ -48,9 +48,15 @@ The baseline tag and full commit are the only complete identity for the archived
 alongside `Debug_1.5.4.swf` and the unversioned `SWLoader.swf`; only
 `Basesec_1.5.4.swf` is selectable in the login template
 ([`templates/login.html`](../templates/login.html#L40-L51)). `config/main.json`
-contains no application/content version field. An asset hash manifest has not
-yet been created, so filenames and the baseline commit must not be mistaken for
-per-asset integrity verification.
+contains no application/content version field. The generated
+[`legacy-manifest.json`](../legacy-manifest.json) records raw Git-blob SHA-256
+and sizes for 3,258 baseline files under the nine-extension `legacy-assets-v1`
+policy, totaling 758,423,699 bytes. See the
+[tool guide](../tools/hash-manifest/README.md) for commands actually executed on
+CPython 3.9.13, deterministic generation, independent path/sample checks, and
+limitations. This evidence excludes nonmatching extensions, mutable/canonical
+player saves, live-worktree and packaged-release bytes, runtime parity, and
+asset provenance or rights classification; filenames alone remain insufficient.
 
 ## Python and dependency evidence
 

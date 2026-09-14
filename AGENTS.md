@@ -66,9 +66,23 @@ Important:
 - The source-runtime manifest is fully pinned and verified only on Windows x64 CPython 3.9.13; see `docs/legacy-baseline.md` for interpreter provenance, two clean installs, and contained root HTTP evidence.
 - Executed package consistency check: `python -m pip --isolated check`.
 - Run startup and syntax checks in a disposable source copy to contain saves and bytecode; the verified HTTP smoke requests only `http://127.0.0.1:5055/` without a browser or Flash execution.
-- No verified automated test, lint, or type-check command exists in the current legacy baseline yet.
+- No verified automated gameplay test, lint, or type-check command exists in the current legacy baseline yet. Focused preservation-tool tests are verified separately below.
 - Do not invent commands in this file.
 - When Godot, compatibility API, Server v1, or test tooling is added, update this section with commands that were actually executed successfully.
+
+Verified preservation-tool commands (CPython 3.9.13 Windows x64 and local Git;
+`python` denotes a working selected interpreter, not the Windows Store alias):
+
+```bash
+python -B tools/hash-manifest/hash_manifest.py generate
+python -B tools/hash-manifest/hash_manifest.py verify
+python -B -m unittest discover -s tools/hash-manifest -p test_hash_manifest.py -v
+```
+
+See `tools/hash-manifest/README.md` for the explicit executable used, immutable
+Git-blob source/policy, 3,258-entry evidence, exit codes, and scope limitations.
+These commands execute no Flash or application runtime and establish no gameplay
+or canonical-save parity.
 
 ## Code style
 

@@ -43,6 +43,8 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 
 :bookmark_tabs: [Legacy environment baseline](docs/legacy-baseline.md)
 
+:bookmark_tabs: [Immutable legacy asset integrity manifest](tools/hash-manifest/README.md)
+
 :warning: [Known legacy bugs and limitations](docs/known-legacy-bugs.md)
 
 ## On archives and accessibility to digital heritage

@@ -37,15 +37,15 @@ It is a progress ledger, not the source of truth for specified behavior.
 - **Current milestone:** M0 — Preservation
 - **Roadmap cursor:** M0 / build SHA-256 asset manifest
 - **Active OpenSpec change:** `build-legacy-asset-hash-manifest`
-- **Lifecycle stage:** PROPOSED
-- **Change status:** PROPOSED — planning artifacts complete, strict validation passed, 0/8 implementation tasks complete
-- **Current objective:** Review and merge the bounded legacy asset-integrity proposal through its dedicated remote branch and PR.
+- **Lifecycle stage:** VERIFIED
+- **Change status:** VERIFIED — all 8/8 Apply tasks complete; independent Orca verification passed with no CRITICAL or WARNING findings
+- **Current objective:** Merge the verified Apply PR, then sync the approved `legacy-asset-integrity` delta and archive the bounded change.
 - **Last completed change:** `lock-legacy-python-runtime-dependencies` — archived as `2026-09-14-lock-legacy-python-runtime-dependencies`
-- **Next eligible objective:** Apply `build-legacy-asset-hash-manifest` after its proposal PR merges; do not begin canonical save fixtures or later M0 work first.
+- **Next eligible objective:** Complete spec sync and archive for `build-legacy-asset-hash-manifest`; do not begin canonical save fixtures or later M0 work first.
 - **Blocking issues:** None.
 - **Last OpenSpec validation:** PASS — `openspec validate build-legacy-asset-hash-manifest --strict --json` reported no issues (2026-09-14)
-- **Last implementation verification:** PASS — independent Orca verification task `task_88423198a58c` / dispatch `ctx_85555e872905` plus root final checks (2026-09-14); no CRITICAL or WARNING findings
-- **Last verified commit:** `b47eba9f0a711899ff6eb1d3747634bc13541e5f` (proposal base on updated `main`)
+- **Last implementation verification:** PASS — independent Orca verification task `task_840b8d19c9a5` / dispatch `ctx_02cca9dee596` plus root final checks (2026-09-14); no CRITICAL or WARNING findings
+- **Last verified commit:** `bf4cfe91455cddbbeaa54f86cc4fdc122921ac75` (verified Apply implementation branch commit)
 - **Last updated:** 2026-09-14
 
 ### Status values
