@@ -17,4 +17,4 @@
 
 ## 4. Final Verification
 
-- [ ] 4.1 Run the focused fixture tests, read-only fixture verification, `python -m pip --isolated check`, the contained `python -m compileall -q .` baseline check, strict OpenSpec validation, and the installed OpenSpec implementation verification workflow; inspect `git diff` and `git status` and report any unavailable check exactly.
+- [x] 4.1 Run the focused fixture tests, read-only fixture verification, `python -m pip --isolated check`, the contained `python -m compileall -q .` baseline check, strict OpenSpec validation, and the installed OpenSpec implementation verification workflow; inspect `git diff` and `git status` and report any unavailable check exactly.
