@@ -100,6 +100,19 @@ See `docs/legacy-command-recording.md` for the executed external-directory
 enablement setting, schema, sanitization, containment, and failure semantics.
 The focused checks use disposable saves and no Flash or listening server.
 
+Verified offline structural state-diff commands (Windows x64 CPython 3.9.13):
+
+```bash
+python -B tools/state-diff/state_diff.py compare --before tests/saves/fresh-player-pre-migration.json --after tests/saves/fresh-player.json
+python -B tools/state-diff/state_diff.py compare --before tests/saves/fresh-player.json --after tests/saves/fresh-player.json
+python -B -m unittest discover -s tools/state-diff -p test_state_diff.py -v
+```
+
+See `tools/state-diff/README.md` for the executable, explicit record mode,
+value-free report, limits, privacy and containment evidence. The comparisons
+exit `1` for the canonical `/version` difference and `0` for equality; these
+checks establish structural evidence, not gameplay parity or persistence.
+
 ---
 
 ## Code style

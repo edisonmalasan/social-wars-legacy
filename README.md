@@ -47,6 +47,8 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 
 :bookmark_tabs: [Opt-in legacy command transaction recording](docs/legacy-command-recording.md)
 
+:bookmark_tabs: [Offline legacy village structural state diff](tools/state-diff/README.md)
+
 :warning: [Known legacy bugs and limitations](docs/known-legacy-bugs.md)
 
 ## On archives and accessibility to digital heritage
