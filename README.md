@@ -45,6 +45,8 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 
 :bookmark_tabs: [Immutable legacy asset integrity manifest](tools/hash-manifest/README.md)
 
+:bookmark_tabs: [Opt-in legacy command transaction recording](docs/legacy-command-recording.md)
+
 :warning: [Known legacy bugs and limitations](docs/known-legacy-bugs.md)
 
 ## On archives and accessibility to digital heritage

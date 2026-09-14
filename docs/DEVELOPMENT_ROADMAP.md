@@ -37,15 +37,15 @@ It is a progress ledger, not the source of truth for specified behavior.
 - **Current milestone:** M1 — Protocol Discovery
 - **Roadmap cursor:** M1 / implement the legacy protocol recorder
 - **Active OpenSpec change:** `record-legacy-command-transactions`
-- **Lifecycle stage:** PROPOSED
-- **Change status:** PROPOSED — planning artifacts complete for the bounded `command.php` transaction recorder; implementation tasks 0/7
-- **Current objective:** Review and merge the strictly validated proposal, then begin Apply only in a later turn under the OpenSpec planning boundary.
+- **Lifecycle stage:** VERIFIED
+- **Change status:** VERIFIED — 7/7 tasks accepted after implementation dispatch `ctx_64fb239c97be`, root review, and independent verification dispatch `ctx_cf9ee1f5be1f`
+- **Current objective:** Merge the verified Apply stage on `feat/legacy-command-recorder`, then sync and archive the bounded change.
 - **Last completed change:** `capture-fresh-legacy-save-fixtures` — archived as `2026-09-14-capture-fresh-legacy-save-fixtures`
-- **Next eligible objective:** Apply `record-legacy-command-transactions` after its proposal PR is merged; authentic early-, mid-, late-game, and stress-town player-save acquisition remains a separate preservation gap.
-- **Blocking issues:** None for the bounded command-recorder proposal; the absent authentic progressed-player corpus remains explicitly unavailable and unverified.
-- **Last OpenSpec validation:** PASS — `record-legacy-command-transactions` validated strictly with all planning artifacts complete (2026-09-14)
-- **Last implementation verification:** PASS — independent Orca verification task `task_dbe1abe6b472` / dispatch `ctx_28247b935e42` plus root final checks (2026-09-14); no CRITICAL or WARNING findings
-- **Last verified commit:** `7dc4f937191b402e5bb51c627cb424f43fee9fc0` (merged and validated specification sync on `main`)
+- **Next eligible objective:** Complete Apply merge, spec sync, and archive for `record-legacy-command-transactions`; authentic early-, mid-, late-game, and stress-town player-save acquisition remains a separate preservation gap.
+- **Blocking issues:** None for the bounded command recorder; the absent authentic progressed-player corpus remains explicitly unavailable and unverified.
+- **Last OpenSpec validation:** PASS — `record-legacy-command-transactions` and all current specs validated strictly after implementation (2026-09-14)
+- **Last implementation verification:** PASS — independent Orca verification task `task_38325d773274` / dispatch `ctx_cf9ee1f5be1f` plus root final checks (2026-09-14); no CRITICAL or WARNING findings
+- **Last verified commit:** `8154aa16a12e489aa08b2d17ea3b93f20ac58da4` (verified Apply implementation commit; merge pending)
 - **Last updated:** 2026-09-14
 
 ### Status values
