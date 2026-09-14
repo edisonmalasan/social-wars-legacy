@@ -35,14 +35,14 @@ This section is maintained by the root Codex orchestrator.
 It is a progress ledger, not the source of truth for specified behavior.
 
 - **Current milestone:** M2 — Behavioral Tooling
-- **Roadmap cursor:** M2 / implement village state diff
-- **Active OpenSpec change:** `implement-legacy-village-state-diff`
-- **Lifecycle stage:** SYNCING
-- **Change status:** SYNCING — verified Apply PR #22 merged as `dc9f960`; independent Orca verification PASS with no CRITICAL or WARNING findings; new `legacy-village-state-diff` requirements are being synchronized to the durable main specification
-- **Current objective:** Validate and merge the specification sync PR, then archive the completed change and advance the roadmap cursor.
-- **Last completed change:** `record-legacy-command-transactions` — archived as `2026-09-14-record-legacy-command-transactions`
-- **Next eligible objective:** Apply, independently verify, sync, and archive `implement-legacy-village-state-diff`; command replay remains subsequent work, and authentic progressed-player save acquisition remains a separate preservation gap.
-- **Blocking issues:** None for village-state-diff planning; the absent authentic progressed-player corpus remains explicitly unavailable and unverified.
+- **Roadmap cursor:** M2 / implement command replay
+- **Active OpenSpec change:** None
+- **Lifecycle stage:** ARCHIVED
+- **Change status:** ARCHIVED — `implement-legacy-village-state-diff` is archived as `2026-09-15-implement-legacy-village-state-diff`; Apply PR #22 merged as `dc9f960`, spec-sync PR #23 merged as `c3ddfc7`, independent Orca verification PASS with no CRITICAL or WARNING findings, and strict validation PASS
+- **Current objective:** Reconcile and propose one bounded legacy command-replay change before implementation.
+- **Last completed change:** `implement-legacy-village-state-diff` — archived as `2026-09-15-implement-legacy-village-state-diff`; last verified implementation commit `dc9f960`
+- **Next eligible objective:** Implement the smallest coherent offline legacy command-replay runner using recorded command transactions and structural state comparison; endpoint and command catalogs remain subsequent work.
+- **Blocking issues:** None for command-replay exploration; authentic progressed-player saves remain unavailable and unverified, so they must not be synthesized or claimed as parity evidence.
 - **Last OpenSpec validation:** PASS — `implement-legacy-village-state-diff` and all current specs validated strictly at proposal (2026-09-14)
 - **Last implementation verification:** PASS — independent Orca verification task `task_38325d773274` / dispatch `ctx_cf9ee1f5be1f` plus root final checks (2026-09-14); no CRITICAL or WARNING findings
 - **Last verified commit:** `cc7626e` (merged specification sync)
