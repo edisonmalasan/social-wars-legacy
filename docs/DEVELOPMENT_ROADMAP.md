@@ -35,17 +35,17 @@ This section is maintained by the root Codex orchestrator.
 It is a progress ledger, not the source of truth for specified behavior.
 
 - **Current milestone:** M0 — Preservation
-- **Roadmap cursor:** M0 / build SHA-256 asset manifest
-- **Active OpenSpec change:** `build-legacy-asset-hash-manifest`
-- **Lifecycle stage:** VERIFIED
-- **Change status:** VERIFIED — Apply PR #10 merged; syncing the approved `legacy-asset-integrity` delta before archive
-- **Current objective:** Validate and merge the `legacy-asset-integrity` main-spec sync, then archive the bounded change.
-- **Last completed change:** `lock-legacy-python-runtime-dependencies` — archived as `2026-09-14-lock-legacy-python-runtime-dependencies`
-- **Next eligible objective:** Archive `build-legacy-asset-hash-manifest` after the spec-sync PR merges; do not begin canonical save fixtures or later M0 work first.
+- **Roadmap cursor:** M0 / create canonical save fixtures
+- **Active OpenSpec change:** None
+- **Lifecycle stage:** ARCHIVED
+- **Change status:** ARCHIVED — `build-legacy-asset-hash-manifest` completed 8/8 tasks, passed independent verification, synced its main spec, and archived as `2026-09-14-build-legacy-asset-hash-manifest`
+- **Current objective:** Stop after the completed asset-integrity change; no canonical-save work is active in this orchestration run.
+- **Last completed change:** `build-legacy-asset-hash-manifest` — archived as `2026-09-14-build-legacy-asset-hash-manifest`
+- **Next eligible objective:** Explore and propose one bounded M0 change to create canonical legacy save fixtures; do not begin it without a new orchestration request.
 - **Blocking issues:** None.
-- **Last OpenSpec validation:** PASS — `openspec validate build-legacy-asset-hash-manifest --strict --json` reported no issues (2026-09-14)
+- **Last OpenSpec validation:** PASS — active change strict validation, archived change strict validation, and main-spec strict validation completed successfully (2026-09-14)
 - **Last implementation verification:** PASS — independent Orca verification task `task_840b8d19c9a5` / dispatch `ctx_02cca9dee596` plus root final checks (2026-09-14); no CRITICAL or WARNING findings
-- **Last verified commit:** `d28daf5bf273c13d438309e02112066141e8b7fc` (merged verified Apply on `main`)
+- **Last verified commit:** `5fe76a08d1d0f5df0004855c626543eba2987509` (merged verified spec sync and archive base on `main`)
 - **Last updated:** 2026-09-14
 
 ### Status values
