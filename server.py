@@ -32,6 +32,8 @@ print (" [+] Loading server...")
 from flask import Flask, render_template, send_from_directory, request, redirect, session, send_file
 from flask.debughelpers import attach_enctype_error_multidict
 from command import command
+from legacy_command_recorder import Observation
+from sessions import session as player_state
 from engine import timestamp_now
 from version import version_name
 from bundle import ASSETS_DIR, STUB_DIR, TEMPLATES_DIR, BASE_DIR
@@ -299,21 +301,25 @@ def flash_sync_error_response():
 
 @app.route(__DYNAMIC_ROOT + "/command.php", methods=['POST'])
 def command_response():
-    USERID = request.values['USERID']
-    user_key = request.values['user_key']
-    language = request.values['language']
+    with Observation(request, player_state) as observation:
+        USERID = request.values['USERID']
+        user_key = request.values['user_key']
+        language = request.values['language']
 
-    # print(f"command: USERID: {USERID}. --", request.values)
+        # print(f"command: USERID: {USERID}. --", request.values)
 
-    data_str = request.values['data']
-    data_hash = data_str[:64]
-    assert data_str[64] == ';'
-    data_payload = data_str[65:]
-    data = json.loads(data_payload)
+        data_str = request.values['data']
+        data_hash = data_str[:64]
+        assert data_str[64] == ';'
+        data_payload = data_str[65:]
+        data = json.loads(data_payload)
 
-    command(USERID, data)
-    
-    return ({"result": "success"}, 200)
+        observation.executing(USERID, data)
+        command(USERID, data)
+
+        response = ({"result": "success"}, 200)
+        observation.completed(response)
+        return response
 
 # Used by Player's World and Alliance buttons
 # I added this so the error message stops appearing

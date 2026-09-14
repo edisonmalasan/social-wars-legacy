@@ -90,6 +90,16 @@ Git-blob source/policy, 3,258-entry evidence, exit codes, and scope limitations.
 These commands execute no Flash or application runtime and establish no gameplay
 or canonical-save parity.
 
+Verified opt-in command-recorder check (Windows x64 CPython 3.9.13):
+
+```bash
+python -B -m unittest discover -s tests -p test_legacy_command_recorder.py -v
+```
+
+See `docs/legacy-command-recording.md` for the executed external-directory
+enablement setting, schema, sanitization, containment, and failure semantics.
+The focused checks use disposable saves and no Flash or listening server.
+
 ---
 
 ## Code style
