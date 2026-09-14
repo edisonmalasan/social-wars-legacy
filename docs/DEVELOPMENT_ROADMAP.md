@@ -37,9 +37,9 @@ It is a progress ledger, not the source of truth for specified behavior.
 - **Current milestone:** M2 — Behavioral Tooling
 - **Roadmap cursor:** M2 / implement village state diff
 - **Active OpenSpec change:** `implement-legacy-village-state-diff`
-- **Lifecycle stage:** VERIFIED
-- **Change status:** VERIFIED — implementation dispatch `ctx_8449f1f12494` completed; root review task `task_1de14e09aeb5` accepted the diff; independent verification task `task_62321889d463` / dispatch `ctx_fe468868e688` returned PASS with no CRITICAL or WARNING findings; strict change/all/spec validation PASS
-- **Current objective:** Commit and merge the verified Apply PR, then sync the new capability specification and archive the change on fresh stage branches.
+- **Lifecycle stage:** SYNCING
+- **Change status:** SYNCING — verified Apply PR #22 merged as `dc9f960`; independent Orca verification PASS with no CRITICAL or WARNING findings; new `legacy-village-state-diff` requirements are being synchronized to the durable main specification
+- **Current objective:** Validate and merge the specification sync PR, then archive the completed change and advance the roadmap cursor.
 - **Last completed change:** `record-legacy-command-transactions` — archived as `2026-09-14-record-legacy-command-transactions`
 - **Next eligible objective:** Apply, independently verify, sync, and archive `implement-legacy-village-state-diff`; command replay remains subsequent work, and authentic progressed-player save acquisition remains a separate preservation gap.
 - **Blocking issues:** None for village-state-diff planning; the absent authentic progressed-player corpus remains explicitly unavailable and unverified.
