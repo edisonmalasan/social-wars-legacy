@@ -34,18 +34,18 @@ This section is maintained by the root Codex orchestrator.
 
 It is a progress ledger, not the source of truth for specified behavior.
 
-- **Current milestone:** M0 — Preservation
-- **Roadmap cursor:** M0 / create canonical save fixtures
-- **Active OpenSpec change:** `capture-fresh-legacy-save-fixtures`
-- **Lifecycle stage:** VERIFIED
-- **Change status:** VERIFIED — Apply merged as PR #14 (`9401e5ba2844b169294dbdd47cf7a4bbde023ae4`); specification sync is in progress
-- **Current objective:** Sync the accepted `legacy-save-fixtures` capability into the main specs, then archive the bounded change.
-- **Last completed change:** `build-legacy-asset-hash-manifest` — archived as `2026-09-14-build-legacy-asset-hash-manifest`
-- **Next eligible objective:** Complete spec sync and archive for `capture-fresh-legacy-save-fixtures`; authentic early-, mid-, late-game, and stress-town save capture remains unavailable and is not part of this bounded slice.
-- **Blocking issues:** None for the bounded fresh-save slice; the absent authentic progressed-player corpus remains an explicit later preservation gap.
-- **Last OpenSpec validation:** PASS — `capture-fresh-legacy-save-fixtures` strict validation completed successfully (2026-09-14)
+- **Current milestone:** M1 — Protocol Discovery
+- **Roadmap cursor:** M1 / implement the legacy protocol recorder
+- **Active OpenSpec change:** None
+- **Lifecycle stage:** ARCHIVED
+- **Change status:** ARCHIVED — `capture-fresh-legacy-save-fixtures` archived as `2026-09-14-capture-fresh-legacy-save-fixtures` after Apply PR #14 and spec-sync PR #15
+- **Current objective:** Reconcile the protocol-recording boundary and propose the smallest behavior-preserving legacy request recorder change.
+- **Last completed change:** `capture-fresh-legacy-save-fixtures` — archived as `2026-09-14-capture-fresh-legacy-save-fixtures`
+- **Next eligible objective:** Implement the legacy protocol recorder without changing legacy behavior; authentic early-, mid-, late-game, and stress-town player-save acquisition remains a separate preservation gap.
+- **Blocking issues:** None for protocol-recorder planning; the absent authentic progressed-player corpus remains explicitly unavailable and unverified.
+- **Last OpenSpec validation:** PASS — archived change and all main specs validated strictly after sync (2026-09-14)
 - **Last implementation verification:** PASS — independent Orca verification task `task_dbe1abe6b472` / dispatch `ctx_28247b935e42` plus root final checks (2026-09-14); no CRITICAL or WARNING findings
-- **Last verified commit:** `9401e5ba2844b169294dbdd47cf7a4bbde023ae4` (merged verified Apply on `main`)
+- **Last verified commit:** `7dc4f937191b402e5bb51c627cb424f43fee9fc0` (merged and validated specification sync on `main`)
 - **Last updated:** 2026-09-14
 
 ### Status values
