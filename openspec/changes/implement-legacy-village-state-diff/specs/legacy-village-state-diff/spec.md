@@ -66,4 +66,3 @@ The command SHALL reject invalid UTF-8, malformed JSON, duplicate object keys, n
 #### Scenario: Preserve all supplied evidence
 - **WHEN** comparison succeeds or fails
 - **THEN** every supplied input and repository file retains its original bytes and no runtime save, cache, temporary report, or bytecode file is created by the documented invocation
-
