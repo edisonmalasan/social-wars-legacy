@@ -1,0 +1,200 @@
+{
+  "algorithm": "sha256",
+  "baseline_commit": "e8c98a03c902eba70323538dc5d4eaba2f2927a1",
+  "classification": "controlled repository behavior; not historical player observations",
+  "controlled_inputs": {
+    "timestamp": 1700000000,
+    "uuid": "00000000-0000-4000-8000-000000000001"
+  },
+  "coverage": {
+    "early_game": "unavailable/unverified",
+    "fresh_player": "verified controlled canonical input",
+    "late_game": "unavailable/unverified",
+    "mid_game": "unavailable/unverified",
+    "migration_boundary": "verified complete controlled before/after states",
+    "static_neighbors": "non-player static content; not progression substitutes",
+    "stress_town": "unavailable/unverified"
+  },
+  "fixtures": [
+    {
+      "baseline_commit": "e8c98a03c902eba70323538dc5d4eaba2f2927a1",
+      "classification": "controlled canonical test input",
+      "controlled_inputs": {
+        "timestamp": 1700000000,
+        "uuid": "00000000-0000-4000-8000-000000000001"
+      },
+      "path": "tests/saves/fresh-player-pre-migration.json",
+      "role": "pre-migration input",
+      "sha256": "0b92be3ead3f01374dca383781095903ba7ca8171a6ad6b9576750c873a1498e",
+      "size": 15625,
+      "source_blob_ids": {
+        "bundle.py": "f065b2424fd324f39350477b95ba4a7d4ae631ff",
+        "config/auctionhouse.json": "d60f10585be8f394eb00835ab3a4f0845701bb3e",
+        "config/get_game_config.php_23july2012.txt": "8af1e3198c73875414276a624fbf5a154fa042f0",
+        "config/get_game_config.php_29august2012.txt": "72f2f1c70bfbeac3c77f4275b8c1dc6db3d94337",
+        "config/get_game_config.php_29august2012_nohash.json": "92f94a5987883867e1f5cedd6207583bc9c49dc6",
+        "config/get_game_config.php_29august2012_nohash.txt": "9363c3ae8ffa51bb51ab74085f82da90945da815",
+        "config/main.json": "92f94a5987883867e1f5cedd6207583bc9c49dc6",
+        "config/patch/atom_fusion_item.json": "c2cdc1ba26c977b6356952bfaaf3089373cb0aa1",
+        "config/patch/atom_fusion_items_data.json": "796a691a70c688174aaf09f1b50a6a1dca6b909b",
+        "config/patch/atom_fusion_powerup.json": "58bd84181b5a8bce9ec672cbee703330118c8c99",
+        "config/patch/patches.txt": "394d5826fc8797cc40b6fd76f7cb97c1c6b213e3",
+        "config/patch/targets.json": "54cccf233f770cd0e59553e2b771efbe90a2ab78",
+        "config/patch/unit_patch.json": "d06d3eb3305d7ad13b4df6687ed262dbd48f6155",
+        "constants.py": "31c1fd21af7c1741925644f866bb531ede09764c",
+        "engine.py": "b6aa0983e6fe8971bd8b7411f605154825314f13",
+        "get_game_config.py": "b5a6a7b59ad558fd41482816893c3dedcafb272a",
+        "mods/mods.txt": "836e4eacdfbce5898b97adbec70881113e5a0b85",
+        "mods/no_hiring_needed.json": "c29b473e135796e51e727d21ba10f858a858f8f2",
+        "sessions.py": "dc55f1c46bfb1628e46c752631c116d29d10ba21",
+        "version.py": "657d7f3d2e78c21029a7ed3d0dbe8b85ce65cd8e",
+        "villages/initial.json": "e29ed0ffe76d0d03787b253608178a5ddcfb21ba"
+      }
+    },
+    {
+      "baseline_commit": "e8c98a03c902eba70323538dc5d4eaba2f2927a1",
+      "classification": "controlled canonical test input",
+      "controlled_inputs": {
+        "timestamp": 1700000000,
+        "uuid": "00000000-0000-4000-8000-000000000001"
+      },
+      "path": "tests/saves/fresh-player.json",
+      "role": "persisted fresh-player/post-migration output",
+      "sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+      "size": 15628,
+      "source_blob_ids": {
+        "bundle.py": "f065b2424fd324f39350477b95ba4a7d4ae631ff",
+        "config/auctionhouse.json": "d60f10585be8f394eb00835ab3a4f0845701bb3e",
+        "config/get_game_config.php_23july2012.txt": "8af1e3198c73875414276a624fbf5a154fa042f0",
+        "config/get_game_config.php_29august2012.txt": "72f2f1c70bfbeac3c77f4275b8c1dc6db3d94337",
+        "config/get_game_config.php_29august2012_nohash.json": "92f94a5987883867e1f5cedd6207583bc9c49dc6",
+        "config/get_game_config.php_29august2012_nohash.txt": "9363c3ae8ffa51bb51ab74085f82da90945da815",
+        "config/main.json": "92f94a5987883867e1f5cedd6207583bc9c49dc6",
+        "config/patch/atom_fusion_item.json": "c2cdc1ba26c977b6356952bfaaf3089373cb0aa1",
+        "config/patch/atom_fusion_items_data.json": "796a691a70c688174aaf09f1b50a6a1dca6b909b",
+        "config/patch/atom_fusion_powerup.json": "58bd84181b5a8bce9ec672cbee703330118c8c99",
+        "config/patch/patches.txt": "394d5826fc8797cc40b6fd76f7cb97c1c6b213e3",
+        "config/patch/targets.json": "54cccf233f770cd0e59553e2b771efbe90a2ab78",
+        "config/patch/unit_patch.json": "d06d3eb3305d7ad13b4df6687ed262dbd48f6155",
+        "constants.py": "31c1fd21af7c1741925644f866bb531ede09764c",
+        "engine.py": "b6aa0983e6fe8971bd8b7411f605154825314f13",
+        "get_game_config.py": "b5a6a7b59ad558fd41482816893c3dedcafb272a",
+        "mods/mods.txt": "836e4eacdfbce5898b97adbec70881113e5a0b85",
+        "mods/no_hiring_needed.json": "c29b473e135796e51e727d21ba10f858a858f8f2",
+        "sessions.py": "dc55f1c46bfb1628e46c752631c116d29d10ba21",
+        "version.py": "657d7f3d2e78c21029a7ed3d0dbe8b85ce65cd8e",
+        "villages/initial.json": "e29ed0ffe76d0d03787b253608178a5ddcfb21ba"
+      }
+    }
+  ],
+  "schema_version": 1,
+  "serialization": "Windows ASCII JSON, CRLF, indent=4, insertion order, no final newline; persisted bytes unchanged",
+  "source_comparison": "Git blob bytes, permitting only CRLF/LF checkout conversion",
+  "sources": {
+    "bundle.py": {
+      "git_blob": "f065b2424fd324f39350477b95ba4a7d4ae631ff",
+      "sha256": "76ce0c9b5cf469d4a1bb34617d00a891989f9b82a2460126e14659855b9a3301",
+      "size": 751
+    },
+    "config/auctionhouse.json": {
+      "git_blob": "d60f10585be8f394eb00835ab3a4f0845701bb3e",
+      "sha256": "a8dc79616f5effe4e3eb4d56ab532a14e7eff32056e18438df88fd8781f6498e",
+      "size": 436
+    },
+    "config/get_game_config.php_23july2012.txt": {
+      "git_blob": "8af1e3198c73875414276a624fbf5a154fa042f0",
+      "sha256": "924fc56f13199d9622444e8e1f16e6f6d19e3f378ed8545f98e2b4a76d98dd00",
+      "size": 930791
+    },
+    "config/get_game_config.php_29august2012.txt": {
+      "git_blob": "72f2f1c70bfbeac3c77f4275b8c1dc6db3d94337",
+      "sha256": "a31a49c31df07f91f0b5e7dde9c07452029cb3db4f53ac8e9b454aef05417eda",
+      "size": 945531
+    },
+    "config/get_game_config.php_29august2012_nohash.json": {
+      "git_blob": "92f94a5987883867e1f5cedd6207583bc9c49dc6",
+      "sha256": "e6dc61619e81c52404cafb5b1db6fa9616cd55440721e77d73c57e5319196245",
+      "size": 1651617
+    },
+    "config/get_game_config.php_29august2012_nohash.txt": {
+      "git_blob": "9363c3ae8ffa51bb51ab74085f82da90945da815",
+      "sha256": "890a94d2615eb79f82a45bb1a684b75e13dc8456811bb5582937691176840e9e",
+      "size": 945466
+    },
+    "config/main.json": {
+      "git_blob": "92f94a5987883867e1f5cedd6207583bc9c49dc6",
+      "sha256": "e6dc61619e81c52404cafb5b1db6fa9616cd55440721e77d73c57e5319196245",
+      "size": 1651617
+    },
+    "config/patch/atom_fusion_item.json": {
+      "git_blob": "c2cdc1ba26c977b6356952bfaaf3089373cb0aa1",
+      "sha256": "a1feb119ecb3f542184a17c53d7ca3552531aca69f2f5a101115eab3f3e1490a",
+      "size": 1357
+    },
+    "config/patch/atom_fusion_items_data.json": {
+      "git_blob": "796a691a70c688174aaf09f1b50a6a1dca6b909b",
+      "sha256": "4fe18367d94178323d60eb0c4a0c2f37edfbed8562eb1f2823c8644bfa7c07cc",
+      "size": 42202
+    },
+    "config/patch/atom_fusion_powerup.json": {
+      "git_blob": "58bd84181b5a8bce9ec672cbee703330118c8c99",
+      "sha256": "d72c2b0b51f8b74d7fb18c262fe16c21a45ef565e9311010dfdb9b8d37ed033e",
+      "size": 711
+    },
+    "config/patch/patches.txt": {
+      "git_blob": "394d5826fc8797cc40b6fd76f7cb97c1c6b213e3",
+      "sha256": "a168193672d8e599dc7bd1f66b78baf9454a1f610b65e6a13890bc7f536bb720",
+      "size": 260
+    },
+    "config/patch/targets.json": {
+      "git_blob": "54cccf233f770cd0e59553e2b771efbe90a2ab78",
+      "sha256": "416f38b19a26cb407aa6013bf88c0fb8473c28ef48859b7a29e56cab34beb053",
+      "size": 4815
+    },
+    "config/patch/unit_patch.json": {
+      "git_blob": "d06d3eb3305d7ad13b4df6687ed262dbd48f6155",
+      "sha256": "229fc18d2dcd67aba95fd24aa7eaf1180704e5bf02718b252317972843940230",
+      "size": 150222
+    },
+    "constants.py": {
+      "git_blob": "31c1fd21af7c1741925644f866bb531ede09764c",
+      "sha256": "fd7bb0b5e5170311818ef5775c60e79ab26bcc1da955f3f91c1009a0b5c3af96",
+      "size": 37327
+    },
+    "engine.py": {
+      "git_blob": "b6aa0983e6fe8971bd8b7411f605154825314f13",
+      "sha256": "0c69c86ce8971d44b6f85039c103c4a0b74c9e80a83ff9df42a2a1bd21de5f4d",
+      "size": 8730
+    },
+    "get_game_config.py": {
+      "git_blob": "b5a6a7b59ad558fd41482816893c3dedcafb272a",
+      "sha256": "fd7dc02e84f92f42e97d4b04579c7073e54f467474d077d1d00090d001bfa29c",
+      "size": 10408
+    },
+    "mods/mods.txt": {
+      "git_blob": "836e4eacdfbce5898b97adbec70881113e5a0b85",
+      "sha256": "61e15220349a5b69d5fac3a0cab3206494888de981f51f931740ed01cea71e62",
+      "size": 423
+    },
+    "mods/no_hiring_needed.json": {
+      "git_blob": "c29b473e135796e51e727d21ba10f858a858f8f2",
+      "sha256": "916aeb76c494ff518ccc6181e8f18887bae63c44dea35ded81b368832e5e88bf",
+      "size": 4621
+    },
+    "sessions.py": {
+      "git_blob": "dc55f1c46bfb1628e46c752631c116d29d10ba21",
+      "sha256": "a820f534aea14ab1e1bc97f178ac15f5bb6a55dc8c4f7da25ed4d9516f5c7d64",
+      "size": 8006
+    },
+    "version.py": {
+      "git_blob": "657d7f3d2e78c21029a7ed3d0dbe8b85ce65cd8e",
+      "sha256": "a1eb433918a14c1bf80709a0bf3987e47b5595f353b168cf9baa32474958467b",
+      "size": 1648
+    },
+    "villages/initial.json": {
+      "git_blob": "e29ed0ffe76d0d03787b253608178a5ddcfb21ba",
+      "sha256": "3e64da21ed9a002369ca006212b65f83454b7de5c208f0e735db47a55bcd1206",
+      "size": 7774
+    }
+  }
+}
