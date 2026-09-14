@@ -37,15 +37,15 @@ It is a progress ledger, not the source of truth for specified behavior.
 - **Current milestone:** M0 — Preservation
 - **Roadmap cursor:** M0 / build SHA-256 asset manifest
 - **Active OpenSpec change:** `build-legacy-asset-hash-manifest`
-- **Lifecycle stage:** VERIFYING
-- **Change status:** VERIFYING — root review accepted implementation tasks 1.1–4.1; 7/8 tasks complete pending independent verification and final acceptance
-- **Current objective:** Independently verify the deterministic legacy Git-blob asset manifest against the approved OpenSpec change and repository evidence.
+- **Lifecycle stage:** VERIFIED
+- **Change status:** VERIFIED — all 8/8 Apply tasks complete; independent Orca verification passed with no CRITICAL or WARNING findings
+- **Current objective:** Merge the verified Apply PR, then sync the approved `legacy-asset-integrity` delta and archive the bounded change.
 - **Last completed change:** `lock-legacy-python-runtime-dependencies` — archived as `2026-09-14-lock-legacy-python-runtime-dependencies`
-- **Next eligible objective:** Complete Apply acceptance, spec sync, and archive for `build-legacy-asset-hash-manifest`; do not begin canonical save fixtures or later M0 work first.
+- **Next eligible objective:** Complete spec sync and archive for `build-legacy-asset-hash-manifest`; do not begin canonical save fixtures or later M0 work first.
 - **Blocking issues:** None.
 - **Last OpenSpec validation:** PASS — `openspec validate build-legacy-asset-hash-manifest --strict --json` reported no issues (2026-09-14)
-- **Last implementation verification:** PASS — independent Orca verification task `task_88423198a58c` / dispatch `ctx_85555e872905` plus root final checks (2026-09-14); no CRITICAL or WARNING findings
-- **Last verified commit:** `01683c4667e34b2a41fea9f3017d643b02e5ca10` (merged proposal on `main`)
+- **Last implementation verification:** PASS — independent Orca verification task `task_840b8d19c9a5` / dispatch `ctx_02cca9dee596` plus root final checks (2026-09-14); no CRITICAL or WARNING findings
+- **Last verified commit:** `bf4cfe91455cddbbeaa54f86cc4fdc122921ac75` (verified Apply implementation branch commit)
 - **Last updated:** 2026-09-14
 
 ### Status values
