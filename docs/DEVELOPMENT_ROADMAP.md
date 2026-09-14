@@ -38,14 +38,14 @@ It is a progress ledger, not the source of truth for specified behavior.
 - **Roadmap cursor:** M0 / create canonical save fixtures
 - **Active OpenSpec change:** `capture-fresh-legacy-save-fixtures`
 - **Lifecycle stage:** VERIFIED
-- **Change status:** VERIFIED — 9/9 tasks accepted after Orca implementation dispatch `ctx_dc642cdf120e`, root review, and independent verification dispatch `ctx_28247b935e42`
-- **Current objective:** Merge the verified Apply stage on `test/fresh-legacy-save-fixtures`, then sync and archive the bounded change.
+- **Change status:** VERIFIED — Apply merged as PR #14 (`9401e5ba2844b169294dbdd47cf7a4bbde023ae4`); specification sync is in progress
+- **Current objective:** Sync the accepted `legacy-save-fixtures` capability into the main specs, then archive the bounded change.
 - **Last completed change:** `build-legacy-asset-hash-manifest` — archived as `2026-09-14-build-legacy-asset-hash-manifest`
-- **Next eligible objective:** Complete Apply merge, spec sync, and archive for `capture-fresh-legacy-save-fixtures`; authentic early-, mid-, late-game, and stress-town save capture remains unavailable and is not part of this bounded slice.
+- **Next eligible objective:** Complete spec sync and archive for `capture-fresh-legacy-save-fixtures`; authentic early-, mid-, late-game, and stress-town save capture remains unavailable and is not part of this bounded slice.
 - **Blocking issues:** None for the bounded fresh-save slice; the absent authentic progressed-player corpus remains an explicit later preservation gap.
 - **Last OpenSpec validation:** PASS — `capture-fresh-legacy-save-fixtures` strict validation completed successfully (2026-09-14)
 - **Last implementation verification:** PASS — independent Orca verification task `task_dbe1abe6b472` / dispatch `ctx_28247b935e42` plus root final checks (2026-09-14); no CRITICAL or WARNING findings
-- **Last verified commit:** `6ab558cc2e2166a4bd7274615bde72710c4f840a` (verified Apply implementation commit; merge pending)
+- **Last verified commit:** `9401e5ba2844b169294dbdd47cf7a4bbde023ae4` (merged verified Apply on `main`)
 - **Last updated:** 2026-09-14
 
 ### Status values
