@@ -173,8 +173,10 @@ timestamps, migrates the save to `0.02a`, and writes
 Existing `saves/` JSON files are loaded at startup and again on `GET /`. Invalid
 or corrupt saves are skipped; recognized 0.01a saves receive the migrations in
 [`version.py`](../version.py#L8-L49) and are rewritten as 0.02a. This describes
-the code path only; representative canonical save fixtures and runtime migration
-verification do not yet exist.
+the legacy code path. [Controlled fresh-player fixtures and full-state migration
+verification](../tools/save-fixtures/README.md) now capture that bounded path;
+authentic early-, mid-, late-game, and stress-town player saves remain unavailable
+and unverified. Static neighbor and quest content is not player-save history.
 
 ## Configuration, patches, and mods
 

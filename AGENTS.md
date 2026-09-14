@@ -8,6 +8,8 @@ The existing Flask/Flash implementation is the reference implementation, behavio
 
 Do not treat the legacy repository as disposable code.
 
+---
+
 ## Stack
 
 - Legacy server: Python + Flask
@@ -19,6 +21,8 @@ Do not treat the legacy repository as disposable code.
 - Target database: PostgreSQL
 - Specification workflow: OpenSpec
 - Optional later infrastructure: Redis / WebSockets only when justified
+
+---
 
 ## Architecture rules
 
@@ -40,6 +44,8 @@ buy_building(player_id, building_id, x, y)
 # Bad: client dictates authoritative outcome.
 apply_client_state(coins=999999, xp=5000)
 ```
+
+---
 
 ## Setup & commands
 
@@ -84,6 +90,8 @@ Git-blob source/policy, 3,258-entry evidence, exit codes, and scope limitations.
 These commands execute no Flash or application runtime and establish no gameplay
 or canonical-save parity.
 
+---
+
 ## Code style
 
 - Prefer small domain modules over another giant dispatcher like `command.py`.
@@ -95,6 +103,8 @@ or canonical-save parity.
 - Python imports: use consistent absolute package imports in new application packages.
 - GDScript: keep scenes/components focused; do not create a giant global `GameManager`.
 - Limit Godot autoloads to cross-cutting services such as `GameApi`, `Session`, `ContentRegistry`, `GameClock`, `Settings`, and `AudioManager`.
+
+---
 
 ## Testing
 
@@ -108,6 +118,8 @@ or canonical-save parity.
 - If a required check cannot be run, report exactly why.
 - Never convert “code compiles” into “tests pass.”
 
+---
+
 ## Boundaries — do not touch
 
 - Never delete original SWFs, saves, configs, images, sounds, XML, or other preservation material merely because a replacement exists.
@@ -118,6 +130,8 @@ or canonical-save parity.
 - Never hardcode production secrets.
 - Never package Flash Player, Ruffle, ActionScript runtimes, or runtime-required SWFs into the final modern client.
 - Do not modify legacy behavior merely to make modern implementation easier; document and reproduce it first.
+
+---
 
 ## Change scope
 
@@ -130,6 +144,8 @@ or canonical-save parity.
 - Preserve existing behavior unless the task or approved spec explicitly changes it.
 - Do not rebalance gameplay during parity work.
 - Prefer one migration domain/vertical slice at a time.
+
+---
 
 ## Migration order
 
@@ -160,6 +176,8 @@ Unless an approved OpenSpec change intentionally requires otherwise:
     Special / Event Systems
 
 The first major target is a real town rendered in Godot without executing Flash, not PostgreSQL or infrastructure modernization.
+
+---
 
 ## Git / PR workflow 
  
@@ -407,6 +425,8 @@ For one OpenSpec change, the normal flow is:
 - Never merge a PR with failing required checks unless explicitly authorized. 
 - Never claim a branch was pushed, a PR was opened, or a merge occurred unless it actually happened.
 
+---
+
 ## Source of truth
 
 When deciding what the project should do, use this order:
@@ -424,6 +444,8 @@ When sources conflict, investigate the conflict. Do not silently invent a resolu
 
 For preservation parity, observed legacy behavior is evidence; an accidental modern implementation difference is not automatically an improvement.
 
+---
+
 ## Existing / brownfield project rules
 
 Before modifying an existing capability:
@@ -437,6 +459,8 @@ Before modifying an existing capability:
 - Do not assume undocumented means unused.
 - Do not rewrite working legacy systems merely because they are unfamiliar.
 - Classify obscure systems explicitly as implemented, parity-verified, retired, or out-of-scope.
+
+---
 
 ## Spec-driven development — OpenSpec
 
@@ -469,6 +493,8 @@ Use exploration for investigation only; it is not permission to implement.
 
 OpenSpec owns feature requirements and change artifacts. This file owns durable repository-wide engineering rules.
 
+---
+
 ## Reconstruction workflow
 
 For each migrated feature:
@@ -485,6 +511,8 @@ For each migrated feature:
     10. Inspect diff and report checks actually run.
 
 Do not mark a legacy feature replaced until parity has been verified or an approved spec explicitly changes its behavior.
+
+---
 
 ## Orchestration mode
 

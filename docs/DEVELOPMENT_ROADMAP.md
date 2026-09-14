@@ -37,15 +37,15 @@ It is a progress ledger, not the source of truth for specified behavior.
 - **Current milestone:** M0 — Preservation
 - **Roadmap cursor:** M0 / create canonical save fixtures
 - **Active OpenSpec change:** `capture-fresh-legacy-save-fixtures`
-- **Lifecycle stage:** PROPOSED
-- **Change status:** PROPOSED — planning artifacts complete, 0/9 implementation tasks; strict validation passes
-- **Current objective:** Merge the bounded fresh-player and migration-boundary fixture proposal, then begin Apply on a fresh implementation branch.
+- **Lifecycle stage:** VERIFIED
+- **Change status:** VERIFIED — 9/9 tasks accepted after Orca implementation dispatch `ctx_dc642cdf120e`, root review, and independent verification dispatch `ctx_28247b935e42`
+- **Current objective:** Merge the verified Apply stage on `test/fresh-legacy-save-fixtures`, then sync and archive the bounded change.
 - **Last completed change:** `build-legacy-asset-hash-manifest` — archived as `2026-09-14-build-legacy-asset-hash-manifest`
-- **Next eligible objective:** Apply `capture-fresh-legacy-save-fixtures` after its proposal PR is merged; authentic early-, mid-, late-game, and stress-town save capture remains unavailable and is not part of this bounded slice.
+- **Next eligible objective:** Complete Apply merge, spec sync, and archive for `capture-fresh-legacy-save-fixtures`; authentic early-, mid-, late-game, and stress-town save capture remains unavailable and is not part of this bounded slice.
 - **Blocking issues:** None for the bounded fresh-save slice; the absent authentic progressed-player corpus remains an explicit later preservation gap.
 - **Last OpenSpec validation:** PASS — `capture-fresh-legacy-save-fixtures` strict validation completed successfully (2026-09-14)
-- **Last implementation verification:** PASS — independent Orca verification task `task_840b8d19c9a5` / dispatch `ctx_02cca9dee596` plus root final checks (2026-09-14); no CRITICAL or WARNING findings
-- **Last verified commit:** `700b244932c4c9f0a791f04d2c57ff241a6d8eb8` (proposal base on updated `main`)
+- **Last implementation verification:** PASS — independent Orca verification task `task_dbe1abe6b472` / dispatch `ctx_28247b935e42` plus root final checks (2026-09-14); no CRITICAL or WARNING findings
+- **Last verified commit:** `6ab558cc2e2166a4bd7274615bde72710c4f840a` (verified Apply implementation commit; merge pending)
 - **Last updated:** 2026-09-14
 
 ### Status values

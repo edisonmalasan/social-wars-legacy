@@ -1,1 +1,4 @@
 /legacy-manifest.json text eol=lf
+/tests/saves/fresh-player-pre-migration.json -text whitespace=cr-at-eol
+/tests/saves/fresh-player.json -text whitespace=cr-at-eol
+/tests/saves/manifest.json text eol=lf
