@@ -113,6 +113,19 @@ value-free report, limits, privacy and containment evidence. The comparisons
 exit `1` for the canonical `/version` difference and `0` for equality; these
 checks establish structural evidence, not gameplay parity or persistence.
 
+Verified contained legacy command-replay check (Windows x64 CPython 3.9.13,
+installed pinned source-runtime packages, and local Git baseline objects):
+
+```bash
+python -B -m unittest discover -s tools/protocol-replay -p test_protocol_replay.py -v
+```
+
+See `tools/protocol-replay/README.md` for the executable, four-command
+recorder-v1 eligibility, immutable oracle closure, isolated disposable child,
+private value-free report, limits, persistence meaning, and containment evidence.
+These are controlled replay checks without server, network, browser, or Flash
+execution; they establish no authentic progressed-player or gameplay parity.
+
 ---
 
 ## Code style

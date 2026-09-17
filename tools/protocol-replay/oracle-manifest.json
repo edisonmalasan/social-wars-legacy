@@ -1,0 +1,70 @@
+{
+  "baseline": "e8c98a03c902eba70323538dc5d4eaba2f2927a1",
+  "files": {
+    "bundle.py": {
+      "blob": "f065b2424fd324f39350477b95ba4a7d4ae631ff",
+      "size": 751
+    },
+    "command.py": {
+      "blob": "9c535e0100be0a51b0998617cd5d7e315dae82a9",
+      "size": 30238
+    },
+    "config/main.json": {
+      "blob": "92f94a5987883867e1f5cedd6207583bc9c49dc6",
+      "size": 1651617
+    },
+    "config/patch/atom_fusion_item.json": {
+      "blob": "c2cdc1ba26c977b6356952bfaaf3089373cb0aa1",
+      "size": 1357
+    },
+    "config/patch/atom_fusion_items_data.json": {
+      "blob": "796a691a70c688174aaf09f1b50a6a1dca6b909b",
+      "size": 42202
+    },
+    "config/patch/atom_fusion_powerup.json": {
+      "blob": "58bd84181b5a8bce9ec672cbee703330118c8c99",
+      "size": 711
+    },
+    "config/patch/patches.txt": {
+      "blob": "394d5826fc8797cc40b6fd76f7cb97c1c6b213e3",
+      "size": 260
+    },
+    "config/patch/targets.json": {
+      "blob": "54cccf233f770cd0e59553e2b771efbe90a2ab78",
+      "size": 4815
+    },
+    "config/patch/unit_patch.json": {
+      "blob": "d06d3eb3305d7ad13b4df6687ed262dbd48f6155",
+      "size": 150222
+    },
+    "constants.py": {
+      "blob": "31c1fd21af7c1741925644f866bb531ede09764c",
+      "size": 37327
+    },
+    "engine.py": {
+      "blob": "b6aa0983e6fe8971bd8b7411f605154825314f13",
+      "size": 8730
+    },
+    "get_game_config.py": {
+      "blob": "b5a6a7b59ad558fd41482816893c3dedcafb272a",
+      "size": 10408
+    },
+    "mods/mods.txt": {
+      "blob": "836e4eacdfbce5898b97adbec70881113e5a0b85",
+      "size": 423
+    },
+    "sessions.py": {
+      "blob": "dc55f1c46bfb1628e46c752631c116d29d10ba21",
+      "size": 8006
+    },
+    "version.py": {
+      "blob": "657d7f3d2e78c21029a7ed3d0dbe8b85ce65cd8e",
+      "size": 1648
+    },
+    "villages/initial.json": {
+      "blob": "e29ed0ffe76d0d03787b253608178a5ddcfb21ba",
+      "size": 7774
+    }
+  },
+  "schema_version": 1
+}
