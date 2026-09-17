@@ -42,7 +42,7 @@ The implementation must distinguish these 15 explicit registrations, one implici
 
 ### New Capabilities
 
-- `legacy-endpoint-catalog`: Source-grounded, evidence-labeled inventory of legacy routes with deterministic offline consistency verification.
+- `endpoint-inventory`: Source-grounded, evidence-labeled inventory of legacy routes with deterministic offline consistency verification.
 
 ### Modified Capabilities
 
