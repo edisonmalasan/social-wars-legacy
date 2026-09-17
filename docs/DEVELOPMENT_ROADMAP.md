@@ -37,16 +37,16 @@ It is a progress ledger, not the source of truth for specified behavior.
 - **Current milestone:** M2 — Behavioral Tooling
 - **Roadmap cursor:** M2 / implement command replay
 - **Active OpenSpec change:** `implement-contained-legacy-command-replay`
-- **Lifecycle stage:** PROPOSED
-- **Change status:** PROPOSED — complete planning artifacts grounded in read-only Orca exploration task `task_a115d198ea16` / dispatch `ctx_50dabb6dbe40`; strict change/all validation PASS
-- **Current objective:** Strictly validate and merge the bounded contained-command-replay proposal, then apply it on a fresh implementation branch.
+- **Lifecycle stage:** VERIFIED
+- **Change status:** VERIFIED — root review, required checks, strict validation, and independent Orca verification passed on `feat/contained-command-replay`; user-authorized fallback completion gate applies
+- **Current objective:** Commit and merge the verified Apply change, synchronize its specification, and archive it before endpoint catalog exploration.
 - **Last completed change:** `implement-legacy-village-state-diff` — archived as `2026-09-15-implement-legacy-village-state-diff`; last verified implementation commit `dc9f960`
 - **Next eligible objective:** Apply, independently verify, sync, and archive `implement-contained-legacy-command-replay`; endpoint and command catalogs remain subsequent work.
-- **Blocking issues:** None for command-replay exploration; authentic progressed-player saves remain unavailable and unverified, so they must not be synthesized or claimed as parity evidence.
-- **Last OpenSpec validation:** PASS — `implement-legacy-village-state-diff` and all current specs validated strictly at proposal (2026-09-14)
-- **Last implementation verification:** PASS — independent Orca verification task `task_38325d773274` / dispatch `ctx_cf9ee1f5be1f` plus root final checks (2026-09-14); no CRITICAL or WARNING findings
-- **Last verified commit:** `cc7626e` (merged specification sync)
-- **Last updated:** 2026-09-14
+- **Blocking issues:** None for this bounded change. CLI help and installed skills expose no dedicated OpenSpec verification workflow; the user explicitly authorized strict validation, independent verifier PASS, required checks, and final diff review as the fallback gate. The verifier's two in-checkout compileall runs created bytecode subsequently removed; root confirmed no remaining cache files and verifier reported byte-level cleanup evidence. This remediated procedural warning is non-blocking under the user's instruction. Authentic progressed-player saves remain unavailable and unverified.
+- **Last OpenSpec validation:** PASS — `implement-contained-legacy-command-replay` and all current specs validated strictly (6 items, 2026-09-17); this is not the missing verification workflow
+- **Last implementation verification:** Independent Orca task `task_b997b10ca3e6` / dispatch `ctx_2c7c034e9a5c` reported implementation PASS, no CRITICAL findings, and the disclosed procedural WARNING; root ran replay 32, recorder 13, state-diff 29, hash-manifest 11 tests, 3,258-entry manifest verification, and package consistency successfully. Fallback implementation acceptance is complete; Git/PR, Sync, and Archive remain.
+- **Last verified commit:** `cc7626e` (merged specification sync); current replay implementation remains uncommitted on `4d42879`
+- **Last updated:** 2026-09-17
 
 ### Status values
 
