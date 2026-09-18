@@ -1,0 +1,2282 @@
+{
+  "schema_version": 1,
+  "policy": {
+    "survey_id": "content-field-types-survey-v1",
+    "source_file": "config/main.json",
+    "evidence_policy": "Reviewed structural survey of stored content value encodings. Every count is exactly recomputed from config/main.json with the standard library; patches are never applied, served bytes are never produced, and no content validity, gameplay parity, or normalization is claimed.",
+    "count_note": "Counts are exact recomputations over all entries, never samples. Per-field profiles record JSON-level type distribution plus string-encoded-number, embedded-JSON-string, empty-string, and null counts. Object keys record value-shape distributions instead of field profiles.",
+    "key_count": 20,
+    "array_key_count": 15,
+    "object_key_count": 5
+  },
+  "predicates": {
+    "string_encoded_number": {
+      "grammar": "[+-]?(?:[0-9]+(?:\\.[0-9]+)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?",
+      "description": "A string counts as a string-encoded number only if it fully matches the numeric grammar: optional sign, digits with optional fraction or leading-dot fraction, optional decimal exponent. Surrounding whitespace, hex, thousands separators, and Infinity/NaN spellings never match."
+    },
+    "embedded_json_string": {
+      "rule": "json.loads succeeds",
+      "description": "A string counts as an embedded-JSON string only if the standard-library JSON decoder parses it. The predicate is independent of the numeric grammar: plain numeric strings, the string null, and whitespace-padded JSON all count; empty strings never count."
+    }
+  },
+  "whole_file": {
+    "string_count": 43544,
+    "number_count": 2997,
+    "boolean_count": 0,
+    "null_count": 780
+  },
+  "array_keys": [
+    {
+      "name": "items",
+      "container_shape": "array",
+      "entry_count": 778,
+      "encoding_class": "string_encoded",
+      "fields": {
+        "activation": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "attack": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "attack_interval": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "attack_range": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "best_against": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 138,
+          "embedded_json_string_count": 138,
+          "empty_string_count": 299,
+          "null_count": 0
+        },
+        "best_against_mult": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "build_time": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "building_limit_same_id": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "building_limit_same_scf": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "category_id": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "clicks_to_build": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "collect": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "collect_type": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "collect_xp": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "cost": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "cost_type": {
+          "presence_count": 778,
+          "types": {
+            "string": 0,
+            "number": 0,
+            "boolean": 0,
+            "null": 778,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 778
+        },
+        "cost_unit_cash": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "costs": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "defense": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "display_order": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "elevation": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "expiration": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "gift_level": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "giftable": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "group_type": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 46,
+          "null_count": 0
+        },
+        "height": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "id": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "img_name": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "in_store": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "inventory_ids": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "life": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "max_collects": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "max_elem_vol": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "max_frame": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "min_level": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "name": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "new_item": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "population": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "premium_upgrade_costs": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 139,
+          "empty_string_count": 639,
+          "null_count": 0
+        },
+        "properties": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 777,
+          "empty_string_count": 1,
+          "null_count": 0
+        },
+        "race": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "subcat_functional": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "subcategory_id": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "syringes": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "training_time": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "trains_ids": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "type": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "unit_capacity": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "upgrades_to": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "velocity": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "volume": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "width": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "xp": {
+          "presence_count": 778,
+          "types": {
+            "string": 778,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 778,
+          "embedded_json_string_count": 778,
+          "empty_string_count": 0,
+          "null_count": 0
+        }
+      },
+      "notes": "Fully string-encoded: every present value is a string except cost_type, which is null in all 778 entries. 41 of 53 fields are string-encoded numbers in every entry; costs, inventory_ids, properties, and premium_upgrade_costs carry embedded-JSON containers (objects/arrays/quoted nulls), 1697 container values in total. Empty strings appear only in best_against (299), group_type (46), premium_upgrade_costs (639), and properties (1).",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 150,
+          "end_line": 42941
+        }
+      ]
+    },
+    {
+      "name": "expansion_prices",
+      "container_shape": "array",
+      "entry_count": 98,
+      "encoding_class": "native",
+      "fields": {
+        "cash": {
+          "presence_count": 98,
+          "types": {
+            "string": 0,
+            "number": 98,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "coins": {
+          "presence_count": 98,
+          "types": {
+            "string": 0,
+            "number": 98,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "inventory_qte": {
+          "presence_count": 98,
+          "types": {
+            "string": 0,
+            "number": 98,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "neighbors": {
+          "presence_count": 98,
+          "types": {
+            "string": 0,
+            "number": 98,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        }
+      },
+      "notes": "Fully native: all four fields are JSON numbers in every entry; no strings, nulls, or containers.",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 43754,
+          "end_line": 44343
+        }
+      ]
+    },
+    {
+      "name": "levels",
+      "container_shape": "array",
+      "entry_count": 100,
+      "encoding_class": "mixed",
+      "fields": {
+        "exp_required": {
+          "presence_count": 100,
+          "types": {
+            "string": 0,
+            "number": 100,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "name": {
+          "presence_count": 100,
+          "types": {
+            "string": 100,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "reward_amount": {
+          "presence_count": 100,
+          "types": {
+            "string": 0,
+            "number": 100,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "reward_type": {
+          "presence_count": 100,
+          "types": {
+            "string": 100,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        }
+      },
+      "notes": "Mixed key with homogeneous fields: name and reward_type are strings in all 100 entries, exp_required and reward_amount are numbers in all 100 entries. No string-encoded numbers, embedded JSON, empty strings, or nulls.",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 44344,
+          "end_line": 44945
+        }
+      ]
+    },
+    {
+      "name": "neighbor_assists",
+      "container_shape": "array",
+      "entry_count": 5,
+      "encoding_class": "mixed",
+      "fields": {
+        "action": {
+          "presence_count": 5,
+          "types": {
+            "string": 5,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "notification": {
+          "presence_count": 5,
+          "types": {
+            "string": 5,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "reward": {
+          "presence_count": 5,
+          "types": {
+            "string": 0,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 5
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "rnd": {
+          "presence_count": 5,
+          "types": {
+            "string": 0,
+            "number": 5,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "task": {
+          "presence_count": 5,
+          "types": {
+            "string": 5,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        }
+      },
+      "notes": "Mixed key: action, notification, and task are strings; rnd is a number; reward is an object with numeric coins/cash/xp in all 5 entries.",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 44946,
+          "end_line": 45002
+        }
+      ]
+    },
+    {
+      "name": "town_prices",
+      "container_shape": "array",
+      "entry_count": 4,
+      "encoding_class": "native",
+      "fields": {
+        "cash": {
+          "presence_count": 4,
+          "types": {
+            "string": 0,
+            "number": 4,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "coins": {
+          "presence_count": 4,
+          "types": {
+            "string": 0,
+            "number": 4,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "level": {
+          "presence_count": 4,
+          "types": {
+            "string": 0,
+            "number": 4,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        }
+      },
+      "notes": "Fully native: cash, coins, and level are JSON numbers in all 4 entries.",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 45003,
+          "end_line": 45024
+        }
+      ]
+    },
+    {
+      "name": "map_prices",
+      "container_shape": "array",
+      "entry_count": 4,
+      "encoding_class": "native",
+      "fields": {
+        "cash": {
+          "presence_count": 4,
+          "types": {
+            "string": 0,
+            "number": 4,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "coins": {
+          "presence_count": 4,
+          "types": {
+            "string": 0,
+            "number": 4,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "level": {
+          "presence_count": 4,
+          "types": {
+            "string": 0,
+            "number": 4,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        }
+      },
+      "notes": "Fully native: cash, coins, and level are JSON numbers in all 4 entries.",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 45025,
+          "end_line": 45046
+        }
+      ]
+    },
+    {
+      "name": "findable_items",
+      "container_shape": "array",
+      "entry_count": 10,
+      "encoding_class": "mixed",
+      "fields": {
+        "coins": {
+          "presence_count": 10,
+          "types": {
+            "string": 0,
+            "number": 10,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "description": {
+          "presence_count": 10,
+          "types": {
+            "string": 10,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "id": {
+          "presence_count": 10,
+          "types": {
+            "string": 0,
+            "number": 10,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "title": {
+          "presence_count": 10,
+          "types": {
+            "string": 10,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        }
+      },
+      "notes": "Mixed key with homogeneous fields: id and coins are numbers, title and description are strings in all 10 entries.",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 45047,
+          "end_line": 45108
+        }
+      ]
+    },
+    {
+      "name": "goals",
+      "container_shape": "array",
+      "entry_count": 91,
+      "encoding_class": "mixed",
+      "fields": {
+        "description": {
+          "presence_count": 91,
+          "types": {
+            "string": 91,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "hint": {
+          "presence_count": 91,
+          "types": {
+            "string": 91,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 91,
+          "null_count": 0
+        },
+        "id": {
+          "presence_count": 91,
+          "types": {
+            "string": 0,
+            "number": 91,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "reward": {
+          "presence_count": 91,
+          "types": {
+            "string": 0,
+            "number": 91,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "title": {
+          "presence_count": 91,
+          "types": {
+            "string": 91,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        }
+      },
+      "notes": "Mixed key with homogeneous fields: id and reward are numbers, title, description, and hint are strings in all 91 entries. hint is empty in all 91 entries.",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 45109,
+          "end_line": 45747
+        }
+      ]
+    },
+    {
+      "name": "offer_packs",
+      "container_shape": "array",
+      "entry_count": 44,
+      "encoding_class": "mixed",
+      "fields": {
+        "cost_cash": {
+          "presence_count": 44,
+          "types": {
+            "string": 0,
+            "number": 44,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "enabled": {
+          "presence_count": 44,
+          "types": {
+            "string": 0,
+            "number": 44,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "gold": {
+          "presence_count": 44,
+          "types": {
+            "string": 0,
+            "number": 44,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "id": {
+          "presence_count": 44,
+          "types": {
+            "string": 0,
+            "number": 44,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "items": {
+          "presence_count": 44,
+          "types": {
+            "string": 0,
+            "number": 0,
+            "boolean": 0,
+            "null": 1,
+            "array": 43,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 1
+        },
+        "mana": {
+          "presence_count": 44,
+          "types": {
+            "string": 0,
+            "number": 44,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "name": {
+          "presence_count": 44,
+          "types": {
+            "string": 44,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "oil": {
+          "presence_count": 44,
+          "types": {
+            "string": 0,
+            "number": 44,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "position": {
+          "presence_count": 44,
+          "types": {
+            "string": 0,
+            "number": 44,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "steel": {
+          "presence_count": 44,
+          "types": {
+            "string": 0,
+            "number": 44,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "type": {
+          "presence_count": 44,
+          "types": {
+            "string": 44,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 18,
+          "null_count": 0
+        },
+        "wood": {
+          "presence_count": 44,
+          "types": {
+            "string": 0,
+            "number": 44,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "xp": {
+          "presence_count": 44,
+          "types": {
+            "string": 0,
+            "number": 44,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        }
+      },
+      "notes": "Mixed key: 10 numeric fields, name and type strings, and items which is an array of id cross-references in 43 entries and null in 1 entry. type is empty in 18 entries.",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 45748,
+          "end_line": 47261
+        }
+      ]
+    },
+    {
+      "name": "social_items",
+      "container_shape": "array",
+      "entry_count": 26,
+      "encoding_class": "mixed",
+      "fields": {
+        "description": {
+          "presence_count": 26,
+          "types": {
+            "string": 26,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 26,
+          "null_count": 0
+        },
+        "id": {
+          "presence_count": 26,
+          "types": {
+            "string": 0,
+            "number": 26,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "worker_cost": {
+          "presence_count": 26,
+          "types": {
+            "string": 0,
+            "number": 26,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "workers": {
+          "presence_count": 26,
+          "types": {
+            "string": 26,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        }
+      },
+      "notes": "Mixed key with homogeneous fields: id and worker_cost are numbers, description and workers are strings in all 26 entries. description is empty in all 26 entries.",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 47262,
+          "end_line": 47419
+        }
+      ]
+    },
+    {
+      "name": "sounds",
+      "container_shape": "array",
+      "entry_count": 139,
+      "encoding_class": "string_encoded",
+      "fields": {
+        "description": {
+          "presence_count": 139,
+          "types": {
+            "string": 139,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "file": {
+          "presence_count": 139,
+          "types": {
+            "string": 139,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "id": {
+          "presence_count": 139,
+          "types": {
+            "string": 139,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 139,
+          "embedded_json_string_count": 139,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "loops": {
+          "presence_count": 139,
+          "types": {
+            "string": 139,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 139,
+          "embedded_json_string_count": 139,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "max": {
+          "presence_count": 139,
+          "types": {
+            "string": 139,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 139,
+          "embedded_json_string_count": 139,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "preload": {
+          "presence_count": 139,
+          "types": {
+            "string": 139,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 139,
+          "embedded_json_string_count": 139,
+          "empty_string_count": 0,
+          "null_count": 0
+        }
+      },
+      "notes": "Fully string-encoded: all 6 fields are strings in all 139 entries, and id, loops, max, and preload are string-encoded numbers throughout.",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 48659,
+          "end_line": 49772
+        }
+      ]
+    },
+    {
+      "name": "collections",
+      "container_shape": "array",
+      "entry_count": 10,
+      "encoding_class": "string_encoded",
+      "fields": {
+        "cashPrice": {
+          "presence_count": 10,
+          "types": {
+            "string": 10,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 10,
+          "embedded_json_string_count": 10,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "description": {
+          "presence_count": 10,
+          "types": {
+            "string": 10,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "id": {
+          "presence_count": 10,
+          "types": {
+            "string": 10,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 10,
+          "embedded_json_string_count": 10,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "item_ids": {
+          "presence_count": 10,
+          "types": {
+            "string": 10,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 10,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "name": {
+          "presence_count": 10,
+          "types": {
+            "string": 10,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "prize": {
+          "presence_count": 10,
+          "types": {
+            "string": 10,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 10,
+          "empty_string_count": 0,
+          "null_count": 0
+        }
+      },
+      "notes": "Fully string-encoded: all 6 fields are strings in all 10 entries. cashPrice and id are string-encoded numbers; item_ids and prize carry embedded-JSON arrays/objects.",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 49773,
+          "end_line": 49854
+        }
+      ]
+    },
+    {
+      "name": "level_ranking_reward",
+      "container_shape": "array",
+      "entry_count": 50,
+      "encoding_class": "mixed",
+      "fields": {
+        "cash": {
+          "presence_count": 50,
+          "types": {
+            "string": 0,
+            "number": 50,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "level": {
+          "presence_count": 50,
+          "types": {
+            "string": 0,
+            "number": 50,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "units": {
+          "presence_count": 50,
+          "types": {
+            "string": 0,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 50
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        }
+      },
+      "notes": "Mixed key: cash and level are numbers and units is an object mapping item ids to quantities in all 50 entries.",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 49855,
+          "end_line": 50206
+        }
+      ]
+    },
+    {
+      "name": "darts_items",
+      "container_shape": "array",
+      "entry_count": 30,
+      "encoding_class": "mixed",
+      "fields": {
+        "extra_item": {
+          "presence_count": 30,
+          "types": {
+            "string": 0,
+            "number": 30,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "id": {
+          "presence_count": 30,
+          "types": {
+            "string": 0,
+            "number": 30,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "items": {
+          "presence_count": 30,
+          "types": {
+            "string": 0,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 30,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "start_date": {
+          "presence_count": 30,
+          "types": {
+            "string": 30,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        }
+      },
+      "notes": "Mixed key: id and extra_item are numbers, items is an array of item ids, and start_date is a datetime string in all 30 entries. Stored start_date values are derivation input for make_dynamic, not served values.",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 50207,
+          "end_line": 50598
+        }
+      ]
+    },
+    {
+      "name": "magics",
+      "container_shape": "array",
+      "entry_count": 10,
+      "encoding_class": "mixed",
+      "fields": {
+        "area": {
+          "presence_count": 10,
+          "types": {
+            "string": 10,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 10,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "cash": {
+          "presence_count": 10,
+          "types": {
+            "string": 0,
+            "number": 10,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "description": {
+          "presence_count": 10,
+          "types": {
+            "string": 10,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "gold": {
+          "presence_count": 10,
+          "types": {
+            "string": 0,
+            "number": 10,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "id": {
+          "presence_count": 10,
+          "types": {
+            "string": 0,
+            "number": 10,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "img_name": {
+          "presence_count": 10,
+          "types": {
+            "string": 10,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "level": {
+          "presence_count": 10,
+          "types": {
+            "string": 0,
+            "number": 10,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "mana": {
+          "presence_count": 10,
+          "types": {
+            "string": 0,
+            "number": 10,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "name": {
+          "presence_count": 10,
+          "types": {
+            "string": 10,
+            "number": 0,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        },
+        "target": {
+          "presence_count": 10,
+          "types": {
+            "string": 0,
+            "number": 10,
+            "boolean": 0,
+            "null": 0,
+            "array": 0,
+            "object": 0
+          },
+          "string_encoded_number_count": 0,
+          "embedded_json_string_count": 0,
+          "empty_string_count": 0,
+          "null_count": 0
+        }
+      },
+      "notes": "Mixed key with homogeneous fields: area, description, img_name, and name are strings; cash, gold, id, level, mana, and target are numbers in all 10 entries. area carries an embedded-JSON array string.",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 51133,
+          "end_line": 51254
+        }
+      ]
+    }
+  ],
+  "object_keys": [
+    {
+      "name": "categories",
+      "container_shape": "object",
+      "entry_count": 6,
+      "value_types": {
+        "string": 0,
+        "number": 0,
+        "boolean": 0,
+        "null": 0,
+        "array": 0,
+        "object": 6
+      },
+      "notes": "All 6 values are objects with integer id, string name, and a sub array of {id, name, parent} entries (5, 4, 5, 4, 1, 3 entries respectively).",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 2,
+          "end_line": 149
+        }
+      ]
+    },
+    {
+      "name": "inventory_items",
+      "container_shape": "object",
+      "entry_count": 90,
+      "value_types": {
+        "string": 0,
+        "number": 0,
+        "boolean": 0,
+        "null": 0,
+        "array": 0,
+        "object": 90
+      },
+      "notes": "All 90 values are objects with the same 7 string fields (id, name, cashPrice, droppable, dropRate, dropsFrom, description); every value is string-encoded including the numeric ids and prices.",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 42942,
+          "end_line": 43753
+        }
+      ]
+    },
+    {
+      "name": "globals",
+      "container_shape": "object",
+      "entry_count": 104,
+      "value_types": {
+        "string": 8,
+        "number": 66,
+        "boolean": 0,
+        "null": 0,
+        "array": 22,
+        "object": 8
+      },
+      "notes": "Mixed value shapes: 62 integers, 4 floats (MARKET_INCREMENT, MARKET_SELL_PERCENTAGE, LIMIT_PER_LEVEL_SILO, REACTIVATE_WONDER_DISCOUNT), 8 strings (comma-separated lists, a URL, a date, and one embedded-JSON object string DEPOT_LIMITS), 8 objects (constant maps), and 22 arrays (numeric schedules and reward tables, some nesting objects).",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 47420,
+          "end_line": 48049
+        }
+      ]
+    },
+    {
+      "name": "images",
+      "container_shape": "object",
+      "entry_count": 607,
+      "value_types": {
+        "string": 607,
+        "number": 0,
+        "boolean": 0,
+        "null": 0,
+        "array": 0,
+        "object": 0
+      },
+      "notes": "All 607 values are the locale string en; each key is the asset path.",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 48050,
+          "end_line": 48658
+        }
+      ]
+    },
+    {
+      "name": "units_collections_categories",
+      "container_shape": "object",
+      "entry_count": 20,
+      "value_types": {
+        "string": 0,
+        "number": 0,
+        "boolean": 0,
+        "null": 0,
+        "array": 0,
+        "object": 20
+      },
+      "notes": "All 20 values are objects with integer category_id/cost/position/rewards, localized category_name_* strings (category_name_el is empty in every entry), a units array of integer item ids (89 total), and costs which is a numeric array in 19 entries and null in 1 entry.",
+      "source_references": [
+        {
+          "file": "config/main.json",
+          "line": 50599,
+          "end_line": 51132
+        }
+      ]
+    }
+  ]
+}
