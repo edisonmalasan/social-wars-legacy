@@ -55,6 +55,10 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 
 :bookmark_tabs: [Offline endpoint catalog verification](tools/endpoint-catalog/README.md)
 
+:bookmark_tabs: [Legacy command catalog](docs/legacy-protocol/commands.md)
+
+:bookmark_tabs: [Offline command catalog verification](tools/command-catalog/README.md)
+
 :warning: [Known legacy bugs and limitations](docs/known-legacy-bugs.md)
 
 ## On archives and accessibility to digital heritage

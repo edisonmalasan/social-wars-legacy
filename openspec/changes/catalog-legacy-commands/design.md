@@ -1,11 +1,11 @@
 ## Context
 
-The endpoint catalog, recorder, replay, and state-diff capabilities are verified and archived. The dispatcher in `command.py` (956 lines, 64 named branches plus an unhandled fallthrough) is the next undocumented behavioral surface. This design scopes the planning artifacts. Scope is documentation and read-only tooling; no dispatcher behavior changes. Runtime evidence comes from the existing recorder/replay tools covering four commands; no new execution evidence is captured here.
+The endpoint catalog, recorder, replay, and state-diff capabilities are verified and archived. The dispatcher in `command.py` (956 lines, 63 named branches plus an unhandled fallthrough; the proposal first estimated 64) is the next undocumented behavioral surface. This design scopes the planning artifacts. Scope is documentation and read-only tooling; no dispatcher behavior changes. Runtime evidence comes from the existing recorder/replay tools covering four commands; no new execution evidence is captured here.
 
 ## Goals / Non-Goals
 
 **Goals:**
-- A reviewed, machine-readable command catalog (`commands.json`) and readable documentation (`commands.md`) covering the envelope contract, all 64 named commands, and the unhandled fallthrough.
+- A reviewed, machine-readable command catalog (`commands.json`) and readable documentation (`commands.md`) covering the envelope contract, all 63 named commands, and the unhandled fallthrough.
 - An offline, read-only verifier (`tools/command-catalog/verify_commands.py`) that confirms catalog coverage against the current source without importing the legacy application.
 - Focused regression tests for extraction, drift detection, and containment.
 
