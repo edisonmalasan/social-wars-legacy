@@ -36,16 +36,16 @@ It is a progress ledger, not the source of truth for specified behavior.
 
 - **Current milestone:** M2 — Behavioral Tooling
 - **Roadmap cursor:** M2 / canonical game content
-- **Active OpenSpec change:** `census-legacy-game-content`
-- **Lifecycle stage:** PROPOSED
-- **Change status:** Proposal PR #37 merged as `bc2e139` on remote-tracking `feat/content-census` (branched fresh from updated `main`). 20 top-level content keys, five ordered patches, inactive mods pipeline, duplicate cleaning, and dynamic-derivation boundary scoped from direct source reads. Awaiting Apply implementation.
-- **Current objective:** Implement the approved content census, verifier, and regression tests per `openspec/changes/census-legacy-game-content/tasks.md`; orchestrator verifies independently before Apply acceptance.
-- **Last completed change:** `catalog-legacy-commands` — archived as `2026-09-18-catalog-legacy-commands`; proposal PR #33, Apply PR #34, sync PR #35
-- **Next eligible objective:** Canonical content or domain model after this archive; authentic progressed-player saves remain unavailable and must not be synthesized.
+- **Active OpenSpec change:** none
+- **Lifecycle stage:** ARCHIVED
+- **Change status:** `census-legacy-game-content` fully complete. Apply merged via PR #38 (`e61d625`): implementation `5f6da0a` plus doc links `badf887`. Spec sync merged via PR #39 (`9407d49`): new main spec `openspec/specs/content-census/spec.md`. Change archived as `2026-09-18-census-legacy-game-content`. Implementation worker `ctx_b9c68abc917b` (task `task_d974da4d0ccc`) delivered all tasks; terminal retained under user takeover, inbox empty.
+- **Current objective:** Propose the next smallest coherent change: content normalization (`packages/game-content` schemas plus builder, roadmap section 10) or the canonical domain model (section 8) — whichever bounds smaller against the new census.
+- **Last completed change:** `census-legacy-game-content` — archived as `2026-09-18-census-legacy-game-content`; proposal PR #37, Apply PR #38, sync PR #39
+- **Next eligible objective:** Content normalization or domain model after this archive; authentic progressed-player saves remain unavailable and must not be synthesized.
 - **Blocking issues:** None for the archived change. Source-truth correction recorded: the proposal estimated 64 named dispatcher branches, but `command.py` contains 63 literal comparisons (`push_dead_unit` is an engine helper, not a branch); change artifacts, catalog, verifier, and docs all enforce 63+1. Non-blocking follow-ups: unused `copy_tool` helper in `tools/endpoint-catalog/test_endpoint_catalog.py`; orchestrator has no local Python interpreter, so execution evidence relies on worker-attested runs under the pinned CPython 3.9.13. No dedicated OpenSpec verification workflow is installed; used the user-authorized strict validation, independent verification, required checks, and final diff review fallback. Authentic progressed-player saves remain unavailable and unverified.
-- **Last OpenSpec validation:** PASS — `census-legacy-game-content` strict validation (2026-09-18); this is not the unavailable verification workflow
-- **Last implementation verification:** Command catalog fallback acceptance complete (proposal PR #33, Apply PR #34, sync PR #35, archive PR #36). No content-census implementation verified yet.
-- **Last verified commit:** `bc2e139` (Merge pull request #37, content census proposal)
+- **Last OpenSpec validation:** PASS — change strict validation plus `openspec validate --specs` with 9 main specs (2026-09-18); this is not the unavailable verification workflow
+- **Last implementation verification:** Orca implementation dispatch `ctx_b9c68abc917b` reported verifier exit 0 with agreement on two byte-identical runs, 26 unittest tests exit 0 (sibling endpoint/command suites still 20/20) under CPython 3.9.13; root independently reviewed all seven delivered files and confirmed all 20 entry counts, 778/778 item-id distinctness, all five patch op shapes, exit-code contract, and containment against sources. Fallback acceptance is complete.
+- **Last verified commit:** `e61d625` (Merge pull request #38, content census Apply)
 - **Last updated:** 2026-09-18
 
 ### Status values
