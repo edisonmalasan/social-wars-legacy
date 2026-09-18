@@ -126,6 +126,18 @@ private value-free report, limits, persistence meaning, and containment evidence
 These are controlled replay checks without server, network, browser, or Flash
 execution; they establish no authentic progressed-player or gameplay parity.
 
+Verified offline endpoint-catalog check (Windows x64 CPython 3.9.13):
+
+```bash
+python -B tools/endpoint-catalog/verify_endpoints.py
+python -B -m unittest discover -s tools/endpoint-catalog -p test_endpoint_catalog.py -v
+```
+
+See `docs/legacy-protocol/endpoints.md` and `tools/endpoint-catalog/README.md`
+for the executable, invocation, exit codes, evidence classification, and
+containment. These checks establish source-grounded catalog/inventory/source
+consistency, not executed endpoints, gameplay parity, or command discovery.
+
 ---
 
 ## Code style
