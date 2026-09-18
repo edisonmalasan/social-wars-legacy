@@ -35,17 +35,17 @@ This section is maintained by the root Codex orchestrator.
 It is a progress ledger, not the source of truth for specified behavior.
 
 - **Current milestone:** M2 — Behavioral Tooling
-- **Roadmap cursor:** M2 / legacy endpoint catalog
-- **Active OpenSpec change:** `catalog-legacy-server-endpoints`
-- **Lifecycle stage:** IMPLEMENTING
-- **Change status:** Implementation and repair in progress on remote-tracking `feat/endpoint-catalog`; proposal PR #29 merged as `1553bab`. First Orca implementation attempt `ctx_a36b44f82b7d` settled failed with partial files; retry `ctx_f899a4e34d48` is active under task `task_69dc2a0583ad`.
-- **Current objective:** Complete the approved offline endpoint catalog, verifier, and regression tests; independently verify all requirements before Apply acceptance.
-- **Last completed change:** `implement-contained-legacy-command-replay` — archived as `2026-09-17-implement-contained-legacy-command-replay`; last verified implementation commit `78bc788`
-- **Next eligible objective:** Command catalog after endpoint-catalog verification, merge, spec sync, and archive; authentic progressed-player saves remain unavailable and must not be synthesized.
-- **Blocking issues:** Endpoint catalog acceptance remains blocked by incomplete catalog data, schema/source-reference and readable-inventory verification, and missing full regression/containment evidence. The unrequested report-file write was removed in the retry and its two focused tests independently passed; this is not overall acceptance. No dedicated OpenSpec verification workflow is installed; use the user-authorized strict validation, independent verification, required checks, and final diff review fallback. Authentic progressed-player saves remain unavailable and unverified.
-- **Last OpenSpec validation:** PASS — all 6 specs and 0 active changes validated strictly (2026-09-17); this is not the unavailable verification workflow
-- **Last implementation verification:** Independent Orca task `task_b997b10ca3e6` / dispatch `ctx_2c7c034e9a5c` reported implementation PASS, no CRITICAL findings, and the disclosed remediated procedural WARNING; root ran replay 32, recorder 13, state-diff 29, hash-manifest 11 tests, 3,258-entry manifest verification, and package consistency successfully. Fallback acceptance is complete.
-- **Last verified commit:** `78bc788` (`feat: add contained legacy command replay`, merged via PR #26)
+- **Roadmap cursor:** M2 / legacy command catalog
+- **Active OpenSpec change:** none
+- **Lifecycle stage:** ARCHIVED
+- **Change status:** `catalog-legacy-server-endpoints` fully complete. Apply merged via PR #30 (`aa3b4c1`): implementation `6de9263` plus doc links `b1548d7`. Spec sync merged via PR #31 (`25572ac`): new main spec `openspec/specs/endpoint-inventory/spec.md`. Change archived as `2026-09-18-catalog-legacy-server-endpoints`. Repair worker `ctx_3c297d2d0eae` (task `task_0f857c1678a4`) resolved all six root review findings; terminal released, inbox empty.
+- **Current objective:** Propose the next smallest coherent change: the legacy command catalog (`docs/legacy-protocol/commands.md` or machine-readable catalog plus generated docs per roadmap section 7).
+- **Last completed change:** `catalog-legacy-server-endpoints` — archived as `2026-09-18-catalog-legacy-server-endpoints`; Apply PR #30, sync PR #31
+- **Next eligible objective:** Legacy command catalog after this archive; authentic progressed-player saves remain unavailable and must not be synthesized.
+- **Blocking issues:** None for the archived change. Non-blocking follow-up: unused `copy_tool` helper remains in `tools/endpoint-catalog/test_endpoint_catalog.py`; remove during a future endpoint-catalog touch. No dedicated OpenSpec verification workflow is installed; used the user-authorized strict validation, independent verification, required checks, and final diff review fallback. Authentic progressed-player saves remain unavailable and unverified.
+- **Last OpenSpec validation:** PASS — change strict validation plus `openspec validate --specs` with 7 main specs (2026-09-18); this is not the unavailable verification workflow
+- **Last implementation verification:** Orca repair dispatch `ctx_3c297d2d0eae` reported verifier exit 0 with agreement on two byte-identical runs and 20 unittest tests exit 0 under CPython 3.9.13; root independently reviewed all five delivered files, traced coverage/methods/references against `server.py`, and confirmed 19 catalog entries, exit-code contract, and containment. Fallback acceptance is complete.
+- **Last verified commit:** `aa3b4c1` (Merge pull request #30, endpoint catalog Apply)
 - **Last updated:** 2026-09-18
 
 ### Status values
