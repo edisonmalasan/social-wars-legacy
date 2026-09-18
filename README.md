@@ -59,6 +59,10 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 
 :bookmark_tabs: [Offline command catalog verification](tools/command-catalog/README.md)
 
+:bookmark_tabs: [Legacy game-content census](docs/game-content/census.md)
+
+:bookmark_tabs: [Offline content census verification](tools/content-census/README.md)
+
 :warning: [Known legacy bugs and limitations](docs/known-legacy-bugs.md)
 
 ## On archives and accessibility to digital heritage

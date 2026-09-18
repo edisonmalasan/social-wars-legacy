@@ -153,6 +153,22 @@ unhandled fallthrough (the approved proposal estimated 64 named branches; the
 extra row, `push_dead_unit`, is an engine helper, not a dispatcher branch),
 not executed commands, gameplay parity, or progressed-player coverage.
 
+Verified offline content-census check (Windows x64 CPython 3.9.13):
+
+```bash
+python -B tools/content-census/verify_content.py
+python -B -m unittest discover -s tools/content-census -p test_content_census.py -v
+```
+
+See `docs/game-content/census.md` and `tools/content-census/README.md`
+for the executable, invocation, exit codes, evidence classification, and
+containment. These checks establish source-grounded census/inventory/source
+consistency for the 20 top-level keys of `config/main.json`, the five
+ordered patches, the inactive mods pipeline, import-time duplicate
+cleaning, and the dynamic-derivation boundary (stored sources only;
+served bytes are time-dependent and explicitly unverified), not
+served-byte equality, content validity, gameplay parity, or normalization.
+
 ---
 
 ## Code style

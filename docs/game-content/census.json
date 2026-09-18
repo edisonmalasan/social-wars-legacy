@@ -1,0 +1,498 @@
+{
+  "content_keys": [
+    {
+      "asset_reference_fields": [],
+      "container_shape": "object",
+      "entry_count": 6,
+      "id_scheme": "String dictionary keys ('1', '2', '3', '4', '5', '12') mirroring each entry's integer `id`. Nested `sub` arrays carry integer `id` values with a `parent` back-reference to the owning category.",
+      "layering": "Stored base content in config/main.json. Not targeted by any active patch; served as stored except for the wall-clock darts rewrite, which does not touch this key.",
+      "name": "categories",
+      "source_references": [
+        {
+          "end_line": 149,
+          "file": "config/main.json",
+          "line": 2
+        }
+      ]
+    },
+    {
+      "asset_reference_fields": [
+        "img_name"
+      ],
+      "container_shape": "array",
+      "entry_count": 778,
+      "id_scheme": "Unique string `id` per entry ('1'..), 778 of 778 distinct in the stored file. Cross-referenced by offer_packs `items`, collections `item_ids`, darts_items `items`/`extra_item`, and units_collections_categories `units`. Patches append further entries at load time (see patches).",
+      "layering": "Stored base content in config/main.json (778 entries). Load-time layering appends 1 entry (atom_fusion_item) plus 121 entries (unit_patch), then adds per-item fields (atom_fusion_items_data). Import-time remove_duplicate_items keeps the later of two entries sharing an `id`.",
+      "name": "items",
+      "source_references": [
+        {
+          "end_line": 42941,
+          "file": "config/main.json",
+          "line": 150
+        }
+      ]
+    },
+    {
+      "asset_reference_fields": [],
+      "container_shape": "object",
+      "entry_count": 90,
+      "id_scheme": "String dictionary keys mirroring each entry's string `id` (all 90 keys equal their entry `id`).",
+      "layering": "Stored base content in config/main.json. Not targeted by any active patch.",
+      "name": "inventory_items",
+      "source_references": [
+        {
+          "end_line": 43753,
+          "file": "config/main.json",
+          "line": 42942
+        }
+      ]
+    },
+    {
+      "asset_reference_fields": [],
+      "container_shape": "array",
+      "entry_count": 98,
+      "id_scheme": "No stable ID; entries carry only price fields (`coins`, `cash`, `neighbors`, `inventory_qte`) and are addressed by positional index.",
+      "layering": "Stored base content in config/main.json. Not targeted by any active patch.",
+      "name": "expansion_prices",
+      "source_references": [
+        {
+          "end_line": 44343,
+          "file": "config/main.json",
+          "line": 43754
+        }
+      ]
+    },
+    {
+      "asset_reference_fields": [],
+      "container_shape": "array",
+      "entry_count": 100,
+      "id_scheme": "No stable ID; entries carry `name`, `exp_required`, `reward_type`, `reward_amount` and are addressed by positional index (0-based level).",
+      "layering": "Stored base content in config/main.json. Not targeted by any active patch.",
+      "name": "levels",
+      "source_references": [
+        {
+          "end_line": 44945,
+          "file": "config/main.json",
+          "line": 44344
+        }
+      ]
+    },
+    {
+      "asset_reference_fields": [],
+      "container_shape": "array",
+      "entry_count": 5,
+      "id_scheme": "No stable ID; entries carry `task`, `action`, `notification`, `reward`, `rnd` and are addressed by positional index.",
+      "layering": "Stored base content in config/main.json. Not targeted by any active patch.",
+      "name": "neighbor_assists",
+      "source_references": [
+        {
+          "end_line": 45002,
+          "file": "config/main.json",
+          "line": 44946
+        }
+      ]
+    },
+    {
+      "asset_reference_fields": [],
+      "container_shape": "array",
+      "entry_count": 4,
+      "id_scheme": "No stable ID; entries carry `coins`, `cash`, `level` and are addressed by positional index.",
+      "layering": "Stored base content in config/main.json. Not targeted by any active patch.",
+      "name": "town_prices",
+      "source_references": [
+        {
+          "end_line": 45024,
+          "file": "config/main.json",
+          "line": 45003
+        }
+      ]
+    },
+    {
+      "asset_reference_fields": [],
+      "container_shape": "array",
+      "entry_count": 4,
+      "id_scheme": "No stable ID; entries carry `coins`, `cash`, `level` and are addressed by positional index.",
+      "layering": "Stored base content in config/main.json. Not targeted by any active patch.",
+      "name": "map_prices",
+      "source_references": [
+        {
+          "end_line": 45046,
+          "file": "config/main.json",
+          "line": 45025
+        }
+      ]
+    },
+    {
+      "asset_reference_fields": [],
+      "container_shape": "array",
+      "entry_count": 10,
+      "id_scheme": "Unique integer `id` per entry (1..10).",
+      "layering": "Stored base content in config/main.json. Not targeted by any active patch.",
+      "name": "findable_items",
+      "source_references": [
+        {
+          "end_line": 45108,
+          "file": "config/main.json",
+          "line": 45047
+        }
+      ]
+    },
+    {
+      "asset_reference_fields": [],
+      "container_shape": "array",
+      "entry_count": 91,
+      "id_scheme": "Unique integer `id` per entry (91 of 91 distinct). Entries carry `title`, `hint`, `description`, `reward`.",
+      "layering": "Stored base content in config/main.json. Not targeted by any active patch.",
+      "name": "goals",
+      "source_references": [
+        {
+          "end_line": 45747,
+          "file": "config/main.json",
+          "line": 45109
+        }
+      ]
+    },
+    {
+      "asset_reference_fields": [],
+      "container_shape": "array",
+      "entry_count": 44,
+      "id_scheme": "Unique integer `id` per entry (44 of 44 distinct). The `items` array holds item-id cross-references into the `items` key (content references, not file-asset paths).",
+      "layering": "Stored base content in config/main.json. Not targeted by any active patch.",
+      "name": "offer_packs",
+      "source_references": [
+        {
+          "end_line": 47261,
+          "file": "config/main.json",
+          "line": 45748
+        }
+      ]
+    },
+    {
+      "asset_reference_fields": [],
+      "container_shape": "array",
+      "entry_count": 26,
+      "id_scheme": "Unique integer `id` per entry, non-sequential (26 of 26 distinct; e.g. 3, 9, 12, 16, ...). Entries carry `worker_cost`, `workers`, `description`.",
+      "layering": "Stored base content in config/main.json. Not targeted by any active patch.",
+      "name": "social_items",
+      "source_references": [
+        {
+          "end_line": 47419,
+          "file": "config/main.json",
+          "line": 47262
+        }
+      ]
+    },
+    {
+      "asset_reference_fields": [],
+      "container_shape": "object",
+      "entry_count": 104,
+      "id_scheme": "String constant names as object keys (e.g. CONSTRUCTING_TIME); 62 int, 22 list, 8 dict, 8 str, 4 float values. No per-entry ID.",
+      "layering": "Stored base content in config/main.json. Extended at load time by the atom_fusion_powerup patch, which adds the SOUL_MIXER_POWERUPS_LEVELS key.",
+      "name": "globals",
+      "source_references": [
+        {
+          "end_line": 48049,
+          "file": "config/main.json",
+          "line": 47420
+        }
+      ]
+    },
+    {
+      "asset_reference_fields": [
+        "key"
+      ],
+      "container_shape": "object",
+      "entry_count": 607,
+      "id_scheme": "No per-entry ID; the object key itself is the asset path (e.g. /chapters/chapter_1.jpg). All 607 stored values are the locale string 'en'.",
+      "layering": "Stored base content in config/main.json. Not targeted by any active patch. The key is the asset reference.",
+      "name": "images",
+      "source_references": [
+        {
+          "end_line": 48658,
+          "file": "config/main.json",
+          "line": 48050
+        }
+      ]
+    },
+    {
+      "asset_reference_fields": [
+        "file"
+      ],
+      "container_shape": "array",
+      "entry_count": 139,
+      "id_scheme": "Unique string `id` per entry (139 of 139 distinct). The `file` field names the sound asset (e.g. explo1).",
+      "layering": "Stored base content in config/main.json. Not targeted by any active patch.",
+      "name": "sounds",
+      "source_references": [
+        {
+          "end_line": 49772,
+          "file": "config/main.json",
+          "line": 48659
+        }
+      ]
+    },
+    {
+      "asset_reference_fields": [],
+      "container_shape": "array",
+      "entry_count": 10,
+      "id_scheme": "Unique string `id` per entry (10 of 10 distinct). `item_ids` and `prize` are JSON-encoded strings holding item-id cross-references.",
+      "layering": "Stored base content in config/main.json. Not targeted by any active patch.",
+      "name": "collections",
+      "source_references": [
+        {
+          "end_line": 49854,
+          "file": "config/main.json",
+          "line": 49773
+        }
+      ]
+    },
+    {
+      "asset_reference_fields": [],
+      "container_shape": "array",
+      "entry_count": 50,
+      "id_scheme": "No `id` field; entries carry an integer `level` field in descending order (50..1) plus `cash` and a `units` map of item-id to quantity.",
+      "layering": "Stored base content in config/main.json. Not targeted by any active patch.",
+      "name": "level_ranking_reward",
+      "source_references": [
+        {
+          "end_line": 50206,
+          "file": "config/main.json",
+          "line": 49855
+        }
+      ]
+    },
+    {
+      "asset_reference_fields": [],
+      "container_shape": "array",
+      "entry_count": 30,
+      "id_scheme": "Unique integer `id` per entry (30 of 30 distinct). Entries carry `start_date`, an `items` array of item-id cross-references, and `extra_item`. Stored `start_date` values are the derivation input; served values are rewritten from the wall clock (see dynamic_derivation).",
+      "layering": "Stored base content in config/main.json (30 entries). The targets patch replaces the whole array at load time (position 5 of 5). Served `start_date` bytes are then re-derived per request and at import by make_dynamic.",
+      "name": "darts_items",
+      "source_references": [
+        {
+          "end_line": 50598,
+          "file": "config/main.json",
+          "line": 50207
+        }
+      ]
+    },
+    {
+      "asset_reference_fields": [],
+      "container_shape": "object",
+      "entry_count": 20,
+      "id_scheme": "String dictionary keys mirroring each entry's integer `category_id` (all 20 keys equal their entry `category_id`). The `units` arrays hold item-id cross-references.",
+      "layering": "Stored base content in config/main.json. Not targeted by any active patch.",
+      "name": "units_collections_categories",
+      "source_references": [
+        {
+          "end_line": 51132,
+          "file": "config/main.json",
+          "line": 50599
+        }
+      ]
+    },
+    {
+      "asset_reference_fields": [
+        "img_name"
+      ],
+      "container_shape": "array",
+      "entry_count": 10,
+      "id_scheme": "Unique integer `id` per entry (10 of 10 distinct). Entries carry `name`, `description`, `mana`, `area`, `level`, `gold`, `cash`, `target`.",
+      "layering": "Stored base content in config/main.json. Not targeted by any active patch.",
+      "name": "magics",
+      "source_references": [
+        {
+          "end_line": 51254,
+          "file": "config/main.json",
+          "line": 51133
+        }
+      ]
+    }
+  ],
+  "duplicate_cleaning": {
+    "description": "Import-time remove_duplicate_items scans config `items` for two entries sharing an `id`, deletes the earlier entry, and repeats until no duplicates remain; the later duplicate is kept. The stored census counts above are pre-cleaning values: the stored file itself contains no duplicate item ids (778 of 778 distinct), so the cleaner is a no-op on current sources. Served configuration therefore matches stored counts for `items` before patches are considered.",
+    "source_references": [
+      {
+        "end_line": 34,
+        "file": "get_game_config.py",
+        "line": 11
+      }
+    ]
+  },
+  "dynamic_derivation": {
+    "description": "make_dynamic rewrites every darts_items `start_date` from the wall clock: it runs once at import (get_game_config.py:319) and again on every served response inside get_game_config (get_game_config.py:89-91), via update_darts week-wrapping. Served `start_date` bytes are therefore time-dependent and nondeterministic across runs. The census records stored sources only; served-byte equality is explicitly unverified and out of scope.",
+    "source_references": [
+      {
+        "end_line": 91,
+        "file": "get_game_config.py",
+        "line": 89
+      },
+      {
+        "end_line": 319,
+        "file": "get_game_config.py",
+        "line": 213
+      }
+    ]
+  },
+  "mods": {
+    "active_mods": [],
+    "inactive_mods": [
+      "no_hiring_needed"
+    ],
+    "source_references": [
+      {
+        "end_line": 7,
+        "file": "mods/mods.txt",
+        "line": 1
+      },
+      {
+        "end_line": 199,
+        "file": "mods/no_hiring_needed.json",
+        "line": 1
+      },
+      {
+        "end_line": 78,
+        "file": "get_game_config.py",
+        "line": 60
+      }
+    ],
+    "status": "inactive: mods/mods.txt ships with its single mod `no_hiring_needed` commented out, so modify_game_config applies nothing at load time. The archived mod payload mods/no_hiring_needed.json is preserved but never loaded."
+  },
+  "patches": {
+    "entries": [
+      {
+        "name": "atom_fusion_item",
+        "op_count": 1,
+        "op_counts": {
+          "add": 1
+        },
+        "position": 1,
+        "source_references": [
+          {
+            "end_line": 12,
+            "file": "config/patch/patches.txt",
+            "line": 1
+          },
+          {
+            "end_line": 62,
+            "file": "config/patch/atom_fusion_item.json",
+            "line": 1
+          }
+        ],
+        "target_paths": [
+          "/items/-"
+        ]
+      },
+      {
+        "name": "unit_patch",
+        "op_count": 121,
+        "op_counts": {
+          "add": 121
+        },
+        "position": 2,
+        "source_references": [
+          {
+            "end_line": 12,
+            "file": "config/patch/patches.txt",
+            "line": 1
+          },
+          {
+            "end_line": 1,
+            "file": "config/patch/unit_patch.json",
+            "line": 1
+          }
+        ],
+        "target_paths": [
+          "/items/-"
+        ]
+      },
+      {
+        "name": "atom_fusion_items_data",
+        "op_count": 600,
+        "op_counts": {
+          "add": 600
+        },
+        "position": 3,
+        "source_references": [
+          {
+            "end_line": 12,
+            "file": "config/patch/patches.txt",
+            "line": 1
+          },
+          {
+            "end_line": 903,
+            "file": "config/patch/atom_fusion_items_data.json",
+            "line": 1
+          }
+        ],
+        "target_paths": [
+          "/items/{index}/breeding_order",
+          "/items/{index}/sm_training_time"
+        ]
+      },
+      {
+        "name": "atom_fusion_powerup",
+        "op_count": 1,
+        "op_counts": {
+          "add": 1
+        },
+        "position": 4,
+        "source_references": [
+          {
+            "end_line": 12,
+            "file": "config/patch/patches.txt",
+            "line": 1
+          },
+          {
+            "end_line": 32,
+            "file": "config/patch/atom_fusion_powerup.json",
+            "line": 1
+          }
+        ],
+        "target_paths": [
+          "/globals/SOUL_MIXER_POWERUPS_LEVELS"
+        ]
+      },
+      {
+        "name": "targets",
+        "op_count": 1,
+        "op_counts": {
+          "replace": 1
+        },
+        "position": 5,
+        "source_references": [
+          {
+            "end_line": 12,
+            "file": "config/patch/patches.txt",
+            "line": 1
+          },
+          {
+            "end_line": 360,
+            "file": "config/patch/targets.json",
+            "line": 1
+          }
+        ],
+        "target_paths": [
+          "/darts_items"
+        ]
+      }
+    ],
+    "order": [
+      "atom_fusion_item",
+      "unit_patch",
+      "atom_fusion_items_data",
+      "atom_fusion_powerup",
+      "targets"
+    ]
+  },
+  "policy": {
+    "census_id": "legacy-game-content-v1",
+    "count_note": "Entry counts are stored-source values from config/main.json before patch application, duplicate cleaning, and dynamic derivation. The approved proposal listed the same 20 top-level keys and 5 ordered patches; this census records source truth as verified by tools/content-census/verify_content.py.",
+    "evidence_policy": "File inspection only. This census is evidence of reviewed stored sources, not evidence of served-byte equality, content validity, gameplay parity, or normalization. Served darts start_date bytes are time-dependent and explicitly unverified.",
+    "key_count": 20,
+    "patch_count": 5,
+    "served_bytes_note": "Served configuration is re-derived from the wall clock by make_dynamic at import (get_game_config.py:319) and on every served response (get_game_config.py:89-91); census coverage is stored sources only.",
+    "source_file": "config/main.json"
+  },
+  "schema_version": 1
+}
