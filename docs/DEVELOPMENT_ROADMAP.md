@@ -36,16 +36,16 @@ It is a progress ledger, not the source of truth for specified behavior.
 
 - **Current milestone:** M2 — Behavioral Tooling
 - **Roadmap cursor:** M2 / canonical game content
-- **Active OpenSpec change:** `survey-content-field-types`
-- **Lifecycle stage:** PROPOSED
-- **Change status:** Proposal PR #41 merged as `84c7402` on remote-tracking `feat/field-survey` (branched fresh from updated `main`). Whole-file type distribution (43,544 strings / 2,997 numbers / 0 booleans / 780 nulls), per-key profile groups, and deterministic predicate definitions scoped from direct `config/main.json` reads. Awaiting Apply implementation.
-- **Current objective:** Implement the approved field-type survey, verifier, and regression tests per `openspec/changes/survey-content-field-types/tasks.md`; orchestrator verifies independently before Apply acceptance.
-- **Last completed change:** `census-legacy-game-content` — archived as `2026-09-18-census-legacy-game-content`; proposal PR #37, Apply PR #38, sync PR #39
+- **Active OpenSpec change:** none
+- **Lifecycle stage:** ARCHIVED
+- **Change status:** `survey-content-field-types` fully complete. Apply merged via PR #42 (`7a2da0f`): implementation `036fe57` plus doc links `e3a1fc6`. Spec sync merged via PR #43 (`9aa4567`): new main spec `openspec/specs/content-field-survey/spec.md`. Change archived as `2026-09-18-survey-content-field-types`. Implementation worker `ctx_6d24af71bd22` (task `task_d3ba022bdcc5`) delivered all tasks; terminal retained under user takeover, inbox empty.
+- **Current objective:** Propose the next smallest coherent change: content normalization (`packages/game-content` schemas plus builder, roadmap section 10) or the canonical domain model (section 8) — now grounded in the census plus the field-type survey.
+- **Last completed change:** `survey-content-field-types` — archived as `2026-09-18-survey-content-field-types`; proposal PR #41, Apply PR #42, sync PR #43
 - **Next eligible objective:** Content normalization or domain model after this archive; authentic progressed-player saves remain unavailable and must not be synthesized.
 - **Blocking issues:** None for the archived change. Source-truth correction recorded: the proposal estimated 64 named dispatcher branches, but `command.py` contains 63 literal comparisons (`push_dead_unit` is an engine helper, not a branch); change artifacts, catalog, verifier, and docs all enforce 63+1. Non-blocking follow-ups: unused `copy_tool` helper in `tools/endpoint-catalog/test_endpoint_catalog.py`; orchestrator has no local Python interpreter, so execution evidence relies on worker-attested runs under the pinned CPython 3.9.13. No dedicated OpenSpec verification workflow is installed; used the user-authorized strict validation, independent verification, required checks, and final diff review fallback. Authentic progressed-player saves remain unavailable and unverified.
-- **Last OpenSpec validation:** PASS — `survey-content-field-types` strict validation (2026-09-18); this is not the unavailable verification workflow
-- **Last implementation verification:** Content census fallback acceptance complete (proposal PR #37, Apply PR #38, sync PR #39, archive PR #40). No field-survey implementation verified yet.
-- **Last verified commit:** `84c7402` (Merge pull request #41, field survey proposal)
+- **Last OpenSpec validation:** PASS — change strict validation plus `openspec validate --specs` with 10 main specs (2026-09-18); this is not the unavailable verification workflow
+- **Last implementation verification:** Orca implementation dispatch `ctx_6d24af71bd22` reported verifier exit 0 with agreement on two byte-identical runs, 46 unittest tests exit 0 (sibling census 26/26, command 20/20, endpoint 20/20) under CPython 3.9.13; root independently reviewed all seven delivered files and confirmed whole-file counts, the 9-key mixed set, predicate edge behavior, exit-code contract, and containment against sources. Fallback acceptance is complete.
+- **Last verified commit:** `7a2da0f` (Merge pull request #42, field survey Apply)
 - **Last updated:** 2026-09-18
 
 ### Status values
