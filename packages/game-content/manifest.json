@@ -1,0 +1,136 @@
+{
+  "coercion_ruleset": "coercion-ruleset-v1",
+  "content_fingerprint": "44e5b9edd1eba2910833bb8e2f063175e51c5754e38c35177648e4de779df501",
+  "counts": {
+    "appended_items": 122,
+    "buildings": 470,
+    "loaded_items": 900,
+    "specials": 1,
+    "stored_items": 778,
+    "trains_nondefault": 130,
+    "units": 429,
+    "upgrades_nontrivial": 56,
+    "with_breeding_fields": 300
+  },
+  "inputs": {
+    "main": {
+      "bytes": 1702871,
+      "file": "config/main.json",
+      "sha256": "55ffd929372a4a31785cfd683982856324e2b73ba9a6624c53f09b68e4dd0ea5"
+    },
+    "mods": {
+      "active_mods": [],
+      "inactive_mods": [
+        "no_hiring_needed"
+      ],
+      "status": "inactive"
+    },
+    "patch_list": {
+      "file": "config/patch/patches.txt",
+      "order": [
+        "atom_fusion_item",
+        "unit_patch",
+        "atom_fusion_items_data",
+        "atom_fusion_powerup",
+        "targets"
+      ]
+    },
+    "patches": [
+      {
+        "appended_items": 1,
+        "file": "config/patch/atom_fusion_item.json",
+        "name": "atom_fusion_item",
+        "op_count": 1,
+        "op_counts": {
+          "add": 1
+        },
+        "position": 1
+      },
+      {
+        "appended_items": 121,
+        "file": "config/patch/unit_patch.json",
+        "name": "unit_patch",
+        "op_count": 121,
+        "op_counts": {
+          "add": 121
+        },
+        "position": 2
+      },
+      {
+        "appended_items": 0,
+        "file": "config/patch/atom_fusion_items_data.json",
+        "name": "atom_fusion_items_data",
+        "op_count": 600,
+        "op_counts": {
+          "add": 600
+        },
+        "position": 3
+      },
+      {
+        "appended_items": 0,
+        "file": "config/patch/atom_fusion_powerup.json",
+        "name": "atom_fusion_powerup",
+        "op_count": 1,
+        "op_counts": {
+          "add": 1
+        },
+        "position": 4
+      },
+      {
+        "appended_items": 0,
+        "file": "config/patch/targets.json",
+        "name": "targets",
+        "op_count": 1,
+        "op_counts": {
+          "replace": 1
+        },
+        "position": 5
+      }
+    ]
+  },
+  "layering": {
+    "duplicates_removed": 0,
+    "order": [
+      "atom_fusion_item",
+      "unit_patch",
+      "atom_fusion_items_data",
+      "atom_fusion_powerup",
+      "targets"
+    ]
+  },
+  "notes": [
+    "cost_type (null in every stored and appended entry) dropped, rule R4.",
+    "costs carry one or more resource keys within o/s/g/w/c; single-key dominance is not assumed.",
+    "upgrades_to/trains_ids values -1 and 0 mean none; other values resolve to known legacy_id entries.",
+    "best_against numerics are opaque codes (verified non-resolving against item ids), not item references.",
+    "inventory_ids keys reference the inventory_items domain, not item ids, and are carried as structures without item-id checks.",
+    "breeding_order/sm_training_time exist only where atom_fusion_items_data added them."
+  ],
+  "outputs": [
+    {
+      "bytes": 698544,
+      "file": "packages/game-content/normalized/buildings.json",
+      "sha256": "13ac38e95312af44819a5e8e7af4d7efa306afe879415da872e66914721b2f4d"
+    },
+    {
+      "bytes": 680410,
+      "file": "packages/game-content/normalized/units.json",
+      "sha256": "6a7121cdefddf4835ac90c408c98da762b7ccd7de866aea749368beffdad36e0"
+    },
+    {
+      "bytes": 1672,
+      "file": "packages/game-content/normalized/specials.json",
+      "sha256": "684b1355b2b12f4b89ef873e80038a6c7221a4edd0c04e9f4646acd50d1b0912"
+    }
+  ],
+  "policy": "items-normalization-v1",
+  "result": "success",
+  "schema_version": 1,
+  "validation": {
+    "cost_violations": 0,
+    "duplicate_ids": 0,
+    "missing_fields": 0,
+    "round_trip_diffs": 0,
+    "unresolvable_references": 0
+  }
+}

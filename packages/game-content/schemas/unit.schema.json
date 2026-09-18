@@ -1,0 +1,281 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "packages/game-content/schemas/unit.schema.json",
+  "title": "Normalized unit definition (legacy items domain, stored type u)",
+  "description": "Contract for one normalized unit: one loaded legacy items entry with stored type u. All numeric legacy strings are coerced to numbers (rule R1), embedded-JSON strings to structures (rule R2), meaningful empty strings preserved and structure-absence empties to null (rule R3); the always-null cost_type is dropped (rule R4). See packages/game-content/README.md for the rule set and survey citations.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "type",
+    "in_store",
+    "name",
+    "cost",
+    "costs",
+    "xp",
+    "display_order",
+    "activation",
+    "inventory_ids",
+    "expiration",
+    "collect",
+    "max_collects",
+    "collect_type",
+    "category_id",
+    "subcategory_id",
+    "subcat_functional",
+    "min_level",
+    "width",
+    "height",
+    "giftable",
+    "max_frame",
+    "img_name",
+    "elevation",
+    "unit_capacity",
+    "attack",
+    "defense",
+    "life",
+    "velocity",
+    "attack_range",
+    "attack_interval",
+    "new_item",
+    "population",
+    "gift_level",
+    "cost_unit_cash",
+    "race",
+    "clicks_to_build",
+    "trains_ids",
+    "upgrades_to",
+    "best_against",
+    "best_against_mult",
+    "properties",
+    "syringes",
+    "volume",
+    "max_elem_vol",
+    "building_limit_same_id",
+    "building_limit_same_scf",
+    "group_type",
+    "training_time",
+    "premium_upgrade_costs",
+    "build_time",
+    "collect_xp"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Stored string item id, preserved verbatim (rule R5)."
+    },
+    "kind": {
+      "const": "unit",
+      "description": "Classification of the stored type field: u maps to unit."
+    },
+    "source_file": {
+      "type": "string",
+      "description": "Origin file of the loaded entry: config/main.json or the appending patch file."
+    },
+    "source_layer": {
+      "type": "string",
+      "description": "Layering origin: stored, or patch:<name>:<position>."
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint (sha256 over stored source plus ordered patches); sources carry no version stamp."
+    },
+    "type": {
+      "type": "string",
+      "description": "Stored type field, preserved verbatim (u for units)."
+    },
+    "in_store": {
+      "type": "integer"
+    },
+    "name": {
+      "type": "string"
+    },
+    "cost": {
+      "type": "integer"
+    },
+    "costs": {
+      "type": "object",
+      "description": "Coerced cost map (rule R2); keys are resource codes, amounts non-negative.",
+      "propertyNames": {
+        "enum": [
+          "o",
+          "s",
+          "g",
+          "w",
+          "c"
+        ]
+      },
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "xp": {
+      "type": "integer"
+    },
+    "display_order": {
+      "type": "integer"
+    },
+    "activation": {
+      "type": "integer"
+    },
+    "inventory_ids": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Coerced inventory reference map, or null when the stored value is the JSON null string (rule R2). Keys reference the inventory_items domain, not item ids, and are not item-id validated."
+    },
+    "expiration": {
+      "type": "integer"
+    },
+    "collect": {
+      "type": "integer"
+    },
+    "max_collects": {
+      "type": "integer"
+    },
+    "collect_type": {
+      "type": "string"
+    },
+    "category_id": {
+      "type": "integer"
+    },
+    "subcategory_id": {
+      "type": "integer"
+    },
+    "subcat_functional": {
+      "type": "integer"
+    },
+    "min_level": {
+      "type": "integer"
+    },
+    "width": {
+      "type": "integer"
+    },
+    "height": {
+      "type": "integer"
+    },
+    "giftable": {
+      "type": "integer"
+    },
+    "max_frame": {
+      "type": "integer"
+    },
+    "img_name": {
+      "type": "string",
+      "description": "Asset reference, preserved verbatim as observed."
+    },
+    "elevation": {
+      "type": "integer"
+    },
+    "unit_capacity": {
+      "type": "integer"
+    },
+    "attack": {
+      "type": "integer"
+    },
+    "defense": {
+      "type": "integer"
+    },
+    "life": {
+      "type": "integer"
+    },
+    "velocity": {
+      "type": "integer"
+    },
+    "attack_range": {
+      "type": "integer"
+    },
+    "attack_interval": {
+      "type": "integer"
+    },
+    "new_item": {
+      "type": "integer"
+    },
+    "population": {
+      "type": "integer"
+    },
+    "gift_level": {
+      "type": "integer"
+    },
+    "cost_unit_cash": {
+      "type": "integer"
+    },
+    "race": {
+      "type": "string"
+    },
+    "clicks_to_build": {
+      "type": "integer"
+    },
+    "trains_ids": {
+      "type": "integer",
+      "description": "Trained unit reference: -1 and 0 mean none; any other value must resolve to a known legacy_id."
+    },
+    "upgrades_to": {
+      "type": "integer",
+      "description": "Upgrade-chain reference: -1 and 0 mean none; any other value must resolve to a known legacy_id."
+    },
+    "best_against": {
+      "type": [
+        "integer",
+        "string"
+      ],
+      "description": "Opaque combat flag: numeric codes coerce to integers (rule R1, verified non-resolving against item ids), flag strings and the meaningful empty string are preserved (rule R3/R7)."
+    },
+    "best_against_mult": {
+      "type": "integer"
+    },
+    "properties": {
+      "type": "object",
+      "description": "Coerced property map (rule R2)."
+    },
+    "syringes": {
+      "type": "integer"
+    },
+    "volume": {
+      "type": "integer"
+    },
+    "max_elem_vol": {
+      "type": "integer"
+    },
+    "building_limit_same_id": {
+      "type": "integer"
+    },
+    "building_limit_same_scf": {
+      "type": "integer"
+    },
+    "group_type": {
+      "type": "string",
+      "description": "Grouping label; the meaningful empty string is preserved (rule R3)."
+    },
+    "training_time": {
+      "type": "integer"
+    },
+    "premium_upgrade_costs": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Coerced premium cost map, or null when the stored value is the empty string marking absence (rule R3)."
+    },
+    "build_time": {
+      "type": "integer"
+    },
+    "collect_xp": {
+      "type": "integer"
+    },
+    "breeding_order": {
+      "type": "integer",
+      "description": "Optional patch-added field (atom_fusion_items_data); present only where the patch added it."
+    },
+    "sm_training_time": {
+      "type": "integer",
+      "description": "Optional patch-added field (atom_fusion_items_data); present only where the patch added it."
+    }
+  }
+}

@@ -9,7 +9,7 @@ The package SHALL contain one normalized definition per loaded items entry, clas
 
 #### Scenario: Review domain coverage
 - **WHEN** the loaded items content is compared with the normalized package
-- **THEN** all 469 buildings, 308 units, and the documented special are represented with preserved legacy IDs
+- **THEN** all 470 buildings, 429 units, and the documented special are represented with preserved legacy IDs (stored 778 plus 122 patch-appended entries, all ids distinct)
 
 #### Scenario: Distinguish specials from definitions
 - **WHEN** a maintainer reviews the Expandable Land entry
