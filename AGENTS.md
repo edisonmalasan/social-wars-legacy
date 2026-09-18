@@ -138,6 +138,21 @@ for the executable, invocation, exit codes, evidence classification, and
 containment. These checks establish source-grounded catalog/inventory/source
 consistency, not executed endpoints, gameplay parity, or command discovery.
 
+Verified offline command-catalog check (Windows x64 CPython 3.9.13):
+
+```bash
+python -B tools/command-catalog/verify_commands.py
+python -B -m unittest discover -s tools/command-catalog -p test_command_catalog.py -v
+```
+
+See `docs/legacy-protocol/commands.md` and `tools/command-catalog/README.md`
+for the executable, invocation, exit codes, evidence classification, and
+containment. These checks establish source-grounded catalog/inventory/source
+consistency for the 63 named `command.py` dispatcher branches plus the
+unhandled fallthrough (the approved proposal estimated 64 named branches; the
+extra row, `push_dead_unit`, is an engine helper, not a dispatcher branch),
+not executed commands, gameplay parity, or progressed-player coverage.
+
 ---
 
 ## Code style
