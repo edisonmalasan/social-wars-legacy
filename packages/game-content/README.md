@@ -129,3 +129,142 @@ scope exactly as in the content census (`make_dynamic` never runs here).
 ```bash
 python -B -m unittest discover -s packages/game-content/tests -p test_build_items.py -v
 ```
+
+---
+
+# Quest normalization extension
+
+Normalized, schema-checked quest and collection definitions for the
+legacy Social Wars `goals` (91 entries) and `collections` (10 entries)
+content domains, built offline from stored sources with Python 3.9
+standard library only; no new dependencies. Run the items build first:
+the quest builder reads the committed normalized items outputs as its
+cross-domain reference edge, and merges its `quests` section into the
+package manifest the items build produces.
+
+## Inputs
+
+- `config/main.json` (stored source: 91 `goals` entries with native
+  integer `id`, native integer `reward`, string
+  `title`/`description`/`hint` with `hint` empty in all 91; 10
+  `collections` entries with all 6 fields string-typed: string `id`,
+  `name`, `description`, embedded-JSON `item_ids` integer-array strings,
+  embedded-JSON `prize` single-key object strings, string-encoded
+  `cashPrice` numbers).
+- `config/patch/patches.txt` plus the five ordered patch files, read
+  only to verify no patch targets `goals` or `collections` (any such
+  target fails the build explicitly; stored content is the input, there
+  is no layering).
+- `mods/mods.txt` (must stay inactive; any active mod fails the build).
+- `packages/game-content/schemas/quest.schema.json` and
+  `collection.schema.json` (contracts enforced by the builder).
+- `packages/game-content/normalized/buildings.json`, `units.json`,
+  `specials.json` (committed items outputs; their union of 900
+  `legacy_id` values is the cross-domain reference set).
+
+## Coercion rules (`quest-coercion-ruleset-v1`, survey-cited)
+
+- Q1 numeric strings to numbers (integral floats become int), using the
+  same field-survey numeric grammar as items
+  `[+-]?(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?`:
+  collection `id` and `cashPrice`.
+- Q2 embedded-JSON strings to structures: `item_ids` to an integer
+  array (non-empty), `prize` to an object of item-id keys to positive
+  integer counts.
+- Q3 native and verbatim fields kept as stored: quest `id`/`reward`
+  (native integers), quest `title`/`hint`/`description` and collection
+  `name`/`description` (strings). The uniformly-empty `hint` (91 of 91)
+  and the uniform `reward` (10 in all 91) are preserved verbatim with
+  manifest notes, never defaulted or dropped.
+- Q4 `legacy_id` preserves the stored `id` verbatim as a string (the
+  decimal form of the native integer for quests, the stored string for
+  collections).
+- Q5 resolved item references: `item_refs` carries the `item_ids` ids
+  as decimal `legacy_id` strings in stored order, and `prize_refs`
+  carries the prize keys sorted; every referenced id must resolve
+  against the normalized items legacy-ID set or validation fails.
+
+No value is rebalanced, renamed for gameplay, or assigned new meaning.
+
+## Outputs
+
+- `normalized/quests.json`: 91 quest definitions (one per stored
+  `goals` entry, stored order).
+- `normalized/collections.json`: 10 collection definitions (one per
+  stored `collections` entry, stored order).
+- `manifest.json`: the existing items manifest with a `quests` section
+  merged in, recording quest inputs with digests, the cross-domain
+  items reference edge (files, counts, union size), the coercion
+  ruleset version, the content fingerprint (sha256 over the stored
+  source bytes plus the mods list), definition counts, builder outcome,
+  output digests, and uniformity notes. Regenerated on every successful
+  quest build; the tests assert it matches the produced output while
+  the items keys survive the merge untouched.
+
+## Validation gates (failures exit 1, outputs unwritten)
+
+Duplicate quest or collection ids (refusing silent loss), unresolvable
+`item_ids`/`prize` references against the normalized items set,
+non-integral or negative `cashPrice`, non-positive prize amounts,
+empty `item_ids`, missing or mistyped schema-required fields (every
+schema-required field is enforced; the traceability test proves it by
+mutation), `item_refs`/`prize_refs` drift, and any round-trip
+difference outside the documented coercions. The round-trip gate
+re-coerces each stored entry and compares by value (embedded-JSON
+structures parsed, numeric strings numeric, strings verbatim, field
+sets exact); the derived `item_refs`/`prize_refs` are checked against
+their sources instead of the stored bytes.
+
+## Executable and invocation
+
+Verified executable: `C:\Users\Edison\AppData\Local\Programs\Python\Python39\python.exe`
+(CPython 3.9.13, tags/v3.9.13:6de2ca5, May 17 2022, 16:36:42, MSC v.1929 64 bit (AMD64)).
+`sys.executable` reported exactly the path above and `python --version`
+reported `Python 3.9.13` for the passing run. Any working Python 3.9+
+standard-library interpreter should behave identically.
+
+From the repository root (after the items build):
+
+```bash
+python -B packages/game-content/tools/build_quests.py
+```
+
+Exit 0 prints a JSON success report with counts and output files.
+Exit 1 prints a `validation-failed` report listing each problem and
+writes nothing (the manifest is left untouched). Exit 2 reports
+invalid input or unsupported shapes (missing/unreadable files,
+unparseable content, an active mod, a patch targeting quest content,
+an invalid schema file, or a missing/malformed normalized items
+output) on stderr.
+
+## Evidence classification
+
+This extension establishes source-grounded normalization consistency
+for the stored `goals`/`collections` domains: classification coverage,
+coercion fidelity, cross-domain reference resolution against the
+normalized items package, and round-trip equivalence modulo documented
+rules. It is evidence of representation change, not of served-byte
+equality, content validity, gameplay parity, asset existence (M4 owns
+asset truth), or progressed-player coverage. Served bytes stay out of
+scope exactly as in the content census (`make_dynamic` never runs here).
+
+## Containment
+
+- Reads only `config/main.json`, `config/patch/patches.txt`, the five
+  patch files (target check only), `mods/mods.txt`, the two quest
+  schema files, the three committed normalized items outputs, and the
+  package manifest for the merge (plus optional `--repo-root`/`--out-root`
+  relocation of the same reads).
+- Never imports or executes any legacy application module (no
+  `get_game_config`, `jsonpatch`, or Flask import), never reads runtime
+  saves, never contacts a network, never starts a server, and never
+  opens a browser or Flash content.
+- Writes only the two normalized quest files plus the merged
+  `manifest.json`, and only on success. No bytecode (`-B` recommended),
+  no caches, no temporary files in the repository. Repeated runs over
+  unchanged inputs are byte-identical.
+- The focused tests in `tests/test_build_quests.py` run the same way:
+
+```bash
+python -B -m unittest discover -s packages/game-content/tests -p test_build_quests.py -v
+```

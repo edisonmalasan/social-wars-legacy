@@ -36,16 +36,16 @@ It is a progress ledger, not the source of truth for specified behavior.
 
 - **Current milestone:** M3 — Content Normalization
 - **Roadmap cursor:** M3 / items normalization
-- **Active OpenSpec change:** none
-- **Lifecycle stage:** ARCHIVED
-- **Change status:** `normalize-items-game-content` fully complete. Apply merged via PR #46 (`6133052`): implementation `545e79d` plus doc links `2a597cc`. Spec sync merged via PR #47 (`2ef8d33`): new main spec `openspec/specs/items-normalization/spec.md`. Change archived as `2026-09-18-normalize-items-game-content`. Implementation worker `ctx_43ea9b4fabcc` (task `task_1f75744cb09b`) plus repair worker `ctx_8201fa3c7bd2` (task `task_f1b7fdb29045`) delivered all tasks; terminals retained under user takeover, inbox empty.
-- **Current objective:** Propose the next smallest coherent M3 change: quest/research/collection normalization (goals, magics-adjacent research timers, collections) or the canonical domain model (roadmap section 8) — whichever bounds smaller against the census, survey, and items precedent.
+- **Active OpenSpec change:** `normalize-quest-content`
+- **Lifecycle stage:** PROPOSED
+- **Change status:** Proposal PR #49 merged as `2af307d` on remote-tracking `feat/quest-normalization` (branched fresh from updated `main`). Goals (91, native IDs, uniform hint/reward) plus collections (10, embedded item refs resolving cleanly) scoped from direct `config/main.json` reads; no patch targets these keys. Awaiting Apply implementation.
+- **Current objective:** Implement the approved quest normalization package, builder/validator, and regression tests per `openspec/changes/normalize-quest-content/tasks.md`; orchestrator verifies independently before Apply acceptance.
 - **Last completed change:** `normalize-items-game-content` — archived as `2026-09-18-normalize-items-game-content`; proposal PR #45, Apply PR #46, sync PR #47
 - **Next eligible objective:** Quest/research/collection normalization or domain model after this archive; authentic progressed-player saves remain unavailable and must not be synthesized.
 - **Blocking issues:** None for the archived change. Source-truth corrections recorded: command catalog 63 (not 64) branches; items normalization covers loaded 900 definitions (not stored 778) with `0` as a relation sentinel alongside `-1` (manifest stats 56/130) and no dead re-emit helper. Non-blocking follow-ups: unused `copy_tool` helper in `tools/endpoint-catalog/test_endpoint_catalog.py`; orchestrator has no local Python interpreter, so execution evidence relies on worker-attested runs under the pinned CPython 3.9.13; `worker-start --agent opencode` offers no flag passthrough, so opencode `--auto` cannot be injected through the supported Orca path (all six worker dispatches still completed autonomously). No dedicated OpenSpec verification workflow is installed; used the user-authorized strict validation, independent verification, required checks, and final diff review fallback. Authentic progressed-player saves remain unavailable and unverified.
-- **Last OpenSpec validation:** PASS — change strict validation plus `openspec validate --specs` with 11 main specs (2026-09-18); this is not the unavailable verification workflow
-- **Last implementation verification:** Orca implementation dispatch `ctx_43ea9b4fabcc` plus repair dispatch `ctx_8201fa3c7bd2` reported clean build exit 0 byte-identical, 46 unittest tests exit 0 (siblings green except pre-existing Flask-missing protocol-replay/recorder env failures) under CPython 3.9.13; root independently reviewed all eleven delivered files, traced layering/coercion/relation claims against `config/main.json`/`get_game_config.py`/`engine.py`, and confirmed 470/429/1 outputs, exit-code contract, and containment. Fallback acceptance is complete.
-- **Last verified commit:** `6133052` (Merge pull request #46, items normalization Apply)
+- **Last OpenSpec validation:** PASS — `normalize-quest-content` strict validation (2026-09-18); this is not the unavailable verification workflow
+- **Last implementation verification:** Items normalization fallback acceptance complete (proposal PR #45, Apply PR #46, sync PR #47, archive PR #48). No quest normalization implementation verified yet.
+- **Last verified commit:** `2af307d` (Merge pull request #49, quest normalization proposal)
 - **Last updated:** 2026-09-18
 
 ### Status values

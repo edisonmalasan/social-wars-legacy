@@ -1,0 +1,312 @@
+[
+  {
+    "legacy_id": "1",
+    "kind": "collection",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 1,
+    "name": "Draggy Collection",
+    "description": "collection description 1",
+    "item_ids": [
+      66,
+      67,
+      68,
+      69,
+      70
+    ],
+    "item_refs": [
+      "66",
+      "67",
+      "68",
+      "69",
+      "70"
+    ],
+    "prize": {
+      "1085": 1
+    },
+    "prize_refs": [
+      "1085"
+    ],
+    "cashPrice": 35
+  },
+  {
+    "legacy_id": "2",
+    "kind": "collection",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 2,
+    "name": "Transformer Collection",
+    "description": "collection description 2",
+    "item_ids": [
+      46,
+      47,
+      48,
+      49,
+      50
+    ],
+    "item_refs": [
+      "46",
+      "47",
+      "48",
+      "49",
+      "50"
+    ],
+    "prize": {
+      "1062": 1
+    },
+    "prize_refs": [
+      "1062"
+    ],
+    "cashPrice": 60
+  },
+  {
+    "legacy_id": "3",
+    "kind": "collection",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 3,
+    "name": "Plane Collection",
+    "description": "collection description 3",
+    "item_ids": [
+      51,
+      52,
+      53,
+      54,
+      55
+    ],
+    "item_refs": [
+      "51",
+      "52",
+      "53",
+      "54",
+      "55"
+    ],
+    "prize": {
+      "1096": 1
+    },
+    "prize_refs": [
+      "1096"
+    ],
+    "cashPrice": 75
+  },
+  {
+    "legacy_id": "4",
+    "kind": "collection",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 4,
+    "name": "Defense Collection",
+    "description": "collection description 4",
+    "item_ids": [
+      71,
+      72,
+      73,
+      74,
+      75
+    ],
+    "item_refs": [
+      "71",
+      "72",
+      "73",
+      "74",
+      "75"
+    ],
+    "prize": {
+      "164": 1
+    },
+    "prize_refs": [
+      "164"
+    ],
+    "cashPrice": 10
+  },
+  {
+    "legacy_id": "5",
+    "kind": "collection",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 5,
+    "name": "Gun Collection",
+    "description": "collection description 5",
+    "item_ids": [
+      41,
+      42,
+      43,
+      44,
+      45
+    ],
+    "item_refs": [
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "prize": {
+      "1073": 1
+    },
+    "prize_refs": [
+      "1073"
+    ],
+    "cashPrice": 20
+  },
+  {
+    "legacy_id": "6",
+    "kind": "collection",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 6,
+    "name": "Tank Collection",
+    "description": "collection description 6",
+    "item_ids": [
+      56,
+      57,
+      58,
+      59,
+      60
+    ],
+    "item_refs": [
+      "56",
+      "57",
+      "58",
+      "59",
+      "60"
+    ],
+    "prize": {
+      "1010": 1
+    },
+    "prize_refs": [
+      "1010"
+    ],
+    "cashPrice": 30
+  },
+  {
+    "legacy_id": "7",
+    "kind": "collection",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 7,
+    "name": "Launcher Collection",
+    "description": "collection description 6",
+    "item_ids": [
+      76,
+      77,
+      78,
+      79,
+      80
+    ],
+    "item_refs": [
+      "76",
+      "77",
+      "78",
+      "79",
+      "80"
+    ],
+    "prize": {
+      "45": 1
+    },
+    "prize_refs": [
+      "45"
+    ],
+    "cashPrice": 9
+  },
+  {
+    "legacy_id": "8",
+    "kind": "collection",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 8,
+    "name": "Soldier Awards Collection",
+    "description": "collection description 6",
+    "item_ids": [
+      86,
+      87,
+      88,
+      89,
+      90
+    ],
+    "item_refs": [
+      "86",
+      "87",
+      "88",
+      "89",
+      "90"
+    ],
+    "prize": {
+      "136": 1
+    },
+    "prize_refs": [
+      "136"
+    ],
+    "cashPrice": 10
+  },
+  {
+    "legacy_id": "9",
+    "kind": "collection",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 9,
+    "name": "Relaxing Time Collection",
+    "description": "collection description 6",
+    "item_ids": [
+      81,
+      82,
+      83,
+      84,
+      85
+    ],
+    "item_refs": [
+      "81",
+      "82",
+      "83",
+      "84",
+      "85"
+    ],
+    "prize": {
+      "106": 1
+    },
+    "prize_refs": [
+      "106"
+    ],
+    "cashPrice": 10
+  },
+  {
+    "legacy_id": "10",
+    "kind": "collection",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 10,
+    "name": "Animal Collection",
+    "description": "collection description 6",
+    "item_ids": [
+      61,
+      62,
+      63,
+      64,
+      65
+    ],
+    "item_refs": [
+      "61",
+      "62",
+      "63",
+      "64",
+      "65"
+    ],
+    "prize": {
+      "1056": 1
+    },
+    "prize_refs": [
+      "1056"
+    ],
+    "cashPrice": 15
+  }
+]

@@ -124,6 +124,85 @@
     }
   ],
   "policy": "items-normalization-v1",
+  "quests": {
+    "coercion_ruleset": "quest-coercion-ruleset-v1",
+    "content_fingerprint": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "counts": {
+      "collections": 10,
+      "hint_empty": 91,
+      "quests": 91,
+      "reward_values": [
+        10
+      ],
+      "stored_collections": 10,
+      "stored_goals": 91
+    },
+    "inputs": {
+      "items_reference_edge": {
+        "counts": {
+          "buildings": 470,
+          "specials": 1,
+          "units": 429
+        },
+        "files": [
+          "packages/game-content/normalized/buildings.json",
+          "packages/game-content/normalized/units.json",
+          "packages/game-content/normalized/specials.json"
+        ],
+        "union_legacy_ids": 900
+      },
+      "main": {
+        "bytes": 1702871,
+        "file": "config/main.json",
+        "sha256": "55ffd929372a4a31785cfd683982856324e2b73ba9a6624c53f09b68e4dd0ea5"
+      },
+      "mods": {
+        "active_mods": [],
+        "inactive_mods": [
+          "no_hiring_needed"
+        ],
+        "status": "inactive"
+      },
+      "patch_order": [
+        "atom_fusion_item",
+        "unit_patch",
+        "atom_fusion_items_data",
+        "atom_fusion_powerup",
+        "targets"
+      ],
+      "quest_patch_targets": "none"
+    },
+    "notes": [
+      "Stored goals map one-to-one to quests; native integer id and reward kept verbatim (rule Q3).",
+      "hint is empty in all stored goals entries; preserved verbatim with this note (rule Q3).",
+      "reward is uniform (10) across all stored goals entries; preserved verbatim with this note, never defaulted (rule Q3).",
+      "Collection id and cashPrice coerce from string-encoded numbers to integers (rule Q1); item_ids and prize coerce from embedded-JSON strings to an integer array and an object (rule Q2).",
+      "item_refs/prize_refs carry the resolved cross-domain item references validated against the normalized items legacy-ID set; unresolvable references fail validation (rule Q5).",
+      "No active patch targets goals or collections; the build refuses patch drift and active mods explicitly."
+    ],
+    "outputs": [
+      {
+        "bytes": 35294,
+        "file": "packages/game-content/normalized/quests.json",
+        "sha256": "c86d39c12c5315a843a2bf0014409c705186281b7376e54aae1f2aaf0d9c3730"
+      },
+      {
+        "bytes": 5681,
+        "file": "packages/game-content/normalized/collections.json",
+        "sha256": "1b789937a2055e6eeec498390b62c47df99e4c975e8107b216c05d5366a12d16"
+      }
+    ],
+    "policy": "quest-normalization-v1",
+    "result": "success",
+    "schema_version": 1,
+    "validation": {
+      "duplicate_ids": 0,
+      "missing_fields": 0,
+      "price_violations": 0,
+      "round_trip_diffs": 0,
+      "unresolvable_references": 0
+    }
+  },
   "result": "success",
   "schema_version": 1,
   "validation": {

@@ -200,6 +200,26 @@ schemas, round-trip evidence, and manifest), not served-byte equality,
 content validity, gameplay parity, asset existence, or
 progressed-player coverage.
 
+Verified offline quest-normalization check (Windows x64 CPython 3.9.13):
+
+```bash
+python -B packages/game-content/tools/build_quests.py
+python -B -m unittest discover -s packages/game-content/tests -p test_build_quests.py -v
+```
+
+See `packages/game-content/README.md` (quest normalization extension)
+for the executable, invocation, exit codes, evidence classification,
+and containment. Run the items-normalization build first: the quest
+builder reads the committed normalized items outputs as its
+cross-domain reference edge and merges its `quests` section into the
+package manifest. These checks establish source-grounded normalization
+consistency for the 91 stored `goals` entries (quests with schemas,
+uniform hint/reward preserved with notes, and round-trip evidence) and
+the 10 stored `collections` entries (collections with schemas,
+coerced item references resolving against the 900 normalized items
+legacy IDs, and manifest), not served-byte equality, content validity,
+gameplay parity, asset existence, or progressed-player coverage.
+
 ---
 
 ## Code style

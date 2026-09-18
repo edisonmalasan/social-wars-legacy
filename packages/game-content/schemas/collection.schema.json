@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "packages/game-content/schemas/collection.schema.json",
+  "title": "Normalized collection definition (legacy collections domain)",
+  "description": "Contract for one normalized collection: one stored legacy collections entry. String-encoded id and cashPrice coerce to numbers (rule Q1), embedded-JSON item_ids/prize strings coerce to structures (rule Q2), and item_refs/prize_refs carry the resolved cross-domain item references validated against the normalized items legacy-ID set (rule Q5). See packages/game-content/README.md for the rule set and survey citations.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "id",
+    "name",
+    "description",
+    "item_ids",
+    "item_refs",
+    "prize",
+    "prize_refs",
+    "cashPrice"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Stored collections string id, preserved verbatim (rule Q4)."
+    },
+    "kind": {
+      "const": "collection",
+      "description": "Classification of the stored collections domain: every collections entry maps to collection."
+    },
+    "source_file": {
+      "type": "string",
+      "description": "Origin file of the stored entry: config/main.json (no patch targets collections)."
+    },
+    "source_layer": {
+      "type": "string",
+      "description": "Layering origin: stored (no patch targets collections)."
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint (sha256 over the stored source bytes plus the mods list); sources carry no version stamp."
+    },
+    "id": {
+      "type": "integer",
+      "description": "Stored string id coerced to an integer (rule Q1)."
+    },
+    "name": {
+      "type": "string",
+      "description": "Collection name, preserved verbatim (rule Q3)."
+    },
+    "description": {
+      "type": "string",
+      "description": "Collection description, preserved verbatim (rule Q3)."
+    },
+    "item_ids": {
+      "type": "array",
+      "description": "Required item ids coerced from the embedded-JSON string to an integer array (rule Q2); every id must resolve against the normalized items legacy-ID set (rule Q5).",
+      "minItems": 1,
+      "items": { "type": "integer" }
+    },
+    "item_refs": {
+      "type": "array",
+      "description": "Resolved cross-domain references for item_ids: the same ids as decimal legacy_id strings in stored order (rule Q5).",
+      "minItems": 1,
+      "items": { "type": "string" }
+    },
+    "prize": {
+      "type": "object",
+      "description": "Prize map coerced from the embedded-JSON string to an object of item-id keys to positive counts (rule Q2); every key must resolve against the normalized items legacy-ID set (rule Q5).",
+      "minProperties": 1,
+      "additionalProperties": { "type": "integer", "minimum": 1 }
+    },
+    "prize_refs": {
+      "type": "array",
+      "description": "Resolved cross-domain references for the prize keys: the prize item ids as decimal legacy_id strings in sorted order (rule Q5).",
+      "minItems": 1,
+      "items": { "type": "string" }
+    },
+    "cashPrice": {
+      "type": "integer",
+      "description": "Stored string-encoded cash price coerced to an integer (rule Q1).",
+      "minimum": 0
+    }
+  }
+}
