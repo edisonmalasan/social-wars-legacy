@@ -35,17 +35,17 @@ This section is maintained by the root Codex orchestrator.
 It is a progress ledger, not the source of truth for specified behavior.
 
 - **Current milestone:** M2 — Behavioral Tooling
-- **Roadmap cursor:** M2 / legacy command catalog
-- **Active OpenSpec change:** `catalog-legacy-commands`
-- **Lifecycle stage:** PROPOSED
-- **Change status:** Proposal PR #33 merged as `6315a28` on remote-tracking `feat/command-catalog` (branched fresh from updated `main`). 64 named dispatcher branches plus envelope and fallthrough scoped from direct `command.py` reads. Awaiting Apply implementation.
-- **Current objective:** Implement the approved command catalog, verifier, and regression tests per `openspec/changes/catalog-legacy-commands/tasks.md`; orchestrator verifies independently before Apply acceptance.
-- **Last completed change:** `catalog-legacy-server-endpoints` — archived as `2026-09-18-catalog-legacy-server-endpoints`; Apply PR #30, sync PR #31, archive PR #32
-- **Next eligible objective:** Content normalization after command-catalog verification, merge, spec sync, and archive; authentic progressed-player saves remain unavailable and must not be synthesized.
-- **Blocking issues:** None. Non-blocking follow-up: unused `copy_tool` helper remains in `tools/endpoint-catalog/test_endpoint_catalog.py`; remove during a future endpoint-catalog touch. No dedicated OpenSpec verification workflow is installed; use the user-authorized strict validation, independent verification, required checks, and final diff review fallback. Authentic progressed-player saves remain unavailable and unverified.
-- **Last OpenSpec validation:** PASS — `catalog-legacy-commands` strict validation (2026-09-18); this is not the unavailable verification workflow
-- **Last implementation verification:** Endpoint catalog fallback acceptance complete (PRs #30/#31/#32). No command-catalog implementation verified yet.
-- **Last verified commit:** `6315a28` (Merge pull request #33, command catalog proposal)
+- **Roadmap cursor:** M2 / canonical game content
+- **Active OpenSpec change:** none
+- **Lifecycle stage:** ARCHIVED
+- **Change status:** `catalog-legacy-commands` fully complete. Apply merged via PR #34 (`3583c40`): implementation `a5b3932` plus doc links `78ee183`. Spec sync merged via PR #35 (`a48ea6f`): new main spec `openspec/specs/command-catalog/spec.md`. Change archived as `2026-09-18-catalog-legacy-commands`. Implementation worker `ctx_ea199a373b05` (task `task_2c50d359318b`) delivered all tasks; terminal retained under user takeover, inbox empty.
+- **Current objective:** Propose the next smallest coherent change: canonical game content normalization (`packages/game-content`, roadmap section 10) or the domain-model definition (section 8) — whichever bounds smaller against `get_game_config.py`.
+- **Last completed change:** `catalog-legacy-commands` — archived as `2026-09-18-catalog-legacy-commands`; proposal PR #33, Apply PR #34, sync PR #35
+- **Next eligible objective:** Canonical content or domain model after this archive; authentic progressed-player saves remain unavailable and must not be synthesized.
+- **Blocking issues:** None for the archived change. Source-truth correction recorded: the proposal estimated 64 named dispatcher branches, but `command.py` contains 63 literal comparisons (`push_dead_unit` is an engine helper, not a branch); change artifacts, catalog, verifier, and docs all enforce 63+1. Non-blocking follow-ups: unused `copy_tool` helper in `tools/endpoint-catalog/test_endpoint_catalog.py`; orchestrator has no local Python interpreter, so execution evidence relies on worker-attested runs under the pinned CPython 3.9.13. No dedicated OpenSpec verification workflow is installed; used the user-authorized strict validation, independent verification, required checks, and final diff review fallback. Authentic progressed-player saves remain unavailable and unverified.
+- **Last OpenSpec validation:** PASS — change strict validation plus `openspec validate --specs` with 8 main specs (2026-09-18); this is not the unavailable verification workflow
+- **Last implementation verification:** Orca implementation dispatch `ctx_ea199a373b05` reported verifier exit 0 with agreement on two byte-identical runs and 20 unittest tests exit 0 under CPython 3.9.13; root independently reviewed all seven delivered files, traced envelope/resource/fallthrough claims against `command.py`/`engine.py`, and confirmed 63+1 entries, exit-code contract, and containment. Fallback acceptance is complete.
+- **Last verified commit:** `3583c40` (Merge pull request #34, command catalog Apply)
 - **Last updated:** 2026-09-18
 
 ### Status values
