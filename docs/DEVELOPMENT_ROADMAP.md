@@ -35,18 +35,18 @@ This section is maintained by the root Codex orchestrator.
 It is a progress ledger, not the source of truth for specified behavior.
 
 - **Current milestone:** M2 — Behavioral Tooling
-- **Roadmap cursor:** M2 / implement command replay
-- **Active OpenSpec change:** `implement-contained-legacy-command-replay`
-- **Lifecycle stage:** ARCHIVED
-- **Change status:** ARCHIVED — `implement-contained-legacy-command-replay` archived as `2026-09-17-implement-contained-legacy-command-replay` after Apply PR #26 and spec-sync PR #27 merged; fallback verification gate (strict validation, independent verifier PASS, required checks, final diff review) used because no dedicated OpenSpec verify workflow is installed
-- **Current objective:** Explore and propose the next M2 bounded objective — the legacy endpoint catalog — on a fresh proposal branch from updated `main`.
+- **Roadmap cursor:** M2 / legacy endpoint catalog
+- **Active OpenSpec change:** `catalog-legacy-server-endpoints`
+- **Lifecycle stage:** IMPLEMENTING
+- **Change status:** Implementation and repair in progress on remote-tracking `feat/endpoint-catalog`; proposal PR #29 merged as `1553bab`. First Orca implementation attempt `ctx_a36b44f82b7d` settled failed with partial files; retry `ctx_f899a4e34d48` is active under task `task_69dc2a0583ad`.
+- **Current objective:** Complete the approved offline endpoint catalog, verifier, and regression tests; independently verify all requirements before Apply acceptance.
 - **Last completed change:** `implement-contained-legacy-command-replay` — archived as `2026-09-17-implement-contained-legacy-command-replay`; last verified implementation commit `78bc788`
-- **Next eligible objective:** Legacy endpoint catalog proposal (M2 backlog item 9), then command catalog; authentic progressed-player saves remain unavailable and must not be synthesized.
-- **Blocking issues:** None. CLI help and installed skills expose no dedicated OpenSpec verification workflow; the user explicitly authorized strict validation, independent verifier PASS, required checks, and final diff review as the fallback gate, recorded as a non-blocking tooling limitation. The verifier's two in-checkout compileall runs created bytecode subsequently removed; root confirmed no remaining cache files and verifier reported byte-level cleanup evidence. This remediated procedural warning is non-blocking under the user's instruction. Authentic progressed-player saves remain unavailable and unverified.
+- **Next eligible objective:** Command catalog after endpoint-catalog verification, merge, spec sync, and archive; authentic progressed-player saves remain unavailable and must not be synthesized.
+- **Blocking issues:** Endpoint catalog acceptance remains blocked by incomplete catalog data, schema/source-reference and readable-inventory verification, and missing full regression/containment evidence. The unrequested report-file write was removed in the retry and its two focused tests independently passed; this is not overall acceptance. No dedicated OpenSpec verification workflow is installed; use the user-authorized strict validation, independent verification, required checks, and final diff review fallback. Authentic progressed-player saves remain unavailable and unverified.
 - **Last OpenSpec validation:** PASS — all 6 specs and 0 active changes validated strictly (2026-09-17); this is not the unavailable verification workflow
 - **Last implementation verification:** Independent Orca task `task_b997b10ca3e6` / dispatch `ctx_2c7c034e9a5c` reported implementation PASS, no CRITICAL findings, and the disclosed remediated procedural WARNING; root ran replay 32, recorder 13, state-diff 29, hash-manifest 11 tests, 3,258-entry manifest verification, and package consistency successfully. Fallback acceptance is complete.
 - **Last verified commit:** `78bc788` (`feat: add contained legacy command replay`, merged via PR #26)
-- **Last updated:** 2026-09-17
+- **Last updated:** 2026-09-18
 
 ### Status values
 

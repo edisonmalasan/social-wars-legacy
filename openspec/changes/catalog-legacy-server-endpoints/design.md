@@ -6,7 +6,7 @@ The recorder, replay, and state-diff capabilities are verified. The proposal on 
 
 **Goals:**
 - A reviewed, machine-readable endpoint catalog (`endpoints.json`) and readable documentation (`endpoints.md`) covering all 15 explicit active routes, Flask's implicit static registration, and three commented-out auction declarations.
-- An offline, read-only verifier (`tools/endpoint-catalog/verify.py`) that confirms catalog coverage against the current source without importing the legacy application.
+- An offline, read-only verifier (`tools/endpoint-catalog/verify_endpoints.py`) that confirms catalog coverage against the current source without importing the legacy application.
 - Focused regression tests for extraction, drift detection, and containment.
 
 **Non-Goals:**

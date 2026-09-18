@@ -51,6 +51,10 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 
 :bookmark_tabs: [Contained four-command legacy replay](tools/protocol-replay/README.md)
 
+:bookmark_tabs: [Legacy server endpoint catalog](docs/legacy-protocol/endpoints.md)
+
+:bookmark_tabs: [Offline endpoint catalog verification](tools/endpoint-catalog/README.md)
+
 :warning: [Known legacy bugs and limitations](docs/known-legacy-bugs.md)
 
 ## On archives and accessibility to digital heritage
