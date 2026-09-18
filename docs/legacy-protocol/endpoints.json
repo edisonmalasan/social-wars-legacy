@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "policy": {
+    "catalog_id": "legacy-endpoints-v1",
+    "source_file": "server.py",
+    "dynamic_root": "/dynamic/menvswomen/srvsexwars",
+    "static_root": "/static/socialwars",
+    "method_policy": "Omitted methods default to GET; Flask adds HEAD for GET and automatic OPTIONS.",
+    "evidence_policy": "source-inspection only; no executed endpoint evidence"
+  },
+  "endpoints": [
+    {
+      "route": "/", "handler": "login", "classification": "explicit_active",
+      "declared_methods": ["GET", "POST"], "effective_methods": ["GET", "HEAD", "OPTIONS", "POST"],
+      "inputs": {"required": ["form.USERID (POST)", "form.GAMEVERSION (POST)"], "optional": [], "route_parameters": []},
+      "responses": ["GET renders login.html with save metadata and version", "POST redirects to /play.html", "Missing POST fields raise request errors", "HEAD is registered but the method-specific branches return no response; not executed"],
+      "state_effects": ["Clears session USERID and GAMEVERSION before processing", "Reloads in-memory saves; POST sets session USERID and GAMEVERSION"],
+      "persistence_effects": ["load_saves may create the saves directory and persist migrated saves"],
+      "evidence": "Source inspection; existing contained root GET smoke is documented in docs/legacy-baseline.md, not rerun here; POST and gameplay evidence unavailable",
+      "source_references": [{"file": "server.py", "line": 58, "end_line": 75}, {"file": "sessions.py", "line": 34, "end_line": 68}]
+    },
+    {
+      "route": "/play.html", "handler": "play", "classification": "explicit_active",
+      "declared_methods": null, "effective_methods": ["GET", "HEAD", "OPTIONS"],
+      "inputs": {"required": [], "optional": ["session.USERID", "session.GAMEVERSION"], "route_parameters": []},
+      "responses": ["Redirects to / when either session field is missing or USERID is absent from loaded saves", "Otherwise renders play.html with save metadata, server time, friends, version and host configuration; archival Flash reference page"],
+      "state_effects": ["Reads session and loaded saves; no explicit player mutation"],
+      "persistence_effects": ["No explicit save write"],
+      "evidence": "Source inspection only; endpoint execution evidence unavailable",
+      "source_references": [{"file": "server.py", "line": 77, "end_line": 91}]
+    },
+    {
+      "route": "/new.html", "handler": "new", "classification": "explicit_active",
+      "declared_methods": null, "effective_methods": ["GET", "HEAD", "OPTIONS"],
+      "inputs": {"required": [], "optional": [], "route_parameters": []},
+      "responses": ["Redirects to relative play.html after village creation"],
+      "state_effects": ["Default GET is state-changing: creates and migrates a village from the initial template", "Adds village to in-memory saves and sets session USERID and GAMEVERSION"],
+      "persistence_effects": ["new_village calls save_session to write the new village save"],
+      "evidence": "Source inspection only; endpoint execution evidence unavailable",
+      "source_references": [{"file": "server.py", "line": 93, "end_line": 97}, {"file": "sessions.py", "line": 110, "end_line": 129}, {"file": "sessions.py", "line": 248, "end_line": 255}]
+    },
+    {
+      "route": "/crossdomain.xml", "handler": "crossdomain", "classification": "explicit_active",
+      "declared_methods": null, "effective_methods": ["GET", "HEAD", "OPTIONS"],
+      "inputs": {"required": [], "optional": [], "route_parameters": []},
+      "responses": ["Serves the archived crossdomain.xml policy file from the stub directory"],
+      "state_effects": ["No state change"],
+      "persistence_effects": ["None"],
+      "evidence": "Source inspection only; endpoint execution evidence unavailable",
+      "source_references": [{"file": "server.py", "line": 99, "end_line": 101}]
+    },
+    {
+      "route": "/img/<path:path>", "handler": "images", "classification": "explicit_active",
+      "declared_methods": null, "effective_methods": ["GET", "HEAD", "OPTIONS"],
+      "inputs": {"required": [], "optional": [], "route_parameters": ["path"]},
+      "responses": ["Serves template images from the templates img directory; missing files raise NotFound"],
+      "state_effects": ["No state change"],
+      "persistence_effects": ["None"],
+      "evidence": "Source inspection only; endpoint execution evidence unavailable",
+      "source_references": [{"file": "server.py", "line": 103, "end_line": 105}]
+    },
+    {
+      "route": "/avatars/<path:path>", "handler": "avatars", "classification": "explicit_active",
+      "declared_methods": null, "effective_methods": ["GET", "HEAD", "OPTIONS"],
+      "inputs": {"required": [], "optional": [], "route_parameters": ["path"]},
+      "responses": ["Serves template avatars from the templates avatars directory; missing files raise NotFound"],
+      "state_effects": ["No state change"],
+      "persistence_effects": ["None"],
+      "evidence": "Source inspection only; endpoint execution evidence unavailable",
+      "source_references": [{"file": "server.py", "line": 108, "end_line": 110}]
+    },
+    {
+      "route": "/css/<path:path>", "handler": "css", "classification": "explicit_active",
+      "declared_methods": null, "effective_methods": ["GET", "HEAD", "OPTIONS"],
+      "inputs": {"required": [], "optional": [], "route_parameters": ["path"]},
+      "responses": ["Serves template styles from the templates css directory; missing files raise NotFound"],
+      "state_effects": ["No state change"],
+      "persistence_effects": ["None"],
+      "evidence": "Source inspection only; endpoint execution evidence unavailable",
+      "source_references": [{"file": "server.py", "line": 112, "end_line": 114}]
+    },
+    {
+      "route": "/static/socialwars/<path:path>", "handler": "static_assets_loader", "classification": "explicit_active",
+      "declared_methods": null, "effective_methods": ["GET", "HEAD", "OPTIONS"],
+      "inputs": {"required": [], "optional": [], "route_parameters": ["path"]},
+      "responses": ["Serves game assets from the local assets directory", "The remote GitHub CDN branch is disabled behind a literal False and never runs"],
+      "state_effects": ["No state change"],
+      "persistence_effects": ["None"],
+      "evidence": "Source inspection only; endpoint execution evidence unavailable",
+      "source_references": [{"file": "server.py", "line": 118, "end_line": 131}, {"file": "bundle.py", "line": 4, "end_line": 23}]
+    },
+    {
+      "route": "/dynamic/menvswomen/srvsexwars/track_game_status.php", "handler": "track_game_status_response", "classification": "explicit_active",
+      "declared_methods": ["POST"], "effective_methods": ["OPTIONS", "POST"],
+      "inputs": {"required": ["values.status", "values.installId", "values.user_id"], "optional": [], "route_parameters": []},
+      "responses": ["Empty body with 200 after logging the status"],
+      "state_effects": ["Reads status inputs; no player mutation"],
+      "persistence_effects": ["None"],
+      "evidence": "Source inspection only; endpoint execution evidence unavailable",
+      "source_references": [{"file": "server.py", "line": 135, "end_line": 143}]
+    },
+    {
+      "route": "/dynamic/menvswomen/srvsexwars/get_game_config.php", "handler": "get_game_config_response", "classification": "explicit_active",
+      "declared_methods": null, "effective_methods": ["GET", "HEAD", "OPTIONS"],
+      "inputs": {"required": ["values.USERID", "values.user_key", "values.language"], "optional": [], "route_parameters": []},
+      "responses": ["Returns the dynamic game configuration object built from the module config"],
+      "state_effects": ["make_dynamic mutates the in-memory configuration on every request before returning it"],
+      "persistence_effects": ["None"],
+      "evidence": "Source inspection only; endpoint execution evidence unavailable",
+      "source_references": [{"file": "server.py", "line": 145, "end_line": 153}, {"file": "get_game_config.py", "line": 89, "end_line": 91}]
+    },
+    {
+      "route": "/dynamic/menvswomen/srvsexwars/get_player_info.php", "handler": "get_player_info_response", "classification": "explicit_active",
+      "declared_methods": ["POST"], "effective_methods": ["OPTIONS", "POST"],
+      "inputs": {"required": ["values.USERID", "values.user_key", "values.language"], "optional": ["values.user", "values.client_id", "values.map"], "route_parameters": []},
+      "responses": ["Current player: returns get_player_info payload with 200", "General Mike ids 100000030/100000031: neighbor info payload with 200", "Other user ids starting with 100000: quest map neighbor info payload with 200", "Otherwise: static neighbor visit payload with 200", "Unknown neighbor ids return an empty string payload; missing required fields raise request errors"],
+      "state_effects": ["Current-player branch updates playerInfo last_logged_in and applies server-side resets in get_player_info despite the read-sounding name", "Neighbor and quest branches read static villages without player mutation"],
+      "persistence_effects": ["Resets and login timestamp change in-memory state only; persistence happens on later command.php saves"],
+      "evidence": "Source inspection; focused recorder and replay tooling cover four command.php inputs only, not this endpoint",
+      "source_references": [{"file": "server.py", "line": 155, "end_line": 182}, {"file": "get_player_info.py", "line": 4, "end_line": 21}, {"file": "get_player_info.py", "line": 23, "end_line": 42}]
+    },
+    {
+      "route": "/dynamic/menvswomen/srvsexwars/sync_error_track.php", "handler": "sync_error_track_response", "classification": "explicit_active",
+      "declared_methods": ["POST"], "effective_methods": ["OPTIONS", "POST"],
+      "inputs": {"required": ["values.USERID", "values.user_key", "values.language"], "optional": [], "route_parameters": []},
+      "responses": ["Empty body with 200 acknowledgement"],
+      "state_effects": ["Reads inputs; no player mutation"],
+      "persistence_effects": ["None"],
+      "evidence": "Source inspection only; endpoint execution evidence unavailable",
+      "source_references": [{"file": "server.py", "line": 279, "end_line": 286}]
+    },
+    {
+      "route": "/null", "handler": "flash_sync_error_response", "classification": "explicit_active",
+      "declared_methods": null, "effective_methods": ["GET", "HEAD", "OPTIONS"],
+      "inputs": {"required": ["values.sp_ref_cat"], "optional": [], "route_parameters": []},
+      "responses": ["Redirects to /play.html for the three known sp_ref_cat values", "Unknown sp_ref_cat values leave reason unset and raise UnboundLocalError before any redirect; source-visible failure branch"],
+      "state_effects": ["Diagnostic logging only"],
+      "persistence_effects": ["None"],
+      "evidence": "Source inspection only; endpoint execution evidence unavailable",
+      "source_references": [{"file": "server.py", "line": 288, "end_line": 300}]
+    },
+    {
+      "route": "/dynamic/menvswomen/srvsexwars/command.php", "handler": "command_response", "classification": "explicit_active",
+      "declared_methods": ["POST"], "effective_methods": ["OPTIONS", "POST"],
+      "inputs": {"required": ["values.USERID", "values.user_key", "values.language", "values.data with 64-char hash, semicolon and JSON payload"], "optional": [], "route_parameters": []},
+      "responses": ["Returns {\"result\": \"success\"} with 200 after command execution; malformed payloads assert or raise and produce no success response"],
+      "state_effects": ["Executes the command dispatcher across resources, maps, units, stores, goals, inventory and collections; opt-in legacy_command_recorder.Observation may persist recording files when enabled", "save_session persists the player save after the command batch"],
+      "persistence_effects": ["Writes saves/<USERID>.save.json via save_session"],
+      "evidence": "Source inspection; contained four-command replay evidence exists in tools/protocol-replay, not rerun here; progressed-player gameplay parity remains unverified",
+      "source_references": [{"file": "server.py", "line": 302, "end_line": 322}, {"file": "command.py", "line": 9, "end_line": 32}, {"file": "legacy_command_recorder.py", "line": 148, "end_line": 196}, {"file": "sessions.py", "line": 248, "end_line": 255}]
+    },
+    {
+      "route": "/dynamic/menvswomen/srvsexwars/alliance/", "handler": "alliance", "classification": "explicit_active",
+      "declared_methods": ["POST"], "effective_methods": ["OPTIONS", "POST"],
+      "inputs": {"required": ["values.USERID", "values.user_key", "values.language", "values.method"], "optional": [], "route_parameters": []},
+      "responses": ["Empty JSON object with 200"],
+      "state_effects": ["None; registered placeholder to suppress client errors"],
+      "persistence_effects": ["None"],
+      "evidence": "Source inspection only; endpoint execution evidence unavailable; alliance gameplay is not implemented",
+      "source_references": [{"file": "server.py", "line": 326, "end_line": 334}]
+    },
+    {
+      "route": "/static/<path:filename>", "handler": "static (Flask default)", "classification": "framework_default",
+      "declared_methods": null, "effective_methods": ["GET", "HEAD", "OPTIONS"],
+      "inputs": {"required": [], "optional": [], "route_parameters": ["filename"]},
+      "responses": ["Framework-provided file serving from the application static folder relative to the source checkout"],
+      "state_effects": ["No state change"],
+      "persistence_effects": ["None"],
+      "evidence": "Framework registration reviewed in the pinned Flask 2.2.5 source (app.py add_url_rule static branch); not executed here",
+      "source_references": [{"file": "server.py", "line": 45, "end_line": 45}]
+    },
+    {
+      "route": "/dynamic/menvswomen/srvsexwars/bets/get_bets_list.php", "handler": "get_bets_list", "classification": "disabled",
+      "declared_methods": ["POST"], "effective_methods": [],
+      "inputs": {"required": ["values.USERID", "values.user_key", "values.language", "values.data with user_id and level"], "optional": [], "route_parameters": []},
+      "responses": ["Disabled declaration; no registered response; commented body would return a bets result JSON with 200"],
+      "state_effects": ["None; the commented body would read the auction house module that is also commented out"],
+      "persistence_effects": ["None; not registered"],
+      "evidence": "Commented source declaration only; no runtime path exists",
+      "source_references": [{"file": "server.py", "line": 186, "end_line": 215}]
+    },
+    {
+      "route": "/dynamic/menvswomen/srvsexwars/bets/get_bet_detail.php", "handler": "get_bet_detail", "classification": "disabled",
+      "declared_methods": ["POST"], "effective_methods": [],
+      "inputs": {"required": ["values.USERID", "values.user_key", "values.language", "values.data with uuid"], "optional": ["data.checkFinish"], "route_parameters": []},
+      "responses": ["Disabled declaration; no registered response; commented body would return a bet detail JSON with 200"],
+      "state_effects": ["None; the commented body would read the auction house module that is also commented out"],
+      "persistence_effects": ["None; not registered"],
+      "evidence": "Commented source declaration only; no runtime path exists",
+      "source_references": [{"file": "server.py", "line": 217, "end_line": 246}]
+    },
+    {
+      "route": "/dynamic/menvswomen/srvsexwars/bets/set_bet.php", "handler": "set_bet", "classification": "disabled",
+      "declared_methods": ["POST"], "effective_methods": [],
+      "inputs": {"required": ["values.USERID", "values.user_key", "values.language", "values.data with uuid, bet and round"], "optional": [], "route_parameters": []},
+      "responses": ["Disabled declaration; no registered response; commented body would return a betResult OK JSON with 200"],
+      "state_effects": ["None; the commented body would write bets through the auction house module that is also commented out"],
+      "persistence_effects": ["None; not registered"],
+      "evidence": "Commented source declaration only; no runtime path exists",
+      "source_references": [{"file": "server.py", "line": 248, "end_line": 277}]
+    }
+  ]
+}
