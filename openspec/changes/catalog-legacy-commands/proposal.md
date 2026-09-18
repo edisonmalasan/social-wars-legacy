@@ -4,7 +4,7 @@ The endpoint catalog inventories where requests enter the legacy server, but `co
 
 ## What Changes
 
-- Add a reviewed machine-readable command catalog and readable documentation covering the `command.php` envelope, all 64 named dispatcher commands, and the unhandled-command fallthrough.
+- Add a reviewed machine-readable command catalog and readable documentation covering the `command.php` envelope, all 63 named dispatcher commands, and the unhandled-command fallthrough. (The proposal first estimated 64; implementation verified 63 against source — `push_dead_unit` is an engine helper, not a branch.)
 - Record per command: domain, positional argument shape, client-sent resource deltas, state read, state modified, persistence effects, client-trusted fields and security concerns, observed fixtures, replacement API placeholder, and migration status.
 - Record the envelope contract: `first_number`, `publishActions`, `ts`, `tries`, `accessToken`, and the per-command `[map_id, cmd, args, resources_changed]` tuple, including that `apply_resources` runs from client-sent deltas before dispatch.
 - Add a read-only offline verifier that checks catalog structure, command coverage, and source references against current source without importing or executing the legacy application; reject unsupported dispatch syntax instead of silently dropping it.
@@ -25,7 +25,7 @@ References below identify the dispatcher in `command.py` at proposal time. The e
 | `set_goals`, `complete_goal` | quests/goals | Goal progress and completion |
 | `set_quest_var`, `admin_set_quest_rank` | quests | Quest variable mutation |
 | `push_unit`, `pop_unit`, `push_queue_unit`, `push_queue_unit2`, `pop_queue_unit` | units | Unit production queues |
-| `kill`, `kill_iid`, `resurrect_hero`, `push_dead_unit` | combat/units | Damage, death, revive paths |
+| `kill`, `kill_iid`, `resurrect_hero` | combat/units | Damage, death, revive paths (`push_dead_unit` is an engine helper used by `sell`, not a dispatcher branch) |
 | `end_quest`, `end_attack`, `collect_mission` | missions/combat | Mission resolution |
 | `next_research_item`, `next_research_step`, `reset_research_item`, `research_buy_step_cash` | research | Research timers and cash steps |
 | `complete_collection`, `unit_collections_completed` | collections | Collection completion |
@@ -42,7 +42,7 @@ References below identify the dispatcher in `command.py` at proposal time. The e
 | `flash_debug`, `ping`, `set_variables` | diagnostics | `ping`/`set_variables` have replay evidence |
 | unhandled names | dispatcher | Logged at `command.py:954-956`, batch continues |
 
-The implementation must distinguish all 64 named branches plus the fallthrough, verify the envelope contract, and document per-command client trust (notably the pre-dispatch `apply_resources` of client-sent deltas and any premium/time effects) without gameplay-parity claims.
+The implementation must distinguish all 63 named branches plus the fallthrough, verify the envelope contract, and document per-command client trust (notably the pre-dispatch `apply_resources` of client-sent deltas and any premium/time effects) without gameplay-parity claims.
 
 ## Capabilities
 

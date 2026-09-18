@@ -1,0 +1,2842 @@
+{
+  "schema_version": 1,
+  "policy": {
+    "catalog_id": "legacy-commands-v1",
+    "source_file": "command.py",
+    "branch_count": 63,
+    "entry_count": 64,
+    "count_note": "The approved proposal estimated 64 named dispatcher branches, but the source contains 63 literal cmd == comparisons (command.py:42-953) plus the unhandled else fallthrough (command.py:954-956). The 64th proposal-table row, push_dead_unit, is an engine helper (engine.py:149-171) called from the sell KILL path, not a dispatcher branch. This catalog records source truth: 63 handled entries plus 1 fallthrough entry.",
+    "envelope_policy": "One command.php POST carries a 64-char hash, a semicolon, and a JSON payload; the verifier checks the envelope documentation fields but does not execute transport.",
+    "evidence_policy": "source-inspection only; no executed command evidence beyond the four replay-covered commands named in their entries"
+  },
+  "envelope": {
+    "fields": [
+      "first_number (unread beyond parsing)",
+      "publishActions (unread beyond parsing)",
+      "ts / timestamp (unread beyond parsing)",
+      "tries (unread beyond parsing)",
+      "accessToken (unread beyond parsing)",
+      "commands (list of per-command tuples)"
+    ],
+    "command_tuple": [
+      "map_id (index into save[maps])",
+      "cmd (command name string)",
+      "args (positional arg list)",
+      "resources_changed (8-element resource delta list)"
+    ],
+    "resource_delta_shape": [
+      "resource[0] unknown",
+      "resource[1] xp (map)",
+      "resource[2] gold (map)",
+      "resource[3] wood (map)",
+      "resource[4] oil (map)",
+      "resource[5] steel (map)",
+      "resource[6] cash (playerInfo)",
+      "resource[7] mana (privateState)"
+    ],
+    "pre_dispatch": "apply_resources(save, map, resources_changed) runs for every command before dispatch (command.py:40; engine.py:251-271); deltas are client-sent, clamped at zero, and never validated against costs.",
+    "batch_persistence": "save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255), including batches that hit only the unhandled fallthrough.",
+    "fallthrough": "Unknown cmd names reach the else at command.py:954-956, which logs and returns from do_command while the batch continues and batch persistence still runs.",
+    "source_references": [
+      {
+        "file": "command.py",
+        "line": 9,
+        "end_line": 32
+      },
+      {
+        "file": "command.py",
+        "line": 34,
+        "end_line": 41
+      },
+      {
+        "file": "engine.py",
+        "line": 251,
+        "end_line": 271
+      },
+      {
+        "file": "sessions.py",
+        "line": 248,
+        "end_line": 255
+      }
+    ]
+  },
+  "commands": [
+    {
+      "name": "buy",
+      "classification": "handled",
+      "domain": "buildings",
+      "args": {
+        "positional": [
+          "args[0] item_index (int)",
+          "args[1] item_id (int)",
+          "args[2] x (int)",
+          "args[3] y (int)",
+          "args[4] playerID / player team (int)",
+          "args[5] orientation (int)",
+          "args[6] unknown",
+          "args[7] reason (str)"
+        ],
+        "shape": "exactly 8 positional args"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "save, map via session(USERID) and save[maps][map_id] (command.py:35-37)"
+      ],
+      "state_writes": [
+        "bought_unit_add(save, item_id) when playerID == 1 (engine.py:86-90)",
+        "map_add_item(map, item_index, item_id, x, y, orientation, player) (engine.py:8-32)"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item_id, coordinates, orientation, player team, reason",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client chooses item and placement; costs are conveyed only through client-sent deltas."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 42,
+          "end_line": 59
+        },
+        {
+          "file": "engine.py",
+          "line": 8,
+          "end_line": 32
+        }
+      ]
+    },
+    {
+      "name": "complete_tutorial",
+      "classification": "handled",
+      "domain": "progression",
+      "args": {
+        "positional": [
+          "args[0] tutorial_step (int)"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "save[playerInfo]"
+      ],
+      "state_writes": [
+        "save[playerInfo][completed_tutorial] = 1 when tutorial_step >= 25 or == 15"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "tutorial_step value",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client-declared step; completion flag follows the client value with no server-side step validation."
+      ],
+      "observed_fixtures": [
+        "Contained four-command replay evidence in tools/protocol-replay (recorder-v1 eligible oracle); no progressed-player or gameplay-parity claim."
+      ],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Replay evidence exists (see observed_fixtures); no other focused evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 60,
+          "end_line": 67
+        }
+      ]
+    },
+    {
+      "name": "set_goals",
+      "classification": "handled",
+      "domain": "quests",
+      "args": {
+        "positional": [
+          "args[0] goal_id",
+          "args[1] progress JSON: [visited, currentStep]"
+        ],
+        "shape": "exactly 2 positional args; args[1] must parse as JSON"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "save[privateState]",
+        "goal title lookup for logging"
+      ],
+      "state_writes": [
+        "set_goals(save[privateState], goal_id, progress) (engine.py:96-101)"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "goal_id and full progress vector",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client sets arbitrary goal progress; no server-side quest precondition check."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 68,
+          "end_line": 75
+        },
+        {
+          "file": "engine.py",
+          "line": 96,
+          "end_line": 101
+        }
+      ]
+    },
+    {
+      "name": "complete_goal",
+      "classification": "handled",
+      "domain": "quests",
+      "args": {
+        "positional": [
+          "args[0] goal_id"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "goal title lookup for logging only"
+      ],
+      "state_writes": [
+        "None; branch only logs completion"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255). (no command-specific state to persist)"
+      ],
+      "client_trust": [
+        "goal_id",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "No state change in this branch; any reward travels exclusively through client-sent deltas."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 76,
+          "end_line": 80
+        }
+      ]
+    },
+    {
+      "name": "level_up",
+      "classification": "handled",
+      "domain": "progression",
+      "args": {
+        "positional": [
+          "args[0] new_level (int)"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "map[level]"
+      ],
+      "state_writes": [
+        "map[level] = new_level with no range or XP validation"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "new_level value",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client sets the map level directly; XP/level consistency is not verified server-side."
+      ],
+      "observed_fixtures": [
+        "Contained four-command replay evidence in tools/protocol-replay (recorder-v1 eligible oracle); no progressed-player or gameplay-parity claim."
+      ],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Replay evidence exists (see observed_fixtures); no other focused evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 81,
+          "end_line": 86
+        }
+      ]
+    },
+    {
+      "name": "set_quest_var",
+      "classification": "handled",
+      "domain": "quests",
+      "args": {
+        "positional": [
+          "args[0] key (str)",
+          "args[1] value"
+        ],
+        "shape": "exactly 2 positional args"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "map[currentQuestVars]",
+        "map[idCurrentMission]"
+      ],
+      "state_writes": [
+        "map[idCurrentMission] = value when key == 'id'",
+        "map[currentQuestVars][key] = value (dict created when falsy)",
+        "key 'idSimpleChapter' is explicitly ignored and returns early"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "quest key and value",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client writes arbitrary quest variables; no value type parsing or quest validation."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 87,
+          "end_line": 118
+        }
+      ]
+    },
+    {
+      "name": "move",
+      "classification": "handled",
+      "domain": "buildings",
+      "args": {
+        "positional": [
+          "args[0] item_index",
+          "args[1] x",
+          "args[2] y",
+          "args[3] frame",
+          "args[4] string"
+        ],
+        "shape": "exactly 5 positional args; frame/string are read but unused"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "map item at item_index via map_get_item (engine.py:36-41)"
+      ],
+      "state_writes": [
+        "item[1] = x, item[2] = y; missing item logs an error and returns early"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item index and target coordinates",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client repositions any indexed item; no ownership, collision, or bounds check."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 119,
+          "end_line": 135
+        },
+        {
+          "file": "engine.py",
+          "line": 36,
+          "end_line": 41
+        }
+      ]
+    },
+    {
+      "name": "collect",
+      "classification": "handled",
+      "domain": "economy",
+      "args": {
+        "positional": [
+          "args[0] item_index"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Income itself travels through client-sent deltas; the branch only stamps the timer."
+      ],
+      "state_reads": [
+        "map item at item_index"
+      ],
+      "state_writes": [
+        "item[3] = time_now (collect timer); missing item logs an error and returns early"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item index",
+        "resources_changed deltas (the actual income)"
+      ],
+      "security_notes": [
+        "Server does not compute yield; the client declares what collecting produced."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 136,
+          "end_line": 148
+        }
+      ]
+    },
+    {
+      "name": "sell",
+      "classification": "handled",
+      "domain": "buildings",
+      "args": {
+        "positional": [
+          "args[0] item_index",
+          "args[1] reason (str)"
+        ],
+        "shape": "exactly 2 positional args"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Refund (if any) travels through client-sent deltas."
+      ],
+      "state_reads": [
+        "map item at item_index"
+      ],
+      "state_writes": [
+        "reason KILL routes the item through push_dead_unit (engine.py:149-171), which may mark it resurrectable",
+        "map_delete_item(map, item_index) (engine.py:48-53); missing item logs an error and returns early"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item index and reason string",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client chooses the victim item and the reason; resurrectability is a server-side lookup, not a client flag."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 149,
+          "end_line": 168
+        },
+        {
+          "file": "engine.py",
+          "line": 149,
+          "end_line": 171
+        }
+      ]
+    },
+    {
+      "name": "kill",
+      "classification": "handled",
+      "domain": "combat",
+      "args": {
+        "positional": [
+          "args[0] item_index",
+          "args[1] reason (str)"
+        ],
+        "shape": "exactly 2 positional args"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "map item at item_index"
+      ],
+      "state_writes": [
+        "map_delete_item(map, item_index); missing item logs an error and returns early; unlike sell, never touches the dead-unit pool"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item index and reason string",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client deletes any indexed item with an arbitrary reason; no combat-resolution check."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 169,
+          "end_line": 182
+        },
+        {
+          "file": "engine.py",
+          "line": 48,
+          "end_line": 53
+        }
+      ]
+    },
+    {
+      "name": "kill_iid",
+      "classification": "handled",
+      "domain": "combat",
+      "args": {
+        "positional": [
+          "args[0] item_id",
+          "args[1] reason_str"
+        ],
+        "shape": "exactly 2 positional args; neither affects state"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "item name lookup for logging only"
+      ],
+      "state_writes": [
+        "None; branch only logs"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255). (no command-specific state to persist)"
+      ],
+      "client_trust": [
+        "item_id and reason string",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Log-only branch; any associated loss or refund travels exclusively through client-sent deltas."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 183,
+          "end_line": 188
+        }
+      ]
+    },
+    {
+      "name": "batch_remove",
+      "classification": "handled",
+      "domain": "buildings",
+      "args": {
+        "positional": [
+          "args[0] index_list JSON (list of item indexes)"
+        ],
+        "shape": "exactly 1 positional arg; must parse as JSON list"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "map items at the listed indexes"
+      ],
+      "state_writes": [
+        "map_delete_item for every listed index; unknown indexes are ignored inside map_delete_item"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "full index list",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client bulk-deletes arbitrary map indexes in one command."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 189,
+          "end_line": 197
+        }
+      ]
+    },
+    {
+      "name": "orient",
+      "classification": "handled",
+      "domain": "buildings",
+      "args": {
+        "positional": [
+          "args[0] item_index",
+          "args[1] orientation"
+        ],
+        "shape": "exactly 2 positional args"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "map item at item_index"
+      ],
+      "state_writes": [
+        "item[4] = int(orientation); missing item logs an error and returns early"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item index and orientation",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Orientation is int()-coerced server-side but otherwise client-chosen."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 198,
+          "end_line": 210
+        }
+      ]
+    },
+    {
+      "name": "expand",
+      "classification": "handled",
+      "domain": "town",
+      "args": {
+        "positional": [
+          "args[0] expansion (int-like)"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Expansion cost travels through client-sent deltas."
+      ],
+      "state_reads": [
+        "map[expansions]"
+      ],
+      "state_writes": [
+        "map[expansions] += [int(expansion)]"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "expansion id",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client unlocks any expansion id; no adjacency, level, or cost verification."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 211,
+          "end_line": 217
+        }
+      ]
+    },
+    {
+      "name": "store_item",
+      "classification": "handled",
+      "domain": "storage",
+      "args": {
+        "positional": [
+          "args[0] item_index"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "map item at item_index"
+      ],
+      "state_writes": [
+        "item popped via map_pop_item (engine.py:42-47), then add_store_item(map, item_id) (engine.py:70-76); missing item logs an error and returns early"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item index",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client moves any indexed item into storage; no capacity check."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 218,
+          "end_line": 232
+        },
+        {
+          "file": "engine.py",
+          "line": 42,
+          "end_line": 47
+        }
+      ]
+    },
+    {
+      "name": "place_stored_item",
+      "classification": "handled",
+      "domain": "storage",
+      "args": {
+        "positional": [
+          "args[0] item_index",
+          "args[1] item_id",
+          "args[2] x",
+          "args[3] y",
+          "args[4] playerID",
+          "args[5] orientation",
+          "args[6] unknown_autoactivable_bool",
+          "args[7] unknown_imgIndex"
+        ],
+        "shape": "exactly 8 positional args"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "map store for item_id"
+      ],
+      "state_writes": [
+        "remove_store_item(map, item_id) (engine.py:77-85)",
+        "map_add_item at the given coordinates (engine.py:8-32)",
+        "bought_unit_add(save, item_id) (engine.py:86-90)"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item_id, coordinates, orientation, player team",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Placement is client-declared; stored-stock accounting is the only server-side gate."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 233,
+          "end_line": 249
+        },
+        {
+          "file": "engine.py",
+          "line": 77,
+          "end_line": 85
+        }
+      ]
+    },
+    {
+      "name": "sell_stored_item",
+      "classification": "handled",
+      "domain": "storage",
+      "args": {
+        "positional": [
+          "args[0] item_id"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Sale proceeds travel through client-sent deltas."
+      ],
+      "state_reads": [
+        "map store for item_id"
+      ],
+      "state_writes": [
+        "remove_store_item(map, item_id)"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item_id",
+        "resources_changed deltas (the proceeds)"
+      ],
+      "security_notes": [
+        "Server removes the stored item but never prices the sale."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 250,
+          "end_line": 257
+        }
+      ]
+    },
+    {
+      "name": "store_add_items",
+      "classification": "handled",
+      "domain": "storage",
+      "args": {
+        "positional": [
+          "args[0] item_id_list (list)"
+        ],
+        "shape": "exactly 1 positional arg; iterated directly (must be a list)"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "map store"
+      ],
+      "state_writes": [
+        "add_store_item plus bought_unit_add for every listed item_id"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "full item_id list",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client grants itself arbitrary stored items; payment travels only through deltas."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 258,
+          "end_line": 267
+        }
+      ]
+    },
+    {
+      "name": "next_research_step",
+      "classification": "handled",
+      "domain": "research",
+      "args": {
+        "positional": [
+          "args[0] type (0 Area 51, 1 Robotic Center)"
+        ],
+        "shape": "exactly 1 positional arg; used as a list index"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "save[privateState][researchStepNumber/typeStampDoResearch]"
+      ],
+      "state_writes": [
+        "researchStepNumber[type] += 1; timeStampDoResearch[type] = time_now"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "research type index",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "No research-point or prerequisite check; the type index is trusted."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 268,
+          "end_line": 275
+        }
+      ]
+    },
+    {
+      "name": "research_buy_step_cash",
+      "classification": "handled",
+      "domain": "research",
+      "args": {
+        "positional": [
+          "args[0] cash (read but unused)",
+          "args[1] type"
+        ],
+        "shape": "exactly 2 positional args; args[0] is ignored by the branch"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Cash cost travels through client-sent deltas; the cash arg itself is read and ignored."
+      ],
+      "state_reads": [
+        "save[privateState][timeStampDoResearch]"
+      ],
+      "state_writes": [
+        "timeStampDoResearch[type] = 0"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "research type index",
+        "resources_changed deltas (the cash cost)"
+      ],
+      "security_notes": [
+        "Server clears the timer without verifying any cash payment."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 276,
+          "end_line": 283
+        }
+      ]
+    },
+    {
+      "name": "next_research_item",
+      "classification": "handled",
+      "domain": "research",
+      "args": {
+        "positional": [
+          "args[0] type"
+        ],
+        "shape": "exactly 1 positional arg; used as a list index"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "save[privateState] research counters"
+      ],
+      "state_writes": [
+        "researchItemNumber[type] += 1; researchStepNumber[type] = 0; timeStampDoResearch[type] = 0"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "research type index",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client advances the research track with no completion check."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 284,
+          "end_line": 292
+        }
+      ]
+    },
+    {
+      "name": "reset_research_item",
+      "classification": "handled",
+      "domain": "research",
+      "args": {
+        "positional": [
+          "args[0] type"
+        ],
+        "shape": "exactly 1 positional arg; used as a list index"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "save[privateState] research counters"
+      ],
+      "state_writes": [
+        "researchItemNumber, researchStepNumber and timeStampDoResearch for type all set to 0"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "research type index",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client resets the research track; no authorization or cost check."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 293,
+          "end_line": 301
+        }
+      ]
+    },
+    {
+      "name": "flash_debug",
+      "classification": "handled",
+      "domain": "diagnostics",
+      "args": {
+        "positional": [
+          "args[0] cash",
+          "args[1] unknown (ignored)",
+          "args[2] xp",
+          "args[3] gold",
+          "args[4] oil",
+          "args[5] steel",
+          "args[6] wood"
+        ],
+        "shape": "exactly 7 positional args; DEBUG ONLY, never a production client path"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Then overwrites balances outright, bypassing delta accounting."
+      ],
+      "state_reads": [
+        "save[playerInfo]",
+        "map resources"
+      ],
+      "state_writes": [
+        "playerInfo[cash] = cash; map xp/gold/oil/steel/wood overwritten with the client values"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "entire resource state",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "DEBUG COMMAND: client dictates absolute resource balances. Must never be reachable on a production path; the modern API must not reproduce it."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; must-not-migrate; debug-only, never a production path",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 302,
+          "end_line": 321
+        }
+      ]
+    },
+    {
+      "name": "add_xp_unit",
+      "classification": "handled",
+      "domain": "progression",
+      "args": {
+        "positional": [
+          "args[0] item_index",
+          "args[1] xp_gain",
+          "args[2] level (optional; presence changes only the log line)"
+        ],
+        "shape": "2 or 3 positional args"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "map item at item_index"
+      ],
+      "state_writes": [
+        "item attr xp created or incremented by xp_gain; missing item logs an error and returns early"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item index and xp_gain",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client awards arbitrary unit XP; the optional level arg is cosmetic."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 322,
+          "end_line": 344
+        }
+      ]
+    },
+    {
+      "name": "weekly_reward",
+      "classification": "handled",
+      "domain": "rewards",
+      "args": {
+        "positional": [
+          "args[0] item_index",
+          "args[1] item_id",
+          "args[2] x",
+          "args[3] y",
+          "args[4] playerID; longer arg lists grant the item, shorter ones grant resources only"
+        ],
+        "shape": "variable-length args; len(args) > 4 selects the item branch"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Resource prizes travel through client-sent deltas."
+      ],
+      "state_reads": [
+        "save[privateState][weeklyRewardIndex]"
+      ],
+      "state_writes": [
+        "item branch: map_add_item plus bought_unit_add",
+        "always: timeStampMondayBonus = time_now; weeklyRewardIndex = (index + 1) % get_weekly_reward_length()"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "prize item and coordinates (item branch)",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "No weekly-eligibility check beyond overwriting the timestamp; client selects the prize."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 345,
+          "end_line": 364
+        },
+        {
+          "file": "get_game_config.py",
+          "line": 195,
+          "end_line": 209
+        }
+      ]
+    },
+    {
+      "name": "push_unit",
+      "classification": "handled",
+      "domain": "units",
+      "args": {
+        "positional": [
+          "args[0] index_unit",
+          "args[1] index_building"
+        ],
+        "shape": "exactly 2 positional args"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "unit and building map items"
+      ],
+      "state_writes": [
+        "unit popped via map_pop_item, then push_unit(unit, building) (engine.py:54-57); missing unit or building logs an error and returns early"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "unit and building indexes",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client assigns any unit to any building; no garrison rules checked."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 365,
+          "end_line": 382
+        },
+        {
+          "file": "engine.py",
+          "line": 54,
+          "end_line": 57
+        }
+      ]
+    },
+    {
+      "name": "pop_unit",
+      "classification": "handled",
+      "domain": "units",
+      "args": {
+        "positional": [
+          "args[0] index_building",
+          "args[1] index_unit",
+          "args[2] item_id",
+          "args[3] x",
+          "args[4] y",
+          "args[5] playerID",
+          "args[6] unknown (read but unused)"
+        ],
+        "shape": "exactly 7 positional args"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "building map item; garrisoned unit via pop_unit (engine.py:58-69)"
+      ],
+      "state_writes": [
+        "popped unit rewritten to item_id/x/y/playerID, then map_add_item_from_item (engine.py:33-35); missing building or empty garrison logs an error and returns early"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "building index, replacement item_id, coordinates, player team",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client re-types the popped unit to any item_id at any coordinates."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 383,
+          "end_line": 411
+        },
+        {
+          "file": "engine.py",
+          "line": 58,
+          "end_line": 69
+        }
+      ]
+    },
+    {
+      "name": "activate",
+      "classification": "handled",
+      "domain": "inventory",
+      "args": {
+        "positional": [
+          "args[0] item_id (used as a map item INDEX via map_get_item, despite the name)",
+          "args[1] activate (int)"
+        ],
+        "shape": "exactly 2 positional args"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "map item at the args[0] index"
+      ],
+      "state_writes": [
+        "activate > 0: item[3] = time_now and item[6][cp] = args[1]; else item[3] = time_now and item[6] = {}; missing item logs an error and returns early"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item index and CP value",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client sets arbitrary CP state on any indexed item."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 412,
+          "end_line": 429
+        }
+      ]
+    },
+    {
+      "name": "collect_mission",
+      "classification": "handled",
+      "domain": "missions",
+      "args": {
+        "positional": [
+          "args[0] next_mission (int-like)"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "map[idCurrentMission]"
+      ],
+      "state_writes": [
+        "next_mission > 99 wraps to 1; map[idCurrentMission] = str(next_mission); map[timestampLastChapter] = time_now; map[currentQuestVars] = {}"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "next mission number",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client advances the mission track; no mission-completion verification."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 430,
+          "end_line": 443
+        }
+      ]
+    },
+    {
+      "name": "win_daily_bonus",
+      "classification": "handled",
+      "domain": "rewards",
+      "args": {
+        "positional": [
+          "args[0] item (item_id; <= 0 means resources only)",
+          "args[1] bonus id; next id = args[1] + 1, wraps to 1 above 5"
+        ],
+        "shape": "exactly 2 positional args"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Resource prizes travel through client-sent deltas."
+      ],
+      "state_reads": [
+        "save[privateState] bonus fields"
+      ],
+      "state_writes": [
+        "timestampLastBonus = time_now; bonusNextId = next_id (wrapped)",
+        "item > 0: bought_unit_add plus add_store_item; else resources-only log"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "prize item and bonus id",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "No daily-eligibility check beyond overwriting the timestamp; client selects the prize."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 444,
+          "end_line": 464
+        }
+      ]
+    },
+    {
+      "name": "trade_resource",
+      "classification": "handled",
+      "domain": "economy",
+      "args": {
+        "positional": [
+          "args[0] resource_type (read but unused)",
+          "args[1] sold flag: 1 sold, 2 bought (read but unused)"
+        ],
+        "shape": "exactly 2 positional args; both are ignored by the branch"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Trade amounts travel exclusively through client-sent deltas."
+      ],
+      "state_reads": [
+        "map[numTradesDone]"
+      ],
+      "state_writes": [
+        "map[numTradesDone] = min(20, numTradesDone + 1); map[timestampLastTrade] = time_now"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "trade amounts and direction",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Server counts the trade but never validates rates, amounts, or the 20-trade cap against the claimed resources."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 465,
+          "end_line": 474
+        }
+      ]
+    },
+    {
+      "name": "buy_stored_item_cash",
+      "classification": "handled",
+      "domain": "storage",
+      "args": {
+        "positional": [
+          "args[0] item_id"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Cash price travels through client-sent deltas."
+      ],
+      "state_reads": [
+        "map store"
+      ],
+      "state_writes": [
+        "bought_unit_add(save, item_id) plus add_store_item(map, item_id)"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item_id",
+        "resources_changed deltas (the price)"
+      ],
+      "security_notes": [
+        "Server grants the item without verifying any cash payment."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 475,
+          "end_line": 481
+        }
+      ]
+    },
+    {
+      "name": "unit_collections_completed",
+      "classification": "handled",
+      "domain": "collections",
+      "args": {
+        "positional": [
+          "args[0] collection_id"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "save collection state via unit_collection_complete (engine.py:91-95)"
+      ],
+      "state_writes": [
+        "unit_collection_complete(save, collection_id)"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "collection_id",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client declares collection completion; no set-membership verification."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 482,
+          "end_line": 487
+        },
+        {
+          "file": "engine.py",
+          "line": 91,
+          "end_line": 95
+        }
+      ]
+    },
+    {
+      "name": "add_inventory_item",
+      "classification": "handled",
+      "domain": "inventory",
+      "args": {
+        "positional": [
+          "args[0] item",
+          "args[1] quantity"
+        ],
+        "shape": "exactly 2 positional args"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "save[privateState] inventory"
+      ],
+      "state_writes": [
+        "inventory_add(save[privateState], item, quantity) (engine.py:109-115)"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item and quantity",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client mints arbitrary inventory stock."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 488,
+          "end_line": 495
+        },
+        {
+          "file": "engine.py",
+          "line": 109,
+          "end_line": 115
+        }
+      ]
+    },
+    {
+      "name": "remove_inventory_item",
+      "classification": "handled",
+      "domain": "inventory",
+      "args": {
+        "positional": [
+          "args[0] item",
+          "args[1] quantity"
+        ],
+        "shape": "exactly 2 positional args"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "save[privateState] inventory"
+      ],
+      "state_writes": [
+        "inventory_remove(save[privateState], item, quantity) (engine.py:116-124)"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item and quantity",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client-declared removal; no crafting or consumption linkage checked."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 496,
+          "end_line": 503
+        },
+        {
+          "file": "engine.py",
+          "line": 116,
+          "end_line": 124
+        }
+      ]
+    },
+    {
+      "name": "complete_collection",
+      "classification": "handled",
+      "domain": "collections",
+      "args": {
+        "positional": [
+          "args[0] collection_id",
+          "args[1] bought flag (log label only)"
+        ],
+        "shape": "exactly 2 positional args"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "collection prize via get_collection_prize (get_game_config.py:170-180); privateState[collections]"
+      ],
+      "state_writes": [
+        "every prize key added via add_store_item(map, int(key), prize[key])",
+        "collection_id appended to privateState[collections] when absent"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "collection_id",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client declares completion; the prize itself is a server-side lookup, not a client value."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 504,
+          "end_line": 524
+        },
+        {
+          "file": "get_game_config.py",
+          "line": 170,
+          "end_line": 180
+        }
+      ]
+    },
+    {
+      "name": "add_click",
+      "classification": "handled",
+      "domain": "buildings",
+      "args": {
+        "positional": [
+          "args[0] index"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "map item at index"
+      ],
+      "state_writes": [
+        "add_click(item) (engine.py:125-131); missing item logs an error and returns early"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item index",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client advances click-to-build state with no work verification."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 525,
+          "end_line": 536
+        },
+        {
+          "file": "engine.py",
+          "line": 125,
+          "end_line": 131
+        }
+      ]
+    },
+    {
+      "name": "activate_item_click",
+      "classification": "handled",
+      "domain": "buildings",
+      "args": {
+        "positional": [
+          "args[0] index"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "map item at index"
+      ],
+      "state_writes": [
+        "activate_item_click(item) (engine.py:132-136); missing item logs an error and returns early"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item index",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client finalizes click-to-build state with no work verification."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 537,
+          "end_line": 548
+        },
+        {
+          "file": "engine.py",
+          "line": 132,
+          "end_line": 136
+        }
+      ]
+    },
+    {
+      "name": "buy_si_help",
+      "classification": "handled",
+      "domain": "buildings",
+      "args": {
+        "positional": [
+          "args[0] index"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Help cost travels through client-sent deltas."
+      ],
+      "state_reads": [
+        "map item at index"
+      ],
+      "state_writes": [
+        "buy_si_help(item) (engine.py:137-143); missing item logs an error and returns early"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item index",
+        "resources_changed deltas (the cost)"
+      ],
+      "security_notes": [
+        "Server applies help without verifying any payment."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 549,
+          "end_line": 560
+        },
+        {
+          "file": "engine.py",
+          "line": 137,
+          "end_line": 143
+        }
+      ]
+    },
+    {
+      "name": "finish_si",
+      "classification": "handled",
+      "domain": "buildings",
+      "args": {
+        "positional": [
+          "args[0] index"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "map item at index"
+      ],
+      "state_writes": [
+        "finish_si(item) (engine.py:144-148); missing item logs an error and returns early"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item index",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client finishes social-interaction state with no help verification."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 561,
+          "end_line": 572
+        },
+        {
+          "file": "engine.py",
+          "line": 144,
+          "end_line": 148
+        }
+      ]
+    },
+    {
+      "name": "darts_reset",
+      "classification": "handled",
+      "domain": "events",
+      "args": {
+        "positional": [
+          "args[0] seed (client-chosen)"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "save[privateState] darts fields"
+      ],
+      "state_writes": [
+        "dartsRandomSeed = seed; dartsBalloonsShot = []; dartsHasFree = True; dartsGotExtra = False; timeStampDartsReset and timeStampDartsNewFree = time_now"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "random seed",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client seeds the event minigame RNG; outcomes derived from it are client-influenced."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 573,
+          "end_line": 585
+        }
+      ]
+    },
+    {
+      "name": "darts_new_free",
+      "classification": "handled",
+      "domain": "events",
+      "args": {
+        "positional": [],
+        "shape": "no args read"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "save[privateState] darts fields"
+      ],
+      "state_writes": [
+        "dartsHasFree = True; timeStampDartsNewFree = time_now"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client grants itself a free event shot; no cooldown verification."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 586,
+          "end_line": 592
+        }
+      ]
+    },
+    {
+      "name": "darts_shoot_balloon",
+      "classification": "handled",
+      "domain": "events",
+      "args": {
+        "positional": [
+          "args[0] target index",
+          "args[1] won_extra flag"
+        ],
+        "shape": "exactly 2 positional args"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Event winnings travel through client-sent deltas."
+      ],
+      "state_reads": [
+        "save[privateState][dartsBalloonsShot]"
+      ],
+      "state_writes": [
+        "target appended when new; dartsHasFree = False; timeStampDartsNewFree = time_now; dartsGotExtra = True when won_extra"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "target index and win flag",
+        "resources_changed deltas (the winnings)"
+      ],
+      "security_notes": [
+        "Client reports its own hits and wins; no shot validation."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 593,
+          "end_line": 611
+        }
+      ]
+    },
+    {
+      "name": "buy_premium_account",
+      "classification": "handled",
+      "domain": "monetization",
+      "args": {
+        "positional": [
+          "args[0] package_index"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Package price travels through client-sent deltas."
+      ],
+      "state_reads": [
+        "save[privateState][timeStampEndPremium]; package days via get_premium_days (get_game_config.py:181-194)"
+      ],
+      "state_writes": [
+        "expired premium: timeStampEndPremium = time_now + days * 86400; active premium: extended by days * 86400"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "package index",
+        "resources_changed deltas (the price)"
+      ],
+      "security_notes": [
+        "Server extends premium time without verifying any real-money payment."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 612,
+          "end_line": 624
+        },
+        {
+          "file": "get_game_config.py",
+          "line": 181,
+          "end_line": 194
+        }
+      ]
+    },
+    {
+      "name": "resurrect_hero",
+      "classification": "handled",
+      "domain": "units",
+      "args": {
+        "positional": [
+          "args[0] index",
+          "args[1] item_id",
+          "args[2] x",
+          "args[3] y",
+          "args[4] used_syringe (read but unused)"
+        ],
+        "shape": "exactly 5 positional args; used_syringe is ignored by the branch"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Syringe cost travels through client-sent deltas."
+      ],
+      "state_reads": [
+        "save[privateState] dead-unit pool via resurrect_hero (engine.py:172-182)"
+      ],
+      "state_writes": [
+        "resurrect_hero(save[privateState], item_id); map_add_item(map, index, item_id, x, y)"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item_id and revive coordinates",
+        "resources_changed deltas (the syringe cost)"
+      ],
+      "security_notes": [
+        "Server never checks syringe stock; the flag is informational only."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 625,
+          "end_line": 636
+        },
+        {
+          "file": "engine.py",
+          "line": 172,
+          "end_line": 182
+        }
+      ]
+    },
+    {
+      "name": "set_resource_allies",
+      "classification": "handled",
+      "domain": "economy",
+      "args": {
+        "positional": [
+          "args[0] resource",
+          "args[1] index (map item index)"
+        ],
+        "shape": "exactly 2 positional args"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "map item at index (when present)"
+      ],
+      "state_writes": [
+        "when the item exists: item[3] = time_now and finish_si(item); always: map[resourceAlliesMarket] = resource"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "resource value and item index",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Alliance-adjacent in name only: the branch sets a market resource field; alliance gameplay itself is not implemented (the alliance/ route returns an empty placeholder). Not overstated as social behavior."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 637,
+          "end_line": 648
+        }
+      ]
+    },
+    {
+      "name": "buy_mana_new",
+      "classification": "handled",
+      "domain": "inventory",
+      "args": {
+        "positional": [],
+        "shape": "no args read; explicit no-op"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Mana price travels through client-sent deltas."
+      ],
+      "state_reads": [
+        "None"
+      ],
+      "state_writes": [
+        "None; branch only logs 'Bought mana'"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255). (no command-specific state to persist)"
+      ],
+      "client_trust": [
+        "resources_changed deltas (the price and the mana)"
+      ],
+      "security_notes": [
+        "No-op branch; the entire purchase is conveyed through deltas."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 649,
+          "end_line": 651
+        }
+      ]
+    },
+    {
+      "name": "buy_magic",
+      "classification": "handled",
+      "domain": "inventory",
+      "args": {
+        "positional": [
+          "args[0] magic_id"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Spell price travels through client-sent deltas."
+      ],
+      "state_reads": [
+        "save[privateState][magics]"
+      ],
+      "state_writes": [
+        "known spell: magics[str(magic_id)] += min(50, count + 1); unknown spell: magics[str(magic_id)] = 0"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "magic_id",
+        "resources_changed deltas (the price)"
+      ],
+      "security_notes": [
+        "Server grants spell stock without verifying payment; increment arithmetic is a preserved source quirk."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 652,
+          "end_line": 663
+        }
+      ]
+    },
+    {
+      "name": "use_magic",
+      "classification": "handled",
+      "domain": "inventory",
+      "args": {
+        "positional": [
+          "args[0] magic_id"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "save[privateState][magics]"
+      ],
+      "state_writes": [
+        "known spell: magics[str(magic_id)] = min(50, count + 1); unknown spell: magics[str(magic_id)] = 0; the branch never decrements stock (preserved source quirk)"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "magic_id",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Use path mirrors the buy increment and never consumes stock; a modern replacement must define consumption explicitly."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 664,
+          "end_line": 675
+        }
+      ]
+    },
+    {
+      "name": "push_queue_unit",
+      "classification": "handled",
+      "domain": "units",
+      "args": {
+        "positional": [
+          "args[0] index"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "map item at index"
+      ],
+      "state_writes": [
+        "push_queue_unit(item) (engine.py:183-190); missing item logs an error and returns early"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item index",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client queues production on any indexed item; no queue-capacity check."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 676,
+          "end_line": 686
+        },
+        {
+          "file": "engine.py",
+          "line": 183,
+          "end_line": 190
+        }
+      ]
+    },
+    {
+      "name": "push_queue_unit2",
+      "classification": "handled",
+      "domain": "units",
+      "args": {
+        "positional": [
+          "args[0] atom_fusion_index",
+          "args[1] unit_id"
+        ],
+        "shape": "exactly 2 positional args"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "atom fusion map item"
+      ],
+      "state_writes": [
+        "push_queue_unit2(atom_fusion, unit_id) (engine.py:206-214); missing fusion item logs an error and returns early"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "fusion index and unit_id",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client queues any unit_id on any fusion building; no recipe check."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 687,
+          "end_line": 698
+        },
+        {
+          "file": "engine.py",
+          "line": 206,
+          "end_line": 214
+        }
+      ]
+    },
+    {
+      "name": "pop_queue_unit",
+      "classification": "handled",
+      "domain": "units",
+      "args": {
+        "positional": [
+          "args[0] index"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "map item at index"
+      ],
+      "state_writes": [
+        "pop_queue_unit(item) (engine.py:191-205); missing item logs an error and returns early"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item index",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client pops the production queue; no timer-completion verification."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 699,
+          "end_line": 709
+        },
+        {
+          "file": "engine.py",
+          "line": 191,
+          "end_line": 205
+        }
+      ]
+    },
+    {
+      "name": "buy_offer_pack",
+      "classification": "handled",
+      "domain": "monetization",
+      "args": {
+        "positional": [
+          "args[0] package_id (read but unused)",
+          "args[1] item_list JSON (list of item ids)"
+        ],
+        "shape": "exactly 2 positional args; args[1] must parse as JSON"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Pack price travels through client-sent deltas."
+      ],
+      "state_reads": [
+        "map store"
+      ],
+      "state_writes": [
+        "add_store_item(map, item) for every id in the client-sent list"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "full item list and package id",
+        "resources_changed deltas (the price)"
+      ],
+      "security_notes": [
+        "Client composes its own pack contents; the package_id is informational only."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 710,
+          "end_line": 719
+        }
+      ]
+    },
+    {
+      "name": "buy_powerups",
+      "classification": "handled",
+      "domain": "monetization",
+      "args": {
+        "positional": [
+          "args[0] powerup_index (read but unused)"
+        ],
+        "shape": "exactly 1 positional arg; explicit TODO no-op"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Price travels through client-sent deltas."
+      ],
+      "state_reads": [
+        "None"
+      ],
+      "state_writes": [
+        "None; branch body is a TODO that only logs"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255). (no command-specific state to persist)"
+      ],
+      "client_trust": [
+        "resources_changed deltas (the price and any effect)"
+      ],
+      "security_notes": [
+        "No-op branch; nothing is granted or charged server-side."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 720,
+          "end_line": 726
+        }
+      ]
+    },
+    {
+      "name": "soulmixer_speedup",
+      "classification": "handled",
+      "domain": "events",
+      "args": {
+        "positional": [
+          "args[0] atom_fusion_index"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Speedup cost travels through client-sent deltas; the computed cash_cost is log-only."
+      ],
+      "state_reads": [
+        "atom fusion item timers and sm_training_time attribute"
+      ],
+      "state_writes": [
+        "atom_fusion[6][ts] = 0, clearing the training timer"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "fusion index",
+        "resources_changed deltas (the cost)"
+      ],
+      "security_notes": [
+        "Server clears the timer without verifying payment of the computed cost."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 727,
+          "end_line": 744
+        }
+      ]
+    },
+    {
+      "name": "admin_set_quest_rank",
+      "classification": "handled",
+      "domain": "quests",
+      "args": {
+        "positional": [
+          "args[0] quest_index",
+          "args[1] difficulty"
+        ],
+        "shape": "exactly 2 positional args; ADMIN-NAMED, never a production client path"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "save[privateState][questsRank]"
+      ],
+      "state_writes": [
+        "privateState[questsRank][str(quest_index)] = difficulty with no validation"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "quest index and difficulty",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Admin-named branch with no authorization check in the dispatcher; client sets arbitrary quest difficulty."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; must-not-migrate as-is; admin-only semantics need explicit authorization design",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 745,
+          "end_line": 751
+        }
+      ]
+    },
+    {
+      "name": "end_quest",
+      "classification": "handled",
+      "domain": "missions",
+      "args": {
+        "positional": [
+          "args[0] response JSON with win/duration/units/map/difficulty/voluntary_end/quest_id"
+        ],
+        "shape": "exactly 1 positional arg (args beyond index 0 are unread); must parse as JSON object"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Quest rewards travel through client-sent deltas."
+      ],
+      "state_reads": [
+        "save[privateState]; map[questTimes]"
+      ],
+      "state_writes": [
+        "lost units (unit[2] - unit[3] when positive) removed via map_lose_item (engine.py:215-229)",
+        "unparseable JSON or missing quest_id logs an error and returns early",
+        "map[questTimes][str(quest_id)] = time_now",
+        "source-visible fragility: a response without a units list reaches a for-loop over None and raises before stamping quest time"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "entire battle outcome report",
+        "resources_changed deltas (the rewards)"
+      ],
+      "security_notes": [
+        "Client reports its own wins, losses, and quest id; difficulty is clamped to 1-3 but nothing else is validated."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 752,
+          "end_line": 807
+        },
+        {
+          "file": "engine.py",
+          "line": 215,
+          "end_line": 229
+        }
+      ]
+    },
+    {
+      "name": "end_attack",
+      "classification": "handled",
+      "domain": "combat",
+      "args": {
+        "positional": [
+          "args[0] response JSON (voluntary_end/victim/attacker/resources/honor/duration/townhall_gold/win/different_island/victim_units/attacker_units/resources_victim)",
+          "args[1] unknown (read but unused)"
+        ],
+        "shape": "at least 2 positional args; args[0] must parse as JSON object"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "Loot travels through client-sent deltas."
+      ],
+      "state_reads": [
+        "save[privateState]; reported victim/attacker blocks (read-only)"
+      ],
+      "state_writes": [
+        "attacker losses removed via map_lose_item",
+        "unparseable JSON logs an error and returns early",
+        "explicit TODOs: victim save untouched, no attack logs written; like end_quest, a response without attacker_units reaches a for-loop over None and raises"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "entire battle report including loot and honor",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Client reports its own victory, loot, and honor; victim-side effects are not applied anywhere."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 808,
+          "end_line": 885
+        },
+        {
+          "file": "engine.py",
+          "line": 215,
+          "end_line": 229
+        }
+      ]
+    },
+    {
+      "name": "rt_open_graph_unit",
+      "classification": "handled",
+      "domain": "social",
+      "args": {
+        "positional": [
+          "args[0] item"
+        ],
+        "shape": "exactly 1 positional arg"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "save[privateState][publishedOpenGraphUnit] (normalized to a list when missing or mistyped)"
+      ],
+      "state_writes": [
+        "str(item) appended when not already present"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "item id",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Publish-tracking flag only; no social graph is written."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 886,
+          "end_line": 898
+        }
+      ]
+    },
+    {
+      "name": "first_time_marketplace",
+      "classification": "handled",
+      "domain": "social",
+      "args": {
+        "positional": [],
+        "shape": "no args read"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "save[privateState]"
+      ],
+      "state_writes": [
+        "privateState[marketPlaceFirstTime] = True"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Seen-flag only; no marketplace behavior is gated on it in the dispatcher."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 899,
+          "end_line": 904
+        }
+      ]
+    },
+    {
+      "name": "fast_forward",
+      "classification": "handled",
+      "domain": "time",
+      "args": {
+        "positional": [
+          "args[0] seconds (int)"
+        ],
+        "shape": "exactly 1 positional arg; TIME-MANIPULATION, never a production client path"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "map and privateState timestamps, research timers, item timers, quest times"
+      ],
+      "state_writes": [
+        "rewinds map timestamp/timestampLastChapter/timestampLastTreasure/timestampLastTrade, privateState timestampLastBonus/timestampLastAllianceBonus/timeStampDartsNewFree/tsAttacksReset/tsSpyingsReset, every research timer, every item timer and atom-fusion ts, and every quest time by seconds (floored at 0)",
+        "weekly fields timeStampMondayBonus and timeStampDartsReset are explicitly left untouched (commented out)"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255)."
+      ],
+      "client_trust": [
+        "arbitrary rewind interval",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "TIME-MANIPULATION COMMAND: client rewinds nearly every server-side cooldown. Must never be reachable on a production path; the modern API must not reproduce it."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; must-not-migrate; time-manipulation, never a production path",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 905,
+          "end_line": 947
+        }
+      ]
+    },
+    {
+      "name": "ping",
+      "classification": "handled",
+      "domain": "diagnostics",
+      "args": {
+        "positional": [],
+        "shape": "no args read"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs."
+      ],
+      "state_reads": [
+        "None"
+      ],
+      "state_writes": [
+        "None; branch only logs 'Pong'"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255). (no command-specific state to persist)"
+      ],
+      "client_trust": [
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Heartbeat branch; deltas still apply, so even ping can move resources."
+      ],
+      "observed_fixtures": [
+        "Contained four-command replay evidence in tools/protocol-replay (recorder-v1 eligible oracle); no progressed-player or gameplay-parity claim."
+      ],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Replay evidence exists (see observed_fixtures); no other focused evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 948,
+          "end_line": 950
+        }
+      ]
+    },
+    {
+      "name": "set_variables",
+      "classification": "handled",
+      "domain": "diagnostics",
+      "args": {
+        "positional": [],
+        "shape": "no args read; explicit no-op"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs.",
+        "This is the whole point of the branch: resource-only updates with no other state change."
+      ],
+      "state_reads": [
+        "None"
+      ],
+      "state_writes": [
+        "None; branch only logs 'Set player resources'"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255). (persists the pre-dispatch delta application)"
+      ],
+      "client_trust": [
+        "resources_changed deltas (the entire effect)"
+      ],
+      "security_notes": [
+        "Resource-only update path with no accompanying game action; deltas are the command."
+      ],
+      "observed_fixtures": [
+        "Contained four-command replay evidence in tools/protocol-replay (recorder-v1 eligible oracle); no progressed-player or gameplay-parity claim."
+      ],
+      "migration_status": "preserved-legacy; no modern replacement; pending domain migration",
+      "evidence": "Replay evidence exists (see observed_fixtures); no other focused evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 951,
+          "end_line": 953
+        }
+      ]
+    },
+    {
+      "name": "(unhandled)",
+      "classification": "fallthrough",
+      "domain": "dispatcher",
+      "args": {
+        "positional": [
+          "any unknown cmd string with any args"
+        ],
+        "shape": "else branch at command.py:954-956, outside the 63 named branches"
+      },
+      "resource_effects": [
+        "Pre-dispatch apply_resources(save, map, resources_changed) runs before this branch (command.py:40; engine.py:251-271); client-sent deltas are clamped at zero, never validated against costs. (deltas apply before the name is even checked)"
+      ],
+      "state_reads": [
+        "None beyond the shared dispatcher head"
+      ],
+      "state_writes": [
+        "None; branch logs the unknown name and returns from do_command while the batch continues"
+      ],
+      "persistence_effects": [
+        "Batch-level save_session(USERID) persists the whole player save after the command batch (command.py:32; sessions.py:248-255). (still runs for the batch, persisting deltas and earlier commands)"
+      ],
+      "client_trust": [
+        "unknown command names are accepted without error",
+        "resources_changed deltas"
+      ],
+      "security_notes": [
+        "Unknown names are silently absorbed (log-only) while their resource deltas still apply; a modern API must reject unknown intents explicitly."
+      ],
+      "observed_fixtures": [],
+      "migration_status": "preserved-legacy; modern API must reject unknown commands instead of absorbing them",
+      "evidence": "Source inspection only; no focused behavioral evidence.",
+      "source_references": [
+        {
+          "file": "command.py",
+          "line": 954,
+          "end_line": 956
+        }
+      ]
+    }
+  ]
+}

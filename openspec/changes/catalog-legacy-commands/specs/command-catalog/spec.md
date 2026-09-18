@@ -5,11 +5,11 @@ Provide a source-grounded inventory of preserved legacy dispatcher commands that
 ## ADDED Requirements
 
 ### Requirement: Complete classified command inventory
-The inventory SHALL cover the `command.php` envelope contract, every named dispatcher branch in the legacy command module, and the unhandled-command fallthrough. Each entry SHALL identify its command name, domain, positional argument shape, and dispatch classification. Unhandled names SHALL NOT be presented as implemented behavior, and debug or time-manipulation commands SHALL be labeled as never valid on a production client path.
+The inventory SHALL cover the `command.php` envelope contract, every named dispatcher branch in the legacy command module, and the unhandled-command fallthrough. Each entry SHALL identify its command name, domain, positional argument shape, and dispatch classification. Unhandled names SHALL NOT be presented as implemented behavior, and debug or time-manipulation commands SHALL be labeled as never valid on a production client path. (The proposal estimated 64 named branches; source truth is 63 — `push_dead_unit` is an engine helper, not a dispatcher branch.)
 
 #### Scenario: Review current dispatch coverage
 - **WHEN** the current legacy dispatcher is compared with the inventory
-- **THEN** all 64 named commands and the unhandled fallthrough are represented separately
+- **THEN** all 63 named commands and the unhandled fallthrough are represented separately
 
 #### Scenario: Distinguish the envelope from commands
 - **WHEN** a maintainer reviews a batched request
