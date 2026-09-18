@@ -63,6 +63,10 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 
 :bookmark_tabs: [Offline content census verification](tools/content-census/README.md)
 
+:bookmark_tabs: [Legacy content field-type survey](docs/game-content/field-types.md)
+
+:bookmark_tabs: [Offline field-type survey verification](tools/field-survey/README.md)
+
 :warning: [Known legacy bugs and limitations](docs/known-legacy-bugs.md)
 
 ## On archives and accessibility to digital heritage

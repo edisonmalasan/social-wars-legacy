@@ -169,6 +169,22 @@ cleaning, and the dynamic-derivation boundary (stored sources only;
 served bytes are time-dependent and explicitly unverified), not
 served-byte equality, content validity, gameplay parity, or normalization.
 
+Verified offline content field-type survey check (Windows x64 CPython 3.9.13):
+
+```bash
+python -B tools/field-survey/verify_fields.py
+python -B -m unittest discover -s tools/field-survey -p test_field_survey.py -v
+```
+
+See `docs/game-content/field-types.md` and `tools/field-survey/README.md`
+for the executable, invocation, exit codes, evidence classification, and
+containment. These checks establish source-grounded survey/readable/source
+consistency for per-field encoding profiles of the 15 array-of-object keys
+and value-shape profiles of the 5 object keys of `config/main.json`
+(stored sources only; served bytes are time-dependent and explicitly
+unverified), not served-byte equality, content validity, gameplay parity,
+normalization, coercion, or schema authoring.
+
 ---
 
 ## Code style
