@@ -36,16 +36,16 @@ It is a progress ledger, not the source of truth for specified behavior.
 
 - **Current milestone:** M2 — Behavioral Tooling
 - **Roadmap cursor:** M2 / canonical game content
-- **Active OpenSpec change:** none
-- **Lifecycle stage:** ARCHIVED
-- **Change status:** `catalog-legacy-commands` fully complete. Apply merged via PR #34 (`3583c40`): implementation `a5b3932` plus doc links `78ee183`. Spec sync merged via PR #35 (`a48ea6f`): new main spec `openspec/specs/command-catalog/spec.md`. Change archived as `2026-09-18-catalog-legacy-commands`. Implementation worker `ctx_ea199a373b05` (task `task_2c50d359318b`) delivered all tasks; terminal retained under user takeover, inbox empty.
-- **Current objective:** Propose the next smallest coherent change: canonical game content normalization (`packages/game-content`, roadmap section 10) or the domain-model definition (section 8) — whichever bounds smaller against `get_game_config.py`.
+- **Active OpenSpec change:** `census-legacy-game-content`
+- **Lifecycle stage:** PROPOSED
+- **Change status:** Proposal PR #37 merged as `bc2e139` on remote-tracking `feat/content-census` (branched fresh from updated `main`). 20 top-level content keys, five ordered patches, inactive mods pipeline, duplicate cleaning, and dynamic-derivation boundary scoped from direct source reads. Awaiting Apply implementation.
+- **Current objective:** Implement the approved content census, verifier, and regression tests per `openspec/changes/census-legacy-game-content/tasks.md`; orchestrator verifies independently before Apply acceptance.
 - **Last completed change:** `catalog-legacy-commands` — archived as `2026-09-18-catalog-legacy-commands`; proposal PR #33, Apply PR #34, sync PR #35
 - **Next eligible objective:** Canonical content or domain model after this archive; authentic progressed-player saves remain unavailable and must not be synthesized.
 - **Blocking issues:** None for the archived change. Source-truth correction recorded: the proposal estimated 64 named dispatcher branches, but `command.py` contains 63 literal comparisons (`push_dead_unit` is an engine helper, not a branch); change artifacts, catalog, verifier, and docs all enforce 63+1. Non-blocking follow-ups: unused `copy_tool` helper in `tools/endpoint-catalog/test_endpoint_catalog.py`; orchestrator has no local Python interpreter, so execution evidence relies on worker-attested runs under the pinned CPython 3.9.13. No dedicated OpenSpec verification workflow is installed; used the user-authorized strict validation, independent verification, required checks, and final diff review fallback. Authentic progressed-player saves remain unavailable and unverified.
-- **Last OpenSpec validation:** PASS — change strict validation plus `openspec validate --specs` with 8 main specs (2026-09-18); this is not the unavailable verification workflow
-- **Last implementation verification:** Orca implementation dispatch `ctx_ea199a373b05` reported verifier exit 0 with agreement on two byte-identical runs and 20 unittest tests exit 0 under CPython 3.9.13; root independently reviewed all seven delivered files, traced envelope/resource/fallthrough claims against `command.py`/`engine.py`, and confirmed 63+1 entries, exit-code contract, and containment. Fallback acceptance is complete.
-- **Last verified commit:** `3583c40` (Merge pull request #34, command catalog Apply)
+- **Last OpenSpec validation:** PASS — `census-legacy-game-content` strict validation (2026-09-18); this is not the unavailable verification workflow
+- **Last implementation verification:** Command catalog fallback acceptance complete (proposal PR #33, Apply PR #34, sync PR #35, archive PR #36). No content-census implementation verified yet.
+- **Last verified commit:** `bc2e139` (Merge pull request #37, content census proposal)
 - **Last updated:** 2026-09-18
 
 ### Status values
