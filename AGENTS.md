@@ -185,6 +185,21 @@ and value-shape profiles of the 5 object keys of `config/main.json`
 unverified), not served-byte equality, content validity, gameplay parity,
 normalization, coercion, or schema authoring.
 
+Verified offline items-normalization check (Windows x64 CPython 3.9.13):
+
+```bash
+python -B packages/game-content/tools/build_items.py
+python -B -m unittest discover -s packages/game-content/tests -p test_build_items.py -v
+```
+
+See `packages/game-content/README.md` for the executable, invocation,
+exit codes, evidence classification, and containment. These checks
+establish source-grounded normalization consistency for the 900 loaded
+`items` entries (470 buildings, 429 units, 1 documented special with
+schemas, round-trip evidence, and manifest), not served-byte equality,
+content validity, gameplay parity, asset existence, or
+progressed-player coverage.
+
 ---
 
 ## Code style
