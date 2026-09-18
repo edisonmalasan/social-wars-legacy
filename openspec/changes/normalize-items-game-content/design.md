@@ -5,7 +5,7 @@ M2 behavioral tooling is complete and archived. The content census records store
 ## Goals / Non-Goals
 
 **Goals:**
-- Normalized `buildings.json` (469) and `units.json` (308) with `legacy_id`, source, content version, and asset references, plus a documented special for id `925`.
+- Normalized `buildings.json` (470) and `units.json` (429) with `legacy_id`, source, content version, and asset references, plus a documented special for id `925`. Stored content splits `b` 469 / `u` 308 / `l` 1; the five ordered patches append one `b` (id `302`) and 121 `u` entries, so loaded content is 900 entries with distinct ids.
 - JSON schemas for building and unit definitions; a stdlib-only builder/validator that loads stored content, mirrors legacy layering without importing it, coerces per documented rules, validates, and writes output only on success.
 - Round-trip evidence (legacy-shaped re-emission diffed modulo coercions) and a manifest entry.
 - Focused regression tests for classification, coercion, validation failures, round-trip, and containment.

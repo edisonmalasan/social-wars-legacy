@@ -34,18 +34,18 @@ This section is maintained by the root Codex orchestrator.
 
 It is a progress ledger, not the source of truth for specified behavior.
 
-- **Current milestone:** M2 — Behavioral Tooling
-- **Roadmap cursor:** M2 / canonical game content
-- **Active OpenSpec change:** none
-- **Lifecycle stage:** ARCHIVED
-- **Change status:** `survey-content-field-types` fully complete. Apply merged via PR #42 (`7a2da0f`): implementation `036fe57` plus doc links `e3a1fc6`. Spec sync merged via PR #43 (`9aa4567`): new main spec `openspec/specs/content-field-survey/spec.md`. Change archived as `2026-09-18-survey-content-field-types`. Implementation worker `ctx_6d24af71bd22` (task `task_d3ba022bdcc5`) delivered all tasks; terminal retained under user takeover, inbox empty.
-- **Current objective:** Propose the next smallest coherent change: content normalization (`packages/game-content` schemas plus builder, roadmap section 10) or the canonical domain model (section 8) — now grounded in the census plus the field-type survey.
-- **Last completed change:** `survey-content-field-types` — archived as `2026-09-18-survey-content-field-types`; proposal PR #41, Apply PR #42, sync PR #43
-- **Next eligible objective:** Content normalization or domain model after this archive; authentic progressed-player saves remain unavailable and must not be synthesized.
+- **Current milestone:** M3 — Content Normalization
+- **Roadmap cursor:** M3 / items normalization
+- **Active OpenSpec change:** `normalize-items-game-content`
+- **Lifecycle stage:** PROPOSED
+- **Change status:** M2 exit satisfied (recorder, replay, state diff, golden fixtures archived and verified; catalogs/census/survey as bonus tooling). Proposal PR #45 merged as `8f42052` on remote-tracking `feat/items-normalization` (branched fresh from updated `main`). 469 buildings / 308 units / 1 documented special split, cost keys `o/s/g/w/c`, 194 upgrade chains, 138 training relations scoped from direct `config/main.json` reads. Awaiting Apply implementation.
+- **Current objective:** Implement the approved items normalization package, builder/validator, and regression tests per `openspec/changes/normalize-items-game-content/tasks.md`; orchestrator verifies independently before Apply acceptance.
+- **Last completed change:** `survey-content-field-types` — archived as `2026-09-18-survey-content-field-types`; proposal PR #41, Apply PR #42, sync PR #43, archive PR #44
+- **Next eligible objective:** Remaining items-normalization stages (Apply, Sync, Archive), then quests/research/collections/missions domains; authentic progressed-player saves remain unavailable and must not be synthesized.
 - **Blocking issues:** None for the archived change. Source-truth correction recorded: the proposal estimated 64 named dispatcher branches, but `command.py` contains 63 literal comparisons (`push_dead_unit` is an engine helper, not a branch); change artifacts, catalog, verifier, and docs all enforce 63+1. Non-blocking follow-ups: unused `copy_tool` helper in `tools/endpoint-catalog/test_endpoint_catalog.py`; orchestrator has no local Python interpreter, so execution evidence relies on worker-attested runs under the pinned CPython 3.9.13. No dedicated OpenSpec verification workflow is installed; used the user-authorized strict validation, independent verification, required checks, and final diff review fallback. Authentic progressed-player saves remain unavailable and unverified.
-- **Last OpenSpec validation:** PASS — change strict validation plus `openspec validate --specs` with 10 main specs (2026-09-18); this is not the unavailable verification workflow
-- **Last implementation verification:** Orca implementation dispatch `ctx_6d24af71bd22` reported verifier exit 0 with agreement on two byte-identical runs, 46 unittest tests exit 0 (sibling census 26/26, command 20/20, endpoint 20/20) under CPython 3.9.13; root independently reviewed all seven delivered files and confirmed whole-file counts, the 9-key mixed set, predicate edge behavior, exit-code contract, and containment against sources. Fallback acceptance is complete.
-- **Last verified commit:** `7a2da0f` (Merge pull request #42, field survey Apply)
+- **Last OpenSpec validation:** PASS — `normalize-items-game-content` strict validation (2026-09-18); this is not the unavailable verification workflow
+- **Last implementation verification:** Field survey fallback acceptance complete (proposal PR #41, Apply PR #42, sync PR #43, archive PR #44). No normalization implementation verified yet.
+- **Last verified commit:** `8f42052` (Merge pull request #45, items normalization proposal)
 - **Last updated:** 2026-09-18
 
 ### Status values

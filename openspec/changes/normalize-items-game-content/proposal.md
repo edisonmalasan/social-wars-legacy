@@ -5,7 +5,7 @@ M2 behavioral tooling is complete (recorder, replay, state diff, golden fixtures
 ## What Changes
 
 - Add a normalized items content package under `packages/game-content/` with `normalized/buildings.json`, `normalized/units.json`, JSON schemas under `schemas/` (building, unit), a stdlib-only builder/validator tool, and a manifest entry recording sources, content version, and legacy IDs.
-- Classify by the stored `type` field: `b` (469 buildings), `u` (308 units); the single `l` entry (id `925`, "Expandable Land") becomes a documented special definition, not a building or unit.
+- Classify by the stored `type` field: stored `b` (469) plus one patch-appended `b` (id `302`) normalize to 470 buildings; stored `u` (308) plus 121 patch-appended `u` normalize to 429 units; the single `l` entry (id `925`, "Expandable Land") becomes a documented special definition, not a building or unit. All 900 loaded ids are distinct.
 - Coerce per the field-type survey with documented rules: numeric strings to numbers, embedded-JSON strings (`costs`, `properties`, `inventory_ids`, `premium_upgrade_costs`) parsed to structures, `""` preserved only where the survey shows it is meaningful (e.g. `best_against`), `cost_type` (null in all 778 entries) dropped with a recorded note. Every definition preserves `legacy_id` (the stored string `id`).
 - Normalize from loaded content (stored `main.json` plus the five ordered patches plus duplicate cleaning, mirroring the legacy loader without importing it), never from served bytes.
 - Validate: duplicate IDs, `upgrades_to` (194 chains) and `trains_ids` (138 relations) resolving to known definitions, `costs` parsing to known resource keys (`o`, `s`, `g`, `w`, `c`) with non-negative amounts, required fields present per schema, and every schema-required field covered by a validator check (traceability test).
@@ -22,7 +22,7 @@ References below are proposal-time measurements from direct reads; the implement
 | `type` split | `b` 469, `u` 308, `l` 1 (id `925` Expandable Land) |
 | `costs` shape | Always a JSON-object string; resource keys exactly `o`, `s`, `g`, `w`, `c` |
 | `cost_type` | Null in all 778 entries (dead field, dropped with note) |
-| Cross-references | `upgrades_to` non-trivial in 194 entries; `trains_ids` non-default in 138 entries |
+| Cross-references | `upgrades_to` non-sentinel in 56 entries (`-1` and `0` mean none; 138 further entries hold `0`); `trains_ids` non-sentinel in 130 entries (8 further entries hold `0`) |
 | Load layering | Stored file + 5 ordered patches (which append 122 items and add fields) + keep-later duplicate cleaning |
 | Served bytes | Out of scope (`make_dynamic` does not touch `items`, but normalization input is defined as loaded content, never served output) |
 
