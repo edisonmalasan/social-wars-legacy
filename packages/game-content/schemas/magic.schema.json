@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "packages/game-content/schemas/magic.schema.json",
+  "title": "Normalized magic definition (legacy magics domain)",
+  "description": "Contract for one normalized magic: one stored legacy magics entry. Native integer id and costs are kept verbatim (rule T3); the embedded-JSON area string coerces to an integer array (rule T2); name, description, and img_name are verbatim asset strings recorded, never validated (rule T3). See packages/game-content/README.md for the rule set and survey citations.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "id",
+    "name",
+    "description",
+    "mana",
+    "level",
+    "gold",
+    "cash",
+    "target",
+    "area",
+    "img_name"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Stored magics id preserved verbatim as a string (rule T4): the decimal form of the native integer id."
+    },
+    "kind": {
+      "const": "magic",
+      "description": "Classification of the stored magics domain: every magics entry maps to magic."
+    },
+    "source_file": {
+      "type": "string",
+      "description": "Origin file of the stored entry: config/main.json (no patch targets magics)."
+    },
+    "source_layer": {
+      "type": "string",
+      "description": "Layering origin: stored (no patch targets magics)."
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint (sha256 over the stored source bytes plus the mods list); sources carry no version stamp."
+    },
+    "id": {
+      "type": "integer",
+      "description": "Native stored magics id, kept verbatim (rule T3).",
+      "minimum": 0
+    },
+    "name": {
+      "type": "string",
+      "description": "Magic name, preserved verbatim (rule T3)."
+    },
+    "description": {
+      "type": "string",
+      "description": "Magic description, preserved verbatim (rule T3)."
+    },
+    "mana": {
+      "type": "integer",
+      "description": "Native stored mana cost, kept verbatim (rule T3).",
+      "minimum": 0
+    },
+    "level": {
+      "type": "integer",
+      "description": "Native stored unlock level, kept verbatim (rule T3).",
+      "minimum": 0
+    },
+    "gold": {
+      "type": "integer",
+      "description": "Native stored gold cost, kept verbatim (rule T3).",
+      "minimum": 0
+    },
+    "cash": {
+      "type": "integer",
+      "description": "Native stored cash cost, kept verbatim (rule T3).",
+      "minimum": 0
+    },
+    "target": {
+      "type": "integer",
+      "description": "Native stored targeting mode, kept verbatim as an opaque code (rule T3).",
+      "minimum": 0
+    },
+    "area": {
+      "type": "array",
+      "description": "Spell area offsets coerced from the embedded-JSON string to an integer array (rule T2); formation data recorded, never treated as item references.",
+      "minItems": 1,
+      "items": { "type": "integer" }
+    },
+    "img_name": {
+      "type": "string",
+      "description": "Spell icon asset name, recorded verbatim and never validated; asset truth belongs to M4 (rule T3)."
+    }
+  }
+}

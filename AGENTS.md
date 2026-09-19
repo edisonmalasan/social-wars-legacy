@@ -220,6 +220,28 @@ coerced item references resolving against the 900 normalized items
 legacy IDs, and manifest), not served-byte equality, content validity,
 gameplay parity, asset existence, or progressed-player coverage.
 
+Verified offline reference-tables normalization check (Windows x64 CPython 3.9.13):
+
+```bash
+python -B packages/game-content/tools/build_tables.py
+python -B -m unittest discover -s packages/game-content/tests -p test_build_tables.py -v
+```
+
+See `packages/game-content/README.md` (reference-tables normalization
+extension) for the executable, invocation, exit codes, evidence
+classification, and containment. This extension has no cross-domain
+reference edge and merges its `tables` section into the package
+manifest while leaving the items and quests keys untouched. These
+checks establish source-grounded normalization consistency for the 10
+stored `magics` entries (magics with schemas, embedded-JSON area
+coerced, asset names recorded), the 100 stored `levels` entries
+(levels with schemas, positional XP-curve order preserved with
+`legacy_id` as the 0-based index, native fields verbatim), and the
+139 stored `sounds` entries (sounds with schemas, string-encoded
+numerics coerced, asset names recorded), with round-trip evidence and
+manifest, not served-byte equality, content validity, gameplay parity,
+asset existence, or progressed-player coverage.
+
 ---
 
 ## Code style

@@ -205,6 +205,84 @@
   },
   "result": "success",
   "schema_version": 1,
+  "tables": {
+    "coercion_ruleset": "tables-coercion-ruleset-v1",
+    "content_fingerprint": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "counts": {
+      "exp_max": 2016089205,
+      "exp_min": 0,
+      "exp_monotonic_nondecreasing": true,
+      "levels": 100,
+      "magics": 10,
+      "reward_types": [
+        "c",
+        "g",
+        "s",
+        "w"
+      ],
+      "sounds": 139,
+      "stored_levels": 100,
+      "stored_magics": 10,
+      "stored_sounds": 139
+    },
+    "inputs": {
+      "main": {
+        "bytes": 1702871,
+        "file": "config/main.json",
+        "sha256": "55ffd929372a4a31785cfd683982856324e2b73ba9a6624c53f09b68e4dd0ea5"
+      },
+      "mods": {
+        "active_mods": [],
+        "inactive_mods": [
+          "no_hiring_needed"
+        ],
+        "status": "inactive"
+      },
+      "patch_order": [
+        "atom_fusion_item",
+        "unit_patch",
+        "atom_fusion_items_data",
+        "atom_fusion_powerup",
+        "targets"
+      ],
+      "tables_patch_targets": "none"
+    },
+    "notes": [
+      "Stored magics map one-to-one to magics; native integer id and mana/level/gold/cash/target kept verbatim (rule T3).",
+      "Magic area coerces from the embedded-JSON string to a non-empty integer array (rule T2); offsets are formation data, never item references.",
+      "Levels carry no stable stored id; legacy_id is the 0-based positional index as a string and level_index preserves the XP curve order positionally (rule T4), matching the legacy positional loader.",
+      "Stored levels map one-to-one to levels; all native fields kept verbatim including any curve irregularities, never smoothed (rule T3).",
+      "Sound id, loops, max, and preload coerce from string-encoded numbers to integers (rule T1).",
+      "img_name, file, and description strings are recorded verbatim and never validated; asset truth belongs to M4 (rule T3).",
+      "No active patch targets magics, levels, or sounds; the build refuses patch drift and active mods explicitly."
+    ],
+    "outputs": [
+      {
+        "bytes": 5248,
+        "file": "packages/game-content/normalized/magics.json",
+        "sha256": "0939e9e861375d4bf1e5c3a08b322cf1b8b40baed49f73ec656314e7129f6cc7"
+      },
+      {
+        "bytes": 33549,
+        "file": "packages/game-content/normalized/levels.json",
+        "sha256": "a8b78b0a7aa13b44a0161a6d4462c3579e81fd98ed29236ded11eb940cb909e4"
+      },
+      {
+        "bytes": 47332,
+        "file": "packages/game-content/normalized/sounds.json",
+        "sha256": "1d31fb3550d24cc94a913c3beabe9e556e0b4b9787655202ec1bbe0bb3abd174"
+      }
+    ],
+    "policy": "tables-normalization-v1",
+    "result": "success",
+    "schema_version": 1,
+    "validation": {
+      "amount_violations": 0,
+      "duplicate_ids": 0,
+      "missing_fields": 0,
+      "round_trip_diffs": 0
+    }
+  },
   "validation": {
     "cost_violations": 0,
     "duplicate_ids": 0,

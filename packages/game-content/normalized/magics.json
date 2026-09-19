@@ -1,0 +1,212 @@
+[
+  {
+    "legacy_id": "1",
+    "kind": "magic",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 1,
+    "name": "AirStrike",
+    "description": "Call some aircraft units to bomb the zone and turn enemies into ashes!!",
+    "mana": 8,
+    "level": 38,
+    "gold": 30000,
+    "cash": 50,
+    "target": 2,
+    "area": [
+      5,
+      7,
+      9
+    ],
+    "img_name": "tech_airstrike"
+  },
+  {
+    "legacy_id": "2",
+    "kind": "magic",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 2,
+    "name": "Medic Case Rain",
+    "description": "A rain of medic kits to fast heal your units in case of critical damage!!",
+    "mana": 8,
+    "level": 40,
+    "gold": 40000,
+    "cash": 60,
+    "target": 1,
+    "area": [
+      5,
+      7,
+      9
+    ],
+    "img_name": "tech_medic_case_rain"
+  },
+  {
+    "legacy_id": "3",
+    "kind": "magic",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 3,
+    "name": "Protection Shield",
+    "description": "A protection dome will protect your units of any enemy fire!!",
+    "mana": 8,
+    "level": 45,
+    "gold": 60000,
+    "cash": 80,
+    "target": 1,
+    "area": [
+      5,
+      7,
+      9
+    ],
+    "img_name": "tech_protection_shield"
+  },
+  {
+    "legacy_id": "4",
+    "kind": "magic",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 4,
+    "name": "Nuclear Bomb",
+    "description": "A nuclear bomb will wash away any life form on the spot... nough said!!",
+    "mana": 20,
+    "level": 52,
+    "gold": 90000,
+    "cash": 110,
+    "target": 2,
+    "area": [
+      5,
+      7,
+      9
+    ],
+    "img_name": "tech_nuclear_bomb"
+  },
+  {
+    "legacy_id": "5",
+    "kind": "magic",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 5,
+    "name": "Shortcircuit Inductor",
+    "description": "A powerful electric current will prevent all units of being able to fire!!",
+    "mana": 10,
+    "level": 50,
+    "gold": 80000,
+    "cash": 100,
+    "target": 2,
+    "area": [
+      5,
+      7,
+      9
+    ],
+    "img_name": "tech_frequency_inhibitor"
+  },
+  {
+    "legacy_id": "6",
+    "kind": "magic",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 6,
+    "name": "Magnetic Trap",
+    "description": "Enemy units will be unable to attack while they are being carried away towards a magnetic field",
+    "mana": 12,
+    "level": 42,
+    "gold": 50000,
+    "cash": 70,
+    "target": 2,
+    "area": [
+      25,
+      30,
+      35
+    ],
+    "img_name": "tech_iman"
+  },
+  {
+    "legacy_id": "7",
+    "kind": "magic",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 7,
+    "name": "Mech Summoner",
+    "description": "Two powerful and loyal Mechs will come to your aid and won't leave the place until they die!",
+    "mana": 16,
+    "level": 48,
+    "gold": 70000,
+    "cash": 90,
+    "target": 0,
+    "area": [
+      5,
+      7,
+      9
+    ],
+    "img_name": "tech_robot_summoner"
+  },
+  {
+    "legacy_id": "8",
+    "kind": "magic",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 8,
+    "name": "Stealth Sneak",
+    "description": "You units will move undetected during some time. Very handy to reach key spots without being seen!!",
+    "mana": 8,
+    "level": 55,
+    "gold": 100000,
+    "cash": 120,
+    "target": 1,
+    "area": [
+      5,
+      7,
+      9
+    ],
+    "img_name": "tech_stealth_instinct"
+  },
+  {
+    "legacy_id": "9",
+    "kind": "magic",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 9,
+    "name": "Alien Abduction",
+    "description": "Call some UFO allies to abduct all small and medium units!!",
+    "mana": 15,
+    "level": 35,
+    "gold": 20000,
+    "cash": 40,
+    "target": 2,
+    "area": [
+      5,
+      7,
+      9
+    ],
+    "img_name": "tech_mars_attack"
+  },
+  {
+    "legacy_id": "10",
+    "kind": "magic",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 10,
+    "name": "Attack Boost",
+    "description": "Your units will increase their attack and life to wreak havoc on enemies!!",
+    "mana": 10,
+    "level": 35,
+    "gold": 10000,
+    "cash": 30,
+    "target": 1,
+    "area": [
+      5,
+      10,
+      15
+    ],
+    "img_name": "tech_attack_boost"
+  }
+]
