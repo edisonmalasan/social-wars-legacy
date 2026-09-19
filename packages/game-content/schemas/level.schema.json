@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "packages/game-content/schemas/level.schema.json",
+  "title": "Normalized level definition (legacy levels domain)",
+  "description": "Contract for one normalized level: one stored legacy levels entry in positional XP-curve order. Levels carry no stable stored id (the legacy loader indexes positionally), so legacy_id is the 0-based positional index as a string (rule T4); all native fields are kept verbatim, including any curve irregularities (rule T3). See packages/game-content/README.md for the rule set and survey citations.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "level_index",
+    "name",
+    "exp_required",
+    "reward_type",
+    "reward_amount"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Positional index of the stored levels entry as a decimal string (rule T4): levels have no stable stored id and the legacy loader (get_game_config.py) indexes the array positionally."
+    },
+    "kind": {
+      "const": "level",
+      "description": "Classification of the stored levels domain: every levels entry maps to level."
+    },
+    "source_file": {
+      "type": "string",
+      "description": "Origin file of the stored entry: config/main.json (no patch targets levels)."
+    },
+    "source_layer": {
+      "type": "string",
+      "description": "Layering origin: stored (no patch targets levels)."
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint (sha256 over the stored source bytes plus the mods list); sources carry no version stamp."
+    },
+    "level_index": {
+      "type": "integer",
+      "description": "0-based position of the entry in the stored levels array; the XP curve order is positional and preserved (rule T4).",
+      "minimum": 0
+    },
+    "name": {
+      "type": "string",
+      "description": "Level rank name, preserved verbatim (rule T3)."
+    },
+    "exp_required": {
+      "type": "integer",
+      "description": "Native stored XP threshold, kept verbatim including any curve irregularities; never smoothed (rule T3).",
+      "minimum": 0
+    },
+    "reward_type": {
+      "type": "string",
+      "description": "Native stored level-up reward resource code, preserved verbatim as an opaque code (rule T3).",
+      "enum": ["c", "g", "s", "w"]
+    },
+    "reward_amount": {
+      "type": "integer",
+      "description": "Native stored level-up reward amount, kept verbatim (rule T3).",
+      "minimum": 0
+    }
+  }
+}

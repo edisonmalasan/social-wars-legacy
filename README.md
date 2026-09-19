@@ -71,6 +71,8 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 
 :bookmark_tabs: [Offline quest normalization build](packages/game-content/README.md#quest-normalization-extension)
 
+:bookmark_tabs: [Offline reference-tables normalization build](packages/game-content/README.md#reference-tables-normalization-extension)
+
 :warning: [Known legacy bugs and limitations](docs/known-legacy-bugs.md)
 
 ## On archives and accessibility to digital heritage

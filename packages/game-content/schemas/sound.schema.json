@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "packages/game-content/schemas/sound.schema.json",
+  "title": "Normalized sound definition (legacy sounds domain)",
+  "description": "Contract for one normalized sound: one stored legacy sounds entry. String-encoded id and numeric params coerce to integers (rule T1); file and description are verbatim asset strings recorded, never validated (rule T3). See packages/game-content/README.md for the rule set and survey citations.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "id",
+    "file",
+    "description",
+    "loops",
+    "max",
+    "preload"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Stored sounds string id, preserved verbatim (rule T4)."
+    },
+    "kind": {
+      "const": "sound",
+      "description": "Classification of the stored sounds domain: every sounds entry maps to sound."
+    },
+    "source_file": {
+      "type": "string",
+      "description": "Origin file of the stored entry: config/main.json (no patch targets sounds)."
+    },
+    "source_layer": {
+      "type": "string",
+      "description": "Layering origin: stored (no patch targets sounds)."
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint (sha256 over the stored source bytes plus the mods list); sources carry no version stamp."
+    },
+    "id": {
+      "type": "integer",
+      "description": "Stored string id coerced to an integer (rule T1).",
+      "minimum": 0
+    },
+    "file": {
+      "type": "string",
+      "description": "Sound file asset name, recorded verbatim and never validated; asset truth belongs to M4 (rule T3)."
+    },
+    "description": {
+      "type": "string",
+      "description": "Sound description, preserved verbatim (rule T3)."
+    },
+    "loops": {
+      "type": "integer",
+      "description": "Stored string-encoded loop count coerced to an integer (rule T1).",
+      "minimum": 0
+    },
+    "max": {
+      "type": "integer",
+      "description": "Stored string-encoded concurrent-play limit coerced to an integer (rule T1).",
+      "minimum": 0
+    },
+    "preload": {
+      "type": "integer",
+      "description": "Stored string-encoded preload flag coerced to an integer (rule T1).",
+      "minimum": 0
+    }
+  }
+}

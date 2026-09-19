@@ -268,3 +268,142 @@ scope exactly as in the content census (`make_dynamic` never runs here).
 ```bash
 python -B -m unittest discover -s packages/game-content/tests -p test_build_quests.py -v
 ```
+
+---
+
+# Reference-tables normalization extension
+
+Normalized, schema-checked magic, level-curve, and sound definitions
+for the legacy Social Wars `magics` (10 entries), `levels` (100
+entries), and `sounds` (139 entries) content domains, built offline
+from stored sources with Python 3.9 standard library only; no new
+dependencies. This extension has no cross-domain reference edge and
+requires no prior build; it merges its `tables` section into the
+package manifest the items and quest builds produce.
+
+## Inputs
+
+- `config/main.json` (stored source: 10 `magics` entries with native
+  integer `id`, native integer `mana`/`level`/`gold`/`cash`/`target`,
+  string `name`/`description`/`img_name`, and embedded-JSON `area`
+  integer-array strings; 100 `levels` entries with fully native
+  `name`/`exp_required`/`reward_type`/`reward_amount` and no stable
+  id; 139 `sounds` entries with all 6 fields string-typed: string
+  `id`, `file`, `description`, and string-encoded
+  `loops`/`max`/`preload` numbers).
+- `config/patch/patches.txt` plus the five ordered patch files, read
+  only to verify no patch targets `magics`, `levels`, or `sounds`
+  (any such target fails the build explicitly; stored content is the
+  input, there is no layering).
+- `mods/mods.txt` (must stay inactive; any active mod fails the build).
+- `packages/game-content/schemas/magic.schema.json`,
+  `level.schema.json`, and `sound.schema.json` (contracts enforced by
+  the builder).
+
+## Coercion rules (`tables-coercion-ruleset-v1`, survey-cited)
+
+- T1 numeric strings to numbers (integral floats become int), using the
+  same field-survey numeric grammar as items and quests
+  `[+-]?(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?`:
+  sound `id`, `loops`, `max`, and `preload`.
+- T2 embedded-JSON strings to structures: magic `area` to a
+  non-empty integer array. Offsets are formation data, never item
+  references.
+- T3 native and verbatim fields kept as stored: magic
+  `id`/`mana`/`level`/`gold`/`cash`/`target` (native integers),
+  magic `name`/`description`/`img_name` (strings), all level fields
+  (fully native), and sound `file`/`description` (strings).
+  `img_name`, `file`, and `description` strings are recorded asset
+  references, never validated; asset truth belongs to M4. The XP
+  curve (`exp_required` spanning 0 to 2016089205) is preserved
+  verbatim including any irregularities, never smoothed; XP order is
+  positional.
+- T4 `legacy_id` preserves the stored identity verbatim as a string:
+  the decimal form of the native integer `id` for magics, the stored
+  string `id` for sounds, and the 0-based positional index for
+  levels (levels carry no stable stored id and the legacy loader
+  indexes the array positionally), with `level_index` carrying the
+  numeric position.
+
+No value is rebalanced, renamed for gameplay, or assigned new meaning.
+
+## Outputs
+
+- `normalized/magics.json`: 10 magic definitions (one per stored
+  `magics` entry, stored order).
+- `normalized/levels.json`: 100 level definitions (one per stored
+  `levels` entry, stored XP-curve order preserved positionally).
+- `normalized/sounds.json`: 139 sound definitions (one per stored
+  `sounds` entry, stored order).
+- `manifest.json`: the existing items/quest manifest with a `tables`
+  section merged in, recording tables inputs with digests, the
+  coercion ruleset version, the content fingerprint (sha256 over the
+  stored source bytes plus the mods list), definition counts
+  (including the XP range, monotonicity note, and reward-type set),
+  builder outcome, and output digests. Regenerated on every successful
+  tables build; the tests assert it matches the produced output while
+  the items and quests keys survive the merge untouched.
+
+## Validation gates (failures exit 1, outputs unwritten)
+
+Duplicate magic or sound ids (refusing silent loss), negative magic
+amounts, negative XP or reward amounts, negative sound params,
+non-integral sound numerics, non-integer area elements, missing or
+mistyped schema-required fields (every schema-required field is
+enforced; the traceability test proves it by mutation), and any
+round-trip difference outside the documented coercions. The round-trip
+gate re-coerces each stored entry and compares by value (embedded-JSON
+structures parsed, numeric strings numeric, strings verbatim, field
+sets exact); level identity is positional.
+
+## Executable and invocation
+
+Verified executable: `C:\Users\Edison\AppData\Local\Programs\Python\Python39\python.exe`
+(CPython 3.9.13, tags/v3.9.13:6de2ca5, May 17 2022, 16:36:42, MSC v.1929 64 bit (AMD64)).
+`sys.executable` reported exactly the path above and `python --version`
+reported `Python 3.9.13` for the passing run. Any working Python 3.9+
+standard-library interpreter should behave identically.
+
+From the repository root:
+
+```bash
+python -B packages/game-content/tools/build_tables.py
+```
+
+Exit 0 prints a JSON success report with counts and output files.
+Exit 1 prints a `validation-failed` report listing each problem and
+writes nothing (the manifest is left untouched). Exit 2 reports
+invalid input or unsupported shapes (missing/unreadable files,
+unparseable content, an active mod, a patch targeting tables content,
+or an invalid schema file) on stderr.
+
+## Evidence classification
+
+This extension establishes source-grounded normalization consistency
+for the stored `magics`/`levels`/`sounds` domains: classification
+coverage, coercion fidelity, positional XP-curve preservation, and
+round-trip equivalence modulo documented rules. It is evidence of
+representation change, not of served-byte equality, content validity,
+gameplay parity, asset existence (M4 owns asset truth), or
+progressed-player coverage. Served bytes stay out of scope exactly as
+in the content census (`make_dynamic` never runs here).
+
+## Containment
+
+- Reads only `config/main.json`, `config/patch/patches.txt`, the five
+  patch files (target check only), `mods/mods.txt`, the three tables
+  schema files, and the package manifest for the merge (plus optional
+  `--repo-root`/`--out-root` relocation of the same reads).
+- Never imports or executes any legacy application module (no
+  `get_game_config`, `jsonpatch`, or Flask import), never reads runtime
+  saves, never contacts a network, never starts a server, and never
+  opens a browser or Flash content.
+- Writes only the three normalized tables files plus the merged
+  `manifest.json`, and only on success. No bytecode (`-B` recommended),
+  no caches, no temporary files in the repository. Repeated runs over
+  unchanged inputs are byte-identical.
+- The focused tests in `tests/test_build_tables.py` run the same way:
+
+```bash
+python -B -m unittest discover -s packages/game-content/tests -p test_build_tables.py -v
+```
