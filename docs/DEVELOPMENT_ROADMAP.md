@@ -36,17 +36,17 @@ It is a progress ledger, not the source of truth for specified behavior.
 
 - **Current milestone:** M3 — Content Normalization
 - **Roadmap cursor:** M3 / items normalization
-- **Active OpenSpec change:** `normalize-reference-tables`
-- **Lifecycle stage:** PROPOSED
-- **Change status:** Proposal PR #53 merged as `980994f` on remote-tracking `feat/reference-tables-normalization` (branched fresh from updated `main`). Magics (10, mixed native/embedded), levels XP curve (100, fully native), sounds (139, string-encoded) scoped from direct `config/main.json` reads; no patch targets these keys. Awaiting Apply implementation.
-- **Current objective:** Implement the approved reference-tables normalization package, builder/validator, and regression tests per `openspec/changes/normalize-reference-tables/tasks.md`; orchestrator verifies independently before Apply acceptance.
-- **Last completed change:** `normalize-quest-content` — archived as `2026-09-18-normalize-quest-content`; proposal PR #49, Apply PR #50, sync PR #51
-- **Next eligible objective:** Remaining content domains, domain model, or Compatibility API v0 groundwork after this archive; authentic progressed-player saves remain unavailable and must not be synthesized.
+- **Active OpenSpec change:** none
+- **Lifecycle stage:** ARCHIVED
+- **Change status:** `normalize-reference-tables` fully complete. Apply merged via PR #54 (`d827fcf`): implementation `6b63338` (builder/validator, 10 magics / 100 levels / 139 sounds, schemas, 52-test suite, docs). Spec sync merged via PR #55 (`3f52272`): new main spec `openspec/specs/reference-tables-normalization/spec.md`. Change archived as `2026-09-19-normalize-reference-tables`. Worker-attested checks under pinned Windows x64 CPython 3.9.13: clean build exit 0, 52 tests OK, strict validations PASS; orchestrator independently reviewed staged diff (12 files, +5296 insertions, no legacy sources touched) and `git diff --check` clean.
+- **Current objective:** Propose the next smallest coherent M3 change: remaining content domains (missions, offers, economy tables, remaining misc keys), the canonical domain model (roadmap section 8), or the Compatibility API v0 groundwork — whichever bounds smaller against the normalized package precedent.
+- **Last completed change:** `normalize-reference-tables` — archived as `2026-09-19-normalize-reference-tables`; proposal PR #53, Apply PR #54, sync PR #55
+- **Next eligible objective:** Remaining content domains (missions, offers, economy tables, misc keys), domain model, or Compatibility API v0 groundwork after this archive; authentic progressed-player saves remain unavailable and must not be synthesized.
 - **Blocking issues:** None for the archived change. Source-truth corrections recorded: command catalog 63 (not 64) branches; items normalization covers loaded 900 definitions (not stored 778) with `0` as a relation sentinel alongside `-1` (manifest stats 56/130) and no dead re-emit helper. Non-blocking follow-ups: unused `copy_tool` helper in `tools/endpoint-catalog/test_endpoint_catalog.py`; orchestrator has no local Python interpreter, so execution evidence relies on worker-attested runs under the pinned CPython 3.9.13; `worker-start --agent opencode` offers no flag passthrough, so opencode `--auto` cannot be injected through the supported Orca path (all six worker dispatches still completed autonomously). No dedicated OpenSpec verification workflow is installed; used the user-authorized strict validation, independent verification, required checks, and final diff review fallback. Authentic progressed-player saves remain unavailable and unverified.
-- **Last OpenSpec validation:** PASS — `normalize-reference-tables` strict validation (2026-09-18); this is not the unavailable verification workflow
-- **Last implementation verification:** Quest normalization fallback acceptance complete (proposal PR #49, Apply PR #50, sync PR #51, archive PR #52). No reference-tables implementation verified yet.
-- **Last verified commit:** `980994f` (Merge pull request #53, reference tables proposal)
-- **Last updated:** 2026-09-18
+- **Last OpenSpec validation:** PASS — change strict validation, `reference-tables-normalization` spec strict validation, and `openspec validate --specs --strict` 13/13 PASS (2026-09-19); this is not the unavailable verification workflow
+- **Last implementation verification:** Reference-tables fallback acceptance complete (proposal PR #53, Apply PR #54, sync PR #55, archive in progress). Worker-attested: build exit 0 (10/100/139), 52 tests OK, strict validations PASS under pinned CPython 3.9.13; orchestrator independently reviewed implementation diff and containment.
+- **Last verified commit:** `3f52272` (Merge pull request #55, reference tables spec sync)
+- **Last updated:** 2026-09-19
 
 ### Status values
 
