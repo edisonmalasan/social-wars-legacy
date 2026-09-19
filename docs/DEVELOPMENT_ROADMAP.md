@@ -36,16 +36,16 @@ It is a progress ledger, not the source of truth for specified behavior.
 
 - **Current milestone:** M3 — Content Normalization
 - **Roadmap cursor:** M3 / items normalization
-- **Active OpenSpec change:** `normalize-quest-content`
-- **Lifecycle stage:** PROPOSED
-- **Change status:** Proposal PR #49 merged as `2af307d` on remote-tracking `feat/quest-normalization` (branched fresh from updated `main`). Goals (91, native IDs, uniform hint/reward) plus collections (10, embedded item refs resolving cleanly) scoped from direct `config/main.json` reads; no patch targets these keys. Awaiting Apply implementation.
-- **Current objective:** Implement the approved quest normalization package, builder/validator, and regression tests per `openspec/changes/normalize-quest-content/tasks.md`; orchestrator verifies independently before Apply acceptance.
-- **Last completed change:** `normalize-items-game-content` — archived as `2026-09-18-normalize-items-game-content`; proposal PR #45, Apply PR #46, sync PR #47
-- **Next eligible objective:** Quest/research/collection normalization or domain model after this archive; authentic progressed-player saves remain unavailable and must not be synthesized.
+- **Active OpenSpec change:** none
+- **Lifecycle stage:** ARCHIVED
+- **Change status:** `normalize-quest-content` fully complete. Apply merged via PR #50 (`3af18f0`): implementation `a174014` plus doc links `10949fd`. Spec sync merged via PR #51 (`1bb3ceb`): new main spec `openspec/specs/quest-normalization/spec.md`. Change archived as `2026-09-18-normalize-quest-content`. Implementation worker `ctx_f451380b6c40` (task `task_f7b4593541fb`) delivered all tasks; terminal retained under user takeover, inbox empty.
+- **Current objective:** Propose the next smallest coherent M3 change: remaining content domains (missions, offers, magics, sounds, levels, economy tables), the canonical domain model (roadmap section 8), or the Compatibility API v0 groundwork — whichever bounds smaller against the normalized package precedent.
+- **Last completed change:** `normalize-quest-content` — archived as `2026-09-18-normalize-quest-content`; proposal PR #49, Apply PR #50, sync PR #51
+- **Next eligible objective:** Remaining content domains, domain model, or Compatibility API v0 groundwork after this archive; authentic progressed-player saves remain unavailable and must not be synthesized.
 - **Blocking issues:** None for the archived change. Source-truth corrections recorded: command catalog 63 (not 64) branches; items normalization covers loaded 900 definitions (not stored 778) with `0` as a relation sentinel alongside `-1` (manifest stats 56/130) and no dead re-emit helper. Non-blocking follow-ups: unused `copy_tool` helper in `tools/endpoint-catalog/test_endpoint_catalog.py`; orchestrator has no local Python interpreter, so execution evidence relies on worker-attested runs under the pinned CPython 3.9.13; `worker-start --agent opencode` offers no flag passthrough, so opencode `--auto` cannot be injected through the supported Orca path (all six worker dispatches still completed autonomously). No dedicated OpenSpec verification workflow is installed; used the user-authorized strict validation, independent verification, required checks, and final diff review fallback. Authentic progressed-player saves remain unavailable and unverified.
-- **Last OpenSpec validation:** PASS — `normalize-quest-content` strict validation (2026-09-18); this is not the unavailable verification workflow
-- **Last implementation verification:** Items normalization fallback acceptance complete (proposal PR #45, Apply PR #46, sync PR #47, archive PR #48). No quest normalization implementation verified yet.
-- **Last verified commit:** `2af307d` (Merge pull request #49, quest normalization proposal)
+- **Last OpenSpec validation:** PASS — change strict validation plus `openspec validate --specs` with 12 main specs (2026-09-18); this is not the unavailable verification workflow
+- **Last implementation verification:** Orca implementation dispatch `ctx_f451380b6c40` reported clean build exit 0 byte-identical, 49 unittest tests exit 0 (siblings green) under CPython 3.9.13; root independently reviewed all ten delivered files, traced cross-domain references and round-trip claims against `config/main.json` and the normalized items outputs, and confirmed 91/10 outputs, manifest merge, schema contract, and containment. Fallback acceptance is complete.
+- **Last verified commit:** `3af18f0` (Merge pull request #50, quest normalization Apply)
 - **Last updated:** 2026-09-18
 
 ### Status values
