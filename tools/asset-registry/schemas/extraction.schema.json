@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tools/asset-registry/schemas/extraction.schema.json",
+  "title": "Sound extraction manifest",
+  "description": "Contract for the generated sound extraction manifest: per-sound source provenance, characteristics, sync offsets, and output digests for verbatim MP3 payload extraction.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "policy",
+    "result",
+    "inputs",
+    "counts",
+    "sounds"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "description": "Extraction manifest format version.",
+      "minimum": 1
+    },
+    "policy": {
+      "const": "sound-extraction-v1",
+      "description": "Extraction policy identifier."
+    },
+    "result": {
+      "const": "success",
+      "description": "Build outcome marker; only successful runs write outputs."
+    },
+    "inputs": {
+      "type": "object",
+      "description": "Input provenance: source SWF path, inspection fingerprint, and expected sync offset."
+    },
+    "counts": {
+      "type": "object",
+      "description": "Extraction totals: sound count and output byte total."
+    },
+    "sounds": {
+      "type": "array",
+      "description": "Per-sound entries in character-ID order.",
+      "items": { "type": "object" }
+    }
+  }
+}

@@ -25741,6 +25741,7 @@
       "saves/",
       "temp/",
       "new_assets/",
+      "assets/converted/",
       "build/bundle",
       "build/dist",
       "build/work"

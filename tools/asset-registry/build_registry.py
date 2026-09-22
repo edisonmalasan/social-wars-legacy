@@ -32,6 +32,7 @@ SCHEMA_VERSION = 1
 
 INCLUDE_EXTENSIONS = (".swf", ".jpg", ".jpeg", ".png", ".mp3", ".wav", ".gif")
 EXCLUDE_PREFIXES = ("./.git/", "./saves/", "./temp/", "./new_assets/",
+                    "./assets/converted/",
                     "./build/bundle", "./build/dist", "./build/work")
 
 NORMALIZED_DIR = Path("packages") / "game-content" / "normalized"
@@ -257,11 +258,9 @@ def build_registry(root):
         if entry["size"] < 0:
             problems.append("negative size at " + entry["path"])
         validate_digest(entry["sha256"], entry["path"], problems)
-        for excluded in ("./.git/", "./saves/", "./temp/", "./new_assets/",
-                         "./build/bundle", "./build/dist", "./build/work"):
-            if ("./" + entry["path"]).startswith(excluded):
-                problems.append("excluded path leaked into registry: "
-                                + entry["path"])
+        if is_excluded(entry["path"]):
+            problems.append("excluded path leaked into registry: "
+                            + entry["path"])
     if problems:
         raise ValidationFailure(problems)
     by_extension = {}

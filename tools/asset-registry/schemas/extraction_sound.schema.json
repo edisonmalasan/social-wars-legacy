@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tools/asset-registry/schemas/extraction_sound.schema.json",
+  "title": "Single extracted sound entry",
+  "description": "Contract for one extracted sound: source tag provenance, characteristics nibbles, sync offset, and output digest for a verbatim MP3 payload slice.",
+  "type": "object",
+  "required": [
+    "character_id",
+    "format",
+    "rate",
+    "size",
+    "sound_type",
+    "sync_offset",
+    "payload_bytes",
+    "output_bytes",
+    "output",
+    "sha256"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "character_id": {
+      "type": "integer",
+      "description": "DefineSound character ID, also the output file stem.",
+      "minimum": 0
+    },
+    "format": {
+      "type": "integer",
+      "description": "Sound format nibble; only 2 (MP3) is accepted.",
+      "minimum": 2,
+      "maximum": 2
+    },
+    "rate": {
+      "type": "integer",
+      "description": "Sound rate nibble (0: 5.5 kHz, 1: 11 kHz, 2: 22 kHz, 3: 44 kHz).",
+      "minimum": 0,
+      "maximum": 3
+    },
+    "size": {
+      "type": "integer",
+      "description": "Sound size nibble (0: 8-bit, 1: 16-bit).",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "sound_type": {
+      "type": "integer",
+      "description": "Sound type nibble (0: mono, 1: stereo).",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "sync_offset": {
+      "type": "integer",
+      "description": "Tag-payload offset of the first frame sync; must equal the expected uniform offset.",
+      "minimum": 0
+    },
+    "payload_bytes": {
+      "type": "integer",
+      "description": "Full tag payload length in bytes.",
+      "minimum": 0
+    },
+    "output_bytes": {
+      "type": "integer",
+      "description": "Extracted MP3 length in bytes.",
+      "minimum": 1
+    },
+    "output": {
+      "type": "string",
+      "description": "Converted output path relative to the repository root."
+    },
+    "sha256": {
+      "type": "string",
+      "description": "SHA-256 hex digest of the extracted MP3 bytes."
+    }
+  }
+}

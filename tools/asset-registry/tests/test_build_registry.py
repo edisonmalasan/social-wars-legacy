@@ -67,6 +67,7 @@ def make_fixture_tree():
     write_bytes(work, "new_assets/draft.png", b"excluded")
     write_bytes(work, "build/bundle/out.swf", b"excluded")
     write_bytes(work, "build/work/tmp.mp3", b"excluded")
+    write_bytes(work, "assets/converted/sounds/9.mp3", b"generated")
     normalized = work / "packages" / "game-content" / "normalized"
     normalized.mkdir(parents=True)
     (normalized / "units.json").write_text(json.dumps([
@@ -140,7 +141,7 @@ class FixtureEnumerationTests(unittest.TestCase):
         paths = [entry["path"] for entry in self.registry["entries"]]
         for excluded in ("saves/player.json", "temp/work.swf",
                          "new_assets/draft.png", "build/bundle/out.swf",
-                         "build/work/tmp.mp3"):
+                         "build/work/tmp.mp3", "assets/converted/sounds/9.mp3"):
             self.assertNotIn(excluded, paths)
         self.assertEqual(len(paths), 7)
 
