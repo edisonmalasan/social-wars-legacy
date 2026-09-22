@@ -1,0 +1,763 @@
+[
+  {
+    "legacy_id": "1",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 1,
+    "units": [
+      1007,
+      1020,
+      1021,
+      1058,
+      1059
+    ],
+    "unit_refs": [
+      "1007",
+      "1020",
+      "1021",
+      "1058",
+      "1059"
+    ],
+    "rewards": 0,
+    "cost": 1,
+    "costs": null,
+    "position": 10,
+    "category_name": "Earth Soldiers",
+    "category_name_es": "Earth Soldiers",
+    "category_name_br": "Earth Soldiers",
+    "category_name_it": "Earth Soldiers",
+    "category_name_fr": "Earth Soldiers",
+    "category_name_de": "Earth Soldiers",
+    "category_name_tr": "Earth Soldiers",
+    "category_name_el": ""
+  },
+  {
+    "legacy_id": "2",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 2,
+    "units": [
+      1008,
+      1022,
+      1023,
+      1063,
+      1064
+    ],
+    "unit_refs": [
+      "1008",
+      "1022",
+      "1023",
+      "1063",
+      "1064"
+    ],
+    "rewards": 0,
+    "cost": 200,
+    "costs": [
+      1,
+      1,
+      2,
+      2,
+      2
+    ],
+    "position": 20,
+    "category_name": "Earth Bazookas I",
+    "category_name_es": "Earth Bazookas I",
+    "category_name_br": "Earth Bazookas I",
+    "category_name_it": "Earth Bazookas I",
+    "category_name_fr": "Earth Bazookas I",
+    "category_name_de": "Earth Bazookas I",
+    "category_name_tr": "Earth Bazookas I",
+    "category_name_el": ""
+  },
+  {
+    "legacy_id": "6",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 6,
+    "units": [
+      1010,
+      1121,
+      1065
+    ],
+    "unit_refs": [
+      "1010",
+      "1121",
+      "1065"
+    ],
+    "rewards": 0,
+    "cost": 200,
+    "costs": [
+      3,
+      45,
+      6
+    ],
+    "position": 40,
+    "category_name": "Earth Special Vehicles",
+    "category_name_es": "Earth Special Vehicles",
+    "category_name_br": "Earth Special Vehicles",
+    "category_name_it": "Earth Special Vehicles",
+    "category_name_fr": "Earth Special Vehicles",
+    "category_name_de": "Earth Special Vehicles",
+    "category_name_tr": "Earth Special Vehicles",
+    "category_name_el": ""
+  },
+  {
+    "legacy_id": "3",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 3,
+    "units": [
+      1014,
+      1030,
+      1031,
+      1044,
+      1006
+    ],
+    "unit_refs": [
+      "1014",
+      "1030",
+      "1031",
+      "1044",
+      "1006"
+    ],
+    "rewards": 0,
+    "cost": 200,
+    "costs": [
+      1,
+      1,
+      2,
+      10,
+      38
+    ],
+    "position": 50,
+    "category_name": "Machine Gun Jeeps",
+    "category_name_es": "Machine Gun Jeeps",
+    "category_name_br": "Machine Gun Jeeps",
+    "category_name_it": "Machine Gun Jeeps",
+    "category_name_fr": "Machine Gun Jeeps",
+    "category_name_de": "Machine Gun Jeeps",
+    "category_name_tr": "Machine Gun Jeeps",
+    "category_name_el": ""
+  },
+  {
+    "legacy_id": "4",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 4,
+    "units": [
+      1016,
+      1003,
+      1004,
+      1070,
+      1071
+    ],
+    "unit_refs": [
+      "1016",
+      "1003",
+      "1004",
+      "1070",
+      "1071"
+    ],
+    "rewards": 0,
+    "cost": 200,
+    "costs": [
+      3,
+      3,
+      4,
+      10,
+      14
+    ],
+    "position": 55,
+    "category_name": "Earth Tanks",
+    "category_name_es": "Tanks",
+    "category_name_br": "Tanks",
+    "category_name_it": "Tanks",
+    "category_name_fr": "Tanks",
+    "category_name_de": "Tanks",
+    "category_name_tr": "Tanks",
+    "category_name_el": ""
+  },
+  {
+    "legacy_id": "5",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 5,
+    "units": [
+      1002,
+      1037,
+      1047,
+      1069
+    ],
+    "unit_refs": [
+      "1002",
+      "1037",
+      "1047",
+      "1069"
+    ],
+    "rewards": 0,
+    "cost": 200,
+    "costs": [
+      20,
+      55,
+      35,
+      25
+    ],
+    "position": 60,
+    "category_name": "Earth Tanks II",
+    "category_name_es": "Tanks II",
+    "category_name_br": "Tanks II",
+    "category_name_it": "Tanks II",
+    "category_name_fr": "Tanks II",
+    "category_name_de": "Tanks II",
+    "category_name_tr": "Tanks II",
+    "category_name_el": ""
+  },
+  {
+    "legacy_id": "7",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 7,
+    "units": [
+      1015,
+      1025,
+      1026
+    ],
+    "unit_refs": [
+      "1015",
+      "1025",
+      "1026"
+    ],
+    "rewards": 0,
+    "cost": 200,
+    "costs": [
+      10,
+      15,
+      20
+    ],
+    "position": 70,
+    "category_name": "Earth Aircrafts",
+    "category_name_es": "Earth Aircrafts",
+    "category_name_br": "Earth Aircrafts",
+    "category_name_it": "Earth Aircrafts",
+    "category_name_fr": "Earth Aircrafts",
+    "category_name_de": "Earth Aircrafts",
+    "category_name_tr": "Earth Aircrafts",
+    "category_name_el": ""
+  },
+  {
+    "legacy_id": "10",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 10,
+    "units": [
+      1027,
+      1028,
+      1029
+    ],
+    "unit_refs": [
+      "1027",
+      "1028",
+      "1029"
+    ],
+    "rewards": 0,
+    "cost": 200,
+    "costs": [
+      5,
+      7,
+      9
+    ],
+    "position": 75,
+    "category_name": "Earth Helicopters",
+    "category_name_es": "Earth Helicopters",
+    "category_name_br": "Earth Helicopters",
+    "category_name_it": "Earth Helicopters",
+    "category_name_fr": "Earth Helicopters",
+    "category_name_de": "Earth Helicopters",
+    "category_name_tr": "Earth Helicopters",
+    "category_name_el": ""
+  },
+  {
+    "legacy_id": "11",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 11,
+    "units": [
+      1066,
+      1067,
+      1038
+    ],
+    "unit_refs": [
+      "1066",
+      "1067",
+      "1038"
+    ],
+    "rewards": 0,
+    "cost": 200,
+    "costs": [
+      9,
+      12,
+      25
+    ],
+    "position": 80,
+    "category_name": "Earth Helicopters II",
+    "category_name_es": "Earth Helicopters II",
+    "category_name_br": "Earth Helicopters II",
+    "category_name_it": "Earth Helicopters II",
+    "category_name_fr": "Earth Helicopters II",
+    "category_name_de": "Earth Helicopters II",
+    "category_name_tr": "Earth Helicopters II",
+    "category_name_el": ""
+  },
+  {
+    "legacy_id": "12",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 12,
+    "units": [
+      1012,
+      1024,
+      1045,
+      1033,
+      1034
+    ],
+    "unit_refs": [
+      "1012",
+      "1024",
+      "1045",
+      "1033",
+      "1034"
+    ],
+    "rewards": 0,
+    "cost": 200,
+    "costs": [
+      25,
+      25,
+      25,
+      25,
+      15
+    ],
+    "position": 85,
+    "category_name": "Special Units I",
+    "category_name_es": "Special Units I",
+    "category_name_br": "Special Units I",
+    "category_name_it": "Special Units I",
+    "category_name_fr": "Special Units I",
+    "category_name_de": "Special Units I",
+    "category_name_tr": "Special Units I",
+    "category_name_el": ""
+  },
+  {
+    "legacy_id": "13",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 13,
+    "units": [
+      1042,
+      1054,
+      1055,
+      1072,
+      1073
+    ],
+    "unit_refs": [
+      "1042",
+      "1054",
+      "1055",
+      "1072",
+      "1073"
+    ],
+    "rewards": 0,
+    "cost": 200,
+    "costs": [
+      25,
+      25,
+      40,
+      40,
+      50
+    ],
+    "position": 90,
+    "category_name": "Special Units II",
+    "category_name_es": "Special Units II",
+    "category_name_br": "Special Units II",
+    "category_name_it": "Special Units II",
+    "category_name_fr": "Special Units II",
+    "category_name_de": "Special Units II",
+    "category_name_tr": "Special Units II",
+    "category_name_el": ""
+  },
+  {
+    "legacy_id": "14",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 14,
+    "units": [
+      1050,
+      1051,
+      1046,
+      1060,
+      1036
+    ],
+    "unit_refs": [
+      "1050",
+      "1051",
+      "1046",
+      "1060",
+      "1036"
+    ],
+    "rewards": 0,
+    "cost": 200,
+    "costs": [
+      1,
+      1,
+      8,
+      8,
+      12
+    ],
+    "position": 95,
+    "category_name": "Special Units III",
+    "category_name_es": "Special Units III",
+    "category_name_br": "Special Units III",
+    "category_name_it": "Special Units III",
+    "category_name_fr": "Special Units III",
+    "category_name_de": "Special Units III",
+    "category_name_tr": "Special Units III",
+    "category_name_el": ""
+  },
+  {
+    "legacy_id": "16",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 16,
+    "units": [
+      1048,
+      1096,
+      1102,
+      1061
+    ],
+    "unit_refs": [
+      "1048",
+      "1096",
+      "1102",
+      "1061"
+    ],
+    "rewards": 0,
+    "cost": 200,
+    "costs": [
+      60,
+      70,
+      70,
+      90
+    ],
+    "position": 105,
+    "category_name": "Special Units IV",
+    "category_name_es": "Special Units V",
+    "category_name_br": "Special Units V",
+    "category_name_it": "Special Units V",
+    "category_name_fr": "Special Units V",
+    "category_name_de": "Special Units V",
+    "category_name_tr": "Special Units V",
+    "category_name_el": ""
+  },
+  {
+    "legacy_id": "17",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 17,
+    "units": [
+      1062,
+      1101,
+      1074,
+      1075,
+      1112
+    ],
+    "unit_refs": [
+      "1062",
+      "1101",
+      "1074",
+      "1075",
+      "1112"
+    ],
+    "rewards": 0,
+    "cost": 200,
+    "costs": [
+      100,
+      110,
+      120,
+      130,
+      140
+    ],
+    "position": 110,
+    "category_name": "Mechs & Bots I",
+    "category_name_es": "Mechs & Bots I",
+    "category_name_br": "Mechs & Bots I",
+    "category_name_it": "Mechs & Bots I",
+    "category_name_fr": "Mechs & Bots I",
+    "category_name_de": "Mechs & Bots I",
+    "category_name_tr": "Mechs & Bots I",
+    "category_name_el": ""
+  },
+  {
+    "legacy_id": "21",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 21,
+    "units": [
+      1128,
+      1153,
+      1163,
+      1171,
+      1173
+    ],
+    "unit_refs": [
+      "1128",
+      "1153",
+      "1163",
+      "1171",
+      "1173"
+    ],
+    "rewards": 0,
+    "cost": 200,
+    "costs": [
+      35,
+      37,
+      39,
+      41,
+      43
+    ],
+    "position": 130,
+    "category_name": "Drones I",
+    "category_name_es": "Drones I",
+    "category_name_br": "Drones I",
+    "category_name_it": "Drones I",
+    "category_name_fr": "Drones I",
+    "category_name_de": "Drones I",
+    "category_name_tr": "Drones I",
+    "category_name_el": ""
+  },
+  {
+    "legacy_id": "22",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 22,
+    "units": [
+      1179,
+      1182,
+      1206,
+      1211,
+      1216
+    ],
+    "unit_refs": [
+      "1179",
+      "1182",
+      "1206",
+      "1211",
+      "1216"
+    ],
+    "rewards": 0,
+    "cost": 200,
+    "costs": [
+      45,
+      48,
+      48,
+      48,
+      48
+    ],
+    "position": 135,
+    "category_name": "Drones II",
+    "category_name_es": "Drones II",
+    "category_name_br": "Drones II",
+    "category_name_it": "Drones II",
+    "category_name_fr": "Drones II",
+    "category_name_de": "Drones II",
+    "category_name_tr": "Drones II",
+    "category_name_el": ""
+  },
+  {
+    "legacy_id": "23",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 23,
+    "units": [
+      1099,
+      1100,
+      1105,
+      1119
+    ],
+    "unit_refs": [
+      "1099",
+      "1100",
+      "1105",
+      "1119"
+    ],
+    "rewards": 0,
+    "cost": 200,
+    "costs": [
+      140,
+      150,
+      170,
+      175
+    ],
+    "position": 140,
+    "category_name": "Dragons",
+    "category_name_es": "Dragons",
+    "category_name_br": "Dragons",
+    "category_name_it": "Dragons",
+    "category_name_fr": "Dragons",
+    "category_name_de": "Dragons",
+    "category_name_tr": "Dragons",
+    "category_name_el": ""
+  },
+  {
+    "legacy_id": "24",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 24,
+    "units": [
+      1085,
+      1097,
+      1098,
+      1120,
+      1168
+    ],
+    "unit_refs": [
+      "1085",
+      "1097",
+      "1098",
+      "1120",
+      "1168"
+    ],
+    "rewards": 0,
+    "cost": 200,
+    "costs": [
+      35,
+      37,
+      39,
+      41,
+      43
+    ],
+    "position": 145,
+    "category_name": "Draggies",
+    "category_name_es": "Draggies",
+    "category_name_br": "Draggies",
+    "category_name_it": "Draggies",
+    "category_name_fr": "Draggies",
+    "category_name_de": "Draggies",
+    "category_name_tr": "Draggies",
+    "category_name_el": ""
+  },
+  {
+    "legacy_id": "34",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 34,
+    "units": [
+      1144,
+      1145,
+      1146,
+      1148,
+      1170
+    ],
+    "unit_refs": [
+      "1144",
+      "1145",
+      "1146",
+      "1148",
+      "1170"
+    ],
+    "rewards": 0,
+    "cost": 200,
+    "costs": [
+      70,
+      75,
+      55,
+      40,
+      170
+    ],
+    "position": 195,
+    "category_name": "Aliens & Spiders",
+    "category_name_es": "Aliens",
+    "category_name_br": "Aliens",
+    "category_name_it": "Aliens",
+    "category_name_fr": "Aliens",
+    "category_name_de": "Aliens",
+    "category_name_tr": "Aliens",
+    "category_name_el": ""
+  },
+  {
+    "legacy_id": "35",
+    "kind": "unit_collection_category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "category_id": 35,
+    "units": [
+      1186,
+      1187,
+      1198,
+      1188,
+      1189
+    ],
+    "unit_refs": [
+      "1186",
+      "1187",
+      "1198",
+      "1188",
+      "1189"
+    ],
+    "rewards": 0,
+    "cost": 200,
+    "costs": [
+      55,
+      60,
+      65,
+      75,
+      80
+    ],
+    "position": 200,
+    "category_name": "Nebular Civ I",
+    "category_name_es": "Nebular Civ I",
+    "category_name_br": "Nebular Civ I",
+    "category_name_it": "Nebular Civ I",
+    "category_name_fr": "Nebular Civ I",
+    "category_name_de": "Nebular Civ I",
+    "category_name_tr": "Nebular Civ I",
+    "category_name_el": ""
+  }
+]

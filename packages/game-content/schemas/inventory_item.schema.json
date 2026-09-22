@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "packages/game-content/schemas/inventory_item.schema.json",
+  "title": "Normalized inventory item definition (legacy inventory_items domain)",
+  "description": "Contract for one normalized inventory item: one stored legacy inventory_items object entry. The stored object key is the stable identity, so legacy_id is the key verbatim (rule N2); string-encoded numerics coerce to integers (rule N1) and display strings are kept verbatim. See packages/game-content/README.md for the rule set and survey citations.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "id",
+    "name",
+    "cashPrice",
+    "droppable",
+    "dropRate",
+    "dropsFrom",
+    "description"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Stored inventory_items object key preserved verbatim (rule N2): the decimal inventory id string."
+    },
+    "kind": {
+      "const": "inventory_item",
+      "description": "Classification of the stored inventory_items domain: every entry maps to inventory_item."
+    },
+    "source_file": {
+      "type": "string",
+      "description": "Origin file of the stored entry: config/main.json (no patch targets inventory_items)."
+    },
+    "source_layer": {
+      "type": "string",
+      "description": "Layering origin: stored (no patch targets inventory_items)."
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint (sha256 over the stored source bytes plus the mods list); sources carry no version stamp."
+    },
+    "id": {
+      "type": "integer",
+      "description": "Inventory id coerced from the string-encoded stored value to an integer (rule N1).",
+      "minimum": 0
+    },
+    "name": {
+      "type": "string",
+      "description": "Inventory display name, preserved verbatim (rule N1)."
+    },
+    "cashPrice": {
+      "type": "integer",
+      "description": "Cash price coerced from the string-encoded stored value to an integer (rule N1).",
+      "minimum": 0
+    },
+    "droppable": {
+      "type": "integer",
+      "description": "Droppable flag coerced from the string-encoded stored value to an integer (rule N1).",
+      "minimum": 0
+    },
+    "dropRate": {
+      "type": "integer",
+      "description": "Drop rate coerced from the string-encoded stored value to an integer (rule N1).",
+      "minimum": 0
+    },
+    "dropsFrom": {
+      "type": "integer",
+      "description": "Drop-source code coerced from the string-encoded stored value to an integer; carried as an opaque code, never treated as an item reference (rule N1).",
+      "minimum": 0
+    },
+    "description": {
+      "type": "string",
+      "description": "Inventory display description, preserved verbatim (rule N1)."
+    }
+  }
+}
