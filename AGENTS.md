@@ -311,6 +311,30 @@ evidence modulo documented coercions, and manifest, not served-byte
 equality, content validity, gameplay parity, asset existence,
 progressed-player coverage, or implemented inventory/shop behavior.
 
+Verified offline darts-schedule normalization check (Windows x64 CPython 3.9.13):
+
+```bash
+python -B packages/game-content/tools/build_darts.py
+python -B -m unittest discover -s packages/game-content/tests -p test_build_darts.py -v
+```
+
+See `packages/game-content/README.md` (darts-schedule normalization
+extension) for the executable, invocation, exit codes, evidence
+classification, and containment. Run the items-normalization build first: the
+darts builder reads the committed normalized items outputs as its
+cross-domain reference edge for pooled and extra ids, applies only the
+`targets` whole-array replace of `/darts_items` (stored 30 entries recorded
+as replace inputs, 27 patched entries normalized), and merges its `darts`
+section into the package manifest while leaving the prior keys untouched.
+These checks establish source-grounded normalization consistency for the 27
+patched `darts_items` entries (ids 1..27 with six-id native pools and extra
+ids resolving against the 900 normalized items legacy IDs, `start_date`
+values preserved verbatim as derivation inputs), with schema, exact
+round-trip evidence against the patched array, and manifest, not
+served-byte equality (`make_dynamic` rewrites served dates and never runs
+here), content validity, gameplay parity, asset existence, or
+progressed-player coverage.
+
 ---
 
 ## Code style

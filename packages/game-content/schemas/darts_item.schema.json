@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "packages/game-content/schemas/darts_item.schema.json",
+  "title": "Normalized darts item definition (legacy darts_items domain, patched)",
+  "description": "Contract for one normalized darts schedule entry: one patched legacy darts_items entry after the targets whole-array replace. The patched integer id is the stable identity, so legacy_id is its decimal form (rule D2); pooled integers are kept verbatim and validated as item references, and start_date is preserved verbatim as a derivation input, never a served value (rules D2/D3). See packages/game-content/README.md for the rule set and survey/census citations.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "id",
+    "start_date",
+    "items",
+    "item_refs",
+    "extra_item",
+    "extra_ref"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Patched darts_items id preserved verbatim as a string (rule D2): the decimal form of the native integer id."
+    },
+    "kind": {
+      "const": "darts_item",
+      "description": "Classification of the patched darts_items domain: every entry maps to darts_item."
+    },
+    "source_file": {
+      "type": "string",
+      "description": "Origin file of the patched entry: config/patch/targets.json via the ordered patch layering (stored config/main.json carries the replace inputs)."
+    },
+    "source_layer": {
+      "type": "string",
+      "description": "Layering origin: patched(targets) — the whole-array replace of /darts_items (rule D1)."
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint (sha256 over the stored source bytes, the patch bytes, and the mods list); sources carry no version stamp."
+    },
+    "id": {
+      "type": "integer",
+      "description": "Native patched darts id, kept verbatim (rule D2).",
+      "minimum": 0
+    },
+    "start_date": {
+      "type": "string",
+      "description": "Patched start datetime preserved verbatim as a derivation input for make_dynamic; never interpreted as a served value (rule D3)."
+    },
+    "items": {
+      "type": "array",
+      "description": "Native patched pooled item ids, kept verbatim; every element must resolve against the normalized items legacy-ID set (rule D2).",
+      "minItems": 1,
+      "items": { "type": "integer" }
+    },
+    "item_refs": {
+      "type": "array",
+      "description": "Resolved cross-domain item references: the pooled ids as legacy_id strings in stored pool order, each validated against the normalized items legacy-ID set (rule D2).",
+      "minItems": 1,
+      "items": { "type": "string" }
+    },
+    "extra_item": {
+      "type": "integer",
+      "description": "Native patched extra item id, kept verbatim; must resolve against the normalized items legacy-ID set (rule D2).",
+      "minimum": 0
+    },
+    "extra_ref": {
+      "type": "string",
+      "description": "Resolved cross-domain item reference for the extra id as a legacy_id string (rule D2)."
+    }
+  }
+}
