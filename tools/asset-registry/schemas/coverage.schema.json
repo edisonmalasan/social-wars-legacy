@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tools/asset-registry/schemas/coverage.schema.json",
+  "title": "Content-to-asset coverage report",
+  "description": "Contract for the generated coverage report: per-domain joins of normalized content references against the asset registry, with missing-name lists and unreferenced-file counts for conversion prioritization.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "policy",
+    "result",
+    "inputs",
+    "domains",
+    "corpus",
+    "unreferenced"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "description": "Coverage format version.",
+      "minimum": 1
+    },
+    "policy": {
+      "const": "asset-registry-v1",
+      "description": "Coverage build policy identifier."
+    },
+    "result": {
+      "const": "success",
+      "description": "Build outcome marker; only successful builds write outputs."
+    },
+    "inputs": {
+      "type": "object",
+      "description": "Reference sources: normalized package files consumed with digests."
+    },
+    "domains": {
+      "type": "object",
+      "description": "Per-domain join results keyed by domain name (item_sprites, magic_sprites, sounds, images)."
+    },
+    "corpus": {
+      "type": "object",
+      "description": "Corpus totals mirrored from the registry for join-rate context."
+    },
+    "unreferenced": {
+      "type": "object",
+      "description": "Present-but-unreferenced file counts per directory class."
+    }
+  }
+}

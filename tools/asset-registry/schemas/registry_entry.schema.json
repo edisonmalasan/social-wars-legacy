@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tools/asset-registry/schemas/registry_entry.schema.json",
+  "title": "Single asset corpus registry entry",
+  "description": "Contract for one registry entry: identity and classification of one worktree asset file. Status starts at registered; later M4 slices advance it through extraction and conversion states.",
+  "type": "object",
+  "required": [
+    "path",
+    "size",
+    "sha256",
+    "extension",
+    "directory_class",
+    "status"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "path": {
+      "type": "string",
+      "description": "Repository-relative POSIX path with forward slashes, exactly as walked."
+    },
+    "size": {
+      "type": "integer",
+      "description": "File size in bytes.",
+      "minimum": 0
+    },
+    "sha256": {
+      "type": "string",
+      "description": "SHA-256 hex digest of the worktree file bytes (64 lowercase hex characters)."
+    },
+    "extension": {
+      "type": "string",
+      "description": "Lowercase file extension including the dot (e.g. .swf)."
+    },
+    "directory_class": {
+      "type": "string",
+      "description": "First path segment (top-level directory) classifying the file location."
+    },
+    "status": {
+      "const": "registered",
+      "description": "Conversion lifecycle status; this slice only registers."
+    }
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "corpus": {
+    "bytes": 752465386,
+    "files": 3215
+  },
+  "domains": {
+    "images": {
+      "basename_collision": 50,
+      "basename_single": 525,
+      "distinct_references": 607,
+      "missing": [
+        "/chapters/chapter_10_m.jpg",
+        "/chapters/chapter_10_old.jpg",
+        "/chapters/chapter_10_w.jpg",
+        "/chapters/chapter_11_m.jpg",
+        "/chapters/chapter_11_old.jpg",
+        "/chapters/chapter_11_w.jpg",
+        "/chapters/chapter_12_m.jpg",
+        "/chapters/chapter_12_w.jpg",
+        "/chapters/chapter_1_m.jpg",
+        "/chapters/chapter_1_w.jpg",
+        "/chapters/chapter_2_m.jpg",
+        "/chapters/chapter_2_w.jpg",
+        "/chapters/chapter_3_m.jpg",
+        "/chapters/chapter_3_w.jpg",
+        "/chapters/chapter_4_m.jpg",
+        "/chapters/chapter_4_w.jpg",
+        "/chapters/chapter_5_m.jpg",
+        "/chapters/chapter_5_old.jpg",
+        "/chapters/chapter_5_w.jpg",
+        "/chapters/chapter_6_m.jpg",
+        "/chapters/chapter_6_old.jpg",
+        "/chapters/chapter_6_w.jpg",
+        "/chapters/chapter_7_m.jpg",
+        "/chapters/chapter_7_old.jpg",
+        "/chapters/chapter_7_w.jpg",
+        "/chapters/chapter_8_m.jpg",
+        "/chapters/chapter_8_w.jpg",
+        "/chapters/chapter_9_m.jpg",
+        "/chapters/chapter_9_w.jpg",
+        "/chapters/simple/prison1.jpg",
+        "/chapters/simple/prison2.jpg",
+        "/intro/intro - copia.swf"
+      ],
+      "references": 607,
+      "resolved": 525,
+      "rule": "basename match (web-root-relative form preserved, never rewritten)"
+    },
+    "item_sprites": {
+      "distinct_references": 872,
+      "missing": [
+        "0137_spy_academy_m",
+        "10000_chained_bonus_giant_walker",
+        "10027_prision",
+        "10034_chained_hercules_mech",
+        "10048_cross_dc",
+        "1011_bad_girl_m",
+        "982_chained_red_spinner",
+        "casachina",
+        "treasure",
+        "vacaPerdida"
+      ],
+      "references": 917,
+      "resolved": 907,
+      "rule": "assets/sprites/<stem>.swf"
+    },
+    "magic_sprites": {
+      "distinct_references": 10,
+      "missing": [],
+      "references": 10,
+      "resolved": 10,
+      "rule": "assets/magic/<stem>.swf"
+    },
+    "sounds": {
+      "distinct_references": 138,
+      "missing": [],
+      "references": 139,
+      "resolved": 139,
+      "rule": "assets/sounds/<stem>.mp3"
+    }
+  },
+  "inputs": {
+    "normalized_files": [
+      "packages/game-content/normalized/buildings.json",
+      "packages/game-content/normalized/units.json",
+      "packages/game-content/normalized/specials.json",
+      "packages/game-content/normalized/magics.json",
+      "packages/game-content/normalized/sounds.json",
+      "packages/game-content/normalized/images.json"
+    ]
+  },
+  "policy": "asset-registry-v1",
+  "result": "success",
+  "schema_version": 1,
+  "unreferenced": {
+    "assets": 1616,
+    "templates": 16
+  }
+}
