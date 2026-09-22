@@ -9,7 +9,8 @@ execution.
 
 - Worktree asset files with extensions `.swf`, `.jpg`, `.jpeg`,
   `.png`, `.mp3`, `.wav`, `.gif`, minus exclusions `.git/`, `saves/`,
-  `temp/`, `new_assets/`, `build/bundle`, `build/dist`, `build/work`.
+  `temp/`, `new_assets/`, `assets/converted/` (generated outputs are
+  not source corpus), `build/bundle`, `build/dist`, `build/work`.
 - Committed normalized outputs: `buildings.json`, `units.json`,
   `specials.json` (`img_name`), `magics.json` (`img_name`),
   `sounds.json` (`file`), `images.json` (`path`).
@@ -163,4 +164,82 @@ gameplay parity, or Godot rendering.
 
 ```bash
 python -B -m unittest discover -s tools/asset-registry/tests -p test_inspect_swf.py -v
+```
+
+---
+
+# Sound extraction (M4 slice 3: verbatim MP3 extraction)
+
+Verbatim payload extraction for the 27 embedded MP3 sounds (all in
+`assets/swf/dynamic2.swf`), built offline with Python 3.9 standard
+library only; no new dependencies, no decoding, no playback, no
+transcoding, no Flash runtime in any form.
+
+## Inputs
+
+- `tools/asset-registry/inspection.json` (committed inspection; every
+  file with `sound_ids` is extracted).
+- `tools/asset-registry/schemas/extraction.schema.json` and
+  `extraction_sound.schema.json` (contracts enforced by the extractor).
+
+## Slicing rule
+
+DefineSound tags are re-walked; format nibble 2 (MP3) with sane
+rate/size/type characteristics is required and anything else fails
+closed. Each payload is sliced from its first `FF Ex` frame sync to
+payload end; the sync offset must equal 9 for every sound (the measured
+uniform invariant) or the build fails as drift. One `.mp3` per
+character ID lands under `assets/converted/sounds/`.
+
+## Outputs
+
+- `assets/converted/sounds/<id>.mp3`: 27 verbatim MP3 frames.
+- `tools/asset-registry/extraction.json`: per-sound source tag,
+  characteristics, sync offset, output digest, and byte counts.
+- `tools/asset-registry/statuses.json`: registry-path to `extracted`
+  overlay; registry, coverage, and inspection files stay untouched.
+
+## Validation gates (failures exit 1, outputs unwritten)
+
+Non-MP3 formats, shifted or missing syncs, truncated walks, digest
+mismatches on re-derivation, duplicate IDs, and schema violations.
+Exit 2 reports invalid input (missing inspection, unreadable files,
+unparseable content). Reruns on unchanged inputs are byte-identical.
+
+## Executable and invocation
+
+Verified executable: `C:\Users\Edison\AppData\Local\Programs\Python\Python39\python.exe`
+(CPython 3.9.13). Any working Python 3.9+ standard-library interpreter
+should behave identically.
+
+From the repository root (after the inspection build):
+
+```bash
+python -B tools/asset-registry/extract_sounds.py
+```
+
+## Evidence classification
+
+This tool establishes source-grounded extraction consistency for all
+27 embedded sounds: payload provenance, characteristics, sync
+uniformity, and digest fidelity. It is evidence of verbatim slicing,
+not of decoding, playback quality, transcoding, timeline semantics,
+gameplay parity, or Godot rendering. MP3 stays MP3 — Godot plays it
+natively, so no transcoding is specified.
+
+## Containment
+
+- Reads only the committed inspection, the two extraction schemas,
+  and the inspection-listed sounded SWF (plus optional
+  `--repo-root`/`--out-root` relocation).
+- Never imports or executes any legacy application module, never uses
+  subprocess/network/server/browser/Flash/audio-decoding libraries,
+  never modifies any source asset.
+- Writes only converted MP3s plus the two manifest files, and only on
+  success. No bytecode (`-B` recommended), no caches, no temporary
+  files in the repository.
+- The focused tests run the same way:
+
+```bash
+python -B -m unittest discover -s tools/asset-registry/tests -p test_extract_sounds.py -v
 ```

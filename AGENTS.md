@@ -120,6 +120,20 @@ establish no conversion, timeline semantics, script behavior, asset validity,
 gameplay parity, or Godot rendering. No ActionScript executes and no Flash
 runtime is involved.
 
+Verified offline sound-extraction commands (Windows x64 CPython 3.9.13):
+
+```bash
+python -B tools/asset-registry/extract_sounds.py
+python -B -m unittest discover -s tools/asset-registry/tests -p test_extract_sounds.py -v
+```
+
+See `tools/asset-registry/README.md` and `docs/assets/registry.md` for the
+executable, slicing rule, exit codes, evidence classification, and
+containment. These commands extract all 27 embedded MP3 payloads verbatim
+(no decoding, playback, transcoding, or source mutation) and establish no
+timeline semantics, audio-quality claims, gameplay parity, or Godot
+rendering.
+
 Verified opt-in command-recorder check (Windows x64 CPython 3.9.13):
 
 ```bash

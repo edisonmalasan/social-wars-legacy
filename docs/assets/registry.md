@@ -63,6 +63,17 @@ reads (`struct` + `zlib` only) into `tools/asset-registry/inspection.json`:
 See `tools/asset-registry/README.md` for invocation, parsing rules,
 exit codes, evidence classification, and containment.
 
+## Sound extraction
+
+`extract_sounds.py` slices the 27 embedded MP3 payloads (all format
+nibble 2, all in `assets/swf/dynamic2.swf`) verbatim from each tag's
+first frame sync (uniform offset 9, asserted) into
+`assets/converted/sounds/<id>.mp3`, with `extraction.json` provenance
+and a `statuses.json` overlay advancing those registry paths to
+`extracted`. No decoding, playback, transcoding, or source mutation;
+MP3 stays MP3. Zero non-MP3 sounds exist corpus-wide; any future one
+fails closed.
+
 ## Prioritization input (roadmap §14)
 
 Suggested conversion order: terrain, one building, one unit, essential
