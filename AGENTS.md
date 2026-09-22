@@ -150,6 +150,20 @@ correctness, color judgment, timeline assembly, gameplay parity, or Godot
 rendering. Bulk outputs regenerate under ignored `assets/converted/images/`;
 the committed digest manifest is the permanent evidence.
 
+Verified offline first-building conversion commands (Windows x64 CPython 3.9.13):
+
+```bash
+python -B tools/asset-registry/convert_building.py
+python -B -m unittest discover -s tools/asset-registry/tests -p test_convert_building.py -v
+```
+
+See `tools/asset-registry/README.md` and `docs/assets/registry.md` for the
+executable, parsing boundary, exit codes, evidence classification, and
+containment. These commands assemble one converted building package (shape
+bounds/styles with bitmap linkage, no tessellation) and establish no
+rendering correctness, visual fidelity, gameplay footprint semantics, or Godot
+loading. No Godot project is created or required.
+
 Verified opt-in command-recorder check (Windows x64 CPython 3.9.13):
 
 ```bash

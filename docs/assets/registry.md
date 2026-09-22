@@ -86,6 +86,16 @@ permanent evidence, and `statuses.json` merges under the neutral
 `asset-statuses-v1` envelope. No rendering, no JPEG decoding to
 pixels, no source mutation; unknown formats fail closed.
 
+## First-building conversion
+
+`convert_building.py` assembles `assets/converted/buildings/0001_house_1_m/`
+(House I, 2×2 tiles) from inspection data, extraction outputs, the
+normalized building definition, and parsed SHAPEWITHSTYLE records
+(bounds, fill/line styles, bitmap-fill references, edge counts — no
+tessellation). `conversions.json` records package digests and
+`statuses.json` marks the source `converted`. Matrices stay raw;
+scripts stay uninterpreted; no Godot involvement.
+
 ## Prioritization input (roadmap §14)
 
 Suggested conversion order: terrain, one building, one unit, essential

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tools/asset-registry/schemas/conversion.schema.json",
+  "title": "Conversion manifest",
+  "description": "Contract for the generated conversion manifest: converted packages with digests for Godot-import readiness tracking.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "policy",
+    "result",
+    "inputs",
+    "counts",
+    "packages"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "description": "Conversion manifest format version.",
+      "minimum": 1
+    },
+    "policy": {
+      "const": "building-conversion-v1",
+      "description": "Conversion policy identifier."
+    },
+    "result": {
+      "const": "success",
+      "description": "Build outcome marker; only successful runs write outputs."
+    },
+    "inputs": {
+      "type": "object",
+      "description": "Input provenance: normalized buildings digest, inspection and extraction fingerprints."
+    },
+    "counts": {
+      "type": "object",
+      "description": "Conversion totals: package count and output byte total."
+    },
+    "packages": {
+      "type": "array",
+      "description": "Converted package entries with digests.",
+      "items": { "type": "object" }
+    }
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tools/asset-registry/schemas/building_package.schema.json",
+  "title": "Single converted building package",
+  "description": "Contract for one converted building package: identity, content and source provenance, frame data, symbols, parsed shape-style records with bitmap references, bitmap outputs with digests, and placement tiles recorded verbatim.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "content_ref",
+    "frame_width",
+    "frame_height",
+    "frame_rate",
+    "frame_count",
+    "symbols",
+    "shapes",
+    "bitmaps",
+    "placement"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Building sprite stem, also the normalized img_name."
+    },
+    "kind": {
+      "const": "converted_building",
+      "description": "Classification: one converted building package."
+    },
+    "source_file": {
+      "type": "string",
+      "description": "Source SWF registry path."
+    },
+    "source_layer": {
+      "type": "string",
+      "description": "Provenance layer: converted(asset-registry)."
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint of the normalized package inputs consumed."
+    },
+    "content_ref": {
+      "type": "object",
+      "description": "The single matched normalized building definition, recorded verbatim."
+    },
+    "frame_width": {
+      "type": "integer",
+      "description": "Stage width in pixels from the SWF header.",
+      "minimum": 0
+    },
+    "frame_height": {
+      "type": "integer",
+      "description": "Stage height in pixels from the SWF header.",
+      "minimum": 0
+    },
+    "frame_rate": {
+      "type": "number",
+      "description": "Frame rate in frames per second."
+    },
+    "frame_count": {
+      "type": "integer",
+      "description": "Total frames declared in the header.",
+      "minimum": 0
+    },
+    "symbols": {
+      "type": "array",
+      "description": "SymbolClass names recorded verbatim.",
+      "items": { "type": "string" }
+    },
+    "shapes": {
+      "type": "array",
+      "description": "Parsed shape-style records with bounds, style types, bitmap references, and edge counts.",
+      "items": { "type": "object" }
+    },
+    "bitmaps": {
+      "type": "array",
+      "description": "Bitmap outputs with digests, byte-copied from extraction outputs.",
+      "items": { "type": "object" }
+    },
+    "placement": {
+      "type": "object",
+      "description": "Placement tiles recorded verbatim from the content definition."
+    }
+  }
+}
