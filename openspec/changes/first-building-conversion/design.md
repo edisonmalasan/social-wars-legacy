@@ -23,7 +23,7 @@ Extraction slices produce loose bitmap files; nothing yet assembles a per-defini
 
 - **Package by directory, manifest globally.** Per-building directory holds `package.json` plus bitmap copies (small: one JPEG plus alpha); `conversions.json` at the registry root records every converted package with digests. Rationale: Godot imports directories, reviewers read manifests.
 - **Bitmap copies, not references.** The package is self-contained for future Godot import; digests must match extraction outputs byte-for-byte, enforced by the builder.
-- **Styles parsed, edges preserved as counts.** Fill/line style arrays fully decoded (types, colors, bitmap IDs, gradient stubs recorded); edge records counted but not tessellated — tessellation is the largest conversion risk and belongs to a needs-driven slice.
+- **Styles parsed, edges preserved as counts.** Fill/line style arrays fully decoded (types, colors, bitmap IDs, gradient stubs recorded), including mid-stream NewStyles blocks (parsed into the same arrays with counts recorded); edge records counted but not tessellated — tessellation is the largest conversion risk and belongs to a needs-driven slice.
 - **Content linkage validated, never rebalanced.** The `img_name` lookup must resolve to exactly one normalized building definition; costs/tiles recorded verbatim.
 - **Small domain module.** New converter beside the registry tools sharing the schemas/tests/README pattern; no new dependencies.
 

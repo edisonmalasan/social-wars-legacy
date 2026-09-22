@@ -330,3 +330,84 @@ timeline assembly, gameplay parity, or Godot rendering.
 ```bash
 python -B -m unittest discover -s tools/asset-registry/tests -p test_extract_images.py -v
 ```
+
+---
+
+# First-building conversion (M4 slice 5: package assembly)
+
+Assembled converted package for `0001_house_1_m` (House I) from
+inspection data, extraction outputs, the normalized buildings package,
+and parsed shape-style records, built offline with Python 3.9 standard
+library only; no new dependencies, no tessellation, no rasterization,
+no matrix/script interpretation, no Flash runtime in any form.
+
+## Inputs
+
+- `tools/asset-registry/inspection.json` (frame data, symbols).
+- `tools/asset-registry/image_extraction.json` plus extracted bitmap
+  files (bitmap linkage with digest equality).
+- `packages/game-content/normalized/buildings.json` (exactly one
+  `img_name` match; placement tiles recorded verbatim).
+- `tools/asset-registry/schemas/building_package.schema.json` and
+  `conversion.schema.json` (contracts enforced by the converter).
+
+## Parsing boundary
+
+SHAPEWITHSTYLE bounds, fill/line style arrays (solid, gradient stubs,
+bitmap fills with IDs plus raw matrices), and edge-record type counts
+are parsed; mid-stream NewStyles blocks are parsed into the same
+arrays. Matrices stay raw bytes. Edge geometry is counted, never
+tessellated. Shape tags outside {2, 22, 32} fail closed.
+
+## Outputs
+
+- `assets/converted/buildings/0001_house_1_m/`: `package.json` plus
+  byte-identical bitmap copies (digests must match extraction outputs).
+- `tools/asset-registry/conversions.json`: package entries with digests.
+- `tools/asset-registry/statuses.json`: merged overlay marking the
+  source path `converted` (neutral `asset-statuses-v1` envelope).
+
+## Validation gates (failures exit 1, outputs unwritten)
+
+Bounds presence, bitmap-fill resolution, content-ref uniqueness, digest
+equality, schema fields, and determinism. Exit 2 reports invalid input
+(missing inspection/extraction/buildings, unreadable files,
+unparseable content).
+
+## Executable and invocation
+
+Verified executable: `C:\Users\Edison\AppData\Local\Programs\Python\Python39\python.exe`
+(CPython 3.9.13). Any working Python 3.9+ standard-library interpreter
+should behave identically.
+
+From the repository root (after the extraction builds):
+
+```bash
+python -B tools/asset-registry/convert_building.py
+```
+
+## Evidence classification
+
+This tool establishes source-grounded assembly consistency for one
+converted building: shape-style fidelity, bitmap linkage, content
+linkage, and determinism. It is evidence of package assembly, not of
+rendering correctness, visual fidelity, tessellation, gameplay
+footprint semantics, or Godot loading. No Godot project is created or
+required here.
+
+## Containment
+
+- Reads only the committed inspection, extraction manifest plus bitmap
+  files, normalized buildings, the two converter schemas, and the
+  source SWF (plus optional `--repo-root`/`--out-root` relocation).
+- Never imports or executes any legacy application module, never uses
+  subprocess/network/server/browser/Flash, never modifies any source
+  asset or prior manifest (verified byte-identical after runs).
+- Writes only the package directory plus the conversions manifest and
+  statuses merge, and only on success. No bytecode (`-B` recommended),
+  no caches, no temporary files in the repository.
+- The focused tests run the same way:
+
+```bash
+python -B -m unittest discover -s tools/asset-registry/tests -p test_convert_building.py -v
+```

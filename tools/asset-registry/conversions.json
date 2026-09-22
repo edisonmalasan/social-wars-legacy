@@ -1,0 +1,23 @@
+{
+  "counts": {
+    "output_bytes": 11733,
+    "packages": 1
+  },
+  "inputs": {
+    "buildings": "packages/game-content/normalized/buildings.json",
+    "content_version": "ddeca79973ed603d3d2f3dc2e4527192cb3bf2350d349a17c460c94e791bd3f1",
+    "extraction": "tools/asset-registry/image_extraction.json",
+    "inspection": "tools/asset-registry/inspection.json"
+  },
+  "packages": [
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0001_house_1_m",
+      "legacy_id": "0001_house_1_m",
+      "package_sha256": "7de262e9f5ec67b1dc57945137f3d5f9a27707d6587dddd4a508e72d366b92a7"
+    }
+  ],
+  "policy": "building-conversion-v1",
+  "result": "success",
+  "schema_version": 1
+}
