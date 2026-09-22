@@ -105,6 +105,21 @@ parsing, conversion, asset validity, gameplay parity, or Godot rendering.
 Registry hashes identify worktree bytes and are distinct from the baseline
 Git-blob hashes owned by `legacy-manifest.json`.
 
+Verified offline SWF-inspection commands (Windows x64 CPython 3.9.13):
+
+```bash
+python -B tools/asset-registry/inspect_swf.py
+python -B -m unittest discover -s tools/asset-registry/tests -p test_inspect_swf.py -v
+```
+
+See `tools/asset-registry/README.md` and `docs/assets/registry.md` for the
+executable, parsing rules, exit codes, evidence classification, and
+containment. These commands statically inventory all 1,176 SWF headers, tags,
+symbols, and embedded-asset IDs (1,175 with ABC, 0 with legacy actions) and
+establish no conversion, timeline semantics, script behavior, asset validity,
+gameplay parity, or Godot rendering. No ActionScript executes and no Flash
+runtime is involved.
+
 Verified opt-in command-recorder check (Windows x64 CPython 3.9.13):
 
 ```bash
