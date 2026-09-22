@@ -242,6 +242,28 @@ numerics coerced, asset names recorded), with round-trip evidence and
 manifest, not served-byte equality, content validity, gameplay parity,
 asset existence, or progressed-player coverage.
 
+Verified offline economy-schedules normalization check (Windows x64 CPython 3.9.13):
+
+```bash
+python -B packages/game-content/tools/build_economy.py
+python -B -m unittest discover -s packages/game-content/tests -p test_build_economy.py -v
+```
+
+See `packages/game-content/README.md` (economy-schedules normalization
+extension) for the executable, invocation, exit codes, evidence
+classification, and containment. Run the items-normalization build first: the
+economy builder reads the committed normalized items outputs as its
+cross-domain reference edge for ranking rewards and merges its `economy`
+section into the package manifest while leaving the items, quests, and
+tables keys untouched. These checks establish source-grounded normalization
+consistency for the 98 stored `expansion_prices` entries, the 4 stored
+`town_prices` entries, the 4 stored `map_prices` entries (identical values
+preserved as separate schedules, never deduplicated), and the 50 stored
+`level_ranking_reward` entries (levels 50..1 with native single-entry units
+maps resolving against the 900 normalized items legacy IDs), with schemas,
+exact round-trip evidence, and manifest, not served-byte equality, content
+validity, gameplay parity, asset existence, or progressed-player coverage.
+
 ---
 
 ## Code style

@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "packages/game-content/schemas/level_ranking_reward.schema.json",
+  "title": "Normalized level ranking reward definition (legacy level_ranking_reward domain)",
+  "description": "Contract for one normalized level ranking reward: one stored legacy level_ranking_reward entry. The stored integer level is the stable identity, so legacy_id is its decimal form (rule E2); cash and the units map are kept verbatim native values (rule E1), and every units key must resolve against the normalized items legacy-ID set (rule E3). See packages/game-content/README.md for the rule set and survey citations.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "level",
+    "cash",
+    "units",
+    "unit_refs"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Stored level_ranking_reward level preserved verbatim as a string (rule E2): the decimal form of the native integer level."
+    },
+    "kind": {
+      "const": "level_ranking_reward",
+      "description": "Classification of the stored level_ranking_reward domain: every entry maps to level_ranking_reward."
+    },
+    "source_file": {
+      "type": "string",
+      "description": "Origin file of the stored entry: config/main.json (no patch targets level_ranking_reward)."
+    },
+    "source_layer": {
+      "type": "string",
+      "description": "Layering origin: stored (no patch targets level_ranking_reward)."
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint (sha256 over the stored source bytes plus the mods list); sources carry no version stamp."
+    },
+    "level": {
+      "type": "integer",
+      "description": "Native stored ranking level, kept verbatim; rows cover 50..1 exactly once (rule E1).",
+      "minimum": 1
+    },
+    "cash": {
+      "type": "integer",
+      "description": "Native stored cash reward, kept verbatim (rule E1).",
+      "minimum": 0
+    },
+    "units": {
+      "type": "object",
+      "description": "Native stored units reward map of item-id keys to integer quantities, kept verbatim; every key must resolve against the normalized items legacy-ID set (rules E1/E3)."
+    },
+    "unit_refs": {
+      "type": "array",
+      "description": "Resolved cross-domain item references: the units map keys as legacy_id strings in sorted order, each validated against the normalized items legacy-ID set (rule E3).",
+      "minItems": 1,
+      "items": { "type": "string" }
+    }
+  }
+}

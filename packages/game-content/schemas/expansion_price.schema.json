@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "packages/game-content/schemas/expansion_price.schema.json",
+  "title": "Normalized expansion price definition (legacy expansion_prices domain)",
+  "description": "Contract for one normalized expansion price: one stored legacy expansion_prices entry in positional schedule order. The schedule carries no stable stored id (the legacy loader indexes positionally), so legacy_id is the 0-based positional index as a string (rule E2); all native amounts are kept verbatim (rule E1). See packages/game-content/README.md for the rule set and survey citations.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "position",
+    "coins",
+    "cash",
+    "neighbors",
+    "inventory_qte"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Positional index of the stored expansion_prices entry as a decimal string (rule E2): the schedule has no stable stored id and the legacy loader indexes the array positionally."
+    },
+    "kind": {
+      "const": "expansion_price",
+      "description": "Classification of the stored expansion_prices domain: every entry maps to expansion_price."
+    },
+    "source_file": {
+      "type": "string",
+      "description": "Origin file of the stored entry: config/main.json (no patch targets expansion_prices)."
+    },
+    "source_layer": {
+      "type": "string",
+      "description": "Layering origin: stored (no patch targets expansion_prices)."
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint (sha256 over the stored source bytes plus the mods list); sources carry no version stamp."
+    },
+    "position": {
+      "type": "integer",
+      "description": "0-based position of the entry in the stored expansion_prices array; the price ladder order is positional and preserved (rule E2).",
+      "minimum": 0
+    },
+    "coins": {
+      "type": "integer",
+      "description": "Native stored coin cost, kept verbatim (rule E1).",
+      "minimum": 0
+    },
+    "cash": {
+      "type": "integer",
+      "description": "Native stored cash cost, kept verbatim (rule E1).",
+      "minimum": 0
+    },
+    "neighbors": {
+      "type": "integer",
+      "description": "Native stored neighbor requirement, kept verbatim (rule E1).",
+      "minimum": 0
+    },
+    "inventory_qte": {
+      "type": "integer",
+      "description": "Native stored inventory quantity requirement, kept verbatim (rule E1).",
+      "minimum": 0
+    }
+  }
+}
