@@ -264,6 +264,28 @@ maps resolving against the 900 normalized items legacy IDs), with schemas,
 exact round-trip evidence, and manifest, not served-byte equality, content
 validity, gameplay parity, asset existence, or progressed-player coverage.
 
+Verified offline social-tables normalization check (Windows x64 CPython 3.9.13):
+
+```bash
+python -B packages/game-content/tools/build_social.py
+python -B -m unittest discover -s packages/game-content/tests -p test_build_social.py -v
+```
+
+See `packages/game-content/README.md` (social-tables normalization
+extension) for the executable, invocation, exit codes, evidence
+classification, and containment. This extension has no cross-domain
+reference edge and merges its `social` section into the package
+manifest while leaving the items, quests, tables, and economy keys
+untouched. These checks establish source-grounded normalization
+consistency for the 5 stored `neighbor_assists` entries (positional
+assists with verbatim rewards and display strings), the 10 stored
+`findable_items` entries (sequential ids, uniform coin rewards), and
+the 26 stored `social_items` entries (non-sequential ids, verbatim
+worker names, uniformly-empty descriptions preserved with notes),
+with schemas, exact round-trip evidence, and manifest, not
+served-byte equality, content validity, gameplay parity, asset
+existence, progressed-player coverage, or implemented social behavior.
+
 ---
 
 ## Code style

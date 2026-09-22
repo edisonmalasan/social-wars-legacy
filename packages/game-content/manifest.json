@@ -300,6 +300,88 @@
   },
   "result": "success",
   "schema_version": 1,
+  "social": {
+    "coercion_ruleset": "social-coercion-ruleset-v1",
+    "content_fingerprint": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "counts": {
+      "assist_reward_shapes": 1,
+      "assist_rnd_values": [
+        0
+      ],
+      "assists": 5,
+      "findable_coins_values": [
+        100
+      ],
+      "findables": 10,
+      "social_description_empty": 26,
+      "social_worker_costs": [
+        1,
+        2,
+        3
+      ],
+      "socials": 26,
+      "stored_assists": 5,
+      "stored_findables": 10,
+      "stored_socials": 26
+    },
+    "inputs": {
+      "main": {
+        "bytes": 1702871,
+        "file": "config/main.json",
+        "sha256": "55ffd929372a4a31785cfd683982856324e2b73ba9a6624c53f09b68e4dd0ea5"
+      },
+      "mods": {
+        "active_mods": [],
+        "inactive_mods": [
+          "no_hiring_needed"
+        ],
+        "status": "inactive"
+      },
+      "patch_order": [
+        "atom_fusion_item",
+        "unit_patch",
+        "atom_fusion_items_data",
+        "atom_fusion_powerup",
+        "targets"
+      ],
+      "social_patch_targets": "none"
+    },
+    "notes": [
+      "Stored social tables map one-to-one to definitions; native amounts and display strings are kept verbatim with no string coercion and no embedded-JSON parsing (rule S1).",
+      "Neighbor assists carry no stable stored id; legacy_id is the 0-based positional index as a string and position preserves the entry order positionally (rule S2), matching the legacy positional loader.",
+      "Findable and social legacy_id values are the decimal forms of the stored native integer ids (rule S2).",
+      "Assist rewards are identical across all stored entries and findable coins are uniform; both are carried as stored, never factored out.",
+      "Social description is empty in every stored entry; preserved verbatim with this note, never defaulted (rule S1).",
+      "Reward amounts are coins/cash/xp literals and worker names are display data; neither is treated as an item reference.",
+      "No active patch targets any social-table key; the build refuses patch drift and active mods explicitly."
+    ],
+    "outputs": [
+      {
+        "bytes": 2533,
+        "file": "packages/game-content/normalized/neighbor_assists.json",
+        "sha256": "a0430aa352f9c83689bb9224cca2f4249cb41f89a3fdeb786509c8ba33535fb7"
+      },
+      {
+        "bytes": 3920,
+        "file": "packages/game-content/normalized/findable_items.json",
+        "sha256": "925ec9cd0251dfccb1f200d92c2609f3cccd1fe57f52429740c7634b695683ea"
+      },
+      {
+        "bytes": 9214,
+        "file": "packages/game-content/normalized/social_items.json",
+        "sha256": "885e3da9192bd6316dca98c5508c300ef0a6bdcb5bd81d5b4b523d62c6eff662"
+      }
+    ],
+    "policy": "social-normalization-v1",
+    "result": "success",
+    "schema_version": 1,
+    "validation": {
+      "amount_violations": 0,
+      "duplicate_ids": 0,
+      "missing_fields": 0,
+      "round_trip_diffs": 0
+    }
+  },
   "tables": {
     "coercion_ruleset": "tables-coercion-ruleset-v1",
     "content_fingerprint": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",

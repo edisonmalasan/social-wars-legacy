@@ -550,3 +550,134 @@ bytes stay out of scope exactly as in the content census
 ```bash
 python -B -m unittest discover -s packages/game-content/tests -p test_build_economy.py -v
 ```
+
+---
+
+# Social-tables normalization extension
+
+Normalized, schema-checked social/ambient definitions for the legacy
+Social Wars `neighbor_assists` (5 entries), `findable_items`
+(10 entries), and `social_items` (26 entries) content domains, built
+offline from stored sources with Python 3.9 standard library only; no
+new dependencies. This extension has no cross-domain reference edge
+and requires no prior build; it merges its `social` section into the
+package manifest.
+
+## Inputs
+
+- `config/main.json` (stored source: 5 `neighbor_assists` entries with
+  string `task`/`action`/`notification`, native integer `rnd`, and a
+  native `reward` object of `coins`/`cash`/`xp` integers, and no stable
+  id; 10 `findable_items` entries with native integer `id` sequential
+  1..10, native integer `coins` uniform 100, and string
+  `title`/`description`; 26 `social_items` entries with native integer
+  `id` non-sequential, string `workers` names, native integer
+  `worker_cost` in {1,2,3}, and string `description` empty in all 26).
+- `config/patch/patches.txt` plus the five ordered patch files, read
+  only to verify no patch targets any social-table key (any such
+  target fails the build explicitly; stored content is the input, there
+  is no layering).
+- `mods/mods.txt` (must stay inactive; any active mod fails the build).
+- `packages/game-content/schemas/neighbor_assist.schema.json`,
+  `findable_item.schema.json`, and `social_item.schema.json`
+  (contracts enforced by the builder).
+
+## Coercion rules (`social-coercion-ruleset-v1`, survey-cited)
+
+- S1 native amounts and display strings kept verbatim: every amount is
+  a native JSON integer carried exactly as stored (booleans never count
+  as integers) and every display string is carried exactly as stored.
+  No string-encoded numbers, no embedded JSON, and no meaningful empty
+  strings occur except the uniformly-empty social `description`.
+- S2 `legacy_id` preserves schedule identity: the 0-based positional
+  index as a string with a numeric `position` field for neighbor
+  assists (which carry no stable stored id and load positionally), and
+  the decimal form of the native integer `id` for findables and social
+  items. Entry order is preserved positionally.
+- Uniform values are observations, not defaults: the identical assist
+  rewards, uniform assist `rnd`, uniform findable coins, and the
+  uniformly-empty social descriptions are carried as stored with
+  manifest notes, never factored out; worker names and reward amounts
+  are display data and literals, never references or behavior.
+
+No value is rebalanced, renamed for gameplay, or assigned new meaning.
+
+## Outputs
+
+- `normalized/neighbor_assists.json`: 5 assist definitions (one per
+  stored entry, stored order).
+- `normalized/findable_items.json`: 10 findable definitions (one per
+  stored entry, stored order).
+- `normalized/social_items.json`: 26 social-item definitions (one per
+  stored entry, stored order).
+- `manifest.json`: the existing items/quest/tables/economy manifest
+  with a `social` section merged in, recording social inputs with
+  digests, the coercion ruleset version, the content fingerprint
+  (sha256 over the stored source bytes plus the mods list), definition
+  counts (including reward-shape, rnd, coins, empty-description, and
+  worker-cost uniformity notes), builder outcome, output digests, and
+  uniformity notes. Regenerated on every successful social build; the
+  tests assert it matches the produced output while the items, quests,
+  tables, and economy keys survive the merge untouched.
+
+## Validation gates (failures exit 1, outputs unwritten)
+
+Duplicate positional/id values (refusing silent loss), negative
+amounts, empty worker names, missing or mistyped schema-required
+fields (every schema-required field is enforced; the traceability test
+proves it by mutation), and any round-trip difference (expected: exact
+equality, since every field is native or verbatim string). The
+round-trip gate re-coerces each stored entry and compares by value
+with field sets exact.
+
+## Executable and invocation
+
+Verified executable: `C:\Users\Edison\AppData\Local\Programs\Python\Python39\python.exe`
+(CPython 3.9.13, tags/v3.9.13:6de2ca5, May 17 2022, 16:36:42, MSC v.1929 64 bit (AMD64)).
+`sys.executable` reported exactly the path above and `python --version`
+reported `Python 3.9.13` for the passing run. Any working Python 3.9+
+standard-library interpreter should behave identically.
+
+From the repository root:
+
+```bash
+python -B packages/game-content/tools/build_social.py
+```
+
+Exit 0 prints a JSON success report with counts and output files.
+Exit 1 prints a `validation-failed` report listing each problem and
+writes nothing (the manifest is left untouched). Exit 2 reports
+invalid input or unsupported shapes (missing/unreadable files,
+unparseable content, an active mod, a patch targeting social content,
+or an invalid schema file) on stderr.
+
+## Evidence classification
+
+This extension establishes source-grounded normalization consistency
+for the stored social-table domains: classification coverage, verbatim
+fidelity, and exact round-trip equivalence. It is evidence of
+representation change, not of served-byte equality, content validity,
+gameplay parity, asset existence (M4 owns asset truth),
+progressed-player coverage, or implemented social behavior. Served
+bytes stay out of scope exactly as in the content census
+(`make_dynamic` never runs here).
+
+## Containment
+
+- Reads only `config/main.json`, `config/patch/patches.txt`, the five
+  patch files (target check only), `mods/mods.txt`, the three social
+  schema files, and the package manifest for the merge (plus optional
+  `--repo-root`/`--out-root` relocation of the same reads).
+- Never imports or executes any legacy application module (no
+  `get_game_config`, `jsonpatch`, or Flask import), never reads runtime
+  saves, never contacts a network, never starts a server, and never
+  opens a browser or Flash content.
+- Writes only the three normalized social files plus the merged
+  `manifest.json`, and only on success. No bytecode (`-B` recommended),
+  no caches, no temporary files in the repository. Repeated runs over
+  unchanged inputs are byte-identical.
+- The focused tests in `tests/test_build_social.py` run the same way:
+
+```bash
+python -B -m unittest discover -s packages/game-content/tests -p test_build_social.py -v
+```

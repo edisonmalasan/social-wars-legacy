@@ -1,0 +1,87 @@
+[
+  {
+    "legacy_id": "0",
+    "kind": "neighbor_assist",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "position": 0,
+    "task": "Help! Some trolls are attacking my villagers!",
+    "action": "Click OKAY to eliminate the trolls",
+    "notification": "helped to eliminate the trolls",
+    "rnd": 0,
+    "reward": {
+      "coins": 50,
+      "cash": 0,
+      "xp": 15
+    }
+  },
+  {
+    "legacy_id": "1",
+    "kind": "neighbor_assist",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "position": 1,
+    "task": "Help! Some of my fighters got sick and I need them for the battle!",
+    "action": "Click OKAY to heal sick fighters",
+    "notification": "helped to heal sick fighters",
+    "rnd": 0,
+    "reward": {
+      "coins": 50,
+      "cash": 0,
+      "xp": 15
+    }
+  },
+  {
+    "legacy_id": "2",
+    "kind": "neighbor_assist",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "position": 2,
+    "task": "Help! A heavy storm has damaged my houses!",
+    "action": "Click OKAY to repair damaged houses",
+    "notification": "helped to repair damaged houses",
+    "rnd": 0,
+    "reward": {
+      "coins": 50,
+      "cash": 0,
+      "xp": 15
+    }
+  },
+  {
+    "legacy_id": "3",
+    "kind": "neighbor_assist",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "position": 3,
+    "task": "Help! We ran out of water and our villagers are thirsty!",
+    "action": "Click OKAY to provide some water",
+    "notification": "provided you some water",
+    "rnd": 0,
+    "reward": {
+      "coins": 50,
+      "cash": 0,
+      "xp": 15
+    }
+  },
+  {
+    "legacy_id": "4",
+    "kind": "neighbor_assist",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "position": 4,
+    "task": "Help! A little villager girl is lost and her mum can't find her!",
+    "action": "Click OKAY to find the little villager girl",
+    "notification": "helped to find the little villager girl",
+    "rnd": 0,
+    "reward": {
+      "coins": 50,
+      "cash": 0,
+      "xp": 15
+    }
+  }
+]
