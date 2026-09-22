@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tools/asset-registry/schemas/registry.schema.json",
+  "title": "Asset corpus registry entry set",
+  "description": "Contract for the generated asset registry: deterministic POSIX-sorted entries identifying worktree asset bytes. Hashes identify worktree bytes and are distinct from the baseline Git-blob hashes in legacy-manifest.json. Symbol, dimension, frame, and conversion fields belong to later M4 slices and are not stubbed here.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "policy",
+    "result",
+    "inputs",
+    "counts",
+    "entries"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "description": "Registry format version.",
+      "minimum": 1
+    },
+    "policy": {
+      "const": "asset-registry-v1",
+      "description": "Registry build policy identifier."
+    },
+    "result": {
+      "const": "success",
+      "description": "Build outcome marker; only successful builds write outputs."
+    },
+    "inputs": {
+      "type": "object",
+      "description": "Enumeration inputs: included extensions and excluded directory prefixes."
+    },
+    "counts": {
+      "type": "object",
+      "description": "Corpus totals: file count, byte total, per-extension and per-directory-class counts."
+    },
+    "entries": {
+      "type": "array",
+      "description": "Registry entries in exact POSIX path order.",
+      "items": { "type": "object" }
+    }
+  }
+}

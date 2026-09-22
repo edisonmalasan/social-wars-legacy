@@ -90,6 +90,21 @@ Git-blob source/policy, 3,258-entry evidence, exit codes, and scope limitations.
 These commands execute no Flash or application runtime and establish no gameplay
 or canonical-save parity.
 
+Verified offline asset-registry commands (Windows x64 CPython 3.9.13):
+
+```bash
+python -B tools/asset-registry/build_registry.py
+python -B -m unittest discover -s tools/asset-registry/tests -p test_build_registry.py -v
+```
+
+See `tools/asset-registry/README.md` and `docs/assets/registry.md` for the
+executable, invocation, exit codes, evidence classification, and containment.
+These commands enumerate the worktree asset corpus (3,215 files including
+1,176 SWFs), join normalized content references against it, and establish no
+parsing, conversion, asset validity, gameplay parity, or Godot rendering.
+Registry hashes identify worktree bytes and are distinct from the baseline
+Git-blob hashes owned by `legacy-manifest.json`.
+
 Verified opt-in command-recorder check (Windows x64 CPython 3.9.13):
 
 ```bash
