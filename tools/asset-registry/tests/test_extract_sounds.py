@@ -163,7 +163,7 @@ class SyntheticExtractionTests(unittest.TestCase):
     def test_status_overlay(self):
         self.assertEqual(self.statuses["statuses"],
                          {"assets/swf/two.swf": "extracted"})
-        self.assertEqual(self.statuses["policy"], "sound-extraction-v1")
+        self.assertEqual(self.statuses["policy"], "asset-statuses-v1")
 
 
 class SyntheticFailureTests(unittest.TestCase):

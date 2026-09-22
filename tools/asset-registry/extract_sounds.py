@@ -388,7 +388,7 @@ def write_outputs(out_root, document, statuses, payloads):
     extraction_payload = (json.dumps(document, indent=2, sort_keys=True) + "\n"
                           ).encode("utf-8")
     statuses_payload = (json.dumps({"schema_version": SCHEMA_VERSION,
-                                    "policy": POLICY,
+                                    "policy": "asset-statuses-v1",
                                     "statuses": statuses},
                                    indent=2, sort_keys=True) + "\n").encode("utf-8")
     (out / EXTRACTION_FILE).write_bytes(extraction_payload)

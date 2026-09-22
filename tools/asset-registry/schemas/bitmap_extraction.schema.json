@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tools/asset-registry/schemas/bitmap_extraction.schema.json",
+  "title": "Bitmap extraction manifest",
+  "description": "Contract for the generated bitmap extraction manifest: per-bitmap source provenance, family, format, dimensions, and output digests for format-faithful JPG/PNG extraction.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "policy",
+    "result",
+    "inputs",
+    "counts",
+    "bitmaps"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "description": "Extraction manifest format version.",
+      "minimum": 1
+    },
+    "policy": {
+      "const": "bitmap-extraction-v1",
+      "description": "Extraction policy identifier."
+    },
+    "result": {
+      "const": "success",
+      "description": "Build outcome marker; only successful runs write outputs."
+    },
+    "inputs": {
+      "type": "object",
+      "description": "Input provenance: inspection fingerprint plus table-splice counts."
+    },
+    "counts": {
+      "type": "object",
+      "description": "Extraction totals: per-family bitmap counts and output byte totals."
+    },
+    "bitmaps": {
+      "type": "array",
+      "description": "Per-bitmap entries in walk order (file path, then tag order).",
+      "items": { "type": "object" }
+    }
+  }
+}
