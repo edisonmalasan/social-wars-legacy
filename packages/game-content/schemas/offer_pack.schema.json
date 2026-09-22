@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "packages/game-content/schemas/offer_pack.schema.json",
+  "title": "Normalized offer pack definition (legacy offer_packs domain)",
+  "description": "Contract for one normalized offer pack: one stored legacy offer_packs entry. The stored integer id is the stable identity, so legacy_id is its decimal form (rule F2); scalars are kept verbatim and item shapes are deep-copied verbatim with a recorded shape class (rule F1/F2); flat/pair-first/group leaves resolve as item references while pair seconds and pinned anomalies stay opaque (rule F3). See packages/game-content/README.md for the rule set and survey citations.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "id",
+    "name",
+    "type",
+    "cost_cash",
+    "gold",
+    "wood",
+    "steel",
+    "oil",
+    "mana",
+    "xp",
+    "enabled",
+    "position",
+    "items_shape",
+    "items",
+    "item_refs"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Stored offer_packs id preserved verbatim as a string (rule F2): the decimal form of the native integer id."
+    },
+    "kind": {
+      "const": "offer_pack",
+      "description": "Classification of the stored offer_packs domain: every entry maps to offer_pack."
+    },
+    "source_file": {
+      "type": "string",
+      "description": "Origin file of the stored entry: config/main.json (no patch targets offer_packs)."
+    },
+    "source_layer": {
+      "type": "string",
+      "description": "Layering origin: stored (no patch targets offer_packs)."
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint (sha256 over the stored source bytes plus the mods list); sources carry no version stamp."
+    },
+    "id": {
+      "type": "integer",
+      "description": "Native stored offer id, kept verbatim (rule F1).",
+      "minimum": 0
+    },
+    "name": {
+      "type": "string",
+      "description": "Offer display name, preserved verbatim (rule F1)."
+    },
+    "type": {
+      "type": "string",
+      "description": "Offer type code, preserved verbatim; empty in 18 stored entries, kept with a manifest note and never defaulted (rule F1)."
+    },
+    "cost_cash": {
+      "type": "integer",
+      "description": "Native stored cash cost, kept verbatim (rule F1).",
+      "minimum": 0
+    },
+    "gold": {
+      "type": "integer",
+      "description": "Native stored gold amount, kept verbatim (rule F1).",
+      "minimum": 0
+    },
+    "wood": {
+      "type": "integer",
+      "description": "Native stored wood amount, kept verbatim (rule F1).",
+      "minimum": 0
+    },
+    "steel": {
+      "type": "integer",
+      "description": "Native stored steel amount, kept verbatim (rule F1).",
+      "minimum": 0
+    },
+    "oil": {
+      "type": "integer",
+      "description": "Native stored oil amount, kept verbatim (rule F1).",
+      "minimum": 0
+    },
+    "mana": {
+      "type": "integer",
+      "description": "Native stored mana amount, kept verbatim (rule F1).",
+      "minimum": 0
+    },
+    "xp": {
+      "type": "integer",
+      "description": "Native stored xp amount, kept verbatim (rule F1).",
+      "minimum": 0
+    },
+    "enabled": {
+      "type": "integer",
+      "description": "Native stored enabled flag, kept verbatim (rule F1).",
+      "minimum": 0
+    },
+    "position": {
+      "type": "integer",
+      "description": "Native stored display position, kept verbatim (rule F1).",
+      "minimum": 0
+    },
+    "items_shape": {
+      "type": "string",
+      "description": "Recorded shape class of the stored items value: null, flat, pairs, or groups (rule F2).",
+      "enum": ["null", "flat", "pairs", "groups"]
+    },
+    "items": {
+      "type": ["array", "null"],
+      "description": "Stored items structure deep-copied verbatim: null, a flat integer array, or nested integer arrays; never decoded semantically (rule F2)."
+    },
+    "item_refs": {
+      "type": "array",
+      "description": "Resolved cross-domain item references as legacy_id strings in stored traversal order (flat leaves, pair firsts, group leaves), each validated against the normalized items legacy-ID set outside the pinned allowlist (rule F3).",
+      "items": { "type": "string" }
+    }
+  }
+}

@@ -356,6 +356,28 @@ and manifest, not served-byte equality, content validity, gameplay
 parity, tuning correctness, asset existence, or progressed-player
 coverage.
 
+Verified offline offers normalization check (Windows x64 CPython 3.9.13):
+
+```bash
+python -B packages/game-content/tools/build_offers.py
+python -B -m unittest discover -s packages/game-content/tests -p test_build_offers.py -v
+```
+
+See `packages/game-content/README.md` (offers normalization
+extension) for the executable, invocation, exit codes, evidence
+classification, and containment. Run the items-normalization build first: the
+offers builder reads the committed normalized items outputs as its
+cross-domain reference edge and merges its `offers` section into the
+package manifest while leaving the prior keys untouched. These checks
+establish source-grounded normalization consistency for the 44 stored
+`offer_packs` entries (verbatim scalars and item shapes with null/flat/
+pairs/groups classes, flat/pair-first/group leaves resolving against
+the 900 normalized items legacy IDs, pair seconds opaque, two pinned
+leaf anomalies preserved verbatim under an exact-match allowlist),
+with schema, exact round-trip evidence, and manifest, not served-byte
+equality, content validity, gameplay parity, pack-semantics
+correctness, asset existence, or progressed-player coverage.
+
 ---
 
 ## Code style
