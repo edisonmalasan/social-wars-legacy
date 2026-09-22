@@ -1,0 +1,2439 @@
+[
+  {
+    "legacy_id": "1",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 1,
+    "name": "starter pack",
+    "type": "",
+    "cost_cash": 25,
+    "gold": 5000,
+    "wood": 5000,
+    "steel": 5000,
+    "oil": 5000,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 1,
+    "position": 6,
+    "items_shape": "flat",
+    "items": [
+      1042,
+      84
+    ],
+    "item_refs": [
+      "1042",
+      "84"
+    ]
+  },
+  {
+    "legacy_id": "2",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 2,
+    "name": "Powerful pack",
+    "type": "",
+    "cost_cash": 30,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "flat",
+    "items": [
+      1004,
+      1004,
+      1004,
+      1004,
+      1004,
+      1031,
+      1031,
+      1031,
+      1031,
+      1031,
+      1026,
+      1026,
+      1026,
+      1026,
+      1026,
+      1029,
+      1029,
+      1029,
+      1029,
+      1029
+    ],
+    "item_refs": [
+      "1004",
+      "1004",
+      "1004",
+      "1004",
+      "1004",
+      "1031",
+      "1031",
+      "1031",
+      "1031",
+      "1031",
+      "1026",
+      "1026",
+      "1026",
+      "1026",
+      "1026",
+      "1029",
+      "1029",
+      "1029",
+      "1029",
+      "1029"
+    ]
+  },
+  {
+    "legacy_id": "3",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 3,
+    "name": "Powerful pack",
+    "type": "",
+    "cost_cash": 30,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 1,
+    "position": 5,
+    "items_shape": "flat",
+    "items": [
+      1004,
+      1004,
+      1004,
+      1004,
+      1004,
+      1031,
+      1031,
+      1031,
+      1031,
+      1031,
+      1026,
+      1026,
+      1026,
+      1026,
+      1026,
+      1029,
+      1029,
+      1029,
+      1029,
+      1029,
+      1050,
+      1050,
+      1051,
+      1051
+    ],
+    "item_refs": [
+      "1004",
+      "1004",
+      "1004",
+      "1004",
+      "1004",
+      "1031",
+      "1031",
+      "1031",
+      "1031",
+      "1031",
+      "1026",
+      "1026",
+      "1026",
+      "1026",
+      "1026",
+      "1029",
+      "1029",
+      "1029",
+      "1029",
+      "1029",
+      "1050",
+      "1050",
+      "1051",
+      "1051"
+    ]
+  },
+  {
+    "legacy_id": "4",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 4,
+    "name": "Mistery Box 1",
+    "type": "",
+    "cost_cash": 20,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "pairs",
+    "items": [
+      [
+        67,
+        35
+      ],
+      [
+        85,
+        70
+      ],
+      [
+        1046,
+        90
+      ],
+      [
+        1037,
+        100
+      ]
+    ],
+    "item_refs": [
+      "67",
+      "85",
+      "1046",
+      "1037"
+    ]
+  },
+  {
+    "legacy_id": "5",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 5,
+    "name": "Mistery Box 2",
+    "type": "",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1038,
+        1071,
+        1085
+      ],
+      [
+        1072,
+        1055,
+        1059
+      ],
+      [
+        1045,
+        1044,
+        1046
+      ]
+    ],
+    "item_refs": [
+      "1038",
+      "1071",
+      "1085",
+      "1072",
+      "1055",
+      "1059",
+      "1045",
+      "1044",
+      "1046"
+    ]
+  },
+  {
+    "legacy_id": "6",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 6,
+    "name": "Mistery Box 3",
+    "type": "",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1112,
+        1100,
+        1074
+      ],
+      [
+        1097,
+        1073,
+        1055
+      ],
+      [
+        1067,
+        1064,
+        1031
+      ]
+    ],
+    "item_refs": [
+      "1112",
+      "1100",
+      "1074",
+      "1097",
+      "1073",
+      "1055",
+      "1067",
+      "1064",
+      "1031"
+    ]
+  },
+  {
+    "legacy_id": "7",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 7,
+    "name": "New Mistery Box 3",
+    "type": "",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1112,
+        1100,
+        1074
+      ],
+      [
+        1097,
+        1073,
+        1055
+      ],
+      [
+        1067,
+        1064,
+        1031
+      ]
+    ],
+    "item_refs": [
+      "1112",
+      "1100",
+      "1074",
+      "1097",
+      "1073",
+      "1055",
+      "1067",
+      "1064",
+      "1031"
+    ]
+  },
+  {
+    "legacy_id": "8",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 8,
+    "name": "New Mistery Box 4",
+    "type": "",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1105,
+        1062,
+        1101
+      ],
+      [
+        1085,
+        1048,
+        1073
+      ],
+      [
+        1031,
+        1059,
+        1046
+      ]
+    ],
+    "item_refs": [
+      "1105",
+      "1062",
+      "1101",
+      "1085",
+      "1048",
+      "1073",
+      "1031",
+      "1059",
+      "1046"
+    ]
+  },
+  {
+    "legacy_id": "9",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 9,
+    "name": "New Mistery Box 5",
+    "type": "",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1141,
+        1096,
+        1075
+      ],
+      [
+        1089,
+        1121,
+        1072
+      ],
+      [
+        1067,
+        1045,
+        1064
+      ]
+    ],
+    "item_refs": [
+      "1141",
+      "1096",
+      "1075",
+      "1089",
+      "1121",
+      "1072",
+      "1067",
+      "1045",
+      "1064"
+    ]
+  },
+  {
+    "legacy_id": "10",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 10,
+    "name": "New Mistery Box 6",
+    "type": "",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1119,
+        1141,
+        1074
+      ],
+      [
+        1085,
+        1121,
+        1072
+      ],
+      [
+        1071,
+        1031,
+        1046
+      ]
+    ],
+    "item_refs": [
+      "1119",
+      "1141",
+      "1074",
+      "1085",
+      "1121",
+      "1072",
+      "1071",
+      "1031",
+      "1046"
+    ]
+  },
+  {
+    "legacy_id": "11",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 11,
+    "name": "New Mistery Box 7",
+    "type": "",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1152,
+        1127,
+        1074
+      ],
+      [
+        1089,
+        1048,
+        1085
+      ],
+      [
+        1031,
+        1067,
+        1045
+      ]
+    ],
+    "item_refs": [
+      "1152",
+      "1127",
+      "1074",
+      "1089",
+      "1048",
+      "1085",
+      "1031",
+      "1067",
+      "1045"
+    ]
+  },
+  {
+    "legacy_id": "12",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 12,
+    "name": "New Mistery Box 8",
+    "type": "",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1169,
+        1152,
+        1075
+      ],
+      [
+        1102,
+        1048,
+        1120
+      ],
+      [
+        1031,
+        1067,
+        1071
+      ]
+    ],
+    "item_refs": [
+      "1169",
+      "1152",
+      "1075",
+      "1102",
+      "1048",
+      "1120",
+      "1031",
+      "1067",
+      "1071"
+    ]
+  },
+  {
+    "legacy_id": "13",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 13,
+    "name": "New Mistery Box 9",
+    "type": "",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1119,
+        1169,
+        1101
+      ],
+      [
+        1102,
+        1121,
+        1120
+      ],
+      [
+        1046,
+        1067,
+        1071
+      ]
+    ],
+    "item_refs": [
+      "1119",
+      "1169",
+      "1101",
+      "1102",
+      "1121",
+      "1120",
+      "1046",
+      "1067",
+      "1071"
+    ]
+  },
+  {
+    "legacy_id": "14",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 14,
+    "name": "New Mistery Box 10",
+    "type": "",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1127,
+        1112,
+        1177,
+        1101,
+        1075
+      ],
+      [
+        1102,
+        1121,
+        1048,
+        1120,
+        1085
+      ],
+      [
+        1046,
+        1067,
+        1071,
+        1072,
+        1045
+      ]
+    ],
+    "item_refs": [
+      "1127",
+      "1112",
+      "1177",
+      "1101",
+      "1075",
+      "1102",
+      "1121",
+      "1048",
+      "1120",
+      "1085",
+      "1046",
+      "1067",
+      "1071",
+      "1072",
+      "1045"
+    ]
+  },
+  {
+    "legacy_id": "15",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 15,
+    "name": "Defense Pack",
+    "type": "",
+    "cost_cash": 45,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 1,
+    "position": 4,
+    "items_shape": "flat",
+    "items": [
+      82,
+      45,
+      45,
+      46,
+      46,
+      88,
+      88
+    ],
+    "item_refs": [
+      "82",
+      "45",
+      "45",
+      "46",
+      "46",
+      "88",
+      "88"
+    ]
+  },
+  {
+    "legacy_id": "16",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 16,
+    "name": "Mega Powerful Army",
+    "type": "",
+    "cost_cash": 40,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 1,
+    "position": 3,
+    "items_shape": "flat",
+    "items": [
+      1061,
+      1070,
+      1070,
+      1070,
+      1066,
+      1066,
+      1066,
+      1066,
+      1063,
+      1063,
+      1063,
+      1063,
+      1063,
+      1058,
+      1058,
+      1058,
+      1058,
+      1058
+    ],
+    "item_refs": [
+      "1061",
+      "1070",
+      "1070",
+      "1070",
+      "1066",
+      "1066",
+      "1066",
+      "1066",
+      "1063",
+      "1063",
+      "1063",
+      "1063",
+      "1063",
+      "1058",
+      "1058",
+      "1058",
+      "1058",
+      "1058"
+    ]
+  },
+  {
+    "legacy_id": "17",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 17,
+    "name": "New Mistery Box 11",
+    "type": "",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1105,
+        1176,
+        1101,
+        1096,
+        1082
+      ],
+      [
+        1083,
+        1055,
+        1081,
+        1168,
+        1072
+      ],
+      [
+        1031,
+        1059,
+        1071,
+        1064,
+        1045
+      ]
+    ],
+    "item_refs": [
+      "1105",
+      "1176",
+      "1101",
+      "1096",
+      "1082",
+      "1083",
+      "1055",
+      "1081",
+      "1168",
+      "1072",
+      "1031",
+      "1059",
+      "1071",
+      "1064",
+      "1045"
+    ]
+  },
+  {
+    "legacy_id": "18",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 18,
+    "name": "Premium Account",
+    "type": "premium_account",
+    "cost_cash": 0,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 1,
+    "position": 2,
+    "items_shape": "null",
+    "items": null,
+    "item_refs": []
+  },
+  {
+    "legacy_id": "19",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 19,
+    "name": "New Mistery Box 12",
+    "type": "",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1084,
+        1075,
+        1177,
+        1102,
+        1082
+      ],
+      [
+        1048,
+        1010,
+        1080,
+        1168,
+        1055
+      ],
+      [
+        1046,
+        1025,
+        1059,
+        1056,
+        1064
+      ]
+    ],
+    "item_refs": [
+      "1084",
+      "1075",
+      "1177",
+      "1102",
+      "1082",
+      "1048",
+      "1010",
+      "1080",
+      "1168",
+      "1055",
+      "1046",
+      "1025",
+      "1059",
+      "1056",
+      "1064"
+    ]
+  },
+  {
+    "legacy_id": "20",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 20,
+    "name": "New Mistery Box 20",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1184,
+        1101,
+        1112
+      ],
+      [
+        1075,
+        1102,
+        1195,
+        1048,
+        1066,
+        1072
+      ],
+      [
+        1055,
+        1046,
+        1025,
+        1059,
+        1056,
+        1064
+      ]
+    ],
+    "item_refs": [
+      "1184",
+      "1101",
+      "1112",
+      "1075",
+      "1102",
+      "1195",
+      "1048",
+      "1066",
+      "1072",
+      "1055",
+      "1046",
+      "1025",
+      "1059",
+      "1056",
+      "1064"
+    ]
+  },
+  {
+    "legacy_id": "21",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 21,
+    "name": "New Mistery Box 21",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1207,
+        1141,
+        1105
+      ],
+      [
+        1075,
+        1176,
+        1096,
+        1168,
+        1120,
+        1072
+      ],
+      [
+        1046,
+        1031,
+        1059,
+        1071,
+        1064,
+        1045
+      ]
+    ],
+    "item_refs": [
+      "1207",
+      "1141",
+      "1105",
+      "1075",
+      "1176",
+      "1096",
+      "1168",
+      "1120",
+      "1072",
+      "1046",
+      "1031",
+      "1059",
+      "1071",
+      "1064",
+      "1045"
+    ]
+  },
+  {
+    "legacy_id": "22",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 22,
+    "name": "New Mistery Box 22",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1191,
+        1207,
+        1112
+      ],
+      [
+        1057,
+        1177,
+        1102,
+        1158,
+        1010,
+        1121
+      ],
+      [
+        1195,
+        1124,
+        1055,
+        1046,
+        1056,
+        1031
+      ]
+    ],
+    "item_refs": [
+      "1191",
+      "1207",
+      "1112",
+      "1057",
+      "1177",
+      "1102",
+      "1158",
+      "1010",
+      "1121",
+      "1195",
+      "1124",
+      "1055",
+      "1046",
+      "1056",
+      "1031"
+    ]
+  },
+  {
+    "legacy_id": "23",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 23,
+    "name": "New Mistery Box 23",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1184,
+        1101,
+        1112
+      ],
+      [
+        1176,
+        1057,
+        1201,
+        1048,
+        1166,
+        1096
+      ],
+      [
+        1168,
+        1124,
+        1072,
+        1193,
+        1033,
+        1045
+      ]
+    ],
+    "item_refs": [
+      "1184",
+      "1101",
+      "1112",
+      "1176",
+      "1057",
+      "1201",
+      "1048",
+      "1166",
+      "1096",
+      "1168",
+      "1124",
+      "1072",
+      "1193",
+      "1033",
+      "1045"
+    ]
+  },
+  {
+    "legacy_id": "24",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 24,
+    "name": "New Mistery Box 24",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1191,
+        1225,
+        1207
+      ],
+      [
+        1141,
+        1158,
+        1177,
+        1157,
+        1201,
+        1102
+      ],
+      [
+        1121,
+        1195,
+        1031,
+        1046,
+        1056,
+        1033
+      ]
+    ],
+    "item_refs": [
+      "1191",
+      "1225",
+      "1207",
+      "1141",
+      "1158",
+      "1177",
+      "1157",
+      "1201",
+      "1102",
+      "1121",
+      "1195",
+      "1031",
+      "1046",
+      "1056",
+      "1033"
+    ]
+  },
+  {
+    "legacy_id": "25",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 25,
+    "name": "New Mistery Box 25",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1194,
+        1217,
+        1218
+      ],
+      [
+        1112,
+        1166,
+        1219,
+        1177,
+        1010,
+        1195
+      ],
+      [
+        1224,
+        1055,
+        1193,
+        1056,
+        1045,
+        1064
+      ]
+    ],
+    "item_refs": [
+      "1194",
+      "1217",
+      "1218",
+      "1112",
+      "1166",
+      "1219",
+      "1177",
+      "1010",
+      "1195",
+      "1224",
+      "1055",
+      "1193",
+      "1056",
+      "1045",
+      "1064"
+    ]
+  },
+  {
+    "legacy_id": "26",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 26,
+    "name": "New Mistery Box 26",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1105,
+        1245,
+        1123
+      ],
+      [
+        1101,
+        1175,
+        1214,
+        1201,
+        1102,
+        1227
+      ],
+      [
+        1238,
+        1046,
+        1056,
+        1033,
+        1071,
+        1064
+      ]
+    ],
+    "item_refs": [
+      "1105",
+      "1245",
+      "1123",
+      "1101",
+      "1175",
+      "1214",
+      "1201",
+      "1102",
+      "1227",
+      "1238",
+      "1046",
+      "1056",
+      "1033",
+      "1071",
+      "1064"
+    ]
+  },
+  {
+    "legacy_id": "27",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 27,
+    "name": "New Mistery Box 27",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1192,
+        1212,
+        1225
+      ],
+      [
+        1112,
+        1048,
+        1102,
+        1177,
+        1121,
+        1244
+      ],
+      [
+        1071,
+        1055,
+        1224,
+        1031,
+        1046,
+        1056
+      ]
+    ],
+    "item_refs": [
+      "1192",
+      "1212",
+      "1225",
+      "1112",
+      "1048",
+      "1102",
+      "1177",
+      "1121",
+      "1244",
+      "1071",
+      "1055",
+      "1224",
+      "1031",
+      "1046",
+      "1056"
+    ]
+  },
+  {
+    "legacy_id": "28",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 28,
+    "name": "New Mistery Box 28",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1172,
+        1217,
+        1184
+      ],
+      [
+        1057,
+        1048,
+        1201,
+        1177,
+        1010,
+        1227
+      ],
+      [
+        1238,
+        1193,
+        1046,
+        1033,
+        1071,
+        1064
+      ]
+    ],
+    "item_refs": [
+      "1172",
+      "1217",
+      "1184",
+      "1057",
+      "1048",
+      "1201",
+      "1177",
+      "1010",
+      "1227",
+      "1238",
+      "1193",
+      "1046",
+      "1033",
+      "1071",
+      "1064"
+    ]
+  },
+  {
+    "legacy_id": "29",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 29,
+    "name": "New Mistery Box 29",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1194,
+        1236,
+        1207
+      ],
+      [
+        1057,
+        1096,
+        1102,
+        1177,
+        1121,
+        1244
+      ],
+      [
+        1224,
+        1055,
+        1072,
+        1045,
+        1056,
+        1064
+      ]
+    ],
+    "item_refs": [
+      "1194",
+      "1236",
+      "1207",
+      "1057",
+      "1096",
+      "1102",
+      "1177",
+      "1121",
+      "1244",
+      "1224",
+      "1055",
+      "1072",
+      "1045",
+      "1056",
+      "1064"
+    ]
+  },
+  {
+    "legacy_id": "30",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 30,
+    "name": "New Mistery Box 30",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1222,
+        1197,
+        1192
+      ],
+      [
+        1169,
+        1225,
+        1048,
+        1177,
+        1264,
+        1201
+      ],
+      [
+        1071,
+        1055,
+        1224,
+        1031,
+        1046,
+        1056
+      ]
+    ],
+    "item_refs": [
+      "1222",
+      "1197",
+      "1192",
+      "1169",
+      "1225",
+      "1048",
+      "1177",
+      "1264",
+      "1201",
+      "1071",
+      "1055",
+      "1224",
+      "1031",
+      "1046",
+      "1056"
+    ]
+  },
+  {
+    "legacy_id": "31",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 31,
+    "name": "New Mistery Box 31",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1216,
+        1212,
+        1191
+      ],
+      [
+        1112,
+        1225,
+        1096,
+        1102,
+        1010,
+        1121
+      ],
+      [
+        1227,
+        1195,
+        1031,
+        1046,
+        1056,
+        1033
+      ]
+    ],
+    "item_refs": [
+      "1216",
+      "1212",
+      "1191",
+      "1112",
+      "1225",
+      "1096",
+      "1102",
+      "1010",
+      "1121",
+      "1227",
+      "1195",
+      "1031",
+      "1046",
+      "1056",
+      "1033"
+    ]
+  },
+  {
+    "legacy_id": "32",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 32,
+    "name": "New Mistery Box 32",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1178,
+        1217,
+        1184
+      ],
+      [
+        1057,
+        1048,
+        1201,
+        1177,
+        1010,
+        1227
+      ],
+      [
+        1238,
+        1193,
+        1046,
+        1033,
+        1071,
+        1064
+      ]
+    ],
+    "item_refs": [
+      "1178",
+      "1217",
+      "1184",
+      "1057",
+      "1048",
+      "1201",
+      "1177",
+      "1010",
+      "1227",
+      "1238",
+      "1193",
+      "1046",
+      "1033",
+      "1071",
+      "1064"
+    ]
+  },
+  {
+    "legacy_id": "33",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 33,
+    "name": "New Mistery Box 33",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1226,
+        1279,
+        1270
+      ],
+      [
+        1225,
+        1112,
+        1096,
+        1102,
+        1264,
+        1201
+      ],
+      [
+        1071,
+        1055,
+        1224,
+        1031,
+        1046,
+        1056
+      ]
+    ],
+    "item_refs": [
+      "1226",
+      "1279",
+      "1270",
+      "1225",
+      "1112",
+      "1096",
+      "1102",
+      "1264",
+      "1201",
+      "1071",
+      "1055",
+      "1224",
+      "1031",
+      "1046",
+      "1056"
+    ]
+  },
+  {
+    "legacy_id": "34",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 34,
+    "name": "New Mistery Box 34",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1222,
+        1192,
+        1212
+      ],
+      [
+        1169,
+        1213,
+        1048,
+        1177,
+        1269,
+        1121
+      ],
+      [
+        1224,
+        1055,
+        1193,
+        1056,
+        1045,
+        1064
+      ]
+    ],
+    "item_refs": [
+      "1222",
+      "1192",
+      "1212",
+      "1169",
+      "1213",
+      "1048",
+      "1177",
+      "1269",
+      "1121",
+      "1224",
+      "1055",
+      "1193",
+      "1056",
+      "1045",
+      "1064"
+    ]
+  },
+  {
+    "legacy_id": "35",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 35,
+    "name": "New Mistery Box 35",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1226,
+        1197,
+        1162
+      ],
+      [
+        1057,
+        1199,
+        1175,
+        1096,
+        1102,
+        1277
+      ],
+      [
+        1072.1224,
+        1071,
+        1031,
+        1033,
+        1059
+      ]
+    ],
+    "item_refs": [
+      "1226",
+      "1197",
+      "1162",
+      "1057",
+      "1199",
+      "1175",
+      "1096",
+      "1102",
+      "1277",
+      "1071",
+      "1031",
+      "1033",
+      "1059"
+    ]
+  },
+  {
+    "legacy_id": "36",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 36,
+    "name": "New Mistery Box 36",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1239,
+        1167,
+        1279
+      ],
+      [
+        1225,
+        1282,
+        1220,
+        1177,
+        1121,
+        1244
+      ],
+      [
+        1071,
+        1055,
+        1264,
+        1031,
+        1046,
+        1056
+      ]
+    ],
+    "item_refs": [
+      "1239",
+      "1167",
+      "1279",
+      "1225",
+      "1282",
+      "1220",
+      "1177",
+      "1121",
+      "1244",
+      "1071",
+      "1055",
+      "1264",
+      "1031",
+      "1046",
+      "1056"
+    ]
+  },
+  {
+    "legacy_id": "37",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 37,
+    "name": "New Mistery Box 37",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1237,
+        1194,
+        1270
+      ],
+      [
+        1141,
+        1199,
+        1261,
+        1102,
+        1121,
+        1269
+      ],
+      [
+        1072,
+        1224,
+        1071,
+        1031,
+        1033,
+        1059
+      ]
+    ],
+    "item_refs": [
+      "1237",
+      "1194",
+      "1270",
+      "1141",
+      "1199",
+      "1261",
+      "1102",
+      "1121",
+      "1269",
+      "1072",
+      "1224",
+      "1071",
+      "1031",
+      "1033",
+      "1059"
+    ]
+  },
+  {
+    "legacy_id": "38",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 38,
+    "name": "New Mistery Box 38",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1237,
+        1194,
+        1270
+      ],
+      [
+        1141,
+        1199,
+        1261,
+        1102,
+        1121,
+        1269
+      ],
+      [
+        1072,
+        1224,
+        1071,
+        1031,
+        1033,
+        1059
+      ]
+    ],
+    "item_refs": [
+      "1237",
+      "1194",
+      "1270",
+      "1141",
+      "1199",
+      "1261",
+      "1102",
+      "1121",
+      "1269",
+      "1072",
+      "1224",
+      "1071",
+      "1031",
+      "1033",
+      "1059"
+    ]
+  },
+  {
+    "legacy_id": "39",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 39,
+    "name": "New Mistery Box 39",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1210,
+        1212,
+        1252
+      ],
+      [
+        1223,
+        1213,
+        1175,
+        1048,
+        1283,
+        1201
+      ],
+      [
+        1238,
+        1193,
+        1046,
+        1033,
+        1071,
+        1064
+      ]
+    ],
+    "item_refs": [
+      "1210",
+      "1212",
+      "1252",
+      "1223",
+      "1213",
+      "1175",
+      "1048",
+      "1283",
+      "1201",
+      "1238",
+      "1193",
+      "1046",
+      "1033",
+      "1071",
+      "1064"
+    ]
+  },
+  {
+    "legacy_id": "40",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 40,
+    "name": "New Mistery Box 40",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1210,
+        1212,
+        1252
+      ],
+      [
+        1223,
+        1213,
+        1175,
+        1048,
+        1283,
+        1201
+      ],
+      [
+        1238,
+        1193,
+        1046,
+        1033,
+        1071,
+        1064
+      ]
+    ],
+    "item_refs": [
+      "1210",
+      "1212",
+      "1252",
+      "1223",
+      "1213",
+      "1175",
+      "1048",
+      "1283",
+      "1201",
+      "1238",
+      "1193",
+      "1046",
+      "1033",
+      "1071",
+      "1064"
+    ]
+  },
+  {
+    "legacy_id": "41",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 41,
+    "name": "New Mistery Box 41",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1239,
+        1197,
+        1217
+      ],
+      [
+        1087,
+        1282,
+        1220,
+        1177,
+        1096,
+        1121
+      ],
+      [
+        1071,
+        1055,
+        1224,
+        1031,
+        1046,
+        1056
+      ]
+    ],
+    "item_refs": [
+      "1239",
+      "1197",
+      "1217",
+      "1087",
+      "1282",
+      "1220",
+      "1177",
+      "1096",
+      "1121",
+      "1071",
+      "1055",
+      "1224",
+      "1031",
+      "1046",
+      "1056"
+    ]
+  },
+  {
+    "legacy_id": "42",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 42,
+    "name": "New Mistery Box 42",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1226,
+        1222,
+        1270
+      ],
+      [
+        1225,
+        1261,
+        1048,
+        1102,
+        1286,
+        1121
+      ],
+      [
+        1072,
+        1269,
+        1071,
+        1031,
+        1033,
+        1059
+      ]
+    ],
+    "item_refs": [
+      "1226",
+      "1222",
+      "1270",
+      "1225",
+      "1261",
+      "1048",
+      "1102",
+      "1286",
+      "1121",
+      "1072",
+      "1269",
+      "1071",
+      "1031",
+      "1033",
+      "1059"
+    ]
+  },
+  {
+    "legacy_id": "43",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 43,
+    "name": "New Mistery Box 43",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 0,
+    "position": 0,
+    "items_shape": "groups",
+    "items": [
+      [
+        1237,
+        1167,
+        1279
+      ],
+      [
+        1207,
+        1199,
+        1175,
+        1177,
+        1283,
+        1201
+      ],
+      [
+        1071,
+        1055,
+        1224,
+        1031,
+        1046,
+        1056
+      ]
+    ],
+    "item_refs": [
+      "1237",
+      "1167",
+      "1279",
+      "1207",
+      "1199",
+      "1175",
+      "1177",
+      "1283",
+      "1201",
+      "1071",
+      "1055",
+      "1224",
+      "1031",
+      "1046",
+      "1056"
+    ]
+  },
+  {
+    "legacy_id": "44",
+    "kind": "offer_pack",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 44,
+    "name": "New Mistery Box 44",
+    "type": "super",
+    "cost_cash": 60,
+    "gold": 0,
+    "wood": 0,
+    "steel": 0,
+    "oil": 0,
+    "mana": 0,
+    "xp": 0,
+    "enabled": 1,
+    "position": 1,
+    "items_shape": "groups",
+    "items": [
+      [
+        1210,
+        1212,
+        1252
+      ],
+      [
+        1223,
+        1213,
+        1175,
+        1048,
+        1283,
+        1201
+      ],
+      [
+        1238,
+        1193,
+        1046,
+        1033,
+        1071,
+        1064
+      ]
+    ],
+    "item_refs": [
+      "1210",
+      "1212",
+      "1252",
+      "1223",
+      "1213",
+      "1175",
+      "1048",
+      "1283",
+      "1201",
+      "1238",
+      "1193",
+      "1046",
+      "1033",
+      "1071",
+      "1064"
+    ]
+  }
+]

@@ -352,6 +352,91 @@
     "inventory_ids keys reference the inventory_items domain, not item ids, and are carried as structures without item-id checks.",
     "breeding_order/sm_training_time exist only where atom_fusion_items_data added them."
   ],
+  "offers": {
+    "anomalies": [
+      {
+        "leaf": 35,
+        "note": "Unresolving pair second in Mistery Box 1; recorded opaque, never a reference.",
+        "offer_id": 4
+      },
+      {
+        "leaf": 1072.1224,
+        "note": "Non-integer group leaf where sibling offers carry 1072 and 1224; preserved verbatim, never repaired.",
+        "offer_id": 35
+      }
+    ],
+    "coercion_ruleset": "offers-coercion-ruleset-v1",
+    "content_fingerprint": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "counts": {
+      "offers": 44,
+      "shape_counts": {
+        "flat": 5,
+        "groups": 37,
+        "null": 1,
+        "pairs": 1
+      },
+      "stored_offers": 44
+    },
+    "inputs": {
+      "items_reference_edge": {
+        "counts": {
+          "buildings": 470,
+          "specials": 1,
+          "units": 429
+        },
+        "files": [
+          "packages/game-content/normalized/buildings.json",
+          "packages/game-content/normalized/units.json",
+          "packages/game-content/normalized/specials.json"
+        ],
+        "union_legacy_ids": 900
+      },
+      "main": {
+        "bytes": 1702871,
+        "file": "config/main.json",
+        "sha256": "55ffd929372a4a31785cfd683982856324e2b73ba9a6624c53f09b68e4dd0ea5"
+      },
+      "mods": {
+        "active_mods": [],
+        "inactive_mods": [
+          "no_hiring_needed"
+        ],
+        "status": "inactive"
+      },
+      "offers_patch_targets": "none",
+      "patch_order": [
+        "atom_fusion_item",
+        "unit_patch",
+        "atom_fusion_items_data",
+        "atom_fusion_powerup",
+        "targets"
+      ]
+    },
+    "notes": [
+      "Stored offer packs map one-to-one to definitions; scalars and item shapes are preserved verbatim with per-entry shape classes null/flat/pairs/groups (rules F1/F2).",
+      "Flat leaves, pair firsts, and group integer leaves resolve against the normalized items legacy-ID set; pair seconds are opaque numbers (rule F3).",
+      "The two pinned anomalies are preserved verbatim under an exact-match allowlist; any other unresolving leaf fails validation.",
+      "Pack semantics (repetition, pairs, groups) are carried as observed structures, never decoded as quantities, prices, weights, or choice rules.",
+      "No active patch targets offer_packs; the build refuses patch drift and active mods explicitly."
+    ],
+    "outputs": [
+      {
+        "bytes": 39956,
+        "file": "packages/game-content/normalized/offer_packs.json",
+        "sha256": "81d26ade6eb5ecb436a45af0a76b7daf222a61fb40f9eb544179681d88bae22d"
+      }
+    ],
+    "policy": "offers-normalization-v1",
+    "result": "success",
+    "schema_version": 1,
+    "validation": {
+      "amount_violations": 0,
+      "duplicate_ids": 0,
+      "missing_fields": 0,
+      "round_trip_diffs": 0,
+      "unresolvable_references": 0
+    }
+  },
   "outputs": [
     {
       "bytes": 698544,
