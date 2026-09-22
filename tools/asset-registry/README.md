@@ -243,3 +243,90 @@ natively, so no transcoding is specified.
 ```bash
 python -B -m unittest discover -s tools/asset-registry/tests -p test_extract_sounds.py -v
 ```
+
+---
+
+# Bitmap extraction (M4 slice 4: format-faithful image extraction)
+
+Format-faithful extraction for all bitmap payloads (46,425 JPEG3 +
+14,364 lossless + 913 plain-JPEG tags), built offline with Python 3.9
+standard library only; no new dependencies, no rendering, no JPEG
+decoding to pixels, no Flash runtime in any form.
+
+## Inputs
+
+- `tools/asset-registry/inspection.json` (committed inspection; every
+  file is re-walked for bitmap tags).
+- `tools/asset-registry/schemas/bitmap_extraction.schema.json` and
+  `extracted_bitmap.schema.json` (contracts enforced by the extractor).
+
+## Per-family rules
+
+- Plain JPEG (tags 6/21): payload bytes verbatim; JPEGTables spliced
+  only when SOI is absent (never observed on real corpus; synthetic
+  tests prove the path, manifest records splice counts).
+- JPEG3 (tag 35): verbatim `.jpg` plus zlib-decoded alpha as
+  grayscale `_alpha.png`; decoded length must equal width×height,
+  where dimensions come from a minimal JPEG SOF scan (structure only).
+- Lossless ARGB (format 5): zlib pixels mapped ARGB→RGBA as stored
+  (no un-premultiplying; documented) into `.png` via the hand-rolled
+  writer (signature, IHDR, filter-0 IDAT, IEND with CRCs).
+- Lossless colormap (format 3): U8 count prefix outside zlib, palette
+  plus stride-padded index rows inside; expanded to RGBA `.png`.
+- Any other bitmap format fails closed as drift.
+
+## Outputs
+
+- `assets/converted/images/<swf-stem>/`: bulk `.jpg`/`.png` outputs in
+  the ignored build-artifact directory (61k files, ~566 MB — committing
+  them is rejected; they regenerate byte-identically from the manifest).
+- `tools/asset-registry/image_extraction.json`: per-bitmap source tag,
+  family, format, dimensions, output digests, and byte counts.
+- `tools/asset-registry/statuses.json`: merged overlay advancing
+  extracted files (neutral `asset-statuses-v1` envelope shared across
+  extraction slices).
+
+## Validation gates (failures exit 1, outputs unwritten)
+
+Payload structure, zlib integrity, alpha dimension match, PNG re-parse
+(signature plus IHDR), JPEG SOI presence, unknown-format refusal,
+schema fields, and determinism. Exit 2 reports invalid input (missing
+inspection, unreadable files, unparseable content).
+
+## Executable and invocation
+
+Verified executable: `C:\Users\Edison\AppData\Local\Programs\Python\Python39\python.exe`
+(CPython 3.9.13). Any working Python 3.9+ standard-library interpreter
+should behave identically.
+
+From the repository root (after the inspection build):
+
+```bash
+python -B tools/asset-registry/extract_images.py
+```
+
+## Evidence classification
+
+This tool establishes source-grounded extraction consistency for all
+61,702 bitmap payloads: family coverage, dimensional fidelity
+(re-parse checked), digest fidelity, and determinism. It is evidence
+of byte transport, not of rendering correctness, color judgment,
+timeline assembly, gameplay parity, or Godot rendering.
+
+## Containment
+
+- Reads only the committed inspection, the two bitmap schemas, and
+  the inspection-listed SWF files (plus optional
+  `--repo-root`/`--out-root` relocation).
+- Never imports or executes any legacy application module, never uses
+  subprocess/network/server/browser/Flash, never modifies any source
+  asset.
+- Writes bulk outputs under ignored `assets/converted/images/` plus
+  the committed manifest and statuses merge, and only on success. No
+  bytecode (`-B` recommended), no caches, no temporary files in the
+  repository.
+- The focused tests run the same way:
+
+```bash
+python -B -m unittest discover -s tools/asset-registry/tests -p test_extract_images.py -v
+```

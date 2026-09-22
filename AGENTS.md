@@ -134,6 +134,22 @@ containment. These commands extract all 27 embedded MP3 payloads verbatim
 timeline semantics, audio-quality claims, gameplay parity, or Godot
 rendering.
 
+Verified offline bitmap-extraction commands (Windows x64 CPython 3.9.13):
+
+```bash
+python -B tools/asset-registry/extract_images.py
+python -B -m unittest discover -s tools/asset-registry/tests -p test_extract_images.py -v
+```
+
+See `tools/asset-registry/README.md` and `docs/assets/registry.md` for the
+executable, per-family rules, committed-vs-ignored output split, exit codes,
+evidence classification, and containment. These commands extract all 61,702
+bitmap payloads (verbatim JPEG, JPEG-plus-alpha, RGBA PNGs via a hand-rolled
+stdlib writer) with re-parse validation and establish no rendering
+correctness, color judgment, timeline assembly, gameplay parity, or Godot
+rendering. Bulk outputs regenerate under ignored `assets/converted/images/`;
+the committed digest manifest is the permanent evidence.
+
 Verified opt-in command-recorder check (Windows x64 CPython 3.9.13):
 
 ```bash

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tools/asset-registry/schemas/extracted_bitmap.schema.json",
+  "title": "Single extracted bitmap entry",
+  "description": "Contract for one extracted bitmap: source tag provenance, family, format, dimensions, and output digests.",
+  "type": "object",
+  "required": [
+    "source",
+    "tag",
+    "character_id",
+    "family",
+    "format",
+    "width",
+    "height",
+    "outputs"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "source": {
+      "type": "string",
+      "description": "Registry path of the source SWF file."
+    },
+    "tag": {
+      "type": "integer",
+      "description": "SWF tag code of the bitmap definition.",
+      "minimum": 0
+    },
+    "character_id": {
+      "type": "integer",
+      "description": "Bitmap character ID within its file.",
+      "minimum": 0
+    },
+    "family": {
+      "type": "string",
+      "description": "Bitmap family: jpeg, jpeg3, or lossless.",
+      "enum": ["jpeg", "jpeg3", "lossless"]
+    },
+    "format": {
+      "type": "integer",
+      "description": "Native bitmap format code (lossless 3/5; JPEG families record 0).",
+      "minimum": 0
+    },
+    "width": {
+      "type": "integer",
+      "description": "Bitmap width in pixels (from tag fields or JPEG SOF).",
+      "minimum": 1
+    },
+    "height": {
+      "type": "integer",
+      "description": "Bitmap height in pixels (from tag fields or JPEG SOF).",
+      "minimum": 1
+    },
+    "outputs": {
+      "type": "array",
+      "description": "Output files with digests, in write order.",
+      "minItems": 1,
+      "items": { "type": "object" }
+    }
+  }
+}

@@ -74,6 +74,18 @@ and a `statuses.json` overlay advancing those registry paths to
 MP3 stays MP3. Zero non-MP3 sounds exist corpus-wide; any future one
 fails closed.
 
+## Bitmap extraction
+
+`extract_images.py` converts all 61,702 bitmap payloads: plain JPEG
+verbatim (conditional table splice), JPEG3 as verbatim `.jpg` plus
+dimension-matched alpha `_alpha.png`, lossless ARGB/colormap as RGBA
+`.png` via a hand-rolled stdlib writer. Bulk outputs live under the
+ignored `assets/converted/images/` and regenerate byte-identically;
+the committed `image_extraction.json` with per-output digests is the
+permanent evidence, and `statuses.json` merges under the neutral
+`asset-statuses-v1` envelope. No rendering, no JPEG decoding to
+pixels, no source mutation; unknown formats fail closed.
+
 ## Prioritization input (roadmap §14)
 
 Suggested conversion order: terrain, one building, one unit, essential
