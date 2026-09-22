@@ -335,6 +335,27 @@ served-byte equality (`make_dynamic` rewrites served dates and never runs
 here), content validity, gameplay parity, asset existence, or
 progressed-player coverage.
 
+Verified offline globals-tuning normalization check (Windows x64 CPython 3.9.13):
+
+```bash
+python -B packages/game-content/tools/build_globals.py
+python -B -m unittest discover -s packages/game-content/tests -p test_build_globals.py -v
+```
+
+See `packages/game-content/README.md` (globals-tuning normalization
+extension) for the executable, invocation, exit codes, evidence
+classification, and containment. This extension has no cross-domain
+reference edge and merges its `globals` section into the package
+manifest while leaving the prior keys untouched. These checks
+establish source-grounded normalization consistency for the 105 loaded
+`globals` entries (104 stored constants plus the single powerup-added
+schedule, heterogeneous values kept verbatim with recorded types and
+opaque string constants never parsed), with schema including the
+value-type union, exact round-trip evidence against the loaded object,
+and manifest, not served-byte equality, content validity, gameplay
+parity, tuning correctness, asset existence, or progressed-player
+coverage.
+
 ---
 
 ## Code style

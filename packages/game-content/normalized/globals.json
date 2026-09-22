@@ -1,0 +1,1601 @@
+[
+  {
+    "legacy_id": "CONSTRUCTING_TIME",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "CONSTRUCTING_TIME",
+    "value_type": "integer",
+    "value": 1000
+  },
+  {
+    "legacy_id": "ENERGY_INCREASE_ENERGY_INTERVAL",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "ENERGY_INCREASE_ENERGY_INTERVAL",
+    "value_type": "integer",
+    "value": 300000
+  },
+  {
+    "legacy_id": "ENERGY_MAX_REGULAR_VALUE",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "ENERGY_MAX_REGULAR_VALUE",
+    "value_type": "integer",
+    "value": 30
+  },
+  {
+    "legacy_id": "ENERGY_CONSTRUCTION_COST",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "ENERGY_CONSTRUCTION_COST",
+    "value_type": "integer",
+    "value": 1
+  },
+  {
+    "legacy_id": "ENERGY_COSTS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "ENERGY_COSTS",
+    "value_type": "object",
+    "value": {
+      "10": 10,
+      "20": 20,
+      "30": 30,
+      "40": 40
+    }
+  },
+  {
+    "legacy_id": "BASE_RESOURCE_LIMITS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "BASE_RESOURCE_LIMITS",
+    "value_type": "object",
+    "value": {
+      "g": 20000,
+      "o": 20000,
+      "s": 20000,
+      "w": 20000
+    }
+  },
+  {
+    "legacy_id": "NUM_ACTIVE_MISSIONS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "NUM_ACTIVE_MISSIONS",
+    "value_type": "integer",
+    "value": 5
+  },
+  {
+    "legacy_id": "COLLECT_MINUTES",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "COLLECT_MINUTES",
+    "value_type": "array",
+    "value": [
+      5,
+      60,
+      240,
+      480
+    ]
+  },
+  {
+    "legacy_id": "COLLECT_MULTIPLIER",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "COLLECT_MULTIPLIER",
+    "value_type": "array",
+    "value": [
+      0.25,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "legacy_id": "ENERGY_ASSIST_QTY",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "ENERGY_ASSIST_QTY",
+    "value_type": "integer",
+    "value": 1
+  },
+  {
+    "legacy_id": "COST_HURRY_UP",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "COST_HURRY_UP",
+    "value_type": "integer",
+    "value": 2
+  },
+  {
+    "legacy_id": "HEALTH_SPY_EAGLES",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "HEALTH_SPY_EAGLES",
+    "value_type": "array",
+    "value": [
+      200,
+      400,
+      800,
+      10000
+    ]
+  },
+  {
+    "legacy_id": "PRIZE_COLLECTIONS_CASH",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "PRIZE_COLLECTIONS_CASH",
+    "value_type": "array",
+    "value": [
+      0,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      15,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      20
+    ]
+  },
+  {
+    "legacy_id": "MARKET_BASE_COSTS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MARKET_BASE_COSTS",
+    "value_type": "object",
+    "value": {
+      "o": 100,
+      "s": 150,
+      "w": 100
+    }
+  },
+  {
+    "legacy_id": "MARKET_MAX_NUM_TRADES",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MARKET_MAX_NUM_TRADES",
+    "value_type": "integer",
+    "value": 20
+  },
+  {
+    "legacy_id": "MARKET_INCREMENT",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MARKET_INCREMENT",
+    "value_type": "number",
+    "value": 0.02
+  },
+  {
+    "legacy_id": "MARKET_MAX_INCREMENTS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MARKET_MAX_INCREMENTS",
+    "value_type": "integer",
+    "value": 200
+  },
+  {
+    "legacy_id": "MARKET_MAX_DECREMENTS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MARKET_MAX_DECREMENTS",
+    "value_type": "integer",
+    "value": 25
+  },
+  {
+    "legacy_id": "MARKET_SELL_PERCENTAGE",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MARKET_SELL_PERCENTAGE",
+    "value_type": "number",
+    "value": 0.75
+  },
+  {
+    "legacy_id": "MARKET_PERIOD_HOURS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MARKET_PERIOD_HOURS",
+    "value_type": "integer",
+    "value": 20
+  },
+  {
+    "legacy_id": "MARKET_AMOUNT_TRADE",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MARKET_AMOUNT_TRADE",
+    "value_type": "array",
+    "value": [
+      100,
+      200,
+      300
+    ]
+  },
+  {
+    "legacy_id": "MIN_LEVEL_ATTACKS_1",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MIN_LEVEL_ATTACKS_1",
+    "value_type": "integer",
+    "value": 10
+  },
+  {
+    "legacy_id": "MIN_LEVEL_ATTACKS_2",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MIN_LEVEL_ATTACKS_2",
+    "value_type": "integer",
+    "value": 15
+  },
+  {
+    "legacy_id": "MIN_LEVEL_ATTACKS_3",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MIN_LEVEL_ATTACKS_3",
+    "value_type": "integer",
+    "value": 20
+  },
+  {
+    "legacy_id": "MIN_LEVEL_ATTACK_SIEGE_1",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MIN_LEVEL_ATTACK_SIEGE_1",
+    "value_type": "integer",
+    "value": 25
+  },
+  {
+    "legacy_id": "MIN_LEVEL_ATTACK_SIEGE_2",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MIN_LEVEL_ATTACK_SIEGE_2",
+    "value_type": "integer",
+    "value": 30
+  },
+  {
+    "legacy_id": "MIN_LEVEL_ATTACK_SIEGE_3",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MIN_LEVEL_ATTACK_SIEGE_3",
+    "value_type": "integer",
+    "value": 35
+  },
+  {
+    "legacy_id": "MAX_MINES_STONE",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MAX_MINES_STONE",
+    "value_type": "integer",
+    "value": 1
+  },
+  {
+    "legacy_id": "MAX_MINES_GOLD",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MAX_MINES_GOLD",
+    "value_type": "integer",
+    "value": 1
+  },
+  {
+    "legacy_id": "MAX_MINES_FOOD",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MAX_MINES_FOOD",
+    "value_type": "integer",
+    "value": 1
+  },
+  {
+    "legacy_id": "MAX_MINES_WOOD",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MAX_MINES_WOOD",
+    "value_type": "integer",
+    "value": 1
+  },
+  {
+    "legacy_id": "SPYINGS_MAX",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "SPYINGS_MAX",
+    "value_type": "integer",
+    "value": 3
+  },
+  {
+    "legacy_id": "SPYINGS_PERIOD_HOURS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "SPYINGS_PERIOD_HOURS",
+    "value_type": "integer",
+    "value": 24
+  },
+  {
+    "legacy_id": "MAX_SELECTED_OBJECTS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MAX_SELECTED_OBJECTS",
+    "value_type": "integer",
+    "value": 20
+  },
+  {
+    "legacy_id": "SPACE_SELECTED_ELEMENTS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "SPACE_SELECTED_ELEMENTS",
+    "value_type": "integer",
+    "value": 50
+  },
+  {
+    "legacy_id": "SPACEY_SELECTED_ELEMENTS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "SPACEY_SELECTED_ELEMENTS",
+    "value_type": "integer",
+    "value": 50
+  },
+  {
+    "legacy_id": "LEFT_MARGIN_SELECTED_ELEMENTS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "LEFT_MARGIN_SELECTED_ELEMENTS",
+    "value_type": "integer",
+    "value": 17
+  },
+  {
+    "legacy_id": "TOP_MARGIN_SELECTED_ELEMENTS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "TOP_MARGIN_SELECTED_ELEMENTS",
+    "value_type": "integer",
+    "value": 20
+  },
+  {
+    "legacy_id": "INCREMENT_HEALTH_REPAIR",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "INCREMENT_HEALTH_REPAIR",
+    "value_type": "integer",
+    "value": 10
+  },
+  {
+    "legacy_id": "TIMER_NEIGHBOUR",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "TIMER_NEIGHBOUR",
+    "value_type": "integer",
+    "value": 300000
+  },
+  {
+    "legacy_id": "TIMER_HARVEST",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "TIMER_HARVEST",
+    "value_type": "integer",
+    "value": 1000
+  },
+  {
+    "legacy_id": "TIMER_DEAD_DISAPPEAR",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "TIMER_DEAD_DISAPPEAR",
+    "value_type": "integer",
+    "value": 4000
+  },
+  {
+    "legacy_id": "TIMER_SPEECH_ACTIVE",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "TIMER_SPEECH_ACTIVE",
+    "value_type": "integer",
+    "value": 3000
+  },
+  {
+    "legacy_id": "TIMER_OGRES_VILLAGE",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "TIMER_OGRES_VILLAGE",
+    "value_type": "integer",
+    "value": 14400
+  },
+  {
+    "legacy_id": "TIMER_REPOSITION",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "TIMER_REPOSITION",
+    "value_type": "integer",
+    "value": 300
+  },
+  {
+    "legacy_id": "TIMER_REATACAR",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "TIMER_REATACAR",
+    "value_type": "integer",
+    "value": 300
+  },
+  {
+    "legacy_id": "DISTANCE_INTERACTION",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "DISTANCE_INTERACTION",
+    "value_type": "integer",
+    "value": 1
+  },
+  {
+    "legacy_id": "AGGRO_RANGE",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "AGGRO_RANGE",
+    "value_type": "integer",
+    "value": 10
+  },
+  {
+    "legacy_id": "DISTANCIA_MINIMA_ARQUEROS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "DISTANCIA_MINIMA_ARQUEROS",
+    "value_type": "integer",
+    "value": 3
+  },
+  {
+    "legacy_id": "LIMIT_PER_LEVEL_TOWER",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "LIMIT_PER_LEVEL_TOWER",
+    "value_type": "integer",
+    "value": 4
+  },
+  {
+    "legacy_id": "LIMIT_PER_LEVEL_SILO",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "LIMIT_PER_LEVEL_SILO",
+    "value_type": "number",
+    "value": 0.2
+  },
+  {
+    "legacy_id": "START_MAX_POPULATION",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "START_MAX_POPULATION",
+    "value_type": "integer",
+    "value": 20
+  },
+  {
+    "legacy_id": "SHOW_ADD_ENERGY_BUTTON_LIMIT",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "SHOW_ADD_ENERGY_BUTTON_LIMIT",
+    "value_type": "integer",
+    "value": 3
+  },
+  {
+    "legacy_id": "NEWS_IMAGE",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "NEWS_IMAGE",
+    "value_type": "string",
+    "value": "new_bestciv2_5,megabot_NEW,reptilegun_NEW,NEWS_QUESTS,NEWS_QUESTS19_20,NEWS_casa_subasta,news_laboratory,new_wonder,NEWS_ALLIANCE,new_premium2,NEWS_SHOTTING,4_NEW_QUEST,new_xp,NEWS_tanques_helicopteros5,NEWS_tanques_helicopteros4,NEWS_massive_damage,NEWS_NIDO_ROBOTS,NEWS_recruitmentcenter,NEWS_new_quest,NEWS_mr_t,NEWS_healer,NEWS_mecanico,news_aviones_2,NEWS_fortress,NEWS_wonders,031111_news_helicopters"
+  },
+  {
+    "legacy_id": "NEWS_STORE",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "NEWS_STORE",
+    "value_type": "string",
+    "value": "12.121.0,12.121.0,12.121.0,,,1.17.0,1.17.0,7.0.0,,premium,,,,4.31.0,4.31.0,4.35.0,1.17.0,1.17.0,,12.121.0,4.34.0,4.34.0,4.0.0,3.23.0,7.0.0,4.33.0"
+  },
+  {
+    "legacy_id": "PERMISSION_PACK_UNITS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "PERMISSION_PACK_UNITS",
+    "value_type": "array",
+    "value": [
+      10,
+      20,
+      30,
+      40
+    ]
+  },
+  {
+    "legacy_id": "PERMISSION_COSTS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "PERMISSION_COSTS",
+    "value_type": "object",
+    "value": {
+      "10": 10,
+      "20": 20,
+      "30": 30,
+      "40": 40
+    }
+  },
+  {
+    "legacy_id": "LIMIT_PER_LEVEL_WALL",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "LIMIT_PER_LEVEL_WALL",
+    "value_type": "integer",
+    "value": 6
+  },
+  {
+    "legacy_id": "INITIAL_LIMIT_PER_WALL",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "INITIAL_LIMIT_PER_WALL",
+    "value_type": "integer",
+    "value": 80
+  },
+  {
+    "legacy_id": "INITIAL_PER_LEVEL_TOWER",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "INITIAL_PER_LEVEL_TOWER",
+    "value_type": "integer",
+    "value": 20
+  },
+  {
+    "legacy_id": "ROUND_TABLE",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "ROUND_TABLE",
+    "value_type": "array",
+    "value": [
+      389
+    ]
+  },
+  {
+    "legacy_id": "RECRUITMENT_PRIZE",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "RECRUITMENT_PRIZE",
+    "value_type": "array",
+    "value": [
+      140
+    ]
+  },
+  {
+    "legacy_id": "ALLIES_BUILDING",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "ALLIES_BUILDING",
+    "value_type": "array",
+    "value": [
+      61,
+      3061
+    ]
+  },
+  {
+    "legacy_id": "ALLIES_MARKET",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "ALLIES_MARKET",
+    "value_type": "array",
+    "value": [
+      74,
+      3074
+    ]
+  },
+  {
+    "legacy_id": "ALLIES_MARKET_INCREMENTAL_COLLECT",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "ALLIES_MARKET_INCREMENTAL_COLLECT",
+    "value_type": "object",
+    "value": {
+      "w": 125,
+      "s": 125,
+      "o": 125,
+      "g": 125
+    }
+  },
+  {
+    "legacy_id": "ALLIES_MARKET_INITIAL_COLLECT",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "ALLIES_MARKET_INITIAL_COLLECT",
+    "value_type": "object",
+    "value": {
+      "w": 125,
+      "s": 125,
+      "o": 125,
+      "g": 125
+    }
+  },
+  {
+    "legacy_id": "ALLIES_MARKET_TROLLS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "ALLIES_MARKET_TROLLS",
+    "value_type": "integer",
+    "value": 352
+  },
+  {
+    "legacy_id": "MAX_POPULATION_PER_LEVEL",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MAX_POPULATION_PER_LEVEL",
+    "value_type": "integer",
+    "value": 3
+  },
+  {
+    "legacy_id": "COLLECT_HELP_SECONDS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "COLLECT_HELP_SECONDS",
+    "value_type": "integer",
+    "value": 3600
+  },
+  {
+    "legacy_id": "DAILY_GOLD_REWARDS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "DAILY_GOLD_REWARDS",
+    "value_type": "array",
+    "value": [
+      100,
+      250,
+      500,
+      1000,
+      0
+    ]
+  },
+  {
+    "legacy_id": "DEPOT_LIMITS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "DEPOT_LIMITS",
+    "value_type": "string",
+    "value": "{\"g\":[1, 7, 17,27],\"o\":[1, 8,18,28],\"w\":[1, 5,15,25],\"s\":[1, 6,16,26]};"
+  },
+  {
+    "legacy_id": "MANA_PER_PURCHASE",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MANA_PER_PURCHASE",
+    "value_type": "integer",
+    "value": 5
+  },
+  {
+    "legacy_id": "MANA_REWARD_PER_LEVEL",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MANA_REWARD_PER_LEVEL",
+    "value_type": "integer",
+    "value": 2
+  },
+  {
+    "legacy_id": "ISLE_ORDER",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "ISLE_ORDER",
+    "value_type": "array",
+    "value": [
+      "100000006",
+      "100000007",
+      "100000008",
+      "100000002",
+      "100000012",
+      "100000021",
+      "100000022",
+      "100000003",
+      "100000028",
+      "100000014",
+      "100000013",
+      "100000020",
+      "100000015",
+      "100000019",
+      "100000018",
+      "100000023",
+      "100000011",
+      "100000033"
+    ]
+  },
+  {
+    "legacy_id": "URL_APP_PROD",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "URL_APP_PROD",
+    "value_type": "string",
+    "value": "http://apps.facebook.com/socialwarsgame/"
+  },
+  {
+    "legacy_id": "REACTIVATE_WONDER_DISCOUNT",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "REACTIVATE_WONDER_DISCOUNT",
+    "value_type": "number",
+    "value": 0.5
+  },
+  {
+    "legacy_id": "MAX_POPULATION_CAP",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MAX_POPULATION_CAP",
+    "value_type": "integer",
+    "value": 175
+  },
+  {
+    "legacy_id": "REWARDS_CHAPTERS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "REWARDS_CHAPTERS",
+    "value_type": "array",
+    "value": [
+      {},
+      {
+        "g": 250,
+        "w": 200
+      },
+      {
+        "g": 500,
+        "o": 400
+      },
+      {
+        "g": 750,
+        "s": 600
+      },
+      {
+        "g": 1000,
+        "w": 800
+      },
+      {
+        "g": 1250,
+        "o": 1000
+      },
+      {
+        "g": 1500,
+        "s": 1200
+      },
+      {
+        "g": 1750,
+        "w": 1400
+      },
+      {
+        "g": 2000,
+        "o": 1600
+      },
+      {
+        "g": 2250,
+        "s": 1800
+      },
+      {
+        "g": 2500,
+        "w": 2000
+      },
+      {
+        "g": 2750,
+        "o": 2200
+      },
+      {
+        "g": 3000,
+        "s": 2400
+      }
+    ]
+  },
+  {
+    "legacy_id": "REWARDS_QUESTS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "REWARDS_QUESTS",
+    "value_type": "array",
+    "value": [
+      {},
+      {
+        "g": 1500,
+        "w": 400
+      },
+      {
+        "g": 2000,
+        "w": 600
+      },
+      {
+        "g": 2500,
+        "o": 800
+      },
+      {
+        "g": 3000,
+        "s": 1000
+      },
+      {
+        "g": 3500,
+        "w": 1200
+      },
+      {
+        "g": 4000,
+        "o": 1400
+      },
+      {
+        "g": 4500,
+        "s": 1600
+      },
+      {
+        "g": 5000,
+        "o": 1800
+      },
+      {
+        "g": 5500,
+        "s": 2000
+      },
+      {
+        "g": 6000,
+        "w": 2200
+      },
+      {
+        "g": 6500,
+        "o": 2400
+      },
+      {
+        "g": 7000,
+        "s": 2600
+      },
+      {
+        "g": 7500,
+        "w": 2800
+      },
+      {
+        "g": 8000,
+        "o": 3000
+      },
+      {
+        "g": 10000,
+        "s": 3200
+      },
+      {
+        "g": 12000,
+        "w": 3500
+      },
+      {
+        "g": 14000,
+        "o": 3500
+      },
+      {
+        "g": 16000,
+        "s": 3500
+      },
+      {
+        "g": 18000,
+        "w": 3800
+      },
+      {
+        "g": 20000,
+        "o": 4000
+      },
+      {
+        "g": 22000,
+        "s": 4000
+      },
+      {
+        "g": 24000,
+        "w": 4200
+      }
+    ]
+  },
+  {
+    "legacy_id": "LIMITED_EDITION_EXPIRATION",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "LIMITED_EDITION_EXPIRATION",
+    "value_type": "string",
+    "value": "2012-09-14"
+  },
+  {
+    "legacy_id": "NEWFRIENDS_REWARD_ID_UNIT",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "NEWFRIENDS_REWARD_ID_UNIT",
+    "value_type": "string",
+    "value": "1046.1, 1055.1, 1048.1, 1050.2, 1051.1"
+  },
+  {
+    "legacy_id": "NEWFRIENDS_REWARD_DESCRIPTION",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "NEWFRIENDS_REWARD_DESCRIPTION",
+    "value_type": "string",
+    "value": "1180,1181,1182,1183,1184"
+  },
+  {
+    "legacy_id": "NEWFRIENDS_REWARD_SCALE_UNIT",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "NEWFRIENDS_REWARD_SCALE_UNIT",
+    "value_type": "string",
+    "value": "1,1,.7,1,1"
+  },
+  {
+    "legacy_id": "MAX_GOLD_STOLEN",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MAX_GOLD_STOLEN",
+    "value_type": "integer",
+    "value": 20000
+  },
+  {
+    "legacy_id": "GOLD_STOLEN_TOP_PCT",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "GOLD_STOLEN_TOP_PCT",
+    "value_type": "integer",
+    "value": 35
+  },
+  {
+    "legacy_id": "GOLD_STOLEN_BOTTOM_PCT",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "GOLD_STOLEN_BOTTOM_PCT",
+    "value_type": "integer",
+    "value": 15
+  },
+  {
+    "legacy_id": "MONDAY_BONUS_REWARDS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "MONDAY_BONUS_REWARDS",
+    "value_type": "array",
+    "value": [
+      {
+        "type": "g",
+        "value": 2500
+      },
+      {
+        "type": "u",
+        "value": [
+          1055,
+          1033,
+          1046,
+          1063,
+          1198
+        ]
+      },
+      {
+        "type": "c",
+        "value": 5
+      }
+    ]
+  },
+  {
+    "legacy_id": "UNIT_XP_LEVELS_MULTIPLIERS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "UNIT_XP_LEVELS_MULTIPLIERS",
+    "value_type": "array",
+    "value": [
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        2,
+        20,
+        50
+      ],
+      [
+        10,
+        2,
+        20,
+        25
+      ],
+      [
+        20,
+        3,
+        20,
+        12
+      ],
+      [
+        40,
+        3,
+        20,
+        6
+      ],
+      [
+        65,
+        4,
+        20,
+        4
+      ]
+    ]
+  },
+  {
+    "legacy_id": "ALLIANCE_DAILY_BONUS_REWARDS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "ALLIANCE_DAILY_BONUS_REWARDS",
+    "value_type": "array",
+    "value": [
+      {
+        "type": "g",
+        "value": 150,
+        "members": 0
+      },
+      {
+        "type": "g",
+        "value": 1500,
+        "members": 5
+      },
+      {
+        "type": "g",
+        "value": 5000,
+        "members": 25
+      },
+      {
+        "type": "c",
+        "value": 1,
+        "members": 45
+      }
+    ]
+  },
+  {
+    "legacy_id": "BUILD_SPEEDUP_MIN_TIME",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "BUILD_SPEEDUP_MIN_TIME",
+    "value_type": "integer",
+    "value": 10
+  },
+  {
+    "legacy_id": "BUILD_SPEEDUP_PRICING",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "BUILD_SPEEDUP_PRICING",
+    "value_type": "array",
+    "value": [
+      5,
+      1
+    ]
+  },
+  {
+    "legacy_id": "UPGRADE_SPEEDUP_PRICING",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "UPGRADE_SPEEDUP_PRICING",
+    "value_type": "array",
+    "value": [
+      5,
+      1
+    ]
+  },
+  {
+    "legacy_id": "DART_COST_CASH",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "DART_COST_CASH",
+    "value_type": "integer",
+    "value": 20
+  },
+  {
+    "legacy_id": "PREMIUM_ACCOUNTS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "PREMIUM_ACCOUNTS",
+    "value_type": "array",
+    "value": [
+      {
+        "time": 360,
+        "price": 800
+      },
+      {
+        "time": 180,
+        "price": 450
+      },
+      {
+        "time": 30,
+        "price": 80
+      },
+      {
+        "time": 7,
+        "price": 40
+      },
+      {
+        "time": 3,
+        "price": 20
+      },
+      {
+        "time": 1,
+        "price": 8
+      }
+    ]
+  },
+  {
+    "legacy_id": "UNIT_XP_LEVELS_MULTIPLIERS_10",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "UNIT_XP_LEVELS_MULTIPLIERS_10",
+    "value_type": "array",
+    "value": [
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        2,
+        20,
+        50
+      ],
+      [
+        10,
+        2,
+        20,
+        25
+      ],
+      [
+        20,
+        3,
+        20,
+        12
+      ],
+      [
+        40,
+        3,
+        20,
+        6
+      ],
+      [
+        65,
+        4,
+        20,
+        4
+      ],
+      [
+        95,
+        4,
+        25,
+        3
+      ],
+      [
+        125,
+        4,
+        25,
+        2.5
+      ],
+      [
+        160,
+        4,
+        25,
+        2
+      ],
+      [
+        200,
+        4,
+        25,
+        1.5
+      ]
+    ]
+  },
+  {
+    "legacy_id": "LEVEL_MAGIC",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "LEVEL_MAGIC",
+    "value_type": "integer",
+    "value": 2
+  },
+  {
+    "legacy_id": "COST_MANA_CASH",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "COST_MANA_CASH",
+    "value_type": "integer",
+    "value": 1
+  },
+  {
+    "legacy_id": "COST_MANA_GOLD",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "COST_MANA_GOLD",
+    "value_type": "integer",
+    "value": 10000
+  },
+  {
+    "legacy_id": "NUM_SPELL_USES_LVL2",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "NUM_SPELL_USES_LVL2",
+    "value_type": "integer",
+    "value": 25
+  },
+  {
+    "legacy_id": "NUM_SPELL_USES_LVL3",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "NUM_SPELL_USES_LVL3",
+    "value_type": "integer",
+    "value": 50
+  },
+  {
+    "legacy_id": "CASH_WONDER",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "CASH_WONDER",
+    "value_type": "integer",
+    "value": 176
+  },
+  {
+    "legacy_id": "QUESTS_MIN_LEVELS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "QUESTS_MIN_LEVELS",
+    "value_type": "object",
+    "value": {
+      "100000021": 40,
+      "100000022": 40,
+      "100000025": 40,
+      "100000026": 40
+    }
+  },
+  {
+    "legacy_id": "RESOURCE_PACKS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "RESOURCE_PACKS",
+    "value_type": "array",
+    "value": [
+      {
+        "g": 5000,
+        "price": {
+          "c": 10
+        },
+        "img": "res_g_1"
+      },
+      {
+        "g": 25000,
+        "price": {
+          "c": 30
+        },
+        "img": "res_g_2"
+      },
+      {
+        "g": 100000,
+        "price": {
+          "c": 90
+        },
+        "img": "res_g_3"
+      },
+      {
+        "w": 5000,
+        "price": {
+          "c": 10
+        },
+        "img": "res_w_1"
+      },
+      {
+        "w": 25000,
+        "price": {
+          "c": 30
+        },
+        "img": "res_w_2"
+      },
+      {
+        "w": 100000,
+        "price": {
+          "c": 90
+        },
+        "img": "res_w_3"
+      },
+      {
+        "o": 2500,
+        "price": {
+          "c": 10
+        },
+        "img": "res_o_1"
+      },
+      {
+        "o": 12500,
+        "price": {
+          "c": 30
+        },
+        "img": "res_o_2"
+      },
+      {
+        "o": 50000,
+        "price": {
+          "c": 90
+        },
+        "img": "res_o_3"
+      },
+      {
+        "s": 2500,
+        "price": {
+          "c": 10
+        },
+        "img": "res_s_1"
+      },
+      {
+        "s": 12500,
+        "price": {
+          "c": 30
+        },
+        "img": "res_s_2"
+      },
+      {
+        "s": 50000,
+        "price": {
+          "c": 90
+        },
+        "img": "res_s_3"
+      }
+    ]
+  },
+  {
+    "legacy_id": "CROSS_ITEMS",
+    "kind": "global_entry",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "CROSS_ITEMS",
+    "value_type": "object",
+    "value": {
+      "SE": {
+        "id": 10020,
+        "img": "socialempires",
+        "functionExternal": "socialempires",
+        "gameName": "Social Empires",
+        "position": 1
+      },
+      "DC": {
+        "id": 10078,
+        "img": "dragoncity",
+        "functionExternal": "dragoncity",
+        "gameName": "Dragon City",
+        "position": 2
+      }
+    }
+  },
+  {
+    "legacy_id": "SOUL_MIXER_POWERUPS_LEVELS",
+    "kind": "global_entry",
+    "source_file": "config/patch/atom_fusion_powerup.json",
+    "source_layer": "patched(atom_fusion_powerup)",
+    "content_version": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "key": "SOUL_MIXER_POWERUPS_LEVELS",
+    "value_type": "array",
+    "value": [
+      {
+        "cash_cost": 1,
+        "order_increment": 1
+      },
+      {
+        "cash_cost": 2,
+        "order_increment": 2
+      },
+      {
+        "cash_cost": 4,
+        "order_increment": 4
+      },
+      {
+        "cash_cost": 8,
+        "order_increment": 8
+      },
+      {
+        "cash_cost": 15,
+        "order_increment": 15
+      },
+      {
+        "cash_cost": 20,
+        "order_increment": 20
+      }
+    ]
+  }
+]

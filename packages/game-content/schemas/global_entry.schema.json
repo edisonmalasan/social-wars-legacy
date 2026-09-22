@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "packages/game-content/schemas/global_entry.schema.json",
+  "title": "Normalized global tuning entry definition (legacy globals domain, loaded)",
+  "description": "Contract for one normalized tuning constant: one loaded legacy globals entry (stored plus the single powerup add). The constant name is the stable identity, so legacy_id is the name verbatim (rule G3); the value is kept verbatim as observed JSON with its type recorded (rule G2), and string constants stay opaque, never parsed. See packages/game-content/README.md for the rule set and survey/census citations.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "key",
+    "value_type",
+    "value"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Loaded globals constant name preserved verbatim (rule G3)."
+    },
+    "kind": {
+      "const": "global_entry",
+      "description": "Classification of the loaded globals domain: every entry maps to global_entry."
+    },
+    "source_file": {
+      "type": "string",
+      "description": "Origin file of the loaded entry: config/main.json for stored constants, config/patch/atom_fusion_powerup.json for the single added schedule."
+    },
+    "source_layer": {
+      "type": "string",
+      "description": "Layering origin: stored, or patched(atom_fusion_powerup) for the single added schedule (rule G1).",
+      "enum": ["stored", "patched(atom_fusion_powerup)"]
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint (sha256 over the stored source bytes, the powerup patch bytes, and the mods list); sources carry no version stamp."
+    },
+    "key": {
+      "type": "string",
+      "description": "Loaded globals constant name, kept verbatim; equals legacy_id (rule G3)."
+    },
+    "value_type": {
+      "type": "string",
+      "description": "Recorded JSON type of the verbatim value: integer, number, string, array, object, boolean, or null (rule G2).",
+      "enum": ["integer", "number", "string", "array", "object", "boolean", "null"]
+    },
+    "value": {
+      "type": ["integer", "number", "string", "array", "object", "boolean", "null"],
+      "description": "Tuning value kept verbatim as observed JSON; string constants stay opaque and are never parsed as references or behavior (rule G2)."
+    }
+  }
+}

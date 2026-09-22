@@ -966,3 +966,127 @@ in the content census (`make_dynamic` never runs here).
 ```bash
 python -B -m unittest discover -s packages/game-content/tests -p test_build_darts.py -v
 ```
+
+---
+
+# Globals-tuning normalization extension
+
+Normalized, schema-checked tuning-constant definitions for the legacy
+Social Wars `globals` content domain (104 stored constants plus the
+single `atom_fusion_powerup` add, 105 effective entries), built offline
+from stored sources with Python 3.9 standard library only; no new
+dependencies. This extension has no cross-domain reference edge and
+requires no prior build; it merges its `globals` section into the
+package manifest.
+
+## Inputs
+
+- `config/main.json` (stored source: 104 `globals` constants —
+  62 integers, 4 floats, 8 strings, 22 lists, 8 objects — recorded as
+  layering inputs).
+- `config/patch/patches.txt` plus the five ordered patch files: the
+  builder verifies the order, applies only the single
+  `atom_fusion_powerup` add of `/globals/SOUL_MIXER_POWERUPS_LEVELS`
+  (6 rows of `{cash_cost,order_increment}`), and refuses any other
+  globals target or divergent add shape explicitly.
+- `mods/mods.txt` (must stay inactive; any active mod fails the build).
+- `packages/game-content/schemas/global_entry.schema.json` (contract
+  enforced by the builder, including the value-type union).
+
+## Coercion rules (`globals-coercion-ruleset-v1`, survey/census-cited)
+
+- G1 patch layering mirrors the legacy loader for this key only: the
+  ordered list is verified and exactly the one powerup add is applied;
+  per-entry `source_layer` records `stored` or
+  `patched(atom_fusion_powerup)`, and the manifest records stored
+  (104) versus loaded (105) counts.
+- G2 values kept verbatim as observed JSON with recorded types
+  (integer, number, string, array, object, boolean, null; booleans
+  never count as integers). No numeric parsing, no embedded-JSON
+  decoding, no CSV splitting.
+- G3 `legacy_id` preserves the constant name verbatim in loaded key
+  order, never re-sorted; key/id equality is enforced. String
+  constants (version lists, URL, date, depot-limits string,
+  friend-reward CSV strings) stay opaque display and config data,
+  never parsed as references or behavior.
+
+No value is rebalanced, renamed, regrouped, or assigned new meaning.
+
+## Outputs
+
+- `normalized/globals.json`: 105 tuning definitions (one per loaded
+  entry, loaded key order).
+- `manifest.json`: the existing package manifest with a `globals`
+  section merged in, recording globals inputs with digests (stored
+  source plus the powerup patch bytes), the patch lineage (`add`),
+  the coercion ruleset version, the content fingerprint (sha256 over
+  the stored source bytes, the powerup patch bytes, plus the mods
+  list), definition counts (including the value-type distribution and
+  the string-constant key list), builder outcome, output digests, and
+  notes. Regenerated on every successful globals build; the tests
+  assert it matches the produced output while the prior keys survive
+  the merge untouched.
+
+## Validation gates (failures exit 1, outputs unwritten)
+
+Duplicate keys (refusing silent loss), key/id drift, patch-shape
+divergence handled as exit-2 drift refusal, missing or mistyped
+schema-required fields including the value-type union and the
+value/type cross-check (every schema-required field is enforced; the
+traceability test proves it by mutation, and the union test proves
+every observed JSON type is accepted), and any round-trip difference
+against the loaded object (expected: exact equality by key, type, and
+value).
+
+## Executable and invocation
+
+Verified executable: `C:\Users\Edison\AppData\Local\Programs\Python\Python39\python.exe`
+(CPython 3.9.13, tags/v3.9.13:6de2ca5, May 17 2022, 16:36:42, MSC v.1929 64 bit (AMD64)).
+`sys.executable` reported exactly the path above and `python --version`
+reported `Python 3.9.13` for the passing run. Any working Python 3.9+
+standard-library interpreter should behave identically.
+
+From the repository root:
+
+```bash
+python -B packages/game-content/tools/build_globals.py
+```
+
+Exit 0 prints a JSON success report with counts and output files.
+Exit 1 prints a `validation-failed` report listing each problem and
+writes nothing (the manifest is left untouched). Exit 2 reports
+invalid input or unsupported shapes (missing/unreadable files,
+unparseable content, an active mod, globals patch drift, or an
+invalid schema file) on stderr.
+
+## Evidence classification
+
+This extension establishes source-grounded normalization consistency
+for the loaded globals table: layering fidelity, classification
+coverage, verbatim value fidelity with recorded types, and exact
+round-trip equivalence. It is evidence of representation change, not
+of served-byte equality, content validity, gameplay parity, tuning
+correctness, asset existence, or progressed-player coverage. Served
+bytes stay out of scope exactly as in the content census
+(`make_dynamic` never runs here).
+
+## Containment
+
+- Reads only `config/main.json`, `config/patch/patches.txt`, the five
+  patch files (the powerup add applied, the rest target-checked),
+  `mods/mods.txt`, the globals schema file, and the package manifest
+  for the merge (plus optional `--repo-root`/`--out-root` relocation
+  of the same reads).
+- Never imports or executes any legacy application module (no
+  `get_game_config`, `jsonpatch`, or Flask import), never reads runtime
+  saves, never contacts a network, never starts a server, never reads
+  the wall clock, and never opens a browser or Flash content.
+- Writes only the normalized globals file plus the merged
+  `manifest.json`, and only on success. No bytecode (`-B` recommended),
+  no caches, no temporary files in the repository. Repeated runs over
+  unchanged inputs are byte-identical.
+- The focused tests in `tests/test_build_globals.py` run the same way:
+
+```bash
+python -B -m unittest discover -s packages/game-content/tests -p test_build_globals.py -v
+```
