@@ -1,0 +1,178 @@
+[
+  {
+    "legacy_id": "1",
+    "kind": "category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 1,
+    "name": "Village",
+    "sub": [
+      {
+        "id": 11,
+        "name": "Houses",
+        "parent": 1
+      },
+      {
+        "id": 12,
+        "name": "Factories",
+        "parent": 1
+      },
+      {
+        "id": 13,
+        "name": "Fields & Farms",
+        "parent": 1
+      },
+      {
+        "id": 14,
+        "name": "Silos",
+        "parent": 1
+      },
+      {
+        "id": 17,
+        "name": "Miscellaneous",
+        "parent": 1
+      }
+    ]
+  },
+  {
+    "legacy_id": "2",
+    "kind": "category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 2,
+    "name": "Defense",
+    "sub": [
+      {
+        "id": 21,
+        "name": "Turrets",
+        "parent": 2
+      },
+      {
+        "id": 22,
+        "name": "Walls",
+        "parent": 2
+      },
+      {
+        "id": 23,
+        "name": "Fortresses",
+        "parent": 2
+      },
+      {
+        "id": 24,
+        "name": "Bunkers",
+        "parent": 2
+      }
+    ]
+  },
+  {
+    "legacy_id": "3",
+    "kind": "category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 3,
+    "name": "Army",
+    "sub": [
+      {
+        "id": 31,
+        "name": "Soldiers",
+        "parent": 3
+      },
+      {
+        "id": 32,
+        "name": "Vehicles",
+        "parent": 3
+      },
+      {
+        "id": 33,
+        "name": "Aircrafts",
+        "parent": 3
+      },
+      {
+        "id": 34,
+        "name": "Specials",
+        "parent": 3
+      },
+      {
+        "id": 35,
+        "name": "Siege",
+        "parent": 3
+      }
+    ]
+  },
+  {
+    "legacy_id": "4",
+    "kind": "category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 4,
+    "name": "Decorations",
+    "sub": [
+      {
+        "id": 41,
+        "name": "Trees",
+        "parent": 4
+      },
+      {
+        "id": 42,
+        "name": "Flowers",
+        "parent": 4
+      },
+      {
+        "id": 44,
+        "name": "Statues",
+        "parent": 4
+      },
+      {
+        "id": 45,
+        "name": "Others",
+        "parent": 4
+      }
+    ]
+  },
+  {
+    "legacy_id": "5",
+    "kind": "category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 5,
+    "name": "Wonders",
+    "sub": [
+      {
+        "id": 51,
+        "name": "Wonders",
+        "parent": 5
+      }
+    ]
+  },
+  {
+    "legacy_id": "12",
+    "kind": "category",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 12,
+    "name": "New",
+    "sub": [
+      {
+        "id": 121,
+        "name": "Limited Edition",
+        "parent": 12
+      },
+      {
+        "id": 122,
+        "name": "New",
+        "parent": 12
+      },
+      {
+        "id": 123,
+        "name": "Exclusive",
+        "parent": 12
+      }
+    ]
+  }
+]

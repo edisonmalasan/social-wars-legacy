@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "packages/game-content/schemas/unit_collection_category.schema.json",
+  "title": "Normalized unit collection category definition (legacy units_collections_categories domain)",
+  "description": "Contract for one normalized unit collection category: one stored legacy units_collections_categories object entry. The stored object key is the stable identity, so legacy_id is the key verbatim (rule N2); native integers are kept verbatim, localized names verbatim (uniformly-empty category_name_el preserved with a note), units integers validated against the normalized items set, and the single null costs preserved as null (rule N3). See packages/game-content/README.md for the rule set and survey citations.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "category_id",
+    "units",
+    "unit_refs",
+    "rewards",
+    "cost",
+    "costs",
+    "position",
+    "category_name",
+    "category_name_es",
+    "category_name_br",
+    "category_name_it",
+    "category_name_fr",
+    "category_name_de",
+    "category_name_tr",
+    "category_name_el"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Stored units_collections_categories object key preserved verbatim (rule N2)."
+    },
+    "kind": {
+      "const": "unit_collection_category",
+      "description": "Classification of the stored units_collections_categories domain: every entry maps to unit_collection_category."
+    },
+    "source_file": {
+      "type": "string",
+      "description": "Origin file of the stored entry: config/main.json (no patch targets units_collections_categories)."
+    },
+    "source_layer": {
+      "type": "string",
+      "description": "Layering origin: stored (no patch targets units_collections_categories)."
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint (sha256 over the stored source bytes plus the mods list); sources carry no version stamp."
+    },
+    "category_id": {
+      "type": "integer",
+      "description": "Native stored collection category id, kept verbatim (rule N3).",
+      "minimum": 0
+    },
+    "units": {
+      "type": "array",
+      "description": "Native stored unit item ids, kept verbatim; every element must resolve against the normalized items legacy-ID set (rule N3).",
+      "minItems": 1,
+      "items": { "type": "integer" }
+    },
+    "unit_refs": {
+      "type": "array",
+      "description": "Resolved cross-domain item references: the units integers as legacy_id strings in stored order, each validated against the normalized items legacy-ID set (rule N3).",
+      "minItems": 1,
+      "items": { "type": "string" }
+    },
+    "rewards": {
+      "type": "integer",
+      "description": "Native stored rewards value, kept verbatim (rule N3).",
+      "minimum": 0
+    },
+    "cost": {
+      "type": "integer",
+      "description": "Native stored cost value, kept verbatim (rule N3).",
+      "minimum": 0
+    },
+    "costs": {
+      "type": ["array", "null"],
+      "description": "Native stored costs schedule, kept verbatim; null in exactly one stored entry (key 1), preserved as null with a manifest note, never defaulted (rule N3).",
+      "items": { "type": "integer" }
+    },
+    "position": {
+      "type": "integer",
+      "description": "Native stored display position, kept verbatim (rule N3).",
+      "minimum": 0
+    },
+    "category_name": {
+      "type": "string",
+      "description": "Collection display name, preserved verbatim (rule N3)."
+    },
+    "category_name_es": {
+      "type": "string",
+      "description": "Spanish display name, preserved verbatim (rule N3)."
+    },
+    "category_name_br": {
+      "type": "string",
+      "description": "Portuguese display name, preserved verbatim (rule N3)."
+    },
+    "category_name_it": {
+      "type": "string",
+      "description": "Italian display name, preserved verbatim (rule N3)."
+    },
+    "category_name_fr": {
+      "type": "string",
+      "description": "French display name, preserved verbatim (rule N3)."
+    },
+    "category_name_de": {
+      "type": "string",
+      "description": "German display name, preserved verbatim (rule N3)."
+    },
+    "category_name_tr": {
+      "type": "string",
+      "description": "Turkish display name, preserved verbatim (rule N3)."
+    },
+    "category_name_el": {
+      "type": "string",
+      "description": "Greek display name, preserved verbatim; empty in all stored entries, kept with a manifest note and never defaulted (rule N3)."
+    }
+  }
+}

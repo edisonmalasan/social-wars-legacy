@@ -286,6 +286,31 @@ with schemas, exact round-trip evidence, and manifest, not
 served-byte equality, content validity, gameplay parity, asset
 existence, progressed-player coverage, or implemented social behavior.
 
+Verified offline inventory-taxonomy normalization check (Windows x64 CPython 3.9.13):
+
+```bash
+python -B packages/game-content/tools/build_taxonomy.py
+python -B -m unittest discover -s packages/game-content/tests -p test_build_taxonomy.py -v
+```
+
+See `packages/game-content/README.md` (inventory-taxonomy normalization
+extension) for the executable, invocation, exit codes, evidence
+classification, and containment. Run the items-normalization build first: the
+taxonomy builder reads the committed normalized items outputs as its
+cross-domain reference edge (collection units, stored `inventory_ids` keys)
+and merges its `taxonomy` section into the package manifest while leaving
+the items, quests, tables, economy, and social keys untouched. These checks
+establish source-grounded normalization consistency for the 90 stored
+`inventory_items` entries (string-encoded numerics coerced, object keys
+preserved), the 6 stored `categories` entries (sub arrays carried with
+parent checks, patch-era item category codes recorded as opaque with notes),
+and the 20 stored `units_collections_categories` entries (units resolving
+against the 900 normalized items legacy IDs, single null costs and
+uniformly-empty Greek names preserved with notes), with schemas, round-trip
+evidence modulo documented coercions, and manifest, not served-byte
+equality, content validity, gameplay parity, asset existence,
+progressed-player coverage, or implemented inventory/shop behavior.
+
 ---
 
 ## Code style

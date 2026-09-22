@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "packages/game-content/schemas/category.schema.json",
+  "title": "Normalized category definition (legacy categories domain)",
+  "description": "Contract for one normalized shop-taxonomy category: one stored legacy categories object entry. The stored object key is the stable identity, so legacy_id is the key verbatim (rule N2); integer ids and localized names are kept verbatim with the sub array carried as observed (rule N3). See packages/game-content/README.md for the rule set and survey citations.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "id",
+    "name",
+    "sub"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Stored categories object key preserved verbatim (rule N2)."
+    },
+    "kind": {
+      "const": "category",
+      "description": "Classification of the stored categories domain: every entry maps to category."
+    },
+    "source_file": {
+      "type": "string",
+      "description": "Origin file of the stored entry: config/main.json (no patch targets categories)."
+    },
+    "source_layer": {
+      "type": "string",
+      "description": "Layering origin: stored (no patch targets categories)."
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint (sha256 over the stored source bytes plus the mods list); sources carry no version stamp."
+    },
+    "id": {
+      "type": "integer",
+      "description": "Native stored category id, kept verbatim (rule N3).",
+      "minimum": 0
+    },
+    "name": {
+      "type": "string",
+      "description": "Category display name, preserved verbatim (rule N3)."
+    },
+    "sub": {
+      "type": "array",
+      "description": "Subcategory entries carried as observed integer-id/name/parent triples; each parent equals the category id (rule N3).",
+      "minItems": 1,
+      "items": { "type": "object" }
+    }
+  }
+}

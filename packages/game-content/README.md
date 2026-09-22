@@ -681,3 +681,156 @@ bytes stay out of scope exactly as in the content census
 ```bash
 python -B -m unittest discover -s packages/game-content/tests -p test_build_social.py -v
 ```
+
+---
+
+# Inventory-taxonomy normalization extension
+
+Normalized, schema-checked classification definitions for the legacy
+Social Wars object-keyed content domains — `inventory_items`
+(90 entries), `categories` (6 entries), and
+`units_collections_categories` (20 entries) — built offline from stored
+sources with Python 3.9 standard library only; no new dependencies.
+Run the items-normalization build first: the taxonomy builder reads
+the committed normalized items outputs as its cross-domain reference
+edge (collection units and stored `inventory_ids` keys) and merges its
+`taxonomy` section into the package manifest.
+
+## Inputs
+
+- `config/main.json` (stored source: 90 `inventory_items` object
+  entries keyed `1`..`90` with all 7 fields string-typed:
+  string-encoded `id`, `cashPrice`, `droppable`, `dropRate`,
+  `dropsFrom` numerics plus `name`/`description` strings; 6
+  `categories` object entries with native integer `id`, string `name`,
+  and a `sub` array of `{id,name,parent}` triples; 20
+  `units_collections_categories` object entries with native integer
+  `category_id`/`rewards`/`cost`/`position`, integer `units` arrays
+  (89 total), `costs` numeric arrays (null in exactly key `1`), and 8
+  localized name strings with `category_name_el` empty in all 20).
+- `config/patch/patches.txt` plus the five ordered patch files, read
+  only to verify no patch targets any taxonomy key (any such target
+  fails the build explicitly; stored content is the input, there is no
+  layering).
+- `mods/mods.txt` (must stay inactive; any active mod fails the build).
+- `packages/game-content/schemas/inventory_item.schema.json`,
+  `category.schema.json`, and `unit_collection_category.schema.json`
+  (contracts enforced by the builder).
+- `packages/game-content/normalized/buildings.json`, `units.json`,
+  `specials.json` (committed items outputs; their union of 900
+  `legacy_id` values is the cross-domain reference set for collection
+  units).
+
+## Coercion rules (`taxonomy-coercion-ruleset-v1`, survey-cited)
+
+- N1 inventory numeric strings to integers (integral floats become
+  int), using the same field-survey numeric grammar as prior slices
+  `[+-]?(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?`:
+  `id`, `cashPrice`, `droppable`, `dropRate`, and `dropsFrom`
+  (carried as an opaque code, never an item reference); `name` and
+  `description` preserved verbatim.
+- N2 `legacy_id` preserves the stored object key verbatim in stored
+  document order, never re-sorted; key/id equality is enforced
+  (inventory string id, category and collection integer ids).
+- N3 native and verbatim fields kept as stored: category ids/names
+  with `sub` triples (every sub parent equals its category id),
+  collection integers, localized names (uniformly-empty
+  `category_name_el` preserved with a note), the single null `costs`
+  preserved as null with a note, and `units` integer arrays with
+  `unit_refs` carried in stored order. Every collection unit must
+  resolve against the normalized items legacy-ID set and every
+  stored-items `inventory_ids` object key must resolve against the
+  normalized inventory key set, or validation fails. Stored item
+  `category_id`/`subcategory_id` codes without a category entry are
+  opaque classification codes recorded with a note (items
+  `best_against` precedent), never references and never failures.
+
+No value is rebalanced, renamed for gameplay, or assigned new meaning.
+
+## Outputs
+
+- `normalized/inventory_items.json`: 90 inventory definitions (one per
+  stored object entry, stored document order).
+- `normalized/categories.json`: 6 category definitions (one per stored
+  object entry, stored document order).
+- `normalized/unit_collection_categories.json`: 20 collection
+  definitions (one per stored object entry, stored document order).
+- `manifest.json`: the existing items/quest/tables/economy/social
+  manifest with a `taxonomy` section merged in, recording taxonomy
+  inputs with digests, both cross-domain reference edges (items union
+  size; stored-items `inventory_ids` object/null counts), the coercion
+  ruleset version, the content fingerprint (sha256 over the stored
+  source bytes plus the mods list), definition counts (including sub
+  totals, null-costs keys, empty-`el` counts, and opaque-code gap
+  lists), builder outcome, output digests, and notes. Regenerated on
+  every successful taxonomy build; the tests assert it matches the
+  produced output while the prior keys survive the merge untouched.
+
+## Validation gates (failures exit 1, outputs unwritten)
+
+Duplicate keys (refusing silent loss), key/id mismatches, sub parent
+mismatches, negative amounts, non-positive inventory numerics where
+integral is required, unresolvable collection unit references,
+unresolvable stored `inventory_ids` keys, missing or mistyped
+schema-required fields (every schema-required field is enforced; the
+traceability test proves it by mutation), `unit_refs` drift, and any
+round-trip difference outside the documented coercions. The round-trip
+gate re-coerces each stored object entry and compares by value
+(numeric strings numeric, structures verbatim, strings verbatim, key
+sets and document order exact).
+
+## Executable and invocation
+
+Verified executable: `C:\Users\Edison\AppData\Local\Programs\Python\Python39\python.exe`
+(CPython 3.9.13, tags/v3.9.13:6de2ca5, May 17 2022, 16:36:42, MSC v.1929 64 bit (AMD64)).
+`sys.executable` reported exactly the path above and `python --version`
+reported `Python 3.9.13` for the passing run. Any working Python 3.9+
+standard-library interpreter should behave identically.
+
+From the repository root (after the items build):
+
+```bash
+python -B packages/game-content/tools/build_taxonomy.py
+```
+
+Exit 0 prints a JSON success report with counts and output files.
+Exit 1 prints a `validation-failed` report listing each problem and
+writes nothing (the manifest is left untouched). Exit 2 reports
+invalid input or unsupported shapes (missing/unreadable files,
+unparseable content, an active mod, a patch targeting taxonomy
+content, an invalid schema file, or a missing/malformed normalized
+items output) on stderr.
+
+## Evidence classification
+
+This extension establishes source-grounded normalization consistency
+for the stored taxonomy domains: classification coverage, coercion
+fidelity, cross-domain reference resolution (collections against
+items, stored `inventory_ids` against inventory), opaque-code gap
+recording, and round-trip equivalence modulo documented rules. It is
+evidence of representation change, not of served-byte equality,
+content validity, gameplay parity, asset existence (M4 owns asset
+truth), progressed-player coverage, or implemented inventory/shop
+behavior. Served bytes stay out of scope exactly as in the content
+census (`make_dynamic` never runs here).
+
+## Containment
+
+- Reads only `config/main.json`, `config/patch/patches.txt`, the five
+  patch files (target check only), `mods/mods.txt`, the three taxonomy
+  schema files, the three committed normalized items outputs, and the
+  package manifest for the merge (plus optional `--repo-root`/`--out-root`
+  relocation of the same reads).
+- Never imports or executes any legacy application module (no
+  `get_game_config`, `jsonpatch`, or Flask import), never reads runtime
+  saves, never contacts a network, never starts a server, and never
+  opens a browser or Flash content.
+- Writes only the three normalized taxonomy files plus the merged
+  `manifest.json`, and only on success. No bytecode (`-B` recommended),
+  no caches, no temporary files in the repository. Repeated runs over
+  unchanged inputs are byte-identical.
+- The focused tests in `tests/test_build_taxonomy.py` run the same way:
+
+```bash
+python -B -m unittest discover -s packages/game-content/tests -p test_build_taxonomy.py -v
+```
