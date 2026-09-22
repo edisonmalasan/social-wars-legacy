@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tools/asset-registry/schemas/inspection_entry.schema.json",
+  "title": "Single SWF static inspection entry",
+  "description": "Contract for one inspected SWF: header fields, tag inventory, symbol/export names, embedded asset IDs, and script presence recorded by static byte reads only. Nothing here is executed, rendered, or interpreted behaviorally.",
+  "type": "object",
+  "required": [
+    "path",
+    "signature",
+    "version",
+    "declared_length",
+    "actual_length",
+    "frame_width",
+    "frame_height",
+    "frame_rate",
+    "frame_count",
+    "tags",
+    "sprite_count",
+    "max_sprite_depth",
+    "symbols",
+    "exports",
+    "bitmap_ids",
+    "sound_ids",
+    "sound_formats",
+    "has_abc",
+    "has_action",
+    "abc_count",
+    "action_count",
+    "frame_labels",
+    "scene_count"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "path": {
+      "type": "string",
+      "description": "Registry path of the inspected SWF file."
+    },
+    "signature": {
+      "type": "string",
+      "description": "SWF compression signature; CWS (zlib) and FWS (uncompressed) are accepted, anything else fails closed.",
+      "enum": ["CWS", "FWS"]
+    },
+    "version": {
+      "type": "integer",
+      "description": "SWF version byte.",
+      "minimum": 1
+    },
+    "declared_length": {
+      "type": "integer",
+      "description": "File length declared in the header (recorded, never trusted).",
+      "minimum": 8
+    },
+    "actual_length": {
+      "type": "integer",
+      "description": "Measured worktree file size in bytes; walks are bounded by it.",
+      "minimum": 8
+    },
+    "frame_width": {
+      "type": "integer",
+      "description": "Stage width in pixels from the FrameSize rect.",
+      "minimum": 0
+    },
+    "frame_height": {
+      "type": "integer",
+      "description": "Stage height in pixels from the FrameSize rect.",
+      "minimum": 0
+    },
+    "frame_rate": {
+      "type": "number",
+      "description": "Frame rate in frames per second from the 8.8 fixed field."
+    },
+    "frame_count": {
+      "type": "integer",
+      "description": "Total frames declared in the header.",
+      "minimum": 0
+    },
+    "tags": {
+      "type": "object",
+      "description": "Tag code inventory mapping decimal tag codes to occurrence counts, including tags nested inside DefineSprite timelines."
+    },
+    "sprite_count": {
+      "type": "integer",
+      "description": "DefineSprite tag occurrences including nested ones.",
+      "minimum": 0
+    },
+    "max_sprite_depth": {
+      "type": "integer",
+      "description": "Maximum DefineSprite nesting depth reached (0 when no sprites nest further).",
+      "minimum": 0
+    },
+    "symbols": {
+      "type": "array",
+      "description": "SymbolClass names recorded verbatim in tag order.",
+      "items": { "type": "string" }
+    },
+    "exports": {
+      "type": "array",
+      "description": "ExportAssets names recorded verbatim in tag order.",
+      "items": { "type": "string" }
+    },
+    "bitmap_ids": {
+      "type": "array",
+      "description": "Character IDs of embedded bitmap definitions (DefineBits family).",
+      "items": { "type": "integer" }
+    },
+    "sound_ids": {
+      "type": "array",
+      "description": "Character IDs of embedded sound definitions.",
+      "items": { "type": "integer" }
+    },
+    "sound_formats": {
+      "type": "array",
+      "description": "Sound format nibbles parallel to sound_ids.",
+      "items": { "type": "integer" }
+    },
+    "has_abc": {
+      "type": "boolean",
+      "description": "True when any DoABC tag is present (presence only, never executed)."
+    },
+    "has_action": {
+      "type": "boolean",
+      "description": "True when any DoAction/DoInitAction tag is present (presence only)."
+    },
+    "abc_count": {
+      "type": "integer",
+      "description": "DoABC tag occurrences.",
+      "minimum": 0
+    },
+    "action_count": {
+      "type": "integer",
+      "description": "DoAction plus DoInitAction tag occurrences.",
+      "minimum": 0
+    },
+    "frame_labels": {
+      "type": "array",
+      "description": "FrameLabel names recorded verbatim in tag order.",
+      "items": { "type": "string" }
+    },
+    "scene_count": {
+      "type": "integer",
+      "description": "Scene count from DefineSceneAndFrameLabelData, or 0 when absent.",
+      "minimum": 0
+    }
+  }
+}

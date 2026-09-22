@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tools/asset-registry/schemas/inspection.schema.json",
+  "title": "SWF static inspection output",
+  "description": "Contract for the generated SWF inspection: per-path static inventories plus corpus statistics for conversion scoping. All data comes from static byte reads; nothing is executed or rendered.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "policy",
+    "result",
+    "inputs",
+    "counts",
+    "entries"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "description": "Inspection format version.",
+      "minimum": 1
+    },
+    "policy": {
+      "const": "swf-inspection-v1",
+      "description": "Inspection policy identifier."
+    },
+    "result": {
+      "const": "success",
+      "description": "Build outcome marker; only successful runs write outputs."
+    },
+    "inputs": {
+      "type": "object",
+      "description": "Input provenance: registry digest plus corpus file count."
+    },
+    "counts": {
+      "type": "object",
+      "description": "Corpus statistics: file count, version distribution, scripted-file counts, embedded-asset totals."
+    },
+    "entries": {
+      "type": "object",
+      "description": "Per-path inspection entries keyed by registry path."
+    }
+  }
+}

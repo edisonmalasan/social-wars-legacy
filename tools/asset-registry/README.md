@@ -79,3 +79,88 @@ conversion, asset validity, gameplay parity, or Godot rendering.
 ```bash
 python -B -m unittest discover -s tools/asset-registry/tests -p test_build_registry.py -v
 ```
+
+---
+
+# SWF static inspection (M4 slice 2: parse and record)
+
+Static inventory of SWF headers, tags, symbols, and embedded assets,
+built offline with Python 3.9 standard library (`struct` + `zlib`)
+only; no new dependencies, no execution, no conversion, no asset
+mutation, no Flash runtime in any form.
+
+## Inputs
+
+- `tools/asset-registry/registry.json` (committed registry; every
+  `.swf` entry is inspected).
+- `tools/asset-registry/schemas/inspection.schema.json` and
+  `inspection_entry.schema.json` (contracts enforced by the inspector).
+
+## Parsing rules
+
+- Headers: `CWS` (zlib) and `FWS` (uncompressed) accepted; `ZWS` and
+  any other signature fail closed as drift. Versions must be 1..40.
+  Declared header lengths are recorded, never trusted: walks are
+  bounded by actual bytes.
+- FrameSize RECT bit-decoding yields stage dimensions; frame rate
+  (8.8 fixed) and frame count recorded verbatim.
+- Tag walks terminate at the End tag or fail identifying the file;
+  overruns and truncations fail explicitly. Unknown tag codes are
+  recorded by number, never rejected.
+- DefineSprite payloads are walked recursively with merged
+  inventories; nesting beyond 64 levels fails closed.
+- SymbolClass/ExportAssets names, DefineBits/JPEG and DefineSound
+  IDs, DoABC/DoAction presence and counts, frame labels, and scene
+  counts are recorded verbatim; nothing is interpreted behaviorally.
+- Scene data uses variable-length LEB128 integers per the SWF format;
+  fixed-width decoding is a known pitfall and is covered by a
+  dedicated synthetic test.
+
+## Outputs
+
+- `tools/asset-registry/inspection.json`: per-path entries plus corpus
+  statistics (file count, version distribution, scripted-file counts,
+  embedded-asset totals, sprite totals and depth).
+
+## Validation gates (failures exit 1, outputs unwritten)
+
+Unreadable or unparseable corpus files, walk termination failures,
+signature/version violations, missing registry or wrong registry
+policy (exit 2), schema violations, and any determinism difference.
+Reruns on unchanged inputs are byte-identical.
+
+## Executable and invocation
+
+Verified executable: `C:\Users\Edison\AppData\Local\Programs\Python\Python39\python.exe`
+(CPython 3.9.13). Any working Python 3.9+ standard-library interpreter
+should behave identically.
+
+From the repository root (after the registry build):
+
+```bash
+python -B tools/asset-registry/inspect_swf.py
+```
+
+## Evidence classification
+
+This tool establishes source-grounded parse consistency for the SWF
+corpus: header fidelity, tag inventories, symbol listings, and
+script-presence flags across all 1176 files (1,175 with ABC, 0 with
+legacy actions). It is evidence of static observation, not of
+conversion, timeline semantics, script behavior, asset validity,
+gameplay parity, or Godot rendering.
+
+## Containment
+
+- Reads only the committed registry, the two inspection schemas, and
+  the registry-listed `.swf` files (plus optional
+  `--repo-root`/`--out-root` relocation).
+- Never imports or executes any legacy application module, never uses
+  subprocess/network/server/browser/Flash, never modifies any asset.
+- Writes only `inspection.json`, and only on success. No bytecode
+  (`-B` recommended), no caches, no temporary files in the repository.
+- The focused tests run the same way:
+
+```bash
+python -B -m unittest discover -s tools/asset-registry/tests -p test_inspect_swf.py -v
+```

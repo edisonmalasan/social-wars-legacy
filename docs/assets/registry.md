@@ -36,9 +36,32 @@ manifest preserves the immutable baseline for integrity.
 ## Status lifecycle
 
 Every entry starts at `registered`. Later M4 slices advance entries
-through extraction and conversion states; this slice never changes a
-status. Symbol names, dimensions, pivots, frame counts, and conversion
-outputs belong to the SWF-parsing and conversion slices, not here.
+through extraction and conversion states; the registry and inspection
+slices never change a status. Symbol names, dimensions, pivots, frame
+counts, and conversion outputs belong to the SWF-parsing and conversion
+slices, not here.
+
+## SWF static inspection
+
+`inspect_swf.py` parses every registry `.swf` file with static byte
+reads (`struct` + `zlib` only) into `tools/asset-registry/inspection.json`:
+
+- Headers: signature (`CWS` only in the measured corpus; `FWS`
+  accepted, anything else fails closed), version (10/11/15/17),
+  declared vs actual length (both recorded, declared never trusted),
+  stage size, frame rate, frame count.
+- Tag inventories with counts, merged across nested DefineSprite
+  timelines (105,038 nested sprite tags corpus-wide, max nesting
+  depth 1).
+- SymbolClass/ExportAssets names verbatim, embedded bitmap IDs
+  (61,702) and sound IDs (27), DoABC presence (1,175 files) and legacy
+  action presence (0 files), frame labels, scene counts.
+- Corpus statistics for conversion scoping: near-universal ABC
+  presence means conversion tooling must assume scripted timelines by
+  default; static-only art is the exception, not the rule.
+
+See `tools/asset-registry/README.md` for invocation, parsing rules,
+exit codes, evidence classification, and containment.
 
 ## Prioritization input (roadmap §14)
 
