@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "packages/game-content/schemas/image_asset.schema.json",
+  "title": "Normalized image asset definition (legacy images domain)",
+  "description": "Contract for one normalized image asset: one stored legacy images object entry. The asset path is the stable identity, so legacy_id is the path verbatim (rule M2); the locale must be exactly en (rule M1). Paths are recorded references only, never checked against disk or executed (M4 owns asset truth). See packages/game-content/README.md for the rule set and survey citations.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "path",
+    "locale"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Stored images object key (asset path) preserved verbatim: slashes, case, and extension untouched (rule M2)."
+    },
+    "kind": {
+      "const": "image_asset",
+      "description": "Classification of the stored images domain: every entry maps to image_asset."
+    },
+    "source_file": {
+      "type": "string",
+      "description": "Origin file of the stored entry: config/main.json (no patch targets images)."
+    },
+    "source_layer": {
+      "type": "string",
+      "description": "Layering origin: stored (no patch targets images)."
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint (sha256 over the stored source bytes plus the mods list); sources carry no version stamp."
+    },
+    "path": {
+      "type": "string",
+      "description": "Asset path preserved verbatim; recorded reference only, never checked against disk or executed (rule M2)."
+    },
+    "locale": {
+      "type": "string",
+      "description": "Locale tag, exactly en; anything else fails as drift (rule M1).",
+      "enum": ["en"]
+    }
+  }
+}

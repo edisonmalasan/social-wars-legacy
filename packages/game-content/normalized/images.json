@@ -1,0 +1,5465 @@
+[
+  {
+    "legacy_id": "/chapters/chapter_1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_10.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_10.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_10_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_10_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_10_old.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_10_old.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_10_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_10_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_11.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_11.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_11_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_11_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_11_old.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_11_old.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_11_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_11_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_12.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_12.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_12_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_12_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_12_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_12_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_1_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_1_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_1_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_1_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_2_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_2_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_2_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_2_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_3_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_3_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_3_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_3_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_4.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_4.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_4_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_4_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_4_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_4_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_5.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_5.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_5_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_5_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_5_old.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_5_old.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_5_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_5_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_6.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_6.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_6_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_6_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_6_old.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_6_old.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_6_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_6_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_7.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_7.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_7_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_7_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_7_old.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_7_old.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_7_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_7_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_8.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_8.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_8_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_8_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_8_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_8_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_9.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_9.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_9_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_9_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/chapter_9_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/chapter_9_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/simple/aliens.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/simple/aliens.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/simple/arachnids.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/simple/arachnids.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/simple/arachnids_old.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/simple/arachnids_old.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/simple/orcs.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/simple/orcs.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/simple/orcs_old.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/simple/orcs_old.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/simple/prison1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/simple/prison1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters/simple/prison2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters/simple/prison2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters2/chapter_1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters2/chapter_1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters2/chapter_10.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters2/chapter_10.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters2/chapter_11.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters2/chapter_11.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters2/chapter_12.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters2/chapter_12.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters2/chapter_2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters2/chapter_2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters2/chapter_3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters2/chapter_3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters2/chapter_4.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters2/chapter_4.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters2/chapter_5.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters2/chapter_5.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters2/chapter_6.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters2/chapter_6.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters2/chapter_7.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters2/chapter_7.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters2/chapter_8.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters2/chapter_8.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters2/chapter_9.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters2/chapter_9.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters2/simple/aliens.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters2/simple/aliens.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters2/simple/arachnids.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters2/simple/arachnids.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters2/simple/arachnids_old.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters2/simple/arachnids_old.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters2/simple/orcs.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters2/simple/orcs.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/chapters2/simple/orcs_old.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/chapters2/simple/orcs_old.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/1.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/1.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/10.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/10.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/2.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/2.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/3.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/3.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/4.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/4.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/5.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/5.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/6.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/6.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/7.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/7.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/8.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/8.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/9.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/9.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_10.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_10.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_11.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_11.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_16.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_16.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_17.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_17.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_18.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_18.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_19.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_19.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_20.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_20.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_21.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_21.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_22.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_22.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_23.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_23.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_24.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_24.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_25.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_25.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_26.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_26.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_27.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_27.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_28.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_28.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_29.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_29.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_30.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_30.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_31.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_31.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_32.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_32.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_33.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_33.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_34.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_34.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_36.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_36.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_37.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_37.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_39.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_39.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_40.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_40.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_41.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_41.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_42.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_42.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_43.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_43.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_45.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_45.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_46.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_46.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_47.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_47.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_48.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_48.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_49.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_49.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_5.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_5.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_50.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_50.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_51.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_51.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_52.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_52.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_53.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_53.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_54.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_54.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_55.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_55.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_56.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_56.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_57.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_57.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_58.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_58.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_59.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_59.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_6.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_6.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_60.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_60.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_8.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_8.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_87.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_87.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/goals/hint_9.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/goals/hint_9.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/intro/intro - copia.swf",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/intro/intro - copia.swf",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/intro/intro.swf",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/intro/intro.swf",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/intro/intro2.swf",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/intro/intro2.swf",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/intro/intro3.swf",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/intro/intro3.swf",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/intro/intro4.swf",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/intro/intro4.swf",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/intro/intro_m.swf",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/intro/intro_m.swf",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/intro/intro_w.swf",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/intro/intro_w.swf",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10050_nice_fountain.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10050_nice_fountain.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10050_nice_fountain_m.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10050_nice_fountain_m.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10050_nice_fountain_w.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10050_nice_fountain_w.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10051_orange_tree.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10051_orange_tree.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10051_orange_tree_m.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10051_orange_tree_m.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10051_orange_tree_w.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10051_orange_tree_w.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10052_chickens.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10052_chickens.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10052_chickens_m.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10052_chickens_m.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10052_chickens_w.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10052_chickens_w.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10053_lost_rocket.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10053_lost_rocket.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10053_lost_rocket_m.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10053_lost_rocket_m.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10053_lost_rocket_w.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10053_lost_rocket_w.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10054_astronaut_pack.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10054_astronaut_pack.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10054_astronaut_pack_m.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10054_astronaut_pack_m.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10054_astronaut_pack_w.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10054_astronaut_pack_w.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10055_destroyed_tank.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10055_destroyed_tank.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10055_destroyed_tank_m.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10055_destroyed_tank_m.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10055_destroyed_tank_w.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10055_destroyed_tank_w.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10056_lost_puppies.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10056_lost_puppies.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10056_lost_puppies_m.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10056_lost_puppies_m.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10056_lost_puppies_w.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10056_lost_puppies_w.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10057_oil_barrels.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10057_oil_barrels.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10057_oil_barrels_m.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10057_oil_barrels_m.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/10057_oil_barrels_w.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/10057_oil_barrels_w.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/132_troubled_traveller.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/132_troubled_traveller.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/132_troubled_traveller_m.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/132_troubled_traveller_m.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/132_troubled_traveller_w.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/132_troubled_traveller_w.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/133_injured_soldier.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/133_injured_soldier.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/133_injured_soldier_m.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/133_injured_soldier_m.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/lost/133_injured_soldier_w.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/lost/133_injured_soldier_w.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/031111_news_helicopters.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/031111_news_helicopters.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/031111_news_helicopters_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/031111_news_helicopters_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/031111_news_helicopters_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/031111_news_helicopters_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/4_NEW_QUEST.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/4_NEW_QUEST.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/best_civ1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/best_civ1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/best_civ2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/best_civ2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/best_civ3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/best_civ3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/best_civ5.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/best_civ5.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/best_civ6.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/best_civ6.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/best_civ7.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/best_civ7.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/gunbot_NEW.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/gunbot_NEW.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/megabot_NEW.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/megabot_NEW.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_ALLIANCE.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_ALLIANCE.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_andromeda_civ1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_andromeda_civ1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_avatar_civ1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_avatar_civ1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_avatar_civ2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_avatar_civ2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_avatar_civ3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_avatar_civ3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_avatar_civ4.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_avatar_civ4.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_avatar_civ5.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_avatar_civ5.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/news_aviones_2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/news_aviones_2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/news_aviones_2_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/news_aviones_2_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/news_aviones_2_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/news_aviones_2_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_casa_subasta.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_casa_subasta.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_CRUSADERBOT.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_CRUSADERBOT.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_CRUSADERPRIEST.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_CRUSADERPRIEST.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_elfos_civ1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_elfos_civ1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_elfos_civ3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_elfos_civ3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_elfos_civ4.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_elfos_civ4.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_elves_civ2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_elves_civ2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/news_fireman.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/news_fireman.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/news_fireman_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/news_fireman_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/news_fireman_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/news_fireman_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_fortress.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_fortress.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_fortress_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_fortress_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_fortress_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_fortress_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_healer.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_healer.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_healer_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_healer_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_healer_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_healer_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_Hercules_swat.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_Hercules_swat.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/news_laboratory.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/news_laboratory.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_massive_damage.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_massive_damage.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_massive_damage_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_massive_damage_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_massive_damage_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_massive_damage_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_mecanico.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_mecanico.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_mecanico_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_mecanico_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_mecanico_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_mecanico_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_mondays.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_mondays.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_mondays_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_mondays_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_mondays_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_mondays_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_mr_t.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_mr_t.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_mr_t_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_mr_t_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_mr_t_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_mr_t_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_new_quest.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_new_quest.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_new_quest_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_new_quest_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_new_quest_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_new_quest_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_NIDO_ROBOTS.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_NIDO_ROBOTS.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_NIDO_ROBOTS_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_NIDO_ROBOTS_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_NIDO_ROBOTS_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_NIDO_ROBOTS_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_orcs_goblins_civ1_2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_orcs_goblins_civ1_2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_orcs_goblins_civ1_2_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_orcs_goblins_civ1_2_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_orcs_goblins_civ1_2_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_orcs_goblins_civ1_2_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_QUESTS.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_QUESTS.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_QUESTS19_20.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_QUESTS19_20.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_recruitmentcenter.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_recruitmentcenter.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_recruitmentcenter_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_recruitmentcenter_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_recruitmentcenter_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_recruitmentcenter_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_SHOTTING.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_SHOTTING.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_SPACECRU_CIV1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_SPACECRU_CIV1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_SPACECRU_CIV1_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_SPACECRU_CIV1_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_SPACECRU_CIV1_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_SPACECRU_CIV1_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_SPACECRU_CIV2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_SPACECRU_CIV2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_SPACECRU_CIV2_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_SPACECRU_CIV2_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_SPACECRU_CIV2_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_SPACECRU_CIV2_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_SPACECRU_CIV3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_SPACECRU_CIV3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_SPACECRU_CIV3_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_SPACECRU_CIV3_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_SPACECRU_CIV3_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_SPACECRU_CIV3_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_space_vikings.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_space_vikings.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_space_vikings2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_space_vikings2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_space_vikings3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_space_vikings3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_tanques_helicopteros4.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_tanques_helicopteros4.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_tanques_helicopteros4_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_tanques_helicopteros4_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_tanques_helicopteros4_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_tanques_helicopteros4_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_tanques_helicopteros5.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_tanques_helicopteros5.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_tanques_helicopteros5_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_tanques_helicopteros5_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_tanques_helicopteros5_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_tanques_helicopteros5_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_Vikings_civ3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_Vikings_civ3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_Vikings_civ4.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_Vikings_civ4.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_Vikings_civ5.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_Vikings_civ5.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_wonders.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_wonders.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_wonders_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_wonders_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/NEWS_wonders_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/NEWS_wonders_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/new_bestciv2_1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/new_bestciv2_1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/new_bestciv2_2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/new_bestciv2_2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/new_bestciv2_3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/new_bestciv2_3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/new_bestciv2_4.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/new_bestciv2_4.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/new_bestciv2_5.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/new_bestciv2_5.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/new_bestciv4.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/new_bestciv4.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/new_elves_civ5.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/new_elves_civ5.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/new_elves_civ6.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/new_elves_civ6.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/new_orks2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/new_orks2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/new_orks2_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/new_orks2_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/new_orks2_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/new_orks2_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/new_premium.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/new_premium.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/new_premium2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/new_premium2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/new_punisherbot.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/new_punisherbot.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/new_weekly_quest.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/new_weekly_quest.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/new_weekly_quest_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/new_weekly_quest_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/new_weekly_quest_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/new_weekly_quest_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/new_wonder.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/new_wonder.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/new_xp.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/new_xp.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/news/reptilegun_NEW.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/news/reptilegun_NEW.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/1.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/1.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/10.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/10.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/11.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/11.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/11.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/11.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/12.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/12.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/13.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/13.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/13.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/13.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/14.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/14.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/15.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/15.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/16.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/16.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/17.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/17.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/18.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/18.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/19.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/19.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/1_m.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/1_m.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/1_w.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/1_w.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/2.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/2.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/20.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/20.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/21.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/21.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/22.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/22.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/23.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/23.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/24.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/24.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/25.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/25.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/26.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/26.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/27.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/27.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/28.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/28.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/29.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/29.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/2_m.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/2_m.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/2_w.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/2_w.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/3.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/3.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/30.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/30.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/31.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/31.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/32.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/32.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/33.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/33.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/34.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/34.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/35.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/35.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/36.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/36.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/37.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/37.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/38.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/38.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/39.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/39.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/39.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/39.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/3_m.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/3_m.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/3_w.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/3_w.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/4.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/4.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/40.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/40.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/41.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/41.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/42.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/42.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/43.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/43.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/44.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/44.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/4_m.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/4_m.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/4_w.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/4_w.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/5.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/5.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/5_m.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/5_m.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/5_w.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/5_w.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/6.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/6.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/6_m.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/6_m.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/6_w.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/6_w.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/7.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/7.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/7_m.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/7_m.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/7_w.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/7_w.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/8.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/8.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/8_m.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/8_m.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/8_w.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/8_w.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/packs/9.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/packs/9.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-0.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-0.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-10.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-10.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-11.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-11.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-12.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-12.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-13.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-13.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-14.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-14.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-15.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-15.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-16.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-16.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-17.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-17.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-18.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-18.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-19.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-19.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-20.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-20.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-21.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-21.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-22.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-22.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-4.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-4.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-5.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-5.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-6.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-6.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-7.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-7.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-8.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-8.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest-9.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest-9.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest_0.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest_0.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest_1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest_1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest_10.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest_10.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest_11.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest_11.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest_12.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest_12.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest_2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest_2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest_3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest_3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest_4.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest_4.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest_5.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest_5.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest_6.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest_6.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest_7.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest_7.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest_8.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest_8.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest_9.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest_9.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__0.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__0.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__0_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__0_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__0_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__0_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__10.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__10.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__10_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__10_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__10_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__10_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__11.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__11.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__11_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__11_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__11_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__11_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__12.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__12.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__12_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__12_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__12_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__12_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__13.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__13.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__14.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__14.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__15.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__15.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__16.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__16.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__17.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__17.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__18.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__18.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__19.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__19.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__1_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__1_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__1_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__1_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__20.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__20.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__2_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__2_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__2_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__2_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__3_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__3_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__3_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__3_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__4.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__4.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__4_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__4_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__4_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__4_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__5.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__5.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__5_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__5_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__5_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__5_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__6.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__6.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__6_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__6_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__6_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__6_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__7.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__7.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__7_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__7_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__7_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__7_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__8.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__8.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__8_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__8_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__8_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__8_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__9.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__9.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__9_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__9_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest__9_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest__9_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___0.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___0.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___10.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___10.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___11.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___11.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___12.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___12.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___13.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___13.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___14.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___14.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___15.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___15.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___16.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___16.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___17.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___17.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___18.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___18.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___19.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___19.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___20.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___20.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___4.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___4.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___5.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___5.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___6.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___6.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___7.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___7.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___8.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___8.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests/quest___9.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests/quest___9.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests_map/map1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests_map/map1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests_map/map2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests_map/map2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests_map/map3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests_map/map3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests_map/map3_old.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests_map/map3_old.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests_map/map4.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests_map/map4.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests_map/map4_old.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests_map/map4_old.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/quests_map/map5.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/quests_map/map5.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/res_packs/res_g_1.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/res_packs/res_g_1.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/res_packs/res_g_2.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/res_packs/res_g_2.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/res_packs/res_g_3.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/res_packs/res_g_3.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/res_packs/res_o_1.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/res_packs/res_o_1.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/res_packs/res_o_2.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/res_packs/res_o_2.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/res_packs/res_o_3.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/res_packs/res_o_3.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/res_packs/res_s_1.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/res_packs/res_s_1.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/res_packs/res_s_2.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/res_packs/res_s_2.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/res_packs/res_s_3.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/res_packs/res_s_3.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/res_packs/res_w_1.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/res_packs/res_w_1.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/res_packs/res_w_2.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/res_packs/res_w_2.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "/res_packs/res_w_3.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "/res_packs/res_w_3.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "aguila2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "aguila2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "button_generic_openBuilding.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "button_generic_openBuilding.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "button_offerBuilding_10061_redBaron_button.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "button_offerBuilding_10061_redBaron_button.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "button_offer_building.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "button_offer_building.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "button_popupDragonCenter.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "button_popupDragonCenter.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "button_popupRecruitment.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "button_popupRecruitment.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "button_popupRoboticCenter.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "button_popupRoboticCenter.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_g0.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_g0.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_g0m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_g0m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_g0w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_g0w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_g1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_g1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_g1m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_g1m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_g1w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_g1w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_g2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_g2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_g2m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_g2m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_g2w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_g2w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_g3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_g3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_g3m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_g3m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_g3w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_g3w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_o0.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_o0.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_o0m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_o0m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_o0w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_o0w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_o1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_o1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_o1m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_o1m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_o1w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_o1w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_o2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_o2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_o2m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_o2m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_o2w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_o2w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_o3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_o3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_o3m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_o3m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_o3w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_o3w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_s0.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_s0.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_s0m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_s0m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_s0w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_s0w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_s1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_s1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_s1m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_s1m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_s1w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_s1w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_s2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_s2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_s2m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_s2m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_s2w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_s2w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_s3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_s3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_s3m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_s3m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_s3w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_s3w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_w0.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_w0.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_w0m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_w0m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_w0w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_w0w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_w1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_w1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_w1m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_w1m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_w1w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_w1w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_w2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_w2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_w2m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_w2m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_w2w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_w2w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_w3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_w3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_w3m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_w3m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "collect_w3w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "collect_w3w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "expansion.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "expansion.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "expansion_cash.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "expansion_cash.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "expansion_gold.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "expansion_gold.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "globo_spy.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "globo_spy.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "GOING_TO_BATTLE.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "GOING_TO_BATTLE.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "help_island_image.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "help_island_image.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "LOOSE_MEN.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "LOOSE_MEN.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "LOOSE_WOMEN.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "LOOSE_WOMEN.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "magic_black_hole.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "magic_black_hole.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "magic_crack.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "magic_crack.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "magic_dragon.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "magic_dragon.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "magic_enlarge.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "magic_enlarge.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "magic_fire.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "magic_fire.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "magic_frozen.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "magic_frozen.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "magic_full_limit.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "magic_full_limit.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "magic_golem.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "magic_golem.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "magic_heal.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "magic_heal.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "magic_lightning.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "magic_lightning.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "magic_poison.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "magic_poison.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "magic_range_increaser.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "magic_range_increaser.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "magic_shield.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "magic_shield.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "magic_speed_increaser.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "magic_speed_increaser.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "magic_stone.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "magic_stone.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "magic_yeti.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "magic_yeti.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "mapa1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "mapa1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "mapa2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "mapa2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "mapa3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "mapa3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "mapa4.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "mapa4.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "mapa5.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "mapa5.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "next_chapter.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "next_chapter.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "next_chapter_m.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "next_chapter_m.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "next_chapter_w.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "next_chapter_w.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "NoGiftsIcon.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "NoGiftsIcon.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "offer_pack_1.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "offer_pack_1.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "offer_pack_2.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "offer_pack_2.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "offer_pack_3.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "offer_pack_3.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "permiso.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "permiso.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "PILA1.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "PILA1.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "PILA2.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "PILA2.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "PILA3.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "PILA3.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "PILA4.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "PILA4.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "popupRecruitment_1046.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "popupRecruitment_1046.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "popupRecruitment_1048.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "popupRecruitment_1048.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "popupRecruitment_1050.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "popupRecruitment_1050.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "popupRecruitment_1051.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "popupRecruitment_1051.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "popupRecruitment_1055.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "popupRecruitment_1055.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "popupResearchCenter_buildingProcess.swf",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "popupResearchCenter_buildingProcess.swf",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "popupResearchCenter_buildingProcess_2.swf",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "popupResearchCenter_buildingProcess_2.swf",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "popupResearchCenter_buildingProcess_3.swf",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "popupResearchCenter_buildingProcess_3.swf",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "POPUP_ASSAULT_HISTORY_MEN.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "POPUP_ASSAULT_HISTORY_MEN.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "POPUP_ASSAULT_HISTORY_WOMEN.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "POPUP_ASSAULT_HISTORY_WOMEN.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_magic_black_hole.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_magic_black_hole.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_magic_crack.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_magic_crack.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_magic_dragon.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_magic_dragon.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_magic_enlarge.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_magic_enlarge.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_magic_fire.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_magic_fire.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_magic_frozen.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_magic_frozen.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_magic_full_limit.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_magic_full_limit.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_magic_golem.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_magic_golem.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_magic_heal.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_magic_heal.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_magic_poison.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_magic_poison.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_magic_range_increaser.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_magic_range_increaser.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_magic_shield.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_magic_shield.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_magic_speed_increaser.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_magic_speed_increaser.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_magic_stone.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_magic_stone.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_magic_yeti.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_magic_yeti.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_tech_airstrike.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_tech_airstrike.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_tech_attack_boost.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_tech_attack_boost.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_tech_frequency_inhibitor.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_tech_frequency_inhibitor.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_tech_iman.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_tech_iman.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_tech_mars_attack.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_tech_mars_attack.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_tech_medic_case_rain.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_tech_medic_case_rain.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_tech_nuclear_bomb.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_tech_nuclear_bomb.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_tech_protection_shield.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_tech_protection_shield.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_tech_robot_summoner.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_tech_robot_summoner.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "prev_tech_stealth_instinct.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "prev_tech_stealth_instinct.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "SLEEP_MEN.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "SLEEP_MEN.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "SLEEP_WOMEN.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "SLEEP_WOMEN.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "soldado_regalos.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "soldado_regalos.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "soldado_regalos_m.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "soldado_regalos_m.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "soldado_regalos_w.png",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "soldado_regalos_w.png",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "tech_airstrike.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "tech_airstrike.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "tech_attack_boost.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "tech_attack_boost.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "tech_frequency_inhibitor.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "tech_frequency_inhibitor.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "tech_iman.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "tech_iman.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "tech_mars_attack.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "tech_mars_attack.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "tech_medic_case_rain.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "tech_medic_case_rain.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "tech_nuclear_bomb.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "tech_nuclear_bomb.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "tech_protection_shield.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "tech_protection_shield.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "tech_robot_summoner.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "tech_robot_summoner.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "tech_stealth_instinct.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "tech_stealth_instinct.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "WIN_MEN.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "WIN_MEN.jpg",
+    "locale": "en"
+  },
+  {
+    "legacy_id": "WIN_WOMEN.jpg",
+    "kind": "image_asset",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "path": "WIN_WOMEN.jpg",
+    "locale": "en"
+  }
+]

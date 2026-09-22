@@ -258,6 +258,77 @@
       "round_trip_diffs": 0
     }
   },
+  "images": {
+    "coercion_ruleset": "images-coercion-ruleset-v1",
+    "content_fingerprint": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "counts": {
+      "extensions": {
+        "jpg": 470,
+        "png": 127,
+        "swf": 10
+      },
+      "images": 607,
+      "leading_slash": 459,
+      "stored_images": 607,
+      "swf_paths": [
+        "/intro/intro - copia.swf",
+        "/intro/intro.swf",
+        "/intro/intro2.swf",
+        "/intro/intro3.swf",
+        "/intro/intro4.swf",
+        "/intro/intro_m.swf",
+        "/intro/intro_w.swf",
+        "popupResearchCenter_buildingProcess.swf",
+        "popupResearchCenter_buildingProcess_2.swf",
+        "popupResearchCenter_buildingProcess_3.swf"
+      ]
+    },
+    "inputs": {
+      "images_patch_targets": "none",
+      "main": {
+        "bytes": 1702871,
+        "file": "config/main.json",
+        "sha256": "55ffd929372a4a31785cfd683982856324e2b73ba9a6624c53f09b68e4dd0ea5"
+      },
+      "mods": {
+        "active_mods": [],
+        "inactive_mods": [
+          "no_hiring_needed"
+        ],
+        "status": "inactive"
+      },
+      "patch_order": [
+        "atom_fusion_item",
+        "unit_patch",
+        "atom_fusion_items_data",
+        "atom_fusion_powerup",
+        "targets"
+      ]
+    },
+    "notes": [
+      "Stored images map one-to-one to definitions; legacy_id is the asset path verbatim in stored document order, never rewritten (rule M2).",
+      "Every locale is exactly en; anything else fails as drift (rule M1).",
+      "Extension distribution and leading-slash counts are recorded without enforcement.",
+      "Swf paths are archival references for the M4 asset pipeline; they are never executed, converted, or checked against disk here.",
+      "No active patch targets images; the build refuses patch drift and active mods explicitly."
+    ],
+    "outputs": [
+      {
+        "bytes": 178461,
+        "file": "packages/game-content/normalized/images.json",
+        "sha256": "cc4276a898faf59acf06218df58af1b0031453fde6ac7d100b80c702516e432f"
+      }
+    ],
+    "policy": "images-normalization-v1",
+    "result": "success",
+    "schema_version": 1,
+    "validation": {
+      "amount_violations": 0,
+      "duplicate_ids": 0,
+      "missing_fields": 0,
+      "round_trip_diffs": 0
+    }
+  },
   "inputs": {
     "main": {
       "bytes": 1702871,

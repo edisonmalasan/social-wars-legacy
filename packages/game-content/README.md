@@ -1227,3 +1227,113 @@ here).
 ```bash
 python -B -m unittest discover -s packages/game-content/tests -p test_build_offers.py -v
 ```
+
+---
+
+# Images normalization extension
+
+Normalized, schema-checked asset-path registry for the legacy Social
+Wars `images` (607 entries) content domain, built offline from stored
+sources with Python 3.9 standard library only; no new dependencies.
+This extension has no cross-domain reference edge and requires no
+prior build; it merges its `images` section into the package manifest.
+With this extension every one of the 20 census content keys has a
+normalized counterpart.
+
+## Inputs
+
+- `config/main.json` (stored source: 607 `images` object entries with
+  asset-path keys and the locale string `en` as every value: 470 jpg,
+  127 png, 10 swf paths; 459 leading-slash, 148 relative).
+- `config/patch/patches.txt` plus the five ordered patch files, read
+  only to verify no patch targets `images` (any such target fails the
+  build explicitly; stored content is the input, there is no
+  layering).
+- `mods/mods.txt` (must stay inactive; any active mod fails the build).
+- `packages/game-content/schemas/image_asset.schema.json` (contract
+  enforced by the builder).
+
+## Coercion rules (`images-coercion-ruleset-v1`, survey-cited)
+
+- M1 locale exactly `en`: every value must be the string `en`;
+  anything else fails as drift with the offending path identified.
+- M2 paths preserved verbatim: `legacy_id` is the stored key exactly
+  (slashes, case, and extension untouched) in stored document order,
+  never rewritten, never checked against disk, never executed. The
+  10 swf paths are archival references for the M4 asset pipeline.
+
+No value is assigned new meaning.
+
+## Outputs
+
+- `normalized/images.json`: 607 asset definitions (one per stored
+  object entry, stored document order).
+- `manifest.json`: the existing package manifest with an `images`
+  section merged in, recording images inputs with digests, the
+  coercion ruleset version, the content fingerprint (sha256 over the
+  stored source bytes plus the mods list), definition counts
+  (including the extension split, leading-slash count, and swf path
+  list), builder outcome, output digests, and notes. Regenerated on
+  every successful images build; the tests assert it matches the
+  produced output while the prior keys survive the merge untouched.
+
+## Validation gates (failures exit 1, outputs unwritten)
+
+Duplicate or empty keys (refusing silent loss), non-`en` locales,
+missing or mistyped schema-required fields (every schema-required
+field is enforced; the traceability test proves it by mutation, and
+the locale enum is enforced), and any round-trip difference
+(expected: exact equality). The round-trip gate re-coerces each
+stored object entry and compares path and locale with key sets and
+document order exact.
+
+## Executable and invocation
+
+Verified executable: `C:\Users\Edison\AppData\Local\Programs\Python\Python39\python.exe`
+(CPython 3.9.13, tags/v3.9.13:6de2ca5, May 17 2022, 16:36:42, MSC v.1929 64 bit (AMD64)).
+`sys.executable` reported exactly the path above and `python --version`
+reported `Python 3.9.13` for the passing run. Any working Python 3.9+
+standard-library interpreter should behave identically.
+
+From the repository root:
+
+```bash
+python -B packages/game-content/tools/build_images.py
+```
+
+Exit 0 prints a JSON success report with counts and output files.
+Exit 1 prints a `validation-failed` report listing each problem and
+writes nothing (the manifest is left untouched). Exit 2 reports
+invalid input or unsupported shapes (missing/unreadable files,
+unparseable content, an active mod, a patch targeting images content,
+or an invalid schema file) on stderr.
+
+## Evidence classification
+
+This extension establishes source-grounded normalization consistency
+for the stored images index: registry coverage, verbatim path
+fidelity, and exact round-trip equivalence. It is evidence of
+representation change, not of served-byte equality, content validity,
+gameplay parity, asset existence or convertibility (M4 owns asset
+truth), or progressed-player coverage. Served bytes stay out of scope
+exactly as in the content census (`make_dynamic` never runs here).
+
+## Containment
+
+- Reads only `config/main.json`, `config/patch/patches.txt`, the five
+  patch files (target check only), `mods/mods.txt`, the images schema
+  file, and the package manifest for the merge (plus optional
+  `--repo-root`/`--out-root` relocation of the same reads).
+- Never imports or executes any legacy application module (no
+  `get_game_config`, `jsonpatch`, or Flask import), never stats asset
+  files, never reads runtime saves, never contacts a network, never
+  starts a server, and never opens a browser or Flash content.
+- Writes only the normalized images file plus the merged
+  `manifest.json`, and only on success. No bytecode (`-B` recommended),
+  no caches, no temporary files in the repository. Repeated runs over
+  unchanged inputs are byte-identical.
+- The focused tests in `tests/test_build_images.py` run the same way:
+
+```bash
+python -B -m unittest discover -s packages/game-content/tests -p test_build_images.py -v
+```

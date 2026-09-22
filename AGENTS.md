@@ -378,6 +378,26 @@ with schema, exact round-trip evidence, and manifest, not served-byte
 equality, content validity, gameplay parity, pack-semantics
 correctness, asset existence, or progressed-player coverage.
 
+Verified offline images normalization check (Windows x64 CPython 3.9.13):
+
+```bash
+python -B packages/game-content/tools/build_images.py
+python -B -m unittest discover -s packages/game-content/tests -p test_build_images.py -v
+```
+
+See `packages/game-content/README.md` (images normalization
+extension) for the executable, invocation, exit codes, evidence
+classification, and containment. This extension has no cross-domain
+reference edge and merges its `images` section into the package
+manifest while leaving the prior keys untouched. These checks
+establish source-grounded normalization consistency for the 607 stored
+`images` entries (asset paths preserved verbatim with locale `en`
+enforced, extension split and swf paths recorded), with schema, exact
+round-trip evidence, and manifest, not served-byte equality, content
+validity, gameplay parity, asset existence or convertibility (M4 owns
+asset truth), or progressed-player coverage. With this extension every
+one of the 20 census content keys has a normalized counterpart.
+
 ---
 
 ## Code style
