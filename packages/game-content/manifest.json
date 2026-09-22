@@ -12,6 +12,101 @@
     "upgrades_nontrivial": 56,
     "with_breeding_fields": 300
   },
+  "economy": {
+    "coercion_ruleset": "economy-coercion-ruleset-v1",
+    "content_fingerprint": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "counts": {
+      "expansion_prices": 98,
+      "map_prices": 4,
+      "ranking_cash_values": [
+        1
+      ],
+      "ranking_level_max": 50,
+      "ranking_level_min": 1,
+      "ranking_rewards": 50,
+      "stored_expansion_prices": 98,
+      "stored_map_prices": 4,
+      "stored_ranking_rewards": 50,
+      "stored_town_prices": 4,
+      "town_map_values_identical": true,
+      "town_prices": 4
+    },
+    "inputs": {
+      "economy_patch_targets": "none",
+      "items_reference_edge": {
+        "counts": {
+          "buildings": 470,
+          "specials": 1,
+          "units": 429
+        },
+        "files": [
+          "packages/game-content/normalized/buildings.json",
+          "packages/game-content/normalized/units.json",
+          "packages/game-content/normalized/specials.json"
+        ],
+        "union_legacy_ids": 900
+      },
+      "main": {
+        "bytes": 1702871,
+        "file": "config/main.json",
+        "sha256": "55ffd929372a4a31785cfd683982856324e2b73ba9a6624c53f09b68e4dd0ea5"
+      },
+      "mods": {
+        "active_mods": [],
+        "inactive_mods": [
+          "no_hiring_needed"
+        ],
+        "status": "inactive"
+      },
+      "patch_order": [
+        "atom_fusion_item",
+        "unit_patch",
+        "atom_fusion_items_data",
+        "atom_fusion_powerup",
+        "targets"
+      ]
+    },
+    "notes": [
+      "Stored price schedules map one-to-one to definitions; every native amount is kept verbatim with no string coercion and no embedded-JSON parsing (rule E1).",
+      "Price schedules carry no stable stored id; legacy_id is the 0-based positional index as a string and position preserves the schedule order positionally (rule E2), matching the legacy positional loader.",
+      "Town and map stored values are identical as observed but are preserved as separate schedules, never merged or deduplicated.",
+      "Ranking legacy_id is the decimal form of the stored native integer level; rows cover 50..1 exactly once (rule E2).",
+      "Ranking units keys resolve against the normalized items legacy-ID set with unit_refs carried in sorted order; unresolvable references fail validation (rule E3).",
+      "No active patch targets any economy-schedule key; the build refuses patch drift and active mods explicitly."
+    ],
+    "outputs": [
+      {
+        "bytes": 31769,
+        "file": "packages/game-content/normalized/expansion_prices.json",
+        "sha256": "92e82208725022dcd90a18de5252a98cb69bc4e5989844097651ab16772aa188"
+      },
+      {
+        "bytes": 1160,
+        "file": "packages/game-content/normalized/town_prices.json",
+        "sha256": "61d65cf0a535273ce1f7db65704557cabcc78b077dbf4709695d5d29e0d13f69"
+      },
+      {
+        "bytes": 1156,
+        "file": "packages/game-content/normalized/map_prices.json",
+        "sha256": "2ed3128fd736ade59c0547cadfeccfb309392b54ebefd7772698e8823c51a19b"
+      },
+      {
+        "bytes": 16785,
+        "file": "packages/game-content/normalized/level_ranking_reward.json",
+        "sha256": "647be7c65016ba79f6d105a97795346beb0bcd19bba84038ecd9456ed2733dc2"
+      }
+    ],
+    "policy": "economy-normalization-v1",
+    "result": "success",
+    "schema_version": 1,
+    "validation": {
+      "amount_violations": 0,
+      "duplicate_ids": 0,
+      "missing_fields": 0,
+      "round_trip_diffs": 0,
+      "unresolvable_references": 0
+    }
+  },
   "inputs": {
     "main": {
       "bytes": 1702871,

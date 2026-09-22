@@ -1,0 +1,752 @@
+[
+  {
+    "legacy_id": "50",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 50,
+    "cash": 1,
+    "units": {
+      "1016": 1
+    },
+    "unit_refs": [
+      "1016"
+    ]
+  },
+  {
+    "legacy_id": "49",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 49,
+    "cash": 1,
+    "units": {
+      "1008": 1
+    },
+    "unit_refs": [
+      "1008"
+    ]
+  },
+  {
+    "legacy_id": "48",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 48,
+    "cash": 1,
+    "units": {
+      "1014": 1
+    },
+    "unit_refs": [
+      "1014"
+    ]
+  },
+  {
+    "legacy_id": "47",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 47,
+    "cash": 1,
+    "units": {
+      "1027": 1
+    },
+    "unit_refs": [
+      "1027"
+    ]
+  },
+  {
+    "legacy_id": "46",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 46,
+    "cash": 1,
+    "units": {
+      "1010": 1
+    },
+    "unit_refs": [
+      "1010"
+    ]
+  },
+  {
+    "legacy_id": "45",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 45,
+    "cash": 1,
+    "units": {
+      "1015": 1
+    },
+    "unit_refs": [
+      "1015"
+    ]
+  },
+  {
+    "legacy_id": "44",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 44,
+    "cash": 1,
+    "units": {
+      "1007": 1
+    },
+    "unit_refs": [
+      "1007"
+    ]
+  },
+  {
+    "legacy_id": "43",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 43,
+    "cash": 1,
+    "units": {
+      "1034": 1
+    },
+    "unit_refs": [
+      "1034"
+    ]
+  },
+  {
+    "legacy_id": "42",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 42,
+    "cash": 1,
+    "units": {
+      "1022": 1
+    },
+    "unit_refs": [
+      "1022"
+    ]
+  },
+  {
+    "legacy_id": "41",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 41,
+    "cash": 1,
+    "units": {
+      "1005": 1
+    },
+    "unit_refs": [
+      "1005"
+    ]
+  },
+  {
+    "legacy_id": "40",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 40,
+    "cash": 1,
+    "units": {
+      "1003": 1
+    },
+    "unit_refs": [
+      "1003"
+    ]
+  },
+  {
+    "legacy_id": "39",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 39,
+    "cash": 1,
+    "units": {
+      "1020": 1
+    },
+    "unit_refs": [
+      "1020"
+    ]
+  },
+  {
+    "legacy_id": "38",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 38,
+    "cash": 1,
+    "units": {
+      "1013": 1
+    },
+    "unit_refs": [
+      "1013"
+    ]
+  },
+  {
+    "legacy_id": "37",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 37,
+    "cash": 1,
+    "units": {
+      "1036": 1
+    },
+    "unit_refs": [
+      "1036"
+    ]
+  },
+  {
+    "legacy_id": "36",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 36,
+    "cash": 1,
+    "units": {
+      "1007": 1
+    },
+    "unit_refs": [
+      "1007"
+    ]
+  },
+  {
+    "legacy_id": "35",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 35,
+    "cash": 1,
+    "units": {
+      "1028": 1
+    },
+    "unit_refs": [
+      "1028"
+    ]
+  },
+  {
+    "legacy_id": "34",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 34,
+    "cash": 1,
+    "units": {
+      "1020": 1
+    },
+    "unit_refs": [
+      "1020"
+    ]
+  },
+  {
+    "legacy_id": "33",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 33,
+    "cash": 1,
+    "units": {
+      "1022": 1
+    },
+    "unit_refs": [
+      "1022"
+    ]
+  },
+  {
+    "legacy_id": "32",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 32,
+    "cash": 1,
+    "units": {
+      "1006": 1
+    },
+    "unit_refs": [
+      "1006"
+    ]
+  },
+  {
+    "legacy_id": "31",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 31,
+    "cash": 1,
+    "units": {
+      "1013": 1
+    },
+    "unit_refs": [
+      "1013"
+    ]
+  },
+  {
+    "legacy_id": "30",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 30,
+    "cash": 1,
+    "units": {
+      "1025": 1
+    },
+    "unit_refs": [
+      "1025"
+    ]
+  },
+  {
+    "legacy_id": "29",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 29,
+    "cash": 1,
+    "units": {
+      "1021": 1
+    },
+    "unit_refs": [
+      "1021"
+    ]
+  },
+  {
+    "legacy_id": "28",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 28,
+    "cash": 1,
+    "units": {
+      "1035": 1
+    },
+    "unit_refs": [
+      "1035"
+    ]
+  },
+  {
+    "legacy_id": "27",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 27,
+    "cash": 1,
+    "units": {
+      "1030": 1
+    },
+    "unit_refs": [
+      "1030"
+    ]
+  },
+  {
+    "legacy_id": "26",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 26,
+    "cash": 1,
+    "units": {
+      "1008": 1
+    },
+    "unit_refs": [
+      "1008"
+    ]
+  },
+  {
+    "legacy_id": "25",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 25,
+    "cash": 1,
+    "units": {
+      "1038": 1
+    },
+    "unit_refs": [
+      "1038"
+    ]
+  },
+  {
+    "legacy_id": "23",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 23,
+    "cash": 1,
+    "units": {
+      "1023": 1
+    },
+    "unit_refs": [
+      "1023"
+    ]
+  },
+  {
+    "legacy_id": "22",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 22,
+    "cash": 1,
+    "units": {
+      "1018": 1
+    },
+    "unit_refs": [
+      "1018"
+    ]
+  },
+  {
+    "legacy_id": "21",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 21,
+    "cash": 1,
+    "units": {
+      "1021": 1
+    },
+    "unit_refs": [
+      "1021"
+    ]
+  },
+  {
+    "legacy_id": "20",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 20,
+    "cash": 1,
+    "units": {
+      "1026": 1
+    },
+    "unit_refs": [
+      "1026"
+    ]
+  },
+  {
+    "legacy_id": "19",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 19,
+    "cash": 1,
+    "units": {
+      "1035": 1
+    },
+    "unit_refs": [
+      "1035"
+    ]
+  },
+  {
+    "legacy_id": "24",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 24,
+    "cash": 1,
+    "units": {
+      "1003": 1
+    },
+    "unit_refs": [
+      "1003"
+    ]
+  },
+  {
+    "legacy_id": "18",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 18,
+    "cash": 1,
+    "units": {
+      "1006": 1
+    },
+    "unit_refs": [
+      "1006"
+    ]
+  },
+  {
+    "legacy_id": "17",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 17,
+    "cash": 1,
+    "units": {
+      "1031": 1
+    },
+    "unit_refs": [
+      "1031"
+    ]
+  },
+  {
+    "legacy_id": "16",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 16,
+    "cash": 1,
+    "units": {
+      "1036": 1
+    },
+    "unit_refs": [
+      "1036"
+    ]
+  },
+  {
+    "legacy_id": "15",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 15,
+    "cash": 1,
+    "units": {
+      "1004": 1
+    },
+    "unit_refs": [
+      "1004"
+    ]
+  },
+  {
+    "legacy_id": "14",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 14,
+    "cash": 1,
+    "units": {
+      "1027": 1
+    },
+    "unit_refs": [
+      "1027"
+    ]
+  },
+  {
+    "legacy_id": "13",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 13,
+    "cash": 1,
+    "units": {
+      "1027": 1
+    },
+    "unit_refs": [
+      "1027"
+    ]
+  },
+  {
+    "legacy_id": "12",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 12,
+    "cash": 1,
+    "units": {
+      "1019": 1
+    },
+    "unit_refs": [
+      "1019"
+    ]
+  },
+  {
+    "legacy_id": "11",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 11,
+    "cash": 1,
+    "units": {
+      "1027": 1
+    },
+    "unit_refs": [
+      "1027"
+    ]
+  },
+  {
+    "legacy_id": "10",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 10,
+    "cash": 1,
+    "units": {
+      "1029": 1
+    },
+    "unit_refs": [
+      "1029"
+    ]
+  },
+  {
+    "legacy_id": "9",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 9,
+    "cash": 1,
+    "units": {
+      "1027": 1
+    },
+    "unit_refs": [
+      "1027"
+    ]
+  },
+  {
+    "legacy_id": "8",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 8,
+    "cash": 1,
+    "units": {
+      "1027": 1
+    },
+    "unit_refs": [
+      "1027"
+    ]
+  },
+  {
+    "legacy_id": "7",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 7,
+    "cash": 1,
+    "units": {
+      "1027": 1
+    },
+    "unit_refs": [
+      "1027"
+    ]
+  },
+  {
+    "legacy_id": "6",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 6,
+    "cash": 1,
+    "units": {
+      "1027": 1
+    },
+    "unit_refs": [
+      "1027"
+    ]
+  },
+  {
+    "legacy_id": "5",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 5,
+    "cash": 1,
+    "units": {
+      "1002": 1
+    },
+    "unit_refs": [
+      "1002"
+    ]
+  },
+  {
+    "legacy_id": "4",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 4,
+    "cash": 1,
+    "units": {
+      "1027": 1
+    },
+    "unit_refs": [
+      "1027"
+    ]
+  },
+  {
+    "legacy_id": "3",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 3,
+    "cash": 1,
+    "units": {
+      "1027": 1
+    },
+    "unit_refs": [
+      "1027"
+    ]
+  },
+  {
+    "legacy_id": "2",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 2,
+    "cash": 1,
+    "units": {
+      "1027": 1
+    },
+    "unit_refs": [
+      "1027"
+    ]
+  },
+  {
+    "legacy_id": "1",
+    "kind": "level_ranking_reward",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "level": 1,
+    "cash": 1,
+    "units": {
+      "1037": 1
+    },
+    "unit_refs": [
+      "1037"
+    ]
+  }
+]

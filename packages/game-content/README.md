@@ -407,3 +407,146 @@ in the content census (`make_dynamic` never runs here).
 ```bash
 python -B -m unittest discover -s packages/game-content/tests -p test_build_tables.py -v
 ```
+
+---
+
+# Economy-schedules normalization extension
+
+Normalized, schema-checked price-schedule and reward definitions for the
+legacy Social Wars `expansion_prices` (98 entries), `town_prices`
+(4 entries), `map_prices` (4 entries), and `level_ranking_reward`
+(50 entries) content domains, built offline from stored sources with
+Python 3.9 standard library only; no new dependencies. Run the
+items-normalization build first: the economy builder reads the committed
+normalized items outputs as its cross-domain reference edge for ranking
+rewards and merges its `economy` section into the package manifest.
+
+## Inputs
+
+- `config/main.json` (stored source: 98 `expansion_prices` entries with
+  fully native `coins`/`cash`/`neighbors`/`inventory_qte` and no stable
+  id; 4 `town_prices` and 4 `map_prices` entries with fully native
+  `coins`/`cash`/`level` and no stable id, identical values as stored;
+  50 `level_ranking_reward` entries with native integer `level`
+  descending 50..1, native integer `cash` uniform 1, and a native
+  single-entry `units` object mapping item-id keys to integer
+  quantities).
+- `config/patch/patches.txt` plus the five ordered patch files, read
+  only to verify no patch targets any economy-schedule key (any such
+  target fails the build explicitly; stored content is the input, there
+  is no layering).
+- `mods/mods.txt` (must stay inactive; any active mod fails the build).
+- `packages/game-content/schemas/expansion_price.schema.json`,
+  `town_price.schema.json`, `map_price.schema.json`, and
+  `level_ranking_reward.schema.json` (contracts enforced by the builder).
+- `packages/game-content/normalized/buildings.json`, `units.json`,
+  `specials.json` (committed items outputs; their union of 900
+  `legacy_id` values is the cross-domain reference set for ranking
+  `units` keys).
+
+## Coercion rules (`economy-coercion-ruleset-v1`, survey-cited)
+
+- E1 native fields kept verbatim: every schedule amount is a native
+  JSON integer carried exactly as stored (booleans never count as
+  integers); `units` quantities are native positive integers. No
+  string-encoded numbers, no embedded JSON, no empty strings occur in
+  these four keys.
+- E2 `legacy_id` preserves schedule identity: the 0-based positional
+  index as a string with a numeric `position` field for the three price
+  schedules (which carry no stable stored id and load positionally),
+  and the decimal form of the native integer `level` for ranking
+  rewards (rows cover 50..1 exactly once). Schedule order is preserved
+  positionally; town and map schedules stay separate files even though
+  their stored values are identical, never merged or deduplicated.
+- E3 resolved ranking references: `unit_refs` carries the `units` keys
+  sorted; every referenced id must resolve against the normalized items
+  legacy-ID set or validation fails.
+
+No value is rebalanced, renamed for gameplay, or assigned new meaning.
+
+## Outputs
+
+- `normalized/expansion_prices.json`: 98 price definitions (one per
+  stored entry, stored order).
+- `normalized/town_prices.json`: 4 price definitions (one per stored
+  entry, stored order).
+- `normalized/map_prices.json`: 4 price definitions (one per stored
+  entry, stored order).
+- `normalized/level_ranking_reward.json`: 50 reward definitions (one
+  per stored entry, stored order).
+- `manifest.json`: the existing items/quest/tables manifest with an
+  `economy` section merged in, recording economy inputs with digests,
+  the cross-domain items reference edge (files, counts, union size),
+  the coercion ruleset version, the content fingerprint (sha256 over
+  the stored source bytes plus the mods list), definition counts
+  (including ranking level range, cash values, and the
+  town/map-identical observation), builder outcome, output digests, and
+  uniformity notes. Regenerated on every successful economy build; the
+  tests assert it matches the produced output while the items, quests,
+  and tables keys survive the merge untouched.
+
+## Validation gates (failures exit 1, outputs unwritten)
+
+Duplicate positional ids or ranking levels, ranking coverage other than
+exactly 50..1, negative amounts, non-positive ranking quantities,
+unresolvable ranking `units` references against the normalized items
+set, `unit_refs` drift, missing or mistyped schema-required fields
+(every schema-required field is enforced; the traceability test proves
+it by mutation), and any round-trip difference (expected: exact
+equality, since every field is native). The round-trip gate re-coerces
+each stored entry and compares by value with field sets exact.
+
+## Executable and invocation
+
+Verified executable: `C:\Users\Edison\AppData\Local\Programs\Python\Python39\python.exe`
+(CPython 3.9.13, tags/v3.9.13:6de2ca5, May 17 2022, 16:36:42, MSC v.1929 64 bit (AMD64)).
+`sys.executable` reported exactly the path above and `python --version`
+reported `Python 3.9.13` for the passing run. Any working Python 3.9+
+standard-library interpreter should behave identically.
+
+From the repository root (after the items build):
+
+```bash
+python -B packages/game-content/tools/build_economy.py
+```
+
+Exit 0 prints a JSON success report with counts and output files.
+Exit 1 prints a `validation-failed` report listing each problem and
+writes nothing (the manifest is left untouched). Exit 2 reports
+invalid input or unsupported shapes (missing/unreadable files,
+unparseable content, an active mod, a patch targeting economy content,
+an invalid schema file, or a missing/malformed normalized items
+output) on stderr.
+
+## Evidence classification
+
+This extension establishes source-grounded normalization consistency
+for the stored economy-schedule domains: classification coverage,
+verbatim native fidelity, cross-domain reference resolution for ranking
+rewards against the normalized items package, and exact round-trip
+equivalence. It is evidence of representation change, not of
+served-byte equality, content validity, gameplay parity, asset
+existence (M4 owns asset truth), or progressed-player coverage. Served
+bytes stay out of scope exactly as in the content census
+(`make_dynamic` never runs here).
+
+## Containment
+
+- Reads only `config/main.json`, `config/patch/patches.txt`, the five
+  patch files (target check only), `mods/mods.txt`, the four economy
+  schema files, the three committed normalized items outputs, and the
+  package manifest for the merge (plus optional `--repo-root`/`--out-root`
+  relocation of the same reads).
+- Never imports or executes any legacy application module (no
+  `get_game_config`, `jsonpatch`, or Flask import), never reads runtime
+  saves, never contacts a network, never starts a server, and never
+  opens a browser or Flash content.
+- Writes only the four normalized economy files plus the merged
+  `manifest.json`, and only on success. No bytecode (`-B` recommended),
+  no caches, no temporary files in the repository. Repeated runs over
+  unchanged inputs are byte-identical.
+- The focused tests in `tests/test_build_economy.py` run the same way:
+
+```bash
+python -B -m unittest discover -s packages/game-content/tests -p test_build_economy.py -v
+```
