@@ -834,3 +834,135 @@ census (`make_dynamic` never runs here).
 ```bash
 python -B -m unittest discover -s packages/game-content/tests -p test_build_taxonomy.py -v
 ```
+
+---
+
+# Darts-schedule normalization extension
+
+Normalized, schema-checked weekly event definitions for the legacy
+Social Wars `darts_items` content domain (30 stored entries, replaced
+wholesale by the `targets` patch with 27 effective entries), built
+offline from stored sources with Python 3.9 standard library only; no
+new dependencies. Run the items-normalization build first: the darts
+builder reads the committed normalized items outputs as its
+cross-domain reference edge for pooled and extra ids and merges its
+`darts` section into the package manifest.
+
+## Inputs
+
+- `config/main.json` (stored source: 30 `darts_items` entries, recorded
+  as replace inputs only, never normalized directly).
+- `config/patch/patches.txt` plus the five ordered patch files: the
+  builder verifies the order, applies only the single `targets`
+  whole-array replace of `/darts_items` (27 entries with native
+  integer `id` sequential 1..27, six-element native integer `items`
+  pools, native integer `extra_item`, and 19-char `start_date`
+  datetime strings), and refuses any other darts target or divergent
+  replace shape explicitly.
+- `mods/mods.txt` (must stay inactive; any active mod fails the build).
+- `packages/game-content/schemas/darts_item.schema.json` (contract
+  enforced by the builder).
+- `packages/game-content/normalized/buildings.json`, `units.json`,
+  `specials.json` (committed items outputs; their union of 900
+  `legacy_id` values is the cross-domain reference set).
+
+## Coercion rules (`darts-coercion-ruleset-v1`, survey/census-cited)
+
+- D1 patch layering mirrors the legacy loader for this key only: the
+  ordered list is verified and exactly the one `targets` replace is
+  applied; `source_layer` records `patched(targets)` and the manifest
+  records stored (30) versus patched (27) counts.
+- D2 native pools kept verbatim: `id`, pooled `items` integers, and
+  `extra_item` are native JSON integers carried exactly as stored
+  (booleans never count as integers); `legacy_id` is the decimal id;
+  `item_refs` carries the pool ids in stored order and `extra_ref`
+  the extra id, every referenced id resolving against the normalized
+  items legacy-ID set or validation fails.
+- D3 `start_date` strings preserved verbatim as derivation inputs for
+  `make_dynamic`, never recomputed and never compared against served
+  bytes (census dynamic-derivation boundary).
+
+No value is rebalanced, renamed for gameplay, or assigned new meaning.
+
+## Outputs
+
+- `normalized/darts_items.json`: 27 darts definitions (one per patched
+  entry, patched order).
+- `manifest.json`: the existing package manifest with a `darts`
+  section merged in, recording darts inputs with digests (stored
+  source plus the `targets` patch bytes), the patch lineage
+  (`replace`), the cross-domain items reference edge, the coercion
+  ruleset version, the content fingerprint (sha256 over the stored
+  source bytes, the `targets` patch bytes, plus the mods list),
+  definition counts, builder outcome, output digests, and the
+  dynamic-boundary notes. Regenerated on every successful darts build;
+  the tests assert it matches the produced output while the prior keys
+  survive the merge untouched.
+
+## Validation gates (failures exit 1, outputs unwritten)
+
+Duplicate patched ids (refusing silent loss), unresolvable pooled or
+extra references against the normalized items set, `item_refs` /
+`extra_ref` drift, missing or mistyped schema-required fields (every
+schema-required field is enforced; the traceability test proves it by
+mutation), and any round-trip difference against the patched array
+(expected: exact equality). Patch drift (any other darts target, a
+missing `targets` patch, or a divergent replace shape) and active mods
+report exit 2 without writing output.
+
+## Executable and invocation
+
+Verified executable: `C:\Users\Edison\AppData\Local\Programs\Python\Python39\python.exe`
+(CPython 3.9.13, tags/v3.9.13:6de2ca5, May 17 2022, 16:36:42, MSC v.1929 64 bit (AMD64)).
+`sys.executable` reported exactly the path above and `python --version`
+reported `Python 3.9.13` for the passing run. Any working Python 3.9+
+standard-library interpreter should behave identically.
+
+From the repository root (after the items build):
+
+```bash
+python -B packages/game-content/tools/build_darts.py
+```
+
+Exit 0 prints a JSON success report with counts and output files.
+Exit 1 prints a `validation-failed` report listing each problem and
+writes nothing (the manifest is left untouched). Exit 2 reports
+invalid input or unsupported shapes (missing/unreadable files,
+unparseable content, an active mod, darts patch drift, an invalid
+schema file, or a missing/malformed normalized items output) on
+stderr.
+
+## Evidence classification
+
+This extension establishes source-grounded normalization consistency
+for the patched darts schedule: layering fidelity, classification
+coverage, verbatim pool fidelity, cross-domain reference resolution
+against the normalized items package, and exact round-trip
+equivalence. It is evidence of representation change, not of
+served-byte equality (explicitly out of scope: `make_dynamic`
+rewrites every served `start_date` from the wall clock), content
+validity, gameplay parity, asset existence (M4 owns asset truth), or
+progressed-player coverage. Served bytes stay out of scope exactly as
+in the content census (`make_dynamic` never runs here).
+
+## Containment
+
+- Reads only `config/main.json`, `config/patch/patches.txt`, the five
+  patch files (the `targets` replace applied, the rest target-checked),
+  `mods/mods.txt`, the darts schema file, the three committed
+  normalized items outputs, and the package manifest for the merge
+  (plus optional `--repo-root`/`--out-root` relocation of the same
+  reads).
+- Never imports or executes any legacy application module (no
+  `get_game_config`, `jsonpatch`, or Flask import), never reads runtime
+  saves, never contacts a network, never starts a server, never reads
+  the wall clock, and never opens a browser or Flash content.
+- Writes only the normalized darts file plus the merged
+  `manifest.json`, and only on success. No bytecode (`-B` recommended),
+  no caches, no temporary files in the repository. Repeated runs over
+  unchanged inputs are byte-identical.
+- The focused tests in `tests/test_build_darts.py` run the same way:
+
+```bash
+python -B -m unittest discover -s packages/game-content/tests -p test_build_darts.py -v
+```

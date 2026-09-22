@@ -12,6 +12,82 @@
     "upgrades_nontrivial": 56,
     "with_breeding_fields": 300
   },
+  "darts": {
+    "coercion_ruleset": "darts-coercion-ruleset-v1",
+    "content_fingerprint": "5c30f76a0dbf5f0dbc59ec9cfc45fec4becd2f87afa93c934a4ca0bce2693fbc",
+    "counts": {
+      "darts": 27,
+      "patched_darts": 27,
+      "pool_sizes": [
+        6
+      ],
+      "stored_darts": 30
+    },
+    "inputs": {
+      "darts_layering": "replace",
+      "items_reference_edge": {
+        "counts": {
+          "buildings": 470,
+          "specials": 1,
+          "units": 429
+        },
+        "files": [
+          "packages/game-content/normalized/buildings.json",
+          "packages/game-content/normalized/units.json",
+          "packages/game-content/normalized/specials.json"
+        ],
+        "union_legacy_ids": 900
+      },
+      "main": {
+        "bytes": 1702871,
+        "file": "config/main.json",
+        "sha256": "55ffd929372a4a31785cfd683982856324e2b73ba9a6624c53f09b68e4dd0ea5"
+      },
+      "mods": {
+        "active_mods": [],
+        "inactive_mods": [
+          "no_hiring_needed"
+        ],
+        "status": "inactive"
+      },
+      "patch_order": [
+        "atom_fusion_item",
+        "unit_patch",
+        "atom_fusion_items_data",
+        "atom_fusion_powerup",
+        "targets"
+      ],
+      "targets_patch": {
+        "bytes": 5174,
+        "file": "config/patch/targets.json",
+        "sha256": "121879bef519b00804302f25c593fe8a42e7715b6b8a65ed24f60c238600e3cf"
+      }
+    },
+    "notes": [
+      "Stored darts are replace inputs only; the targets patch replaces the whole array and only the patched entries are normalized (rule D1).",
+      "Only the single targets replace of /darts_items is applied; any other darts target or divergent replace shape refuses the build until re-censused.",
+      "Pooled and extra ids resolve against the normalized items legacy-ID set with references carried in stored pool order (rule D2).",
+      "start_date values are stored derivation inputs for make_dynamic, preserved verbatim and never recomputed; served bytes drift with the wall clock and are explicitly out of scope (rule D3).",
+      "No active patch beyond the ordered list and no active mod; the build refuses patch drift and active mods explicitly."
+    ],
+    "outputs": [
+      {
+        "bytes": 14619,
+        "file": "packages/game-content/normalized/darts_items.json",
+        "sha256": "1f5b7677f395b337845b1914e5b4689815c785698a51f745c4e78f94439be32d"
+      }
+    ],
+    "policy": "darts-normalization-v1",
+    "result": "success",
+    "schema_version": 1,
+    "validation": {
+      "amount_violations": 0,
+      "duplicate_ids": 0,
+      "missing_fields": 0,
+      "round_trip_diffs": 0,
+      "unresolvable_references": 0
+    }
+  },
   "economy": {
     "coercion_ruleset": "economy-coercion-ruleset-v1",
     "content_fingerprint": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
