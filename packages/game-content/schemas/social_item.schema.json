@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "packages/game-content/schemas/social_item.schema.json",
+  "title": "Normalized social item definition (legacy social_items domain)",
+  "description": "Contract for one normalized social item: one stored legacy social_items entry. The stored integer id is the stable identity, so legacy_id is its decimal form (rule S2); native amounts and display strings are kept verbatim (rule S1), including the uniformly-empty description which is preserved with a manifest note, never defaulted. See packages/game-content/README.md for the rule set and survey citations.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "id",
+    "workers",
+    "worker_cost",
+    "description"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Stored social_items id preserved verbatim as a string (rule S2): the decimal form of the native integer id."
+    },
+    "kind": {
+      "const": "social_item",
+      "description": "Classification of the stored social_items domain: every entry maps to social_item."
+    },
+    "source_file": {
+      "type": "string",
+      "description": "Origin file of the stored entry: config/main.json (no patch targets social_items)."
+    },
+    "source_layer": {
+      "type": "string",
+      "description": "Layering origin: stored (no patch targets social_items)."
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint (sha256 over the stored source bytes plus the mods list); sources carry no version stamp."
+    },
+    "id": {
+      "type": "integer",
+      "description": "Native stored social item id, kept verbatim (rule S1)."
+    },
+    "workers": {
+      "type": "string",
+      "description": "Hireable-worker display names, preserved verbatim as display data, never parsed as references or behavior (rule S1)."
+    },
+    "worker_cost": {
+      "type": "integer",
+      "description": "Native stored worker cost, kept verbatim (rule S1).",
+      "minimum": 0
+    },
+    "description": {
+      "type": "string",
+      "description": "Social item description, preserved verbatim; empty in all stored entries, kept with a manifest note and never defaulted (rule S1)."
+    }
+  }
+}

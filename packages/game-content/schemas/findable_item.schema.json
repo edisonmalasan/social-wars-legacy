@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "packages/game-content/schemas/findable_item.schema.json",
+  "title": "Normalized findable item definition (legacy findable_items domain)",
+  "description": "Contract for one normalized findable item: one stored legacy findable_items entry. The stored integer id is the stable identity, so legacy_id is its decimal form (rule S2); native amounts and display strings are kept verbatim (rule S1). See packages/game-content/README.md for the rule set and survey citations.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "id",
+    "title",
+    "description",
+    "coins"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Stored findable_items id preserved verbatim as a string (rule S2): the decimal form of the native integer id."
+    },
+    "kind": {
+      "const": "findable_item",
+      "description": "Classification of the stored findable_items domain: every entry maps to findable_item."
+    },
+    "source_file": {
+      "type": "string",
+      "description": "Origin file of the stored entry: config/main.json (no patch targets findable_items)."
+    },
+    "source_layer": {
+      "type": "string",
+      "description": "Layering origin: stored (no patch targets findable_items)."
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint (sha256 over the stored source bytes plus the mods list); sources carry no version stamp."
+    },
+    "id": {
+      "type": "integer",
+      "description": "Native stored findable id, kept verbatim (rule S1).",
+      "minimum": 0
+    },
+    "title": {
+      "type": "string",
+      "description": "Findable display title, preserved verbatim (rule S1)."
+    },
+    "description": {
+      "type": "string",
+      "description": "Findable display description, preserved verbatim (rule S1)."
+    },
+    "coins": {
+      "type": "integer",
+      "description": "Native stored coin reward, kept verbatim (rule S1).",
+      "minimum": 0
+    }
+  }
+}

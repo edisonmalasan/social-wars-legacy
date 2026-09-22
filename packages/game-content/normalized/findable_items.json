@@ -1,0 +1,112 @@
+[
+  {
+    "legacy_id": "1",
+    "kind": "findable_item",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 1,
+    "title": "Clown",
+    "description": "You've found a sad Clown on your park. Share it with your friends to find a new home for him!",
+    "coins": 100
+  },
+  {
+    "legacy_id": "2",
+    "kind": "findable_item",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 2,
+    "title": "Little Boy",
+    "description": "A little child got lost in your Park. Share it with your friends to find his parents!",
+    "coins": 100
+  },
+  {
+    "legacy_id": "3",
+    "kind": "findable_item",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 3,
+    "title": "Little Girl",
+    "description": "A little child got lost in your Park. Share it with your friends to find his parents!",
+    "coins": 100
+  },
+  {
+    "legacy_id": "4",
+    "kind": "findable_item",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 4,
+    "title": "Teddy Bear",
+    "description": "You've found a Teddy Bear on your Park. Share it with your friends to find his owner!",
+    "coins": 100
+  },
+  {
+    "legacy_id": "5",
+    "kind": "findable_item",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 5,
+    "title": "Budget",
+    "description": "Ohh, it seems somebody lost his wallet! Find his owner sharing it with your friends. A reward is given!!",
+    "coins": 100
+  },
+  {
+    "legacy_id": "6",
+    "kind": "findable_item",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 6,
+    "title": "Bolso",
+    "description": "Ohh, a girl lost her Handbag on your Park!! Find his owner sharing it with your friends. A reward is given!!",
+    "coins": 100
+  },
+  {
+    "legacy_id": "7",
+    "kind": "findable_item",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 7,
+    "title": "Globo",
+    "description": "A little child lost his balloon !! Help him to find it !!",
+    "coins": 100
+  },
+  {
+    "legacy_id": "8",
+    "kind": "findable_item",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 8,
+    "title": "Llaves",
+    "description": "Ohh, One of your visitors lost his keys on your Park. Find his owner sharing it with your friends. A reward is given!!",
+    "coins": 100
+  },
+  {
+    "legacy_id": "9",
+    "kind": "findable_item",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 9,
+    "title": "Gorra",
+    "description": "A teenager visitor lost his Cup!! On sunny days it's indispensable. Give the cup back by sharing it with your friends !!",
+    "coins": 100
+  },
+  {
+    "legacy_id": "10",
+    "kind": "findable_item",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "content_version": "004ba829043dfb00d78888a764bd7e13a37db9c5c05195cd910ac3d570678bb3",
+    "id": 10,
+    "title": "Movil",
+    "description": "Ohh, an old man lost his Handy on your park. Share it with your friends to find the owner !!",
+    "coins": 100
+  }
+]

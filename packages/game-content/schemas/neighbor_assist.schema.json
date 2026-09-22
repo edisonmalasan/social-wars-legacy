@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "packages/game-content/schemas/neighbor_assist.schema.json",
+  "title": "Normalized neighbor assist definition (legacy neighbor_assists domain)",
+  "description": "Contract for one normalized neighbor assist: one stored legacy neighbor_assists entry in positional order. The table carries no stable stored id (the legacy loader indexes positionally), so legacy_id is the 0-based positional index as a string (rule S2); native amounts and display strings are kept verbatim (rule S1). See packages/game-content/README.md for the rule set and survey citations.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "position",
+    "task",
+    "action",
+    "notification",
+    "rnd",
+    "reward"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Positional index of the stored neighbor_assists entry as a decimal string (rule S2): the table has no stable stored id and the legacy loader indexes the array positionally."
+    },
+    "kind": {
+      "const": "neighbor_assist",
+      "description": "Classification of the stored neighbor_assists domain: every entry maps to neighbor_assist."
+    },
+    "source_file": {
+      "type": "string",
+      "description": "Origin file of the stored entry: config/main.json (no patch targets neighbor_assists)."
+    },
+    "source_layer": {
+      "type": "string",
+      "description": "Layering origin: stored (no patch targets neighbor_assists)."
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint (sha256 over the stored source bytes plus the mods list); sources carry no version stamp."
+    },
+    "position": {
+      "type": "integer",
+      "description": "0-based position of the entry in the stored neighbor_assists array; entry order is positional and preserved (rule S2).",
+      "minimum": 0
+    },
+    "task": {
+      "type": "string",
+      "description": "Help-task prompt shown to the player, preserved verbatim as display data (rule S1)."
+    },
+    "action": {
+      "type": "string",
+      "description": "Help-action label shown to the player, preserved verbatim as display data (rule S1)."
+    },
+    "notification": {
+      "type": "string",
+      "description": "Help completion notice fragment, preserved verbatim as display data (rule S1)."
+    },
+    "rnd": {
+      "type": "integer",
+      "description": "Native stored random-weight value, kept verbatim (rule S1).",
+      "minimum": 0
+    },
+    "reward": {
+      "type": "object",
+      "description": "Native stored help reward of coins/cash/xp amounts, kept verbatim; amounts are literals, not references (rule S1)."
+    }
+  }
+}
