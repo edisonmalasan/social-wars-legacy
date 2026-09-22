@@ -183,6 +183,81 @@
       "unresolvable_references": 0
     }
   },
+  "globals": {
+    "coercion_ruleset": "globals-coercion-ruleset-v1",
+    "content_fingerprint": "06e04320ce72422b3282211fa581bb48a5d3253a1c296d735f8b6b8c63d9f0b3",
+    "counts": {
+      "globals": 105,
+      "loaded_globals": 105,
+      "stored_globals": 104,
+      "string_keys": [
+        "DEPOT_LIMITS",
+        "LIMITED_EDITION_EXPIRATION",
+        "NEWFRIENDS_REWARD_DESCRIPTION",
+        "NEWFRIENDS_REWARD_ID_UNIT",
+        "NEWFRIENDS_REWARD_SCALE_UNIT",
+        "NEWS_IMAGE",
+        "NEWS_STORE",
+        "URL_APP_PROD"
+      ],
+      "value_types": {
+        "array": 23,
+        "integer": 62,
+        "number": 4,
+        "object": 8,
+        "string": 8
+      }
+    },
+    "inputs": {
+      "globals_layering": "add",
+      "main": {
+        "bytes": 1702871,
+        "file": "config/main.json",
+        "sha256": "55ffd929372a4a31785cfd683982856324e2b73ba9a6624c53f09b68e4dd0ea5"
+      },
+      "mods": {
+        "active_mods": [],
+        "inactive_mods": [
+          "no_hiring_needed"
+        ],
+        "status": "inactive"
+      },
+      "patch_order": [
+        "atom_fusion_item",
+        "unit_patch",
+        "atom_fusion_items_data",
+        "atom_fusion_powerup",
+        "targets"
+      ],
+      "powerup_patch": {
+        "bytes": 742,
+        "file": "config/patch/atom_fusion_powerup.json",
+        "sha256": "79db1fec2ce50af2c42d47e1eead4395ebe3856b875c12a7abecd492c2396d43"
+      }
+    },
+    "notes": [
+      "Stored globals map one-to-one to definitions plus the single powerup add; legacy_id is the constant name in loaded key order, never re-sorted (rules G1/G3).",
+      "Values are verbatim observed JSON with recorded types; integers, floats, strings, arrays, objects, booleans, and null each round-trip exactly (rule G2).",
+      "String constants (version lists, URL, date, depot-limits string, friend-reward CSV strings) stay opaque display and config data, never parsed as references or behavior.",
+      "No other patch targets globals; the build refuses patch drift and active mods explicitly."
+    ],
+    "outputs": [
+      {
+        "bytes": 41335,
+        "file": "packages/game-content/normalized/globals.json",
+        "sha256": "430977adab50c27408f4f9ae57cc87f91937caa3b45dc94d7002a96ecdbf03e6"
+      }
+    ],
+    "policy": "globals-normalization-v1",
+    "result": "success",
+    "schema_version": 1,
+    "validation": {
+      "amount_violations": 0,
+      "duplicate_ids": 0,
+      "missing_fields": 0,
+      "round_trip_diffs": 0
+    }
+  },
   "inputs": {
     "main": {
       "bytes": 1702871,
