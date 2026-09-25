@@ -164,6 +164,23 @@ bounds/styles with bitmap linkage, no tessellation) and establish no
 rendering correctness, visual fidelity, gameplay footprint semantics, or Godot
 loading. No Godot project is created or required.
 
+Verified offline first-unit conversion commands (Windows x64 CPython 3.9.13):
+
+```bash
+python -B tools/asset-registry/convert_unit.py
+python -B -m unittest discover -s tools/asset-registry/tests -p test_convert_unit.py -v
+```
+
+See `tools/asset-registry/README.md` and `docs/assets/registry.md` for the
+executable, extraction prerequisite, worktree-form note, parsing boundary
+(depth-first placement order, labels names-only, fill-array alignment,
+placeholder rule), neutral `conversion-v1` envelope, exit codes, evidence
+classification, and containment. These commands assemble one converted unit
+package (per-sprite timeline inventory with shape/bitmap linkage, no
+tessellation, no playback semantics) and establish no animation correctness,
+rendering, visual fidelity, gameplay semantics, or Godot loading. No Godot
+project is created or required.
+
 Verified opt-in command-recorder check (Windows x64 CPython 3.9.13):
 
 ```bash
