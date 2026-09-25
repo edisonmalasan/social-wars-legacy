@@ -366,6 +366,29 @@ class RealHouseTests(unittest.TestCase):
         self.assertEqual([path.name for path in names],
                          ["1.jpg", "1_alpha.png", "package.json"])
 
+    def test_regenerated_package_matches_committed_bytes(self):
+        """Regression: the shared style-array alignment fix must leave the
+        committed house package (bytes and manifest digest) untouched."""
+        code, stdout, _ = run_main(["--repo-root", str(ROOT),
+                                    "--out-root", str(self.out)])
+        self.assertEqual(code, 0, stdout)
+        relative = Path("assets/converted/buildings/0001_house_1_m")
+        fresh = (self.out / relative / "package.json").read_bytes()
+        committed = (ROOT / relative / "package.json").read_bytes()
+        self.assertEqual(
+            fresh, committed,
+            "regenerated house package differs from the committed bytes")
+        for name in ("1.jpg", "1_alpha.png"):
+            self.assertEqual((self.out / relative / name).read_bytes(),
+                             (ROOT / relative / name).read_bytes(), name)
+        document = json.loads(
+            (ROOT / "tools" / "asset-registry" / "conversions.json"
+             ).read_text(encoding="utf-8"))
+        entry = next(item for item in document["packages"]
+                     if item["legacy_id"] == "0001_house_1_m")
+        self.assertEqual(hashlib.sha256(fresh).hexdigest(),
+                         entry["package_sha256"])
+
     def test_registry_outputs_untouched(self):
         before = {}
         for name in ("registry.json", "coverage.json", "inspection.json",

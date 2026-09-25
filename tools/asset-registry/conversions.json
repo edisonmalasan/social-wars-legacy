@@ -1,23 +1,35 @@
 {
   "counts": {
-    "output_bytes": 11733,
-    "packages": 1
+    "output_bytes": 396434,
+    "packages": 2
   },
   "inputs": {
     "buildings": "packages/game-content/normalized/buildings.json",
-    "content_version": "ddeca79973ed603d3d2f3dc2e4527192cb3bf2350d349a17c460c94e791bd3f1",
+    "buildings_content_version": "ddeca79973ed603d3d2f3dc2e4527192cb3bf2350d349a17c460c94e791bd3f1",
     "extraction": "tools/asset-registry/image_extraction.json",
-    "inspection": "tools/asset-registry/inspection.json"
+    "inspection": "tools/asset-registry/inspection.json",
+    "units": "packages/game-content/normalized/units.json",
+    "units_content_version": "9d8ad3b3f2087f6ba1c09fabd583a11d674f05a88b839f5bc6675db8a3ecfd5b"
   },
   "packages": [
     {
       "bitmaps": 2,
       "directory": "assets/converted/buildings/0001_house_1_m",
       "legacy_id": "0001_house_1_m",
-      "package_sha256": "7de262e9f5ec67b1dc57945137f3d5f9a27707d6587dddd4a508e72d366b92a7"
+      "output_bytes": 11733,
+      "package_sha256": "7de262e9f5ec67b1dc57945137f3d5f9a27707d6587dddd4a508e72d366b92a7",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 56,
+      "directory": "assets/converted/units/10033_wild_elephant",
+      "legacy_id": "10033_wild_elephant",
+      "output_bytes": 384701,
+      "package_sha256": "c40b754c3660d42c30bd8ba2388354efb96a71fad0d9082a105563c10b05d1c7",
+      "policy": "unit-conversion-v1"
     }
   ],
-  "policy": "building-conversion-v1",
+  "policy": "conversion-v1",
   "result": "success",
   "schema_version": 1
 }

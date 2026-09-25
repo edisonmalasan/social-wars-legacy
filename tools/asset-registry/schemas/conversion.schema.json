@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "tools/asset-registry/schemas/conversion.schema.json",
   "title": "Conversion manifest",
-  "description": "Contract for the generated conversion manifest: converted packages with digests for Godot-import readiness tracking.",
+  "description": "Contract for the shared conversion manifest: converted packages with digests for Godot-import readiness tracking. The neutral envelope is written by every converter; each package entry carries the policy of the converter that produced it.",
   "type": "object",
   "required": [
     "schema_version",
@@ -20,8 +20,8 @@
       "minimum": 1
     },
     "policy": {
-      "const": "building-conversion-v1",
-      "description": "Conversion policy identifier."
+      "const": "conversion-v1",
+      "description": "Neutral conversion envelope identifier shared by all converters."
     },
     "result": {
       "const": "success",
@@ -29,16 +29,58 @@
     },
     "inputs": {
       "type": "object",
-      "description": "Input provenance: normalized buildings digest, inspection and extraction fingerprints."
+      "description": "Input provenance: normalized content digests keyed per domain plus inspection and extraction fingerprints."
     },
     "counts": {
       "type": "object",
-      "description": "Conversion totals: package count and output byte total."
+      "description": "Conversion totals: package count and summed per-entry output byte total."
     },
     "packages": {
       "type": "array",
-      "description": "Converted package entries with digests.",
-      "items": { "type": "object" }
+      "description": "Converted package entries with digests, byte totals, and per-converter policies.",
+      "items": {
+        "type": "object",
+        "required": [
+          "legacy_id",
+          "directory",
+          "package_sha256",
+          "bitmaps",
+          "output_bytes",
+          "policy"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "legacy_id": {
+            "type": "string",
+            "description": "Converted package identity (sprite stem or legacy id)."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Repository-relative package directory."
+          },
+          "package_sha256": {
+            "type": "string",
+            "description": "SHA-256 of the package.json bytes."
+          },
+          "bitmaps": {
+            "type": "integer",
+            "description": "Number of bitmap output entries recorded in the package.",
+            "minimum": 0
+          },
+          "output_bytes": {
+            "type": "integer",
+            "description": "Package.json bytes plus copied bitmap bytes; summed into counts.output_bytes.",
+            "minimum": 0
+          },
+          "policy": {
+            "enum": [
+              "building-conversion-v1",
+              "unit-conversion-v1"
+            ],
+            "description": "Policy of the converter that produced this entry."
+          }
+        }
+      }
     }
   }
 }
