@@ -92,9 +92,30 @@ pixels, no source mutation; unknown formats fail closed.
 (House I, 2×2 tiles) from inspection data, extraction outputs, the
 normalized building definition, and parsed SHAPEWITHSTYLE records
 (bounds, fill/line styles, bitmap-fill references, edge counts — no
-tessellation). `conversions.json` records package digests and
-`statuses.json` marks the source `converted`. Matrices stay raw;
-scripts stay uninterpreted; no Godot involvement.
+tessellation). `conversions.json` records package digests under the
+neutral `conversion-v1` envelope (per-entry `policy`/`output_bytes`;
+both converters reproduce identical bytes in either order, and a legacy
+envelope migrates only through the building tool while it holds solely
+the building entry), and `statuses.json` marks the source `converted`.
+Matrices stay raw; scripts stay uninterpreted; no Godot involvement.
+
+## First-unit conversion
+
+`convert_unit.py` assembles `assets/converted/units/10033_wild_elephant/`
+(unit 933, Wild Elephant) from inspection data, extraction outputs, the
+normalized unit definition (exactly one `legacy_id` match), and parsed
+sprite timelines recorded per sprite with 1-based label frame indices,
+depth-first placements, removals, `SymbolClass` id-name pairs, and the
+root timeline as `main`. Shape records come from the shared shape-style
+parser: the 28 elephant shapes parse with the fill-array byte-boundary
+alignment, 25 keep an unreferenced `65535` placeholder fill recorded
+verbatim, and the 28 referenced bitmap ids resolve to the 28 JPEG3
+extraction outputs (digest equality on 28 JPEG plus 28 alpha copies).
+`unit_package.schema.json` validates the package, reruns are
+byte-identical, and the merged `conversions.json` stays neutral
+(`unit-conversion-v1` per entry); the unit tool rejects a legacy
+envelope. The extraction outputs are a documented prerequisite; no
+rendering, no timeline assembly beyond inventory, no Godot involvement.
 
 ## Prioritization input (roadmap §14)
 

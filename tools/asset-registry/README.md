@@ -363,16 +363,21 @@ tessellated. Shape tags outside {2, 22, 32} fail closed.
 
 - `assets/converted/buildings/0001_house_1_m/`: `package.json` plus
   byte-identical bitmap copies (digests must match extraction outputs).
-- `tools/asset-registry/conversions.json`: package entries with digests.
+- `tools/asset-registry/conversions.json`: package entries with digests
+  under the neutral `conversion-v1` envelope (per-entry `policy` and
+  `output_bytes`; foreign entries and input keys preserved so either
+  converter yields identical bytes in either order). A legacy
+  `building-conversion-v1` envelope migrates only while it holds solely
+  the building entry; foreign legacy entries fail closed.
 - `tools/asset-registry/statuses.json`: merged overlay marking the
   source path `converted` (neutral `asset-statuses-v1` envelope).
 
 ## Validation gates (failures exit 1, outputs unwritten)
 
 Bounds presence, bitmap-fill resolution, content-ref uniqueness, digest
-equality, schema fields, and determinism. Exit 2 reports invalid input
-(missing inspection/extraction/buildings, unreadable files,
-unparseable content).
+equality, schema fields, envelope policy, and determinism. Exit 2
+reports invalid input (missing inspection/extraction/buildings,
+unreadable files, unparseable content).
 
 ## Executable and invocation
 
@@ -385,6 +390,10 @@ From the repository root (after the extraction builds):
 ```bash
 python -B tools/asset-registry/convert_building.py
 ```
+
+Byte-identical reruns also depend on the worktree line-ending forms of
+the fingerprint inputs; see the worktree-form note in the
+*First-unit conversion* section below.
 
 ## Evidence classification
 
@@ -410,4 +419,131 @@ required here.
 
 ```bash
 python -B -m unittest discover -s tools/asset-registry/tests -p test_convert_building.py -v
+```
+
+---
+
+# First-unit conversion (unit slice: package assembly)
+
+Assembled converted package for `10033_wild_elephant` (normalized unit
+`legacy_id` 933, Wild Elephant) from inspection data, extraction
+outputs, the normalized units package, and parsed sprite-timeline
+records, built offline with Python 3.9 standard library only; no new
+dependencies, no tessellation, no rasterization, no matrix/script
+interpretation, no Flash runtime in any form.
+
+## Inputs
+
+- `tools/asset-registry/inspection.json` (frame labels and sprite
+  count for the source, cross-checked against the parsed timeline).
+- `tools/asset-registry/image_extraction.json` plus extracted bitmap
+  files (bitmap linkage with digest equality).
+- `packages/game-content/normalized/units.json` (exactly one `legacy_id`
+  `933` match, `img_name` `10033_wild_elephant`, recorded verbatim and
+  no other definition touched).
+- `tools/asset-registry/schemas/unit_package.schema.json` and
+  `conversion.schema.json` (contracts enforced by the converter).
+
+## Parsing boundary
+
+`DefineSprite` bodies and their timeline tags: `PlaceObject2` decoded
+depth-first (`flags UI8`, `depth UI16`, `character UI16` when the
+character bit is set), `RemoveObject2` as the depth only, `FrameLabel`
+frame indices (preceding `ShowFrame` count plus one), `ShowFrame`
+counting, and `End`. Frame labels are recorded as names with their
+frame indices only — an inventory for playback, never playback or
+state-machine semantics of their own. `SymbolClass` id-name pairs and
+the root timeline are recorded as `symbols` and `main`. Shape records
+come from the shared shape-style parser (bounds, fill/line arrays,
+edge counts — no tessellation); that parser aligns to the next byte
+boundary after the fill-style array because bitmap fills in sprite
+libraries end mid-byte.
+Fill indices activated by state-change records are collected and each
+referenced fill must be in range and resolve to a non-placeholder
+extraction output, while unreferenced `65535` placeholder fills are
+recorded verbatim. Unsupported timeline tags, undefined character
+references, declared-versus-observed frame-count mismatches, and label
+or sprite-count disagreement with inspection fail closed.
+
+## Outputs
+
+- `assets/converted/units/10033_wild_elephant/`: `package.json` plus
+  byte-identical bitmap copies (digests must match extraction outputs).
+- `tools/asset-registry/conversions.json`: merged package entry under
+  the shared neutral `conversion-v1` envelope (identical bytes
+  regardless of converter run order).
+- `tools/asset-registry/statuses.json`: merged overlay marking the
+  source path `converted` (neutral `asset-statuses-v1` envelope).
+
+## Validation gates (failures exit 1, outputs unwritten)
+
+Content-ref uniqueness, sprite and label coverage, declared-versus-
+observed frame counts, character references, referenced bitmap-fill
+resolution, inspection agreement, digest equality, schema fields
+(including nested), envelope policy (a legacy envelope fails closed
+under the unit converter), and determinism. Exit 2 reports invalid
+input (missing inspection/extraction/units, unreadable files,
+unparseable content).
+
+## Executable and invocation
+
+Verified executable used for this section's runs:
+`C:\Users\Edison\AppData\Local\Temp\opencode\cpython39\pkg\tools\python.exe`
+(CPython 3.9.13 Windows x64). Any working Python 3.9+ standard-library
+interpreter should behave identically.
+
+From the repository root, after the extraction builds. The elephant's
+bitmap outputs are ignored under `assets/converted/images/` and may be
+absent in a fresh tree, so run the already-verified extraction first —
+it also rewrites the tracked `statuses.json` (downgrading
+already-`converted` entries to `extracted`) and regenerates
+`image_extraction.json` with identical values in LF form, so restore
+every tracked file it touched (worktree-form note below) before
+converting:
+
+```bash
+python -B tools/asset-registry/extract_images.py
+python -B tools/asset-registry/convert_unit.py
+```
+
+Worktree-form note: `content_version` fingerprints the raw worktree
+bytes of the content file plus `inspection.json` and
+`image_extraction.json` (`buildings_content_version` over
+`buildings.json`, `units_content_version` over `units.json`), and the
+committed package digests reproduce only with the generated forms in
+place: `buildings.json`/`units.json` LF as `build_items.py` writes
+them, both registry manifests in their `core.autocrlf=true` checkout
+form (CRLF). `inspect_swf.py`/`extract_images.py` rewrite their
+manifests with LF endings (changing the fingerprint), and
+`build_items.py` resets `packages/game-content/manifest.json`'s other
+sections; after any of those runs restore what changed (delete the
+file first when only the line-ending form differs, then
+`git checkout --`; restore `manifest.json` after `build_items.py`, and
+`statuses.json` after an extraction run) before re-running a
+converter. Order: extract → restore forms → convert.
+
+## Evidence classification
+
+This tool establishes source-grounded assembly consistency for one
+converted unit: sprite-timeline fidelity (labels, placements, removals,
+frame counts), shape-style and bitmap linkage, content linkage, and
+determinism. It is evidence of package assembly, not of animation
+correctness, rendering, visual fidelity, gameplay semantics, or Godot
+loading. No Godot project is created or required here.
+
+## Containment
+
+- Reads only the committed inspection, extraction manifest plus bitmap
+  files, normalized units, the two converter schemas, and the source
+  SWF (plus optional `--repo-root`/`--out-root` relocation).
+- Never imports or executes any legacy application module, never uses
+  subprocess/network/server/browser/Flash, never modifies any source
+  asset or prior manifest (verified byte-identical after runs).
+- Writes only the package directory plus the conversions manifest and
+  statuses merge, and only on success. No bytecode (`-B` recommended),
+  no caches, no temporary files in the repository.
+- The focused tests run the same way:
+
+```bash
+python -B -m unittest discover -s tools/asset-registry/tests -p test_convert_unit.py -v
 ```

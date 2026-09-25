@@ -31,6 +31,7 @@ from pathlib import Path
 import sys
 
 POLICY = "building-conversion-v1"
+ENVELOPE_POLICY = "conversion-v1"
 SCHEMA_VERSION = 1
 TARGET_STEM = "0001_house_1_m"
 
@@ -178,6 +179,22 @@ def validate_against_schema(definition, schema, label):
                                       label + "." + field + "[" + str(index) + "]",
                                       sub)
                     problems.extend(sub)
+            # Object item schemas with their own required/properties are
+            # validated field by field (package entries, nested records).
+            if isinstance(items_spec.get("required"), list) \
+                    and isinstance(items_spec.get("properties"), dict):
+                for index, element in enumerate(value):
+                    if isinstance(element, dict):
+                        problems.extend(validate_against_schema(
+                            element, items_spec,
+                            label + "." + field + "[" + str(index) + "]"))
+        elif allowed and "object" in allowed and isinstance(value, dict):
+            # Object properties with their own required/properties are
+            # validated field by field (nested timeline records).
+            if isinstance(spec.get("required"), list) \
+                    and isinstance(spec.get("properties"), dict):
+                problems.extend(validate_against_schema(
+                    value, spec, label + "." + field))
     if schema.get("additionalProperties") is False:
         for field in definition:
             if field not in schema["properties"]:
@@ -296,11 +313,18 @@ def parse_line_style(reader, rgba, index, label):
 
 
 def parse_style_arrays(reader, rgba, label):
-    """Parse a FillStyleArray plus LineStyleArray; return (fills, lines)."""
+    """Parse a FillStyleArray plus LineStyleArray; return (fills, lines).
+
+    Fill styles end wherever their MATRIX ends, so the byte-oriented
+    LineStyleArray resumes on the next byte boundary (bitmap fills in
+    sprite libraries end mid-byte; a single already-aligned fill is a
+    no-op for this alignment).
+    """
     fill_count = int.from_bytes(reader.read_bytes(1, label), "big")
     if fill_count == 0xFF:
         fill_count = struct.unpack("<H", reader.read_bytes(2, label))[0]
     fills = [parse_fill_style(reader, rgba, label) for _ in range(fill_count)]
+    reader.align_to_byte()
     line_count = int.from_bytes(reader.read_bytes(1, label), "big")
     if line_count == 0xFF:
         line_count = struct.unpack("<H", reader.read_bytes(2, label))[0]
@@ -314,7 +338,8 @@ def count_shape_records(reader, fill_bits, line_bits, rgba, label, extra):
 
     Mid-stream NewStyles blocks are parsed into extra style arrays (the
     counts and bitmap references matter for conversion); only geometry
-    stays uncomputed.
+    stays uncomputed. Referenced fill indices (1-based; index 0 means
+    no fill) are collected into extra["fill_refs"] in record order.
     """
     counts = {"end": 0, "style_change": 0, "straight": 0, "curved": 0,
               "new_styles": 0}
@@ -330,9 +355,13 @@ def count_shape_records(reader, fill_bits, line_bits, rgba, label, extra):
                 move_bits = reader.read_bits(5, label)
                 reader.read_bits(2 * move_bits, label)
             if flags & 0x02:
-                reader.read_bits(fill_bits, label)
+                index = reader.read_bits(fill_bits, label)
+                if index:
+                    extra.setdefault("fill_refs", []).append(index)
             if flags & 0x04:
-                reader.read_bits(fill_bits, label)
+                index = reader.read_bits(fill_bits, label)
+                if index:
+                    extra.setdefault("fill_refs", []).append(index)
             if flags & 0x08:
                 reader.read_bits(line_bits, label)
             if flags & 0x10:
@@ -359,8 +388,13 @@ def count_shape_records(reader, fill_bits, line_bits, rgba, label, extra):
                 reader.read_bits(4 * bits, label)
 
 
-def parse_shape_with_style(payload, tag, shape_id, label):
-    """Parse bounds plus style arrays; count edge records, skip geometry."""
+def parse_shape_with_style(payload, tag, shape_id, label, collect_refs=False):
+    """Parse bounds plus style arrays; count edge records, skip geometry.
+
+    With collect_refs the returned dict gains "fill_refs" (referenced
+    1-based fill indices in record order); the default result shape is
+    unchanged so existing package output stays byte-identical.
+    """
     if tag in TAG_REFUSED_SHAPE:
         raise ValidationFailure(["unsupported shape tag at " + label + ": "
                                  + str(tag)])
@@ -382,8 +416,11 @@ def parse_shape_with_style(payload, tag, shape_id, label):
         reader, fill_bits, line_bits, rgba, label, extra)
     fills.extend(extra["fills"])
     lines.extend(extra["lines"])
-    return {"character_id": shape_id, "tag": tag, "bounds": bounds,
-            "fills": fills, "lines": lines, "records": records}
+    result = {"character_id": shape_id, "tag": tag, "bounds": bounds,
+              "fills": fills, "lines": lines, "records": records}
+    if collect_refs:
+        result["fill_refs"] = list(extra.get("fill_refs", []))
+    return result
 
 
 def decompress_body(data, label):
@@ -477,13 +514,90 @@ def load_all(root):
             "buildings": buildings, "statuses": statuses}
 
 
-def fingerprint_inputs(root):
+def fingerprint_inputs(root, files=None):
+    if files is None:
+        files = (BUILDINGS_FILE, REGISTRY_DIR / "inspection.json",
+                 REGISTRY_DIR / "image_extraction.json")
     digest = hashlib.sha256()
-    for relative in (BUILDINGS_FILE, REGISTRY_DIR / "inspection.json",
-                     REGISTRY_DIR / "image_extraction.json"):
+    for relative in files:
         digest.update(read_bytes_file(root / relative,
                                       "fingerprint " + relative.as_posix()))
     return digest.hexdigest()
+
+
+def merge_conversion_document(root, own_entry, own_inputs, tool_policy):
+    """Merge this converter's package entry into the shared manifest.
+
+    Reads the existing `conversions.json`, preserves foreign package
+    entries and input keys verbatim, replaces this converter's entry
+    (keyed by directory), sorts entries by directory, recomputes counts
+    from the entries, and stamps the neutral envelope policy so the
+    result does not depend on which converter ran last. A legacy
+    `building-conversion-v1` envelope is migrated only by the building
+    converter and only while it holds exactly the building entry; the
+    unit converter rejects it with a clear failure.
+    """
+    entries = []
+    inputs = {}
+    path = root / CONVERSIONS_FILE
+    if path.exists():
+        existing = read_json_file(path, "conversion manifest")
+        if not isinstance(existing, dict):
+            raise InputError("conversion manifest not object")
+        policy = existing.get("policy")
+        packages = existing.get("packages")
+        foreign_inputs = existing.get("inputs")
+        if not isinstance(packages, list):
+            raise ValidationFailure(["conversion manifest packages not array"])
+        if not isinstance(foreign_inputs, dict):
+            raise ValidationFailure(["conversion manifest inputs not object"])
+        if policy == ENVELOPE_POLICY:
+            # Foreign input keys are preserved verbatim.
+            inputs = dict(foreign_inputs)
+            entries = list(packages)
+        elif policy == POLICY:
+            if tool_policy != POLICY:
+                raise ValidationFailure(
+                    ["conversion manifest is legacy " + POLICY
+                     + "; run convert_building.py to migrate it first"])
+            foreign = [entry for entry in packages
+                       if not isinstance(entry, dict)
+                       or entry.get("directory") != own_entry["directory"]]
+            if foreign:
+                raise ValidationFailure(
+                    ["legacy conversion manifest holds foreign entries; "
+                     "refusing to migrate"])
+            # Migration supersedes the legacy content_version key with
+            # the tool-scoped key stamped by the caller.
+            inputs = {key: value for key, value in foreign_inputs.items()
+                      if key != "content_version"}
+            entries = []
+        else:
+            raise ValidationFailure(
+                ["conversion manifest policy not recognized: "
+                 + repr(policy)])
+    entries = [entry for entry in entries
+               if isinstance(entry, dict)
+               and entry.get("directory") != own_entry["directory"]]
+    entries.append(own_entry)
+    entries.sort(key=lambda entry: entry["directory"])
+    inputs.update(own_inputs)
+    output_bytes = 0
+    for entry in entries:
+        value = entry.get("output_bytes")
+        if type(value) is not int or value < 0:
+            raise ValidationFailure(
+                ["conversion manifest entry missing output_bytes: "
+                 + str(entry.get("directory"))])
+        output_bytes += value
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "policy": ENVELOPE_POLICY,
+        "result": "success",
+        "inputs": inputs,
+        "counts": {"packages": len(entries), "output_bytes": output_bytes},
+        "packages": entries,
+    }
 
 
 def build_package(repo_root, out_root):
@@ -579,28 +693,20 @@ def build_package(repo_root, out_root):
     package_payload = (json.dumps(package, indent=2, sort_keys=True) + "\n"
                        ).encode("utf-8")
     conversion_schema = load_loose_schema(root, CONVERSION_SCHEMA_FILE.name)
-    document = {
-        "schema_version": SCHEMA_VERSION,
+    document = merge_conversion_document(root, {
+        "legacy_id": TARGET_STEM,
+        "directory": (CONVERTED_BUILDINGS_DIR / TARGET_STEM).as_posix(),
+        "package_sha256": hashlib.sha256(package_payload).hexdigest(),
+        "bitmaps": len(bitmaps),
+        "output_bytes": len(package_payload) + sum(
+            bitmap["bytes"] for bitmap in bitmaps),
         "policy": POLICY,
-        "result": "success",
-        "inputs": {
-            "buildings": BUILDINGS_FILE.as_posix(),
-            "inspection": (REGISTRY_DIR / "inspection.json").as_posix(),
-            "extraction": (REGISTRY_DIR / "image_extraction.json").as_posix(),
-            "content_version": fingerprint,
-        },
-        "counts": {
-            "packages": 1,
-            "output_bytes": len(package_payload) + sum(
-                bitmap["bytes"] for bitmap in bitmaps),
-        },
-        "packages": [{
-            "legacy_id": TARGET_STEM,
-            "directory": (CONVERTED_BUILDINGS_DIR / TARGET_STEM).as_posix(),
-            "package_sha256": hashlib.sha256(package_payload).hexdigest(),
-            "bitmaps": len(bitmaps),
-        }],
-    }
+    }, {
+        "buildings": BUILDINGS_FILE.as_posix(),
+        "inspection": (REGISTRY_DIR / "inspection.json").as_posix(),
+        "extraction": (REGISTRY_DIR / "image_extraction.json").as_posix(),
+        "buildings_content_version": fingerprint,
+    }, POLICY)
     problems.extend(validate_against_schema(document, conversion_schema, "conversion"))
     if problems:
         raise ValidationFailure(problems)

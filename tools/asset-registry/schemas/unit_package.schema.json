@@ -1,0 +1,381 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tools/asset-registry/schemas/unit_package.schema.json",
+  "title": "Single converted unit package",
+  "description": "Contract for one converted unit package: identity, content and source provenance, frame data, SymbolClass id-name pairs, the root timeline, per-sprite animation inventories (labels, placements, removals), parsed shape-style records with referenced fill indices, and bitmap outputs with digests.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "content_ref",
+    "frame_width",
+    "frame_height",
+    "frame_rate",
+    "frame_count",
+    "symbols",
+    "main",
+    "sprites",
+    "shapes",
+    "bitmaps"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Unit sprite stem, also the normalized img_name."
+    },
+    "kind": {
+      "const": "converted_unit",
+      "description": "Classification: one converted unit package."
+    },
+    "source_file": {
+      "type": "string",
+      "description": "Source SWF registry path."
+    },
+    "source_layer": {
+      "type": "string",
+      "description": "Provenance layer: converted(asset-registry)."
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint of the normalized unit inputs consumed."
+    },
+    "content_ref": {
+      "type": "object",
+      "description": "The single matched normalized unit definition, recorded verbatim."
+    },
+    "frame_width": {
+      "type": "integer",
+      "description": "Stage width in pixels from the SWF header.",
+      "minimum": 1
+    },
+    "frame_height": {
+      "type": "integer",
+      "description": "Stage height in pixels from the SWF header.",
+      "minimum": 1
+    },
+    "frame_rate": {
+      "type": "number",
+      "description": "Frame rate in frames per second from the SWF header."
+    },
+    "frame_count": {
+      "type": "integer",
+      "description": "Declared root frame count from the SWF header.",
+      "minimum": 0
+    },
+    "symbols": {
+      "type": "array",
+      "description": "SymbolClass id-name pairs recorded in tag order.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "name"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Exported character id."
+          },
+          "name": {
+            "type": "string",
+            "description": "Exported class name, verbatim."
+          }
+        }
+      }
+    },
+    "main": {
+      "type": "object",
+      "description": "Root timeline inventory recorded the same way as a sprite entry.",
+      "required": ["frame_count", "labels", "placements", "removes"],
+      "additionalProperties": false,
+      "properties": {
+        "frame_count": {
+          "type": "integer",
+          "description": "Declared root frame count, validated equal to observed ShowFrame count.",
+          "minimum": 0
+        },
+        "labels": {
+          "type": "array",
+          "description": "FrameLabel names and 1-based frame indices, verbatim.",
+          "items": {
+            "type": "object",
+            "required": ["name", "frame", "anchor"],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Label name recorded verbatim, never interpreted."
+              },
+              "frame": {
+                "type": "integer",
+                "description": "1-based frame index of the labeled frame.",
+                "minimum": 1
+              },
+              "anchor": {
+                "type": "boolean",
+                "description": "Named-anchor flag presence from the FrameLabel layout."
+              }
+            }
+          }
+        },
+        "placements": {
+          "type": "array",
+          "description": "PlaceObject2 records with depth-first decoded fields.",
+          "items": {
+            "type": "object",
+            "required": ["frame", "depth", "character_id", "character_kind", "move"],
+            "additionalProperties": false,
+            "properties": {
+              "frame": {
+                "type": "integer",
+                "description": "1-based frame the placement applies to.",
+                "minimum": 1
+              },
+              "depth": {
+                "type": "integer",
+                "description": "Stack depth recorded verbatim.",
+                "minimum": 1
+              },
+              "character_id": {
+                "type": ["integer", "null"],
+                "description": "Referenced character id, null when the record carries no character.",
+                "minimum": 1
+              },
+              "character_kind": {
+                "type": ["string", "null"],
+                "enum": ["shape", "sprite"],
+                "description": "Resolved definition kind of the referenced character."
+              },
+              "move": {
+                "type": "boolean",
+                "description": "Move flag from the PlaceObject2 flags byte."
+              }
+            }
+          }
+        },
+        "removes": {
+          "type": "array",
+          "description": "RemoveObject2 records.",
+          "items": {
+            "type": "object",
+            "required": ["frame", "depth"],
+            "additionalProperties": false,
+            "properties": {
+              "frame": {
+                "type": "integer",
+                "description": "1-based frame the removal applies to.",
+                "minimum": 1
+              },
+              "depth": {
+                "type": "integer",
+                "description": "Stack depth removed, recorded verbatim.",
+                "minimum": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "sprites": {
+      "type": "array",
+      "description": "DefineSprite timeline inventories sorted by sprite id.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["sprite_id", "frame_count", "labels", "placements", "removes"],
+        "additionalProperties": false,
+        "properties": {
+          "sprite_id": {
+            "type": "integer",
+            "description": "DefineSprite character id."
+          },
+          "frame_count": {
+            "type": "integer",
+            "description": "Declared frame count, validated equal to observed ShowFrame count.",
+            "minimum": 0
+          },
+          "labels": {
+            "type": "array",
+            "description": "FrameLabel names and 1-based frame indices, verbatim.",
+            "items": {
+              "type": "object",
+              "required": ["name", "frame", "anchor"],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Label name recorded verbatim, never interpreted."
+                },
+                "frame": {
+                  "type": "integer",
+                  "description": "1-based frame index of the labeled frame.",
+                  "minimum": 1
+                },
+                "anchor": {
+                  "type": "boolean",
+                  "description": "Named-anchor flag presence from the FrameLabel layout."
+                }
+              }
+            }
+          },
+          "placements": {
+            "type": "array",
+            "description": "PlaceObject2 records with depth-first decoded fields.",
+            "items": {
+              "type": "object",
+              "required": ["frame", "depth", "character_id", "character_kind", "move"],
+              "additionalProperties": false,
+              "properties": {
+                "frame": {
+                  "type": "integer",
+                  "description": "1-based frame the placement applies to.",
+                  "minimum": 1
+                },
+                "depth": {
+                  "type": "integer",
+                  "description": "Stack depth recorded verbatim.",
+                  "minimum": 1
+                },
+                "character_id": {
+                  "type": ["integer", "null"],
+                  "description": "Referenced character id, null when the record carries no character.",
+                  "minimum": 1
+                },
+                "character_kind": {
+                  "type": ["string", "null"],
+                  "enum": ["shape", "sprite"],
+                  "description": "Resolved definition kind of the referenced character."
+                },
+                "move": {
+                  "type": "boolean",
+                  "description": "Move flag from the PlaceObject2 flags byte."
+                }
+              }
+            }
+          },
+          "removes": {
+            "type": "array",
+            "description": "RemoveObject2 records.",
+            "items": {
+              "type": "object",
+              "required": ["frame", "depth"],
+              "additionalProperties": false,
+              "properties": {
+                "frame": {
+                  "type": "integer",
+                  "description": "1-based frame the removal applies to.",
+                  "minimum": 1
+                },
+                "depth": {
+                  "type": "integer",
+                  "description": "Stack depth removed, recorded verbatim.",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "shapes": {
+      "type": "array",
+      "description": "SHAPEWITHSTYLE records with bounds, style arrays, edge counts, and referenced fill indices.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["character_id", "tag", "bounds", "fills", "lines", "records", "fill_refs"],
+        "additionalProperties": false,
+        "properties": {
+          "character_id": {
+            "type": "integer",
+            "description": "Shape character id."
+          },
+          "tag": {
+            "type": "integer",
+            "description": "DefineShape tag code."
+          },
+          "bounds": {
+            "type": "object",
+            "description": "Shape bounds RECT with twip and pixel extents.",
+            "required": ["xmin", "xmax", "ymin", "ymax", "width_px", "height_px"],
+            "additionalProperties": false,
+            "properties": {
+              "xmin": {"type": "integer", "description": "Minimum x in twips."},
+              "xmax": {"type": "integer", "description": "Maximum x in twips."},
+              "ymin": {"type": "integer", "description": "Minimum y in twips."},
+              "ymax": {"type": "integer", "description": "Maximum y in twips."},
+              "width_px": {"type": "integer", "description": "Width in pixels."},
+              "height_px": {"type": "integer", "description": "Height in pixels."}
+            }
+          },
+          "fills": {
+            "type": "array",
+            "description": "Parsed fill styles recorded verbatim, including unreferenced placeholder fills.",
+            "items": {
+              "type": "object"
+            }
+          },
+          "lines": {
+            "type": "array",
+            "description": "Parsed line styles recorded verbatim.",
+            "items": {
+              "type": "object"
+            }
+          },
+          "records": {
+            "type": "object",
+            "description": "Edge-record counts; geometry is never tessellated.",
+            "required": ["end", "style_change", "straight", "curved", "new_styles"],
+            "additionalProperties": false,
+            "properties": {
+              "end": {"type": "integer", "description": "EndShapeRecord count."},
+              "style_change": {"type": "integer", "description": "StyleChangeState count."},
+              "straight": {"type": "integer", "description": "Straight edge record count."},
+              "curved": {"type": "integer", "description": "Curved edge record count."},
+              "new_styles": {"type": "integer", "description": "Mid-stream NewStyles block count."}
+            }
+          },
+          "fill_refs": {
+            "type": "array",
+            "description": "Referenced 1-based fill indices in record order.",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    "bitmaps": {
+      "type": "array",
+      "description": "Copied bitmap outputs referenced by resolved fills.",
+      "items": {
+        "type": "object",
+        "required": ["character_id", "file", "bytes", "sha256"],
+        "additionalProperties": false,
+        "properties": {
+          "character_id": {
+            "type": "integer",
+            "description": "Bitmap character id of the resolved fill."
+          },
+          "file": {
+            "type": "string",
+            "description": "Repository-relative copy path inside the package directory."
+          },
+          "bytes": {
+            "type": "integer",
+            "description": "Copied payload byte count.",
+            "minimum": 1
+          },
+          "sha256": {
+            "type": "string",
+            "description": "SHA-256 of the copied bytes, equal to the extraction digest."
+          }
+        }
+      }
+    }
+  }
+}
