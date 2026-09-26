@@ -1,0 +1,148 @@
+{
+  "algorithm": {
+    "digest_source": "worktree bytes under core.autocrlf=true",
+    "file": "sha256 of the file bytes, lowercase hex",
+    "group": "SHA-256 of the ordinal-sorted \"<sha256>  <repo-relative posix path>\\n\" lines of every file in the group"
+  },
+  "combined_sha256": "636698690d74b0e5b802e7ca7cf93fd693c87d2c28e69f9c0776d74df167d085",
+  "generated_at_utc": "2026-09-26T18:29:24+00:00",
+  "groups": {
+    "config": {
+      "absent_paths": [],
+      "files": {
+        "config/auctionhouse.json": "0b4d74b3e69cfc58636eb3af9e89d0f88fd9f461f6d234e3e8c25f6f5ec33f0f",
+        "config/get_game_config.php_23july2012.txt": "924fc56f13199d9622444e8e1f16e6f6d19e3f378ed8545f98e2b4a76d98dd00",
+        "config/get_game_config.php_29august2012.txt": "a31a49c31df07f91f0b5e7dde9c07452029cb3db4f53ac8e9b454aef05417eda",
+        "config/get_game_config.php_29august2012_nohash.json": "55ffd929372a4a31785cfd683982856324e2b73ba9a6624c53f09b68e4dd0ea5",
+        "config/get_game_config.php_29august2012_nohash.txt": "890a94d2615eb79f82a45bb1a684b75e13dc8456811bb5582937691176840e9e",
+        "config/main.json": "55ffd929372a4a31785cfd683982856324e2b73ba9a6624c53f09b68e4dd0ea5",
+        "config/patch/atom_fusion_item.json": "0c21303a8a363e9aa24a49084af1d9ed54ff1bc65c4446854be23d8793a62d1a",
+        "config/patch/atom_fusion_items_data.json": "b8eb217c0951afe257c31acfea003f98afeea7673fa6ea0ecbd4e50ee15997ce",
+        "config/patch/atom_fusion_powerup.json": "79db1fec2ce50af2c42d47e1eead4395ebe3856b875c12a7abecd492c2396d43",
+        "config/patch/patches.txt": "680311239c57412fe4159c027a67976765b429ea3613297e6771311f5a04651a",
+        "config/patch/targets.json": "121879bef519b00804302f25c593fe8a42e7715b6b8a65ed24f60c238600e3cf",
+        "config/patch/unit_patch.json": "229fc18d2dcd67aba95fd24aa7eaf1180704e5bf02718b252317972843940230"
+      },
+      "files_count": 12,
+      "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+    },
+    "conversion_packages": {
+      "absent_paths": [],
+      "files": {
+        "assets/converted/buildings/0001_house_1_m/1.jpg": "1c8ce8838969cefed8e8c2d574b7c933ffc2076506a13f16e731d573de9853c4",
+        "assets/converted/buildings/0001_house_1_m/1_alpha.png": "6685b0af171e0da40313f26587551d976e63d48d2331ad96937c2e55d395e42c",
+        "assets/converted/buildings/0001_house_1_m/package.json": "7de262e9f5ec67b1dc57945137f3d5f9a27707d6587dddd4a508e72d366b92a7",
+        "assets/converted/units/10033_wild_elephant/1.jpg": "adca085be63b02813c0692118bd93209cb6650d7f533388878871e9059a4a71e",
+        "assets/converted/units/10033_wild_elephant/11.jpg": "a02595c982a8b9bc51b054b06f3e20dce8e2e810774dde5f61e75b9b7c4cac4d",
+        "assets/converted/units/10033_wild_elephant/11_alpha.png": "ff4c45f3203eec949548cf16b77a9dd7a47e083decd4f697c45b84b7c3897a7d",
+        "assets/converted/units/10033_wild_elephant/13.jpg": "dbb9d671297b8b07334d3dab756438cb3e34ab8ac20cbe9cef4cc12f98537617",
+        "assets/converted/units/10033_wild_elephant/13_alpha.png": "e4e60f0aec93ad1721cc26fce1e14ec2566f2ec63836ba87703c2ab27f9abc1b",
+        "assets/converted/units/10033_wild_elephant/15.jpg": "8798dfd08eaccc5e5aabf4ccc9895360a34ef1a3adc17b294d9dd8a8c2352840",
+        "assets/converted/units/10033_wild_elephant/15_alpha.png": "364443e1e65d42c315482aa3bf28b8059749bd25436b66dcc46fbd9ce836dfe6",
+        "assets/converted/units/10033_wild_elephant/17.jpg": "04e2e53db72ea0ee87686b211021aa288c3232e1348dbd0fb5f19d42429b58ed",
+        "assets/converted/units/10033_wild_elephant/17_alpha.png": "7939a7565ccfd745a4871e24ff26b564e61debbffa5b6479318d8b834a4dae6b",
+        "assets/converted/units/10033_wild_elephant/1_alpha.png": "e65eee0fd084a51ae9a8a17c3838a5584d38559b72520619829963481c337cea",
+        "assets/converted/units/10033_wild_elephant/20.jpg": "ba14581414567f6f0ab0f26689b08b481ec04eb34bcc44b11cd7f69bae959a03",
+        "assets/converted/units/10033_wild_elephant/20_alpha.png": "f44e323dd1be93c98f41901760c42b24cbe967107e16c8ff8fd836f86d54a9dc",
+        "assets/converted/units/10033_wild_elephant/22.jpg": "1a06e5338797eb0385392ee4da92e1c8acfa9a7a219565654fb8a8f8df03fb6d",
+        "assets/converted/units/10033_wild_elephant/22_alpha.png": "4a3525df106a5a52b1d4a07e602ba70de054ab929e6ec73e88aed808def21e57",
+        "assets/converted/units/10033_wild_elephant/24.jpg": "a6cb2396f192ecd57237d86f09ef486d8e141ed621b30a54d87d2fa3f2bd2767",
+        "assets/converted/units/10033_wild_elephant/24_alpha.png": "ecb31502f24f3ebfb1180fcdc3547efde194991cfa71abea53e17ea41a646a78",
+        "assets/converted/units/10033_wild_elephant/26.jpg": "680b7f2b41c5d9c5b0a4fdfd9649fb8eb9e317bfd21f3881f541b9d7dc16b1b5",
+        "assets/converted/units/10033_wild_elephant/26_alpha.png": "327b2cc7e0acfc841c50a0a0e88d1f6f420042b6419e0c948d9108221b7ee453",
+        "assets/converted/units/10033_wild_elephant/29.jpg": "8c05d4e850a457e9669bf2e740a05b0e5ae8980e09e2a6120cc52d7213bdcf31",
+        "assets/converted/units/10033_wild_elephant/29_alpha.png": "86741b7d317ac007d0d98d78edbfe3a305ed2e038d971a271706bf17636ed7f2",
+        "assets/converted/units/10033_wild_elephant/3.jpg": "282d587340b7a1ad6013a68401e5090714f437622a7ca2d42e5821142671d970",
+        "assets/converted/units/10033_wild_elephant/31.jpg": "ea4f0c2fa3d8f2ecc1b125c33d5f6e3143ab70b28f087fb0a493695163fb2a9a",
+        "assets/converted/units/10033_wild_elephant/31_alpha.png": "129754bd9b73fc0caea85f24f460d8d2e45ccdaf7b40c37b22ee687249885a95",
+        "assets/converted/units/10033_wild_elephant/33.jpg": "2c0f6f9d52c464d38ab945b5285f574fdca42dd7fc046d2b44bba51ca676a48d",
+        "assets/converted/units/10033_wild_elephant/33_alpha.png": "dc254863a514acd19467975f179c469ff8e96803c6fac199f901bc1f1971cf2c",
+        "assets/converted/units/10033_wild_elephant/35.jpg": "571d1fecc1ffd644dd99153fe728c3e799462cda4a775c5b387f6d6b7932cc76",
+        "assets/converted/units/10033_wild_elephant/35_alpha.png": "e34541191aba8c42f229d445a28b5c4cd6a23220d3e4fe04cbea70f890caefa1",
+        "assets/converted/units/10033_wild_elephant/38.jpg": "a2c5ee2bcc5bbba6a5f36f66becb5f7a6cdcb314785afff352035bb30c1e03e3",
+        "assets/converted/units/10033_wild_elephant/38_alpha.png": "bb56f7655b0fb165b9c3396b1b986ff2b50185b3fdee94fe7c5033af9010ea4a",
+        "assets/converted/units/10033_wild_elephant/3_alpha.png": "180da1a4f7a5681941b823cc1cda6cfd94272cbd1c7322fdcaee2d2356508f4e",
+        "assets/converted/units/10033_wild_elephant/40.jpg": "fd45c652ea824a1aa0013e115117b38363bcad3457fd9095b22412b9a38cc1b7",
+        "assets/converted/units/10033_wild_elephant/40_alpha.png": "e0479b6c8485a46736cc5ee2ff9340ae184334ae49b8c317e10b604509e99bff",
+        "assets/converted/units/10033_wild_elephant/42.jpg": "b2060911245b8bad6039b86c48cf48fd231d8bdd549d4bba26363e8c5c614e4b",
+        "assets/converted/units/10033_wild_elephant/42_alpha.png": "7d2f2f0e9b5a0328d8ecb48e92ae6e348dde7e1c26acb6016b797f8ee86d3664",
+        "assets/converted/units/10033_wild_elephant/44.jpg": "50d9c946930363d3b5e3904205f0e23c54f14f972a2fdef79f30f593327fa223",
+        "assets/converted/units/10033_wild_elephant/44_alpha.png": "ac043f055bbee52d37181ca0d5380a74c67dac81df8d6fc41f81beeb0f5bf5ba",
+        "assets/converted/units/10033_wild_elephant/47.jpg": "cf3d73e2d381a2f263aa4a6ab83b3a67b8f5588caea813c96e94329d79878997",
+        "assets/converted/units/10033_wild_elephant/47_alpha.png": "1eeb7f15da6f60408cbe4b85c01405b65a051b1940b4d54f97099c03d1e0ff00",
+        "assets/converted/units/10033_wild_elephant/49.jpg": "0ee0979eb030f035d3ab01090b77290799247c30b492792351ae6342a1663e4f",
+        "assets/converted/units/10033_wild_elephant/49_alpha.png": "a2b4d0594caec0024075b68cee9c40f5bc61fb3e6a0180ab0f8f282b4894d500",
+        "assets/converted/units/10033_wild_elephant/5.jpg": "553937e29eccb1b68b9ee922f34bd814767b951f1b78dfe9dca9edb5a2eb411c",
+        "assets/converted/units/10033_wild_elephant/51.jpg": "777c2e272437786b64e91630847cd7c386246c22bc23eae4971da5ac32733b75",
+        "assets/converted/units/10033_wild_elephant/51_alpha.png": "8798a63c7bef43b5659cd37b395c821160f9c203d18e3b395a30185bb4fac068",
+        "assets/converted/units/10033_wild_elephant/53.jpg": "b7ffd73f77abe33ad89b9b8cc56f29b10343627be911673d79b1d02cef88bf42",
+        "assets/converted/units/10033_wild_elephant/53_alpha.png": "3fce7cfbcc30d5cdd60943ba63f2df503a97c15236bbee897449927702268261",
+        "assets/converted/units/10033_wild_elephant/56.jpg": "2e1cd94b341cfe01b01d9ca240b6dadfecd254e38b5800b9bbb5760a316520d7",
+        "assets/converted/units/10033_wild_elephant/56_alpha.png": "c2a5d7206737cc45470398041582b53dfb74f5aabfc6dc6bcf9ffd4f37896f4e",
+        "assets/converted/units/10033_wild_elephant/58.jpg": "3cf1e8ad4aed838852df1a309ba8c7e584a4d2b6afb81b6a44437e1ceec72c82",
+        "assets/converted/units/10033_wild_elephant/58_alpha.png": "dfbf763c0a49e0e681eb3e370cbe63ec301649e2b20b1bf05acb58dd5946aa89",
+        "assets/converted/units/10033_wild_elephant/5_alpha.png": "a01f49e3ac15afd843a1bfb5412709bdbc16bb80bc874d9b207ee2329b3b10ce",
+        "assets/converted/units/10033_wild_elephant/60.jpg": "295325e31d95f1467a3e2d18b73686f853e6fdd0c672289b4c2dbdd868e705d6",
+        "assets/converted/units/10033_wild_elephant/60_alpha.png": "e0204f0cc56910983df452a0321e8d17d6e0671446dc648533625fd0c86574d7",
+        "assets/converted/units/10033_wild_elephant/7.jpg": "f8de2f2339347e9327fa0ab1a24d57c995f89691f135b7be5abf2e4c3d987249",
+        "assets/converted/units/10033_wild_elephant/7_alpha.png": "6f5bcc5dde1cb1c66ec4d338732db3b959c0203fdb078065c62c2725929bb76a",
+        "assets/converted/units/10033_wild_elephant/9.jpg": "7efba179e16a62e3b06487f0006e72bf2a9f859a1e1a1a3e38142cb31f987c1b",
+        "assets/converted/units/10033_wild_elephant/9_alpha.png": "67bd323ccfa4dde436e0bf4c462beb909016db01630a1203f4a0dd73d609d56b",
+        "assets/converted/units/10033_wild_elephant/package.json": "1234668907fec19fed8182a5f9970c93b6a10ed985b59062f63a8c06f3b2c270"
+      },
+      "files_count": 60,
+      "sha256": "9a8d9fa54b35023d279764111e9d15b409b306a1c8e9c683c880154137e38a63"
+    },
+    "legacy_sources": {
+      "absent_paths": [],
+      "files": {
+        "auctions.py": "224605c36f5103ecbc2a4e0f1faf374c0433e26b3b66cd5d5afb7cbf142700e0",
+        "bundle.py": "b1a62375a3cee195aeaf49526e2cb85eca0f9d2825a90c1e6f2951241685bb53",
+        "command.py": "90ebd5384513a757ad739df0b2e86d3fd56d9b6efc0b0bfeb704e3b55c12b6ca",
+        "constants.py": "7357609428abcf8e5abcdcf39acb882eff47c024d7580f5a5d57ea4f771dcc98",
+        "engine.py": "1f95dde44d80dfcda2a7641cd7ff5f19631c133589e458a1887229b1f920b02a",
+        "get_game_config.py": "dd14dca1a99338268cd52460753fa8fafbf8e9a01724e7cf27b5a24ce81e2b4d",
+        "get_player_info.py": "09d88cd24155053d655d211dc36a84dbdaccd22326c69ac3f77c1c3408ec0226",
+        "legacy_command_recorder.py": "7fe12897b2b22728e8854c3a34f49c962518c8d3d8c7e4927798b3a199642eb0",
+        "server.py": "4cdb45b57f84b9e7a4bff0e93dae53f0acaddbb57869806f4e0e8c5ee851cedd",
+        "sessions.py": "ad02bbea90c1eb119f60e065e635043317ef3682deed3b21924281498dd7dd9b",
+        "version.py": "e8f6d55940c288de48f2fe1b9afe7a93f39b6f6ce0a16a0e0b0fd99fb5d1a830"
+      },
+      "files_count": 11,
+      "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+    },
+    "m4_evidence": {
+      "absent_paths": [],
+      "files": {
+        "apps/client-godot/evidence/first-render/first-render.png": "da15d192a901d75c3dc0d394d7eef1f9066beca3423b58620645c7d613f2bae5",
+        "apps/client-godot/evidence/first-render/report.json": "a9d3d763bb2b759c9ef6fe257599cf48e9d0a86494e6164e7a89c45eff68d2a4"
+      },
+      "files_count": 2,
+      "sha256": "dfa732f9cde218aa7d8bed8d16ab49195eec86959c5b629d75e1ca31acc10b5f"
+    },
+    "registry_manifests": {
+      "absent_paths": [],
+      "files": {
+        "tools/asset-registry/conversions.json": "eb7c800118441fef733c332e4927427eae64e3a8275ff4e625fef3d268a08528",
+        "tools/asset-registry/image_extraction.json": "1a7406d5703f40632d9e130bb45bbb3d5eb53d1b12e9d23e898ed58ad4744f01",
+        "tools/asset-registry/inspection.json": "21eb74e03709b2170a74c85e644bbd67f710e6b28eeac1dd5f0bcf1d9edeac03"
+      },
+      "files_count": 3,
+      "sha256": "e9b3b46585e66e117e1aa0389ed3f3b24eac29e6ca3450944509991d17b0d5b0"
+    },
+    "saves": {
+      "absent_paths": [
+        "saves"
+      ],
+      "files": {
+        "tests/saves/fresh-player-pre-migration.json": "0b92be3ead3f01374dca383781095903ba7ca8171a6ad6b9576750c873a1498e",
+        "tests/saves/fresh-player.json": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+        "tests/saves/manifest.json": "ce6d52202d24969eac8dbc2e2aab665ad9f56e8766249cabd5d859325e37e106"
+      },
+      "files_count": 3,
+      "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+    }
+  },
+  "purpose": "Pre-change byte baseline of every path the godot-compatibility-boot change must leave identical; verified again in the final state.",
+  "schema": "godot-compatibility-boot/guard-baseline-v1"
+}
