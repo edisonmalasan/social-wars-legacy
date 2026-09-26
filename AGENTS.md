@@ -79,6 +79,24 @@ with `--version` prints `4.7.2.stable.official.ed1daf0bf`. WinGet created no
 `godot` PATH alias without administrator privileges; invoke the executable
 under `%LOCALAPPDATA%\Microsoft\WinGet\Packages\GodotEngine.GodotEngine_*\`.
 
+Verified first-render verification commands (Godot 4.7.2.stable, Windows x64
+interactive session; the engine has no `godot` PATH alias — the scripts
+locate the installed executable themselves):
+
+```bash
+powershell -File apps/client-godot/verify.ps1
+```
+
+This single command runs the three headless suites (package loader, scene
+build, project scope), the comparator self-test (expected exit 1), the
+windowed capture plus compare, and SHA-256 pre/post guards over both
+conversion packages and the three registry manifests; it exits 0 only when
+everything passes. Viewport capture needs an interactive display session;
+comparison and the self-test run headless. Individual engine invocations,
+tolerances, and the correctness-claim limits are documented in
+`apps/client-godot/README.md`; committed evidence lives under
+`apps/client-godot/evidence/first-render/`.
+
 Important:
 
 - The source-runtime manifest is fully pinned and verified only on Windows x64 CPython 3.9.13; see `docs/legacy-baseline.md` for interpreter provenance, two clean installs, and contained root HTTP evidence.
