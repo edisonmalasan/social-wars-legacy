@@ -33,7 +33,8 @@ SCHEMA_VERSION = 1
 INCLUDE_EXTENSIONS = (".swf", ".jpg", ".jpeg", ".png", ".mp3", ".wav", ".gif")
 EXCLUDE_PREFIXES = ("./.git/", "./saves/", "./temp/", "./new_assets/",
                     "./assets/converted/",
-                    "./build/bundle", "./build/dist", "./build/work")
+                    "./build/bundle", "./build/dist", "./build/work",
+                    "./apps/")
 
 NORMALIZED_DIR = Path("packages") / "game-content" / "normalized"
 REGISTRY_DIR = Path("tools") / "asset-registry"

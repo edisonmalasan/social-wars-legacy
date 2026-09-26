@@ -1,0 +1,183 @@
+{
+  "capture": {
+    "format": "RGBA8",
+    "height": 224,
+    "path": "apps/client-godot/evidence/first-render/first-render.png",
+    "sha256": "da15d192a901d75c3dc0d394d7eef1f9066beca3423b58620645c7d613f2bae5",
+    "width": 448
+  },
+  "engine": {
+    "godot": "4.7.2",
+    "hash": "ed1daf0bf001b61586d9930840f2f1394092c079",
+    "renderer": "opengl3",
+    "version": "4.7.2-stable (official)",
+    "video_adapter": "AMD Radeon(TM) Graphics",
+    "video_adapter_api": "3.3.0 Core Profile Context 26.5.2.260413"
+  },
+  "entities": [
+    {
+      "anchor": {
+        "x": 16.0,
+        "y": 16.0
+      },
+      "kind": "converted_building",
+      "label": "assets/converted/buildings/0001_house_1_m",
+      "legacy_id": "0001_house_1_m",
+      "oracle_ok": true,
+      "shapes": [
+        {
+          "alpha_sha256": "6685b0af171e0da40313f26587551d976e63d48d2331ad96937c2e55d395e42c",
+          "anchor": {
+            "x": 16.0,
+            "y": 16.0
+          },
+          "bitmap_id": 1,
+          "character_id": 2,
+          "jpg_sha256": "1c8ce8838969cefed8e8c2d574b7c933ffc2076506a13f16e731d573de9853c4",
+          "oracle": {
+            "bitmap_px": {
+              "x": 216.0,
+              "y": 144.0
+            },
+            "error_px": {
+              "x": 0.0,
+              "y": 0.0
+            },
+            "mapped_px": {
+              "x": 216.0,
+              "y": 144.0
+            },
+            "ok": true
+          },
+          "size": {
+            "x": 216.0,
+            "y": 144.0
+          }
+        }
+      ],
+      "size_px": {
+        "x": 216.0,
+        "y": 144.0
+      }
+    },
+    {
+      "anchor": {
+        "x": 248.0,
+        "y": 16.0
+      },
+      "kind": "converted_unit",
+      "label": "assets/converted/units/10033_wild_elephant",
+      "legacy_id": "10033_wild_elephant",
+      "oracle_ok": true,
+      "shapes": [
+        {
+          "alpha_sha256": "e65eee0fd084a51ae9a8a17c3838a5584d38559b72520619829963481c337cea",
+          "anchor": {
+            "x": 248.0,
+            "y": 16.0
+          },
+          "bitmap_id": 1,
+          "character_id": 2,
+          "jpg_sha256": "adca085be63b02813c0692118bd93209cb6650d7f533388878871e9059a4a71e",
+          "oracle": {
+            "bitmap_px": {
+              "x": 171.0,
+              "y": 191.0
+            },
+            "error_px": {
+              "x": 0.0,
+              "y": 0.0
+            },
+            "mapped_px": {
+              "x": 171.0,
+              "y": 191.0
+            },
+            "ok": true
+          },
+          "size": {
+            "x": 171.0,
+            "y": 191.0
+          }
+        }
+      ],
+      "size_px": {
+        "x": 171.0,
+        "y": 191.0
+      }
+    }
+  ],
+  "generated_by": "apps/client-godot/scripts/verification.gd",
+  "inputs": {
+    "manifests": [
+      {
+        "path": "tools/asset-registry/conversions.json",
+        "sha256": "eb7c800118441fef733c332e4927427eae64e3a8275ff4e625fef3d268a08528"
+      },
+      {
+        "path": "tools/asset-registry/inspection.json",
+        "sha256": "21eb74e03709b2170a74c85e644bbd67f710e6b28eeac1dd5f0bcf1d9edeac03"
+      },
+      {
+        "path": "tools/asset-registry/image_extraction.json",
+        "sha256": "1a7406d5703f40632d9e130bb45bbb3d5eb53d1b12e9d23e898ed58ad4744f01"
+      }
+    ],
+    "packages": [
+      {
+        "dir": "assets/converted/buildings/0001_house_1_m",
+        "directory_sha256": "a63dc0afb6128c8b2e96877636ba4b697a61dcae277ec3b63d99a5764fc10e66",
+        "files": 3
+      },
+      {
+        "dir": "assets/converted/units/10033_wild_elephant",
+        "directory_sha256": "0eac109bc32cdf7919e613eaa18f89e43fc0177c46e272460588247b324058b4",
+        "files": 57
+      }
+    ]
+  },
+  "metrics": {
+    "entity_coverage": 1.0,
+    "entity_pixels_matched": 38416,
+    "entity_pixels_visible": 38416,
+    "max_abs_per_channel": {
+      "a": 0,
+      "b": 1,
+      "g": 1,
+      "r": 1
+    },
+    "mean_abs_per_channel": {
+      "a": 0.0,
+      "b": 0.0197,
+      "g": 0.0148,
+      "r": 0.0167
+    },
+    "pixels_over_tolerance": 0,
+    "pixels_over_tolerance_ratio": 0.0,
+    "pixels_total": 100352,
+    "pixels_with_any_diff": 2794,
+    "worst_pixel": {
+      "channel": "g",
+      "value": 1,
+      "x": 167,
+      "y": 16
+    }
+  },
+  "mode": "capture",
+  "reference": {
+    "builder": "reference-compositor/v1",
+    "height": 224,
+    "perturbed": false,
+    "width": 448
+  },
+  "result": {
+    "failures": [],
+    "pass": true
+  },
+  "schema": "first-render-in-godot/report/v1",
+  "tolerance": {
+    "max_channel_abs": 2,
+    "max_pixels_over_tolerance_ratio": 0.005,
+    "mean_abs_max": 0.5,
+    "min_entity_coverage": 0.95
+  }
+}

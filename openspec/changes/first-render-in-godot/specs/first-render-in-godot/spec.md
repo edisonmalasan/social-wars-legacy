@@ -33,7 +33,7 @@ The system SHALL load `assets/converted/buildings/0001_house_1_m/package.json` a
 - **THEN** loading fails with an error naming the package and no render output is produced from it
 
 ### Requirement: Frame-1 placement resolution
-The system SHALL resolve frame-1 renderable content by walking `main` placements into sprite timelines and their frame-1 placements down to shapes, SHALL select fills only through `fill_refs` (ignoring unreferenced `65535` placeholder fills), and SHALL fail with an explicit error when a placement references a character the package does not contain. Transforms SHALL be applied as the package expresses them; where placements carry no transform fields, identity is used.
+The system SHALL resolve frame-1 renderable content by walking `main` placements into sprite timelines and their frame-1 placements down to shapes, SHALL select fills through `fill_refs` where the package provides it and SHALL never select an unreferenced `65535` placeholder fill, and SHALL fail with an explicit error when a placement references a character the package does not contain. Transforms SHALL be applied as the package expresses them; where placements carry no transform fields, identity is used.
 
 #### Scenario: Resolve the house
 - **WHEN** frame-1 resolution runs on the building package
