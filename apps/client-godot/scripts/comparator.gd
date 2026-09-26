@@ -145,6 +145,10 @@ static func compare(capture: Image, reference: Image,
 		if float(mean_abs[channel]) > float(tolerance["mean_abs_max"]):
 			failures.append("mean_abs.%s = %s exceeds %s"
 				% [channel, mean_abs[channel], tolerance["mean_abs_max"]])
+	for channel in CHANNELS:
+		if int(max_abs[channel]) > int(tolerance["max_channel_abs"]):
+			failures.append("max_abs.%s = %s exceeds %s"
+				% [channel, max_abs[channel], tolerance["max_channel_abs"]])
 	if over_ratio > float(tolerance["max_pixels_over_tolerance_ratio"]):
 		failures.append(
 			"failing pixel ratio %s (%s of %s pixels over +%s per channel) exceeds %s"

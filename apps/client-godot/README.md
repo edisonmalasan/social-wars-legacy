@@ -151,18 +151,26 @@ assuming a cause.
 | `max_pixels_over_tolerance_ratio` | 0.005 (5 ‰) | Observed 0 pixels over tolerance. Allows a handful of driver-specific outliers without accepting a widespread mismatch: the self-test's single 24×24 block already reaches 0.00574 and fails. |
 | `min_entity_coverage` | 0.95 | Observed 1.0 (38,416 of 38,416 visible entity pixels). Tolerates edge pixels only; a displaced, clipped or missing shape collapses this — the perturbed self-test reference drops to 0.9852 while the other criteria fail. |
 
-All four are AND-ed: the run fails if any is violated, and the report lists
-every violated criterion under `failures`. The reference comparator never
-reads the captured PNG — it re-decodes the package with its own file reads
-and straight-alpha over-blend — so a green result is a real cross-check.
+All four are AND-ed: the run fails if any is violated — `max_abs_per_channel`
+against `max_channel_abs`, `mean_abs_per_channel` against `mean_abs_max`, the
+over-tolerance pixel ratio, and entity coverage — and the report lists every
+violated criterion under `failures`. The reference comparator never reads
+the captured PNG — it re-decodes the package with its own file reads and
+straight-alpha over-blend — so a green result cross-checks decoding, matrix
+mapping and compositing. Placement resolution itself is shared between the
+two paths and is cross-checked separately by the loader tests, the
+bounds↔bitmap oracle, and verify.ps1's report assertions.
 
 ### Self-test (tolerance sensitivity)
 
 `run_selftest.gd` perturbs a 24×24 block of the rendered frame with opaque
 red before comparison. Measured outcome: exit `1`, `[selftest] DETECTED`,
 `pixels_over_tolerance = 576` (= 24×24), `max_abs_per_channel.r = 191`,
-and the two recorded failures
-`mean_abs.r = 1.113 exceeds 0.5` and
+and the five recorded failures
+`mean_abs.r = 1.113 exceeds 0.5`,
+`max_abs.r = 191 exceeds 2`,
+`max_abs.g = 64 exceeds 2`,
+`max_abs.b = 64 exceeds 2`, and
 `failing pixel ratio 0.00574 (576 of 100352 pixels over +2 per channel)
 exceeds 0.005` — proving the tolerances reject a local colour error even
 though its entity coverage (0.9852) alone would still pass.
