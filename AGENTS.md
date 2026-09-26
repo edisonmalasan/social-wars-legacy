@@ -15,7 +15,7 @@ Do not treat the legacy repository as disposable code.
 - Legacy server: Python + Flask
 - Legacy storage: JSON save files
 - Legacy client: Flash/SWF — reference only; must be retired from modern runtime
-- Modern client: Godot 4.x + GDScript `[exact Godot version must be pinned before M5]`
+- Modern client: Godot 4.7.2.stable + GDScript `[pinned 2026-09-26 via winget package GodotEngine.GodotEngine; installed executable verified: Godot_v4.7.2-stable_win64.exe → 4.7.2.stable.official.ed1daf0bf]`
 - Compatibility layer: Python
 - Target server: Python + FastAPI + Pydantic + SQLAlchemy + Alembic
 - Target database: PostgreSQL
@@ -66,6 +66,18 @@ Current baseline syntax check:
 ```bash
 python -m compileall -q .
 ```
+
+Local Godot engine install (Windows x64; prerequisite for the future Godot
+client — no Godot project exists yet, so this is not a project build command):
+
+```bash
+winget install GodotEngine.GodotEngine --accept-package-agreements --accept-source-agreements
+```
+
+Verified 2026-09-26: running the installed `Godot_v4.7.2-stable_win64.exe`
+with `--version` prints `4.7.2.stable.official.ed1daf0bf`. WinGet created no
+`godot` PATH alias without administrator privileges; invoke the executable
+under `%LOCALAPPDATA%\Microsoft\WinGet\Packages\GodotEngine.GodotEngine_*\`.
 
 Important:
 
