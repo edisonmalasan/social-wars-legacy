@@ -32,4 +32,4 @@
 - [x] 5.2 Land a project-scope check asserting no game-system autoload/scene/script exists in `apps/client-godot/`, and verify it runs as part of the verification command.
 - [x] 5.3 Update `AGENTS.md` with the Godot commands actually executed and evidence paths, complete `apps/client-godot/README.md` (evidence locations, correctness-claim limits — source-bitmap fidelity, not live-Flash parity — display-session constraint), and verify both documents' commands run exactly as written from a clean state.
 - [x] 5.4 Commit the evidence (`first-render.png`, `report.json`), run every test added by this change plus the full existing asset-registry suite under pinned CPython 3.9.13, and verify all pass, `git diff --check` is clean, and no source/package bytes changed.
-- [ ] 5.5 Update the roadmap Project Status ledger with the M4 exit assessment result and pointers to the committed evidence; verify the ledger statement matches the actual report contents.
+- [x] 5.5 Update the roadmap Project Status ledger with the M4 exit assessment result and pointers to the committed evidence; verify the ledger statement matches the actual report contents.
