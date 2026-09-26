@@ -2,17 +2,17 @@
 
 ## 1. Executed-legacy boot fixtures
 
-- [ ] 1.1 Write the fixture capture command that starts the real legacy Flask server in a disposable copy (pinned CPython 3.9.13, `-B`, temporary corpus seeded from `tests/saves/fresh-player.json`), performs the legacy login/session save-list request plus `get_game_config.php` and `get_player_info.php` requests with exact request parameters, records before-hashes, responses, and after-hashes, and stops the server within the run.
-- [ ] 1.2 Execute the capture; commit the captured request/before/response/after fixtures under `tests/fixtures/godot-compatibility-boot/` with a README naming the executable, invocation, exit code, and containment (no working-tree save touched, disposable copy discarded).
-- [ ] 1.3 Commit the field-stability record separating stable fields from time-dependent fields (timestamps, time-derived config) with the documented normalization for each time-dependent field, derived from two captures or code inspection as appropriate.
-- [ ] 1.4 Define the SHA-256 guard set (legacy sources, `config/`, both conversion packages, the three registry manifests, committed M4 evidence, on-disk saves) and capture the pre-change baseline digests.
+- [x] 1.1 Write the fixture capture command that starts the real legacy Flask server in a disposable copy (pinned CPython 3.9.13, `-B`, temporary corpus seeded from `tests/saves/fresh-player.json`), performs the legacy login/session save-list request plus `get_game_config.php` and `get_player_info.php` requests with exact request parameters, records before-hashes, responses, and after-hashes, and stops the server within the run.
+- [x] 1.2 Execute the capture; commit the captured request/before/response/after fixtures under `tests/fixtures/godot-compatibility-boot/` with a README naming the executable, invocation, exit code, and containment (no working-tree save touched, disposable copy discarded).
+- [x] 1.3 Commit the field-stability record separating stable fields from time-dependent fields (timestamps, time-derived config) with the documented normalization for each time-dependent field, derived from two captures or code inspection as appropriate.
+- [x] 1.4 Define the SHA-256 guard set (legacy sources, `config/`, both conversion packages, the three registry manifests, committed M4 evidence, on-disk saves) and capture the pre-change baseline digests.
 
 ## 2. Compatibility API v0 service
 
-- [ ] 2.1 Add `apps/compat-api/` with a Flask service skeleton using only the existing locked dependencies: loopback `127.0.0.1` binding at port 5056, legacy state initialization matching `server.py` (`load_saves`, `load_static_villages`, `load_quests`) by importing the legacy boot modules unchanged, and a documented start command.
-- [ ] 2.2 Implement `GET /v0/session` (legacy `all_saves_info()` + game version + server time in the documented envelope) and `POST /v0/bootstrap` (legacy `get_game_config()` + `get_player_info()` payloads), with structured JSON errors: 400 missing `user_id`, 404 unknown save, non-2xx, no partial payload.
-- [ ] 2.3 Guarantee no persistence: the service never calls `save_session` or writes any file; add a test asserting pre/post SHA-256 identity of every save in the corpus after session + bootstrap calls (including the in-memory `last_logged_in`/`reset_stuff` semantics being exercised).
-- [ ] 2.4 Add offline parity tests: Compatibility API outputs replayed against the committed legacy fixtures field-by-field for stable fields and under the documented normalization for time-dependent fields, with no server and no network running.
+- [x] 2.1 Add `apps/compat-api/` with a Flask service skeleton using only the existing locked dependencies: loopback `127.0.0.1` binding at port 5056, legacy state initialization matching `server.py` (`load_saves`, `load_static_villages`, `load_quests`) by importing the legacy boot modules unchanged, and a documented start command.
+- [x] 2.2 Implement `GET /v0/session` (legacy `all_saves_info()` + game version + server time in the documented envelope) and `POST /v0/bootstrap` (legacy `get_game_config()` + `get_player_info()` payloads), with structured JSON errors: 400 missing `user_id`, 404 unknown save, non-2xx, no partial payload.
+- [x] 2.3 Guarantee no persistence: the service never calls `save_session` or writes any file; add a test asserting pre/post SHA-256 identity of every save in the corpus after session + bootstrap calls (including the in-memory `last_logged_in`/`reset_stuff` semantics being exercised).
+- [x] 2.4 Add offline parity tests: Compatibility API outputs replayed against the committed legacy fixtures field-by-field for stable fields and under the documented normalization for time-dependent fields, with no server and no network running.
 
 ## 3. GameApi abstraction and boot scene
 
