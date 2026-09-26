@@ -25744,7 +25744,8 @@
       "assets/converted/",
       "build/bundle",
       "build/dist",
-      "build/work"
+      "build/work",
+      "apps/"
     ],
     "include_extensions": [
       ".swf",

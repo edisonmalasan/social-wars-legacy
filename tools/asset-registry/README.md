@@ -10,7 +10,9 @@ execution.
 - Worktree asset files with extensions `.swf`, `.jpg`, `.jpeg`,
   `.png`, `.mp3`, `.wav`, `.gif`, minus exclusions `.git/`, `saves/`,
   `temp/`, `new_assets/`, `assets/converted/` (generated outputs are
-  not source corpus), `build/bundle`, `build/dist`, `build/work`.
+  not source corpus), `build/bundle`, `build/dist`, `build/work`, and
+  `apps/` (modern Godot client output — project files and committed
+  render evidence are not legacy source corpus).
 - Committed normalized outputs: `buildings.json`, `units.json`,
   `specials.json` (`img_name`), `magics.json` (`img_name`),
   `sounds.json` (`file`), `images.json` (`path`).
