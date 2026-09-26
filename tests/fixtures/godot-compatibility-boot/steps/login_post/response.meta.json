@@ -1,0 +1,17 @@
+{
+  "body_bytes": 207,
+  "body_sha256": "2de230237d9f4055670576b9485897dbc06581889ca90527504cbdbd4933ec01",
+  "captured_at_utc": "2026-09-26T18:15:06+00:00",
+  "headers": {
+    "Connection": "close",
+    "Content-Length": "207",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Sat, 26 Sep 2026 18:15:06 GMT",
+    "Location": "/play.html",
+    "Server": "Werkzeug/2.2.3 Python/3.9.13",
+    "Set-Cookie": "session=.eJyrVnJ39HUNcw0K9vT3U7JSckosTi1OTY431DPVM9ErLk9T0lEKDXYN8nQBShpAgS6YMAERFjAuFBgq1QIAmEUT_w.argLqg.-KMQgqV3_TwGpmsmg1Bh_O4LFCc; HttpOnly; Path=/",
+    "Vary": "Cookie"
+  },
+  "reason": "FOUND",
+  "status": 302
+}

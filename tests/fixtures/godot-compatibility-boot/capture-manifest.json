@@ -1,0 +1,195 @@
+{
+  "cleanup": {
+    "disposable_removed_before_manifest_write": true,
+    "server_stopped_within_run": true
+  },
+  "containment": {
+    "disposable_copy_removed": true,
+    "fixture_output": "tests/fixtures/godot-compatibility-boot",
+    "identical": true,
+    "loopback_only": true,
+    "method": "SHA-256 snapshot of every read working-tree group before the run and after the server stopped; equal or the run fails before writing fixtures.",
+    "no_flash_browser_external_network": true,
+    "only_working_tree_writes": "fixture files under --out",
+    "post_combined_sha256": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "post_run": {
+      "config": {
+        "exists": true,
+        "files": 12,
+        "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+      },
+      "mods": {
+        "exists": true,
+        "files": 2,
+        "sha256": "81b3c6e1f426e8813d96028b9035a853c1fbff8716256e84e956d8826f136ba3"
+      },
+      "root_python": {
+        "exists": true,
+        "files": 11,
+        "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+      },
+      "saves": {
+        "exists": false,
+        "files": 0,
+        "sha256": "absent"
+      },
+      "templates": {
+        "exists": true,
+        "files": 19,
+        "sha256": "2dffe0ca8746b63cf64fd1062a7f259ba2bb85a2fc54f7a2cd2bd2564ffee4ef"
+      },
+      "tests/saves": {
+        "exists": true,
+        "files": 3,
+        "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+      },
+      "villages": {
+        "exists": true,
+        "files": 31,
+        "sha256": "92429a07402766d8183b16fb32178b5c51f1e555df69d3cb46085a7d977f96ea"
+      }
+    },
+    "pre_combined_sha256": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "pre_run": {
+      "config": {
+        "exists": true,
+        "files": 12,
+        "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+      },
+      "mods": {
+        "exists": true,
+        "files": 2,
+        "sha256": "81b3c6e1f426e8813d96028b9035a853c1fbff8716256e84e956d8826f136ba3"
+      },
+      "root_python": {
+        "exists": true,
+        "files": 11,
+        "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+      },
+      "saves": {
+        "exists": false,
+        "files": 0,
+        "sha256": "absent"
+      },
+      "templates": {
+        "exists": true,
+        "files": 19,
+        "sha256": "2dffe0ca8746b63cf64fd1062a7f259ba2bb85a2fc54f7a2cd2bd2564ffee4ef"
+      },
+      "tests/saves": {
+        "exists": true,
+        "files": 3,
+        "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+      },
+      "villages": {
+        "exists": true,
+        "files": 31,
+        "sha256": "92429a07402766d8183b16fb32178b5c51f1e555df69d3cb46085a7d977f96ea"
+      }
+    },
+    "working_tree_saves_unchanged": true
+  },
+  "corpus": {
+    "pid": "00000000-0000-4000-8000-000000000001",
+    "seed": {
+      "file_sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+      "path": "tests/saves/fresh-player.json",
+      "saves_group_sha256_before_server_start": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6"
+    },
+    "seeded_as": "saves/<pid>.save.json in the disposable copy",
+    "startup_preserved_seed": true
+  },
+  "executed_at_utc": "2026-09-26T18:15:06+00:00",
+  "exit_code": 0,
+  "interpreter": {
+    "executable": "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+    "requirement": "CPython 3.9.x (pinned baseline for this change)",
+    "version": "3.9.13 (tags/v3.9.13:6de2ca5, May 17 2022, 16:36:42) [MSC v.1929 64 bit (AMD64)]"
+  },
+  "invocation": "python -B apps/compat-api/capture_legacy_fixtures.py",
+  "purpose": "Executed request/before/response/after fixtures for the legacy boot endpoints; parity oracle for Compatibility API v0 tests.",
+  "requests": {
+    "count": 5,
+    "dynamic_endpoint_requests": 2,
+    "login_surface_requests": 3,
+    "steps": [
+      {
+        "method": "GET",
+        "name": "login_page",
+        "path": "/",
+        "response_bytes": 3529,
+        "response_sha256": "818607bbdb5e2e52866ab03e9eff2bd176e54ef2761ec6cc887daa93bfb8893c",
+        "saves_sha256_after": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6",
+        "saves_sha256_before": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6",
+        "saves_unchanged_by_call": true,
+        "status": 200,
+        "target": "/"
+      },
+      {
+        "method": "POST",
+        "name": "login_post",
+        "path": "/",
+        "response_bytes": 207,
+        "response_sha256": "2de230237d9f4055670576b9485897dbc06581889ca90527504cbdbd4933ec01",
+        "saves_sha256_after": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6",
+        "saves_sha256_before": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6",
+        "saves_unchanged_by_call": true,
+        "status": 302,
+        "target": "/"
+      },
+      {
+        "method": "GET",
+        "name": "play_page",
+        "path": "/play.html",
+        "response_bytes": 7346,
+        "response_sha256": "67e89cc03eb100740819fc3623e405ff4191f35f5c078a18a5eaada7017703d8",
+        "saves_sha256_after": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6",
+        "saves_sha256_before": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6",
+        "saves_unchanged_by_call": true,
+        "status": 200,
+        "target": "/play.html"
+      },
+      {
+        "method": "GET",
+        "name": "get_game_config",
+        "path": "/dynamic/menvswomen/srvsexwars/get_game_config.php",
+        "response_bytes": 1092491,
+        "response_sha256": "c96d3d1940a1906e624bcac01f448170323813dda3e7bb59077f1b244bb96d4c",
+        "saves_sha256_after": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6",
+        "saves_sha256_before": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6",
+        "saves_unchanged_by_call": true,
+        "status": 200,
+        "target": "/dynamic/menvswomen/srvsexwars/get_game_config.php?USERID=00000000-0000-4000-8000-000000000001&user_key=123456789&language=en"
+      },
+      {
+        "method": "POST",
+        "name": "get_player_info",
+        "path": "/dynamic/menvswomen/srvsexwars/get_player_info.php",
+        "response_bytes": 5492,
+        "response_sha256": "facedf76784d3dc03a3a45e81756a8546f90f7647dbff8917593404d9e401709",
+        "saves_sha256_after": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6",
+        "saves_sha256_before": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6",
+        "saves_unchanged_by_call": true,
+        "status": 200,
+        "target": "/dynamic/menvswomen/srvsexwars/get_player_info.php"
+      }
+    ]
+  },
+  "schema": "godot-compatibility-boot/legacy-capture-v1",
+  "server": {
+    "command": [
+      "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+      "-B",
+      "server.py"
+    ],
+    "command_recorder_env": "SOCIALWARS_COMMAND_RECORD_DIR stripped from child",
+    "cwd": "<disposable copy under the system temp root>",
+    "host": "127.0.0.1",
+    "output_logs": "server.stdout.log / server.stderr.log inside the disposable copy (removed with the copy; not committed)",
+    "port": 5055,
+    "port_free_after_stop": true,
+    "port_free_before_start": true,
+    "readiness": "TCP connect loop on 127.0.0.1:5055 (no extra HTTP request)",
+    "stopped_by": "taskkill /T /F <pid>, wait, then port-free re-check"
+  }
+}

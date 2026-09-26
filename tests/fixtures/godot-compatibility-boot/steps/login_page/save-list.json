@@ -1,0 +1,13 @@
+{
+  "derived_from": "steps/login_page/response.body",
+  "game_version": "alpha 0.02",
+  "parsing": "templates/login.html rendering: option value=userid, option text '<name> ~ level <level> (<xp> xp)'; game version from 'By the Social Warriors team ~ <version>'. Names are HTML-unescaped.",
+  "saves": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "level": 1,
+      "name": "Warrior",
+      "xp": 4
+    }
+  ]
+}

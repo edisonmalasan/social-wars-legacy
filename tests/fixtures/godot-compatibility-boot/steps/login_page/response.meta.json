@@ -1,0 +1,14 @@
+{
+  "body_bytes": 3529,
+  "body_sha256": "818607bbdb5e2e52866ab03e9eff2bd176e54ef2761ec6cc887daa93bfb8893c",
+  "captured_at_utc": "2026-09-26T18:15:06+00:00",
+  "headers": {
+    "Connection": "close",
+    "Content-Length": "3529",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Sat, 26 Sep 2026 18:15:06 GMT",
+    "Server": "Werkzeug/2.2.3 Python/3.9.13"
+  },
+  "reason": "OK",
+  "status": 200
+}

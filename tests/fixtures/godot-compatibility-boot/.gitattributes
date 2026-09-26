@@ -1,0 +1,5 @@
+# Byte-exact response fixtures: never normalize these bytes.
+* -text whitespace=cr-at-eol
+
+# Legacy HTML is preserved verbatim; its indentation is evidence, not style.
+*.body whitespace=-trailing-space,-space-before-tab

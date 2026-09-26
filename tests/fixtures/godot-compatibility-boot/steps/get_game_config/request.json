@@ -1,0 +1,21 @@
+{
+  "captured_at_utc": "2026-09-26T18:15:06+00:00",
+  "form": null,
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "GET",
+  "note": "Exact client request bytes are reconstructed from this record; Host is set explicitly, no User-Agent header is sent.",
+  "path": "/dynamic/menvswomen/srvsexwars/get_game_config.php",
+  "port": 5055,
+  "query": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "language": "en",
+    "user_key": "123456789"
+  },
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/get_game_config.php?USERID=00000000-0000-4000-8000-000000000001&user_key=123456789&language=en"
+}
