@@ -50,3 +50,53 @@ V = `verify.ps1`, VB = `verify-boot.ps1`.
 | 14 | Record the milestone progress | roadmap `Project Status` ledger entry (task 5.3, archive stage) | — (ledger) |
 | 15 | (R1) Boot with the pinned engine | `test_project_scope` pinned-engine check (`find("4.7")`) + `test_boot_scene` ready-marker assertion (`contains("4.7.2")`) + boot-report `main-scene boot reported engine 4.7.2` + VB main-scene live phase | V, VB |
 | 16 | (R1) Remain within the verification scope | `test_project_scope` (`checks=589`): allow-list, four autoloads, no UI/legacy/transport tokens, first-render scene and tests intact | V |
+
+Disclosures: every specified branch is executed directly — both zoom-bound
+rejections, all three pan rejections, every `handle_input` branch (wheel at
+both bounds, press/motion/zero-motion/release, release without a drag,
+right/idle/key/wheel-release pass-through), and the `_unhandled_input`
+delegation. The source-scan early return on an unreadable file is a test
+harness failure guard, not specified behavior.
+
+### Verification record (2026-09-27)
+
+Independent verifier subagent verdict: **PASS, 0 CRITICAL, 5 WARNINGs, 7 NOTEs**.
+
+- W1 (spec scenarios 2/7 claim position unchanged, but
+  `_assert_zoom_unchanged` asserted only level/factor/node zoom) →
+  repaired: the helper takes an expected position and all four
+  bound-rejection sites pass `Vector2.ZERO`; suite re-run green
+  (`checks=128`, +4).
+- W2 (a left release with no active drag had no check) → repaired: added
+  to `_check_passthrough` (+1).
+- W3 (task 1.1 attributed transport/legacy-protocol coverage to the
+  suite's own scan) → repaired: reworded to the project-scope scan, which
+  owns those tokens for every allow-listed file.
+- W4 (design D9 risk claimed "both scenes are asserted unchanged"; only
+  the scene *set* is asserted) → repaired: the risk sentence now states
+  set equality over the two allow-listed paths, that this change edits no
+  `.tscn`, and that per-scene contents remain governed by the scene-build
+  suite's structural assertions.
+- W5 (task 5.2 claimed every row names a check that ran; rows 13–14 are
+  records work) → repaired: qualified to the code rows (1–12, 15–16) with
+  rows 13–14 named as docs/ledger records, row 14 deferred to archive.
+- NOTEs: N1 wheel-down sync now also asserts factor and node zoom (+2);
+  N2 mapping row 15 cites the exact checks (`find("4.7")`,
+  `contains("4.7.2")`, the boot-report engine line); N3 the suite's
+  source-contract scan extended from 13 to 16 tokens
+  (`OS.get_unix_time`, `DirAccess`, `ResourceSaver`, +3); N4 design D2
+  wording now names the proposal/design/tasks/README plus the spec
+  Purpose as the provisional framing; N5 the proposal's M5 delivered set
+  corrected to "all except camera and UI foundation"; N7 mapping row 12
+  attribution corrected (guard baseline + `git status`, plus verify
+  assertions). N6 (spec-boundary audit) clean: only
+  `first-render-in-godot` R1 required the MODIFIED delta and the
+  verifier confirmed the precedent that per-change containment clauses in
+  older living specs are historical records of their own boundary.
+- Repairs re-verified in the final state: `test_camera_controls`
+  `checks=128`, `test_project_scope` `checks=589` (41 files, 32
+  sources); full battery re-run green (`verify.ps1` and `verify-boot.ps1`
+  exit 0, guard pre=post `6978b959…`, `boot-report.json` 50 assertions
+  `pass=true` with the camera suite recorded); `git diff --check` 0;
+  `openspec validate godot-camera --strict` exit 0; `openspec validate
+  --all --strict` 32/32.
