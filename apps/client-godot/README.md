@@ -86,7 +86,7 @@ godot --path apps/client-godot res://scenes/first_render.tscn
   package directory (`packages/game-content/`).
 - Godot discovers and reports engine `4.7.2.stable` exactly.
 - All five headless test suites exit 0 and print `[test] PASS`
-  (observed check counts: loader 123, scene-build 36, project-scope 613,
+  (observed check counts: loader 123, scene-build 36, project-scope 589,
   content-registry 52, asset-ids 50).
 - The three deliberate-failure scenarios exit non-zero **and** print their
   `[test] EXPECTED-FAILURE` markers (no `UNEXPECTED-ACCEPT`).
@@ -296,7 +296,7 @@ powershell -File apps/client-godot/verify-boot.ps1
 ```
 
 It runs, in order: guard baseline → Compatibility API unittest discovery +
-loopback smoke → the six headless Godot suites → the unreachable-endpoint
+loopback smoke → the seven headless Godot suites → the unreachable-endpoint
 scenario against a port with nothing listening → three live phases → guard
 baseline again → `evidence/boot/boot-report.json`. Each live phase is wrapped
 by `compat_live_phase.py`, which starts `apps/compat-api/run.py`, waits for
@@ -319,6 +319,9 @@ godot --headless --path apps/client-godot -s res://tests/test_session.gd -- --ga
 # Game clock scaffold + boot integration (110 observed checks): same dead
 # endpoint for its follow-up failing boot that must clear the anchor
 godot --headless --path apps/client-godot -s res://tests/test_game_clock.gd -- --gameapi-endpoint=http://127.0.0.1:5057
+# Camera controls (118 observed checks): pure component, no API and no
+# boot flow; the endpoint argument the loop passes is ignored
+godot --headless --path apps/client-godot -s res://tests/test_camera_controls.gd
 # Failure path: the scene must enter the explicit error state (suite exits 0
 # only when it observed it)
 godot --headless --path apps/client-godot -s res://tests/test_boot_scene.gd -- --scenario=unreachable --gameapi-endpoint=http://127.0.0.1:5057
@@ -347,6 +350,24 @@ integration: at `state=ready` the clock is anchored within a bounded
 interval of the fixture response timestamp, a failed boot leaves no anchor
 behind, and a failing follow-up attempt clears the previous anchor rather
 than keeping it. It is the sixth hermetic suite `verify-boot.ps1` runs.
+
+The camera suite (OpenSpec `godot-camera`) proves the camera controls
+component — a `Camera2D`-based, non-autoload part instanced by scenes: the
+default view at creation, discrete zoom levels 0–2 over the fixed factor
+table `1.0 / 2.0 / 4.0` (provisional foundation values — authentic town
+camera ranges and bounds bind at the M6 town slice, captured with evidence
+first), both level-bound rejections failing closed with state untouched,
+exact cumulative world-space pans with the zero vector and non-finite
+deltas rejected, and change-only pan/zoom notifications whose payloads are
+the committed change. Its pointer half maps wheel notches (consumed,
+silent at a bound), a left drag that pans the content under the cursor by
+the screen movement divided by the committed zoom factor (exact at two
+levels), and pass-through for unrelated events, with the node's own
+`_unhandled_input` delegation observed through behavior; a final source
+scan covers the component's no-clock, no-persistence, no-loading, and
+no-other-script clauses. It is the seventh hermetic suite
+`verify-boot.ps1` runs, and it needs no endpoint, service, or boot flow
+(118 observed checks).
 
 ### Evidence
 
