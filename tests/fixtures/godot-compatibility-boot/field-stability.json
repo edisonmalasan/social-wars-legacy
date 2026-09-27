@@ -1,0 +1,225 @@
+{
+  "derivation": {
+    "capture_a": {
+      "executed_at_utc": "2026-09-26T18:15:06+00:00",
+      "invocation": "python -B apps/compat-api/capture_legacy_fixtures.py",
+      "path": "tests/fixtures/godot-compatibility-boot"
+    },
+    "capture_b": {
+      "executed_at_utc": "2026-09-26T18:22:47+00:00",
+      "invocation": "python -B apps/compat-api/capture_legacy_fixtures.py",
+      "path": "<transient second capture; not committed>"
+    },
+    "code_inspection": [
+      {
+        "claim": "Returns int(time.time()): every timestamp in the boot surfaces is wall-clock epoch seconds and cannot equal a fixture value at a later run.",
+        "file": "engine.py",
+        "symbol": "timestamp_now"
+      },
+      {
+        "claim": "Computes ts_now once, returns it as 'timestamp', and assigns the same ts_now to session(USERID)['playerInfo']['last_logged_in'] before serializing playerInfo; both fields are therefore equal within one response and change on every call.",
+        "file": "get_player_info.py",
+        "symbol": "get_player_info"
+      },
+      {
+        "claim": "get_game_config() runs make_dynamic() on every call, and make_dynamic rewrites darts_items[*].start_date from the wall clock (week-aligned wrap of the stored schedule). The values are time-derived even when two captures in the same wrap window produce identical strings.",
+        "file": "get_game_config.py",
+        "symbol": "get_game_config / make_dynamic / update_darts"
+      },
+      {
+        "claim": "Boundary-dependent resets: numTradesDone is cleared when the day changes and timeStampDartsReset is zeroed at the week boundary. For the fresh-player corpus (timestampLastTrade=0, timeStampDartsReset=0, numTradesDone=0) both branches keep the value 0, so the outputs are invariant for this corpus; verified stable across captures A and B.",
+        "file": "engine.py",
+        "symbol": "reset_stuff"
+      },
+      {
+        "claim": "Static-village iteration order follows os.listdir() order of the corpus villages directory, which is filesystem-dependent rather than time-dependent; parity compares neighbors as a pid-keyed mapping.",
+        "file": "sessions.py",
+        "symbol": "neighbors / load_static_villages"
+      },
+      {
+        "claim": "Static string 'alpha 0.02'; stable across captures.",
+        "file": "version.py",
+        "symbol": "version_name"
+      },
+      {
+        "claim": "play.html embeds serverTime=timestamp_now() as a FlashVar, so the logged-in render differs per request in that value only (observed: equal after masking in captures A and B).",
+        "file": "server.py",
+        "symbol": "play (route) + templates/play.html"
+      }
+    ],
+    "method": "Two executed captures of the real legacy server leaf-diffed (captures A and B) plus code inspection of the legacy boot modules; both evidence kinds are recorded per field.",
+    "observed_differences": {
+      "get_game_config": {
+        "body_sha256_a": "c96d3d1940a1906e624bcac01f448170323813dda3e7bb59077f1b244bb96d4c",
+        "body_sha256_b": "c96d3d1940a1906e624bcac01f448170323813dda3e7bb59077f1b244bb96d4c",
+        "comparison": "leaf-by-leaf diff of the parsed JSON response",
+        "differing_path_count": 0,
+        "differing_paths": []
+      },
+      "get_player_info": {
+        "body_sha256_a": "facedf76784d3dc03a3a45e81756a8546f90f7647dbff8917593404d9e401709",
+        "body_sha256_b": "2c2f73d8b43d3f4324947f8037682073b15347e8f547d94588ce5da773af7626",
+        "comparison": "leaf-by-leaf diff of the parsed JSON response",
+        "differing_path_count": 2,
+        "differing_paths": [
+          {
+            "a": "1790446506",
+            "b": "1790446967",
+            "path": "/playerInfo/last_logged_in"
+          },
+          {
+            "a": "1790446506",
+            "b": "1790446967",
+            "path": "/timestamp"
+          }
+        ]
+      },
+      "login_page": {
+        "body_sha256_a": "818607bbdb5e2e52866ab03e9eff2bd176e54ef2761ec6cc887daa93bfb8893c",
+        "body_sha256_b": "818607bbdb5e2e52866ab03e9eff2bd176e54ef2761ec6cc887daa93bfb8893c",
+        "comparison": "parsed save-list (game_version + saves[]) plus raw body digests",
+        "differing_paths": [],
+        "parsed_equal": true,
+        "raw_body_equal": true
+      },
+      "login_post": {
+        "comparison": "status + Location header (empty body)",
+        "location_a": "/play.html",
+        "location_b": "/play.html",
+        "location_equal": true,
+        "status_a": 302,
+        "status_b": 302,
+        "status_equal": true
+      },
+      "play_page": {
+        "comparison": "rendered page with the serverTime=<digits> FlashVar masked",
+        "equal_after_mask": true,
+        "masked_sha256_a": "d1180071d4ce160589c05fdf4908ea10430463a3b5bb6ddf1f7ae7f5428f696a",
+        "masked_sha256_b": "d1180071d4ce160589c05fdf4908ea10430463a3b5bb6ddf1f7ae7f5428f696a",
+        "server_time_values_a": [
+          "1790446506"
+        ],
+        "server_time_values_b": [
+          "1790446967"
+        ]
+      }
+    }
+  },
+  "non_parity_targets": {
+    "before_after_save_records": {
+      "role": "SHA-256 of the disposable corpus saves around each call; expected invariant: identical before/after every request (legacy boot endpoints do not persist)."
+    },
+    "login_post": {
+      "observed": {
+        "comparison": "status + Location header (empty body)",
+        "location_a": "/play.html",
+        "location_b": "/play.html",
+        "location_equal": true,
+        "status_a": 302,
+        "status_b": 302,
+        "status_equal": true
+      },
+      "role": "Documents the legacy login semantics (form fields, 302 redirect, session cookie); the v0 API has no login."
+    },
+    "play_page": {
+      "observed": {
+        "comparison": "rendered page with the serverTime=<digits> FlashVar masked",
+        "equal_after_mask": true,
+        "masked_sha256_a": "d1180071d4ce160589c05fdf4908ea10430463a3b5bb6ddf1f7ae7f5428f696a",
+        "masked_sha256_b": "d1180071d4ce160589c05fdf4908ea10430463a3b5bb6ddf1f7ae7f5428f696a",
+        "server_time_values_a": [
+          "1790446506"
+        ],
+        "server_time_values_b": [
+          "1790446967"
+        ]
+      },
+      "role": "Documents the logged-in legacy render; not consumed by the v0 API. serverTime FlashVar is time-dependent.",
+      "time_dependent": [
+        {
+          "evidence": "Observed differing across captures A and B.",
+          "field": "serverTime=<digits> FlashVar",
+          "normalization": {
+            "kind": "masked_substring",
+            "rule": "The 'serverTime=<digits>' FlashVar is masked before string comparison of the rendered page."
+          }
+        }
+      ]
+    },
+    "response_meta_headers": {
+      "role": "Per-response Date/Server headers in response.meta.json are capture-time metadata, never compared."
+    }
+  },
+  "parity_targets": {
+    "get_game_config": {
+      "legacy_surface": "GET .../get_game_config.php (executed)",
+      "stable": "All response fields are deep-compared exactly, except the time-dependent paths listed below.",
+      "time_dependent": [
+        {
+          "evidence": "Code inspection: get_game_config() -> make_dynamic() rewrites the schedule from the wall clock on every call. Observed: 0 differing paths between captures A and B (two captures in the same wrap window match; the values are still time-derived and are normalized).",
+          "field": "darts_items[*].start_date",
+          "normalization": {
+            "kind": "format_only",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$",
+            "rule": "Values are not compared. Both sides must match the legacy '%Y-%m-%d %H:%M:%S' layout after make_dynamic rewrites the schedule."
+          },
+          "observed_differences": []
+        }
+      ]
+    },
+    "get_player_info": {
+      "environment_dependent": [
+        {
+          "evidence": "Code inspection: iteration order follows os.listdir() of the disposable corpus villages directory (sessions.load_static_villages).",
+          "field": "neighbors",
+          "normalization": {
+            "kind": "pid_keyed_mapping",
+            "rule": "Compared as {pid: entry} mappings with equal length and equal pid sets; array order is not part of the comparison."
+          }
+        }
+      ],
+      "invariant_notes": [
+        "map.numTradesDone and privateState.timeStampDartsReset are produced by the time-boundary reset_stuff() mechanism but are value-stable at 0 for the fresh-player corpus on both branches (code-inspected and equal across captures A and B), so they remain under exact comparison."
+      ],
+      "legacy_surface": "POST .../get_player_info.php (current-player branch, executed)",
+      "stable": "All response fields are deep-compared exactly (result, processed_errors, playerInfo minus last_logged_in, map, privateState, neighbors entries per pid), except the fields listed below.",
+      "time_dependent": [
+        {
+          "evidence": "Observed differing across captures A and B; code inspection: engine.timestamp_now().",
+          "field": "timestamp",
+          "normalization": {
+            "kind": "positive_epoch_seconds",
+            "rule": "Must be an int > 0. The fixture value is a same-second observation of engine.timestamp_now() at capture time and is never compared to the value produced later."
+          }
+        },
+        {
+          "evidence": "Observed differing across captures A and B; code inspection: get_player_info() assigns the same ts_now used for 'timestamp' (0 in the seed save, the in-memory boot mutation itself).",
+          "field": "playerInfo.last_logged_in",
+          "normalization": {
+            "kind": "equal_to_response_timestamp",
+            "rule": "Must be an int > 0 and exactly equal to the same response's 'timestamp' field (legacy assigns one ts_now to both). The fixture's own value is not compared."
+          }
+        }
+      ]
+    },
+    "session": {
+      "legacy_surface": "GET / login page save-list (parsed from the executed response) plus version.py version_name",
+      "stable": {
+        "game_version": "Static 'alpha 0.02' rendered into the login page; equal across captures A and B (code-inspected: version.py version_name is a constant).",
+        "saves": "Per save: id, name, level, xp exactly as sessions.save_info() computes them; equal across captures A and B."
+      },
+      "time_dependent": [
+        {
+          "evidence": "Code inspection: engine.timestamp_now() = int(time.time()); the legacy play.html serverTime FlashVar differs between captures A and B (observed in play_page).",
+          "field": "server_time",
+          "normalization": {
+            "kind": "positive_epoch_seconds",
+            "rule": "Must be an int > 0. The fixture value is a same-second observation of engine.timestamp_now() at capture time and is never compared to the value produced later."
+          }
+        }
+      ]
+    }
+  },
+  "purpose": "Separate stable legacy response fields from time-dependent and environment-dependent ones, with the documented normalization for each non-stable field. Consumed by the Compatibility API v0 offline parity tests.",
+  "schema": "godot-compatibility-boot/field-stability-v1"
+}

@@ -9,7 +9,9 @@
     2. SHA-256 digests of both conversion packages and the guarded manifests
     3. headless loader / scene-build / project-scope tests (must exit 0)
     4. deliberate-failure test scenarios (must exit non-zero AND be detected)
-    5. windowed render + capture + compare run (writes the evidence)
+    5. windowed render + capture + compare run (writes the evidence; the
+       scene is passed explicitly because the project's main scene is the
+       boot scene)
     6. comparator self-test on a perturbed reference (must exit non-zero)
     7. headless comparison of the committed capture (must exit 0)
     8. scratch report must equal the committed report (provenance fields
@@ -263,8 +265,12 @@ try {
         Write-Host "[verify] SKIP windowed capture run (-SkipWindowed): needs a display session"
         Fail "capture step skipped, so this run is NOT a complete verification (display session required)"
     } else {
-        $windowed = Invoke-Godot -Arguments @("--path", $projectRel) `
-            -TimeoutSeconds 900 -Name "windowed-capture"
+        # Design D6: the main scene is now the boot scene, so the M4 capture
+        # runs its own scene explicitly; the committed evidence must stay
+        # byte-identical (the guard baseline covers it).
+        $windowed = Invoke-Godot -Arguments @(
+            "--path", $projectRel, "res://scenes/first_render.tscn"
+        ) -TimeoutSeconds 900 -Name "windowed-capture"
         Report-Result ($windowed.ExitCode -eq 0) "windowed run exits 0 (got $($windowed.ExitCode))"
         Report-Result (Test-Path -LiteralPath $capturePng) "capture written to $capturePng"
         Report-Result (Test-Path -LiteralPath $evidenceReport) "report written to $evidenceReport"

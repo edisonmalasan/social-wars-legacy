@@ -2,18 +2,24 @@
 ; It's best edited using the editor UI and not directly,
 ; since the parameters that go here are not all obvious.
 ;
-; Social Wars first-render verification project.
+; Social Wars boot client (M5 foundation).
 ; Pinned engine: Godot 4.7.2.stable.official.ed1daf0bf.
-; Render-verification content only: no game systems, no autoloads,
-; no network access. See README.md.
+; Entry point is the boot scene; the GameApi autoload owns every server
+; interaction (fake by default, loopback legacy_v0 for verification). The
+; render-verification scene stays runnable as its own scene. No other game
+; systems. See README.md.
 
 config_version=5
 
 [application]
 
 config/name="Social Wars First Render"
-run/main_scene="res://scenes/first_render.tscn"
+run/main_scene="res://scenes/boot.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
+
+[autoload]
+
+GameApi="*res://scripts/gameapi/game_api.gd"
 
 [audio]
 
@@ -25,6 +31,14 @@ window/size/viewport_width=448
 window/size/viewport_height=224
 window/size/resizable=false
 window/stretch/mode="disabled"
+
+[gameapi]
+
+; Implementation switch (spec: "GameApi abstraction"): "fake" keeps tests
+; hermetic; verify-boot.ps1 selects "legacy_v0" explicitly at runtime via
+; the --gameapi= user argument. The endpoint is loopback-only by contract.
+implementation="fake"
+endpoint="http://127.0.0.1:5056"
 
 [rendering]
 

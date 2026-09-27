@@ -1,0 +1,241 @@
+extends RefCounted
+## Typed boot data crossing the GameApi boundary (design D5, spec
+## "GameApi abstraction").
+##
+## Presentation code never receives raw transport dictionaries: every
+## GameApi operation returns one of the result classes below, and the two
+## legacy JSON payloads (game config, player info) are wrapped in payload
+## classes that only the API layer unpacks. The parse functions are shared
+## by both implementations, so `FakeApi` and `LegacyV0Api` produce the same
+## typed shapes by construction (spec: "Boot offline with the fake
+## implementation").
+
+## The v0 protocol identifier every envelope must carry.
+const PROTOCOL := "compat-v0"
+
+
+## One saved village exactly as the v0 session list reports it.
+class SaveInfo:
+	extends RefCounted
+	var id := ""
+	var name := ""
+	var xp := 0
+	var level := 0
+
+
+## The boot summary the boot scene displays (name, level, xp), derived from
+## the save entry of the bootstrapped user id.
+class PlayerSummary:
+	extends RefCounted
+	var user_id := ""
+	var name := ""
+	var level := 0
+	var xp := 0
+
+
+## Legacy `get_game_config()` payload: a Dictionary only because the legacy
+## payload itself is one; opaque to presentation code.
+class ConfigPayload:
+	extends RefCounted
+	var raw: Dictionary = {}
+
+
+## Legacy `get_player_info()` payload: opaque like the config, except the
+## player's display name, which is typed for convenience.
+class PlayerInfoPayload:
+	extends RefCounted
+	var raw: Dictionary = {}
+	var player_name := ""
+
+
+## Result of `list_sessions()`.
+class SaveListResult:
+	extends RefCounted
+	var ok := false
+	var protocol := ""
+	var game_version := ""
+	var server_time := 0
+	## Array of `SaveInfo`.
+	var saves: Array[SaveInfo] = []
+	var error_code := ""
+	var error_message := ""
+
+
+## Result of `get_bootstrap()`: the session envelope plus the typed summary
+## and the two wrapped legacy payloads.
+class BootstrapResult:
+	extends RefCounted
+	var ok := false
+	var protocol := ""
+	var game_version := ""
+	var server_time := 0
+	## Array of `SaveInfo`.
+	var saves: Array[SaveInfo] = []
+	var summary: PlayerSummary = null
+	var config: ConfigPayload = null
+	var player_info: PlayerInfoPayload = null
+	var error_code := ""
+	var error_message := ""
+
+
+## Structured failure for `list_sessions()` (never a partial payload).
+static func save_list_failure(code: String, message: String) -> SaveListResult:
+	var result := SaveListResult.new()
+	result.ok = false
+	result.error_code = code
+	result.error_message = message
+	return result
+
+
+## Structured failure for `get_bootstrap()` (never a partial payload).
+static func bootstrap_failure(code: String, message: String) -> BootstrapResult:
+	var result := BootstrapResult.new()
+	result.ok = false
+	result.error_code = code
+	result.error_message = message
+	return result
+
+
+## Parses any v0 session envelope — success or structured error — into the
+## typed result. Shared by `FakeApi` (which synthesizes the envelope from the
+## committed fixtures) and `LegacyV0Api` (which decodes the HTTP body).
+static func parse_save_list(payload: Variant) -> SaveListResult:
+	if not (payload is Dictionary):
+		return save_list_failure("bad_response", "response is not a JSON object")
+	var envelope: Dictionary = payload
+	if envelope.get("ok") != true:
+		return _save_list_error(envelope)
+	if str(envelope.get("protocol", "")) != PROTOCOL:
+		return save_list_failure("protocol_mismatch",
+			"expected protocol %s, got %s" % [PROTOCOL,
+			str(envelope.get("protocol"))])
+	var raw_saves: Variant = envelope.get("saves")
+	if not (raw_saves is Array):
+		return save_list_failure("bad_response", "envelope carries no saves array")
+	var saves: Array[SaveInfo] = []
+	for entry in raw_saves:
+		var parsed := _parse_save(entry)
+		if parsed == null:
+			return save_list_failure("bad_response", "a save entry is malformed")
+		saves.append(parsed)
+	var server_time := _parse_epoch(envelope.get("server_time"))
+	if server_time < 0:
+		return save_list_failure("bad_response", "server_time is not a number")
+	var result := SaveListResult.new()
+	result.ok = true
+	result.protocol = PROTOCOL
+	result.game_version = str(envelope.get("game_version", ""))
+	result.server_time = server_time
+	result.saves = saves
+	return result
+
+
+## Parses a v0 bootstrap envelope into the typed result, deriving the player
+## summary from the save entry that names `user_id`.
+static func parse_bootstrap(payload: Variant, user_id: String) -> BootstrapResult:
+	var list := parse_save_list(payload)
+	if not list.ok:
+		return bootstrap_failure(list.error_code, list.error_message)
+	var envelope: Dictionary = payload
+	var config_raw: Variant = envelope.get("config")
+	if not (config_raw is Dictionary):
+		return bootstrap_failure("bad_response", "bootstrap carries no config object")
+	var player_raw: Variant = envelope.get("player_info")
+	if not (player_raw is Dictionary):
+		return bootstrap_failure("bad_response", "bootstrap carries no player_info object")
+	var summary := summary_for(list.saves, user_id)
+	if summary == null:
+		return bootstrap_failure("summary_unavailable",
+			"the session list has no save for user_id '%s'" % user_id)
+	var result := BootstrapResult.new()
+	result.ok = true
+	result.protocol = list.protocol
+	result.game_version = list.game_version
+	result.server_time = list.server_time
+	result.saves = list.saves
+	result.summary = summary
+	result.config = ConfigPayload.new()
+	result.config.raw = config_raw
+	result.player_info = PlayerInfoPayload.new()
+	result.player_info.raw = player_raw
+	result.player_info.player_name = _player_name(player_raw)
+	return result
+
+
+## Summary for one save id, or null when the list does not name it.
+static func summary_for(saves: Array[SaveInfo], user_id: String) -> PlayerSummary:
+	for save in saves:
+		if save.id == user_id:
+			var summary := PlayerSummary.new()
+			summary.user_id = save.id
+			summary.name = save.name
+			summary.level = save.level
+			summary.xp = save.xp
+			return summary
+	return null
+
+
+## Extracts `playerInfo.name` from the legacy player-info payload.
+static func _player_name(payload: Dictionary) -> String:
+	var info: Variant = payload.get("playerInfo")
+	if info is Dictionary:
+		var typed: Dictionary = info
+		return str(typed.get("name", ""))
+	return ""
+
+
+## Save entry -> SaveInfo, or null when the entry is malformed.
+static func _parse_save(entry: Variant) -> SaveInfo:
+	if not (entry is Dictionary):
+		return null
+	var typed: Dictionary = entry
+	var id: Variant = typed.get("id")
+	var name: Variant = typed.get("name")
+	if not (id is String) or not (name is String):
+		return null
+	var xp := _parse_number(typed.get("xp"))
+	var level := _parse_number(typed.get("level"))
+	if xp < 0 or level < 0:
+		return null
+	var save := SaveInfo.new()
+	save.id = id
+	save.name = name
+	save.xp = xp
+	save.level = level
+	return save
+
+
+## Non-negative integer from an int or float transport value; -1 otherwise.
+static func _parse_number(value: Variant) -> int:
+	if value is int:
+		return int(value)
+	if value is float:
+		var typed := float(value)
+		if typed < 0.0 or typed != floor(typed):
+			return -1
+		return int(typed)
+	return -1
+
+
+## Epoch seconds from an int or float transport value; -1 otherwise.
+static func _parse_epoch(value: Variant) -> int:
+	if value is int:
+		return int(value)
+	if value is float:
+		var typed := float(value)
+		if typed < 0.0:
+			return -1
+		return int(typed)
+	return -1
+
+
+## Structured error fields of a failed envelope (code + message).
+static func _save_list_error(envelope: Dictionary) -> SaveListResult:
+	var code := "bad_response"
+	var message := "response reported failure without a structured error"
+	var error: Variant = envelope.get("error")
+	if error is Dictionary:
+		var typed: Dictionary = error
+		code = str(typed.get("code", code))
+		message = str(typed.get("message", message))
+	return save_list_failure(code, message)

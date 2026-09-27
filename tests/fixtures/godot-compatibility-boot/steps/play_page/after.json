@@ -1,0 +1,13 @@
+{
+  "captured_at_utc": "2026-09-26T18:15:06+00:00",
+  "files": [
+    {
+      "bytes": 15628,
+      "path": "00000000-0000-4000-8000-000000000001.save.json",
+      "sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5"
+    }
+  ],
+  "files_count": 1,
+  "scope": "disposable corpus saves directory (one entry per file)",
+  "sha256": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6"
+}

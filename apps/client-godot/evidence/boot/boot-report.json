@@ -1,0 +1,465 @@
+{
+    "schema":  "godot-compatibility-boot/verify-boot-v1",
+    "generated_utc":  "2026-09-27T02:31:58Z",
+    "environment":  {
+                        "engine_executable":  "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                        "engine_version":  "4.7.2.stable.official.ed1daf0bf",
+                        "python_executable":  "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+                        "python_version":  "3.9.13",
+                        "git_commit":  "c54abe3f7348fa6994033edebddc3e9d5cb82d68",
+                        "display_session":  false,
+                        "network":  "loopback only (127.0.0.1)"
+                    },
+    "service":  {
+                    "command":  [
+                                    "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+                                    "-B",
+                                    "apps/compat-api/run.py",
+                                    "--port",
+                                    "5056"
+                                ],
+                    "endpoint":  "http://127.0.0.1:5056",
+                    "port":  5056,
+                    "unreachable_endpoint":  "http://127.0.0.1:5057",
+                    "disposable_corpus":  true
+                },
+    "inputs":  {
+                   "fixture_save_list":  "tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json",
+                   "fixture_save_list_sha256":  "ad0404c2c340a48f06e2e49ae7eb7973978cd2ccb02ac6ff7bfba4eb75f6d9f4",
+                   "guard_baseline":  "tests/fixtures/godot-compatibility-boot/guard-baseline.json",
+                   "guard_baseline_sha256":  "b9f591813736caae01e5696f2f3617e45e44564115a900af50f8e00b110d19fd"
+               },
+    "switch":  {
+                   "setting":  "gameapi/implementation",
+                   "values":  [
+                                  "fake",
+                                  "legacy_v0"
+                              ],
+                   "endpoint_setting":  "gameapi/endpoint",
+                   "runtime_override":  [
+                                            "--gameapi=fake",
+                                            "--gameapi=legacy_v0",
+                                            "--gameapi-endpoint=\u003curl\u003e",
+                                            "--boot-user=\u003cid\u003e"
+                                        ]
+               },
+    "commands":  [
+                     {
+                         "name":  "python-version",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+                                         "-c",
+                                         "import sys; print(sys.version.split()[0])"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/01-python-version.out.txt"
+                     },
+                     {
+                         "name":  "godot-version",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--version"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/02-godot-version.out.txt"
+                     },
+                     {
+                         "name":  "guard-pre",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+                                         "-B",
+                                         "apps/compat-api/guard_baseline.py",
+                                         "verify"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/03-guard-pre.out.txt"
+                     },
+                     {
+                         "name":  "compat-unittests",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+                                         "-B",
+                                         "-m",
+                                         "unittest",
+                                         "discover",
+                                         "-s",
+                                         "apps/compat-api/tests",
+                                         "-p",
+                                         "test_*.py",
+                                         "-v"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/04-compat-unittests.out.txt"
+                     },
+                     {
+                         "name":  "compat-smoke",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+                                         "-B",
+                                         "apps/compat-api/tests/smoke_loopback.py"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/05-compat-smoke.out.txt"
+                     },
+                     {
+                         "name":  "test_package_loader",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_package_loader.gd"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/06-test_package_loader.out.txt"
+                     },
+                     {
+                         "name":  "test_scene_build",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_scene_build.gd"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/07-test_scene_build.out.txt"
+                     },
+                     {
+                         "name":  "test_game_api_fake",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_game_api_fake.gd"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/08-test_game_api_fake.out.txt"
+                     },
+                     {
+                         "name":  "test_boot_scene",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_boot_scene.gd"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/09-test_boot_scene.out.txt"
+                     },
+                     {
+                         "name":  "boot-unreachable",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_boot_scene.gd",
+                                         "--",
+                                         "--scenario=unreachable",
+                                         "--gameapi=legacy_v0",
+                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/10-boot-unreachable.out.txt"
+                     },
+                     {
+                         "name":  "boot-main-live",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+                                         "-B",
+                                         "apps/client-godot/compat_live_phase.py",
+                                         "--port",
+                                         "5056",
+                                         "--name",
+                                         "boot-main-live",
+                                         "--",
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--",
+                                         "--gameapi=legacy_v0",
+                                         "--gameapi-endpoint=http://127.0.0.1:5056"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/11-boot-main-live.out.txt"
+                     },
+                     {
+                         "name":  "gameapi-live",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+                                         "-B",
+                                         "apps/client-godot/compat_live_phase.py",
+                                         "--port",
+                                         "5056",
+                                         "--name",
+                                         "gameapi-live",
+                                         "--",
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_game_api_live.gd",
+                                         "--",
+                                         "--gameapi-endpoint=http://127.0.0.1:5056"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/12-gameapi-live.out.txt"
+                     },
+                     {
+                         "name":  "boot-api-error-live",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+                                         "-B",
+                                         "apps/client-godot/compat_live_phase.py",
+                                         "--port",
+                                         "5056",
+                                         "--name",
+                                         "boot-api-error-live",
+                                         "--",
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_boot_scene.gd",
+                                         "--",
+                                         "--scenario=api-error",
+                                         "--gameapi=legacy_v0",
+                                         "--gameapi-endpoint=http://127.0.0.1:5056",
+                                         "--boot-user=does-not-exist-0000"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/13-boot-api-error-live.out.txt"
+                     },
+                     {
+                         "name":  "guard-post",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+                                         "-B",
+                                         "apps/compat-api/guard_baseline.py",
+                                         "verify"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/14-guard-post.out.txt"
+                     }
+                 ],
+    "assertions":  [
+                       {
+                           "name":  "pinned interpreter is CPython 3.9.13 (got \u00273.9.13\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "engine version is 4.7.2.stable.official.ed1daf0bf (got: 4.7.2.stable.official.ed1daf0bf)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "service port 5056 is free before the run",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "unreachable port 5057 has nothing listening",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "guard baseline verify exits 0 before the run (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "guard baseline reports a combined digest",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "compat unittest discovery exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "compat unittest discovery reports OK",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "compat loopback smoke exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "compat loopback smoke reports PASS",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_package_loader exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_package_loader reports PASS",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_scene_build exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_scene_build reports PASS",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_game_api_fake exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_game_api_fake reports PASS",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_boot_scene exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_boot_scene reports PASS",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "unreachable scenario exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "unreachable scenario reaches the explicit error state",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "unreachable scenario asserts the error state",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "unreachable scenario was asserted, not silently accepted",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "main-scene boot success: live phase exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "main-scene boot success: live-phase summary records ok with clean teardown",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "legacy-v0 GameApi suite: live phase exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "legacy-v0 GameApi suite: live-phase summary records ok with clean teardown",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "structured API-error boot scenario: live phase exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "structured API-error boot scenario: live-phase summary records ok with clean teardown",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "main-scene boot printed its state marker",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "main-scene boot reached state=ready (got ready)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "main-scene boot reported protocol compat-v0",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "main-scene boot reported game version alpha 0.02",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "main-scene boot reported engine 4.7.2 (got 4.7.2-stable (official) ed1daf0bf)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "main-scene boot printed its summary marker",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "boot summary user id equals the fixture save id",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "boot summary name equals the fixture save name",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "boot summary level equals the fixture save level",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "boot summary xp equals the fixture save xp",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "structured API-error scenario reaches the explicit error state",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "structured API-error scenario asserts the error state",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "guard baseline verify exits 0 after the run (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "guarded bytes are identical before and after (pre=6978b9594f52b3f87ebe043b7d1ce0da67632d0a0537f0af7ea3d22f2e7ff348 post=6978b9594f52b3f87ebe043b7d1ce0da67632d0a0537f0af7ea3d22f2e7ff348)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "service port 5056 was released after teardown",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "no working-tree saves/ directory was created",
+                           "ok":  true
+                       }
+                   ],
+    "guard":  {
+                  "pre_combined_sha256":  "6978b9594f52b3f87ebe043b7d1ce0da67632d0a0537f0af7ea3d22f2e7ff348",
+                  "post_combined_sha256":  "6978b9594f52b3f87ebe043b7d1ce0da67632d0a0537f0af7ea3d22f2e7ff348",
+                  "identical":  true
+              },
+    "failures":  [
+
+                 ],
+    "pass":  true,
+    "claim_limits":  [
+                         "read-only bootstrap parity for the fresh-save corpus",
+                         "not gameplay parity",
+                         "not authentication security",
+                         "not progressed-player coverage",
+                         "no Flash, Ruffle, ActionScript, or browser execution",
+                         "loopback only; no external network"
+                     ]
+}

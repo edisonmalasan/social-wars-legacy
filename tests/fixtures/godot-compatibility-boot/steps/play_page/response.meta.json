@@ -1,0 +1,15 @@
+{
+  "body_bytes": 7346,
+  "body_sha256": "67e89cc03eb100740819fc3623e405ff4191f35f5c078a18a5eaada7017703d8",
+  "captured_at_utc": "2026-09-26T18:15:06+00:00",
+  "headers": {
+    "Connection": "close",
+    "Content-Length": "7346",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Sat, 26 Sep 2026 18:15:06 GMT",
+    "Server": "Werkzeug/2.2.3 Python/3.9.13",
+    "Vary": "Cookie"
+  },
+  "reason": "OK",
+  "status": 200
+}
