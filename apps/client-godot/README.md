@@ -86,7 +86,7 @@ godot --path apps/client-godot res://scenes/first_render.tscn
   package directory (`packages/game-content/`).
 - Godot discovers and reports engine `4.7.2.stable` exactly.
 - All five headless test suites exit 0 and print `[test] PASS`
-  (observed check counts: loader 123, scene-build 36, project-scope 589,
+  (observed check counts: loader 123, scene-build 36, project-scope 591,
   content-registry 52, asset-ids 50).
 - The three deliberate-failure scenarios exit non-zero **and** print their
   `[test] EXPECTED-FAILURE` markers (no `UNEXPECTED-ACCEPT`).
@@ -296,7 +296,7 @@ powershell -File apps/client-godot/verify-boot.ps1
 ```
 
 It runs, in order: guard baseline → Compatibility API unittest discovery +
-loopback smoke → the seven headless Godot suites → the unreachable-endpoint
+loopback smoke → the eight headless Godot suites → the unreachable-endpoint
 scenario against a port with nothing listening → three live phases → guard
 baseline again → `evidence/boot/boot-report.json`. Each live phase is wrapped
 by `compat_live_phase.py`, which starts `apps/compat-api/run.py`, waits for
@@ -322,6 +322,9 @@ godot --headless --path apps/client-godot -s res://tests/test_game_clock.gd -- -
 # Camera controls (128 observed checks): pure component, no API and no
 # boot flow; the endpoint argument the loop passes is ignored
 godot --headless --path apps/client-godot -s res://tests/test_camera_controls.gd
+# UI foundation (84 observed checks): pure component, no API and no
+# boot flow; the endpoint argument the loop passes is ignored
+godot --headless --path apps/client-godot -s res://tests/test_ui_foundation.gd
 # Failure path: the scene must enter the explicit error state (suite exits 0
 # only when it observed it)
 godot --headless --path apps/client-godot -s res://tests/test_boot_scene.gd -- --scenario=unreachable --gameapi-endpoint=http://127.0.0.1:5057
@@ -368,6 +371,22 @@ scan covers the component's no-clock, no-persistence, no-loading, and
 no-other-script clauses. It is the seventh hermetic suite
 `verify-boot.ps1` runs, and it needs no endpoint, service, or boot flow
 (128 observed checks).
+
+The UI foundation suite (OpenSpec `godot-ui-foundation`) proves the UI
+foundation component — a `CanvasLayer`-based, non-autoload part instanced
+by scenes: the empty registry and committed layer index at creation, slot
+registration in order with full-rect visible pass-through containers and
+exactly one notification per registration, empty and duplicate
+registrations rejected with the registry untouched, hide/show flipping
+the committed visibility with one change-only notification per change,
+and the unknown-slot and unchanged-value rejections failing closed with
+state untouched; a final source scan covers the component's no-clock,
+no-persistence, no-loading, and no-other-script clauses. It is the
+eighth hermetic suite `verify-boot.ps1` runs, and it needs no endpoint,
+service, or boot flow (84 observed checks). The slot structure is
+provisional foundation (design D2): no legacy UI behavior has been
+captured, so authentic slot taxonomy, stacking order, and HUD layout
+bind later, with evidence, alongside the M6 HUD work.
 
 ### Evidence
 
