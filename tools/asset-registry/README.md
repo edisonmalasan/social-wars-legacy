@@ -549,3 +549,94 @@ loading. No Godot project is created or required here.
 ```bash
 python -B -m unittest discover -s tools/asset-registry/tests -p test_convert_unit.py -v
 ```
+
+# Asset ID registry (M5 content slice: legacy-to-runtime mapping)
+
+## Inputs
+
+- `tools/asset-registry/registry.json` (corpus paths, sizes, digests),
+  `coverage.json` (the committed four-domain join),
+  `conversions.json` (assembled packages), and `image_extraction.json`
+  (recorded bitmap outputs under `assets/converted/images/`).
+- The six normalized reference sources: `buildings.json`, `units.json`,
+  `specials.json`, `magics.json`, `sounds.json`, `images.json`.
+
+All ten inputs are recorded in the output with byte counts and SHA-256
+digests; `image_extraction.json` is read lazily, after reconciliation.
+
+## Join and status rules
+
+Reference extraction and join rules mirror `build_registry.py`'s coverage
+step exactly (item `img_name` comma-split, `magics.img_name`,
+`sounds.file`, `images.path`; `assets/sprites/<stem>.swf`,
+`assets/magic/<stem>.swf`, `assets/sounds/<stem>.mp3`, basename match for
+images). Each distinct reference gets exactly one status:
+
+- `converted` — the reference equals a `conversions.json` package
+  `legacy_id`; runtime is the package directory.
+- `extracted` — no package, but bitmap outputs are recorded for the
+  source SWF; runtime is that single recorded directory under
+  `assets/converted/images/` (manifest evidence, not a directory walk).
+- `passthrough` — single corpus hit already runtime-readable
+  (jpg/jpeg/png/mp3); runtime is the corpus file itself.
+- `pending` — source exists with no runtime output and no extraction
+  record; no runtime path.
+- `ambiguous` — several corpus files share the image basename;
+  sorted candidates recorded, no runtime path.
+- `missing_source` — no corpus hit; the reference must appear in that
+  domain's committed coverage `missing` list.
+
+## Outputs
+
+- `tools/asset-registry/asset_ids.json` (policy `asset-id-registry-v1`,
+  `schema_version` 1): `inputs`, `counts` (references, distinct,
+  resolved references, per-kind and per-status), and `kinds` (fixed
+  order images, item_sprites, magic_sprites, sounds) with one sorted
+  entry per distinct reference.
+
+## Validation gates (failures exit 1, outputs unwritten)
+
+Coverage reconciliation (references, distinct, resolved, missing lists,
+and the images basename tiers), converted set equal to the conversion
+packages, single output directory per extracted source, closed-vocabulary
+statuses, runtime-path contract (a runtime path exists iff the status
+carries one), entry/`reference_count` sums against distinct counts, and
+byte-identical reruns. Exit 2 reports invalid input (missing/unparseable
+files, malformed records).
+
+## Executable and invocation
+
+Verified executable used for this section's runs:
+`C:\Users\Edison\AppData\Local\Temp\opencode\cpython39\pkg\tools\python.exe`
+(CPython 3.9.13 Windows x64). From the repository root; every prerequisite
+manifest is committed, so no other tool must run first:
+
+```bash
+python -B tools/asset-registry/build_asset_ids.py
+python -B -m unittest discover -s tools/asset-registry/tests -p test_build_asset_ids.py -v
+```
+
+## Evidence classification
+
+This tool establishes source-grounded runtime-mapping consistency: every
+distinct content asset reference is mapped to exactly one closed-vocabulary
+status, the mapping reconciles against the committed coverage, conversion,
+and extraction manifests, and reruns are byte-identical. It is evidence of
+mapping consistency, not of asset validity, conversion correctness,
+rendering, gameplay parity, or Godot loading (client-side resolution is
+exercised by the Godot asset-ID suite).
+
+## Containment
+
+- Reads only the ten inputs listed above plus the corpus source files and
+  conversion package directories it records (existence and digest checks).
+- Never imports or executes any legacy application module, never uses
+  subprocess/network/server/browser/Flash, never modifies any source
+  asset or prior manifest (verified byte-identical after runs).
+- Writes only `tools/asset-registry/asset_ids.json`, and only on success.
+  No bytecode (`-B` recommended), no caches, no temporary files in the
+  repository. The focused tests run the same way:
+
+```bash
+python -B -m unittest discover -s tools/asset-registry/tests -p test_build_asset_ids.py -v
+```
