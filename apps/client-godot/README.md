@@ -87,7 +87,7 @@ godot --path apps/client-godot res://scenes/first_render.tscn
 - Godot discovers and reports engine `4.7.2.stable` exactly.
 - All five headless test suites exit 0 and print `[test] PASS`
   (observed check counts: loader 123, scene-build 36, project-scope 585,
-  content-registry 44, asset-ids 47).
+  content-registry 52, asset-ids 50).
 - The three deliberate-failure scenarios exit non-zero **and** print their
   `[test] EXPECTED-FAILURE` markers (no `UNEXPECTED-ACCEPT`).
 - Headless compare exits 0 with `[compare] PASS`.
