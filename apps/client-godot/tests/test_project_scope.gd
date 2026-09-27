@@ -1,11 +1,14 @@
 extends "res://tests/test_base.gd"
-## Project-scope check (OpenSpec task 5.2 / spec: "Remain within the
-## verification scope").
+## Project-scope check (OpenSpec tasks 3.6 / spec: modified R1 "Minimal
+## render-verification Godot project" + "Remain within the verification
+## scope").
 ##
-## Asserts that `apps/client-godot/` contains only render-verification
-## content: no game-system autoload, no extra scene, no script outside the
-## explicit allow-list, and no reference to the legacy protocol or to a
-## network/Flash runtime anywhere in the project sources.
+## Asserts that `apps/client-godot/` contains exactly the render-verification
+## content plus the allow-listed M5 foundation files this change introduces
+## (GameApi with its two implementations, boot data, boot scene): no other
+## game system, no scene beyond the allow-list, no script outside the
+## allow-list, no Flash-related runtime, no legacy protocol token anywhere,
+## and no transport reference outside the legacy-v0 implementation file.
 ##
 ## Runs headless as part of `verify.ps1`.
 
@@ -18,9 +21,17 @@ const ALLOWED := [
 	"project.godot",
 	"README.md",
 	"verify.ps1",
+	"verify-boot.ps1",
+	"compat_live_phase.py",
+	"scenes/boot.tscn",
 	"scenes/first_render.tscn",
+	"scripts/boot.gd",
 	"scripts/comparator.gd",
 	"scripts/first_render.gd",
+	"scripts/gameapi/boot_data.gd",
+	"scripts/gameapi/fake_api.gd",
+	"scripts/gameapi/game_api.gd",
+	"scripts/gameapi/legacy_v0_api.gd",
 	"scripts/layout.gd",
 	"scripts/package_loader.gd",
 	"scripts/package_paths.gd",
@@ -30,35 +41,62 @@ const ALLOWED := [
 	"scripts/run_selftest.gd",
 	"scripts/verification.gd",
 	"tests/test_base.gd",
+	"tests/test_boot_scene.gd",
+	"tests/test_game_api_fake.gd",
+	"tests/test_game_api_live.gd",
 	"tests/test_package_loader.gd",
 	"tests/test_project_scope.gd",
 	"tests/test_scene_build.gd",
+	"evidence/boot/boot-report.json",
 	"evidence/first-render/first-render.png",
 	"evidence/first-render/report.json",
 ]
 
-## Strings that must never appear in project sources: M5 game systems,
-## legacy protocol entry points, network access, or a Flash runtime.
+## The exact scene set the project may declare (set equality below).
+const EXPECTED_SCENES := [
+	"scenes/boot.tscn",
+	"scenes/first_render.tscn",
+]
+
+## The one autoload this change allow-loads (spec: modified R1).
+const EXPECTED_AUTOLOAD := "GameApi=\"*res://scripts/gameapi/game_api.gd\""
+
+## Strings that must never appear in ANY project script or scene: legacy
+## protocol entry points and form encoding, a Flash runtime, the game
+## systems deferred to their own changes, non-loopback network primitives,
+## and any UI-foundation system (which the allow-list additionally excludes
+## file by file).
 const FORBIDDEN := [
-	"GameApi",
-	"LegacyV0Api",
+	"command.php",
+	"FlashVars",
+	"AMF",
+	"x-www-form-urlencoded",
+	"USERID",
+	"user_key",
+	"Ruffle",
+	"ActionScript",
 	"ContentRegistry",
 	"GameClock",
 	"Session",
-	"command.php",
-	"FlashVars",
-	"AMFPHP",
-	"Ruffle",
+	"Camera2D",
+	"Camera3D",
+	"UiFoundation",
 	"WebSocket",
-	"HTTPRequest",
-	"HTTPClient",
 	"TCPServer",
 	"UDPServer",
 	"PacketPeer",
-	"Camera2D",
-	"Camera3D",
-	"http://",
 	"https://",
+]
+
+## Transport tokens allowed in exactly one file: the legacy-v0
+## implementation (spec: "Keep legacy transport out of the UI" — only the
+## legacy-v0 implementation may reference the compat endpoint or the HTTP
+## request client).
+const LEGACY_V0_FILE := "scripts/gameapi/legacy_v0_api.gd"
+const RESTRICTED_TO_LEGACY_V0 := [
+	"http://",
+	"HTTPRequest",
+	"HTTPClient",
 ]
 
 
@@ -83,12 +121,19 @@ func _check_file_inventory(root: String) -> void:
 		if not ALLOWED.has(str(relative)):
 			unexpected.append(str(relative))
 	check_eq(unexpected, [],
-		"only allow-listed verification files exist in the project")
+		"only allow-listed foundation/verification files exist in the project")
 	var missing: Array = []
 	for allowed in ALLOWED:
 		if not found.has(allowed):
 			missing.append(allowed)
 	check_eq(missing, [], "every allow-listed file exists")
+	var flash_files: Array = []
+	for relative in found:
+		var extension := str(relative).get_extension().to_lower()
+		if extension == "swf" or extension == "swc":
+			flash_files.append(str(relative))
+	check_eq(flash_files, [],
+		"no Flash runtime payload file exists in the project")
 	info("project files checked: %s" % found.size())
 
 
@@ -115,8 +160,9 @@ func _collect(directory: String, prefix: String, out: Array) -> String:
 	return ""
 
 
-## `project.godot` must expose exactly the verification scene and no
-## autoload of any kind.
+## `project.godot` must declare the boot scene as the main scene (with the
+## first-render scene still present as its own scene) and exactly the one
+## allow-listed autoload.
 func _check_project_config(root: String) -> void:
 	var path := root.path_join("project.godot")
 	var handle := FileAccess.open(path, FileAccess.READ)
@@ -127,25 +173,43 @@ func _check_project_config(root: String) -> void:
 	handle = null
 	check(text.find("config_version=5") != -1,
 		"project uses the Godot 4 config format")
-	check(text.find("run/main_scene=\"res://scenes/first_render.tscn\"")
-		!= -1, "the verification scene is the only main scene")
+	check(text.find("run/main_scene=\"res://scenes/boot.tscn\"") != -1,
+		"the boot scene is the main scene")
 	check(text.find("4.7") != -1,
 		"project features declare the pinned 4.7 engine")
 	check(text.find("gl_compatibility") != -1,
 		"renderer is gl_compatibility")
 
 	var autoload_section := _section(text, "autoload")
-	check_eq(autoload_section.strip_edges(), "",
-		"no autoload is registered (no game-system services)")
-	var main_scenes := 0
+	var entries: Array = []
+	for line in autoload_section.split("\n"):
+		var stripped := line.strip_edges()
+		if stripped != "":
+			entries.append(stripped)
+	check_eq(entries.size(), 1,
+		"exactly one autoload is registered (no other game-system services)")
+	if entries.size() == 1:
+		check_eq(str(entries[0]), EXPECTED_AUTOLOAD,
+			"the only autoload is GameApi")
+	else:
+		fail("unexpected autoload entries: %s" % str(entries))
+
+	var scenes: Array = []
 	for relative in ALLOWED:
 		if str(relative).ends_with(".tscn"):
-			main_scenes += 1
-	check_eq(main_scenes, 1, "the project declares exactly one scene")
+			scenes.append(str(relative))
+	scenes.sort()
+	var expected: Array = EXPECTED_SCENES.duplicate()
+	expected.sort()
+	check_eq(scenes, expected,
+		"the scene set is exactly {boot.tscn, first_render.tscn}")
+	check(scenes.has("scenes/first_render.tscn"),
+		"the first-render verification scene remains runnable")
 
 
-## Every script and scene must avoid the legacy protocol, game systems,
-## network access and Flash runtimes.
+## Every script and scene must avoid the legacy protocol, Flash runtimes,
+## non-loopback transports and the deferred game systems; transport tokens
+## are confined to the legacy-v0 implementation file.
 func _check_sources(root: String) -> void:
 	var scanned := 0
 	for relative in ALLOWED:
@@ -153,9 +217,9 @@ func _check_sources(root: String) -> void:
 		if extension != "gd" and extension != "tscn":
 			continue
 		if str(relative) == "tests/test_project_scope.gd":
-			# This file necessarily contains the token list verbatim, so it
-			# cannot scan itself; it is allow-listed above and its list is
-			# asserted non-empty below.
+			# This file necessarily contains the token lists verbatim, so it
+			# cannot scan itself; it is allow-listed above and its lists are
+			# asserted intact below.
 			continue
 		var handle := FileAccess.open(root.path_join(str(relative)),
 			FileAccess.READ)
@@ -168,9 +232,19 @@ func _check_sources(root: String) -> void:
 		for token in FORBIDDEN:
 			check(body.find(token) == -1,
 				"%s must not reference %s" % [relative, token])
+		for token in RESTRICTED_TO_LEGACY_V0:
+			if str(relative) == LEGACY_V0_FILE:
+				continue
+			check(body.find(token) == -1,
+				"%s must not reference %s (confined to %s)"
+				% [relative, token, LEGACY_V0_FILE])
 	check_eq(FORBIDDEN.size(), 19,
 		"the forbidden-token list is intact (this file is the only source "
 		+ "excluded from the scan)")
+	check_eq(RESTRICTED_TO_LEGACY_V0.size(), 3,
+		"the legacy-v0-only token list is intact")
+	check(ALLOWED.has(LEGACY_V0_FILE),
+		"the legacy-v0 implementation is allow-listed and scanned")
 	info("sources scanned for forbidden references: %s" % scanned)
 
 

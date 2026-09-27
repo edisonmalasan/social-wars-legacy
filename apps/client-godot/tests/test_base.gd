@@ -9,9 +9,18 @@ extends SceneTree
 ## The process exits 0 only when every check passed. Check names are printed
 ## so a failing run is diagnosable from redirected output alone.
 ##
-## Optional user argument `--scenario=<name>` selects a deliberate-failure
-## scenario; those runs are *expected* to exit non-zero and must be asserted
-## by the caller (verify.ps1), never treated as passing tests on their own.
+## Optional user argument `--scenario=<name>` selects a named scenario; such
+## runs must always be asserted explicitly by the caller (verify.ps1 /
+## verify-boot.ps1), never treated as passing tests on their own. Two kinds
+## exist and they differ in exit code:
+##
+##   * rejection scenarios (package loader): a fault is injected and the
+##     suite has to *detect* it, so the run exits non-zero
+##     (`expect_failure()`) and prints `EXPECTED-FAILURE`;
+##   * fault-path scenarios (boot scene): the suite verifies that the scene
+##     entered its documented error state, so the run exits 0 only when that
+##     state was observed and asserted; the `[boot] state=error code=...`
+##     marker, not the exit code, is what the caller matches.
 
 const Paths = preload("res://scripts/package_paths.gd")
 
@@ -36,7 +45,10 @@ func _init() -> void:
 func _run() -> void:
 	print("[test] script=%s scenario=%s"
 		% [test_path(), scenario if scenario != "" else "(default)"])
-	run_scenario()
+	# `await` keeps existing synchronous suites behavior-identical (a plain
+	# call resolves immediately) while allowing suites that drive async APIs
+	# (GameApi over HTTP or fixtures) to finish before the summary runs.
+	await run_scenario()
 	if terminated:
 		return
 	_finish()
