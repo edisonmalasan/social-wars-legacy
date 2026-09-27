@@ -319,7 +319,7 @@ godot --headless --path apps/client-godot -s res://tests/test_session.gd -- --ga
 # Game clock scaffold + boot integration (110 observed checks): same dead
 # endpoint for its follow-up failing boot that must clear the anchor
 godot --headless --path apps/client-godot -s res://tests/test_game_clock.gd -- --gameapi-endpoint=http://127.0.0.1:5057
-# Camera controls (118 observed checks): pure component, no API and no
+# Camera controls (128 observed checks): pure component, no API and no
 # boot flow; the endpoint argument the loop passes is ignored
 godot --headless --path apps/client-godot -s res://tests/test_camera_controls.gd
 # Failure path: the scene must enter the explicit error state (suite exits 0
@@ -367,7 +367,7 @@ levels), and pass-through for unrelated events, with the node's own
 scan covers the component's no-clock, no-persistence, no-loading, and
 no-other-script clauses. It is the seventh hermetic suite
 `verify-boot.ps1` runs, and it needs no endpoint, service, or boot flow
-(118 observed checks).
+(128 observed checks).
 
 ### Evidence
 
