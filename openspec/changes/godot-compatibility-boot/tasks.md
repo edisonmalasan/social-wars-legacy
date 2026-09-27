@@ -27,7 +27,33 @@
 
 - [x] 4.1 Add `apps/client-godot/verify-boot.ps1`: pinned-python compat + parity + containment tests → start Compatibility API on 5056 with a disposable corpus → headless boot run asserting session list, bootstrap summary fields equal to the fixture save, and error-path behavior → teardown → SHA-256 guard set verified → committed `apps/client-godot/evidence/boot/boot-report.json` written; non-zero exit on any failure.
 - [x] 4.2 Run the full battery in the final state: Compatibility API tests, all four Godot test suites, `verify-boot.ps1`, M4 `verify.ps1` (evidence byte-identical), pinned `git diff --check`, and `openspec validate --specs --strict`.
-- [ ] 4.3 Review the complete diff against the spec delta scenarios; confirm every scenario maps to an executed check and record any executed-check gaps honestly in the ledger.
+- [x] 4.3 Review the complete diff against the spec delta scenarios; confirm every scenario maps to an executed check and record any executed-check gaps honestly in the ledger.
+
+  Scenario → executed-check mapping (reviewed by the root orchestrator, 2026-09-27):
+
+  | # | Scenario | Executed check |
+  |---|----------|----------------|
+  | 1 | Serve the session list | `test_compat_v0`: `test_saves_mirror_legacy_save_info`, `test_server_time_tracks_the_clock`, `test_envelope_shape`; parity: `test_session_equals_login_page_save_list`, `test_session_and_bootstrap_agree_on_the_save_list`; loopback smoke `GET /v0/session` |
+  | 2 | Bootstrap a known user | `test_compat_v0`: `test_known_user_returns_both_legacy_payloads`; parity: `test_config_equals_captured_legacy_response`, `test_player_info_equals_captured_legacy_response` |
+  | 3 | Preserve legacy boot semantics without writing | `test_compat_v0`: `test_save_bytes_identical_after_session_and_bootstrap`, `test_legacy_boot_effects_run_without_writing`, `test_legacy_save_session_is_never_called`, `test_compat_sources_have_no_persistence_path`, `test_working_tree_has_no_saves_directory` |
+  | 4 | Fail closed on an unusable request | `test_compat_v0`: `test_missing_user_id_is_400`, `test_unknown_user_is_404_and_carries_no_payload`, `test_invalid_user_id_is_400`, `test_unusable_body_is_400_invalid_payload`, `test_every_error_body_is_structured` |
+  | 5 | Bind to loopback only | `test_compat_v0`: `test_loopback_and_protocol_constants`, `test_documented_start_command_runs`; `smoke_loopback.py` connects `127.0.0.1:5056` only |
+  | 6 | Boot offline with the fake implementation | headless Godot `test_game_api_fake.gd` (verify-boot hermetic suite) |
+  | 7 | Boot live against Compatibility API | headless Godot `test_game_api_live.gd` (verify-boot live phase, exit 0 + clean teardown) |
+  | 8 | Keep legacy transport out of the UI | headless Godot `test_project_scope.gd` (script scan, forbidden-token absence; runs in `verify.ps1`) |
+  | 9 | Boot end to end | `verify-boot.ps1` main-scene live phase: `state=ready`, summary id/name/level/xp == fixture save, exit 0 |
+  | 10 | Fail visibly when unreachable | `verify-boot.ps1` unreachable-endpoint phase (port 5057): error state asserted |
+  | 11 | Fail visibly on API error | `verify-boot.ps1` structured-API-error phase: explicit error state asserted |
+  | 12 | Capture from the executed legacy server | `capture_legacy_fixtures.py` executed (exit 0; `tests/fixtures/godot-compatibility-boot/README.md` record: server started/stopped in-run, no working-tree save touched) |
+  | 13 | Replay parity offline | `test_parity.py`: `test_no_server_is_running`, `test_every_call_runs_under_the_socket_guard` + field-by-field replay tests (in the 31-test discovery run) |
+  | 14 | Verify without side effects | `guard_baseline.py verify` exit 0 before/after the battery; `verify-boot.ps1` asserts pre=`6978b959…` = post=`6978b959…`; capture writes only the unguarded `tests/fixtures/godot-compatibility-boot/` tree |
+  | 15 | Keep M4 green | `verify.ps1` exit 0 in the final state, followed by `guard_baseline.py verify` exit 0 (this pairing failed before repair `c54abe3`; `report.json` digests equal the recorded committed/producer form `9eda9d83…`, PNG raw-byte digest recorded) |
+  | 16 | Record the executed commands | `AGENTS.md` compatibility-boot command block + `apps/compat-api/README.md` + `apps/client-godot/README.md` + fixtures README (all ticked via 5.1/5.2) |
+  | 17 | Record the milestone progress | task 5.3 ledger update |
+  | 18 | Boot with the pinned engine (R1 MODIFIED) | `verify-boot.ps1` engine-version assertion `4.7.2.stable.official.ed1daf0bf` + main-scene boot; `verify.ps1` windowed run of `res://scenes/first_render.tscn` |
+  | 19 | Remain within the verification scope (R1 MODIFIED) | `test_project_scope.gd`: allow-list, scene set equality `{boot.tscn, first_render.tscn}`, autoload exactly `GameApi`, forbidden tokens, first-render suites intact (runs green in `verify.ps1`) |
+
+  Gaps found by this review (recorded honestly in the roadmap ledger): the fixture-capture-time guard evidence was recorded under the retired schema-v1 raw-byte semantics, so capture-time before/after guard identity is not re-executable under v2 — the final-state guard plus the capture's write set being disjoint from the guard set is the available evidence.
 
 ## 5. Documentation, commands, and records
 
