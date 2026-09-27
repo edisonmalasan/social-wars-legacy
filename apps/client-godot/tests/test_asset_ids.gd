@@ -9,7 +9,8 @@ extends "res://tests/test_base.gd"
 ##     reference counts, and every kind's per-status counts sum to its
 ##     distinct count over the closed vocabulary;
 ##   * a converted sprite resolves to its package directory on disk;
-##   * a passthrough sound resolves to a source MP3 that exists;
+##   * a passthrough sound resolves to a source MP3 whose bytes match its
+##     recorded SHA-256;
 ##   * a known-but-unavailable reference reports its status with no runtime
 ##     path, while an unknown kind or absent reference reports an error;
 ##   * the committed registry file is byte-identical after the run.
@@ -133,6 +134,16 @@ func _check_passthrough(registry: Variant, asset_path: String) -> void:
 		"the runtime path is a source MP3 (%s)" % runtime)
 	check(FileAccess.file_exists(Paths.repo_root().path_join(runtime)),
 		"the source MP3 exists on disk")
+	var source := str(entry.get("source", ""))
+	check_eq(source, runtime,
+		"the passthrough source path equals its runtime path")
+	var recorded := str(entry.get("source_sha256", ""))
+	check_eq(recorded.length(), 64,
+		"the passthrough entry records a source SHA-256")
+	if recorded.length() == 64 and runtime != "":
+		check_eq(Paths.file_sha256(Paths.repo_root().path_join(runtime)),
+			recorded,
+			"the source MP3 bytes match the recorded SHA-256")
 
 
 func _check_unavailable(registry: Variant, asset_path: String) -> void:

@@ -4,7 +4,7 @@ extends "res://tests/test_base.gd"
 ##
 ## Proves, against the committed package:
 ##   * no implicit load happens at scene start (explicit-load contract);
-##   * three fault classes fail closed with an error naming the offender,
+##   * four fault classes fail closed with an error naming the offender,
 ##     each injected into a mutated COPY under `.godot/` (never the source);
 ##   * the default load verifies all 22 manifest outputs (byte count +
 ##     SHA-256 before parse) and indexes them by `legacy_id`;
@@ -94,6 +94,33 @@ func _check_faults(registry: Variant, package_dir: String) -> void:
 		"the missing-file error names quests.json (got: %s)"
 		% str(missing.get("error", "")))
 	_restore(package_dir, copy_root, "normalized/quests.json")
+
+	# Fault D: unparseable output -> parse failure names the file. The
+	# manifest entry is re-pointed at the broken bytes so byte-count and
+	# SHA-256 verification PASS and the parse layer is what fails; both the
+	# file and the manifest record are restored so later faults start from
+	# a pristine copy.
+	var sounds_path := copy_root \
+		+ "/packages/game-content/normalized/sounds.json"
+	var broken := "{ this is not json".to_utf8_buffer()
+	_write_bytes(sounds_path, broken)
+	check(_repoint_manifest(copy_root, "sounds.json",
+			broken.size(), Paths.sha256_hex(broken)),
+		"the copy's manifest entry is re-pointed at the broken bytes")
+	var unparseable: Dictionary = registry.load_content(
+		_copy_repo_root(copy_root))
+	check_eq(bool(unparseable.get("ok", true)), false,
+		"an unparseable output is rejected")
+	check(str(unparseable.get("error", "")).contains("sounds.json"),
+		"the parse error names sounds.json (got: %s)"
+		% str(unparseable.get("error", "")))
+	check(str(unparseable.get("error", "")).contains("invalid JSON"),
+		"the parse error says the file is invalid JSON (got: %s)"
+		% str(unparseable.get("error", "")))
+	check(not unparseable.has("counts"),
+		"no partial package is served from the damaged copy")
+	_restore(package_dir, copy_root, "normalized/sounds.json")
+	_restore(package_dir, copy_root, "manifest.json")
 
 	# Fault C: duplicate legacy_id inside one domain -> rejected by name.
 	# The manifest entry is re-pointed at the mutated bytes so byte-count and
@@ -188,13 +215,41 @@ func _check_lookups(registry: Variant, package_dir: String) -> void:
 	else:
 		fail("quests.json is a readable non-empty array")
 
-	# A hardcoded known building resolves by its stored legacy_id.
+	# A hardcoded known building resolves to its exact stored entry.
+	var building_file: Variant = _read_json(
+		package_dir + "/normalized/buildings.json")
 	var building: Dictionary = registry.get_entry("buildings", "1")
 	check_eq(bool(building.get("found", false)), true,
 		"building legacy_id 1 is found")
-	if bool(building.get("found", false)):
-		check_eq(str((building["entry"] as Dictionary).get("legacy_id", "")),
-			"1", "the returned building entry carries legacy_id 1")
+	if typeof(building_file) == TYPE_ARRAY and (building_file as Array).size() > 0:
+		var stored: Variant = null
+		for item_v in building_file as Array:
+			if typeof(item_v) == TYPE_DICTIONARY \
+					and str((item_v as Dictionary).get("legacy_id", "")) == "1":
+				stored = item_v
+				break
+		check(stored != null, "buildings.json stores an entry with legacy_id 1")
+		if stored != null and bool(building.get("found", false)):
+			check_eq(JSON.stringify(building.get("entry", {})),
+				JSON.stringify(stored),
+				"the stored building entry equals the file entry exactly")
+	else:
+		fail("buildings.json is a readable non-empty array")
+
+	# A stored sound resolves by its stored legacy_id (spec scenario
+	# "Look up known definitions" names a building, a quest, and a sound).
+	var sounds_file: Variant = _read_json(package_dir + "/normalized/sounds.json")
+	if typeof(sounds_file) == TYPE_ARRAY and (sounds_file as Array).size() > 0:
+		var sound: Dictionary = (sounds_file as Array)[0]
+		var sound_id := str(sound["legacy_id"])
+		var sound_found: Dictionary = registry.get_entry("sounds", sound_id)
+		check_eq(bool(sound_found.get("found", false)), true,
+			"sound %s is found" % sound_id)
+		check_eq(JSON.stringify(sound_found.get("entry", {})),
+			JSON.stringify(sound),
+			"the stored sound entry equals the file entry exactly")
+	else:
+		fail("sounds.json is a readable non-empty array")
 
 	# Explicit not-found results (never null or guessed values).
 	var no_entry: Dictionary = registry.get_entry("buildings", "no_such_id")

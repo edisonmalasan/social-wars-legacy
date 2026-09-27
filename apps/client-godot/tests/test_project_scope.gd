@@ -1,5 +1,5 @@
 extends "res://tests/test_base.gd"
-## Project-scope check (OpenSpec tasks 3.6 / spec: modified R1 "Minimal
+## Project-scope check (OpenSpec task 3.1 / spec: modified R1 "Minimal
 ## render-verification Godot project" + "Remain within the verification
 ## scope").
 ##
