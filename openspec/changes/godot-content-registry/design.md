@@ -1,0 +1,52 @@
+# Design
+
+## Context
+
+The client already reads repository files outside `res://` read-only through `package_paths.gd` (globalized repo-root paths, SHA-256 file and directory digests, pre/post byte-identity proofs — the M4 D9 pattern). The normalized content package commits `manifest.json` whose root section plus nine extension sections record exactly 22 output files with byte counts and SHA-256 digests; every output is a JSON array whose entries each carry a `legacy_id`. The asset side already commits `registry.json` (corpus paths, sizes, SHA-256), `coverage.json` (four reference domains joined to the corpus with resolved/missing counts), `conversions.json` (two assembled packages), and `image_extraction.json` (61,702 extracted bitmaps grouped under `assets/converted/images/<swf-stem>/`). The project-scope test enumerates every project file, asserts a single autoload, and scans `.gd`/`.tscn` sources for a forbidden-token list that still names `ContentRegistry`. See proposal.md for motivation and the delta specs for the required behavior.
+
+## Goals / Non-Goals
+
+**Goals:**
+- A fail-closed, read-only `ContentRegistry` autoload whose file inventory is derived from the content manifest at load time (no second, hand-maintained file list).
+- A deterministic, committed `asset_ids.json` that truthfully maps every distinct content asset reference to a modern runtime status and, only where it exists, a runtime path.
+- Client-side resolution semantics that distinguish unavailable assets from unknown references.
+- Verification that keeps every existing guard and evidence byte-identical while adding its own proof.
+
+**Non-Goals:**
+- Rendering, drawing, or consuming content in any scene; the boot scene and its tests stay untouched.
+- Cross-domain reference resolution (quest → reward item, unit → building) and typed per-domain definition classes (`BuildingDefinition` etc.) — future content-domain changes.
+- Assembling SWF conversions, converting new assets, or regenerating any existing registry/manifest output.
+- Serving content over the Compatibility API, packaging content for export builds, or introducing `Session`, `GameClock`, camera, or UI foundation.
+
+## Decisions
+
+**D1 — Manifest is the single inventory.** The registry reads `packages/game-content/manifest.json`, walks the root `outputs` plus each extension section's `outputs`, and verifies every file's byte count and SHA-256 before parsing it. Alternative rejected: a hardcoded file list in GDScript, which would silently drift from the manifest. Section membership (root, quests, tables, economy, social, taxonomy, darts, globals, offers, images) is carried in the load result so `count()` can be checked against manifest-verified totals.
+
+**D2 — Read directly from the repo root; do not stage a copy.** `ContentRegistry` loads `packages/game-content/` via the existing `Paths.repo_root()` pattern, exactly like the M4 package loader. Alternatives rejected: (a) duplicating ~1.9 MB of JSON inside `apps/client-godot/` requires a sync-verification tool and doubles the preservation surface for zero benefit in the verification-only scope; (b) serving content through the Compatibility API conflates static content with the boot payload and would widen the v0 contract.
+
+**D3 — Explicit, lazy, fail-closed load.** The autoload's `_ready` performs no I/O; `load_content(base_dir := <repo default>)` parses and indexes everything once and caches the result, returning `{ok, error}` in the house style (see `package_loader.gd`). The optional base-dir parameter exists so tests can point the loader at mutated copies under `.godot/` to prove fail-closed behavior without touching sources. Entries are indexed per domain by `str(legacy_id)`; a second entry with the same key in the same domain aborts the load with an error naming the domain (mixed int/string identifiers cannot collide silently because the collision is detected, not resolved).
+
+**D4 — Asset ID registry as a sibling builder, not a change to `build_registry.py`.** A new `tools/asset-registry/build_asset_ids.py` (pinned CPython, stdlib only) writes only `tools/asset-registry/asset_ids.json` (policy `asset-id-registry-v1`). It re-derives the four reference domains with the same join rules `coverage.json` documents (item sprites → `assets/sprites/<stem>.swf`, magic → `assets/magic/<stem>.swf`, sounds → `assets/sounds/<stem>.mp3`, images → basename match) and classifies each distinct reference against `registry.json`, `conversions.json`, and `image_extraction.json`. The `asset-registry` capability keeps governing its existing builder ("the two registry files" = that builder's outputs); this change's capability owns `asset_ids.json`. Status semantics: `converted` ⇔ a `conversions.json` package directory exists; `extracted` ⇔ at least one bitmap output is recorded under `assets/converted/images/<stem>/` and no package exists; `passthrough` ⇔ the source is already a runtime-readable jpg/png/mp3 with a single unambiguous corpus hit; `pending` ⇔ source SWF exists with no extraction record and no package; `ambiguous` ⇔ image basename matches multiple corpus files (candidates recorded, no runtime path); `missing_source` ⇔ no corpus hit (must equal the coverage missing list). Validation recomputes coverage counts in memory and fails on any disagreement before writing; reruns are byte-identical (sorted keys, fixed field order, no timestamps).
+
+**D5 — Resolution contract.** `resolve_asset(kind, ref)` loads `asset_ids.json` (indexed by kind + ref) and returns the entry: runtime path only for `converted`/`extracted`/`passthrough`; status-only for `pending`/`ambiguous`/`missing_source` (`ambiguous` additionally carries its candidate list); explicit error for an unknown kind or a reference the registry does not contain. Unknown-reference errors and known-unavailable statuses are deliberately different outcomes (spec scenario "Distinguish unavailable from unknown").
+
+**D6 — Scope integration without disturbing evidence.** `project.godot` gains `ContentRegistry="*res://scripts/content_registry.gd"` after `GameApi`; `test_project_scope.gd` grows its ALLOWED list by `scripts/content_registry.gd`, `tests/test_content_registry.gd`, `tests/test_asset_ids.gd`, expects exactly those two autoload lines, and drops `ContentRegistry` from FORBIDDEN (19 → 18, count assertion updated); `GameClock`, `Session`, camera, UI, legacy-protocol, and transport tokens stay. `verify.ps1` invokes the two new headless suites, adds `tools/asset-registry/asset_ids.json` to its guarded manifest digests, and adds a pre/post directory digest over `packages/game-content/`. The first-render report stays byte-identical because `package_paths.gd::MANIFEST_FILES`, `first_render.gd`, and the windowed scene are untouched. `verify-boot.ps1` needs no change: its hermetic suite list excludes the scope test, and the new autoload performs no I/O at scene load.
+
+**D7 — Test layout.** `test_content_registry.gd`: real-package load with manifest-count assertions, lookup behaviors, mutated-copy failure cases (alter byte / drop file / duplicate `legacy_id`), and a directory digest over `packages/game-content/` before/after. `test_asset_ids.gd`: vocabulary and count integrity of the committed registry plus the three resolution scenarios. `tools/asset-registry/tests/test_build_asset_ids.py`: rebuild-to-temp byte equality against the committed file, evidence reconciliation (coverage counts, conversion packages, extraction dirs, missing lists), preservation digests, and a tampered-input negative case. `smoke`-style commands are wired into `verify.ps1`; the Python commands are documented in AGENTS.md.
+
+## Risks / Trade-offs
+
+- [Loading cost: SHA-256 over ~1.9 MB plus JSON parse of the 698 KB buildings file on every process start that calls `load_content`] → Lazy load keeps boot and unrelated suites unaffected; the cost is paid once per process and is negligible against the existing package-loader suite budget.
+- [Status misclassification where extraction evidence is partial (SWF with zero recorded bitmaps)] → `extracted` requires at least one recorded bitmap output under the stem's directory; zero records yield `pending`, and reconciliation tests pin the per-domain status counts.
+- [Ambiguous image basenames (50) invite a wrong "best guess" runtime path] → The vocabulary separates `ambiguous`, records candidates, and the resolver refuses to emit a runtime path for it.
+- [A third output file in `tools/asset-registry/` sits next to outputs owned by another capability] → D4 scopes ownership explicitly; the new builder never rewrites the existing manifests, and its preservation test proves their digests unchanged.
+- [`str(legacy_id)` indexing could collide mixed-type identifiers within one domain] → Collisions are detected and abort the load; per-domain identifier types are uniform in the committed package, asserted by the load test.
+- [Scope-test forbidden list and autoload count are hand-maintained constants] → Each constant is asserted by the scope test itself (counts + exact autoload line), so an incomplete edit fails rather than passes.
+
+## Migration Plan
+
+None: a new capability plus one modified allow-list requirement; no data, API, or stored-state migration. Rollback is reverting the branch — no persisted artifacts outside Git.
+
+## Open Questions
+
+None outstanding: content delivery (D2), registry ownership of `asset_ids.json` (D4), and evidence invariance (D6) are resolved above; anything discovered during Apply that would change the specs or task breakdown will be updated in the change artifacts rather than decided silently.
