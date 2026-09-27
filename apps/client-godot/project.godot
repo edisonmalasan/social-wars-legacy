@@ -12,9 +12,9 @@
 ; GameClock autoload holds the server-anchored game time committed by
 ; the same boot.
 ; The render-verification scene stays runnable as its own scene. The
-; camera controls are a non-autoload component instanced by scenes
-; (OpenSpec `godot-camera`); UI foundation is the only game system
-; still deferred to its own change. See README.md.
+; camera controls and the UI foundation are non-autoload components
+; instanced by scenes (OpenSpec `godot-camera`, `godot-ui-foundation`).
+; See README.md.
 
 config_version=5
 
