@@ -1,12 +1,12 @@
 {
     "schema":  "godot-compatibility-boot/verify-boot-v1",
-    "generated_utc":  "2026-09-27T13:58:04Z",
+    "generated_utc":  "2026-09-27T14:55:43Z",
     "environment":  {
                         "engine_executable":  "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
                         "engine_version":  "4.7.2.stable.official.ed1daf0bf",
                         "python_executable":  "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
                         "python_version":  "3.9.13",
-                        "git_commit":  "034e66b9125fbaae018423f15fe7d0c7fc69b429",
+                        "git_commit":  "e57d1d99396b222356d6830ed6f6b3d8603788c9",
                         "display_session":  false,
                         "network":  "loopback only (127.0.0.1)"
                     },
@@ -203,6 +203,22 @@
                          "log":  "apps/client-godot/.godot/verify-boot/11-test_game_clock.out.txt"
                      },
                      {
+                         "name":  "test_camera_controls",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_camera_controls.gd",
+                                         "--",
+                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/12-test_camera_controls.out.txt"
+                     },
+                     {
                          "name":  "boot-unreachable",
                          "command":  [
                                          "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
@@ -218,7 +234,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/12-boot-unreachable.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/13-boot-unreachable.out.txt"
                      },
                      {
                          "name":  "boot-main-live",
@@ -241,7 +257,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/13-boot-main-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/14-boot-main-live.out.txt"
                      },
                      {
                          "name":  "gameapi-live",
@@ -265,7 +281,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/14-gameapi-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/15-gameapi-live.out.txt"
                      },
                      {
                          "name":  "boot-api-error-live",
@@ -292,7 +308,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/15-boot-api-error-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/16-boot-api-error-live.out.txt"
                      },
                      {
                          "name":  "guard-post",
@@ -304,7 +320,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/16-guard-post.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/17-guard-post.out.txt"
                      }
                  ],
     "assertions":  [
@@ -394,6 +410,14 @@
                        },
                        {
                            "name":  "test_game_clock reports PASS",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_camera_controls exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_camera_controls reports PASS",
                            "ok":  true
                        },
                        {
