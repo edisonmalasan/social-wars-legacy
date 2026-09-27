@@ -224,8 +224,10 @@ choice is observable in the evidence, not a hidden assumption.
 
 ## Compatibility boot slice
 
-Second OpenSpec change: `openspec/changes/godot-compatibility-boot`
-(delta spec under `openspec/changes/godot-compatibility-boot/specs/`).
+Second OpenSpec change: `godot-compatibility-boot`, archived at
+`openspec/changes/archive/2026-09-27-godot-compatibility-boot` (delta specs
+synced to `openspec/specs/godot-compatibility-boot/spec.md` and the modified
+R1 in `openspec/specs/first-render-in-godot/spec.md`).
 
 This adds the client boot path on top of the first-render work: a `GameApi`
 autoload with typed `list_sessions()` / `get_bootstrap(user_id)` operations,
