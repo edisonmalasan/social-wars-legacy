@@ -23,7 +23,7 @@
 
 - [x] 5.1 Full battery in the final state, all exit 0: `powershell -File apps/client-godot/verify.ps1`; `powershell -File apps/client-godot/verify-boot.ps1` (guard verify embedded pre/post, digests equal `6978b9594f52b3f87ebe043b7d1ce0da67632d0a0537f0af7ea3d22f2e7ff348`); `git diff --check` (0); `openspec validate godot-camera --strict` (exit 0); `openspec validate --all --strict` (32 passed, 0 failed). Observed counts: loader 123, scene-build 36, project-scope 589, content-registry 52, asset-ids 50, game-api-fake 29, boot-scene 32/19/18, session 67, game clock 110, camera controls 128; `boot-report.json` 50 assertions, `pass=true`, first-render evidence byte-identical (`git status` shows no first-render or guarded-byte change).
 - [x] 5.2 Scenario → executed-check mapping (below); every code row (1–12, 15–16) names a check that actually ran, and rows 13–14 record the docs and ledger work (row 13 reviewed with this change, row 14 executed at archive).
-- [ ] 5.3 Update the roadmap Project Status ledger (`docs/DEVELOPMENT_ROADMAP.md`, root-orchestrator-owned): the camera controls delivered with evidence pointers, the M5 items that remain, and the change lifecycle state — executed at archive stage (see ledger).
+- [x] 5.3 Update the roadmap Project Status ledger (`docs/DEVELOPMENT_ROADMAP.md`, root-orchestrator-owned): the camera controls delivered with evidence pointers, the M5 items that remain, and the change lifecycle state — executed at archive stage (see ledger).
 
 ### 5.2 Scenario → executed-check mapping
 
