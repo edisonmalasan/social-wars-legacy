@@ -1,17 +1,28 @@
 extends "res://tests/test_base.gd"
-## Session scaffold suite (OpenSpec `godot-session` task 1.2, spec:
-## "Session scaffold").
+## Session suite (OpenSpec `godot-session` tasks 1.2 / 2.1, spec:
+## "Session scaffold" + "Boot integration").
 ##
-## Proves the four scaffold scenarios: no implicit session exists at
-## startup, a valid activation commits the getters and notifies observers
-## once, an invalid activation fails closed with committed state
-## untouched, and clearing returns to inactive under the documented
-## signal rules (including the silent repeated clear).
+## Scaffold half: no implicit session exists at startup, a valid
+## activation commits the getters and notifies observers once, an invalid
+## activation fails closed with committed state untouched, and clearing
+## returns to inactive under the documented signal rules (including the
+## silent repeated clear).
 ##
-## The boot-integration scenarios arrive with task 2.1. Runs headless as
-## part of `verify-boot.ps1`.
+## Boot-integration half: a successful boot against the fake
+## implementation commits the fixture save into the session; a follow-up
+## attempt against a loopback endpoint with nothing listening replaces it
+## with no session left behind. The endpoint arrives as
+## `--gameapi-endpoint=` — this file hardcodes no endpoint (transport
+## tokens are restricted to the legacy-v0 implementation file).
+##
+## Runs headless as part of `verify-boot.ps1`.
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
+
+const FIXTURE_SAVE_LIST := \
+	"tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json"
+const ARG_ENDPOINT := "--gameapi-endpoint="
+const STATE_TIMEOUT_MSEC := 60000
 
 ## User ids observed via the activation signal, in emission order.
 var _activated_ids: Array = []
@@ -32,6 +43,7 @@ func run_scenario() -> void:
 	_check_activate(session)
 	_check_reject_invalid_while_active(session)
 	_check_clear(session)
+	await _check_boot_integration(session)
 
 
 ## Spec: "Start without an implicit session".
@@ -128,6 +140,130 @@ func _assert_session_unchanged(session: Variant, label: String) -> void:
 	if summary != null:
 		check_eq(summary.name, "Tester",
 			label + ": the summary content is untouched")
+
+
+## Spec: "Boot integration" — attempt 1 (fake) must reach ready with the
+## session active and equal to the fixture save; attempt 2 (legacy_v0
+## against a dead loopback endpoint) must fail and leave no session, so
+## the previously active one is replaced rather than kept.
+func _check_boot_integration(session: Variant) -> void:
+	var api: Variant = root.get_node_or_null("GameApi")
+	check(api != null, "GameApi autoload is registered")
+	if api == null:
+		return
+	var endpoint := _arg(ARG_ENDPOINT)
+	check(endpoint != "",
+		"the follow-up failure needs " + ARG_ENDPOINT
+		+ "<loopback url with nothing listening>")
+	if endpoint == "":
+		return
+	var expected := _fixture_first_save()
+	check(expected.size() > 0, "fixture save exists")
+	if expected.is_empty():
+		return
+
+	# Attempt 1: the fake implementation reaches ready and commits the session.
+	api.configure("fake")
+	_activated_ids.clear()
+	_cleared_events = 0
+	var ready: Variant = _add_boot_scene()
+	if ready == null:
+		return
+	var ready_state := await _wait_for_terminal(ready)
+	check_eq(ready_state, "ready",
+		"the first boot reaches ready with the fake implementation")
+	check(session.is_active(), "the session is active at ready")
+	check_eq(session.user_id(), str(expected["id"]),
+		"the session names the bootstrapped save")
+	var active_summary: Variant = session.summary()
+	check(active_summary != null, "the active session carries a summary")
+	if active_summary != null:
+		check_eq(active_summary.name, str(expected["name"]),
+			"the session summary name equals the fixture save")
+		check_eq(active_summary.level, int(expected["level"]),
+			"the session summary level equals the fixture save")
+		check_eq(active_summary.xp, int(expected["xp"]),
+			"the session summary xp equals the fixture save")
+	check_eq(str(ready.boot_user_id), str(session.user_id()),
+		"the session equals the boot target")
+	check_eq(_activated_ids.size(), 1,
+		"the boot activation notifies observers exactly once")
+	check_eq(_cleared_events, 0,
+		"the clear before the first attempt (already inactive) stays silent")
+	_remove_scene(ready)
+
+	# Attempt 2: a failing boot replaces the active session with none.
+	api.configure("legacy_v0", endpoint)
+	var failing: Variant = _add_boot_scene()
+	if failing == null:
+		return
+	var failing_state := await _wait_for_terminal(failing)
+	check_eq(failing_state, "error",
+		"the follow-up boot fails against the dead endpoint")
+	check(not session.is_active(),
+		"the failing attempt leaves no session behind")
+	check_eq(session.user_id(), "",
+		"no stale user id survives the failed attempt")
+	check(session.summary() == null,
+		"no stale summary survives the failed attempt")
+	check_eq(_cleared_events, 1,
+		"the new attempt cleared the previously active session")
+	check_eq(_activated_ids.size(), 1,
+		"the failed attempt never activates")
+	_remove_scene(failing)
+
+
+## Adds a fresh boot scene with tests' headless mode (no auto-quit).
+func _add_boot_scene() -> Variant:
+	var scene: Variant = load("res://scenes/boot.tscn").instantiate()
+	check(scene != null, "boot scene loads")
+	if scene == null:
+		return null
+	scene.auto_quit = false
+	root.add_child(scene)
+	return scene
+
+
+## Removes a finished boot scene from the tree before the next attempt.
+func _remove_scene(scene: Variant) -> void:
+	root.remove_child(scene)
+	scene.free()
+
+
+## Waits until the boot reaches a terminal state (bounded, no hang).
+func _wait_for_terminal(scene: Variant) -> String:
+	var deadline := Time.get_ticks_msec() + STATE_TIMEOUT_MSEC
+	while scene.state == "" and Time.get_ticks_msec() < deadline:
+		await process_frame
+	return str(scene.state)
+
+
+func _arg(prefix: String) -> String:
+	for argument in OS.get_cmdline_user_args():
+		if argument.begins_with(prefix):
+			return argument.trim_prefix(prefix)
+	return ""
+
+
+## The first save of the committed fixture save list (expected values).
+func _fixture_first_save() -> Dictionary:
+	var path := Paths.repo_root().path_join(FIXTURE_SAVE_LIST)
+	var handle := FileAccess.open(path, FileAccess.READ)
+	check(handle != null, "fixture save list is readable: " + path)
+	if handle == null:
+		return {}
+	var parsed: Variant = JSON.parse_string(handle.get_as_text())
+	handle = null
+	if not (parsed is Dictionary):
+		check(false, "fixture save list is a JSON object")
+		return {}
+	var typed: Dictionary = parsed
+	var saves: Variant = typed.get("saves")
+	if not (saves is Array) or saves.is_empty() \
+			or not (saves[0] is Dictionary):
+		check(false, "fixture save list carries a first save")
+		return {}
+	return saves[0]
 
 
 func _summary(user_id: String, display_name: String,

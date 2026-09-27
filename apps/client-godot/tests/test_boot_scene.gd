@@ -10,6 +10,10 @@ extends "res://tests/test_base.gd"
 ##   api-error   a structured API error (unknown save id): the scene
 ##               displays that error instead of an empty or guessed summary.
 ##
+## Every scenario also asserts the `Session` scaffold state (spec
+## `godot-session`): active with the fixture save at ready, and inactive
+## after either failure mode.
+##
 ## The failure scenarios receive their endpoint and save id from
 ## verify-boot.ps1 as user arguments (`--gameapi-endpoint=`, `--boot-user=`,
 ## `--gameapi=`); this file hardcodes no endpoint. The api-error scenario
@@ -128,6 +132,23 @@ func _assert_ready(scene: Variant) -> void:
 		"no error text is displayed on success")
 	check_eq(str(scene.boot_user_id), str(expected["id"]),
 		"boot targeted the fixture save id")
+	# Spec `godot-session`: "Session active at ready".
+	var session: Variant = root.get_node_or_null("Session")
+	check(session != null, "Session autoload is registered")
+	if session != null:
+		check(session.is_active(), "the session is active at ready")
+		check_eq(str(session.user_id()), str(expected["id"]),
+			"the session names the bootstrapped save")
+		var active_summary: Variant = session.summary()
+		check(active_summary != null,
+			"the active session carries a typed summary")
+		if active_summary != null:
+			check_eq(active_summary.name, str(expected["name"]),
+				"the session summary name equals the fixture save")
+			check_eq(active_summary.level, int(expected["level"]),
+				"the session summary level equals the fixture save")
+			check_eq(active_summary.xp, int(expected["xp"]),
+				"the session summary xp equals the fixture save")
 
 
 func _assert_unreachable(scene: Variant, endpoint: String) -> void:
@@ -149,6 +170,7 @@ func _assert_unreachable(scene: Variant, endpoint: String) -> void:
 	check_eq(str(scene.displayed_name), "", "no player name is displayed")
 	check(str(scene.displayed_error).contains("unreachable_endpoint"),
 		"the failure is displayed (got %s)" % str(scene.displayed_error))
+	_assert_no_session_after_failure("unreachable")
 
 
 func _assert_api_error(scene: Variant, user_id: String) -> void:
@@ -168,6 +190,22 @@ func _assert_api_error(scene: Variant, user_id: String) -> void:
 	check(str(scene.displayed_error).contains("unknown_user_id"),
 		"the structured error is displayed (got %s)"
 		% str(scene.displayed_error))
+	_assert_no_session_after_failure("structured API error")
+
+
+## Spec `godot-session`: "No session after a failed boot" — each failure
+## mode must leave the scaffold inactive with no stale user id or summary.
+func _assert_no_session_after_failure(label: String) -> void:
+	var session: Variant = root.get_node_or_null("Session")
+	check(session != null, "Session autoload is registered")
+	if session == null:
+		return
+	check(not session.is_active(),
+		"no session exists after a %s boot" % label)
+	check_eq(str(session.user_id()), "",
+		"no stale user id survives a %s boot" % label)
+	check(session.summary() == null,
+		"no stale summary survives a %s boot" % label)
 
 
 func _arg(prefix: String) -> String:

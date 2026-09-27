@@ -12,7 +12,8 @@
     3. Compatibility API guard baseline, pre-run
     4. Compatibility API unittest discovery + documented loopback smoke
     5. headless hermetic Godot suites: package loader, scene build, fake
-       GameApi, boot scene (default scenario)
+       GameApi, boot scene (default scenario), session (the loop passes
+       the dead endpoint for the session suite's failure phase)
     6. boot-scene unreachable-endpoint failure scenario, run with no service
        at all
     7. three live phases against the real Compatibility API: the main-scene
@@ -277,11 +278,15 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session")
     foreach ($suite in $hermetic) {
+        # The dead endpoint is passed to every suite: only test_session
+        # reads it (its follow-up failing boot replaces a previously
+        # active session), and suites that ignore user args are unaffected.
         $run = Invoke-Logged -FileName $GodotExe -Arguments @(
             "--headless", "--path", $projectRel,
-            "--script", "res://tests/$suite.gd"
+            "--script", "res://tests/$suite.gd",
+            "--", "--gameapi-endpoint=http://127.0.0.1:$DeadPort"
         ) -TimeoutSeconds 900 -Name $suite
         Report-Result ($run.ExitCode -eq 0) "$suite exits 0 (got $($run.ExitCode))"
         Report-Result ($run.Combined -match "\[test\] PASS") "$suite reports PASS"
