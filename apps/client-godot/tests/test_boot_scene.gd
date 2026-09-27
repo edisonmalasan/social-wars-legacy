@@ -12,7 +12,9 @@ extends "res://tests/test_base.gd"
 ##
 ## Every scenario also asserts the `Session` scaffold state (spec
 ## `godot-session`): active with the fixture save at ready, and inactive
-## after either failure mode.
+## after either failure mode, and the `GameClock` anchor (spec
+## `godot-game-clock`): anchored to the fixture response epoch at ready,
+## and unanchored with a zero epoch after either failure mode.
 ##
 ## The failure scenarios receive their endpoint and save id from
 ## verify-boot.ps1 as user arguments (`--gameapi-endpoint=`, `--boot-user=`,
@@ -23,10 +25,15 @@ const BootData = preload("res://scripts/gameapi/boot_data.gd")
 
 const FIXTURE_SAVE_LIST := \
 	"tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json"
+const FIXTURE_PLAYER_INFO := \
+	"tests/fixtures/godot-compatibility-boot/steps/get_player_info/response.body"
 const ARG_ENDPOINT := "--gameapi-endpoint="
 const ARG_IMPLEMENTATION := "--gameapi="
 const ARG_BOOT_USER := "--boot-user="
 const STATE_TIMEOUT_MSEC := 60000
+## Bounded post-anchor interval for the ready epoch (time-dependent value:
+## asserted as a flag and a range, never an exact wall-clock comparison).
+const EPOCH_RANGE_SEC := 60
 
 
 func run_scenario() -> void:
@@ -149,6 +156,21 @@ func _assert_ready(scene: Variant) -> void:
 				"the session summary level equals the fixture save")
 			check_eq(active_summary.xp, int(expected["xp"]),
 				"the session summary xp equals the fixture save")
+	# Spec `godot-game-clock`: "Anchored clock at ready".
+	var clock: Variant = root.get_node_or_null("GameClock")
+	check(clock != null, "GameClock autoload is registered")
+	if clock != null:
+		check(clock.is_anchored(), "the clock is anchored at ready")
+		check(not clock.is_paused(), "the clock runs at ready")
+		var ts := _fixture_server_time()
+		check(ts > 0, "fixture server timestamp exists")
+		if ts > 0:
+			var now: int = clock.now_epoch_sec()
+			check(now >= ts,
+				"the anchored epoch is at or ahead of the response timestamp")
+			check(now <= ts + EPOCH_RANGE_SEC,
+				"the anchored epoch is within a bounded post-anchor interval "
+				+ "(got %d vs %d)" % [now, ts])
 
 
 func _assert_unreachable(scene: Variant, endpoint: String) -> void:
@@ -171,6 +193,7 @@ func _assert_unreachable(scene: Variant, endpoint: String) -> void:
 	check(str(scene.displayed_error).contains("unreachable_endpoint"),
 		"the failure is displayed (got %s)" % str(scene.displayed_error))
 	_assert_no_session_after_failure("unreachable")
+	_assert_no_anchor_after_failure("unreachable")
 
 
 func _assert_api_error(scene: Variant, user_id: String) -> void:
@@ -191,6 +214,7 @@ func _assert_api_error(scene: Variant, user_id: String) -> void:
 		"the structured error is displayed (got %s)"
 		% str(scene.displayed_error))
 	_assert_no_session_after_failure("structured API error")
+	_assert_no_anchor_after_failure("structured API error")
 
 
 ## Spec `godot-session`: "No session after a failed boot" — each failure
@@ -206,6 +230,21 @@ func _assert_no_session_after_failure(label: String) -> void:
 		"no stale user id survives a %s boot" % label)
 	check(session.summary() == null,
 		"no stale summary survives a %s boot" % label)
+
+
+## Spec `godot-game-clock`: "No anchor after a failed boot" — each failure
+## mode must leave the clock unanchored with no stale epoch.
+func _assert_no_anchor_after_failure(label: String) -> void:
+	var clock: Variant = root.get_node_or_null("GameClock")
+	check(clock != null, "GameClock autoload is registered")
+	if clock == null:
+		return
+	check(not clock.is_anchored(),
+		"the clock is unanchored after a %s boot" % label)
+	check_eq(clock.server_time(), 0,
+		"no stale server time survives a %s boot" % label)
+	check_eq(clock.now_epoch_sec(), 0,
+		"the epoch is zero after a %s boot" % label)
 
 
 func _arg(prefix: String) -> String:
@@ -234,3 +273,20 @@ func _fixture_first_save() -> Dictionary:
 		check(false, "fixture save list carries a first save")
 		return {}
 	return saves[0]
+
+
+## The fixture capture's legacy server timestamp — the epoch the fake
+## implementation reports as `server_time` (time-dependent, so it is used
+## for range assertions, never for exact value comparison).
+func _fixture_server_time() -> int:
+	var path := Paths.repo_root().path_join(FIXTURE_PLAYER_INFO)
+	var handle := FileAccess.open(path, FileAccess.READ)
+	check(handle != null, "fixture player info is readable: " + path)
+	if handle == null:
+		return 0
+	var parsed: Variant = JSON.parse_string(handle.get_as_text())
+	handle = null
+	if not (parsed is Dictionary):
+		check(false, "fixture player info is a JSON object")
+		return 0
+	return BootData._parse_epoch((parsed as Dictionary).get("timestamp"))

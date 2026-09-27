@@ -12,6 +12,12 @@ extends Control
 ## `Session` autoload only on success — so `state=ready` always implies an
 ## active session and a failed boot leaves none behind.
 ##
+## GameClock (OpenSpec `godot-game-clock`, design D6): every attempt also
+## clears the previous anchor on entry, and a successful bootstrap anchors
+## the clock to the response's `server_time` immediately before the session
+## is activated — so `state=ready` also implies an anchored clock and a
+## failed boot leaves none behind.
+##
 ## Headless sessions print a machine-readable terminal marker and quit
 ## (exit 0 on `state=ready`, exit 1 on `state=error`); windowed sessions stay
 ## open as the client entry point. Headless tests set `auto_quit = false`
@@ -75,9 +81,15 @@ func _boot() -> void:
 	if session == null:
 		_fail("session_missing", "the Session autoload is not registered")
 		return
-	# Every attempt starts from a known state: no stale session survives a
-	# failed or superseded boot (spec `godot-session`: "Boot integration").
+	var clock := get_node_or_null("/root/GameClock")
+	if clock == null:
+		_fail("gameclock_missing", "the GameClock autoload is not registered")
+		return
+	# Every attempt starts from a known state: no stale session or clock
+	# anchor survives a failed or superseded boot (specs `godot-session` and
+	# `godot-game-clock`: "Boot integration").
 	session.clear()
+	clock.clear()
 	connection_state = "listing saves via " + api.describe_transport()
 	_connection_label.text = "connection: connecting - " + connection_state
 	var sessions: Variant = await api.list_sessions()
@@ -106,10 +118,24 @@ func _boot() -> void:
 		_fail(result.error_code, result.error_message)
 		return
 	summary = result.summary
+	if not _anchor_clock(clock, save_list.server_time):
+		return
 	if not _activate_session(session):
 		return
 	_display_summary()
 	_complete()
+
+
+## Commits the response's server epoch to the clock immediately before the
+## session activation; fail-closed, so an anchor failure surfaces as an
+## explicit boot error instead of a ready state without game time
+## (spec `godot-game-clock`: "Boot integration", design D6).
+func _anchor_clock(clock: Variant, server_time: int) -> bool:
+	var anchoring: Dictionary = clock.anchor(server_time)
+	if anchoring.get("ok") != true:
+		_fail("gameclock_anchor", str(anchoring.get("error", "")))
+		return false
+	return true
 
 
 ## Commits the bootstrapped save to the session immediately before the
