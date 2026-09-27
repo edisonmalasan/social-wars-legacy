@@ -109,9 +109,9 @@ powershell -File apps/client-godot/verify-boot.ps1
 ```
 
 This single command runs the Compatibility API guard verification before and
-after, the Compatibility API unittest discovery and loopback smoke, the five
+after, the Compatibility API unittest discovery and loopback smoke, the six
 headless Godot suites (package loader, scene build, fake GameApi, boot
-scene, session), the unreachable-endpoint scenario against a loopback port with
+scene, session, game clock), the unreachable-endpoint scenario against a loopback port with
 nothing listening, and three live phases that start `apps/compat-api/run.py`
 on `127.0.0.1:5056` with a disposable corpus, boot the main scene and both
 GameApi implementations against it, and tear it down again — proving the port

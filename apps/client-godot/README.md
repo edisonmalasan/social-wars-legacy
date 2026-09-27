@@ -86,7 +86,7 @@ godot --path apps/client-godot res://scenes/first_render.tscn
   package directory (`packages/game-content/`).
 - Godot discovers and reports engine `4.7.2.stable` exactly.
 - All five headless test suites exit 0 and print `[test] PASS`
-  (observed check counts: loader 123, scene-build 36, project-scope 601,
+  (observed check counts: loader 123, scene-build 36, project-scope 613,
   content-registry 52, asset-ids 50).
 - The three deliberate-failure scenarios exit non-zero **and** print their
   `[test] EXPECTED-FAILURE` markers (no `UNEXPECTED-ACCEPT`).
@@ -296,7 +296,7 @@ powershell -File apps/client-godot/verify-boot.ps1
 ```
 
 It runs, in order: guard baseline → Compatibility API unittest discovery +
-loopback smoke → the five headless Godot suites → the unreachable-endpoint
+loopback smoke → the six headless Godot suites → the unreachable-endpoint
 scenario against a port with nothing listening → three live phases → guard
 baseline again → `evidence/boot/boot-report.json`. Each live phase is wrapped
 by `compat_live_phase.py`, which starts `apps/compat-api/run.py`, waits for
@@ -316,6 +316,9 @@ godot --headless --path apps/client-godot -s res://tests/test_boot_scene.gd
 # endpoint for its follow-up failing boot; verify-boot.ps1 passes it to
 # every hermetic suite
 godot --headless --path apps/client-godot -s res://tests/test_session.gd -- --gameapi-endpoint=http://127.0.0.1:5057
+# Game clock scaffold + boot integration (98 observed checks): same dead
+# endpoint for its follow-up failing boot that must clear the anchor
+godot --headless --path apps/client-godot -s res://tests/test_game_clock.gd -- --gameapi-endpoint=http://127.0.0.1:5057
 # Failure path: the scene must enter the explicit error state (suite exits 0
 # only when it observed it)
 godot --headless --path apps/client-godot -s res://tests/test_boot_scene.gd -- --scenario=unreachable --gameapi-endpoint=http://127.0.0.1:5057
@@ -333,6 +336,17 @@ session names the bootstrapped save with a summary equal to the fixture
 save, a failed boot leaves none behind, and a failing follow-up attempt
 replaces a previously active session rather than keeping it. It is the
 fifth hermetic suite `verify-boot.ps1` runs.
+
+The game-clock suite (OpenSpec `godot-game-clock`) proves the `GameClock`
+scaffold's fail-closed lifecycle — no implicit anchor at startup,
+anchor-once to the fixture response epoch with invalid anchors rejected,
+pause freezing reported time while resume continues it, manual advance
+moving time by exactly the requested count only while paused, and clearing
+back to unanchored under the transition-signal rules — plus the boot
+integration: at `state=ready` the clock is anchored within a bounded
+interval of the fixture response timestamp, a failed boot leaves no anchor
+behind, and a failing follow-up attempt clears the previous anchor rather
+than keeping it. It is the sixth hermetic suite `verify-boot.ps1` runs.
 
 ### Evidence
 
