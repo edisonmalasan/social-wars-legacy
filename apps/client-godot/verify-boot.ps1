@@ -12,9 +12,9 @@
     3. Compatibility API guard baseline, pre-run
     4. Compatibility API unittest discovery + documented loopback smoke
     5. headless hermetic Godot suites: package loader, scene build, fake
-       GameApi, boot scene (default scenario), session, game clock (the
-       loop passes the dead endpoint for the session and game-clock
-       suites' failure phase)
+       GameApi, boot scene (default scenario), session, game clock,
+       camera controls (the loop passes the dead endpoint for the session
+       and game-clock suites' failure phase; camera controls ignores it)
     6. boot-scene unreachable-endpoint failure scenario, run with no service
        at all
     7. three live phases against the real Compatibility API: the main-scene
@@ -279,7 +279,7 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a

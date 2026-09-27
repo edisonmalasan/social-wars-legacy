@@ -7,9 +7,10 @@ extends "res://tests/test_base.gd"
 ## content plus the allow-listed foundation files (GameApi with its two
 ## implementations, boot data, boot scene), the content-registry work (the
 ## ContentRegistry autoload with its script, its content suite, and the
-## asset-ID suite), and the session and game-clock work (the Session and
-## GameClock autoloads with their scaffold scripts and suites): no other game
-## system, no scene beyond the allow-list, no script outside the
+## asset-ID suite), the session and game-clock work (the Session and
+## GameClock autoloads with their scaffold scripts and suites), and the
+## camera-controls work (the component script and its suite): no other
+## game system, no scene beyond the allow-list, no script outside the
 ## allow-list, no Flash-related runtime, no legacy protocol token
 ## anywhere, and no transport reference outside the legacy-v0
 ## implementation file.
@@ -30,6 +31,7 @@ const ALLOWED := [
 	"scenes/boot.tscn",
 	"scenes/first_render.tscn",
 	"scripts/boot.gd",
+	"scripts/camera_controls.gd",
 	"scripts/comparator.gd",
 	"scripts/content_registry.gd",
 	"scripts/first_render.gd",
@@ -50,6 +52,7 @@ const ALLOWED := [
 	"tests/test_asset_ids.gd",
 	"tests/test_base.gd",
 	"tests/test_boot_scene.gd",
+	"tests/test_camera_controls.gd",
 	"tests/test_content_registry.gd",
 	"tests/test_game_api_fake.gd",
 	"tests/test_game_api_live.gd",
@@ -80,10 +83,10 @@ const EXPECTED_AUTOLOADS := [
 ]
 
 ## Strings that must never appear in ANY project script or scene: legacy
-## protocol entry points and form encoding, a Flash runtime, the game
-## systems deferred to their own changes, non-loopback network primitives,
-## and any UI-foundation system (which the allow-list additionally excludes
-## file by file).
+## protocol entry points and form encoding, a Flash runtime, the deferred
+## UI-foundation system, and non-loopback network primitives (the camera
+## tokens retired when the camera-controls work arrived; the allow-list
+## additionally excludes UI foundation file by file).
 const FORBIDDEN := [
 	"command.php",
 	"FlashVars",
@@ -93,8 +96,6 @@ const FORBIDDEN := [
 	"user_key",
 	"Ruffle",
 	"ActionScript",
-	"Camera2D",
-	"Camera3D",
 	"UiFoundation",
 	"WebSocket",
 	"TCPServer",
@@ -259,7 +260,7 @@ func _check_sources(root: String) -> void:
 			check(body.find(token) == -1,
 				"%s must not reference %s (confined to %s)"
 				% [relative, token, LEGACY_V0_FILE])
-	check_eq(FORBIDDEN.size(), 16,
+	check_eq(FORBIDDEN.size(), 14,
 		"the forbidden-token list is intact (this file is the only source "
 		+ "excluded from the scan)")
 	check_eq(RESTRICTED_TO_LEGACY_V0.size(), 3,
