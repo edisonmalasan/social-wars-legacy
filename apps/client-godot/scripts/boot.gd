@@ -15,8 +15,10 @@ extends Control
 ## GameClock (OpenSpec `godot-game-clock`, design D6): every attempt also
 ## clears the previous anchor on entry, and a successful bootstrap anchors
 ## the clock to the response's `server_time` immediately before the session
-## is activated — so `state=ready` also implies an anchored clock and a
-## failed boot leaves none behind.
+## is activated — so `state=ready` also implies an anchored clock, and
+## every bootstrap failure path (unreachable endpoint, structured API
+## error, or malformed response) occurs before that anchor, leaving the
+## clock unanchored.
 ##
 ## Headless sessions print a machine-readable terminal marker and quit
 ## (exit 0 on `state=ready`, exit 1 on `state=error`); windowed sessions stay

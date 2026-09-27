@@ -29,6 +29,23 @@ const ARG_ENDPOINT := "--gameapi-endpoint="
 const STATE_TIMEOUT_MSEC := 60000
 const EPOCH_RANGE_SEC := 60
 
+const CLOCK_SOURCE := "res://scripts/game_clock.gd"
+## Requirement clauses of "Clock scaffold" that no scenario covers on its
+## own: the scaffold source must contain no wall-clock or calendar read
+## and no persistence or content-loading reference (transport is covered
+## by the project-scope scan; the scope FORBIDDEN list itself stays at the
+## approved 16 tokens, so the clock's own suite scans its source directly).
+const CLOCK_SOURCE_FORBIDDEN := [
+	"from_system",
+	"OS.get_time",
+	"OS.get_date",
+	"OS.get_datetime",
+	"FileAccess",
+	"ConfigFile",
+	"preload(",
+	"load(",
+]
+
 ## Epoch values observed via the anchoring signal, in emission order.
 var _anchored_values: Array = []
 ## Number of observed clearing notifications.
@@ -43,6 +60,12 @@ var _last_tick_payload := -1
 ## base (asserted once at the end, so the check count stays deterministic
 ## no matter how many frames the run lasts).
 var _tick_regressions := 0
+## Count of tick payloads that differed from the committed elapsed time at
+## emission (one verdict at the end, same determinism discipline).
+var _payload_mismatches := 0
+## The clock under test, so the tick handler can verify payloads at
+## emission time (set before any handler can fire).
+var _clock: Variant = null
 
 
 func run_scenario() -> void:
@@ -50,6 +73,7 @@ func run_scenario() -> void:
 	check(clock != null, "GameClock autoload is registered")
 	if clock == null:
 		return
+	_clock = clock
 	clock.clock_anchored.connect(_on_clock_anchored)
 	clock.clock_cleared.connect(_on_clock_cleared)
 	clock.clock_paused_changed.connect(_on_clock_paused_changed)
@@ -61,6 +85,7 @@ func run_scenario() -> void:
 	_check_reject_anchor_while_anchored(clock)
 	# `await` on the two helpers that suspend internally; the plain sync
 	# helpers resolve immediately (test_base pattern).
+	_check_source_contract()
 	await _check_pause_resume(clock)
 	_check_advance(clock)
 	_check_clear(clock)
@@ -70,6 +95,24 @@ func run_scenario() -> void:
 	# tick of the whole run (all bases), recorded without per-frame checks.
 	check_eq(_tick_regressions, 0,
 		"tick payloads strictly increase within every base")
+	check_eq(_payload_mismatches, 0,
+		"every notification payload equals the committed elapsed time at "
+		+ "emission")
+
+
+## Spec: "Clock scaffold" requirement clauses without a scenario of their
+## own — no wall-clock/calendar read and no persistence or content
+## loading inside the clock source itself.
+func _check_source_contract() -> void:
+	var handle := FileAccess.open(CLOCK_SOURCE, FileAccess.READ)
+	check(handle != null, "the clock source is readable: " + CLOCK_SOURCE)
+	if handle == null:
+		return
+	var body := handle.get_as_text()
+	handle = null
+	for token in CLOCK_SOURCE_FORBIDDEN:
+		check(body.find(token) == -1,
+			"game_clock.gd must not reference %s" % token)
 
 
 ## Spec: "Start without an implicit anchor".
@@ -175,16 +218,43 @@ func _check_pause_resume(clock: Variant) -> void:
 	check_eq(_paused_states.size(), 2,
 		"a repeated resume is a no-op that notifies nobody")
 
+	# Snapshot immediately after the resume (synchronous, no frame between),
+	# then sample once per frame across the growth window: each frame that
+	# crosses a millisecond boundary must emit exactly one notification and
+	# a frame that does not cross must emit none — counted, never checked
+	# per frame, so the suite's check count stays deterministic.
+	var running_elapsed: int = clock.elapsed_msec()
+	var running_ticks := _tick_payloads.size()
+	var seen_elapsed := running_elapsed
+	var seen_ticks := running_ticks
+	var frame_mismatches := 0
 	var deadline := Time.get_ticks_msec() + STATE_TIMEOUT_MSEC
 	while clock.elapsed_msec() <= elapsed_frozen \
 			and Time.get_ticks_msec() < deadline:
 		await process_frame
+		var now_elapsed: int = clock.elapsed_msec()
+		var now_ticks := _tick_payloads.size()
+		if now_elapsed != seen_elapsed:
+			if now_ticks != seen_ticks + 1:
+				frame_mismatches += 1
+			seen_elapsed = now_elapsed
+			seen_ticks = now_ticks
+		elif now_ticks != seen_ticks:
+			frame_mismatches += 1
+			seen_ticks = now_ticks
 	check(clock.elapsed_msec() > elapsed_frozen,
 		"time advances again after resuming")
 	check(clock.now_epoch_sec() >= epoch_frozen,
 		"the resumed epoch is never behind its frozen value")
 	check(_tick_payloads.size() > ticks_before,
 		"the resumed advance notifies observers")
+	check_eq(frame_mismatches, 0,
+		"every crossing frame emitted exactly one notification and no "
+		+ "frame emitted otherwise")
+	if not _tick_payloads.is_empty():
+		check_eq(_tick_payloads[_tick_payloads.size() - 1],
+			clock.elapsed_msec(),
+			"the frame-driven tick payload equals the committed elapsed time")
 
 
 ## Spec: "Advance exactly while paused, fail closed otherwise".
@@ -372,8 +442,9 @@ func _arg(prefix: String) -> String:
 
 
 ## The fixture capture's legacy server timestamp — the epoch the fake
-## implementation reports as `server_time` (a time-dependent field, so it
-## is used for range assertions, never for exact value comparison).
+## implementation reports as `server_time`. It is a committed constant:
+## the anchor is compared to it exactly, while the running epoch is only
+## asserted as a bounded range (never against wall time).
 func _fixture_server_time() -> int:
 	var path := Paths.repo_root().path_join(FIXTURE_PLAYER_INFO)
 	var handle := FileAccess.open(path, FileAccess.READ)
@@ -407,3 +478,5 @@ func _on_clock_ticked(payload: int) -> void:
 	if payload <= _last_tick_payload:
 		_tick_regressions += 1
 	_last_tick_payload = payload
+	if _clock != null and payload != _clock.elapsed_msec():
+		_payload_mismatches += 1
