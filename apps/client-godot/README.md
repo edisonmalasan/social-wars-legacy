@@ -86,7 +86,7 @@ godot --path apps/client-godot res://scenes/first_render.tscn
   package directory (`packages/game-content/`).
 - Godot discovers and reports engine `4.7.2.stable` exactly.
 - All five headless test suites exit 0 and print `[test] PASS`
-  (observed check counts: loader 123, scene-build 36, project-scope 585,
+  (observed check counts: loader 123, scene-build 36, project-scope 601,
   content-registry 52, asset-ids 50).
 - The three deliberate-failure scenarios exit non-zero **and** print their
   `[test] EXPECTED-FAILURE` markers (no `UNEXPECTED-ACCEPT`).
@@ -296,7 +296,7 @@ powershell -File apps/client-godot/verify-boot.ps1
 ```
 
 It runs, in order: guard baseline → Compatibility API unittest discovery +
-loopback smoke → the four headless Godot suites → the unreachable-endpoint
+loopback smoke → the five headless Godot suites → the unreachable-endpoint
 scenario against a port with nothing listening → three live phases → guard
 baseline again → `evidence/boot/boot-report.json`. Each live phase is wrapped
 by `compat_live_phase.py`, which starts `apps/compat-api/run.py`, waits for
@@ -312,6 +312,10 @@ Individual steps:
 # Hermetic (no service)
 godot --headless --path apps/client-godot -s res://tests/test_game_api_fake.gd
 godot --headless --path apps/client-godot -s res://tests/test_boot_scene.gd
+# Session scaffold + boot integration (67 observed checks): needs the dead
+# endpoint for its follow-up failing boot; verify-boot.ps1 passes it to
+# every hermetic suite
+godot --headless --path apps/client-godot -s res://tests/test_session.gd -- --gameapi-endpoint=http://127.0.0.1:5057
 # Failure path: the scene must enter the explicit error state (suite exits 0
 # only when it observed it)
 godot --headless --path apps/client-godot -s res://tests/test_boot_scene.gd -- --scenario=unreachable --gameapi-endpoint=http://127.0.0.1:5057
@@ -320,6 +324,15 @@ python -B apps/client-godot/compat_live_phase.py --port 5056 --name live -- <god
 # Project scope (asserts the allow-list, including this change's evidence)
 godot --headless --path apps/client-godot -s res://tests/test_project_scope.gd
 ```
+
+The session suite (OpenSpec `godot-session`) proves the `Session`
+scaffold's fail-closed lifecycle — no implicit session at startup,
+explicit activation/clearing with transition signals, invalid activation
+leaving state untouched — plus the boot integration: at `state=ready` the
+session names the bootstrapped save with a summary equal to the fixture
+save, a failed boot leaves none behind, and a failing follow-up attempt
+replaces a previously active session rather than keeping it. It is the
+fifth hermetic suite `verify-boot.ps1` runs.
 
 ### Evidence
 
