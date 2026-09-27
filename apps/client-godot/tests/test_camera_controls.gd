@@ -32,7 +32,10 @@ const CAMERA_SOURCE_FORBIDDEN := [
 	"OS.get_time",
 	"OS.get_date",
 	"OS.get_datetime",
+	"OS.get_unix_time",
 	"FileAccess",
+	"DirAccess",
+	"ResourceSaver",
 	"ConfigFile",
 	"preload(",
 	"load(",
@@ -101,7 +104,7 @@ func _check_zoom_walk() -> void:
 	check(at_max.get("ok") == false, "zooming in at the maximum is rejected")
 	check(String(at_max.get("error", "")).find("zoom_maximum_reached") != -1,
 		"the error names the violated condition")
-	_assert_zoom_unchanged(camera, 2, 4.0, Vector2(4, 4),
+	_assert_zoom_unchanged(camera, 2, 4.0, Vector2(4, 4), Vector2.ZERO,
 		"a rejected zoom leaves the view untouched")
 	check_eq(_zoom_payloads, [1, 2], "a rejected zoom notifies nobody")
 
@@ -120,7 +123,7 @@ func _check_zoom_walk() -> void:
 	check(at_min.get("ok") == false, "zooming out at the minimum is rejected")
 	check(String(at_min.get("error", "")).find("zoom_minimum_reached") != -1,
 		"the error names the violated condition")
-	_assert_zoom_unchanged(camera, 0, 1.0, Vector2(1, 1),
+	_assert_zoom_unchanged(camera, 0, 1.0, Vector2(1, 1), Vector2.ZERO,
 		"a rejected zoom leaves the view untouched")
 	check_eq(_zoom_payloads, [1, 2, 1, 0],
 		"a rejected zoom at the minimum notifies nobody")
@@ -186,6 +189,9 @@ func _check_wheel_input() -> void:
 		"a wheel-down notch is consumed")
 	check_eq(camera.zoom_level(), 0, "wheel-down zooms out one level")
 	check_eq(_zoom_payloads, [1, 0], "each notch notifies once")
+	check_eq(camera.zoom_factor(), 1.0, "the factor follows the notch down")
+	check_eq(camera.zoom, Vector2(1, 1),
+		"the node's zoom follows the notch down")
 
 	camera.zoom_in()
 	camera.zoom_in()
@@ -193,7 +199,7 @@ func _check_wheel_input() -> void:
 	var payloads_before := _zoom_payloads.size()
 	check(camera.handle_input(_wheel_event(MOUSE_BUTTON_WHEEL_UP, true)) == true,
 		"wheel-up at the maximum is still consumed")
-	_assert_zoom_unchanged(camera, 2, 4.0, Vector2(4, 4),
+	_assert_zoom_unchanged(camera, 2, 4.0, Vector2(4, 4), Vector2.ZERO,
 		"wheel-up at the maximum changes nothing")
 	check_eq(_zoom_payloads.size(), payloads_before,
 		"wheel-up at the maximum is silent")
@@ -204,7 +210,7 @@ func _check_wheel_input() -> void:
 	var payloads_before_min := _zoom_payloads.size()
 	check(camera.handle_input(_wheel_event(MOUSE_BUTTON_WHEEL_DOWN, true)) == true,
 		"wheel-down at the minimum is still consumed")
-	_assert_zoom_unchanged(camera, 0, 1.0, Vector2(1, 1),
+	_assert_zoom_unchanged(camera, 0, 1.0, Vector2(1, 1), Vector2.ZERO,
 		"wheel-down at the minimum changes nothing")
 	check_eq(_zoom_payloads.size(), payloads_before_min,
 		"wheel-down at the minimum is silent")
@@ -260,6 +266,8 @@ func _check_passthrough() -> void:
 	var pan_count := _pan_payloads.size()
 	check(camera.handle_input(_mouse_button(MOUSE_BUTTON_RIGHT, true)) == false,
 		"a right-button press is unconsumed")
+	check(camera.handle_input(_mouse_button(MOUSE_BUTTON_LEFT, false)) == false,
+		"a left release without a drag is unconsumed")
 	check(camera.handle_input(_motion(Vector2(25, 0))) == false,
 		"idle motion is unconsumed")
 	check(camera.handle_input(InputEventKey.new()) == false,
@@ -331,10 +339,11 @@ func _on_camera_zoomed(level: int) -> void:
 
 
 func _assert_zoom_unchanged(camera: Variant, level: int, factor: float,
-		node_zoom: Vector2, message: String) -> void:
+		node_zoom: Vector2, expected_position: Vector2, message: String) -> void:
 	check_eq(camera.zoom_level(), level, message + " (level)")
 	check_eq(camera.zoom_factor(), factor, message + " (factor)")
 	check_eq(camera.zoom, node_zoom, message + " (node zoom)")
+	check_eq(camera.position, expected_position, message + " (position)")
 
 
 func _assert_position_unchanged(camera: Variant, expected: Vector2,
