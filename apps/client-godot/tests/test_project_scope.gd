@@ -7,8 +7,8 @@ extends "res://tests/test_base.gd"
 ## content plus the allow-listed foundation files (GameApi with its two
 ## implementations, boot data, boot scene), the content-registry work (the
 ## ContentRegistry autoload with its script, its content suite, and the
-## asset-ID suite), and the session work this change introduces (the
-## Session autoload with its scaffold script and suite): no other game
+## asset-ID suite), and the session and game-clock work (the Session and
+## GameClock autoloads with their scaffold scripts and suites): no other game
 ## system, no scene beyond the allow-list, no script outside the
 ## allow-list, no Flash-related runtime, no legacy protocol token
 ## anywhere, and no transport reference outside the legacy-v0
@@ -33,6 +33,7 @@ const ALLOWED := [
 	"scripts/comparator.gd",
 	"scripts/content_registry.gd",
 	"scripts/first_render.gd",
+	"scripts/game_clock.gd",
 	"scripts/gameapi/boot_data.gd",
 	"scripts/gameapi/fake_api.gd",
 	"scripts/gameapi/game_api.gd",
@@ -52,6 +53,7 @@ const ALLOWED := [
 	"tests/test_content_registry.gd",
 	"tests/test_game_api_fake.gd",
 	"tests/test_game_api_live.gd",
+	"tests/test_game_clock.gd",
 	"tests/test_package_loader.gd",
 	"tests/test_project_scope.gd",
 	"tests/test_scene_build.gd",
@@ -67,13 +69,14 @@ const EXPECTED_SCENES := [
 	"scenes/first_render.tscn",
 ]
 
-## The three autoloads this change allow-loads (spec: modified R1): the
-## foundation bridge, the canonical content registry, and the session
-## scaffold, nothing else.
+## The four autoloads this change allow-loads (spec: modified R1): the
+## foundation bridge, the canonical content registry, the session
+## scaffold, and the game clock, nothing else.
 const EXPECTED_AUTOLOADS := [
 	"GameApi=\"*res://scripts/gameapi/game_api.gd\"",
 	"ContentRegistry=\"*res://scripts/content_registry.gd\"",
 	"Session=\"*res://scripts/session.gd\"",
+	"GameClock=\"*res://scripts/game_clock.gd\"",
 ]
 
 ## Strings that must never appear in ANY project script or scene: legacy
@@ -90,7 +93,6 @@ const FORBIDDEN := [
 	"user_key",
 	"Ruffle",
 	"ActionScript",
-	"GameClock",
 	"Camera2D",
 	"Camera3D",
 	"UiFoundation",
@@ -174,7 +176,7 @@ func _collect(directory: String, prefix: String, out: Array) -> String:
 
 
 ## `project.godot` must declare the boot scene as the main scene (with the
-## first-render scene still present as its own scene) and exactly the three
+## first-render scene still present as its own scene) and exactly the four
 ## allow-listed autoloads.
 func _check_project_config(root: String) -> void:
 	var path := root.path_join("project.godot")
@@ -199,16 +201,17 @@ func _check_project_config(root: String) -> void:
 		var stripped := line.strip_edges()
 		if stripped != "":
 			entries.append(stripped)
-	check_eq(entries.size(), 3,
-		"exactly three allow-listed autoloads are registered "
+	check_eq(entries.size(), 4,
+		"exactly four allow-listed autoloads are registered "
 		+ "(no other game-system services)")
-	if entries.size() == 3:
+	if entries.size() == 4:
 		var actual: Array = entries.duplicate()
 		actual.sort()
 		var expected: Array = EXPECTED_AUTOLOADS.duplicate()
 		expected.sort()
 		check_eq(actual, expected,
-			"the only autoloads are GameApi, ContentRegistry and Session")
+			"the only autoloads are GameApi, ContentRegistry, "
+			+ "Session and GameClock")
 	else:
 		fail("unexpected autoload entries: %s" % str(entries))
 
@@ -256,7 +259,7 @@ func _check_sources(root: String) -> void:
 			check(body.find(token) == -1,
 				"%s must not reference %s (confined to %s)"
 				% [relative, token, LEGACY_V0_FILE])
-	check_eq(FORBIDDEN.size(), 17,
+	check_eq(FORBIDDEN.size(), 16,
 		"the forbidden-token list is intact (this file is the only source "
 		+ "excluded from the scan)")
 	check_eq(RESTRICTED_TO_LEGACY_V0.size(), 3,

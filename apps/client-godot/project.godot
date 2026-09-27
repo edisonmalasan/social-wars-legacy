@@ -7,8 +7,10 @@
 ; Entry point is the boot scene; the GameApi autoload owns every server
 ; interaction (fake by default, loopback legacy_v0 for verification), the
 ; ContentRegistry autoload loads the canonical normalized content and
-; the asset ID registry on explicit request only, and the Session
-; autoload holds the active session committed by a successful boot.
+; the asset ID registry on explicit request only, the Session autoload
+; holds the active session committed by a successful boot, and the
+; GameClock autoload holds the server-anchored game time committed by
+; the same boot.
 ; The render-verification scene stays runnable as its own scene. No
 ; other game systems. See README.md.
 
@@ -25,6 +27,7 @@ config/features=PackedStringArray("4.7", "GL Compatibility")
 GameApi="*res://scripts/gameapi/game_api.gd"
 ContentRegistry="*res://scripts/content_registry.gd"
 Session="*res://scripts/session.gd"
+GameClock="*res://scripts/game_clock.gd"
 
 [audio]
 
