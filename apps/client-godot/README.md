@@ -347,9 +347,10 @@ Verified by this change (fresh-save corpus only):
 - `legacy_v0` produces the same typed results as `fake` over loopback, and
   both failure paths — unreachable endpoint and structured API error — reach
   an explicit error state that names the failure.
-- Guarded bytes (legacy sources, `config/`, both conversion packages, the
-  three registry manifests, the committed first-render evidence, saves) are
-  byte-identical before and after the whole run.
+- Guarded content (legacy sources, `config/`, both conversion packages, the
+  three registry manifests, the committed first-render evidence, saves) is
+  unchanged before and after the whole run under the guard's
+  line-ending-invariant digests (`guard-baseline-v2`).
 
 Explicitly **not** verified: gameplay parity, authentication security,
 progressed-player coverage, served-byte equality for time-dependent fields,

@@ -1,30 +1,30 @@
 {
   "algorithm": {
-    "digest_source": "worktree bytes under core.autocrlf=true",
-    "file": "sha256 of the file bytes, lowercase hex",
+    "digest_source": "line-ending-normalized content for text files; exact bytes for binary files",
+    "file": "sha256 of the guarded file bytes, lowercase hex: text files (valid UTF-8 without NUL) normalized CRLF -> LF first, all other files exact bytes",
     "group": "SHA-256 of the ordinal-sorted \"<sha256>  <repo-relative posix path>\\n\" lines of every file in the group"
   },
-  "combined_sha256": "636698690d74b0e5b802e7ca7cf93fd693c87d2c28e69f9c0776d74df167d085",
-  "generated_at_utc": "2026-09-26T18:29:24+00:00",
+  "combined_sha256": "6978b9594f52b3f87ebe043b7d1ce0da67632d0a0537f0af7ea3d22f2e7ff348",
+  "generated_at_utc": "2026-09-27T02:25:11+00:00",
   "groups": {
     "config": {
       "absent_paths": [],
       "files": {
-        "config/auctionhouse.json": "0b4d74b3e69cfc58636eb3af9e89d0f88fd9f461f6d234e3e8c25f6f5ec33f0f",
+        "config/auctionhouse.json": "a8dc79616f5effe4e3eb4d56ab532a14e7eff32056e18438df88fd8781f6498e",
         "config/get_game_config.php_23july2012.txt": "924fc56f13199d9622444e8e1f16e6f6d19e3f378ed8545f98e2b4a76d98dd00",
         "config/get_game_config.php_29august2012.txt": "a31a49c31df07f91f0b5e7dde9c07452029cb3db4f53ac8e9b454aef05417eda",
-        "config/get_game_config.php_29august2012_nohash.json": "55ffd929372a4a31785cfd683982856324e2b73ba9a6624c53f09b68e4dd0ea5",
+        "config/get_game_config.php_29august2012_nohash.json": "e6dc61619e81c52404cafb5b1db6fa9616cd55440721e77d73c57e5319196245",
         "config/get_game_config.php_29august2012_nohash.txt": "890a94d2615eb79f82a45bb1a684b75e13dc8456811bb5582937691176840e9e",
-        "config/main.json": "55ffd929372a4a31785cfd683982856324e2b73ba9a6624c53f09b68e4dd0ea5",
-        "config/patch/atom_fusion_item.json": "0c21303a8a363e9aa24a49084af1d9ed54ff1bc65c4446854be23d8793a62d1a",
-        "config/patch/atom_fusion_items_data.json": "b8eb217c0951afe257c31acfea003f98afeea7673fa6ea0ecbd4e50ee15997ce",
-        "config/patch/atom_fusion_powerup.json": "79db1fec2ce50af2c42d47e1eead4395ebe3856b875c12a7abecd492c2396d43",
-        "config/patch/patches.txt": "680311239c57412fe4159c027a67976765b429ea3613297e6771311f5a04651a",
-        "config/patch/targets.json": "121879bef519b00804302f25c593fe8a42e7715b6b8a65ed24f60c238600e3cf",
+        "config/main.json": "e6dc61619e81c52404cafb5b1db6fa9616cd55440721e77d73c57e5319196245",
+        "config/patch/atom_fusion_item.json": "a1feb119ecb3f542184a17c53d7ca3552531aca69f2f5a101115eab3f3e1490a",
+        "config/patch/atom_fusion_items_data.json": "4fe18367d94178323d60eb0c4a0c2f37edfbed8562eb1f2823c8644bfa7c07cc",
+        "config/patch/atom_fusion_powerup.json": "d72c2b0b51f8b74d7fb18c262fe16c21a45ef565e9311010dfdb9b8d37ed033e",
+        "config/patch/patches.txt": "a168193672d8e599dc7bd1f66b78baf9454a1f610b65e6a13890bc7f536bb720",
+        "config/patch/targets.json": "416f38b19a26cb407aa6013bf88c0fb8473c28ef48859b7a29e56cab34beb053",
         "config/patch/unit_patch.json": "229fc18d2dcd67aba95fd24aa7eaf1180704e5bf02718b252317972843940230"
       },
       "files_count": 12,
-      "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+      "sha256": "aa8c02e4884f3d248a84a2073b4cd06403f684d0c58ad75bec42475b1f3ee2ed"
     },
     "conversion_packages": {
       "absent_paths": [],
@@ -88,61 +88,61 @@
         "assets/converted/units/10033_wild_elephant/7_alpha.png": "6f5bcc5dde1cb1c66ec4d338732db3b959c0203fdb078065c62c2725929bb76a",
         "assets/converted/units/10033_wild_elephant/9.jpg": "7efba179e16a62e3b06487f0006e72bf2a9f859a1e1a1a3e38142cb31f987c1b",
         "assets/converted/units/10033_wild_elephant/9_alpha.png": "67bd323ccfa4dde436e0bf4c462beb909016db01630a1203f4a0dd73d609d56b",
-        "assets/converted/units/10033_wild_elephant/package.json": "1234668907fec19fed8182a5f9970c93b6a10ed985b59062f63a8c06f3b2c270"
+        "assets/converted/units/10033_wild_elephant/package.json": "c40b754c3660d42c30bd8ba2388354efb96a71fad0d9082a105563c10b05d1c7"
       },
       "files_count": 60,
-      "sha256": "9a8d9fa54b35023d279764111e9d15b409b306a1c8e9c683c880154137e38a63"
+      "sha256": "aae02f094df3c81a3a25b6abe206c3934286e049a555f96c52fb2c34523a1784"
     },
     "legacy_sources": {
       "absent_paths": [],
       "files": {
-        "auctions.py": "224605c36f5103ecbc2a4e0f1faf374c0433e26b3b66cd5d5afb7cbf142700e0",
-        "bundle.py": "b1a62375a3cee195aeaf49526e2cb85eca0f9d2825a90c1e6f2951241685bb53",
-        "command.py": "90ebd5384513a757ad739df0b2e86d3fd56d9b6efc0b0bfeb704e3b55c12b6ca",
-        "constants.py": "7357609428abcf8e5abcdcf39acb882eff47c024d7580f5a5d57ea4f771dcc98",
-        "engine.py": "1f95dde44d80dfcda2a7641cd7ff5f19631c133589e458a1887229b1f920b02a",
-        "get_game_config.py": "dd14dca1a99338268cd52460753fa8fafbf8e9a01724e7cf27b5a24ce81e2b4d",
-        "get_player_info.py": "09d88cd24155053d655d211dc36a84dbdaccd22326c69ac3f77c1c3408ec0226",
-        "legacy_command_recorder.py": "7fe12897b2b22728e8854c3a34f49c962518c8d3d8c7e4927798b3a199642eb0",
-        "server.py": "4cdb45b57f84b9e7a4bff0e93dae53f0acaddbb57869806f4e0e8c5ee851cedd",
-        "sessions.py": "ad02bbea90c1eb119f60e065e635043317ef3682deed3b21924281498dd7dd9b",
-        "version.py": "e8f6d55940c288de48f2fe1b9afe7a93f39b6f6ce0a16a0e0b0fd99fb5d1a830"
+        "auctions.py": "8d07dcc8d8bb85805f0f8d4f3621e110f4d419174f457add880120a8b9b5f7f9",
+        "bundle.py": "76ce0c9b5cf469d4a1bb34617d00a891989f9b82a2460126e14659855b9a3301",
+        "command.py": "674852efbb9ba1aa563a4e21b723e7c87ddea39a0321c20cd5acf44d20e67b8c",
+        "constants.py": "fd7bb0b5e5170311818ef5775c60e79ab26bcc1da955f3f91c1009a0b5c3af96",
+        "engine.py": "0c69c86ce8971d44b6f85039c103c4a0b74c9e80a83ff9df42a2a1bd21de5f4d",
+        "get_game_config.py": "fd7dc02e84f92f42e97d4b04579c7073e54f467474d077d1d00090d001bfa29c",
+        "get_player_info.py": "90417a800523369386e10f4ee2745784aaa08d54f7ad76c8bf5f842db1ca3376",
+        "legacy_command_recorder.py": "0af3bcb44fe1c9397f8a610cc5bb95160993d33a8349a190196d60fb325bab97",
+        "server.py": "4ba6f138dd002cd14e187921afca87c70d06d3cbb284bbf53cf617d26d62e1b5",
+        "sessions.py": "a820f534aea14ab1e1bc97f178ac15f5bb6a55dc8c4f7da25ed4d9516f5c7d64",
+        "version.py": "a1eb433918a14c1bf80709a0bf3987e47b5595f353b168cf9baa32474958467b"
       },
       "files_count": 11,
-      "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+      "sha256": "76285b736a2cd675565976efa4127e997c68edb949fc8b6520cd80a94a1d21f4"
     },
     "m4_evidence": {
       "absent_paths": [],
       "files": {
         "apps/client-godot/evidence/first-render/first-render.png": "da15d192a901d75c3dc0d394d7eef1f9066beca3423b58620645c7d613f2bae5",
-        "apps/client-godot/evidence/first-render/report.json": "a9d3d763bb2b759c9ef6fe257599cf48e9d0a86494e6164e7a89c45eff68d2a4"
+        "apps/client-godot/evidence/first-render/report.json": "9eda9d8358459f71e8f1df0f953ead00529fc49e21a478c65f808247887bc85a"
       },
       "files_count": 2,
-      "sha256": "dfa732f9cde218aa7d8bed8d16ab49195eec86959c5b629d75e1ca31acc10b5f"
+      "sha256": "bbeca0493a2a63513ab7dd3d2ca878f32f2deeb41b74867048cc36c5dad61f0c"
     },
     "registry_manifests": {
       "absent_paths": [],
       "files": {
-        "tools/asset-registry/conversions.json": "eb7c800118441fef733c332e4927427eae64e3a8275ff4e625fef3d268a08528",
-        "tools/asset-registry/image_extraction.json": "1a7406d5703f40632d9e130bb45bbb3d5eb53d1b12e9d23e898ed58ad4744f01",
-        "tools/asset-registry/inspection.json": "21eb74e03709b2170a74c85e644bbd67f710e6b28eeac1dd5f0bcf1d9edeac03"
+        "tools/asset-registry/conversions.json": "c6fc2ad31463e63f989bf0c73f41dcf6109693e93ff96083ae459b9160700e8b",
+        "tools/asset-registry/image_extraction.json": "2a00538e52e6ccd51bc7cc648b6a87acafce548e313e0378913332d618ac2455",
+        "tools/asset-registry/inspection.json": "47f8b795cb1b27fe00df72745b7a20548db4071b5480c24376ed07e1a844a6fb"
       },
       "files_count": 3,
-      "sha256": "e9b3b46585e66e117e1aa0389ed3f3b24eac29e6ca3450944509991d17b0d5b0"
+      "sha256": "66673648c75f4f1ef3c08dd789d6b8c5d140f8d82a0f588dd1e4b3496e09cb95"
     },
     "saves": {
       "absent_paths": [
         "saves"
       ],
       "files": {
-        "tests/saves/fresh-player-pre-migration.json": "0b92be3ead3f01374dca383781095903ba7ca8171a6ad6b9576750c873a1498e",
-        "tests/saves/fresh-player.json": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+        "tests/saves/fresh-player-pre-migration.json": "8d980953422a16e86b032d5c8db3c729c7d2bb3de04f334bc0f453de1584b72c",
+        "tests/saves/fresh-player.json": "da2c56c685cfbd3a39a4cacee2b1ceb9ab0987679b1cdd93d8907ca0194a931e",
         "tests/saves/manifest.json": "ce6d52202d24969eac8dbc2e2aab665ad9f56e8766249cabd5d859325e37e106"
       },
       "files_count": 3,
-      "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+      "sha256": "4399f52afa312ec05b8b2297809d85acf26464a1fb82a11a3672a09abc2f3cc9"
     }
   },
   "purpose": "Pre-change byte baseline of every path the godot-compatibility-boot change must leave identical; verified again in the final state.",
-  "schema": "godot-compatibility-boot/guard-baseline-v1"
+  "schema": "godot-compatibility-boot/guard-baseline-v2"
 }

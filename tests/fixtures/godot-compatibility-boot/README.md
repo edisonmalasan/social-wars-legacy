@@ -109,5 +109,10 @@ establish gameplay parity, progressed-player coverage, authentication
 security, rendering correctness, or Godot loading. Response bytes are
 observations of a running legacy server, not an authored specification;
 `response.meta.json` headers (Date/Server) are capture-time metadata and are
-never compared. The guard baseline is over worktree bytes under this
-checkout's `core.autocrlf=true` configuration.
+never compared. Guard baseline digests are line-ending invariant
+(`guard-baseline-v2`): text files (valid UTF-8 without NUL) are hashed after
+CRLF → LF normalization and binary files as exact bytes, so neither this
+checkout's `core.autocrlf=true` form nor the documented `report.json`
+producer's LF output changes a digest of unchanged content. (Schema v1 keyed
+digests to raw worktree bytes and failed the first time `verify.ps1`
+rewrote that file; it was retired inside this change and re-captured here.)

@@ -123,10 +123,14 @@ needs port 5056 to be free.
 python -B apps/compat-api/guard_baseline.py verify
 ```
 
-→ `guard-baseline: OK - 6 group(s), combined 636698690d74b0e5b802e7ca7cf93fd693c87d2c28e69f9c0776d74df167d085`,
+→ `guard-baseline: OK - 6 group(s), combined 6978b9594f52b3f87ebe043b7d1ce0da67632d0a0537f0af7ea3d22f2e7ff348`,
 exit `0`. Verifies the pre-change SHA-256 guard set (legacy sources, `config/`,
 both conversion packages, three registry manifests, committed M4 evidence,
 on-disk saves) against `tests/fixtures/godot-compatibility-boot/guard-baseline.json`.
+Guard digests are line-ending invariant (`guard-baseline-v2`): text files
+(valid UTF-8 without NUL) are hashed after CRLF → LF normalization, all other
+files as exact bytes — so a `core.autocrlf=true` checkout form and the
+`report.json` producer's LF output never change a digest of unchanged content.
 
 Fixture capture (task 1.1/1.2 evidence, one-shot) — see
 `tests/fixtures/godot-compatibility-boot/README.md` for its invocation, exit

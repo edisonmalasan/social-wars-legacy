@@ -22,9 +22,11 @@ group                         contents
                               the repository has none)
 ============================  ==============================================
 
-Digest rules are the shared canonical rules in ``hashing.py``: a file digest is
-the SHA-256 of its bytes; a group digest is the SHA-256 of the ordinal-sorted
-``"<sha256>  <repo-relative posix path>\\n"`` lines of every file in the group.
+Digest rules: a file digest is the SHA-256 of its *guarded* bytes — text files
+(bytes that decode as UTF-8 without NUL) are normalized CRLF -> LF first, any
+other file is digested as its exact bytes; a group digest is the SHA-256 of
+the ordinal-sorted ``"<sha256>  <repo-relative posix path>\\n"`` lines of every
+file in the group (shared ``hashing.canonical_digest``).
 
 Commands (from the repository root, pinned CPython 3.9.x, ``-B``):
 
@@ -38,10 +40,12 @@ Exit codes:
 - ``2`` — usage or environment error (wrong interpreter, path outside the repo,
           missing baseline, guarded path missing)
 
-Scope limits: digests cover worktree bytes under the repository's
-``core.autocrlf=true`` checkout, so the baseline is evidence for this checkout,
-not a cross-checkout fingerprint. The tool only reads guarded paths and writes
-the single baseline file.
+Scope limits: text digests are line-ending invariant, so the baseline holds
+across ``core.autocrlf`` checkout forms (CRLF checkouts) and across the
+documented producer of ``report.json``, which rewrites that file with LF
+endings — raw-byte digests keyed the baseline to one checkout form and failed
+the moment the producer ran (schema v1, retired). Binary digests are exact
+bytes. The tool only reads guarded paths and writes the single baseline file.
 """
 
 from __future__ import annotations
@@ -61,11 +65,10 @@ sys.path.insert(0, str(HERE))
 from hashing import (  # noqa: E402
     MISSING_DIGEST,
     canonical_digest,
-    directory_entries,
-    sha256_file,
+    sha256_bytes,
 )
 
-SCHEMA = "godot-compatibility-boot/guard-baseline-v1"
+SCHEMA = "godot-compatibility-boot/guard-baseline-v2"
 DEFAULT_BASELINE = REPO_ROOT / "tests" / "fixtures" / "godot-compatibility-boot" / "guard-baseline.json"
 
 EXIT_OK = 0
@@ -122,6 +125,47 @@ def legacy_source_paths() -> List[str]:
     return sorted(path.name for path in REPO_ROOT.glob("*.py"))
 
 
+def guarded_bytes(path: Path) -> bytes:
+    """File bytes made line-ending invariant for text, exact for binary.
+
+    Bytes that decode as UTF-8 without containing NUL are treated as text and
+    normalized CRLF -> LF before hashing, so neither a ``core.autocrlf=true``
+    CRLF checkout nor a producer that rewrites the file with LF endings can
+    change the digest of unchanged content. Every other file is returned as
+    its exact bytes (binary evidence such as the first-render PNG).
+    """
+    data = path.read_bytes()
+    try:
+        data.decode("utf-8")
+    except UnicodeDecodeError:
+        return data
+    if b"\x00" in data:
+        return data
+    return data.replace(b"\r\n", b"\n")
+
+
+def guarded_sha256_file(path: Path) -> str:
+    """SHA-256 of :func:`guarded_bytes` as lowercase hex."""
+    return sha256_bytes(guarded_bytes(path))
+
+
+def guarded_directory_entries(dir_path: Path, prefix: str = "") -> List[Tuple[str, str]]:
+    """Like ``hashing.directory_entries`` but with guarded file digests."""
+    root = Path(dir_path)
+    if not root.is_dir():
+        raise FileNotFoundError("directory not found: %s" % (dir_path,))
+    entries: List[Tuple[str, str]] = []
+    for path in sorted(root.rglob("*")):
+        if not path.is_file():
+            continue
+        relative = path.relative_to(root).as_posix()
+        if prefix:
+            relative = prefix + "/" + relative
+        entries.append((relative, guarded_sha256_file(path)))
+    entries.sort(key=lambda item: item[0])
+    return entries
+
+
 def group_files(name: str) -> Dict[str, Optional[str]]:
     """Map repo-relative posix path -> sha256 (``None`` = absent path)."""
     kind, paths = GROUPS[name]
@@ -134,14 +178,14 @@ def group_files(name: str) -> Dict[str, Optional[str]]:
         if kind == "files":
             if not absolute.is_file():
                 raise GuardError(EXIT_USAGE, "guarded file missing: %s" % rel)
-            files[rel] = sha256_file(absolute)
+            files[rel] = guarded_sha256_file(absolute)
             continue
         if not absolute.is_dir():
             if kind == "optional_dirs":
                 files[rel] = None
                 continue
             raise GuardError(EXIT_USAGE, "guarded directory missing: %s" % rel)
-        for path, digest in directory_entries(absolute, rel):
+        for path, digest in guarded_directory_entries(absolute, rel):
             files[path] = digest
     return files
 
@@ -170,12 +214,19 @@ def baseline_document() -> Dict[str, object]:
         ),
         "generated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "algorithm": {
-            "file": "sha256 of the file bytes, lowercase hex",
+            "file": (
+                "sha256 of the guarded file bytes, lowercase hex: text files "
+                "(valid UTF-8 without NUL) normalized CRLF -> LF first, all "
+                "other files exact bytes"
+            ),
             "group": (
                 'SHA-256 of the ordinal-sorted "<sha256>  <repo-relative posix '
                 'path>\\n" lines of every file in the group'
             ),
-            "digest_source": "worktree bytes under core.autocrlf=true",
+            "digest_source": (
+                "line-ending-normalized content for text files; exact bytes "
+                "for binary files"
+            ),
         },
         "groups": groups,
         "combined_sha256": canonical_digest(
