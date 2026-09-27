@@ -7,6 +7,11 @@ extends Control
 ## endpoint or a structured API error surfaces as an explicit error state
 ## that names the failure — never a blank screen or a partial success.
 ##
+## Session (OpenSpec `godot-session`, design D6): every attempt clears the
+## previous session on entry, and the bootstrapped save is committed to the
+## `Session` autoload only on success — so `state=ready` always implies an
+## active session and a failed boot leaves none behind.
+##
 ## Headless sessions print a machine-readable terminal marker and quit
 ## (exit 0 on `state=ready`, exit 1 on `state=error`); windowed sessions stay
 ## open as the client entry point. Headless tests set `auto_quit = false`
@@ -66,6 +71,13 @@ func _boot() -> void:
 	if api == null:
 		_fail("gameapi_missing", "the GameApi autoload is not registered")
 		return
+	var session := get_node_or_null("/root/Session")
+	if session == null:
+		_fail("session_missing", "the Session autoload is not registered")
+		return
+	# Every attempt starts from a known state: no stale session survives a
+	# failed or superseded boot (spec `godot-session`: "Boot integration").
+	session.clear()
 	connection_state = "listing saves via " + api.describe_transport()
 	_connection_label.text = "connection: connecting - " + connection_state
 	var sessions: Variant = await api.list_sessions()
@@ -94,8 +106,22 @@ func _boot() -> void:
 		_fail(result.error_code, result.error_message)
 		return
 	summary = result.summary
+	if not _activate_session(session):
+		return
 	_display_summary()
 	_complete()
+
+
+## Commits the bootstrapped save to the session immediately before the
+## ready state; fail-closed, so an activation failure surfaces as an
+## explicit boot error instead of a ready state without a session
+## (spec `godot-session`: "Boot integration", design D6).
+func _activate_session(session: Variant) -> bool:
+	var activation: Dictionary = session.activate(boot_user_id, summary)
+	if activation.get("ok") != true:
+		_fail("session_activate", str(activation.get("error", "")))
+		return false
+	return true
 
 
 ## User id to bootstrap: `--boot-user=` when given (explicit verification

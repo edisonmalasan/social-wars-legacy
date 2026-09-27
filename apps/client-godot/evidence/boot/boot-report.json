@@ -1,12 +1,12 @@
 {
     "schema":  "godot-compatibility-boot/verify-boot-v1",
-    "generated_utc":  "2026-09-27T08:38:08Z",
+    "generated_utc":  "2026-09-27T10:59:56Z",
     "environment":  {
                         "engine_executable":  "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
                         "engine_version":  "4.7.2.stable.official.ed1daf0bf",
                         "python_executable":  "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
                         "python_version":  "3.9.13",
-                        "git_commit":  "51c3b5ff2bbb706e95b2f475c45a00f824ec2cb8",
+                        "git_commit":  "3cca9382edbfdf3284016ba77a93c4ec31ffc4a6",
                         "display_session":  false,
                         "network":  "loopback only (127.0.0.1)"
                     },
@@ -114,7 +114,9 @@
                                          "--path",
                                          "apps/client-godot",
                                          "--script",
-                                         "res://tests/test_package_loader.gd"
+                                         "res://tests/test_package_loader.gd",
+                                         "--",
+                                         "--gameapi-endpoint=http://127.0.0.1:5057"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -128,7 +130,9 @@
                                          "--path",
                                          "apps/client-godot",
                                          "--script",
-                                         "res://tests/test_scene_build.gd"
+                                         "res://tests/test_scene_build.gd",
+                                         "--",
+                                         "--gameapi-endpoint=http://127.0.0.1:5057"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -142,7 +146,9 @@
                                          "--path",
                                          "apps/client-godot",
                                          "--script",
-                                         "res://tests/test_game_api_fake.gd"
+                                         "res://tests/test_game_api_fake.gd",
+                                         "--",
+                                         "--gameapi-endpoint=http://127.0.0.1:5057"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -156,11 +162,29 @@
                                          "--path",
                                          "apps/client-godot",
                                          "--script",
-                                         "res://tests/test_boot_scene.gd"
+                                         "res://tests/test_boot_scene.gd",
+                                         "--",
+                                         "--gameapi-endpoint=http://127.0.0.1:5057"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
                          "log":  "apps/client-godot/.godot/verify-boot/09-test_boot_scene.out.txt"
+                     },
+                     {
+                         "name":  "test_session",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_session.gd",
+                                         "--",
+                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/10-test_session.out.txt"
                      },
                      {
                          "name":  "boot-unreachable",
@@ -178,7 +202,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/10-boot-unreachable.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/11-boot-unreachable.out.txt"
                      },
                      {
                          "name":  "boot-main-live",
@@ -201,7 +225,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/11-boot-main-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/12-boot-main-live.out.txt"
                      },
                      {
                          "name":  "gameapi-live",
@@ -225,7 +249,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/12-gameapi-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/13-gameapi-live.out.txt"
                      },
                      {
                          "name":  "boot-api-error-live",
@@ -252,7 +276,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/13-boot-api-error-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/14-boot-api-error-live.out.txt"
                      },
                      {
                          "name":  "guard-post",
@@ -264,7 +288,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/14-guard-post.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/15-guard-post.out.txt"
                      }
                  ],
     "assertions":  [
@@ -338,6 +362,14 @@
                        },
                        {
                            "name":  "test_boot_scene reports PASS",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_session exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_session reports PASS",
                            "ok":  true
                        },
                        {
