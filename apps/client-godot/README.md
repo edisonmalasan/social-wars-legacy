@@ -316,7 +316,7 @@ godot --headless --path apps/client-godot -s res://tests/test_boot_scene.gd
 # endpoint for its follow-up failing boot; verify-boot.ps1 passes it to
 # every hermetic suite
 godot --headless --path apps/client-godot -s res://tests/test_session.gd -- --gameapi-endpoint=http://127.0.0.1:5057
-# Game clock scaffold + boot integration (98 observed checks): same dead
+# Game clock scaffold + boot integration (110 observed checks): same dead
 # endpoint for its follow-up failing boot that must clear the anchor
 godot --headless --path apps/client-godot -s res://tests/test_game_clock.gd -- --gameapi-endpoint=http://127.0.0.1:5057
 # Failure path: the scene must enter the explicit error state (suite exits 0
