@@ -13,7 +13,7 @@
 
 ## 3. Scope contract
 
-- [ ] 3.1 Update `apps/client-godot/tests/test_project_scope.gd` per design D8: `ALLOWED` += `scripts/session.gd` and `tests/test_session.gd`, `EXPECTED_AUTOLOADS` = exactly the three autoload lines in project order, `FORBIDDEN` drops `"Session"` with the count assertion 18 → 17, and the doc comments describe the three-autoload boundary — verify `tests/test_project_scope.gd` exits 0 with `[test] PASS checks=<observed>` headless while still asserting every remaining forbidden token.
+- [x] 3.1 Update `apps/client-godot/tests/test_project_scope.gd` per design D8: `ALLOWED` += `scripts/session.gd` and `tests/test_session.gd`, `EXPECTED_AUTOLOADS` = exactly the three autoload lines in project order, `FORBIDDEN` drops `"Session"` with the count assertion 18 → 17, and the doc comments describe the three-autoload boundary — verify `tests/test_project_scope.gd` exits 0 with `[test] PASS checks=<observed>` headless while still asserting every remaining forbidden token.
 
 ## 4. Documentation
 

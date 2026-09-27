@@ -5,12 +5,14 @@ extends "res://tests/test_base.gd"
 ##
 ## Asserts that `apps/client-godot/` contains exactly the render-verification
 ## content plus the allow-listed foundation files (GameApi with its two
-## implementations, boot data, boot scene) and the content-registry work this
-## change introduces (the ContentRegistry autoload with its script, its
-## content suite, and the asset-ID suite): no other game system, no scene
-## beyond the allow-list, no script outside the allow-list, no Flash-related
-## runtime, no legacy protocol token anywhere, and no transport reference
-## outside the legacy-v0 implementation file.
+## implementations, boot data, boot scene), the content-registry work (the
+## ContentRegistry autoload with its script, its content suite, and the
+## asset-ID suite), and the session work this change introduces (the
+## Session autoload with its scaffold script and suite): no other game
+## system, no scene beyond the allow-list, no script outside the
+## allow-list, no Flash-related runtime, no legacy protocol token
+## anywhere, and no transport reference outside the legacy-v0
+## implementation file.
 ##
 ## Runs headless as part of `verify.ps1`.
 
@@ -42,6 +44,7 @@ const ALLOWED := [
 	"scripts/report.gd",
 	"scripts/run_compare.gd",
 	"scripts/run_selftest.gd",
+	"scripts/session.gd",
 	"scripts/verification.gd",
 	"tests/test_asset_ids.gd",
 	"tests/test_base.gd",
@@ -52,6 +55,7 @@ const ALLOWED := [
 	"tests/test_package_loader.gd",
 	"tests/test_project_scope.gd",
 	"tests/test_scene_build.gd",
+	"tests/test_session.gd",
 	"evidence/boot/boot-report.json",
 	"evidence/first-render/first-render.png",
 	"evidence/first-render/report.json",
@@ -63,11 +67,13 @@ const EXPECTED_SCENES := [
 	"scenes/first_render.tscn",
 ]
 
-## The two autoloads this change allow-loads (spec: modified R1): the
-## foundation bridge and the canonical content registry, nothing else.
+## The three autoloads this change allow-loads (spec: modified R1): the
+## foundation bridge, the canonical content registry, and the session
+## scaffold, nothing else.
 const EXPECTED_AUTOLOADS := [
 	"GameApi=\"*res://scripts/gameapi/game_api.gd\"",
 	"ContentRegistry=\"*res://scripts/content_registry.gd\"",
+	"Session=\"*res://scripts/session.gd\"",
 ]
 
 ## Strings that must never appear in ANY project script or scene: legacy
@@ -85,7 +91,6 @@ const FORBIDDEN := [
 	"Ruffle",
 	"ActionScript",
 	"GameClock",
-	"Session",
 	"Camera2D",
 	"Camera3D",
 	"UiFoundation",
@@ -169,7 +174,7 @@ func _collect(directory: String, prefix: String, out: Array) -> String:
 
 
 ## `project.godot` must declare the boot scene as the main scene (with the
-## first-render scene still present as its own scene) and exactly the two
+## first-render scene still present as its own scene) and exactly the three
 ## allow-listed autoloads.
 func _check_project_config(root: String) -> void:
 	var path := root.path_join("project.godot")
@@ -194,16 +199,16 @@ func _check_project_config(root: String) -> void:
 		var stripped := line.strip_edges()
 		if stripped != "":
 			entries.append(stripped)
-	check_eq(entries.size(), 2,
-		"exactly two allow-listed autoloads are registered "
+	check_eq(entries.size(), 3,
+		"exactly three allow-listed autoloads are registered "
 		+ "(no other game-system services)")
-	if entries.size() == 2:
+	if entries.size() == 3:
 		var actual: Array = entries.duplicate()
 		actual.sort()
 		var expected: Array = EXPECTED_AUTOLOADS.duplicate()
 		expected.sort()
 		check_eq(actual, expected,
-			"the only autoloads are GameApi and ContentRegistry")
+			"the only autoloads are GameApi, ContentRegistry and Session")
 	else:
 		fail("unexpected autoload entries: %s" % str(entries))
 
@@ -251,7 +256,7 @@ func _check_sources(root: String) -> void:
 			check(body.find(token) == -1,
 				"%s must not reference %s (confined to %s)"
 				% [relative, token, LEGACY_V0_FILE])
-	check_eq(FORBIDDEN.size(), 18,
+	check_eq(FORBIDDEN.size(), 17,
 		"the forbidden-token list is intact (this file is the only source "
 		+ "excluded from the scan)")
 	check_eq(RESTRICTED_TO_LEGACY_V0.size(), 3,
