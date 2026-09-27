@@ -2,8 +2,8 @@
 
 ## 1. Session scaffold
 
-- [ ] 1.1 Implement `apps/client-godot/scripts/session.gd` per design D1–D5: inactive at startup, `activate(user_id, summary) -> {ok, error}` with the fail-closed validation set (non-empty id, non-null summary, summary names the same id), `clear()` returning to inactive, getters reflecting only committed state, and `session_activated` / `session_cleared` signals with the specified emission rules — verify the file contains no forbidden token (GameClock, camera, legacy protocol, transport) by the scope scan once registered.
-- [ ] 1.2 Register the `Session` autoload in `apps/client-godot/project.godot` (third line, after `ContentRegistry`) and add `apps/client-godot/tests/test_session.gd` with the four scaffold scenarios (no implicit session at startup, successful activation with getter/signal assertions, invalid activation rejected with state unchanged, clear semantics including the silent repeated clear) — verify `godot --headless --path apps/client-godot -s res://tests/test_session.gd` exits 0 with `[test] PASS`.
+- [x] 1.1 Implement `apps/client-godot/scripts/session.gd` per design D1–D5: inactive at startup, `activate(user_id, summary) -> {ok, error}` with the fail-closed validation set (non-empty id, non-null summary, summary names the same id), `clear()` returning to inactive, getters reflecting only committed state, and `session_activated` / `session_cleared` signals with the specified emission rules — verify the file contains no forbidden token (GameClock, camera, legacy protocol, transport) by the scope scan once registered.
+- [x] 1.2 Register the `Session` autoload in `apps/client-godot/project.godot` (third line, after `ContentRegistry`) and add `apps/client-godot/tests/test_session.gd` with the four scaffold scenarios (no implicit session at startup, successful activation with getter/signal assertions, invalid activation rejected with state unchanged, clear semantics including the silent repeated clear) — verify `godot --headless --path apps/client-godot -s res://tests/test_session.gd` exits 0 with `[test] PASS`.
 
 ## 2. Boot integration
 
