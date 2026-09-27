@@ -562,9 +562,10 @@ python -B -m unittest discover -s tools/asset-registry/tests -p test_build_asset
 ```
 
 See `tools/asset-registry/README.md` (asset ID registry section) for the
-executable, invocation, join and status rules, exit codes, evidence
-classification, and containment. These commands join every distinct
-content asset reference (images, item sprites, magic sprites, sounds)
+executable, invocation, join and status rules, exit codes, worktree-form
+note, evidence classification, and containment. These commands join
+every distinct content asset reference (images, item sprites, magic
+sprites, sounds)
 against the committed corpus registry and the M4 conversion and
 extraction manifests, writing the deterministic
 `tools/asset-registry/asset_ids.json` (ten recorded inputs, 1,627

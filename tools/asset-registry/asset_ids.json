@@ -81,9 +81,9 @@
       "sha256": "6a7121cdefddf4835ac90c408c98da762b7ccd7de866aea749368beffdad36e0"
     },
     {
-      "bytes": 1225,
+      "bytes": 1260,
       "file": "tools/asset-registry/conversions.json",
-      "sha256": "c6fc2ad31463e63f989bf0c73f41dcf6109693e93ff96083ae459b9160700e8b"
+      "sha256": "eb7c800118441fef733c332e4927427eae64e3a8275ff4e625fef3d268a08528"
     },
     {
       "bytes": 2896,
@@ -91,14 +91,14 @@
       "sha256": "d08945af5f63900bd8315940a4954505e927ad03c7eeebe1ca5e516d1bbe0a93"
     },
     {
-      "bytes": 36085402,
+      "bytes": 37304780,
       "file": "tools/asset-registry/image_extraction.json",
-      "sha256": "2a00538e52e6ccd51bc7cc648b6a87acafce548e313e0378913332d618ac2455"
+      "sha256": "1a7406d5703f40632d9e130bb45bbb3d5eb53d1b12e9d23e898ed58ad4744f01"
     },
     {
-      "bytes": 850835,
+      "bytes": 876598,
       "file": "tools/asset-registry/registry.json",
-      "sha256": "2a5e4b87d360a32068c6b1a8783c38b87eae7a878c402e80d763e7477f684cc9"
+      "sha256": "7ec3c49f0cfd2c5c6ccbf31e4cf9021673423f55ddf4179223f0df94d501b841"
     }
   ],
   "kinds": [

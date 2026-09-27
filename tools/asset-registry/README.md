@@ -564,6 +564,19 @@ python -B -m unittest discover -s tools/asset-registry/tests -p test_convert_uni
 All ten inputs are recorded in the output with byte counts and SHA-256
 digests; `image_extraction.json` is read lazily, after reconciliation.
 
+Worktree-form note (mirrors the converter note above): the recorded
+digests are raw worktree bytes, so a rerun reproduces the committed
+`asset_ids.json` only with the inputs in their recorded forms — the six
+normalized content files and `coverage.json` in LF form (pinned by
+`.gitattributes`), and `registry.json`, `conversions.json`,
+`image_extraction.json` in their `core.autocrlf=true` CRLF checkout
+form. Do not normalize those three manifests to LF: beyond changing the
+recorded digests, `image_extraction.json`'s CRLF bytes are required by
+the M4 converter fingerprint (`content_version` above), which the
+committed converted-package digests reproduce only in that form.
+`asset_ids.json` itself is pinned to LF so its rebuild-equality test
+survives a fresh checkout.
+
 ## Join and status rules
 
 Reference extraction and join rules mirror `build_registry.py`'s coverage

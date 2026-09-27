@@ -3,4 +3,5 @@
 /tests/saves/fresh-player.json -text whitespace=cr-at-eol
 /tests/saves/manifest.json text eol=lf
 /packages/game-content/** text eol=lf
-/tools/asset-registry/*.json text eol=lf
+/tools/asset-registry/asset_ids.json text eol=lf
+/tools/asset-registry/coverage.json text eol=lf
