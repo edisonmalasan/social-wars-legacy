@@ -221,3 +221,137 @@ the elephant composite is 20,714 opaque / 9,665 fully transparent of its
 the test suite's 0.004 epsilon) would change 4,144 house pixels
 (13.3 % of 31,104) and 2,409 elephant pixels (7.4 % of 32,661) — so the
 choice is observable in the evidence, not a hidden assumption.
+
+## Compatibility boot slice
+
+Second OpenSpec change: `openspec/changes/godot-compatibility-boot`
+(delta spec under `openspec/changes/godot-compatibility-boot/specs/`).
+
+This adds the client boot path on top of the first-render work: a `GameApi`
+autoload with typed `list_sessions()` / `get_bootstrap(user_id)` operations,
+two implementations behind one switch, and a boot scene as the project's main
+scene. The boot scene lists saves, bootstraps one save, and displays engine
+version, connection state, and the player summary (name, level, xp).
+
+| Piece | Path |
+| --- | --- |
+| Autoload facade | `scripts/gameapi/game_api.gd` (registered as `GameApi`) |
+| Typed boot data | `scripts/gameapi/boot_data.gd` |
+| Offline implementation | `scripts/gameapi/fake_api.gd` (reads committed fixtures, no sockets) |
+| Loopback implementation | `scripts/gameapi/legacy_v0_api.gd` (the only file allowed to name the endpoint or use the HTTP types) |
+| Main scene | `scenes/boot.tscn` + `scripts/boot.gd` |
+| Suites | `tests/test_game_api_fake.gd`, `tests/test_game_api_live.gd`, `tests/test_boot_scene.gd` |
+
+### Implementation switch and endpoint override
+
+Selection is a project setting, never a code change:
+
+| What | Setting (`project.godot`) | Runtime override (after `--`) |
+| --- | --- | --- |
+| Implementation | `[gameapi] implementation` = `fake` (default) \| `legacy_v0` | `--gameapi=fake` / `--gameapi=legacy_v0` |
+| Endpoint | `[gameapi] endpoint` = `http://127.0.0.1:5056` | `--gameapi-endpoint=<url>` |
+| Save to boot | (first save of the list) | `--boot-user=<save id>` |
+
+```powershell
+# Headless main-scene boot against the real Compatibility API
+godot --headless --path apps/client-godot -- --gameapi=legacy_v0 --gameapi-endpoint=http://127.0.0.1:5056
+
+# Headless main-scene boot with the offline fixtures (default)
+godot --headless --path apps/client-godot -- --gameapi=fake
+```
+
+Only `127.0.0.1` is ever dialed. `legacy_v0` speaks `GET /v0/session` and
+`POST /v0/bootstrap` to the Compatibility API v0 service
+(`python -B apps/compat-api/run.py`, port 5056, loopback-only, disposable
+corpus under the system temp directory that is removed when the service
+stops); `fake` reads the committed fixtures under
+`tests/fixtures/godot-compatibility-boot/` and never opens a socket. The
+project-scope test restricts `http://`, `HTTPRequest`, and `HTTPClient` to
+`scripts/gameapi/legacy_v0_api.gd`, so no presentation or boot code can reach
+a transport.
+
+Headless runs print machine-readable markers and quit:
+
+```text
+[boot] state=ready engine="4.7.2-stable (official) ed1daf0bf" protocol=compat-v0 game_version="alpha 0.02"
+[boot] summary user_id=00000000-0000-4000-8000-000000000001 name="Warrior" level=1 xp=4
+[boot] state=error code=unreachable_endpoint message=...
+```
+
+Windowed runs stay open as the client entry point.
+
+### Verification
+
+One command, from the repository root, no display session required:
+
+```powershell
+powershell -File apps/client-godot/verify-boot.ps1
+```
+
+It runs, in order: guard baseline → Compatibility API unittest discovery +
+loopback smoke → the four headless Godot suites → the unreachable-endpoint
+scenario against a port with nothing listening → three live phases → guard
+baseline again → `evidence/boot/boot-report.json`. Each live phase is wrapped
+by `compat_live_phase.py`, which starts `apps/compat-api/run.py`, waits for
+`GET /v0/session`, runs exactly one Godot command, stops the service with
+`CTRL_BREAK`, and asserts the service exited 0, the disposable corpus was
+removed, no new `socialwars-compat-*` directory is left in temp, no
+working-tree `saves/` exists, and the port is released. Exit code is `0` only
+when every check holds; per-step logs land in `.godot/verify-boot/` (ignored).
+
+Individual steps:
+
+```bash
+# Hermetic (no service)
+godot --headless --path apps/client-godot -s res://tests/test_game_api_fake.gd
+godot --headless --path apps/client-godot -s res://tests/test_boot_scene.gd
+# Failure path: the scene must enter the explicit error state (suite exits 0
+# only when it observed it)
+godot --headless --path apps/client-godot -s res://tests/test_boot_scene.gd -- --scenario=unreachable --gameapi-endpoint=http://127.0.0.1:5057
+# Live phases (each starts and tears down the service itself)
+python -B apps/client-godot/compat_live_phase.py --port 5056 --name live -- <godot> --headless --path apps/client-godot -s res://tests/test_game_api_live.gd
+# Project scope (asserts the allow-list, including this change's evidence)
+godot --headless --path apps/client-godot -s res://tests/test_project_scope.gd
+```
+
+### Evidence
+
+| File | Meaning |
+| --- | --- |
+| `evidence/boot/boot-report.json` | `schema: godot-compatibility-boot/verify-boot-v1`: every command with its exit code, every assertion, the pre/post guard digests, the switch/override contract, and the claim limits (`pass: true` only when everything passed) |
+
+Unlike the first-render report this one carries a `generated_utc` timestamp
+and the commit it was generated against, so re-running it changes the bytes;
+it is regenerated evidence, not a deterministic artifact.
+
+The project-scope test is intentionally **not** part of `verify-boot.ps1`:
+it asserts that every allow-listed file — including this report — exists, so
+it runs in `verify.ps1` after the report has been committed.
+
+### Observed engine behavior (this machine)
+
+Godot 4.7.2 never reports a refused loopback connection as `RESULT_CANT_CONNECT`;
+against a closed port the request stays `STATUS_CONNECTING` and surfaces as
+`RESULT_TIMEOUT` after the 30 s request timeout, even though the OS itself
+refuses in ~2 s. The error state therefore names the endpoint and the timeout
+(`endpoint unreachable (no response within 30 seconds): <url>`), and the
+unreachable scenario costs ~30 s.
+
+### Claim limits
+
+Verified by this change (fresh-save corpus only):
+
+- Boot through both implementations reaches `ready` with a summary equal to
+  the committed fixture save (id, name, level, xp), the fixture game version,
+  protocol `compat-v0`, and the pinned engine version.
+- `legacy_v0` produces the same typed results as `fake` over loopback, and
+  both failure paths — unreachable endpoint and structured API error — reach
+  an explicit error state that names the failure.
+- Guarded bytes (legacy sources, `config/`, both conversion packages, the
+  three registry manifests, the committed first-render evidence, saves) are
+  byte-identical before and after the whole run.
+
+Explicitly **not** verified: gameplay parity, authentication security,
+progressed-player coverage, served-byte equality for time-dependent fields,
+and any Flash/Ruffle/ActionScript/browser execution (none runs; the network
+is loopback only).

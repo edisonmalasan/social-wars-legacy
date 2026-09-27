@@ -67,8 +67,8 @@ Current baseline syntax check:
 python -m compileall -q .
 ```
 
-Local Godot engine install (Windows x64; prerequisite for the future Godot
-client — no Godot project exists yet, so this is not a project build command):
+Local Godot engine install (Windows x64; prerequisite for the Godot client
+under `apps/client-godot/`):
 
 ```bash
 winget install GodotEngine.GodotEngine --accept-package-agreements --accept-source-agreements
@@ -95,7 +95,41 @@ everything passes. Viewport capture needs an interactive display session;
 comparison and the self-test run headless. Individual engine invocations,
 tolerances, and the correctness-claim limits are documented in
 `apps/client-godot/README.md`; committed evidence lives under
-`apps/client-godot/evidence/first-render/`.
+`apps/client-godot/evidence/first-render/`. The windowed run passes
+`res://scenes/first_render.tscn` explicitly, because the project's main scene
+is now the boot scene.
+
+Verified compatibility-boot verification commands (Godot 4.7.2.stable and
+pinned CPython 3.9.13, Windows x64; `python` denotes the pinned interpreter,
+never the PATH alias):
+
+```bash
+powershell -File apps/client-godot/verify-boot.ps1
+```
+
+This single command runs the Compatibility API guard verification before and
+after, the Compatibility API unittest discovery and loopback smoke, the four
+headless Godot suites (package loader, scene build, fake GameApi, boot
+scene), the unreachable-endpoint boot scenario against a loopback port with
+nothing listening, and three live phases that start `apps/compat-api/run.py`
+on `127.0.0.1:5056` with a disposable corpus, boot the main scene and both
+GameApi implementations against it, and tear it down again — proving the port
+is released, the corpus removed, and no working-tree `saves/` exists — then
+writes `apps/client-godot/evidence/boot/boot-report.json` and exits 0 only
+when every check passes. It needs no display session. The Compatibility API
+commands it embeds can also be executed directly:
+
+```bash
+python -B apps/compat-api/guard_baseline.py verify
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+python -B apps/compat-api/tests/smoke_loopback.py
+```
+
+The executed-legacy fixture capture command, its exit code, and its
+containment are recorded in
+`tests/fixtures/godot-compatibility-boot/README.md`; that capture starts the
+legacy Flask server in a disposable copy and is not re-run by either
+verification command above.
 
 Important:
 
