@@ -7,7 +7,8 @@
   Steps:
     1. locate the pinned Godot executable and check its version string
     2. SHA-256 digests of both conversion packages and the guarded manifests
-    3. headless loader / scene-build / project-scope tests (must exit 0)
+    3. headless loader / scene-build / project-scope / content-registry /
+       asset-id tests (must exit 0)
     4. deliberate-failure test scenarios (must exit non-zero AND be detected)
     5. windowed render + capture + compare run (writes the evidence; the
        scene is passed explicitly because the project's main scene is the
@@ -186,17 +187,28 @@ try {
     $manifests = @(
         "tools/asset-registry/conversions.json",
         "tools/asset-registry/inspection.json",
-        "tools/asset-registry/image_extraction.json"
+        "tools/asset-registry/image_extraction.json",
+        "tools/asset-registry/asset_ids.json"
+    )
+    # The canonical content package is read by the content-registry suites;
+    # its bytes must survive the whole battery unchanged (spec: "Read-only
+    # containment").
+    $contentDirs = @(
+        "packages/game-content"
     )
 
     function Get-AllDigests {
-        $result = @{ Packages = @{}; Manifests = @{} }
+        $result = @{ Packages = @{}; Manifests = @{}; Content = @{} }
         foreach ($dir in $packageDirs) {
             $digest = Get-DirectoryDigest (Join-Path $repoRoot $dir) $dir
             $result.Packages[$dir] = $digest
         }
         foreach ($manifest in $manifests) {
             $result.Manifests[$manifest] = (Get-FileSha256 (Join-Path $repoRoot $manifest))
+        }
+        foreach ($dir in $contentDirs) {
+            $digest = Get-DirectoryDigest (Join-Path $repoRoot $dir) $dir
+            $result.Content[$dir] = $digest
         }
         return $result
     }
@@ -217,6 +229,11 @@ try {
     Write-Host "[verify] pre-digest packages:"
     foreach ($dir in $packageDirs) {
         Write-Host "[verify]   $($pre.Packages[$dir].Sha256)  $dir"
+    }
+    foreach ($dir in $contentDirs) {
+        Report-Result ($pre.Content[$dir].Files -gt 0) `
+            "pre-digest $dir covers $($pre.Content[$dir].Files) files"
+        Write-Host "[verify] pre-digest content: $($pre.Content[$dir].Sha256)  $dir"
     }
 
     # --- 3. headless tests -------------------------------------------------
@@ -241,6 +258,20 @@ try {
     ) -TimeoutSeconds 900 -Name "test-project-scope"
     Report-Result ($scopeTest.ExitCode -eq 0) "project-scope test exits 0 (got $($scopeTest.ExitCode))"
     Report-Result ($scopeTest.Combined -match "\[test\] PASS") "project-scope test reports PASS"
+
+    $contentTest = Invoke-Godot -Arguments @(
+        "--headless", "--path", $projectRel,
+        "--script", "res://tests/test_content_registry.gd"
+    ) -TimeoutSeconds 900 -Name "test-content-registry"
+    Report-Result ($contentTest.ExitCode -eq 0) "content-registry test exits 0 (got $($contentTest.ExitCode))"
+    Report-Result ($contentTest.Combined -match "\[test\] PASS") "content-registry test reports PASS"
+
+    $assetIdsTest = Invoke-Godot -Arguments @(
+        "--headless", "--path", $projectRel,
+        "--script", "res://tests/test_asset_ids.gd"
+    ) -TimeoutSeconds 900 -Name "test-asset-ids"
+    Report-Result ($assetIdsTest.ExitCode -eq 0) "asset-id test exits 0 (got $($assetIdsTest.ExitCode))"
+    Report-Result ($assetIdsTest.Combined -match "\[test\] PASS") "asset-id test reports PASS"
 
     # --- 4. deliberate-failure scenarios -----------------------------------
 
@@ -386,6 +417,10 @@ try {
     foreach ($manifest in $manifests) {
         Report-Result ($pre.Manifests[$manifest] -eq $post.Manifests[$manifest]) `
             "manifest bytes unchanged: $manifest"
+    }
+    foreach ($dir in $contentDirs) {
+        Report-Result ($pre.Content[$dir].Sha256 -eq $post.Content[$dir].Sha256) `
+            "content package bytes unchanged: $dir"
     }
 
     # --- summary -----------------------------------------------------------

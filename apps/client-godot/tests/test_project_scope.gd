@@ -1,14 +1,16 @@
 extends "res://tests/test_base.gd"
-## Project-scope check (OpenSpec tasks 3.6 / spec: modified R1 "Minimal
+## Project-scope check (OpenSpec task 3.1 / spec: modified R1 "Minimal
 ## render-verification Godot project" + "Remain within the verification
 ## scope").
 ##
 ## Asserts that `apps/client-godot/` contains exactly the render-verification
-## content plus the allow-listed M5 foundation files this change introduces
-## (GameApi with its two implementations, boot data, boot scene): no other
-## game system, no scene beyond the allow-list, no script outside the
-## allow-list, no Flash-related runtime, no legacy protocol token anywhere,
-## and no transport reference outside the legacy-v0 implementation file.
+## content plus the allow-listed foundation files (GameApi with its two
+## implementations, boot data, boot scene) and the content-registry work this
+## change introduces (the ContentRegistry autoload with its script, its
+## content suite, and the asset-ID suite): no other game system, no scene
+## beyond the allow-list, no script outside the allow-list, no Flash-related
+## runtime, no legacy protocol token anywhere, and no transport reference
+## outside the legacy-v0 implementation file.
 ##
 ## Runs headless as part of `verify.ps1`.
 
@@ -27,6 +29,7 @@ const ALLOWED := [
 	"scenes/first_render.tscn",
 	"scripts/boot.gd",
 	"scripts/comparator.gd",
+	"scripts/content_registry.gd",
 	"scripts/first_render.gd",
 	"scripts/gameapi/boot_data.gd",
 	"scripts/gameapi/fake_api.gd",
@@ -40,8 +43,10 @@ const ALLOWED := [
 	"scripts/run_compare.gd",
 	"scripts/run_selftest.gd",
 	"scripts/verification.gd",
+	"tests/test_asset_ids.gd",
 	"tests/test_base.gd",
 	"tests/test_boot_scene.gd",
+	"tests/test_content_registry.gd",
 	"tests/test_game_api_fake.gd",
 	"tests/test_game_api_live.gd",
 	"tests/test_package_loader.gd",
@@ -58,8 +63,12 @@ const EXPECTED_SCENES := [
 	"scenes/first_render.tscn",
 ]
 
-## The one autoload this change allow-loads (spec: modified R1).
-const EXPECTED_AUTOLOAD := "GameApi=\"*res://scripts/gameapi/game_api.gd\""
+## The two autoloads this change allow-loads (spec: modified R1): the
+## foundation bridge and the canonical content registry, nothing else.
+const EXPECTED_AUTOLOADS := [
+	"GameApi=\"*res://scripts/gameapi/game_api.gd\"",
+	"ContentRegistry=\"*res://scripts/content_registry.gd\"",
+]
 
 ## Strings that must never appear in ANY project script or scene: legacy
 ## protocol entry points and form encoding, a Flash runtime, the game
@@ -75,7 +84,6 @@ const FORBIDDEN := [
 	"user_key",
 	"Ruffle",
 	"ActionScript",
-	"ContentRegistry",
 	"GameClock",
 	"Session",
 	"Camera2D",
@@ -161,8 +169,8 @@ func _collect(directory: String, prefix: String, out: Array) -> String:
 
 
 ## `project.godot` must declare the boot scene as the main scene (with the
-## first-render scene still present as its own scene) and exactly the one
-## allow-listed autoload.
+## first-render scene still present as its own scene) and exactly the two
+## allow-listed autoloads.
 func _check_project_config(root: String) -> void:
 	var path := root.path_join("project.godot")
 	var handle := FileAccess.open(path, FileAccess.READ)
@@ -186,11 +194,16 @@ func _check_project_config(root: String) -> void:
 		var stripped := line.strip_edges()
 		if stripped != "":
 			entries.append(stripped)
-	check_eq(entries.size(), 1,
-		"exactly one autoload is registered (no other game-system services)")
-	if entries.size() == 1:
-		check_eq(str(entries[0]), EXPECTED_AUTOLOAD,
-			"the only autoload is GameApi")
+	check_eq(entries.size(), 2,
+		"exactly two allow-listed autoloads are registered "
+		+ "(no other game-system services)")
+	if entries.size() == 2:
+		var actual: Array = entries.duplicate()
+		actual.sort()
+		var expected: Array = EXPECTED_AUTOLOADS.duplicate()
+		expected.sort()
+		check_eq(actual, expected,
+			"the only autoloads are GameApi and ContentRegistry")
 	else:
 		fail("unexpected autoload entries: %s" % str(entries))
 
@@ -238,7 +251,7 @@ func _check_sources(root: String) -> void:
 			check(body.find(token) == -1,
 				"%s must not reference %s (confined to %s)"
 				% [relative, token, LEGACY_V0_FILE])
-	check_eq(FORBIDDEN.size(), 19,
+	check_eq(FORBIDDEN.size(), 18,
 		"the forbidden-token list is intact (this file is the only source "
 		+ "excluded from the scan)")
 	check_eq(RESTRICTED_TO_LEGACY_V0.size(), 3,

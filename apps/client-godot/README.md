@@ -60,6 +60,8 @@ script-only stages):
 godot --headless --path apps/client-godot -s res://tests/test_package_loader.gd
 godot --headless --path apps/client-godot -s res://tests/test_scene_build.gd
 godot --headless --path apps/client-godot -s res://tests/test_project_scope.gd
+godot --headless --path apps/client-godot -s res://tests/test_content_registry.gd
+godot --headless --path apps/client-godot -s res://tests/test_asset_ids.gd
 
 # Deliberate-failure scenarios (each must exit 1 with its marker)
 godot --headless --path apps/client-godot -s res://tests/test_package_loader.gd -- --scenario=foreign-envelope
@@ -79,10 +81,13 @@ godot --path apps/client-godot res://scenes/first_render.tscn
 ### What verify.ps1 asserts
 
 - Before any run: SHA-256 of both package directories (relative paths,
-  ordinal-sorted, `sha256␠␠path\n`) and of the three manifest files.
+  ordinal-sorted, `sha256␠␠path\n`), of the three registry manifests, of
+  `tools/asset-registry/asset_ids.json`, and of the canonical content
+  package directory (`packages/game-content/`).
 - Godot discovers and reports engine `4.7.2.stable` exactly.
-- All three headless test suites exit 0 and print `[test] PASS`
-  (observed check counts: loader 123, scene-build 36, project-scope 291).
+- All five headless test suites exit 0 and print `[test] PASS`
+  (observed check counts: loader 123, scene-build 36, project-scope 585,
+  content-registry 52, asset-ids 50).
 - The three deliberate-failure scenarios exit non-zero **and** print their
   `[test] EXPECTED-FAILURE` markers (no `UNEXPECTED-ACCEPT`).
 - Headless compare exits 0 with `[compare] PASS`.

@@ -87,11 +87,12 @@ locate the installed executable themselves):
 powershell -File apps/client-godot/verify.ps1
 ```
 
-This single command runs the three headless suites (package loader, scene
-build, project scope), the comparator self-test (expected exit 1), the
-windowed capture plus compare, and SHA-256 pre/post guards over both
-conversion packages and the three registry manifests; it exits 0 only when
-everything passes. Viewport capture needs an interactive display session;
+This single command runs the five headless suites (package loader, scene
+build, project scope, content registry, asset IDs), the comparator self-test
+(expected exit 1), the windowed capture plus compare, and SHA-256 pre/post
+guards over both conversion packages, the three registry manifests, the
+asset-ID registry, and the canonical content package directory; it exits 0
+only when everything passes. Viewport capture needs an interactive display session;
 comparison and the self-test run headless. Individual engine invocations,
 tolerances, and the correctness-claim limits are documented in
 `apps/client-godot/README.md`; committed evidence lives under
@@ -552,6 +553,26 @@ round-trip evidence, and manifest, not served-byte equality, content
 validity, gameplay parity, asset existence or convertibility (M4 owns
 asset truth), or progressed-player coverage. With this extension every
 one of the 20 census content keys has a normalized counterpart.
+
+Verified offline asset-ID registry commands (Windows x64 CPython 3.9.13):
+
+```bash
+python -B tools/asset-registry/build_asset_ids.py
+python -B -m unittest discover -s tools/asset-registry/tests -p test_build_asset_ids.py -v
+```
+
+See `tools/asset-registry/README.md` (asset ID registry section) for the
+executable, invocation, join and status rules, exit codes, worktree-form
+note, evidence classification, and containment. These commands join
+every distinct content asset reference (images, item sprites, magic
+sprites, sounds)
+against the committed corpus registry and the M4 conversion and
+extraction manifests, writing the deterministic
+`tools/asset-registry/asset_ids.json` (ten recorded inputs, 1,627
+entries across the closed status vocabulary, byte-identical rerun), and
+they establish no asset validity, conversion correctness, rendering,
+gameplay parity, or Godot loading (client-side resolution is exercised
+by the Godot asset-ID suite).
 
 ---
 
