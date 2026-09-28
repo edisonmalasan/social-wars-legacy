@@ -24,6 +24,11 @@ Containment / prerequisites:
   gone, that no new ``socialwars-compat-*`` directory is left behind, that
   the port is free again, and that the working tree still has no ``saves/``
   directory;
+- ``--expect-save-mutation`` additionally snapshots every file under the
+  running corpus's ``saves/`` directory after readiness, re-reads them after
+  the wrapped command, and fails unless at least one save changed — the
+  proof that a live ``POST /v0/place`` really persisted through the legacy
+  dispatcher into the disposable corpus (the placement-live phase);
 - the wrapped command's stdout/stderr are piped and pumped through this
   script (inherited grandchild handles are not usable here), so the caller's
   log capture sees the engine output interleaved with the ``PASS``/``FAIL``
@@ -34,6 +39,7 @@ Containment / prerequisites:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import shutil
@@ -109,6 +115,40 @@ def parse_corpus_path(log_text):
     return ""
 
 
+def read_server_log(out_path, err_path):
+    """The service output written so far (the corpus marker lands here at
+    startup, long before the wrapped command runs)."""
+    text = ""
+    for path in (out_path, err_path):
+        if os.path.exists(path):
+            with open(path, encoding="utf-8", errors="replace") as handle:
+                text += handle.read()
+    return text
+
+
+def save_digests(corpus):
+    """SHA-256 per file under ``<corpus>/saves`` (empty when the corpus or
+    its saves directory cannot be read)."""
+    if not corpus:
+        return {}
+    saves_dir = os.path.join(corpus, "saves")
+    digests = {}
+    try:
+        entries = sorted(os.listdir(saves_dir))
+    except OSError:
+        return {}
+    for entry in entries:
+        path = os.path.join(saves_dir, entry)
+        if not os.path.isfile(path):
+            continue
+        try:
+            with open(path, "rb") as handle:
+                digests[entry] = hashlib.sha256(handle.read()).hexdigest()
+        except OSError:
+            return {}
+    return digests
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
         prog="compat_live_phase.py",
@@ -128,6 +168,12 @@ def main(argv=None):
         help="seconds to wait for the wrapped command (default %d)" % GODOT_TIMEOUT_SECONDS,
     )
     parser.add_argument("--name", default="live-phase", help="label used in the summary")
+    parser.add_argument(
+        "--expect-save-mutation",
+        action="store_true",
+        help="fail unless at least one file under the corpus saves/ changes "
+        "while the wrapped command runs (placement-live)",
+    )
     parser.add_argument("command", nargs=argparse.REMAINDER, help="command after --")
     args = parser.parse_args(argv)
 
@@ -186,6 +232,24 @@ def main(argv=None):
         "status=%r server_exit=%r" % (status, server.poll()),
     )
 
+    # Opt-in placement proof: snapshot every corpus save while the service
+    # is up but before the wrapped command runs, then compare afterwards.
+    mutation_corpus = ""
+    digests_before = {}
+    if args.expect_save_mutation and ready:
+        mutation_corpus = parse_corpus_path(read_server_log(out_path, err_path))
+        check(
+            "service log names the corpus before the command",
+            bool(mutation_corpus),
+            mutation_corpus,
+        )
+        digests_before = save_digests(mutation_corpus)
+        check(
+            "pre-command corpus save snapshot recorded",
+            bool(digests_before),
+            ", ".join(sorted(digests_before)),
+        )
+
     godot_exit = None
     if ready:
         print("running: %s" % " ".join(command))
@@ -240,6 +304,19 @@ def main(argv=None):
             )
     else:
         check("wrapped command runs against a ready service", False, "service not ready")
+
+    if args.expect_save_mutation:
+        digests_after = save_digests(mutation_corpus)
+        changed = sorted(
+            name
+            for name in set(digests_before) | set(digests_after)
+            if digests_before.get(name) != digests_after.get(name)
+        )
+        check(
+            "corpus save mutated by the live placement",
+            bool(changed),
+            ", ".join(changed),
+        )
 
     # Clean stop: Ctrl+Break reaches the child's new process group and takes
     # run.py's documented KeyboardInterrupt path (exit 0, corpus removed).
@@ -304,6 +381,7 @@ def main(argv=None):
         "checks_passed": passed,
         "checks_failed": len(failures),
         "failures": failures,
+        "save_mutation_checked": bool(args.expect_save_mutation),
         "ok": not failures,
     }
     print("LIVE-PHASE-SUMMARY %s" % json.dumps(summary, sort_keys=True))

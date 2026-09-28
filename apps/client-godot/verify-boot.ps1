@@ -13,15 +13,20 @@
     4. Compatibility API unittest discovery + documented loopback smoke
     5. headless hermetic Godot suites: package loader, scene build, fake
        GameApi, boot scene (default scenario), session, game clock,
-       camera controls, UI foundation, settings, audio manager (the loop
-       passes the dead endpoint for the session and game-clock suites'
-       failure phase; the camera controls, UI foundation, settings, and
-       audio manager suites ignore it)
+       camera controls, UI foundation, settings, audio manager, and the
+       town vertical slice (projection, town state, town scene, HUD,
+       selection, placement, no-Flash gate) (the loop passes the dead
+       endpoint to every suite: the session and game-clock suites use it
+       for their failure phase, the placement suite uses it for its
+       transport-failure check, and suites that ignore user args are
+       unaffected)
     6. boot-scene unreachable-endpoint failure scenario, run with no service
        at all
-    7. three live phases against the real Compatibility API: the main-scene
+    7. four live phases against the real Compatibility API: the main-scene
        boot (success, compared with the committed fixture save), the legacy-v0
-       GameApi suite, and the structured API-error boot scenario
+       GameApi suite, the structured API-error boot scenario, and the
+       placement phase (one intent through the v0 placement endpoint with
+       the disposable corpus save asserted mutated)
     8. Compatibility API guard baseline, post-run, must equal the pre-run
        digests
     9. teardown assertions: loopback port released, no working-tree saves/
@@ -281,11 +286,12 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_selection", "test_town_scene", "test_town_gate")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_gate")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a
         # previously active session / clears a previous clock anchor), and
+        # test_town_placement dials it for its transport-failure check;
         # suites that ignore user args are unaffected.
         $run = Invoke-Logged -FileName $GodotExe -Arguments @(
             "--headless", "--path", $projectRel,
@@ -347,6 +353,17 @@ try {
                 "--gameapi=legacy_v0", "--gameapi-endpoint=$endpoint",
                 "--boot-user=does-not-exist-0000"
             )
+        },
+        @{
+            Name = "placement-live"
+            Assertions = "placement live phase"
+            ExpectSaveMutation = $true
+            Arguments = @(
+                "--headless", "--path", $projectRel,
+                "--script", "res://tests/test_town_placement.gd",
+                "--", "--scenario=live-placement",
+                "--gameapi-endpoint=$endpoint"
+            )
         }
     )
 
@@ -354,9 +371,14 @@ try {
     foreach ($phase in $livePhases) {
         $phaseArgs = @(
             "-B", "apps/client-godot/compat_live_phase.py",
-            "--port", "$Port", "--name", $phase.Name, "--",
-            $GodotExe
-        ) + $phase.Arguments
+            "--port", "$Port", "--name", $phase.Name
+        )
+        if ($phase.ContainsKey("ExpectSaveMutation")) {
+            # placement-live: the harness snapshots the disposable corpus
+            # saves before the Godot run and fails unless one changed after.
+            $phaseArgs += "--expect-save-mutation"
+        }
+        $phaseArgs += @("--", $GodotExe) + $phase.Arguments
         $run = Invoke-Python -Arguments $phaseArgs -TimeoutSeconds 900 -Name $phase.Name
         $phaseLogs[$phase.Name] = $run.Combined
         Report-Result ($run.ExitCode -eq 0) `
@@ -417,6 +439,15 @@ try {
         "structured API-error scenario reaches the explicit error state"
     Report-Result ($apiErrorOut -match "\[test\] PASS script=res://tests/test_boot_scene.gd") `
         "structured API-error scenario asserts the error state"
+
+    # The placement live phase must show a typed success through the real
+    # endpoint, and the harness must have observed the corpus save change.
+    $placeOut = ""
+    if ($phaseLogs.ContainsKey("placement-live")) { $placeOut = $phaseLogs["placement-live"] }
+    Report-Result ($placeOut -match "\[test\] PASS script=res://tests/test_town_placement\.gd") `
+        "placement live phase asserts its scenario"
+    Report-Result ($placeOut -match "(?m)^PASS corpus save mutated by the live placement") `
+        "placement live phase mutated the disposable corpus save"
 
     # --- 8. guard baseline, post-run ---------------------------------------
 

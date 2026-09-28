@@ -74,6 +74,13 @@ func run_scenario() -> void:
 		fail("this test must run headless (got display server %s)"
 			% DisplayServer.get_name())
 		return
+	if scenario == "live-placement":
+		# verify-boot's placement-live phase: one typed intent through the
+		# real Compatibility endpoint; the phase harness asserts the
+		# disposable corpus save mutated, this scenario asserts the typed
+		# response. Everything else here is fixture-fake only.
+		await _check_live_placement()
+		return
 	var payload: Variant = _fixture(CONFIG_FIXTURE)
 	check(payload is Dictionary, "config fixture parses as JSON")
 	if not (payload is Dictionary):
@@ -754,6 +761,56 @@ func _check_transport_failure(town: Node2D, state: Variant, api: Variant,
 		"the transport failure renders nothing")
 	check(town.placement_active(),
 		"the picker survives the transport failure")
+
+
+## The live-placement scenario (verify-boot's placement-live phase): one
+## typed intent through the real Compatibility endpoint, so the unchanged
+## legacy `command()` executes it over the disposable corpus. This side
+## asserts the documented typed response; the phase harness separately
+## asserts the corpus save file mutated. No fixture is touched.
+func _check_live_placement() -> void:
+	var endpoint := _endpoint()
+	check(endpoint != "", "a loopback endpoint resolves for the live phase")
+	if endpoint == "":
+		return
+	var api: Variant = root.get_node_or_null("GameApi")
+	check(api != null, "GameApi autoload is registered")
+	if api == null:
+		return
+	api.configure("legacy_v0", endpoint)
+	var listing: Variant = await api.list_sessions()
+	check(listing is BootData.SaveListResult,
+		"the corpus save list resolves")
+	if not (listing is BootData.SaveListResult):
+		return
+	var saves: Array = (listing as BootData.SaveListResult).saves
+	check(not saves.is_empty(), "the corpus carries a save")
+	if saves.is_empty():
+		return
+	var pid := str(saves[0].id)
+	var placed: Variant = await api.place_building(pid, 1, 51, 39)
+	check(placed is BootData.PlacementResult,
+		"the live placement returns a typed result")
+	if not (placed is BootData.PlacementResult):
+		return
+	var typed := placed as BootData.PlacementResult
+	check(typed.ok, "the live placement succeeds: %s / %s" % [
+		typed.error_code, typed.error_message])
+	if not typed.ok or typed.placement == null or typed.resources == null:
+		return
+	check_eq(typed.result, "success",
+		"the legacy result string is verbatim")
+	check_eq(typed.placement.item_id, 1, "the live entry places House I")
+	check_eq(typed.placement.x, 51, "the live anchor x is verbatim")
+	check_eq(typed.placement.y, 39, "the live anchor y is verbatim")
+	check_eq(typed.resources.wood, 1970,
+		"the live response deducts the documented 30 wood")
+	check_eq(typed.resources.gold, 2000, "gold follows the response")
+	check_eq(typed.resources.oil, 2000, "oil follows the response")
+	check_eq(typed.resources.steel, 2000, "steel follows the response")
+	check_eq(typed.resources.cash, 5, "cash follows the response")
+	check_eq(typed.resources.mana, 0, "mana follows the response")
+	check_eq(typed.resources.xp, 4, "xp follows the response")
 
 
 ## The catalog derives from the payload in hand: this whole run must not
