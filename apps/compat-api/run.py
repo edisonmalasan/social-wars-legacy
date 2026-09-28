@@ -176,12 +176,14 @@ def main(argv: Optional[List[str]] = None) -> int:
         ]
         print(
             "compat-api: Compatibility API v0 (protocol %s) starting on "
-            "http://%s:%d - loopback only, read-only"
+            "http://%s:%d - loopback only; GET /v0/session and "
+            "POST /v0/bootstrap never persist"
             % (compat_service.PROTOCOL, compat_service.HOST, port)
         )
         print("compat-api: corpus %s (%d save file(s))" % (corpus, len(save_files)))
         print(
-            "compat-api: endpoints GET /v0/session, POST /v0/bootstrap; "
+            "compat-api: endpoints GET /v0/session, POST /v0/bootstrap, "
+            "POST /v0/place (persists into the corpus only); "
             "game version %s" % boot.game_version
         )
         app.run(

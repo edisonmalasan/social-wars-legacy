@@ -107,6 +107,26 @@ def save_hashes(corpus: Path) -> List[Dict[str, str]]:
     return records
 
 
+def working_tree_save_hashes() -> List[Dict[str, str]]:
+    """SHA-256 of every working-tree save file (``saves/`` + ``tests/saves/``).
+
+    Placement execution persists into the *corpus only*; the placement
+    suites snapshot this before running and compare after every mutation
+    to prove no working-tree save is ever written.
+    """
+    records: List[Dict[str, str]] = []
+    for relative in ("saves", "tests/saves"):
+        directory = REPO_ROOT / relative
+        if not directory.is_dir():
+            continue
+        records.extend(
+            {"path": path, "sha256": digest}
+            for path, digest in directory_entries(directory, relative.replace("\\", "/"))
+        )
+    records.sort(key=lambda entry: str(entry["path"]))
+    return records
+
+
 def read_seeded_save(corpus: Path) -> Dict[str, object]:
     files = sorted((corpus / "saves").iterdir())
     if not files:
