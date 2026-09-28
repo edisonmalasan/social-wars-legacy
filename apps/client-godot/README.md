@@ -440,6 +440,27 @@ provisional foundation (design D2): no legacy audio behavior has been
 captured, no sound is played (playback and the committed
 `driver="Dummy"` policy bind with the later sound-content work).
 
+Both new services return the foundation fail-closed envelope —
+`{ok: true, error: ""}` on success, or
+`{ok: false, error: "[<service>] <operation> rejected: <token>"}` — with
+exactly these tokens:
+
+| Service | Condition | Token |
+| --- | --- | --- |
+| `Settings` | any setter re-requests the committed value | `setting_unchanged` |
+| `Settings` | `load` targets an absent file | `storage_file_missing` |
+| `Settings` | `load` fails for any other reason (e.g. corrupt contents; the engine code rides in the message detail) | `storage_read_failed` |
+| `Settings` | the file parses but violates the strict two-key schema (missing key, non-`boolean` value, or unknown key) | `storage_invalid_contents` |
+| `Settings` | `save` cannot write the file | `storage_write_failed` |
+| `AudioManager` | the music setter re-requests the committed value | `music_setting_unchanged` |
+| `AudioManager` | the sfx setter re-requests the committed value | `sfx_setting_unchanged` |
+| `AudioManager` | the music setter runs while `Music` is removed | `music_bus_missing` |
+| `AudioManager` | the sfx setter runs while `SFX` is removed | `sfx_bus_missing` |
+
+Notifications are change-only: `setting_changed(key, value)` on
+`Settings`, and `music_enabled_changed(enabled)` /
+`sfx_enabled_changed(enabled)` on `AudioManager`.
+
 ### Evidence
 
 | File | Meaning |
