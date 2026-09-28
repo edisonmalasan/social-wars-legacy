@@ -313,7 +313,10 @@ class SanitizationTests(unittest.TestCase):
             "target": "/dynamic/menvswomen/srvsexwars/command.php",
             "path": "/dynamic/menvswomen/srvsexwars/command.php",
             "query": {},
-            "headers_sent": {"Host": "127.0.0.1:5055"},
+            "headers_sent": {
+                "Host": "127.0.0.1:5055",
+                "Cookie": "session=SESSION-TOKEN-SECRET",
+            },
         }
         built = envelope_mod.build_envelope(
             item_id=1, x=51, y=39, costs='{"w":30}',
@@ -330,10 +333,25 @@ class SanitizationTests(unittest.TestCase):
         rendered = json.dumps(record)
         self.assertNotIn("FORM-SECRET", rendered)
         self.assertNotIn("TOKEN-SECRET", rendered)
+        self.assertNotIn("SESSION-TOKEN-SECRET", rendered)
         self.assertEqual(record["form"]["user_key"], capture.REDACTED)
+        self.assertEqual(record["headers_sent"]["Cookie"], capture.REDACTED)
+        self.assertEqual(record["headers_sent"]["Host"], "127.0.0.1:5055")
         # The commands payload survives sanitization untouched.
         parsed = envelope_mod.parse_data_field(record["form"]["data"])
         self.assertEqual(parsed["commands"], built["commands"])
+
+    def test_session_cookie_headers_are_redacted_but_others_survive(self) -> None:
+        headers = {
+            "Date": "Mon, 28 Sep 2026 15:30:46 GMT",
+            "Set-Cookie": "session=SESSION-TOKEN-SECRET; HttpOnly; Path=/",
+            "Content-Type": "text/html; charset=utf-8",
+        }
+        sanitized = capture.sanitize_headers(headers)
+        self.assertEqual(sanitized["Set-Cookie"], capture.REDACTED)
+        self.assertEqual(sanitized["Date"], headers["Date"])
+        self.assertEqual(sanitized["Content-Type"], headers["Content-Type"])
+        self.assertNotIn("SESSION-TOKEN-SECRET", json.dumps(sanitized))
 
 
 class CaptureContractTests(unittest.TestCase):

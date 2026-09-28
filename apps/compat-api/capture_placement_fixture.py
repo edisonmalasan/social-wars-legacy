@@ -35,10 +35,13 @@ What this does, in order (design D9; harness shared with the boot capture):
    discards the disposable copy, and writes the fixtures under ``--out``
    (default: ``tests/fixtures/godot-building-placement/``).
 
-Recorded request forms are sanitized (design D9): ``user_key`` is redacted
-and any non-empty ``accessToken`` would be redacted — the capture crafts
-``accessToken=""`` (a documented placeholder, never a token value), so the
-recorded ``data`` field is the exact sent bytes with no secret in them.
+Recorded requests and responses are sanitized (design D9): ``user_key``
+is redacted, the disposable server's session cookie (``Cookie`` /
+``Set-Cookie``) is redacted, and any non-empty ``accessToken`` would be
+redacted — the capture crafts ``accessToken=""`` (a documented
+placeholder, never a token value), so no recorded field ever carries a
+secret. The live requests always send the real values; only the records
+are redacted, which also keeps these fields byte-stable across reruns.
 
 Containment (same contract as the boot capture):
 
@@ -145,6 +148,7 @@ ANCHOR_RULE = (
 REDACTED = "<redacted>"
 SENSITIVE_FORM_KEYS = ("user_key",)
 SENSITIVE_ENVELOPE_KEYS = ("accessToken",)
+SENSITIVE_HEADER_KEYS = ("Cookie", "Set-Cookie")
 
 STEPS = ("login_post", "command_buy")
 
@@ -155,6 +159,21 @@ def sanitize_form(form: Dict[str, str]) -> Dict[str, str]:
     return {
         key: (REDACTED if key in SENSITIVE_FORM_KEYS else value)
         for key, value in form.items()
+    }
+
+
+def sanitize_headers(headers: Dict[str, str]) -> Dict[str, str]:
+    """Redact the disposable server's session cookie from recorded headers.
+
+    The live request always sends the real cookie (the login step must
+    behave like a logged-in client); only the *record* is redacted — it is
+    an ephemeral token value of a dead disposable server, it can never be
+    replayed (placement parity works from the intent, not over HTTP), and
+    redacting it keeps reruns byte-stable for these fields.
+    """
+    return {
+        key: (REDACTED if key in SENSITIVE_HEADER_KEYS else value)
+        for key, value in headers.items()
     }
 
 
@@ -232,7 +251,7 @@ def request_record(
         "path": result["path"],
         "query": result["query"],
         "form": recorded_form,
-        "headers_sent": result["headers_sent"],
+        "headers_sent": sanitize_headers(result["headers_sent"]),
         "scheme": "http",
         "host": LEGACY_HOST,
         "port": LEGACY_PORT,
@@ -244,7 +263,7 @@ def response_record(result: Dict[str, Any], body: bytes) -> Dict[str, Any]:
     return {
         "status": result["status"],
         "reason": result["reason"],
-        "headers": result["response_headers"],
+        "headers": sanitize_headers(result["response_headers"]),
         "body_bytes": len(body),
         "body_sha256": sha256_bytes(body),
         "captured_at_utc": iso_now(),
