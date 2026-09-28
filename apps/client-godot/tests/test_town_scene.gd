@@ -351,7 +351,8 @@ func _check_error_states(state: Variant) -> void:
 	var scene: PackedScene = load("res://scenes/town.tscn")
 	var failing: Node2D = scene.instantiate()
 	root.add_child(failing)
-	failing.set_registry(RegistryScript.new())
+	var unloaded: RegistryScript = RegistryScript.new()
+	failing.set_registry(unloaded)
 	var failed: Dictionary = failing.set_town_state(state)
 	check(not bool(failed.get("ok", true)),
 		"unloaded registry fails the build: %s" % failed.get("error"))
@@ -369,6 +370,10 @@ func _check_error_states(state: Variant) -> void:
 	check(not bool(rejected.get("ok", true)),
 		"selection is rejected while the view is not built")
 	failing.free()
+	# The registry is a member reference, not a child of the town: the
+	# orphan Node must be freed here or it leaks (the harness treats the
+	# engine's exit-leak ERROR line as a script error).
+	unloaded.free()
 
 	var missing_state: Node2D = scene.instantiate()
 	root.add_child(missing_state)

@@ -267,12 +267,16 @@ func _reset_view() -> void:
 
 ## Enters the explicit error state: names the failure on the view, keeps
 ## the view cleared of partial renders, and returns the failed envelope.
+## The failure is printed as an explicit stdout marker rather than an
+## engine error line: expected fail-closed rejections follow the boot
+## scene's `state=error` marker convention, while the verification
+## harnesses treat engine `ERROR:` lines as fatal.
 func _enter_error(message: String) -> Dictionary:
 	_reset_view()
 	view_state = STATE_ERROR
 	build_error = message
 	build_ok = false
-	push_error("[town] " + message)
+	print("[town] state=error message=", message)
 	if error_label != null:
 		error_label.text = message
 		error_label.visible = true
