@@ -3,7 +3,13 @@ extends "res://tests/test_base.gd"
 ##
 ## Scenarios:
 ##   (default)   fake implementation, no server: the boot reaches "ready"
-##               and the displayed summary equals the fixture save.
+##               and the displayed summary equals the fixture save; the
+##               launch makes exactly one bootstrap request and never
+##               instantiates the town scene headlessly; a directly
+##               requested boot-to-town handoff reuses that request
+##               (building the 40-placement town) and a payload-less
+##               handoff routes to the explicit error with no partial
+##               town (task 7.1).
 ##   unreachable legacy_v0 against a loopback endpoint with nothing
 ##               listening: the scene enters an error state that names the
 ##               connection failure.
@@ -49,6 +55,7 @@ func run_scenario() -> void:
 	if scene == null:
 		return
 	scene.auto_quit = false
+	var requests_before: int = api.bootstrap_requests
 	root.add_child(scene)
 	var final := await _wait_for_terminal(scene)
 	check(final != "", "boot scene reached a terminal state")
@@ -56,7 +63,8 @@ func run_scenario() -> void:
 		return
 	match scenario:
 		"":
-			_assert_ready(scene)
+			_assert_ready(scene, requests_before)
+			_assert_handoff(scene, api)
 		"unreachable":
 			_assert_unreachable(scene, _arg(ARG_ENDPOINT))
 		"api-error":
@@ -102,11 +110,20 @@ func _wait_for_terminal(scene: Variant) -> String:
 	return str(scene.state)
 
 
-func _assert_ready(scene: Variant) -> void:
+func _assert_ready(scene: Variant, requests_before: int) -> void:
 	check_eq(str(scene.state), "ready",
 		"boot reaches the ready state with the fake implementation")
 	if str(scene.state) != "ready":
 		return
+	# Spec `godot-compatibility-boot` "Windowed boot-to-town transition":
+	# exactly one bootstrap request per launch, and the headless run never
+	# enters the town scene.
+	var api: Variant = root.get_node_or_null("GameApi")
+	if api != null:
+		check_eq(int(api.bootstrap_requests) - requests_before, 1,
+			"exactly one bootstrap request was made for the launch")
+	check(root.get_node_or_null("Town") == null,
+		"the headless boot never instantiates the town scene")
 	var expected := _fixture_first_save()
 	check(expected.size() > 0, "fixture save exists")
 	if expected.is_empty():
@@ -171,6 +188,51 @@ func _assert_ready(scene: Variant) -> void:
 			check(now <= ts + EPOCH_RANGE_SEC,
 				"the anchored epoch is within a bounded post-anchor interval "
 				+ "(got %d vs %d)" % [now, ts])
+
+
+## Spec `godot-compatibility-boot` "Windowed boot-to-town transition"
+## (task 7.1): a directly requested handoff reuses the validated payload
+## with no second bootstrap request, and a handoff without a payload
+## routes to the explicit error with no partial town and no blank view.
+## The headless automatic path is gated in `_complete()` and asserted
+## above (no town instantiated during the boot itself).
+func _assert_handoff(scene: Variant, api: Variant) -> void:
+	var requests_before: int = api.bootstrap_requests
+	var handoff: Dictionary = scene.transition_to_town()
+	check(bool(handoff.get("ok", false)),
+		"a requested handoff builds the town: %s" % handoff.get("error"))
+	check_eq(int(api.bootstrap_requests), requests_before,
+		"the handoff issues no additional bootstrap request")
+	var town: Variant = root.get_node_or_null("Town")
+	check(town != null, "the town scene exists after the handoff")
+	if town != null:
+		check_eq(str(town.view_state), "built", "the town view builds")
+		check_eq(town.objects.size(), 40,
+			"the town renders the save's 40 placements")
+		check(town.build_ok, "the handed town view is committed")
+	check_eq(scene.visible, false,
+		"a successful handoff replaces the boot view")
+	check_eq(str(scene.state), "ready",
+		"a successful handoff leaves the boot state ready")
+
+	# Failure routing: no payload -> explicit error naming the condition,
+	# boot view showing the error (never blank), no partial town.
+	if town != null:
+		town.free()
+	scene.player_info = null
+	var failed: Dictionary = scene.transition_to_town()
+	check(not bool(failed.get("ok", true)),
+		"a payload-less handoff fails closed")
+	check_eq(str(scene.state), "error",
+		"the failed handoff commits the explicit error state")
+	check(String(scene.error_code).begins_with("town_state"),
+		"the failure names the handoff condition: %s" % scene.error_code)
+	check(String(scene.displayed_error).contains(str(scene.error_code)),
+		"the explicit error is displayed: %s" % scene.displayed_error)
+	check_eq(scene.visible, true,
+		"the error view replaces the town (never a blank window)")
+	check(root.get_node_or_null("Town") == null,
+		"no partial town survives the failed handoff")
 
 
 func _assert_unreachable(scene: Variant, endpoint: String) -> void:
