@@ -27,6 +27,6 @@
 
 ## 5. Verification and regression
 
-- [ ] 5.1 Re-run the prior verification batteries and guards; verify `powershell -File apps/client-godot/verify.ps1`, `powershell -File apps/client-godot/verify-boot.ps1`, `python -B apps/compat-api/guard_baseline.py verify`, and `python -B tools/hash-manifest/hash_manifest.py verify` all exit 0 with first-render and guard evidence unchanged.
-- [ ] 5.2 Validate the change against OpenSpec; verify `openspec validate content-validator --type change --strict` and `openspec validate --all --strict` both exit 0.
-- [ ] 5.3 Review the final diff; verify `git status`/`git diff --stat` show only the intended files (validator, suite, package README, AGENTS.md, change artifacts) and no normalized output, `manifest.json`, schema, legacy source, save, guarded, or M4/M5 evidence file changed.
+- [x] 5.1 Re-run the prior verification batteries and guards; verify `powershell -File apps/client-godot/verify.ps1`, `powershell -File apps/client-godot/verify-boot.ps1`, `python -B apps/compat-api/guard_baseline.py verify`, and `python -B tools/hash-manifest/hash_manifest.py verify` all exit 0 with first-render and guard evidence unchanged.
+- [x] 5.2 Validate the change against OpenSpec; verify `openspec validate content-validator --type change --strict` and `openspec validate --all --strict` both exit 0.
+- [x] 5.3 Review the final diff; verify `git status`/`git diff --stat` show only the intended files (validator, suite, package README, AGENTS.md, change artifacts) and no normalized output, `manifest.json`, schema, legacy source, save, guarded, or M4/M5 evidence file changed.
