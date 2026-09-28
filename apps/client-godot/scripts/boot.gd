@@ -37,6 +37,7 @@ extends Control
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const TownState = preload("res://scripts/town/town_state.gd")
+const PlacementCatalog = preload("res://scripts/town/placement_catalog.gd")
 
 signal boot_finished(state: String)
 
@@ -66,6 +67,14 @@ var summary: BootData.PlayerSummary = null
 ## consumed by the town-state parser — the raw transport dictionary never
 ## reaches presentation code (spec "Windowed boot-to-town transition").
 var player_info: BootData.PlayerInfoPayload = null
+## The bootstrap's wrapped game-config payload, kept for the town's
+## placement catalog (building-placement, spec "Placement flow"): the
+## handoff parses it fail-closed and hands the typed catalog — or the
+## failure envelope — to the town, so the picker never derives entries
+## from raw transport and never fabricates one. A missing or malformed
+## config leaves placement unavailable behind the named error; it never
+## fails the town transition itself.
+var config: BootData.ConfigPayload = null
 
 ## Exactly what the summary labels display (single source: the labels are
 ## assigned from these fields, so headless assertions cover the UI text).
@@ -137,6 +146,7 @@ func _boot() -> void:
 		return
 	summary = result.summary
 	player_info = result.player_info
+	config = result.config
 	if not _anchor_clock(clock, save_list.server_time):
 		return
 	if not _activate_session(session):
@@ -242,8 +252,12 @@ func transition_to_town() -> Dictionary:
 	var town: Variant = scene.instantiate()
 	# The state is committed before the tree insertion, so `_ready` builds
 	# the view; a failed build is torn down and surfaced as the explicit
-	# handoff error instead of a partial town.
+	# handoff error instead of a partial town. The placement catalog is
+	# parsed from the payload in hand (no second config request) and its
+	# envelope — success or named failure — is handed alongside: a bad
+	# config leaves placement unavailable, it never fails the town.
 	town.set_town_state(parsed["state"])
+	town.set_placement_catalog(_placement_catalog_envelope())
 	get_tree().root.add_child(town)
 	if not town.build_ok:
 		var failure := str(town.build_error)
@@ -253,6 +267,20 @@ func transition_to_town() -> Dictionary:
 	print('[boot] town=rendered user_id=%s placements=%d' % [
 		boot_user_id, int((parsed["state"] as Variant).placements.size())])
 	return {"ok": true, "error": ""}
+
+
+## The placement catalog envelope for the town handoff: the payload in
+## hand parsed fail-closed, or the named failure envelope when the boot
+## carried no config object — placement becomes unavailable behind that
+## explicit error (never fabricated), and the transition itself is
+## unaffected either way (spec "Placement flow", catalog failure
+## scenario).
+func _placement_catalog_envelope() -> Dictionary:
+	if config == null:
+		return {"ok": false, "error":
+			"[catalog] parse rejected: the bootstrap config payload "
+			+ "is unavailable"}
+	return PlacementCatalog.parse(config.raw)
 
 
 ## Commits an explicit handoff failure: the boot view displays the named

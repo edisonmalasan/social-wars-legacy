@@ -15,20 +15,58 @@ extends "res://tests/test_base.gd"
 ##              while a null/empty cost parses as the documented free
 ##              item and the JSON transport's integral floats parse as
 ##              ints;
+##   flow       the full town flow over the committed fixtures: the
+##              picker opens with the 14 gated level-1 store buildings
+##              and one wired button each, the press path previews a
+##              valid 2x2 target with its cost against current
+##              resources, the three invalid targets (out-of-grid,
+##              occupied, unaffordable) confirm locally with no request
+##              and no state change, a cancelled mode entry leaves the
+##              serialized state byte-identical and the selection
+##              untouched, a confirmed intent applies only the
+##              authoritative response (one new depth-sorted object at
+##              (51,39), wood 1970 in the state and on the HUD), a
+##              structured failure surfaces its code with no state
+##              change, a failed catalog leaves placement unavailable
+##              behind the named error, and — last, because it waits
+##              out the refused loopback endpoint — a transport failure
+##              does the same;
 ##   no-request the whole run issues no bootstrap request (the catalog
-##              derives from the payload in hand, design D10).
+##              derives from the payload in hand and the flow never
+##              re-bootstraps, design D10).
 ##
-## Later tasks extend this file with the town placement-flow scenarios
-## (pick -> preview -> confirm -> apply, invalid-target no-request,
-## failure rollback, cancelled-mode immutability).
-##
-## Uses the committed bootstrap fixtures directly. No API calls, no
-## server. Runs headless as part of `verify-boot.ps1`.
+## Uses the committed bootstrap fixtures directly; no fixture is ever
+## written, no server runs. Runs headless as part of `verify-boot.ps1`.
 
+const TownState = preload("res://scripts/town/town_state.gd")
+const Iso = preload("res://scripts/town/iso.gd")
+const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const PlacementCatalog = preload("res://scripts/town/placement_catalog.gd")
 
 const CONFIG_FIXTURE := \
 	"tests/fixtures/godot-compatibility-boot/steps/get_game_config/response.body"
+const PLAYER_FIXTURE := \
+	"tests/fixtures/godot-compatibility-boot/steps/get_player_info/response.body"
+
+## Executed-placement anchors and facts (probe-recorded against the
+## committed fixtures): the executed legacy `buy` placed House I on a
+## free 2x2 at (51,39) with fixture epoch 1790609721; the Command
+## Center's 4x4 starts at (51,41); (70,20) is a free in-grid 2x2 slot;
+## (150,3) is an anchor outside the shared 0..99 grid; the level-1
+## offering is exactly 14 store-listed buildings.
+const SUCCESS_CELL := Vector2i(51, 39)
+const SUCCESS_TIMESTAMP := 1790609721
+const OCCUPIED_CELL := Vector2i(51, 41)
+const FREE_CELL := Vector2i(70, 20)
+const OUT_OF_GRID_CELL := Vector2i(150, 3)
+const LEVEL_ONE_OFFERING := 14
+
+## Endpoint for the transport scenario: the `--gameapi-endpoint=` user
+## argument (verify-boot passes a refused loopback port to every
+## hermetic suite), else the project setting's loopback default. No
+## hardcoded endpoint in this file — the project-scope scan restricts
+## transport references to the legacy-v0 implementation.
+const ARG_ENDPOINT := "--gameapi-endpoint="
 
 
 func run_scenario() -> void:
@@ -43,6 +81,7 @@ func run_scenario() -> void:
 	_check_catalog_derivation(payload)
 	_check_level_gating(payload)
 	_check_malformed(payload)
+	await _check_flow(payload)
 	_check_no_second_bootstrap_request()
 
 
@@ -111,7 +150,7 @@ func _check_level_gating(payload: Dictionary) -> void:
 		return
 
 	var level_one: Array = PlacementCatalog.picker_entries(catalog, 1)
-	check_eq(level_one.size(), 14,
+	check_eq(level_one.size(), LEVEL_ONE_OFFERING,
 		"level 1 offers exactly the 14 store-listed buildings it allows")
 	var ids := {}
 	for entry: Variant in level_one:
@@ -198,12 +237,14 @@ func _check_malformed(payload: Dictionary) -> void:
 	var free := _parse_with(base, "costs", null)
 	check(bool(free.get("ok", false)), "a null cost parses as a free item")
 	if bool(free.get("ok", false)):
-		var free_entry: Variant = (free["catalog"] as PlacementCatalog.Catalog).entries[0]
+		var free_entry: Variant = \
+			(free["catalog"] as PlacementCatalog.Catalog).entries[0]
 		check_eq(free_entry.costs, {}, "the free item costs nothing")
 	var blank := _parse_with(base, "costs", "")
 	check(bool(blank.get("ok", false)), "an empty cost parses as free")
 	if bool(blank.get("ok", false)):
-		var blank_entry: Variant = (blank["catalog"] as PlacementCatalog.Catalog).entries[0]
+		var blank_entry: Variant = \
+			(blank["catalog"] as PlacementCatalog.Catalog).entries[0]
 		check_eq(blank_entry.costs, {}, "the blank item costs nothing")
 
 	# The pinned JSON transport widens numbers to floats; an integral
@@ -218,6 +259,503 @@ func _check_malformed(payload: Dictionary) -> void:
 			"the widened min_level keeps its integer value")
 
 
+# ---------------------------------------------------------------------------
+# Placement flow (spec "Placement flow")
+# ---------------------------------------------------------------------------
+
+
+## The full flow over the committed fixtures: builds the town from the
+## fresh-save payload, activates the session for the fake's save, hands
+## the typed catalog (the boot handoff's job), and drives picker ->
+## preview -> confirm -> apply plus every failure and no-request path.
+func _check_flow(payload: Dictionary) -> void:
+	var registry: Variant = root.get_node_or_null("ContentRegistry")
+	check(registry != null, "ContentRegistry autoload is registered")
+	if registry == null:
+		return
+	var content: Dictionary = registry.load_content()
+	var assets: Dictionary = registry.load_asset_registry()
+	check(bool(content.get("ok", false)) and bool(assets.get("ok", false)),
+		"content and asset registry load: %s / %s" % [
+			str(content.get("error")), str(assets.get("error"))])
+	if not bool(content.get("ok", false)) or not bool(assets.get("ok", false)):
+		return
+	var info_payload: Variant = _fixture(PLAYER_FIXTURE)
+	check(info_payload is Dictionary, "the player fixture parses as JSON")
+	if not (info_payload is Dictionary):
+		return
+	var parsed: Dictionary = TownState.parse(info_payload, registry)
+	check(bool(parsed.get("ok", false)),
+		"the fresh fixture parses: %s" % parsed.get("error"))
+	if not bool(parsed.get("ok", false)):
+		return
+	var state: Variant = parsed["state"]
+
+	var api: Variant = root.get_node_or_null("GameApi")
+	var session: Variant = root.get_node_or_null("Session")
+	check(api != null and session != null,
+		"GameApi and Session autoloads are registered")
+	if api == null or session == null:
+		return
+	api.configure("fake")
+	var listing: Variant = await api.list_sessions()
+	check(listing is BootData.SaveListResult,
+		"the save list resolves the placement save")
+	if not (listing is BootData.SaveListResult):
+		return
+	check(not (listing as BootData.SaveListResult).saves.is_empty(),
+		"the save list carries a save")
+	if (listing as BootData.SaveListResult).saves.is_empty():
+		return
+	var pid := str((listing as BootData.SaveListResult).saves[0].id)
+	var summary := BootData.PlayerSummary.new()
+	summary.user_id = pid
+	summary.name = state.summary.name
+	summary.level = state.summary.level
+	summary.xp = state.summary.xp
+	var activation: Dictionary = session.activate(pid, summary)
+	check(bool(activation.get("ok", false)),
+		"the session activates the save: %s" % activation.get("error"))
+	if not bool(activation.get("ok", false)):
+		return
+
+	var town: Node2D = load("res://scenes/town.tscn").instantiate()
+	root.add_child(town)
+	var built: Dictionary = town.set_town_state(state)
+	check(bool(built.get("ok", false)), "town builds: %s" % built.get("error"))
+	if not bool(built.get("ok", false)):
+		town.free()
+		return
+	# The boot handoff's job, exercised here directly: the parsed
+	# envelope is committed with no view effects until entry.
+	town.set_placement_catalog(PlacementCatalog.parse(payload))
+	check_eq(town.placement_catalog_entries().size(), LEVEL_ONE_OFFERING,
+		"the handed catalog offers the level-1 entries")
+
+	var requests_start: int = api.placement_requests
+	var snapshot_start := _state_snapshot(state)
+	_check_picker_entry(town, api, requests_start)
+	_check_invalid_targets(town, state, api, requests_start, snapshot_start)
+	_check_cancelled_mode(town, state, api, requests_start, snapshot_start)
+	await _check_applied_response(town, state, api)
+	await _check_structured_failure(town, state, api, session, summary, pid)
+	_check_catalog_unavailable(town, state, api)
+	await _check_transport_failure(town, state, api, payload)
+	check_eq(api.placement_requests, requests_start + 3,
+		"the whole flow issued exactly three requests (success, "
+		+ "structured failure, transport failure); every other check "
+		+ "sent none")
+	town.free()
+
+
+## Picker entry: the mode opens with the gated offering, one wired
+## button per entry, and the press path previews a valid target with
+## its cost against the stored resources.
+func _check_picker_entry(town: Node2D, api: Variant,
+		requests_before: int) -> void:
+	var entered: Dictionary = town.enter_placement()
+	check(bool(entered.get("ok", false)),
+		"the build picker opens: %s" % entered.get("error"))
+	if not bool(entered.get("ok", false)):
+		return
+	check(town.placement_active(), "the placement mode is active")
+	check_eq(int(entered.get("entries", -1)), LEVEL_ONE_OFFERING,
+		"the picker reports the 14 level-1 store buildings")
+	check_eq(town.placement_catalog_entries().size(), LEVEL_ONE_OFFERING,
+		"the catalog accessor offers the same gated entries")
+	check(town.ui.is_slot_visible("placement"),
+		"the picker slot shows while the mode is open")
+	var panel: Variant = _picker_panel(town)
+	check(panel != null, "the picker panel commits into the slot")
+	if panel == null:
+		return
+	var panel_node := panel as Node
+	var item_buttons := 0
+	for child: Variant in panel_node.get_children():
+		if child is Button \
+				and String((child as Button).name).begins_with("item_"):
+			item_buttons += 1
+	check_eq(item_buttons, LEVEL_ONE_OFFERING,
+		"one button per offered building")
+	check_eq(panel_node.get_child_count(), 17,
+		"title, one button per entry, status, and the action row")
+	check(String(_picker_status(town)).contains(
+		"%d available at level 1" % LEVEL_ONE_OFFERING),
+		"the status names the offering and the loaded level")
+	check(_button_named(panel_node, "confirm") != null,
+		"the place action button exists")
+	check(_button_named(panel_node, "cancel") != null,
+		"the cancel action button exists")
+
+	# Level gating through the town flow: a level-2 item withholds and
+	# an absent id names itself — neither is ever offered.
+	var gated: Dictionary = town.pick_placement(5)
+	check(not bool(gated.get("ok", true)),
+		"a level-2 item cannot be picked at level 1")
+	check_eq(str(gated.get("code", "")), "item_not_available",
+		"the gating rejection names the level gate: %s" % gated.get("error"))
+	var absent: Dictionary = town.pick_placement(999999)
+	check_eq(str(absent.get("code", "")), "unknown_item_id",
+		"an absent id names itself: %s" % absent.get("error"))
+	check(town.placement_entry() == null,
+		"failed picks never fabricate a selection")
+
+	# The button wiring picks House I (the signal path, not a direct
+	# call — one `pressed` emission = one pick).
+	var house_button: Variant = _button_named(panel_node, "item_1")
+	check(house_button != null, "the House I button exists")
+	if house_button != null:
+		(house_button as Button).pressed.emit()
+		check(town.placement_entry() != null,
+			"pressing the button commits a selection")
+		if town.placement_entry() != null:
+			check_eq(int(town.placement_entry().id), 1,
+				"the pressed button picks House I")
+
+	# The press path previews the valid target (inverse projection, the
+	# 2x2 footprint, and the cost against the stored wood).
+	var press: Dictionary = town.handle_placement_press(
+		Iso.grid_to_screen(SUCCESS_CELL))
+	check(bool(press.get("ok", false)),
+		"the press-path preview succeeds: %s" % press.get("error"))
+	check(bool(press.get("valid", false)),
+		"the (51,39) press previews a valid target")
+	check_eq(str(press.get("reason", "")), "",
+		"a valid target names no failure")
+	check_eq(press.get("cells", []), [
+		Vector2i(51, 39), Vector2i(52, 39), Vector2i(51, 40), Vector2i(52, 40)],
+		"the footprint preview covers the 2x2 anchored at the press")
+	check(town.placement_preview_shown(), "the overlay shows the preview")
+	check(town.placement_preview_valid(), "the overlay marks it valid")
+	check(String(_picker_status(town)).contains("wood 30 (have 2000)"),
+		"the cost reads against the current resources")
+	check_eq(api.placement_requests, requests_before,
+		"previewing sent no request")
+
+
+## The three invalid targets confirm locally: no request, no state
+## change, and the explicit error names `invalid_target` with the
+## failed gate (design D5: the client owns these gameplay rules).
+func _check_invalid_targets(town: Node2D, state: Variant, api: Variant,
+		requests_before: int, snapshot_before: String) -> void:
+	# out_of_grid: the anchor lies outside the shared 0..99 grid.
+	var target_out: Dictionary = town.preview_placement_cell(
+		OUT_OF_GRID_CELL)
+	check_eq(str(target_out.get("reason", "")), "out_of_grid",
+		"an anchor outside the grid previews out_of_grid")
+	check(not bool(target_out.get("valid", true)),
+		"the out-of-grid target previews invalid")
+	check(not town.placement_preview_valid(),
+		"the overlay marks the out-of-grid target invalid")
+	check(town.placement_preview_shown(),
+		"the invalid target stays visible so its reason reads")
+	var confirm_out: Dictionary = await town.confirm_placement()
+	check(not bool(confirm_out.get("ok", true)),
+		"confirming the out-of-grid target fails")
+	check_eq(str(confirm_out.get("code", "")), "invalid_target",
+		"the out-of-grid confirm names invalid_target: %s"
+		% confirm_out.get("error"))
+	check(String(confirm_out.get("error", "")).contains("out_of_grid"),
+		"the explicit error carries the failed gate")
+	check_eq(api.placement_requests, requests_before,
+		"the out-of-grid target sent no request")
+	check_eq(_state_snapshot(state), snapshot_before,
+		"the out-of-grid attempt changes no state")
+
+	# occupied: the 2x2 overlaps the Command Center's 4x4 at (51,41).
+	var target_occupied: Dictionary = town.preview_placement_cell(
+		OCCUPIED_CELL)
+	check_eq(str(target_occupied.get("reason", "")), "occupied",
+		"a cell inside the Command Center previews occupied")
+	check(not town.placement_preview_valid(),
+		"the overlay marks the occupied target invalid")
+	var confirm_occupied: Dictionary = await town.confirm_placement()
+	check_eq(str(confirm_occupied.get("code", "")), "invalid_target",
+		"the occupied confirm names invalid_target: %s"
+		% confirm_occupied.get("error"))
+	check(String(confirm_occupied.get("error", "")).contains("occupied"),
+		"the explicit error carries the failed gate")
+	check_eq(api.placement_requests, requests_before,
+		"the occupied target sent no request")
+	check_eq(_state_snapshot(state), snapshot_before,
+		"the occupied attempt changes no state")
+
+	# unaffordable: Stoneage costs 20 cash; the fresh save stores 5.
+	var pick_cash: Dictionary = town.pick_placement(66)
+	check(bool(pick_cash.get("ok", false)),
+		"Stoneage (cash-only cost) picks: %s" % pick_cash.get("error"))
+	var target_cash: Dictionary = town.preview_placement_cell(FREE_CELL)
+	check_eq(str(target_cash.get("reason", "")), "unaffordable",
+		"a cost above the stored cash previews unaffordable")
+	check(String(_picker_status(town)).contains("unaffordable"),
+		"the status names the affordability failure")
+	var confirm_cash: Dictionary = await town.confirm_placement()
+	check_eq(str(confirm_cash.get("code", "")), "invalid_target",
+		"the unaffordable confirm names invalid_target: %s"
+		% confirm_cash.get("error"))
+	check(String(confirm_cash.get("error", "")).contains("unaffordable"),
+		"the explicit error carries the failed gate")
+	check_eq(api.placement_requests, requests_before,
+		"the unaffordable target sent no request")
+	check_eq(_state_snapshot(state), snapshot_before,
+		"the unaffordable attempt changes no state")
+
+	# Return to House I so the cancelled-mode check starts from a
+	# committed selection and target.
+	var rehouse: Dictionary = town.pick_placement(1)
+	check(bool(rehouse.get("ok", false)),
+		"House I picks again after the invalid attempts")
+
+
+## A cancelled mode entry drops only mode-local state: selection,
+## serialized town state, resources, and the request count stay
+## byte-identical, and re-closing rejects by name.
+func _check_cancelled_mode(town: Node2D, state: Variant, api: Variant,
+		requests_before: int, snapshot_before: String) -> void:
+	var recommit: Dictionary = town.handle_placement_press(
+		Iso.grid_to_screen(SUCCESS_CELL))
+	check(bool(recommit.get("valid", false)),
+		"a valid target exists before cancel")
+	var object: Variant = town.objects[0]
+	var rect: Rect2 = object.footprint_rect()
+	var select_press: Dictionary = town.handle_pointer_press(
+		rect.position + rect.size * 0.5)
+	check(bool(select_press.get("ok", false)),
+		"a selection commits before cancel: %s" % select_press.get("error"))
+	var selected_before: int = town.selection_legacy_id()
+	check(selected_before >= 0, "the pre-cancel selection is committed")
+	var cancelled: Dictionary = town.cancel_placement()
+	check(bool(cancelled.get("ok", false)),
+		"cancel closes the picker: %s" % cancelled.get("error"))
+	check(not town.placement_active(), "the mode closes")
+	check(not town.placement_preview_shown(), "the overlay drops on cancel")
+	check_eq(town.placement_preview_cells().size(), 0,
+		"no preview cells survive cancel")
+	check(not town.ui.is_slot_visible("placement"),
+		"the picker slot hides on cancel")
+	check_eq(town.selection_legacy_id(), selected_before,
+		"cancel leaves the selection untouched")
+	check_eq(_state_snapshot(state), snapshot_before,
+		"the serialized town state is byte-identical after cancel")
+	check_eq(api.placement_requests, requests_before,
+		"cancel sent no request")
+	var again: Dictionary = town.cancel_placement()
+	check(not bool(again.get("ok", true)),
+		"closing an already-closed mode rejects")
+	check_eq(str(again.get("code", "")), "placement_not_active",
+		"the double-close names the condition")
+
+
+## The confirmed intent sends exactly one request and applies only the
+## authoritative response: one new depth-ordered object at (51,39) with
+## the verbatim eight-field row, the response's resources in the state,
+## the HUD re-read from them, and the overlay dropped — the picker
+## itself stays open for the next placement.
+func _check_applied_response(town: Node2D, state: Variant,
+		api: Variant) -> void:
+	var energy_before: int = state.resources.energy
+	var reentered: Dictionary = town.enter_placement()
+	check(bool(reentered.get("ok", false)),
+		"the picker reopens for the confirmed intent: %s"
+		% reentered.get("error"))
+	var pick_house: Dictionary = town.pick_placement(1)
+	check(bool(pick_house.get("ok", false)),
+		"House I picks for the intent: %s" % pick_house.get("error"))
+	var target: Dictionary = town.preview_placement_cell(SUCCESS_CELL)
+	check(bool(target.get("valid", false)),
+		"the committed target previews valid")
+	var requests_before: int = api.placement_requests
+	var snapshot_before := _state_snapshot(state)
+	var confirmed: Dictionary = await town.confirm_placement()
+	check(bool(confirmed.get("ok", false)),
+		"the confirmed placement succeeds: %s" % confirmed.get("error"))
+	check_eq(api.placement_requests, requests_before + 1,
+		"exactly one request carried the intent")
+	if bool(confirmed.get("ok", false)):
+		var typed_success: Variant = confirmed.get("result")
+		check(typed_success is BootData.PlacementResult,
+			"the success envelope carries the typed result")
+		if typed_success is BootData.PlacementResult:
+			check_eq((typed_success as BootData.PlacementResult).result,
+				"success", "the legacy result string is verbatim")
+
+	check_eq(state.placements.size(), 41, "the state gains one placement")
+	check_eq(town.objects.size(), 41, "the view renders one more object")
+	var placed: Variant = null
+	for placement: Variant in state.placements:
+		if placement is TownState.Placement \
+				and placement.cell == SUCCESS_CELL:
+			placed = placement
+	check(placed != null, "the placement commits at (51,39)")
+	if placed is TownState.Placement:
+		check_eq(placed.item, 1, "the placed item is House I")
+		check_eq(placed.timestamp, SUCCESS_TIMESTAMP,
+			"the fixture epoch arrives verbatim")
+		check_eq(placed.order, 40, "the placement appends at save-order end")
+		check_eq(placed.raw, [1, 51, 39, SUCCESS_TIMESTAMP, 0, [],
+			{"nc": 0}, 1],
+			"the eight-field raw row is verbatim")
+	check_eq(state.resources.wood, 1970,
+		"wood applies from the response (30 deducted, never clamped)")
+	check_eq(state.resources.coins, 2000, "coins follow the response")
+	check_eq(state.resources.cash, 5, "cash follows the response")
+	check_eq(state.resources.mana, 0, "mana follows the response")
+	check_eq(state.resources.energy, energy_before,
+		"energy (absent from the response) never changes")
+	check_eq(state.summary.xp, 4, "xp follows the response")
+	var hud: Variant = town.hud()
+	check(hud != null, "the HUD re-attaches to the mutated state")
+	if hud != null:
+		check_eq(hud.displayed("wood"), "1970",
+			"the HUD renders the authoritative wood")
+		check_eq(hud.displayed("coins"), "2000",
+			"the HUD renders coins verbatim")
+		check_eq(hud.displayed("xp"), "4", "the HUD renders xp verbatim")
+	check(not state.missing.has("wood"),
+		"the response supplies the wood field")
+	check_eq(town.placement_error, "", "success leaves no failure record")
+	check(not town.placement_preview_shown(),
+		"the overlay drops after a successful apply")
+	check(town.placement_active(),
+		"the picker stays open after a successful apply")
+	var previous_depth := -1
+	var depth_ordered := true
+	for object: Variant in town.objects:
+		var depth := Iso.depth_key(object.cell)
+		if depth < previous_depth:
+			depth_ordered = false
+		previous_depth = depth
+	check(depth_ordered,
+		"objects keep non-decreasing isometric depth after the apply")
+	var rendered: Variant = null
+	for object: Variant in town.objects:
+		if object.cell == SUCCESS_CELL:
+			rendered = object
+	check(rendered != null, "an object renders at the placed cell")
+	if rendered != null:
+		check_eq(int(rendered.legacy_id), 1,
+			"the rendered object is House I")
+		check_eq(rendered.footprint, Vector2i(2, 2),
+			"the content footprint resolves")
+	check(_state_snapshot(state) != snapshot_before,
+		"the successful apply changed the serialized state")
+
+
+## The structured failure: the intent goes out, the save cannot
+## resolve, the explicit error names `unknown_user_id`, and no state,
+## object, or HUD value changes.
+func _check_structured_failure(town: Node2D, state: Variant, api: Variant,
+		session: Variant, summary: BootData.PlayerSummary,
+		pid: String) -> void:
+	var snapshot_before := _state_snapshot(state)
+	var requests_before: int = api.placement_requests
+	var bogus_id := pid + "-unresolvable"
+	var bogus := BootData.PlayerSummary.new()
+	bogus.user_id = bogus_id
+	bogus.name = summary.name
+	bogus.level = summary.level
+	bogus.xp = summary.xp
+	var activation: Dictionary = session.activate(bogus_id, bogus)
+	check(bool(activation.get("ok", false)),
+		"the unresolvable session activates: %s" % activation.get("error"))
+	var target: Dictionary = town.preview_placement_cell(FREE_CELL)
+	check(bool(target.get("valid", false)),
+		"a valid target exists before the structured failure")
+	var failed: Dictionary = await town.confirm_placement()
+	check(not bool(failed.get("ok", true)),
+		"the unresolvable save fails the intent")
+	check_eq(str(failed.get("code", "")), "unknown_user_id",
+		"the structured failure surfaces its code: %s" % failed.get("error"))
+	check(town.placement_error.contains("unknown_user_id"),
+		"the explicit error names the structured failure")
+	check_eq(api.placement_requests, requests_before + 1,
+		"the failed intent still sent exactly once")
+	check_eq(_state_snapshot(state), snapshot_before,
+		"the structured failure changes no state")
+	check_eq(town.objects.size(), 41,
+		"the structured failure renders nothing")
+	var restore: Dictionary = session.activate(pid, summary)
+	check(bool(restore.get("ok", false)),
+		"the real session restores: %s" % restore.get("error"))
+	check_eq(session.user_id(), pid, "the restored session names the save")
+
+
+## A failed catalog leaves placement unavailable behind the named
+## error: no mode, no picker, no request, no state change — and the
+## applied state from the successful apply stays intact.
+func _check_catalog_unavailable(town: Node2D, state: Variant,
+		api: Variant) -> void:
+	var requests_open: int = api.placement_requests
+	var snapshot_open := _state_snapshot(state)
+	var closing: Dictionary = town.cancel_placement()
+	check(bool(closing.get("ok", false)),
+		"the picker closes before the catalog-failure check: %s"
+		% closing.get("error"))
+	town.set_placement_catalog({"ok": false, "error":
+		"[catalog] parse rejected: field 'items' of item 0 is invalid"})
+	check_eq(town.placement_catalog_entries().size(), 0,
+		"a failed catalog offers no entries")
+	var unavailable: Dictionary = town.enter_placement()
+	check(not bool(unavailable.get("ok", true)),
+		"a failed catalog leaves the picker unavailable")
+	check_eq(str(unavailable.get("code", "")), "placement_unavailable",
+		"the unavailable rejection names the condition")
+	check(String(unavailable.get("error", "")).contains("field 'items'"),
+		"the explicit error carries the catalog failure: %s"
+		% unavailable.get("error"))
+	check(not town.placement_active(), "no mode opens on a failed catalog")
+	check(not town.ui.is_slot_visible("placement"),
+		"no picker shows on a failed catalog")
+	check_eq(api.placement_requests, requests_open,
+		"the failed catalog never sent a request")
+	check_eq(_state_snapshot(state), snapshot_open,
+		"the failed catalog changes no state")
+	check_eq(town.objects.size(), 41,
+		"the failed catalog renders nothing")
+
+
+## LAST scenario (it waits out the refused loopback endpoint): the
+## intent goes out over the legacy transport, the endpoint refuses it,
+## and the explicit error names `unreachable_endpoint` with no state
+## change (the same no-mutation contract as a structured failure).
+func _check_transport_failure(town: Node2D, state: Variant, api: Variant,
+		payload: Dictionary) -> void:
+	town.set_placement_catalog(PlacementCatalog.parse(payload))
+	var reopened: Dictionary = town.enter_placement()
+	check(bool(reopened.get("ok", false)),
+		"the picker reopens for the transport scenario: %s"
+		% reopened.get("error"))
+	var pick_transport: Dictionary = town.pick_placement(1)
+	check(bool(pick_transport.get("ok", false)),
+		"House I picks for the transport scenario")
+	var target: Dictionary = town.preview_placement_cell(FREE_CELL)
+	check(bool(target.get("valid", false)),
+		"a valid target exists before the transport attempt")
+	var endpoint := _endpoint()
+	check(endpoint != "",
+		"a loopback endpoint resolves for the transport scenario")
+	if endpoint == "":
+		return
+	var requests_before: int = api.placement_requests
+	var snapshot_before := _state_snapshot(state)
+	api.configure("legacy_v0", endpoint)
+	var attempt: Dictionary = await town.confirm_placement()
+	check(not bool(attempt.get("ok", true)),
+		"the refused endpoint fails the intent closed")
+	check_eq(str(attempt.get("code", "")), "unreachable_endpoint",
+		"the transport failure surfaces its code: %s" % attempt.get("error"))
+	check(town.placement_error.contains("unreachable_endpoint"),
+		"the explicit error names the transport failure")
+	check_eq(api.placement_requests, requests_before + 1,
+		"the transport attempt sent exactly one request")
+	check_eq(_state_snapshot(state), snapshot_before,
+		"the transport failure changes no state")
+	check_eq(town.objects.size(), 41,
+		"the transport failure renders nothing")
+	check(town.placement_active(),
+		"the picker survives the transport failure")
+
+
 ## The catalog derives from the payload in hand: this whole run must not
 ## issue a bootstrap request (spec: "parsed fail-closed from the
 ## bootstrap payload the client already receives", design D10).
@@ -228,6 +766,46 @@ func _check_no_second_bootstrap_request() -> void:
 		return
 	check_eq(int(api.bootstrap_requests), 0,
 		"no bootstrap request was issued (the payload in hand suffices)")
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+
+## The picker's VBox panel inside the placement slot root (null before
+## the first entry or when the slot never registered).
+func _picker_panel(town: Variant) -> Variant:
+	if not town.ui.has_slot("placement"):
+		return null
+	var slot: Control = town.ui.slot_root("placement")
+	if slot == null or slot.get_child_count() == 0:
+		return null
+	return slot.get_child(0)
+
+
+## The named button anywhere inside the picker panel (the action row
+## nests the confirm/cancel pair), or null.
+func _button_named(panel: Node, button_name: String) -> Variant:
+	for child: Variant in panel.get_children():
+		if child is Button and String((child as Button).name) == button_name:
+			return child
+		if child is Node:
+			var nested: Variant = _button_named(child as Node, button_name)
+			if nested != null:
+				return nested
+	return null
+
+
+## The on-screen status line text ("" before a panel exists).
+func _picker_status(town: Variant) -> String:
+	var panel: Variant = _picker_panel(town)
+	if panel == null:
+		return ""
+	for child: Variant in (panel as Node).get_children():
+		if child is Label and String((child as Label).name) == "status":
+			return (child as Label).text
+	return ""
 
 
 ## A rejected parse: {ok:false} with a non-empty error containing the
@@ -262,6 +840,44 @@ func _parse_without(row: Dictionary, field: String) -> Dictionary:
 	var crafted := row.duplicate(true)
 	crafted.erase(field)
 	return PlacementCatalog.parse({"items": [crafted]})
+
+
+## Endpoint for this run: `--gameapi-endpoint=` user argument, else the
+## project setting (loopback default). No hardcoded endpoint in this
+## file (the scope scan restricts transport references to the legacy-v0
+## implementation).
+func _endpoint() -> String:
+	for argument in OS.get_cmdline_user_args():
+		if argument.begins_with(ARG_ENDPOINT):
+			return argument.trim_prefix(ARG_ENDPOINT)
+	return str(ProjectSettings.get_setting("gameapi/endpoint", ""))
+
+
+## Deterministic serialization of every committed state field (the
+## byte-identity oracle for the cancelled-mode and failure paths).
+func _state_snapshot(state: Variant) -> String:
+	var rows: Array = []
+	for placement in state.placements:
+		rows.append(placement.raw)
+	return JSON.stringify({
+		"placements": rows,
+		"resources": {
+			"coins": state.resources.coins,
+			"wood": state.resources.wood,
+			"steel": state.resources.steel,
+			"oil": state.resources.oil,
+			"cash": state.resources.cash,
+			"energy": state.resources.energy,
+			"mana": state.resources.mana,
+		},
+		"summary": {
+			"name": state.summary.name,
+			"level": state.summary.level,
+			"xp": state.summary.xp,
+		},
+		"missing": state.missing,
+		"unresolved_ids": state.unresolved_ids,
+	})
 
 
 ## Loads a repository-relative JSON fixture as parsed text (read-only).

@@ -12,7 +12,7 @@ extends "res://tests/test_base.gd"
 ## camera-controls work (the component script and its suite), the
 ## UI-foundation work (the component script and its suite), and the
 ## settings/audio-manager work (the Settings and AudioManager autoloads
-## with their scripts and suites), and the town-rendering work (the nine
+## with their scripts and suites), and the town-rendering work (the eleven
 ## town scripts under `scripts/town/`, the town and town-slice scenes,
 ## their seven suites, and the three committed evidence captures): no other
 ## game system, no scene beyond the allow-list, no script outside the
@@ -59,6 +59,8 @@ const ALLOWED := [
 	"scripts/settings.gd",
 	"scripts/town/iso.gd",
 	"scripts/town/placement_catalog.gd",
+	"scripts/town/placement_flow.gd",
+	"scripts/town/placement_preview.gd",
 	"scripts/town/town.gd",
 	"scripts/town/town_hud.gd",
 	"scripts/town/town_object.gd",
