@@ -16,8 +16,6 @@ extends "res://scripts/town/town.gd"
 ## `--town-capture=<path>` flow; headless runs build and expose records
 ## only (the suite drives the assertions).
 
-const Paths = preload("res://scripts/package_paths.gd")
-
 ## Preserved legacy village input (read-only, repository-relative).
 const VILLAGE := "villages/Scarlet.json"
 

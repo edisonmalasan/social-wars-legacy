@@ -1,0 +1,126 @@
+{
+	"bootstrap_requests": 1,
+	"captures": {
+		"town-player.png": {
+			"path": "apps/client-godot/evidence/town/town-player.png",
+			"sha256": "76c07117072df7f98aa91169cc6492735c6de8e2a23f71f0e0177b7c1c587f71"
+		},
+		"town-slice.png": {
+			"path": "apps/client-godot/evidence/town/town-slice.png",
+			"sha256": "aa4995db6ed601d76f8ef63f3b4115482e1c755daf4e2b46b8de30347cafb32d"
+		}
+	},
+	"constants": {
+		"derivation_status": "derived-provisional",
+		"evidence_gap": "the legacy SWF's static iso-engine identifiers (TILE_SIZE, EI_TILE_HEIGHT_PIXELS, gridWidth/Height, numCols/numRows) were never extracted; pixel parity with the Flash client is not claimed",
+		"grid_extent": 100,
+		"origin_x": 2000.0,
+		"origin_y": 10.0,
+		"tile_height": 20.0,
+		"tile_width": 40.0,
+		"world_rect": [
+			0.0,
+			0.0,
+			4000.0,
+			2000.0
+		]
+	},
+	"inputs": {
+		"bootstrap_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/get_player_info/response.body",
+			"sha256": "facedf76784d3dc03a3a45e81756a8546f90f7647dbff8917593404d9e401709"
+		},
+		"save_list_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json",
+			"sha256": "ad0404c2c340a48f06e2e49ae7eb7973978cd2ccb02ac6ff7bfba4eb75f6d9f4"
+		},
+		"slice_village": {
+			"path": "villages/Scarlet.json",
+			"sha256": "ef217cf2004f97e53bb4f078b8bdd39a1301280d2f77f9ade877f8aaf26ee354"
+		},
+		"terrain": {
+			"path": "assets/images/en/mapa1.jpg",
+			"sha256": "35c4ded53e82be187eb67c54ee7c7023b698c3986954db4b6f9613a2a45cdd3f"
+		}
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed",
+		"no pixel-parity oracle against the legacy client exists",
+		"projection constants are derived and provisional",
+		"thumbnail presentation is provisional pending further conversions",
+		"authentic unit rendering is proven via the slice scene because the live fresh save contains no unit placements"
+	],
+	"player_town": {
+		"camera": {
+			"position": [
+				2116.75,
+				962.625
+			],
+			"world_bounds": [
+				0.0,
+				0.0,
+				4000.0,
+				2000.0
+			],
+			"world_bounds_committed": true,
+			"zoom_factor": 1.0,
+			"zoom_level": 0
+		},
+		"counts_by_visual_source": {
+			"marker": 9,
+			"thumbnail": 31
+		},
+		"hud": {
+			"cash": "5",
+			"coins": "2000",
+			"energy": "50",
+			"level": "1",
+			"mana": "0",
+			"name": "Warrior",
+			"oil": "2000",
+			"steel": "2000",
+			"wood": "2000",
+			"xp": "4"
+		},
+		"objects": 40,
+		"selection_legacy_id": 909
+	},
+	"schema": "town-report-v1",
+	"slice_town": {
+		"camera": {
+			"position": [
+				1809.56591796875,
+				1062.38720703125
+			],
+			"world_bounds": [
+				0.0,
+				0.0,
+				4000.0,
+				2000.0
+			],
+			"world_bounds_committed": true,
+			"zoom_factor": 1.0,
+			"zoom_level": 0
+		},
+		"counts_by_visual_source": {
+			"marker": 18,
+			"placeholder": 8,
+			"sprite": 7,
+			"thumbnail": 543
+		},
+		"hud": {
+			"cash": "42",
+			"coins": "62395",
+			"energy": "50",
+			"level": "33",
+			"mana": "0",
+			"name": "Scarlet",
+			"oil": "97521",
+			"steel": "94869",
+			"wood": "96060",
+			"xp": "107694"
+		},
+		"objects": 576,
+		"selection_legacy_id": 909
+	}
+}
