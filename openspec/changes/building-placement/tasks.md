@@ -25,7 +25,7 @@
 
 - [x] 5.1 Register the new suites and add the placement live phase to `verify-boot.ps1` (start compat over a disposable corpus, place, assert the corpus save mutated, teardown asserting port release and corpus cleanup with no working-tree `saves/`) — verify: `powershell -File apps/client-godot/verify-boot.ps1` exits 0 end to end with every documented marker.
 - [x] 5.2 Capture the windowed placement evidence and the deterministic report into `apps/client-godot/evidence/placement/` (fake-API windowed capture of the town containing the placed building; headless report with inputs/digests, intent, counts before/after, resources, and every non-claim from the delta, including the fake-capture pointer) — verify: both files are committed, the report lists all required fields, and a rerun of the report step reproduces its committed bytes.
-- [ ] 5.3 Run the full preservation battery in the final state — verify: `verify.ps1` and `verify-boot.ps1` both exit 0, `python -B tools/hash-manifest/hash_manifest.py verify` exits 0, guard digests are identical before and after, the M4/M6 evidence bytes are unchanged, and `git diff` shows no legacy/fixture/save byte changes beyond the sanctioned new fixture directory and evidence files.
+- [x] 5.3 Run the full preservation battery in the final state — verify: `verify.ps1` and `verify-boot.ps1` both exit 0, `python -B tools/hash-manifest/hash_manifest.py verify` exits 0, guard digests are identical before and after, the M4/M6 evidence bytes are unchanged, and `git diff` shows no legacy/fixture/save byte changes beyond the sanctioned new fixture directory and evidence files.
 
 ## 6. Documentation and integration review
 
