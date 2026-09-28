@@ -2,16 +2,18 @@ extends Node
 ## `GameApi` autoload — the only bridge between presentation code and server
 ## data (design D5, spec "GameApi abstraction").
 ##
-## Boot code calls `list_sessions()` / `get_bootstrap()` and receives typed
-## boot data (`scripts/gameapi/boot_data.gd`); raw transport dictionaries
-## never reach presentation code, and no other script references a transport.
+## Client code calls `list_sessions()` / `get_bootstrap()` for boot data and
+## `place_building()` for one placement intent, receiving typed results
+## (`scripts/gameapi/boot_data.gd`); raw transport dictionaries never reach
+## presentation code, and no other script references a transport.
 ##
 ## Implementations, selected by the project setting `gameapi/implementation`
 ## (default `fake` so tests are hermetic):
 ##
 ##   fake      - reads the committed executed-legacy fixtures under
-##               `tests/fixtures/godot-compatibility-boot/`; no process,
-##               no server, no socket.
+##               `tests/fixtures/godot-compatibility-boot/` (boot) and
+##               `tests/fixtures/godot-building-placement/` (placement);
+##               no process, no server, no socket.
 ##   legacy_v0 - JSON over loopback HTTP to Compatibility API v0 through the
 ##               built-in HTTP request client; endpoint from the project
 ##               setting `gameapi/endpoint` (default: loopback 127.0.0.1 on
@@ -46,6 +48,12 @@ var endpoint := ""
 ## evidence report records it). Monotonic: `configure()` swaps the
 ## implementation without hiding history, so callers snapshot and compare.
 var bootstrap_requests := 0
+## Number of placement intents this process has issued (M7 flow contract:
+## exactly one per confirm, zero for invalid targets — the flow suite
+## snapshots this counter exactly like `bootstrap_requests`). Monotonic for
+## the same reason: `configure()` swaps the implementation without hiding
+## history.
+var placement_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -97,6 +105,19 @@ func list_sessions() -> BootData.SaveListResult:
 func get_bootstrap(user_id: String) -> BootData.BootstrapResult:
 	bootstrap_requests += 1
 	var result: BootData.BootstrapResult = await _impl.get_bootstrap(user_id)
+	return result
+
+
+## One placement intent (anchor cell in the shared 0..99 town grid) from
+## the selected implementation. The implementation derives the legacy
+## envelope (design D3/D4); the typed result carries the authoritative
+## entry and resources (design D7) — presentation code applies only these
+## values, never a locally computed delta.
+func place_building(user_id: String, item_id: int, x: int, y: int,
+		orientation: int = 0) -> BootData.PlacementResult:
+	placement_requests += 1
+	var result: BootData.PlacementResult = await _impl.place_building(
+		user_id, item_id, x, y, orientation)
 	return result
 
 

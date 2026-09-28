@@ -12,7 +12,7 @@
 
 ## 3. GameApi placement operation
 
-- [ ] 3.1 Add the typed `place_building()` operation to `scripts/gameapi/game_api.gd` and implement it in `fake_api.gd` as the documented deterministic in-memory double (D8: cost map, clamp, slot selection, entry construction over committed fixture state) with `tests/test_game_api_fake.gd` extended for success, structured-failure, and typed-shape coverage — verify: the fake suite passes headless with no process, server, or socket.
+- [x] 3.1 Add the typed `place_building()` operation to `scripts/gameapi/game_api.gd` and implement it in `fake_api.gd` as the documented deterministic in-memory double (D8: cost map, clamp, slot selection, entry construction over committed fixture state) with `tests/test_game_api_fake.gd` extended for success, structured-failure, and typed-shape coverage — verify: the fake suite passes headless with no process, server, or socket.
 - [ ] 3.2 Implement `legacy_v0_api.gd` placement (loopback JSON POST to the endpoint, typed result mapping, structured-error passthrough, endpoint named only inside the legacy-v0 implementation) with live coverage against a running Compatibility API v0 — verify: the live GameApi suite passes inside `verify-boot.ps1`'s live phases and produces the same typed shapes as the fake.
 
 ## 4. Client placement flow
