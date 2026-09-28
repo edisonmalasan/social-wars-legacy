@@ -9,8 +9,10 @@ extends "res://tests/test_base.gd"
 ## ContentRegistry autoload with its script, its content suite, and the
 ## asset-ID suite), the session and game-clock work (the Session and
 ## GameClock autoloads with their scaffold scripts and suites), the
-## camera-controls work (the component script and its suite), and the
-## UI-foundation work (the component script and its suite): no other
+## camera-controls work (the component script and its suite), the
+## UI-foundation work (the component script and its suite), and the
+## settings/audio-manager work (the Settings and AudioManager autoloads
+## with their scripts and suites): no other
 ## game system, no scene beyond the allow-list, no script outside the
 ## allow-list, no Flash-related runtime, no legacy protocol token
 ## anywhere, and no transport reference outside the legacy-v0
@@ -31,6 +33,7 @@ const ALLOWED := [
 	"compat_live_phase.py",
 	"scenes/boot.tscn",
 	"scenes/first_render.tscn",
+	"scripts/audio_manager.gd",
 	"scripts/boot.gd",
 	"scripts/camera_controls.gd",
 	"scripts/comparator.gd",
@@ -49,9 +52,11 @@ const ALLOWED := [
 	"scripts/run_compare.gd",
 	"scripts/run_selftest.gd",
 	"scripts/session.gd",
+	"scripts/settings.gd",
 	"scripts/ui_foundation.gd",
 	"scripts/verification.gd",
 	"tests/test_asset_ids.gd",
+	"tests/test_audio_manager.gd",
 	"tests/test_base.gd",
 	"tests/test_boot_scene.gd",
 	"tests/test_camera_controls.gd",
@@ -63,6 +68,7 @@ const ALLOWED := [
 	"tests/test_project_scope.gd",
 	"tests/test_scene_build.gd",
 	"tests/test_session.gd",
+	"tests/test_settings.gd",
 	"tests/test_ui_foundation.gd",
 	"evidence/boot/boot-report.json",
 	"evidence/first-render/first-render.png",
@@ -75,14 +81,17 @@ const EXPECTED_SCENES := [
 	"scenes/first_render.tscn",
 ]
 
-## The four autoloads this change allow-loads (spec: modified R1): the
+## The six autoloads this change allow-loads (spec: modified R1): the
 ## foundation bridge, the canonical content registry, the session
-## scaffold, and the game clock, nothing else.
+## scaffold, the game clock, the settings service, and the audio
+## manager, nothing else.
 const EXPECTED_AUTOLOADS := [
 	"GameApi=\"*res://scripts/gameapi/game_api.gd\"",
 	"ContentRegistry=\"*res://scripts/content_registry.gd\"",
 	"Session=\"*res://scripts/session.gd\"",
 	"GameClock=\"*res://scripts/game_clock.gd\"",
+	"Settings=\"*res://scripts/settings.gd\"",
+	"AudioManager=\"*res://scripts/audio_manager.gd\"",
 ]
 
 ## Strings that must never appear in ANY project script or scene: legacy
@@ -180,7 +189,7 @@ func _collect(directory: String, prefix: String, out: Array) -> String:
 
 
 ## `project.godot` must declare the boot scene as the main scene (with the
-## first-render scene still present as its own scene) and exactly the four
+## first-render scene still present as its own scene) and exactly the six
 ## allow-listed autoloads.
 func _check_project_config(root: String) -> void:
 	var path := root.path_join("project.godot")
@@ -205,17 +214,17 @@ func _check_project_config(root: String) -> void:
 		var stripped := line.strip_edges()
 		if stripped != "":
 			entries.append(stripped)
-	check_eq(entries.size(), 4,
-		"exactly four allow-listed autoloads are registered "
+	check_eq(entries.size(), 6,
+		"exactly six allow-listed autoloads are registered "
 		+ "(no other game-system services)")
-	if entries.size() == 4:
+	if entries.size() == 6:
 		var actual: Array = entries.duplicate()
 		actual.sort()
 		var expected: Array = EXPECTED_AUTOLOADS.duplicate()
 		expected.sort()
 		check_eq(actual, expected,
 			"the only autoloads are GameApi, ContentRegistry, "
-			+ "Session and GameClock")
+			+ "Session, GameClock, Settings and AudioManager")
 	else:
 		fail("unexpected autoload entries: %s" % str(entries))
 
