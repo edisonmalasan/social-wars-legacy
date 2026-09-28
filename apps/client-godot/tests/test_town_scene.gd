@@ -20,7 +20,15 @@ extends "res://tests/test_base.gd"
 ##              non-finite press fails closed leaving selection unchanged;
 ##   error     an unloaded registry fails the build into the explicit
 ##              error state naming the terrain failure with no partial
-##              render, and a null state fails the same way.
+##              render, and a null state fails the same way;
+##   slice     the preserved `villages/Scarlet.json` builds through
+##              `scenes/town_slice.tscn`: House I and Wild Elephant as
+##              authentic converted package sprites at their legacy
+##              cells, the eight content-unknown placements as labeled
+##              placeholders, that save's HUD strings, its depth order,
+##              camera bounds, and press-to-cell selection, with the
+##              input recorded by path + SHA-256 and left byte-identical
+##              (change task 7.2).
 ##
 ## Uses the ContentRegistry autoload (content + asset registry loaded
 ## explicitly, per its contract). No API, no server. Runs headless as part
@@ -33,6 +41,27 @@ const RegistryScript = preload("res://scripts/content_registry.gd")
 
 const FIXTURE := \
 	"tests/fixtures/godot-compatibility-boot/steps/get_player_info/response.body"
+## The preserved slice village (read-only legacy input) and its committed
+## SHA-256 — the suite proves the render path leaves it byte-identical.
+const SLICE_VILLAGE := "villages/Scarlet.json"
+const SLICE_VILLAGE_SHA256 := \
+	"ef217cf2004f97e53bb4f078b8bdd39a1301280d2f77f9ade877f8aaf26ee354"
+## House I's cell in the village file (row `2061`: item 1 at (86,73)).
+const SLICE_HOUSE_CELL := Vector2i(86, 73)
+## Visual-source counts over the 576 village placements: the hierarchy
+## chooses 7 converted sprites (House I x1 + Wild Elephant x6), 543 keyed
+## thumbnails, 18 footprint markers, and 8 unknown-id placeholders.
+const SLICE_COUNTS := {
+	"sprite": 7, "thumbnail": 543, "marker": 18, "placeholder": 8}
+## The content-unknown placeholder ids with their placement multiplicities
+## (the six distinct ids of `state.unresolved_ids`, eight placements).
+const SLICE_PLACEHOLDER_IDS := [5000, 5001, 5004, 5005, 5007, 5007, 5007, 5008]
+## The village's HUD strings: `str(state.value)` over its own payload.
+const SLICE_HUD := {
+	"coins": "62395", "wood": "96060", "steel": "94869", "oil": "97521",
+	"cash": "42", "energy": "50", "mana": "0",
+	"name": "Scarlet", "level": "33", "xp": "107694",
+}
 ## The fresh save's placements whose img_name has no preserved thumbnail
 ## (documented in the town README section): 2 placements of item 928 and
 ## 7 placements of item 929 render as footprint markers.
@@ -93,6 +122,7 @@ func run_scenario() -> void:
 	_check_selection(town)
 	town.free()
 	_check_error_states(state)
+	_check_slice(registry)
 
 
 ## Terrain provenance/geometry, object placement/metadata/visual
@@ -351,6 +381,189 @@ func _check_error_states(state: Variant) -> void:
 	check_eq(missing_state.view_state, "error",
 		"null state also enters the explicit error state")
 	missing_state.free()
+
+
+## Slice scene (change task 7.2, spec "Town slice verification scene"):
+## the preserved village renders through the same components — House I
+## and Wild Elephant as authentic converted sprites at their legacy
+## cells, the content-unknown placements as placeholders, that save's
+## HUD, depth order, bounds, and selection — with the input recorded by
+## path + SHA-256 and left byte-identical.
+func _check_slice(registry: Variant) -> void:
+	var village_path := Paths.repo_root().path_join(SLICE_VILLAGE)
+	var digest_before := Paths.file_sha256(village_path)
+	check_eq(digest_before, SLICE_VILLAGE_SHA256,
+		"the slice village matches the committed guard digest")
+	var slice_scene: PackedScene = load("res://scenes/town_slice.tscn")
+	check(slice_scene != null, "slice scene loads")
+	if slice_scene == null:
+		return
+	var slice: Node2D = slice_scene.instantiate()
+	root.add_child(slice)
+	check_eq(str(slice.view_state), "built",
+		"the slice view builds from the legacy village")
+	if str(slice.view_state) != "built":
+		info("slice build error: %s" % str(slice.build_error))
+		slice.free()
+		return
+	check_eq(str(slice.input_path), SLICE_VILLAGE,
+		"the slice records its input file")
+	check_eq(str(slice.input_sha256), SLICE_VILLAGE_SHA256,
+		"the slice records the input SHA-256")
+	check_eq(slice.objects.size(), 576,
+		"all 576 village placements render as objects")
+	check_eq(slice.object_counts_by_source(), SLICE_COUNTS,
+		"the visual hierarchy counts match the village")
+
+	# Converted sprites: one House I + six Wild Elephant, each at its
+	# legacy-saved cell with its content footprint and native frame.
+	var house_cells: Array = []
+	var elephant_cells: Array = []
+	var unknown_cells: Array = []
+	for placement in slice.state.placements:
+		match int(placement.item):
+			1:
+				house_cells.append([placement.cell.y, placement.cell.x])
+			933:
+				elephant_cells.append([placement.cell.y, placement.cell.x])
+			_:
+				if not bool(placement.content_ok):
+					unknown_cells.append([
+						placement.cell.y, placement.cell.x,
+						int(placement.item)])
+	house_cells.sort()
+	elephant_cells.sort()
+	unknown_cells.sort()
+	var house_objects: Array = []
+	var elephant_objects: Array = []
+	var placeholder_objects: Array = []
+	var actual_house: Array = []
+	var actual_elephant: Array = []
+	var actual_unknown: Array = []
+	for object in slice.objects:
+		match int(object.legacy_id):
+			1:
+				house_objects.append(object)
+				actual_house.append([object.cell.y, object.cell.x])
+			933:
+				elephant_objects.append(object)
+				actual_elephant.append([object.cell.y, object.cell.x])
+		if str(object.visual_source) == TownVisuals.SOURCE_PLACEHOLDER:
+			placeholder_objects.append(object)
+			actual_unknown.append([
+				object.cell.y, object.cell.x, int(object.legacy_id)])
+	actual_house.sort()
+	actual_elephant.sort()
+	actual_unknown.sort()
+	check_eq(house_objects.size(), 1, "exactly one House I placement renders")
+	check_eq(actual_house, house_cells,
+		"House I renders at its legacy-saved cell")
+	check_eq(elephant_objects.size(), 6,
+		"exactly six Wild Elephant placements render")
+	check_eq(actual_elephant, elephant_cells,
+		"every Wild Elephant renders at its legacy-saved cell")
+	check_eq(footprint_of(house_objects, 0), Vector2i(2, 2),
+		"House I carries its content 2x2 footprint")
+	for object in elephant_objects:
+		check_eq(object.footprint, Vector2i(1, 1),
+			"Wild Elephant carries its content 1x1 footprint")
+	_check_slice_sprite(house_objects[0], Vector2i(216, 144), 1)
+	for object in elephant_objects:
+		_check_slice_sprite(object, Vector2i(171, 191), 933)
+
+	# Placeholders: exactly the eight content-unknown placements, each on
+	# its single saved cell with no child node (drawn as a labeled
+	# footprint) — the town stays intact around them.
+	check_eq(placeholder_objects.size(), 8,
+		"the eight content-unknown placements render as placeholders")
+	check_eq(actual_unknown, unknown_cells,
+		"placeholders render at their legacy-saved cells")
+	var placeholder_ids: Array = []
+	for object in placeholder_objects:
+		placeholder_ids.append(int(object.legacy_id))
+		check_eq(object.footprint, Vector2i.ONE,
+			"an unknown id occupies its single saved cell")
+		check_eq(object.get_child_count(), 0,
+			"a placeholder draws its footprint instead of loading art")
+	placeholder_ids.sort()
+	check_eq(placeholder_ids, SLICE_PLACEHOLDER_IDS,
+		"placeholder ids are exactly the six content-unknown ids "
+		+ "(eight placements)")
+
+	# Depth order over the village (same non-decreasing contract).
+	var depth_regressions := 0
+	for index in range(1, slice.objects.size()):
+		var before: Variant = slice.objects[index - 1]
+		var after: Variant = slice.objects[index]
+		if Iso.depth_key(after.cell) < Iso.depth_key(before.cell):
+			depth_regressions += 1
+	check_eq(depth_regressions, 0,
+		"slice draw order is non-decreasing in isometric depth")
+
+	# Bounds + selection + that save's HUD strings.
+	var camera: Variant = slice.camera
+	check(camera.has_world_bounds(), "slice camera bounds are committed")
+	check_eq(camera.world_bounds(), Iso.world_rect(),
+		"slice camera bounds equal the projection world rect")
+	check_eq(slice.hud().displayed_fields(), SLICE_HUD,
+		"the slice HUD displays that save's verbatim values")
+	var house_press: Dictionary = slice.handle_pointer_press(
+		Iso.grid_to_screen(Vector2i(house_cells[0][1], house_cells[0][0])))
+	check(bool(house_press.get("ok", false)),
+		"the House I press succeeds: %s" % house_press.get("error"))
+	check_eq(int(house_press.get("legacy_id", -1)), 1,
+		"the press selects House I (depth-topmost under its cell)")
+	check_eq(slice.selection_legacy_id(), 1,
+		"the committed slice selection is House I")
+	var clear_press: Dictionary = slice.handle_pointer_press(
+		Vector2(-800, -800))
+	check(bool(clear_press.get("cleared", false)),
+		"an out-of-grid press clears the slice selection")
+	check_eq(slice.selection_legacy_id(), -1,
+		"the cleared slice selection is empty")
+	slice.free()
+	check_eq(Paths.file_sha256(village_path), digest_before,
+		"the village file is byte-identical after the slice render")
+
+
+## One converted-sprite object: native frame texture (never scaled),
+## single container bottom-center anchored over the content footprint,
+## no degradation to a marker.
+func _check_slice_sprite(object: Variant, frame: Vector2i,
+		legacy_id: int) -> void:
+	check_eq(str(object.visual_source), TownVisuals.SOURCE_SPRITE,
+		"id %d renders as a converted package sprite" % legacy_id)
+	check_eq(str(object.visual_error), "",
+		"id %d sprite builds without degrading" % legacy_id)
+	check_eq(object.get_child_count(), 1,
+		"id %d sprite holds exactly one container" % legacy_id)
+	if object.get_child_count() != 1:
+		return
+	var container: Node = object.get_child(0)
+	check(container is Node2D and container.get_child_count() >= 1,
+		"id %d container holds composited shape sprites" % legacy_id)
+	var union := Rect2()
+	for shape in container.get_children():
+		if shape is Sprite2D:
+			var shape_rect := Rect2(Vector2(shape.position),
+				(shape.texture as Texture2D).get_size())
+			union = shape_rect if union.size == Vector2.ZERO \
+				else union.merge(shape_rect)
+	check_eq(union.size, Vector2(frame),
+		"id %d native frame is %dx%d (never scaled to the footprint)"
+		% [legacy_id, frame.x, frame.y])
+	var rect: Rect2 = object.footprint_rect()
+	check_eq(Vector2(container.position),
+		Vector2((rect.size.x - frame.x) / 2.0, rect.size.y - frame.y),
+		"id %d sprite is bottom-center anchored over its footprint"
+		% legacy_id)
+
+
+## Footprint of the object at `index` (guards the index before use).
+static func footprint_of(objects: Array, index: int) -> Vector2i:
+	if index >= objects.size():
+		return Vector2i(-1, -1)
+	return (objects[index] as Variant).footprint
 
 
 ## The first cell in 0..99 no object footprint covers (deterministic for
