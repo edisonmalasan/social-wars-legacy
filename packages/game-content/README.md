@@ -1337,3 +1337,113 @@ exactly as in the content census (`make_dynamic` never runs here).
 ```bash
 python -B -m unittest discover -s packages/game-content/tests -p test_build_images.py -v
 ```
+
+---
+
+# Content validator extension
+
+Standalone offline validation of the committed normalized package for
+the legacy Social Wars content domain, with Python 3.9 standard library
+only; no new dependencies. The validator reads the package exactly as
+committed - `manifest.json`, the normalized outputs the manifest
+records, and the 21 schema files - and never re-derives content, so the
+ten builders remain the sole owners of source fidelity and round-trips.
+It is the offline middle layer between the builders (build-time gates)
+and Godot's `ContentRegistry` (load-time digest verification), and it
+delivers the roadmap M3 "content validator" and "dependency validation"
+lines.
+
+## Checks
+
+Four families, each reported with a stable name, file, entry
+`legacy_id`, and field:
+
+- **structure** - the `normalized/` directory set equals the
+  manifest-recorded output set exactly (22 files, both directions), the
+  root record and all nine extension sections record `schema_version`,
+  `result: success`, and `policy`, and every schema file exists and is
+  structurally valid (object schema, `required` subset of `properties`,
+  `kind` const).
+- **manifest** - every recorded output's byte count and SHA-256 match
+  the file on disk, and the count keys that name output entries match
+  the actual entry counts under the documented per-file mapping
+  (provenance-only counts such as `stored_items` are recorded verbatim,
+  not file-verifiable).
+- **schema** - every entry of the 21 schema-backed files passes the
+  documented subset the builders enforce: required fields, type unions
+  (a boolean is never an integer or a number), `const`, `enum`,
+  property-level `minimum` (native integers), `minItems`,
+  `minProperties`, array element types, `propertyNames`,
+  `additionalProperties: false`, and nested `{type, minimum}` gates over
+  object values. `specials.json` has no schema and instead carries its
+  documented gates: exactly one entry, `legacy_id` `925`, `kind`
+  `special`, and the exact recorded `special_note`.
+- **dependency** - per-file `legacy_id` uniqueness and distinctness
+  across the 900-entry items union; `upgrades_to`/`trains_ids`
+  resolution excluding the `-1`/`0` sentinels; `inventory_ids` object
+  keys resolving against the inventory domain; collections
+  `item_refs`/`prize_refs`, `level_ranking_reward` and
+  `unit_collection_categories` `unit_refs`, darts `item_refs`/`extra_ref`,
+  and offers `item_refs` both resolving against the items union and
+  equal to what their stored source fields derive (builder order
+  rules); offers keeping both pinned anomalies exactly (pair second
+  `35` in offer `4`, float `1072.1224` in offer `35`) with no other
+  unresolving leaf; and categories `sub` parents equal to their
+  category id.
+
+## Executable and invocation
+
+Reported Python for the passing runs: `Python 3.9.13`. Any working
+Python 3.9+ standard-library interpreter should behave identically.
+
+From the repository root:
+
+```bash
+python -B packages/game-content/tools/validate_content.py
+```
+
+The optional `--repo-root PATH` relocates the same package reads.
+
+Exit 0 prints a deterministic JSON success report with
+`files_verified: 22`, `schemas_verified: 21`, `counts_checked: 22`, a
+per-file `entries` map, and `references_checked` (604 on the committed
+package); two runs print byte-identical reports. Exit 1 prints a
+`validation-failed` JSON report listing each problem sorted by family,
+file, entry, and field, and writes nothing. Exit 2 reports invalid
+input or unsupported shape (missing/unreadable/unparseable output,
+missing or invalid schema file, malformed manifest record, or bad
+usage) on stderr without claiming validity.
+
+## Evidence classification
+
+This extension establishes package conformance of committed bytes:
+manifest integrity (bytes, digests, counts), schema conformance over
+the documented subset, and reference integrity and derivation over
+every cross-domain edge. It is evidence that the committed package is
+internally consistent as recorded, not of served-byte equality,
+content validity, asset existence, gameplay parity, or
+progressed-player coverage. Stored sources are not read, so freshness
+and round-trip equivalence remain the builders' build-time contract.
+
+## Containment
+
+- Reads only `packages/game-content/manifest.json`, the normalized
+  outputs the manifest records, the normalized directory listing, and
+  the 21 schema files (plus optional `--repo-root` relocation of the
+  same reads). It never opens `config/`, `mods/`, saves, assets, or
+  legacy sources.
+- Never imports or executes the builders or any legacy application
+  module (no `get_game_config`, `jsonpatch`, or Flask import), never
+  contacts a network, never starts a server, never reads the wall
+  clock, and never opens a browser or Flash content.
+- Writes nothing in any outcome: no bytecode (the module disables it
+  and `-B` is used), no caches, no temporary files in the repository
+  (tests copy the package into the system temp directory and remove
+  it). The committed package's file set and bytes are identical before
+  and after every run, verified by the suite.
+- The focused tests in `tests/test_validate_content.py` run the same
+  way:
+
+```bash
+python -B -m unittest discover -s packages/game-content/tests -p test_validate_content.py -v
+```
