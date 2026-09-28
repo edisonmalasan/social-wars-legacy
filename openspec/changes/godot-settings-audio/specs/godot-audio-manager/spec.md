@@ -7,7 +7,7 @@ Give the Godot client a bounded AudioManager service: an `AudioManager` autoload
 ## ADDED Requirements
 
 ### Requirement: AudioManager bus structure and output state
-The client SHALL provide an `AudioManager` autoload (`scripts/audio_manager.gd`) that at startup ensures idempotently that `Music` and `SFX` exist as audio buses under `Master`, and owns exactly two committed boolean outputs — `music_enabled` and `sfx_enabled`, both `true` at startup — through typed accessors: `set_music_enabled(enabled)` and `set_sfx_enabled(enabled)` SHALL return an explicit `{ok, error}` result and SHALL fail closed with `music_setting_unchanged` / `sfx_setting_unchanged` (leaving committed state untouched and notifying nobody) when the request equals the committed value, and with `music_bus_missing` / `sfx_bus_missing` when the corresponding bus no longer exists; a successful request SHALL commit exactly the requested value, apply it as the bus's mute state (volume SHALL never be written — it stays at 0 dB), and emit exactly one `music_enabled_changed(enabled)` / `sfx_enabled_changed(enabled)` notification carrying the new value; the getters SHALL reflect only committed state; creation SHALL notify nobody; and the service SHALL NOT read wall-clock or time services, load content, perform persistence or transport, reference legacy protocol or Flash-related primitives, or depend on any script other than its read-only Settings binding.
+The client SHALL provide an `AudioManager` autoload (`scripts/audio_manager.gd`) that at startup ensures idempotently that `Music` and `SFX` exist as audio buses under `Master`, and owns exactly two committed boolean outputs — `music_enabled` and `sfx_enabled`, both `true` at startup — through typed accessors: `set_music_enabled(enabled)` and `set_sfx_enabled(enabled)` SHALL return an explicit `{ok, error}` result and SHALL fail closed with `music_setting_unchanged` / `sfx_setting_unchanged` (leaving committed state untouched and notifying nobody) when the request equals the committed value, and with `music_bus_missing` / `sfx_bus_missing` when the corresponding bus no longer exists; a successful request SHALL commit exactly the requested value, apply it to the bus's mute state — the bus is muted if and only if the committed value is `false`, and volume SHALL never be written (it stays at 0 dB) — and emit exactly one `music_enabled_changed(enabled)` / `sfx_enabled_changed(enabled)` notification carrying the new value; the getters SHALL reflect only committed state; creation SHALL notify nobody; and the service SHALL NOT read wall-clock or time services, load content, perform persistence or transport, reference legacy protocol or Flash-related primitives, or depend on any script other than its read-only Settings binding.
 
 #### Scenario: Start with both buses ready
 - **WHEN** the autoload starts
@@ -15,7 +15,7 @@ The client SHALL provide an `AudioManager` autoload (`scripts/audio_manager.gd`)
 
 #### Scenario: Apply a music toggle
 - **WHEN** `set_music_enabled` receives the opposite boolean
-- **THEN** the request succeeds, the getter reflects the committed value, the `Music` bus's mute state matches it, and exactly one notification is emitted with the new value
+- **THEN** the request succeeds, the getter reflects the committed value, the `Music` bus is muted if and only if the committed value is `false`, and exactly one notification is emitted with the new value
 
 #### Scenario: Reject an unchanged toggle
 - **WHEN** a setter receives the value already committed

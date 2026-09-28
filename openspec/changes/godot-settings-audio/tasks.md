@@ -53,7 +53,7 @@ V = `verify.ps1`, VB = `verify-boot.ps1`.
 | 12 | Record the executed commands | `AGENTS.md` ten-suite prose; `README.md` suite purpose, invocation, observed counts | — (docs review) |
 | 13 | Record the milestone progress | roadmap `Project Status` ledger entry (task 5.3, archive stage) | — (ledger) |
 | 14 | Start with both buses ready | `test_audio_manager` startup: both buses under `Master`, getters `true`, unmuted at 0 dB, no notification | GA |
-| 15 | Apply a music toggle | setter success, getter flips, `Music` mute matches, exactly one `music_enabled_changed` payload | GA |
+| 15 | Apply a music toggle | setter success, getter flips, `Music` bus muted iff the committed value is `false`, exactly one `music_enabled_changed` payload | GA |
 | 16 | Reject an unchanged toggle | unchanged request rejected (`music_setting_unchanged` / `sfx_setting_unchanged`), bus and committed state unchanged, silent | GA |
 | 17 | Reject when the bus is missing | bus removed → setter rejected (`*_bus_missing`), committed state unchanged, silent; bus restored | GA |
 | 18 | Follow a Settings change | Settings commits `music_enabled=false` → AudioManager commits, `Music` muted, one `music_enabled_changed` payload | GA |
