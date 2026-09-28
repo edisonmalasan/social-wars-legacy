@@ -8,12 +8,17 @@
 ; interaction (fake by default, loopback legacy_v0 for verification), the
 ; ContentRegistry autoload loads the canonical normalized content and
 ; the asset ID registry on explicit request only, the Session autoload
-; holds the active session committed by a successful boot, and the
+; holds the active session committed by a successful boot, the
 ; GameClock autoload holds the server-anchored game time committed by
-; the same boot.
+; the same boot, the Settings autoload holds the two committed user
+; preferences with explicit fail-closed persistence, and the
+; AudioManager autoload owns the Music/SFX output buses and applies
+; those preferences as bus mute.
 ; The render-verification scene stays runnable as its own scene. The
 ; camera controls and the UI foundation are non-autoload components
-; instanced by scenes (OpenSpec `godot-camera`, `godot-ui-foundation`).
+; instanced by scenes (OpenSpec `godot-camera`, `godot-ui-foundation`);
+; Settings and AudioManager are the cross-cutting autoloads (OpenSpec
+; `godot-settings-audio`).
 ; See README.md.
 
 config_version=5
@@ -30,6 +35,8 @@ GameApi="*res://scripts/gameapi/game_api.gd"
 ContentRegistry="*res://scripts/content_registry.gd"
 Session="*res://scripts/session.gd"
 GameClock="*res://scripts/game_clock.gd"
+Settings="*res://scripts/settings.gd"
+AudioManager="*res://scripts/audio_manager.gd"
 
 [audio]
 

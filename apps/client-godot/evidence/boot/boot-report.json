@@ -1,12 +1,12 @@
 {
     "schema":  "godot-compatibility-boot/verify-boot-v1",
-    "generated_utc":  "2026-09-27T16:59:47Z",
+    "generated_utc":  "2026-09-28T03:22:03Z",
     "environment":  {
                         "engine_executable":  "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
                         "engine_version":  "4.7.2.stable.official.ed1daf0bf",
                         "python_executable":  "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
                         "python_version":  "3.9.13",
-                        "git_commit":  "511d935ac7f575e91b949d3585b8f9a0b806a838",
+                        "git_commit":  "a38797ca6d277d3de279a605002c5a06d8f6e108",
                         "display_session":  false,
                         "network":  "loopback only (127.0.0.1)"
                     },
@@ -235,6 +235,38 @@
                          "log":  "apps/client-godot/.godot/verify-boot/13-test_ui_foundation.out.txt"
                      },
                      {
+                         "name":  "test_settings",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_settings.gd",
+                                         "--",
+                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/14-test_settings.out.txt"
+                     },
+                     {
+                         "name":  "test_audio_manager",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_audio_manager.gd",
+                                         "--",
+                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/15-test_audio_manager.out.txt"
+                     },
+                     {
                          "name":  "boot-unreachable",
                          "command":  [
                                          "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
@@ -250,7 +282,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/14-boot-unreachable.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/16-boot-unreachable.out.txt"
                      },
                      {
                          "name":  "boot-main-live",
@@ -273,7 +305,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/15-boot-main-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/17-boot-main-live.out.txt"
                      },
                      {
                          "name":  "gameapi-live",
@@ -297,7 +329,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/16-gameapi-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/18-gameapi-live.out.txt"
                      },
                      {
                          "name":  "boot-api-error-live",
@@ -324,7 +356,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/17-boot-api-error-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/19-boot-api-error-live.out.txt"
                      },
                      {
                          "name":  "guard-post",
@@ -336,7 +368,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/18-guard-post.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/20-guard-post.out.txt"
                      }
                  ],
     "assertions":  [
@@ -442,6 +474,22 @@
                        },
                        {
                            "name":  "test_ui_foundation reports PASS",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_settings exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_settings reports PASS",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_audio_manager exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_audio_manager reports PASS",
                            "ok":  true
                        },
                        {
