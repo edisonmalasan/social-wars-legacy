@@ -83,6 +83,7 @@ func run_scenario() -> void:
 	check(bool(built.get("ok", false)),
 		"town builds from the fresh state: %s" % built.get("error"))
 	check_eq(town.view_state, "built", "view state is built")
+	check(town.build_ok, "build_ok commits on a successful build")
 	if not bool(built.get("ok", false)):
 		town.free()
 		return

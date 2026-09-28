@@ -125,6 +125,7 @@ func build() -> Dictionary:
 		return _enter_error(str(hud_result.get("error", "")))
 	view_state = STATE_BUILT
 	build_error = ""
+	build_ok = true
 	_maybe_start_capture()
 	return {"ok": true, "error": ""}
 
