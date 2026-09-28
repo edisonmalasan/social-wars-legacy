@@ -165,7 +165,7 @@ func _check_godot_launches() -> void:
 		% str(version.get("string", "")))
 
 
-## Item 36 "no Flash runtime installed / no Ruffle installed" — the
+## Item 36 "no Flash runtime installed / no ruffle installed" — the
 ## payload half: no runtime file of either kind exists in the project
 ## (file-level claim only; see the class comment for claim limits).
 func _check_no_flash_payload() -> void:

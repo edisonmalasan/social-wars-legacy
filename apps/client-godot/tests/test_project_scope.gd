@@ -12,7 +12,9 @@ extends "res://tests/test_base.gd"
 ## camera-controls work (the component script and its suite), the
 ## UI-foundation work (the component script and its suite), and the
 ## settings/audio-manager work (the Settings and AudioManager autoloads
-## with their scripts and suites): no other
+## with their scripts and suites), and the town-rendering work (the eight
+## town scripts under `scripts/town/`, the town and town-slice scenes,
+## their six suites, and the three committed evidence captures): no other
 ## game system, no scene beyond the allow-list, no script outside the
 ## allow-list, no Flash-related runtime, no legacy protocol token
 ## anywhere, and no transport reference outside the legacy-v0
@@ -33,6 +35,8 @@ const ALLOWED := [
 	"compat_live_phase.py",
 	"scenes/boot.tscn",
 	"scenes/first_render.tscn",
+	"scenes/town.tscn",
+	"scenes/town_slice.tscn",
 	"scripts/audio_manager.gd",
 	"scripts/boot.gd",
 	"scripts/camera_controls.gd",
@@ -53,6 +57,14 @@ const ALLOWED := [
 	"scripts/run_selftest.gd",
 	"scripts/session.gd",
 	"scripts/settings.gd",
+	"scripts/town/iso.gd",
+	"scripts/town/town.gd",
+	"scripts/town/town_hud.gd",
+	"scripts/town/town_object.gd",
+	"scripts/town/town_slice.gd",
+	"scripts/town/town_state.gd",
+	"scripts/town/town_terrain.gd",
+	"scripts/town/town_visuals.gd",
 	"scripts/ui_foundation.gd",
 	"scripts/verification.gd",
 	"tests/test_asset_ids.gd",
@@ -69,16 +81,27 @@ const ALLOWED := [
 	"tests/test_scene_build.gd",
 	"tests/test_session.gd",
 	"tests/test_settings.gd",
+	"tests/test_town_gate.gd",
+	"tests/test_town_hud.gd",
+	"tests/test_town_iso.gd",
+	"tests/test_town_scene.gd",
+	"tests/test_town_selection.gd",
+	"tests/test_town_state.gd",
 	"tests/test_ui_foundation.gd",
 	"evidence/boot/boot-report.json",
 	"evidence/first-render/first-render.png",
 	"evidence/first-render/report.json",
+	"evidence/town/report.json",
+	"evidence/town/town-player.png",
+	"evidence/town/town-slice.png",
 ]
 
 ## The exact scene set the project may declare (set equality below).
 const EXPECTED_SCENES := [
 	"scenes/boot.tscn",
 	"scenes/first_render.tscn",
+	"scenes/town.tscn",
+	"scenes/town_slice.tscn",
 ]
 
 ## The six autoloads this change allow-loads (spec: modified R1): the
@@ -236,7 +259,8 @@ func _check_project_config(root: String) -> void:
 	var expected: Array = EXPECTED_SCENES.duplicate()
 	expected.sort()
 	check_eq(scenes, expected,
-		"the scene set is exactly {boot.tscn, first_render.tscn}")
+		"the scene set is exactly {boot.tscn, first_render.tscn, "
+			+ "town.tscn, town_slice.tscn}")
 	check(scenes.has("scenes/first_render.tscn"),
 		"the first-render verification scene remains runnable")
 
