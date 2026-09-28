@@ -21,7 +21,6 @@ usage) on stderr, no validity claim.
 """
 
 import hashlib
-import io
 import json
 import sys
 from pathlib import Path
@@ -528,23 +527,25 @@ def check_counts(loaded, problems):
         if name not in loaded:
             continue
         section, count_key, _schema = FILE_MAP[name]
+        label = section if section is not None else "root"
         counts = loaded[name]["section_record"].get("counts")
         if not isinstance(counts, dict):
             problems.append(problem(
                 FAMILY_MANIFEST, name, "", "counts",
-                "section counts missing or not an object"))
+                "section %s: counts missing or not an object" % label))
             continue
         if count_key not in counts:
             problems.append(problem(
                 FAMILY_MANIFEST, name, "", count_key,
-                "count key missing from section counts"))
+                "section %s: count key missing from counts" % label))
             continue
         recorded = counts[count_key]
         actual = len(loaded[name]["entries"])
         if recorded != actual:
             problems.append(problem(
                 FAMILY_MANIFEST, name, "", count_key,
-                "recorded %r, actual %d entries" % (recorded, actual)))
+                "section %s: recorded %r, actual %d entries"
+                % (label, recorded, actual)))
 
 
 def check_schemas(repo_root, problems):
