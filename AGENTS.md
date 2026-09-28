@@ -109,10 +109,11 @@ powershell -File apps/client-godot/verify-boot.ps1
 ```
 
 This single command runs the Compatibility API guard verification before and
-after, the Compatibility API unittest discovery and loopback smoke, the ten
+after, the Compatibility API unittest discovery and loopback smoke, the sixteen
 headless Godot suites (package loader, scene build, fake GameApi, boot
 scene, session, game clock, camera controls, UI foundation, settings,
-audio manager), the
+audio manager, and the town vertical slice: projection, town state, town
+scene, HUD, selection, no-Flash gate), the
 unreachable-endpoint scenario against a loopback port with nothing listening,
 and three live
 phases that start
@@ -135,6 +136,24 @@ containment are recorded in
 `tests/fixtures/godot-compatibility-boot/README.md`; that capture starts the
 legacy Flask server in a disposable copy and is not re-run by either
 verification command above.
+
+Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
+the two windowed captures need an interactive display session):
+
+```bash
+godot --path apps/client-godot res://scenes/boot.tscn -- --gameapi=fake --town-capture=<repo>/apps/client-godot/evidence/town/town-player.png
+godot --path apps/client-godot res://scenes/town_slice.tscn -- --town-capture=<repo>/apps/client-godot/evidence/town/town-slice.png
+godot --headless --path apps/client-godot res://scenes/town.tscn -- --town-report=<repo>/apps/client-godot/evidence/town/report.json
+```
+
+These are the D10 evidence steps committed under
+`apps/client-godot/evidence/town/` (two 1400x600 captures plus the
+deterministic report; rerunning the report step reproduces its bytes, and
+the bare `--town-report` flag defaults to that report path). The six town
+suites and the no-Flash gate run inside `verify-boot.ps1`. These commands
+execute no Flash and establish no pixel parity: the claim limits and the
+projection evidence gap are recorded in
+`apps/client-godot/README.md` ("Town vertical slice").
 
 Important:
 

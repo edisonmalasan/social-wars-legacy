@@ -40,6 +40,12 @@ const ARG_ENDPOINT := "--gameapi-endpoint="
 var implementation := IMPL_FAKE
 ## Endpoint for the legacy-v0 implementation ("" = the loopback default).
 var endpoint := ""
+## Number of bootstrap requests this process has issued (M6 launch
+## contract: exactly one per launch — the legacy bootstrap mutates
+## `last_logged_in`, so the boot suite asserts the count and the town
+## evidence report records it). Monotonic: `configure()` swaps the
+## implementation without hiding history, so callers snapshot and compare.
+var bootstrap_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -89,6 +95,7 @@ func list_sessions() -> BootData.SaveListResult:
 
 ## Typed bootstrap for one save id from the selected implementation.
 func get_bootstrap(user_id: String) -> BootData.BootstrapResult:
+	bootstrap_requests += 1
 	var result: BootData.BootstrapResult = await _impl.get_bootstrap(user_id)
 	return result
 

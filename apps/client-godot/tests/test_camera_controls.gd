@@ -12,9 +12,13 @@ extends "res://tests/test_base.gd"
 ## left drag pans the content under the cursor with the screen movement
 ## divided by the committed factor (exact at two zoom levels) and ends at
 ## the release, unrelated events pass through unconsumed, and the node's
-## own `_unhandled_input` delegation is observed through behavior. A final
-## source scan covers the scaffold's no-clock/no-persistence/no-loading/
-## no-other-script clauses directly.
+## own `_unhandled_input` delegation is observed through behavior. The
+## bounds half (M6 town slice): optional fail-closed world bounds —
+## invalid rectangles rejected, inside commits silent, an outside
+## position corrected exactly once, out-of-bounds pans rejected, and a
+## clear restoring unbounded panning. A final source scan covers the
+## scaffold's no-clock/no-persistence/no-loading/no-other-script
+## clauses directly.
 ##
 ## Pure component: no API, no boot flow, no endpoint argument. Runs headless
 ## as part of `verify-boot.ps1`.
@@ -55,6 +59,7 @@ func run_scenario() -> void:
 	_check_default_view()
 	_check_zoom_walk()
 	_check_pan_and_rejections()
+	_check_world_bounds()
 	_check_wheel_input()
 	_check_drag_input()
 	_check_passthrough()
@@ -79,6 +84,10 @@ func _check_default_view() -> void:
 	check_eq(camera.ZOOM_FACTORS.size(), 3, "the factor table has three entries")
 	check_eq(_zoom_payloads.size(), 0, "creation notifies nobody")
 	check_eq(_pan_payloads.size(), 0, "creation never pans")
+	check(not camera.has_world_bounds(),
+		"the default view reports no world bounds")
+	check_eq(camera.world_bounds(), Rect2(),
+		"unset bounds expose an empty rectangle")
 	camera.free()
 
 
@@ -170,6 +179,108 @@ func _check_pan_and_rejections() -> void:
 		"an infinite pan leaves the position untouched")
 
 	check_eq(_pan_payloads.size(), 2, "rejected pans never notify")
+	camera.free()
+
+
+## Spec deltas (M6): optional world bounds — invalid rectangles fail
+## closed, committing bounds clamps an outside position exactly once, a
+## pan leaving committed bounds fails closed, and clearing restores the
+## unbounded contract byte-for-byte.
+func _check_world_bounds() -> void:
+	_reset_notifications()
+	var camera: Variant = _new_camera()
+
+	# Invalid rectangles fail closed: named error, bounds unset,
+	# position and notifications untouched.
+	var non_finite: Dictionary = camera.set_world_bounds(
+		Rect2(Vector2(NAN, 0), Vector2(10, 10)))
+	check(non_finite.get("ok") == false, "a non-finite rectangle is rejected")
+	check(String(non_finite.get("error", "")).find("bounds_non_finite") != -1,
+		"the non-finite rejection names the violated condition")
+	var infinite: Dictionary = camera.set_world_bounds(
+		Rect2(Vector2(0, 0), Vector2(INF, 10)))
+	check(infinite.get("ok") == false, "an infinite extent is rejected")
+	var empty: Dictionary = camera.set_world_bounds(
+		Rect2(Vector2(0, 0), Vector2(0, 10)))
+	check(empty.get("ok") == false, "an empty rectangle is rejected")
+	check(String(empty.get("error", "")).find("bounds_empty") != -1,
+		"the empty rejection names the violated condition")
+	check(not camera.has_world_bounds(),
+		"failed bounds requests leave the bounds unset")
+	check_eq(camera.position, Vector2.ZERO,
+		"failed bounds requests leave the position unchanged")
+	check_eq(_pan_payloads.size(), 0, "failed bounds requests never notify")
+
+	# Committing bounds with the position already inside: no movement, no
+	# notification; bounds never affect zoom level, factor, or node zoom.
+	camera.zoom_in()
+	var committed: Dictionary = camera.set_world_bounds(
+		Rect2(Vector2(-50, -50), Vector2(300, 200)))
+	check(committed.get("ok") == true, "an inside position commits bounds")
+	check(camera.has_world_bounds(), "the bounds getter reports committed state")
+	check_eq(camera.world_bounds(),
+		Rect2(Vector2(-50, -50), Vector2(300, 200)),
+		"the committed rectangle round-trips")
+	check_eq(camera.position, Vector2.ZERO,
+		"committing bounds with an inside position does not move")
+	check_eq(_pan_payloads.size(), 0,
+		"committing bounds with an inside position does not notify")
+	check_eq(camera.zoom_level(), 1, "bounds do not affect the zoom level")
+	check_eq(camera.zoom_factor(), 2.0, "bounds do not affect the factor")
+	check_eq(camera.zoom, Vector2(2, 2), "bounds do not affect the node zoom")
+
+	# A pan that stays inside commits exactly; one that would leave fails
+	# closed with no movement and no notification.
+	var inside: Dictionary = camera.pan_by(Vector2(100, 50))
+	check(inside.get("ok") == true, "a pan inside the bounds succeeds")
+	check_eq(camera.position, Vector2(100, 50),
+		"the in-bounds pan commits exactly the requested delta")
+	check_eq(_pan_payloads, [Vector2(100, 50)],
+		"the in-bounds pan notifies once")
+	var outside: Dictionary = camera.pan_by(Vector2(0, 200))
+	check(outside.get("ok") == false, "a pan leaving the bounds is rejected")
+	check(String(outside.get("error", "")).find("outside_world_bounds") != -1,
+		"the out-of-bounds rejection names the violated condition")
+	check_eq(camera.position, Vector2(100, 50),
+		"the rejected pan leaves the position unchanged")
+	check_eq(_pan_payloads, [Vector2(100, 50)],
+		"the rejected pan notifies nobody")
+
+	# Committing bounds that exclude the current position corrects exactly
+	# once, with exactly one notification carrying the correction delta.
+	var clamped: Dictionary = camera.set_world_bounds(
+		Rect2(Vector2(1000, 1000), Vector2(100, 100)))
+	check(clamped.get("ok") == true,
+		"an outside position is corrected into the new bounds")
+	check_eq(camera.position, Vector2(1000, 1000),
+		"the position is clamped into the new rectangle")
+	check_eq(_pan_payloads, [Vector2(100, 50), Vector2(900, 950)],
+		"exactly one notification carries the correction delta")
+	var second: Dictionary = camera.set_world_bounds(
+		Rect2(Vector2(1000, 1000), Vector2(100, 100)))
+	check(second.get("ok") == true, "re-applying the same bounds succeeds")
+	check_eq(camera.position, Vector2(1000, 1000),
+		"re-applying bounds does not move")
+	check_eq(_pan_payloads.size(), 2, "re-applying bounds does not notify")
+
+	# A pan blocked by the bounds, then a clear: the same delta commits
+	# exactly, and the clear itself moves and notifies nothing.
+	var blocked: Dictionary = camera.pan_by(Vector2(500, 500))
+	check(blocked.get("ok") == false, "the pan beyond the bounds is rejected")
+	check_eq(camera.position, Vector2(1000, 1000),
+		"the blocked pan leaves the position unchanged")
+	var cleared: Dictionary = camera.clear_world_bounds()
+	check(cleared.get("ok") == true, "clearing bounds succeeds")
+	check(not camera.has_world_bounds(), "the bounds getter reports unset")
+	check_eq(camera.position, Vector2(1000, 1000),
+		"clearing bounds does not move")
+	check_eq(_pan_payloads.size(), 2, "clearing bounds does not notify")
+	var unbounded: Dictionary = camera.pan_by(Vector2(500, 500))
+	check(unbounded.get("ok") == true,
+		"the previously rejected delta commits after the clear")
+	check_eq(camera.position, Vector2(1500, 1500),
+		"the unbounded pan commits exactly")
+	check_eq(_pan_payloads.size(), 3, "the unbounded pan notifies once")
 	camera.free()
 
 

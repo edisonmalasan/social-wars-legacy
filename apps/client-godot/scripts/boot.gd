@@ -24,8 +24,19 @@ extends Control
 ## (exit 0 on `state=ready`, exit 1 on `state=error`); windowed sessions stay
 ## open as the client entry point. Headless tests set `auto_quit = false`
 ## before adding the scene to the tree, then observe `boot_finished`.
+##
+## Windowed boot-to-town transition (M6, spec `godot-compatibility-boot`
+## "Windowed boot-to-town transition"): after the ready marker a windowed
+## run hands the already-validated bootstrap payload to the town-state
+## parser and replaces the boot view with the built town view — reusing
+## the single bootstrap request of the launch (no second request), with
+## any handoff failure named explicitly in place of the view (never a
+## blank window, never a partial town). Headless runs never enter this
+## path: their marker, summary, error-state, and exit-code contract is
+## byte-for-byte the original.
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
+const TownState = preload("res://scripts/town/town_state.gd")
 
 signal boot_finished(state: String)
 
@@ -50,6 +61,11 @@ var engine_version := ""
 var connection_state := "not connected"
 ## Typed summary when state == "ready" (null otherwise, never partial).
 var summary: BootData.PlayerSummary = null
+## The bootstrap's wrapped player-info payload, kept from the successful
+## bootstrap for the windowed town handoff: an API-layer opaque payload
+## consumed by the town-state parser — the raw transport dictionary never
+## reaches presentation code (spec "Windowed boot-to-town transition").
+var player_info: BootData.PlayerInfoPayload = null
 
 ## Exactly what the summary labels display (single source: the labels are
 ## assigned from these fields, so headless assertions cover the UI text).
@@ -120,6 +136,7 @@ func _boot() -> void:
 		_fail(result.error_code, result.error_message)
 		return
 	summary = result.summary
+	player_info = result.player_info
 	if not _anchor_clock(clock, save_list.server_time):
 		return
 	if not _activate_session(session):
@@ -177,6 +194,88 @@ func _display_summary() -> void:
 func _complete() -> void:
 	state = "ready"
 	_emit_marker(0)
+	# Headless runs never enter the town scene (spec "Headless boot
+	# behavior is unchanged"); the marker, summary, error-state, and
+	# exit-code contract above is untouched either way.
+	if DisplayServer.get_name() != "headless":
+		# Deferred: this `_ready` chain runs while the tree is still
+		# attaching the boot scene, and attaching the town then would be
+		# rejected ("parent node is busy setting up children"). At idle
+		# the handoff runs synchronously and keeps its `{ok, error}`
+		# contract for direct callers (tests).
+		transition_to_town.call_deferred()
+
+
+## Windowed boot-to-town handoff (spec "Windowed boot-to-town
+## transition"): hands the already-validated bootstrap payload to the
+## town-state parser, builds the town scene, and replaces the boot view
+## with it. Issues no bootstrap request of its own — it reuses the single
+## request of the launch (the legacy bootstrap mutates `last_logged_in`).
+## Fail-closed: every failure commits an explicit error naming itself in
+## place of the view (`_town_fail`), never a blank window and never a
+## partial town. Returns `{ok, error}`; tests may call it directly to
+## drive the handoff and its failure routing.
+func transition_to_town() -> Dictionary:
+	if player_info == null:
+		return _town_fail("town_state_missing",
+			"the bootstrap payload is unavailable")
+	var content := get_node_or_null("/root/ContentRegistry")
+	if content == null:
+		return _town_fail("content_registry_missing",
+			"the ContentRegistry autoload is not registered")
+	if not content.is_loaded():
+		var loaded: Dictionary = content.load_content()
+		if not loaded.get("ok", false):
+			return _town_fail("content_load", str(loaded.get("error", "")))
+	if not content.assets_loaded():
+		var assets: Dictionary = content.load_asset_registry()
+		if not assets.get("ok", false):
+			return _town_fail("asset_registry_load",
+				str(assets.get("error", "")))
+	var parsed: Dictionary = TownState.parse(player_info.raw, content)
+	if not parsed.get("ok", false):
+		return _town_fail("town_state", str(parsed.get("error", "")))
+	var scene: Variant = load("res://scenes/town.tscn")
+	if not (scene is PackedScene):
+		return _town_fail("town_scene",
+			"res://scenes/town.tscn failed to load")
+	var town: Variant = scene.instantiate()
+	# The state is committed before the tree insertion, so `_ready` builds
+	# the view; a failed build is torn down and surfaced as the explicit
+	# handoff error instead of a partial town.
+	town.set_town_state(parsed["state"])
+	get_tree().root.add_child(town)
+	if not town.build_ok:
+		var failure := str(town.build_error)
+		town.free()
+		return _town_fail("town_build", failure)
+	visible = false  # the boot view is replaced by the town view
+	print('[boot] town=rendered user_id=%s placements=%d' % [
+		boot_user_id, int((parsed["state"] as Variant).placements.size())])
+	return {"ok": true, "error": ""}
+
+
+## Commits an explicit handoff failure: the boot view displays the named
+## error in place of the town (never blank), the terminal state records
+## it, and the standard error marker line is printed. `boot_finished` is
+## not re-emitted — the boot's own terminal emission already happened.
+## In an evidence capture run (`--town-capture=`) the process exits 1 so
+## a failed capture cannot hang on an open window.
+func _town_fail(code: String, message: String) -> Dictionary:
+	state = "error"
+	error_code = code
+	error_message = message
+	displayed_error = "error: %s: %s" % [code, message]
+	if _error_label != null:
+		_error_label.text = displayed_error
+	visible = true
+	print("[boot] state=error code=%s message=%s" % [code, message])
+	for argument in OS.get_cmdline_user_args():
+		if argument.begins_with("--town-capture="):
+			get_tree().quit(1)
+			break
+	return {"ok": false,
+		"error": "[boot] transition rejected: %s: %s" % [code, message]}
 
 
 func _fail(code: String, message: String) -> void:

@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/town/town_slice.gd" id="1_slice"]
+[ext_resource type="Script" path="res://scripts/town/town_terrain.gd" id="2_terrain"]
+[ext_resource type="Script" path="res://scripts/camera_controls.gd" id="3_camera"]
+[ext_resource type="Script" path="res://scripts/ui_foundation.gd" id="4_ui"]
+
+[node name="TownSlice" type="Node2D"]
+script = ExtResource("1_slice")
+
+[node name="Terrain" type="TextureRect" parent="."]
+script = ExtResource("2_terrain")
+
+[node name="Objects" type="Node2D" parent="."]
+
+[node name="Camera" type="Camera2D" parent="."]
+script = ExtResource("3_camera")
+
+[node name="Ui" type="CanvasLayer" parent="."]
+script = ExtResource("4_ui")
+
+[node name="ErrorLabel" type="Label" parent="Ui"]
+visible = false
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 700.0
+offset_bottom = 120.0
+theme_override_colors/font_color = Color(1, 0.35, 0.3, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1

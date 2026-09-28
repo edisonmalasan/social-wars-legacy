@@ -296,9 +296,10 @@ powershell -File apps/client-godot/verify-boot.ps1
 ```
 
 It runs, in order: guard baseline → Compatibility API unittest discovery +
-loopback smoke → the ten headless Godot suites → the unreachable-endpoint
-scenario against a port with nothing listening → three live phases → guard
-baseline again → `evidence/boot/boot-report.json`. Each live phase is wrapped
+loopback smoke → the sixteen headless Godot suites → the
+unreachable-endpoint scenario against a port with nothing listening → three
+live phases → guard baseline again → `evidence/boot/boot-report.json`. Each
+live phase is wrapped
 by `compat_live_phase.py`, which starts `apps/compat-api/run.py`, waits for
 `GET /v0/session`, runs exactly one Godot command, stops the service with
 `CTRL_BREAK`, and asserts the service exited 0, the disposable corpus was
@@ -331,6 +332,15 @@ godot --headless --path apps/client-godot -s res://tests/test_settings.gd
 # Audio manager (107 observed checks): pure service, no API and no boot
 # flow; the endpoint argument the loop passes is ignored
 godot --headless --path apps/client-godot -s res://tests/test_audio_manager.gd
+# Town vertical slice (six suites; scene/content work, the endpoint
+# argument the loop passes is ignored): isometric projection, town state,
+# town scene + slice, HUD, selection, and the no-Flash gate
+godot --headless --path apps/client-godot --script res://tests/test_town_iso.gd
+godot --headless --path apps/client-godot --script res://tests/test_town_state.gd
+godot --headless --path apps/client-godot --script res://tests/test_town_scene.gd
+godot --headless --path apps/client-godot --script res://tests/test_town_hud.gd
+godot --headless --path apps/client-godot --script res://tests/test_town_selection.gd
+godot --headless --path apps/client-godot --script res://tests/test_town_gate.gd
 # Failure path: the scene must enter the explicit error state (suite exits 0
 # only when it observed it)
 godot --headless --path apps/client-godot -s res://tests/test_boot_scene.gd -- --scenario=unreachable --gameapi-endpoint=http://127.0.0.1:5057
@@ -503,3 +513,163 @@ Explicitly **not** verified: gameplay parity, authentication security,
 progressed-player coverage, served-byte equality for time-dependent fields,
 and any Flash/Ruffle/ActionScript/browser execution (none runs; the network
 is loopback only).
+
+## Town vertical slice
+
+The town slice renders a real legacy town in Godot without Flash: typed
+town state from the existing bootstrap data, one isometric coordinate
+space, the legacy terrain, saved town objects, an authoritative HUD,
+selection, and a bounded camera. This section records the derived
+geometry; the launch flow, visual hierarchy, slice-scene provenance,
+verification commands, and claim limits are documented in the sections
+that follow.
+
+### Architecture
+
+The view is a composition of focused parts, all reading one typed
+`TownState` — presentation never sees a raw transport payload:
+
+| Piece | Role |
+| --- | --- |
+| `scripts/town/town_state.gd` | fail-closed payload → typed state (eight-field placements verbatim, content resolution, resources/summary) |
+| `scripts/town/iso.gd` | the single grid↔screen projection (constants below) |
+| `scripts/town/town_terrain.gd` | legacy terrain over the world rectangle, resolved via ContentRegistry |
+| `scripts/town/town_visuals.gd` | visual-source choice per placement (hierarchy below) |
+| `scripts/town/town_object.gd` | per-placement node: metadata, footprint highlight |
+| `scripts/town/town_hud.gd` | authoritative HUD values on the UI-foundation slot |
+| `scripts/town/town.gd` + `scenes/town.tscn` | the view: terrain, depth-sorted objects, HUD, bounded camera, selection, fail-closed error state |
+| `scripts/town/town_slice.gd` + `scenes/town_slice.tscn` | the same view over the preserved Scarlet village |
+| `scripts/camera_controls.gd` | component with fail-closed optional world bounds |
+
+`scripts/boot.gd` hands the already-validated bootstrap payload to this
+stack in windowed runs — the flow below.
+
+### Isometric projection constants
+
+`scripts/town/iso.gd` commits the only coordinate space the town uses —
+terrain, object footprints, selection hits, and camera bounds all consume
+these constants (one geometry, no second source):
+
+| Constant | Value | Meaning |
+| --- | --- | --- |
+| `TILE_WIDTH` | `TW=40` | tile width in world pixels (2:1 diamond) |
+| `TILE_HEIGHT` | `TH=20` | tile height in world pixels |
+| `GRID_EXTENT` | `100` | legacy grid: integer cells `0..99` on both axes |
+| world rect | `4000x2000` | `Iso.world_rect()`; also the terrain rectangle |
+
+**Derivation** (design D2; executed with committed data, no Flash and no
+bytecode interpretation):
+
+1. *Scale anchor from converted art* — the only size evidence tying pixels
+   to cells is the converted package frames against content footprints:
+   House I's frame (216x144) on a 2x2 footprint and Wild Elephant's frame
+   (171x191) on a 1x1 footprint bound the candidate family; the 90x90
+   thumbnails are fixed-size UI art and were excluded from scale selection.
+2. *Viewable-town criterion* — at the legacy stage size 1400x600 a `TW=40`
+   view spans 35x30 cells, which contains 29 of the 40 fresh-save
+   placements (the densest such window), while thumbnails sit near their
+   natural size against 2x2 footprints (80 px) and converted sprites stay
+   at authentic native bounds (overhang over the footprint is accepted and
+   recorded as provisional presentation; sprites are never scaled).
+3. *Land-fit validation of alignment and orientation* — `mapa1.jpg`
+   (701x514, resolved through ContentRegistry as `mapa1.jpg`, status
+   `passthrough`) is classified land/water by blue-dominance (water iff
+   `b8 - max(r8,g8) > 18`), and every placement's **saved-cell anchor** —
+   the center of its 1x1 footprint rect — projects through the committed
+   constants (pixel `int(world.x/4000*W)` truncation) into the image.
+   Recorded residual: **fresh save 39/40 land** — the
+   single water cell is bridge item 929 at (29,48), which lies over the
+   crater lake and is semantically correct — and **Scarlet 549/576 land**,
+   with the residuals concentrated at the grid's far shore/corner
+   extremities plus bridge placements; **0 off-grid** in both. The check
+   is scale-invariant (the terrain texture is stretched to the world
+   rectangle: 5.7x horizontal, 3.9x vertical), so it validates
+   alignment/orientation, not scale.
+
+**Evidence basis:** legacy save coordinate extents (`0..99` across 20+
+saves, placement format `[item, x, y, timestamp, orientation, store, attr,
+player]`), content footprints (`width`/`height`), the two converted
+sprite frames, the 90x90 thumbnail UI art, the Basesec stage (1400x600 at
+30 fps), and the legacy client's static iso-engine identifiers
+(`TILE_SIZE`, `EI_TILE_HEIGHT_PIXELS`, `core.isoengine.isoUtils`,
+`gridWidth`, `gridHeight`, `numCols`, `numRows`).
+
+**Evidence gap and status:** those ABC identifiers exist only as strings —
+their numeric values were **never extracted** from the SWF bytecode. The
+constants above are **derived and provisional**; pixel parity with the
+legacy Flash client is not claimed, and the `x -> lower-right` orientation
+is provisional presentation. Extracting `TILE_SIZE` /
+`EI_TILE_HEIGHT_PIXELS` is recorded as a parity follow-up, not an
+assumption.
+
+### Launch flow: windowed boot to town
+
+The main scene boots through `scenes/boot.tscn`: the `GameApi` facade
+(fake or legacy-v0) lists saves, bootstraps exactly once, anchors the
+session and game clock, and shows the summary. Windowed runs then hand the
+already-validated payload to `TownState.parse` and attach
+`scenes/town.tscn` (`transition_to_town`, deferred to idle so the tree is
+free to attach it; a failure names itself on the boot view instead of
+leaving a blank window). Headless boot keeps its exact marker and
+exit-code contract — no town scene, one bootstrap request either way.
+
+### Visual hierarchy
+
+One placement renders through the most specific source available
+(`town_visuals.gd`); authored art is never rescaled:
+
+1. converted package sprite — authentic bounds at the saved cell
+   (overhang beyond the footprint is provisional presentation);
+2. keyed legacy thumbnail — scaled to the content footprint;
+3. labeled footprint marker — content the package carries but no art for;
+4. `?` placeholder — ids the content package does not resolve; the
+   placement still renders and the town stays intact (unresolved ids are
+   recorded, never dropped).
+
+Draw order is depth `x+y` ascending with deterministic tie-breaks (depth,
+grid y, grid x, save order), so every run draws identically.
+
+### Slice-scene provenance
+
+`scenes/town_slice.tscn` renders `villages/Scarlet.json` through the same
+components as the player's town — one projection, terrain, object layer,
+HUD, bounded camera, selection. The village file is read directly from
+the preserved repository input (no server, no bootstrap); its path and
+SHA-256 are recorded in the town report. The fresh save contains no unit
+placements, so authentic unit rendering (the Wild Elephant sprite) and
+that save's HUD values are proven only through this scene.
+
+### Evidence capture (D10 three-step)
+
+```bash
+# 1. Windowed fake-API launch: boot -> town transition + player capture
+#    (writes town-player.png at the legacy 1400x600 stage, exits 0)
+godot --path apps/client-godot res://scenes/boot.tscn -- --gameapi=fake --town-capture=<repo>/apps/client-godot/evidence/town/town-player.png
+
+# 2. Windowed slice capture (writes town-slice.png, exits 0)
+godot --path apps/client-godot res://scenes/town_slice.tscn -- --town-capture=<repo>/apps/client-godot/evidence/town/town-slice.png
+
+# 3. Headless deterministic report (writes report.json; a rerun is
+#    byte-identical; the bare --town-report flag defaults to
+#    evidence/town/report.json)
+godot --headless --path apps/client-godot res://scenes/town.tscn -- --town-report=<repo>/apps/client-godot/evidence/town/report.json
+```
+
+The report records the input paths and digests, the projection constants
+with their `derived-provisional` status, per-view object counts by visual
+source, the observed HUD/selection/camera state, the bootstrap-request
+count (exactly one), and both capture digests. It carries no timestamps
+or run-varying provenance, so reruns reproduce its bytes.
+
+### Town claim limits
+
+- no Flash, Ruffle, ActionScript, or browser executed;
+- no pixel-parity oracle against the legacy client exists;
+- projection constants are derived and provisional;
+- thumbnail presentation is provisional pending further conversions;
+- authentic unit rendering is proven via the slice scene because the
+  live fresh save contains no unit placements.
+
+These non-claims are recorded verbatim in `evidence/town/report.json`.
+Verification: the six town suites plus `test_town_gate.gd` run inside
+`verify-boot.ps1`; the scope suite enforces the 66-file boundary.
