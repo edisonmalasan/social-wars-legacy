@@ -7,8 +7,10 @@ extends Camera2D
 ## world position plus a discrete zoom level 0..2 over the fixed factor
 ## table (design D4), with the node's own zoom kept equal to the committed
 ## factor. Provisional foundation (design D2): no legacy camera behavior
-## has been captured, so authentic bounds, ranges, and input feel bind
-## later, with evidence, at the town slice.
+## has been captured, so authentic bounds, ranges, and input feel are
+## still provisional — the town slice commits optional fail-closed world
+## bounds (design D1) over the projection's world rectangle, and unset
+## bounds keep the original unbounded contract byte-for-byte.
 ##
 ## The controls follow the fail-closed `{ok, error}` envelope of the other
 ## foundation scaffolds: a rejected request names the violated condition,
@@ -36,6 +38,10 @@ const ZOOM_FACTORS := [1.0, 2.0, 4.0]
 var _zoom_level := ZOOM_LEVEL_MIN
 ## True between a consumed left press and its release.
 var _dragging := false
+## Committed world bounds (empty while unbounded).
+var _world_bounds := Rect2()
+## True while world bounds are committed (town slice design D1).
+var _has_world_bounds := false
 
 
 ## Delegates the node's input entry point to the public handler, so an
@@ -77,9 +83,11 @@ func zoom_out() -> Dictionary:
 
 ## Pans the view by a world-space delta. Fail-closed: the zero vector and
 ## any non-finite component are rejected with an error naming the condition
-## and the committed position is untouched; otherwise the position moves by
-## exactly the requested delta and one pan notification is emitted. No
-## bounds are enforced — town bounds belong to the town slice (design D5).
+## and the committed position is untouched; with world bounds committed, a
+## delta whose result would leave them is rejected the same way (named
+## error, no movement, no notification); otherwise the position moves by
+## exactly the requested delta and one pan notification is emitted. With
+## bounds unset the unbounded foundation contract applies byte-for-byte.
 func pan_by(world_delta: Vector2) -> Dictionary:
 	if world_delta == Vector2.ZERO:
 		return {"ok": false,
@@ -87,9 +95,65 @@ func pan_by(world_delta: Vector2) -> Dictionary:
 	if not world_delta.is_finite():
 		return {"ok": false,
 			"error": "[camera] pan_by rejected: pan_invalid_delta"}
-	position += world_delta
+	var target := position + world_delta
+	if _has_world_bounds and not _contains(target):
+		return {"ok": false,
+			"error": "[camera] pan_by rejected: outside_world_bounds"}
+	position = target
 	camera_panned.emit(world_delta)
 	return {"ok": true, "error": ""}
+
+
+## True while world bounds are committed.
+func has_world_bounds() -> bool:
+	return _has_world_bounds
+
+
+## The committed world bounds (Rect2() while unbounded). Reflects only
+## committed state.
+func world_bounds() -> Rect2:
+	return _world_bounds
+
+
+## Commits world bounds. Fail-closed: a non-finite component or empty
+## extent is rejected with a named error, bounds and position unchanged.
+## A committed position outside the new bounds is corrected exactly once
+## (one movement, one pan notification carrying the correction delta); a
+## position already inside commits the bounds with no movement and no
+## notification. Bounds never affect zoom level, factor, or node zoom.
+func set_world_bounds(rect: Rect2) -> Dictionary:
+	if not rect.position.is_finite() or not rect.size.is_finite():
+		return {"ok": false,
+			"error": "[camera] set_world_bounds rejected: bounds_non_finite"}
+	if rect.size.x <= 0.0 or rect.size.y <= 0.0:
+		return {"ok": false,
+			"error": "[camera] set_world_bounds rejected: bounds_empty"}
+	_world_bounds = rect
+	_has_world_bounds = true
+	if not _contains(position):
+		var corrected := position.clamp(rect.position, rect.position + rect.size)
+		var correction := corrected - position
+		position = corrected
+		if correction != Vector2.ZERO:
+			camera_panned.emit(correction)
+	return {"ok": true, "error": ""}
+
+
+## Clears world bounds, restoring the unbounded pan contract: no movement
+## and no notification.
+func clear_world_bounds() -> Dictionary:
+	_world_bounds = Rect2()
+	_has_world_bounds = false
+	return {"ok": true, "error": ""}
+
+
+## Inclusive containment of a point in the committed bounds (edges are
+## inside, matching Vector2.clamp's correction target).
+func _contains(point: Vector2) -> bool:
+	return (point.x >= _world_bounds.position.x
+		and point.x <= _world_bounds.position.x + _world_bounds.size.x
+		and point.y >= _world_bounds.position.y
+		and point.y <= _world_bounds.position.y + _world_bounds.size.y)
 
 
 ## Maps a pointer event; returns true when the event was consumed.
