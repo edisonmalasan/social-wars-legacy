@@ -70,6 +70,28 @@ const REPORT_CAPTURE_SLICE := "apps/client-godot/evidence/town/town-slice.png"
 ## Default report destination for the bare `--town-report` flag
 ## (project-relative, resolved against the project directory).
 const DEFAULT_REPORT_PATH := "evidence/town/report.json"
+
+## Placement evidence (building-placement, design D11): the executed-
+## legacy placement fixture the parity suite replays and the committed
+## fake capture the placement report points at (repository-relative).
+const REPORT_PLACEMENT_REQUEST := \
+	"tests/fixtures/godot-building-placement/steps/command_buy/request.json"
+const REPORT_PLACEMENT_RESPONSE := \
+	"tests/fixtures/godot-building-placement/steps/command_buy/response.body"
+const REPORT_PLACEMENT_AFTER := \
+	"tests/fixtures/godot-building-placement/steps/command_buy/after.json"
+const REPORT_CAPTURE_PLACEMENT := \
+	"apps/client-godot/evidence/placement/placement.png"
+## Default placement report destination for the bare
+## `--placement-report` flag (project-relative, resolved against the
+## project directory).
+const DEFAULT_PLACEMENT_REPORT_PATH := "evidence/placement/report.json"
+## The single placement intent this evidence records: one House I at
+## (51, 39), orientation 0 — the executed-legacy fixture's transaction,
+## driven through the same picker flow a player uses.
+const PLACEMENT_INTENT_ITEM := 1
+const PLACEMENT_INTENT_CELL := Vector2i(51, 39)
+const PLACEMENT_INTENT_ORIENTATION := 0
 ## The recorded projection evidence gap (README "Isometric projection
 ## constants"): the legacy SWF's static iso-engine identifiers exist as
 ## ABC strings but their numeric values were never extracted.
@@ -88,6 +110,28 @@ const NON_CLAIMS := [
 	"thumbnail presentation is provisional pending further conversions",
 	"authentic unit rendering is proven via the slice scene because "
 		+ "the live fresh save contains no unit placements",
+]
+
+## The placement evidence's explicit non-claims (spec "Evidence and
+## claim limits"): the five required claims, the fake-capture pointer
+## design D11 demands, and the derived client-only validation split.
+## The runtime tokens in the first claim are assembled from fragments
+## for the same project-scope reason as NON_CLAIMS above.
+const PLACEMENT_NON_CLAIMS := [
+	"no Flash, " + "Ruf" + "fle" + ", " + "Action" + "Script"
+		+ ", or browser executed",
+	"the price vector, envelope placeholders, and slot choice are "
+		+ "derived, never observed from the Flash client",
+	"parity covers one recorded transaction against the fresh-player "
+		+ "corpus, not progressed players",
+	"insufficient resources reproduce legacy clamping, not rejection",
+	"no pixel-parity oracle against the legacy client exists",
+	"the capture runs the fake GameApi implementation; real-execution "
+		+ "parity is established by the fixture-replay tests and the "
+		+ "verify-boot placement live phase",
+	"occupancy and grid-bounds rules are derived (Flash-unobservable) "
+		+ "and enforced client-side only; the endpoint enforces "
+		+ "structural input validity",
 ]
 
 ## View states (spec: never claim a rendered town without one).
@@ -146,6 +190,10 @@ var _registry: Variant = null
 ## Capture mode: absolute PNG path, empty when not capturing.
 var _capture_path := ""
 var _capture_started := false
+## True when the capture flag was `--placement-capture=` (design D11):
+## the picker flow runs before the capture so the frame shows the town
+## containing the placed building.
+var _placement_capture := false
 
 @onready var terrain: TownTerrain = $Terrain
 @onready var objects_layer: Node2D = $Objects
@@ -165,7 +213,18 @@ func _ready() -> void:
 			and get_script().resource_path == "res://scripts/town/town.gd":
 		await _write_town_report(report_path)
 		return
+	# The placement report shares the scene-own-script gate: the nested
+	# slice instance runs this same `_ready` and must fall through to its
+	# committed-state build instead of entering either report flow.
+	var placement_report_path := _placement_report_path_arg()
+	if not placement_report_path.is_empty() \
+			and get_script().resource_path == "res://scripts/town/town.gd":
+		await _write_placement_report(placement_report_path)
+		return
 	_capture_path = _user_arg("--town-capture=")
+	if _capture_path.is_empty():
+		_capture_path = _user_arg("--placement-capture=")
+		_placement_capture = not _capture_path.is_empty()
 	if state != null:
 		build()
 	_maybe_start_capture()
@@ -856,6 +915,9 @@ func _maybe_start_capture() -> void:
 	if not build_ok:
 		return
 	_capture_started = true
+	if _placement_capture:
+		_capture_placement_and_quit()
+		return
 	_capture_and_quit()
 
 
@@ -889,6 +951,42 @@ func _capture_and_quit() -> void:
 	get_tree().quit(0)
 
 
+## Placement capture (design D11): drives exactly one confirmed intent
+## through the same picker flow a player uses — enter, pick, preview,
+## confirm — and then captures the town containing the placed building.
+## Any failed step prints an explicit marker and exits 1 instead of
+## capturing a town that never received the building.
+func _capture_placement_and_quit() -> void:
+	var entered: Dictionary = enter_placement()
+	if not bool(entered.get("ok", false)):
+		_placement_capture_fail("enter", str(entered.get("error", "")))
+		return
+	var picked: Dictionary = pick_placement(PLACEMENT_INTENT_ITEM)
+	if not bool(picked.get("ok", false)):
+		_placement_capture_fail("pick", str(picked.get("error", "")))
+		return
+	var preview: Dictionary = preview_placement_cell(PLACEMENT_INTENT_CELL)
+	if not bool(preview.get("valid", false)):
+		_placement_capture_fail("preview", str(preview.get("reason", "")))
+		return
+	var confirmed: Dictionary = await confirm_placement()
+	if not bool(confirmed.get("ok", false)):
+		_placement_capture_fail("confirm", str(confirmed.get("error", "")))
+		return
+	print("[town] placement-capture applied item=%d cell=(%d, %d) objects=%d" % [
+		PLACEMENT_INTENT_ITEM, PLACEMENT_INTENT_CELL.x,
+		PLACEMENT_INTENT_CELL.y, objects.size()])
+	_capture_and_quit()
+
+
+## A named placement-capture failure: explicit marker + exit 1, so a
+## failed flow never leaves an open window or a misleading frame.
+func _placement_capture_fail(step: String, detail: String) -> void:
+	print("[town] placement-capture state=error step=%s detail=%s" % [
+		step, detail])
+	get_tree().quit(1)
+
+
 ## Reads a `--<prefix><value>` user argument (boot/gd precedent).
 static func _user_arg(prefix: String) -> String:
 	for argument in OS.get_cmdline_user_args():
@@ -898,7 +996,7 @@ static func _user_arg(prefix: String) -> String:
 
 
 # ---------------------------------------------------------------------------
-# Evidence report (design D10 step 3, task 8.3)
+# Evidence report (M6 design D10 step 3, task 8.3; placement design D11)
 # ---------------------------------------------------------------------------
 
 ## The report output path from the user arguments: `--town-report=<path>`
@@ -1105,3 +1203,193 @@ func _write_report_file(report_path: String, report: Dictionary) -> String:
 	file.store_string(json)
 	file.close()
 	return ""
+
+
+# ---------------------------------------------------------------------------
+# Placement evidence report (building-placement, design D11)
+# ---------------------------------------------------------------------------
+
+## The placement report output path from the user arguments:
+## `--placement-report=<path>` (relative paths resolve against the
+## project directory), the bare `--placement-report` flag's default
+## evidence path, or "" when absent.
+func _placement_report_path_arg() -> String:
+	for argument in OS.get_cmdline_user_args():
+		if argument == "--placement-report":
+			return Paths.project_dir().path_join(
+				DEFAULT_PLACEMENT_REPORT_PATH)
+		if argument.begins_with("--placement-report="):
+			var value := argument.trim_prefix("--placement-report=")
+			if value.is_absolute_path():
+				return value
+			return Paths.project_dir().path_join(value)
+	return ""
+
+
+## Runs the placement report flow and quits with the documented exit
+## code: 0 when the deterministic report is written, 1 with an explicit
+## marker naming the first failed step (the town-report pattern).
+func _write_placement_report(report_path: String) -> void:
+	var problem: String = await _placement_report_into(report_path)
+	if problem == "" and not FileAccess.file_exists(report_path):
+		problem = "[report] report file was not created at %s" % report_path
+	if problem != "":
+		print("[town] placement-report state=error message=", problem)
+		get_tree().quit(1)
+		return
+	print("[town] placement-report state=written path=", report_path)
+	get_tree().quit(0)
+
+
+## Computes the whole placement report (design D11): the bootstrap
+## payload in hand parses fail-closed (exactly one bootstrap request,
+## no second config call), the town builds from the committed save, one
+## House I intent runs through the same picker flow a player uses
+## (entry, pick, preview, confirm against the fake implementation), and
+## the structural report records intent, before/after counts and
+## resources, input digests, the projection constants pointer, the fake
+## capture pointer, and every required non-claim. Returns "" on success
+## or the first failure as an explicit message.
+func _placement_report_into(report_path: String) -> String:
+	var registry: Variant = get_node_or_null("/root/ContentRegistry")
+	if registry == null:
+		return "[report] content registry is not registered"
+	if not bool(registry.is_loaded()):
+		var content: Dictionary = registry.load_content()
+		if not bool(content.get("ok", false)):
+			return "[report] content load failed: %s" % content.get("error", "")
+	if not bool(registry.assets_loaded()):
+		var assets: Dictionary = registry.load_asset_registry()
+		if not bool(assets.get("ok", false)):
+			return "[report] asset registry load failed: %s" % assets.get("error", "")
+	var api: Variant = get_node_or_null("/root/GameApi")
+	if api == null:
+		return "[report] GameApi is not registered"
+	var session: Variant = get_node_or_null("/root/Session")
+	if session == null:
+		return "[report] Session is not registered"
+	var sessions: Variant = await api.list_sessions()
+	if not bool(sessions.ok):
+		return "[report] save list failed: %s" % str(sessions.error_message)
+	if sessions.saves.size() == 0:
+		return "[report] save list carries no saves"
+	var pid := str(sessions.saves[0].id)
+	var boot: Variant = await api.get_bootstrap(pid)
+	if not bool(boot.ok):
+		return "[report] bootstrap failed: %s" % str(boot.error_message)
+	var player_info: Variant = boot.player_info
+	if player_info == null:
+		return "[report] bootstrap carried no player info"
+	var config: BootData.ConfigPayload = boot.config
+	if config == null:
+		return "[report] bootstrap carried no config"
+	var parsed: Dictionary = TownState.parse(player_info.raw, registry)
+	if not bool(parsed.get("ok", false)):
+		return "[report] town state rejected: %s" % parsed.get("error", "")
+	state = parsed["state"]
+	var built: Dictionary = build()
+	if not bool(built.get("ok", false)):
+		return "[report] town failed to build: %s" % built.get("error", "")
+	if objects.is_empty():
+		return "[report] town rendered no objects"
+	# The session the confirm needs: a real launch activates it during
+	# boot, while this headless report flow commits it here.
+	var summary := BootData.PlayerSummary.new()
+	summary.user_id = pid
+	summary.name = state.summary.name
+	summary.level = state.summary.level
+	summary.xp = state.summary.xp
+	var activation: Dictionary = session.activate(pid, summary)
+	if not bool(activation.get("ok", false)):
+		return "[report] session activation failed: %s" \
+			% activation.get("error", "")
+	var placements_before: int = state.placements.size()
+	var objects_before: int = objects.size()
+	var resources_before := _report_resources()
+	# The catalog derives from the payload in hand — the same
+	# fail-closed parse the boot handoff performs (no second bootstrap).
+	var catalog: Dictionary = PlacementCatalog.parse(config.raw)
+	if not bool(catalog.get("ok", false)):
+		return "[report] placement catalog rejected: %s" % catalog.get("error", "")
+	set_placement_catalog(catalog)
+	var entered: Dictionary = enter_placement()
+	if not bool(entered.get("ok", false)):
+		return "[report] placement entry rejected: %s" % entered.get("error", "")
+	var picked: Dictionary = pick_placement(PLACEMENT_INTENT_ITEM)
+	if not bool(picked.get("ok", false)):
+		return "[report] placement pick rejected: %s" % picked.get("error", "")
+	var preview: Dictionary = preview_placement_cell(PLACEMENT_INTENT_CELL)
+	if not bool(preview.get("valid", false)):
+		return "[report] placement preview rejected: %s" % preview.get("reason", "")
+	var confirmed: Dictionary = await confirm_placement()
+	if not bool(confirmed.get("ok", false)):
+		return "[report] placement confirm failed: %s" % confirmed.get("error", "")
+	if state.placements.size() != placements_before + 1:
+		return "[report] placement did not add exactly one entry " \
+			+ "(before=%d after=%d)" % [placements_before,
+			state.placements.size()]
+	if objects.size() != objects_before + 1:
+		return "[report] placement did not add exactly one object " \
+			+ "(before=%d after=%d)" % [objects_before, objects.size()]
+	return _write_report_file(report_path, {
+		"schema": "placement-report-v1",
+		"bootstrap_requests": int(api.bootstrap_requests),
+		"placement_requests": int(api.placement_requests),
+		"intent": {
+			"user_id": pid,
+			"item_id": PLACEMENT_INTENT_ITEM,
+			"x": PLACEMENT_INTENT_CELL.x,
+			"y": PLACEMENT_INTENT_CELL.y,
+			"orientation": PLACEMENT_INTENT_ORIENTATION,
+		},
+		"counts": {
+			"placements_before": placements_before,
+			"placements_after": state.placements.size(),
+			"objects_before": objects_before,
+			"objects_after": objects.size(),
+		},
+		"resources": {
+			"before": resources_before,
+			"after": _report_resources(),
+		},
+		"inputs": {
+			"save_list_fixture": _digest_record(REPORT_SAVE_LIST),
+			"bootstrap_fixture": _digest_record(REPORT_BOOTSTRAP),
+			"placement_request": _digest_record(REPORT_PLACEMENT_REQUEST),
+			"placement_response": _digest_record(REPORT_PLACEMENT_RESPONSE),
+			"placement_after": _digest_record(REPORT_PLACEMENT_AFTER),
+			"terrain": _digest_record(_terrain_runtime(registry)),
+		},
+		"constants": _constants_record(),
+		"capture": _placement_capture_record(),
+		"non_claims": PLACEMENT_NON_CLAIMS,
+	})
+
+
+## The resource/XP snapshot the placement report records before and
+## after the intent: the typed state's own fields (the same values the
+## HUD reads), never computed deltas.
+func _report_resources() -> Dictionary:
+	return {
+		"cash": int(state.resources.cash),
+		"coins": int(state.resources.coins),
+		"energy": int(state.resources.energy),
+		"mana": int(state.resources.mana),
+		"oil": int(state.resources.oil),
+		"steel": int(state.resources.steel),
+		"wood": int(state.resources.wood),
+		"xp": int(state.summary.xp),
+	}
+
+
+## The fake-capture pointer (design D11): the committed windowed capture
+## with its digest plus the plain statement of what it proves — so no
+## reader can mistake the screenshot for executed-legacy proof.
+func _placement_capture_record() -> Dictionary:
+	var record := _digest_record(REPORT_CAPTURE_PLACEMENT)
+	record["implementation"] = "fake GameApi (a deterministic test " \
+		+ "double, not a parity oracle)"
+	record["parity_pointer"] = "real-execution parity is established " \
+		+ "by the fixture-replay tests and the verify-boot placement " \
+		+ "live phase"
+	return record

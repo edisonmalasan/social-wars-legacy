@@ -287,8 +287,9 @@ func _placement_catalog_envelope() -> Dictionary:
 ## error in place of the town (never blank), the terminal state records
 ## it, and the standard error marker line is printed. `boot_finished` is
 ## not re-emitted — the boot's own terminal emission already happened.
-## In an evidence capture run (`--town-capture=`) the process exits 1 so
-## a failed capture cannot hang on an open window.
+## In an evidence capture run (`--town-capture=` or
+## `--placement-capture=`) the process exits 1 so a failed capture
+## cannot hang on an open window.
 func _town_fail(code: String, message: String) -> Dictionary:
 	state = "error"
 	error_code = code
@@ -299,7 +300,8 @@ func _town_fail(code: String, message: String) -> Dictionary:
 	visible = true
 	print("[boot] state=error code=%s message=%s" % [code, message])
 	for argument in OS.get_cmdline_user_args():
-		if argument.begins_with("--town-capture="):
+		if argument.begins_with("--town-capture=") \
+				or argument.begins_with("--placement-capture="):
 			get_tree().quit(1)
 			break
 	return {"ok": false,
