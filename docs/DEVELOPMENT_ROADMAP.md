@@ -2932,6 +2932,8 @@ Session
 GameClock
 camera
 basic UI foundation
+Settings
+AudioManager
 ```
 
 Exit:
