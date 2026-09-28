@@ -503,3 +503,69 @@ Explicitly **not** verified: gameplay parity, authentication security,
 progressed-player coverage, served-byte equality for time-dependent fields,
 and any Flash/Ruffle/ActionScript/browser execution (none runs; the network
 is loopback only).
+
+## Town vertical slice
+
+The town slice renders a real legacy town in Godot without Flash: typed
+town state from the existing bootstrap data, one isometric coordinate
+space, the legacy terrain, saved town objects, an authoritative HUD,
+selection, and a bounded camera. This section records the derived
+geometry; the launch flow, visual hierarchy, slice-scene provenance,
+verification commands, and claim limits are documented in the sections
+that follow.
+
+### Isometric projection constants
+
+`scripts/town/iso.gd` commits the only coordinate space the town uses —
+terrain, object footprints, selection hits, and camera bounds all consume
+these constants (one geometry, no second source):
+
+| Constant | Value | Meaning |
+| --- | --- | --- |
+| `TILE_WIDTH` | `TW=40` | tile width in world pixels (2:1 diamond) |
+| `TILE_HEIGHT` | `TH=20` | tile height in world pixels |
+| `GRID_EXTENT` | `100` | legacy grid: integer cells `0..99` on both axes |
+| world rect | `4000x2000` | `Iso.world_rect()`; also the terrain rectangle |
+
+**Derivation** (design D2; executed with committed data, no Flash and no
+bytecode interpretation):
+
+1. *Scale anchor from converted art* — the only size evidence tying pixels
+   to cells is the converted package frames against content footprints:
+   House I's frame (216x144) on a 2x2 footprint and Wild Elephant's frame
+   (171x191) on a 1x1 footprint bound the candidate family; the 90x90
+   thumbnails are fixed-size UI art and were excluded from scale selection.
+2. *Viewable-town criterion* — at the legacy stage size 1400x600 a `TW=40`
+   view spans 35x30 cells, which contains 29 of the 40 fresh-save
+   placements (the densest such window), while thumbnails sit near their
+   natural size against 2x2 footprints (80 px) and converted sprites stay
+   at authentic native bounds (overhang over the footprint is accepted and
+   recorded as provisional presentation; sprites are never scaled).
+3. *Land-fit validation of alignment and orientation* — `mapa1.jpg`
+   (701x514, resolved through ContentRegistry as `mapa1.jpg`, status
+   `passthrough`) is classified land/water by blue-dominance, and every
+   placement's footprint center projects through the committed constants
+   into the image. Recorded residual: **fresh save 39/40 land** — the
+   single water cell is bridge item 929 at (29,48), which lies over the
+   crater lake and is semantically correct — and **Scarlet 549/576 land**,
+   with the residuals concentrated at the grid's far shore/corner
+   extremities plus bridge placements; **0 off-grid** in both. The check
+   is scale-invariant (the terrain texture is stretched to the world
+   rectangle: 5.7x horizontal, 3.9x vertical), so it validates
+   alignment/orientation, not scale.
+
+**Evidence basis:** legacy save coordinate extents (`0..99` across 20+
+saves, placement format `[item, x, y, timestamp, orientation, store, attr,
+player]`), content footprints (`width`/`height`), the two converted
+sprite frames, the 90x90 thumbnail UI art, the Basesec stage (1400x600 at
+30 fps), and the legacy client's static iso-engine identifiers
+(`TILE_SIZE`, `EI_TILE_HEIGHT_PIXELS`, `core.isoengine.isoUtils`,
+`gridWidth`, `gridHeight`, `numCols`, `numRows`).
+
+**Evidence gap and status:** those ABC identifiers exist only as strings —
+their numeric values were **never extracted** from the SWF bytecode. The
+constants above are **derived and provisional**; pixel parity with the
+legacy Flash client is not claimed, and the `x -> lower-right` orientation
+is provisional presentation. Extracting `TILE_SIZE` /
+`EI_TILE_HEIGHT_PIXELS` is recorded as a parity follow-up, not an
+assumption.
