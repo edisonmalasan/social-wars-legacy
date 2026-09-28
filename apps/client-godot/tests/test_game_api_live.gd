@@ -1,12 +1,15 @@
 extends "res://tests/test_base.gd"
 ## Headless GameApi suite for the legacy-v0 implementation (task 3.3, spec
-## "Boot live against Compatibility API").
+## "Boot live against Compatibility API"; extended by the
+## building-placement change's task 3.2 with the placement parity of spec
+## "Place through either implementation").
 ##
 ## Requires a running Compatibility API v0 on loopback — verify-boot.ps1
 ## wraps this suite with `compat_live_phase.py`, which starts
 ## `apps/compat-api/run.py` (disposable corpus) and tears it down again. The
 ## suite compares every live typed result against the fake implementation's,
-## so both must yield the same boot data (time-dependent fields excepted).
+## so both must yield the same boot data and the same placement results
+## (time-dependent fields excepted).
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 
@@ -130,7 +133,125 @@ func run_scenario() -> void:
 		check(failure.summary == null,
 			"live structured failure carries no summary")
 
+	await _check_live_placement(api, endpoint, user_id)
+
 	info("legacy_v0 matched the fake reference over loopback %s" % endpoint)
+
+
+## Placement through both implementations (task 3.2, spec "Place through
+## either implementation"): identical typed shapes, identical authoritative
+## values (both sides derive from the committed fresh save), the live
+## entry's wall-clock timestamp as the only time-dependent field, and the
+## endpoint's structured codes passing through unchanged.
+func _check_live_placement(api: Variant, endpoint: String,
+		user_id: String) -> void:
+	# Fake reference: in-memory state, fixture epoch, fixture-derived values.
+	api.configure("fake")
+	var fake_ref: Variant = await api.place_building(user_id, 1, 51, 39)
+	check(fake_ref is BootData.PlacementResult,
+		"fake place_building returns the typed result")
+	if not (fake_ref is BootData.PlacementResult):
+		return
+	var fake: BootData.PlacementResult = fake_ref
+	check(fake.ok, "fake placement reference resolves: %s"
+		% fake.error_message)
+	if not fake.ok:
+		return
+
+	# The same intent against the running Compatibility API.
+	api.configure("legacy_v0", endpoint)
+	var live_ref: Variant = await api.place_building(user_id, 1, 51, 39)
+	check(live_ref is BootData.PlacementResult,
+		"live place_building returns the typed result")
+	if not (live_ref is BootData.PlacementResult):
+		return
+	var live: BootData.PlacementResult = live_ref
+	check(live.ok, "live placement resolves over loopback: %s"
+		% live.error_message)
+	if not live.ok:
+		return
+	check_eq(live.protocol, fake.protocol,
+		"live placement protocol equals the fake's")
+	check_eq(live.result, "success", "live reports the legacy success result")
+	check(live.placement != null and fake.placement != null,
+		"both placements carry a typed entry")
+	check(live.resources != null and fake.resources != null,
+		"both placements carry typed resources")
+	if live.placement == null or fake.placement == null \
+			or live.resources == null or fake.resources == null:
+		return
+	check_eq(live.placement.item_id, fake.placement.item_id,
+		"placement item id equals the fake's")
+	check_eq(live.placement.x, fake.placement.x,
+		"placement anchor x equals the fake's")
+	check_eq(live.placement.y, fake.placement.y,
+		"placement anchor y equals the fake's")
+	check_eq(live.placement.orientation, fake.placement.orientation,
+		"placement orientation equals the fake's")
+	check_eq(live.placement.player, fake.placement.player,
+		"placement player team equals the fake's")
+	check_eq(live.placement.store.size(), fake.placement.store.size(),
+		"placement store equals the fake's")
+	check(live.placement.attr == fake.placement.attr,
+		"placement attr equals the fake's (live=%s fake=%s)"
+		% [JSON.stringify(live.placement.attr),
+		JSON.stringify(fake.placement.attr)])
+	check(fake.placement.timestamp > 0,
+		"fake entry timestamp is the fixture epoch (deterministic)")
+	check(live.placement.timestamp > 0,
+		"live entry timestamp is a positive wall-clock epoch (time-dependent)")
+	# Same committed fresh save on both sides: authoritative resources
+	# agree, and wood pins both to the documented fixture values.
+	check_eq(live.resources.xp, fake.resources.xp, "xp equals the fake's")
+	check_eq(live.resources.gold, fake.resources.gold,
+		"gold equals the fake's")
+	check_eq(live.resources.wood, fake.resources.wood,
+		"wood equals the fake's")
+	check_eq(live.resources.oil, fake.resources.oil,
+		"oil equals the fake's")
+	check_eq(live.resources.steel, fake.resources.steel,
+		"steel equals the fake's")
+	check_eq(live.resources.cash, fake.resources.cash,
+		"cash equals the fake's")
+	check_eq(live.resources.mana, fake.resources.mana,
+		"mana equals the fake's")
+	check_eq(live.resources.wood, 1970,
+		"wood is the committed fresh 2000 minus the w30 cost")
+
+	# Structured service errors pass through with their original codes.
+	var live_bad_item: Variant = await api.place_building(
+		user_id, 999999999, 51, 39)
+	check(live_bad_item is BootData.PlacementResult,
+		"live unknown item returns the typed result")
+	if live_bad_item is BootData.PlacementResult:
+		var bad_item: BootData.PlacementResult = live_bad_item
+		check(not bad_item.ok, "live unknown item is a structured failure")
+		check_eq(bad_item.error_code, "unknown_item_id",
+			"live structured error passes through with the endpoint's code")
+		check(bad_item.placement == null and bad_item.resources == null,
+			"live structured failure carries no partial payload")
+	var live_bad_grid: Variant = await api.place_building(user_id, 1, 100, 39)
+	check(live_bad_grid is BootData.PlacementResult,
+		"live out-of-grid anchor returns the typed result")
+	if live_bad_grid is BootData.PlacementResult:
+		var bad_grid: BootData.PlacementResult = live_bad_grid
+		check(not bad_grid.ok,
+			"live out-of-grid anchor is a structured failure")
+		check_eq(bad_grid.error_code, "invalid_coordinates",
+			"live grid violation names the endpoint's code")
+		check(bad_grid.placement == null and bad_grid.resources == null,
+			"live grid failure carries no partial payload")
+
+	# The fake derives the same code for the same intent (structured-failure
+	# parity; the double never talks to the service).
+	api.configure("fake")
+	var fake_bad_item: Variant = await api.place_building(
+		user_id, 999999999, 51, 39)
+	check(fake_bad_item is BootData.PlacementResult and not fake_bad_item.ok,
+		"fake fails the same intent offline")
+	if fake_bad_item is BootData.PlacementResult:
+		check_eq(fake_bad_item.error_code, "unknown_item_id",
+			"structured codes match between implementations")
 
 
 ## Endpoint for this run: `--gameapi-endpoint=` user argument, else the

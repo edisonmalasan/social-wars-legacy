@@ -91,7 +91,10 @@ class Placement:
 	## identity with the fixture epoch, never a fixed value.
 	var timestamp := 0
 	var orientation := 0
-	## Legacy `store` / `attr` structures — opaque to presentation code.
+	## Legacy `store` / `attr` structures — opaque to presentation code,
+	## carried in canonical legacy form (integral numbers as `int`, since
+	## the JSON transport widens them on the pinned engine while the legacy
+	## save stores ints; see `_canonicalize`).
 	var store: Array = []
 	var attr: Dictionary = {}
 	var player := 0
@@ -376,8 +379,8 @@ static func _parse_placement_entry(value: Variant) -> Placement:
 	placement.y = int(y)
 	placement.timestamp = int(timestamp)
 	placement.orientation = int(orientation)
-	placement.store = raw[5]
-	placement.attr = raw[6]
+	placement.store = _canonicalize(raw[5])
+	placement.attr = _canonicalize(raw[6])
 	placement.player = int(player)
 	return placement
 
@@ -419,3 +422,30 @@ static func _parse_int(value: Variant) -> Variant:
 		if typed == floor(typed) and absf(typed) <= 9007199254740992.0:
 			return int(typed)
 	return null
+
+
+## Canonical legacy form of a nested `store`/`attr` structure: every
+## integral float becomes `int`, because the JSON transport widens the
+## legacy save's ints to floats on the pinned engine while Dictionary
+## equality is type-strict there (probed: `{"nc": 0} == {"nc": 0.0}` is
+## false). Without this, the two implementations would report the same
+## persisted entry with different value types. Non-integral floats,
+## strings, booleans, and null pass through untouched — only the
+## representation is normalized, never the value.
+static func _canonicalize(value: Variant) -> Variant:
+	if value is float:
+		var typed := float(value)
+		if typed == floor(typed) and absf(typed) <= 9007199254740992.0:
+			return int(typed)
+		return typed
+	if value is Dictionary:
+		var out := {}
+		for key: Variant in value:
+			out[key] = _canonicalize(value[key])
+		return out
+	if value is Array:
+		var out: Array = []
+		for element: Variant in value:
+			out.append(_canonicalize(element))
+		return out
+	return value
