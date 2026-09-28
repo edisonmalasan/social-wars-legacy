@@ -578,6 +578,22 @@ they establish no asset validity, conversion correctness, rendering,
 gameplay parity, or Godot loading (client-side resolution is exercised
 by the Godot asset-ID suite).
 
+Verified offline content-validator commands (Windows x64 CPython 3.9.13):
+
+```bash
+python -B packages/game-content/tools/validate_content.py
+python -B -m unittest discover -s packages/game-content/tests -p test_validate_content.py -v
+```
+
+See `packages/game-content/README.md` (content validator extension) for
+the executable, invocation, four check families, exit codes, evidence
+classification, and containment. These commands validate the committed
+normalized package (22 outputs, 21 schemas, manifest bytes/digests/counts,
+and every cross-domain reference edge) with a read-only standard-library
+tool and establish no source freshness, served-byte equality, content
+validity, asset existence, gameplay parity, or progressed-player
+coverage.
+
 ---
 
 ## Code style
