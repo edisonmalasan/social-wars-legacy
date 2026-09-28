@@ -86,7 +86,7 @@ godot --path apps/client-godot res://scenes/first_render.tscn
   package directory (`packages/game-content/`).
 - Godot discovers and reports engine `4.7.2.stable` exactly.
 - All five headless test suites exit 0 and print `[test] PASS`
-  (observed check counts: loader 123, scene-build 36, project-scope 591,
+  (observed check counts: loader 123, scene-build 36, project-scope 659,
   content-registry 52, asset-ids 50).
 - The three deliberate-failure scenarios exit non-zero **and** print their
   `[test] EXPECTED-FAILURE` markers (no `UNEXPECTED-ACCEPT`).
@@ -296,7 +296,7 @@ powershell -File apps/client-godot/verify-boot.ps1
 ```
 
 It runs, in order: guard baseline → Compatibility API unittest discovery +
-loopback smoke → the eight headless Godot suites → the unreachable-endpoint
+loopback smoke → the ten headless Godot suites → the unreachable-endpoint
 scenario against a port with nothing listening → three live phases → guard
 baseline again → `evidence/boot/boot-report.json`. Each live phase is wrapped
 by `compat_live_phase.py`, which starts `apps/compat-api/run.py`, waits for
@@ -325,6 +325,12 @@ godot --headless --path apps/client-godot -s res://tests/test_camera_controls.gd
 # UI foundation (84 observed checks): pure component, no API and no
 # boot flow; the endpoint argument the loop passes is ignored
 godot --headless --path apps/client-godot -s res://tests/test_ui_foundation.gd
+# Settings (91 observed checks): pure service, no API and no boot flow;
+# the endpoint argument the loop passes is ignored
+godot --headless --path apps/client-godot -s res://tests/test_settings.gd
+# Audio manager (107 observed checks): pure service, no API and no boot
+# flow; the endpoint argument the loop passes is ignored
+godot --headless --path apps/client-godot -s res://tests/test_audio_manager.gd
 # Failure path: the scene must enter the explicit error state (suite exits 0
 # only when it observed it)
 godot --headless --path apps/client-godot -s res://tests/test_boot_scene.gd -- --scenario=unreachable --gameapi-endpoint=http://127.0.0.1:5057
@@ -387,6 +393,52 @@ service, or boot flow (84 observed checks). The slot structure is
 provisional foundation (design D2): no legacy UI behavior has been
 captured, so authentic slot taxonomy, stacking order, and HUD layout
 bind later, with evidence, alongside the M6 HUD work.
+
+The settings suite (OpenSpec `godot-settings-audio`) proves the
+`Settings` autoload's provisional preference contract — both boolean
+preferences start `true` and creation notifies nobody, a commit flips
+exactly one preference with exactly one key-and-value notification, and
+an unchanged request is rejected with `setting_unchanged`, committed
+state untouched, and silence — plus its explicit `ConfigFile`
+persistence: a save/load round trip over a temp file under the ignored
+`.godot/` cache, an absent file (`storage_file_missing`), corrupt
+contents (`storage_read_failed`, read inside an
+`Engine.print_error_messages = false` window because the engine prints
+an `ERROR:` line that `verify-boot.ps1` fails on), the three
+strict-schema violations (`storage_invalid_contents`: missing key,
+non-`boolean` value, unknown key), change-only emission across a load,
+and an unwritable path (`storage_write_failed`); a final source scan
+covers the service's no-clock, raw-persistence, content-loading, and
+no-other-dependency clauses (`ConfigFile` and its `load(` are excluded
+as the sanctioned storage mechanism; 17 tokens). It is the ninth
+hermetic suite `verify-boot.ps1` runs, and it needs no endpoint,
+service, or boot flow (91 observed checks). The contract is provisional
+foundation (design D2): no legacy user-settings behavior exists to
+capture, so authentic preference semantics bind later, with evidence —
+and nothing persists a preference outside the suites yet (no settings
+UI; `load`/`save` are wired by the M6 HUD work).
+
+The audio-manager suite (OpenSpec `godot-settings-audio`) proves the
+`AudioManager` autoload — the cross-cutting `Music`/`SFX` bus owner:
+both buses ensured at startup under `Master` exactly once, unmuted at
+0 dB with both outputs on and nobody notified, each setter committing
+and applying as bus mute (muted if and only if the committed value is
+`false`) with exactly one change-only notification, and the
+unchanged-value and removed-bus rejections failing closed with their
+named errors, committed state and the bus untouched, and silence (the
+removed bus is restored in-suite) — plus the Settings binding: a live
+follow of a committed preference onto the bus, the initial application
+of an already-false preference at a fresh instance's bind (exactly one
+notification), and the fail-soft branch with the Settings autoload
+temporarily removed and restored, both branches asserted; a final
+source scan covers the manager's no-clock, no-persistence, no-content,
+and no-other-dependency clauses (16 tokens; its `/root/Settings`
+binding is the sole allowed cross-service reference). It is the tenth
+hermetic suite `verify-boot.ps1` runs, and it needs no endpoint,
+service, or boot flow (107 observed checks). The contract is
+provisional foundation (design D2): no legacy audio behavior has been
+captured, no sound is played (playback and the committed
+`driver="Dummy"` policy bind with the later sound-content work).
 
 ### Evidence
 
