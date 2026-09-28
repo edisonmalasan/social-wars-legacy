@@ -198,7 +198,12 @@ func _complete() -> void:
 	# behavior is unchanged"); the marker, summary, error-state, and
 	# exit-code contract above is untouched either way.
 	if DisplayServer.get_name() != "headless":
-		transition_to_town()
+		# Deferred: this `_ready` chain runs while the tree is still
+		# attaching the boot scene, and attaching the town then would be
+		# rejected ("parent node is busy setting up children"). At idle
+		# the handoff runs synchronously and keeps its `{ok, error}`
+		# contract for direct callers (tests).
+		transition_to_town.call_deferred()
 
 
 ## Windowed boot-to-town handoff (spec "Windowed boot-to-town
