@@ -201,9 +201,28 @@ class TestStructureManifest(unittest.TestCase):
             manifest["quests"]["counts"]["quests"] = 90
             save_json(manifest_path, manifest)
             problems = failure_problems(self, repo)
-            assert_problem(
+            item = assert_problem(
                 self, problems, validator.FAMILY_MANIFEST,
                 file="quests.json", field="quests")
+            self.assertIn("section quests", item["message"])
+            self.assertIn("90", item["message"])
+            self.assertIn("91", item["message"])
+
+    def test_record_field_gates(self):
+        with tempfile.TemporaryDirectory() as temp:
+            repo = copy_repo(temp)
+            manifest_path = Path(repo) / "packages/game-content/manifest.json"
+            manifest = load_json(manifest_path)
+            manifest["quests"]["result"] = "failed"
+            del manifest["quests"]["policy"]
+            del manifest["quests"]["schema_version"]
+            save_json(manifest_path, manifest)
+            problems = failure_problems(self, repo)
+            for field in ("quests.result", "quests.policy",
+                          "quests.schema_version"):
+                assert_problem(
+                    self, problems, validator.FAMILY_STRUCTURE,
+                    field=field)
 
     def test_missing_section_record_fails(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -314,6 +333,14 @@ class TestSchemaConformance(unittest.TestCase):
         self.assertIn(field, entry)
         mutated = copy.deepcopy(entry)
         mutated[field] = "not-a-number"
+        problems = validator.check_entry(mutated, self.schemas[name])
+        self.assertIn((field, "type mismatch: expected integer"), problems)
+
+    def test_bool_is_never_an_integer(self):
+        name, field, spec = self.find_property(
+            lambda s: s.get("type") == "integer" and "const" not in s)
+        mutated = copy.deepcopy(self.entries(name)[0])
+        mutated[field] = True
         problems = validator.check_entry(mutated, self.schemas[name])
         self.assertIn((field, "type mismatch: expected integer"), problems)
 
@@ -509,16 +536,14 @@ class TestDependencies(unittest.TestCase):
                 problems)
 
     def test_inventory_key_unresolvable(self):
-        with tempfile.TemporaryDirectory() as temp:
-            repo = copy_repo(temp)
-            target = None
-            for name in ("buildings.json", "units.json", "specials.json"):
-                for index, entry in enumerate(load_json(NORMALIZED / name)):
-                    if isinstance(entry.get("inventory_ids"), dict):
-                        target = (name, index)
-                        break
-                if target:
+        target = None
+        for name in ("buildings.json", "units.json", "specials.json"):
+            for index, entry in enumerate(load_json(NORMALIZED / name)):
+                if isinstance(entry.get("inventory_ids"), dict):
+                    target = (name, index)
                     break
+            if target:
+                break
         self.assertIsNotNone(target, "no items entry carries inventory_ids")
         with tempfile.TemporaryDirectory() as temp:
             repo = copy_repo(temp)
@@ -573,6 +598,19 @@ class TestDependencies(unittest.TestCase):
                 self, problems, validator.FAMILY_DEPENDENCY,
                 file="collections.json", field="prize_refs",
                 message_part="derived")
+
+    def test_prize_refs_unresolvable(self):
+        with tempfile.TemporaryDirectory() as temp:
+            repo = copy_repo(temp)
+
+            def change(entries):
+                entries[0]["prize_refs"][0] = "999999999"
+            mutate(repo, "collections.json", change)
+            problems = failure_problems(self, repo)
+            assert_problem(
+                self, problems, validator.FAMILY_DEPENDENCY,
+                file="collections.json", field="prize_refs",
+                message_part="unresolvable reference")
 
     def test_ranking_refs_drift_caught(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -634,6 +672,45 @@ class TestDependencies(unittest.TestCase):
                 file="darts_items.json", field="extra_ref",
                 message_part="derived")
 
+    def test_unit_collection_refs_unresolvable(self):
+        with tempfile.TemporaryDirectory() as temp:
+            repo = copy_repo(temp)
+
+            def change(entries):
+                entries[0]["unit_refs"][0] = "999999999"
+            mutate(repo, "unit_collection_categories.json", change)
+            problems = failure_problems(self, repo)
+            assert_problem(
+                self, problems, validator.FAMILY_DEPENDENCY,
+                file="unit_collection_categories.json", field="unit_refs",
+                message_part="unresolvable reference")
+
+    def test_darts_refs_unresolvable(self):
+        with tempfile.TemporaryDirectory() as temp:
+            repo = copy_repo(temp)
+
+            def change(entries):
+                entries[0]["item_refs"][0] = "999999999"
+            mutate(repo, "darts_items.json", change)
+            problems = failure_problems(self, repo)
+            assert_problem(
+                self, problems, validator.FAMILY_DEPENDENCY,
+                file="darts_items.json", field="item_refs",
+                message_part="unresolvable reference")
+
+    def test_darts_extra_ref_unresolvable(self):
+        with tempfile.TemporaryDirectory() as temp:
+            repo = copy_repo(temp)
+
+            def change(entries):
+                entries[0]["extra_ref"] = "999999999"
+            mutate(repo, "darts_items.json", change)
+            problems = failure_problems(self, repo)
+            assert_problem(
+                self, problems, validator.FAMILY_DEPENDENCY,
+                file="darts_items.json", field="extra_ref",
+                message_part="unresolvable reference")
+
     def test_offer_refs_drift_caught(self):
         with tempfile.TemporaryDirectory() as temp:
             repo = copy_repo(temp)
@@ -651,6 +728,40 @@ class TestDependencies(unittest.TestCase):
                 self, problems, validator.FAMILY_DEPENDENCY,
                 file="offer_packs.json", field="item_refs",
                 message_part="derived")
+
+    def test_offer_pair_first_unresolvable(self):
+        with tempfile.TemporaryDirectory() as temp:
+            repo = copy_repo(temp)
+
+            def change(entries):
+                for entry in entries:
+                    if entry["items_shape"] == "pairs":
+                        entry["items"][0][0] = 999999999
+                        return
+                raise AssertionError("no pairs offer available")
+            mutate(repo, "offer_packs.json", change)
+            problems = failure_problems(self, repo)
+            assert_problem(
+                self, problems, validator.FAMILY_DEPENDENCY,
+                file="offer_packs.json", field="item_refs",
+                message_part="unresolvable offer pair reference")
+
+    def test_offer_group_leaf_unresolvable(self):
+        with tempfile.TemporaryDirectory() as temp:
+            repo = copy_repo(temp)
+
+            def change(entries):
+                for entry in entries:
+                    if entry["items_shape"] == "groups":
+                        entry["items"][0][0] = 999999999
+                        return
+                raise AssertionError("no groups offer available")
+            mutate(repo, "offer_packs.json", change)
+            problems = failure_problems(self, repo)
+            assert_problem(
+                self, problems, validator.FAMILY_DEPENDENCY,
+                file="offer_packs.json", field="item_refs",
+                message_part="unresolvable offer group reference")
 
     def test_offer_unresolvable_leaf_caught(self):
         with tempfile.TemporaryDirectory() as temp:
