@@ -3,7 +3,8 @@ extends Node
 ## to Compatibility API v0 (design D5, specs "Boot live against Compatibility
 ## API", "Place through either implementation", "Purchase through either
 ## implementation", "Move through either implementation", "Sell through
-## either implementation", and "Upgrade through either implementation").
+## either implementation", "Upgrade through either implementation", and
+## "Construction through either implementation").
 ##
 ## This is the ONLY project file allowed to name the compat endpoint or to
 ## use the built-in HTTP request/enumeration types; the scope test restricts
@@ -24,6 +25,7 @@ const MOVE_PATH := "/v0/move"
 const SELL_PATH := "/v0/sell"
 const STORE_PATH := "/v0/store"
 const UPGRADE_PATH := "/v0/upgrade"
+const CONSTRUCTION_PATH := "/v0/construction"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -215,6 +217,36 @@ func upgrade_building(user_id: String,
 			str(outcome.get("code", "bad_response")),
 			str(outcome.get("message", "")))
 	return BootData.parse_upgrade(outcome.get("payload"))
+
+
+## One construction intent over loopback HTTP: the client sends only the intent
+## (`user_id`, the legacy `item_index` of an existing placement, and ONE action
+## of the closed vocabulary) — no duration, no countdown, no price, no
+## resource deltas. The service derives the legacy command and every argument
+## from committed content and the row's own state, the start duration from the
+## item's committed `build_time` (design D2/D3), so the typed result's two
+## rows, resolved action, and resources are authoritative (design D5). The row
+## as read BEFORE execution and the row re-read AFTER it are parsed by the one
+## shared entry parser every other response uses.
+##
+## Structured service errors pass through with their original codes — notably
+## `unknown_item_index` for a stale or unknown index, `invalid_action` for an
+## action outside the closed set, and `no_build_time` for a placement whose
+## item has no resolvable positive committed build time, all of which the
+## client surfaces instead of building anything; transport failures keep the
+## boot failure rules, never a partial payload.
+func build_construction(user_id: String, item_index: int,
+		action: String) -> BootData.ConstructionResult:
+	var outcome := await _call("POST", CONSTRUCTION_PATH, JSON.stringify({
+		"user_id": user_id,
+		"item_index": item_index,
+		"action": action,
+	}))
+	if not outcome.get("ok", false):
+		return BootData.construction_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return BootData.parse_construction(outcome.get("payload"))
 
 
 ## One HTTP round trip. Success returns `{ok: true, payload: Dictionary}`;

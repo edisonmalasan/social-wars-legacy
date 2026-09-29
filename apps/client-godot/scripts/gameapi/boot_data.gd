@@ -36,6 +36,17 @@ extends RefCounted
 ## is the documented time-dependent field (the purchase half stamps a fresh
 ## wall-clock epoch), so no test asserts it by value.
 ##
+## The construction command needs its own result class because its three
+## actions share ONE envelope that is two-sided and adds the action the
+## service resolved: the row AS READ BEFORE EXECUTION (`previous`, the very
+## row the client named) and the row re-read from the save after execution
+## (`row`, carrying the countdown, the click counter, or neither). Both sides
+## are the same shape, so both go through the one typed entry parser every
+## other response uses — a row can never be read with two rule sets
+## (building-construction design D3/D5). The row's start instant is the
+## documented time-dependent field (legacy stamps it with `time_now()`), so no
+## test asserts it by value.
+##
 ## Presentation code never receives raw transport dictionaries: every
 ## GameApi operation returns one of the result classes below, and the two
 ## legacy JSON payloads (game config, player info) are wrapped in payload
@@ -46,6 +57,13 @@ extends RefCounted
 
 ## The v0 protocol identifier every envelope must carry.
 const PROTOCOL := "compat-v0"
+
+## The closed action vocabulary of the v0 construction endpoint (building-
+## construction design D2). These are the endpoint's OWN outcome names, NOT
+## legacy command names: the client chooses an outcome and the service chooses
+## the legacy command. The set is closed and echoed exactly as sent, so a
+## response naming anything else is a `bad_response`, never a guess.
+const CONSTRUCTION_ACTIONS := ["start", "click", "finish"]
 
 
 ## One saved village exactly as the v0 session list reports it.
@@ -337,6 +355,54 @@ class UpgradeResult:
 ## Structured failure for `upgrade_building()` (never a partial payload).
 static func upgrade_failure(code: String, message: String) -> UpgradeResult:
 	var result := UpgradeResult.new()
+	result.ok = false
+	result.error_code = code
+	result.error_message = message
+	return result
+
+
+## Result of `build_construction()`: the legacy result plus the two-sided
+## authoritative superset and the action the service resolved
+## (building-construction design D3/D5) — the eight-field row AS READ BEFORE
+## EXECUTION (`previous`, the row the client named) AND the same row RE-READ
+## FROM THE SAVE after execution (`row`, carrying the recorded countdown, the
+## raised click counter, or neither) — plus the current resources.
+##
+## The resolved `action` is echoed exactly as the service received it, so the
+## client renders the same vocabulary it sent. The derived vector is NEUTRAL,
+## so a construction claims **NO building cost of any kind**: the committed
+## configuration records no price for building, and the global that does
+## (`BUILD_SPEEDUP_PRICING`) prices a speedup, which is out of scope.
+##
+## `row.timestamp` is the documented time-dependent field: a start re-stamps
+## it with the wall clock, so it is asserted as a positive integer and never
+## by value.
+class ConstructionResult:
+	extends RefCounted
+	var ok := false
+	var protocol := ""
+	var game_version := ""
+	## Wall-clock seconds the legacy server stamped (a time-dependent field,
+	## so tests assert positivity, never a fixed value).
+	var server_time := 0
+	## The legacy result string ("success"); "" on failure.
+	var result := ""
+	## The row exactly as it was read before execution.
+	var previous: Placement = null
+	## The row re-read from the save after execution.
+	var row: Placement = null
+	## The action the service resolved, echoed from the closed vocabulary
+	## ("start", "click", "finish"); "" on failure.
+	var action := ""
+	var resources: Resources = null
+	var error_code := ""
+	var error_message := ""
+
+
+## Structured failure for `build_construction()` (never a partial payload).
+static func construction_failure(code: String,
+		message: String) -> ConstructionResult:
+	var result := ConstructionResult.new()
 	result.ok = false
 	result.error_code = code
 	result.error_message = message
@@ -637,6 +703,64 @@ static func parse_upgrade(payload: Variant) -> UpgradeResult:
 	return result
 
 
+## Parses a v0 construction envelope — success or structured error — into the
+## typed result. Shared by `FakeApi` (which synthesizes the envelope from the
+## committed construction fixture after applying the documented in-memory
+## semantics) and `LegacyV0Api` (which decodes the HTTP body), so both
+## implementations yield the same typed shape by construction. BOTH rows go
+## through the SAME fail-closed entry parser the placement, sell, store, and
+## upgrade responses use (design D3/D5): one row rule, six entry points. The
+## resolved action must name the closed vocabulary (design D2), so a response
+## echoing an unknown value is a `bad_response` rather than a guess.
+static func parse_construction(payload: Variant) -> ConstructionResult:
+	if not (payload is Dictionary):
+		return construction_failure("bad_response",
+			"response is not a JSON object")
+	var envelope: Dictionary = payload
+	if envelope.get("ok") != true:
+		return _construction_error(envelope)
+	if str(envelope.get("protocol", "")) != PROTOCOL:
+		return construction_failure("protocol_mismatch",
+			"expected protocol %s, got %s" % [PROTOCOL,
+			str(envelope.get("protocol"))])
+	if str(envelope.get("result", "")) != "success":
+		return construction_failure("bad_response",
+			"construction response did not report the legacy success result")
+	var previous := _parse_placement_entry(envelope.get("previous"))
+	if previous == null:
+		return construction_failure("bad_response",
+			"previous row is not the legacy eight-field array")
+	var row := _parse_placement_entry(envelope.get("row"))
+	if row == null:
+		return construction_failure("bad_response",
+			"post-execution row is not the legacy eight-field array")
+	var action := str(envelope.get("action", ""))
+	if not CONSTRUCTION_ACTIONS.has(action):
+		return construction_failure("bad_response",
+			"action '%s' is outside the documented construction set" % action)
+	var resources_raw: Variant = envelope.get("resources")
+	if not (resources_raw is Dictionary):
+		return construction_failure("bad_response",
+			"construction response carries no resources object")
+	var resources := _parse_resources(resources_raw)
+	if resources == null:
+		return construction_failure("bad_response",
+			"construction resources are not seven non-negative integers")
+	var result := ConstructionResult.new()
+	result.ok = true
+	result.protocol = PROTOCOL
+	result.game_version = str(envelope.get("game_version", ""))
+	result.server_time = _parse_epoch(envelope.get("server_time"))
+	if result.server_time < 0:
+		return construction_failure("bad_response", "server_time is not a number")
+	result.result = "success"
+	result.previous = previous
+	result.row = row
+	result.action = action
+	result.resources = resources
+	return result
+
+
 ## The storage mapping -> `{str(item_id): int}` with integral floats
 ## canonicalized to ints (the JSON transport widens them on the pinned engine
 ## while Dictionary equality is type-strict there — the same tolerance
@@ -819,6 +943,21 @@ static func _upgrade_error(envelope: Dictionary) -> UpgradeResult:
 		code = str(typed.get("code", code))
 		message = str(typed.get("message", message))
 	return upgrade_failure(code, message)
+
+
+## Structured error fields of a failed construction envelope (code + message)
+## — the same one envelope rule the other six commands use, so a code the
+## service named (`no_build_time`, `unknown_item_index`, `invalid_action`,
+## `internal_error`, …) reaches the client unchanged.
+static func _construction_error(envelope: Dictionary) -> ConstructionResult:
+	var code := "bad_response"
+	var message := "response reported failure without a structured error"
+	var error: Variant = envelope.get("error")
+	if error is Dictionary:
+		var typed: Dictionary = error
+		code = str(typed.get("code", code))
+		message = str(typed.get("message", message))
+	return construction_failure(code, message)
 
 
 ## Eight-field legacy entry -> typed `Placement`; null when malformed

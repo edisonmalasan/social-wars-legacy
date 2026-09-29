@@ -9,14 +9,16 @@ extends "res://tests/test_base.gd"
 ## through either implementation", by `building-store` with the store
 ## parity of spec "Store through either implementation", and by
 ## `building-upgrade` with the upgrade parity of spec "Upgrade through either
-## implementation").
+## implementation", and by `building-construction` with the construction
+## parity of spec "Construction through either implementation").
 ##
 ## Requires a running Compatibility API v0 on loopback — verify-boot.ps1
 ## wraps this suite with `compat_live_phase.py`, which starts
 ## `apps/compat-api/run.py` (disposable corpus) and tears it down again. The
 ## suite compares every live typed result against the fake implementation's,
 ## so both must yield the same boot data and the same placement, purchase,
-## move, sell, store, and upgrade results (time-dependent fields excepted).
+## move, sell, store, upgrade, and construction results (time-dependent fields
+## excepted).
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 
@@ -83,6 +85,29 @@ const UPGRADE_NO_PATH_ITEM := 929
 ## `unknown_item_index`, so legacy's silent no-op is never reported as a
 ## success.
 const UPGRADE_UNKNOWN_INDEX := 9999
+## The executed-legacy construction transaction's target: the Turret I (item
+## 22) at legacy map key 11, anchored at (58,48), whose row is mutated IN
+## PLACE through the three actions (start, click, finish) — the same key and
+## cell throughout, which is what this line's endpoint proves per action. Every
+## placed row of the corpus resolves a positive committed build time, so no
+## `no_build_time` failure is reachable here (the compat suite owns that path by
+## stubbing the accessor, and the fake mirrors it over an in-memory row).
+const CONSTRUCTION_ITEM := 22
+const CONSTRUCTION_INDEX := 11
+const CONSTRUCTION_CELL := Vector2i(58, 48)
+## The item's committed build time and click requirement: the start countdown
+## the service derives and the threshold the client compares against (no
+## legacy branch compares anything).
+const CONSTRUCTION_BUILD_TIME := 5
+const CONSTRUCTION_CLICKS := 1
+const CONSTRUCTION_START := "start"
+const CONSTRUCTION_CLICK := "click"
+const CONSTRUCTION_FINISH := "finish"
+## An integer index that names no row in the corpus save: the construction
+## endpoint resolves it before executing and answers 404
+## `unknown_item_index`, so legacy's silent no-op is never reported as a
+## success.
+const CONSTRUCTION_UNKNOWN_INDEX := 9999
 
 
 func run_scenario() -> void:
@@ -207,6 +232,7 @@ func run_scenario() -> void:
 	await _check_live_sell(api, endpoint, user_id)
 	await _check_live_store(api, endpoint, user_id)
 	await _check_live_upgrade(api, endpoint, user_id)
+	await _check_live_construction(api, endpoint, user_id)
 	# The live corpus now carries every mutating transaction, so this suite's
 	# parity claim is stated once, explicitly: the two implementations are
 	# compared on the fields each own, and each side's resource bag is
@@ -1072,6 +1098,223 @@ func _check_live_upgrade(api: Variant, endpoint: String,
 		% [UPGRADE_INDEX, live.upgraded.x, live.upgraded.y,
 			live.upgraded.item_id]
 		+ "xp=%d gold=%d" % [live.resources.xp, live.resources.gold])
+
+
+## Construction through both implementations (task 3.3, spec "Construction
+## through either implementation"): the three actions walked over ONE row, each
+## asserted against the endpoint's OWN per-action post-condition — a start
+## carries the derived countdown, a click carries a counter of at least one, a
+## completion carries none — plus the reused key and cell, the two rows, the
+## resolved action, and the neutral resource vector. The fake reference is
+## compared on every stable field, so both implementations must answer the same
+## typed shapes.
+func _check_live_construction(api: Variant, endpoint: String,
+		user_id: String) -> void:
+	api.configure("legacy_v0", endpoint)
+	var resources_before: BootData.Resources = await _live_resources(api,
+		endpoint, user_id)
+	check(resources_before != null,
+		"the live corpus pre-construction resources resolve")
+	var row_before: Variant = await _live_row(api, endpoint, user_id,
+		CONSTRUCTION_INDEX)
+	check(row_before != null, "the live corpus pre-construction row resolves")
+	if row_before == null:
+		return
+	var prior := row_before as Array
+	var started: Variant = await api.build_construction(user_id,
+		CONSTRUCTION_INDEX, CONSTRUCTION_START)
+	check(started is BootData.ConstructionResult,
+		"live build_construction returns the typed result")
+	if not (started is BootData.ConstructionResult):
+		return
+	var first: BootData.ConstructionResult = started
+	check(first.ok, "live construction start resolves over loopback: %s"
+		% first.error_message)
+	if not first.ok or first.previous == null or first.row == null \
+			or first.resources == null:
+		return
+	check_eq(first.protocol, BootData.PROTOCOL,
+		"live construction protocol is compat-v0")
+	check(first.game_version != "",
+		"the live construction response carries the game version")
+	check(first.server_time > 0,
+		"live server_time is a positive wall-clock epoch (time-dependent)")
+	check_eq(first.result, "success",
+		"live construction reports the legacy success result")
+	check_eq(first.action, CONSTRUCTION_START,
+		"the live start echoes the action it resolved")
+	check_eq(first.previous.item_id, int(prior[0]),
+		"the live previous row names the corpus's own item")
+	check_eq([first.previous.x, first.previous.y], [int(prior[1]), int(prior[2])],
+		"the live previous row carries the corpus's own cell")
+	# The start reuses the same key and cell and records the derived countdown
+	# server-side: no client value can influence it (design D2).
+	check_eq(first.row.item_id, CONSTRUCTION_ITEM,
+		"the live post-execution row keeps the row's own item")
+	check_eq([first.row.x, first.row.y], [int(prior[1]), int(prior[2])],
+		"the live post-execution row sits at the pre-execution cell (the key "
+		+ "is reused)")
+	check(first.row.timestamp > int(prior[3]),
+		"the live post-execution row is freshly stamped (time-dependent field, "
+		+ "never asserted by value)")
+	var countdown: Variant = (first.row.attr as Dictionary).get("cp", null)
+	check_eq(countdown, CONSTRUCTION_BUILD_TIME,
+		"the live start recorded the item's committed build time as the "
+		+ "countdown (the endpoint's own post-condition)")
+	check(not (first.row.attr as Dictionary).has("nc"),
+		"the live start wrote no click counter of its own")
+
+	# --- the click: the counter is raised, the countdown is left alone.
+	var clicked: Variant = await api.build_construction(user_id,
+		CONSTRUCTION_INDEX, CONSTRUCTION_CLICK)
+	check(clicked is BootData.ConstructionResult and clicked.ok,
+		"live construction click resolves over loopback")
+	if not (clicked is BootData.ConstructionResult) or not clicked.ok:
+		return
+	var second: BootData.ConstructionResult = clicked
+	check_eq(second.action, CONSTRUCTION_CLICK, "the live click echoes its action")
+	var raised: Variant = (second.row.attr as Dictionary).get("nc", null)
+	check(raised != null and int(raised) >= 1,
+		"the live click recorded a counter of at least 1 (the endpoint's own "
+		+ "post-condition)")
+	check_eq((second.row.attr as Dictionary).get("cp", null),
+		CONSTRUCTION_BUILD_TIME,
+		"the live click left the recorded countdown alone")
+	check_eq([second.row.x, second.row.y], [int(prior[1]), int(prior[2])],
+		"the live click reused the very same cell")
+
+	# --- the completion: the counter is consumed, the countdown survives.
+	var finished: Variant = await api.build_construction(user_id,
+		CONSTRUCTION_INDEX, CONSTRUCTION_FINISH)
+	check(finished is BootData.ConstructionResult and finished.ok,
+		"live construction finish resolves over loopback")
+	if not (finished is BootData.ConstructionResult) or not finished.ok:
+		return
+	var third: BootData.ConstructionResult = finished
+	check_eq(third.action, CONSTRUCTION_FINISH,
+		"the live completion echoes its action")
+	check(not (third.row.attr as Dictionary).has("nc"),
+		"the live completion consumed the click counter (the endpoint's own "
+		+ "post-condition)")
+	check_eq((third.row.attr as Dictionary).get("cp", null),
+		CONSTRUCTION_BUILD_TIME,
+		"the live completion left the recorded countdown alone")
+	check_eq([third.row.x, third.row.y], [int(prior[1]), int(prior[2])],
+		"the live completion reused the very same cell")
+	check_eq(int(third.row.player), int(prior[7]),
+		"the live completion kept the row's own player field")
+	# The neutral vector changes no resource, so no building cost is claimed.
+	if resources_before != null:
+		for key in ["gold", "wood", "oil", "steel", "mana", "xp", "cash"]:
+			check_eq(int(third.resources.get(key)), int(resources_before.get(key)),
+				"%s is untouched by the construction (neutral vector, design D4)"
+					% key)
+	var row_after: Variant = await _live_row(api, endpoint, user_id,
+		CONSTRUCTION_INDEX)
+	check(row_after != null, "the live corpus post-construction row resolves")
+	if row_after != null:
+		check_eq([int((row_after as Array)[1]), int((row_after as Array)[2])],
+			[int(prior[1]), int(prior[2])],
+			"the corpus still holds that cell (the key was reused, not re-keyed)")
+		check_eq(int((row_after as Array)[0]), CONSTRUCTION_ITEM,
+			"the corpus still holds the row's own item")
+
+	# Fake reference: an independent in-memory state over the committed
+	# construction-fixture before-state, walked through the same three steps.
+	# Only the fields BOTH sides own are compared: this phase's live corpus has
+	# already executed the move transaction, which repositions the very row
+	# under construction, so the live row's cell is the CORPUS's own cell while
+	# the fake's is its fixture's. Each side's cell is therefore compared
+	# against its own pre-transaction state (asserted above for the live side)
+	# and never against the other implementation's.
+	api.configure("fake")
+	for step in [CONSTRUCTION_START, CONSTRUCTION_CLICK, CONSTRUCTION_FINISH]:
+		var fake: Variant = await api.build_construction(user_id,
+			CONSTRUCTION_INDEX, str(step))
+		check(fake is BootData.ConstructionResult and fake.ok,
+			"fake construction %s resolves offline" % step)
+		if not (fake is BootData.ConstructionResult) or not fake.ok:
+			continue
+		var typed: BootData.ConstructionResult = fake
+		check_eq(typed.action, str(step),
+			"the fake echoes the %s action too" % step)
+		var live_result: BootData.ConstructionResult = null
+		match str(step):
+			CONSTRUCTION_START:
+				live_result = first
+			CONSTRUCTION_CLICK:
+				live_result = second
+			_:
+				live_result = third
+		var live_row: BootData.Placement = live_result.row
+		check_eq(typed.row.item_id, live_row.item_id,
+			"live and fake %s rows name the same item" % step)
+		check_eq(typed.row.orientation, live_row.orientation,
+			"live and fake %s rows carry the same orientation" % step)
+		check_eq(typed.row.player, live_row.player,
+			"live and fake %s rows carry the same player field" % step)
+		check_eq(typed.previous.item_id, live_result.previous.item_id,
+			"live and fake %s previous rows name the same item" % step)
+		check_eq(typed.previous.attr, live_result.previous.attr,
+			"live and fake %s previous rows carry the same attribute bag"
+				% step)
+		check(typed.row.timestamp > 0,
+			"the fake's %s row carries the capture's recorded epoch (a "
+			% step + "time-dependent field, never compared by value)")
+		check_eq((typed.row.attr as Dictionary).get("cp", null),
+			(live_row.attr as Dictionary).get("cp", null),
+			"live and fake %s rows record the same countdown" % step)
+		check_eq((typed.row.attr as Dictionary).get("nc", null),
+			(live_row.attr as Dictionary).get("nc", null),
+			"live and fake %s rows record the same click counter" % step)
+		check_eq(typed.row.x, CONSTRUCTION_CELL.x,
+			"the fake's %s row stays at the fixture's own cell" % step)
+
+	# Structured service errors pass through with their original codes, and the
+	# fake derives the same codes for the same intents offline.
+	api.configure("legacy_v0", endpoint)
+	var live_unknown: Variant = await api.build_construction(user_id,
+		CONSTRUCTION_UNKNOWN_INDEX, CONSTRUCTION_START)
+	check(live_unknown is BootData.ConstructionResult,
+		"the live unknown index returns the typed result")
+	if live_unknown is BootData.ConstructionResult:
+		var unknown: BootData.ConstructionResult = live_unknown
+		check(not unknown.ok,
+			"an index the corpus does not name is a structured failure")
+		check_eq(unknown.error_code, "unknown_item_index",
+			"the live structured error passes through with the endpoint's code")
+		check(unknown.previous == null and unknown.row == null
+			and unknown.resources == null,
+			"the live structured failure carries no partial payload")
+	var live_bad_action: Variant = await api.build_construction(user_id,
+		CONSTRUCTION_INDEX, "activate")
+	check(live_bad_action is BootData.ConstructionResult
+		and not live_bad_action.ok,
+		"a legacy command name is never accepted by the endpoint")
+	if live_bad_action is BootData.ConstructionResult:
+		check_eq((live_bad_action as BootData.ConstructionResult).error_code,
+			"invalid_action",
+			"the live invalid action passes through with the endpoint's code")
+	api.configure("fake")
+	var fake_unknown: Variant = await api.build_construction(user_id,
+		CONSTRUCTION_UNKNOWN_INDEX, CONSTRUCTION_START)
+	check(fake_unknown is BootData.ConstructionResult and not fake_unknown.ok,
+		"fake fails the same intent offline")
+	if fake_unknown is BootData.ConstructionResult:
+		check_eq(fake_unknown.error_code, "unknown_item_index",
+			"structured codes match between implementations")
+	var fake_bad_action: Variant = await api.build_construction(user_id,
+		CONSTRUCTION_INDEX, "add_click")
+	check(fake_bad_action is BootData.ConstructionResult and not fake_bad_action.ok,
+		"the fake refuses a legacy command name offline too")
+	if fake_bad_action is BootData.ConstructionResult:
+		check_eq(fake_bad_action.error_code, "invalid_action",
+			"the invalid-action code matches between implementations")
+	print("[test] live-construction applied item_index=%d cell=(%d, %d) "
+		% [CONSTRUCTION_INDEX, third.row.x, third.row.y]
+		+ "countdown=%d clicks_consumed=true xp=%d gold=%d" % [
+			int((third.row.attr as Dictionary).get("cp", 0)),
+			third.resources.xp, third.resources.gold])
 
 
 ## The corpus's own eight-field row at one legacy key, read from its

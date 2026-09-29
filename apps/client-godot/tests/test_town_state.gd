@@ -33,6 +33,16 @@ extends "res://tests/test_base.gd"
 ##               verbatim key instead), and the pure key rule covers digit
 ##               strings, int keys, `0`, negatives, non-numeric, empty, and
 ##               non-scalar keys;
+##   construction the typed construction state (building-construction task
+##               4.1, design D5): a row with no construction state records
+##               none of the three facts, a counter-only row records the
+##               counter, a countdown-with-counter row records both plus the
+##               row's start instant, a countdown-only row records the
+##               countdown and the start instant, a zero timestamp yields no
+##               start instant (nothing stamped the row), a non-object bag
+##               records NO state and is marked unreadable without rejecting
+##               the delivered save, and a present-but-invalid counter or
+##               countdown each fail closed naming the row;
 ##   village     the preserved `villages/Scarlet.json` (`maps[0]` shape)
 ##               parses: 576 placements, the six content-unknown ids
 ##               recorded, House I and Wild Elephant resolved.
@@ -80,6 +90,7 @@ func run_scenario() -> void:
 	_check_absent_field(payload, registry)
 	_check_storage(payload, registry)
 	_check_addressable_keys(payload, registry)
+	_check_construction_state(payload, registry)
 	_check_registry_precondition()
 	_check_village_parse(registry)
 
@@ -445,6 +456,185 @@ func _check_addressable_keys(payload: Variant, registry: Variant) -> void:
 		"an addressable row stays addressable beside unusable keys")
 
 
+## The typed construction state (building-construction task 4.1, design D5):
+## the click counter, the recorded countdown, and the start instant are each
+## ABSENT when the row records none, they are read from the row's own attribute
+## bag in the one shared placement parser, and every present-but-invalid value
+## fails closed naming the row. The pure accessor the flow helpers read is the
+## same rule set, so a row can never be read two ways.
+func _check_construction_state(payload: Variant, registry: Variant) -> void:
+	# The committed corpus itself: every fresh row was placed before the
+	# corpus was recorded, so every bag is empty and no row is building.
+	var result: Dictionary = TownState.parse(payload, registry)
+	check(bool(result.get("ok", false)),
+		"the fresh save parses for the construction check: %s"
+		% result.get("error"))
+	if not bool(result.get("ok", false)):
+		return
+	var state = result["state"]
+	var without_state := 0
+	for placement in state.placements:
+		var construction: Dictionary = TownState.construction_of(placement)
+		if not bool(construction.get("ok", false)):
+			continue
+		if placement.clicks == null and placement.countdown == null \
+				and placement.started_at == null:
+			without_state += 1
+	check_eq(without_state, state.placements.size(),
+		"no row of the fresh corpus records construction state (attr is {})")
+	var turret = _placement_by_slot(state, 11)
+	check(turret != null, "the fixture's key 11 resolves for the build check")
+	if turret != null:
+		var empty: Dictionary = TownState.construction_of(turret)
+		check(bool(empty.get("ok", false)),
+			"an empty attribute bag is a readable construction state")
+		check_eq(empty.get("clicks", 1), null,
+			"an empty bag records no click counter")
+		check_eq(empty.get("countdown", 1), null,
+			"an empty bag records no countdown")
+		check_eq(empty.get("started_at", 1), null,
+			"an empty bag records no start instant")
+
+	# The four documented states, each parsed through the SAME parser and read
+	# through the SAME accessor the pure flow helpers use.
+	_check_construction_row(payload, registry, "bare", 0, {}, null, null, null)
+	_check_construction_row(payload, registry, "counter", 0, {"nc": 0}, 0,
+		null, null)
+	_check_construction_row(payload, registry, "counter-raised", 0, {"nc": 1},
+		1, null, null)
+	_check_construction_row(payload, registry, "countdown-and-counter",
+		1790690555, {"cp": 5, "nc": 1}, 1, 5, 1790690555)
+	_check_construction_row(payload, registry, "countdown-only", 1790690555,
+		{"cp": 5}, null, 5, 1790690555)
+	# A countdown with no usable start instant: the row's own timestamp is 0,
+	# so nothing stamped it and no remaining time can be derived from it.
+	_check_construction_row(payload, registry, "countdown-unstamped", 0,
+		{"cp": 5}, null, 5, null)
+	# Other bag entries are carried verbatim and never interpreted: the
+	# friend-assist cluster's `si` bag is out of scope for this line.
+	var friendly: Dictionary = _with_attr(payload, {"si": [], "nc": 2, "cp": 60})
+	var friendly_result: Dictionary = TownState.parse(friendly, registry)
+	check(bool(friendly_result.get("ok", false)),
+		"a row carrying the friend-assist bag still parses: %s"
+		% friendly_result.get("error"))
+	if bool(friendly_result.get("ok", false)):
+		var friendly_state = friendly_result["state"]
+		var friendly_placement: Variant = _placement_by_slot(friendly_state, 11)
+		check(friendly_placement != null
+			and friendly_placement.clicks == 2
+			and friendly_placement.countdown == 60
+			and friendly_placement.attr.has("si"),
+			"only nc and cp are interpreted; si is carried verbatim")
+
+	# Present-but-invalid: a counter and a countdown each fail closed naming
+	# the offending row, exactly as a malformed coordinate does.
+	_expect_construction_reject(_with_attr(payload, {"nc": -1}), "counter")
+	_expect_construction_reject(_with_attr(payload, {"nc": 1.5}), "counter")
+	_expect_construction_reject(_with_attr(payload, {"nc": "one"}), "counter")
+	_expect_construction_reject(_with_attr(payload, {"cp": 0}), "countdown")
+	_expect_construction_reject(_with_attr(payload, {"cp": -5}), "countdown")
+	_expect_construction_reject(_with_attr(payload, {"cp": "soon"}), "countdown")
+
+	# A bag that is not an object at all records NO construction state and is
+	# marked unreadable, WITHOUT rejecting the save: the delivered parser has
+	# always kept such a row verbatim (the selection suite's crafted overlap
+	# rows carry `0` there), so rejecting it would change delivered behavior,
+	# while reading a counter out of it would be fabrication.
+	var opaque: Dictionary = (payload as Dictionary).duplicate(true)
+	((opaque["map"] as Dictionary)["items"] as Dictionary)["opaque"] = [
+		26, 0, 0, 0, 0, 0, 0, 0]
+	var opaque_result: Dictionary = TownState.parse(opaque, registry)
+	check(bool(opaque_result.get("ok", false)),
+		"a row whose bag is not an object still parses: %s"
+		% opaque_result.get("error"))
+	if bool(opaque_result.get("ok", false)):
+		var opaque_state = opaque_result["state"]
+		check_eq(opaque_state.placements.size(), 41,
+			"the row is kept, not dropped")
+		var opaque_placement: Variant = _placement_by_slot(opaque_state, "opaque")
+		check(opaque_placement != null, "the opaque row is addressable by key")
+		if opaque_placement != null:
+			check(not opaque_placement.construction_readable,
+				"the opaque row is marked unreadable, not half-parsed")
+			check_eq(opaque_placement.clicks, null,
+				"the opaque row records no click counter")
+			var unreadable: Dictionary = TownState.construction_of(
+				opaque_placement)
+			check(not bool(unreadable.get("ok", true)),
+				"the shared accessor refuses to read the opaque row")
+
+	# The accessor itself never guesses: an absent placement and an untyped bag
+	# are both refused, and the sentinel-free nulls are reported as nulls.
+	check(not bool(TownState.construction_of(null).get("ok", true)),
+		"an absent placement has no readable construction state")
+	check(not bool(TownState.construction_of({"clicks": 1}).get("ok", true)),
+		"an untyped bag is never read as a placement (no guessing)")
+
+
+## One crafted row's construction state: the row, the expected three facts,
+## and the fact the parser kept the row verbatim.
+func _check_construction_row(payload: Variant, registry: Variant, key: String,
+		stamp: int, attr: Dictionary, clicks: Variant, countdown: Variant,
+		started: Variant) -> void:
+	var crafted: Dictionary = (payload as Dictionary).duplicate(true)
+	((crafted["map"] as Dictionary)["items"] as Dictionary)[key] = [
+		22, 12, 12, stamp, 0, [], attr, 1]
+	var result: Dictionary = TownState.parse(crafted, registry)
+	check(bool(result.get("ok", false)),
+		"the '%s' row parses: %s" % [key, result.get("error")])
+	if not bool(result.get("ok", false)):
+		return
+	var placement: Variant = _placement_by_slot(result["state"], key)
+	check(placement != null, "the '%s' row is kept and addressable" % key)
+	if placement == null:
+		return
+	check(placement.construction_readable,
+		"the '%s' row's construction state is readable" % key)
+	check_eq(placement.clicks, clicks,
+		"the '%s' row's click counter is the recorded one" % key)
+	check_eq(placement.countdown, countdown,
+		"the '%s' row's countdown is the recorded one" % key)
+	check_eq(placement.started_at, started,
+		"the '%s' row's start instant is the recorded one" % key)
+	check_eq(placement.attr, attr,
+		"the '%s' row's attribute bag is carried verbatim" % key)
+	var shared: Dictionary = TownState.construction_of(placement)
+	check(bool(shared.get("ok", false)),
+		"the shared accessor reads the '%s' row" % key)
+	check_eq(shared.get("clicks", 0), clicks,
+		"the shared accessor reports the '%s' row's counter" % key)
+	check_eq(shared.get("countdown", 0), countdown,
+		"the shared accessor reports the '%s' row's countdown" % key)
+	check_eq(shared.get("started_at", 0), started,
+		"the shared accessor reports the '%s' row's start instant" % key)
+
+
+## A rejected construction parse: `{ok: false}` with an error naming the
+## offending row and no state produced.
+func _expect_construction_reject(payload: Dictionary, needle: String) -> void:
+	var result: Dictionary = TownState.parse(payload, registry_of(payload))
+	check(not bool(result.get("ok", true)),
+		"an invalid %s fails closed" % needle)
+	check(result.get("state") == null, "an invalid %s yields no state" % needle)
+	check(str(result.get("error", "")).find(needle) != -1
+		and str(result.get("error", "")).find("11") != -1,
+		"the error names the invalid %s and the offending row (got: %s)"
+		% [needle, str(result.get("error", ""))])
+
+
+## The committed placement carrying an addressable index (null when absent).
+func _placement_by_slot(state: Variant, slot: Variant) -> Variant:
+	if state == null:
+		return null
+	for placement: Variant in state.placements:
+		if placement == null:
+			continue
+		if int(placement.slot) == int(slot) or str(placement.slot_key) \
+				== str(slot):
+			return placement
+	return null
+
+
 ## A rejected storage parse: `{ok: false}` with an error naming the
 ## offender and no state produced.
 func _expect_storage_reject(payload: Dictionary, needle: String) -> void:
@@ -460,6 +650,13 @@ func _expect_storage_reject(payload: Dictionary, needle: String) -> void:
 ## The ContentRegistry autoload (the payload scenarios all share it).
 func registry_of(_payload: Dictionary) -> Variant:
 	return root.get_node_or_null("ContentRegistry")
+
+
+## The payload with one crafted attribute bag on the recorded key 11.
+func _with_attr(payload: Dictionary, value: Variant) -> Dictionary:
+	var crafted: Dictionary = (payload as Dictionary).duplicate(true)
+	((crafted["map"] as Dictionary)["items"] as Dictionary)["11"][6] = value
+	return crafted
 
 
 ## The payload with one crafted `map.store` value.

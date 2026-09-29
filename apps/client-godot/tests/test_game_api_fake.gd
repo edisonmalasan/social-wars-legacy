@@ -41,6 +41,10 @@ const FIXTURE_UPGRADE_BEFORE := \
 	"tests/fixtures/godot-building-upgrade/steps/command_upgrade/before.json"
 const FIXTURE_UPGRADE_AFTER := \
 	"tests/fixtures/godot-building-upgrade/steps/command_upgrade/after.json"
+const FIXTURE_CONSTRUCTION_BEFORE := \
+	"tests/fixtures/godot-building-construction/steps/command_construction/before.json"
+const FIXTURE_CONSTRUCTION_AFTER := \
+	"tests/fixtures/godot-building-construction/steps/command_construction/after.json"
 
 ## The executed-legacy store transaction's constants (fixture facts, read
 ## from the committed capture): the Tree decoration (item 905, 1x1) at
@@ -91,6 +95,46 @@ const UPGRADE_SECOND_TARGET := 25
 ## An integer index the map does not name (the endpoint's 404, resolved
 ## before execution), and index 0, which is never a real legacy key.
 const UPGRADE_UNKNOWN_INDEX := 9999
+
+## The executed-legacy construction transaction's constants (fixture facts,
+## read from the committed capture): the Turret I (item 22, 1x1) at legacy map
+## key "11", anchored at `(58,48)`, whose row `[22, 58, 48, 0, 0, [], {}, 1]`
+## is mutated IN PLACE — the placement count stays 40, the key and cell are
+## reused — so it ends up carrying the recorded countdown equal to the item's
+## committed `build_time` plus a click counter of 1, which is the item's
+## `clicks_to_build`, while every other row and every resource stays
+## byte-identical. The start instant is the capture's own wall clock, so it is
+## asserted as a positive integer and never by value.
+const CONSTRUCTION_ITEM := 22
+const CONSTRUCTION_INDEX := 11
+const CONSTRUCTION_CELL_X := 58
+const CONSTRUCTION_CELL_Y := 48
+const CONSTRUCTION_ROW := [CONSTRUCTION_ITEM, 58, 48, 0, 0, [], {}, 1]
+## The item's committed build time in the loaded configuration
+## (`build_time` "5" for the Turret I) and its committed click requirement
+## (`clicks_to_build` "1") — the two facts the double derives for itself and
+## the service derives server-side, and the two the executed fixture's
+## recorded countdown and click counter confirm.
+const CONSTRUCTION_BUILD_TIME := 5
+const CONSTRUCTION_CLICKS := 1
+## The three actions of the endpoint's closed vocabulary, in the order a
+## construction walks them.
+const CONSTRUCTION_START := "start"
+const CONSTRUCTION_CLICK := "click"
+const CONSTRUCTION_FINISH := "finish"
+## An integer index the map does not name (the endpoint's 404, resolved
+## before execution) and index 0, which is never a real legacy key.
+const CONSTRUCTION_UNKNOWN_INDEX := 9999
+## A second placed Turret I, still addressable, used to prove that a failed
+## intent left the in-memory state uncorrupted.
+const CONSTRUCTION_SPARE_INDEX := 20
+## An item the committed configuration records `build_time` "0" for (a Worker
+## I): the double must refuse a start on a row naming it with the endpoint's
+## own `no_build_time` rather than coercing a zero that legacy would turn into
+## a whole-attribute-bag clear. The corpus places no such row, so the suite
+## parks one in the double's IN-MEMORY state (the committed fixture is never
+## written) — the client-side mirror of the compat suite's own stub.
+const CONSTRUCTION_NO_TIME_ITEM := 1001
 
 
 func run_scenario() -> void:
@@ -187,6 +231,7 @@ func run_scenario() -> void:
 	await _check_sell(api, user_id)
 	await _check_store(api, user_id)
 	await _check_upgrade(api, user_id)
+	await _check_construction(api, user_id)
 
 	info("fake implementation resolved %d save(s) with no server and no socket"
 		% save_list.saves.size())
@@ -1196,10 +1241,336 @@ func _check_upgrade(api: Variant, user_id: String) -> void:
 		+ "plus 5 structured failures with no server and no socket")
 
 
+## Construction double coverage (task 3.2, design D8): the three actions in
+## sequence over ONE row (start, click, finish), the derived duration read from
+## the fixture's OWN item build time and cross-checked against the executed
+## fixture's recorded countdown, the time-dependent start instant asserted as a
+## positive integer and never by value, the row mutated in place with nothing
+## else touched, and every structural failure with the endpoint's own code —
+## including the 400 `no_build_time`, the one refusal that keeps an unbuildable
+## row away from legacy's whole-attribute-bag clearing branch (design D3/D6).
+func _check_construction(api: Variant, user_id: String) -> void:
+	var before := _read_fixture_object(FIXTURE_CONSTRUCTION_BEFORE)
+	var after := _read_fixture_object(FIXTURE_CONSTRUCTION_AFTER)
+	if before.is_empty() or after.is_empty():
+		return
+	var before_map: Dictionary = before["maps"][0]
+	var after_map: Dictionary = after["maps"][0]
+	var before_items: Dictionary = before_map["items"]
+	var after_items: Dictionary = after_map["items"]
+	check_eq(before_items.size(), 40,
+		"the construction fixture before map carries 40 placements")
+	check_eq(after_items.size(), 40,
+		"the executed construction kept 40 placements (the key is REUSED)")
+	check(after_items.has("11"),
+		"the executed construction left the row at key 11 (in place)")
+	# The two rows the executed pair produced, in the typed form the client
+	# receives.
+	var row_before := _typed_row(before_items["11"])
+	var row_after := _typed_row(after_items["11"])
+	check_eq(row_before, CONSTRUCTION_ROW,
+		"the fixture anchors the Turret I at (58,48) under key 11")
+	check_eq(int(row_after[0]), CONSTRUCTION_ITEM,
+		"the executed construction kept the row's own item")
+	check_eq([int(row_after[1]), int(row_after[2])],
+		[CONSTRUCTION_CELL_X, CONSTRUCTION_CELL_Y],
+		"the executed construction reused the very same cell")
+	check(int(row_after[3]) > int(row_before[3]),
+		"the executed construction re-stamped the row with a later wall-clock "
+		+ "start instant (time-dependent field, never asserted by value)")
+	var recorded: Dictionary = row_after[6] as Dictionary
+	check(recorded.has("cp") and int(recorded["cp"]) == CONSTRUCTION_BUILD_TIME,
+		"the executed construction recorded the item's committed build time "
+		+ "as the countdown (the derived duration, matched here)")
+	check(recorded.has("nc") and int(recorded["nc"]) == CONSTRUCTION_CLICKS,
+		"the executed construction raised the click counter to the item's "
+		+ "committed clicks_to_build")
+	# Every other row is byte-identical: the one in-place attribute-bag write
+	# is the only map write the executed transaction made.
+	var other_keys: Array = []
+	for key: Variant in before_items:
+		if str(key) != "11":
+			other_keys.append(str(key))
+	other_keys.sort()
+	var untouched := true
+	for key: String in other_keys:
+		if _typed_row(before_items[key]) != _typed_row(after_items[key]):
+			untouched = false
+	check(untouched,
+		"the executed construction changed no other row (39 rows stay "
+		+ "byte-identical)")
+	# The neutral derived vector means the resource bag and the storage are
+	# unchanged, so NO building cost is claimed.
+	for key in ["xp", "gold", "wood", "oil", "steel"]:
+		check_eq(before_map[key], after_map[key],
+			"the executed construction left %s unchanged" % key)
+	check_eq(before["playerInfo"]["cash"], after["playerInfo"]["cash"],
+		"the executed construction left cash unchanged (no cost is claimed)")
+	check_eq(before["privateState"]["mana"], after["privateState"]["mana"],
+		"the executed construction left mana unchanged")
+	check_eq(after_map["store"], {},
+		"the executed construction left storage empty (it touches no storage)")
+	check_eq(before["privateState"]["boughtUnits"], [],
+		"the executed construction started from an empty bought-units list")
+	check_eq(after["privateState"]["boughtUnits"], [],
+		"the executed construction wrote no bought-units bookkeeping")
+	# The capture's recorded epoch, read the same way the placement and
+	# upgrade doubles read theirs: the start a double re-stamps with, never
+	# the wall clock.
+	var requests_before: int = api.construction_requests
+
+	# --- step 1: start. The duration is DERIVED from committed content, and
+	# the row is re-stamped in place with the countdown recorded.
+	var started: Variant = await api.build_construction(user_id,
+		CONSTRUCTION_INDEX, CONSTRUCTION_START)
+	check(started is BootData.ConstructionResult,
+		"build_construction returns the typed result")
+	if not (started is BootData.ConstructionResult):
+		return
+	var first: BootData.ConstructionResult = started
+	check(first.ok, "fake construction start resolves offline: %s"
+		% first.error_message)
+	if not first.ok:
+		return
+	check_eq(first.protocol, BootData.PROTOCOL,
+		"construction protocol is compat-v0")
+	check_eq(first.game_version, "alpha 0.02", "the game version is the fixture's")
+	check(first.server_time > 0,
+		"server_time is the positive fixture epoch (time-dependent field)")
+	check_eq(first.result, "success", "legacy result string is reported")
+	check_eq(first.action, CONSTRUCTION_START,
+		"the resolved action is echoed from the closed vocabulary")
+	check(first.previous != null, "the pre-execution row is carried")
+	check(first.row != null, "the post-execution row is carried")
+	check(first.resources != null, "typed resources are carried")
+	if first.previous == null or first.row == null or first.resources == null:
+		return
+	# BOTH sides are the legacy eight-field row through the one shared entry
+	# parser, and the two differ in exactly the two fields the start writes.
+	check_eq(_boot_row(first.previous), CONSTRUCTION_ROW,
+		"the previous row is the executed fixture's pre-execution row")
+	check_eq(first.previous.timestamp, 0,
+		"the previous row keeps the save's timestamp (never restamped)")
+	check_eq(first.previous.attr, {}, "the previous row keeps its empty bag")
+	check_eq(first.row.item_id, CONSTRUCTION_ITEM,
+		"the post-execution row names the row's own item")
+	check_eq([first.row.x, first.row.y],
+		[CONSTRUCTION_CELL_X, CONSTRUCTION_CELL_Y],
+		"the post-execution row reuses the pre-execution cell")
+	check(first.row.timestamp > int(CONSTRUCTION_ROW[3]),
+		"the post-execution row is re-stamped with a later start instant "
+		+ "(the deterministic double never reads the wall clock)")
+	check_eq(first.row.timestamp, int(row_after[3]),
+		"the re-stamp reuses the capture's recorded epoch, exactly as the "
+		+ "placement and upgrade doubles reuse theirs")
+	check_eq(first.row.attr, {"cp": CONSTRUCTION_BUILD_TIME},
+		"the post-execution row records the derived countdown and nothing else")
+	check_eq(first.row.orientation, int(row_after[4]),
+		"the post-execution row carries the row's own orientation")
+	check_eq(first.row.player, int(row_after[7]),
+		"the post-execution row carries the row's own player field")
+	# The neutral derived vector: the resource bag is the fresh save's own
+	# values — never a computed delta, and no building cost.
+	check_eq(first.resources.gold, int(before_map["gold"]),
+		"gold is unchanged by the neutral vector")
+	check_eq(first.resources.wood, int(before_map["wood"]),
+		"wood is unchanged by the neutral vector")
+	check_eq(first.resources.oil, int(before_map["oil"]),
+		"oil is unchanged by the neutral vector")
+	check_eq(first.resources.steel, int(before_map["steel"]),
+		"steel is unchanged by the neutral vector")
+	check_eq(first.resources.xp, int(before_map["xp"]),
+		"xp is unchanged by the neutral vector")
+	check_eq(first.resources.cash, int(before["playerInfo"]["cash"]),
+		"cash is unchanged by the neutral vector")
+	check_eq(first.resources.mana, int(before["privateState"]["mana"]),
+		"mana is unchanged by the neutral vector")
+
+	# --- step 2: click. The counter is raised (seeded to 1 when absent) and
+	# the countdown is left exactly as the start recorded it.
+	var clicked: Variant = await api.build_construction(user_id,
+		CONSTRUCTION_INDEX, CONSTRUCTION_CLICK)
+	check(clicked is BootData.ConstructionResult and clicked.ok,
+		"fake construction click resolves offline: %s"
+		% (clicked.error_message if clicked is BootData.ConstructionResult
+			else "not typed"))
+	if not (clicked is BootData.ConstructionResult) or not clicked.ok:
+		return
+	var second: BootData.ConstructionResult = clicked
+	check_eq(second.action, CONSTRUCTION_CLICK, "the click action is echoed")
+	check_eq(second.previous.attr, {"cp": CONSTRUCTION_BUILD_TIME},
+		"the click's pre-execution row is the started row verbatim")
+	check_eq(second.row.attr,
+		{"cp": CONSTRUCTION_BUILD_TIME, "nc": CONSTRUCTION_CLICKS},
+		"the click raises the counter to 1 beside the recorded countdown")
+	check_eq(_typed_attr(second.row.attr), _typed_attr(row_after[6]),
+		"the walked start-then-click pair reproduces the executed fixture's own "
+		+ "recorded bag, field for field")
+	check_eq(second.row.timestamp, int(row_after[3]),
+		"a click writes no timestamp of its own")
+
+	# --- step 3: finish. The counter is consumed and the countdown is left
+	# alone: the whole state the executed fixture's own two commands produced.
+	var finished: Variant = await api.build_construction(user_id,
+		CONSTRUCTION_INDEX, CONSTRUCTION_FINISH)
+	check(finished is BootData.ConstructionResult and finished.ok,
+		"fake construction finish resolves offline")
+	if not (finished is BootData.ConstructionResult) or not finished.ok:
+		return
+	var third: BootData.ConstructionResult = finished
+	check_eq(third.action, CONSTRUCTION_FINISH, "the finish action is echoed")
+	check_eq(third.row.attr, {"cp": CONSTRUCTION_BUILD_TIME},
+		"the completion consumes the counter and writes nothing else")
+	check_eq(third.row.timestamp, int(row_after[3]),
+		"the completion writes no timestamp of its own")
+	check_eq(third.resources.gold, int(before_map["gold"]),
+		"the completion changes no resource (neutral vector)")
+
+	# A fourth click re-raises the counter the completion consumed: the
+	# double is a faithful in-memory model of the three branches, not a
+	# once-only scripted answer.
+	var again: Variant = await api.build_construction(user_id,
+		CONSTRUCTION_INDEX, CONSTRUCTION_CLICK)
+	check(again is BootData.ConstructionResult and again.ok,
+		"a click after a completion resolves again")
+	if again is BootData.ConstructionResult and again.ok:
+		check_eq((again as BootData.ConstructionResult).row.attr,
+			{"cp": CONSTRUCTION_BUILD_TIME, "nc": 1},
+			"the click counter is seeded to 1 when absent, never guessed")
+
+	# --- structured failures: endpoint codes, no partial payload ----
+	var ghost: Variant = await api.build_construction("ghost-0000",
+		CONSTRUCTION_INDEX, CONSTRUCTION_START)
+	_check_construction_failure(ghost, "unknown_user_id", "unknown save id")
+	var empty: Variant = await api.build_construction("", CONSTRUCTION_INDEX,
+		CONSTRUCTION_START)
+	_check_construction_failure(empty, "missing_user_id", "empty save id")
+	var unknown_index: Variant = await api.build_construction(user_id,
+		CONSTRUCTION_UNKNOWN_INDEX, CONSTRUCTION_START)
+	_check_construction_failure(unknown_index, "unknown_item_index",
+		"an index the map does not name")
+	var zero: Variant = await api.build_construction(user_id, 0,
+		CONSTRUCTION_START)
+	_check_construction_failure(zero, "unknown_item_index",
+		"index 0 (never a real legacy key)")
+	for bad_action in ["activate", "add_click", "activate_item_click", "",
+			"START", "finish "]:
+		var refused: Variant = await api.build_construction(user_id,
+			CONSTRUCTION_INDEX, str(bad_action))
+		_check_construction_failure(refused, "invalid_action",
+			"the action '%s' (a legacy command name is never accepted)"
+				% str(bad_action))
+	# A start on a row whose item has no resolvable POSITIVE committed build
+	# time: the endpoint answers 400 no_build_time BEFORE the dispatcher runs,
+	# so the row's bag is never cleared and no duration is ever coerced. The
+	# corpus places no such row, so the suite parks one in the double's
+	# IN-MEMORY state (the committed fixture is never written).
+	var no_time_index := 4242
+	_park_row(api, no_time_index, CONSTRUCTION_NO_TIME_ITEM)
+	var no_time: Variant = await api.build_construction(user_id, no_time_index,
+		CONSTRUCTION_START)
+	_check_construction_failure(no_time, "no_build_time",
+		"an item with no resolvable positive committed build time")
+	# The same row's other two actions carry no duration at all, so they are
+	# NOT refused: only a start resolves one (design D2).
+	var no_time_click: Variant = await api.build_construction(user_id,
+		no_time_index, CONSTRUCTION_CLICK)
+	check(no_time_click is BootData.ConstructionResult and no_time_click.ok,
+		"a click derives no duration, so it is not refused")
+	if no_time_click is BootData.ConstructionResult and no_time_click.ok:
+		check_eq((no_time_click as BootData.ConstructionResult).row.attr,
+			{"nc": 1},
+			"the click on the unbuildable row raised only the counter")
+	var no_time_finish: Variant = await api.build_construction(user_id,
+		no_time_index, CONSTRUCTION_FINISH)
+	check(no_time_finish is BootData.ConstructionResult and no_time_finish.ok,
+		"a completion derives no duration, so it is not refused")
+
+	# --- the failures applied nothing: an unrelated row still resolves to
+	# its own item (state not corrupted) and the construction is still there.
+	var unrelated: Variant = await api.build_construction(user_id,
+		CONSTRUCTION_SPARE_INDEX, CONSTRUCTION_START)
+	check(unrelated is BootData.ConstructionResult and unrelated.ok,
+		"an unrelated row still resolves after the failed attempts")
+	if unrelated is BootData.ConstructionResult and unrelated.ok:
+		check_eq((unrelated as BootData.ConstructionResult).previous.item_id, 22,
+			"the unrelated row resolves to its own item (state not corrupted)")
+		check_eq((unrelated as BootData.ConstructionResult).row.attr,
+			{"cp": CONSTRUCTION_BUILD_TIME},
+			"the unrelated row recorded its own derived countdown")
+	var built: Variant = await api.build_construction(user_id,
+		CONSTRUCTION_INDEX, CONSTRUCTION_START)
+	check(built is BootData.ConstructionResult and built.ok,
+		"the constructed row is still addressable after the failed attempts")
+	if built is BootData.ConstructionResult and built.ok:
+		check_eq((built as BootData.ConstructionResult).row.attr,
+			{"cp": CONSTRUCTION_BUILD_TIME, "nc": 1},
+			"a re-start keeps the counter and re-records the countdown: the "
+			+ "positive-duration branch writes only cp, never clears the bag")
+	check_eq(int((_read_fixture_object(FIXTURE_CONSTRUCTION_AFTER)["maps"][0]
+		as Dictionary)["items"]["11"][3]), int(row_after[3]),
+		"the committed after-state still holds its own recorded start instant")
+
+	# Every call increments the intent counter exactly once, including the
+	# refusals: a refused intent is still an intent this client issued.
+	check_eq(api.construction_requests, requests_before + 19,
+		"every build_construction call increments the intent counter exactly "
+		+ "once (three walked steps, a re-click, nine structural failures, the "
+		+ "unbuildable row's click and completion, and two recovery calls)")
+	info("construction double walked the executed fixture's row through all "
+		+ "three actions plus 9 structured failures with no server and no socket")
+
+
+## Every construction failure carries the endpoint's code and no partial
+## payload (design D3/D5) — including the 404 `unknown_item_index`, the 400
+## `invalid_action`, and the 400 `no_build_time` that keeps an unbuildable row
+## away from legacy's attribute-bag-clearing branch.
+func _check_construction_failure(result: Variant, code: String,
+		label: String) -> void:
+	check(result is BootData.ConstructionResult,
+		label + " returns the typed result")
+	if not (result is BootData.ConstructionResult):
+		return
+	var typed: BootData.ConstructionResult = result
+	check(not typed.ok, label + " is a structured failure")
+	check_eq(typed.error_code, code, label + " names the endpoint's code")
+	check(typed.previous == null, label + " carries no partial previous row")
+	check(typed.row == null, label + " carries no partial post-execution row")
+	check(typed.resources == null, label + " carries no partial resources")
+	check_eq(typed.result, "",
+		label + " reports no legacy result for a failed construction")
+	check_eq(typed.action, "",
+		label + " reports no resolved action for a failed construction")
+
+
+## Parks one extra row under a key the committed corpus does not name, inside
+## the double's IN-MEMORY state only (the committed fixture is never written),
+## so the one `no_build_time` refusal a start can produce becomes reachable.
+## This is the client-side mirror of the compat suite's own accessor stub.
+func _park_row(api: Variant, index: int, item_id: int) -> void:
+	var double: Variant = api._impl
+	if double == null or not (double is FakeApi):
+		check(false, "the fake double instance is reachable for its "
+			+ "in-memory state")
+		return
+	(double._construction_state["items"] as Dictionary)[str(index)] = [
+		item_id, 5, 5, 0, 0, [], {}, 1]
+
+
+## One recorded attribute bag in the canonical typed form (the JSON transport
+## widens the save's ints to floats on the pinned engine).
+func _typed_attr(value: Variant) -> Dictionary:
+	var out := {}
+	if not (value is Dictionary):
+		return out
+	for key: Variant in (value as Dictionary):
+		var amount: Variant = (value as Dictionary)[key]
+		out[str(key)] = int(amount) if (amount is int or amount is float) \
+			else amount
+	return out
+
+
 ## Every upgrade failure carries the endpoint's code and no partial payload
-## (design D5) — including the 404 `unknown_item_index`, which stands in for
-## legacy's silent no-op, and the 400 `no_upgrade_path`, which keeps an
-## un-upgradeable building from being reduced to a bare sale.
 func _check_upgrade_failure(result: Variant, code: String,
 		label: String) -> void:
 	check(result is BootData.UpgradeResult,
