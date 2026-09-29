@@ -295,6 +295,47 @@ committed capture runs the fake implementation, so real-execution parity rests
 on the fixture-replay tests and the live phase. No Flash, Ruffle, ActionScript,
 or browser executes in any of these commands.
 
+Verified building-store commands (milestone M7; Godot 4.7.2.stable and pinned
+CPython 3.9.13, Windows x64; `python` denotes the pinned interpreter, never the
+PATH alias):
+
+```bash
+python -B apps/compat-api/capture_store_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_town_store.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-09-29): the store fixture capture (one-shot
+executed-legacy `store_item` oracle — the Tree at map slot 2 put into storage,
+`store` `{}` to `{"905": 1}`, 40 to 39 placements, every other row, the
+bought-units list, the private state, the player info, and all seven resources
+byte-identical; exit codes and containment recorded in
+`tests/fixtures/godot-building-store/README.md`), the compat suite including the
+store envelope, the `/v0/store` endpoint with both post-execution proofs, and
+executed-legacy parity tests (observed `Ran 390 tests ... OK`, exit `0`), the
+hermetic store-flow suite, both batteries in the final state (each exit `0`; the
+second embeds the `store-live` phase that asserts a disposable corpus save
+mutated), and the preservation manifest (3,258 entries, exit `0`). The
+compatibility service listens on `127.0.0.1:5056` only, and every network call
+in these commands is loopback. The evidence capture and report steps are
+documented in `apps/client-godot/README.md` ("Building store"); committed
+evidence lives under `apps/client-godot/evidence/building-store/`. Claim limits:
+parity covers one recorded transaction against the fresh-player corpus; the
+command's argument value and the neutral price vector are derived-provisional,
+never observed from the Flash client; **no storing cost and no capacity rule are
+claimed** (the committed configuration records neither and the legacy server has
+no capacity check); the bought-units list is deliberately not written by the
+legacy branch; this line only moves a building *into* storage, so stored items
+are not yet playable and `place_stored_item` remains open; storability and
+addressability are client-side rules only, with no server-authoritative
+validation (that belongs to Server v1 / M13); no pixel-parity oracle exists; the
+committed capture runs the fake implementation, so real-execution parity rests
+on the fixture-replay tests and the live phase. No Flash, Ruffle, ActionScript,
+or browser executes in any of these commands.
+
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 

@@ -1203,5 +1203,134 @@ each), and the fake-capture pointer.
 
 These non-claims are recorded verbatim in
 `evidence/building-sell/report.json`.
-Remaining deliver lines of M7 (separate changes): store, upgrade, build timers,
-income, expansion, resources, and XP.
+
+## Building store
+
+The store slice (OpenSpec `building-store`, milestone M7) closes the loop the
+purchase line left open: a building the player owns can be put into their
+**storage**, executed as one typed intent by the unchanged legacy `store_item`
+path inside Compatibility API v0, with an executed-legacy store fixture as the
+parity oracle. It is the `btPutInStorage` affordance the legacy client's
+building panel already had, reproduced on the selection-driven surface this
+client already has.
+
+### Flow
+
+1. **Action** — a `Store` action beside the delivered `Move` and `Sell`
+   actions, offered only while a placed building is selected **and** addressable
+   (an unaddressable legacy key is refused with the same explicit reason the
+   move and sell flows use, never coerced). The three modes are mutually
+   exclusive: arming one refuses the others.
+2. **Confirm** — targetless, like a sale: it names the building and reports
+   where it will land. Confirming sends exactly one
+   `GameApi.store_building(user_id, item_index)` intent; cancelling, or a
+   pointer press that changes the selection, sends nothing.
+3. **Apply** — only the authoritative response is applied: the building's
+   object is freed, its typed placement is removed while the remaining
+   buildings keep the committed depth order, the typed storage is replaced
+   through the **same fail-closed parser** the payload parse and the purchase
+   apply use, the storage readout re-renders from it, and HUD resources and XP
+   take the response values. The apply snapshots every field it touches first,
+   so any failure restores the building, the previous storage view, the readout,
+   and the HUD — a store is never half-applied.
+
+### Endpoint contract and envelope derivations
+
+`POST /v0/store` accepts only the intent `{user_id, item_index}` — the full
+contract, response example, structured error codes, validation split, and
+corpus-only persistence scope are documented in `apps/compat-api/README.md`.
+The endpoint resolves the index against the save and reads the row **before**
+executing, then proves afterwards that the row is gone and the storage entry
+landed. The legacy batch envelope is derived server-side and marked
+**derived-provisional**: one `store_item` command whose single argument is the
+item index, a **neutral** all-zero resource vector, and the shared placeholders
+`accessToken=""`, `publishActions=[]`, `tries=1`, `first_number=0`. The
+response carries both sides of the move — the pre-execution eight-field
+`removed` row and the full post-execution `store` mapping — so the client needs
+no arithmetic for pre-existing contents.
+
+**No storing cost and no capacity rule are claimed**: the committed
+configuration records no price for storing (item `cost`/`cost_type` are dead
+fields, `costs` prices the purchase only) and the legacy server performs no
+capacity check. Validation split (design D5): the client owns the gameplay
+rules and the endpoint owns structural fail-closed input validity only;
+authoritative validation belongs to Server v1 (M13). The legacy branch does not
+write the bought-units list, and this line reproduces that exactly.
+
+### Verification (commands actually executed)
+
+```bash
+# Store fixture capture (one-shot, executed-legacy oracle): the exact command,
+# exit codes, and containment are recorded in
+# tests/fixtures/godot-building-store/README.md
+python -B apps/compat-api/capture_store_fixture.py
+
+# Store envelope + endpoint + executed-legacy parity tests (inside the compat
+# suite; observed: Ran 390 tests ... OK, exit 0)
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+
+# The hermetic store-flow suite standalone
+godot --headless --path apps/client-godot --script res://tests/test_town_store.gd
+
+# Full batteries in the final state (each embeds the store suite and the
+# store-live phase; both observed exit 0)
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+```
+
+`verify-boot.ps1` includes the hermetic `test_town_store` suite and an eighth
+live phase `store-live`, which starts the Compatibility API over a disposable
+corpus, sends one intent through `POST /v0/store`, asserts the typed response,
+and — via `compat_live_phase.py --expect-save-mutation` — asserts a corpus save
+file actually mutated, then tears down asserting the port is released, the
+corpus is removed, and no working-tree `saves/` exists.
+
+### Evidence capture (two-step, as the delivered slices)
+
+```bash
+# 1. Windowed fake-API launch: boot → town, select the Tree at slot 2, store,
+#    confirm, then capture the frame (writes building-store.png at the legacy
+#    1400x600 stage; a failed flow exits 1 with an explicit [town]
+#    store-capture state=error marker)
+godot --path apps/client-godot res://scenes/boot.tscn -- --gameapi=fake --store-capture=<repo>/apps/client-godot/evidence/building-store/building-store.png
+
+# 2. Headless deterministic report (writes report.json; a rerun is
+#    byte-identical; the bare --store-report flag defaults to
+#    evidence/building-store/report.json)
+godot --headless --path apps/client-godot res://scenes/town.tscn -- --store-report=<repo>/apps/client-godot/evidence/building-store/report.json
+```
+
+The report (`schema store-report-v1`) records the inputs and digests, the
+intent `{user_id, item_index: 2}`, the stored building (Tree, slot 2) with its
+row `[905, 53, 39, 0, 0, [], {}, 1]` and cell `(53, 39)`, the storage mapping
+before/after (`{}` to `{"905": 1}`) and its readout line, counts before/after
+(40 to 39 placements and objects), resources before/after (unchanged), the
+projection-constants pointer, the bootstrap and store request counts (exactly
+one each), and the fake-capture pointer.
+
+### Store claim limits
+
+- no Flash, Ruffle, ActionScript, or browser executed;
+- the command's argument value and the neutral price vector are derived, never
+  observed from the Flash client;
+- **no storing cost and no capacity rule are claimed** — the committed
+  configuration records neither and the legacy server has no capacity check;
+- the bought-units list is deliberately not written by the legacy branch, and
+  this line does not change that;
+- this line only moves a building *into* storage, so stored items are **not yet
+  playable**: `place_stored_item` (storage to map) and `sell_stored_item` remain
+  open legacy commands;
+- parity covers one recorded transaction against the fresh-player corpus, not
+  progressed players;
+- storability and addressability are client-side rules only; the endpoint
+  enforces structural input validity and no server-authoritative validation
+  exists;
+- no pixel-parity oracle against the legacy client exists, and the surface's
+  layout and labels are documented placeholders;
+- the committed capture runs the fake GameApi — a deterministic test double, not
+  a parity oracle.
+
+These non-claims are recorded verbatim in
+`evidence/building-store/report.json`.
+Remaining deliver lines of M7 (separate changes): upgrade, build timers, income,
+expansion, resources, and XP.
