@@ -4,8 +4,9 @@ extends Node
 ##
 ## Reads only the committed executed-legacy fixture files under
 ## `tests/fixtures/godot-compatibility-boot/`, for placement under
-## `tests/fixtures/godot-building-placement/`, and for purchase under
-## `tests/fixtures/godot-item-purchase/` at the repository root: no
+## `tests/fixtures/godot-building-placement/`, for purchase under
+## `tests/fixtures/godot-item-purchase/`, and for move under
+## `tests/fixtures/godot-building-move/` at the repository root: no
 ## process, no server, no socket. It synthesizes the documented v0 envelopes
 ## from those files and parses them with the same `BootData` functions the
 ## live implementation uses, so both implementations yield identical typed
@@ -19,9 +20,11 @@ extends Node
 ## wall clock). `purchase_item()` applies the documented purchase semantics
 ## in memory (design D9) over the committed purchase-fixture state with the
 ## same determinism (its `server_time` is the fixture's recorded epoch, not
-## the wall clock). Parity against executed legacy is owned exclusively by
+## the wall clock). `move_building()` applies the documented move semantics
+## in memory over the committed move-fixture state with that same
+## determinism. Parity against executed legacy is owned exclusively by
 ## the compat fixture-replay tests; this double exists so the client flow can
-## be tested hermetically.
+## be tested hermetically and is NEVER itself a parity oracle.
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const Paths = preload("res://scripts/package_paths.gd")
@@ -45,6 +48,17 @@ const PURCHASE_BEFORE_FIXTURE := \
 ## transaction; the in-memory apply never writes a file.
 const PURCHASE_AFTER_FIXTURE := \
 	"tests/fixtures/godot-item-purchase/steps/command_buy_stored_item_cash/after.json"
+## The executed-legacy move fixture's before-state (which again equals the
+## fresh-player corpus the boot fixtures carry): the double's starting save
+## for `move_building()`.
+const MOVE_BEFORE_FIXTURE := \
+	"tests/fixtures/godot-building-move/steps/command_move/before.json"
+## The same fixture's after-state — the real legacy server's record of the
+## one executed `move` (Turret I at map slot 11, `(58,48)` -> `(58,47)`).
+## Read (never written) so a malformed capture cannot leave the double
+## running on an inconsistent oracle.
+const MOVE_AFTER_FIXTURE := \
+	"tests/fixtures/godot-building-move/steps/command_move/after.json"
 
 ## Anchor grid extent the v0 endpoint validates against (anchors 0..99;
 ## footprints may extend past the edge — design D5). Must match
@@ -83,6 +97,13 @@ var _purchase_state: Dictionary = {}
 var _purchase_pid := ""
 var _purchase_loaded := false
 var _purchase_error := ""
+
+# Mutable in-memory move state (building-move design D8): one save, replaced
+# only by successful moves inside this process. Never written anywhere.
+var _move_state: Dictionary = {}
+var _move_pid := ""
+var _move_loaded := false
+var _move_error := ""
 
 
 ## The session envelope synthesized from the committed fixtures.
@@ -251,6 +272,79 @@ func purchase_item(user_id: String, item_id: int) -> BootData.PurchaseResult:
 		"result": "success",
 		"store": (_purchase_state["store"] as Dictionary).duplicate(),
 		"resources": _purchase_resources(),
+	})
+
+
+## Deterministic in-memory move double (building-move design D8): the
+## documented semantics of the unchanged legacy `move` branch — resolve the
+## row with the item's map index, write ONLY `item[1] = x` and `item[2] = y`
+## in place, apply the pre-dispatch resource vector (the derived vector is
+## NEUTRAL, so every stored resource is unchanged), and add, remove, and
+## re-key nothing — applied over the committed move fixture's before-state,
+## mutating only this process. No process, no server, no socket; parity
+## against executed legacy is owned exclusively by the compat
+## fixture-replay tests, so this double is a test fixture, never an oracle.
+##
+## The response mirrors the v0 endpoint's authoritative superset: the legacy
+## result, the PERSISTED eight-field row re-read after the write, and the
+## current resources — byte-for-byte the shape `place_building()` returns,
+## so the client reuses one typed result class and one parse function
+## (design D4).
+##
+## Structural failures mirror the endpoint's codes (design D5): unknown or
+## empty save id, an integer index that names no row in the fixture's map
+## (`unknown_item_index` — the endpoint's 404, resolved BEFORE execution so
+## legacy's silent no-op is never reported as a success), and coordinates
+## outside the shared grid (`invalid_coordinates`). Everything else —
+## occupancy, the no-op cell, ownership — is gameplay validation the client
+## owns, exactly as the endpoint leaves it unenforced; this double never
+## invents a gate the legacy server does not have, and never accepts a
+## client-sent price.
+func move_building(user_id: String, item_index: int, x: int,
+		y: int) -> BootData.PlacementResult:
+	if user_id.strip_edges() == "":
+		return _move_failure("missing_user_id",
+			"user_id must be a non-empty string")
+	if not _ensure_loaded():
+		return _move_failure("fixture_unreadable", _load_error)
+	if not _ensure_move_loaded():
+		return _move_failure("fixture_unreadable", _move_error)
+	if user_id != _move_pid:
+		return _move_failure("unknown_user_id",
+			"no save exists for user_id '%s'" % user_id)
+	if x < 0 or x >= GRID_EXTENT or y < 0 or y >= GRID_EXTENT:
+		return _move_failure("invalid_coordinates",
+			"x and y must be integers with anchors inside the 0..%d town grid"
+			% (GRID_EXTENT - 1))
+	var row: Variant = (_move_state["items"] as Dictionary).get(
+		str(item_index))
+	if not (row is Array) or (row as Array).size() != 8:
+		# The endpoint resolves the index against the corpus before
+		# executing (design D3/D5), so a stale or unknown index is a
+		# structured failure with no mutation, never a silent success.
+		return _move_failure("unknown_item_index",
+			"no placement with index %d in this save's map" % item_index)
+	# Legacy do_command order for `move`: the pre-dispatch
+	# `apply_resources` (clamped) first, then the two in-place coordinate
+	# writes. The derived vector is all zeros, so the clamp never rewrites
+	# a value and the resources below are the state's own.
+	var resources := _move_resources()
+	var entry: Array = (row as Array).duplicate()
+	entry[1] = x
+	entry[2] = y
+	(_move_state["items"] as Dictionary)[str(item_index)] = entry
+	# Same envelope shape the service returns; the shared parser yields
+	# the typed result (identical shapes by construction, design D4).
+	return BootData.parse_placement({
+		"protocol": BootData.PROTOCOL,
+		"ok": true,
+		"game_version": str(_save_list_doc.get("game_version", "")),
+		# Time-dependent field: the fixture capture's legacy server epoch,
+		# never the wall clock (deterministic by construction).
+		"server_time": _fixture_server_time(),
+		"result": "success",
+		"placement": entry,
+		"resources": resources,
 	})
 
 
@@ -427,6 +521,123 @@ func _first_map(doc: Dictionary, label: String) -> Variant:
 		_placement_error = "placement fixture %s state first map is not an object" % label
 		return null
 	return (maps as Array)[0]
+
+
+# --- move double (building-move design D8) ----------------------------------
+
+
+## Structured failure in the service's error envelope shape, parsed by the
+## same shared parser the live implementation uses.
+func _move_failure(code: String, message: String) -> BootData.PlacementResult:
+	return BootData.parse_placement({
+		"protocol": BootData.PROTOCOL,
+		"ok": false,
+		"error": {"code": code, "message": message},
+	})
+
+
+## Loads the committed move fixture's before-state into mutable process
+## state (once). Structural failures are named with the offending field; the
+## boot, placement, and purchase fixtures' error state is untouched
+## (independent sinks).
+func _ensure_move_loaded() -> bool:
+	if _move_loaded:
+		return _move_error == ""
+	_move_loaded = true
+	# The pair is read through explicit sinks (the placement pair's
+	# precedent), so a malformed capture fails this surface closed without
+	# touching the boot, placement, or purchase error state.
+	var before_sink := {"error": ""}
+	var before := _read_json_into(MOVE_BEFORE_FIXTURE, before_sink)
+	if str(before_sink["error"]) != "":
+		_move_error = str(before_sink["error"])
+		return false
+	var after_sink := {"error": ""}
+	# The after-state is read (never written) so a malformed capture cannot
+	# leave the double running on an inconsistent oracle.
+	_read_json_into(MOVE_AFTER_FIXTURE, after_sink)
+	if str(after_sink["error"]) != "":
+		_move_error = str(after_sink["error"])
+		return false
+	return _init_move_state(before)
+
+
+## Validates the move fixture's before-state and builds the in-memory save
+## state. Every consumed field is checked, so a malformed fixture fails
+## closed instead of crashing the double. The placements are kept as the
+## save's own `items` map keyed by their legacy index, so an index resolves
+## exactly as `engine.map_get_item(map, index)` resolves it.
+func _init_move_state(before: Dictionary) -> bool:
+	var maps: Variant = before.get("maps")
+	if not (maps is Array) or (maps as Array).is_empty():
+		_move_error = "move fixture before state carries no maps array"
+		return false
+	if not ((maps as Array)[0] is Dictionary):
+		_move_error = "move fixture before state first map is not an object"
+		return false
+	var map: Dictionary = (maps as Array)[0]
+	var items: Variant = map.get("items")
+	if not (items is Dictionary):
+		_move_error = "move fixture before state carries no items map"
+		return false
+	var info: Variant = before.get("playerInfo")
+	var priv: Variant = before.get("privateState")
+	if not (info is Dictionary) or not (priv is Dictionary):
+		_move_error = "move fixture before state lacks playerInfo/privateState"
+		return false
+	for key in ["xp", "gold", "wood", "oil", "steel"]:
+		var value: Variant = map.get(key)
+		if not (value is int or value is float) \
+				or float(value) != floor(float(value)):
+			_move_error = "move fixture before state lacks map %s" % key
+			return false
+	var pid: Variant = (info as Dictionary).get("pid")
+	var cash: Variant = (info as Dictionary).get("cash")
+	var mana: Variant = (priv as Dictionary).get("mana")
+	if not (pid is String) or not (cash is int or cash is float) \
+			or not (mana is int or mana is float):
+		_move_error = "move fixture before state lacks save fields"
+		return false
+	# Every placement must be the documented eight-field row under a
+	# positive integer index (the shape the move's own resolution depends
+	# on); an unusable key is a malformed capture, never a coerced index.
+	var typed_items := {}
+	for key: Variant in (items as Dictionary):
+		var index: Variant = BootData._parse_int(key)
+		if key is String and str(key).is_valid_int():
+			index = str(key).to_int()
+		if index == null or int(index) <= 0:
+			_move_error = "move fixture placement key '%s' is not a " \
+				% str(key) + "positive integer index"
+			return false
+		var row: Variant = (items as Dictionary)[key]
+		if not (row is Array) or (row as Array).size() != 8:
+			_move_error = "move fixture placement '%s' is not the " \
+				% str(key) + "eight-field array"
+			return false
+		typed_items[str(int(index))] = (row as Array).duplicate()
+	_move_state = {
+		"items": typed_items,
+		"xp": int(map.get("xp")),
+		"gold": int(map.get("gold")),
+		"wood": int(map.get("wood")),
+		"oil": int(map.get("oil")),
+		"steel": int(map.get("steel")),
+		"cash": int(cash),
+		"mana": int(mana),
+	}
+	_move_pid = pid
+	return true
+
+
+## The seven stored resource values of the in-memory move state. A move
+## derives a neutral vector (design D2), so these are the state's own
+## values — reported verbatim, never a computed delta.
+func _move_resources() -> Dictionary:
+	var resources := {}
+	for key: String in RESOURCE_KEYS:
+		resources[key] = int(_move_state[key])
+	return resources
 
 
 # --- purchase double (design D9) --------------------------------------------

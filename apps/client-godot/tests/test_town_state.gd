@@ -1,7 +1,8 @@
 extends "res://tests/test_base.gd"
 ## Typed town-state suite (OpenSpec `godot-town-rendering` "Typed town
 ## state loading", change task 2.1; extended by `building-purchase` task
-## 4.1 with the typed storage mapping).
+## 4.1 with the typed storage mapping and by `building-move` task 4.1 with
+## the addressable legacy map key).
 ##
 ## Scenarios:
 ##   fresh       the committed fresh-save bootstrap fixture parses into
@@ -24,6 +25,14 @@ extends "res://tests/test_base.gd"
 ##               `storage` rather than defaulted, and a non-object field,
 ##               a non-item-id key, or a non-integer quantity each fail
 ##               closed naming the offender;
+##   keys        the addressable legacy map key (building-move design D7):
+##               every fresh row carries its key verbatim as the
+##               addressable index a move intent names, a key that is not a
+##               positive integer is recorded unaddressable and NEVER
+##               coerced (it is kept, rendered, and reported by its
+##               verbatim key instead), and the pure key rule covers digit
+##               strings, int keys, `0`, negatives, non-numeric, empty, and
+##               non-scalar keys;
 ##   village     the preserved `villages/Scarlet.json` (`maps[0]` shape)
 ##               parses: 576 placements, the six content-unknown ids
 ##               recorded, House I and Wild Elephant resolved.
@@ -70,6 +79,7 @@ func run_scenario() -> void:
 	_check_unresolved_id(payload, registry)
 	_check_absent_field(payload, registry)
 	_check_storage(payload, registry)
+	_check_addressable_keys(payload, registry)
 	_check_registry_precondition()
 	_check_village_parse(registry)
 
@@ -324,6 +334,115 @@ func _check_storage(payload: Variant, registry: Variant) -> void:
 		"the shared parser reports an absent mapping as not present")
 	check_eq(response_absent.get("storage", {}), {},
 		"an absent mapping yields no fabricated inventory")
+
+
+## The addressable legacy map key (building-move task 4.1, design D7): the
+## positive integer a row was stored under is the verbatim index a move
+## intent names; a key that is not one is recorded unaddressable and never
+## coerced, because coercing it to `0` would address a real, different row.
+func _check_addressable_keys(payload: Variant, registry: Variant) -> void:
+	var result: Dictionary = TownState.parse(payload, registry)
+	check(bool(result.get("ok", false)),
+		"the fresh save parses for the key check: %s" % result.get("error"))
+	if not bool(result.get("ok", false)):
+		return
+	var state = result["state"]
+	# Every fresh row is keyed 1..40, so each is addressable and its recorded
+	# key text equals its index.
+	var by_slot := {}
+	for placement in state.placements:
+		by_slot[placement.slot] = true
+		check(int(placement.slot) > 0,
+			"fresh placement '%s' carries an addressable index"
+				% str(placement.slot_key))
+		check_eq(str(placement.slot_key), str(placement.slot),
+			"the recorded key text equals the addressable index")
+	check_eq(by_slot.size(), 40, "all 40 fresh keys are distinct and addressable")
+	# The row the executed move fixture targets: key "11", Turret I.
+	var turret = null
+	for placement in state.placements:
+		if placement.slot == 11:
+			turret = placement
+	check(turret != null, "the fixture's key 11 resolves to a placement")
+	if turret != null:
+		check_eq(turret.item, 22, "key 11 names Turret I")
+		check_eq(turret.cell, Vector2i(58, 48),
+			"key 11 is anchored at (58,48) in the fresh save")
+
+	# The pure key rule, over every shape a save could carry. A digit
+	# string is the documented legacy shape; an int key canonicalizes to
+	# the same index; everything else is unaddressable, never coerced.
+	check_eq(TownState.slot_of("11"), 11, "a digit string is the index")
+	check_eq(TownState.slot_of(11), 11, "an int key is the same index")
+	check_eq(TownState.slot_of("1"), 1, "index 1 is addressable")
+	check_eq(TownState.slot_of("0"), null, "index 0 is not addressable")
+	check_eq(TownState.slot_of(0), null, "int key 0 is not addressable either")
+	check_eq(TownState.slot_of("-1"), null, "a negative key is not addressable")
+	check_eq(TownState.slot_of("-1"), null,
+		"a negative digit-prefixed key is not addressable")
+	check_eq(TownState.slot_of("mystery"), null,
+		"a non-numeric key is not addressable")
+	check_eq(TownState.slot_of("1.5"), null,
+		"a non-integer numeric key is not addressable")
+	check_eq(TownState.slot_of(""), null, "an empty key is not addressable")
+	check_eq(TownState.slot_of(null), null, "a null key is not addressable")
+	check_eq(TownState.slot_of([11]), null,
+		"a non-scalar key is not addressable")
+	check_eq(TownState.slot_of({"11": true}), null,
+		"an object key is not addressable")
+	check_eq(TownState.NO_SLOT, -1,
+		"the unaddressable sentinel is never a usable index")
+	check(not TownState.is_addressable(null),
+		"an absent placement is never addressable")
+	check(not TownState.is_addressable({"slot": 11}),
+		"an untyped bag is never addressable (no guessing)")
+
+	# A crafted payload whose rows carry unusable keys: the save still parses
+	# and every row is kept, rendered, and reported by its verbatim key — the
+	# move flow refuses such a row explicitly instead of moving another one.
+	var crafted: Dictionary = (payload as Dictionary).duplicate(true)
+	var items: Dictionary = (crafted["map"] as Dictionary)["items"]
+	items["mystery"] = [1, 20, 20, 0, 0, [], {}, 1]
+	items["0"] = [1, 21, 20, 0, 0, [], {}, 1]
+	items[""] = [1, 22, 20, 0, 0, [], {}, 1]
+	items["-3"] = [1, 23, 20, 0, 0, [], {}, 1]
+	items[7] = [1, 24, 20, 0, 0, [], {}, 1]
+	var crafted_result: Dictionary = TownState.parse(crafted, registry)
+	check(bool(crafted_result.get("ok", false)),
+		"unusable keys do not fail the save: %s"
+		% crafted_result.get("error"))
+	if not bool(crafted_result.get("ok", false)):
+		return
+	var crafted_state = crafted_result["state"]
+	check_eq(crafted_state.placements.size(), 45,
+		"every crafted row is kept, not dropped")
+	var unaddressable := 0
+	for placement in crafted_state.placements:
+		if not TownState.is_addressable(placement):
+			unaddressable += 1
+			check_eq(int(placement.slot), TownState.NO_SLOT,
+				"an unaddressable row carries the sentinel, not a guess")
+			check(str(placement.slot_key) in ["mystery", "0", "", "-3"],
+				"an unaddressable row records its own key verbatim ('%s')"
+					% str(placement.slot_key))
+	check_eq(unaddressable, 4,
+		"the four unusable keys are recorded unaddressable")
+	# An int key "7" already names a real row, so the parser now finds two
+	# rows under the same index: both carry it verbatim (the key is never
+	# rewritten), and the duplicate is the save's own shape to report, not
+	# something the parser invents.
+	var seven = 0
+	for placement in crafted_state.placements:
+		if int(placement.slot) == 7:
+			seven += 1
+	check_eq(seven, 2, "both rows stored under index 7 carry it verbatim")
+	# The usable rows are untouched by the unusable ones.
+	var turret_after = null
+	for placement in crafted_state.placements:
+		if placement.slot == 11 and placement.item == 22:
+			turret_after = placement
+	check(turret_after != null,
+		"an addressable row stays addressable beside unusable keys")
 
 
 ## A rejected storage parse: `{ok: false}` with an error naming the

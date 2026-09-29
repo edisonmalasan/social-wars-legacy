@@ -22,6 +22,13 @@ extends RefCounted
 ## Requires an explicitly loaded `ContentRegistry` (content + asset
 ## registry) — the registry's own contract is explicit loading, and this
 ## parser never loads implicitly on the caller's behalf.
+##
+## Addressable keys (building-move design D7): every placement also carries
+## the legacy map key it was stored under, so a move intent can name the row
+## it targets. A key that is not a positive integer is recorded verbatim as
+## unaddressable (`NO_SLOT`) instead of being coerced — a coerced index
+## would address a *different* row, which is exactly the failure this
+## records instead.
 
 ## Content domains searched, in order, for a placed legacy id (the
 ## normalized package splits items into buildings/units/specials; ids do
@@ -53,9 +60,17 @@ const STORAGE_FIELD := "map.store"
 const STORAGE_MISSING_KEY := "storage"
 
 
+## The addressable-index sentinel: a placement whose legacy map key is not
+## a positive integer carries no index a move intent could name
+## (building-move design D7). Never `0` — coercing an unusable key to 0
+## would address a real row.
+const NO_SLOT := -1
+
 ## One placement exactly as the legacy save carries it: the eight
 ## positional fields kept verbatim (`raw` preserves the parsed values
-## byte-for-byte) plus resolved content metadata for rendering.
+## byte-for-byte), the legacy map key the row was stored under
+## (building-move design D7), plus resolved content metadata for
+## rendering.
 class Placement:
 	extends RefCounted
 	## Item (legacy id) as an integer.
@@ -71,6 +86,13 @@ class Placement:
 	var player: Variant = null
 	## The full eight-field row as parsed from the save.
 	var raw: Array = []
+	## The legacy map key this row was parsed from, as text, verbatim —
+	## the diagnostic the move flow names when the key is unusable.
+	var slot_key := ""
+	## The addressable index a legacy `move` names this row by (design
+	## D7): the positive integer the key carried, or `NO_SLOT` (-1) when
+	## the key is not one. Never coerced to a guessable value.
+	var slot := -1
 	## Save order — the deterministic last tie-break of the depth sort.
 	var order := 0
 	## True when ContentRegistry resolved the placed legacy id.
@@ -175,6 +197,12 @@ static func parse(payload: Variant, registry: RegistryScript) -> Dictionary:
 		placement.raw = (row as Array).duplicate()
 		placement.order = order
 		order += 1
+		# The legacy map key the row was stored under (design D7): the
+		# addressable index a move intent names, or the recorded
+		# unaddressable key. Recorded either way — never dropped, never
+		# coerced into an index that could name a different row.
+		placement.slot_key = str(key)
+		placement.slot = _slot_index(key)
 		var item: Variant = _integer(row[0])
 		if item == null:
 			return reject.call(
@@ -310,6 +338,45 @@ static func _item_id(key: Variant) -> Variant:
 				return null
 		return text.to_int()
 	return null
+
+
+## One placement map key -> its addressable index, or `NO_SLOT` when the key
+## is not a positive integer (building-move design D7). Legacy resolves a
+## row with `engine.map_get_item(map, index)`, i.e.
+## `map["items"][str(index)]`, so a digit string is the documented shape and
+## an int key canonicalizes to the same index. Everything else is recorded
+## as unaddressable instead of coerced: a key legacy could not address
+## (`"0"`, `"-1"`, `"mystery"`, an empty string, a float) yields
+## `NO_SLOT`, never a guess that would name a different row.
+static func _slot_index(key: Variant) -> int:
+	if key is int:
+		return int(key) if int(key) > 0 else NO_SLOT
+	if key is String:
+		var text := str(key)
+		if text.is_empty() or text.length() > 16:
+			return NO_SLOT
+		for character in text:
+			if character < "0" or character > "9":
+				return NO_SLOT
+		var value := text.to_int()
+		return value if value > 0 else NO_SLOT
+	return NO_SLOT
+
+
+## One placement key -> its addressable index, or null when the key is not
+## a positive integer (the public form of `_slot_index`, for callers that
+## want the "no index" case without the sentinel).
+static func slot_of(key: Variant) -> Variant:
+	var index := _slot_index(key)
+	return null if index == NO_SLOT else index
+
+
+## True when the placement carries an addressable index a move intent can
+## name (design D7). Reads the sentinel, never a guess.
+static func is_addressable(placement: Variant) -> bool:
+	if placement == null or not (placement is Placement):
+		return false
+	return int((placement as Placement).slot) > 0
 
 
 ## The house storage rejection envelope: names the offending field or key.

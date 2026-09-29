@@ -2,8 +2,10 @@ extends "res://tests/test_base.gd"
 ## Headless GameApi suite for the legacy-v0 implementation (task 3.3, spec
 ## "Boot live against Compatibility API"; extended by the
 ## building-placement change's task 3.2 with the placement parity of spec
-## "Place through either implementation" and by `building-purchase` with the
-## purchase parity of spec "Purchase through either implementation").
+## "Place through either implementation", by `building-purchase` with the
+## purchase parity of spec "Purchase through either implementation", and by
+## `building-move` with the move parity of spec "Move through either
+## implementation").
 ##
 ## Requires a running Compatibility API v0 on loopback — verify-boot.ps1
 ## wraps this suite with `compat_live_phase.py`, which starts
@@ -26,6 +28,16 @@ const PURCHASE_PRICE := 5
 ## is not derivable, so both implementations fail closed with
 ## `costs_not_cash` rather than inventing a price.
 const WOOD_PRICED_ITEM := 1
+## The executed-legacy move transaction's target: the Turret I (item 22) at
+## legacy map key 11, from (58,48) to (58,47) — the one move both
+## implementations must answer identically.
+const MOVE_ITEM := 22
+const MOVE_INDEX := 11
+const MOVE_CELL := Vector2i(58, 47)
+## An integer index that names no row in the corpus save: the endpoint
+## resolves it before executing and answers 404 `unknown_item_index`, so
+## legacy's silent no-op is never reported as a success.
+const MOVE_UNKNOWN_INDEX := 9999
 
 
 func run_scenario() -> void:
@@ -146,6 +158,7 @@ func run_scenario() -> void:
 
 	await _check_live_placement(api, endpoint, user_id)
 	await _check_live_purchase(api, endpoint, user_id)
+	await _check_live_move(api, endpoint, user_id)
 	# The live corpus now carries both mutating transactions, so this suite's
 	# parity claim is stated once, explicitly: the two implementations are
 	# compared on the fields each own, and each side's resource bag is
@@ -402,6 +415,141 @@ func _check_live_purchase(api: Variant, endpoint: String,
 			"structured codes match between implementations")
 	print("[test] live-purchase applied item=%d store=%s cash=%d"
 		% [PURCHASE_ITEM, JSON.stringify(live.store), live.resources.cash])
+
+
+## Move through both implementations (building-move task 3.3, spec "Move
+## through either implementation"): the SAME typed placement result both
+## implementations already share for a placement (design D4), the live
+## response's persisted row matching the executed fixture's after-state for
+## every stable field, the neutral price vector leaving the resource bag
+## untouched, and the endpoint's structured codes passing through unchanged.
+##
+## The corpus in this phase already carries the placement and purchase
+## transactions, so the live side's resources are its own — the honest claim
+## is the one the contract makes: the move changes the row's cell and
+## nothing else, and both implementations produce the same typed shape and
+## the same row.
+func _check_live_move(api: Variant, endpoint: String,
+		user_id: String) -> void:
+	# The live side's pre-move resources, read from the corpus itself.
+	api.configure("legacy_v0", endpoint)
+	var live_before: BootData.Resources = await _live_resources(api, endpoint,
+		user_id)
+	check(live_before != null, "the live corpus pre-move resources resolve")
+
+	var live_ref: Variant = await api.move_building(user_id, MOVE_INDEX,
+		MOVE_CELL.x, MOVE_CELL.y)
+	check(live_ref is BootData.PlacementResult,
+		"live move_building returns the typed result")
+	if not (live_ref is BootData.PlacementResult):
+		return
+	var live: BootData.PlacementResult = live_ref
+	check(live.ok, "live move resolves over loopback: %s"
+		% live.error_message)
+	if not live.ok:
+		return
+	check_eq(live.protocol, BootData.PROTOCOL,
+		"live move protocol is compat-v0")
+	check_eq(live.result, "success",
+		"live move reports the legacy success result")
+	check(live.placement != null and live.resources != null,
+		"the live move response carries the persisted row and resources")
+	if live.placement == null or live.resources == null:
+		return
+	# The persisted row, re-read from the save after execution: the cell the
+	# intent named and every other field untouched.
+	check_eq(live.placement.item_id, MOVE_ITEM,
+		"the live row names the Turret I")
+	check_eq(live.placement.x, MOVE_CELL.x,
+		"the live row carries the requested x")
+	check_eq(live.placement.y, MOVE_CELL.y,
+		"the live row carries the requested y")
+	check_eq(live.placement.player, 1,
+		"the live row keeps the player's team field (unchanged by a move)")
+	if live_before != null:
+		# The derived price vector is neutral, so a move changes NO resource
+		# (design D2) — the strongest available assertion, and the reason the
+		# committed fixture's before/after resource bags are identical.
+		for key in ["gold", "wood", "oil", "steel", "mana", "xp", "cash"]:
+			check_eq(int(live.resources.get(key)), int(live_before.get(key)),
+				"%s is untouched by the move (neutral vector, design D2)"
+					% key)
+
+	# Fake reference: an independent in-memory state over the committed
+	# move-fixture before-state.
+	api.configure("fake")
+	var fake_ref: Variant = await api.move_building(user_id, MOVE_INDEX,
+		MOVE_CELL.x, MOVE_CELL.y)
+	check(fake_ref is BootData.PlacementResult,
+		"fake move_building returns the typed result")
+	if not (fake_ref is BootData.PlacementResult):
+		return
+	var fake: BootData.PlacementResult = fake_ref
+	check(fake.ok, "fake move reference resolves: %s" % fake.error_message)
+	if not fake.ok or fake.placement == null or fake.resources == null:
+		return
+	check_eq(live.protocol, fake.protocol,
+		"live move protocol equals the fake's")
+	check_eq(live.result, fake.result,
+		"live move result string equals the fake's")
+	check_eq(live.placement.item_id, fake.placement.item_id,
+		"live move item id equals the fake's")
+	check_eq(live.placement.x, fake.placement.x,
+		"live move x equals the fake's")
+	check_eq(live.placement.y, fake.placement.y,
+		"live move y equals the fake's")
+	check_eq(live.placement.orientation, fake.placement.orientation,
+		"live move orientation equals the fake's (unchanged by a move)")
+	check_eq(live.placement.player, fake.placement.player,
+		"live move player field equals the fake's")
+	check_eq(live.placement.store.size(), fake.placement.store.size(),
+		"live move store equals the fake's (unchanged by a move)")
+	check(live.placement.attr == fake.placement.attr,
+		"live move attr equals the fake's (live=%s fake=%s)"
+		% [JSON.stringify(live.placement.attr),
+		JSON.stringify(fake.placement.attr)])
+	# The fake's own row: the executed fixture's after-state, verbatim.
+	check_eq(fake.placement.y, 47,
+		"the fake reproduces the fixture's moved y")
+	check_eq(fake.placement.timestamp, 0,
+		"the fake never restamps the row's timestamp")
+
+	# Structured service errors pass through with their original codes, and
+	# the fake derives the same code for the same intent offline.
+	api.configure("legacy_v0", endpoint)
+	var live_unknown: Variant = await api.move_building(user_id,
+		MOVE_UNKNOWN_INDEX, MOVE_CELL.x, MOVE_CELL.y)
+	check(live_unknown is BootData.PlacementResult,
+		"the live unknown index returns the typed result")
+	if live_unknown is BootData.PlacementResult:
+		var unknown: BootData.PlacementResult = live_unknown
+		check(not unknown.ok,
+			"an index the corpus does not name is a structured failure")
+		check_eq(unknown.error_code, "unknown_item_index",
+			"the live structured error passes through with the endpoint's code")
+		check(unknown.placement == null and unknown.resources == null,
+			"the live structured failure carries no partial payload")
+	var live_grid: Variant = await api.move_building(user_id, MOVE_INDEX,
+		100, MOVE_CELL.y)
+	check(live_grid is BootData.PlacementResult,
+		"the live out-of-grid anchor returns the typed result")
+	if live_grid is BootData.PlacementResult:
+		var bad_grid: BootData.PlacementResult = live_grid
+		check(not bad_grid.ok,
+			"the live out-of-grid anchor is a structured failure")
+		check_eq(bad_grid.error_code, "invalid_coordinates",
+			"the live grid violation names the endpoint's code")
+	api.configure("fake")
+	var fake_unknown: Variant = await api.move_building(user_id,
+		MOVE_UNKNOWN_INDEX, MOVE_CELL.x, MOVE_CELL.y)
+	check(fake_unknown is BootData.PlacementResult and not fake_unknown.ok,
+		"fake fails the same intent offline")
+	if fake_unknown is BootData.PlacementResult:
+		check_eq(fake_unknown.error_code, "unknown_item_index",
+			"structured codes match between implementations")
+	print("[test] live-move applied item_index=%d cell=(%d, %d) xp=%d gold=%d"
+		% [MOVE_INDEX, live.placement.x, live.placement.y,
+		live.resources.xp, live.resources.gold])
 
 
 ## The seven stored resources of the running corpus, as the typed

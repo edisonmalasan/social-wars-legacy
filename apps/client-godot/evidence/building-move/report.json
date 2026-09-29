@@ -1,0 +1,127 @@
+{
+	"bootstrap_requests": 1,
+	"capture": {
+		"implementation": "fake GameApi (a deterministic test double, not a parity oracle)",
+		"parity_pointer": "real-execution parity is established by the fixture-replay tests and the verify-boot move-live phase",
+		"path": "apps/client-godot/evidence/building-move/building-move.png",
+		"sha256": "3cc830925e630ae3e90571c03fd715f447482e4cfb41cfbdcc4a3cb2fd85c427"
+	},
+	"constants": {
+		"derivation_status": "derived-provisional",
+		"evidence_gap": "the legacy SWF's static iso-engine identifiers (TILE_SIZE, EI_TILE_HEIGHT_PIXELS, gridWidth/Height, numCols/numRows) were never extracted; pixel parity with the Flash client is not claimed",
+		"grid_extent": 100,
+		"origin_x": 2000.0,
+		"origin_y": 10.0,
+		"tile_height": 20.0,
+		"tile_width": 40.0,
+		"world_rect": [
+			0.0,
+			0.0,
+			4000.0,
+			2000.0
+		]
+	},
+	"counts": {
+		"objects_after": 40,
+		"objects_before": 40,
+		"placements_after": 40,
+		"placements_before": 40
+	},
+	"inputs": {
+		"bootstrap_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/get_player_info/response.body",
+			"sha256": "facedf76784d3dc03a3a45e81756a8546f90f7647dbff8917593404d9e401709"
+		},
+		"move_after": {
+			"path": "tests/fixtures/godot-building-move/steps/command_move/after.json",
+			"sha256": "f7e3566fb673424380bc04a333f78265c5e99183bbdfba0e92d9a1adaf10d0ad"
+		},
+		"move_request": {
+			"path": "tests/fixtures/godot-building-move/steps/command_move/request.json",
+			"sha256": "7e21601aa63c9a9f532ecbec308a77651022051637bc328e971f6984b153c197"
+		},
+		"move_response": {
+			"path": "tests/fixtures/godot-building-move/steps/command_move/response.body",
+			"sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87"
+		},
+		"save_list_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json",
+			"sha256": "ad0404c2c340a48f06e2e49ae7eb7973978cd2ccb02ac6ff7bfba4eb75f6d9f4"
+		},
+		"terrain": {
+			"path": "assets/images/en/mapa1.jpg",
+			"sha256": "35c4ded53e82be187eb67c54ee7c7023b698c3986954db4b6f9613a2a45cdd3f"
+		}
+	},
+	"intent": {
+		"item_index": 11,
+		"user_id": "00000000-0000-4000-8000-000000000001",
+		"x": 58,
+		"y": 47
+	},
+	"move_requests": 1,
+	"moved_building": {
+		"cell_after": [
+			58,
+			47
+		],
+		"cell_before": [
+			58,
+			48
+		],
+		"legacy_id": 22,
+		"name": "Turret I",
+		"row_after": [
+			22,
+			58,
+			47,
+			0,
+			0,
+			[],
+			{},
+			1
+		],
+		"row_before": [
+			22,
+			58,
+			48,
+			0,
+			0,
+			[],
+			{},
+			1
+		],
+		"slot": 11
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed",
+		"the command's argument values, the arguments the legacy branch discards, and the neutral price vector are derived, never observed from the Flash client; no claim is made about what moving costs in the legacy client",
+		"parity covers one recorded transaction against the fresh-player corpus, not progressed players",
+		"occupancy, the no-op cell, and grid-bounds rules are enforced client-side only; the endpoint enforces structural input validity and no server-authoritative validation exists",
+		"no pixel-parity oracle against the legacy client exists",
+		"the capture runs the fake GameApi implementation; real-execution parity is established by the fixture-replay tests and the verify-boot move-live phase"
+	],
+	"resources": {
+		"after": {
+			"cash": 5,
+			"coins": 2000,
+			"energy": 50,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2000,
+			"xp": 4
+		},
+		"before": {
+			"cash": 5,
+			"coins": 2000,
+			"energy": 50,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2000,
+			"xp": 4
+		}
+	},
+	"schema": "move-report-v1"
+}

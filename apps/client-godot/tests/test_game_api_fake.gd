@@ -23,6 +23,10 @@ const FIXTURE_PURCHASE_BEFORE := \
 	"tests/fixtures/godot-item-purchase/steps/command_buy_stored_item_cash/before.json"
 const FIXTURE_PURCHASE_AFTER := \
 	"tests/fixtures/godot-item-purchase/steps/command_buy_stored_item_cash/after.json"
+const FIXTURE_MOVE_BEFORE := \
+	"tests/fixtures/godot-building-move/steps/command_move/before.json"
+const FIXTURE_MOVE_AFTER := \
+	"tests/fixtures/godot-building-move/steps/command_move/after.json"
 
 
 func run_scenario() -> void:
@@ -115,6 +119,7 @@ func run_scenario() -> void:
 
 	await _check_placement(api, user_id)
 	await _check_purchase(api, user_id)
+	await _check_move(api, user_id)
 
 	info("fake implementation resolved %d save(s) with no server and no socket"
 		% save_list.saves.size())
@@ -355,6 +360,162 @@ func _check_purchase_failure(result: Variant, code: String,
 	check(not typed.ok, label + " is a structured failure")
 	check_eq(typed.error_code, code, label + " names the endpoint's code")
 	check(typed.store.is_empty(), label + " carries no partial storage")
+	check(typed.resources == null, label + " carries no partial resources")
+
+
+## Move double coverage (building-move task 3.2, design D8): the documented
+## in-memory semantics over the committed move fixture's before-state (the
+## index resolves against the save's own placements, ONLY `x`/`y` are
+## written in place, no key is added, removed, or re-keyed, and the derived
+## neutral resource vector leaves every resource untouched), the endpoint's
+## structured failure codes, and the intent counter — all with no process, no
+## server, and no socket.
+##
+## The executed transaction, read from the fixture (never written): the
+## after-state's one changed leaf (`items["11"][2]`: 48 -> 47) is the whole
+## oracle, and the double's in-memory row must equal it exactly.
+func _check_move(api: Variant, user_id: String) -> void:
+	var before := _read_fixture_object(FIXTURE_MOVE_BEFORE)
+	var after := _read_fixture_object(FIXTURE_MOVE_AFTER)
+	if before.is_empty() or after.is_empty():
+		return
+	var before_map: Dictionary = before["maps"][0]
+	var after_map: Dictionary = after["maps"][0]
+	var before_items: Dictionary = before_map["items"]
+	var after_items: Dictionary = after_map["items"]
+	check_eq(before_items.size(), 40,
+		"the fixture before map carries 40 placements")
+	check_eq(after_items.size(), 40,
+		"the fixture after map still carries 40 placements (a move adds none)")
+	# The JSON transport widens the save's ints to floats on the pinned
+	# engine, so the expected rows are canonicalized to the typed int form
+	# the client actually receives (the same tolerance the shared placement
+	# parser documents).
+	var moved_before := _typed_row(before_items["11"])
+	var moved_after := _typed_row(after_items["11"])
+	check_eq(moved_before, [22, 58, 48, 0, 0, [], {}, 1],
+		"the fixture anchors the Turret I at (58,48) under key 11")
+	check_eq(moved_after, [22, 58, 47, 0, 0, [], {}, 1],
+		"the fixture moves it to (58,47) and changes nothing else")
+	check_eq(before_map["gold"], after_map["gold"],
+		"the executed move left gold unchanged")
+	check_eq(before_map["wood"], after_map["wood"],
+		"the executed move left wood unchanged")
+	check_eq(before["playerInfo"]["cash"], after["playerInfo"]["cash"],
+		"the executed move left cash unchanged (the derived vector is neutral)")
+	var requests_before: int = api.move_requests
+
+	# --- success: Turret I from key 11 to (58,47) ------------------
+	var moved: Variant = await api.move_building(user_id, 11, 58, 47)
+	check(moved is BootData.PlacementResult,
+		"move_building returns the typed result")
+	if not (moved is BootData.PlacementResult):
+		return
+	var first: BootData.PlacementResult = moved
+	check(first.ok, "fake move resolves offline: %s" % first.error_message)
+	if not first.ok:
+		return
+	check_eq(first.protocol, BootData.PROTOCOL, "move protocol is compat-v0")
+	check_eq(first.result, "success", "legacy result string is reported")
+	check(first.placement != null, "typed placement entry is carried")
+	check(first.resources != null, "typed resources are carried")
+	if first.placement == null or first.resources == null:
+		return
+	# The double reproduces the executed transaction's row byte-for-byte.
+	check_eq(first.placement.item_id, 22,
+		"the moved entry names the Turret I")
+	check_eq(first.placement.x, 58, "the moved entry's x matches the intent")
+	check_eq(first.placement.y, 47, "the moved entry's y matches the intent")
+	check_eq(first.placement.timestamp, int(moved_after[3]),
+		"the moved entry keeps its row timestamp (never restamped)")
+	check_eq(first.placement.orientation, int(moved_after[4]),
+		"the moved entry keeps its orientation")
+	check_eq(first.placement.store, [], "the moved entry keeps its store")
+	check_eq(first.placement.attr, {}, "the moved entry keeps its attr")
+	check_eq(first.placement.player, int(moved_after[7]),
+		"the moved entry keeps its player field")
+	# The neutral derived price vector means the resource bag is the fresh
+	# save's own values (design D2) — never a computed delta.
+	check_eq(first.resources.gold, int(before_map["gold"]),
+		"gold is unchanged by the neutral vector")
+	check_eq(first.resources.wood, int(before_map["wood"]),
+		"wood is unchanged by the neutral vector")
+	check_eq(first.resources.oil, int(before_map["oil"]),
+		"oil is unchanged by the neutral vector")
+	check_eq(first.resources.steel, int(before_map["steel"]),
+		"steel is unchanged by the neutral vector")
+	check_eq(first.resources.xp, int(before_map["xp"]),
+		"xp is unchanged by the neutral vector")
+	check_eq(first.resources.cash, int(before["playerInfo"]["cash"]),
+		"cash is unchanged by the neutral vector")
+	check_eq(first.resources.mana, int(before["privateState"]["mana"]),
+		"mana is unchanged by the neutral vector")
+
+	# --- the no-op cell is the CLIENT's refusal, never the double's:
+	# the endpoint enforces structural validity only, so the double accepts
+	# it exactly as the service does.
+	var noop: Variant = await api.move_building(user_id, 11, 58, 47)
+	check(noop is BootData.PlacementResult and noop.ok,
+		"the double accepts a repeated target (the client refuses it)")
+	if noop is BootData.PlacementResult and noop.ok:
+		check_eq(noop.placement.y, 47,
+			"the repeated target writes the same cell again")
+
+	# --- structured failures: endpoint codes, no partial payload ---
+	var ghost: Variant = await api.move_building("ghost-0000", 11, 58, 47)
+	_check_move_failure(ghost, "unknown_user_id", "unknown save id")
+	var empty: Variant = await api.move_building("", 11, 58, 47)
+	_check_move_failure(empty, "missing_user_id", "empty save id")
+	var unknown_index: Variant = await api.move_building(user_id, 9999, 58, 47)
+	_check_move_failure(unknown_index, "unknown_item_index",
+		"an index the map does not name")
+	var off_grid: Variant = await api.move_building(user_id, 11, 100, 47)
+	_check_move_failure(off_grid, "invalid_coordinates",
+		"anchor past the grid edge")
+	var negative: Variant = await api.move_building(user_id, 11, 58, -1)
+	_check_move_failure(negative, "invalid_coordinates",
+		"negative anchor")
+
+	# --- the failures applied nothing: the row is still the moved one ---
+	var reread: Variant = await api.move_building(user_id, 11, 58, 47)
+	check(reread is BootData.PlacementResult and reread.ok,
+		"the double still resolves after the failed attempts")
+	if reread is BootData.PlacementResult and reread.ok:
+		check_eq(reread.placement.y, 47,
+			"the failed attempts moved nothing else")
+
+	check_eq(api.move_requests, requests_before + 8,
+		"every move_building call increments the intent counter exactly once")
+	info("move double resolved the executed fixture's row plus 5 structured "
+		+ "failures with no server and no socket")
+
+
+## The committed eight-field row in the typed form the client receives:
+## every integral float (the JSON transport's width) becomes an int, and
+## nothing else is touched. The nested `store`/`attr` structures are carried
+## as-is, so only the positional fields are canonicalized.
+func _typed_row(value: Variant) -> Array:
+	if not (value is Array):
+		return []
+	var row: Array = []
+	for element: Variant in (value as Array):
+		row.append(int(element) if (element is int or element is float) \
+			else element)
+	return row
+
+
+## Every move failure carries the endpoint's code and no partial payload
+## (design D5) — including the 404 `unknown_item_index`, which stands in
+## for legacy's silent no-op early return.
+func _check_move_failure(result: Variant, code: String, label: String) -> void:
+	check(result is BootData.PlacementResult,
+		label + " returns the typed result")
+	if not (result is BootData.PlacementResult):
+		return
+	var typed: BootData.PlacementResult = result
+	check(not typed.ok, label + " is a structured failure")
+	check_eq(typed.error_code, code, label + " names the endpoint's code")
+	check(typed.placement == null, label + " carries no partial placement")
 	check(typed.resources == null, label + " carries no partial resources")
 
 
