@@ -242,6 +242,32 @@ class LegacyBoot:
             )
         return items
 
+    def has_map_item(self, user_id: str, index: int) -> bool:
+        """Whether ``map["items"][str(index)]`` names a row in this save.
+
+        This is the move deliver line's addressability rule: legacy
+        ``engine.map_get_item`` looks the row up by ``str(index)``
+        (``engine.py:36-40``) and returns ``None`` for a missing key, after
+        which ``command.move`` logs an error and returns early — a silent
+        no-op that still persists the save.  The endpoint therefore resolves
+        the index against the corpus itself and answers a structured error
+        instead of reporting that no-op as success.
+        """
+        return str(index) in self.map_items(user_id)
+
+    def map_item(self, user_id: str, index: int) -> object:
+        """``map["items"][str(index)]`` — one placement row, or ``None``.
+
+        The row is the eight-field entry legacy writes through
+        ``engine.map_add_item`` (``engine.py:31``): ``[item, x, y, timestamp,
+        orientation, store, attr, player]``.  It is returned by reference on
+        purpose: after ``execute_commands`` the same list object is what the
+        legacy dispatcher just persisted, so a read back through this accessor
+        is the authoritative post-execution state (exactly as ``map_store``
+        does for the purchase superset).
+        """
+        return self.map_items(user_id).get(str(index))
+
     def map_store(self, user_id: str) -> Dict[str, object]:
         """``save["maps"][0]["store"]`` — the player's storage mapping.
 

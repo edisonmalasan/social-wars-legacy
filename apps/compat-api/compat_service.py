@@ -37,6 +37,23 @@ Surface (loopback only, port :5056):
     current ``resources`` (design D4). The contract accepts no client-supplied
     price, quantity, or resource deltas — extra keys are ignored.
 
+``POST /v0/move`` with JSON ``{"user_id", "item_index", "x", "y"}``
+    ``{protocol, ok, game_version, server_time, result, placement, resources}``
+    — an intent only, and the third state-mutating surface. The legacy batch
+    envelope is derived internally (one ``move`` command whose five arguments
+    are the legacy map index, the target coordinates, and the two documented
+    placeholders the branch discards, with the **neutral** derived resource
+    vector — design D2/D6 of the ``building-move`` change), the unchanged
+    legacy ``command()`` dispatcher executes it in-process, and the answer
+    carries the legacy ``result`` plus the authoritative superset: the
+    persisted eight-field ``placement`` entry re-read from the save after
+    execution and the current ``resources`` (design D4). The contract accepts
+    no client-supplied price, resource deltas, ``frame``, or ``string`` — the
+    extra keys are ignored. ``item_index`` is the legacy map key as an
+    integer and must resolve to a row in the corpus save *before* the
+    dispatcher runs, because legacy's own missing-item path is a silent no-op
+    that would otherwise be reported as a success.
+
 Deviation recorded for review: the bootstrap envelope also carries ``saves``
 (the session envelope plus ``config`` and ``player_info``). Design D3 lists
 only ``config`` and ``player_info``; the extra key is a superset of D3 and
@@ -54,6 +71,11 @@ code                     HTTP  when
 ``missing_item_id``      400  ``/v0/place`` or ``/v0/purchase`` body carries no ``item_id``
 ``invalid_item_id``      400  ``item_id`` present but not an integer (``bool`` excluded)
 ``unknown_item_id``      404  integer id absent from the loaded config
+``missing_item_index``   400  ``/v0/move`` body carries no ``item_index``
+``invalid_item_index``   400  ``item_index`` present but not an integer (``bool``
+                                excluded)
+``unknown_item_index``   404  integer index that names no row in the save's
+                                ``map["items"]`` (legacy would silently no-op)
 ``invalid_coordinates``  400  ``x``/``y`` missing, not integers, or outside ``0..99``
 ``invalid_orientation``  400  ``orientation`` present but not an integer
 ``costs_not_cash``       400  ``/v0/purchase`` item's config price is not a cash
@@ -68,12 +90,12 @@ code                     HTTP  when
 Persistence scope (design D6, spec ``godot-compatibility-boot``): the
 session and bootstrap endpoints never persist — this module never calls
 ``sessions.save_session`` for them and every call leaves the saves
-byte-identical. ``POST /v0/place`` and ``POST /v0/purchase`` execute the
-unchanged legacy ``command()`` dispatcher, which persists through legacy
-``save_session`` into the **service corpus's** ``saves/`` and nowhere else; the
-service never opens a working-tree file for writing, and it never binds
-anywhere except ``127.0.0.1`` (the bind address lives here so both the start
-command and the tests read one constant).
+byte-identical. ``POST /v0/place``, ``POST /v0/purchase``, and
+``POST /v0/move`` execute the unchanged legacy ``command()`` dispatcher, which
+persists through legacy ``save_session`` into the **service corpus's**
+``saves/`` and nowhere else; the service never opens a working-tree file for
+writing, and it never binds anywhere except ``127.0.0.1`` (the bind address
+lives here so both the start command and the tests read one constant).
 """
 
 from __future__ import annotations
@@ -83,6 +105,7 @@ from typing import Any, Dict, Optional, Tuple
 from flask import Flask, Response, jsonify, request
 
 import compat_legacy
+import move_envelope
 import placement_envelope
 import purchase_envelope
 
@@ -97,6 +120,9 @@ ERROR_UNKNOWN_USER_ID = "unknown_user_id"
 ERROR_MISSING_ITEM_ID = "missing_item_id"
 ERROR_INVALID_ITEM_ID = "invalid_item_id"
 ERROR_UNKNOWN_ITEM_ID = "unknown_item_id"
+ERROR_MISSING_ITEM_INDEX = "missing_item_index"
+ERROR_INVALID_ITEM_INDEX = "invalid_item_index"
+ERROR_UNKNOWN_ITEM_INDEX = "unknown_item_index"
 ERROR_INVALID_COORDINATES = "invalid_coordinates"
 ERROR_INVALID_ORIENTATION = "invalid_orientation"
 ERROR_COSTS_NOT_CASH = "costs_not_cash"
@@ -410,6 +436,125 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
                 boot,
                 result="success",
                 store=store,
+                resources=resources,
+            ),
+            200,
+        )
+
+    @app.post("/v0/move")
+    def v0_move() -> Tuple[Dict[str, Any], int]:
+        """Execute one move intent through the unchanged legacy path.
+
+        Validation is structural fail-closed (design D3/D5): a JSON object
+        body, a resolvable save, an integer item index that names a row in
+        the corpus save, and integer anchor coordinates inside the town grid.
+        Grid bounds as a *gameplay* rule, footprint occupancy (with the moving
+        building's own cells excluded), and the refusal of a no-op move to the
+        cell the building already occupies are the client's job exactly as
+        they were Flash's — legacy ``move`` performs no validation at all — and
+        anti-cheat validation belongs to Server v1 (M13).  The item index is
+        resolved here rather than left to legacy, because legacy's
+        missing-item path (``command.py:126-129``) is a silent early return
+        that still persists the save: reporting that as a success would claim a
+        state change that never happened.  Every failure below returns before
+        the legacy dispatcher runs, so the corpus is untouched on every error
+        path.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404,
+                ERROR_UNKNOWN_USER_ID,
+                "no save exists for user_id %r" % user_id,
+            )
+
+        if "item_index" not in payload:
+            return error_response(
+                400, ERROR_MISSING_ITEM_INDEX, "item_index is required"
+            )
+        item_index = payload["item_index"]
+        if not move_envelope.is_strict_int(item_index):
+            return error_response(
+                400, ERROR_INVALID_ITEM_INDEX, "item_index must be an integer"
+            )
+
+        x = payload.get("x")
+        y = payload.get("y")
+        if (
+            not move_envelope.is_strict_int(x)
+            or not move_envelope.is_strict_int(y)
+            or not move_envelope.in_grid(x, y)
+        ):
+            return error_response(
+                400,
+                ERROR_INVALID_COORDINATES,
+                "x and y must be integers with anchors inside the "
+                "0..%d town grid" % (move_envelope.GRID_EXTENT - 1),
+            )
+
+        # Resolve the index against the corpus before deriving: an index that
+        # names no row must fail closed, never reach legacy's silent no-op.
+        try:
+            known = boot.has_map_item(user_id, item_index)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not known:
+            return error_response(
+                404,
+                ERROR_UNKNOWN_ITEM_INDEX,
+                "no placement with index %d in this save's map" % item_index,
+            )
+
+        # Derive the legacy envelope (design D6): the neutral resource vector
+        # and the discarded frame/string placeholders are the module's, never
+        # the client's.  The contract carries no price or resource delta:
+        # extra keys are ignored so the client's own derivation can never win.
+        try:
+            envelope_payload = move_envelope.build_envelope(
+                item_index=item_index,
+                x=x,
+                y=y,
+            )
+        except move_envelope.EnvelopeError as failure:
+            return error_response(400, failure.code, str(failure))
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        # Execute the unchanged legacy command dispatcher in-process.  It
+        # persists via legacy save_session into this corpus only; the legacy
+        # HTTP route returns {"result": "success"} whenever command()
+        # returns without raising, so reaching here IS the legacy result.
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        # Read back what actually landed: the persisted eight-field row at that
+        # key (design D4), so the client never has to reconstruct it.
+        try:
+            placement = boot.map_item(user_id, item_index)
+            resources = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not isinstance(placement, list):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy execution did not persist the placement entry",
+            )
+        return (
+            envelope(
+                boot,
+                result="success",
+                placement=placement,
                 resources=resources,
             ),
             200,

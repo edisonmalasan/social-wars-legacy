@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-09-29T04:56:05+00:00",
+  "form": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "data": "95061781e0d55d52b66ed34c5253832216e74d057a7f5df26f720b693a61db0a;{\"accessToken\":\"\",\"commands\":[[0,\"move\",[11,58,47,0,\"\"],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1790657765}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "command.php form (USERID, user_key, language, data) with the derived <64-hex>;<json> envelope carrying one move command whose five arguments are the map index, the target cell, and the two documented placeholders legacy discards, and whose resources_changed is the neutral all-zero vector; user_key is redacted in this record (design D9); accessToken is the crafted empty placeholder, never a token value.",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}
