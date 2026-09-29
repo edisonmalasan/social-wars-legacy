@@ -1074,5 +1074,134 @@ each), and the fake-capture pointer.
 
 These non-claims are recorded verbatim in
 `evidence/building-move/report.json`.
-Remaining deliver lines of M7 (separate changes): sell, store, upgrade, build
-timers, income, expansion, resources, and XP.
+
+## Building sell
+
+The sell slice (OpenSpec `building-sell`, milestone M7) is the disposal
+counterpart to the move line: a placed building the player no longer wants is
+sold, executed as one typed intent by the unchanged legacy `sell` path inside
+Compatibility API v0, with an executed-legacy sell fixture as the parity oracle.
+Nothing is placed, nothing touches storage, and the legacy combat reason is
+never reached.
+
+### Flow
+
+1. **Action** — the delivered selection-driven surface gains a `Sell` action
+   beside `Move`, offered only while a placed building is selected **and** that
+   building's legacy map key is addressable; an unaddressable key is refused
+   with the same explicit reason the move flow already uses, never coerced.
+2. **Confirm** — the sell confirm names the building and has no target (a sale
+   occupies no grid cell). Confirming sends exactly one
+   `GameApi.sell_building(user_id, item_index)` intent; cancelling sends
+   nothing and leaves the town byte-identical; a pointer press that changes the
+   selection while the confirm is armed is refused with no request, so a sale
+   can never be silently re-targeted.
+3. **Apply** — only the authoritative response is applied: the building's
+   rendered object is freed, its typed placement is removed while the remaining
+   buildings keep the committed depth order, and HUD resources and XP take the
+   response values. The apply snapshots the placement, its index, the object,
+   and the resource bag first, so any failure restores everything and the
+   building stays on the map. A structured or transport failure surfaces its
+   code and removes nothing.
+
+### Endpoint contract and envelope derivations
+
+`POST /v0/sell` accepts only the intent `{user_id, item_index}` — the full
+contract, response example, structured error codes, validation split, and
+corpus-only persistence scope are documented in `apps/compat-api/README.md`.
+The endpoint resolves `item_index` against the save's own placements and reads
+that row **before** executing (legacy's missing-item path is a silent early
+return that would otherwise be reported as success), then proves afterwards
+that the key is gone from the persisted save. The legacy batch envelope is
+derived server-side and marked **derived-provisional**: one `sell` command with
+arguments `[item_index, reason]`, the reason **derived** as the empty string
+legacy compares against `"KILL"` and otherwise uses as a log label, a **neutral**
+all-zero resource vector, and the shared placeholders `accessToken=""`,
+`publishActions=[]`, `tries=1`, `first_number=0`. **No reason is accepted from
+the client**, so the combat reason that would route a row through
+`push_dead_unit` is unreachable through this surface.
+
+**No refund is claimed.** The committed configuration records no building-sale
+refund rule — item `cost` and `cost_type` are dead fields over all 778 items,
+`costs` prices the purchase only, and `MARKET_SELL_PERCENTAGE` governs the
+*resource* market — while the legacy refund travels only in client-sent deltas
+this contract refuses. A sale therefore removes the building and changes no
+balance, and refund economics belong to Server v1 (M13) and the later
+*resources* deliver line.
+
+### Verification (commands actually executed)
+
+```bash
+# Sell fixture capture (one-shot, executed-legacy oracle): the exact command,
+# exit codes, and containment are recorded in
+# tests/fixtures/godot-building-sell/README.md
+python -B apps/compat-api/capture_sell_fixture.py
+
+# Sell envelope + endpoint + executed-legacy parity tests (inside the compat
+# suite; observed: Ran 306 tests ... OK, exit 0)
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+
+# The hermetic sell-flow suite standalone (observed: 169 checks, PASS)
+godot --headless --path apps/client-godot --script res://tests/test_town_sell.gd
+
+# Full batteries in the final state (each embeds the sell suites and the
+# sell-live phase; both observed exit 0)
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+```
+
+`verify-boot.ps1` includes the hermetic `test_town_sell` suite (the sell flow
+over the fake double — action gating, the unaddressable refusal, one request per
+confirm, cancellation, the authoritative apply, and transport/structured-failure
+rollback) and a seventh live phase `sell-live`, which starts the Compatibility
+API over a disposable corpus, sends one intent through `POST /v0/sell`, asserts
+the typed response, and — via `compat_live_phase.py --expect-save-mutation` —
+asserts a corpus save file actually mutated, then tears down asserting the port
+is released, the corpus is removed, and no working-tree `saves/` exists.
+
+### Evidence capture (two-step, as the delivered slices)
+
+```bash
+# 1. Windowed fake-API launch: boot -> town, select the Turret I at slot 20,
+#    sell, confirm, then capture the frame (writes building-sell.png at the
+#    legacy 1400x600 stage, exits 0; a failed flow exits 1 with an explicit
+#    [town] sell-capture state=error marker)
+godot --path apps/client-godot res://scenes/boot.tscn -- --gameapi=fake --sell-capture=<repo>/apps/client-godot/evidence/building-sell/building-sell.png
+
+# 2. Headless deterministic report (writes report.json; a rerun is
+#    byte-identical; the bare --sell-report flag defaults to
+#    evidence/building-sell/report.json)
+godot --headless --path apps/client-godot res://scenes/town.tscn -- --sell-report=<repo>/apps/client-godot/evidence/building-sell/report.json
+```
+
+The report (`schema sell-report-v1`) records the inputs and digests, the intent
+`{user_id, item_index: 20}`, the sold building (Turret I, slot 20) with its row
+`[22, 41, 48, 0, 0, [], {}, 1]` and cell `(41, 48)`, counts before/after (40 ->
+39 placements and objects), resources before/after (unchanged), the
+projection-constants pointer, the bootstrap and sell request counts (exactly one
+each), and the fake-capture pointer.
+
+### Sell claim limits
+
+- no Flash, Ruffle, ActionScript, or browser executed;
+- the derived sell reason and the neutral price vector are derived, never
+  observed from the Flash client;
+- **no refund is claimed** — the committed configuration records no
+  building-sale refund rule and the legacy refund travels in client-sent deltas
+  this contract refuses, so a sale removes the building and changes no balance;
+- the legacy combat `KILL` reason is never reached, because no reason is
+  accepted from the client;
+- parity covers one recorded transaction against the fresh-player corpus, not
+  progressed players;
+- sellability and addressability are client-side rules only; the endpoint
+  enforces structural input validity and no server-authoritative validation
+  exists;
+- no pixel-parity oracle against the legacy client exists, and the surface's
+  layout and labels are documented placeholders;
+- the committed capture runs the fake GameApi — a deterministic test double, not
+  a parity oracle.
+
+These non-claims are recorded verbatim in
+`evidence/building-sell/report.json`.
+Remaining deliver lines of M7 (separate changes): store, upgrade, build timers,
+income, expansion, resources, and XP.

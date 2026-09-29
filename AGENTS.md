@@ -254,6 +254,47 @@ the committed capture runs the fake implementation, so real-execution parity
 rests on the fixture-replay tests and the live phase. No Flash, Ruffle,
 ActionScript, or browser executes in any of these commands.
 
+Verified building-sell commands (milestone M7; Godot 4.7.2.stable and pinned
+CPython 3.9.13, Windows x64; `python` denotes the pinned interpreter, never the
+PATH alias):
+
+```bash
+python -B apps/compat-api/capture_sell_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_town_sell.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-09-29): the sell fixture capture (one-shot
+executed-legacy `sell` oracle — Turret I at map slot 20 removed, 40 → 39
+placements, every other row, the storage, the private state, and all seven
+resources byte-identical; exit codes and containment recorded in
+`tests/fixtures/godot-building-sell/README.md`), the compat suite including the
+sell envelope, `/v0/sell` endpoint, and executed-legacy parity tests (observed
+`Ran 306 tests ... OK`, exit `0`), the hermetic sell-flow suite (observed 169
+checks, PASS; runs without a service and routes its transport-failure check
+against the dead endpoint the loop passes), both batteries in the final state
+(each exit `0`; the second embeds the `sell-live` phase that asserts a
+disposable corpus save mutated), and the preservation manifest (3,258 entries,
+exit `0`). The compatibility service listens on `127.0.0.1:5056` only, and every
+network call in these commands is loopback. The evidence capture and report
+steps are documented in `apps/client-godot/README.md` ("Building sell");
+committed evidence lives under `apps/client-godot/evidence/building-sell/`.
+Claim limits: parity covers one recorded transaction against the fresh-player
+corpus; the derived sell reason and the neutral price vector are
+derived-provisional, never observed from the Flash client, and **no refund is
+claimed** (the committed configuration records no building-sale refund rule and
+the legacy refund travels in client-sent deltas this contract refuses, so a sale
+removes the building and changes no balance); the legacy combat `KILL` reason is
+never reached because no reason is accepted from the client; sellability and
+addressability are client-side rules only, with no server-authoritative
+validation (that belongs to Server v1 / M13); no pixel-parity oracle exists; the
+committed capture runs the fake implementation, so real-execution parity rests
+on the fixture-replay tests and the live phase. No Flash, Ruffle, ActionScript,
+or browser executes in any of these commands.
+
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 
