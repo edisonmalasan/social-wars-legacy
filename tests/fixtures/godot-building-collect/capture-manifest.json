@@ -1,0 +1,527 @@
+{
+  "cleanup": {
+    "disposable_removed_before_manifest_write": true,
+    "server_stopped_within_run": true
+  },
+  "containment": {
+    "disposable_copy_removed": true,
+    "fixture_output": "tests/fixtures/godot-building-collect",
+    "identical": true,
+    "loopback_only": true,
+    "method": "SHA-256 snapshot of every read working-tree group before the run and after the server stopped; equal or the run fails before writing fixtures. The already committed boot, placement, purchase, move, sell, store, upgrade, and construction fixtures are digest-pinned for the same reason.",
+    "no_flash_browser_external_network": true,
+    "only_working_tree_writes": "fixture files under --out",
+    "post_combined_sha256": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "post_run": {
+      "config": {
+        "exists": true,
+        "files": 12,
+        "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+      },
+      "mods": {
+        "exists": true,
+        "files": 2,
+        "sha256": "81b3c6e1f426e8813d96028b9035a853c1fbff8716256e84e956d8826f136ba3"
+      },
+      "root_python": {
+        "exists": true,
+        "files": 11,
+        "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+      },
+      "saves": {
+        "exists": false,
+        "files": 0,
+        "sha256": "absent"
+      },
+      "templates": {
+        "exists": true,
+        "files": 19,
+        "sha256": "2dffe0ca8746b63cf64fd1062a7f259ba2bb85a2fc54f7a2cd2bd2564ffee4ef"
+      },
+      "tests/saves": {
+        "exists": true,
+        "files": 3,
+        "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+      },
+      "villages": {
+        "exists": true,
+        "files": 31,
+        "sha256": "92429a07402766d8183b16fb32178b5c51f1e555df69d3cb46085a7d977f96ea"
+      }
+    },
+    "pre_combined_sha256": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "pre_run": {
+      "config": {
+        "exists": true,
+        "files": 12,
+        "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+      },
+      "mods": {
+        "exists": true,
+        "files": 2,
+        "sha256": "81b3c6e1f426e8813d96028b9035a853c1fbff8716256e84e956d8826f136ba3"
+      },
+      "root_python": {
+        "exists": true,
+        "files": 11,
+        "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+      },
+      "saves": {
+        "exists": false,
+        "files": 0,
+        "sha256": "absent"
+      },
+      "templates": {
+        "exists": true,
+        "files": 19,
+        "sha256": "2dffe0ca8746b63cf64fd1062a7f259ba2bb85a2fc54f7a2cd2bd2564ffee4ef"
+      },
+      "tests/saves": {
+        "exists": true,
+        "files": 3,
+        "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+      },
+      "villages": {
+        "exists": true,
+        "files": 31,
+        "sha256": "92429a07402766d8183b16fb32178b5c51f1e555df69d3cb46085a7d977f96ea"
+      }
+    },
+    "protected_fixtures": {
+      "identical": true,
+      "paths": [
+        "tests/fixtures/godot-compatibility-boot",
+        "tests/fixtures/godot-building-placement",
+        "tests/fixtures/godot-item-purchase",
+        "tests/fixtures/godot-building-move",
+        "tests/fixtures/godot-building-sell",
+        "tests/fixtures/godot-building-store",
+        "tests/fixtures/godot-building-upgrade",
+        "tests/fixtures/godot-building-construction"
+      ],
+      "post_run": {
+        "godot-building-construction": {
+          "exists": true,
+          "files": 12,
+          "sha256": "8efdebcf8e5b91251a48f17d840380da8cd48ea33a922656c67acb115d3c3751"
+        },
+        "godot-building-move": {
+          "exists": true,
+          "files": 12,
+          "sha256": "b3c477a7947fbe409330f03a8658cdca707a2631b52d1d4c5127f440619799c1"
+        },
+        "godot-building-placement": {
+          "exists": true,
+          "files": 12,
+          "sha256": "546a5f00e5e45319ffd17f5ee67201dd2b72cb21de833a3e35e8a9a98d60c5a8"
+        },
+        "godot-building-sell": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fa85af3fb12ef8b9298203a64632b6d7b31c1ed48f8d1ba716151f25ec7ab1c4"
+        },
+        "godot-building-store": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d4dff84132353a60e3a005c42d067185772ec8d6a2548ffdc5aa4779a2055194"
+        },
+        "godot-building-upgrade": {
+          "exists": true,
+          "files": 12,
+          "sha256": "398675ad94928dd75f7fbcd9f62e082d73ee973d3c973f5bbdf44a083a9c0521"
+        },
+        "godot-compatibility-boot": {
+          "exists": true,
+          "files": 31,
+          "sha256": "4d389707e0f18676fb23b3a2a8a47031b4e233366e4066437f8bad6854e15234"
+        },
+        "godot-item-purchase": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d05e5b92b26a1222774bb32e76a42417c692e65ee1b87abdb8a2f4e6cd84e813"
+        }
+      },
+      "pre_run": {
+        "godot-building-construction": {
+          "exists": true,
+          "files": 12,
+          "sha256": "8efdebcf8e5b91251a48f17d840380da8cd48ea33a922656c67acb115d3c3751"
+        },
+        "godot-building-move": {
+          "exists": true,
+          "files": 12,
+          "sha256": "b3c477a7947fbe409330f03a8658cdca707a2631b52d1d4c5127f440619799c1"
+        },
+        "godot-building-placement": {
+          "exists": true,
+          "files": 12,
+          "sha256": "546a5f00e5e45319ffd17f5ee67201dd2b72cb21de833a3e35e8a9a98d60c5a8"
+        },
+        "godot-building-sell": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fa85af3fb12ef8b9298203a64632b6d7b31c1ed48f8d1ba716151f25ec7ab1c4"
+        },
+        "godot-building-store": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d4dff84132353a60e3a005c42d067185772ec8d6a2548ffdc5aa4779a2055194"
+        },
+        "godot-building-upgrade": {
+          "exists": true,
+          "files": 12,
+          "sha256": "398675ad94928dd75f7fbcd9f62e082d73ee973d3c973f5bbdf44a083a9c0521"
+        },
+        "godot-compatibility-boot": {
+          "exists": true,
+          "files": 31,
+          "sha256": "4d389707e0f18676fb23b3a2a8a47031b4e233366e4066437f8bad6854e15234"
+        },
+        "godot-item-purchase": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d05e5b92b26a1222774bb32e76a42417c692e65ee1b87abdb8a2f4e6cd84e813"
+        }
+      }
+    },
+    "working_tree_saves_unchanged": true
+  },
+  "corpus": {
+    "login_preserved_seed": true,
+    "pid": "00000000-0000-4000-8000-000000000001",
+    "seed": {
+      "file_sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+      "path": "tests/saves/fresh-player.json",
+      "saves_group_sha256_before_server_start": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6"
+    },
+    "seeded_as": "saves/<pid>.save.json in the disposable copy",
+    "startup_preserved_seed": true
+  },
+  "executed_at_utc": "2026-09-29T18:18:22+00:00",
+  "exit_code": 0,
+  "intent": {
+    "bounds_rule": "not applicable: a collection has no target cell of its own \u2014 the branch rewrites only the addressed row's timestamp, and the cell is the recorded anchor the capture pins",
+    "cell": [
+      53,
+      39
+    ],
+    "derived": {
+      "args": [
+        2
+      ],
+      "collect": 20,
+      "collect_type": "w",
+      "collect_xp": 1,
+      "command": "collect",
+      "decisions": {
+        "D1_amount_formula": "amount = collect x the multiplier of the highest committed rung the elapsed time has reached, clamped at the top rung. DERIVED-PROVISIONAL: the two ladder globals are parallel four-element arrays and no legacy branch reads either, so the pairing is an inference. Rejected alternative: a flat collect, or extrapolating past the last rung",
+        "D2_experience_scaling": "collect_xp is scaled by the same rung as the amount. DERIVED-PROVISIONAL. Rejected alternative: a flat collect_xp, which is equally unobservable and is recorded so a later change can revisit it with evidence",
+        "D3_sub_first_rung": "no rung reached fails closed with too_early; the endpoint never derives a sub-five-minute amount from the 0.25 multiplier. DERIVED-PROVISIONAL. Rejected alternatives: a quarter of the amount, and silently paying nothing",
+        "D4_cap_semantics": "a non-zero committed max_collects fails closed with capped_collection; only 0 is implemented (767 of 778 stored items record 0, and the corpus's income rows all record 0). DERIVED-PROVISIONAL: nothing says whether a non-zero cap limits one collection, a daily total, or a lifetime output",
+        "D5_shared_field": "a collection is refused on a row whose attribute bag carries cp or nc, in BOTH layers (the client offers no Collect action; the endpoint fails closed with construction_in_progress before the dispatcher runs). ESTABLISHED RISK, DERIVED RULE: the executed probe below showed the countdown surviving the overwrite while legacy answered success; what the legacy client itself does is never observed",
+        "D6_resource_mapping": "g->gold (slot 2), w->wood (3), o->oil (4), s->steel (5), c->cash (6); the unread slot 0 and the never-produced mana slot 7 are always zero, because no item records a mana collect type. DERIVED-PROVISIONAL. Rejected alternative: a 'm' mapping for a content value no item records",
+        "D7_intent_only": "the request carries only the save id and the row index; the amount, resource, experience, rung, and reference instant are the service's own, derived from committed content and the row's own instant",
+        "D8_two_part_proof": "after execution the row must still exist, be an eight-field list, and its recorded collection instant must move STRICTLY FORWARD, AND every stored resource must have changed by EXACTLY the derived delta; any other outcome fails closed with internal_error rather than reporting the legacy success"
+      },
+      "envelope_keys": [
+        "accessToken",
+        "commands",
+        "first_number",
+        "publishActions",
+        "tries",
+        "ts"
+      ],
+      "ladder": {
+        "minutes": [
+          5,
+          60,
+          240,
+          480
+        ],
+        "multipliers": [
+          0.25,
+          1.0,
+          2.0,
+          3.0
+        ],
+        "rungs": [
+          {
+            "after_minutes": 5,
+            "index": 0,
+            "multiplier": 0.25,
+            "tree_payout": {
+              "amount": 5,
+              "experience": 0,
+              "resource": "wood",
+              "resource_slot": 3
+            }
+          },
+          {
+            "after_minutes": 60,
+            "index": 1,
+            "multiplier": 1.0,
+            "tree_payout": {
+              "amount": 20,
+              "experience": 1,
+              "resource": "wood",
+              "resource_slot": 3
+            }
+          },
+          {
+            "after_minutes": 240,
+            "index": 2,
+            "multiplier": 2.0,
+            "tree_payout": {
+              "amount": 40,
+              "experience": 2,
+              "resource": "wood",
+              "resource_slot": 3
+            }
+          },
+          {
+            "after_minutes": 480,
+            "index": 3,
+            "multiplier": 3.0,
+            "tree_payout": {
+              "amount": 60,
+              "experience": 3,
+              "resource": "wood",
+              "resource_slot": 3
+            }
+          }
+        ]
+      },
+      "max_collects": 0,
+      "resource_vector": "unknown, xp, gold, wood, oil, steel, cash, mana",
+      "resources_changed": [
+        0,
+        3,
+        0,
+        60,
+        0,
+        0,
+        0,
+        0
+      ],
+      "status": "established: the command's argument shape and its single effect (item[3] = time_now, command.py:136-147), that the income is the client-sent 8-slot vector applied verbatim per resource as max(current + delta, 0) and applied BEFORE the branch (command.py:40, engine.py:251-271), the per-item income content fields, the ladder globals, the corpus facts, that a collection on a just-started construction overwrites the build's start instant while the countdown survives, and the resulting state from this executed transaction. DERIVED and never observed from the Flash client: the amount formula (D1), the experience scaling (D2), the sub-first-rung refusal (D3), the cap semantics (D4), the shared-field refusal rule (D5), and the cash/mana mapping (D6). The claim is that a payout grows in four committed rungs derived from an item's committed income fields, never any specific amount the legacy client pays",
+      "tier": 3
+    },
+    "item_id": 905,
+    "item_index": 2,
+    "item_name": "Tree",
+    "target_rule": "the placed Tree decoration (item id 905) at map slot 2 anchored at (53,39) in the committed fresh save, whose committed income is collect 20, collect_type 'w', collect_xp 1, max_collects 0 \u2014 the fresh corpus has no row with a recent collection instant (every row's item[3] is 0), so the elapsed time is unbounded and the top committed ladder rung applies deterministically; the corpus's only income-bearing rows are decorations because the real factories are not placed, and slot 2 is the same row the store fixture puts into storage in its own independent transaction, so both fixtures stay independently readable"
+  },
+  "interpreter": {
+    "executable": "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+    "requirement": "CPython 3.9.x (pinned baseline for this change)",
+    "version": "3.9.13 (tags/v3.9.13:6de2ca5, May 17 2022, 16:36:42) [MSC v.1929 64 bit (AMD64)]"
+  },
+  "invocation": "python -B apps/compat-api/capture_collect_fixture.py",
+  "probes": [
+    {
+      "clamp_not_exercised": "a -5 gold delta on a 2000 balance stays positive, so the max(..., 0) clamp did not bite; the clamp only bites when a delta would drive a balance below zero, which the derived payouts of this change never do",
+      "command": "collect(2)",
+      "established": "the branch stamps ONLY the row's timestamp (command.py:136-147) and the client-sent vector is applied verbatim, per resource, including a negative delta (engine.apply_resources runs before the branch, command.py:40 / engine.py:251-271). Nothing else in the save moves.",
+      "probe": 1,
+      "question": "what does the collect branch actually write, and is the client-sent resource vector applied verbatim?",
+      "resources": "xp 4 -> 11; wood 2000 -> 2060; gold 2000 -> 1995",
+      "response": "{\"result\":\"success\"}",
+      "row_after": "[905, 53, 39, <wall-clock>, 0, [], {}, 1]",
+      "row_before": [
+        905,
+        53,
+        39,
+        0,
+        0,
+        [],
+        {},
+        1
+      ],
+      "vector": [
+        0,
+        7,
+        -5,
+        60,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "command": "activate(11, 3600) then collect(11)",
+      "consequence": "this is the evidence for the design D5 construction_in_progress refusal: the client offers no Collect action for such a row AND the endpoint fails closed before the dispatcher runs, so a client that ignores the client-side rule still cannot corrupt the construction timers the delivered construction line depends on",
+      "established": "item[3] moved to the COLLECT instant while attr['cp'] = 3600 SURVIVED, so the row still advertises a full hour of construction but its start instant is now the collection time: the delivered construction line's remaining-time derivation cp - (now - item[3]) measures the countdown from the wrong epoch and silently restarts an active build's timer \u2014 and legacy reports success",
+      "not_observed_from_client": "which stamp a real client sends first, and whether it avoids this state at all \u2014 never observed, because Flash is never executed in this repository",
+      "probe": 2,
+      "question": "what happens when a collection runs on a row whose construction was just started \u2014 is the shared item[3] field merely ambiguous or actually destructive?",
+      "resources": "xp 4 -> 5; wood 2000 -> 2020; every other row, the private state, and playerInfo byte-identical",
+      "response": "{\"result\":\"success\"}",
+      "row_after": "[22, 58, 48, <collect instant>, 0, [], {\"cp\": 3600}, 1]",
+      "row_before": [
+        22,
+        58,
+        48,
+        0,
+        0,
+        [],
+        {},
+        1
+      ],
+      "vector": [
+        0,
+        1,
+        0,
+        20,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "purpose": "Executed request/before/response/after fixtures for one legacy collect transaction carrying the content-derived payout; the executed-legacy parity oracle for the Compatibility API v0 collect endpoint.",
+  "schema": "godot-building-collect/legacy-capture-v1",
+  "server": {
+    "command": [
+      "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+      "-B",
+      "server.py"
+    ],
+    "command_recorder_env": "SOCIALWARS_COMMAND_RECORD_DIR stripped from child",
+    "cwd": "<disposable copy under the system temp root>",
+    "host": "127.0.0.1",
+    "output_logs": "server.stdout.log / server.stderr.log inside the disposable copy (removed with the copy; not committed)",
+    "port": 5055,
+    "port_free_after_stop": true,
+    "port_free_before_start": true,
+    "readiness": "TCP connect loop on 127.0.0.1:5055 (no extra HTTP request)",
+    "stopped_by": "taskkill /T /F <pid>, wait, then port-free re-check"
+  },
+  "time_dependent_fields": {
+    "documented_normalization": "collect parity compares the row's collection instant as a positive integer STRICTLY GREATER than the before-state's, never by value: legacy stamps it with timestamp_now() and no branch interprets it. The reference instant the rung was computed against is a service-side value the endpoint reports as reference_time, never a recorded legacy field. No other clock field is written",
+    "leaves": [
+      "/captured_at_utc in steps/login_post/request.json",
+      "/captured_at_utc in steps/login_post/response.meta.json",
+      "/captured_at_utc in steps/command_collect/request.json",
+      "/captured_at_utc in steps/command_collect/response.meta.json",
+      "/executed_at_utc in capture-manifest.json",
+      "/headers/Date in steps/login_post/response.meta.json",
+      "/headers/Date in steps/command_collect/response.meta.json",
+      "the envelope ts inside steps/command_collect/request.json's /form/data (and therefore that whole field's string, because the digest covers the payload), since ts is the current time",
+      "the collected row's wall-clock collection instant: /maps/0/items/2/3 in steps/command_collect/after.json, and the two manifest leaves derived from it \u2014 /transaction/row_after/3 and /transaction/steps/1/save_after_sha256"
+    ],
+    "rule": "every other leaf of every committed file is byte-identical across reruns; the leaves below are the whole documented time-dependent surface, and the claim is machine-checkable: a leaf-level diff of two consecutive runs must differ at exactly these 11 paths and nowhere else",
+    "stable_by_derivation": "the resource movement is byte-stable because the derived payout is fixed: every corpus row's item[3] is 0, so the top committed rung applies deterministically and the payout is always [0, 3, 0, 60, 0, 0, 0, 0], making /transaction/resources_after, /transaction/resource_delta, and the resource leaves of the two save documents stable"
+  },
+  "transaction": {
+    "attr_after": {},
+    "attr_before": {},
+    "bought_units_after": [],
+    "bought_units_before": [],
+    "cap_note": "only a committed max_collects of 0 is implemented; a non-zero cap is refused with capped_collection rather than interpreted",
+    "cap_semantics_implemented": false,
+    "clamp_exercised": false,
+    "clamp_note": "legacy's max(current + delta, 0) only bites when a delta would drive a balance below zero; the derived payout is a credit added to balances that sit far above zero, so this fixture never exercises the clamp",
+    "collect_writes": [
+      "engine.apply_resources applies the derived payout on the single command with max(..., 0) per resource, BEFORE the branch (command.py:40; engine.py:251-271)",
+      "command.collect resolves the row and writes item[3] = time_now() and nothing else (command.py:136-147)",
+      "no branch compares the elapsed time with COLLECT_MINUTES, reads COLLECT_MULTIPLIER or max_collects, and no branch writes privateState, maps[0].store, or playerInfo"
+    ],
+    "construction_overlap": "item[3] is BOTH a construction start instant (activate) and a last-collection instant (collect); the endpoint refuses a row carrying cp or nc with construction_in_progress before the dispatcher runs, and the recorded after-state's attr bag is still {}",
+    "count": 2,
+    "dead_heroes_after": {},
+    "entry_field_order": [
+      "item",
+      "x",
+      "y",
+      "timestamp",
+      "orientation",
+      "store",
+      "attr",
+      "player"
+    ],
+    "friend_assist_in_scope": false,
+    "key_reused": "2",
+    "other_rows_unchanged": true,
+    "placement_count_after": 40,
+    "placement_count_before": 40,
+    "player_info_unchanged": true,
+    "private_state_unchanged": true,
+    "resource_delta": {
+      "cash": 0,
+      "gold": 0,
+      "mana": 0,
+      "oil": 0,
+      "steel": 0,
+      "wood": 60,
+      "xp": 3
+    },
+    "resources_after": {
+      "cash": 5,
+      "gold": 2000,
+      "mana": 0,
+      "oil": 2000,
+      "steel": 2000,
+      "wood": 2060,
+      "xp": 7
+    },
+    "resources_before": {
+      "cash": 5,
+      "gold": 2000,
+      "mana": 0,
+      "oil": 2000,
+      "steel": 2000,
+      "wood": 2000,
+      "xp": 4
+    },
+    "response_body": "{\"result\": \"success\"}",
+    "row_after": [
+      905,
+      53,
+      39,
+      1790705901,
+      0,
+      [],
+      {},
+      1
+    ],
+    "row_before": [
+      905,
+      53,
+      39,
+      0,
+      0,
+      [],
+      {},
+      1
+    ],
+    "steps": [
+      {
+        "method": "POST",
+        "name": "login_post",
+        "path": "/",
+        "response_bytes": 207,
+        "response_sha256": "2de230237d9f4055670576b9485897dbc06581889ca90527504cbdbd4933ec01",
+        "save_after_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_before_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_unchanged_by_call": true,
+        "status": 302,
+        "target": "/"
+      },
+      {
+        "method": "POST",
+        "name": "command_collect",
+        "path": "/dynamic/menvswomen/srvsexwars/command.php",
+        "response_bytes": 21,
+        "response_sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87",
+        "save_after_sha256": "aed1486150d237ebc5500d9abe0893c3b6a9a747f4b26deba16c34b81fdc19e8",
+        "save_before_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_unchanged_by_call": false,
+        "status": 200,
+        "target": "/dynamic/menvswomen/srvsexwars/command.php"
+      }
+    ],
+    "store_after": {}
+  }
+}

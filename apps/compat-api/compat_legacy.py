@@ -49,7 +49,7 @@ import os
 import shutil
 import sys
 from pathlib import Path
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Tuple
 
 sys.dont_write_bytecode = True
 
@@ -59,6 +59,7 @@ SEED_SAVE = REPO_ROOT / "tests" / "saves" / "fresh-player.json"
 
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
+import collect_envelope  # noqa: E402
 from hashing import directory_entries, sha256_file  # noqa: E402
 
 # Directories the legacy boot modules read through bundle.py's "." paths.
@@ -304,6 +305,141 @@ class LegacyBoot:
         if seconds <= 0:
             return None
         return seconds
+
+    # --- collection income content (godot-building-collect) ---------------
+    # Every accessor below reads the loaded legacy configuration exactly as
+    # ``item_costs`` reads ``costs`` and ``item_build_time`` reads
+    # ``build_time`` — never from a save and never from a client.  The four
+    # income fields are **string-encoded** in the committed config
+    # (``"20"``, ``"1"``, ``"0"`` for the Tree; ``"w"`` is the one string that
+    # is not a number) and the content census over the 778 stored items of
+    # ``config/main.json`` records: ``collect`` is ``"0"`` for 727 of them;
+    # ``collect_type`` is exactly ``g`` (731), ``w`` (23), ``o`` (11), ``s``
+    # (11), ``c`` (2); ``collect_xp`` is ``"0"`` for 419; ``max_collects`` is
+    # ``"0"`` for 767 with ``"25"`` (9 items) and ``"100"`` (2 items) for the
+    # rest.  The resolution rules below follow that census and refuse anything
+    # it does not describe rather than coercing it.
+
+    def _item_string(self, item_id: int, attribute: str) -> Optional[str]:
+        """One raw committed item attribute as a trimmed string, or ``None``.
+
+        The shared read for the four income fields: an id the loaded config
+        cannot even index (the ``get_attribute_from_item_id`` lookup raises) and
+        an absent attribute are both ``None``, exactly as
+        ``item_upgrade_to`` and ``item_build_time`` treat them.
+        """
+        try:
+            raw = self._config.get_attribute_from_item_id(item_id, attribute)
+        except (TypeError, ValueError, KeyError, IndexError):
+            return None
+        if raw is None or isinstance(raw, bool):
+            return None
+        if isinstance(raw, str):
+            return raw.strip()
+        return str(raw).strip()
+
+    def _item_non_negative_int(self, item_id: int, attribute: str) -> Optional[int]:
+        """One committed item attribute as a non-negative ``int``, or ``None``.
+
+        A missing attribute, a non-integer value, and a **negative** value are
+        all ``None``: an income field that is negative cannot be a collection
+        amount, and never becoming a negative vector entry keeps legacy's
+        ``max(…, 0)`` clamp out of this contract's own transactions.  ``0`` is
+        a real, resolved value here — unlike ``build_time``, where zero means
+        "no duration" — because ``collect "0"`` is the committed content of 727
+        items and is what the endpoint turns into a ``no_income`` refusal.
+        """
+        text = self._item_string(item_id, attribute)
+        if text is None or text == "":
+            return None
+        try:
+            value = int(text)
+        except (TypeError, ValueError):
+            return None
+        if value < 0:
+            return None
+        return value
+
+    def item_collect_amount(self, item_id: int) -> Optional[int]:
+        """The item's committed collection amount, or ``None`` if unusable.
+
+        The collect deliver line's content accessor for the payout's magnitude,
+        read from the item's ``collect`` field.  ``None`` means the committed
+        content cannot describe an amount (absent attribute, an id the config
+        does not resolve, a non-integer value, or a negative one) and the
+        endpoint fails closed with ``no_income`` **before** the legacy
+        dispatcher runs rather than paying zero or a coerced figure.
+
+        A resolved ``0`` is returned as ``0``, never as ``None``: it is the
+        committed content of 727 of the 778 stored items and it is exactly the
+        "this building produces nothing" case D4/D6 must refuse.
+        """
+        return self._item_non_negative_int(item_id, "collect")
+
+    def item_collect_type(self, item_id: int) -> Optional[str]:
+        """The item's committed collection resource type, or ``None``.
+
+        Read from the item's ``collect_type`` field and returned **verbatim**:
+        the mapping onto the vector's slots is the closed
+        :data:`collect_envelope.COLLECT_RESOURCE_SLOTS` vocabulary, so this
+        accessor deliberately does not validate, upper-case, or coerce.  Only an
+        absent attribute or an id the config cannot index yields ``None``; a
+        value outside the committed five reaches the derivation, which fails
+        closed with ``unknown_collect_type`` (design D6).
+        """
+        text = self._item_string(item_id, "collect_type")
+        if text is None or text == "":
+            return None
+        return text
+
+    def item_collect_xp(self, item_id: int) -> Optional[int]:
+        """The item's committed collection experience, or ``None`` if unusable.
+
+        Read from the item's ``collect_xp`` field, non-negative like
+        :meth:`item_collect_amount`, and scaled by the **same** committed ladder
+        rung as the amount (design D2 — a flat ``collect_xp`` is the rejected
+        alternative, recorded as derived-provisional).  A resolved ``0`` is a
+        real value: it is the committed content of 419 of the 778 stored items,
+        and a building pays resource income with no experience at all.
+        """
+        return self._item_non_negative_int(item_id, "collect_xp")
+
+    def item_max_collects(self, item_id: int) -> Optional[int]:
+        """The item's committed collection cap, or ``None`` if unusable.
+
+        Read from the item's ``max_collects`` field, non-negative like the two
+        income accessors.  **A non-zero value is refused, never interpreted**
+        (design D4): the committed census is ``"0"`` for 767 of the 778 stored
+        items with ``"25"`` (9 items) and ``"100"`` (2 items) for the rest, and
+        nothing in the repository says whether a non-zero cap limits one
+        collection, a daily total, or a building's lifetime output — the three
+        readings imply different payouts.  The endpoint therefore answers
+        ``capped_collection`` (409) for such an item, so the ambiguity can never
+        be resolved by guessing.  ``None`` (absent or unusable) is answered the
+        same way rather than treated as "no cap".
+        """
+        return self._item_non_negative_int(item_id, "max_collects")
+
+    def collect_ladder(self) -> Optional[Tuple[Tuple[int, ...], Tuple[float, ...]]]:
+        """The committed collection ladder, or ``None`` if it does not resolve.
+
+        Read from the loaded configuration's ``globals``:
+        ``COLLECT_MINUTES = [5, 60, 240, 480]`` and the parallel
+        ``COLLECT_MULTIPLIER = [0.25, 1, 2, 3]``.  The pair is validated and
+        normalized by :func:`collect_envelope.collect_ladder`, which refuses an
+        empty, mismatched, non-monotonic, or non-positive ladder with
+        ``no_tier``; that refusal is mapped to ``None`` here so a caller
+        fails closed at the endpoint boundary instead of importing the
+        derivation's error type into the adapter.
+        """
+        globals_object = self._config.get_game_config().get("globals")
+        if not isinstance(globals_object, dict):
+            return None
+        pair = (globals_object.get("COLLECT_MINUTES"), globals_object.get("COLLECT_MULTIPLIER"))
+        try:
+            return collect_envelope.collect_ladder(pair)
+        except collect_envelope.EnvelopeError:
+            return None
 
     def save_document(self, user_id: str) -> dict:
         """The in-memory save document for ``user_id`` (legacy ``session()``)."""

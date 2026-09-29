@@ -1,0 +1,21 @@
+{
+  "captured_at_utc": "2026-09-29T18:18:21+00:00",
+  "form": {
+    "GAMEVERSION": "Basesec_1.5.4.swf",
+    "USERID": "00000000-0000-4000-8000-000000000001"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "Login form (USERID + GAMEVERSION) exactly as the boot, placement, purchase, move, sell, store, upgrade, and construction captures send it; recorded for session fidelity \u2014 command.php performs no session validation. user_key would be redacted if present.",
+  "path": "/",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/"
+}

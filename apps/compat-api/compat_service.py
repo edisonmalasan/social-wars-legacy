@@ -191,6 +191,72 @@ Surface (loopback only, port :5056):
     duration, ``click`` → ``attr["nc"]`` is present and at least ``1``,
     ``finish`` → ``attr["nc"]`` is absent.
 
+``POST /v0/collect`` with JSON ``{"user_id", "item_index"}``
+    ``{protocol, ok, game_version, server_time, result, previous, row, payout,
+    tier, reference_time, resources}`` — an intent only, and the eighth
+    state-mutating surface.  This is the **first** line in this family whose
+    derived resource vector is deliberately *not* neutral, because for the
+    first time the committed configuration describes the action's effect
+    (design D1-D6 of the ``building-collect`` change).  The unchanged legacy
+    ``command()`` dispatcher executes one ``collect`` command in-process; that
+    branch writes **only** ``item[3] = time_now`` (``command.py:136-147``) and
+    the income is the client-sent 8-slot vector applied verbatim per resource
+    as ``max(current + delta, 0)`` by ``engine.apply_resources`` before the
+    branch runs (``engine.py:251-271``), so the payout this service derives is
+    **the vector it sends**.  The answer carries the legacy ``result`` plus the
+    authoritative superset: the eight-field row **as it was read before
+    execution** (``previous``), the eight-field row **re-read from the persisted
+    save after execution** (``row``), the derived ``payout`` and the ladder
+    ``tier`` it came from, the ``reference_time`` the elapsed time was computed
+    against, and the current ``resources`` (design D8).
+
+    Nothing but the save id and the index enters the contract: no amount,
+    resource, tier, time, price, or resource delta is accepted from a client —
+    the extra keys (``amount``, ``resource``, ``tier``, ``time``, ``price``,
+    ``resources_changed``, ``collect``, ``collect_type``, ``collect_xp``,
+    ``max_collects``, …) are ignored.  The payout is therefore derived entirely
+    from committed content and the addressed row's own state: the amount from
+    the item's committed ``collect``, the resource from its committed
+    ``collect_type``, the experience from its committed ``collect_xp``, each
+    scaled by the committed ladder rung (``COLLECT_MINUTES`` /
+    ``COLLECT_MULTIPLIER``) the row's elapsed time has actually reached,
+    **clamped at the top rung**.  The vector's unread ``unknown`` slot and its
+    never-produced ``mana`` slot are always zero.
+
+    Five content/guard conflicts fail closed with **409** and no mutation, each
+    a **derived-provisional** decision that refuses rather than guesses:
+    ``capped_collection`` for an item whose committed ``max_collects`` is
+    non-zero (only ``0`` is implemented, because nothing says what a non-zero
+    cap limits), ``unknown_collect_type`` for a ``collect_type`` outside the
+    committed five ``g/w/o/s/c`` (the committed census is 731/23/11/11/2 and no
+    item records a mana type), ``no_income`` for an item whose committed
+    ``collect`` is ``0`` (727 of 778 stored items, including 39 of the corpus's
+    40 placed rows), ``too_early`` when no committed rung is reached
+    (``COLLECT_MINUTES[0] = 5``; a sub-rung amount would be invented), and
+    ``construction_in_progress`` for a row whose attribute bag carries a
+    countdown ``cp`` or a click counter ``nc``.
+
+    That last refusal is **required, not defensive** (design D5): ``item[3]``
+    is *both* a construction start instant (written by ``activate``) and a
+    last-collection instant (written by ``collect``), and an executed-legacy
+    probe showed ``activate(11, 3600)`` followed by ``collect(11)`` leaving
+    ``[22, 58, 48, <collect instant>, 0, [], {"cp": 3600}, 1]`` — the build's
+    start instant overwritten while the countdown survived, silently restarting
+    an active build's timer, with the legacy server answering
+    ``{"result":"success"}``.  The delivered construction line reads that same
+    field as a build's start instant, so this endpoint refuses the collection
+    **before** the dispatcher runs and the corpus is left byte-identical.
+
+    After execution the endpoint proves the post-state in **two** ways
+    (design D8) and fails closed with ``internal_error`` on any other outcome:
+    the row still exists, is an eight-field list, and its recorded collection
+    instant moved **strictly forward**; **and** every stored resource changed by
+    **exactly** the derived delta.  The second check is what makes a reduced or
+    diverging payout *reported* rather than trusted — legacy's ``max(…, 0)``
+    clamp would otherwise let a short credit look like a success.  The
+    pre-execution ``resources`` are read **before** dispatch so the comparison
+    is against the state the batch actually started from.
+
 Deviation recorded for review: the bootstrap envelope also carries ``saves``
 (the session envelope plus ``config`` and ``player_info``). Design D3 lists
 only ``config`` and ``player_info``; the extra key is a superset of D3 and
@@ -209,8 +275,8 @@ code                     HTTP  when
 ``invalid_item_id``      400  ``item_id`` present but not an integer (``bool`` excluded)
 ``unknown_item_id``      404  integer id absent from the loaded config
 ``missing_item_index``   400  ``/v0/move``, ``/v0/sell``, ``/v0/store``,
-                                ``/v0/upgrade``, or ``/v0/construction`` body
-                                carries no ``item_index``
+                                ``/v0/upgrade``, ``/v0/construction``, or
+                                ``/v0/collect`` body carries no ``item_index``
 ``invalid_item_index``   400  ``item_index`` present but not an integer (``bool``
                                 excluded)
 ``unknown_item_index``   404  integer index that names no row in the save's
@@ -234,6 +300,46 @@ code                     HTTP  when
 ``invalid_duration``     400  derived start duration is not a positive integer
                                 (server-side derivation failure; never client
                                 input)
+``capped_collection``    409  ``/v0/collect``: the addressed placement's item
+                                records a **non-zero** committed ``max_collects``
+                                — only ``0`` is implemented, because nothing in
+                                the repository says whether a non-zero cap
+                                limits one collection, a daily total, or a
+                                building's lifetime output.  The legacy
+                                dispatcher never runs, and the cap is never
+                                interpreted
+``unknown_collect_type`` 409  ``/v0/collect``: the addressed placement's item
+                                records a ``collect_type`` outside the
+                                committed vocabulary ``{g, w, o, s, c}`` (the
+                                census is 731/23/11/11/2 over the 778 stored
+                                items, and no item records a mana type, so the
+                                vector's ``mana`` slot is always zero).  The
+                                value is refused, never coerced into an assumed
+                                resource
+``no_income``            409  ``/v0/collect``: the addressed placement's item
+                                records a committed collection amount of ``0``,
+                                or none it can describe (absent, non-integer, or
+                                negative) — 727 of the 778 stored items and 39 of
+                                the corpus's 40 placed rows.  The legacy
+                                dispatcher never runs
+``too_early``            409  ``/v0/collect``: the addressed row's elapsed time
+                                since its recorded collection instant has
+                                reached **no** committed ladder rung
+                                (``COLLECT_MINUTES[0] = 5``), so a payout would
+                                have to be invented.  No corpus row carries a
+                                recent instant, so this path is covered by a
+                                stubbed instant rather than by a fixture
+``construction_in_progress``
+                          409  ``/v0/collect``: the addressed row's attribute
+                                bag carries a construction countdown (``cp``) or
+                                a build-click counter (``nc``).  ``collect``
+                                writes the same ``item[3]`` that
+                                ``activate`` stamps as a build's start instant,
+                                and an executed-legacy probe showed the
+                                countdown surviving the overwrite while the
+                                legacy server answered success.  Refused before
+                                the dispatcher runs, so the delivered
+                                construction timers are never corrupted
 ``invalid_reason``       400  derived reason is not a string (server-side
                                 derivation failure; never client input)
 ``invalid_coordinates``  400  ``x``/``y`` missing, not integers, or outside ``0..99``
@@ -252,8 +358,8 @@ session and bootstrap endpoints never persist — this module never calls
 ``sessions.save_session`` for them and every call leaves the saves
 byte-identical. ``POST /v0/place``, ``POST /v0/purchase``,
 ``POST /v0/move``, ``POST /v0/sell``, ``POST /v0/store``,
-``POST /v0/upgrade``, and ``POST /v0/construction`` execute the
-unchanged legacy ``command()`` dispatcher, which
+``POST /v0/upgrade``, ``POST /v0/construction``, and ``POST /v0/collect``
+execute the unchanged legacy ``command()`` dispatcher, which
 persists through legacy ``save_session`` into the **service corpus's**
 ``saves/`` and nowhere else; the service never opens a working-tree file for
 writing, and it never binds anywhere except ``127.0.0.1`` (the bind address
@@ -267,6 +373,7 @@ from typing import Any, Dict, Optional, Tuple
 from flask import Flask, Response, jsonify, request
 
 import compat_legacy
+import collect_envelope
 import construction_envelope
 import move_envelope
 import placement_envelope
@@ -293,6 +400,11 @@ ERROR_NO_UPGRADE_PATH = "no_upgrade_path"
 ERROR_MISSING_ACTION = "missing_action"
 ERROR_INVALID_ACTION = "invalid_action"
 ERROR_NO_BUILD_TIME = "no_build_time"
+ERROR_CAPPED_COLLECTION = "capped_collection"
+ERROR_UNKNOWN_COLLECT_TYPE = "unknown_collect_type"
+ERROR_NO_INCOME = "no_income"
+ERROR_TOO_EARLY = "too_early"
+ERROR_CONSTRUCTION_IN_PROGRESS = "construction_in_progress"
 ERROR_INVALID_REASON = "invalid_reason"
 ERROR_INVALID_COORDINATES = "invalid_coordinates"
 ERROR_INVALID_ORIENTATION = "invalid_orientation"
@@ -1491,6 +1603,371 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
                 row=updated_row,
                 action=action,
                 resources=resources,
+            ),
+            200,
+        )
+
+    @app.post("/v0/collect")
+    def v0_collect() -> Tuple[Dict[str, Any], int]:
+        """Execute one collection intent through the unchanged legacy path.
+
+        One call carries **exactly one** legacy ``collect`` command, whose
+        single argument is the addressed placement's legacy map index
+        (``command.py:136-147``).  That branch writes **only**
+        ``item[3] = time_now``; the income travels in the client-sent 8-slot
+        resource vector, which ``engine.apply_resources`` applies before the
+        branch runs as ``max(current + delta, 0)`` per resource
+        (``command.py:40``, ``engine.py:251-271``).  This line is therefore the
+        first in the family whose derived vector is **not** neutral: the
+        committed configuration describes the income, so the vector is derived
+        from it and never from a client.
+
+        Validation is structural fail-closed first, then the content and guard
+        refusals, all **before** the dispatcher runs (design D1-D6): a JSON
+        object body, a resolvable save, an integer item index that names a row
+        in the corpus save, a row that carries no construction state, an item
+        with a usable committed income and no cap, a collect type inside the
+        committed vocabulary, and an elapsed time that has reached a committed
+        ladder rung.  The index is resolved here rather than left to legacy
+        because legacy's missing-item path (``command.py:139-142``) logs an
+        error and returns early while the batch still persists: reporting that
+        as a success would claim a state change that never happened.
+
+        The construction-state refusal is load-bearing rather than defensive.
+        ``item[3]`` is *both* a construction start instant (written by
+        ``activate``) and a last-collection instant (written by ``collect``),
+        and an executed-legacy probe showed ``activate(11, 3600)`` then
+        ``collect(11)`` leaving ``[22, 58, 48, <collect instant>, 0, [],
+        {"cp": 3600}, 1]``: the build's start instant overwritten while the
+        countdown survived, silently restarting an active build's timer, with
+        the legacy server answering ``{"result":"success"}``.  The delivered
+        construction line reads that same field as a build's start instant, so
+        this endpoint refuses a row carrying ``cp`` or ``nc`` **before**
+        executing and leaves the corpus byte-identical (design D5).
+
+        The remaining four refusals are derived-provisional and refuse rather
+        than guess: a non-zero committed ``max_collects`` is never interpreted
+        (only ``0`` is implemented), a ``collect_type`` outside the committed
+        five is never coerced into an assumed resource, a committed amount of
+        ``0`` (727 of 778 stored items) is not an income, and an elapsed time
+        that reached no committed rung (``COLLECT_MINUTES[0] = 5``) must not
+        have a payout invented for it.  No legacy branch reads any of the
+        content behind these rules, so every one of them is marked
+        derived-provisional wherever it is recorded; authoritative validation
+        belongs to Server v1 (M13).
+
+        Nothing but the save id and the index enters the contract: no amount,
+        resource, tier, time, price, or resource delta is accepted from a
+        client — the extra keys are ignored, so no client value can influence
+        the payout.  Legacy performs no ownership, state, or gameplay
+        validation of any kind, so the endpoint's own validation is structural
+        fail-closed only.
+
+        After execution the endpoint proves the post-state in **two** ways
+        (design D8) and fails closed with ``internal_error`` on any other
+        outcome: the row still exists, is an eight-field list, and its recorded
+        collection instant moved **strictly forward**; **and** every stored
+        resource changed by **exactly** the derived delta.  The value-level
+        check is what turns a reduced or diverging payout — including one a
+        clamp would have shortened — into a reported failure instead of a
+        trusted success, and the pre-execution ``resources`` are read before
+        dispatch so the comparison starts from the state the batch actually saw.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404,
+                ERROR_UNKNOWN_USER_ID,
+                "no save exists for user_id %r" % user_id,
+            )
+
+        if "item_index" not in payload:
+            return error_response(
+                400, ERROR_MISSING_ITEM_INDEX, "item_index is required"
+            )
+        item_index = payload["item_index"]
+        if not collect_envelope.is_strict_int(item_index):
+            return error_response(
+                400, ERROR_INVALID_ITEM_INDEX, "item_index must be an integer"
+            )
+
+        # Resolve the index against the corpus before deriving, and read the
+        # eight-field row while it is still there: an index that names no row
+        # must fail closed, never reach legacy's silent no-op.
+        try:
+            known = boot.has_map_item(user_id, item_index)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not known:
+            return error_response(
+                404,
+                ERROR_UNKNOWN_ITEM_INDEX,
+                "no placement with index %d in this save's map" % item_index,
+            )
+        try:
+            previous = boot.map_item(user_id, item_index)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not isinstance(previous, list):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the addressed placement is not a row this service can report",
+            )
+        # Copies: the legacy dispatcher mutates this very row **in place** —
+        # ``collect`` writes ``item[3]`` — so a shallow list copy would still
+        # alias the live list and the "before" row would report the
+        # after-state.  The **length is checked before any field is indexed**,
+        # so a row that is not an eight-field entry is reported rather than
+        # raising an IndexError out of the route.
+        if len(previous) != 8:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the addressed placement is not an eight-field row",
+            )
+        previous_row = list(previous)
+        if isinstance(previous_row[6], dict):
+            previous_row[6] = dict(previous_row[6])
+        if isinstance(previous_row[5], list):
+            previous_row[5] = list(previous_row[5])
+        source_item_id = previous_row[0]
+        if not collect_envelope.is_strict_int(source_item_id):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the addressed placement carries no integer item id to collect",
+            )
+        collection_instant = previous_row[3]
+        if not collect_envelope.is_strict_int(collection_instant):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the addressed placement carries no integer collection instant",
+            )
+
+        # Design D5: refuse a row carrying construction state before anything
+        # else can be derived.  A countdown (``cp``) or a build-click counter
+        # (``nc``) means ``item[3]`` is a construction start instant, and
+        # executing ``collect`` here would overwrite it while the countdown
+        # survived — silently restarting an active build's timer, which the
+        # legacy server nonetheless reports as a success.
+        attr = previous_row[6]
+        if isinstance(attr, dict):
+            for key in ("cp", "nc"):
+                if key in attr:
+                    return error_response(
+                        409,
+                        ERROR_CONSTRUCTION_IN_PROGRESS,
+                        "the placement at index %d is under construction "
+                        "(attr['%s'] = %r); collecting it would overwrite the "
+                        "build's start instant" % (item_index, key, attr[key]),
+                    )
+        elif attr not in ({}, None):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the addressed placement carries no readable attribute bag",
+            )
+
+        # The pre-execution resources are read **before** dispatch so the
+        # value-level post-execution proof compares against the state the batch
+        # actually started from (design D8).
+        try:
+            resources_before = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        # The four income fields come from the item's committed content, never
+        # from a client.  ``None`` means the committed content cannot describe
+        # them, and each of the three refusals answers before the dispatcher
+        # runs (design D4/D6).
+        try:
+            amount = boot.item_collect_amount(source_item_id)
+            resource_type = boot.item_collect_type(source_item_id)
+            experience = boot.item_collect_xp(source_item_id)
+            cap = boot.item_max_collects(source_item_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if amount is None or amount <= 0:
+            return error_response(
+                409,
+                ERROR_NO_INCOME,
+                "item %d records no committed collection income" % source_item_id,
+            )
+        if cap is None or cap != 0:
+            return error_response(
+                409,
+                ERROR_CAPPED_COLLECTION,
+                "item %d records a committed collection cap of %r, and this "
+                "service implements only the uncapped 0" % (source_item_id, cap),
+            )
+        if resource_type is None or (
+            isinstance(resource_type, str)
+            and resource_type not in collect_envelope.COLLECT_RESOURCE_SLOTS
+        ):
+            return error_response(
+                409,
+                ERROR_UNKNOWN_COLLECT_TYPE,
+                "item %d records collect_type %r, which is not one of %s"
+                % (
+                    source_item_id,
+                    resource_type,
+                    sorted(collect_envelope.COLLECT_RESOURCE_SLOTS),
+                ),
+            )
+
+        # The elapsed time is measured against this service's own clock, never
+        # a client value, and never extrapolated past the top rung (design D1).
+        reference_time = boot.server_time()
+        ladder = boot.collect_ladder()
+        if ladder is None:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the committed collection ladder does not resolve",
+            )
+        try:
+            elapsed = reference_time - collection_instant
+            tier = collect_envelope.tier_for(elapsed, ladder)
+        except collect_envelope.EnvelopeError as failure:
+            return error_response(500, ERROR_INTERNAL, failure.code)
+        # Design D3: below the first committed rung no amount is invented.
+        if tier is None:
+            first_rung_seconds = collect_envelope.threshold_seconds_for(0, ladder)
+            return error_response(
+                409,
+                ERROR_TOO_EARLY,
+                "the placement at index %d has been collecting for %d seconds, "
+                "which reaches no committed ladder rung (the first waits %d "
+                "seconds, committed as %d minutes)"
+                % (item_index, elapsed, first_rung_seconds, ladder[0][0]),
+            )
+
+        # Derive the legacy envelope (design D1/D2/D6): the command, its single
+        # argument, and the content-derived payout are the module's, never the
+        # client's.
+        try:
+            payout = collect_envelope.payout_for(
+                amount=amount,
+                resource_type=resource_type,
+                experience=experience,
+                tier=tier,
+                ladder=ladder,
+            )
+            envelope_payload = collect_envelope.build_envelope(
+                item_index=item_index, vector=payout
+            )
+        except collect_envelope.EnvelopeError as failure:
+            if failure.code == "unknown_collect_type":
+                return error_response(409, failure.code, str(failure))
+            if failure.code == "invalid_vector":
+                # A server-side derivation failure: the committed content
+                # produced a vector this contract must never send.
+                return error_response(500, ERROR_INTERNAL, failure.code)
+            return error_response(400, failure.code, str(failure))
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        # Execute the unchanged legacy command dispatcher in-process.  It
+        # persists via legacy save_session into this corpus only; the legacy
+        # HTTP route returns {"result": "success"} whenever command() returns
+        # without raising, so reaching here IS the legacy result — which is
+        # precisely why it is NOT taken as proof that the payout landed.
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        # Prove the post-state (design D8).  A collection must never destroy a
+        # row and must re-stamp its collection instant **forward**; the
+        # reported value is legacy's own wall clock, so the comparison is
+        # structural and never by value.
+        try:
+            still_present = boot.has_map_item(user_id, item_index)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not still_present:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy execution did not keep the placement entry at its key",
+            )
+        try:
+            updated = boot.map_item(user_id, item_index)
+            resources_after = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not isinstance(updated, list) or len(updated) != 8:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy execution did not persist an eight-field placement row",
+            )
+        updated_row = list(updated)
+        new_instant = updated_row[3]
+        if not collect_envelope.is_strict_int(new_instant):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the row at index %d records a non-integer collection instant "
+                "%r after execution" % (item_index, new_instant),
+            )
+        if new_instant <= collection_instant:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the row at index %d records collection instant %r after "
+                "execution, which does not move strictly forward from %r"
+                % (item_index, new_instant, collection_instant),
+            )
+        # The value-level half of the proof: every stored resource must have
+        # moved by **exactly** the derived delta.  A clamp that reduced a
+        # payout, a partial application, or any other divergence is reported
+        # here rather than returned as a success.
+        payout_by_name = {
+            "xp": payout[collect_envelope.EXPERIENCE_SLOT],
+            "gold": payout[2],
+            "wood": payout[3],
+            "oil": payout[4],
+            "steel": payout[5],
+            "cash": payout[6],
+            "mana": payout[7],
+        }
+        for name in sorted(payout_by_name):
+            expected = max(resources_before[name] + payout_by_name[name], 0)
+            if resources_after[name] != expected:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "resource %s is %r after execution, not the derived %r "
+                    "(it was %r, the derived delta is %r)"
+                    % (
+                        name,
+                        resources_after[name],
+                        expected,
+                        resources_before[name],
+                        payout_by_name[name],
+                    ),
+                )
+        return (
+            envelope(
+                boot,
+                result="success",
+                previous=previous_row,
+                row=updated_row,
+                payout=payout,
+                tier=tier,
+                reference_time=reference_time,
+                resources=resources_after,
             ),
             200,
         )
