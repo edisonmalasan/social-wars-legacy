@@ -68,12 +68,14 @@ var summary: BootData.PlayerSummary = null
 ## reaches presentation code (spec "Windowed boot-to-town transition").
 var player_info: BootData.PlayerInfoPayload = null
 ## The bootstrap's wrapped game-config payload, kept for the town's
-## placement catalog (building-placement, spec "Placement flow"): the
-## handoff parses it fail-closed and hands the typed catalog — or the
-## failure envelope — to the town, so the picker never derives entries
-## from raw transport and never fabricates one. A missing or malformed
-## config leaves placement unavailable behind the named error; it never
-## fails the town transition itself.
+## placement and shop catalogs (building-placement / building-purchase,
+## specs "Placement flow" and "Purchase flow"): the handoff parses it
+## fail-closed ONCE and hands the same typed envelope to both surfaces —
+## or the failure envelope to both — so a picker or shop entry is never
+## derived from raw transport, never fabricated, and no second config
+## request is ever issued. A missing or malformed config leaves both
+## unavailable behind the named error; it never fails the town transition
+## itself.
 var config: BootData.ConfigPayload = null
 
 ## Exactly what the summary labels display (single source: the labels are
@@ -252,12 +254,15 @@ func transition_to_town() -> Dictionary:
 	var town: Variant = scene.instantiate()
 	# The state is committed before the tree insertion, so `_ready` builds
 	# the view; a failed build is torn down and surfaced as the explicit
-	# handoff error instead of a partial town. The placement catalog is
-	# parsed from the payload in hand (no second config request) and its
-	# envelope — success or named failure — is handed alongside: a bad
-	# config leaves placement unavailable, it never fails the town.
+	# handoff error instead of a partial town. The placement and shop
+	# catalogs are parsed from the payload in hand (no second config
+	# request) and the same envelope is handed to both surfaces — one
+	# fail-closed parse, two consumers — so a bad config leaves both
+	# unavailable and never fails the town.
 	town.set_town_state(parsed["state"])
-	town.set_placement_catalog(_placement_catalog_envelope())
+	var catalog := _catalog_envelope()
+	town.set_placement_catalog(catalog)
+	town.set_shop_catalog(catalog)
 	get_tree().root.add_child(town)
 	if not town.build_ok:
 		var failure := str(town.build_error)
@@ -269,13 +274,15 @@ func transition_to_town() -> Dictionary:
 	return {"ok": true, "error": ""}
 
 
-## The placement catalog envelope for the town handoff: the payload in
-## hand parsed fail-closed, or the named failure envelope when the boot
-## carried no config object — placement becomes unavailable behind that
-## explicit error (never fabricated), and the transition itself is
-## unaffected either way (spec "Placement flow", catalog failure
-## scenario).
-func _placement_catalog_envelope() -> Dictionary:
+## The catalog envelope for the town handoff: the payload in hand parsed
+## fail-closed, or the named failure envelope when the boot carried no
+## config object — the placement picker and the shop (building-placement /
+## building-purchase) both become unavailable behind that explicit error
+## (never fabricated), and the transition itself is unaffected either way
+## (spec "Placement flow" and "Purchase flow", catalog failure scenario).
+## ONE parse serves both surfaces, so the two can never disagree about the
+## catalog and no second config request is ever issued.
+func _catalog_envelope() -> Dictionary:
 	if config == null:
 		return {"ok": false, "error":
 			"[catalog] parse rejected: the bootstrap config payload "
@@ -287,9 +294,9 @@ func _placement_catalog_envelope() -> Dictionary:
 ## error in place of the town (never blank), the terminal state records
 ## it, and the standard error marker line is printed. `boot_finished` is
 ## not re-emitted — the boot's own terminal emission already happened.
-## In an evidence capture run (`--town-capture=` or
-## `--placement-capture=`) the process exits 1 so a failed capture
-## cannot hang on an open window.
+## In an evidence capture run (`--town-capture=`,
+## `--placement-capture=`, or `--purchase-capture=`) the process exits 1
+## so a failed capture cannot hang on an open window.
 func _town_fail(code: String, message: String) -> Dictionary:
 	state = "error"
 	error_code = code
@@ -301,7 +308,8 @@ func _town_fail(code: String, message: String) -> Dictionary:
 	print("[boot] state=error code=%s message=%s" % [code, message])
 	for argument in OS.get_cmdline_user_args():
 		if argument.begins_with("--town-capture=") \
-				or argument.begins_with("--placement-capture="):
+				or argument.begins_with("--placement-capture=") \
+				or argument.begins_with("--purchase-capture="):
 			get_tree().quit(1)
 			break
 	return {"ok": false,

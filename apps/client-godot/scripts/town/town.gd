@@ -19,6 +19,20 @@ extends Node2D
 ## the left press: the open picker routes it to the preview, otherwise
 ## to selection (design D10).
 ##
+## Shop mode (building-purchase, spec "Purchase flow"): a shop panel in
+## its OWN UI-foundation slot over the same fail-closed catalog parse,
+## offering store-listed, cash-priced, level-eligible entries with their
+## price against current cash, a storage readout of the typed state's
+## storage (resolved content name when one exists, the raw item id
+## otherwise), and a confirm that sends exactly one intent through GameApi
+## and applies only the authoritative response — the response's storage
+## mapping replaces the state's through the shared parser, HUD resources
+## take the response's values — while an unaffordable price is refused
+## locally with no request and every failure surfaces an explicit error
+## with no state change. The shop sits BESIDE the picker, never inside it
+## (design D8): separate slot, separate selection, and the picker's
+## preview/overlay state is untouched.
+##
 ## Fail-closed whole view (design D9): a failed build enters an explicit
 ## error state that names the failure and clears any partial view —
 ## never a silently blank or partially drawn town. Camera bounds are
@@ -41,6 +55,12 @@ extends Node2D
 ## counts, and observed state only — no timestamps or run-varying
 ## provenance — so reruns are byte-identical. Any failure prints an
 ## explicit `[town] report state=error` marker and exits 1.
+##
+## The placement and purchase evidence steps mirror that pattern exactly
+## one level down: `--placement-capture=<path>` / `--purchase-capture=<path>`
+## drive their flow (picker / shop) before the frame is written, and
+## `--placement-report=<path>` / `--purchase-report=<path>` write their
+## deterministic `placement-report-v1` / `purchase-report-v1` reports.
 
 const Iso = preload("res://scripts/town/iso.gd")
 const TownState = preload("res://scripts/town/town_state.gd")
@@ -55,6 +75,7 @@ const Paths = preload("res://scripts/package_paths.gd")
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const PlacementCatalog = preload("res://scripts/town/placement_catalog.gd")
 const PlacementFlow = preload("res://scripts/town/placement_flow.gd")
+const ShopFlow = preload("res://scripts/town/shop_flow.gd")
 
 ## Report-mode inputs and captures (repository-relative paths; the
 ## fixture paths mirror the fake GameApi's own committed constants and
@@ -82,16 +103,35 @@ const REPORT_PLACEMENT_AFTER := \
 	"tests/fixtures/godot-building-placement/steps/command_buy/after.json"
 const REPORT_CAPTURE_PLACEMENT := \
 	"apps/client-godot/evidence/placement/placement.png"
-## Default placement report destination for the bare
-## `--placement-report` flag (project-relative, resolved against the
-## project directory).
-const DEFAULT_PLACEMENT_REPORT_PATH := "evidence/placement/report.json"
-## The single placement intent this evidence records: one House I at
-## (51, 39), orientation 0 — the executed-legacy fixture's transaction,
+## Purchase evidence (building-purchase, design D9): the executed-legacy
+## purchase fixture the parity suite replays and the committed fake capture
+## the purchase report points at (repository-relative).
+const REPORT_PURCHASE_REQUEST := "tests/fixtures/godot-item-purchase/steps/" \
+	+ "command_buy_stored_item_cash/request.json"
+const REPORT_PURCHASE_RESPONSE := "tests/fixtures/godot-item-purchase/steps/" \
+	+ "command_buy_stored_item_cash/response.body"
+const REPORT_PURCHASE_AFTER := "tests/fixtures/godot-item-purchase/steps/" \
+	+ "command_buy_stored_item_cash/after.json"
+const REPORT_CAPTURE_PURCHASE := \
+	"apps/client-godot/evidence/purchase/purchase.png"
+## Default purchase report destination for the bare `--purchase-report` flag
+## (project-relative, resolved against the project directory).
+const DEFAULT_PURCHASE_REPORT_PATH := "evidence/purchase/report.json"
+## The single placement intent the placement evidence records: one House I
+## at (51, 39), orientation 0 — the executed-legacy fixture's transaction,
 ## driven through the same picker flow a player uses.
 const PLACEMENT_INTENT_ITEM := 1
 const PLACEMENT_INTENT_CELL := Vector2i(51, 39)
 const PLACEMENT_INTENT_ORIENTATION := 0
+## The single purchase intent the purchase evidence records: one Victory
+## Arch (item 105) for the fresh player's exactly-5 cash — the
+## executed-legacy fixture's transaction, driven through the same shop flow
+## a player uses.
+const PURCHASE_INTENT_ITEM := 105
+## Default placement report destination for the bare
+## `--placement-report` flag (project-relative, resolved against the
+## project directory).
+const DEFAULT_PLACEMENT_REPORT_PATH := "evidence/placement/report.json"
 ## The recorded projection evidence gap (README "Isometric projection
 ## constants"): the legacy SWF's static iso-engine identifiers exist as
 ## ABC strings but their numeric values were never extracted.
@@ -134,6 +174,31 @@ const PLACEMENT_NON_CLAIMS := [
 		+ "structural input validity",
 ]
 
+## The purchase evidence's explicit non-claims (spec "Purchase evidence and
+## claim limits"): the five carried-forward claims, the cash-only
+## derivation and command-choice claim design D9 adds, the storage
+## display-only limit, the client-owned validation split, and the
+## fake-capture pointer. The runtime tokens in the first claim are assembled
+## from fragments for the same project-scope reason as above.
+const PURCHASE_NON_CLAIMS := [
+	"no Flash, " + "Ruf" + "fle" + ", " + "Action" + "Script"
+		+ ", or browser executed",
+	"the legacy command choice and the cash-only price derivation are "
+		+ "derived, never observed from the Flash client",
+	"parity covers one recorded transaction against the fresh-player "
+		+ "corpus, not progressed players",
+	"insufficient cash reproduces legacy clamping, not rejection",
+	"storage is display-only here: no placing from or selling out of "
+		+ "storage",
+	"no pixel-parity oracle against the legacy client exists",
+	"the capture runs the fake GameApi implementation; real-execution "
+		+ "parity is established by the fixture-replay tests and the "
+		+ "verify-boot purchase-live phase",
+	"the level gate and cash affordability are derived (Flash-"
+		+ "unobservable) and enforced client-side only; the endpoint "
+		+ "enforces structural input validity",
+]
+
 ## View states (spec: never claim a rendered town without one).
 const STATE_EMPTY := "empty"
 const STATE_BUILT := "built"
@@ -145,9 +210,22 @@ const CAPTURE_SIZE := Vector2i(1400, 600)
 ## UI-foundation slot the build picker occupies (spec: "a build picker
 ## over a placement catalog").
 const SLOT_PLACEMENT := "placement"
+## UI-foundation slot the shop occupies (spec: "a shop surface over a
+## fail-closed catalog"). Beside the picker, never inside it (design D8):
+## the two surfaces own separate slots, entries, and lifecycle.
+const SLOT_SHOP := "shop"
 ## Picker panel width in pixels (provisional presentation — no legacy
 ## picker layout has been captured).
 const PLACEMENT_PANEL_WIDTH := 300.0
+## Shop panel width in pixels (provisional presentation for the same
+## reason).
+const SHOP_PANEL_WIDTH := 300.0
+## The storage readout's indicator lines: the payload carried no storage
+## field at all (design D7 — the missing field is named, never presented as
+## an empty inventory), and the payload carried a storage object with no
+## entries (a real, observed empty storage).
+const MISSING_STORAGE_TEXT := "[missing: %s]"
+const EMPTY_STORAGE_TEXT := "(empty)"
 
 ## The typed town state handed to this view (read-only by contract).
 var state: Variant = null
@@ -181,6 +259,26 @@ var _placement_cell := Vector2i.ZERO
 ## The picker's status label (null while no panel is built).
 var _placement_status: Variant = null
 
+## Purchase flow (building-purchase, spec "Purchase flow"). The shop is a
+## surface BESIDE the picker, never inside it (design D8): it owns its own
+## UI-foundation slot, its own entry selection, and its own status line, and
+## it never touches the picker's selection, preview, or overlay state. The
+## catalog envelope is the same fail-closed parse the boot handoff performs
+## (handed to both surfaces); a failed catalog leaves the shop unavailable
+## behind an explicit error rather than a fabricated entry or a guessed
+## price.
+var shop_catalog_result: Variant = null
+## The last purchase failure ("" until one occurs; cleared on entry and
+## after the next success) — the explicit error the spec requires.
+var shop_error := ""
+var _shop_active := false
+## The selected shop entry (PlacementCatalog.Entry or null).
+var _shop_entry: Variant = null
+## The shop's status label (null while no panel is built).
+var _shop_status: Variant = null
+## The storage readout container (null while no panel is built).
+var _shop_storage: Variant = null
+
 ## Visual hierarchy + texture caches (shared across rebuilds of this view).
 var _visuals := TownVisuals.new()
 ## The committed HUD builder once attached.
@@ -194,6 +292,10 @@ var _capture_started := false
 ## the picker flow runs before the capture so the frame shows the town
 ## containing the placed building.
 var _placement_capture := false
+## True when the capture flag was `--purchase-capture=` (design D9): the
+## shop flow runs before the capture so the frame shows the town whose
+## storage readout carries the purchased item.
+var _purchase_capture := false
 
 @onready var terrain: TownTerrain = $Terrain
 @onready var objects_layer: Node2D = $Objects
@@ -221,10 +323,22 @@ func _ready() -> void:
 			and get_script().resource_path == "res://scripts/town/town.gd":
 		await _write_placement_report(placement_report_path)
 		return
+	# The purchase report shares the same scene-own-script gate: the nested
+	# slice instance must fall through to its committed-state build instead
+	# of re-entering the report flow (which would re-run the purchase).
+	var purchase_report_path := _purchase_report_path_arg()
+	if not purchase_report_path.is_empty() \
+			and get_script().resource_path == "res://scripts/town/town.gd":
+		await _write_purchase_report(purchase_report_path)
+		return
 	_capture_path = _user_arg("--town-capture=")
+	_purchase_capture = false
 	if _capture_path.is_empty():
 		_capture_path = _user_arg("--placement-capture=")
 		_placement_capture = not _capture_path.is_empty()
+	if _capture_path.is_empty():
+		_capture_path = _user_arg("--purchase-capture=")
+		_purchase_capture = not _capture_path.is_empty()
 	if state != null:
 		build()
 	_maybe_start_capture()
@@ -805,6 +919,456 @@ func _on_placement_cancel() -> void:
 	cancel_placement()
 
 
+# ---------------------------------------------------------------------------
+# Purchase flow (building-purchase, spec "Purchase flow")
+# ---------------------------------------------------------------------------
+
+
+## Commits the typed catalog envelope handed by the boot handoff (or a
+## test) to the SHOP surface. Pure state: no view effects — `enter_shop`
+## consumes it. The boot handoff hands the very same envelope it hands the
+## placement picker (one fail-closed parse, two consumers, no second
+## config request).
+func set_shop_catalog(result: Dictionary) -> void:
+	shop_catalog_result = result
+
+
+## The shop's entries for the loaded level: store-listed entries the level
+## allows whose config price is a cash price, payload order (11 at level 1
+## of the fresh save). Empty while the catalog is unavailable — never
+## fabricated, never a guessed price.
+func shop_catalog_entries() -> Array:
+	var catalog: Variant = _shop_catalog()
+	if catalog == null or state == null:
+		return []
+	return ShopFlow.shop_entries(catalog, state.summary.level)
+
+
+## True while the shop is open.
+func shop_active() -> bool:
+	return _shop_active
+
+
+## The selected shop entry (PlacementCatalog.Entry or null).
+func shop_entry() -> Variant:
+	return _shop_entry
+
+
+## The storage readout lines currently rendered: one per stored item, the
+## explicit missing-field indicator when the payload carried no storage, or
+## the empty-storage indicator. A resolved content name when ContentRegistry
+## knows the id, the raw item id otherwise — never a guessed name
+## (design D7).
+func storage_rows() -> Array:
+	var rows: Array = storage_texts()
+	rows.sort()
+	return rows
+
+
+## Opens the shop over the catalog (spec: "the player opens the shop
+## surface"). Fail-closed: an unbuilt view, a missing or failed catalog, or
+## an already-open shop rejects with an explicit error naming the
+## condition; a successful open resets the mode-local selection, commits
+## the panel into its own UI-foundation slot, and renders the storage
+## readout.
+func enter_shop() -> Dictionary:
+	if view_state != STATE_BUILT:
+		return _shop_reject("town_not_built", "the town view is not built")
+	if _shop_active:
+		return _shop_reject("shop_already_active", "the shop is already open")
+	if not (shop_catalog_result is Dictionary):
+		return _shop_reject("shop_unavailable",
+			"the shop catalog was never provided")
+	if not bool((shop_catalog_result as Dictionary).get("ok", false)):
+		return _shop_reject("shop_unavailable",
+			"the shop catalog failed to parse: %s"
+			% str((shop_catalog_result as Dictionary).get("error", "")))
+	var entries := shop_catalog_entries()
+	var panel := _build_shop_panel(entries)
+	if not bool(panel.get("ok", false)):
+		return _shop_reject("shop_panel", str(panel.get("error", "")))
+	_shop_active = true
+	_shop_entry = null
+	shop_error = ""
+	if ui != null and ui.has_slot(SLOT_SHOP) \
+			and not ui.is_slot_visible(SLOT_SHOP):
+		ui.set_slot_visible(SLOT_SHOP, true)
+	_set_shop_status("pick an item to buy (%d available at level %d)"
+		% [entries.size(), state.summary.level])
+	_render_storage()
+	return {"ok": true, "error": "", "entries": entries.size()}
+
+
+## Selects one shop entry (spec: "chooses a store-listed, cash-priced item
+## their level allows"). An id the catalog lacks names the id; an id the
+## level gate or the cash-price rule withholds names that gate — never
+## offered, never guessed, never priced.
+func pick_shop_item(item_id: int) -> Dictionary:
+	if not _shop_active:
+		return _shop_reject("shop_not_active", "the shop is not open")
+	var chosen: Variant = null
+	for entry: Variant in shop_catalog_entries():
+		if entry is PlacementCatalog.Entry and entry.id == item_id:
+			chosen = entry
+			break
+	if chosen == null:
+		return _shop_reject(_withheld_reason(item_id),
+			_withheld_detail(item_id))
+	_shop_entry = chosen
+	var evaluation: Dictionary = ShopFlow.evaluate(state, chosen)
+	if bool(evaluation.get("ok", false)) \
+			and not bool(evaluation.get("purchasable", true)):
+		# Not a rejection: the entry is offered, the price is simply
+		# currently unaffordable. The refusal text is shown so the player
+		# can read why, and the confirm will refuse with no request.
+		_set_shop_status("%s | %s" % [chosen.name,
+			ShopFlow.refusal_text(evaluation)])
+	else:
+		_set_shop_status("%s | price: %s" % [chosen.name,
+			ShopFlow.price_against_cash_text(state, chosen)])
+	return {"ok": true, "error": "", "item_id": item_id}
+
+
+## Sends exactly one purchase intent (spec: "a purchase confirm that sends
+## exactly one intent") and applies only the authoritative response.
+## Nothing is sent unless the surface, a selection, an affordable price, an
+## active session, and a registered API are all committed: an unaffordable
+## price, a missing session, or a missing API rejects locally with the
+## explicit error and no request. A structured or transport failure surfaces
+## its code with no state change (design D7). Awaits the GameApi call.
+func confirm_purchase() -> Dictionary:
+	if not _shop_active:
+		return _shop_reject("shop_not_active", "the shop is not open")
+	if _shop_entry == null:
+		return _shop_reject("shop_no_selection", "no shop entry is selected")
+	var evaluation: Dictionary = ShopFlow.evaluate(state, _shop_entry)
+	if not bool(evaluation.get("ok", false)):
+		return _shop_reject("shop_evaluation",
+			str(evaluation.get("error", "")))
+	if not bool(evaluation.get("purchasable", false)):
+		# The client owns affordability (design D5): refuse locally, send
+		# nothing, and name the reason with the two numbers it compares.
+		return _shop_reject("not_purchasable",
+			ShopFlow.refusal_text(evaluation))
+	var session: Variant = get_node_or_null("/root/Session")
+	if session == null or not session.is_active() \
+			or str(session.user_id()).strip_edges() == "":
+		return _shop_reject("session_unavailable",
+			"no active save to buy into")
+	var api: Variant = get_node_or_null("/root/GameApi")
+	if api == null:
+		return _shop_reject("gameapi_unavailable",
+			"the GameApi autoload is not registered")
+	var response: Variant = await api.purchase_item(session.user_id(),
+		int(_shop_entry.id))
+	if not (response is BootData.PurchaseResult):
+		return _shop_reject("bad_response",
+			"GameApi returned no typed purchase result")
+	var typed: BootData.PurchaseResult = response
+	if not typed.ok:
+		# Structured or transport failure: one contract — the explicit
+		# error names the code and message, nothing was applied.
+		shop_error = "[town] purchase failed: %s: %s" % [
+			typed.error_code, typed.error_message]
+		_set_shop_status(shop_error)
+		return {"ok": false, "error": shop_error, "code": typed.error_code}
+	var applied: Dictionary = _apply_purchase(typed)
+	if not bool(applied.get("ok", false)):
+		return _shop_reject("apply_failed", str(applied.get("error", "")))
+	shop_error = ""
+	var quantity := int(state.storage.get(str(int(_shop_entry.id)), 0))
+	_set_shop_status("bought %s (x%d in storage)" % [_shop_entry.name, quantity])
+	return {"ok": true, "error": "", "result": typed}
+
+
+## Applies the authoritative response (design D4/D7): the typed storage
+## mapping replaces the state's storage through the SAME fail-closed parser
+## the payload parse used (never a computed delta, never a partial write),
+## the stored resources and XP take the response's values verbatim, the
+## storage readout and the HUD re-render from them, and the fields the
+## response supplies are no longer missing. Pre-checks run before any
+## mutation; the only post-mutation failure — a rejected HUD re-attach —
+## rolls every write back, so a failed apply changes nothing.
+func _apply_purchase(result: BootData.PurchaseResult) -> Dictionary:
+	if state == null:
+		return {"ok": false, "error": "the town state is unavailable"}
+	if ui == null or _hud == null:
+		return {"ok": false, "error": "the town HUD is not attached"}
+	var resources: BootData.Resources = result.resources
+	if resources == null:
+		return {"ok": false, "error": "the purchase response is incomplete"}
+	# The response's storage is read with the payload's own parser: one
+	# rule set, so a response can never be interpreted differently than
+	# the save it replaces.
+	var storage: Dictionary = TownState.storage_of(result.store)
+	if not bool(storage.get("ok", false)):
+		return {"ok": false, "error": str(storage.get("error", ""))}
+	var previous := {
+		"storage": (state.storage as Dictionary).duplicate(),
+		"missing": (state.missing as Array).duplicate(),
+		"coins": state.resources.coins,
+		"wood": state.resources.wood,
+		"steel": state.resources.steel,
+		"oil": state.resources.oil,
+		"cash": state.resources.cash,
+		"mana": state.resources.mana,
+		"xp": state.summary.xp,
+	}
+	state.storage = (storage["storage"] as Dictionary).duplicate()
+	state.resources.coins = resources.gold
+	state.resources.wood = resources.wood
+	state.resources.steel = resources.steel
+	state.resources.oil = resources.oil
+	state.resources.cash = resources.cash
+	state.resources.mana = resources.mana
+	state.summary.xp = resources.xp
+	var hud_result: Dictionary = _hud.attach(ui, state)
+	if not bool(hud_result.get("ok", false)):
+		# Roll every mutation back: a failed apply changes nothing.
+		state.storage = previous["storage"]
+		state.missing = previous["missing"]
+		state.resources.coins = previous["coins"]
+		state.resources.wood = previous["wood"]
+		state.resources.steel = previous["steel"]
+		state.resources.oil = previous["oil"]
+		state.resources.cash = previous["cash"]
+		state.resources.mana = previous["mana"]
+		state.summary.xp = previous["xp"]
+		_render_storage()
+		return {"ok": false, "error": str(hud_result.get("error", ""))}
+	# The response supplies values the payload may have lacked.
+	for key in ["coins", "wood", "steel", "oil", "cash", "mana"]:
+		state.missing.erase(key)
+	state.missing.erase("xp")
+	state.missing.erase(TownState.STORAGE_MISSING_KEY)
+	_render_storage()
+	return {"ok": true, "error": ""}
+
+
+## Closes the shop without sending anything: the mode-local selection
+## drops, the slot hides, and the town state, selection, and resources stay
+## byte-identical.
+func cancel_shop() -> Dictionary:
+	if not _shop_active:
+		return _shop_reject("shop_not_active", "the shop is not open")
+	_shop_active = false
+	_shop_entry = null
+	if ui != null and ui.has_slot(SLOT_SHOP) \
+			and ui.is_slot_visible(SLOT_SHOP):
+		ui.set_slot_visible(SLOT_SHOP, false)
+	_set_shop_status("shop closed")
+	return {"ok": true, "error": "", "cancelled": true}
+
+
+## Builds the shop into its own UI-foundation slot (registered once,
+## contents replaced per open — the picker/HUD attach precedent). The panel
+## is hidden while building; `enter_shop` shows it once committed.
+## Fail-closed envelope: a rejected registration or missing slot root
+## returns {ok:false} and commits no visible panel.
+func _build_shop_panel(entries: Array) -> Dictionary:
+	if ui == null:
+		return {"ok": false, "error": "the UI foundation is unavailable"}
+	if not ui.has_slot(SLOT_SHOP):
+		var registration: Dictionary = ui.register_slot(SLOT_SHOP)
+		if not bool(registration.get("ok", false)):
+			return {"ok": false,
+				"error": str(registration.get("error", "rejected"))}
+	if ui.is_slot_visible(SLOT_SHOP):
+		ui.set_slot_visible(SLOT_SHOP, false)
+	var root: Control = ui.slot_root(SLOT_SHOP)
+	if root == null:
+		return {"ok": false, "error": "the shop slot root is unavailable"}
+	for child in root.get_children():
+		root.remove_child(child)
+		child.free()
+	_shop_status = null
+	_shop_storage = null
+	var panel := VBoxContainer.new()
+	panel.name = "shop"
+	panel.anchor_left = 1.0
+	panel.anchor_right = 1.0
+	panel.offset_left = -SHOP_PANEL_WIDTH
+	panel.offset_right = -8.0
+	panel.offset_top = 8.0
+	panel.offset_bottom = -8.0
+	panel.add_theme_constant_override("separation", 2)
+	root.add_child(panel)
+	var title := Label.new()
+	title.name = "title"
+	title.text = "Shop"
+	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_style_placement_label(title)
+	panel.add_child(title)
+	for entry: Variant in entries:
+		if not (entry is PlacementCatalog.Entry):
+			continue
+		var typed: PlacementCatalog.Entry = entry
+		var button := Button.new()
+		button.name = "item_%d" % typed.id
+		button.text = "%s  %s" % [typed.name, ShopFlow.price_text(typed)]
+		button.tooltip_text = ShopFlow.price_against_cash_text(state, typed)
+		button.pressed.connect(_on_shop_pick.bind(typed.id))
+		panel.add_child(button)
+	var storage_title := Label.new()
+	storage_title.name = "storage"
+	storage_title.text = "Storage"
+	storage_title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_style_placement_label(storage_title)
+	panel.add_child(storage_title)
+	var storage_box := VBoxContainer.new()
+	storage_box.name = "storage_entries"
+	storage_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	storage_box.add_theme_constant_override("separation", 1)
+	panel.add_child(storage_box)
+	_shop_storage = storage_box
+	var status := Label.new()
+	status.name = "status"
+	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	status.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_style_placement_label(status)
+	panel.add_child(status)
+	_shop_status = status
+	var row := HBoxContainer.new()
+	row.name = "actions"
+	var confirm := Button.new()
+	confirm.name = "confirm"
+	confirm.text = "Buy"
+	confirm.pressed.connect(_on_shop_confirm)
+	row.add_child(confirm)
+	var cancel := Button.new()
+	cancel.name = "cancel"
+	cancel.text = "Cancel"
+	cancel.pressed.connect(_on_shop_cancel)
+	row.add_child(cancel)
+	panel.add_child(row)
+	return {"ok": true, "error": ""}
+
+
+## Re-renders the storage readout in place (one label per row, the
+## indicator lines included), leaving the entry buttons and the status
+## label untouched. A no-op before a panel exists.
+func _render_storage() -> void:
+	if _shop_storage == null or not is_instance_valid(_shop_storage):
+		return
+	var box := _shop_storage as VBoxContainer
+	for child in box.get_children():
+		box.remove_child(child)
+		child.free()
+	for text: String in storage_rows():
+		var row := Label.new()
+		row.name = "storage_entry"
+		row.text = text
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_style_placement_label(row)
+		box.add_child(row)
+
+
+## The readout lines in a stable order: the indicator lines while the state
+## carries no storage, else one line per stored item sorted by the numeric
+## item id. A resolved content name when ContentRegistry knows the id, the
+## raw id otherwise — never a guessed name. Quantity `0` is shown as
+## stored (it occurs in real saves), never hidden.
+func storage_texts() -> Array:
+	if state == null:
+		return [MISSING_STORAGE_TEXT]
+	if state.missing.has(TownState.STORAGE_MISSING_KEY):
+		return [MISSING_STORAGE_TEXT % TownState.STORAGE_MISSING_KEY]
+	var ids := _storage_ids(state.storage)
+	if ids.is_empty():
+		return [EMPTY_STORAGE_TEXT]
+	var registry: RegistryScript = get_node_or_null("/root/ContentRegistry") \
+		if _registry == null else _registry
+	var lines: Array = []
+	for id_text: String in ids:
+		lines.append(_storage_row(int(id_text),
+			int(state.storage[id_text]), registry))
+	return lines
+
+
+## One readout line: the resolved content name and its quantity, or the
+## raw item id with an explicit unresolved marker.
+func _storage_row(item_id: int, quantity: int, registry: Variant) -> String:
+	var name := TownState.content_name(item_id, registry)
+	if name == "":
+		return "item %d  x%d  (name unresolved)" % [item_id, quantity]
+	return "%s  x%d  (item %d)" % [name, quantity, item_id]
+
+
+## The storage keys as digit strings in ascending numeric order, so the
+## readout (and the evidence report) are deterministic regardless of the
+## payload's key order.
+func _storage_ids(storage: Dictionary) -> Array:
+	var ids: Array = []
+	for key: Variant in storage:
+		ids.append(str(key))
+	ids.sort_custom(func(a: String, b: String) -> bool: return int(a) < int(b))
+	return ids
+
+
+## Writes the shop status line (no-op before a panel exists).
+func _set_shop_status(text: String) -> void:
+	if _shop_status != null and is_instance_valid(_shop_status):
+		(_shop_status as Label).text = text
+
+
+## The shop catalog envelope's catalog (null when absent or failed).
+func _shop_catalog() -> Variant:
+	if not (shop_catalog_result is Dictionary):
+		return null
+	var envelope := shop_catalog_result as Dictionary
+	if not bool(envelope.get("ok", false)):
+		return null
+	return envelope.get("catalog")
+
+
+## Why an id the shop did not offer is withheld: an id the catalog lacks, an
+## entry the level gate withholds, or an entry this command cannot price in
+## cash (design D2's derivation boundary, not a gameplay rule).
+func _withheld_reason(item_id: int) -> String:
+	var entry: Variant = PlacementCatalog.find_entry(_shop_catalog(), item_id)
+	if entry == null:
+		return "unknown_item_id"
+	return "item_not_available"
+
+
+## The explicit message for a withheld id (naming the id and the gate).
+func _withheld_detail(item_id: int) -> String:
+	var entry: Variant = PlacementCatalog.find_entry(_shop_catalog(), item_id)
+	if entry == null:
+		return "no catalog entry with id %d" % item_id
+	if not entry.in_store:
+		return "item %d is not store-listed" % item_id
+	if int(entry.min_level) > int(state.summary.level):
+		return "item %d is not available at level %d" % [
+			item_id, int(state.summary.level)]
+	return "item %d is not priced in cash, so this shop cannot buy it" \
+		% item_id
+
+
+## The house shop failure envelope: records the explicit error naming the
+## code and condition, shows it in the shop status when open, and returns
+## {ok:false} without touching town state, storage, or resources.
+func _shop_reject(code: String, message: String) -> Dictionary:
+	shop_error = "[town] purchase rejected: %s: %s" % [code, message]
+	_set_shop_status(shop_error)
+	return {"ok": false, "error": shop_error, "code": code}
+
+
+## Shop button wiring: a press selects that entry.
+func _on_shop_pick(item_id: int) -> void:
+	pick_shop_item(item_id)
+
+
+## Shop button wiring: confirm sends (awaits the one intent).
+func _on_shop_confirm() -> void:
+	await confirm_purchase()
+
+
+## Shop button wiring: cancel closes with no request.
+func _on_shop_cancel() -> void:
+	cancel_shop()
+
+
 ## Left press -> placement preview while the build picker is open,
 ## otherwise -> selection. The camera's drag handling is independent
 ## (design D7/D8: the press selects or previews, motion pans, the press
@@ -835,7 +1399,9 @@ func _reset_view() -> void:
 		error_label.visible = false
 		error_label.text = ""
 	# A rebuild drops the placement mode with the rest of the view: no
-	# stale picker, target, overlay, or status survives a fresh build.
+	# stale picker, target, overlay, or status survives a fresh build. The
+	# shop drops with it, in its own right (design D8): the two surfaces
+	# never share mode state.
 	_placement_active = false
 	_placement_entry = null
 	_placement_evaluation = {}
@@ -847,6 +1413,13 @@ func _reset_view() -> void:
 	if ui != null and ui.has_slot(SLOT_PLACEMENT) \
 			and ui.is_slot_visible(SLOT_PLACEMENT):
 		ui.set_slot_visible(SLOT_PLACEMENT, false)
+	_shop_active = false
+	_shop_entry = null
+	_shop_status = null
+	_shop_storage = null
+	if ui != null and ui.has_slot(SLOT_SHOP) \
+			and ui.is_slot_visible(SLOT_SHOP):
+		ui.set_slot_visible(SLOT_SHOP, false)
 
 
 ## Enters the explicit error state: names the failure on the view, keeps
@@ -915,6 +1488,9 @@ func _maybe_start_capture() -> void:
 	if not build_ok:
 		return
 	_capture_started = true
+	if _purchase_capture:
+		_capture_purchase_and_quit()
+		return
 	if _placement_capture:
 		_capture_placement_and_quit()
 		return
@@ -983,6 +1559,37 @@ func _capture_placement_and_quit() -> void:
 ## failed flow never leaves an open window or a misleading frame.
 func _placement_capture_fail(step: String, detail: String) -> void:
 	print("[town] placement-capture state=error step=%s detail=%s" % [
+		step, detail])
+	get_tree().quit(1)
+
+
+## Purchase capture (design D9): drives exactly one confirmed intent
+## through the same shop flow a player uses — enter, pick, confirm — and
+## then captures the town whose storage readout carries the purchased item.
+## Any failed step prints an explicit marker and exits 1 instead of
+## capturing a town that never received the item.
+func _capture_purchase_and_quit() -> void:
+	var entered: Dictionary = enter_shop()
+	if not bool(entered.get("ok", false)):
+		_purchase_capture_fail("enter", str(entered.get("error", "")))
+		return
+	var picked: Dictionary = pick_shop_item(PURCHASE_INTENT_ITEM)
+	if not bool(picked.get("ok", false)):
+		_purchase_capture_fail("pick", str(picked.get("error", "")))
+		return
+	var confirmed: Dictionary = await confirm_purchase()
+	if not bool(confirmed.get("ok", false)):
+		_purchase_capture_fail("confirm", str(confirmed.get("error", "")))
+		return
+	print("[town] purchase-capture applied item=%d storage=%s" % [
+		PURCHASE_INTENT_ITEM, JSON.stringify(_storage_record())])
+	_capture_and_quit()
+
+
+## A named purchase-capture failure: explicit marker + exit 1, so a failed
+## flow never leaves an open window or a misleading frame.
+func _purchase_capture_fail(step: String, detail: String) -> void:
+	print("[town] purchase-capture state=error step=%s detail=%s" % [
 		step, detail])
 	get_tree().quit(1)
 
@@ -1391,5 +1998,186 @@ func _placement_capture_record() -> Dictionary:
 		+ "double, not a parity oracle)"
 	record["parity_pointer"] = "real-execution parity is established " \
 		+ "by the fixture-replay tests and the verify-boot placement " \
+		+ "live phase"
+	return record
+
+
+# ---------------------------------------------------------------------------
+# Purchase evidence report (building-purchase, design D9)
+# ---------------------------------------------------------------------------
+
+
+## The purchase report output path from the user arguments:
+## `--purchase-report=<path>` (relative paths resolve against the project
+## directory), the bare `--purchase-report` flag's default evidence path,
+## or "" when absent.
+func _purchase_report_path_arg() -> String:
+	for argument in OS.get_cmdline_user_args():
+		if argument == "--purchase-report":
+			return Paths.project_dir().path_join(
+				DEFAULT_PURCHASE_REPORT_PATH)
+		if argument.begins_with("--purchase-report="):
+			var value := argument.trim_prefix("--purchase-report=")
+			if value.is_absolute_path():
+				return value
+			return Paths.project_dir().path_join(value)
+	return ""
+
+
+## Runs the purchase report flow and quits with the documented exit code:
+## 0 when the deterministic report is written, 1 with an explicit marker
+## naming the first failed step (the town/placement report pattern).
+func _write_purchase_report(report_path: String) -> void:
+	var problem: String = await _purchase_report_into(report_path)
+	if problem == "" and not FileAccess.file_exists(report_path):
+		problem = "[report] report file was not created at %s" % report_path
+	if problem != "":
+		print("[town] purchase-report state=error message=", problem)
+		get_tree().quit(1)
+		return
+	print("[town] purchase-report state=written path=", report_path)
+	get_tree().quit(0)
+
+
+## Computes the whole purchase report (design D9): the bootstrap payload in
+## hand parses fail-closed (exactly one bootstrap request, no second config
+## call), the town builds from the committed save, one Victory Arch intent
+## runs through the same shop flow a player uses (enter, pick, confirm
+## against the fake implementation), and the structural report records the
+## intent, the storage and resource before/after values, the request
+## counts, input digests, the projection constants pointer, the fake
+## capture pointer, and every required non-claim. Returns "" on success or
+## the first failure as an explicit message.
+func _purchase_report_into(report_path: String) -> String:
+	var registry: Variant = get_node_or_null("/root/ContentRegistry")
+	if registry == null:
+		return "[report] content registry is not registered"
+	if not bool(registry.is_loaded()):
+		var content: Dictionary = registry.load_content()
+		if not bool(content.get("ok", false)):
+			return "[report] content load failed: %s" % content.get("error", "")
+	if not bool(registry.assets_loaded()):
+		var assets: Dictionary = registry.load_asset_registry()
+		if not bool(assets.get("ok", false)):
+			return "[report] asset registry load failed: %s" % assets.get("error", "")
+	var api: Variant = get_node_or_null("/root/GameApi")
+	if api == null:
+		return "[report] GameApi is not registered"
+	var session: Variant = get_node_or_null("/root/Session")
+	if session == null:
+		return "[report] Session is not registered"
+	var sessions: Variant = await api.list_sessions()
+	if not bool(sessions.ok):
+		return "[report] save list failed: %s" % str(sessions.error_message)
+	if sessions.saves.size() == 0:
+		return "[report] save list carries no saves"
+	var pid := str(sessions.saves[0].id)
+	var boot: Variant = await api.get_bootstrap(pid)
+	if not bool(boot.ok):
+		return "[report] bootstrap failed: %s" % str(boot.error_message)
+	var player_info: Variant = boot.player_info
+	if player_info == null:
+		return "[report] bootstrap carried no player info"
+	var config: BootData.ConfigPayload = boot.config
+	if config == null:
+		return "[report] bootstrap carried no config"
+	var parsed: Dictionary = TownState.parse(player_info.raw, registry)
+	if not bool(parsed.get("ok", false)):
+		return "[report] town state rejected: %s" % parsed.get("error", "")
+	state = parsed["state"]
+	var built: Dictionary = build()
+	if not bool(built.get("ok", false)):
+		return "[report] town failed to build: %s" % built.get("error", "")
+	if objects.is_empty():
+		return "[report] town rendered no objects"
+	# The session the confirm needs: a real launch activates it during
+	# boot, while this headless report flow commits it here.
+	var summary := BootData.PlayerSummary.new()
+	summary.user_id = pid
+	summary.name = state.summary.name
+	summary.level = state.summary.level
+	summary.xp = state.summary.xp
+	var activation: Dictionary = session.activate(pid, summary)
+	if not bool(activation.get("ok", false)):
+		return "[report] session activation failed: %s" \
+			% activation.get("error", "")
+	var storage_before: Dictionary = _storage_record()
+	var resources_before: Dictionary = _report_resources()
+	# The catalog derives from the payload in hand — the same fail-closed
+	# parse the boot handoff performs (no second bootstrap).
+	var catalog: Dictionary = PlacementCatalog.parse(config.raw)
+	if not bool(catalog.get("ok", false)):
+		return "[report] shop catalog rejected: %s" % catalog.get("error", "")
+	set_shop_catalog(catalog)
+	var entries_before: int = shop_catalog_entries().size()
+	if entries_before == 0:
+		return "[report] the shop offered no entry at level %d" \
+			% int(state.summary.level)
+	var entered: Dictionary = enter_shop()
+	if not bool(entered.get("ok", false)):
+		return "[report] shop entry rejected: %s" % entered.get("error", "")
+	var picked: Dictionary = pick_shop_item(PURCHASE_INTENT_ITEM)
+	if not bool(picked.get("ok", false)):
+		return "[report] shop pick rejected: %s" % picked.get("error", "")
+	var confirmed: Dictionary = await confirm_purchase()
+	if not bool(confirmed.get("ok", false)):
+		return "[report] purchase confirm failed: %s" % confirmed.get("error", "")
+	var storage_after: Dictionary = _storage_record()
+	if int(storage_after.get(str(PURCHASE_INTENT_ITEM), 0)) != 1:
+		return "[report] the purchase did not land in storage (got %s)" \
+			% JSON.stringify(storage_after)
+	return _write_report_file(report_path, {
+		"schema": "purchase-report-v1",
+		"bootstrap_requests": int(api.bootstrap_requests),
+		"purchase_requests": int(api.purchase_requests),
+		"intent": {
+			"user_id": pid,
+			"item_id": PURCHASE_INTENT_ITEM,
+		},
+		"shop_entries_at_level": entries_before,
+		"storage": {
+			"before": storage_before,
+			"after": storage_after,
+		},
+		"resources": {
+			"before": resources_before,
+			"after": _report_resources(),
+		},
+		"readout": storage_texts(),
+		"inputs": {
+			"save_list_fixture": _digest_record(REPORT_SAVE_LIST),
+			"bootstrap_fixture": _digest_record(REPORT_BOOTSTRAP),
+			"purchase_request": _digest_record(REPORT_PURCHASE_REQUEST),
+			"purchase_response": _digest_record(REPORT_PURCHASE_RESPONSE),
+			"purchase_after": _digest_record(REPORT_PURCHASE_AFTER),
+			"terrain": _digest_record(_terrain_runtime(registry)),
+		},
+		"constants": _constants_record(),
+		"capture": _purchase_capture_record(),
+		"non_claims": PURCHASE_NON_CLAIMS,
+	})
+
+
+## The storage snapshot the purchase report records before and after the
+## intent: the typed state's own mapping, exactly as the readout renders it
+## (never computed deltas).
+func _storage_record() -> Dictionary:
+	var record := {}
+	if state == null:
+		return record
+	for key: Variant in state.storage:
+		record[str(key)] = int(state.storage[key])
+	return record
+
+
+## The fake-capture pointer (design D9): the committed windowed capture
+## with its digest plus the plain statement of what it proves — so no
+## reader can mistake the screenshot for executed-legacy proof.
+func _purchase_capture_record() -> Dictionary:
+	var record := _digest_record(REPORT_CAPTURE_PURCHASE)
+	record["implementation"] = "fake GameApi (a deterministic test " \
+		+ "double, not a parity oracle)"
+	record["parity_pointer"] = "real-execution parity is established " \
+		+ "by the fixture-replay tests and the verify-boot purchase " \
 		+ "live phase"
 	return record

@@ -1,7 +1,8 @@
 extends Node
 ## `LegacyV0Api` — GameApi implementation that speaks JSON over loopback HTTP
 ## to Compatibility API v0 (design D5, specs "Boot live against Compatibility
-## API" and "Place through either implementation").
+## API", "Place through either implementation", and "Purchase through either
+## implementation").
 ##
 ## This is the ONLY project file allowed to name the compat endpoint or to
 ## use the built-in HTTP request/enumeration types; the scope test restricts
@@ -17,6 +18,7 @@ const DEFAULT_ENDPOINT := "http://127.0.0.1:5056"
 const SESSION_PATH := "/v0/session"
 const BOOTSTRAP_PATH := "/v0/bootstrap"
 const PLACE_PATH := "/v0/place"
+const PURCHASE_PATH := "/v0/purchase"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -81,6 +83,25 @@ func place_building(user_id: String, item_id: int, x: int, y: int,
 			str(outcome.get("code", "bad_response")),
 			str(outcome.get("message", "")))
 	return BootData.parse_placement(outcome.get("payload"))
+
+
+## One purchase intent over loopback HTTP: the client sends only the intent
+## (`user_id`, `item_id`) — no price, no quantity, no resource deltas — and
+## the service derives the legacy `buy_stored_item_cash` envelope from the
+## item's own config (design D2/D3), so the typed result's storage mapping
+## and resources are authoritative (design D4). Structured service errors
+## pass through with their original codes; transport failures keep the boot
+## failure rules — never a partial payload.
+func purchase_item(user_id: String, item_id: int) -> BootData.PurchaseResult:
+	var outcome := await _call("POST", PURCHASE_PATH, JSON.stringify({
+		"user_id": user_id,
+		"item_id": item_id,
+	}))
+	if not outcome.get("ok", false):
+		return BootData.purchase_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return BootData.parse_purchase(outcome.get("payload"))
 
 
 ## One HTTP round trip. Success returns `{ok: true, payload: Dictionary}`;

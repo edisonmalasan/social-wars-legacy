@@ -2,19 +2,30 @@ extends "res://tests/test_base.gd"
 ## Headless GameApi suite for the legacy-v0 implementation (task 3.3, spec
 ## "Boot live against Compatibility API"; extended by the
 ## building-placement change's task 3.2 with the placement parity of spec
-## "Place through either implementation").
+## "Place through either implementation" and by `building-purchase` with the
+## purchase parity of spec "Purchase through either implementation").
 ##
 ## Requires a running Compatibility API v0 on loopback — verify-boot.ps1
 ## wraps this suite with `compat_live_phase.py`, which starts
 ## `apps/compat-api/run.py` (disposable corpus) and tears it down again. The
 ## suite compares every live typed result against the fake implementation's,
-## so both must yield the same boot data and the same placement results
-## (time-dependent fields excepted).
+## so both must yield the same boot data and the same placement and purchase
+## results (time-dependent fields excepted).
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 
 const ARG_ENDPOINT := "--gameapi-endpoint="
 const UNKNOWN_USER := "does-not-exist-0000"
+## The executed-legacy purchase transaction's item (Victory Arch, priced
+## `{"c": 5}` in the committed config) — the one intent both
+## implementations must answer identically.
+const PURCHASE_ITEM := 105
+## The item's derived cash price (the committed config's `costs {"c": 5}`).
+const PURCHASE_PRICE := 5
+## A store-listed building priced in wood, not cash: this command's price
+## is not derivable, so both implementations fail closed with
+## `costs_not_cash` rather than inventing a price.
+const WOOD_PRICED_ITEM := 1
 
 
 func run_scenario() -> void:
@@ -134,6 +145,12 @@ func run_scenario() -> void:
 			"live structured failure carries no summary")
 
 	await _check_live_placement(api, endpoint, user_id)
+	await _check_live_purchase(api, endpoint, user_id)
+	# The live corpus now carries both mutating transactions, so this suite's
+	# parity claim is stated once, explicitly: the two implementations are
+	# compared on the fields each own, and each side's resource bag is
+	# compared against ITS OWN pre-purchase bootstrap (the live side has the
+	# placement's wood already spent, the fake side does not).
 
 	info("legacy_v0 matched the fake reference over loopback %s" % endpoint)
 
@@ -261,3 +278,165 @@ func _endpoint() -> String:
 		if argument.begins_with(ARG_ENDPOINT):
 			return argument.trim_prefix(ARG_ENDPOINT)
 	return str(ProjectSettings.get_setting("gameapi/endpoint", ""))
+
+
+## Purchase through both implementations (building-purchase task 3.3,
+## spec "Purchase through either implementation"): the same typed shape
+## from both, the endpoint's structured codes passing through unchanged,
+## and each side's authoritative storage and resources checked against its
+## OWN pre-purchase state.
+##
+## Why each side is compared against itself rather than across: this phase
+## runs BOTH mutating transactions against the same disposable corpus, and
+## the live side therefore already carries the placement's 30-wood spend
+## while the fake double starts from the committed fresh-save fixture. The
+## honest parity claim is the one the contract actually makes: both
+## implementations produce the same typed shape, the same storage mapping
+## for this item, and a resource bag equal to their own pre-purchase
+## values except for the derived cash price. Claiming identical absolute
+## resources across the two sides here would be a false claim, not a
+## stronger test.
+func _check_live_purchase(api: Variant, endpoint: String,
+		user_id: String) -> void:
+	# The live side's pre-purchase resources, read from the corpus itself.
+	api.configure("legacy_v0", endpoint)
+	var live_before: BootData.Resources = await _live_resources(api, endpoint,
+		user_id)
+	check(live_before != null,
+		"the live corpus pre-purchase resources resolve")
+
+	# The same intent against the running Compatibility API.
+	var live_ref: Variant = await api.purchase_item(user_id, PURCHASE_ITEM)
+	check(live_ref is BootData.PurchaseResult,
+		"live purchase_item returns the typed result")
+	if not (live_ref is BootData.PurchaseResult):
+		return
+	var live: BootData.PurchaseResult = live_ref
+	check(live.ok, "live purchase resolves over loopback: %s"
+		% live.error_message)
+	if not live.ok:
+		return
+	check(live.server_time > 0,
+		"live server_time is a positive wall-clock epoch (time-dependent)")
+	check_eq(live.protocol, BootData.PROTOCOL,
+		"live purchase protocol is compat-v0")
+	check(live.game_version != "",
+		"the live purchase response carries the game version")
+	check_eq(live.result, "success", "live reports the legacy success result")
+	check(live.resources != null, "the live response carries typed resources")
+	if live.resources == null or live_before == null:
+		return
+	check_eq(live.store, {"105": 1},
+		"the live response carries the full storage mapping (design D4)")
+	# The derived cash price is the ONLY resource the purchase changes.
+	check_eq(live.resources.cash, maxi(live_before.cash - PURCHASE_PRICE, 0),
+		"cash falls by exactly the derived price (legacy clamp included)")
+	for key in ["gold", "wood", "oil", "steel", "mana", "xp"]:
+		check_eq(int(live.resources.get(key)), int(live_before.get(key)),
+			"%s is untouched by the purchase (design D2)" % key)
+
+	# Fake reference: an independent in-memory state over the committed
+	# purchase-fixture before-state.
+	api.configure("fake")
+	var fake_ref: Variant = await api.purchase_item(user_id, PURCHASE_ITEM)
+	check(fake_ref is BootData.PurchaseResult,
+		"fake purchase_item returns the typed result")
+	if not (fake_ref is BootData.PurchaseResult):
+		return
+	var fake: BootData.PurchaseResult = fake_ref
+	check(fake.ok, "fake purchase reference resolves: %s"
+		% fake.error_message)
+	if not fake.ok:
+		return
+	check(fake.resources != null, "the fake reference carries resources")
+	if fake.resources == null:
+		return
+	check_eq(live.protocol, fake.protocol,
+		"live purchase protocol equals the fake's")
+	check_eq(live.game_version, fake.game_version,
+		"live purchase game version equals the fake's")
+	check_eq(live.result, fake.result,
+		"live purchase result string equals the fake's")
+	check_eq(live.store, fake.store,
+		"live purchase storage equals the fake's (live=%s fake=%s)"
+		% [JSON.stringify(live.store), JSON.stringify(fake.store)])
+	# The fake runs from the committed fresh save, so its absolute values
+	# are the fixture's documented ones.
+	check_eq(fake.resources.cash, 0,
+		"the fake deducts the derived 5 cash from the fixture's 5")
+	check_eq(fake.resources.gold, 2000, "the fake's gold equals the fixture's")
+	check_eq(fake.resources.wood, 2000, "the fake's wood equals the fixture's")
+	check_eq(fake.resources.oil, 2000, "the fake's oil equals the fixture's")
+	check_eq(fake.resources.steel, 2000, "the fake's steel equals the fixture's")
+	check_eq(fake.resources.mana, 0, "the fake's mana equals the fixture's")
+	check_eq(fake.resources.xp, 4, "the fake's xp equals the fixture's")
+
+	# Structured service errors pass through with their original codes, and
+	# the fake derives the same code for the same intent offline.
+	api.configure("legacy_v0", endpoint)
+	var live_bad_item: Variant = await api.purchase_item(user_id, 999999999)
+	check(live_bad_item is BootData.PurchaseResult,
+		"live unknown item returns the typed result")
+	if live_bad_item is BootData.PurchaseResult:
+		var bad_item: BootData.PurchaseResult = live_bad_item
+		check(not bad_item.ok, "live unknown item is a structured failure")
+		check_eq(bad_item.error_code, "unknown_item_id",
+			"live structured error passes through with the endpoint's code")
+		check(bad_item.resources == null and bad_item.store.is_empty(),
+			"live structured failure carries no partial payload")
+	var live_wood: Variant = await api.purchase_item(user_id, WOOD_PRICED_ITEM)
+	check(live_wood is BootData.PurchaseResult,
+		"live wood-priced item returns the typed result")
+	if live_wood is BootData.PurchaseResult:
+		var wood: BootData.PurchaseResult = live_wood
+		check(not wood.ok,
+			"a wood-priced item is refused by the cash-only derivation")
+		check_eq(wood.error_code, "costs_not_cash",
+			"the derivation boundary names its own code")
+	api.configure("fake")
+	var fake_wood: Variant = await api.purchase_item(user_id, WOOD_PRICED_ITEM)
+	check(fake_wood is BootData.PurchaseResult and not fake_wood.ok,
+		"fake fails the same intent offline")
+	if fake_wood is BootData.PurchaseResult:
+		check_eq(fake_wood.error_code, "costs_not_cash",
+			"structured codes match between implementations")
+	print("[test] live-purchase applied item=%d store=%s cash=%d"
+		% [PURCHASE_ITEM, JSON.stringify(live.store), live.resources.cash])
+
+
+## The seven stored resources of the running corpus, as the typed
+## `BootData.Resources` the purchase response carries. This is the
+## pre-purchase reference the live purchase is compared against — read from
+## the corpus itself, never from the fake's fixture, because the live side
+## has already executed the placement transaction in this phase.
+func _live_resources(api: Variant, endpoint: String,
+		user_id: String) -> BootData.Resources:
+	api.configure("legacy_v0", endpoint)
+	var boot: Variant = await api.get_bootstrap(user_id)
+	if not (boot is BootData.BootstrapResult) or not bool(boot.ok):
+		check(false, "the live corpus pre-purchase bootstrap resolves")
+		return null
+	# The resources live in the player-info payload; this suite reads them
+	# out of it directly so the reference is a plain value, not a second
+	# typed parse that could mask a transport difference.
+	var info: Variant = (boot as BootData.BootstrapResult).player_info
+	if info == null:
+		check(false, "the live corpus pre-purchase payload is readable")
+		return null
+	var raw: Dictionary = (info as BootData.PlayerInfoPayload).raw
+	# The corpus carries the storage mapping the purchase is about to
+	# extend; recording it makes the pre/post comparison explicit.
+	info("live pre-purchase storage=%s"
+		% JSON.stringify(raw.get("map", {}).get("store", {})))
+	var map: Dictionary = raw.get("map", {}) as Dictionary
+	var player: Dictionary = raw.get("playerInfo", {}) as Dictionary
+	var priv: Dictionary = raw.get("privateState", {}) as Dictionary
+	var resources := BootData.Resources.new()
+	resources.xp = int(map.get("xp", 0))
+	resources.gold = int(map.get("gold", 0))
+	resources.wood = int(map.get("wood", 0))
+	resources.oil = int(map.get("oil", 0))
+	resources.steel = int(map.get("steel", 0))
+	resources.cash = int(player.get("cash", 0))
+	resources.mana = int(priv.get("mana", 0))
+	return resources

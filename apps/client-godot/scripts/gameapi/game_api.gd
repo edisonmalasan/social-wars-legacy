@@ -2,8 +2,9 @@ extends Node
 ## `GameApi` autoload — the only bridge between presentation code and server
 ## data (design D5, spec "GameApi abstraction").
 ##
-## Client code calls `list_sessions()` / `get_bootstrap()` for boot data and
-## `place_building()` for one placement intent, receiving typed results
+## Client code calls `list_sessions()` / `get_bootstrap()` for boot data,
+## `place_building()` for one placement intent, and `purchase_item()` for one
+## purchase intent, receiving typed results
 ## (`scripts/gameapi/boot_data.gd`); raw transport dictionaries never reach
 ## presentation code, and no other script references a transport.
 ##
@@ -11,8 +12,9 @@ extends Node
 ## (default `fake` so tests are hermetic):
 ##
 ##   fake      - reads the committed executed-legacy fixtures under
-##               `tests/fixtures/godot-compatibility-boot/` (boot) and
-##               `tests/fixtures/godot-building-placement/` (placement);
+##               `tests/fixtures/godot-compatibility-boot/` (boot),
+##               `tests/fixtures/godot-building-placement/` (placement), and
+##               `tests/fixtures/godot-item-purchase/` (purchase);
 ##               no process, no server, no socket.
 ##   legacy_v0 - JSON over loopback HTTP to Compatibility API v0 through the
 ##               built-in HTTP request client; endpoint from the project
@@ -54,6 +56,12 @@ var bootstrap_requests := 0
 ## the same reason: `configure()` swaps the implementation without hiding
 ## history.
 var placement_requests := 0
+## Number of purchase intents this process has issued (M7 purchase flow
+## contract: exactly one per confirm, zero for a refused confirm — the shop
+## suite snapshots this counter exactly like `placement_requests`). Monotonic
+## for the same reason: `configure()` swaps the implementation without
+## hiding history.
+var purchase_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -118,6 +126,20 @@ func place_building(user_id: String, item_id: int, x: int, y: int,
 	placement_requests += 1
 	var result: BootData.PlacementResult = await _impl.place_building(
 		user_id, item_id, x, y, orientation)
+	return result
+
+
+## One purchase intent (a save id and a store item id) from the selected
+## implementation. The contract carries NO price, NO quantity, and NO
+## resource deltas: the implementation derives the legacy envelope from the
+## item's own config (design D2/D3), so the typed result's storage mapping
+## and resources are authoritative (design D4) — presentation code replaces
+## its storage view and its resource values from these fields verbatim and
+## never computes a delta.
+func purchase_item(user_id: String, item_id: int) -> BootData.PurchaseResult:
+	purchase_requests += 1
+	var result: BootData.PurchaseResult = await _impl.purchase_item(
+		user_id, item_id)
 	return result
 
 

@@ -242,6 +242,23 @@ class LegacyBoot:
             )
         return items
 
+    def map_store(self, user_id: str) -> Dict[str, object]:
+        """``save["maps"][0]["store"]`` — the player's storage mapping.
+
+        Legacy ``engine.add_store_item`` increments
+        ``map["store"][str(item_id)]`` (``command.buy_stored_item_cash``), so
+        the post-execution storage is read back from the same in-memory save
+        the legacy dispatcher just persisted.  Real saves may hold buildings
+        and units and may hold quantity ``0``; entries are never filtered here.
+        """
+        store = self.first_map(user_id).get("store")
+        if not isinstance(store, dict):
+            raise LegacyBootError(
+                "invalid_save_state",
+                "first map of save for user id %r has no store" % user_id,
+            )
+        return store
+
     def execute_commands(self, user_id: str, envelope: Dict[str, object]) -> None:
         """Run the unchanged legacy ``command()`` batch dispatcher (D2).
 

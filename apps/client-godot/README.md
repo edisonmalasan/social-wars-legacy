@@ -809,5 +809,136 @@ is established by the fixture-replay tests and the `placement-live` phase.
   double, not a parity oracle.
 
 These non-claims are recorded verbatim in `evidence/placement/report.json`.
-Remaining deliver lines of M7 (separate changes): purchase/shop, move, sell,
-store, upgrade, build timers, income, expansion, resources, and XP.
+
+## Building purchase
+
+The purchase slice (OpenSpec `building-purchase`, milestone M7) opens the other
+half of the acquisition loop: a store-listed item the player can pay for in cash
+is bought into the player's **storage** instead of onto the map, executed as one
+typed intent by the unchanged legacy `buy_stored_item_cash` path inside
+Compatibility API v0, with an executed-legacy purchase fixture as the parity
+oracle. Placement still fuses payment with map placement (legacy `buy`), so both
+acquisition paths coexist.
+
+### Flow
+
+1. **Catalog** — the same fail-closed `placement_catalog.gd` parse the picker
+   already uses, handed to a second surface by the boot handoff (no second
+   config request). `shop_flow.gd` filters it to store-listed entries the loaded
+   level allows **and** whose config price is a cash price — 11 entries at level
+   1 of the fresh save out of the 166 store-listed buildings. A missing or
+   malformed catalog makes the surface unavailable behind a named error; it
+   never fabricates an entry and never guesses a price.
+2. **Shop surface** — its own UI-foundation slot beside the build picker
+   (`Shop`, entry buttons showing the price against current cash, a status line,
+   and a storage readout). Entering, picking, and cancelling are view
+   operations with no request.
+3. **Confirm** — exactly one `GameApi.purchase_item(user_id, item_id)` intent.
+   The client owns the gameplay rules legacy never enforced: an entry whose
+   price exceeds current cash is refused locally with the two numbers it
+   compares and **no request is sent**; the endpoint would clamp instead, and
+   server-authoritative validation belongs to Server v1 (M13).
+4. **Apply** — only the authoritative response is applied: the response's
+   **full** storage mapping replaces the typed storage through the same
+   fail-closed parser the payload parse uses, and the HUD resources and XP take
+   the response's values verbatim. A failed apply rolls every write back; a
+   structured or transport failure surfaces its code and changes nothing.
+5. **Storage readout** — `map["store"]` parsed into typed state: quantity `0`
+   and ids the content package cannot resolve are preserved verbatim (real saves
+   hold units and zeroes), a missing field is named rather than defaulted to an
+   empty inventory, and a malformed field rejects the parse naming the key.
+
+### Endpoint contract and envelope derivations
+
+`POST /v0/purchase` accepts only the intent `{user_id, item_id}` — the full
+contract, response example, structured error codes, validation split, and
+corpus-only persistence scope are documented in `apps/compat-api/README.md`.
+The legacy batch envelope is derived server-side and marked
+**derived-provisional** throughout: the **cash-only** price (the item's config
+`costs` must be exactly `{"c": <int>}`) negated onto the cash slot of the legacy
+8-slot `[unknown, xp, gold, wood, oil, steel, cash, mana]` vector, one
+`buy_stored_item_cash` command whose single argument is the item id, and the
+placeholders `accessToken=""`, `publishActions=[]`, `tries=1`,
+`first_number=0`. The Flash client is never executed, so neither the exact
+envelope **nor the choice of this command for a shop purchase** is observed —
+both are derived. An item priced in another resource fails closed with
+`costs_not_cash`; the client never offers such an entry, and any-price storage
+acquisition (`store_add_items`) is a later change.
+
+### Verification (commands actually executed)
+
+```bash
+# Purchase fixture capture (one-shot, executed-legacy oracle): the exact
+# command, exit codes, and containment are recorded in
+# tests/fixtures/godot-item-purchase/README.md
+python -B apps/compat-api/capture_purchase_fixture.py
+
+# Purchase envelope + endpoint + executed-legacy parity tests (inside the
+# compat suite; observed: Ran 157 tests ... OK, exit 0)
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+
+# The hermetic purchase-flow suite standalone (observed: 213 checks, PASS)
+godot --headless --path apps/client-godot --script res://tests/test_town_purchase.gd
+
+# Full batteries in the final state (each embeds the purchase suites and the
+# purchase-live phase; both observed exit 0)
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+```
+
+`verify-boot.ps1` includes the hermetic `test_town_purchase` suite (the shop
+flow over the fake double — entry gating, exactly one request, the unaffordable
+no-request case, the authoritative apply, failure rollback, catalog
+fail-closed, and a transport-failure check against the dead endpoint) and a
+fifth live phase `purchase-live`, which starts the Compatibility API over a
+disposable corpus, sends one intent through `POST /v0/purchase`, asserts the
+typed response, and — via `compat_live_phase.py --expect-save-mutation` —
+asserts a corpus save file actually mutated, then tears down asserting the port
+is released, the corpus is removed, and no working-tree `saves/` exists.
+
+### Evidence capture (two-step, as the placement slice)
+
+```bash
+# 1. Windowed fake-API launch: boot -> town, the shop flow confirms one
+#    Victory Arch (item 105, 5 cash), then the frame is captured (writes
+#    purchase.png at the legacy 1400x600 stage, exits 0; a failed flow exits 1
+#    with an explicit [town] purchase-capture state=error marker)
+godot --path apps/client-godot res://scenes/boot.tscn -- --gameapi=fake --purchase-capture=<repo>/apps/client-godot/evidence/purchase/purchase.png
+
+# 2. Headless deterministic report (writes report.json; a rerun is
+#    byte-identical — observed SHA-256 9510BE8409FE25E3… across three
+#    consecutive runs; the bare --purchase-report flag defaults to
+#    evidence/purchase/report.json)
+godot --headless --path apps/client-godot res://scenes/town.tscn -- --purchase-report=<repo>/apps/client-godot/evidence/purchase/report.json
+```
+
+The report (`schema purchase-report-v1`) records the inputs and digests
+(save-list and bootstrap fixtures, the executed-legacy purchase fixture's
+request/response/after-state, the terrain image, the committed capture), the
+intent `{user_id, item_id: 105}`, storage before/after (`{}` → `{"105": 1}`),
+resources before/after (cash 5 → 0, everything else unchanged), the shop entry
+count at the loaded level (11), the projection-constants pointer, the bootstrap
+and purchase request counts (exactly one each), and the fake-capture pointer.
+
+### Purchase claim limits
+
+- no Flash, Ruffle, ActionScript, or browser executed;
+- the choice of `buy_stored_item_cash` and the cash-only price derivation are
+  derived, never observed from the Flash client — the service therefore claims
+  nothing about resource-priced storage purchases;
+- parity covers one recorded transaction against the fresh-player corpus, not
+  progressed players;
+- insufficient cash reproduces legacy clamping, not rejection, and the client
+  refuses such a purchase without sending anything;
+- storage is display-only here: nothing places from or sells out of storage
+  (`place_stored_item` / `sell_stored_item` are the later *store* and *sell*
+  deliver lines);
+- no pixel-parity oracle against the legacy client exists, and the shop layout,
+  entry labels, and readout are documented placeholders (no captured legacy
+  shop layout exists);
+- the committed capture runs the fake GameApi — a deterministic test double, not
+  a parity oracle.
+
+These non-claims are recorded verbatim in `evidence/purchase/report.json`.
+Remaining deliver lines of M7 (separate changes): move, sell, store, upgrade,
+build timers, income, expansion, resources, and XP.

@@ -110,6 +110,40 @@ answer plus the authoritative superset:
   clamp rather than a rejection — server-side validation belongs to
   Server v1 / M13.
 
+`POST /v0/purchase` with body `{"user_id", "item_id"}` is the second
+state-mutating surface (the `building-purchase` change). The body is an **intent
+only**: extra keys, including a client-supplied `price`, `quantity`, or resource
+delta, are ignored. The endpoint derives the legacy batch envelope internally —
+the **cash-only** price from the item's loaded config `costs`, one
+`buy_stored_item_cash` command whose single argument is the item id, and the
+documented placeholders, all values **derived-provisional** (design D2 of
+`building-purchase`) — then executes the unchanged legacy `command()` dispatcher
+in-process over the service corpus. Success returns the legacy answer plus the
+authoritative superset:
+
+```json
+{"protocol": "compat-v0", "ok": true, "game_version": "alpha 0.02",
+ "server_time": 1790649056, "result": "success",
+ "store": {"105": 1},
+ "resources": {"xp": 4, "gold": 2000, "wood": 2000, "oil": 2000,
+               "steel": 2000, "cash": 0, "mana": 0}}
+```
+
+- `result` is the legacy string verbatim; `store` is the **full** post-execution
+  storage mapping `{str(item_id): int}` (quantity `0` and unresolvable ids
+  preserved, never filtered) so the client needs no arithmetic; `resources` are
+  the authoritative current values the client applies verbatim (design D4). This
+  payload carries no time-dependent field beyond `server_time`.
+- Validation is structural only: a JSON object body, a resolvable save id, a
+  strict-int `item_id` present in the loaded config, and a **cash-only** config
+  price. An item priced in another resource (or mixed, or unpriced) fails closed
+  with `costs_not_cash` — a derivation boundary for this command, not a gameplay
+  rule: the client never offers such an entry, and any-price storage acquisition
+  is the separate `store_add_items` grant path this change does not cover. The
+  level gate and cash affordability are gameplay rules the client enforces
+  (design D5), while insufficient cash reproduces the legacy `max(…, 0)` clamp
+  rather than a rejection.
+
 ### Structured errors
 
 Always JSON, always `ok:false`, keys exactly
@@ -121,11 +155,12 @@ Always JSON, always `ok:false`, keys exactly
 | `missing_user_id` | 400 | `user_id` absent, null, or empty/whitespace |
 | `invalid_user_id` | 400 | `user_id` present but not a string |
 | `unknown_user_id` | 404 | well-formed id that names no save |
-| `missing_item_id` | 400 | `/v0/place` body carries no `item_id` |
+| `missing_item_id` | 400 | `/v0/place` or `/v0/purchase` body carries no `item_id` |
 | `invalid_item_id` | 400 | `item_id` present but not an integer (`bool` excluded) |
 | `unknown_item_id` | 404 | integer id absent from the loaded config |
 | `invalid_coordinates` | 400 | `x`/`y` missing, not integers, or outside `0..99` |
 | `invalid_orientation` | 400 | `orientation` present but not an integer |
+| `costs_not_cash` | 400 | `/v0/purchase` item's config `costs` is not exactly a cash price (absent, empty, another resource, or mixed) |
 | `bad_request` | 400 | other malformed requests Flask rejects |
 | `not_found` | 404 | unknown path |
 | `method_not_allowed` | 405 | known path, unsupported method |
@@ -135,20 +170,27 @@ Always JSON, always `ok:false`, keys exactly
 
 All run from the repository root on Windows x64 with the pinned interpreter
 (CPython 3.9.13); exit codes are the real observed ones (bootstrap-era
-counts 2026-09-27; placement-era counts 2026-09-29):
+counts 2026-09-27; placement-era counts 2026-09-29; purchase-era counts
+2026-09-29):
 
 ```bash
 python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
 ```
 
-→ `Ran 90 tests ... OK`, exit `0`. Covers envelope/error shapes, bootstrap and
+→ `Ran 157 tests ... OK`, exit `0` (90 before the `building-purchase` change).
+Covers envelope/error shapes, bootstrap and
 session parity against the committed fixtures, pre/post save SHA-256 identity,
 the no-persistence source guard, and the offline socket guard (the suite opens
 no socket and starts no server) — plus, since the `building-placement` change,
 the placement envelope derivation and sanitization (`test_placement_envelope`),
 the `/v0/place` structural contract and corpus-only persistence
 (`test_place_endpoint`), and the executed-legacy placement parity replay of
-the committed `buy` fixture (`test_place_parity`).
+the committed `buy` fixture (`test_place_parity`) — and, since the
+`building-purchase` change, the cash-only purchase envelope derivation
+(`test_purchase_envelope`), the `/v0/purchase` structural contract, the
+clamp-at-zero path, and corpus-only persistence (`test_purchase_endpoint`),
+plus the executed-legacy purchase parity replay of the committed
+`buy_stored_item_cash` fixture (`test_purchase_parity`).
 
 ```bash
 python -B apps/compat-api/tests/smoke_loopback.py
@@ -191,6 +233,14 @@ for its invocation, exit code `0`, and containment record:
 python -B apps/compat-api/capture_placement_fixture.py
 ```
 
+Purchase fixture capture (the `building-purchase` change's executed-legacy
+oracle, one-shot) — see `tests/fixtures/godot-item-purchase/README.md`
+for its invocation, exit code `0`, and containment record:
+
+```bash
+python -B apps/compat-api/capture_purchase_fixture.py
+```
+
 ## Layout
 
 - `compat_legacy.py` — corpus build/layout checks and the in-process adapter
@@ -200,18 +250,25 @@ python -B apps/compat-api/capture_placement_fixture.py
   `PROTOCOL`, `HOST`, `DEFAULT_PORT`.
 - `placement_envelope.py` — the derived-provisional `/v0/place` envelope
   (slot choice, price vector, documented placeholders) and sanitizers.
+- `purchase_envelope.py` — the derived-provisional `/v0/purchase` envelope
+  (cash-only price vector, one `buy_stored_item_cash` command, the documented
+  placeholders), reusing the placement module's shared helpers unchanged.
 - `run.py` — documented start command (corpus lifecycle, exit codes).
 - `guard_baseline.py` — generate/verify the SHA-256 guard set.
 - `field_stability.py` — derive the field-stability record from two captures.
 - `capture_legacy_fixtures.py` — executed-legacy boot fixture capture.
 - `capture_placement_fixture.py` — executed-legacy placement fixture capture.
+- `capture_purchase_fixture.py` — executed-legacy purchase fixture capture.
 - `tests/` — `test_compat_v0.py` (service + containment), `test_parity.py`
   (offline replay against the committed boot fixtures),
   `test_placement_envelope.py` (offline envelope derivation/sanitization),
   `test_place_endpoint.py` (structural contract + corpus-only persistence),
   `test_place_parity.py` (offline placement replay against the executed
-  fixture), `compat_test_harness.py`, `smoke_loopback.py` (opt-in loopback
-  smoke).
+  fixture), `test_purchase_envelope.py` (offline cash-only purchase
+  derivation), `test_purchase_endpoint.py` (structural contract, clamp,
+  corpus-only persistence), `test_purchase_parity.py` (offline purchase replay
+  against the executed fixture), `compat_test_harness.py`,
+  `smoke_loopback.py` (opt-in loopback smoke).
 
 ## Claim limits
 
@@ -223,15 +280,23 @@ change it also establishes **placement parity for one recorded `buy`
 transaction**: `POST /v0/place` replayed against the executed-legacy
 placement fixture equals its response and after-state for every stable field
 (the envelope `ts` and the placement entry's wall-clock `timestamp` are the
-documented time-dependent fields).
+documented time-dependent fields). Since the `building-purchase` change it
+additionally establishes **purchase parity for one recorded
+`buy_stored_item_cash` transaction**: `POST /v0/purchase` replayed against the
+executed-legacy purchase fixture equals its response and after-state for every
+stable field (the envelope `ts` and the HTTP `Date` header are the documented
+time-dependent fields).
 
 It does **not** establish authentication security, progressed-player coverage,
 or parity for any other command. The price vector, envelope placeholders, and
-slot choice are derived-provisional — never observed from the Flash client.
-Insufficient resources reproduce the legacy `max(…, 0)` clamp, never a
+slot choice are derived-provisional — never observed from the Flash client; the
+same holds for the **choice of `buy_stored_item_cash` as the purchase command**
+and for the **cash-only price derivation**, which also means the service claims
+nothing about whether a resource-priced storage purchase exists in the legacy
+client. Insufficient resources reproduce the legacy `max(…, 0)` clamp, never a
 rejection (authoritative server-side validation belongs to Server v1 / M13),
-and occupancy and grid-bounds rules are enforced client-side only.
-Persistence is confined to the disposable service corpus: `POST /v0/place`
-persists through the legacy dispatcher into the corpus `saves/`, while the
-session and bootstrap endpoints remain strictly non-persisting, and the
-working tree is never written.
+and occupancy, grid-bounds, level-gate, and cash-affordability rules are
+enforced client-side only. Persistence is confined to the disposable service
+corpus: `POST /v0/place` and `POST /v0/purchase` persist through the legacy
+dispatcher into the corpus `saves/`, while the session and bootstrap endpoints
+remain strictly non-persisting, and the working tree is never written.

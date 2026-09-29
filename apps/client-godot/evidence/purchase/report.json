@@ -1,0 +1,98 @@
+{
+	"bootstrap_requests": 1,
+	"capture": {
+		"implementation": "fake GameApi (a deterministic test double, not a parity oracle)",
+		"parity_pointer": "real-execution parity is established by the fixture-replay tests and the verify-boot purchase live phase",
+		"path": "apps/client-godot/evidence/purchase/purchase.png",
+		"sha256": "cf3c15b6ed5e00e09722e1290a75b85f6bf953e5b0850b8daa4c4961d1b686c0"
+	},
+	"constants": {
+		"derivation_status": "derived-provisional",
+		"evidence_gap": "the legacy SWF's static iso-engine identifiers (TILE_SIZE, EI_TILE_HEIGHT_PIXELS, gridWidth/Height, numCols/numRows) were never extracted; pixel parity with the Flash client is not claimed",
+		"grid_extent": 100,
+		"origin_x": 2000.0,
+		"origin_y": 10.0,
+		"tile_height": 20.0,
+		"tile_width": 40.0,
+		"world_rect": [
+			0.0,
+			0.0,
+			4000.0,
+			2000.0
+		]
+	},
+	"inputs": {
+		"bootstrap_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/get_player_info/response.body",
+			"sha256": "facedf76784d3dc03a3a45e81756a8546f90f7647dbff8917593404d9e401709"
+		},
+		"purchase_after": {
+			"path": "tests/fixtures/godot-item-purchase/steps/command_buy_stored_item_cash/after.json",
+			"sha256": "8d460651cb9b9b5d654b5b2bb9040f73a1d3509af17630eb1b0fbbf3be59eff5"
+		},
+		"purchase_request": {
+			"path": "tests/fixtures/godot-item-purchase/steps/command_buy_stored_item_cash/request.json",
+			"sha256": "b9775d5ff489b32fb2149279d767e00fae3b16e4b5681c44e91cf13fd88b665b"
+		},
+		"purchase_response": {
+			"path": "tests/fixtures/godot-item-purchase/steps/command_buy_stored_item_cash/response.body",
+			"sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87"
+		},
+		"save_list_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json",
+			"sha256": "ad0404c2c340a48f06e2e49ae7eb7973978cd2ccb02ac6ff7bfba4eb75f6d9f4"
+		},
+		"terrain": {
+			"path": "assets/images/en/mapa1.jpg",
+			"sha256": "35c4ded53e82be187eb67c54ee7c7023b698c3986954db4b6f9613a2a45cdd3f"
+		}
+	},
+	"intent": {
+		"item_id": 105,
+		"user_id": "00000000-0000-4000-8000-000000000001"
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed",
+		"the legacy command choice and the cash-only price derivation are derived, never observed from the Flash client",
+		"parity covers one recorded transaction against the fresh-player corpus, not progressed players",
+		"insufficient cash reproduces legacy clamping, not rejection",
+		"storage is display-only here: no placing from or selling out of storage",
+		"no pixel-parity oracle against the legacy client exists",
+		"the capture runs the fake GameApi implementation; real-execution parity is established by the fixture-replay tests and the verify-boot purchase-live phase",
+		"the level gate and cash affordability are derived (Flash-unobservable) and enforced client-side only; the endpoint enforces structural input validity"
+	],
+	"purchase_requests": 1,
+	"readout": [
+		"Victory Arch  x1  (item 105)"
+	],
+	"resources": {
+		"after": {
+			"cash": 0,
+			"coins": 2000,
+			"energy": 50,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2000,
+			"xp": 4
+		},
+		"before": {
+			"cash": 5,
+			"coins": 2000,
+			"energy": 50,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2000,
+			"xp": 4
+		}
+	},
+	"schema": "purchase-report-v1",
+	"shop_entries_at_level": 11,
+	"storage": {
+		"after": {
+			"105": 1
+		},
+		"before": {}
+	}
+}
