@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-09-29T07:00:30+00:00",
+  "form": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "data": "e1b640f82a0ee6ba88cda87e8ccefcc8936aef17c898847fddab3fca8f83e6e1;{\"accessToken\":\"\",\"commands\":[[0,\"sell\",[20,\"\"],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1790665230}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "command.php form (USERID, user_key, language, data) with the derived <64-hex>;<json> envelope carrying one sell command whose two arguments are the map index and the derived empty reason (design D3 \u2014 never chosen by a client, so the combat KILL reason and push_dead_unit are unreachable), and whose resources_changed is the neutral all-zero vector; user_key is redacted in this record (design D10); accessToken is the crafted empty placeholder, never a token value.",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}

@@ -54,6 +54,28 @@ Surface (loopback only, port :5056):
     dispatcher runs, because legacy's own missing-item path is a silent no-op
     that would otherwise be reported as a success.
 
+``POST /v0/sell`` with JSON ``{"user_id", "item_index"}``
+    ``{protocol, ok, game_version, server_time, result, removed, resources}``
+    — an intent only, and the fourth state-mutating surface. The legacy batch
+    envelope is derived internally (one ``sell`` command whose two arguments
+    are the legacy map index and the **derived** reason the branch treats as a
+    log label, with the **neutral** derived resource vector — design D2/D3 of
+    the ``building-sell`` change), the unchanged legacy ``command()``
+    dispatcher executes it in-process, and the answer carries the legacy
+    ``result`` plus the authoritative superset: the eight-field row **as it
+    was read before execution** (``removed``), the current ``resources``, and
+    a post-execution re-read proving the legacy key is gone from the
+    persisted save (design D5). The contract accepts no client-supplied
+    reason, refund, price, or resource deltas — the extra keys are ignored,
+    so no client can claim the combat ``KILL`` reason and reach
+    ``push_dead_unit``. Because the committed configuration records no
+    building-sale refund rule, the derived vector is neutral and **this
+    service claims no refund at all**. ``item_index`` must resolve to a row
+    in the corpus save *before* the dispatcher runs, for the same
+    missing-item reason the move line documents, and a row that survives
+    execution fails closed with ``internal_error`` instead of claiming a
+    removal that never happened.
+
 Deviation recorded for review: the bootstrap envelope also carries ``saves``
 (the session envelope plus ``config`` and ``player_info``). Design D3 lists
 only ``config`` and ``player_info``; the extra key is a superset of D3 and
@@ -71,11 +93,13 @@ code                     HTTP  when
 ``missing_item_id``      400  ``/v0/place`` or ``/v0/purchase`` body carries no ``item_id``
 ``invalid_item_id``      400  ``item_id`` present but not an integer (``bool`` excluded)
 ``unknown_item_id``      404  integer id absent from the loaded config
-``missing_item_index``   400  ``/v0/move`` body carries no ``item_index``
+``missing_item_index``   400  ``/v0/move`` or ``/v0/sell`` body carries no ``item_index``
 ``invalid_item_index``   400  ``item_index`` present but not an integer (``bool``
                                 excluded)
 ``unknown_item_index``   404  integer index that names no row in the save's
                                 ``map["items"]`` (legacy would silently no-op)
+``invalid_reason``       400  derived reason is not a string (server-side
+                                derivation failure; never client input)
 ``invalid_coordinates``  400  ``x``/``y`` missing, not integers, or outside ``0..99``
 ``invalid_orientation``  400  ``orientation`` present but not an integer
 ``costs_not_cash``       400  ``/v0/purchase`` item's config price is not a cash
@@ -90,8 +114,9 @@ code                     HTTP  when
 Persistence scope (design D6, spec ``godot-compatibility-boot``): the
 session and bootstrap endpoints never persist — this module never calls
 ``sessions.save_session`` for them and every call leaves the saves
-byte-identical. ``POST /v0/place``, ``POST /v0/purchase``, and
-``POST /v0/move`` execute the unchanged legacy ``command()`` dispatcher, which
+byte-identical. ``POST /v0/place``, ``POST /v0/purchase``,
+``POST /v0/move``, and ``POST /v0/sell`` execute the unchanged legacy
+``command()`` dispatcher, which
 persists through legacy ``save_session`` into the **service corpus's**
 ``saves/`` and nowhere else; the service never opens a working-tree file for
 writing, and it never binds anywhere except ``127.0.0.1`` (the bind address
@@ -108,6 +133,7 @@ import compat_legacy
 import move_envelope
 import placement_envelope
 import purchase_envelope
+import sell_envelope
 
 PROTOCOL = "compat-v0"
 HOST = "127.0.0.1"
@@ -123,6 +149,7 @@ ERROR_UNKNOWN_ITEM_ID = "unknown_item_id"
 ERROR_MISSING_ITEM_INDEX = "missing_item_index"
 ERROR_INVALID_ITEM_INDEX = "invalid_item_index"
 ERROR_UNKNOWN_ITEM_INDEX = "unknown_item_index"
+ERROR_INVALID_REASON = "invalid_reason"
 ERROR_INVALID_COORDINATES = "invalid_coordinates"
 ERROR_INVALID_ORIENTATION = "invalid_orientation"
 ERROR_COSTS_NOT_CASH = "costs_not_cash"
@@ -555,6 +582,130 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
                 boot,
                 result="success",
                 placement=placement,
+                resources=resources,
+            ),
+            200,
+        )
+
+    @app.post("/v0/sell")
+    def v0_sell() -> Tuple[Dict[str, Any], int]:
+        """Execute one sell intent through the unchanged legacy path.
+
+        Validation is structural fail-closed (design D4/D6): a JSON object
+        body, a resolvable save, and an integer item index that names a row in
+        the corpus save.  Whether the building is sellable at all, who owns
+        it, and what it refunds are the client's job exactly as they were
+        Flash's — legacy ``sell`` performs no validation at all — and
+        anti-cheat validation belongs to Server v1 (M13).  The index is
+        resolved here rather than left to legacy, because legacy's
+        missing-item path (``command.py:154-156``) is a silent early return
+        that still persists the save: reporting that as a success would claim
+        a removal that never happened.
+
+        No reason is accepted from the client (design D3): the envelope's is
+        the derived empty string, so no client can claim ``"KILL"`` and reach
+        ``push_dead_unit``.  No price, refund, or resource delta is accepted
+        either; the derived vector is neutral, so **this endpoint claims no
+        refund** — the committed configuration records no building-sale
+        refund rule and the legacy refund travels only in client-sent deltas
+        (design D2).  Every failure below returns before the legacy dispatcher
+        runs, so the corpus is untouched on every error path.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404,
+                ERROR_UNKNOWN_USER_ID,
+                "no save exists for user_id %r" % user_id,
+            )
+
+        if "item_index" not in payload:
+            return error_response(
+                400, ERROR_MISSING_ITEM_INDEX, "item_index is required"
+            )
+        item_index = payload["item_index"]
+        if not sell_envelope.is_strict_int(item_index):
+            return error_response(
+                400, ERROR_INVALID_ITEM_INDEX, "item_index must be an integer"
+            )
+
+        # Resolve the index against the corpus before deriving, and read the
+        # eight-field row while it is still there: an index that names no row
+        # must fail closed, never reach legacy's silent no-op, and the row the
+        # client asked to remove is the one the persisted save no longer
+        # holds afterwards (design D5).
+        try:
+            known = boot.has_map_item(user_id, item_index)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not known:
+            return error_response(
+                404,
+                ERROR_UNKNOWN_ITEM_INDEX,
+                "no placement with index %d in this save's map" % item_index,
+            )
+        try:
+            removed = boot.map_item(user_id, item_index)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not isinstance(removed, list):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the addressed placement is not a row this service can report",
+            )
+        # A copy: the in-memory row is the one the legacy dispatcher deletes
+        # from the map, so the response must not alias live state.
+        removed_row = list(removed)
+
+        # Derive the legacy envelope (design D2/D3/D7): the neutral resource
+        # vector and the derived reason are the module's, never the client's.
+        # The contract carries no reason, refund, price, or resource delta:
+        # extra keys are ignored so the client's own derivation can never win.
+        try:
+            envelope_payload = sell_envelope.build_envelope(item_index=item_index)
+        except sell_envelope.EnvelopeError as failure:
+            return error_response(400, failure.code, str(failure))
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        # Execute the unchanged legacy command dispatcher in-process.  It
+        # persists via legacy save_session into this corpus only; the legacy
+        # HTTP route returns {"result": "success"} whenever command()
+        # returns without raising, so reaching here IS the legacy result.
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        # Prove the removal: re-read the map after execution and fail closed
+        # if the key survives.  Legacy's branch deleted it, but reporting a
+        # removal that the persisted save does not show would be a fabricated
+        # authoritative answer (design D5).
+        try:
+            still_present = boot.has_map_item(user_id, item_index)
+            resources = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if still_present:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy execution did not remove the placement entry",
+            )
+        return (
+            envelope(
+                boot,
+                result="success",
+                removed=removed_row,
                 resources=resources,
             ),
             200,
