@@ -29,5 +29,5 @@
 
 ## 6. Documentation and integration review
 
-- [ ] 6.1 Document the placement slice in `apps/client-godot/README.md` and `apps/compat-api` docs (flow, endpoint contract, envelope derivations with derived-provisional status, evidence paths, claim limits) and add the actually executed verification commands to `AGENTS.md` — verify: each documented command matches one that was run successfully in this change, with its purpose and constraints stated.
+- [x] 6.1 Document the placement slice in `apps/client-godot/README.md` and `apps/compat-api` docs (flow, endpoint contract, envelope derivations with derived-provisional status, evidence paths, claim limits) and add the actually executed verification commands to `AGENTS.md` — verify: each documented command matches one that was run successfully in this change, with its purpose and constraints stated.
 - [ ] 6.2 Perform the integration review: re-read the final diff against `proposal.md`/`specs/`/`design.md`, run `openspec validate building-placement --strict` and both batteries once more, and record residual gaps (derived price/envelope placeholders, legacy clamping preserved, no progressed-player coverage, purchase/shop deliver lines still open) — verify: strict validation exits 0, both batteries exit 0, and every spec requirement maps to a passing check or a recorded claim limit.

@@ -77,6 +77,39 @@ envelope plus:
 superset of D3 and keeps the envelope uniform for the boot client (one shape,
 plus the two payload keys).
 
+`POST /v0/place` with body `{"user_id", "item_id", "x", "y", "orientation"?}`
+is the one state-mutating surface of the API. The body is an **intent only**:
+extra keys, including client-supplied resource deltas, are ignored. The
+endpoint derives the legacy batch envelope internally — price vector from the
+loaded config, smallest positive free slot, the documented placeholders — all
+values **derived-provisional**, because the Flash client is never executed
+(design D4 of the `building-placement` change). It then validates structurally
+(fail-closed) and executes through the unchanged legacy `command()`
+dispatcher in-process over the service corpus. Success returns the legacy
+answer plus the authoritative superset:
+
+```json
+{"protocol": "compat-v0", "ok": true, "game_version": "alpha 0.02",
+ "server_time": 1790609721, "result": "success",
+ "placement": [1, 51, 39, 1790609721, 0, [], {"nc": 0}, 1],
+ "resources": {"xp": 4, "gold": 2000, "wood": 1970, "oil": 2000,
+               "steel": 2000, "cash": 5, "mana": 0}}
+```
+
+- `result` is the legacy string verbatim; `placement` is the persisted
+  eight-field entry (`item, x, y, timestamp, orientation, store, attr,
+  player`); `resources` are the authoritative current values the client
+  applies verbatim (design D7). `timestamp` is the server wall clock at
+  execution — the one time-dependent field, normalized in parity.
+- Validation is structural only: a JSON object body, a resolvable save id, a
+  strict-int `item_id` present in the loaded config (`bool` excluded), and
+  anchor-based `x`/`y` in `0..99` (`GRID_EXTENT=100`; footprints may extend
+  past the edge exactly as legacy placements already do). Occupancy and
+  affordability are gameplay rules: the client enforces them for display
+  (design D5), while insufficient funds reproduce the legacy `max(…, 0)`
+  clamp rather than a rejection — server-side validation belongs to
+  Server v1 / M13.
+
 ### Structured errors
 
 Always JSON, always `ok:false`, keys exactly
@@ -88,24 +121,34 @@ Always JSON, always `ok:false`, keys exactly
 | `missing_user_id` | 400 | `user_id` absent, null, or empty/whitespace |
 | `invalid_user_id` | 400 | `user_id` present but not a string |
 | `unknown_user_id` | 404 | well-formed id that names no save |
+| `missing_item_id` | 400 | `/v0/place` body carries no `item_id` |
+| `invalid_item_id` | 400 | `item_id` present but not an integer (`bool` excluded) |
+| `unknown_item_id` | 404 | integer id absent from the loaded config |
+| `invalid_coordinates` | 400 | `x`/`y` missing, not integers, or outside `0..99` |
+| `invalid_orientation` | 400 | `orientation` present but not an integer |
 | `bad_request` | 400 | other malformed requests Flask rejects |
 | `not_found` | 404 | unknown path |
 | `method_not_allowed` | 405 | known path, unsupported method |
-| `internal_error` | 500 | unhandled server failure |
+| `internal_error` | 500 | unhandled server failure, including legacy execution raising after validation passed |
 
 ## Commands actually executed
 
 All run from the repository root on Windows x64 with the pinned interpreter
-(CPython 3.9.13); exit codes are the real observed ones (2026-09-27):
+(CPython 3.9.13); exit codes are the real observed ones (bootstrap-era
+counts 2026-09-27; placement-era counts 2026-09-29):
 
 ```bash
 python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
 ```
 
-→ `Ran 31 tests ... OK`, exit `0`. Covers envelope/error shapes, bootstrap and
+→ `Ran 90 tests ... OK`, exit `0`. Covers envelope/error shapes, bootstrap and
 session parity against the committed fixtures, pre/post save SHA-256 identity,
 the no-persistence source guard, and the offline socket guard (the suite opens
-no socket and starts no server).
+no socket and starts no server) — plus, since the `building-placement` change,
+the placement envelope derivation and sanitization (`test_placement_envelope`),
+the `/v0/place` structural contract and corpus-only persistence
+(`test_place_endpoint`), and the executed-legacy placement parity replay of
+the committed `buy` fixture (`test_place_parity`).
 
 ```bash
 python -B apps/compat-api/tests/smoke_loopback.py
@@ -140,26 +183,55 @@ code `0`, and containment record:
 python -B apps/compat-api/capture_legacy_fixtures.py
 ```
 
+Placement fixture capture (the `building-placement` change's executed-legacy
+oracle, one-shot) — see `tests/fixtures/godot-building-placement/README.md`
+for its invocation, exit code `0`, and containment record:
+
+```bash
+python -B apps/compat-api/capture_placement_fixture.py
+```
+
 ## Layout
 
 - `compat_legacy.py` — corpus build/layout checks and the in-process adapter
   over the legacy modules (`initialize()` mirrors `server.py`'s import and
   `load_saves` / `load_static_villages` / `load_quests` order).
-- `compat_service.py` — Flask app, envelope, and the error table; owns
+- `compat_service.py` — Flask app, envelopes, and the error table; owns
   `PROTOCOL`, `HOST`, `DEFAULT_PORT`.
+- `placement_envelope.py` — the derived-provisional `/v0/place` envelope
+  (slot choice, price vector, documented placeholders) and sanitizers.
 - `run.py` — documented start command (corpus lifecycle, exit codes).
 - `guard_baseline.py` — generate/verify the SHA-256 guard set.
 - `field_stability.py` — derive the field-stability record from two captures.
-- `capture_legacy_fixtures.py` — executed-legacy fixture capture.
+- `capture_legacy_fixtures.py` — executed-legacy boot fixture capture.
+- `capture_placement_fixture.py` — executed-legacy placement fixture capture.
 - `tests/` — `test_compat_v0.py` (service + containment), `test_parity.py`
-  (offline replay against the committed fixtures), `compat_test_harness.py`,
-  `smoke_loopback.py` (opt-in loopback smoke).
+  (offline replay against the committed boot fixtures),
+  `test_placement_envelope.py` (offline envelope derivation/sanitization),
+  `test_place_endpoint.py` (structural contract + corpus-only persistence),
+  `test_place_parity.py` (offline placement replay against the executed
+  fixture), `compat_test_harness.py`, `smoke_loopback.py` (opt-in loopback
+  smoke).
 
 ## Claim limits
 
-This service establishes **read-only bootstrap parity for the fresh-save
-corpus**: session list, game version, config, and player-info payloads equal to
-the committed executed-legacy fixtures for stable fields and under the
-documented normalizations for time-dependent fields. It does **not** establish
-gameplay parity, authentication security, progressed-player coverage, or any
-write/persistence behavior.
+This service establishes **bootstrap parity for the fresh-save corpus**:
+session list, game version, config, and player-info payloads equal to the
+committed executed-legacy fixtures for stable fields and under the documented
+normalizations for time-dependent fields. Since the `building-placement`
+change it also establishes **placement parity for one recorded `buy`
+transaction**: `POST /v0/place` replayed against the executed-legacy
+placement fixture equals its response and after-state for every stable field
+(the envelope `ts` and the placement entry's wall-clock `timestamp` are the
+documented time-dependent fields).
+
+It does **not** establish authentication security, progressed-player coverage,
+or parity for any other command. The price vector, envelope placeholders, and
+slot choice are derived-provisional — never observed from the Flash client.
+Insufficient resources reproduce the legacy `max(…, 0)` clamp, never a
+rejection (authoritative server-side validation belongs to Server v1 / M13),
+and occupancy and grid-bounds rules are enforced client-side only.
+Persistence is confined to the disposable service corpus: `POST /v0/place`
+persists through the legacy dispatcher into the corpus `saves/`, while the
+session and bootstrap endpoints remain strictly non-persisting, and the
+working tree is never written.

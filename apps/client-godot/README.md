@@ -296,15 +296,21 @@ powershell -File apps/client-godot/verify-boot.ps1
 ```
 
 It runs, in order: guard baseline → Compatibility API unittest discovery +
-loopback smoke → the sixteen headless Godot suites → the
-unreachable-endpoint scenario against a port with nothing listening → three
+loopback smoke → the seventeen headless Godot suites → the
+unreachable-endpoint scenario against a port with nothing listening → four
 live phases → guard baseline again → `evidence/boot/boot-report.json`. Each
 live phase is wrapped
 by `compat_live_phase.py`, which starts `apps/compat-api/run.py`, waits for
 `GET /v0/session`, runs exactly one Godot command, stops the service with
 `CTRL_BREAK`, and asserts the service exited 0, the disposable corpus was
 removed, no new `socialwars-compat-*` directory is left in temp, no
-working-tree `saves/` exists, and the port is released. Exit code is `0` only
+working-tree `saves/` exists, and the port is released. The fourth live
+phase (`placement-live`) additionally passes
+`--expect-save-mutation`: the wrapper snapshots every file under the
+running corpus's `saves/` after readiness and fails unless at least one
+changed after the Godot run — proof that a live `POST /v0/place` persisted
+through the legacy dispatcher into the disposable corpus. Exit code is `0`
+only
 when every check holds; per-step logs land in `.godot/verify-boot/` (ignored).
 
 Individual steps:
@@ -332,20 +338,24 @@ godot --headless --path apps/client-godot -s res://tests/test_settings.gd
 # Audio manager (107 observed checks): pure service, no API and no boot
 # flow; the endpoint argument the loop passes is ignored
 godot --headless --path apps/client-godot -s res://tests/test_audio_manager.gd
-# Town vertical slice (six suites; scene/content work, the endpoint
+# Town vertical slice (seven suites; scene/content work, the endpoint
 # argument the loop passes is ignored): isometric projection, town state,
-# town scene + slice, HUD, selection, and the no-Flash gate
+# town scene + slice, HUD, selection, placement, and the no-Flash gate
 godot --headless --path apps/client-godot --script res://tests/test_town_iso.gd
 godot --headless --path apps/client-godot --script res://tests/test_town_state.gd
 godot --headless --path apps/client-godot --script res://tests/test_town_scene.gd
 godot --headless --path apps/client-godot --script res://tests/test_town_hud.gd
 godot --headless --path apps/client-godot --script res://tests/test_town_selection.gd
+godot --headless --path apps/client-godot --script res://tests/test_town_placement.gd
 godot --headless --path apps/client-godot --script res://tests/test_town_gate.gd
 # Failure path: the scene must enter the explicit error state (suite exits 0
 # only when it observed it)
 godot --headless --path apps/client-godot -s res://tests/test_boot_scene.gd -- --scenario=unreachable --gameapi-endpoint=http://127.0.0.1:5057
 # Live phases (each starts and tears down the service itself)
 python -B apps/client-godot/compat_live_phase.py --port 5056 --name live -- <godot> --headless --path apps/client-godot -s res://tests/test_game_api_live.gd
+# Placement live phase (fourth): one intent through POST /v0/place with the
+# disposable corpus save asserted mutated
+python -B apps/client-godot/compat_live_phase.py --port 5056 --name placement-live --expect-save-mutation -- <godot> --headless --path apps/client-godot --script res://tests/test_town_placement.gd -- --scenario=live-placement --gameapi-endpoint=http://127.0.0.1:5056
 # Project scope (asserts the allow-list, including this change's evidence)
 godot --headless --path apps/client-godot -s res://tests/test_project_scope.gd
 ```
@@ -671,5 +681,133 @@ or run-varying provenance, so reruns reproduce its bytes.
   live fresh save contains no unit placements.
 
 These non-claims are recorded verbatim in `evidence/town/report.json`.
-Verification: the six town suites plus `test_town_gate.gd` run inside
-`verify-boot.ps1`; the scope suite enforces the 66-file boundary.
+Verification: the seven town suites (`test_town_iso`, `test_town_state`,
+`test_town_scene`, `test_town_hud`, `test_town_selection`,
+`test_town_placement`, `test_town_gate`) run inside `verify-boot.ps1`; the
+scope suite enforces the 72-file boundary.
+
+## Building placement
+
+The placement slice (OpenSpec `building-placement`, milestone M7) closes the
+loop the town render opened: a store-listed building an eligible player can
+afford is picked in a build picker, previewed at an inverse-projected cell,
+and placed with exactly one intent — executed on the v0 path by the unchanged
+legacy `command()` dispatcher over the Compatibility API's disposable corpus.
+
+### Flow
+
+1. **Catalog** — `placement_catalog.gd` parses the bootstrap config payload
+   already in hand (no second config request), fail-closed: entries are the
+   store-listed buildings whose `min_level` ≤ the loaded level — 14 at level
+   1 of the fresh save out of the 166 store-listed buildings (900 content
+   items total). A parse failure leaves placement unavailable behind a named
+   error; it never fails the town and never fabricates an entry.
+2. **Picker** — the town's Build panel lists the entries (name, footprint,
+   cost against the live resources); picking one arms the preview. Entering,
+   picking, previewing, and cancelling are view operations with no request.
+3. **Preview** — the pointer's world point inverse-projects to a grid cell;
+   `placement_flow.gd` evaluates the target against the typed state: anchor
+   in `0..99` (bounds), footprint free (occupancy), cost affordable
+   (affordability). Invalid targets render marked with the reason and are
+   never sent.
+4. **Confirm** — exactly one `GameApi.place_building(user_id, item_id, x,
+   y, orientation)` intent; only the authoritative response is applied (the
+   persisted eight-field entry becomes a depth-sorted object; resources and
+   XP take the response's values verbatim). A structured or transport
+   failure surfaces its code and changes nothing.
+
+### Endpoint contract and envelope derivations
+
+`POST /v0/place` accepts only the intent `{user_id, item_id, x, y,
+orientation}` — the full contract, response example, structured error codes,
+validation split, and corpus-only persistence scope are documented in
+`apps/compat-api/README.md`. The legacy batch envelope is derived
+server-side and marked **derived-provisional** throughout: next free slot
+(smallest positive integer absent from `maps[0].items`; the fresh save
+occupies `1..40`, so the first placement takes `41`), the price vector
+negated onto the legacy 8-slot `[unknown, xp, gold, wood, oil, steel, cash,
+mana]` vector, team `1`, `unknown=0`, `reason=""`, and the placeholders
+`accessToken=""`, `publishActions=[]`, `tries=1`, `first_number=0`. The
+Flash client is never executed, so its exact envelope is unobservable —
+these values are derived from the legacy server's own accepted input, not
+observed from the client. Validation split (design D5): the client owns the
+gameplay rules (grid display, occupancy, affordability) for a fail-fast
+picker; the endpoint owns structural fail-closed input validity only, and
+insufficient funds reproduce the legacy `max(…, 0)` clamp rather than a
+rejection — authoritative server-side validation belongs to Server v1 (M13).
+
+### Verification (commands actually executed)
+
+```bash
+# Placement fixture capture (one-shot, executed-legacy oracle): the exact
+# command, exit codes, and containment are recorded in
+# tests/fixtures/godot-building-placement/README.md
+python -B apps/compat-api/capture_placement_fixture.py
+
+# Placement envelope + endpoint + executed-legacy parity tests (inside the
+# compat suite; observed: Ran 90 tests ... OK, exit 0)
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+
+# The hermetic picker-flow suite standalone (observed: 284 checks, PASS)
+godot --headless --path apps/client-godot --script res://tests/test_town_placement.gd
+
+# Full batteries in the final state (each embeds the placement suites and
+# the placement-live phase; both observed exit 0)
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+```
+
+`verify-boot.ps1` includes the hermetic `test_town_placement` suite (the
+picker flow over the fake double — entry, gated offering, invalid targets
+never sent, exactly one request, authoritative apply, failure paths, and a
+transport-failure check against the dead endpoint) and a fourth live phase
+`placement-live`, which starts the Compatibility API over a disposable
+corpus, sends one intent through `POST /v0/place`, asserts the typed
+response, and — via `compat_live_phase.py --expect-save-mutation` — asserts
+a corpus save file actually mutated, then tears down asserting the port is
+released, the corpus is removed, and no working-tree `saves/` exists.
+
+### Evidence capture (D11 two-step)
+
+```bash
+# 1. Windowed fake-API launch: boot -> town, the picker flow confirms one
+#    House I at (51, 39), then the frame is captured (writes placement.png
+#    at the legacy 1400x600 stage, exits 0; a failed flow exits 1 with an
+#    explicit [town] placement-capture state=error marker)
+godot --path apps/client-godot res://scenes/boot.tscn -- --gameapi=fake --placement-capture=<repo>/apps/client-godot/evidence/placement/placement.png
+
+# 2. Headless deterministic report (writes report.json; a rerun is
+#    byte-identical — observed SHA-256 BF86CDD0B52B583F… across two
+#    consecutive reruns; the bare --placement-report flag defaults to
+#    evidence/placement/report.json)
+godot --headless --path apps/client-godot res://scenes/town.tscn -- --placement-report=<repo>/apps/client-godot/evidence/placement/report.json
+```
+
+The report (`schema placement-report-v1`) records the inputs and digests
+(save-list and bootstrap fixtures, the executed-legacy placement fixture's
+request/response/after-state, the terrain image, the committed capture), the
+intent `{user_id, item_id: 1, x: 51, y: 39, orientation: 0}`, counts
+before/after (placements and objects 40 → 41), resources before/after (wood
+2000 → 1970, everything else unchanged), the projection constants pointer,
+the bootstrap and placement request counts (exactly one each), and the
+fake-capture pointer: the capture runs the fake implementation — a
+deterministic test double, not a parity oracle — while real-execution parity
+is established by the fixture-replay tests and the `placement-live` phase.
+
+### Placement claim limits
+
+- no Flash, Ruffle, ActionScript, or browser executed;
+- the price vector, envelope placeholders, and slot choice are derived,
+  never observed from the Flash client;
+- parity covers one recorded transaction against the fresh-player corpus,
+  not progressed players;
+- insufficient resources reproduce legacy clamping, not rejection;
+- no pixel-parity oracle against the legacy client exists;
+- occupancy and grid-bounds rules are derived (Flash-unobservable) and
+  enforced client-side only;
+- the committed capture runs the fake GameApi — a deterministic test
+  double, not a parity oracle.
+
+These non-claims are recorded verbatim in `evidence/placement/report.json`.
+Remaining deliver lines of M7 (separate changes): purchase/shop, move, sell,
+store, upgrade, build timers, income, expansion, resources, and XP.

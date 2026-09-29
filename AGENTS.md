@@ -109,18 +109,20 @@ powershell -File apps/client-godot/verify-boot.ps1
 ```
 
 This single command runs the Compatibility API guard verification before and
-after, the Compatibility API unittest discovery and loopback smoke, the sixteen
+after, the Compatibility API unittest discovery and loopback smoke, the seventeen
 headless Godot suites (package loader, scene build, fake GameApi, boot
 scene, session, game clock, camera controls, UI foundation, settings,
 audio manager, and the town vertical slice: projection, town state, town
-scene, HUD, selection, no-Flash gate), the
+scene, HUD, selection, placement, no-Flash gate), the
 unreachable-endpoint scenario against a loopback port with nothing listening,
-and three live
+and four live
 phases that start
 `apps/compat-api/run.py`
-on `127.0.0.1:5056` with a disposable corpus, boot the main scene and both
-GameApi implementations against it, and tear it down again — proving the port
-is released, the corpus removed, and no working-tree `saves/` exists — then
+on `127.0.0.1:5056` with a disposable corpus, boot the main scene, both
+GameApi implementations, and one live placement against it, and tear it down
+again — proving the port
+is released, the corpus removed, no working-tree `saves/` exists, and (for
+the placement phase) that the disposable corpus save actually mutated — then
 writes `apps/client-godot/evidence/boot/boot-report.json` and exits 0 only
 when every check passes. It needs no display session. The Compatibility API
 commands it embeds can also be executed directly:
@@ -136,6 +138,43 @@ containment are recorded in
 `tests/fixtures/godot-compatibility-boot/README.md`; that capture starts the
 legacy Flask server in a disposable copy and is not re-run by either
 verification command above.
+
+Verified building-placement commands (milestone M7; Godot 4.7.2.stable and
+pinned CPython 3.9.13, Windows x64; `python` denotes the pinned interpreter,
+never the PATH alias):
+
+```bash
+python -B apps/compat-api/capture_placement_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_town_placement.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-09-29): the placement fixture capture
+(one-shot executed-legacy `buy` oracle; exit codes and containment recorded
+in `tests/fixtures/godot-building-placement/README.md`), the compat suite
+including the placement envelope, `/v0/place` endpoint, and executed-legacy
+parity tests (observed `Ran 90 tests ... OK`, exit `0`), the hermetic
+picker-flow suite (observed 284 checks, PASS; runs without a service and
+routes its transport-failure check against the dead endpoint the loop
+passes), both batteries in the final state (each exit `0`; the second
+embeds the `placement-live` phase that asserts a disposable corpus save
+mutated), and the preservation manifest (3,258 entries, exit `0`). The
+compatibility service listens on `127.0.0.1:5056` only, and every network
+call in these commands is loopback. The evidence capture and report steps
+are documented in `apps/client-godot/README.md` ("Building placement");
+committed evidence lives under `apps/client-godot/evidence/placement/`.
+Claim limits: parity covers one recorded transaction against the
+fresh-player corpus (no progressed players, no other commands); the price
+vector, envelope placeholders, and slot choice are derived-provisional,
+never observed from the Flash client; insufficient resources reproduce the
+legacy clamp, not rejection (authoritative validation belongs to Server v1
+/ M13); no pixel-parity oracle exists; the committed capture runs the fake
+implementation, so real-execution parity rests on the fixture-replay tests
+and the live phase. No Flash, Ruffle, ActionScript, or browser executes in
+any of these commands.
 
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
