@@ -2,32 +2,68 @@
 
 ## 1. Executed-legacy placement fixture
 
-- [ ] 1.1 Implement the placement capture tool under `apps/compat-api/` (disposable-copy harness shared with the boot capture: interpreter/containment/port checks, seed from `tests/saves/fresh-player.json`, crafted `<64>;<json>` `data` envelope for one `buy` command, POST to `…/command.php`, sanitized `request.json`, full `before.json`/`after.json` saves, `response.body` + `response.meta.json`, `capture-manifest.json`, `README.md` with command/exit codes/containment) with offline unit tests for envelope construction and sanitization — verify: `python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v` passes with the new tests included.
-- [ ] 1.2 Run the capture, commit `tests/fixtures/godot-building-placement/`, and confirm containment — verify: the capture exits 0, the committed fixture reproduces byte-identically on a rerun, every working-tree legacy source/config/village/save hash is identical before and after, and the boot fixtures and their manifests are untouched.
+- [x] 1.1 Implement the placement capture tool under `apps/compat-api/` (disposable-copy harness shared with the boot capture: interpreter/containment/port checks, seed from `tests/saves/fresh-player.json`, crafted `<64>;<json>` `data` envelope for one `buy` command, POST to `…/command.php`, sanitized `request.json`, full `before.json`/`after.json` saves, `response.body` + `response.meta.json`, `capture-manifest.json`, `README.md` with command/exit codes/containment) with offline unit tests for envelope construction and sanitization — verify: `python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v` passes with the new tests included.
+- [x] 1.2 Run the capture, commit `tests/fixtures/godot-building-placement/`, and confirm containment — verify: the capture exits 0, a rerun exits 0 and reproduces the committed fixture byte-identically except for the documented time-dependent fields (the recorded capture/envelope timestamps and the HTTP `Date` header, the placement entry's wall-clock `timestamp`, and the two digests derived from them — the request's `data` digest and the manifest's after-save digest), every working-tree legacy source/config/village/save hash is identical before and after, and the boot fixtures and their manifests are untouched.
 
 ## 2. Placement execution endpoint (Compatibility API v0)
 
-- [ ] 2.1 Implement the v0 placement route: intent validation fail-closed (JSON object, resolvable save id, item id in config, integer in-grid coordinates with the footprint inside), derived legacy envelope (D4 table: costs mapping `g/w/o/s/c` onto the 8-slot resource vector, smallest free slot, player team 1, documented placeholders), in-process execution of the unchanged `command()` dispatcher, corpus-only persistence, and the superset response (`result` + `placement` + `resources`) — verify: new compat tests cover each derivation (cost map, slot choice, clamp-at-zero on insufficient funds), every fail-closed path (structured error, corpus unchanged), and retained session/bootstrap byte-identity, all passing with no server.
-- [ ] 2.2 Implement the offline fixture-replay parity suite: same envelope through the compat endpoint equals the captured legacy response and after-state for all stable fields with documented time-dependent normalizations, plus assertions that working-tree saves are never written by any placement execution — verify: the parity suite passes with no network and `git status` shows no `saves/` or `tests/saves/` changes after the full compat test run.
+- [x] 2.1 Implement the v0 placement route: intent validation fail-closed (JSON object, resolvable save id, item id in config, integer in-grid anchor coordinates `0..99` — footprints may extend past the edge exactly as the fresh save's Harbour placement already does), derived legacy envelope (D4 table: costs mapping `g/w/o/s/c` onto the 8-slot resource vector, smallest free slot, player team 1, documented placeholders), in-process execution of the unchanged `command()` dispatcher, corpus-only persistence, and the superset response (`result` + `placement` + `resources`) — verify: new compat tests cover each derivation (cost map, slot choice, clamp-at-zero on insufficient funds), every fail-closed path (structured error, corpus unchanged), and retained session/bootstrap byte-identity, all passing with no server.
+- [x] 2.2 Implement the offline fixture-replay parity suite: same envelope through the compat endpoint equals the captured legacy response and after-state for all stable fields with documented time-dependent normalizations, plus assertions that working-tree saves are never written by any placement execution — verify: the parity suite passes with no network and `git status` shows no `saves/` or `tests/saves/` changes after the full compat test run.
 
 ## 3. GameApi placement operation
 
-- [ ] 3.1 Add the typed `place_building()` operation to `scripts/gameapi/game_api.gd` and implement it in `fake_api.gd` as the documented deterministic in-memory double (D8: cost map, clamp, slot selection, entry construction over committed fixture state) with `tests/test_game_api_fake.gd` extended for success, structured-failure, and typed-shape coverage — verify: the fake suite passes headless with no process, server, or socket.
-- [ ] 3.2 Implement `legacy_v0_api.gd` placement (loopback JSON POST to the endpoint, typed result mapping, structured-error passthrough, endpoint named only inside the legacy-v0 implementation) with live coverage against a running Compatibility API v0 — verify: the live GameApi suite passes inside `verify-boot.ps1`'s live phases and produces the same typed shapes as the fake.
+- [x] 3.1 Add the typed `place_building()` operation to `scripts/gameapi/game_api.gd` and implement it in `fake_api.gd` as the documented deterministic in-memory double (D8: cost map, clamp, slot selection, entry construction over committed fixture state) with `tests/test_game_api_fake.gd` extended for success, structured-failure, and typed-shape coverage — verify: the fake suite passes headless with no process, server, or socket.
+- [x] 3.2 Implement `legacy_v0_api.gd` placement (loopback JSON POST to the endpoint, typed result mapping, structured-error passthrough, endpoint named only inside the legacy-v0 implementation) with live coverage against a running Compatibility API v0 — verify: the live GameApi suite passes inside `verify-boot.ps1`'s live phases and produces the same typed shapes as the fake.
 
 ## 4. Client placement flow
 
-- [ ] 4.1 Implement the typed placement catalog parsed fail-closed from the bootstrap payload already in hand (`id`, `name`, `costs`, `min_level`, `in_store`, `width`, `height`, `type`; store-listed buildings gated by `min_level` against the loaded level) with `tests/test_town_placement.gd` covering catalog derivation, level gating, and the malformed-payload error state — verify: the suite passes headless and no second bootstrap request is issued.
-- [ ] 4.2 Implement the placement flow in the town scene: build picker over the catalog (UI-foundation slots), footprint preview through the existing iso projection with valid/invalid highlighting for out-of-grid and occupied targets plus the cost-vs-resources display, confirm sending exactly one intent, success applying only the authoritative response (new depth-sorted object, HUD resources from `resources`), and failure surfacing an explicit error with no state change — verify: the placement suite covers pick→preview→confirm→apply, invalid-target no-request cases, transport/structured failure rollback, and byte-identical town state after a cancelled mode entry, while `test_town_selection.gd` still passes unchanged.
-- [ ] 4.3 Wire placement mode into `scenes/town.tscn`/`town.gd` (input routing between selection and placement, overlay layering) and update the project-scope allow-list for every new script, suite, and scene — verify: `test_project_scope.gd` and `test_scene_build.gd` pass with the new file counts and no forbidden token outside the legacy-v0 implementation.
+- [x] 4.1 Implement the typed placement catalog parsed fail-closed from the bootstrap payload already in hand (`id`, `name`, `costs`, `min_level`, `in_store`, `width`, `height`, `type`; store-listed buildings gated by `min_level` against the loaded level) with `tests/test_town_placement.gd` covering catalog derivation, level gating, and the malformed-payload error state — verify: the suite passes headless and no second bootstrap request is issued.
+- [x] 4.2 Implement the placement flow in the town scene: build picker over the catalog (UI-foundation slots), footprint preview through the existing iso projection with valid/invalid highlighting for out-of-grid and occupied targets plus the cost-vs-resources display, confirm sending exactly one intent, success applying only the authoritative response (new depth-sorted object, HUD resources from `resources`), and failure surfacing an explicit error with no state change — verify: the placement suite covers pick→preview→confirm→apply, invalid-target no-request cases, transport/structured failure rollback, and byte-identical town state after a cancelled mode entry, while `test_town_selection.gd` still passes unchanged.
+- [x] 4.3 Wire placement mode into `scenes/town.tscn`/`town.gd` (input routing between selection and placement, overlay layering) and update the project-scope allow-list for every new script, suite, and scene — verify: `test_project_scope.gd` and `test_scene_build.gd` pass with the new file counts and no forbidden token outside the legacy-v0 implementation.
 
 ## 5. Batteries, live phase, and evidence
 
-- [ ] 5.1 Register the new suites and add the placement live phase to `verify-boot.ps1` (start compat over a disposable corpus, place, assert the corpus save mutated, teardown asserting port release and corpus cleanup with no working-tree `saves/`) — verify: `powershell -File apps/client-godot/verify-boot.ps1` exits 0 end to end with every documented marker.
-- [ ] 5.2 Capture the windowed placement evidence and the deterministic report into `apps/client-godot/evidence/placement/` (fake-API windowed capture of the town containing the placed building; headless report with inputs/digests, intent, counts before/after, resources, and every non-claim from the delta, including the fake-capture pointer) — verify: both files are committed, the report lists all required fields, and a rerun of the report step reproduces its committed bytes.
-- [ ] 5.3 Run the full preservation battery in the final state — verify: `verify.ps1` and `verify-boot.ps1` both exit 0, `python -B tools/hash-manifest/hash_manifest.py verify` exits 0, guard digests are identical before and after, the M4/M6 evidence bytes are unchanged, and `git diff` shows no legacy/fixture/save byte changes beyond the sanctioned new fixture directory and evidence files.
+- [x] 5.1 Register the new suites and add the placement live phase to `verify-boot.ps1` (start compat over a disposable corpus, place, assert the corpus save mutated, teardown asserting port release and corpus cleanup with no working-tree `saves/`) — verify: `powershell -File apps/client-godot/verify-boot.ps1` exits 0 end to end with every documented marker.
+- [x] 5.2 Capture the windowed placement evidence and the deterministic report into `apps/client-godot/evidence/placement/` (fake-API windowed capture of the town containing the placed building; headless report with inputs/digests, intent, counts before/after, resources, and every non-claim from the delta, including the fake-capture pointer) — verify: both files are committed, the report lists all required fields, and a rerun of the report step reproduces its committed bytes.
+- [x] 5.3 Run the full preservation battery in the final state — verify: `verify.ps1` and `verify-boot.ps1` both exit 0, `python -B tools/hash-manifest/hash_manifest.py verify` exits 0, guard digests are identical before and after, the M4/M6 evidence bytes are unchanged, and `git diff` shows no legacy/fixture/save byte changes beyond the sanctioned new fixture directory and evidence files.
 
 ## 6. Documentation and integration review
 
-- [ ] 6.1 Document the placement slice in `apps/client-godot/README.md` and `apps/compat-api` docs (flow, endpoint contract, envelope derivations with derived-provisional status, evidence paths, claim limits) and add the actually executed verification commands to `AGENTS.md` — verify: each documented command matches one that was run successfully in this change, with its purpose and constraints stated.
-- [ ] 6.2 Perform the integration review: re-read the final diff against `proposal.md`/`specs/`/`design.md`, run `openspec validate building-placement --strict` and both batteries once more, and record residual gaps (derived price/envelope placeholders, legacy clamping preserved, no progressed-player coverage, purchase/shop deliver lines still open) — verify: strict validation exits 0, both batteries exit 0, and every spec requirement maps to a passing check or a recorded claim limit.
+- [x] 6.1 Document the placement slice in `apps/client-godot/README.md` and `apps/compat-api` docs (flow, endpoint contract, envelope derivations with derived-provisional status, evidence paths, claim limits) and add the actually executed verification commands to `AGENTS.md` — verify: each documented command matches one that was run successfully in this change, with its purpose and constraints stated.
+- [x] 6.2 Perform the integration review: re-read the final diff against `proposal.md`/`specs/`/`design.md`, run `openspec validate building-placement --strict` and both batteries once more, and record residual gaps (derived price/envelope placeholders, legacy clamping preserved, no progressed-player coverage, purchase/shop deliver lines still open) — verify: strict validation exits 0, both batteries exit 0, and every spec requirement maps to a passing check or a recorded claim limit.
+
+## Integration review record (2026-09-29)
+
+- `openspec validate building-placement --strict` exited `0` ("Change 'building-placement' is valid").
+- Both batteries re-run in the final state: `verify.ps1` exited `0` and
+  `verify-boot.ps1` exited `0` (guard digest
+  `6978b9594f52b3f87ebe043b7d1ce0da67632d0a0537f0af7ea3d22f2e7ff348`
+  identical before/after; `placement-live` PASS with
+  `PASS corpus save mutated by the live placement`; port released; no
+  working-tree `saves/`), and `hash_manifest.py verify` exited `0`
+  (3,258 entries). The final diff touches no legacy source, config,
+  village, template, or `tests/saves/` path.
+- Every requirement and scenario in both delta specs maps to a passing
+  check: fixture capture/replay (capture tool + `test_place_parity`,
+  offline, 90 compat tests OK), endpoint contract/clamp/fail-closed/
+  corpus-only/loopback (`test_place_endpoint`,
+  `test_placement_envelope`), client flow/gating/invalid-targets/
+  failure-rollback/catalog-fail-closed (`test_town_placement`, 284
+  checks), evidence + byte-identical report rerun
+  (`evidence/placement/`), batteries/containment (both batteries + hash
+  manifest), GameApi abstraction + either-implementation placement
+  (`test_game_api_fake`, `test_game_api_live`, `placement-live`),
+  documented commands (AGENTS.md + both READMEs).
+- Residual gaps recorded, all also stated as claim limits in
+  `apps/client-godot/README.md` and `apps/compat-api/README.md`:
+  1. the price vector, envelope placeholders (`accessToken`,
+     `publishActions`, `tries`, `first_number`, `unknown`, `reason`), and
+     the next-free-slot choice are **derived-provisional** — never
+     observed from the Flash client;
+  2. insufficient resources reproduce the legacy `max(…, 0)` clamp by
+     design — rejection-style validation is deferred to Server v1 (M13);
+  3. parity covers one recorded `buy` transaction against the fresh-player
+     corpus — no progressed-player coverage and no other commands;
+  4. the remaining M7 deliver lines (purchase/shop, move, sell, store,
+     upgrade, build timers, income, expansion, resources, XP) and M8+ are
+     still open by scope.

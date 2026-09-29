@@ -1,0 +1,96 @@
+{
+	"bootstrap_requests": 1,
+	"capture": {
+		"implementation": "fake GameApi (a deterministic test double, not a parity oracle)",
+		"parity_pointer": "real-execution parity is established by the fixture-replay tests and the verify-boot placement live phase",
+		"path": "apps/client-godot/evidence/placement/placement.png",
+		"sha256": "923ec4e845d9e8b5b92fd9aa11e9947a8652a5f16048ee7b524898b06350abde"
+	},
+	"constants": {
+		"derivation_status": "derived-provisional",
+		"evidence_gap": "the legacy SWF's static iso-engine identifiers (TILE_SIZE, EI_TILE_HEIGHT_PIXELS, gridWidth/Height, numCols/numRows) were never extracted; pixel parity with the Flash client is not claimed",
+		"grid_extent": 100,
+		"origin_x": 2000.0,
+		"origin_y": 10.0,
+		"tile_height": 20.0,
+		"tile_width": 40.0,
+		"world_rect": [
+			0.0,
+			0.0,
+			4000.0,
+			2000.0
+		]
+	},
+	"counts": {
+		"objects_after": 41,
+		"objects_before": 40,
+		"placements_after": 41,
+		"placements_before": 40
+	},
+	"inputs": {
+		"bootstrap_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/get_player_info/response.body",
+			"sha256": "facedf76784d3dc03a3a45e81756a8546f90f7647dbff8917593404d9e401709"
+		},
+		"placement_after": {
+			"path": "tests/fixtures/godot-building-placement/steps/command_buy/after.json",
+			"sha256": "a66794353907f88617b816b5ec0723dad10c53599d881929351fbdbf0ad54757"
+		},
+		"placement_request": {
+			"path": "tests/fixtures/godot-building-placement/steps/command_buy/request.json",
+			"sha256": "856f6835d6f4babd21fa2a91d1a053abbccca0dc05102acc44b9e845a2307bb4"
+		},
+		"placement_response": {
+			"path": "tests/fixtures/godot-building-placement/steps/command_buy/response.body",
+			"sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87"
+		},
+		"save_list_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json",
+			"sha256": "ad0404c2c340a48f06e2e49ae7eb7973978cd2ccb02ac6ff7bfba4eb75f6d9f4"
+		},
+		"terrain": {
+			"path": "assets/images/en/mapa1.jpg",
+			"sha256": "35c4ded53e82be187eb67c54ee7c7023b698c3986954db4b6f9613a2a45cdd3f"
+		}
+	},
+	"intent": {
+		"item_id": 1,
+		"orientation": 0,
+		"user_id": "00000000-0000-4000-8000-000000000001",
+		"x": 51,
+		"y": 39
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed",
+		"the price vector, envelope placeholders, and slot choice are derived, never observed from the Flash client",
+		"parity covers one recorded transaction against the fresh-player corpus, not progressed players",
+		"insufficient resources reproduce legacy clamping, not rejection",
+		"no pixel-parity oracle against the legacy client exists",
+		"the capture runs the fake GameApi implementation; real-execution parity is established by the fixture-replay tests and the verify-boot placement live phase",
+		"occupancy and grid-bounds rules are derived (Flash-unobservable) and enforced client-side only; the endpoint enforces structural input validity"
+	],
+	"placement_requests": 1,
+	"resources": {
+		"after": {
+			"cash": 5,
+			"coins": 2000,
+			"energy": 50,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 1970,
+			"xp": 4
+		},
+		"before": {
+			"cash": 5,
+			"coins": 2000,
+			"energy": 50,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2000,
+			"xp": 4
+		}
+	},
+	"schema": "placement-report-v1"
+}

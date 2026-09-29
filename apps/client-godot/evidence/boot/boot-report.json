@@ -1,12 +1,12 @@
 {
     "schema":  "godot-compatibility-boot/verify-boot-v1",
-    "generated_utc":  "2026-09-28T13:26:46Z",
+    "generated_utc":  "2026-09-29T00:06:10Z",
     "environment":  {
                         "engine_executable":  "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
                         "engine_version":  "4.7.2.stable.official.ed1daf0bf",
                         "python_executable":  "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
                         "python_version":  "3.9.13",
-                        "git_commit":  "3f3406cb4c016aa59b8305565908377b44b1efdc",
+                        "git_commit":  "742f5949efe9a8fd62e85e002ecd6a2c4c424b96",
                         "display_session":  false,
                         "network":  "loopback only (127.0.0.1)"
                     },
@@ -347,6 +347,22 @@
                          "log":  "apps/client-godot/.godot/verify-boot/20-test_town_scene.out.txt"
                      },
                      {
+                         "name":  "test_town_placement",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_town_placement.gd",
+                                         "--",
+                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/21-test_town_placement.out.txt"
+                     },
+                     {
                          "name":  "test_town_gate",
                          "command":  [
                                          "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
@@ -360,7 +376,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/21-test_town_gate.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/22-test_town_gate.out.txt"
                      },
                      {
                          "name":  "boot-unreachable",
@@ -378,7 +394,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/22-boot-unreachable.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/23-boot-unreachable.out.txt"
                      },
                      {
                          "name":  "boot-main-live",
@@ -401,7 +417,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/23-boot-main-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/24-boot-main-live.out.txt"
                      },
                      {
                          "name":  "gameapi-live",
@@ -425,7 +441,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/24-gameapi-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/25-gameapi-live.out.txt"
                      },
                      {
                          "name":  "boot-api-error-live",
@@ -452,7 +468,33 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/25-boot-api-error-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/26-boot-api-error-live.out.txt"
+                     },
+                     {
+                         "name":  "placement-live",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+                                         "-B",
+                                         "apps/client-godot/compat_live_phase.py",
+                                         "--port",
+                                         "5056",
+                                         "--name",
+                                         "placement-live",
+                                         "--expect-save-mutation",
+                                         "--",
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_town_placement.gd",
+                                         "--",
+                                         "--scenario=live-placement",
+                                         "--gameapi-endpoint=http://127.0.0.1:5056"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/27-placement-live.out.txt"
                      },
                      {
                          "name":  "guard-post",
@@ -464,7 +506,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/26-guard-post.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/28-guard-post.out.txt"
                      }
                  ],
     "assertions":  [
@@ -629,6 +671,14 @@
                            "ok":  true
                        },
                        {
+                           "name":  "test_town_placement exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_town_placement reports PASS",
+                           "ok":  true
+                       },
+                       {
                            "name":  "test_town_gate exits 0 (got 0)",
                            "ok":  true
                        },
@@ -677,6 +727,14 @@
                            "ok":  true
                        },
                        {
+                           "name":  "placement live phase: live phase exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "placement live phase: live-phase summary records ok with clean teardown",
+                           "ok":  true
+                       },
+                       {
                            "name":  "main-scene boot printed its state marker",
                            "ok":  true
                        },
@@ -722,6 +780,14 @@
                        },
                        {
                            "name":  "structured API-error scenario asserts the error state",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "placement live phase asserts its scenario",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "placement live phase mutated the disposable corpus save",
                            "ok":  true
                        },
                        {

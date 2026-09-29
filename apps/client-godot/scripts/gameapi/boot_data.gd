@@ -78,6 +78,57 @@ class BootstrapResult:
 	var error_message := ""
 
 
+## One persisted placement entry exactly as the v0 service reports it — the
+## legacy eight-field array (item, x, y, timestamp, orientation, store,
+## attr, player) written by `engine.map_add_item`.
+class Placement:
+	extends RefCounted
+	var item_id := 0
+	var x := 0
+	var y := 0
+	## Wall-clock seconds the legacy server stamped when the entry was
+	## written: a time-dependent field, so tests assert positivity and
+	## identity with the fixture epoch, never a fixed value.
+	var timestamp := 0
+	var orientation := 0
+	## Legacy `store` / `attr` structures — opaque to presentation code,
+	## carried in canonical legacy form (integral numbers as `int`, since
+	## the JSON transport widens them on the pinned engine while the legacy
+	## save stores ints; see `_canonicalize`).
+	var store: Array = []
+	var attr: Dictionary = {}
+	var player := 0
+
+
+## Authoritative post-application resources a placement response carries —
+## the seven stored slots of the legacy resource vector (its unread
+## `unknown` slot 0 has no stored value). The client applies only these
+## values; it never computes its own delta (design D7).
+class Resources:
+	extends RefCounted
+	var xp := 0
+	var gold := 0
+	var wood := 0
+	var oil := 0
+	var steel := 0
+	var cash := 0
+	var mana := 0
+
+
+## Result of `place_building()`: the legacy result plus the authoritative
+## superset (design D7), or a structured failure with no partial payload.
+class PlacementResult:
+	extends RefCounted
+	var ok := false
+	var protocol := ""
+	## The legacy result string ("success"); "" on failure.
+	var result := ""
+	var placement: Placement = null
+	var resources: Resources = null
+	var error_code := ""
+	var error_message := ""
+
+
 ## Structured failure for `list_sessions()` (never a partial payload).
 static func save_list_failure(code: String, message: String) -> SaveListResult:
 	var result := SaveListResult.new()
@@ -90,6 +141,15 @@ static func save_list_failure(code: String, message: String) -> SaveListResult:
 ## Structured failure for `get_bootstrap()` (never a partial payload).
 static func bootstrap_failure(code: String, message: String) -> BootstrapResult:
 	var result := BootstrapResult.new()
+	result.ok = false
+	result.error_code = code
+	result.error_message = message
+	return result
+
+
+## Structured failure for `place_building()` (never a partial payload).
+static func placement_failure(code: String, message: String) -> PlacementResult:
+	var result := PlacementResult.new()
 	result.ok = false
 	result.error_code = code
 	result.error_message = message
@@ -159,6 +219,45 @@ static func parse_bootstrap(payload: Variant, user_id: String) -> BootstrapResul
 	result.player_info = PlayerInfoPayload.new()
 	result.player_info.raw = player_raw
 	result.player_info.player_name = _player_name(player_raw)
+	return result
+
+
+## Parses a v0 placement envelope — success or structured error — into the
+## typed result. Shared by `FakeApi` (which synthesizes the envelope from
+## the committed placement fixture after applying the documented in-memory
+## semantics) and `LegacyV0Api` (which decodes the HTTP body), so both
+## implementations yield the same typed shape by construction.
+static func parse_placement(payload: Variant) -> PlacementResult:
+	if not (payload is Dictionary):
+		return placement_failure("bad_response", "response is not a JSON object")
+	var envelope: Dictionary = payload
+	if envelope.get("ok") != true:
+		return _placement_error(envelope)
+	if str(envelope.get("protocol", "")) != PROTOCOL:
+		return placement_failure("protocol_mismatch",
+			"expected protocol %s, got %s" % [PROTOCOL,
+			str(envelope.get("protocol"))])
+	if str(envelope.get("result", "")) != "success":
+		return placement_failure("bad_response",
+			"placement response did not report the legacy success result")
+	var placement := _parse_placement_entry(envelope.get("placement"))
+	if placement == null:
+		return placement_failure("bad_response",
+			"placement entry is not the legacy eight-field array")
+	var resources_raw: Variant = envelope.get("resources")
+	if not (resources_raw is Dictionary):
+		return placement_failure("bad_response",
+			"placement response carries no resources object")
+	var resources := _parse_resources(resources_raw)
+	if resources == null:
+		return placement_failure("bad_response",
+			"placement resources are not seven non-negative integers")
+	var result := PlacementResult.new()
+	result.ok = true
+	result.protocol = PROTOCOL
+	result.result = "success"
+	result.placement = placement
+	result.resources = resources
 	return result
 
 
@@ -239,3 +338,114 @@ static func _save_list_error(envelope: Dictionary) -> SaveListResult:
 		code = str(typed.get("code", code))
 		message = str(typed.get("message", message))
 	return save_list_failure(code, message)
+
+
+## Structured error fields of a failed placement envelope (code + message).
+static func _placement_error(envelope: Dictionary) -> PlacementResult:
+	var code := "bad_response"
+	var message := "response reported failure without a structured error"
+	var error: Variant = envelope.get("error")
+	if error is Dictionary:
+		var typed: Dictionary = error
+		code = str(typed.get("code", code))
+		message = str(typed.get("message", message))
+	return placement_failure(code, message)
+
+
+## Eight-field legacy entry -> typed `Placement`; null when malformed
+## (wrong shape, non-integer fields, or a negative coordinate/timestamp).
+static func _parse_placement_entry(value: Variant) -> Placement:
+	if not (value is Array):
+		return null
+	var raw: Array = value
+	if raw.size() != 8:
+		return null
+	var item_id: Variant = _parse_int(raw[0])
+	var x: Variant = _parse_int(raw[1])
+	var y: Variant = _parse_int(raw[2])
+	var timestamp: Variant = _parse_int(raw[3])
+	var orientation: Variant = _parse_int(raw[4])
+	var player: Variant = _parse_int(raw[7])
+	if item_id == null or x == null or y == null or timestamp == null \
+			or orientation == null or player == null:
+		return null
+	if int(item_id) < 0 or int(x) < 0 or int(y) < 0 or int(timestamp) < 0:
+		return null
+	if not (raw[5] is Array) or not (raw[6] is Dictionary):
+		return null
+	var placement := Placement.new()
+	placement.item_id = int(item_id)
+	placement.x = int(x)
+	placement.y = int(y)
+	placement.timestamp = int(timestamp)
+	placement.orientation = int(orientation)
+	placement.store = _canonicalize(raw[5])
+	placement.attr = _canonicalize(raw[6])
+	placement.player = int(player)
+	return placement
+
+
+## The seven stored resource slots -> typed `Resources`; null when any
+## slot is missing or not a non-negative integer (legacy clamps them at
+## zero on the server, so a negative value cannot come from the service).
+static func _parse_resources(value: Dictionary) -> Resources:
+	var amounts := {}
+	for key in ["xp", "gold", "wood", "oil", "steel", "cash", "mana"]:
+		if not value.has(key):
+			return null
+		var amount: Variant = _parse_int(value[key])
+		if amount == null or int(amount) < 0:
+			return null
+		amounts[key] = int(amount)
+	var resources := Resources.new()
+	resources.xp = amounts["xp"]
+	resources.gold = amounts["gold"]
+	resources.wood = amounts["wood"]
+	resources.oil = amounts["oil"]
+	resources.steel = amounts["steel"]
+	resources.cash = amounts["cash"]
+	resources.mana = amounts["mana"]
+	return resources
+
+
+## Integer from an int or an integral float; null otherwise. The JSON
+## transport parses every number as float on the pinned engine (probed on
+## Godot 4.7.2: `typeof(JSON.parse_string("5"))` is float), so both
+## integer forms are accepted — the same tolerance `_parse_number`
+## documents for save values. Out-of-range magnitudes, NaN, and infinity
+## are rejected.
+static func _parse_int(value: Variant) -> Variant:
+	if value is int:
+		return value
+	if value is float:
+		var typed := float(value)
+		if typed == floor(typed) and absf(typed) <= 9007199254740992.0:
+			return int(typed)
+	return null
+
+
+## Canonical legacy form of a nested `store`/`attr` structure: every
+## integral float becomes `int`, because the JSON transport widens the
+## legacy save's ints to floats on the pinned engine while Dictionary
+## equality is type-strict there (probed: `{"nc": 0} == {"nc": 0.0}` is
+## false). Without this, the two implementations would report the same
+## persisted entry with different value types. Non-integral floats,
+## strings, booleans, and null pass through untouched — only the
+## representation is normalized, never the value.
+static func _canonicalize(value: Variant) -> Variant:
+	if value is float:
+		var typed := float(value)
+		if typed == floor(typed) and absf(typed) <= 9007199254740992.0:
+			return int(typed)
+		return typed
+	if value is Dictionary:
+		var out := {}
+		for key: Variant in value:
+			out[key] = _canonicalize(value[key])
+		return out
+	if value is Array:
+		var out: Array = []
+		for element: Variant in value:
+			out.append(_canonicalize(element))
+		return out
+	return value

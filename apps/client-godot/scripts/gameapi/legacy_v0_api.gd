@@ -1,7 +1,7 @@
 extends Node
 ## `LegacyV0Api` — GameApi implementation that speaks JSON over loopback HTTP
-## to Compatibility API v0 (design D5, spec "Boot live against Compatibility
-## API").
+## to Compatibility API v0 (design D5, specs "Boot live against Compatibility
+## API" and "Place through either implementation").
 ##
 ## This is the ONLY project file allowed to name the compat endpoint or to
 ## use the built-in HTTP request/enumeration types; the scope test restricts
@@ -16,6 +16,7 @@ const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const DEFAULT_ENDPOINT := "http://127.0.0.1:5056"
 const SESSION_PATH := "/v0/session"
 const BOOTSTRAP_PATH := "/v0/bootstrap"
+const PLACE_PATH := "/v0/place"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -58,6 +59,28 @@ func get_bootstrap(user_id: String) -> BootData.BootstrapResult:
 			str(outcome.get("code", "bad_response")),
 			str(outcome.get("message", "")))
 	return BootData.parse_bootstrap(outcome.get("payload"), user_id)
+
+
+## One placement intent over loopback HTTP: the client sends only the
+## intent (`user_id`, `item_id`, anchor `x`/`y`, `orientation`) and the
+## service derives the legacy envelope server-side (design D3/D4), so the
+## typed result's entry and resources are authoritative (design D7).
+## Structured service errors pass through with their original codes;
+## transport failures keep the boot failure rules — never a partial payload.
+func place_building(user_id: String, item_id: int, x: int, y: int,
+		orientation: int = 0) -> BootData.PlacementResult:
+	var outcome := await _call("POST", PLACE_PATH, JSON.stringify({
+		"user_id": user_id,
+		"item_id": item_id,
+		"x": x,
+		"y": y,
+		"orientation": orientation,
+	}))
+	if not outcome.get("ok", false):
+		return BootData.placement_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return BootData.parse_placement(outcome.get("payload"))
 
 
 ## One HTTP round trip. Success returns `{ok: true, payload: Dictionary}`;

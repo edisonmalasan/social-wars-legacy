@@ -12,9 +12,10 @@ extends "res://tests/test_base.gd"
 ## camera-controls work (the component script and its suite), the
 ## UI-foundation work (the component script and its suite), and the
 ## settings/audio-manager work (the Settings and AudioManager autoloads
-## with their scripts and suites), and the town-rendering work (the eight
+## with their scripts and suites), and the town-rendering work (the eleven
 ## town scripts under `scripts/town/`, the town and town-slice scenes,
-## their six suites, and the three committed evidence captures): no other
+## their seven suites, the four committed evidence captures, and the
+## placement evidence report): no other
 ## game system, no scene beyond the allow-list, no script outside the
 ## allow-list, no Flash-related runtime, no legacy protocol token
 ## anywhere, and no transport reference outside the legacy-v0
@@ -58,6 +59,9 @@ const ALLOWED := [
 	"scripts/session.gd",
 	"scripts/settings.gd",
 	"scripts/town/iso.gd",
+	"scripts/town/placement_catalog.gd",
+	"scripts/town/placement_flow.gd",
+	"scripts/town/placement_preview.gd",
 	"scripts/town/town.gd",
 	"scripts/town/town_hud.gd",
 	"scripts/town/town_object.gd",
@@ -84,6 +88,7 @@ const ALLOWED := [
 	"tests/test_town_gate.gd",
 	"tests/test_town_hud.gd",
 	"tests/test_town_iso.gd",
+	"tests/test_town_placement.gd",
 	"tests/test_town_scene.gd",
 	"tests/test_town_selection.gd",
 	"tests/test_town_state.gd",
@@ -91,6 +96,8 @@ const ALLOWED := [
 	"evidence/boot/boot-report.json",
 	"evidence/first-render/first-render.png",
 	"evidence/first-render/report.json",
+	"evidence/placement/placement.png",
+	"evidence/placement/report.json",
 	"evidence/town/report.json",
 	"evidence/town/town-player.png",
 	"evidence/town/town-slice.png",

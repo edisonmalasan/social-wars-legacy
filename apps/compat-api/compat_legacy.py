@@ -24,13 +24,22 @@ of the contract and are asserted here:
   without ``saves/`` is refused *before* legacy code runs.
 
 Legacy modules are imported with ``sys.dont_write_bytecode`` forced on, so no
-``__pycache__`` is written next to preserved sources. Nothing in this module
-calls ``sessions.save_session``: the adapter has no persistence path at all.
+``__pycache__`` is written next to preserved sources. This module itself never
+calls ``sessions.save_session`` — persistence happens only inside the legacy
+dispatcher (see the persistence scope below).
 
 Corpus construction (``build_corpus``) copies ``config/``, ``mods/`` and
 ``villages/`` and seeds ``saves/<pid>.save.json`` from
 ``tests/saves/fresh-player.json`` — byte-for-byte when the seed is not
 mutated.
+
+Persistence scope (design D6, spec ``godot-compatibility-boot``): the
+session and bootstrap operations below have no persistence path at all —
+they never call ``sessions.save_session``.  State-mutating gameplay
+execution (``execute_commands``) runs the *unchanged* legacy ``command``
+dispatcher, which persists through legacy ``save_session`` into this
+corpus's ``saves/`` directory and nowhere else; a working-tree save is
+never written.
 """
 
 from __future__ import annotations
@@ -153,6 +162,7 @@ class LegacyBoot:
         self._player = _import("get_player_info")
         self._engine = _import("engine")
         self._version = _import("version")
+        self._command = _import("command")
 
     # --- legacy constants -------------------------------------------------
     @property
@@ -191,6 +201,78 @@ class LegacyBoot:
         if user_id not in self.known_user_ids():
             raise LegacyBootError("unknown_user_id", "no save for user id %r" % user_id)
         return self._player.get_player_info(user_id)
+
+    # --- gameplay execution (design D2/D6; godot-building-placement) ------
+    def has_item(self, item_id: int) -> bool:
+        """Whether the loaded legacy config resolves this item id."""
+        return self._config.get_item_from_id(item_id) is not None
+
+    def item_costs(self, item_id: int) -> Optional[str]:
+        """Raw config ``costs`` attribute (JSON string), or ``None``."""
+        return self._config.get_attribute_from_item_id(item_id, "costs")
+
+    def save_document(self, user_id: str) -> dict:
+        """The in-memory save document for ``user_id`` (legacy ``session()``)."""
+        if user_id not in self.known_user_ids():
+            raise LegacyBootError("unknown_user_id", "no save for user id %r" % user_id)
+        save = self._sessions.session(user_id)
+        if not isinstance(save, dict):
+            raise LegacyBootError(
+                "invalid_save_state", "save for user id %r is not a document" % user_id
+            )
+        return save
+
+    def first_map(self, user_id: str) -> dict:
+        """``save["maps"][0]`` with its structural preconditions checked."""
+        save = self.save_document(user_id)
+        maps = save.get("maps")
+        if not isinstance(maps, list) or not maps or not isinstance(maps[0], dict):
+            raise LegacyBootError(
+                "invalid_save_state", "save for user id %r has no first map" % user_id
+            )
+        return maps[0]
+
+    def map_items(self, user_id: str) -> Dict[str, object]:
+        """``save["maps"][0]["items"]`` — the slot allocation state."""
+        items = self.first_map(user_id).get("items")
+        if not isinstance(items, dict):
+            raise LegacyBootError(
+                "invalid_save_state",
+                "first map of save for user id %r has no items" % user_id,
+            )
+        return items
+
+    def execute_commands(self, user_id: str, envelope: Dict[str, object]) -> None:
+        """Run the unchanged legacy ``command()`` batch dispatcher (D2).
+
+        The legacy dispatcher applies each command's resource vector,
+        executes the command (``buy`` writes the placement entry through
+        ``engine.map_add_item`` and records ``boughtUnits``), and persists
+        via ``save_session`` into **this corpus's** ``saves/`` directory —
+        never a working-tree save.  The response the legacy HTTP route
+        would return (``{"result": "success"}``) is exactly what a
+        returning ``command()`` produces, so success here is equivalent.
+        """
+        self._command.command(user_id, envelope)
+
+    def resources(self, user_id: str) -> Dict[str, int]:
+        """Post-application resource values the legacy code maintains.
+
+        Every slot ``engine.apply_resources`` writes: map ``xp`` and the
+        four map resources, ``playerInfo.cash``, ``privateState.mana``
+        (the vector's unread ``unknown`` slot 0 has no stored value).
+        """
+        save = self.save_document(user_id)
+        first_map = self.first_map(user_id)
+        return {
+            "xp": int(first_map["xp"]),
+            "gold": int(first_map["gold"]),
+            "wood": int(first_map["wood"]),
+            "oil": int(first_map["oil"]),
+            "steel": int(first_map["steel"]),
+            "cash": int(save["playerInfo"]["cash"]),
+            "mana": int(save["privateState"]["mana"]),
+        }
 
     # --- state / containment helpers -------------------------------------
     def reload_state(self) -> None:

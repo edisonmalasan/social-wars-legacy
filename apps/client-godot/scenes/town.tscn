@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/town/town.gd" id="1_town"]
 [ext_resource type="Script" path="res://scripts/town/town_terrain.gd" id="2_terrain"]
 [ext_resource type="Script" path="res://scripts/camera_controls.gd" id="3_camera"]
 [ext_resource type="Script" path="res://scripts/ui_foundation.gd" id="4_ui"]
+[ext_resource type="Script" path="res://scripts/town/placement_preview.gd" id="5_placement"]
 
 [node name="Town" type="Node2D"]
 script = ExtResource("1_town")
@@ -12,6 +13,9 @@ script = ExtResource("1_town")
 script = ExtResource("2_terrain")
 
 [node name="Objects" type="Node2D" parent="."]
+
+[node name="Placement" type="Node2D" parent="."]
+script = ExtResource("5_placement")
 
 [node name="Camera" type="Camera2D" parent="."]
 script = ExtResource("3_camera")
