@@ -1,12 +1,12 @@
 {
     "schema":  "godot-compatibility-boot/verify-boot-v1",
-    "generated_utc":  "2026-09-29T15:30:37Z",
+    "generated_utc":  "2026-09-29T19:50:27Z",
     "environment":  {
                         "engine_executable":  "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
                         "engine_version":  "4.7.2.stable.official.ed1daf0bf",
                         "python_executable":  "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
                         "python_version":  "3.9.13",
-                        "git_commit":  "bafd6445f509c8da6dea910b9a699e601cdbf642",
+                        "git_commit":  "3235c8cfb586b6597ced2116d983eb6680278293",
                         "display_session":  false,
                         "network":  "loopback only (127.0.0.1)"
                     },
@@ -459,6 +459,22 @@
                          "log":  "apps/client-godot/.godot/verify-boot/27-test_town_construction.out.txt"
                      },
                      {
+                         "name":  "test_town_collect",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_town_collect.gd",
+                                         "--",
+                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/28-test_town_collect.out.txt"
+                     },
+                     {
                          "name":  "test_town_gate",
                          "command":  [
                                          "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
@@ -472,7 +488,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/28-test_town_gate.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/29-test_town_gate.out.txt"
                      },
                      {
                          "name":  "boot-unreachable",
@@ -490,7 +506,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/29-boot-unreachable.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/30-boot-unreachable.out.txt"
                      },
                      {
                          "name":  "boot-main-live",
@@ -513,7 +529,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/30-boot-main-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/31-boot-main-live.out.txt"
                      },
                      {
                          "name":  "gameapi-live",
@@ -537,7 +553,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/31-gameapi-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/32-gameapi-live.out.txt"
                      },
                      {
                          "name":  "boot-api-error-live",
@@ -564,7 +580,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/32-boot-api-error-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/33-boot-api-error-live.out.txt"
                      },
                      {
                          "name":  "placement-live",
@@ -590,7 +606,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/33-placement-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/34-placement-live.out.txt"
                      },
                      {
                          "name":  "purchase-live",
@@ -616,7 +632,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/34-purchase-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/35-purchase-live.out.txt"
                      },
                      {
                          "name":  "move-live",
@@ -642,7 +658,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/35-move-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/36-move-live.out.txt"
                      },
                      {
                          "name":  "sell-live",
@@ -668,7 +684,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/36-sell-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/37-sell-live.out.txt"
                      },
                      {
                          "name":  "store-live",
@@ -694,7 +710,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/37-store-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/38-store-live.out.txt"
                      },
                      {
                          "name":  "upgrade-live",
@@ -720,7 +736,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/38-upgrade-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/39-upgrade-live.out.txt"
                      },
                      {
                          "name":  "construction-live",
@@ -746,7 +762,33 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/39-construction-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/40-construction-live.out.txt"
+                     },
+                     {
+                         "name":  "collect-live",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+                                         "-B",
+                                         "apps/client-godot/compat_live_phase.py",
+                                         "--port",
+                                         "5056",
+                                         "--name",
+                                         "collect-live",
+                                         "--expect-save-mutation",
+                                         "--",
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_town_collect.gd",
+                                         "--",
+                                         "--scenario=live-collect",
+                                         "--gameapi-endpoint=http://127.0.0.1:5056"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/41-collect-live.out.txt"
                      },
                      {
                          "name":  "guard-post",
@@ -758,7 +800,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/40-guard-post.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/42-guard-post.out.txt"
                      }
                  ],
     "assertions":  [
@@ -979,6 +1021,14 @@
                            "ok":  true
                        },
                        {
+                           "name":  "test_town_collect exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_town_collect reports PASS",
+                           "ok":  true
+                       },
+                       {
                            "name":  "test_town_gate exits 0 (got 0)",
                            "ok":  true
                        },
@@ -1080,6 +1130,14 @@
                        },
                        {
                            "name":  "construction live phase: live-phase summary records ok with clean teardown",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "collect live phase: live phase exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "collect live phase: live-phase summary records ok with clean teardown",
                            "ok":  true
                        },
                        {
@@ -1208,6 +1266,18 @@
                        },
                        {
                            "name":  "construction live phase mutated the disposable corpus save",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "collect live phase asserts its scenario",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "collect live phase drove one content-derived collection through the v0 endpoint at the top committed rung",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "collect live phase mutated the disposable corpus save",
                            "ok":  true
                        },
                        {

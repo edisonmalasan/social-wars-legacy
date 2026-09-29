@@ -7,7 +7,8 @@ extends Node
 ## purchase intent, `move_building()` for one move intent,
 ## `sell_building()` for one sell intent, `store_building()` for one
 ## store intent, `upgrade_building()` for one upgrade intent, and
-## `build_construction()` for one construction intent, receiving
+## `build_construction()` for one construction intent, and
+## `collect_income()` for one collection intent, receiving
 ## typed results
 ## (`scripts/gameapi/boot_data.gd`); raw transport dictionaries never reach
 ## presentation code, and no other script references a transport.
@@ -24,7 +25,8 @@ extends Node
 ##               `tests/fixtures/godot-building-store/` (store),
 ##               `tests/fixtures/godot-building-upgrade/` (upgrade), and
 ##               `tests/fixtures/godot-building-construction/`
-##               (construction); no process, no server, no socket.
+##               (construction), and `tests/fixtures/godot-building-collect/`
+##               (collection); no process, no server, no socket.
 ##   legacy_v0 - JSON over loopback HTTP to Compatibility API v0 through the
 ##               built-in HTTP request client; endpoint from the project
 ##               setting `gameapi/endpoint` (default: loopback 127.0.0.1 on
@@ -101,6 +103,12 @@ var upgrade_requests := 0
 ## `placement_requests`). Monotonic for the same reason: `configure()` swaps
 ## the implementation without hiding history.
 var construction_requests := 0
+## Number of collection intents this process has issued (building-collect flow
+## contract: exactly one per confirm, zero for every local refusal — the
+## collect suite snapshots this counter exactly like `placement_requests`).
+## Monotonic for the same reason: `configure()` swaps the implementation
+## without hiding history.
+var collect_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -266,6 +274,26 @@ func build_construction(user_id: String, item_index: int,
 	construction_requests += 1
 	var result: BootData.ConstructionResult = await _impl.build_construction(
 		user_id, item_index, action)
+	return result
+
+
+## One collection intent (the legacy map index of an existing placement) from
+## the selected implementation. The contract carries NO amount, NO resource,
+## NO tier, NO time, NO price, and NO resource deltas: the service derives the
+## legacy envelope, the committed-income payout, and the ladder rung entirely
+## server-side from the addressed item's own content and the row's own state
+## (design D7), so the typed result's two rows, payout, tier, reference
+## instant, and resources are authoritative (design D8). The response carries
+## the row as read BEFORE execution and the row re-read AFTER it, so
+## presentation code replaces the selected typed placement's row with `row`,
+## takes the balances and experience from `resources`, and evaluates its
+## readout against `reference_time` — never against its own clock and never
+## against its own arithmetic.
+func collect_income(user_id: String,
+		item_index: int) -> BootData.CollectResult:
+	collect_requests += 1
+	var result: BootData.CollectResult = await _impl.collect_income(
+		user_id, item_index)
 	return result
 
 

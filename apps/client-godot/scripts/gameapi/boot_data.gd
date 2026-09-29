@@ -47,6 +47,25 @@ extends RefCounted
 ## documented time-dependent field (legacy stamps it with `time_now()`), so no
 ## test asserts it by value.
 ##
+## The collect command needs its own result class for three reasons the
+## construction class cannot absorb: its response is TWO-SIDED and both sides
+## are the same shape (`previous`, the row as read before execution, and
+## `row`, the row re-read after it — a collection rewrites one row in place,
+## exactly as a construction does, so both go through the one shared entry
+## parser every other response uses, a row can never be read with two rule
+## sets), and it is the FIRST delivered line whose resource vector is
+## deliberately NOT neutral: the service derives a content-derived eight-slot
+## `payout` from the addressed item's committed income fields and the committed
+## collection ladder, and reports the `tier` that payout came from plus the
+## `reference_time` the elapsed time was computed against (building-collect
+## design D1/D7/D8). The client's balances and experience come from the
+## response's `resources`, never from the payout and never from its own
+## arithmetic, so the two disagreeing is detectable rather than silent.
+##
+## `row.timestamp` is again the documented time-dependent field (legacy stamps
+## the collection instant with `time_now()`), so it and `reference_time` are
+## asserted as positive integers and never by value.
+##
 ## Presentation code never receives raw transport dictionaries: every
 ## GameApi operation returns one of the result classes below, and the two
 ## legacy JSON payloads (game config, player info) are wrapped in payload
@@ -409,6 +428,77 @@ static func construction_failure(code: String,
 	return result
 
 
+## The derived collection payout's fixed width: the legacy eight-slot
+## `resources_changed` vector `[unknown, xp, gold, wood, oil, steel, cash,
+## mana]`. The service never sends anything else, so a vector of another
+## length is a `bad_response` rather than a pad.
+const COLLECT_VECTOR_SLOTS := 8
+
+
+## Result of `collect_income()`: the legacy result plus the two-sided
+## authoritative superset and the content-derived payout with the rung it came
+## from (building-collect design D7/D8) — the eight-field row AS READ BEFORE
+## EXECUTION (`previous`, the row the client named) AND the same row RE-READ
+## FROM THE SAVE after execution (`row`, carrying the re-stamped collection
+## instant) — plus the derived `payout`, the `tier` that payout was derived
+## for, the `reference_time` the elapsed time was computed against, and the
+## current resources.
+##
+## **Every number in `payout` and `tier` is derived-provisional**, never
+## observed from the Flash client: the amount formula (committed `collect`
+## scaled by the reached rung's committed multiplier), the experience scaling
+## (`collect_xp` by the same rung), the sub-first-rung refusal, the cap
+## refusal, and the resource-type mapping are all derivations (design D1-D6).
+## The claim is "a payout that grows in four committed rungs, derived from the
+## item's committed income fields" — never any specific amount the legacy
+## client pays.
+##
+## The client applies `resources` verbatim and treats `payout` as a read-only
+## record of what the service derived: the response always wins over the
+## client's own arithmetic, even when the two disagree.
+class CollectResult:
+	extends RefCounted
+	var ok := false
+	var protocol := ""
+	var game_version := ""
+	## Wall-clock seconds the legacy server stamped (a time-dependent field,
+	## so tests assert positivity, never a fixed value).
+	var server_time := 0
+	## The legacy result string ("success"); "" on failure.
+	var result := ""
+	## The row exactly as it was read before execution.
+	var previous: Placement = null
+	## The row re-read from the save after execution, carrying the re-stamped
+	## collection instant (the documented time-dependent field).
+	var row: Placement = null
+	## The derived eight-slot `resources_changed` vector the service applied,
+	## `[unknown, xp, gold, wood, oil, steel, cash, mana]`. Slots 0 (`unknown`,
+	## unread) and 7 (`mana`, never produced) are always zero (design D6).
+	## Read-only evidence: the client never applies this vector itself.
+	var payout: Array = []
+	## The committed ladder rung the payout was derived for, 0-based; -1 on
+	## failure. Clamped at the top rung — the service never extrapolates.
+	var tier := -1
+	## The instant the elapsed time (and therefore the rung) was computed
+	## against. The client's readout evaluates against THIS value rather than
+	## its own clock, which is what keeps the deterministic report
+	## byte-identical across reruns. Wall-clock dependent: asserted as a
+	## positive integer, never by value.
+	var reference_time := 0
+	var resources: Resources = null
+	var error_code := ""
+	var error_message := ""
+
+
+## Structured failure for `collect_income()` (never a partial payload).
+static func collect_failure(code: String, message: String) -> CollectResult:
+	var result := CollectResult.new()
+	result.ok = false
+	result.error_code = code
+	result.error_message = message
+	return result
+
+
 ## Parses any v0 session envelope — success or structured error — into the
 ## typed result. Shared by `FakeApi` (which synthesizes the envelope from the
 ## committed fixtures) and `LegacyV0Api` (which decodes the HTTP body).
@@ -761,6 +851,103 @@ static func parse_construction(payload: Variant) -> ConstructionResult:
 	return result
 
 
+## Parses a v0 collect envelope — success or structured error — into the typed
+## result. Shared by `FakeApi` (which synthesizes the envelope from the
+## committed collect fixture after applying the documented in-memory
+## semantics) and `LegacyV0Api` (which decodes the HTTP body), so both
+## implementations yield the same typed shape by construction. BOTH rows go
+## through the SAME fail-closed entry parser the placement, sell, store,
+## upgrade, and construction responses use (design D3/D5): one row rule, seven
+## entry points.
+##
+## Fail-closed throughout: a payout that is not the documented eight
+## non-negative integers, a tier outside the committed ladder, a
+## `reference_time` that is not a non-negative epoch, or resources that are
+## not seven non-negative integers each answer `bad_response` rather than a
+## partially trusted payload. The wall-clock-dependent fields (`server_time`,
+## `row.timestamp`, `reference_time`) are shape-checked, never value-checked.
+static func parse_collect(payload: Variant) -> CollectResult:
+	if not (payload is Dictionary):
+		return collect_failure("bad_response", "response is not a JSON object")
+	var envelope: Dictionary = payload
+	if envelope.get("ok") != true:
+		return _collect_error(envelope)
+	if str(envelope.get("protocol", "")) != PROTOCOL:
+		return collect_failure("protocol_mismatch",
+			"expected protocol %s, got %s" % [PROTOCOL,
+			str(envelope.get("protocol"))])
+	if str(envelope.get("result", "")) != "success":
+		return collect_failure("bad_response",
+			"collect response did not report the legacy success result")
+	var previous := _parse_placement_entry(envelope.get("previous"))
+	if previous == null:
+		return collect_failure("bad_response",
+			"previous row is not the legacy eight-field array")
+	var row := _parse_placement_entry(envelope.get("row"))
+	if row == null:
+		return collect_failure("bad_response",
+			"post-execution row is not the legacy eight-field array")
+	var payout: Variant = _parse_payout(envelope.get("payout"))
+	if payout == null:
+		return collect_failure("bad_response",
+			"collect payout is not eight non-negative integers")
+	var tier := _parse_epoch(envelope.get("tier"))
+	if tier < 0 or tier >= COLLECT_VECTOR_SLOTS:
+		# Four committed rungs today; the bound is the vector width so a
+		# content change that lengthens the ladder fails closed here instead
+		# of reaching the client as an unbounded multiplier.
+		return collect_failure("bad_response",
+			"tier is not an index inside the committed ladder")
+	var reference_time := _parse_epoch(envelope.get("reference_time"))
+	if reference_time < 0:
+		return collect_failure("bad_response",
+			"reference_time is not a non-negative epoch")
+	var resources_raw: Variant = envelope.get("resources")
+	if not (resources_raw is Dictionary):
+		return collect_failure("bad_response",
+			"collect response carries no resources object")
+	var resources := _parse_resources(resources_raw)
+	if resources == null:
+		return collect_failure("bad_response",
+			"collect resources are not seven non-negative integers")
+	var result := CollectResult.new()
+	result.ok = true
+	result.protocol = PROTOCOL
+	result.game_version = str(envelope.get("game_version", ""))
+	result.server_time = _parse_epoch(envelope.get("server_time"))
+	if result.server_time < 0:
+		return collect_failure("bad_response", "server_time is not a number")
+	result.result = "success"
+	result.previous = previous
+	result.row = row
+	result.payout = payout
+	result.tier = tier
+	result.reference_time = reference_time
+	result.resources = resources
+	return result
+
+
+## The derived eight-slot payout vector, or null when it is not exactly eight
+## non-negative integers. Entries are canonicalized to `int` (the JSON
+## transport widens them on the pinned engine, and Dictionary equality is
+## type-strict there) — only the representation is normalized, never the
+## value. A negative entry is not a shape this contract carries: the income is
+## always a credit, and the service refuses to derive anything else.
+static func _parse_payout(value: Variant) -> Variant:
+	if not (value is Array):
+		return null
+	var raw: Array = value
+	if raw.size() != COLLECT_VECTOR_SLOTS:
+		return null
+	var vector: Array = []
+	for element: Variant in raw:
+		var amount: Variant = _parse_int(element)
+		if amount == null or int(amount) < 0:
+			return null
+		vector.append(int(amount))
+	return vector
+
+
 ## The storage mapping -> `{str(item_id): int}` with integral floats
 ## canonicalized to ints (the JSON transport widens them on the pinned engine
 ## while Dictionary equality is type-strict there — the same tolerance
@@ -958,6 +1145,22 @@ static func _construction_error(envelope: Dictionary) -> ConstructionResult:
 		code = str(typed.get("code", code))
 		message = str(typed.get("message", message))
 	return construction_failure(code, message)
+
+
+## Structured error fields of a failed collect envelope (code + message) — the
+## same one envelope rule the other seven commands use, so a code the service
+## named (`too_early`, `capped_collection`, `unknown_collect_type`,
+## `no_income`, `construction_in_progress`, `unknown_item_index`,
+## `internal_error`, …) reaches the client unchanged.
+static func _collect_error(envelope: Dictionary) -> CollectResult:
+	var code := "bad_response"
+	var message := "response reported failure without a structured error"
+	var error: Variant = envelope.get("error")
+	if error is Dictionary:
+		var typed: Dictionary = error
+		code = str(typed.get("code", code))
+		message = str(typed.get("message", message))
+	return collect_failure(code, message)
 
 
 ## Eight-field legacy entry -> typed `Placement`; null when malformed

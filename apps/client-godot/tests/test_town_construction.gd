@@ -728,11 +728,17 @@ func _check_cancelled_construction(town: Node2D, state: Variant, api: Variant,
 		var names: Array = []
 		for button: Variant in buttons:
 			names.append(String((button as Button).name))
+		# `collect` is the SIXTH mode this shared surface carries
+		# (building-collect design D8), and it is listed here so the assertion
+		# still proves what it always proved: the surface offers the four
+		# delivered actions, the build action, the collect action, ONE confirm,
+		# and ONE cancel — and nothing that clears a building's construction
+		# state.
 		check_eq(names, ["move", "sell", "store", "upgrade", "build",
-			"confirm", "cancel"],
+			"collect", "confirm", "cancel"],
 			"the surface offers exactly the four delivered actions, the build "
-			+ "action, one confirm, and one cancel — no action that clears "
-			+ "construction state")
+			+ "action, the collect action, one confirm, and one cancel — no "
+			+ "action that clears construction state")
 
 
 ## The other direction of the five-mode mutual exclusion: a build cannot be

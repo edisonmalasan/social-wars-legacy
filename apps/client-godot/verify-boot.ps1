@@ -16,15 +16,15 @@
        camera controls, UI foundation, settings, audio manager, and the
        town vertical slice (projection, town state, town scene, HUD,
        selection, placement, purchase, move, sell, store, upgrade,
-       construction, no-Flash gate)
+       construction, collect, no-Flash gate)
        (the loop passes the dead endpoint to every suite: the session and
        game-clock suites use it for their failure phase, the placement,
-       purchase, move, sell, store, upgrade, and construction suites use it
-       for their transport-failure checks, and suites that ignore user args
-       are unaffected)
+       purchase, move, sell, store, upgrade, construction, and collect
+       suites use it for their transport-failure checks, and suites that
+       ignore user args are unaffected)
     6. boot-scene unreachable-endpoint failure scenario, run with no service
        at all
-    7. nine live phases against the real Compatibility API: the main-scene
+    7. ten live phases against the real Compatibility API: the main-scene
        boot (success, compared with the committed fixture save), the legacy-v0
        GameApi suite, the structured API-error boot scenario, the
        placement phase (one intent through the v0 placement endpoint with
@@ -38,10 +38,16 @@
        disposable corpus save asserted mutated), the upgrade phase
        (one intent through the v0 upgrade endpoint, whose response must
        reuse the pre-request key and cell, with the disposable corpus save
-       asserted mutated), and the construction phase (one row walked through
+       asserted mutated), the construction phase (one row walked through
        start, click, and finish through the v0 construction endpoint, each
        response proving its own per-action post-condition, with the
-       disposable corpus save asserted mutated)
+       disposable corpus save asserted mutated), and the collect phase
+       (one intent through the v0 collect endpoint, whose response must
+       prove the value-level post-state (the collection instant moved
+       forward and every stored resource changed by exactly the derived
+       delta) and whose construction-state refusal must leave the
+       refused row's timers untouched, with the disposable corpus save
+       asserted mutated)
     8. Compatibility API guard baseline, post-run, must equal the pre-run
        digests
     9. teardown assertions: loopback port released, no working-tree saves/
@@ -301,15 +307,16 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_gate")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_gate")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a
         # previously active session / clears a previous clock anchor), and
         # test_town_placement / test_town_purchase / test_town_move /
         # test_town_sell / test_town_store / test_town_upgrade /
-        # test_town_construction dial it for their transport-failure checks;
-        # suites that ignore user args are unaffected.
+        # test_town_construction / test_town_collect dial it for their
+        # transport-failure checks; suites that ignore user args are
+        # unaffected.
         $run = Invoke-Logged -FileName $GodotExe -Arguments @(
             "--headless", "--path", $projectRel,
             "--script", "res://tests/$suite.gd",
@@ -447,6 +454,17 @@ try {
                 "--", "--scenario=live-construction",
                 "--gameapi-endpoint=$endpoint"
             )
+        },
+        @{
+            Name = "collect-live"
+            Assertions = "collect live phase"
+            ExpectSaveMutation = $true
+            Arguments = @(
+                "--headless", "--path", $projectRel,
+                "--script", "res://tests/test_town_collect.gd",
+                "--", "--scenario=live-collect",
+                "--gameapi-endpoint=$endpoint"
+            )
         }
     )
 
@@ -458,9 +476,9 @@ try {
         )
         if ($phase.ContainsKey("ExpectSaveMutation")) {
             # placement-live, purchase-live, move-live, sell-live, store-live,
-            # upgrade-live, and construction-live: the harness snapshots the
-            # disposable corpus saves before the Godot run and fails unless one
-            # changed after.
+            # upgrade-live, construction-live, and collect-live: the harness
+            # snapshots the disposable corpus saves before the Godot run and
+            # fails unless one changed after.
             $phaseArgs += "--expect-save-mutation"
         }
         $phaseArgs += @("--", $GodotExe) + $phase.Arguments
@@ -628,6 +646,25 @@ try {
     # phase's --expect-save-mutation.
     Report-Result ($constructionOut -match "(?m)^PASS corpus save mutated by the live placement") `
         "construction live phase mutated the disposable corpus save"
+
+    # The collect live phase must show a typed success through the real endpoint
+    # — including its VALUE-level post-state proof (the collection instant moved
+    # forward and every stored resource moved by exactly the derived delta) and
+    # the two-layer construction-state refusal that leaves the refused row's
+    # start instant and countdown byte-identical — and the harness must have
+    # observed the corpus save change.
+    $collectOut = ""
+    if ($phaseLogs.ContainsKey("collect-live")) { $collectOut = $phaseLogs["collect-live"] }
+    Report-Result ($collectOut -match "\[test\] PASS script=res://tests/test_town_collect\.gd") `
+        "collect live phase asserts its scenario"
+    Report-Result ($collectOut -match '\[test\] live-collect applied item_index=21 cell=\(\d+, \d+\) tier=3') `
+        "collect live phase drove one content-derived collection through the v0 endpoint at the top committed rung"
+    # As with the purchase, move, sell, store, upgrade, and construction phases
+    # above, the harness's save-mutation check is labelled for the placement
+    # phase; the marker is what proves a corpus save changed under the
+    # collect-live phase's --expect-save-mutation.
+    Report-Result ($collectOut -match "(?m)^PASS corpus save mutated by the live placement") `
+        "collect live phase mutated the disposable corpus save"
 
     # --- 8. guard baseline, post-run ---------------------------------------
 

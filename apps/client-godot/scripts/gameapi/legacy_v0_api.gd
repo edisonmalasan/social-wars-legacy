@@ -4,7 +4,8 @@ extends Node
 ## API", "Place through either implementation", "Purchase through either
 ## implementation", "Move through either implementation", "Sell through
 ## either implementation", "Upgrade through either implementation", and
-## "Construction through either implementation").
+## "Construction through either implementation", and "Collect through either
+## implementation").
 ##
 ## This is the ONLY project file allowed to name the compat endpoint or to
 ## use the built-in HTTP request/enumeration types; the scope test restricts
@@ -26,6 +27,7 @@ const SELL_PATH := "/v0/sell"
 const STORE_PATH := "/v0/store"
 const UPGRADE_PATH := "/v0/upgrade"
 const CONSTRUCTION_PATH := "/v0/construction"
+const COLLECT_PATH := "/v0/collect"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -247,6 +249,38 @@ func build_construction(user_id: String, item_index: int,
 			str(outcome.get("code", "bad_response")),
 			str(outcome.get("message", "")))
 	return BootData.parse_construction(outcome.get("payload"))
+
+
+## One collection intent over loopback HTTP: the client sends only the intent
+## (`user_id` and the legacy `item_index` of an existing placement) — no
+## amount, no resource, no tier, no time, no price, and no resource deltas —
+## and the service derives the legacy `collect` envelope, the content-derived
+## eight-slot payout, and the ladder rung server-side from the addressed item's
+## committed income fields and the row's own state (design D7), so the typed
+## result's two rows, payout, rung, reference instant, and resources are
+## authoritative (design D8). Both rows are parsed by the one shared entry
+## parser every other response uses.
+##
+## Structured service errors pass through with their original codes — notably
+## `unknown_item_index` for a stale or unknown index, `no_income` for a row
+## whose item records no committed income, `too_early` for a row that has not
+## reached the first committed rung, `capped_collection` for a non-zero
+## committed cap, `unknown_collect_type` for a resource type outside the
+## committed set, and `construction_in_progress` for a row carrying
+## construction state (the two-layer refusal the executed probe forced) — all
+## of which the client surfaces instead of collecting anything; transport
+## failures keep the boot failure rules, never a partial payload.
+func collect_income(user_id: String,
+		item_index: int) -> BootData.CollectResult:
+	var outcome := await _call("POST", COLLECT_PATH, JSON.stringify({
+		"user_id": user_id,
+		"item_index": item_index,
+	}))
+	if not outcome.get("ok", false):
+		return BootData.collect_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return BootData.parse_collect(outcome.get("payload"))
 
 
 ## One HTTP round trip. Success returns `{ok: true, payload: Dictionary}`;

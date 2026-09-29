@@ -9,8 +9,9 @@ extends Node
 ## `tests/fixtures/godot-building-move/`, for sell under
 ## `tests/fixtures/godot-building-sell/`, and for store under
 ## `tests/fixtures/godot-building-store/`, for upgrade under
-## `tests/fixtures/godot-building-upgrade/`, and for construction under
-## `tests/fixtures/godot-building-construction/` at the repository root: no
+## `tests/fixtures/godot-building-upgrade/`, for construction under
+## `tests/fixtures/godot-building-construction/`, and for collection under
+## `tests/fixtures/godot-building-collect/` at the repository root: no
 ## process, no server, no socket. It synthesizes the documented v0 envelopes
 ## from those files and parses them with the same `BootData` functions the
 ## live implementation uses, so both implementations yield identical typed
@@ -38,7 +39,18 @@ extends Node
 ## mutation per action over the committed construction-fixture state (a start
 ## re-stamps the row's start instant and records the derived countdown, a click
 ## raises the click counter, a completion deletes it), reporting the capture's
-## recorded epoch as the re-stamp so the double never reads the wall clock.
+## recorded epoch as the re-stamp so the double never reads the wall clock, and
+## `collect_income()` applies the matching in-place collection rule over the
+## committed collect-fixture state (the addressed row's collection instant
+## re-stamped, and the content-derived payout applied to exactly the named
+## resource slot and the experience under legacy's `max(current + delta, 0)`
+## clamp), reporting the capture's recorded epoch as both its re-stamp and its
+## `reference_time` so the derived rung is deterministic too. This is the
+## FIRST double whose derived resource vector is deliberately NOT neutral, and
+## its payout is derived-provisional exactly like the service's: the amount
+## formula, the experience scaling, the sub-first-rung refusal, the cap
+## refusal, and the resource-type mapping are all derivations that no legacy
+## branch reads.
 ## Parity against
 ## executed legacy is owned exclusively by
 ## the compat fixture-replay tests; this double exists so the client flow can
@@ -128,6 +140,22 @@ const CONSTRUCTION_BEFORE_FIXTURE := \
 ## epoch a start re-stamps with.
 const CONSTRUCTION_AFTER_FIXTURE := \
 	"tests/fixtures/godot-building-construction/steps/command_construction/after.json"
+## The executed-legacy collect fixture's before-state (which again equals the
+## fresh-player corpus the boot fixtures carry): the double's starting save
+## for `collect_income()`.
+const COLLECT_BEFORE_FIXTURE := \
+	"tests/fixtures/godot-building-collect/steps/command_collect/before.json"
+## The same fixture's after-state — the real legacy server's record of the one
+## executed `collect` (the Tree decoration at map slot 2, anchored at
+## `(53,39)`, whose row carries a re-stamped collection instant while the
+## derived payout lands in exactly two resource slots and every other row,
+## the storage, the private state, and the player info are byte-identical).
+## Read (never written) so a malformed capture cannot leave the double running
+## on an inconsistent oracle, and for its recorded wall-clock collection
+## instant — the deterministic epoch this double re-stamps with and the
+## deterministic `reference_time` it derives the rung against.
+const COLLECT_AFTER_FIXTURE := \
+	"tests/fixtures/godot-building-collect/steps/command_collect/after.json"
 
 ## Anchor grid extent the v0 endpoint validates against (anchors 0..99;
 ## footprints may extend past the edge — design D5). Must match
@@ -144,6 +172,30 @@ const COST_RESOURCES := {
 ## `unknown` has no stored value; `xp`/`mana` are stored but have no
 ## config cost key).
 const RESOURCE_KEYS := ["xp", "gold", "wood", "oil", "steel", "cash", "mana"]
+
+## The committed collection ladder (building-collect design D1): the
+## `COLLECT_MINUTES` / `COLLECT_MULTIPLIER` pair of the loaded configuration's
+## `globals`, recorded here as the ONE ladder this double derives rungs from.
+## The committed thresholds are MINUTES while a row's recorded instant is Unix
+## SECONDS, so the comparison converts through the single named constant below
+## (the compat module's `SECONDS_PER_COMMITTED_MINUTE`, the same 60) — reading
+## the raw minutes against a Unix-second elapsed time would pay the TOP rung
+## within five *seconds*, which is the bug the compat side found and fixed.
+const COLLECT_LADDER_MINUTES := [5, 60, 240, 480]
+const COLLECT_LADDER_MULTIPLIERS := [0.25, 1.0, 2.0, 3.0]
+## The one place the committed ladder's unit is converted.
+const SECONDS_PER_COMMITTED_MINUTE := 60
+## The committed `collect_type` vocabulary -> its slot in the eight-slot
+## legacy `resources_changed` vector `[unknown, xp, gold, wood, oil, steel,
+## cash, mana]` (design D6). The unread `unknown` slot 0 and the never-produced
+## `mana` slot 7 are always zero because no item records a mana collect type;
+## a type outside this closed set is refused with `unknown_collect_type`
+## rather than coerced.
+const COLLECT_RESOURCE_SLOTS := {"g": 2, "w": 3, "o": 4, "s": 5, "c": 6}
+## The experience slot of the same vector (slot 1).
+const COLLECT_EXPERIENCE_SLOT := 1
+## The two slots this derivation can never fill (design D6).
+const COLLECT_ALWAYS_ZERO_SLOTS := [0, 7]
 
 var _save_list_doc: Dictionary = {}
 var _config_payload: Dictionary = {}
@@ -215,6 +267,23 @@ var _construction_pid := ""
 var _construction_epoch := 0
 var _construction_loaded := false
 var _construction_error := ""
+
+# Mutable in-memory collection state (building-collect design D8): one save,
+# whose addressed row is mutated in place by the matching legacy collection
+# rule — and by nothing else — with the derived payout applied under legacy's
+# `max(current + delta, 0)` clamp. Never written anywhere.
+var _collect_state: Dictionary = {}
+var _collect_pid := ""
+## The capture's recorded wall-clock collection instant of the one collection
+## the executed transaction performed — the deterministic stamp a collection
+## re-stamps the addressed row with AND the deterministic `reference_time` the
+## derived rung is computed against, so the double never reads the wall clock
+## and the reached rung is the same in every run (the committed corpus records
+## `item[3] == 0` for every row, so the elapsed time is unbounded and the top
+## rung applies, exactly as the executed fixture records).
+var _collect_epoch := 0
+var _collect_loaded := false
+var _collect_error := ""
 
 
 ## The session envelope synthesized from the committed fixtures.
@@ -822,6 +891,184 @@ func build_construction(user_id: String, item_index: int,
 		"row": entry,
 		"action": action,
 		"resources": _construction_resources(),
+	})
+
+
+## Deterministic in-memory collection double (building-collect design D8): the
+## documented semantics of the unchanged legacy `collect` branch — resolve the
+## row with the item's map index, read that row AS IT IS BEFORE the writes,
+## apply the pre-dispatch resource vector (which is the DERIVED payout, not a
+## neutral one — the first delivered line whose vector is not deliberately
+## zero) per resource as `max(current + delta, 0)`, and re-stamp ONLY that
+## row's collection instant in place, at the same key and cell — applied over
+## the committed collect fixture's before-state, mutating only this process.
+## No process, no server, no socket; parity against executed legacy is owned
+## exclusively by the compat fixture-replay tests, so this double is a test
+## fixture, never an oracle.
+##
+## The payout is derived from the FIXTURE'S OWN committed configuration and
+## the addressed row's pre-execution instant, never from the caller (design
+## D7): the amount from the item's committed `collect`, the resource from its
+## committed `collect_type`, the experience from its committed `collect_xp`,
+## each scaled by the committed multiplier of the rung the elapsed time has
+## reached, with the unread `unknown` slot 0 and the never-produced `mana`
+## slot 7 left zero. **Every one of those rules is derived-provisional**
+## (design D1/D2/D6): no legacy branch reads the ladder, so the claim is
+## "a payout that grows in four committed rungs", never any specific amount
+## the legacy client pays.
+##
+## The response mirrors the v0 endpoint's superset (design D8): the legacy
+## result, the row AS IT WAS READ BEFORE EXECUTION, the row RE-READ from the
+## save after execution, the derived payout with the rung it came from, the
+## reference instant that rung was computed against, and the current
+## resources — so the client needs no arithmetic of its own and never restamps
+## a row locally.
+##
+## Structural failures mirror the endpoint's codes (design D7): unknown or
+## empty save id, an integer index that names no row in the fixture's map
+## (`unknown_item_index` — the endpoint's 404, resolved BEFORE execution so
+## legacy's silent no-op is never reported as a success), an item whose
+## committed amount is zero (`no_income`), a non-zero committed cap
+## (`capped_collection` — refused, never interpreted, because nothing in the
+## repository says what a non-zero cap limits), a resource type outside the
+## committed set (`unknown_collect_type`), a row carrying construction state
+## (`construction_in_progress` — the two-layer refusal the executed probe
+## forced), a row that has reached no committed rung yet (`too_early` — no
+## sub-first-rung amount is ever derived), and an unreadable fixture
+## (`fixture_unreadable`). Ownership, price, and cap semantics are gameplay /
+## economic concerns this contract refuses: this double accepts no amount, no
+## resource, no tier, no time, and no resource delta from any caller.
+func collect_income(user_id: String,
+		item_index: int) -> BootData.CollectResult:
+	if user_id.strip_edges() == "":
+		return _collect_failure("missing_user_id",
+			"user_id must be a non-empty string")
+	if not _ensure_loaded():
+		return _collect_failure("fixture_unreadable", _load_error)
+	if not _ensure_collect_loaded():
+		return _collect_failure("fixture_unreadable", _collect_error)
+	if user_id != _collect_pid:
+		return _collect_failure("unknown_user_id",
+			"no save exists for user_id '%s'" % user_id)
+	var row: Variant = (_collect_state["items"] as Dictionary).get(
+		str(item_index))
+	if not (row is Array) or (row as Array).size() != 8:
+		# The endpoint resolves the index against the corpus before executing
+		# (design D7), so a stale or unknown index is a structured failure with
+		# no mutation, never a silent success.
+		return _collect_failure("unknown_item_index",
+			"no placement with index %d in this save's map" % item_index)
+	var source: Array = row as Array
+	# Design D5 comes FIRST, exactly as the endpoint orders it: the shared
+	# `item[3]` field is a construction start instant OR a collection instant,
+	# and the executed probe shows a collection on a row under construction
+	# overwrites the build's start instant while the countdown survives — while
+	# legacy reports success. The refusal is therefore made BEFORE any payout is
+	# derived, in this layer and in the service, so a client that ignores the
+	# client-side rule still cannot corrupt the timers the delivered
+	# construction line depends on.
+	var attr: Variant = source[6]
+	if attr is Dictionary:
+		for key in ["cp", "nc"]:
+			if (attr as Dictionary).has(key):
+				return _collect_failure("construction_in_progress",
+					"the placement at index %d is under construction (attr['%s'] "
+					% [item_index, key]
+					+ "= %s); collecting it would overwrite the build's start "
+					% str((attr as Dictionary)[key])
+					+ "instant")
+	elif attr != {} and attr != null:
+		# An unusable attribute bag is an unresolvable committed state, not a
+		# gameplay verdict: the endpoint answers 500 internal_error for it, and
+		# the double mirrors that code.
+		return _collect_failure("internal_error",
+			"the addressed placement carries no readable attribute bag")
+	# The committed income fields of the addressed item, read from the
+	# FIXTURE'S OWN loaded configuration — never from the caller. An
+	# unresolvable, non-integer, or negative amount fails closed with the
+	# endpoint's own code rather than being coerced.
+	var amount: Variant = _collect_amount(int(source[0]))
+	if amount == null or int(amount) <= 0:
+		# The endpoint answers 409 no_income for a zero or unresolvable amount
+		# BEFORE the dispatcher runs, so a building that produces nothing is
+		# never handed a zero payout dressed as a success.
+		return _collect_failure("no_income",
+			"item %d records no committed collection income" % int(source[0]))
+	# Design D4: a non-zero committed cap is REFUSED, never interpreted.
+	var cap: Variant = _collect_cap(int(source[0]))
+	if cap == null or int(cap) != 0:
+		return _collect_failure("capped_collection",
+			"item %d records a committed collection cap of %s, and this "
+			% [int(source[0]), str(cap)]
+			+ "contract implements only the uncapped 0")
+	var resource_type: Variant = _collect_resource_type(int(source[0]))
+	if not (resource_type is String) \
+			or not COLLECT_RESOURCE_SLOTS.has(str(resource_type)):
+		# Design D6: a type outside the committed five is refused, never
+		# coerced, so a content change can never pay the wrong resource.
+		return _collect_failure("unknown_collect_type",
+			"item %d records a collection type outside the committed set"
+			% int(source[0]))
+	var experience: Variant = _collect_experience(int(source[0]))
+	if experience == null or int(experience) < 0:
+		return _collect_failure("no_income",
+			"item %d has no resolvable committed collection experience"
+			% int(source[0]))
+	# The rung is derived against the DETERMINISTIC reference instant (the
+	# capture's own recorded epoch), never the wall clock, so the same intent
+	# always reaches the same rung.
+	var reference_time: int = _collect_epoch
+	var elapsed: int = reference_time - int(source[3])
+	if elapsed < 0:
+		return _collect_failure("too_early",
+			"the row's recorded collection instant lies after the reference "
+			+ "instant, so no elapsed time can be derived from it")
+	var tier: int = _collect_tier_for(elapsed)
+	if tier < 0:
+		# Design D3: below the first committed rung nothing is derived and
+		# nothing is offered — the `0.25` multiplier never produces a
+		# speculative payout.
+		return _collect_failure("too_early",
+			"the row has reached no committed collection rung yet (elapsed "
+			+ "%d s, first rung at %d s)" % [elapsed,
+				_collect_threshold_seconds(0)])
+	var payout: Variant = _collect_payout_for(int(amount), int(experience),
+		str(resource_type), tier)
+	if payout == null:
+		return _collect_failure("internal_error",
+			"the committed collection ladder does not resolve for item %d"
+			% int(source[0]))
+	# The pre-execution row is read first (above), then the two writes the
+	# branch performs: the pre-dispatch resource application and the single
+	# in-place write of the collection instant. Nothing else is touched — no
+	# re-keying, no storage, no bought-units bookkeeping, no attribute bag.
+	var previous: Array = source.duplicate()
+	previous[6] = (source[6] as Dictionary).duplicate()
+	var entry: Array = source.duplicate()
+	entry[3] = _collect_epoch
+	for resource: String in RESOURCE_KEYS:
+		var slot: int = _collect_slot_of(resource)
+		var delta: int = int(payout[slot])
+		if delta != 0:
+			_collect_state[resource] = maxi(
+				int(_collect_state[resource]) + delta, 0)
+	(_collect_state["items"] as Dictionary)[str(item_index)] = entry
+	# Same envelope shape the service returns; the shared parser yields the
+	# typed result (identical shapes by construction, design D8).
+	return BootData.parse_collect({
+		"protocol": BootData.PROTOCOL,
+		"ok": true,
+		"game_version": str(_save_list_doc.get("game_version", "")),
+		# Time-dependent field: the fixture capture's legacy server epoch,
+		# never the wall clock (deterministic by construction).
+		"server_time": _fixture_server_time(),
+		"result": "success",
+		"previous": previous,
+		"row": entry,
+		"payout": payout,
+		"tier": tier,
+		"reference_time": reference_time,
+		"resources": _collect_resources(),
 	})
 
 
@@ -1763,6 +2010,303 @@ func _construction_resources() -> Dictionary:
 	for key: String in RESOURCE_KEYS:
 		resources[key] = int(_construction_state[key])
 	return resources
+
+
+# --- collect double (building-collect design D8) ------------------------------
+
+
+## Structured failure in the service's error envelope shape, parsed by the
+## same shared parser the live implementation uses.
+func _collect_failure(code: String, message: String) -> BootData.CollectResult:
+	return BootData.parse_collect({
+		"protocol": BootData.PROTOCOL,
+		"ok": false,
+		"error": {"code": code, "message": message},
+	})
+
+
+## Loads the committed collect fixture into mutable process state (once).
+## Structural failures are named with the offending field; the boot, placement,
+## purchase, move, sell, store, upgrade, and construction fixtures' error
+## state is untouched (independent sinks).
+func _ensure_collect_loaded() -> bool:
+	if _collect_loaded:
+		return _collect_error == ""
+	_collect_loaded = true
+	var before_sink := {"error": ""}
+	var before := _read_json_into(COLLECT_BEFORE_FIXTURE, before_sink)
+	if str(before_sink["error"]) != "":
+		_collect_error = str(before_sink["error"])
+		return false
+	var after_sink := {"error": ""}
+	var after := _read_json_into(COLLECT_AFTER_FIXTURE, after_sink)
+	if str(after_sink["error"]) != "":
+		_collect_error = str(after_sink["error"])
+		return false
+	return _init_collect_state(before, after)
+
+
+## Validates the collect fixture's before- and after-states and builds the
+## in-memory save state. Every consumed field is checked, so a malformed
+## fixture fails closed instead of crashing the double. The placements are kept
+## as the save's own `items` map keyed by their legacy index, so an index
+## resolves exactly as `engine.map_get_item(map, index)` resolves it — and the
+## only writes a collection performs are the addressed row's collection instant
+## and the pre-dispatch resource application. The after-state is read for its
+## recorded wall-clock collection instant: the key is REUSED, so the double
+## takes the epoch of the row the capture re-stamped rather than naming a key
+## (which is the placement double's job, not this one's).
+func _init_collect_state(before: Dictionary, after: Dictionary) -> bool:
+	var maps: Variant = before.get("maps")
+	if not (maps is Array) or (maps as Array).is_empty():
+		_collect_error = "collect fixture before state carries no maps array"
+		return false
+	if not ((maps as Array)[0] is Dictionary):
+		_collect_error = "collect fixture before state first map is not an object"
+		return false
+	var map: Dictionary = (maps as Array)[0]
+	var items: Variant = map.get("items")
+	if not (items is Dictionary):
+		_collect_error = "collect fixture before state carries no items map"
+		return false
+	var info: Variant = before.get("playerInfo")
+	var priv: Variant = before.get("privateState")
+	if not (info is Dictionary) or not (priv is Dictionary):
+		_collect_error = \
+			"collect fixture before state lacks playerInfo/privateState"
+		return false
+	for key in ["xp", "gold", "wood", "oil", "steel"]:
+		var value: Variant = map.get(key)
+		if not (value is int or value is float) \
+				or float(value) != floor(float(value)):
+			_collect_error = "collect fixture before state lacks map %s" % key
+			return false
+	var pid: Variant = (info as Dictionary).get("pid")
+	var cash: Variant = (info as Dictionary).get("cash")
+	var mana: Variant = (priv as Dictionary).get("mana")
+	if not (pid is String) or not (cash is int or cash is float) \
+			or not (mana is int or mana is float):
+		_collect_error = "collect fixture before state lacks save fields"
+		return false
+	# Every placement must be the documented eight-field row under a
+	# positive integer index (the shape the collection's own resolution depends
+	# on); an unusable key is a malformed capture, never a coerced index.
+	var typed_items := {}
+	for key: Variant in (items as Dictionary):
+		var index: Variant = BootData._parse_int(key)
+		if key is String and str(key).is_valid_int():
+			index = str(key).to_int()
+		if index == null or int(index) <= 0:
+			_collect_error = "collect fixture placement key '%s' is not a " \
+				% str(key) + "positive integer index"
+			return false
+		var row: Variant = (items as Dictionary)[key]
+		if not (row is Array) or (row as Array).size() != 8:
+			_collect_error = "collect fixture placement '%s' is not the " \
+				% str(key) + "eight-field array"
+			return false
+		typed_items[str(int(index))] = (row as Array).duplicate()
+	# The executed collection REUSES its key, so the after-state carries exactly
+	# as many placements as the before-state; anything else means the capture is
+	# not the transaction this double reproduces. Exactly one row differs, and
+	# its recorded wall-clock collection instant is the deterministic epoch.
+	var after_maps: Variant = after.get("maps")
+	if not (after_maps is Array) or (after_maps as Array).is_empty():
+		_collect_error = "collect fixture after state carries no maps array"
+		return false
+	if not ((after_maps as Array)[0] is Dictionary):
+		_collect_error = \
+			"collect fixture after state first map is not an object"
+		return false
+	var after_items: Variant = ((after_maps as Array)[0] as Dictionary).get(
+		"items")
+	if not (after_items is Dictionary):
+		_collect_error = "collect fixture after state carries no items map"
+		return false
+	if (after_items as Dictionary).size() != typed_items.size():
+		_collect_error = ("collect fixture after state must reuse the same "
+			+ "placement keys, found %d against %d") % [
+			(after_items as Dictionary).size(), typed_items.size()]
+		return false
+	var collected: Array = []
+	for key: String in typed_items:
+		if not (after_items as Dictionary).has(key):
+			_collect_error = ("collect fixture after state dropped key %s " \
+				% key + "(a collection must reuse its key)")
+			return false
+		if (after_items as Dictionary)[key] != typed_items[key]:
+			collected.append(key)
+	if collected.size() != 1:
+		_collect_error = ("collect fixture after state must mutate exactly one "
+			+ "row in place, found %d") % collected.size()
+		return false
+	var entry: Variant = (after_items as Dictionary)[collected[0]]
+	var stamp: Variant = (entry as Array)[3]
+	if not (stamp is int or stamp is float) or int(stamp) <= 0 \
+			or float(stamp) != floor(float(stamp)):
+		_collect_error = \
+			"collect fixture collection instant is not a positive integer"
+		return false
+	_collect_state = {
+		"items": typed_items,
+		"xp": int(map.get("xp")),
+		"gold": int(map.get("gold")),
+		"wood": int(map.get("wood")),
+		"oil": int(map.get("oil")),
+		"steel": int(map.get("steel")),
+		"cash": int(cash),
+		"mana": int(mana),
+	}
+	_collect_pid = pid
+	_collect_epoch = int(stamp)
+	return true
+
+
+## The seven stored resource values of the in-memory collection state, after
+## the derived payout has been applied under legacy's `max(current + delta, 0)`
+## clamp. Reported verbatim as the response's authoritative `resources`: the
+## client takes these values and never applies the payout itself.
+func _collect_resources() -> Dictionary:
+	var resources := {}
+	for key: String in RESOURCE_KEYS:
+		resources[key] = int(_collect_state[key])
+	return resources
+
+
+## The addressed item's committed collection amount (`collect`), or null when
+## the loaded configuration cannot supply a non-negative integer. The field is
+## STRING-encoded in the committed payload exactly as `build_time` and
+## `upgrades_to` are, and is coerced with the SAME shared rule — so the double
+## derives the amount from committed content, never from the caller, exactly
+## the way the endpoint does (`compat_legacy.item_collect_amount`).
+func _collect_amount(item_id: int) -> Variant:
+	return _collect_income_field(item_id, "collect")
+
+
+## The addressed item's committed collection experience (`collect_xp`), with
+## the same coercion and the same null-on-unresolvable rule.
+func _collect_experience(item_id: int) -> Variant:
+	return _collect_income_field(item_id, "collect_xp")
+
+
+## The addressed item's committed collection cap (`max_collects`), with the
+## same coercion. Only `0` is implemented by design D4; a non-zero value is
+## refused with `capped_collection` rather than interpreted.
+func _collect_cap(item_id: int) -> Variant:
+	return _collect_income_field(item_id, "max_collects")
+
+
+## The addressed item's committed collection resource type (`collect_type`),
+## verbatim: the committed value is a single character from the closed set
+## `g` / `w` / `o` / `s` / `c`, and nothing is coerced or defaulted (design
+## D6). `null` when the item is not in the loaded configuration at all.
+func _collect_resource_type(item_id: int) -> Variant:
+	var item: Variant = _config_items.get(str(item_id))
+	if not (item is Dictionary):
+		return null
+	return str((item as Dictionary).get("collect_type", ""))
+
+
+## One string-encoded committed income field of an item -> its non-negative
+## integer value, or null when the field is absent, not an integer at all, or
+## negative. Nothing is defaulted: a committed configuration that cannot
+## describe the income fails closed with the endpoint's own refusal code.
+func _collect_income_field(item_id: int, field: String) -> Variant:
+	var item: Variant = _config_items.get(str(item_id))
+	if not (item is Dictionary):
+		return null
+	var value: Variant = _config_reference((item as Dictionary).get(field))
+	if value == null or int(value) < 0:
+		return null
+	return value
+
+
+## One committed ladder rung's threshold in SECONDS, through the single named
+## unit constant (design D1/D3). The committed ladder is in minutes while a
+## row's recorded instant is Unix seconds: comparing the two directly would
+## make the five-minute rung read as five *seconds* and pay the TOP rung within
+## the first seconds of a build, which is the bug the compat side found and
+## corrected. A tier outside the committed ladder is refused (0) rather than
+## extrapolated.
+func _collect_threshold_seconds(tier: int) -> int:
+	if tier < 0 or tier >= COLLECT_LADDER_MINUTES.size():
+		return 0
+	return int(COLLECT_LADDER_MINUTES[tier]) * SECONDS_PER_COMMITTED_MINUTE
+
+
+## The highest committed rung an elapsed time has reached, CLAMPED at the top
+## rung (design D1: never extrapolated), or -1 when no rung is reached
+## (design D3: the caller fails closed with `too_early` instead of deriving a
+## sub-first-rung amount from the `0.25` multiplier).
+func _collect_tier_for(elapsed_seconds: int) -> int:
+	var reached: int = -1
+	for index in range(COLLECT_LADDER_MINUTES.size()):
+		if elapsed_seconds >= _collect_threshold_seconds(index):
+			reached = index
+	return reached
+
+
+## The derived eight-slot payout vector for one collection (design D1/D2/D6),
+## or null when the committed ladder or the resource type does not resolve. The
+## amount lands in the slot its committed resource type names and the experience
+## in the experience slot, each scaled by the reached rung's committed
+## multiplier and rounded half-up so a fractional product can never put a float
+## on the legacy vector; the unread `unknown` slot 0 and the never-produced
+## `mana` slot 7 stay zero.
+func _collect_payout_for(amount: int, experience: int, resource_type: String,
+		tier: int) -> Variant:
+	if tier < 0 or tier >= COLLECT_LADDER_MULTIPLIERS.size():
+		return null
+	var slot: Variant = COLLECT_RESOURCE_SLOTS.get(resource_type)
+	if slot == null:
+		return null
+	var multiplier: float = float(COLLECT_LADDER_MULTIPLIERS[tier])
+	# The vector starts at ALL ZEROS, not at nulls: a slot this derivation
+	# does not fill is a zero on the legacy vector, never a hole.
+	var vector: Array = []
+	vector.resize(BootData.COLLECT_VECTOR_SLOTS)
+	for index in range(BootData.COLLECT_VECTOR_SLOTS):
+		vector[index] = 0
+	vector[COLLECT_EXPERIENCE_SLOT] = _collect_scale(experience, multiplier)
+	vector[int(slot)] = _collect_scale(amount, multiplier)
+	for index: int in COLLECT_ALWAYS_ZERO_SLOTS:
+		vector[index] = 0
+	return vector
+
+
+## A rung-scaled amount, rounded to a whole resource (half-up). The committed
+## multipliers are `0.25`, `1`, `2`, and `3`, so every committed product of a
+## committed amount is already an integer (`20 x 0.25 = 5`); the rounding
+## exists so a future fractional multiplier can never put a float on the
+## legacy vector — the Tree's `collect_xp` of 1 at the quarter rung pays `0`.
+func _collect_scale(value: int, multiplier: float) -> int:
+	var scaled := float(value) * multiplier
+	if scaled <= 0.0:
+		return 0
+	if scaled == floor(scaled):
+		return int(scaled)
+	return int(scaled + 0.5)
+
+
+## A stored resource name -> its index in the eight-slot legacy vector, or -1
+## for a name the vector has no slot for (never a guessed index).
+static func _collect_slot_of(resource: String) -> int:
+	match resource:
+		"xp":
+			return COLLECT_EXPERIENCE_SLOT
+		"gold":
+			return 2
+		"wood":
+			return 3
+		"oil":
+			return 4
+		"steel":
+			return 5
+		"cash":
+			return 6
+		"mana":
+			return 7
+	return -1
 
 
 # --- purchase double (design D9) --------------------------------------------

@@ -33,6 +33,12 @@ extends "res://tests/test_base.gd"
 ##               verbatim key instead), and the pure key rule covers digit
 ##               strings, int keys, `0`, negatives, non-numeric, empty, and
 ##               non-scalar keys;
+##   construction the typed collection clock (building-collect task 4.1,
+##               design D5): the row's recorded collection instant (`item[3]`,
+##               the SAME field the construction reading uses and named apart
+##               from it) is always present when the parse succeeded, with `0`
+##               as the documented "never collected" value, and a present-but-
+##               invalid instant fails closed naming the row;
 ##   construction the typed construction state (building-construction task
 ##               4.1, design D5): a row with no construction state records
 ##               none of the three facts, a counter-only row records the
@@ -91,6 +97,7 @@ func run_scenario() -> void:
 	_check_storage(payload, registry)
 	_check_addressable_keys(payload, registry)
 	_check_construction_state(payload, registry)
+	_check_collection_clock(payload, registry)
 	_check_registry_precondition()
 	_check_village_parse(registry)
 
@@ -609,6 +616,139 @@ func _check_construction_row(payload: Variant, registry: Variant, key: String,
 		"the shared accessor reports the '%s' row's start instant" % key)
 
 
+## The typed COLLECTION clock (building-collect task 4.1, design D5): the
+## row's own `item[3]` read on its own terms, ALWAYS present when the parse
+## succeeded (with `0` as the documented "never collected" value the whole
+## fresh corpus carries), parsed fail-closed in the ONE shared placement
+## parser, and kept NAMED separately from the construction reading of the very
+## same field so no code can confuse a build's start instant with a building's
+## last collection.
+func _check_collection_clock(payload: Variant, registry: Variant) -> void:
+	# The committed corpus itself: every fresh row records `item[3] == 0`, which
+	# is a real value (never collected) rather than an absent one.
+	var result: Dictionary = TownState.parse(payload, registry)
+	check(bool(result.get("ok", false)),
+		"the fresh save parses for the collection check: %s"
+			% result.get("error"))
+	if not bool(result.get("ok", false)):
+		return
+	var state = result["state"]
+	var without_clock := 0
+	for placement in state.placements:
+		if placement.collected_at == null:
+			without_clock += 1
+	check_eq(without_clock, 0,
+		"every row of the fresh corpus records a collection clock (the "
+		+ "documented never-collected 0, never null)")
+	var tree = _placement_by_slot(state, 2)
+	check(tree != null, "the fixture's key 2 resolves for the collect check")
+	if tree != null:
+		check_eq(tree.collected_at, 0,
+			"the Tree records a never-collected clock of 0")
+		check_eq(tree.started_at, null,
+			"the collection clock and the construction start instant are kept "
+			+ "distinguishable on the same row: 0 versus absent")
+		var shared: Dictionary = TownState.collection_of(tree)
+		check(bool(shared.get("ok", false)),
+			"the shared accessor reads the Tree's collection clock")
+		check_eq(shared.get("collected_at", -1), 0,
+			"the shared accessor reports the Tree's recorded instant")
+
+	# The documented states, each parsed through the SAME parser and read
+	# through the SAME accessor the pure collection helpers use.
+	_check_collection_row(payload, registry, "bare", 0, 0, {})
+	_check_collection_row(payload, registry, "restamped", 1790690555, 1790690555,
+		{})
+	# A row that carries CONSTRUCTION state: the shared field is a build's start
+	# instant there, and the two readings must both still be readable and
+	# distinguishable — the refusal that follows from it is the collection
+	# FLOW's, not the parser's.
+	_check_collection_row(payload, registry, "under-construction", 1790690555,
+		1790690555, {"cp": 5, "nc": 1})
+	# A row carrying only the friend-assist `si` bag still records a clock: the
+	# construction-state refusal names exactly `cp` and `nc`, so `si` is carried
+	# verbatim and never interpreted.
+	_check_collection_row(payload, registry, "friend-assist", 0, 0, {"si": []})
+	# Other bag entries never change the clock's reading.
+	var friendly: Dictionary = _with_attr(payload, {"si": [], "nc": 2, "cp": 60})
+	var friendly_result: Dictionary = TownState.parse(friendly, registry)
+	check(bool(friendly_result.get("ok", false)),
+		"a row carrying the friend-assist bag still parses: %s"
+			% friendly_result.get("error"))
+	if bool(friendly_result.get("ok", false)):
+		var friendly_row: Variant = _placement_by_slot(friendly_result["state"],
+			11)
+		check(friendly_row != null
+			and friendly_row.collected_at == 0
+			and friendly_row.started_at == null
+			and friendly_row.clicks == 2 and friendly_row.countdown == 60,
+			"the collection clock and the construction state are read from the "
+			+ "same row independently and stay distinguishable: a never-collected "
+			+ "clock of 0 beside a recorded countdown with no usable start "
+			+ "instant")
+		check(friendly_row != null and friendly_row.attr.has("si"),
+			"the friend-assist bag is carried verbatim and never interpreted")
+
+	# Present-but-invalid: a collection instant that is not a non-negative
+	# integer REJECTS the save naming the row, exactly as an invalid counter or
+	# countdown does. `0` is explicitly NOT one of them.
+	_expect_collection_reject(_with_stamp(payload, -1), "collection instant")
+	_expect_collection_reject(_with_stamp(payload, 1.5), "collection instant")
+	_expect_collection_reject(_with_stamp(payload, "now"),
+		"collection instant")
+	_expect_collection_reject(_with_stamp(payload, null), "collection instant")
+	# The accessor itself never guesses.
+	check(not bool(TownState.collection_of(null).get("ok", true)),
+		"an absent placement has no readable collection clock")
+	var untyped := TownState.Placement.new()
+	check(not bool(TownState.collection_of(untyped).get("ok", true)),
+		"a placement built outside the parser records no collection clock, and "
+		+ "the accessor refuses it rather than reading a null as an instant")
+
+
+## One crafted row's collection clock: the row, the expected instant, and — when
+## the row also carries construction state — the construction readings beside
+## it, so the two names for the shared field are asserted apart.
+func _check_collection_row(payload: Variant, registry: Variant, key: String,
+		stamp: int, collected: int, attr: Dictionary) -> void:
+	var crafted: Dictionary = (payload as Dictionary).duplicate(true)
+	((crafted["map"] as Dictionary)["items"] as Dictionary)[key] = [
+		22, 12, 12, stamp, 0, [], attr.duplicate(), 1]
+	var result: Dictionary = TownState.parse(crafted, registry)
+	check(bool(result.get("ok", false)),
+		"the '%s' collection row parses: %s" % [key, result.get("error")])
+	if not bool(result.get("ok", false)):
+		return
+	var placement: Variant = _placement_by_slot(result["state"], key)
+	check(placement != null, "the '%s' row is kept and addressable" % key)
+	if placement == null:
+		return
+	check_eq(placement.collected_at, collected,
+		"the '%s' row's collection clock is the recorded one" % key)
+	if attr.has("cp"):
+		check_eq(placement.started_at, stamp,
+			"the '%s' row's construction start instant is the same field, read "
+			% key + "under its OWN name")
+		check_eq(placement.countdown, int(attr["cp"]),
+			"the '%s' row still records its countdown" % key)
+		check_eq(placement.clicks, int(attr.get("nc", 0)),
+			"the '%s' row still records its click counter" % key)
+	else:
+		check_eq(placement.started_at, null,
+			"the '%s' row records no construction start instant" % key)
+		check_eq(placement.countdown, null,
+			"the '%s' row records no construction countdown" % key)
+		check_eq(placement.clicks, null,
+			"the '%s' row records no construction click counter" % key)
+	check_eq(placement.attr, attr,
+		"the '%s' row's attribute bag is carried verbatim" % key)
+	var shared: Dictionary = TownState.collection_of(placement)
+	check(bool(shared.get("ok", false)),
+		"the shared accessor reads the '%s' row" % key)
+	check_eq(shared.get("collected_at", -1), collected,
+		"the shared accessor reports the '%s' row's collection clock" % key)
+
+
 ## A rejected construction parse: `{ok: false}` with an error naming the
 ## offending row and no state produced.
 func _expect_construction_reject(payload: Dictionary, needle: String) -> void:
@@ -657,6 +797,28 @@ func _with_attr(payload: Dictionary, value: Variant) -> Dictionary:
 	var crafted: Dictionary = (payload as Dictionary).duplicate(true)
 	((crafted["map"] as Dictionary)["items"] as Dictionary)["11"][6] = value
 	return crafted
+
+
+## The payload with one crafted collection instant (`item[3]`) on the
+## recorded key 11 — the shared field the construction reading and the
+## collection reading both come from.
+func _with_stamp(payload: Dictionary, value: Variant) -> Dictionary:
+	var crafted: Dictionary = (payload as Dictionary).duplicate(true)
+	((crafted["map"] as Dictionary)["items"] as Dictionary)["11"][3] = value
+	return crafted
+
+
+## A rejected collection-clock parse: `{ok: false}` with an error naming the
+## offending row and no state produced.
+func _expect_collection_reject(payload: Dictionary, needle: String) -> void:
+	var result: Dictionary = TownState.parse(payload, registry_of(payload))
+	check(not bool(result.get("ok", true)),
+		"an invalid %s fails closed" % needle)
+	check(result.get("state") == null, "an invalid %s yields no state" % needle)
+	check(str(result.get("error", "")).find(needle) != -1
+			and str(result.get("error", "")).find("11") != -1,
+		"the error names the invalid %s and the offending row (got: %s)"
+			% [needle, str(result.get("error", ""))])
 
 
 ## The payload with one crafted `map.store` value.
