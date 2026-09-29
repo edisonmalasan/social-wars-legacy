@@ -1,9 +1,11 @@
 # Legacy collect income (investigation record)
 
-Status: **investigation complete; no implementation yet.** This record exists so
-the next bounded M7 change — *collect income* — can be proposed without
-repeating the investigation, and so the provenance of every value is traceable
-before any code is written. It follows the method the `building-upgrade` and
+Status: **investigation complete, and the six decisions resolved by the
+`building-collect` change** (design D1–D6, delivered and archived
+`2026-09-30-building-collect`). The investigation below is preserved as the
+evidence base; the resolutions are recorded in "The six decisions, as
+resolved" at the end, and one further probe was executed to settle the
+shared-field question. It follows the method the `building-upgrade` and
 `building-construction` changes used: committed legacy source first, then
 executed-legacy probes, with the *established* / *derived* boundary drawn
 explicitly.
@@ -146,3 +148,38 @@ questions the next change must resolve *explicitly* rather than by guessing:
   recorded transaction against the fresh-player corpus; and the server enforces
   only structural input validity, with authoritative validation belonging to
   Server v1 (M13).
+
+## One further probe, and the six decisions as resolved
+
+The `item[3]` question above could not be settled by reading, because both
+commands write the field silently. One more batch was executed on the real legacy
+server: `activate(11, 3600)` then `collect(11)` with `[0, 1, 0, 20, 0, 0, 0, 0]`.
+
+```
+row 11 before: [22, 58, 48, 0,       0, [], {},             1]
+row 11 after : [22, 58, 48, 1790703572, 0, [], {"cp": 3600}, 1]
+xp 4 -> 5; wood 2000 -> 2020; every other row, privateState, playerInfo byte-identical
+response {"result":"success"}
+```
+
+`item[3]` moved to the **collect** instant while `attr["cp"] = 3600` **survived**,
+so the row still advertises a full hour of construction measured from the wrong
+epoch — an active build's timer is silently restarted, and the legacy server
+reports success. So the overlap is not ambiguous, it is corruption.
+
+| # | Question | Resolution (all derived) |
+| --- | --- | --- |
+| D1 | multiplier formula | `amount = collect × COLLECT_MULTIPLIER[r]`, `r` the highest committed rung the elapsed time has reached, **clamped at the top**. **The committed ladder is in minutes and both instants are Unix seconds**, so the comparison converts through one named constant (300 / 3 600 / 14 400 / 28 800 s), each boundary asserted from both sides. Found during implementation: comparing the units directly would have paid the top rung within five seconds |
+| D2 | `collect_xp` scaling | scaled by the **same** rung, rounded half-up (so the 0.25 rung of `collect_xp 1` pays `0`). The flat alternative is the recorded rejected option |
+| D3 | below the first rung | **refused in both layers** — the client offers no action and the service fails closed `too_early` (409) — so a sub-rung amount is never derived |
+| D4 | `max_collects` semantics | `0` implemented as "no cap"; a non-zero cap fails closed `capped_collection` (409) rather than choosing between per-collection, daily, and lifetime readings |
+| D5 | the `item[3]` overlap | **refused in both layers**: the client offers no `Collect` action for a row carrying construction state, and the service fails closed `construction_in_progress` (409) *before* the dispatcher runs, so a client that ignores the client-side rule still cannot corrupt the delivered construction timers |
+| D6 | cash / experience semantics | `g`/`w`/`o`/`s`/`c` map to the vector's gold/wood/oil/steel/cash slots; the unread slot 0 and the **mana** slot 7 are always zero (no item records a mana collect type); an unmapped type fails closed `unknown_collect_type` (409) |
+
+The delivered endpoint additionally proves its post-state **twice**: the row's
+collection instant moved forward **and** every stored resource changed by exactly
+the derived delta, so a clamp that reduced a payout is reported rather than
+trusted. On the committed corpus that lands the Tree at slot 2 (never collected,
+so the elapsed time is unbounded and the top rung is deterministic) at
+`xp 4 → 7` and `wood 2000 → 2060` from the derived vector
+`[0, 3, 0, 60, 0, 0, 0, 0]`, with only `item[3]` changing on the row.

@@ -443,6 +443,71 @@ implementation, so real-execution parity rests on the fixture-replay tests and t
 live phase. No Flash, Ruffle, ActionScript, or browser executes in any of these
 commands.
 
+Verified building-collect commands (milestone M7; Godot 4.7.2.stable and pinned
+CPython 3.9.13, Windows x64; `python` denotes the pinned interpreter, never the
+PATH alias). This is the first deliver line whose resource vector is **derived
+from committed content** rather than refused, and its six derivation rules were
+resolved in the change's design after the committed investigation
+`docs/legacy-collect-income.md`:
+
+```bash
+python -B apps/compat-api/capture_collect_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_town_collect.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-09-30): the collect fixture capture (one-shot
+executed-legacy oracle; the request carries the content-derived top-rung vector
+`[[0,"collect",[2],[0,3,0,60,0,0,0,0]]]` - the Tree (item 905) at map slot 2,
+which has never been collected so the elapsed time is unbounded and the top
+committed rung is deterministic, so the row becomes
+`[905, 53, 39, <collection instant>, 0, [], {}, 1]` with **only** `item[3]`
+changing, `xp 4` to `7` and `wood 2000` to `2060`, the placement count still 40,
+and every other row, the storage, the private state, the player info, and the
+other five resources byte-identical; a second probe recorded in the fixture's
+README and manifest is the evidence for the shared-field refusal - a collection on
+a just-started construction overwrites the build's start instant while the
+countdown survives and the legacy server answers success; exit codes and
+containment recorded in `tests/fixtures/godot-building-collect/README.md`), the
+compat suite including the payout derivation, the `/v0/collect` endpoint with its
+five 409 refusals (`no_income`, `capped_collection`, `unknown_collect_type`,
+`too_early`, `construction_in_progress`) and its two-part post-execution proof
+that checks the collection instant moved forward **and** every stored resource
+changed by exactly the derived delta, and executed-legacy parity tests (observed
+`Ran 768 tests ... OK`, exit `0`), the hermetic collection-flow suite (observed
+379 checks, PASS), both batteries in the final state (each exit `0`; the second
+embeds the `collect-live` phase, which asserts the typed response, its
+value-level post-state proof, that a refused collection left a construction's
+timers untouched, and that a disposable corpus save mutated), and the
+preservation manifest (3,258 entries, exit `0`). The compatibility service
+listens on `127.0.0.1:5056` only, and every network call in these commands is
+loopback. The evidence capture and report steps are documented in
+`apps/client-godot/README.md` ("Building collection"); committed evidence lives
+under `apps/client-godot/evidence/building-collect/`. Claim limits: every payout
+number is **derived**, never observed from the Flash client - the claim is that a
+payout grows in four committed rungs derived from the item's committed income
+fields, never any specific amount the legacy client pays; the committed
+`COLLECT_MINUTES` ladder is in **minutes** while both row instants are Unix
+seconds, so the comparison converts through one named constant (300 / 3 600 /
+14 400 / 28 800 s) with every boundary covered from both sides, and comparing
+them directly was found and corrected during implementation; the clamp is never
+exercised by the fixture; the corpus's only income-bearing rows are decorations
+because the real factories are not placed; **no cap semantics are implemented**
+and a non-zero committed cap is refused; a collection is refused on a row under
+construction **in both layers** (the client offers no action and the service fails
+closed) because executing one overwrites the build's start instant, while the
+legacy client's own behavior is unobserved; below the first committed rung no
+collection is offered and none is executed; collectability and addressability are
+client-side rules only, with the endpoint enforcing structural input validity,
+the content refusals, and the two-part proof, and no server-authoritative
+validation (that belongs to Server v1 / M13); no pixel-parity oracle exists; the
+committed capture runs the fake implementation, so real-execution parity rests on
+the fixture-replay tests and the live phase. No Flash, Ruffle, ActionScript, or
+browser executes in any of these commands.
+
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 

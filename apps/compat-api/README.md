@@ -394,6 +394,78 @@ real construction sends these commands, and that the duration is the item's
 committed `build_time` rather than its `activation` field or a speedup-adjusted
 figure.
 
+`POST /v0/collect` with body `{"user_id", "item_index"}` is the eighth
+state-mutating surface (the `building-collect` change) and **the first whose
+resource vector is derived from committed content rather than refused**. Extra
+keys — an amount, a resource, a tier, a time, a price, a resource delta — are
+ignored, so the client cannot influence the payout.
+
+The legacy mechanics were established by investigation first
+(`docs/legacy-collect-income.md`): the `collect` branch writes **only**
+`item[3] = time_now` (`command.py:136-147`), and the income is the client-sent
+8-slot vector applied verbatim per resource as `max(current + delta, 0)`
+(`engine.py:251-271`). What the service adds is the *derivation* of that vector
+from the item's committed income content:
+
+| Field | Use | Census |
+| --- | --- | --- |
+| `collect` | the amount per collection | `0` for 727 of 778 stored items |
+| `collect_type` | which resource: `g`/`w`/`o`/`s`/`c` | 731 / 23 / 11 / 11 / 2 |
+| `collect_xp` | the experience per collection | `0` for 419 items |
+| `max_collects` | a cap where non-zero | `0` for 767 items |
+| `COLLECT_MINUTES` | the ladder rungs | `[5, 60, 240, 480]` — **minutes** |
+| `COLLECT_MULTIPLIER` | the rung multipliers | `[0.25, 1, 2, 3]` |
+
+`amount = collect × multiplier[r]` and `experience = collect_xp × multiplier[r]`,
+where `r` is the highest rung the elapsed time has reached, **clamped at the top**.
+The ladder is in minutes and both row instants are Unix seconds, so the
+comparison converts through one named constant (300 / 3 600 / 14 400 / 28 800
+seconds) and every boundary is asserted from both sides. Slots 0 and 7 (the unread
+slot and mana) are always zero, because no item records a mana collect type.
+
+```json
+{"protocol": "compat-v0", "ok": true, "game_version": "alpha 0.02",
+ "server_time": 1790705901, "result": "success",
+ "previous": [905, 53, 39, 0, 0, [], {}, 1],
+ "row": [905, 53, 39, 1790705901, 0, [], {}, 1],
+ "payout": [0, 3, 0, 60, 0, 0, 0, 0], "tier": 3,
+ "reference_time": 1790705901,
+ "resources": {"xp": 7, "gold": 2000, "wood": 2060, "oil": 2000,
+               "steel": 2000, "cash": 5, "mana": 0}}
+```
+
+- **The post-state is proved twice** (design D8): the row still exists and its
+  recorded instant moved **forward**, **and** every stored resource changed by
+  **exactly** the derived delta — so a clamp that reduced a payout, or any other
+  divergence, is a fail-closed `internal_error` rather than a reported success.
+  This is the first delivered surface whose proof checks a *value* the client
+  would otherwise trust.
+- **Five 409 refusals, all before the dispatcher runs**, so the corpus is never
+  touched: `no_income` (a row whose item records no amount — 39 of the 40 placed
+  corpus rows), `capped_collection` (a non-zero committed cap, whose semantics
+  are unobserved), `unknown_collect_type` (a resource type outside the committed
+  five), `too_early` (no committed rung reached), and `construction_in_progress`
+  (the row carries a countdown or a build-click counter).
+- **`construction_in_progress` is the evidence-based safety rule.** A collection
+  executed on a row whose construction was just started overwrites that build's
+  start instant while the countdown attribute survives, silently restarting an
+  active build's timer, and the legacy server answers
+  `{"result":"success"}` — so a collection must never be executed there, and the
+  refusal is enforced in **both** layers rather than trusting the client.
+- Validation is structural plus the content refusals above; the click threshold
+  and the ladder are derived client-side rules (design D9), and authoritative
+  validation remains Server v1 (M13) work.
+
+**Provenance - established versus derived.** Established from committed legacy
+source and executed-legacy captures: that the branch writes only the collection
+instant, that the vector is applied verbatim per resource under the documented
+clamp, the income content fields and ladder globals, the corpus facts, and the
+shared-field corruption. **Derived and never observed from the Flash client — all
+six:** the amount formula, the experience scaling, the sub-first-rung refusal, the
+cap refusal, the shared-field refusal, and the cash/experience mapping. The claim
+is that a payout grows in four committed rungs derived from the item's committed
+income fields, never any specific amount the legacy client pays.
+
 ### Structured errors
 
 Always JSON, always `ok:false`, keys exactly
@@ -420,6 +492,11 @@ Always JSON, always `ok:false`, keys exactly
 | `invalid_action` | 400 | `action` present but not one of `start`, `click`, `finish` (the legacy command names are never accepted) |
 | `no_build_time` | 400 | `/v0/construction` `start` on an item with no resolvable positive committed `build_time` (absent, non-integer, or `0`) |
 | `invalid_duration` | 400 | envelope-level only: a derived start duration that is not a positive integer (unreachable through the contract) |
+| `no_income` | 409 | `/v0/collect` the addressed item records no committed collection amount |
+| `capped_collection` | 409 | `/v0/collect` the item records a non-zero committed collection cap, whose semantics are unobserved and therefore refused |
+| `unknown_collect_type` | 409 | `/v0/collect` the item's committed resource type is outside the committed five |
+| `too_early` | 409 | `/v0/collect` the row's elapsed time has not reached the first committed ladder rung |
+| `construction_in_progress` | 409 | `/v0/collect` the addressed row carries a countdown or a build-click counter: collecting there would overwrite the build's start instant |
 | `bad_request` | 400 | other malformed requests Flask rejects |
 | `not_found` | 404 | unknown path |
 | `method_not_allowed` | 405 | known path, unsupported method |
@@ -429,16 +506,16 @@ Always JSON, always `ok:false`, keys exactly
 
 All run from the repository root on Windows x64 with the pinned interpreter
 (CPython 3.9.13); exit codes are the real observed ones (bootstrap-era
-counts 2026-09-27; placement-, purchase-, move-, sell-, store-, upgrade-, and
-construction-era counts 2026-09-29):
+counts 2026-09-27; placement-, purchase-, move-, sell-, store-, upgrade-,
+construction-, and collect-era counts 2026-09-29 and 2026-09-30):
 
 ```bash
 python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
 ```
 
-→ `Ran 616 tests ... OK`, exit `0` (90 before `building-purchase`, 157 before
+→ `Ran 768 tests ... OK`, exit `0` (90 before `building-purchase`, 157 before
 `building-move`, 227 before `building-sell`, 306 before `building-store`, 390 before
-`building-upgrade`, 491 before `building-construction`).
+`building-upgrade`, 491 before `building-construction`, 616 before `building-collect`).
 Covers envelope/error shapes, bootstrap and
 session parity against the committed fixtures, pre/post save SHA-256 identity,
 the no-persistence source guard, and the offline socket guard (the suite opens
@@ -545,6 +622,15 @@ recorded but not captured:
 python -B apps/compat-api/capture_construction_fixture.py
 ```
 
+Collect fixture capture (the `building-collect` change's executed-legacy
+oracle, one-shot) - see `tests/fixtures/godot-building-collect/README.md` for its
+invocation, exit code `0`, its containment record, both recorded probes, and
+the six derived decisions the request carries:
+
+```bash
+python -B apps/compat-api/capture_collect_fixture.py
+```
+
 ## Layout
 
 - `compat_legacy.py` — corpus build/layout checks and the in-process adapter
@@ -647,10 +733,10 @@ client-sent deltas this contract refuses. Insufficient resources reproduce the
 legacy `max(…, 0)` clamp, never a rejection (authoritative server-side validation
 belongs to Server v1 / M13), and occupancy, grid-bounds, level-gate,
 cash-affordability, no-op-move, sellability, storability, upgradability,
-buildability, and addressability rules are enforced client-side only. Persistence is confined to the disposable service
+buildability, collectability, and addressability rules are enforced client-side only. Persistence is confined to the disposable service
 corpus: `POST /v0/place`, `POST /v0/purchase`, `POST /v0/move`,
-`POST /v0/sell`, `POST /v0/store`, `POST /v0/upgrade`, and
-`POST /v0/construction` persist through the legacy dispatcher into the
-corpus `saves/`,
+`POST /v0/sell`, `POST /v0/store`, `POST /v0/upgrade`,
+`POST /v0/construction`, and `POST /v0/collect` persist through the legacy
+dispatcher into the corpus `saves/`,
 while the session and bootstrap endpoints remain strictly non-persisting, and
 the working tree is never written.
