@@ -1,0 +1,14 @@
+{
+  "body_bytes": 21,
+  "body_sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87",
+  "captured_at_utc": "2026-09-29T08:30:11+00:00",
+  "headers": {
+    "Connection": "close",
+    "Content-Length": "21",
+    "Content-Type": "application/json",
+    "Date": "Tue, 29 Sep 2026 08:30:11 GMT",
+    "Server": "Werkzeug/2.2.3 Python/3.9.13"
+  },
+  "reason": "OK",
+  "status": 200
+}

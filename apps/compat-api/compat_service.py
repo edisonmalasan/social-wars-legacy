@@ -76,6 +76,32 @@ Surface (loopback only, port :5056):
     execution fails closed with ``internal_error`` instead of claiming a
     removal that never happened.
 
+``POST /v0/store`` with JSON ``{"user_id", "item_index"}``
+    ``{protocol, ok, game_version, server_time, result, removed, store,
+    resources}`` — an intent only, and the fifth state-mutating surface. The
+    legacy batch envelope is derived internally (one ``store_item`` command
+    whose single argument is the legacy map index, with the **neutral**
+    derived resource vector — design D2/D6 of the ``building-store`` change),
+    the unchanged legacy ``command()`` dispatcher executes it in-process, and
+    the answer carries the legacy ``result`` plus the two-sided authoritative
+    superset: the eight-field row **as it was read before execution**
+    (``removed``), the **full post-execution storage mapping** (``store``), and
+    the current ``resources`` (design D4). The contract accepts no
+    client-supplied quantity, price, or resource deltas — the extra keys are
+    ignored. Because the committed configuration records no price for
+    storing and legacy has no capacity check at all, the derived vector is
+    neutral: **this service claims no storing cost and no capacity rule**, and
+    ``add_store_item``'s default quantity of exactly ``1`` is the only
+    quantity the branch ever uses. The legacy branch deliberately does not
+    write ``privateState.boughtUnits`` (unlike ``buy`` /
+    ``place_stored_item`` / ``buy_stored_item_cash``), and this endpoint
+    reproduces that exactly. ``item_index`` must resolve to a row in the
+    corpus save *before* the dispatcher runs, because legacy's missing-item
+    path is a silent early return that still persists the batch; and the
+    endpoint additionally proves **both** halves of the move after execution
+    (the popped key is absent from the map **and** the item's id is present in
+    the storage), failing closed with ``internal_error`` if either is untrue.
+
 Deviation recorded for review: the bootstrap envelope also carries ``saves``
 (the session envelope plus ``config`` and ``player_info``). Design D3 lists
 only ``config`` and ``player_info``; the extra key is a superset of D3 and
@@ -93,7 +119,8 @@ code                     HTTP  when
 ``missing_item_id``      400  ``/v0/place`` or ``/v0/purchase`` body carries no ``item_id``
 ``invalid_item_id``      400  ``item_id`` present but not an integer (``bool`` excluded)
 ``unknown_item_id``      404  integer id absent from the loaded config
-``missing_item_index``   400  ``/v0/move`` or ``/v0/sell`` body carries no ``item_index``
+``missing_item_index``   400  ``/v0/move``, ``/v0/sell``, or ``/v0/store`` body
+                                carries no ``item_index``
 ``invalid_item_index``   400  ``item_index`` present but not an integer (``bool``
                                 excluded)
 ``unknown_item_index``   404  integer index that names no row in the save's
@@ -115,7 +142,8 @@ Persistence scope (design D6, spec ``godot-compatibility-boot``): the
 session and bootstrap endpoints never persist — this module never calls
 ``sessions.save_session`` for them and every call leaves the saves
 byte-identical. ``POST /v0/place``, ``POST /v0/purchase``,
-``POST /v0/move``, and ``POST /v0/sell`` execute the unchanged legacy
+``POST /v0/move``, ``POST /v0/sell``, and ``POST /v0/store`` execute the
+unchanged legacy
 ``command()`` dispatcher, which
 persists through legacy ``save_session`` into the **service corpus's**
 ``saves/`` and nowhere else; the service never opens a working-tree file for
@@ -134,6 +162,7 @@ import move_envelope
 import placement_envelope
 import purchase_envelope
 import sell_envelope
+import store_envelope
 
 PROTOCOL = "compat-v0"
 HOST = "127.0.0.1"
@@ -706,6 +735,159 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
                 boot,
                 result="success",
                 removed=removed_row,
+                resources=resources,
+            ),
+            200,
+        )
+
+    @app.post("/v0/store")
+    def v0_store() -> Tuple[Dict[str, Any], int]:
+        """Execute one store intent through the unchanged legacy path.
+
+        Validation is structural fail-closed (design D4/D5): a JSON object
+        body, a resolvable save, and an integer item index that names a row in
+        the corpus save.  Whether the placement is a building the player may
+        store at all, who owns it, and whether storage is full are the client's
+        job exactly as they were Flash's — legacy ``store_item`` performs no
+        validation at all — and anti-cheat validation belongs to Server v1
+        (M13).  The index is resolved here rather than left to legacy, because
+        legacy's missing-item path (``command.py:222-224``) logs an error and
+        returns early while the batch still persists: reporting that as a
+        success would claim a state change that never happened.
+
+        No quantity is accepted from the client (design D3): the branch calls
+        ``engine.add_store_item(map, item_id)`` without its third argument, so
+        legacy's default of exactly ``1`` is the only quantity it can use.  No
+        price or resource delta is accepted either; the derived vector is
+        neutral, so **this endpoint claims no storing cost** — the committed
+        configuration records no storing price — and, because the catalog
+        records that legacy has *no* capacity check, **no capacity rule is
+        claimed** either.  The legacy branch deliberately does not write
+        ``privateState.boughtUnits`` (unlike ``buy`` /
+        ``place_stored_item`` / ``buy_stored_item_cash``), and that is
+        reproduced exactly rather than "fixed".
+
+        Every failure below returns before the legacy dispatcher runs, so the
+        corpus is untouched on every error path.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404,
+                ERROR_UNKNOWN_USER_ID,
+                "no save exists for user_id %r" % user_id,
+            )
+
+        if "item_index" not in payload:
+            return error_response(
+                400, ERROR_MISSING_ITEM_INDEX, "item_index is required"
+            )
+        item_index = payload["item_index"]
+        if not store_envelope.is_strict_int(item_index):
+            return error_response(
+                400, ERROR_INVALID_ITEM_INDEX, "item_index must be an integer"
+            )
+
+        # Resolve the index against the corpus before deriving, and read the
+        # eight-field row while it is still there: an index that names no row
+        # must fail closed, never reach legacy's silent no-op, and the row the
+        # client asked to store is the one the persisted save no longer holds
+        # afterwards (design D4/D5).  The item id is read from the row here for
+        # the same reason: it is what legacy's ``add_store_item`` increments,
+        # so it is what the storage proof below must look for.
+        try:
+            known = boot.has_map_item(user_id, item_index)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not known:
+            return error_response(
+                404,
+                ERROR_UNKNOWN_ITEM_INDEX,
+                "no placement with index %d in this save's map" % item_index,
+            )
+        try:
+            removed = boot.map_item(user_id, item_index)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not isinstance(removed, list):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the addressed placement is not a row this service can report",
+            )
+        # A copy: the in-memory row is the one the legacy dispatcher pops
+        # from the map, so the response must not alias live state.
+        removed_row = list(removed)
+        item_id = removed_row[0] if removed_row else None
+        if not store_envelope.is_strict_int(item_id):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the addressed placement carries no integer item id to store",
+            )
+
+        # Derive the legacy envelope (design D2/D6): the neutral resource
+        # vector is the module's, never the client's.  The contract carries no
+        # quantity, price, or resource delta: extra keys are ignored so the
+        # client's own derivation can never win.
+        try:
+            envelope_payload = store_envelope.build_envelope(item_index=item_index)
+        except store_envelope.EnvelopeError as failure:
+            return error_response(400, failure.code, str(failure))
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        # Execute the unchanged legacy command dispatcher in-process.  It
+        # persists via legacy save_session into this corpus only; the legacy
+        # HTTP route returns {"result": "success"} whenever command()
+        # returns without raising, so reaching here IS the legacy result.
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        # Prove BOTH halves of the move from the persisted save: the popped key
+        # must be gone *and* the item's id must be present in the storage.
+        # Reporting either half that the save does not show would be a
+        # fabricated authoritative answer (design D4), so each fails closed.
+        try:
+            still_present = boot.has_map_item(user_id, item_index)
+            store = boot.map_store(user_id)
+            resources = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if still_present:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy execution did not remove the placement entry",
+            )
+        if not isinstance(store, dict):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy execution did not persist the storage entry",
+            )
+        if str(item_id) not in store:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy execution did not persist the storage entry",
+            )
+        return (
+            envelope(
+                boot,
+                result="success",
+                removed=removed_row,
+                store=store,
                 resources=resources,
             ),
             200,

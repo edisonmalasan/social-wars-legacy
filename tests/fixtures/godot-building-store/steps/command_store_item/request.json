@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-09-29T08:30:11+00:00",
+  "form": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "data": "481d82f50a10a99e2082b254d20c3d2836dbb7a25ad944741af21b32b3a76716;{\"accessToken\":\"\",\"commands\":[[0,\"store_item\",[2],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1790670611}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "command.php form (USERID, user_key, language, data) with the derived <64-hex>;<json> envelope carrying one store_item command whose single argument is the legacy map index, and whose resources_changed is the neutral all-zero vector (no storing cost is claimed and the contract carries no quantity: legacy's add_store_item defaults to exactly 1); user_key is redacted in this record; accessToken is the crafted empty placeholder, never a token value.",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}
