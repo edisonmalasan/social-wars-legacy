@@ -6,7 +6,8 @@ extends Node
 ## `place_building()` for one placement intent, `purchase_item()` for one
 ## purchase intent, `move_building()` for one move intent,
 ## `sell_building()` for one sell intent, `store_building()` for one
-## store intent, and `upgrade_building()` for one upgrade intent, receiving
+## store intent, `upgrade_building()` for one upgrade intent, and
+## `build_construction()` for one construction intent, receiving
 ## typed results
 ## (`scripts/gameapi/boot_data.gd`); raw transport dictionaries never reach
 ## presentation code, and no other script references a transport.
@@ -20,9 +21,10 @@ extends Node
 ##               `tests/fixtures/godot-item-purchase/` (purchase),
 ##               `tests/fixtures/godot-building-move/` (move),
 ##               `tests/fixtures/godot-building-sell/` (sell), and
-##               `tests/fixtures/godot-building-store/` (store), and
-##               `tests/fixtures/godot-building-upgrade/` (upgrade); no
-##               process, no server, no socket.
+##               `tests/fixtures/godot-building-store/` (store),
+##               `tests/fixtures/godot-building-upgrade/` (upgrade), and
+##               `tests/fixtures/godot-building-construction/`
+##               (construction); no process, no server, no socket.
 ##   legacy_v0 - JSON over loopback HTTP to Compatibility API v0 through the
 ##               built-in HTTP request client; endpoint from the project
 ##               setting `gameapi/endpoint` (default: loopback 127.0.0.1 on
@@ -93,6 +95,12 @@ var store_requests := 0
 ## Monotonic for the same reason: `configure()` swaps the implementation
 ## without hiding history.
 var upgrade_requests := 0
+## Number of construction intents this process has issued (building-
+## construction flow contract: exactly one per confirm, zero for every local
+## refusal — the construction suite snapshots this counter exactly like
+## `placement_requests`). Monotonic for the same reason: `configure()` swaps
+## the implementation without hiding history.
+var construction_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -239,6 +247,25 @@ func upgrade_building(user_id: String,
 	upgrade_requests += 1
 	var result: BootData.UpgradeResult = await _impl.upgrade_building(
 		user_id, item_index)
+	return result
+
+
+## One construction intent (the legacy map index of an existing placement and
+## ONE action of the closed vocabulary `"start" | "click" | "finish"`) from the
+## selected implementation. The contract carries NO duration, NO countdown,
+## NO price, and NO resource deltas: the service derives the legacy command
+## and every one of its arguments from committed content and the row's own
+## state — the start duration from the item's committed `build_time`, never
+## from the client — so the typed result's two rows, resolved action, and
+## resources are authoritative (design D2/D3/D5). The response carries the row
+## as read BEFORE execution and the row re-read AFTER it, so presentation code
+## replaces the selected typed placement's row with `row` and takes the
+## resource values verbatim. Legacy command names are never accepted.
+func build_construction(user_id: String, item_index: int,
+		action: String) -> BootData.ConstructionResult:
+	construction_requests += 1
+	var result: BootData.ConstructionResult = await _impl.build_construction(
+		user_id, item_index, action)
 	return result
 
 

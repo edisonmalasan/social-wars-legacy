@@ -29,6 +29,20 @@ extends RefCounted
 ## unaddressable (`NO_SLOT`) instead of being coerced — a coerced index
 ## would address a *different* row, which is exactly the failure this
 ## records instead.
+##
+## Construction state (building-construction task 4.1, design D5): every
+## placement also carries the three legacy attribute-bag facts a build
+## records — the click counter (`attr["nc"]`), the recorded countdown
+## (`attr["cp"]`), and the start instant they are measured from (the row's
+## own timestamp, meaningful only while a countdown is recorded). Each is
+## ABSENT when the row carries none, and each is parsed fail-closed in the
+## one shared placement parser, so the readout and the step logic read a
+## single rule set: an attribute bag that is not an object, a counter that is
+## not a non-negative integer, and a countdown that is not a positive integer
+## (legacy can never record one — a non-positive duration CLEARS the whole
+## bag instead) each reject the save naming the offending field. The click
+## requirement and the derived duration are NOT here: both come from
+## committed content, and the service derives them the same way.
 
 ## Content domains searched, in order, for a placed legacy id (the
 ## normalized package splits items into buildings/units/specials; ids do
@@ -93,6 +107,25 @@ class Placement:
 	## D7): the positive integer the key carried, or `NO_SLOT` (-1) when
 	## the key is not one. Never coerced to a guessable value.
 	var slot := -1
+	## The build's click counter (`attr["nc"]`) as a non-negative integer, or
+	## null when the row records none. Seeded by the purchase half for an
+	## item whose committed `clicks_to_build > 0`, raised by a build click,
+	## and deleted by a completion.
+	var clicks: Variant = null
+	## The build's recorded countdown in seconds (`attr["cp"]`) as a positive
+	## integer, or null when the row records none.
+	var countdown: Variant = null
+	## The instant the countdown started — the row's own timestamp, and only
+	## present while a countdown is recorded AND the row carries a positive
+	## one. The remaining time is a pure client derivation from this and
+	## `countdown`; no legacy branch ever computes it.
+	var started_at: Variant = null
+	## False only when the row's attribute bag is not an object at all, so no
+	## construction fact can be read from it. Such a row still parses and
+	## renders (the delivered parser keeps every row verbatim), and the build
+	## flow refuses it by name rather than reading a number out of a value that
+	## is not a bag.
+	var construction_readable := true
 	## Save order — the deterministic last tie-break of the depth sort.
 	var order := 0
 	## True when ContentRegistry resolved the placed legacy id.
@@ -219,6 +252,20 @@ static func parse(payload: Variant, registry: RegistryScript) -> Dictionary:
 		placement.store = row[5]
 		placement.attr = row[6]
 		placement.player = row[7]
+		# Construction state (building-construction design D5): parsed from the
+		# row's own attribute bag in the SAME fail-closed pass, so the readout
+		# and the step logic read one rule set. A row whose bag is not an object
+		# is NOT a rejected save — the delivered parser has always kept such a
+		# row verbatim — but it records NO construction state and is marked
+		# unreadable, so the build flow refuses it by name instead of reading
+		# numbers out of something that is not a bag.
+		var construction: Dictionary = _construction_of(row, str(key))
+		if construction.get("fatal", false):
+			return reject.call(str(construction.get("error", "")))
+		placement.construction_readable = bool(construction.get("ok", false))
+		placement.clicks = construction["clicks"]
+		placement.countdown = construction["countdown"]
+		placement.started_at = construction["started_at"]
 		_resolve_content(placement, registry)
 		if not placement.content_ok \
 				and not (placement.item in state.unresolved_ids):
@@ -377,6 +424,86 @@ static func is_addressable(placement: Variant) -> bool:
 	if placement == null or not (placement is Placement):
 		return false
 	return int((placement as Placement).slot) > 0
+
+
+## The construction state of one placement as the pure flow helpers read it:
+## `{ok, error, clicks, countdown, started_at}`, where each of the three facts
+## is null when the row records none (building-construction design D5). The
+## public form of `_construction_of`, so the readout, the step machine, and the
+## shared placement parser all consume ONE rule set and can never disagree
+## about what a row carries.
+static func construction_of(placement: Variant) -> Dictionary:
+	if placement == null or not (placement is Placement):
+		return {"ok": false, "error": "[town] no typed placement to read",
+			"clicks": null, "countdown": null, "started_at": null}
+	var typed: Placement = placement
+	if not typed.construction_readable:
+		return {"ok": false,
+			"error": "the row's attribute bag is not an object, so no "
+				+ "construction state can be read from it",
+			"clicks": null, "countdown": null, "started_at": null}
+	return {"ok": true, "error": "",
+		"clicks": typed.clicks, "countdown": typed.countdown,
+		"started_at": typed.started_at}
+
+
+## One eight-field row -> its construction state, fail-closed.
+##
+## Rules (nothing guessed, nothing defaulted):
+##   * `attr["nc"]`, when the bag is an object and carries it, must be a
+##     non-negative integer: a click counter is a count, and a negative or
+##     fractional one is not a shape legacy writes — a present-but-invalid
+##     counter REJECTS the save naming the row;
+##   * `attr["cp"]`, likewise, must be a POSITIVE integer: it is a duration in
+##     seconds, and legacy can never record a non-positive one because a
+##     non-positive `activate` duration clears the whole bag instead (design
+##     D6) — a present-but-invalid countdown REJECTS the save naming the row;
+##   * the start instant is the row's own timestamp, present only while a
+##     countdown is recorded and only when that timestamp is a positive
+##     integer — a zero timestamp means nothing stamped this row, so no
+##     remaining time can be derived from it;
+##   * a row whose bag is not an object at all records NO construction state
+##     and is marked unreadable (`ok: false`, `fatal: false`): the delivered
+##     parser has always kept such a row verbatim, so rejecting the save here
+##     would change delivered behavior, while reading a counter out of a value
+##     that is not a bag would be fabrication. The build flow refuses such a
+##     row by name instead.
+## Every other `attr` entry (`si` for friend assistance, and anything a
+## future branch writes) is carried verbatim in `Placement.attr` and never
+## interpreted here.
+static func _construction_of(row: Array, key: String) -> Dictionary:
+	var empty := {"ok": true, "error": "", "fatal": false, "clicks": null,
+		"countdown": null, "started_at": null}
+	if not (row[6] is Dictionary):
+		return {"ok": false, "fatal": false,
+			"error": "field 'attr' of placement '%s' is not an object" % key,
+			"clicks": null, "countdown": null, "started_at": null}
+	var attr: Dictionary = row[6]
+	var clicks: Variant = null
+	if attr.has("nc"):
+		var counter: Variant = _integer(attr["nc"])
+		if counter == null or int(counter) < 0:
+			return {"ok": false, "fatal": true,
+				"error": "click counter of placement '%s' is not a "
+					% key + "non-negative integer",
+				"clicks": null, "countdown": null, "started_at": null}
+		clicks = counter
+	var countdown: Variant = null
+	if attr.has("cp"):
+		var duration: Variant = _integer(attr["cp"])
+		if duration == null or int(duration) <= 0:
+			return {"ok": false, "fatal": true,
+				"error": "countdown of placement '%s' is not a positive "
+					% key + "integer",
+				"clicks": null, "countdown": null, "started_at": null}
+		countdown = duration
+	var started: Variant = null
+	if countdown != null:
+		var stamp: Variant = _integer(row[3])
+		if stamp != null and int(stamp) > 0:
+			started = stamp
+	return {"ok": true, "error": "", "fatal": false, "clicks": clicks,
+		"countdown": countdown, "started_at": started}
 
 
 ## The house storage rejection envelope: names the offending field or key.

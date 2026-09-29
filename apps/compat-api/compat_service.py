@@ -143,6 +143,54 @@ Surface (loopback only, port :5056):
     exist and are deliberately **not** enforced here: none is enforced by the
     legacy server and none can be reproduced from the repository.
 
+``POST /v0/construction`` with JSON ``{"user_id", "item_index", "action"}``
+    ``{protocol, ok, game_version, server_time, result, previous, row, action,
+    resources}`` — an intent only, and the seventh state-mutating surface.  One
+    call carries **exactly one** of the three legacy construction commands; the
+    action names an *outcome* and the service chooses the command and derives
+    every argument (design D2 of the ``building-construction`` change):
+    ``"start"`` → ``activate`` with a duration derived from the addressed
+    placement's item's committed ``build_time``, ``"click"`` → ``add_click``,
+    ``"finish"`` → ``activate_item_click``.  The action vocabulary is **closed**;
+    anything else fails closed with ``invalid_action`` before the dispatcher
+    runs.  The unchanged legacy ``command()`` dispatcher executes the batch
+    in-process, and the answer carries the legacy ``result`` plus the
+    authoritative superset: the eight-field row **as it was read before
+    execution** (``previous``), the eight-field row **re-read from the
+    persisted save after execution** (``row``), the **resolved** ``action``,
+    and the current ``resources`` (design D5).  Unlike every earlier line this
+    contract carries **no derived placeholder argument at all**, and it accepts
+    no client-supplied duration, price, quantity, or resource deltas — the
+    extra keys (``duration``, ``price``, ``resources_changed``, ``count``, …)
+    are ignored, so no client value can influence the countdown.
+
+    A placement whose item has **no resolvable positive committed build time**
+    answers ``no_build_time`` (400) before the dispatcher runs, so an
+    unbuildable row is never handed a coerced duration.  That refusal is
+    load-bearing: legacy's ``activate`` with a non-positive duration does not
+    cancel a build, it **clears the row's whole attribute bag**, destroying
+    the click counter and any friend-assistance entries
+    (``command.py:425-427``), so this contract only ever sends a positive
+    derived duration and exposes **no cancel action** (design D6).
+
+    Because the committed configuration records no price for building, the
+    derived vector is neutral and **this service claims no building cost at
+    all**; the loaded ``BUILD_SPEEDUP_PRICING`` / ``BUILD_SPEEDUP_MIN_TIME``
+    globals price a *speedup*, which is a separate mechanism deliberately out
+    of scope (design D4).  No
+    branch compares the click counter with the item's ``clicks_to_build``, so
+    the completion threshold and the remaining time (``cp - (now - item[3])``)
+    are **client-side derivations with no server enforcement**; whether a build
+    may start on a row that already carries construction state is the client's
+    call, and authoritative validation belongs to Server v1 (M13).
+
+    After execution the endpoint proves the per-action post-condition
+    (design D3) and fails closed with ``internal_error`` on any other outcome:
+    the row still exists and is a list (a construction action must never
+    destroy a row), and then ``start`` → ``attr["cp"]`` equals the derived
+    duration, ``click`` → ``attr["nc"]`` is present and at least ``1``,
+    ``finish`` → ``attr["nc"]`` is absent.
+
 Deviation recorded for review: the bootstrap envelope also carries ``saves``
 (the session envelope plus ``config`` and ``player_info``). Design D3 lists
 only ``config`` and ``player_info``; the extra key is a superset of D3 and
@@ -160,8 +208,9 @@ code                     HTTP  when
 ``missing_item_id``      400  ``/v0/place`` or ``/v0/purchase`` body carries no ``item_id``
 ``invalid_item_id``      400  ``item_id`` present but not an integer (``bool`` excluded)
 ``unknown_item_id``      404  integer id absent from the loaded config
-``missing_item_index``   400  ``/v0/move``, ``/v0/sell``, ``/v0/store``, or
-                                ``/v0/upgrade`` body carries no ``item_index``
+``missing_item_index``   400  ``/v0/move``, ``/v0/sell``, ``/v0/store``,
+                                ``/v0/upgrade``, or ``/v0/construction`` body
+                                carries no ``item_index``
 ``invalid_item_index``   400  ``item_index`` present but not an integer (``bool``
                                 excluded)
 ``unknown_item_index``   404  integer index that names no row in the save's
@@ -172,6 +221,19 @@ code                     HTTP  when
                                 ``0`` sentinels, or an unresolvable id) — the
                                 legacy dispatcher never runs, so such a row is
                                 never reduced to a bare sale
+``missing_action``       400  ``/v0/construction`` body carries no ``action``
+``invalid_action``       400  ``action`` present but not a string, or outside
+                                the closed set ``{"start", "click", "finish"}``
+``no_build_time``        400  ``/v0/construction`` with ``action "start"``: the
+                                addressed placement's item has no resolvable
+                                **positive** committed ``build_time`` (absent,
+                                non-integer, zero, or negative) — the legacy
+                                dispatcher never runs, so a non-positive
+                                duration can never reach ``activate`` and
+                                clear the row's whole attribute bag
+``invalid_duration``     400  derived start duration is not a positive integer
+                                (server-side derivation failure; never client
+                                input)
 ``invalid_reason``       400  derived reason is not a string (server-side
                                 derivation failure; never client input)
 ``invalid_coordinates``  400  ``x``/``y`` missing, not integers, or outside ``0..99``
@@ -189,9 +251,9 @@ Persistence scope (design D6, spec ``godot-compatibility-boot``): the
 session and bootstrap endpoints never persist — this module never calls
 ``sessions.save_session`` for them and every call leaves the saves
 byte-identical. ``POST /v0/place``, ``POST /v0/purchase``,
-``POST /v0/move``, ``POST /v0/sell``, ``POST /v0/store``, and
-``POST /v0/upgrade`` execute the unchanged legacy
-``command()`` dispatcher, which
+``POST /v0/move``, ``POST /v0/sell``, ``POST /v0/store``,
+``POST /v0/upgrade``, and ``POST /v0/construction`` execute the
+unchanged legacy ``command()`` dispatcher, which
 persists through legacy ``save_session`` into the **service corpus's**
 ``saves/`` and nowhere else; the service never opens a working-tree file for
 writing, and it never binds anywhere except ``127.0.0.1`` (the bind address
@@ -205,6 +267,7 @@ from typing import Any, Dict, Optional, Tuple
 from flask import Flask, Response, jsonify, request
 
 import compat_legacy
+import construction_envelope
 import move_envelope
 import placement_envelope
 import purchase_envelope
@@ -227,9 +290,13 @@ ERROR_MISSING_ITEM_INDEX = "missing_item_index"
 ERROR_INVALID_ITEM_INDEX = "invalid_item_index"
 ERROR_UNKNOWN_ITEM_INDEX = "unknown_item_index"
 ERROR_NO_UPGRADE_PATH = "no_upgrade_path"
+ERROR_MISSING_ACTION = "missing_action"
+ERROR_INVALID_ACTION = "invalid_action"
+ERROR_NO_BUILD_TIME = "no_build_time"
 ERROR_INVALID_REASON = "invalid_reason"
 ERROR_INVALID_COORDINATES = "invalid_coordinates"
 ERROR_INVALID_ORIENTATION = "invalid_orientation"
+ERROR_INVALID_DURATION = "invalid_duration"
 ERROR_COSTS_NOT_CASH = "costs_not_cash"
 ERROR_BAD_REQUEST = "bad_request"
 ERROR_NOT_FOUND = "not_found"
@@ -1152,6 +1219,277 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
                 result="success",
                 removed=removed_row,
                 upgraded=upgraded_row,
+                resources=resources,
+            ),
+            200,
+        )
+
+    @app.post("/v0/construction")
+    def v0_construction() -> Tuple[Dict[str, Any], int]:
+        """Execute one construction intent through the unchanged legacy path.
+
+        One call carries **exactly one** of the three legacy construction
+        commands, chosen by the closed action vocabulary (design D2): a
+        ``"start"`` derives ``activate`` with a duration read from the
+        addressed placement's item's committed ``build_time``, a ``"click"``
+        derives ``add_click``, and a ``"finish"`` derives
+        ``activate_item_click``.  The three commands are three *outcomes* of one
+        client-side state machine, not one transaction, so they are never
+        composed into a single batch here.
+
+        Validation is structural fail-closed (design D3/D7): a JSON object body,
+        a resolvable save, an integer item index that names a row in the corpus
+        save, an action inside the closed set, and — for a start only — an item
+        whose committed build time resolves to a **positive** integer.  The
+        index is resolved here rather than left to legacy, because legacy's
+        missing-item path (``command.py:416-419``, ``528-531``, ``539-542``)
+        logs an error and returns early while the batch still persists:
+        reporting that as a success would claim a state change that never
+        happened.  Legacy performs no ownership, state, or gameplay validation
+        of any kind: whether a build may start on a row that already carries
+        construction state, and whether the counter has reached the item's
+        ``clicks_to_build`` (which **no** branch compares), are client-side
+        rules exactly as they were Flash's; authoritative validation belongs to
+        Server v1 (M13).
+
+        Nothing but the index and the action enters the contract: no duration,
+        price, quantity, or resource delta is accepted from a client — the
+        extra keys are ignored.  The start duration is therefore derived from
+        committed content alone, which is why this line has no derived
+        placeholder argument at all.  Because the committed configuration
+        records no price for building, the derived vector is neutral, so
+        **this endpoint claims no building cost** (design D4).  A non-positive
+        duration is refused twice over — ``no_build_time`` when committed
+        content cannot supply one, ``invalid_duration`` if the derivation ever
+        produced one — because legacy's ``activate`` with a non-positive
+        duration **clears the addressed row's whole attribute bag**
+        (``command.py:425-427``), destroying the click counter and any
+        friend-assist entries; this contract therefore exposes no cancel action
+        at all (design D6).
+
+        After execution the endpoint proves the per-action post-condition
+        (design D3) and fails closed with ``internal_error`` on any other
+        outcome: the row still exists and is a list, and then the action's own
+        check — a start carries the derived countdown, a click carries a
+        counter of at least one, a completion carries none.  Reporting a
+        construction that the persisted save does not show would be a fabricated
+        authoritative answer.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404,
+                ERROR_UNKNOWN_USER_ID,
+                "no save exists for user_id %r" % user_id,
+            )
+
+        if "item_index" not in payload:
+            return error_response(
+                400, ERROR_MISSING_ITEM_INDEX, "item_index is required"
+            )
+        item_index = payload["item_index"]
+        if not construction_envelope.is_strict_int(item_index):
+            return error_response(
+                400, ERROR_INVALID_ITEM_INDEX, "item_index must be an integer"
+            )
+
+        if "action" not in payload:
+            return error_response(400, ERROR_MISSING_ACTION, "action is required")
+        action = payload["action"]
+        if not construction_envelope.is_action(action):
+            return error_response(
+                400,
+                ERROR_INVALID_ACTION,
+                "action must be one of %s"
+                % ", ".join(sorted(construction_envelope.ACTIONS)),
+            )
+
+        # Resolve the index against the corpus before deriving, and read the
+        # eight-field row while it is still there: an index that names no row
+        # must fail closed, never reach legacy's silent no-op, and the row the
+        # client asked to build is the row the three commands mutate in place.
+        try:
+            known = boot.has_map_item(user_id, item_index)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not known:
+            return error_response(
+                404,
+                ERROR_UNKNOWN_ITEM_INDEX,
+                "no placement with index %d in this save's map" % item_index,
+            )
+        try:
+            previous = boot.map_item(user_id, item_index)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not isinstance(previous, list):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the addressed placement is not a row this service can report",
+            )
+        # Copies: the legacy dispatcher mutates this very row **in place** —
+        # ``activate`` writes ``item[3]`` and ``item[6]``, and
+        # ``add_click`` / ``activate_item_click`` mutate the same attribute-bag
+        # dict — so a shallow list copy would still alias the live bag and the
+        # "before" row would report the after-state.  The bag and the stored-unit
+        # payload are copied too.
+        previous_row = list(previous)
+        if isinstance(previous_row[6], dict):
+            previous_row[6] = dict(previous_row[6])
+        if isinstance(previous_row[5], list):
+            previous_row[5] = list(previous_row[5])
+        if len(previous_row) != 8:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the addressed placement is not an eight-field row",
+            )
+        source_item_id = previous_row[0]
+        if not construction_envelope.is_strict_int(source_item_id):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the addressed placement carries no integer item id to build",
+            )
+
+        # The start duration comes from the item's committed ``build_time``,
+        # never from the client.  ``None`` means no resolvable positive
+        # duration (absent, non-integer, zero, or negative), and answering here
+        # — before the dispatcher runs — is what keeps an unbuildable row from
+        # ever reaching ``activate``'s attribute-bag-clearing branch
+        # (design D3/D6).  Only a start resolves one: a click and a completion
+        # carry no duration argument at all.
+        duration: Optional[int] = None
+        if action == construction_envelope.ACTION_START:
+            try:
+                duration = boot.item_build_time(source_item_id)
+            except compat_legacy.LegacyBootError as failure:
+                return _legacy_boot_error(failure)
+            if duration is None:
+                return error_response(
+                    400,
+                    ERROR_NO_BUILD_TIME,
+                    "item %d has no resolvable positive committed build time"
+                    % source_item_id,
+                )
+
+        # Derive the legacy envelope (design D2/D4): the command, every one of
+        # its arguments, and the neutral resource vector are the module's, never
+        # the client's.
+        try:
+            if action == construction_envelope.ACTION_START:
+                assert duration is not None
+                envelope_payload = construction_envelope.build_envelope_start(
+                    item_index=item_index, duration=duration
+                )
+            elif action == construction_envelope.ACTION_CLICK:
+                envelope_payload = construction_envelope.build_envelope_click(
+                    item_index=item_index
+                )
+            else:
+                envelope_payload = construction_envelope.build_envelope_finish(
+                    item_index=item_index
+                )
+        except construction_envelope.EnvelopeError as failure:
+            if failure.code == "invalid_duration":
+                # A server-side derivation failure: committed content
+                # produced a duration this contract must never send.
+                return error_response(500, ERROR_INTERNAL, failure.code)
+            return error_response(400, failure.code, str(failure))
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        # Execute the unchanged legacy command dispatcher in-process.  It
+        # persists via legacy save_session into this corpus only; the legacy
+        # HTTP route returns {"result": "success"} whenever command()
+        # returns without raising, so reaching here IS the legacy result —
+        # which is precisely why it is NOT taken as proof of a construction.
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        # Prove the per-action post-condition from the persisted save
+        # (design D3).  A construction action must never destroy the row, and
+        # each action has an exactly checkable post-condition: a start records
+        # the derived countdown, a click raises the counter to at least one,
+        # and a completion consumes it.  Any other outcome — including a
+        # surviving row the action never touched — is reported, not claimed.
+        try:
+            still_present = boot.has_map_item(user_id, item_index)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not still_present:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy execution did not keep the placement entry at its key",
+            )
+        try:
+            updated = boot.map_item(user_id, item_index)
+            resources = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not isinstance(updated, list) or len(updated) != 8:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy execution did not persist an eight-field placement row",
+            )
+        updated_row = list(updated)
+        attr = updated_row[6]
+        if not isinstance(attr, dict):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the row at index %d carries no attribute bag after execution"
+                % item_index,
+            )
+        if action == construction_envelope.ACTION_START:
+            assert duration is not None
+            if attr.get("cp") != duration:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "the row at index %d records countdown %r after execution, "
+                    "not the derived build time %r"
+                    % (item_index, attr.get("cp"), duration),
+                )
+        elif action == construction_envelope.ACTION_CLICK:
+            clicks = attr.get("nc")
+            if not construction_envelope.is_strict_int(clicks) or clicks < 1:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "the row at index %d records click counter %r after "
+                    "execution, not an integer of at least 1"
+                    % (item_index, clicks),
+                )
+        else:
+            if "nc" in attr:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "the row at index %d still carries the click counter %r "
+                    "after a completion"
+                    % (item_index, attr.get("nc")),
+                )
+        return (
+            envelope(
+                boot,
+                result="success",
+                previous=previous_row,
+                row=updated_row,
+                action=action,
                 resources=resources,
             ),
             200,

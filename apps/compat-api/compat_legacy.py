@@ -263,6 +263,48 @@ class LegacyBoot:
             return None
         return reference
 
+    def item_build_time(self, item_id: int) -> Optional[int]:
+        """The item's committed construction duration, or ``None``.
+
+        The construction deliver line's content accessor, read exactly as
+        ``item_costs`` reads ``costs`` and ``item_upgrade_to`` reads
+        ``upgrades_to`` — through the loaded legacy configuration, never from a
+        save or a client.  The committed ``build_time`` is **string-encoded**
+        (``"5"`` for the Turret I and the Command Center, ``"1"`` for the
+        walls, ``"600"`` for the Turret II, ``"3600"`` for the Command Center
+        II, ``"180"`` for the map decorations), is coerced to a positive
+        ``int`` here, and ``None`` is returned for every value that cannot be a
+        build duration:
+
+        * the attribute is absent from the config, or the item id itself is one
+          the config cannot index (the ``get_attribute_from_item_id`` lookup
+          raises, which is caught exactly as ``item_upgrade_to`` catches it);
+        * the value is not an integer at all; and
+        * the value is **zero or negative** — which matters beyond tidiness,
+          because a non-positive duration sent to legacy's ``activate`` clears
+          the addressed row's *whole* attribute bag (``command.py:425-427``),
+          destroying the click counter and any friend-assist entries.
+
+        Returning ``None`` rather than raising is deliberate and fail-closed:
+        the construction endpoint turns it into a structured ``no_build_time``
+        error **before** the legacy dispatcher runs, so an unbuildable row is
+        never handed a coerced duration — and never a clearing one.
+        """
+        try:
+            raw = self._config.get_attribute_from_item_id(item_id, "build_time")
+        except (TypeError, ValueError, KeyError, IndexError):
+            # An id the loaded config cannot even index has no build time.
+            return None
+        if raw is None or isinstance(raw, bool):
+            return None
+        try:
+            seconds = int(str(raw).strip())
+        except (TypeError, ValueError):
+            return None
+        if seconds <= 0:
+            return None
+        return seconds
+
     def save_document(self, user_id: str) -> dict:
         """The in-memory save document for ``user_id`` (legacy ``session()``)."""
         if user_id not in self.known_user_ids():

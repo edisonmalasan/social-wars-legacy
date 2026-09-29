@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-09-29T14:02:35+00:00",
+  "form": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "data": "84e4eaa51b2654d5a61863a129cea2d3c5052b7530c966a56550120c627b8fac;{\"accessToken\":\"\",\"commands\":[[0,\"activate\",[11,5],[0,0,0,0,0,0,0,0]],[0,\"add_click\",[11],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1790690555}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "command.php form (USERID, user_key, language, data) with the derived <64-hex>;<json> envelope carrying exactly two commands in the recorded order: an activate whose two arguments are the legacy map index and the item's committed build_time (resolved server-side from config/main.json, never client-supplied, and the only way the countdown is derived), then an add_click whose single argument is the same map index and which raises the click counter the purchase half seeded; both commands carry the neutral all-zero resources_changed vector (no building cost is claimed); user_key is redacted in this record; accessToken is the crafted empty placeholder, never a token value. The completing activate_item_click is recorded in the manifest's omitted_step block and is NOT part of this batch, so the committed after-state keeps both the countdown and the counter visible.",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}

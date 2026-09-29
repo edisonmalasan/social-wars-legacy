@@ -1473,5 +1473,159 @@ section, the projection-constants pointer, the bootstrap and upgrade request cou
 
 These non-claims are recorded verbatim in
 `evidence/building-upgrade/report.json`.
-Remaining deliver lines of M7 (separate changes): construction timers, collect
-income, town expansion, resources, and XP.
+
+## Building construction
+
+The construction slice (OpenSpec `building-construction`, milestone M7) closes the
+loop the placement and upgrade lines left open: a purchased or upgraded building
+arrives **under construction** - `engine.map_add_item` seeds
+`attr = {"nc": 0}` for any player-owned item whose committed `clicks_to_build` is
+greater than zero - and until now the client rendered that fact and then ignored
+it forever. This line starts a build, records build clicks, completes a build,
+and shows the progress and the countdown. Like the upgrade line, its contract was
+established by investigation first; the record is committed as
+`docs/legacy-construction-timing.md`.
+
+### Flow
+
+1. **Action** - a `Build` action beside the delivered `Move`, `Sell`, `Store`, and
+   `Upgrade` actions, offered only while a placed building is selected and
+   addressable; the five modes are mutually exclusive.
+2. **Confirm** - one primary step, and which step it is follows the row's own
+   state: no construction state -> `Start build` (the countdown is derived from
+   the item's committed build time and shown); a click counter below the item's
+   requirement -> `Add build click (n / required)`; a counter that has reached it
+   -> `Complete build`; a countdown running with the counter already consumed ->
+   nothing to do. Cancelling sends nothing, and **no step anywhere clears the
+   building's construction state** - the one legacy command that would also
+   destroys the click counter and any friend-assistance state, so it is never sent.
+3. **Apply** - only the authoritative response is applied: the typed row is
+   replaced by the response's post-execution row, the same object is retained in
+   depth order, and the construction readout and HUD take the response values. The
+   apply snapshots everything it touches first and rolls all of it back on failure.
+4. **Readout** - any selected placement carrying construction state shows its
+   click progress against the item's committed click requirement and, when a
+   countdown is recorded, its remaining time derived from that countdown and the
+   row's recorded start instant.
+
+### Endpoint contract, envelope, and provenance
+
+`POST /v0/construction` accepts only the intent
+`{user_id, item_index, action}` with `action` in `{start, click, finish}` - the
+full contract, response example, structured error codes, per-action
+post-execution proof, validation split, and corpus-only persistence scope are
+documented in `apps/compat-api/README.md`. The endpoint derives the legacy command
+and every argument: a `start` derives its countdown from the item's committed
+`build_time`, so **no client value can influence it**; a missing, non-integer, or
+non-positive committed build time fails closed rather than being coerced. Each
+action carries a neutral derived vector and a per-action post-condition the service
+proves before it reports success.
+
+*Established from committed legacy source and executed-legacy capture:* the three
+commands' argument shapes and effects; that they write only the row's timestamp and
+attribute bag; that the click counter is seeded by the **purchase** half; the
+countdown's recorded shape; and that **no server-side completion rule exists** - no
+branch compares the counter with the item's click requirement.
+
+*Derived, never observed from the Flash client:* that a real construction sends
+these commands, and that the duration is the item's committed `build_time` rather
+than its `activation` field or a speedup-adjusted figure.
+
+*Why the post-execution proof is load-bearing:* the upgrade line established that
+legacy answers `{"result":"success"}` for a batch that destroys the row, so a
+success status is not by itself evidence that a construction step did what it
+promised.
+
+### Verification (commands actually executed)
+
+```bash
+# Construction fixture capture (one-shot, executed-legacy oracle): the exact
+# command, exit codes, containment, and why the completing command is recorded
+# but not captured are in tests/fixtures/godot-building-construction/README.md
+python -B apps/compat-api/capture_construction_fixture.py
+
+# Construction envelope + endpoint + executed-legacy parity tests (inside the
+# compat suite; observed: Ran 616 tests ... OK, exit 0)
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+
+# The hermetic construction-flow suite standalone (observed: 363 checks, PASS)
+godot --headless --path apps/client-godot --script res://tests/test_town_construction.gd
+
+# Full batteries in the final state (each embeds the construction suite and the
+# construction-live phase; both observed exit 0)
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+```
+
+`verify-boot.ps1` includes the hermetic `test_town_construction` suite and a tenth
+live phase `construction-live`, which starts the Compatibility API over a
+disposable corpus, walks one row through `start`, `click`, and `finish` against
+`POST /v0/construction`, asserts each typed response and its post-condition,
+asserts via `compat_live_phase.py --expect-save-mutation` that a corpus save file
+actually mutated, then tears down asserting the port is released, the corpus is
+removed, and no working-tree `saves/` exists.
+
+### Evidence capture (two-step, as the delivered slices)
+
+```bash
+# 1. Windowed fake-API launch: boot -> town, select the Turret I at slot 11,
+#    build, and confirm each step in turn, then capture the frame (writes
+#    building-construction.png at the legacy 1400x600 stage; a failed flow exits
+#    1 with an explicit [town] construction-capture state=error marker)
+godot --path apps/client-godot res://scenes/boot.tscn -- --gameapi=fake --construction-capture=<repo>/apps/client-godot/evidence/building-construction/building-construction.png
+
+# 2. Headless deterministic report (writes report.json; a rerun is
+#    byte-identical; the bare --construction-report flag defaults to
+#    evidence/building-construction/report.json)
+godot --headless --path apps/client-godot res://scenes/town.tscn -- --construction-report=<repo>/apps/client-godot/evidence/building-construction/report.json
+```
+
+The report (`schema construction-report-v1`) records the inputs and digests, the
+intent and its resolved action, the derived duration and the committed field it
+came from (`build_time`), both rows, the click counter, the countdown and the
+displayed remaining time, the step offered after each action, counts and resources
+before/after (unchanged), the **established-versus-derived provenance split** as its
+own section, the bootstrap and construction request counts, and the non-claims.
+
+### Construction claim limits
+
+- no Flash, Ruffle, ActionScript, or browser executed;
+- the three commands and the start duration are **derived** - never observed from
+  the Flash client - while their shapes, effects, and recorded result are
+  **established** by committed source and executed-legacy capture;
+- **no building cost is claimed**: every action carries the neutral derived vector,
+  no configuration field prices a build, and the speedup prices
+  (`BUILD_SPEEDUP_PRICING`, `BUILD_SPEEDUP_MIN_TIME`, `UPGRADE_SPEEDUP_PRICING`) are
+  out of scope;
+- the click threshold and the remaining time are **client-side derivations** with no
+  server enforcement, and the steps are player-triggered; nothing is claimed about
+  the legacy client's automatic construction loop;
+- the fixture's completing command is **recorded but not captured** - its effect
+  rests on the earlier investigation probe plus the endpoint's `finish`
+  post-execution proof;
+- **friend assistance is out of scope**: no friend can be hired or finished here,
+  and the `attr["si"]` bag is never written by this contract;
+- the legacy command that clears the whole attribute bag is never used as a cancel,
+  and this flow offers no cancel at all;
+- a row whose recorded countdown is running with the counter consumed is
+  **indistinguishable from a freshly started build** - the row itself cannot tell
+  them apart - so the flow records what it completed in-session and offers no step;
+  after a view rebuild a finished build can be clicked again, which is what the
+  legacy `add_click` command permits whenever the counter is absent;
+- the `no_build_time` refusal is exercised through an in-memory row, because no
+  placed building in the committed corpus has a non-positive committed build time;
+- parity covers one recorded transaction against the fresh-player corpus, not
+  progressed players;
+- buildability and addressability are client-side rules only; the endpoint enforces
+  structural input validity and the per-action proof, and no server-authoritative
+  validation exists;
+- no pixel-parity oracle against the legacy client exists, and the surface's layout
+  and labels are documented placeholders (the panel is the delivered shared
+  presentation, so long labels clip at its right edge);
+- the committed capture runs the fake GameApi - a deterministic test double, not a
+  parity oracle.
+
+These non-claims are recorded verbatim in
+`evidence/building-construction/report.json`.
+Remaining deliver lines of M7 (separate changes): collect income, town expansion,
+resources, and XP.

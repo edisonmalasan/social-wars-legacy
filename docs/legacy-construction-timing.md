@@ -62,8 +62,9 @@ reasonable follow-up (or an M10 social item), not a prerequisite.
   among already-placed rows and a fixture must set it explicitly.
 - `build_time` is the per-item build duration (1 for walls, 5 for Turret I and
   the Command Center, 600 for Turret II, 3600 for Command Center II).
-- `UPGRADE_SPEEDUP_PRICING = [5, 1]` (a loaded global) is the recorded price for
-  a construction speedup; no speedup command is in scope for the timer line.
+- `UPGRADE_SPEEDUP_PRICING = [5, 1]`, `BUILD_SPEEDUP_PRICING = [5, 1]`, and
+  `BUILD_SPEEDUP_MIN_TIME = 10` (loaded globals) price a construction *speedup*,
+  not a build; no speedup command is in scope for the timer line.
 - **The fresh-player corpus has no construction in progress**: every one of its
   40 rows has `attr = {}`, `timestamp = 0`, and `store = []`. Any construction
   fixture must *start* a construction rather than observe one.

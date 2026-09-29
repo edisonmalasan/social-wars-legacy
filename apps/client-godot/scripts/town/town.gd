@@ -151,11 +151,49 @@ extends Node2D
 ##
 ## The derived price vector is NEUTRAL, so an upgrade claims NO cost of any
 ## kind, and the fresh row's `{"nc": 0}` construction counter is reported as
-## it arrives and deliberately NOT consumed — the construction-timer line
-## owns it. Three legacy-client rules are known to exist (a level gate, a
+## it arrives and deliberately NOT consumed — this construction line owns it.
+## Three legacy-client rules are known to exist (a level gate, a
 ## daily-upgrade limit, and a space check) and are deliberately NOT
 ## implemented here; the reason is recorded in the delta's non-claims and in
 ## `UPGRADE_NON_CLAIMS` below (design D6).
+##
+## Build mode (building-construction, spec "Construction flow"): a FIFTH mode
+## on the SAME delivered selection-driven surface — beside `Move`, `Sell`,
+## `Store`, and `Upgrade`, exactly one of the five can be armed at a time — so
+## selecting a placed building that has an addressable legacy key and a
+## resolvable committed build time offers a `Build` action, and pressing it
+## arms the build. The armed surface reuses that panel's selection line,
+## status line, and confirm/cancel row in a fifth, TARGETLESS mode whose
+## confirm sends exactly ONE `GameApi.build_construction()` intent — the
+## legacy index and one action of the closed vocabulary, never a duration, a
+## price, or a resource delta, because the service derives the countdown from
+## the item's committed `build_time`. The single primary step FOLLOWS the
+## row's own state through the pure helpers in `construction_flow.gd`: no
+## construction state -> start, a counter below the item's committed click
+## requirement -> click, a counter that reached it -> finish, and nothing to do
+## once this client has completed the build (design D5). Cancellation sends
+## nothing and leaves the town byte-identical, and the confirm deliberately
+## offers **no** action that would clear construction state, because the one
+## legacy command that clears the attribute bag also destroys the click
+## counter and any friend-assist entries (design D6). Success applies only the
+## authoritative response — the typed row replaced by the response's
+## post-execution row, the SAME rendered object retained in depth order (a
+## construction rewrites no item, cell, or footprint, so the visual is
+## untouched), the construction readout and HUD resources and XP taken from
+## the response — with every field the apply touches snapshotted and rolled
+## back if any step fails (design D8, the same contract `_apply_upgrade`
+## implements). A construction readout (click progress and remaining countdown)
+## renders for any selected placement that carries construction state.
+##
+## The click threshold and the remaining countdown are client-side
+## derivations the server never computes — no branch compares the counter
+## with `clicks_to_build` — and the derived resource vector is NEUTRAL, so a
+## build claims **NO building cost of any kind**. Speedups
+## (`BUILD_SPEEDUP_PRICING`, `BUILD_SPEEDUP_MIN_TIME`,
+## `UPGRADE_SPEEDUP_PRICING`) and the friend-assist cluster
+## (`buy_si_help` / `finish_si`, the `attr["si"]` bag) are deliberately out of
+## scope: this line never hires or finishes a friend and never applies a
+## speedup (design D9).
 
 const Iso = preload("res://scripts/town/iso.gd")
 const TownState = preload("res://scripts/town/town_state.gd")
@@ -172,6 +210,7 @@ const PlacementCatalog = preload("res://scripts/town/placement_catalog.gd")
 const PlacementFlow = preload("res://scripts/town/placement_flow.gd")
 const ShopFlow = preload("res://scripts/town/shop_flow.gd")
 const MoveFlow = preload("res://scripts/town/move_flow.gd")
+const ConstructionFlow = preload("res://scripts/town/construction_flow.gd")
 
 ## Report-mode inputs and captures (repository-relative paths; the
 ## fixture paths mirror the fake GameApi's own committed constants and
@@ -322,6 +361,46 @@ const UPGRADE_INTENT_CELL := Vector2i(45, 49)
 ## cross-checks against the client state before it drives the intent.
 const UPGRADE_INTENT_TARGET := 24
 const UPGRADE_INTENT_ROW := [UPGRADE_INTENT_ITEM, 45, 49, 0, 0, [], {}, 1]
+## Construction evidence (building-construction, design D8): the executed-
+## legacy construction fixture the parity suite replays and the committed fake
+## capture the construction report points at (repository-relative).
+const REPORT_CONSTRUCTION_REQUEST := \
+	"tests/fixtures/godot-building-construction/steps/command_construction/request.json"
+const REPORT_CONSTRUCTION_RESPONSE := \
+	"tests/fixtures/godot-building-construction/steps/command_construction/response.body"
+const REPORT_CONSTRUCTION_AFTER := \
+	"tests/fixtures/godot-building-construction/steps/command_construction/after.json"
+const REPORT_CAPTURE_CONSTRUCTION := \
+	"apps/client-godot/evidence/building-construction/building-construction.png"
+## Default construction report destination for the bare
+## `--construction-report` flag (project-relative, resolved against the
+## project directory).
+const DEFAULT_CONSTRUCTION_REPORT_PATH := \
+	"evidence/building-construction/report.json"
+## The single construction intent the construction evidence records: the
+## Turret I (item 22) at legacy map key 11, anchored at (58,48) — the
+## executed-legacy fixture's transaction, driven through the same
+## selection -> arm -> confirm flow a player uses, and then walked through its
+## three steps in turn (start, click, finish) so the report can record the
+## offered step after each action. The fixture's slot is the same row the move
+## fixture repositions in its own independent transaction, so the two fixtures
+## stay independently readable.
+const CONSTRUCTION_INTENT_INDEX := 11
+const CONSTRUCTION_INTENT_ITEM := 22
+const CONSTRUCTION_INTENT_CELL := Vector2i(58, 48)
+## The committed configuration facts the client derives for that item and the
+## service derives server-side: its build time (the start duration, never sent
+## by the client) and its click requirement (the threshold no legacy branch
+## ever compares). Cross-checked against the executed fixture's own recorded
+## countdown and click counter before anything is sent.
+const CONSTRUCTION_INTENT_BUILD_TIME := 5
+const CONSTRUCTION_INTENT_CLICKS := 1
+## The row the executed fixture recorded BEFORE execution, and the attribute
+## bag it recorded after it — the two facts this report cross-checks the
+## client state against before it drives the intent. The start instant is the
+## capture's own wall clock and is therefore never asserted by value.
+const CONSTRUCTION_INTENT_ROW := [CONSTRUCTION_INTENT_ITEM, 58, 48, 0, 0, [],
+	{}, 1]
 ## Default placement report destination for the bare
 ## `--placement-report` flag (project-relative, resolved against the
 ## project directory).
@@ -577,6 +656,149 @@ const UPGRADE_PROVENANCE := {
 	],
 }
 
+## The construction evidence's explicit non-claims (spec "Construction
+## evidence, provenance, and claim limits"). The runtime tokens in the first
+## claim are assembled from fragments for the same project-scope reason as the
+## lists above.
+const CONSTRUCTION_NON_CLAIMS := [
+	"no Flash, " + "Ruf" + "fle" + ", " + "Action" + "Script"
+		+ ", or browser executed",
+	"that a real construction sends these three commands, and that the start "
+	+ "duration a client sends is the item's committed build_time rather than "
+	+ "its activation field or a speedup-adjusted figure, are derived and never "
+	+ "observed from the Flash client",
+	"no building cost is claimed: the committed configuration records no price "
+	+ "for building and every derived command carries the neutral vector, so the "
+	+ "neutral vector is a derivation boundary, not a claim about what the "
+	+ "legacy client charged",
+	"the click threshold and the remaining countdown are client-side "
+	+ "derivations with no server enforcement: no legacy branch compares the "
+	+ "click counter with clicks_to_build, and no branch computes a remaining "
+	+ "time from the recorded countdown and the row's start instant",
+	"the completion record is the client's own, and the limit it carries is "
+	+ "recorded rather than hidden: a completed build and a freshly started "
+	+ "one are the SAME row (the completing command deletes the click counter "
+	+ "and the purchase half only ever seeds it), so once this client "
+	+ "completes a build it offers nothing further for that row until the "
+	+ "view is rebuilt, while a client that has not walked the row re-offers "
+	+ "the click, which is the same ambiguity the legacy client had",
+	"the steps are deliberately explicit and player-triggered (start, click, "
+	+ "finish); nothing is claimed about the automatic timing of the legacy "
+	+ "client's construction loop",
+	"the completing command is recorded but not captured in the fixture: its "
+	+ "effect (deleting the click counter) is established by the earlier "
+	+ "executed-legacy probe and covered by the endpoint's per-action "
+	+ "post-execution proof, and the two-command fixture form was chosen "
+	+ "because it leaves both the countdown and the counter visible",
+	"the legacy command that clears the attribute bag (activate with a "
+	+ "non-positive duration) is never used as a cancel: it would destroy the "
+	+ "click counter and any friend-assist entries, so the confirm offers no "
+	+ "such action and a row with no resolvable build time is refused locally",
+	"construction speedups and their recorded prices (BUILD_SPEEDUP_PRICING, "
+	+ "BUILD_SPEEDUP_MIN_TIME, UPGRADE_SPEEDUP_PRICING) are out of scope, so no "
+	+ "speedup is applied and no price is invented for one",
+	"the friend-assist mechanism is out of scope: no friend can be hired or "
+	+ "finished here, and the attr[\"si\"] bag is carried verbatim and never "
+	+ "interpreted",
+	"parity covers one recorded transaction against the fresh-player corpus, "
+	+ "not progressed players",
+	"buildability, addressability, and the step that follows a row are "
+	+ "client-side rules only; the endpoint enforces structural input validity "
+	+ "plus the documented per-action post-execution proof, and no "
+	+ "server-authoritative validation exists",
+	"no pixel-parity oracle against the legacy client exists",
+	"the capture runs the fake GameApi implementation; real-execution parity is "
+	+ "established by the fixture-replay tests and the verify-boot "
+	+ "construction-live phase",
+]
+
+## The established-versus-derived provenance split the construction report
+## records as its own section (spec "Construction evidence, provenance, and
+## claim limits"). Every row names the evidence a reader can go and check, so
+## no reader has to take the split on trust.
+const CONSTRUCTION_PROVENANCE := {
+	"established": [
+		{"fact": "the three construction commands are named `activate`, "
+			+ "`add_click`, and `activate_item_click`, and they are the ONLY "
+			+ "branches that write construction state",
+			"evidence": "command.py:412-428, 525-535, 537-548 (committed "
+				+ "legacy server source) and "
+				+ "docs/legacy-construction-timing.md"},
+		{"fact": "`activate(item_index, duration)` writes item[3] = "
+			+ "time_now() and, when duration > 0, sets item[6][\"cp\"] = "
+			+ "duration; a non-positive duration instead CLEARS the whole "
+			+ "attribute bag",
+			"evidence": "command.py:412-428; the clearing behaviour is "
+				+ "reproduced by executed-legacy probe C in "
+				+ "docs/legacy-construction-timing.md"},
+		{"fact": "`add_click(item_index)` raises item[6][\"nc\"], seeding it "
+			+ "to 1 when absent, and `activate_item_click(item_index)` deletes "
+			+ "item[6][\"nc\"]",
+			"evidence": "command.py:525-548; engine.py:125-135"},
+		{"fact": "only item[3] (the row timestamp) and item[6] (the row's "
+			+ "attribute bag) are written: no branch touches the private state, "
+			+ "the map storage, or the player info",
+			"evidence": "the five branches' source plus the committed "
+				+ "executed-legacy fixture "
+				+ "tests/fixtures/godot-building-construction/"},
+		{"fact": "the click counter is SEEDED by the purchase half, not by "
+			+ "these commands: engine.map_add_item writes attr[\"nc\"] = 0 for "
+			+ "a player == 1 item whose config has clicks_to_build > 0",
+			"evidence": "engine.py:25-28; that is why the delivered "
+				+ "building-upgrade fixture's upgraded row arrives as "
+				+ "[24, 45, 49, <ts>, 0, [], {\"nc\": 0}, 1]"},
+		{"fact": "the countdown's recorded shape is the row's start instant "
+			+ "plus attr[\"cp\"], so the remaining time is cp - (now - "
+			+ "item[3]) — a pure client derivation over data the server never "
+			+ "interprets",
+			"evidence": "executed-legacy probe B in "
+				+ "docs/legacy-construction-timing.md: [22, 58, 48, 0, 0, "
+				+ "[], {}, 1] -> [22, 58, 48, <ts>, 0, [], {\"cp\": 3600}, 1]"},
+		{"fact": "there is NO server-side completion rule: no branch compares "
+			+ "nc with clicks_to_build, so deciding that a build is finished is "
+			+ "the client's act",
+			"evidence": "the five branches' source; the recorded "
+				+ "established-versus-derived boundary in "
+				+ "docs/legacy-construction-timing.md"},
+		{"fact": "the committed configuration records the per-item build time "
+			+ "(1 walls, 5 Turret I and the Command Center, 600 Turret II, "
+			+ "3600 Command Center II) and the per-item clicks_to_build (1 for "
+			+ "261 buildings, 0 for 154)",
+			"evidence": "packages/game-content normalized items "
+				+ "(buildings.json)"},
+		{"fact": "the executed result: the row at key 11 becomes "
+			+ "[22, 58, 48, <ts>, 0, [], {\"cp\": 5, \"nc\": 1}, 1], the "
+			+ "placement count stays 40, and every other row, the private "
+			+ "state, the storage, the player info, and all seven resources "
+			+ "are byte-identical",
+			"evidence": "the committed executed-legacy fixture "
+				+ "tests/fixtures/godot-building-construction/"},
+	],
+	"derived": [
+		{"fact": "a real construction sends exactly these three commands",
+			"evidence": "never observed; no Flash, " + "Ruf" + "fle" + ", "
+				+ "Action" + "Script" + ", or browser execution in this change"},
+		{"fact": "the start duration a client sends is the item's committed "
+			+ "build_time rather than its `activation` field or a "
+			+ "speedup-adjusted figure",
+			"evidence": "derived: the committed configuration records all "
+				+ "three fields and nothing ties a construction to one of "
+				+ "them; the client's choice is this contract's, and the "
+				+ "service derives the same value server-side from the same "
+				+ "committed content"},
+		{"fact": "the steps are offered one at a time and the player triggers "
+			+ "each one",
+			"evidence": "derived: the legacy client is never executed, so its "
+				+ "automatic timing is unknown; this is an explicitly "
+				+ "player-triggered rendering of the same state machine"},
+		{"fact": "the resource vector carried by all three derived commands is "
+			+ "neutral",
+			"evidence": "no building price exists in the committed "
+				+ "configuration, so no cost is computed and none is claimed; "
+				+ "BUILD_SPEEDUP_PRICING prices a speedup, which is out of scope"},
+	],
+}
+
 ## View states (spec: never claim a rendered town without one).
 const STATE_EMPTY := "empty"
 const STATE_BUILT := "built"
@@ -725,6 +947,38 @@ var _upgrade_active := false
 ## chose.
 var _upgrade_placement: Variant = null
 
+## Build flow (building-construction, spec "Construction flow"). The surface is
+## not a sixth panel: it is a FIFTH mode of the SAME selection-driven surface
+## (design D7), so it owns no slot, no preview, and no grid target — only its
+## own armed state, the placement being built, the explicit failure the spec
+## requires, and the readout the spec requires. The move, sell, store, and
+## upgrade modes, their previews, and their confirm state machines are
+## untouched.
+var construction_error := ""
+var _construction_active := false
+## The placement being built (TownState.Placement or null). The SAME instance
+## the state holds, so the apply replaces exactly the row the player chose.
+var _construction_placement: Variant = null
+## This client's own ledger of the builds it has COMPLETED, keyed by the
+## placement's legacy save key. It exists for one reason and the reason is
+## structural, not cosmetic: the completing command DELETES the click counter
+## and the purchase half only ever seeds it, so a completed build and a
+## freshly started one are the SAME row (`{cp: N}`) and no server state — nor
+## any legacy rule, since nothing compares the counter with
+## `clicks_to_build` — can tell them apart (design D5/D7). Deciding a build is
+## finished is the client's act, so the record of that decision belongs to the
+## client. A client that has not walked the row re-offers the click, which is
+## the same ambiguity the legacy client had; the limit is recorded, not
+## hidden. A rebuild of the view drops the whole ledger, and a row that records
+## no construction state is never gated by it (see
+## `ConstructionFlow.next_step`). The recorded limit: once this client has
+## completed a build on a row, that row offers nothing further in this session
+## — which is exactly the "nothing to do" the spec asks for, and exactly the
+## ambiguity the legacy client had.
+var _construction_completed: Dictionary = {}
+## The construction readout label (null while no panel is built).
+var _construction_readout: Variant = null
+
 ## Visual hierarchy + texture caches (shared across rebuilds of this view).
 var _visuals := TownVisuals.new()
 ## The committed HUD builder once attached.
@@ -759,6 +1013,11 @@ var _store_capture := false
 ## design D9): the upgrade flow runs before the capture so the frame shows the
 ## town carrying the target tier at the same cell.
 var _upgrade_capture := false
+## True when the capture flag was `--construction-capture=`
+## (building-construction, design D8): the build flow runs before the capture
+## so the frame shows the town carrying a building under construction with its
+## construction readout on screen.
+var _construction_capture := false
 
 @onready var terrain: TownTerrain = $Terrain
 @onready var objects_layer: Node2D = $Objects
@@ -820,12 +1079,19 @@ func _ready() -> void:
 			and get_script().resource_path == "res://scripts/town/town.gd":
 		await _write_upgrade_report(upgrade_report_path)
 		return
+	# The construction report shares that gate for the same reason.
+	var construction_report_path := _construction_report_path_arg()
+	if not construction_report_path.is_empty() \
+			and get_script().resource_path == "res://scripts/town/town.gd":
+		await _write_construction_report(construction_report_path)
+		return
 	_capture_path = _user_arg("--town-capture=")
 	_purchase_capture = false
 	_move_capture = false
 	_sell_capture = false
 	_store_capture = false
 	_upgrade_capture = false
+	_construction_capture = false
 	if _capture_path.is_empty():
 		_capture_path = _user_arg("--placement-capture=")
 		_placement_capture = not _capture_path.is_empty()
@@ -844,6 +1110,9 @@ func _ready() -> void:
 	if _capture_path.is_empty():
 		_capture_path = _user_arg("--upgrade-capture=")
 		_upgrade_capture = not _capture_path.is_empty()
+	if _capture_path.is_empty():
+		_capture_path = _user_arg("--construction-capture=")
+		_construction_capture = not _capture_path.is_empty()
 	if state != null:
 		build()
 	_maybe_start_capture()
@@ -1950,6 +2219,11 @@ func arm_move() -> Dictionary:
 		# design D8): an upgrade is armed, so a move is refused by name.
 		return _move_reject("upgrade_already_active",
 			"an upgrade is armed; cancel it before moving")
+	if _construction_active:
+		# The same one-surface rule for the fifth mode (building-construction
+		# design D7): a build is armed, so a move is refused by name.
+		return _move_reject("construction_already_active",
+			"a build is armed; cancel it before moving")
 	if selected == null:
 		return _move_reject("move_no_selection",
 			"no placed building is selected")
@@ -2010,37 +2284,41 @@ func refresh_move_action() -> Dictionary:
 
 
 ## Renders the move panel's current state into its committed controls (the
-## selection line, the status line, the four selection-path actions' states,
-## and the shared confirm row) so the panel text always names the live
-## selection. A no-op while no panel is built.
+## selection line, the status line, the five selection-path actions' states,
+## the construction readout, and the shared confirm row) so the panel text
+## always names the live selection. A no-op while no panel is built.
 ##
-## The panel carries ALL FOUR modes of this selection-driven surface (design
-## D8, extended by building-store design D7 and building-upgrade design D8):
-## `Move`, `Sell`, `Store`, and `Upgrade` are armed from the same selection,
-## exactly one of them can be armed at a time, and the single confirm row
-## names whichever mode is armed. The move arming, its preview, and its target
-## requirements are untouched by the other three, the sell arming is untouched
-## by the store, and the upgrade arming is untouched by all of them.
+## The panel carries ALL FIVE modes of this selection-driven surface (design
+## D8, extended by building-store design D7, building-upgrade design D8, and
+## building-construction design D7): `Move`, `Sell`, `Store`, `Upgrade`, and
+## `Build` are armed from the same selection, exactly one of them can be armed
+## at a time, and the single confirm row names whichever mode is armed. The
+## move arming, its preview, and its target requirements are untouched by the
+## other four, the sell arming is untouched by the store, and the upgrade and
+## build armings are untouched by all of them.
 func _refresh_move_panel() -> void:
 	var arm_button: Variant = _move_panel_button("move")
 	if arm_button is Button:
 		var available := move_selection_available()
 		(arm_button as Button).disabled = _move_active or _sell_active \
-			or _store_active or _upgrade_active or not available
+			or _store_active or _upgrade_active or _construction_active \
+			or not available
 		(arm_button as Button).text = "Move" if available \
 			else "Move (unavailable)"
 	var sell_button: Variant = _move_panel_button("sell")
 	if sell_button is Button:
 		var sell_available := sell_selection_available()
 		(sell_button as Button).disabled = _sell_active or _move_active \
-			or _store_active or _upgrade_active or not sell_available
+			or _store_active or _upgrade_active or _construction_active \
+			or not sell_available
 		(sell_button as Button).text = "Sell" if sell_available \
 			else "Sell (unavailable)"
 	var store_button: Variant = _move_panel_button("store")
 	if store_button is Button:
 		var store_available := store_selection_available()
 		(store_button as Button).disabled = _store_active or _move_active \
-			or _sell_active or _upgrade_active or not store_available
+			or _sell_active or _upgrade_active or _construction_active \
+			or not store_available
 		(store_button as Button).text = "Put in storage" if store_available \
 			else "Put in storage (unavailable)"
 	var upgrade_button: Variant = _move_panel_button("upgrade")
@@ -2049,20 +2327,57 @@ func _refresh_move_panel() -> void:
 		# building with no upgrade path is never offered it.
 		var upgrade_available := upgrade_selection_available()
 		(upgrade_button as Button).disabled = _upgrade_active or _move_active \
-			or _sell_active or _store_active or not upgrade_available
+			or _sell_active or _store_active or _construction_active \
+			or not upgrade_available
 		(upgrade_button as Button).text = "Upgrade" if upgrade_available \
 			else "Upgrade (unavailable)"
+	var build_button: Variant = _move_panel_button("build")
+	if build_button is Button:
+		# The build action additionally needs a resolvable committed build
+		# time, so a row whose item has none is never offered it: the service
+		# would refuse the start with `no_build_time` (design D3).
+		var build_available := construction_selection_available()
+		(build_button as Button).disabled = _construction_active \
+			or _move_active or _sell_active or _store_active or _upgrade_active \
+			or not build_available
+		(build_button as Button).text = "Build" if build_available \
+			else "Build (unavailable)"
 	var confirm_button: Variant = _move_panel_button("confirm")
 	if confirm_button is Button:
-		# A sale, a store, and an upgrade have no grid target, so their
-		# confirm is offered as soon as the mode is armed; a move's only once
-		# a valid target is committed (the move suite's own gate, unchanged).
+		# A sale, a store, an upgrade, and a build have no grid target, so
+		# their confirm is offered as soon as the mode is armed; a move's only
+		# once a valid target is committed (the move suite's own gate,
+		# unchanged).
 		(confirm_button as Button).visible = _move_active or _sell_active \
-			or _store_active or _upgrade_active
+			or _store_active or _upgrade_active or _construction_active
 		(confirm_button as Button).text = "Sell" if _sell_active \
 			else ("Put in storage" if _store_active \
-				else ("Upgrade" if _upgrade_active else "Move here"))
+				else ("Upgrade" if _upgrade_active \
+					else (ConstructionFlow.step_label(
+						_construction_step_text()) if _construction_active \
+						else "Move here")))
+	_refresh_construction_readout()
 	if _move_status == null or not is_instance_valid(_move_status):
+		return
+	if _construction_active:
+		var build_evaluation: Dictionary = _construction_evaluation(
+			_construction_placement)
+		if str(build_evaluation.get("reason", "")) != "":
+			# A refusal names itself; a structural rejection (which arming
+			# already prevents) falls back to the named error rather than an
+			# empty line.
+			var refusal := ConstructionFlow.refusal_text(build_evaluation)
+			_set_move_status("[town] build: %s" % (refusal if refusal != ""
+				else str(build_evaluation.get("error", "not buildable"))))
+		else:
+			_set_move_status("armed: build %s (save key %d) at (%d, %d) | next: "
+				% [_move_label(_construction_placement),
+					int((_construction_placement as TownState.Placement).slot),
+					(_construction_placement as TownState.Placement).cell.x,
+					(_construction_placement as TownState.Placement).cell.y]
+				+ "%s | cost: none claimed | no cancel that clears state"
+				% ConstructionFlow.step_label(
+					str(build_evaluation.get("step", ""))))
 		return
 	if _upgrade_active:
 		if _upgrade_placement is TownState.Placement:
@@ -2391,6 +2706,7 @@ func _build_move_panel(armed: bool) -> Dictionary:
 		root.remove_child(child)
 		child.free()
 	_move_status = null
+	_construction_readout = null
 	var panel := VBoxContainer.new()
 	panel.name = "move"
 	panel.anchor_left = 1.0
@@ -2431,6 +2747,16 @@ func _build_move_panel(armed: bool) -> Dictionary:
 			% [_move_label(_upgrade_placement),
 				_upgrade_label(_upgrade_placement)]
 			+ "(derived, never observed)")
+	elif _construction_active:
+		# A build states the same boundary on its side: the derived resource
+		# vector is neutral and the committed configuration records no price for
+		# building, so NO cost is claimed — and the line names the ONE step the
+		# confirm will send, because the step follows the row's own state
+		# (building-construction design D5).
+		selection.text = ("building: %s | next: %s | cost: none claimed "
+			% [_move_label(_construction_placement),
+				ConstructionFlow.step_label(_construction_step_text())]
+			+ "(derived, never observed) | no cancel that clears state")
 	elif _store_active:
 		selection.text = "storing: %s | cost: none claimed, capacity: none " \
 			% _move_label(_store_placement) + "claimed (derived, never observed)"
@@ -2449,13 +2775,29 @@ func _build_move_panel(armed: bool) -> Dictionary:
 	_style_placement_label(status)
 	panel.add_child(status)
 	_move_status = status
+	# The construction readout (building-construction design D7): a line of its
+	# own, rendered for ANY selected placement that carries construction state
+	# (the click counter against the item's committed click requirement, and
+	# the remaining countdown derived from the recorded duration and the row's
+	# own start instant). Empty while the selection records none — which is the
+	# whole fresh-player corpus at launch, so the line starts blank rather than
+	# claiming a build that is not happening.
+	var readout := Label.new()
+	readout.name = "construction"
+	readout.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	readout.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	readout.text = ""
+	_style_placement_label(readout)
+	panel.add_child(readout)
+	_construction_readout = readout
 	var row := HBoxContainer.new()
 	row.name = "actions"
 	# The selection-path arm actions (design D8, extended by building-store
-	# design D7 and building-upgrade design D8): a `Move`, a `Sell`, a `Put in
-	# storage`, and an `Upgrade` button the player presses after selecting a
-	# placed building. All four belong to this one selection-driven surface,
-	# and exactly one of them can be armed at a time.
+	# design D7, building-upgrade design D8, and building-construction design
+	# D7): a `Move`, a `Sell`, a `Put in storage`, an `Upgrade`, and a `Build`
+	# button the player presses after selecting a placed building. All five
+	# belong to this one selection-driven surface, and exactly one of them can
+	# be armed at a time.
 	var arm := Button.new()
 	arm.name = "move"
 	arm.text = "Move"
@@ -2476,20 +2818,28 @@ func _build_move_panel(armed: bool) -> Dictionary:
 	upgrade.text = "Upgrade"
 	upgrade.pressed.connect(_on_upgrade_action)
 	row.add_child(upgrade)
+	var build := Button.new()
+	build.name = "build"
+	build.text = "Build"
+	build.pressed.connect(_on_construction_action)
+	row.add_child(build)
 	# The confirm exists only while armed: unarmed, the surface offers the
 	# arm actions alone, so no confirm can be pressed before a target (or,
-	# for a sale, a store, or an upgrade, before a building is armed). It
-	# serves ALL FOUR modes and dispatches to whichever one is armed
-	# (design D7/D8).
+	# for a sale, a store, an upgrade, or a build, before a building is armed).
+	# It serves ALL FIVE modes and dispatches to whichever one is armed
+	# (design D7/D8). A build's label is its own offered step, because the step
+	# follows the row's state and must never be a generic "Confirm".
 	var confirm := Button.new()
 	confirm.name = "confirm"
 	confirm.text = "Sell" if _sell_active \
 		else ("Put in storage" if _store_active \
-			else ("Upgrade" if _upgrade_active else "Move here"))
+			else ("Upgrade" if _upgrade_active \
+				else (ConstructionFlow.step_label(_construction_step_text())
+					if _construction_active else "Move here")))
 	confirm.pressed.connect(_on_surface_confirm)
 	row.add_child(confirm)
 	if not armed and not _sell_active and not _store_active \
-			and not _upgrade_active:
+			and not _upgrade_active and not _construction_active:
 		confirm.visible = false
 	var cancel := Button.new()
 	cancel.name = "cancel"
@@ -2504,6 +2854,46 @@ func _build_move_panel(armed: bool) -> Dictionary:
 func _set_move_status(text: String) -> void:
 	if _move_status != null and is_instance_valid(_move_status):
 		(_move_status as Label).text = text
+
+
+## Writes the construction readout line (no-op before a panel exists). The
+## readout renders for ANY selected placement that carries construction state —
+## armed or not — so a player sees a build in progress without arming
+## anything, and sees it update from every authoritative response.
+func _set_construction_readout(text: String) -> void:
+	if _construction_readout != null and is_instance_valid(_construction_readout):
+		(_construction_readout as Label).text = text
+
+
+## Re-renders the construction readout from the live row: the armed placement
+## while a build is armed, otherwise the committed selection. Empty text means
+## the row records no construction state, which is the whole fresh-player
+## corpus at launch.
+func _refresh_construction_readout() -> void:
+	var target: Variant = _construction_placement if _construction_active \
+		else null
+	if target == null:
+		if selected == null or not (selected is TownObject):
+			_set_construction_readout("")
+			return
+		target = (selected as TownObject).placement
+	var requirement: Dictionary = _construction_requirement(target)
+	if not bool(requirement.get("ok", false)):
+		_set_construction_readout("")
+		return
+	var evaluation: Dictionary = _construction_evaluation(target)
+	evaluation["label"] = _move_label(target)
+	_set_construction_readout(ConstructionFlow.readout_text(evaluation))
+
+
+## The armed build's own step as a string, or `complete` when the armed row
+## offers nothing to do. A no-op-safe accessor for the confirm label, the
+## status line, and the suite.
+func _construction_step_text() -> String:
+	if _construction_placement == null:
+		return ConstructionFlow.STEP_COMPLETE
+	var evaluation: Dictionary = _construction_evaluation(_construction_placement)
+	return str(evaluation.get("step", ConstructionFlow.STEP_COMPLETE))
 
 
 ## The moving placement's display label: the resolved content name when one
@@ -2549,12 +2939,15 @@ func _object_depth_less(a: Variant, b: Variant) -> bool:
 	return _depth_less(a.placement, b.placement)
 
 
-## The shared confirm row (design D8, extended by building-store design D7
-## and building-upgrade design D8): one button serves all four modes of this
-## selection-driven surface, so its press dispatches to whichever mode is
-## armed. With no mode armed the button is hidden, so a bare press can never
-## reach an intent.
+## The shared confirm row (design D8, extended by building-store design D7,
+## building-upgrade design D8, and building-construction design D7): one button
+## serves all five modes of this selection-driven surface, so its press
+## dispatches to whichever mode is armed. With no mode armed the button is
+## hidden, so a bare press can never reach an intent.
 func _on_surface_confirm() -> void:
+	if _construction_active:
+		await confirm_construction()
+		return
 	if _upgrade_active:
 		await confirm_upgrade()
 		return
@@ -2567,9 +2960,15 @@ func _on_surface_confirm() -> void:
 	await confirm_move()
 
 
-## The shared cancel row (design D8, extended by building-store design D7 and
-## building-upgrade design D8): the same dispatch, no request either way.
+## The shared cancel row (design D8, extended by building-store design D7,
+## building-upgrade design D8, and building-construction design D7): the same
+## dispatch, no request either way. Cancelling a build sends nothing and
+## clears only mode-local state — it can never reach the legacy command that
+## would clear the building's attribute bag (design D6).
 func _on_surface_cancel() -> void:
+	if _construction_active:
+		cancel_construction()
+		return
 	if _upgrade_active:
 		cancel_upgrade()
 		return
@@ -2650,6 +3049,11 @@ func arm_sell() -> Dictionary:
 		# design D8), so an upgrade in progress refuses the sale by name.
 		return _sell_reject("upgrade_already_active",
 			"an upgrade is armed; cancel it before selling")
+	if _construction_active:
+		# The five modes of this one surface never stack (building-construction
+		# design D7), so a build in progress refuses the sale by name.
+		return _sell_reject("construction_already_active",
+			"a build is armed; cancel it before selling")
 	if selected == null:
 		return _sell_reject("sell_no_selection",
 			"no placed building is selected")
@@ -2942,6 +3346,11 @@ func arm_store() -> Dictionary:
 		# design D8), so an upgrade in progress refuses the store by name.
 		return _store_reject("upgrade_already_active",
 			"an upgrade is armed; cancel it before storing")
+	if _construction_active:
+		# The five modes of this one surface never stack (building-construction
+		# design D7), so a build in progress refuses the store by name.
+		return _store_reject("construction_already_active",
+			"a build is armed; cancel it before storing")
 	if selected == null:
 		return _store_reject("store_no_selection",
 			"no placed building is selected")
@@ -3280,6 +3689,11 @@ func arm_upgrade() -> Dictionary:
 		# design D8), so a store in progress refuses the upgrade by name.
 		return _upgrade_reject("store_already_active",
 			"a store is armed; cancel it before upgrading")
+	if _construction_active:
+		# The five modes of this one surface never stack (building-construction
+		# design D7), so a build in progress refuses the upgrade by name.
+		return _upgrade_reject("construction_already_active",
+			"a build is armed; cancel it before upgrading")
 	if selected == null:
 		return _upgrade_reject("upgrade_no_selection",
 			"no placed building is selected")
@@ -3694,6 +4108,523 @@ func _upgrade_label(placement: Variant) -> String:
 	return "%s (item %d)" % [name, id]
 
 
+# ---------------------------------------------------------------------------
+# Build flow (building-construction, spec "Construction flow")
+# ---------------------------------------------------------------------------
+
+
+## True while the build is armed.
+func construction_active() -> bool:
+	return _construction_active
+
+
+## The placement the armed build targets (TownState.Placement or null).
+func construction_placement() -> Variant:
+	return _construction_placement
+
+
+## The addressable index the armed build names (-1 when unaddressable or
+## unarmed) — the item index a construction intent carries.
+func construction_slot() -> int:
+	if _construction_placement == null:
+		return TownState.NO_SLOT
+	return int(_construction_placement.slot)
+
+
+## The step the armed build's row currently offers, as the pure state machine
+## answers it: `"start"`, `"click"`, `"finish"`, or `"complete"` when there is
+## nothing to do. Always the same pure function the confirm reads, so the
+## label, the status line, and the sent action can never disagree.
+func construction_step() -> String:
+	return _construction_step_text()
+
+
+## The armed build's committed evaluation (the pure flow's envelope, empty
+## while no build is armed) — the same evaluation the confirm reads.
+func construction_evaluation() -> Dictionary:
+	if not _construction_active:
+		return {}
+	return _construction_evaluation(_construction_placement)
+
+
+## The committed construction facts the client derives for the armed build (or
+## for the committed selection while no build is armed): `{ok, item, name,
+## clicks, build_time, reason}`. The click requirement and the build time both
+## come from the typed content package — the same committed fields the service
+## derives from — and neither is ever sent (design D2/D5).
+func construction_requirement() -> Dictionary:
+	var target: Variant = _construction_placement if _construction_active \
+		else null
+	if target == null:
+		if selected == null or not (selected is TownObject):
+			return {"ok": false, "item": 0, "name": "", "clicks": -1,
+				"build_time": 0, "reason": "no placed building is selected"}
+		target = (selected as TownObject).placement
+	return _construction_requirement(target)
+
+
+## The on-screen construction readout for the live selection ("" while the
+## panel does not exist or the row records no construction state).
+func construction_readout() -> String:
+	if _construction_readout == null \
+			or not is_instance_valid(_construction_readout):
+		return ""
+	return (_construction_readout as Label).text
+
+
+## The committed construction facts the client derives for one placement from
+## the typed content package: the item's click requirement (`clicks_to_build`,
+## the threshold no legacy branch ever compares) and its committed build time
+## (`build_time`, the start duration the SERVICE derives server-side and the
+## client never sends). `{ok, item, name, clicks, build_time, reason}`.
+##
+## Fail-closed: no registry, an unloaded package, an item the package does not
+## know, a click requirement that is not a non-negative integer, or a build
+## time that is not a positive integer all answer `{ok: false}` with a named
+## reason — never a guessed requirement and never a coerced duration (a
+## non-positive duration would make legacy CLEAR the row's whole attribute
+## bag, so it is refused rather than sent; design D3/D6).
+##
+## Nothing here is a gameplay gate the repository can reproduce: ownership,
+## price, and a level gate are deliberately not implemented, and the derived
+## resource vector is NEUTRAL, so no building cost is claimed.
+func _construction_requirement(placement: Variant) -> Dictionary:
+	var absent := func(reason: String) -> Dictionary:
+		return {"ok": false, "item": 0, "name": "", "clicks": -1,
+			"build_time": 0, "reason": reason}
+	if placement == null or not (placement is TownState.Placement):
+		return absent.call("no typed placement to build")
+	var registry: Variant = get_node_or_null("/root/ContentRegistry") \
+		if _registry == null else _registry
+	if registry == null or not bool(registry.is_loaded()):
+		return absent.call("the content package is not loaded")
+	var item_id := int((placement as TownState.Placement).item)
+	var entry := _content_entry(registry, item_id)
+	if entry.is_empty():
+		return absent.call("item %d is not in the content package" % item_id)
+	var clicks: Variant = BootData._parse_int(entry.get("clicks_to_build"))
+	if clicks == null or int(clicks) < 0:
+		return absent.call(
+			"item %d resolves no click requirement in the configuration"
+			% item_id)
+	var build_time: Variant = BootData._parse_int(entry.get("build_time"))
+	if build_time == null or int(build_time) <= 0:
+		# The service answers `no_build_time` for the same row, so the client
+		# refuses it by name and sends nothing.
+		return absent.call(
+			"item %d has no resolvable positive committed build time" % item_id)
+	return {"ok": true, "item": item_id, "name": str(entry.get("name", "")),
+		"clicks": int(clicks), "build_time": int(build_time), "reason": ""}
+
+
+## One placement's committed evaluation through the PURE flow helpers
+## (design D5/D7): the same functions the suite calls directly, fed with the
+## committed click requirement and build time, the row's own typed
+## construction state, and this client's own completion ledger. The current
+## instant is supplied here — the flow module reads no clock of its own — so
+## the remaining countdown is a derivation, never a stored fact.
+func _construction_evaluation(placement: Variant) -> Dictionary:
+	var requirement: Dictionary = _construction_requirement(placement)
+	if not bool(requirement.get("ok", false)):
+		return ConstructionFlow.evaluate(state, placement, 0, 0, false,
+			_now_epoch())
+	var completed := false
+	if placement is TownState.Placement:
+		completed = _construction_completed.has(
+			str((placement as TownState.Placement).slot_key))
+	return ConstructionFlow.evaluate(state, placement,
+		int(requirement.get("clicks", 0)), int(requirement.get("build_time", 0)),
+		completed, _now_epoch())
+
+
+## The current wall-clock epoch, in one place: the ONLY place this view reads
+## a clock for the construction readout, and always as an argument to a pure
+## helper (design D5: the remaining time is `cp - (now - item[3])`, a client
+## derivation the server never computes).
+func _now_epoch() -> int:
+	return int(Time.get_unix_time_from_system())
+
+
+## True when the current selection is a placed building a construction intent
+## can name: the addressability rule is the move flow's own, read from the same
+## one predicate (design D7 carried forward), AND the item must resolve a
+## committed build time — a row whose item has none is never offered the action,
+## because the service would refuse the start with `no_build_time` (design D3).
+func construction_selection_available() -> bool:
+	if selected == null or not (selected is TownObject):
+		return false
+	var object: TownObject = selected
+	if not bool(ConstructionFlow.state_of(object.placement)["ok"]):
+		return false
+	if not TownState.is_addressable(object.placement):
+		return false
+	return bool(_construction_requirement(object.placement).get("ok", false))
+
+
+## Arms the build on the current selection (spec "the player selects a placed
+## building, chooses the build action, and confirms"). Fail-closed: an unbuilt
+## view, no selection, a selection that is not a placement, an unaddressable
+## legacy key, an item with no resolvable committed build time, an
+## already-armed build, an armed move, an armed sale, an armed store, an armed
+## upgrade, or a missing panel each reject with an explicit error naming the
+## condition. It adds no state and no request of its own: nothing leaves the
+## client until a confirm, and a build has no grid target, so no preview is
+## shown (design D7).
+func arm_construction() -> Dictionary:
+	if view_state != STATE_BUILT:
+		return _construction_reject("town_not_built",
+			"the town view is not built")
+	if _construction_active:
+		return _construction_reject("construction_already_active",
+			"the build is already armed")
+	if _move_active:
+		return _construction_reject("move_already_active",
+			"a move is armed; cancel it before building")
+	if _sell_active:
+		return _construction_reject("sell_already_active",
+			"a sale is armed; cancel it before building")
+	if _store_active:
+		return _construction_reject("store_already_active",
+			"a store is armed; cancel it before building")
+	if _upgrade_active:
+		return _construction_reject("upgrade_already_active",
+			"an upgrade is armed; cancel it before building")
+	if selected == null:
+		return _construction_reject("construction_no_selection",
+			"no placed building is selected")
+	if not (selected is TownObject):
+		return _construction_reject("construction_no_selection",
+			"the selection is not a placed building")
+	var object: TownObject = selected
+	var placement: Variant = object.placement
+	if not (placement is TownState.Placement):
+		return _construction_reject("construction_no_selection",
+			"the selected object carries no typed placement")
+	var construction: Dictionary = ConstructionFlow.state_of(placement)
+	if not bool(construction["ok"]):
+		# A row whose attribute bag is not an object carries no readable
+		# construction state at all (the shared parser keeps it verbatim and
+		# marks it unreadable), so the build is refused by name rather than
+		# reading a counter out of a value that is not a bag.
+		return _construction_reject(ConstructionFlow.REASON_UNREADABLE_STATE,
+			str(construction["error"]))
+	if not TownState.is_addressable(placement):
+		# The move flow's own explicit reason, which the sell, store, and
+		# upgrade flows already reuse (spec: "A placement with no addressable
+		# legacy key SHALL be refused with the same explicit reason the move
+		# flow already uses"). The index is never coerced, because a coerced
+		# index would name a different row.
+		return _construction_reject(MoveFlow.REASON_UNADDRESSABLE,
+			"the selected placement's save key '%s' is not a positive integer"
+			% str(placement.slot_key))
+	var requirement: Dictionary = _construction_requirement(placement)
+	if not bool(requirement.get("ok", false)):
+		return _construction_reject(ConstructionFlow.REASON_NO_BUILD_TIME,
+			str(requirement.get("reason", "")))
+	_construction_active = true
+	_construction_placement = placement
+	construction_error = ""
+	var panel := _build_move_panel(true)
+	if not bool(panel.get("ok", false)):
+		return _construction_reject("construction_panel",
+			str(panel.get("error", "")))
+	if ui != null and ui.has_slot(SLOT_MOVE) \
+			and not ui.is_slot_visible(SLOT_MOVE):
+		ui.set_slot_visible(SLOT_MOVE, true)
+	_refresh_move_panel()
+	return {"ok": true, "error": "", "slot": int(placement.slot),
+		"item": int(placement.item),
+		"build_time": int(requirement.get("build_time", 0)),
+		"clicks_required": int(requirement.get("clicks", 0)),
+		"step": _construction_step_text()}
+
+
+## Sends exactly one construction intent (spec "a confirm that sends exactly
+## one intent") whose single action is the step the row's state offers, and
+## applies only the authoritative response. Nothing is sent unless the build is
+## armed, the armed building is still the committed selection and addressable,
+## the row offers a step at all, an active session exists, and the API is
+## registered: each missing condition rejects locally with the explicit error
+## and NO request. A structured or transport failure surfaces its code with the
+## building still on its cell carrying its previous construction state, the
+## storage untouched, and no resource changed. Awaits the GameApi call.
+##
+## The intent carries the legacy index and ONE action and nothing else — no
+## duration, no countdown, no price, no click count, no resource delta
+## (design D2/D3): the service derives the legacy command, the start duration
+## from the item's committed `build_time`, and the neutral resource vector.
+func confirm_construction() -> Dictionary:
+	if not _construction_active:
+		return _construction_reject("construction_not_active",
+			"the build is not armed")
+	if _construction_placement == null \
+			or not (_construction_placement is TownState.Placement):
+		return _construction_reject("construction_no_selection",
+			"no building is being built")
+	if not TownState.is_addressable(_construction_placement):
+		return _construction_reject(MoveFlow.REASON_UNADDRESSABLE,
+			"the armed placement's save key '%s' is not a positive integer"
+			% str(_construction_placement.slot_key))
+	if selected == null or not (selected is TownObject) \
+			or (selected as TownObject).placement != _construction_placement:
+		# A press while the build is armed can move the selection (a build owns
+		# no grid target, so it does not own the press the way an armed move
+		# does). Building something other than the committed selection is
+		# refused by name rather than guessed.
+		return _construction_reject("construction_selection_changed",
+			"the selection no longer names the armed building; "
+			+ "cancel and press Build again")
+	var evaluation: Dictionary = _construction_evaluation(_construction_placement)
+	if not ConstructionFlow.offers_step(evaluation):
+		# No offered step (a build this client already completed) or a refusal
+		# (no resolvable build time). Both are named, and both send nothing.
+		return _construction_reject(str(evaluation.get("reason", "no_step")),
+			ConstructionFlow.refusal_text(evaluation))
+	var step := str(evaluation["step"])
+	# The ledger is keyed by the row's legacy save key, captured before the
+	# apply so the completion is recorded against the row the player chose.
+	var slot_key := str((_construction_placement as TownState.Placement).slot_key)
+	var session: Variant = get_node_or_null("/root/Session")
+	if session == null or not session.is_active() \
+			or str(session.user_id()).strip_edges() == "":
+		return _construction_reject("session_unavailable",
+			"no active save to build in")
+	var api: Variant = get_node_or_null("/root/GameApi")
+	if api == null:
+		return _construction_reject("gameapi_unavailable",
+			"the GameApi autoload is not registered")
+	var response: Variant = await api.build_construction(
+		session.user_id(), int(_construction_placement.slot), step)
+	if not (response is BootData.ConstructionResult):
+		return _construction_reject("bad_response",
+			"GameApi returned no typed construction result")
+	var typed: BootData.ConstructionResult = response
+	if not typed.ok:
+		# Structured or transport failure: one contract — the explicit error
+		# names the code and message, nothing was applied.
+		construction_error = "[town] build failed: %s: %s" % [
+			typed.error_code, typed.error_message]
+		_set_move_status(construction_error)
+		_refresh_construction_readout()
+		return {"ok": false, "error": construction_error,
+			"code": typed.error_code}
+	# The label is read BEFORE the apply, which releases the armed placement.
+	var label := _move_label(_construction_placement)
+	var applied: Dictionary = _apply_construction(typed)
+	if not bool(applied.get("ok", false)):
+		return _construction_reject("apply_failed",
+			str(applied.get("error", "")))
+	construction_error = ""
+	_construction_active = false
+	_construction_placement = null
+	# The completion ledger records only the one act a row's own state cannot
+	# record: the client consuming the click counter. Nothing else writes it,
+	# and nothing reads it for a row that records no construction state (a row
+	# that is not building at all always offers a start).
+	if step == ConstructionFlow.STEP_FINISH:
+		_construction_completed[slot_key] = true
+	_set_construction_readout(ConstructionFlow.readout_text(
+		_construction_evaluation_for_selection()))
+	_set_move_status("built %s: %s recorded | cost: none claimed"
+		% [label, ConstructionFlow.step_label(step).to_lower()])
+	return {"ok": true, "error": "", "result": typed, "step": step}
+
+
+## Applies the authoritative response (building-construction design D8): the
+## typed row is replaced by the response's POST-EXECUTION row verbatim while
+## the placement stays IN the state, the SAME rendered object is retained at
+## the SAME index in the committed draw order (a construction rewrites no item,
+## cell, or footprint — only the row's timestamp and attribute bag — so the
+## visual is untouched and nothing is re-sorted), the storage mapping and its
+## readout are left UNTOUCHED, and the stored resources and XP take the
+## response's values (never a computed delta) with the HUD re-attached.
+##
+## Everything the apply touches is snapshotted FIRST — the placement's own row
+## and its parsed construction state, the missing-field list, the resource bag,
+## and the XP — so the only post-mutation failure (a rejected HUD re-attach)
+## restores every one of them from the snapshot. A failed apply therefore
+## leaves the building on the map with its previous row, construction state,
+## readout, and HUD exactly as before.
+##
+## Pre-checks run before any mutation and fail closed: a response naming a
+## different item or a different cell would be a different command than this
+## one (a construction rewrites the addressed row in place at its own cell), so
+## it is reported instead of applied.
+func _apply_construction(result: BootData.ConstructionResult) -> Dictionary:
+	if state == null:
+		return {"ok": false, "error": "the town state is unavailable"}
+	if ui == null or _hud == null:
+		return {"ok": false, "error": "the town HUD is not attached"}
+	if _construction_placement == null \
+			or not (_construction_placement is TownState.Placement):
+		return {"ok": false, "error": "no typed placement is being built"}
+	var entry: BootData.Placement = result.row
+	var resources: BootData.Resources = result.resources
+	if entry == null or resources == null:
+		return {"ok": false, "error": "the construction response is incomplete"}
+	var placement: TownState.Placement = _construction_placement
+	# The placement stays IN the state (a construction rewrites one row in
+	# place, so no container is touched); the check only proves the armed
+	# placement is really this town's, never a stale instance.
+	if not (placement in state.placements):
+		return {"ok": false,
+			"error": "the built placement is not part of the town state"}
+	if not result.action in BootData.CONSTRUCTION_ACTIONS:
+		return {"ok": false,
+			"error": "the construction response names no documented action"}
+	if entry.item_id != int(placement.item):
+		return {"ok": false,
+			"error": ("the construction response changed the building from "
+				+ "item %d to item %d, which this contract never does" % [
+				int(placement.item), entry.item_id])}
+	# The contract reuses the same key and the same cell: a response that moved
+	# the building would be a different command than this one, so it fails
+	# closed BEFORE any mutation instead of being applied.
+	if Vector2i(entry.x, entry.y) != placement.cell:
+		return {"ok": false,
+			"error": ("the construction response moved the building from (%d, %d) "
+				% [placement.cell.x, placement.cell.y]
+				+ "to (%d, %d), which this contract never does"
+				% [entry.x, entry.y])}
+	# The response's post-execution row replaces the typed row verbatim; the
+	# legacy key, the cell, the save order, the resolved content, and the
+	# rendered object are the placement's own — a construction rewrites the
+	# row's construction state, never the placement's identity.
+	var previous := {
+		"raw": placement.raw.duplicate(),
+		"timestamp": placement.timestamp,
+		"orientation": placement.orientation,
+		"store": placement.store,
+		"attr": placement.attr,
+		"player": placement.player,
+		"clicks": placement.clicks,
+		"countdown": placement.countdown,
+		"started_at": placement.started_at,
+		"missing": (state.missing as Array).duplicate(),
+		"coins": state.resources.coins,
+		"wood": state.resources.wood,
+		"steel": state.resources.steel,
+		"oil": state.resources.oil,
+		"cash": state.resources.cash,
+		"mana": state.resources.mana,
+		"xp": state.summary.xp,
+	}
+	placement.timestamp = entry.timestamp
+	placement.orientation = entry.orientation
+	placement.store = entry.store
+	placement.attr = entry.attr
+	placement.player = entry.player
+	placement.raw = [entry.item_id, entry.x, entry.y, entry.timestamp,
+		entry.orientation, entry.store, entry.attr, entry.player]
+	# The typed construction state is re-read through the SAME fail-closed
+	# parser the payload parse used, so the readout and the step machine can
+	# never read a row by a second rule set. A response row the parser rejects
+	# is an apply failure with a full rollback, not a half-written state.
+	var construction: Dictionary = TownState._construction_of(placement.raw,
+		placement.slot_key)
+	if not bool(construction.get("ok", false)):
+		placement.timestamp = previous["timestamp"]
+		placement.orientation = previous["orientation"]
+		placement.store = previous["store"]
+		placement.attr = previous["attr"]
+		placement.player = previous["player"]
+		placement.raw = previous["raw"]
+		return {"ok": false, "error": str(construction.get("error", ""))}
+	placement.clicks = construction["clicks"]
+	placement.countdown = construction["countdown"]
+	placement.started_at = construction["started_at"]
+	# The response supplies values the payload may have lacked, so those keys
+	# are no longer missing; the snapshot restores them verbatim on rollback.
+	for key in ["coins", "wood", "steel", "oil", "cash", "mana"]:
+		state.missing.erase(key)
+	state.missing.erase("xp")
+	state.resources.coins = resources.gold
+	state.resources.wood = resources.wood
+	state.resources.steel = resources.steel
+	state.resources.oil = resources.oil
+	state.resources.cash = resources.cash
+	state.resources.mana = resources.mana
+	state.summary.xp = resources.xp
+	var hud_result: Dictionary = _hud.attach(ui, state)
+	if not bool(hud_result.get("ok", false)):
+		# Roll every mutation back from the snapshot alone: a failed apply
+		# changes nothing, and the building keeps its previous row, its previous
+		# construction state, and its HUD.
+		placement.raw = previous["raw"]
+		placement.timestamp = previous["timestamp"]
+		placement.orientation = previous["orientation"]
+		placement.store = previous["store"]
+		placement.attr = previous["attr"]
+		placement.player = previous["player"]
+		placement.clicks = previous["clicks"]
+		placement.countdown = previous["countdown"]
+		placement.started_at = previous["started_at"]
+		state.missing = previous["missing"]
+		state.resources.coins = previous["coins"]
+		state.resources.wood = previous["wood"]
+		state.resources.steel = previous["steel"]
+		state.resources.oil = previous["oil"]
+		state.resources.cash = previous["cash"]
+		state.resources.mana = previous["mana"]
+		state.summary.xp = previous["xp"]
+		return {"ok": false, "error": str(hud_result.get("error", ""))}
+	# The storage view and its readout are deliberately untouched: a
+	# construction changes neither, and re-rendering them would suggest
+	# otherwise. The object is untouched too: its item, cell, and footprint are
+	# the placement's own.
+	return {"ok": true, "error": ""}
+
+
+## Closes the armed build without sending anything: the mode-local placement
+## drops, the slot hides, and the town state, the row's construction state, the
+## construction readout, the storage view, the committed selection, and the
+## resources stay byte-identical. There is deliberately NO action here that
+## would clear the building's construction state: the one legacy command that
+## clears the attribute bag also destroys the click counter and any
+## friend-assist entries, so it is never reachable from this surface
+## (design D6).
+func cancel_construction() -> Dictionary:
+	if not _construction_active:
+		return _construction_reject("construction_not_active",
+			"the build is not armed")
+	_construction_active = false
+	_construction_placement = null
+	if ui != null and ui.has_slot(SLOT_MOVE) \
+			and ui.is_slot_visible(SLOT_MOVE):
+		ui.set_slot_visible(SLOT_MOVE, false)
+	_set_move_status("build closed (nothing was sent)")
+	return {"ok": true, "error": "", "cancelled": true}
+
+
+## The house construction failure envelope: records the explicit error naming
+## the code and condition, shows it in the surface's status line, and returns
+## {ok:false} without touching town state, the row's construction state, the
+## readout, the storage view, selection, resources, or the committed draw
+## order.
+func _construction_reject(code: String, message: String) -> Dictionary:
+	construction_error = "[town] build rejected: %s: %s" % [code, message]
+	_set_move_status(construction_error)
+	return {"ok": false, "error": construction_error, "code": code}
+
+
+## The selection-path `Build` action (building-construction design D7):
+## selecting an addressable placed building with a resolvable committed build
+## time offers this action beside `Move`, `Sell`, `Store`, and `Upgrade`, and
+## pressing it arms the build. It is a pure wiring step over
+## `arm_construction` — no state, no request of its own — so the delivered
+## selection behavior is unchanged.
+func _on_construction_action() -> void:
+	arm_construction()
+
+
+## The committed selection's own construction evaluation, for the readout the
+## confirm re-renders after the armed placement is released.
+func _construction_evaluation_for_selection() -> Dictionary:
+	if selected == null or not (selected is TownObject):
+		return {"ok": false, "has_state": false}
+	return _construction_evaluation((selected as TownObject).placement)
+
+
 ## Shop button wiring: a press selects that entry.
 func _on_shop_pick(item_id: int) -> void:
 	pick_shop_item(item_id)
@@ -3786,6 +4717,15 @@ func _reset_view() -> void:
 	# upgrade behind either.
 	_upgrade_active = false
 	_upgrade_placement = null
+	# The armed build drops with the rest of the view, in its own right
+	# (building-construction design D7): a rebuild never leaves a stale armed
+	# build behind, and it drops this client's completion ledger with it — that
+	# ledger is client state, so a fresh view of a fresh save starts from the
+	# row's own state alone.
+	_construction_active = false
+	_construction_placement = null
+	_construction_completed = {}
+	_construction_readout = null
 	if ui != null and ui.has_slot(SLOT_MOVE) \
 			and ui.is_slot_visible(SLOT_MOVE):
 		ui.set_slot_visible(SLOT_MOVE, false)
@@ -3832,15 +4772,17 @@ func _commit_selection(object: Variant) -> void:
 	if object != null:
 		object.set_selected(true)
 	# Design D8: the selection is what arms this surface, so a committed
-	# selection refreshes its `Move`, `Sell`, `Store`, and `Upgrade` actions.
-	# It is presentational only — the selection itself, its highlight, and the
-	# picker's routing are exactly as delivered, and arming still requires a
-	# separate press. An armed mode is never refreshed: it already names the
-	# placement it will act on, and `confirm_sell` / `confirm_store` /
-	# `confirm_upgrade` refuse a changed selection by name instead of
+	# selection refreshes its `Move`, `Sell`, `Store`, `Upgrade`, and `Build`
+	# actions (and its construction readout). It is presentational only — the
+	# selection itself, its highlight, and the picker's routing are exactly as
+	# delivered, and arming still requires a separate press. An armed mode is
+	# never refreshed: it already names the placement it will act on, and
+	# `confirm_sell` / `confirm_store` / `confirm_upgrade` /
+	# `confirm_construction` refuse a changed selection by name instead of
 	# silently re-targeting.
 	if not _move_active and not _sell_active and not _store_active \
-			and not _upgrade_active and view_state == STATE_BUILT:
+			and not _upgrade_active and not _construction_active \
+			and view_state == STATE_BUILT:
 		refresh_move_action()
 
 
@@ -3868,6 +4810,9 @@ func _maybe_start_capture() -> void:
 	if not build_ok:
 		return
 	_capture_started = true
+	if _construction_capture:
+		_capture_construction_and_quit()
+		return
 	if _upgrade_capture:
 		_capture_upgrade_and_quit()
 		return
@@ -4179,6 +5124,92 @@ func _capture_upgrade_and_quit() -> void:
 ## flow never leaves an open window or a misleading frame.
 func _upgrade_capture_fail(step: String, detail: String) -> void:
 	print("[town] upgrade-capture state=error step=%s detail=%s" % [
+		step, detail])
+	get_tree().quit(1)
+
+
+## Construction capture (building-construction, design D8): drives the three
+## confirmed steps through the same flow a player uses — select the recorded
+## building, arm the build, confirm each offered step in turn — and then
+## captures the town carrying a building under construction with its
+## construction readout on screen. Any failed step prints an explicit marker
+## and exits 1 instead of capturing a town that never started a build.
+##
+## Every step is confirmed the way a player would: the flow re-arms, because a
+## confirm releases the armed placement exactly as the delivered modes do, and
+## the step machine follows the row's own state. The frame is taken after the
+## build click (the counter raised against the requirement, the countdown
+## still running) because that is the state a player actually watches; the
+## completing step is then confirmed so the captured view is the one a
+## completed build leaves behind, with the readout naming it.
+func _capture_construction_and_quit() -> void:
+	var object: Variant = _object_for_cell(CONSTRUCTION_INTENT_CELL)
+	if object == null:
+		_construction_capture_fail("select",
+			"no rendered object at the recorded cell (%d, %d)"
+			% [CONSTRUCTION_INTENT_CELL.x, CONSTRUCTION_INTENT_CELL.y])
+		return
+	var pressed: Dictionary = handle_pointer_press(
+		Iso.grid_to_screen(object.cell))
+	if not bool(pressed.get("ok", false)):
+		_construction_capture_fail("select", str(pressed.get("error", "")))
+		return
+	if selection() != object:
+		_construction_capture_fail("select",
+			"the press at (%d, %d) did not select the recorded building"
+			% [CONSTRUCTION_INTENT_CELL.x, CONSTRUCTION_INTENT_CELL.y])
+		return
+	var steps: Array = []
+	for index in 3:
+		var armed: Dictionary = arm_construction()
+		if not bool(armed.get("ok", false)):
+			_construction_capture_fail("arm", str(armed.get("error", "")))
+			return
+		if int(armed.get("slot", -1)) != CONSTRUCTION_INTENT_INDEX:
+			_construction_capture_fail("arm",
+				"the armed build names key %d, not %d"
+				% [int(armed.get("slot", -1)), CONSTRUCTION_INTENT_INDEX])
+			return
+		var step := str(armed.get("step", ""))
+		steps.append(step)
+		var confirmed: Dictionary = await confirm_construction()
+		if not bool(confirmed.get("ok", false)):
+			_construction_capture_fail("confirm", str(confirmed.get("error", "")))
+			return
+		# The armed placement is released after each confirm, so the next step
+		# re-selects the very same row through the delivered press path.
+		if index < 2:
+			var reselect: Dictionary = handle_pointer_press(
+				Iso.grid_to_screen(CONSTRUCTION_INTENT_CELL))
+			if not bool(reselect.get("ok", false)):
+				_construction_capture_fail("confirm",
+					str(reselect.get("error", "")))
+				return
+	if steps != [ConstructionFlow.STEP_START, ConstructionFlow.STEP_CLICK,
+			ConstructionFlow.STEP_FINISH]:
+		_construction_capture_fail("arm",
+			"the offered steps were %s, not start/click/finish"
+			% JSON.stringify(steps))
+		return
+	# The readout is rendered for the live selection, so the captured frame
+	# carries the click progress, the remaining countdown, and the completed
+	# build's own words.
+	refresh_move_action()
+	var building: Variant = _placement_for_slot(CONSTRUCTION_INTENT_INDEX)
+	print("[town] construction-capture applied item_index=%d cell=(%d, %d) "
+		% [CONSTRUCTION_INTENT_INDEX, CONSTRUCTION_INTENT_CELL.x,
+			CONSTRUCTION_INTENT_CELL.y]
+		+ "steps=%s objects=%d readout=%s" % [JSON.stringify(steps),
+			objects.size(), construction_readout()]
+		+ "row=%s" % JSON.stringify(_typed_row(building.raw) if building != null
+			else []))
+	_capture_and_quit()
+
+
+## A named construction-capture failure: explicit marker + exit 1, so a failed
+## flow never leaves an open window or a misleading frame.
+func _construction_capture_fail(step: String, detail: String) -> void:
+	print("[town] construction-capture state=error step=%s detail=%s" % [
 		step, detail])
 	get_tree().quit(1)
 
@@ -5665,6 +6696,356 @@ func _upgrade_capture_record() -> Dictionary:
 		+ "double, not a parity oracle)"
 	record["parity_pointer"] = "real-execution parity is established " \
 		+ "by the fixture-replay tests and the verify-boot upgrade-live phase"
+	return record
+
+
+# ---------------------------------------------------------------------------
+# Construction evidence report (building-construction, design D8)
+# ---------------------------------------------------------------------------
+
+
+## The construction report output path from the user arguments:
+## `--construction-report=<path>` (relative paths resolve against the project
+## directory), the bare `--construction-report` flag's default evidence path,
+## or "" when absent.
+func _construction_report_path_arg() -> String:
+	for argument in OS.get_cmdline_user_args():
+		if argument == "--construction-report":
+			return Paths.project_dir().path_join(
+				DEFAULT_CONSTRUCTION_REPORT_PATH)
+		if argument.begins_with("--construction-report="):
+			var value := argument.trim_prefix("--construction-report=")
+			if value.is_absolute_path():
+				return value
+			return Paths.project_dir().path_join(value)
+	return ""
+
+
+## Runs the construction report flow and quits with the documented exit code:
+## 0 when the deterministic report is written, 1 with an explicit marker naming
+## the first failed step (the town/placement/upgrade report pattern).
+func _write_construction_report(report_path: String) -> void:
+	var problem: String = await _construction_report_into(report_path)
+	if problem == "" and not FileAccess.file_exists(report_path):
+		problem = "[report] report file was not created at %s" % report_path
+	if problem != "":
+		print("[town] construction-report state=error message=", problem)
+		get_tree().quit(1)
+		return
+	print("[town] construction-report state=written path=", report_path)
+	get_tree().quit(0)
+
+
+## Computes the whole construction report (design D8): the bootstrap payload in
+## hand parses fail-closed (exactly one bootstrap request, no second config
+## call), the town builds from the committed save, the recorded building is
+## checked against the executed fixture's own before-row, and the flow a
+## player uses is walked through all three steps in turn (start, click,
+## finish — each confirmed against the fake implementation, each re-arming the
+## way the delivered modes do), recording the intent and its resolved action,
+## the derived duration and the committed field it came from, both rows of
+## every step, the click counter, the countdown, the offered step after each
+## action, the counts and resources, the request counts, the input digests, the
+## projection constants pointer, the fake capture pointer, the
+## established-versus-derived provenance split as its own section, and every
+## required non-claim. Returns "" on success or the first failure as an
+## explicit message.
+func _construction_report_into(report_path: String) -> String:
+	var registry: Variant = get_node_or_null("/root/ContentRegistry")
+	if registry == null:
+		return "[report] content registry is not registered"
+	if not bool(registry.is_loaded()):
+		var content: Dictionary = registry.load_content()
+		if not bool(content.get("ok", false)):
+			return "[report] content load failed: %s" % content.get("error", "")
+	if not bool(registry.assets_loaded()):
+		var assets: Dictionary = registry.load_asset_registry()
+		if not bool(assets.get("ok", false)):
+			return "[report] asset registry load failed: %s" % assets.get("error", "")
+	var api: Variant = get_node_or_null("/root/GameApi")
+	if api == null:
+		return "[report] GameApi is not registered"
+	var session: Variant = get_node_or_null("/root/Session")
+	if session == null:
+		return "[report] Session is not registered"
+	var sessions: Variant = await api.list_sessions()
+	if not bool(sessions.ok):
+		return "[report] save list failed: %s" % str(sessions.error_message)
+	if sessions.saves.size() == 0:
+		return "[report] save list carries no saves"
+	var pid := str(sessions.saves[0].id)
+	var boot: Variant = await api.get_bootstrap(pid)
+	if not bool(boot.ok):
+		return "[report] bootstrap failed: %s" % str(boot.error_message)
+	var player_info: Variant = boot.player_info
+	if player_info == null:
+		return "[report] bootstrap carried no player info"
+	var parsed: Dictionary = TownState.parse(player_info.raw, registry)
+	if not bool(parsed.get("ok", false)):
+		return "[report] town state rejected: %s" % parsed.get("error", "")
+	state = parsed["state"]
+	var built: Dictionary = build()
+	if not bool(built.get("ok", false)):
+		return "[report] town failed to build: %s" % built.get("error", "")
+	if objects.is_empty():
+		return "[report] town rendered no objects"
+	# The session the confirm needs: a real launch activates it during boot,
+	# while this headless report flow commits it here.
+	var summary := BootData.PlayerSummary.new()
+	summary.user_id = pid
+	summary.name = state.summary.name
+	summary.level = state.summary.level
+	summary.xp = state.summary.xp
+	var activation: Dictionary = session.activate(pid, summary)
+	if not bool(activation.get("ok", false)):
+		return "[report] session activation failed: %s" \
+			% activation.get("error", "")
+	var building: Variant = _placement_for_slot(CONSTRUCTION_INTENT_INDEX)
+	if building == null:
+		return "[report] no placement carries the recorded legacy key %d" \
+			% CONSTRUCTION_INTENT_INDEX
+	if building.cell != CONSTRUCTION_INTENT_CELL:
+		return "[report] the recorded building sits at (%d, %d), not (%d, %d)" \
+			% [building.cell.x, building.cell.y,
+				CONSTRUCTION_INTENT_CELL.x, CONSTRUCTION_INTENT_CELL.y]
+	if int(building.item) != CONSTRUCTION_INTENT_ITEM:
+		return "[report] the recorded building is item %d, not %d" \
+			% [int(building.item), CONSTRUCTION_INTENT_ITEM]
+	if _typed_row(building.raw) != CONSTRUCTION_INTENT_ROW:
+		return "[report] the recorded row is %s, not the executed fixture's %s" \
+			% [JSON.stringify(_typed_row(building.raw)),
+				JSON.stringify(CONSTRUCTION_INTENT_ROW)]
+	# The click requirement and the build time the client derives from the
+	# committed content package — the very facts the service derives
+	# server-side — are cross-checked against the executed fixture's own
+	# recorded countdown and click counter BEFORE anything is sent.
+	var requirement: Dictionary = _construction_requirement(building)
+	if not bool(requirement.get("ok", false)):
+		return "[report] the recorded building has no committed build facts: %s" \
+			% str(requirement.get("reason", ""))
+	if int(requirement.get("build_time", 0)) != CONSTRUCTION_INTENT_BUILD_TIME:
+		return "[report] the derived build time is %d, not %d" \
+			% [int(requirement.get("build_time", 0)),
+				CONSTRUCTION_INTENT_BUILD_TIME]
+	if int(requirement.get("clicks", -1)) != CONSTRUCTION_INTENT_CLICKS:
+		return "[report] the derived click requirement is %d, not %d" \
+			% [int(requirement.get("clicks", -1)),
+				CONSTRUCTION_INTENT_CLICKS]
+	var placements_before: int = state.placements.size()
+	var objects_before: int = objects.size()
+	var resources_before: Dictionary = _report_resources()
+	var steps: Array = []
+	var countdown_recorded: Variant = null
+	var click_counter: Variant = null
+	var start_time: Variant = null
+	var display_reference: int = 0
+	var remaining_displayed: int = 0
+	var final_step := ""
+	# The player's own path: press the recorded building's cell, arm the build,
+	# confirm — then repeat for each step the row's state offers next. Nothing
+	# here bypasses the flow a player uses.
+	for index in 3:
+		var pressed: Dictionary = handle_pointer_press(
+			Iso.grid_to_screen(CONSTRUCTION_INTENT_CELL))
+		if not bool(pressed.get("ok", false)):
+			return "[report] selection probe rejected: %s" % pressed.get("error", "")
+		if selection_legacy_id() != CONSTRUCTION_INTENT_ITEM:
+			return "[report] the press did not select item %d (selected %d)" \
+				% [CONSTRUCTION_INTENT_ITEM, selection_legacy_id()]
+		var armed: Dictionary = arm_construction()
+		if not bool(armed.get("ok", false)):
+			return "[report] build arm rejected: %s" % armed.get("error", "")
+		if int(armed.get("slot", -1)) != CONSTRUCTION_INTENT_INDEX:
+			return "[report] the armed build names key %d, not %d" \
+				% [int(armed.get("slot", -1)), CONSTRUCTION_INTENT_INDEX]
+		var step := str(armed.get("step", ""))
+		if step == "" or step == ConstructionFlow.STEP_COMPLETE:
+			return "[report] the armed build offers no step at %d" % index
+		var confirmed: Dictionary = await confirm_construction()
+		if not bool(confirmed.get("ok", false)):
+			return "[report] build confirm failed: %s" % confirmed.get("error", "")
+		var response: Variant = confirmed.get("result")
+		if not (response is BootData.ConstructionResult):
+			return "[report] the build confirm carried no typed result"
+		var typed: BootData.ConstructionResult = response
+		if typed.previous == null or typed.row == null \
+				or typed.resources == null:
+			return "[report] the build response carried no rows"
+		if typed.action != step:
+			return "[report] the service resolved action '%s', not the offered " \
+				% typed.action + "step '%s'" % step
+		if state.placements.size() != placements_before:
+			return "[report] a construction changed the placement count " \
+				+ "(before=%d after=%d)" % [placements_before,
+					state.placements.size()]
+		if objects.size() != objects_before:
+			return "[report] a construction changed the object count " \
+				+ "(before=%d after=%d)" % [objects_before, objects.size()]
+		var walking: Variant = _placement_for_slot(CONSTRUCTION_INTENT_INDEX)
+		if walking != building:
+			return "[report] the built key no longer names the same placement"
+		var record := {
+			"action": step,
+			"resolved_action": typed.action,
+			"row_previous": _boot_row(typed.previous),
+			"row_after": _boot_row(typed.row),
+			"row_in_state": _typed_row(building.raw),
+			"clicks_after": building.clicks,
+			"countdown_after": building.countdown,
+			"offered_step_after": "",
+			"readout_after": "",
+			"readout_reference_epoch": 0,
+		}
+		# The remaining countdown is a WALL-CLOCK derivation
+		# (`cp - (now - item[3])`), so this report evaluates the readout at a
+		# PINNED reference instant — the row's own recorded start — instead of
+		# the clock, which is what keeps the report byte-identical across
+		# reruns. The pin is recorded next to every number it produced.
+		var pin := 0
+		if building.started_at != null:
+			pin = int(building.started_at)
+		record["readout_reference_epoch"] = pin
+		record["readout_after"] = _construction_readout_at(pin)
+		if index == 0:
+			countdown_recorded = building.countdown
+			start_time = building.started_at
+			display_reference = pin
+			remaining_displayed = int(ConstructionFlow.remaining_seconds(
+				ConstructionFlow.state_of(building), pin))
+		if index == 1:
+			click_counter = building.clicks
+		# The step the row offers NEXT, read from the pure state machine
+		# through the live row (this client's completion ledger included), so
+		# the report shows the sequence following the row, not a script. It is
+		# read against the placement directly, because a confirm releases the
+		# armed placement exactly as the delivered modes do.
+		record["offered_step_after"] = str(
+			_construction_evaluation(building).get("step",
+				ConstructionFlow.STEP_COMPLETE))
+		steps.append(record)
+	# After the three steps the row records a countdown with the counter
+	# consumed, which is this client's own record that the build is complete.
+	refresh_move_action()
+	final_step = _construction_step_text()
+	return _write_report_file(report_path, {
+		"schema": "construction-report-v1",
+		"bootstrap_requests": int(api.bootstrap_requests),
+		"construction_requests": int(api.construction_requests),
+		"intent": {
+			"user_id": pid,
+			"item_index": CONSTRUCTION_INTENT_INDEX,
+			"actions": [ConstructionFlow.STEP_START, ConstructionFlow.STEP_CLICK,
+				ConstructionFlow.STEP_FINISH],
+		},
+		"derived_duration": {
+			"seconds": int(requirement.get("build_time", 0)),
+			"committed_field": "build_time",
+			"source": "the item's committed build_time in the normalized "
+				+ "content package (item %d, resolved client-side for the "
+				% CONSTRUCTION_INTENT_ITEM
+				+ "readout and derived again server-side by the service)",
+			"sent_by_the_client": false,
+			"matched_by_the_executed_fixture": true,
+			"note": "the committed configuration also records an `activation` "
+				+ "field and the globals price a build SPEEDUP; using either "
+				+ "would be a different claim with no evidence, so the derived "
+				+ "duration is the item's committed build_time and nothing else",
+		},
+		"click_requirement": {
+			"clicks_to_build": int(requirement.get("clicks", 0)),
+			"committed_field": "clicks_to_build",
+			"enforced_server_side": false,
+			"note": "no legacy branch compares the recorded counter with this "
+				+ "value, so the threshold is a client-side derivation",
+		},
+		"building": {
+			"legacy_id": int(building.item),
+			"name": str(building.name),
+			"slot": int(building.slot),
+			"key_reused": int(building.slot) == CONSTRUCTION_INTENT_INDEX,
+			"cell": [building.cell.x, building.cell.y],
+			"object_retained": _object_for_cell(
+				CONSTRUCTION_INTENT_CELL) != null,
+			"visual_touched": false,
+		},
+		"steps": steps,
+		"construction_state": {
+			"click_counter_after": click_counter,
+			"click_counter_consumed": building.clicks == null,
+			"countdown_recorded_seconds": countdown_recorded,
+			"start_time": start_time,
+			"remaining_seconds_as_displayed": remaining_displayed,
+			"display_reference": {
+				"epoch": display_reference,
+				"pinned_to": "the row's own recorded start instant",
+				"why": "the remaining time is cp - (now - item[3]), a wall-clock "
+					+ "derivation the server never computes, so the report "
+					+ "pins its evaluation instant to keep the report "
+					+ "byte-identical across reruns",
+			},
+			"offered_step_after_the_last_action": final_step,
+			"readout_after_the_last_action": construction_readout(),
+			"completed_is_client_recorded": true,
+		},
+		"counts": {
+			"placements_before": placements_before,
+			"placements_after": state.placements.size(),
+			"objects_before": objects_before,
+			"objects_after": objects.size(),
+		},
+		"resources": {
+			"before": resources_before,
+			"after": _report_resources(),
+		},
+		"storage": {
+			"before": _storage_record(),
+			"after": _storage_record(),
+			"touched": false,
+		},
+		"inputs": {
+			"save_list_fixture": _digest_record(REPORT_SAVE_LIST),
+			"bootstrap_fixture": _digest_record(REPORT_BOOTSTRAP),
+			"construction_request": _digest_record(REPORT_CONSTRUCTION_REQUEST),
+			"construction_response": _digest_record(REPORT_CONSTRUCTION_RESPONSE),
+			"construction_after": _digest_record(REPORT_CONSTRUCTION_AFTER),
+			"terrain": _digest_record(_terrain_runtime(registry)),
+		},
+		"constants": _constants_record(),
+		"provenance": CONSTRUCTION_PROVENANCE,
+		"capture": _construction_capture_record(),
+		"non_claims": CONSTRUCTION_NON_CLAIMS,
+	})
+
+
+## The construction readout text evaluated at a PINNED instant, so the report
+## records exactly what the readout would show at that instant instead of a
+## value that changes with the wall clock (the same pin the report's remaining
+## time uses).
+func _construction_readout_at(reference: int) -> String:
+	var building: Variant = _placement_for_slot(CONSTRUCTION_INTENT_INDEX)
+	if building == null:
+		return ""
+	var requirement: Dictionary = _construction_requirement(building)
+	if not bool(requirement.get("ok", false)):
+		return ""
+	var completed := _construction_completed.has(
+		str((building as TownState.Placement).slot_key))
+	var evaluation: Dictionary = ConstructionFlow.evaluate(state, building,
+		int(requirement.get("clicks", 0)),
+		int(requirement.get("build_time", 0)), completed, reference)
+	return ConstructionFlow.readout_text(evaluation)
+
+
+## The fake-capture pointer (building-construction design D8): the committed
+## windowed capture with its digest plus the plain statement of what it proves
+## — so no reader can mistake the screenshot for executed-legacy proof.
+func _construction_capture_record() -> Dictionary:
+	var record := _digest_record(REPORT_CAPTURE_CONSTRUCTION)
+	record["implementation"] = "fake GameApi (a deterministic test " \
+		+ "double, not a parity oracle)"
+	record["parity_pointer"] = "real-execution parity is established " \
+		+ "by the fixture-replay tests and the verify-boot " \
+		+ "construction-live phase"
 	return record
 
 

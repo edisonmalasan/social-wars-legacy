@@ -8,8 +8,9 @@ extends Node
 ## `tests/fixtures/godot-item-purchase/`, for move under
 ## `tests/fixtures/godot-building-move/`, for sell under
 ## `tests/fixtures/godot-building-sell/`, and for store under
-## `tests/fixtures/godot-building-store/`, and for upgrade under
-## `tests/fixtures/godot-building-upgrade/` at the repository root: no
+## `tests/fixtures/godot-building-store/`, for upgrade under
+## `tests/fixtures/godot-building-upgrade/`, and for construction under
+## `tests/fixtures/godot-building-construction/` at the repository root: no
 ## process, no server, no socket. It synthesizes the documented v0 envelopes
 ## from those files and parses them with the same `BootData` functions the
 ## live implementation uses, so both implementations yield identical typed
@@ -32,7 +33,12 @@ extends Node
 ## with it, and `upgrade_building()` replaces exactly the row its intent
 ## names in place — same key, same cell, the target tier derived from the
 ## fixture's own item reference, the fresh row's timestamp pinned to the
-## capture's recorded epoch — and appends that tier to the bought-units list.
+## capture's recorded epoch — and appends that tier to the bought-units list,
+## and `build_construction()` applies the matching in-place attribute-bag
+## mutation per action over the committed construction-fixture state (a start
+## re-stamps the row's start instant and records the derived countdown, a click
+## raises the click counter, a completion deletes it), reporting the capture's
+## recorded epoch as the re-stamp so the double never reads the wall clock.
 ## Parity against
 ## executed legacy is owned exclusively by
 ## the compat fixture-replay tests; this double exists so the client flow can
@@ -108,6 +114,20 @@ const UPGRADE_BEFORE_FIXTURE := \
 ## is the deterministic epoch this double stamps.
 const UPGRADE_AFTER_FIXTURE := \
 	"tests/fixtures/godot-building-upgrade/steps/command_upgrade/after.json"
+## The executed-legacy construction fixture's before-state (which again equals
+## the fresh-player corpus the boot fixtures carry): the double's starting save
+## for `build_construction()`.
+const CONSTRUCTION_BEFORE_FIXTURE := \
+	"tests/fixtures/godot-building-construction/steps/command_construction/before.json"
+## The same fixture's after-state — the real legacy server's record of the one
+## executed construction (the Turret I at map slot 11, anchored at `(58,48)`,
+## whose row gains the recorded countdown and the raised click counter while
+## every other row and every resource is byte-identical). Read (never written)
+## so a malformed capture cannot leave the double running on an inconsistent
+## oracle, and for its recorded wall-clock start instant — the deterministic
+## epoch a start re-stamps with.
+const CONSTRUCTION_AFTER_FIXTURE := \
+	"tests/fixtures/godot-building-construction/steps/command_construction/after.json"
 
 ## Anchor grid extent the v0 endpoint validates against (anchors 0..99;
 ## footprints may extend past the edge — design D5). Must match
@@ -182,6 +202,19 @@ var _upgrade_pid := ""
 var _upgrade_epoch := 0
 var _upgrade_loaded := false
 var _upgrade_error := ""
+
+# Mutable in-memory construction state (building-construction design D8): one
+# save, whose addressed row is mutated in place by the matching legacy
+# attribute-bag rule and by nothing else. Never written anywhere.
+var _construction_state: Dictionary = {}
+var _construction_pid := ""
+## The capture's recorded wall-clock start instant of the one construction the
+## executed transaction performed — the deterministic stamp a start re-stamps
+## the addressed row with (the double never reads the wall clock, exactly as
+## the placement and upgrade doubles reuse their captures' epochs).
+var _construction_epoch := 0
+var _construction_loaded := false
+var _construction_error := ""
 
 
 ## The session envelope synthesized from the committed fixtures.
@@ -669,6 +702,126 @@ func upgrade_building(user_id: String,
 		"removed": removed,
 		"upgraded": entry,
 		"resources": _upgrade_resources(),
+	})
+
+
+## Deterministic in-memory construction double (building-construction design
+## D8): the documented semantics of the three unchanged legacy branches the
+## service derives — read the row the intent names AS IT IS BEFORE the writes,
+## apply the pre-dispatch resource vector (the derived vector is NEUTRAL, so
+## every stored resource is unchanged), and then mutate ONLY that row's
+## timestamp and attribute bag, in place, at the same key and cell:
+## a `start` re-stamps the start instant and records the derived countdown,
+## a `click` raises the click counter (seeding it to `1` when absent), and a
+## `finish` deletes the counter and writes nothing else (design D5/D6). The
+## start duration comes from the addressed item's committed `build_time` in
+## the loaded configuration — never from the caller, exactly the rule the
+## endpoint applies — and the re-stamp reuses the capture's recorded epoch, so
+## the double never reads the wall clock. No clearing branch is implemented or
+## reachable: legacy's `activate` with a non-positive duration would DESTROY
+## the whole attribute bag, so the endpoint refuses such a row and this double
+## mirrors that refusal (design D6). Applied over the committed construction
+## fixture's before-state, mutating only this process. No process, no server,
+## no socket; parity against executed legacy is owned exclusively by the compat
+## fixture-replay tests, so this double is a test fixture, never an oracle.
+##
+## The response mirrors the v0 endpoint's two-sided superset (design D3/D5):
+## the legacy result, the row AS IT WAS READ BEFORE EXECUTION, the row
+## RE-READ from the save after execution, the resolved action echoed from the
+## closed vocabulary, and the current resources.
+##
+## Structural failures mirror the endpoint's codes (design D3): unknown or
+## empty save id, an integer index that names no row in the fixture's map
+## (`unknown_item_index` — the endpoint's 404, resolved BEFORE execution so
+## legacy's silent no-op is never reported as a success), an action outside the
+## documented set (`invalid_action`), a `start` on a row whose item has no
+## resolvable positive committed build time (`no_build_time` — the endpoint's
+## 400, answered before the dispatcher runs so an unbuildable row is never
+## handed a coerced or clearing duration), and an unreadable fixture
+## (`fixture_unreadable`). Ownership, whether a build may start on a row that
+## already carries construction state, the click threshold, and price are
+## gameplay/economic concerns this contract refuses: no branch compares the
+## counter with `clicks_to_build`, the derived vector is neutral, and this
+## double accepts no duration, no price, and no resource delta from any caller.
+func build_construction(user_id: String, item_index: int,
+		action: String) -> BootData.ConstructionResult:
+	if user_id.strip_edges() == "":
+		return _construction_failure("missing_user_id",
+			"user_id must be a non-empty string")
+	if not _ensure_loaded():
+		return _construction_failure("fixture_unreadable", _load_error)
+	if not _ensure_construction_loaded():
+		return _construction_failure("fixture_unreadable", _construction_error)
+	if user_id != _construction_pid:
+		return _construction_failure("unknown_user_id",
+			"no save exists for user_id '%s'" % user_id)
+	# The action is validated BEFORE the index is resolved, the endpoint's own
+	# order: the request shape is checked first, then the corpus.
+	if not BootData.CONSTRUCTION_ACTIONS.has(action):
+		return _construction_failure("invalid_action",
+			"action must be one of %s" % ", ".join(
+				BootData.CONSTRUCTION_ACTIONS))
+	var row: Variant = (_construction_state["items"] as Dictionary).get(
+		str(item_index))
+	if not (row is Array) or (row as Array).size() != 8:
+		# The endpoint resolves the index against the corpus before executing
+		# (design D3), so a stale or unknown index is a structured failure with
+		# no mutation, never a silent success.
+		return _construction_failure("unknown_item_index",
+			"no placement with index %d in this save's map" % item_index)
+	var source: Array = row as Array
+	# Copies: the three branches mutate this row's attribute bag IN PLACE
+	# (legacy's own code writes `item[6]["cp"]`, `item[6]["nc"]`, and deletes
+	# `item[6]["nc"]` on the very dict the save holds), so a shallow row copy
+	# would still alias the live bag and the "before" row would report the
+	# after-state. The bag is therefore copied separately, exactly as the
+	# endpoint does before it hands the row to the dispatcher.
+	var previous: Array = source.duplicate()
+	previous[6] = (source[6] as Dictionary).duplicate()
+	var entry: Array = source.duplicate()
+	entry[6] = (source[6] as Dictionary).duplicate()
+	var attr: Dictionary = entry[6] as Dictionary
+	# Legacy do_command order for each branch: the pre-dispatch
+	# `apply_resources` runs first — and the derived vector is all zeros, so
+	# the clamp never rewrites a value and the resources below are the state's
+	# own — then the row read, then the one in-place write that branch performs.
+	var duration: int = 0
+	if action == BootData.CONSTRUCTION_ACTIONS[0]:
+		# The start duration comes from committed content alone (design D2/D3).
+		# An unresolvable, non-integer, or non-positive committed build time
+		# fails closed with the endpoint's own 400 rather than being coerced:
+		# a zero duration would make legacy CLEAR the whole attribute bag.
+		var derived: Variant = _construction_build_time(int(entry[0]))
+		if derived == null:
+			return _construction_failure("no_build_time",
+				"item %d has no resolvable positive committed build time"
+				% int(entry[0]))
+		duration = int(derived)
+		entry[3] = _construction_epoch
+		attr["cp"] = duration
+	elif action == BootData.CONSTRUCTION_ACTIONS[1]:
+		attr["nc"] = int(attr.get("nc", 0)) + 1
+	else:
+		attr.erase("nc")
+	# The pre-execution row was read first (above), then the one write the
+	# branch performs. Nothing else is touched — no re-keying, no storage, no
+	# bought-units bookkeeping, no resource delta — exactly as the executed
+	# fixture records.
+	(_construction_state["items"] as Dictionary)[str(item_index)] = entry
+	# Same envelope shape the service returns; the shared parser yields the
+	# typed result (identical shapes by construction, design D5).
+	return BootData.parse_construction({
+		"protocol": BootData.PROTOCOL,
+		"ok": true,
+		"game_version": str(_save_list_doc.get("game_version", "")),
+		# Time-dependent field: the fixture capture's legacy server epoch,
+		# never the wall clock (deterministic by construction).
+		"server_time": _fixture_server_time(),
+		"result": "success",
+		"previous": previous,
+		"row": entry,
+		"action": action,
+		"resources": _construction_resources(),
 	})
 
 
@@ -1418,6 +1571,197 @@ func _upgrade_resources() -> Dictionary:
 	var resources := {}
 	for key: String in RESOURCE_KEYS:
 		resources[key] = int(_upgrade_state[key])
+	return resources
+
+
+# --- construction double (building-construction design D8) -------------------
+
+
+## Structured failure in the service's error envelope shape, parsed by the
+## same shared parser the live implementation uses.
+func _construction_failure(code: String,
+		message: String) -> BootData.ConstructionResult:
+	return BootData.parse_construction({
+		"protocol": BootData.PROTOCOL,
+		"ok": false,
+		"error": {"code": code, "message": message},
+	})
+
+
+## The addressed item's committed construction duration, or null when the
+## loaded configuration cannot supply a POSITIVE one. The reference is the
+## item's `build_time`, string-encoded in the committed payload exactly as
+## `costs` and `upgrades_to` are, and coerced with the SAME rule the upgrade
+## double reads `upgrades_to` with — so the double derives the countdown from
+## committed content, never from the caller, exactly the way the endpoint does
+## (`compat_legacy.item_build_time`). A non-positive value is refused rather
+## than coerced: legacy's `activate` with such a duration would CLEAR the
+## addressed row's whole attribute bag, destroying the click counter and any
+## friend-assist entries (design D6), which is why this double exposes no
+## cancel action and never sends one.
+func _construction_build_time(item_id: int) -> Variant:
+	var item: Variant = _config_items.get(str(item_id))
+	if not (item is Dictionary):
+		return null
+	var seconds: Variant = _config_reference((item as Dictionary).get("build_time"))
+	if seconds == null or int(seconds) <= 0:
+		return null
+	return seconds
+
+
+## Loads the committed construction fixture into mutable process state (once).
+## Structural failures are named with the offending field; the boot,
+## placement, purchase, move, sell, store, and upgrade fixtures' error state is
+## untouched (independent sinks).
+func _ensure_construction_loaded() -> bool:
+	if _construction_loaded:
+		return _construction_error == ""
+	_construction_loaded = true
+	var before_sink := {"error": ""}
+	var before := _read_json_into(CONSTRUCTION_BEFORE_FIXTURE, before_sink)
+	if str(before_sink["error"]) != "":
+		_construction_error = str(before_sink["error"])
+		return false
+	var after_sink := {"error": ""}
+	var after := _read_json_into(CONSTRUCTION_AFTER_FIXTURE, after_sink)
+	if str(after_sink["error"]) != "":
+		_construction_error = str(after_sink["error"])
+		return false
+	return _init_construction_state(before, after)
+
+
+## Validates the construction fixture's before- and after-states and builds
+## the in-memory save state. Every consumed field is checked, so a malformed
+## fixture fails closed instead of crashing the double. The placements are
+## kept as the save's own `items` map keyed by their legacy index, so an index
+## resolves exactly as `engine.map_get_item(map, index)` resolves it — and the
+## only writes a construction performs are the one row's timestamp and
+## attribute bag. The after-state is read for its recorded wall-clock start
+## instant: the key is REUSED, so the double takes the epoch of the row the
+## capture stamped rather than naming a key (which is the placement double's
+## job, not this one's).
+func _init_construction_state(before: Dictionary, after: Dictionary) -> bool:
+	var maps: Variant = before.get("maps")
+	if not (maps is Array) or (maps as Array).is_empty():
+		_construction_error = \
+			"construction fixture before state carries no maps array"
+		return false
+	if not ((maps as Array)[0] is Dictionary):
+		_construction_error = \
+			"construction fixture before state first map is not an object"
+		return false
+	var map: Dictionary = (maps as Array)[0]
+	var items: Variant = map.get("items")
+	if not (items is Dictionary):
+		_construction_error = \
+			"construction fixture before state carries no items map"
+		return false
+	var info: Variant = before.get("playerInfo")
+	var priv: Variant = before.get("privateState")
+	if not (info is Dictionary) or not (priv is Dictionary):
+		_construction_error = \
+			"construction fixture before state lacks playerInfo/privateState"
+		return false
+	for key in ["xp", "gold", "wood", "oil", "steel"]:
+		var value: Variant = map.get(key)
+		if not (value is int or value is float) \
+				or float(value) != floor(float(value)):
+			_construction_error = \
+				"construction fixture before state lacks map %s" % key
+			return false
+	var pid: Variant = (info as Dictionary).get("pid")
+	var cash: Variant = (info as Dictionary).get("cash")
+	var mana: Variant = (priv as Dictionary).get("mana")
+	if not (pid is String) or not (cash is int or cash is float) \
+			or not (mana is int or mana is float):
+		_construction_error = \
+			"construction fixture before state lacks save fields"
+		return false
+	# Every placement must be the documented eight-field row under a
+	# positive integer index (the shape the construction's own resolution
+	# depends on); an unusable key is a malformed capture, never a coerced
+	# index.
+	var typed_items := {}
+	for key: Variant in (items as Dictionary):
+		var index: Variant = BootData._parse_int(key)
+		if key is String and str(key).is_valid_int():
+			index = str(key).to_int()
+		if index == null or int(index) <= 0:
+			_construction_error = "construction fixture placement key '%s' is " \
+				% str(key) + "not a positive integer index"
+			return false
+		var row: Variant = (items as Dictionary)[key]
+		if not (row is Array) or (row as Array).size() != 8:
+			_construction_error = "construction fixture placement '%s' is not " \
+				% str(key) + "the eight-field array"
+			return false
+		typed_items[str(int(index))] = (row as Array).duplicate()
+	# The executed pair REUSES its key, so the after-state carries exactly as
+	# many placements as the before-state; anything else means the capture is
+	# not the transaction this double reproduces. Exactly one row differs, and
+	# its recorded wall-clock start instant is the deterministic epoch.
+	var after_maps: Variant = after.get("maps")
+	if not (after_maps is Array) or (after_maps as Array).is_empty():
+		_construction_error = \
+			"construction fixture after state carries no maps array"
+		return false
+	if not ((after_maps as Array)[0] is Dictionary):
+		_construction_error = \
+			"construction fixture after state first map is not an object"
+		return false
+	var after_items: Variant = ((after_maps as Array)[0] as Dictionary).get(
+		"items")
+	if not (after_items is Dictionary):
+		_construction_error = \
+			"construction fixture after state carries no items map"
+		return false
+	if (after_items as Dictionary).size() != typed_items.size():
+		_construction_error = ("construction fixture after state must reuse "
+			+ "the same placement keys, found %d against %d") % [
+			(after_items as Dictionary).size(), typed_items.size()]
+		return false
+	var constructed: Array = []
+	for key: String in typed_items:
+		if not (after_items as Dictionary).has(key):
+			_construction_error = ("construction fixture after state dropped "
+				+ "key %s (a construction must reuse its key)") % key
+			return false
+		if (after_items as Dictionary)[key] != typed_items[key]:
+			constructed.append(key)
+	if constructed.size() != 1:
+		_construction_error = ("construction fixture after state must mutate "
+			+ "exactly one row in place, found %d") % constructed.size()
+		return false
+	var entry: Variant = (after_items as Dictionary)[constructed[0]]
+	var stamp: Variant = (entry as Array)[3]
+	if not (stamp is int or stamp is float) or int(stamp) <= 0 \
+			or float(stamp) != floor(float(stamp)):
+		_construction_error = \
+			"construction fixture stamped start time is not a positive integer"
+		return false
+	_construction_state = {
+		"items": typed_items,
+		"xp": int(map.get("xp")),
+		"gold": int(map.get("gold")),
+		"wood": int(map.get("wood")),
+		"oil": int(map.get("oil")),
+		"steel": int(map.get("steel")),
+		"cash": int(cash),
+		"mana": int(mana),
+	}
+	_construction_pid = pid
+	_construction_epoch = int(stamp)
+	return true
+
+
+## The seven stored resource values of the in-memory construction state. A
+## construction derives a neutral vector (design D4), so these are the state's
+## own values — reported verbatim, never a computed delta, and no building cost
+## is claimed.
+func _construction_resources() -> Dictionary:
+	var resources := {}
+	for key: String in RESOURCE_KEYS:
+		resources[key] = int(_construction_state[key])
 	return resources
 
 

@@ -1,0 +1,347 @@
+{
+	"bootstrap_requests": 1,
+	"building": {
+		"cell": [
+			58,
+			48
+		],
+		"key_reused": true,
+		"legacy_id": 22,
+		"name": "Turret I",
+		"object_retained": true,
+		"slot": 11,
+		"visual_touched": false
+	},
+	"capture": {
+		"implementation": "fake GameApi (a deterministic test double, not a parity oracle)",
+		"parity_pointer": "real-execution parity is established by the fixture-replay tests and the verify-boot construction-live phase",
+		"path": "apps/client-godot/evidence/building-construction/building-construction.png",
+		"sha256": "492cfa70d4b6cfd7444ec3f1b66eb3085a30c094eaa705f35e24cde6a4fc8121"
+	},
+	"click_requirement": {
+		"clicks_to_build": 1,
+		"committed_field": "clicks_to_build",
+		"enforced_server_side": false,
+		"note": "no legacy branch compares the recorded counter with this value, so the threshold is a client-side derivation"
+	},
+	"constants": {
+		"derivation_status": "derived-provisional",
+		"evidence_gap": "the legacy SWF's static iso-engine identifiers (TILE_SIZE, EI_TILE_HEIGHT_PIXELS, gridWidth/Height, numCols/numRows) were never extracted; pixel parity with the Flash client is not claimed",
+		"grid_extent": 100,
+		"origin_x": 2000.0,
+		"origin_y": 10.0,
+		"tile_height": 20.0,
+		"tile_width": 40.0,
+		"world_rect": [
+			0.0,
+			0.0,
+			4000.0,
+			2000.0
+		]
+	},
+	"construction_requests": 3,
+	"construction_state": {
+		"click_counter_after": 1,
+		"click_counter_consumed": true,
+		"completed_is_client_recorded": true,
+		"countdown_recorded_seconds": 5,
+		"display_reference": {
+			"epoch": 1790690555,
+			"pinned_to": "the row's own recorded start instant",
+			"why": "the remaining time is cp - (now - item[3]), a wall-clock derivation the server never computes, so the report pins its evaluation instant to keep the report byte-identical across reruns"
+		},
+		"offered_step_after_the_last_action": "complete",
+		"readout_after_the_last_action": "build: item 22 | clicks 0/1 | 0 s remaining | complete",
+		"remaining_seconds_as_displayed": 5,
+		"start_time": 1790690555
+	},
+	"counts": {
+		"objects_after": 40,
+		"objects_before": 40,
+		"placements_after": 40,
+		"placements_before": 40
+	},
+	"derived_duration": {
+		"committed_field": "build_time",
+		"matched_by_the_executed_fixture": true,
+		"note": "the committed configuration also records an `activation` field and the globals price a build SPEEDUP; using either would be a different claim with no evidence, so the derived duration is the item's committed build_time and nothing else",
+		"seconds": 5,
+		"sent_by_the_client": false,
+		"source": "the item's committed build_time in the normalized content package (item 22, resolved client-side for the readout and derived again server-side by the service)"
+	},
+	"inputs": {
+		"bootstrap_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/get_player_info/response.body",
+			"sha256": "facedf76784d3dc03a3a45e81756a8546f90f7647dbff8917593404d9e401709"
+		},
+		"construction_after": {
+			"path": "tests/fixtures/godot-building-construction/steps/command_construction/after.json",
+			"sha256": "20ab0b640093f68974932bd33c38218b8c14f8d559857637cec8d06265bba173"
+		},
+		"construction_request": {
+			"path": "tests/fixtures/godot-building-construction/steps/command_construction/request.json",
+			"sha256": "91c10f3197add10449c2d45c28a927902bcd8bdf2fdb7ac3c9472fb2fabc3ebb"
+		},
+		"construction_response": {
+			"path": "tests/fixtures/godot-building-construction/steps/command_construction/response.body",
+			"sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87"
+		},
+		"save_list_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json",
+			"sha256": "ad0404c2c340a48f06e2e49ae7eb7973978cd2ccb02ac6ff7bfba4eb75f6d9f4"
+		},
+		"terrain": {
+			"path": "assets/images/en/mapa1.jpg",
+			"sha256": "35c4ded53e82be187eb67c54ee7c7023b698c3986954db4b6f9613a2a45cdd3f"
+		}
+	},
+	"intent": {
+		"actions": [
+			"start",
+			"click",
+			"finish"
+		],
+		"item_index": 11,
+		"user_id": "00000000-0000-4000-8000-000000000001"
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed",
+		"that a real construction sends these three commands, and that the start duration a client sends is the item's committed build_time rather than its activation field or a speedup-adjusted figure, are derived and never observed from the Flash client",
+		"no building cost is claimed: the committed configuration records no price for building and every derived command carries the neutral vector, so the neutral vector is a derivation boundary, not a claim about what the legacy client charged",
+		"the click threshold and the remaining countdown are client-side derivations with no server enforcement: no legacy branch compares the click counter with clicks_to_build, and no branch computes a remaining time from the recorded countdown and the row's start instant",
+		"the completion record is the client's own, and the limit it carries is recorded rather than hidden: a completed build and a freshly started one are the SAME row (the completing command deletes the click counter and the purchase half only ever seeds it), so once this client completes a build it offers nothing further for that row until the view is rebuilt, while a client that has not walked the row re-offers the click, which is the same ambiguity the legacy client had",
+		"the steps are deliberately explicit and player-triggered (start, click, finish); nothing is claimed about the automatic timing of the legacy client's construction loop",
+		"the completing command is recorded but not captured in the fixture: its effect (deleting the click counter) is established by the earlier executed-legacy probe and covered by the endpoint's per-action post-execution proof, and the two-command fixture form was chosen because it leaves both the countdown and the counter visible",
+		"the legacy command that clears the attribute bag (activate with a non-positive duration) is never used as a cancel: it would destroy the click counter and any friend-assist entries, so the confirm offers no such action and a row with no resolvable build time is refused locally",
+		"construction speedups and their recorded prices (BUILD_SPEEDUP_PRICING, BUILD_SPEEDUP_MIN_TIME, UPGRADE_SPEEDUP_PRICING) are out of scope, so no speedup is applied and no price is invented for one",
+		"the friend-assist mechanism is out of scope: no friend can be hired or finished here, and the attr[\"si\"] bag is carried verbatim and never interpreted",
+		"parity covers one recorded transaction against the fresh-player corpus, not progressed players",
+		"buildability, addressability, and the step that follows a row are client-side rules only; the endpoint enforces structural input validity plus the documented per-action post-execution proof, and no server-authoritative validation exists",
+		"no pixel-parity oracle against the legacy client exists",
+		"the capture runs the fake GameApi implementation; real-execution parity is established by the fixture-replay tests and the verify-boot construction-live phase"
+	],
+	"provenance": {
+		"derived": [
+			{
+				"evidence": "never observed; no Flash, Ruffle, ActionScript, or browser execution in this change",
+				"fact": "a real construction sends exactly these three commands"
+			},
+			{
+				"evidence": "derived: the committed configuration records all three fields and nothing ties a construction to one of them; the client's choice is this contract's, and the service derives the same value server-side from the same committed content",
+				"fact": "the start duration a client sends is the item's committed build_time rather than its `activation` field or a speedup-adjusted figure"
+			},
+			{
+				"evidence": "derived: the legacy client is never executed, so its automatic timing is unknown; this is an explicitly player-triggered rendering of the same state machine",
+				"fact": "the steps are offered one at a time and the player triggers each one"
+			},
+			{
+				"evidence": "no building price exists in the committed configuration, so no cost is computed and none is claimed; BUILD_SPEEDUP_PRICING prices a speedup, which is out of scope",
+				"fact": "the resource vector carried by all three derived commands is neutral"
+			}
+		],
+		"established": [
+			{
+				"evidence": "command.py:412-428, 525-535, 537-548 (committed legacy server source) and docs/legacy-construction-timing.md",
+				"fact": "the three construction commands are named `activate`, `add_click`, and `activate_item_click`, and they are the ONLY branches that write construction state"
+			},
+			{
+				"evidence": "command.py:412-428; the clearing behaviour is reproduced by executed-legacy probe C in docs/legacy-construction-timing.md",
+				"fact": "`activate(item_index, duration)` writes item[3] = time_now() and, when duration > 0, sets item[6][\"cp\"] = duration; a non-positive duration instead CLEARS the whole attribute bag"
+			},
+			{
+				"evidence": "command.py:525-548; engine.py:125-135",
+				"fact": "`add_click(item_index)` raises item[6][\"nc\"], seeding it to 1 when absent, and `activate_item_click(item_index)` deletes item[6][\"nc\"]"
+			},
+			{
+				"evidence": "the five branches' source plus the committed executed-legacy fixture tests/fixtures/godot-building-construction/",
+				"fact": "only item[3] (the row timestamp) and item[6] (the row's attribute bag) are written: no branch touches the private state, the map storage, or the player info"
+			},
+			{
+				"evidence": "engine.py:25-28; that is why the delivered building-upgrade fixture's upgraded row arrives as [24, 45, 49, <ts>, 0, [], {\"nc\": 0}, 1]",
+				"fact": "the click counter is SEEDED by the purchase half, not by these commands: engine.map_add_item writes attr[\"nc\"] = 0 for a player == 1 item whose config has clicks_to_build > 0"
+			},
+			{
+				"evidence": "executed-legacy probe B in docs/legacy-construction-timing.md: [22, 58, 48, 0, 0, [], {}, 1] -> [22, 58, 48, <ts>, 0, [], {\"cp\": 3600}, 1]",
+				"fact": "the countdown's recorded shape is the row's start instant plus attr[\"cp\"], so the remaining time is cp - (now - item[3]) — a pure client derivation over data the server never interprets"
+			},
+			{
+				"evidence": "the five branches' source; the recorded established-versus-derived boundary in docs/legacy-construction-timing.md",
+				"fact": "there is NO server-side completion rule: no branch compares nc with clicks_to_build, so deciding that a build is finished is the client's act"
+			},
+			{
+				"evidence": "packages/game-content normalized items (buildings.json)",
+				"fact": "the committed configuration records the per-item build time (1 walls, 5 Turret I and the Command Center, 600 Turret II, 3600 Command Center II) and the per-item clicks_to_build (1 for 261 buildings, 0 for 154)"
+			},
+			{
+				"evidence": "the committed executed-legacy fixture tests/fixtures/godot-building-construction/",
+				"fact": "the executed result: the row at key 11 becomes [22, 58, 48, <ts>, 0, [], {\"cp\": 5, \"nc\": 1}, 1], the placement count stays 40, and every other row, the private state, the storage, the player info, and all seven resources are byte-identical"
+			}
+		]
+	},
+	"resources": {
+		"after": {
+			"cash": 5,
+			"coins": 2000,
+			"energy": 50,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2000,
+			"xp": 4
+		},
+		"before": {
+			"cash": 5,
+			"coins": 2000,
+			"energy": 50,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2000,
+			"xp": 4
+		}
+	},
+	"schema": "construction-report-v1",
+	"steps": [
+		{
+			"action": "start",
+			"clicks_after": null,
+			"countdown_after": 5,
+			"offered_step_after": "click",
+			"readout_after": "build: item 22 | clicks 0/1 | 5 s remaining",
+			"readout_reference_epoch": 1790690555,
+			"resolved_action": "start",
+			"row_after": [
+				22,
+				58,
+				48,
+				1790690555,
+				0,
+				[],
+				{
+					"cp": 5
+				},
+				1
+			],
+			"row_in_state": [
+				22,
+				58,
+				48,
+				1790690555,
+				0,
+				[],
+				{
+					"cp": 5
+				},
+				1
+			],
+			"row_previous": [
+				22,
+				58,
+				48,
+				0,
+				0,
+				[],
+				{},
+				1
+			]
+		},
+		{
+			"action": "click",
+			"clicks_after": 1,
+			"countdown_after": 5,
+			"offered_step_after": "finish",
+			"readout_after": "build: item 22 | clicks 1/1 | 5 s remaining",
+			"readout_reference_epoch": 1790690555,
+			"resolved_action": "click",
+			"row_after": [
+				22,
+				58,
+				48,
+				1790690555,
+				0,
+				[],
+				{
+					"cp": 5,
+					"nc": 1
+				},
+				1
+			],
+			"row_in_state": [
+				22,
+				58,
+				48,
+				1790690555,
+				0,
+				[],
+				{
+					"cp": 5,
+					"nc": 1
+				},
+				1
+			],
+			"row_previous": [
+				22,
+				58,
+				48,
+				1790690555,
+				0,
+				[],
+				{
+					"cp": 5
+				},
+				1
+			]
+		},
+		{
+			"action": "finish",
+			"clicks_after": null,
+			"countdown_after": 5,
+			"offered_step_after": "complete",
+			"readout_after": "build: item 22 | clicks 0/1 | 5 s remaining | complete",
+			"readout_reference_epoch": 1790690555,
+			"resolved_action": "finish",
+			"row_after": [
+				22,
+				58,
+				48,
+				1790690555,
+				0,
+				[],
+				{
+					"cp": 5
+				},
+				1
+			],
+			"row_in_state": [
+				22,
+				58,
+				48,
+				1790690555,
+				0,
+				[],
+				{
+					"cp": 5
+				},
+				1
+			],
+			"row_previous": [
+				22,
+				58,
+				48,
+				1790690555,
+				0,
+				[],
+				{
+					"cp": 5,
+					"nc": 1
+				},
+				1
+			]
+		}
+	],
+	"storage": {
+		"after": {},
+		"before": {},
+		"touched": false
+	}
+}
