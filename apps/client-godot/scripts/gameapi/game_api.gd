@@ -4,7 +4,8 @@ extends Node
 ##
 ## Client code calls `list_sessions()` / `get_bootstrap()` for boot data,
 ## `place_building()` for one placement intent, `purchase_item()` for one
-## purchase intent, and `move_building()` for one move intent, receiving
+## purchase intent, `move_building()` for one move intent, and
+## `sell_building()` for one sell intent, receiving
 ## typed results
 ## (`scripts/gameapi/boot_data.gd`); raw transport dictionaries never reach
 ## presentation code, and no other script references a transport.
@@ -15,8 +16,9 @@ extends Node
 ##   fake      - reads the committed executed-legacy fixtures under
 ##               `tests/fixtures/godot-compatibility-boot/` (boot),
 ##               `tests/fixtures/godot-building-placement/` (placement),
-##               `tests/fixtures/godot-item-purchase/` (purchase), and
-##               `tests/fixtures/godot-building-move/` (move); no process,
+##               `tests/fixtures/godot-item-purchase/` (purchase),
+##               `tests/fixtures/godot-building-move/` (move), and
+##               `tests/fixtures/godot-building-sell/` (sell); no process,
 ##               no server, no socket.
 ##   legacy_v0 - JSON over loopback HTTP to Compatibility API v0 through the
 ##               built-in HTTP request client; endpoint from the project
@@ -70,6 +72,12 @@ var purchase_requests := 0
 ## Monotonic for the same reason: `configure()` swaps the implementation
 ## without hiding history.
 var move_requests := 0
+## Number of sell intents this process has issued (building-sell flow
+## contract: exactly one per confirm, zero for every local refusal — the
+## sell suite snapshots this counter exactly like `placement_requests`).
+## Monotonic for the same reason: `configure()` swaps the implementation
+## without hiding history.
+var sell_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -165,6 +173,20 @@ func move_building(user_id: String, item_index: int, x: int,
 	move_requests += 1
 	var result: BootData.PlacementResult = await _impl.move_building(
 		user_id, item_index, x, y)
+	return result
+
+
+## One sell intent (the legacy map index of an existing placement) from the
+## selected implementation. The contract carries NO price, NO refund, NO
+## sell reason, and NO resource deltas: the service derives the legacy
+## envelope server-side (design D3), so the typed result's removed row and
+## resources are authoritative (design D5). The removed row is the one the
+## service read BEFORE execution, so presentation code removes exactly the
+## building the response names and takes the resource values verbatim.
+func sell_building(user_id: String, item_index: int) -> BootData.SellResult:
+	sell_requests += 1
+	var result: BootData.SellResult = await _impl.sell_building(
+		user_id, item_index)
 	return result
 
 
