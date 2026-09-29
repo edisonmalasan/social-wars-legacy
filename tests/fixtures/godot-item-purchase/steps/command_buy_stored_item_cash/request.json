@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-09-29T02:35:04+00:00",
+  "form": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "data": "300df5f7047a578adb5f1167987587b609e43039d17d917dc2b0d15880a9aa74;{\"accessToken\":\"\",\"commands\":[[0,\"buy_stored_item_cash\",[105],[0,0,0,0,0,0,-5,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1790649304}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "command.php form (USERID, user_key, language, data) with the derived <64-hex>;<json> envelope carrying one buy_stored_item_cash command whose single argument is the item id and whose resources_changed is the negated cash price; user_key is redacted in this record (design D9); accessToken is the crafted empty placeholder, never a token value.",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}

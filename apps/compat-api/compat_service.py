@@ -24,6 +24,19 @@ Surface (loopback only, port :5056):
     the one state-mutating surface; the contract accepts no client-supplied
     resource deltas — extra keys are ignored.
 
+``POST /v0/purchase`` with JSON ``{"user_id", "item_id"}``
+    ``{protocol, ok, game_version, server_time, result, store, resources}``
+    — also an intent only, and the second state-mutating surface. The legacy
+    batch envelope is derived internally from the item's config ``costs``
+    (the cash-only price on the legacy 8-slot resource vector, one
+    ``buy_stored_item_cash`` command whose single argument is the item id,
+    and the documented placeholders — design D2 of the ``building-purchase``
+    change), the unchanged legacy ``command()`` dispatcher executes it
+    in-process, and the answer carries the legacy ``result`` plus the
+    authoritative superset: the full post-execution ``store`` mapping and the
+    current ``resources`` (design D4). The contract accepts no client-supplied
+    price, quantity, or resource deltas — extra keys are ignored.
+
 Deviation recorded for review: the bootstrap envelope also carries ``saves``
 (the session envelope plus ``config`` and ``player_info``). Design D3 lists
 only ``config`` and ``player_info``; the extra key is a superset of D3 and
@@ -38,11 +51,13 @@ code                     HTTP  when
 ``missing_user_id``      400  ``user_id`` absent, null, or an empty string
 ``invalid_user_id``      400  ``user_id`` present but not a string
 ``unknown_user_id``      404  well-formed id that names no save
-``missing_item_id``      400  ``/v0/place`` body carries no ``item_id``
+``missing_item_id``      400  ``/v0/place`` or ``/v0/purchase`` body carries no ``item_id``
 ``invalid_item_id``      400  ``item_id`` present but not an integer (``bool`` excluded)
 ``unknown_item_id``      404  integer id absent from the loaded config
 ``invalid_coordinates``  400  ``x``/``y`` missing, not integers, or outside ``0..99``
 ``invalid_orientation``  400  ``orientation`` present but not an integer
+``costs_not_cash``       400  ``/v0/purchase`` item's config price is not a cash
+                               price (absent, empty, another resource, mixed)
 ``bad_request``          400  other malformed requests Flask rejects
 ``not_found``            404  unknown path
 ``method_not_allowed``   405  known path, unsupported method
@@ -53,11 +68,11 @@ code                     HTTP  when
 Persistence scope (design D6, spec ``godot-compatibility-boot``): the
 session and bootstrap endpoints never persist — this module never calls
 ``sessions.save_session`` for them and every call leaves the saves
-byte-identical. ``POST /v0/place`` executes the unchanged legacy
-``command()`` dispatcher, which persists through legacy ``save_session``
-into the **service corpus's** ``saves/`` and nowhere else; the service
-never opens a working-tree file for writing, and it never binds anywhere
-except ``127.0.0.1`` (the bind address lives here so both the start
+byte-identical. ``POST /v0/place`` and ``POST /v0/purchase`` execute the
+unchanged legacy ``command()`` dispatcher, which persists through legacy
+``save_session`` into the **service corpus's** ``saves/`` and nowhere else; the
+service never opens a working-tree file for writing, and it never binds
+anywhere except ``127.0.0.1`` (the bind address lives here so both the start
 command and the tests read one constant).
 """
 
@@ -69,6 +84,7 @@ from flask import Flask, Response, jsonify, request
 
 import compat_legacy
 import placement_envelope
+import purchase_envelope
 
 PROTOCOL = "compat-v0"
 HOST = "127.0.0.1"
@@ -83,6 +99,7 @@ ERROR_INVALID_ITEM_ID = "invalid_item_id"
 ERROR_UNKNOWN_ITEM_ID = "unknown_item_id"
 ERROR_INVALID_COORDINATES = "invalid_coordinates"
 ERROR_INVALID_ORIENTATION = "invalid_orientation"
+ERROR_COSTS_NOT_CASH = "costs_not_cash"
 ERROR_BAD_REQUEST = "bad_request"
 ERROR_NOT_FOUND = "not_found"
 ERROR_METHOD_NOT_ALLOWED = "method_not_allowed"
@@ -288,6 +305,111 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
                 boot,
                 result="success",
                 placement=placement,
+                resources=resources,
+            ),
+            200,
+        )
+
+    @app.post("/v0/purchase")
+    def v0_purchase() -> Tuple[Dict[str, Any], int]:
+        """Execute one purchase intent through the unchanged legacy path.
+
+        Validation is structural fail-closed (design D3/D5): a JSON object
+        body, a resolvable save, an integer item id present in config, and a
+        cash-only config price (design D2).  The level gate and cash
+        affordability are gameplay rules the client owns exactly as they were
+        Flash's — legacy ``buy_stored_item_cash`` performs no validation at
+        all — and anti-cheat validation belongs to Server v1 (M13).  Every
+        failure below returns before the legacy dispatcher runs, so the corpus
+        is untouched on every error path.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404,
+                ERROR_UNKNOWN_USER_ID,
+                "no save exists for user_id %r" % user_id,
+            )
+
+        if "item_id" not in payload:
+            return error_response(400, ERROR_MISSING_ITEM_ID, "item_id is required")
+        item_id = payload["item_id"]
+        if not purchase_envelope.is_strict_int(item_id):
+            return error_response(
+                400, ERROR_INVALID_ITEM_ID, "item_id must be an integer"
+            )
+        if not boot.has_item(item_id):
+            return error_response(
+                404, ERROR_UNKNOWN_ITEM_ID, "no config item with id %d" % item_id
+            )
+
+        # Derive the legacy envelope from the loaded config (design D2).  The
+        # contract carries no price, quantity, or resource delta: extra keys
+        # are ignored so the client's own derivation can never win.
+        try:
+            envelope_payload = purchase_envelope.build_envelope(
+                item_id=item_id,
+                costs=boot.item_costs(item_id),
+            )
+        except purchase_envelope.EnvelopeError as failure:
+            if failure.code == ERROR_COSTS_NOT_CASH:
+                # The item exists but is not priced in cash alone, so this
+                # command's price is not derivable — the client should not
+                # have offered the item (a derivation boundary, not a
+                # gameplay rule).
+                return error_response(400, ERROR_COSTS_NOT_CASH, str(failure))
+            if failure.code.startswith("costs_"):
+                # Derived from committed config, not from client input:
+                # the config itself is unresolvable, so this is server-side.
+                return error_response(
+                    500, ERROR_INTERNAL, "config costs not derivable: %s" % failure.code
+                )
+            return error_response(400, failure.code, str(failure))
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        # Execute the unchanged legacy command dispatcher in-process.  It
+        # persists via legacy save_session into this corpus only; the legacy
+        # HTTP route returns {"result": "success"} whenever command()
+        # returns without raising, so reaching here IS the legacy result.
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        # Read back what actually landed: the whole storage mapping (design
+        # D4) so the client needs no arithmetic for pre-existing contents.
+        try:
+            store = boot.map_store(user_id)
+        except compat_legacy.LegacyBootError:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy execution did not persist the storage entry",
+            )
+        if not isinstance(store, dict):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy execution did not persist the storage entry",
+            )
+        try:
+            resources = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        return (
+            envelope(
+                boot,
+                result="success",
+                store=store,
                 resources=resources,
             ),
             200,
