@@ -5,15 +5,16 @@ extends "res://tests/test_base.gd"
 ## "Place through either implementation", by `building-purchase` with the
 ## purchase parity of spec "Purchase through either implementation", by
 ## `building-move` with the move parity of spec "Move through either
-## implementation", and by `building-sell` with the sell parity of spec
-## "Sell through either implementation").
+## implementation", by `building-sell` with the sell parity of spec "Sell
+## through either implementation", and by `building-store` with the store
+## parity of spec "Store through either implementation").
 ##
 ## Requires a running Compatibility API v0 on loopback — verify-boot.ps1
 ## wraps this suite with `compat_live_phase.py`, which starts
 ## `apps/compat-api/run.py` (disposable corpus) and tears it down again. The
 ## suite compares every live typed result against the fake implementation's,
 ## so both must yield the same boot data and the same placement, purchase,
-## move, and sell results (time-dependent fields excepted).
+## move, sell, and store results (time-dependent fields excepted).
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 
@@ -49,6 +50,16 @@ const SELL_CELL := Vector2i(41, 48)
 ## resolves it before executing and answers 404 `unknown_item_index`, so
 ## legacy's silent no-op early return is never reported as a success.
 const SELL_UNKNOWN_INDEX := 9999
+## The executed-legacy store transaction's target: the Tree decoration
+## (item 905) at legacy map key 2, anchored at (53,39) — the one store both
+## implementations must answer identically.
+const STORE_ITEM := 905
+const STORE_INDEX := 2
+const STORE_CELL := Vector2i(53, 39)
+## An integer index that names no row in the corpus save: the store endpoint
+## resolves it before executing and answers 404 `unknown_item_index`, so
+## legacy's silent early return is never reported as a success.
+const STORE_UNKNOWN_INDEX := 9999
 
 
 func run_scenario() -> void:
@@ -171,6 +182,7 @@ func run_scenario() -> void:
 	await _check_live_purchase(api, endpoint, user_id)
 	await _check_live_move(api, endpoint, user_id)
 	await _check_live_sell(api, endpoint, user_id)
+	await _check_live_store(api, endpoint, user_id)
 	# The live corpus now carries every mutating transaction, so this suite's
 	# parity claim is stated once, explicitly: the two implementations are
 	# compared on the fields each own, and each side's resource bag is
@@ -692,6 +704,150 @@ func _check_live_sell(api: Variant, endpoint: String, user_id: String) -> void:
 			live.resources.gold])
 
 
+## Store through both implementations (building-store task 3.3, spec "Store
+## through either implementation"): the same typed shape from both, the live
+## removed row matching the executed fixture's pre-execution row for every
+## stable field, the live FULL storage mapping matching the corpus's own
+## pre-store mapping plus exactly that item's id, the neutral price vector
+## leaving the resource bag untouched (and therefore claiming no cost and no
+## capacity rule), and the endpoint's structured codes passing through
+## unchanged.
+##
+## The corpus in this phase already carries the placement, purchase, move, and
+## sell transactions, so the live side's storage and resources are its own —
+## the honest claim is the one the contract makes: a store pops exactly the
+## row the intent names, increments that item's storage entry by exactly 1,
+## and changes nothing else, and both implementations produce the same typed
+## shape and the same removed row.
+func _check_live_store(api: Variant, endpoint: String, user_id: String) -> void:
+	# The live side's pre-store resources and storage, read from the corpus
+	# itself (this phase has already mutated it).
+	api.configure("legacy_v0", endpoint)
+	var live_before: BootData.Resources = await _live_resources(api, endpoint,
+		user_id)
+	check(live_before != null,
+		"the live corpus pre-store resources resolve")
+	var storage_before: Variant = await _live_storage(api, endpoint, user_id)
+	check(storage_before != null,
+		"the live corpus pre-store storage mapping resolves")
+
+	var live_ref: Variant = await api.store_building(user_id, STORE_INDEX)
+	check(live_ref is BootData.StoreResult,
+		"live store_building returns the typed result")
+	if not (live_ref is BootData.StoreResult):
+		return
+	var live: BootData.StoreResult = live_ref
+	check(live.ok, "live store resolves over loopback: %s"
+		% live.error_message)
+	if not live.ok:
+		return
+	check_eq(live.protocol, BootData.PROTOCOL, "live store protocol is compat-v0")
+	check(live.game_version != "",
+		"the live store response carries the game version")
+	check(live.server_time > 0,
+		"live server_time is a positive wall-clock epoch (time-dependent)")
+	check_eq(live.result, "success", "live store reports the legacy success result")
+	check(live.removed != null and live.resources != null,
+		"the live store response carries the removed row and resources")
+	if live.removed == null or live.resources == null:
+		return
+	# The row is the one read BEFORE execution (design D4/D5): the anchor the
+	# save carried, and every other field untouched.
+	check_eq(live.removed.item_id, STORE_ITEM,
+		"the live removed row names the Tree")
+	check_eq(live.removed.x, STORE_CELL.x,
+		"the live removed row carries x=53")
+	check_eq(live.removed.y, STORE_CELL.y,
+		"the live removed row carries y=39")
+	check_eq(live.removed.player, 1,
+		"the live removed row keeps the player's team field")
+	if storage_before != null:
+		# The FULL post-execution mapping: every pre-existing entry survives
+		# untouched and exactly one new entry (this item, quantity 1) lands,
+		# so the client needs no arithmetic of its own.
+		var expected: Dictionary = (storage_before as Dictionary).duplicate()
+		expected[str(STORE_ITEM)] = int(
+			expected.get(str(STORE_ITEM), 0)) + 1
+		check_eq(live.store, expected,
+			"the live store mapping is the corpus's own plus the one new entry")
+	if live_before != null:
+		# The derived price vector is neutral, so a store changes NO resource
+		# (design D2) — and therefore claims no cost and no capacity rule.
+		for key in ["gold", "wood", "oil", "steel", "mana", "xp", "cash"]:
+			check_eq(int(live.resources.get(key)), int(live_before.get(key)),
+				"%s is untouched by the store (neutral vector, design D2)"
+					% key)
+
+	# Fake reference: an independent in-memory state over the committed
+	# store-fixture before-state.
+	api.configure("fake")
+	var fake_ref: Variant = await api.store_building(user_id, STORE_INDEX)
+	check(fake_ref is BootData.StoreResult,
+		"fake store_building returns the typed result")
+	if not (fake_ref is BootData.StoreResult):
+		return
+	var fake: BootData.StoreResult = fake_ref
+	check(fake.ok, "fake store reference resolves: %s" % fake.error_message)
+	if not fake.ok or fake.removed == null or fake.resources == null:
+		return
+	check_eq(live.protocol, fake.protocol,
+		"live store protocol equals the fake's")
+	check_eq(live.result, fake.result,
+		"live store result string equals the fake's")
+	check_eq(live.removed.item_id, fake.removed.item_id,
+		"live store item id equals the fake's")
+	check_eq(live.removed.x, fake.removed.x,
+		"live store x equals the fake's")
+	check_eq(live.removed.y, fake.removed.y,
+		"live store y equals the fake's")
+	check_eq(live.removed.orientation, fake.removed.orientation,
+		"live store orientation equals the fake's (unchanged by a store)")
+	check_eq(live.removed.player, fake.removed.player,
+		"live store player field equals the fake's")
+	check_eq(live.removed.store.size(), fake.removed.store.size(),
+		"live store store equals the fake's (unchanged by a store)")
+	check(live.removed.attr == fake.removed.attr,
+		"live store attr equals the fake's (live=%s fake=%s)"
+		% [JSON.stringify(live.removed.attr),
+		JSON.stringify(fake.removed.attr)])
+	# The fake's own side: the executed fixture's two-sided outcome, verbatim.
+	check_eq(fake.removed.x, 53, "the fake reproduces the fixture's removed x")
+	check_eq(fake.removed.y, 39, "the fake reproduces the fixture's removed y")
+	check_eq(fake.removed.timestamp, 0,
+		"the fake never restamps the removed row's timestamp")
+	check_eq(fake.store, {"905": 1},
+		"the fake reproduces the executed fixture's storage mapping")
+
+	# Structured service errors pass through with their original codes, and
+	# the fake derives the same code for the same intent offline.
+	api.configure("legacy_v0", endpoint)
+	var live_unknown: Variant = await api.store_building(user_id,
+		STORE_UNKNOWN_INDEX)
+	check(live_unknown is BootData.StoreResult,
+		"the live unknown index returns the typed result")
+	if live_unknown is BootData.StoreResult:
+		var unknown: BootData.StoreResult = live_unknown
+		check(not unknown.ok,
+			"an index the corpus does not name is a structured failure")
+		check_eq(unknown.error_code, "unknown_item_index",
+			"the live structured error passes through with the endpoint's code")
+		check(unknown.removed == null and unknown.resources == null,
+			"the live structured failure carries no partial payload")
+		check(unknown.store.is_empty(),
+			"the live structured failure carries no partial storage mapping")
+	api.configure("fake")
+	var fake_unknown: Variant = await api.store_building(user_id,
+		STORE_UNKNOWN_INDEX)
+	check(fake_unknown is BootData.StoreResult and not fake_unknown.ok,
+		"fake fails the same intent offline")
+	if fake_unknown is BootData.StoreResult:
+		check_eq(fake_unknown.error_code, "unknown_item_index",
+			"structured codes match between implementations")
+	print("[test] live-store applied item_index=%d cell=(%d, %d) xp=%d gold=%d"
+		% [STORE_INDEX, live.removed.x, live.removed.y, live.resources.xp,
+			live.resources.gold])
+
+
 ## The seven stored resources of the running corpus, as the typed
 ## `BootData.Resources` the purchase response carries. This is the
 ## pre-purchase reference the live purchase is compared against — read from
@@ -728,3 +884,36 @@ func _live_resources(api: Variant, endpoint: String,
 	resources.cash = int(player.get("cash", 0))
 	resources.mana = int(priv.get("mana", 0))
 	return resources
+
+
+## The corpus's own storage mapping, in the typed `{str(item_id): int}` form
+## the purchase, bootstrap, and store responses all carry. This is the
+## pre-store reference the live store's FULL mapping is compared against —
+## read from the corpus itself, never from the fake's fixture, because the
+## live side has already executed the placement, purchase, move, and sell
+## transactions in this phase. Null when the corpus cannot be read, so the
+## caller states that limit instead of guessing.
+func _live_storage(api: Variant, endpoint: String,
+		user_id: String) -> Variant:
+	api.configure("legacy_v0", endpoint)
+	var boot: Variant = await api.get_bootstrap(user_id)
+	if not (boot is BootData.BootstrapResult) or not bool(boot.ok):
+		check(false, "the live corpus pre-store bootstrap resolves")
+		return null
+	var info: Variant = (boot as BootData.BootstrapResult).player_info
+	if info == null:
+		check(false, "the live corpus pre-store payload is readable")
+		return null
+	var raw: Dictionary = (info as BootData.PlayerInfoPayload).raw
+	var map: Variant = raw.get("map", {})
+	if not (map is Dictionary):
+		check(false, "the live corpus pre-store payload carries a map")
+		return null
+	var store: Variant = (map as Dictionary).get("store", {})
+	if not (store is Dictionary):
+		check(false, "the live corpus pre-store payload carries a storage map")
+		return null
+	var typed := {}
+	for key: Variant in (store as Dictionary):
+		typed[str(key)] = int((store as Dictionary)[key])
+	return typed

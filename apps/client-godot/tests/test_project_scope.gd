@@ -14,8 +14,8 @@ extends "res://tests/test_base.gd"
 ## settings/audio-manager work (the Settings and AudioManager autoloads
 ## with their scripts and suites), and the town-rendering work (the
 ## thirteen town scripts under `scripts/town/`, the town and town-slice
-## scenes, their ten suites, the five committed evidence captures, and
-## the placement, purchase, move, and sell evidence reports): no other
+## scenes, their eleven suites, the six committed evidence captures, and the
+## placement, purchase, move, sell, and store evidence reports): no other
 ## game system, no scene beyond the allow-list, no script outside the
 ## allow-list, no Flash-related runtime, no legacy protocol token
 ## anywhere, and no transport reference outside the legacy-v0
@@ -97,12 +97,15 @@ const ALLOWED := [
 	"tests/test_town_scene.gd",
 	"tests/test_town_selection.gd",
 	"tests/test_town_state.gd",
+	"tests/test_town_store.gd",
 	"tests/test_ui_foundation.gd",
 	"evidence/boot/boot-report.json",
 	"evidence/building-move/building-move.png",
 	"evidence/building-move/report.json",
 	"evidence/building-sell/building-sell.png",
 	"evidence/building-sell/report.json",
+	"evidence/building-store/building-store.png",
+	"evidence/building-store/report.json",
 	"evidence/first-render/first-render.png",
 	"evidence/first-render/report.json",
 	"evidence/placement/placement.png",

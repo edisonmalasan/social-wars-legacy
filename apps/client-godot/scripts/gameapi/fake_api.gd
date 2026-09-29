@@ -6,8 +6,9 @@ extends Node
 ## `tests/fixtures/godot-compatibility-boot/`, for placement under
 ## `tests/fixtures/godot-building-placement/`, for purchase under
 ## `tests/fixtures/godot-item-purchase/`, for move under
-## `tests/fixtures/godot-building-move/`, and for sell under
-## `tests/fixtures/godot-building-sell/` at the repository root: no
+## `tests/fixtures/godot-building-move/`, for sell under
+## `tests/fixtures/godot-building-sell/`, and for store under
+## `tests/fixtures/godot-building-store/` at the repository root: no
 ## process, no server, no socket. It synthesizes the documented v0 envelopes
 ## from those files and parses them with the same `BootData` functions the
 ## live implementation uses, so both implementations yield identical typed
@@ -23,8 +24,11 @@ extends Node
 ## same determinism (its `server_time` is the fixture's recorded epoch, not
 ## the wall clock). `move_building()` applies the documented move semantics
 ## in memory over the committed move-fixture state with that same
-## determinism, and `sell_building()` deletes exactly the row its intent
-## names from the committed sell-fixture state with it. Parity against
+## determinism, `sell_building()` deletes exactly the row its intent
+## names from the committed sell-fixture state with it, and
+## `store_building()` pops exactly the row its intent names from the
+## committed store-fixture state and increments that item's storage entry
+## with it. Parity against
 ## executed legacy is owned exclusively by
 ## the compat fixture-replay tests; this double exists so the client flow can
 ## be tested hermetically and is NEVER itself a parity oracle.
@@ -74,6 +78,18 @@ const SELL_BEFORE_FIXTURE := \
 ## leave the double running on an inconsistent oracle.
 const SELL_AFTER_FIXTURE := \
 	"tests/fixtures/godot-building-sell/steps/command_sell/after.json"
+## The executed-legacy store fixture's before-state (which again equals the
+## fresh-player corpus the boot fixtures carry): the double's starting save
+## for `store_building()`.
+const STORE_BEFORE_FIXTURE := \
+	"tests/fixtures/godot-building-store/steps/command_store_item/before.json"
+## The same fixture's after-state — the real legacy server's record of the
+## one executed `store_item` (the Tree decoration at map slot 2, anchored at
+## `(53,39)`, whose key is absent afterwards while its id `905` appears in
+## the storage mapping with quantity 1). Read (never written) so a malformed
+## capture cannot leave the double running on an inconsistent oracle.
+const STORE_AFTER_FIXTURE := \
+	"tests/fixtures/godot-building-store/steps/command_store_item/after.json"
 
 ## Anchor grid extent the v0 endpoint validates against (anchors 0..99;
 ## footprints may extend past the edge — design D5). Must match
@@ -127,6 +143,14 @@ var _sell_state: Dictionary = {}
 var _sell_pid := ""
 var _sell_loaded := false
 var _sell_error := ""
+
+# Mutable in-memory store state (building-store design D8): one save, with
+# rows popped only by successful stores and storage entries incremented
+# only by them inside this process. Never written anywhere.
+var _store_state: Dictionary = {}
+var _store_pid := ""
+var _store_loaded := false
+var _store_error := ""
 
 
 ## The session envelope synthesized from the committed fixtures.
@@ -430,6 +454,84 @@ func sell_building(user_id: String, item_index: int) -> BootData.SellResult:
 		"result": "success",
 		"removed": removed,
 		"resources": _sell_resources(),
+	})
+
+
+## Deterministic in-memory store double (building-store design D8): the
+## documented semantics of the unchanged legacy `store_item` branch — resolve
+## the row with the item's map index, read that row AS IT IS BEFORE the
+## writes, apply the pre-dispatch resource vector (the derived vector is
+## NEUTRAL, so every stored resource is unchanged), pop exactly that row,
+## and increment `map["store"][str(item_id)]` by legacy's default quantity
+## of exactly 1 — applied over the committed store fixture's before-state,
+## mutating only this process. No process, no server, no socket; parity
+## against executed legacy is owned exclusively by the compat
+## fixture-replay tests, so this double is a test fixture, never an oracle.
+## Exactly two writes land, together: the pop and the storage increment, and
+## nothing else is touched (no re-keying, no storage rule of its own, and —
+## faithfully — no bought-units bookkeeping, because the legacy branch
+## deliberately calls no `bought_unit_add`).
+##
+## The response mirrors the v0 endpoint's two-sided superset (design D4): the
+## legacy result, the eight-field row AS IT WAS READ BEFORE EXECUTION (the
+## save no longer holds it, and reconstructing it afterwards would be
+## fabrication), the FULL post-execution storage mapping (in the very shape
+## and through the very parser the purchase response uses), and the current
+## resources — so the client performs no arithmetic for pre-existing
+## contents.
+##
+## Structural failures mirror the endpoint's codes (design D5): unknown or
+## empty save id, an integer index that names no row in the fixture's map
+## (`unknown_item_index` — the endpoint's 404, resolved BEFORE execution so
+## legacy's silent early return is never reported as a success), and an
+## unreadable fixture (`fixture_unreadable`). Ownership, price, quantity,
+## and capacity are gameplay/economic concerns this contract refuses: the
+## derived vector is neutral, so the double accepts no cost, no quantity,
+## and no capacity from any caller and claims none.
+func store_building(user_id: String,
+		item_index: int) -> BootData.StoreResult:
+	if user_id.strip_edges() == "":
+		return _store_failure("missing_user_id",
+			"user_id must be a non-empty string")
+	if not _ensure_loaded():
+		return _store_failure("fixture_unreadable", _load_error)
+	if not _ensure_store_loaded():
+		return _store_failure("fixture_unreadable", _store_error)
+	if user_id != _store_pid:
+		return _store_failure("unknown_user_id",
+			"no save exists for user_id '%s'" % user_id)
+	var row: Variant = (_store_state["items"] as Dictionary).get(
+		str(item_index))
+	if not (row is Array) or (row as Array).size() != 8:
+		# The endpoint resolves the index against the corpus before
+		# executing (design D3/D5), so a stale or unknown index is a
+		# structured failure with no mutation, never a silent success.
+		return _store_failure("unknown_item_index",
+			"no placement with index %d in this save's map" % item_index)
+	# Legacy do_command order for `store_item`: the pre-dispatch
+	# `apply_resources` (clamped) runs first — and the derived vector is all
+	# zeros, so the clamp never rewrites a value and the resources below are
+	# the state's own — then the row read, the pop, and the storage
+	# increment. This double deliberately writes NO bought-units bookkeeping,
+	# exactly as the executed fixture records.
+	var removed: Array = (row as Array).duplicate()
+	(_store_state["items"] as Dictionary).erase(str(item_index))
+	(_store_state["store"] as Dictionary)[str(int(removed[0]))] = \
+		int((_store_state["store"] as Dictionary).get(
+			str(int(removed[0])), 0)) + 1
+	# Same envelope shape the service returns; the shared parser yields the
+	# typed result (identical shapes by construction, design D5).
+	return BootData.parse_store({
+		"protocol": BootData.PROTOCOL,
+		"ok": true,
+		"game_version": str(_save_list_doc.get("game_version", "")),
+		# Time-dependent field: the fixture capture's legacy server epoch,
+		# never the wall clock (deterministic by construction).
+		"server_time": _fixture_server_time(),
+		"result": "success",
+		"removed": removed,
+		"store": (_store_state["store"] as Dictionary).duplicate(),
+		"resources": _store_resources(),
 	})
 
 
@@ -838,6 +940,140 @@ func _sell_resources() -> Dictionary:
 	var resources := {}
 	for key: String in RESOURCE_KEYS:
 		resources[key] = int(_sell_state[key])
+	return resources
+
+
+# --- store double (building-store design D8) --------------------------------
+
+
+## Structured failure in the service's error envelope shape, parsed by the
+## same shared parser the live implementation uses.
+func _store_failure(code: String, message: String) -> BootData.StoreResult:
+	return BootData.parse_store({
+		"protocol": BootData.PROTOCOL,
+		"ok": false,
+		"error": {"code": code, "message": message},
+	})
+
+
+## Loads the committed store fixture's before-state into mutable process
+## state (once). Structural failures are named with the offending field; the
+## boot, placement, purchase, move, and sell fixtures' error state is
+## untouched (independent sinks).
+func _ensure_store_loaded() -> bool:
+	if _store_loaded:
+		return _store_error == ""
+	_store_loaded = true
+	var before_sink := {"error": ""}
+	var before := _read_json_into(STORE_BEFORE_FIXTURE, before_sink)
+	if str(before_sink["error"]) != "":
+		_store_error = str(before_sink["error"])
+		return false
+	var after_sink := {"error": ""}
+	# The after-state is read (never written) so a malformed capture cannot
+	# leave the double running on an inconsistent oracle.
+	_read_json_into(STORE_AFTER_FIXTURE, after_sink)
+	if str(after_sink["error"]) != "":
+		_store_error = str(after_sink["error"])
+		return false
+	return _init_store_state(before)
+
+
+## Validates the store fixture's before-state and builds the in-memory save
+## state. Every consumed field is checked, so a malformed fixture fails
+## closed instead of crashing the double. The placements are kept as the
+## save's own `items` map keyed by their legacy index, so an index resolves
+## exactly as `engine.map_get_item(map, index)` resolves it — and the two
+## writes a store performs are the one pop and the one storage increment
+## that branch performs. The storage mapping is read with the same rules the
+## endpoint's response carries, so pre-existing entries are never coerced.
+func _init_store_state(before: Dictionary) -> bool:
+	var maps: Variant = before.get("maps")
+	if not (maps is Array) or (maps as Array).is_empty():
+		_store_error = "store fixture before state carries no maps array"
+		return false
+	if not ((maps as Array)[0] is Dictionary):
+		_store_error = "store fixture before state first map is not an object"
+		return false
+	var map: Dictionary = (maps as Array)[0]
+	var items: Variant = map.get("items")
+	if not (items is Dictionary):
+		_store_error = "store fixture before state carries no items map"
+		return false
+	var store: Variant = map.get("store")
+	if not (store is Dictionary):
+		_store_error = "store fixture before state carries no store map"
+		return false
+	var info: Variant = before.get("playerInfo")
+	var priv: Variant = before.get("privateState")
+	if not (info is Dictionary) or not (priv is Dictionary):
+		_store_error = "store fixture before state lacks playerInfo/privateState"
+		return false
+	for key in ["xp", "gold", "wood", "oil", "steel"]:
+		var value: Variant = map.get(key)
+		if not (value is int or value is float) \
+				or float(value) != floor(float(value)):
+			_store_error = "store fixture before state lacks map %s" % key
+			return false
+	var pid: Variant = (info as Dictionary).get("pid")
+	var cash: Variant = (info as Dictionary).get("cash")
+	var mana: Variant = (priv as Dictionary).get("mana")
+	if not (pid is String) or not (cash is int or cash is float) \
+			or not (mana is int or mana is float):
+		_store_error = "store fixture before state lacks save fields"
+		return false
+	# Every placement must be the documented eight-field row under a
+	# positive integer index (the shape the store's own resolution depends
+	# on); an unusable key is a malformed capture, never a coerced index.
+	var typed_items := {}
+	for key: Variant in (items as Dictionary):
+		var index: Variant = BootData._parse_int(key)
+		if key is String and str(key).is_valid_int():
+			index = str(key).to_int()
+		if index == null or int(index) <= 0:
+			_store_error = "store fixture placement key '%s' is not a " \
+				% str(key) + "positive integer index"
+			return false
+		var row: Variant = (items as Dictionary)[key]
+		if not (row is Array) or (row as Array).size() != 8:
+			_store_error = "store fixture placement '%s' is not the " \
+				% str(key) + "eight-field array"
+			return false
+		typed_items[str(int(index))] = (row as Array).duplicate()
+	# Quantities are counts and keys are item ids: the same shapes the
+	# endpoint's storage mapping and the shared parser accept.
+	var typed_store := {}
+	for key: Variant in (store as Dictionary):
+		var id: Variant = BootData._parse_int(key)
+		var quantity: Variant = BootData._parse_int(
+			(store as Dictionary)[key])
+		if id == null or quantity == null or int(id) < 0 or int(quantity) < 0:
+			_store_error = "store fixture before state has an invalid store entry"
+			return false
+		typed_store[str(int(id))] = int(quantity)
+	_store_state = {
+		"items": typed_items,
+		"xp": int(map.get("xp")),
+		"gold": int(map.get("gold")),
+		"wood": int(map.get("wood")),
+		"oil": int(map.get("oil")),
+		"steel": int(map.get("steel")),
+		"cash": int(cash),
+		"mana": int(mana),
+		"store": typed_store,
+	}
+	_store_pid = pid
+	return true
+
+
+## The seven stored resource values of the in-memory store state. A store
+## derives a neutral vector (design D2), so these are the state's own
+## values — reported verbatim, never a computed delta, and no storing cost
+## is claimed.
+func _store_resources() -> Dictionary:
+	var resources := {}
+	for key: String in RESOURCE_KEYS:
+		resources[key] = int(_store_state[key])
 	return resources
 
 

@@ -295,9 +295,9 @@ func _catalog_envelope() -> Dictionary:
 ## it, and the standard error marker line is printed. `boot_finished` is
 ## not re-emitted — the boot's own terminal emission already happened.
 ## In an evidence capture run (`--town-capture=`,
-## `--placement-capture=`, `--purchase-capture=`, `--move-capture=`, or
-## `--sell-capture=`) the process exits 1 so a failed capture cannot hang on
-## an open window.
+## `--placement-capture=`, `--purchase-capture=`, `--move-capture=`,
+## `--sell-capture=`, or `--store-capture=`) the process exits 1 so a failed
+## capture cannot hang on an open window.
 func _town_fail(code: String, message: String) -> Dictionary:
 	state = "error"
 	error_code = code
@@ -312,7 +312,8 @@ func _town_fail(code: String, message: String) -> Dictionary:
 				or argument.begins_with("--placement-capture=") \
 				or argument.begins_with("--purchase-capture=") \
 				or argument.begins_with("--move-capture=") \
-				or argument.begins_with("--sell-capture="):
+				or argument.begins_with("--sell-capture=") \
+				or argument.begins_with("--store-capture="):
 			get_tree().quit(1)
 			break
 	return {"ok": false,
