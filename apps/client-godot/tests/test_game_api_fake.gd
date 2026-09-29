@@ -27,6 +27,10 @@ const FIXTURE_MOVE_BEFORE := \
 	"tests/fixtures/godot-building-move/steps/command_move/before.json"
 const FIXTURE_MOVE_AFTER := \
 	"tests/fixtures/godot-building-move/steps/command_move/after.json"
+const FIXTURE_SELL_BEFORE := \
+	"tests/fixtures/godot-building-sell/steps/command_sell/before.json"
+const FIXTURE_SELL_AFTER := \
+	"tests/fixtures/godot-building-sell/steps/command_sell/after.json"
 
 
 func run_scenario() -> void:
@@ -120,6 +124,7 @@ func run_scenario() -> void:
 	await _check_placement(api, user_id)
 	await _check_purchase(api, user_id)
 	await _check_move(api, user_id)
+	await _check_sell(api, user_id)
 
 	info("fake implementation resolved %d save(s) with no server and no socket"
 		% save_list.saves.size())
@@ -516,6 +521,183 @@ func _check_move_failure(result: Variant, code: String, label: String) -> void:
 	check(not typed.ok, label + " is a structured failure")
 	check_eq(typed.error_code, code, label + " names the endpoint's code")
 	check(typed.placement == null, label + " carries no partial placement")
+	check(typed.resources == null, label + " carries no partial resources")
+
+
+## Sell double coverage (building-sell task 3.2, design D8): the documented
+## in-memory semantics over the committed sell fixture's before-state (the
+## index resolves against the save's own placements, ONLY that row is
+## deleted — no re-keying, no storage write, no bookkeeping — and the derived
+## neutral resource vector leaves every resource untouched), the endpoint's
+## structured failure codes, and the intent counter — all with no process, no
+## server, and no socket.
+##
+## The executed transaction, read from the fixture (never written): the
+## after-state's one removed key (`items["20"]`, the Turret I anchored at
+## `(41,48)`) with every other row byte-identical is the whole oracle, and
+## the double's response must equal it exactly.
+func _check_sell(api: Variant, user_id: String) -> void:
+	var before := _read_fixture_object(FIXTURE_SELL_BEFORE)
+	var after := _read_fixture_object(FIXTURE_SELL_AFTER)
+	if before.is_empty() or after.is_empty():
+		return
+	var before_map: Dictionary = before["maps"][0]
+	var after_map: Dictionary = after["maps"][0]
+	var before_items: Dictionary = before_map["items"]
+	var after_items: Dictionary = after_map["items"]
+	check_eq(before_items.size(), 40,
+		"the sell fixture before map carries 40 placements")
+	check_eq(after_items.size(), 39,
+		"the executed sale left 39 placements (exactly one row removed)")
+	check(after_items.has("20") == false,
+		"the executed sale left no row under key 20")
+	# The removed row, in the typed form the client receives.
+	var removed_before := _typed_row(before_items["20"])
+	check_eq(removed_before, [22, 41, 48, 0, 0, [], {}, 1],
+		"the fixture anchors the Turret I at (41,48) under key 20")
+	# Every OTHER row is byte-identical: the one write a sale performs is the
+	# one delete (design D8).
+	var other_keys: Array = []
+	for key: Variant in before_items:
+		if str(key) != "20":
+			other_keys.append(str(key))
+	other_keys.sort()
+	var untouched := true
+	for key: String in other_keys:
+		if _typed_row(before_items[key]) != _typed_row(after_items[key]):
+			untouched = false
+	check(untouched,
+		"the executed sale changed no other row (39 rows stay byte-identical)")
+	# The neutral derived vector means the resource bag is unchanged, and
+	# the sale touches no storage and no player state (design D2/D8).
+	for key in ["xp", "gold", "wood", "oil", "steel"]:
+		check_eq(before_map[key], after_map[key],
+			"the executed sale left %s unchanged" % key)
+	check_eq(after_map["store"], {},
+		"the executed sale left storage empty (it touches no storage)")
+	check_eq(before["playerInfo"]["cash"], after["playerInfo"]["cash"],
+		"the executed sale left cash unchanged (no refund is claimed)")
+	check_eq(before["privateState"]["mana"], after["privateState"]["mana"],
+		"the executed sale left mana unchanged")
+	check_eq(before["privateState"]["boughtUnits"],
+		after["privateState"]["boughtUnits"],
+		"the executed sale left boughtUnits unchanged")
+	check_eq(after["privateState"]["deadHeroes"], {},
+		"the executed sale left deadHeroes empty (the combat reason is never "
+		+ "reached)")
+	var requests_before: int = api.sell_requests
+
+	# --- success: Turret I at key 20 ---------------------------------
+	var sold: Variant = await api.sell_building(user_id, 20)
+	check(sold is BootData.SellResult,
+		"sell_building returns the typed result")
+	if not (sold is BootData.SellResult):
+		return
+	var first: BootData.SellResult = sold
+	check(first.ok, "fake sale resolves offline: %s" % first.error_message)
+	if not first.ok:
+		return
+	check_eq(first.protocol, BootData.PROTOCOL, "sell protocol is compat-v0")
+	check_eq(first.game_version, "alpha 0.02",
+		"the game version is the fixture's")
+	check(first.server_time > 0,
+		"server_time is the positive fixture epoch (time-dependent field)")
+	check_eq(first.result, "success", "legacy result string is reported")
+	check(first.removed != null, "the removed row is carried")
+	check(first.resources != null, "typed resources are carried")
+	if first.removed == null or first.resources == null:
+		return
+	# The response carries the row AS READ BEFORE EXECUTION (design D5).
+	check_eq(first.removed.item_id, 22, "the removed row names the Turret I")
+	check_eq(first.removed.x, 41, "the removed row carries its saved x")
+	check_eq(first.removed.y, 48, "the removed row carries its saved y")
+	check_eq(first.removed.timestamp, 0,
+		"the removed row keeps the save's timestamp (never restamped)")
+	check_eq(first.removed.orientation, 0,
+		"the removed row keeps its orientation")
+	check_eq(first.removed.store, [], "the removed row keeps its store")
+	check_eq(first.removed.attr, {}, "the removed row keeps its attr")
+	check_eq(first.removed.player, 1,
+		"the removed row keeps the player's team field")
+	# The neutral derived vector means the resource bag is the fresh save's
+	# own values (design D2) — never a computed delta, and no refund.
+	check_eq(first.resources.gold, int(before_map["gold"]),
+		"gold is unchanged by the neutral vector")
+	check_eq(first.resources.wood, int(before_map["wood"]),
+		"wood is unchanged by the neutral vector")
+	check_eq(first.resources.oil, int(before_map["oil"]),
+		"oil is unchanged by the neutral vector")
+	check_eq(first.resources.steel, int(before_map["steel"]),
+		"steel is unchanged by the neutral vector")
+	check_eq(first.resources.xp, int(before_map["xp"]),
+		"xp is unchanged by the neutral vector")
+	check_eq(first.resources.cash, int(before["playerInfo"]["cash"]),
+		"cash is unchanged by the neutral vector")
+	check_eq(first.resources.mana, int(before["privateState"]["mana"]),
+		"mana is unchanged by the neutral vector")
+
+	# --- the stale index: the row this very call removed is gone, so the
+	# endpoint's pre-execution resolution (design D4) answers 404 rather
+	# than reporting a sale that never happened.
+	var stale: Variant = await api.sell_building(user_id, 20)
+	_check_sell_failure(stale, "unknown_item_index",
+		"a stale index after the removal")
+
+	# --- structured failures: endpoint codes, no partial payload ----
+	var ghost: Variant = await api.sell_building("ghost-0000", 11)
+	_check_sell_failure(ghost, "unknown_user_id", "unknown save id")
+	var empty: Variant = await api.sell_building("", 11)
+	_check_sell_failure(empty, "missing_user_id", "empty save id")
+	var unknown_index: Variant = await api.sell_building(user_id, 9999)
+	_check_sell_failure(unknown_index, "unknown_item_index",
+		"an index the map does not name")
+	var zero: Variant = await api.sell_building(user_id, 0)
+	_check_sell_failure(zero, "unknown_item_index",
+		"index 0 (never a real legacy key)")
+
+	# --- a second success: only the NAMED row goes, so another key still
+	# resolves and the state is not corrupted by the first removal.
+	var second: Variant = await api.sell_building(user_id, 11)
+	check(second is BootData.SellResult and second.ok,
+		"a second sale succeeds after the failed attempts")
+	if second is BootData.SellResult and second.ok:
+		var typed: BootData.SellResult = second
+		check_eq(typed.removed.item_id, 22,
+			"the second removed row names the other Turret I")
+		check_eq(typed.removed.x, 58,
+			"the second removed row carries its own saved x")
+		check_eq(typed.removed.y, 48,
+			"the second removed row carries its own saved y")
+		check_eq(typed.resources.gold, int(before_map["gold"]),
+			"the second sale also leaves gold unchanged")
+
+	# --- the failures applied nothing: key 11 went, key 20 is still gone
+	# and every other row still resolves.
+	var third: Variant = await api.sell_building(user_id, 12)
+	check(third is BootData.SellResult and third.ok,
+		"an unrelated row still resolves after the failed attempts")
+	if third is BootData.SellResult and third.ok:
+		check_eq((third as BootData.SellResult).removed.item_id, 23,
+			"the unrelated row resolves to its own item (state not corrupted)")
+
+	check_eq(api.sell_requests, requests_before + 8,
+		"every sell_building call increments the intent counter exactly once")
+	info("sell double resolved the executed fixture's removal plus 4 "
+		+ "structured failures with no server and no socket")
+
+
+## Every sell failure carries the endpoint's code and no partial payload
+## (design D5) — including the 404 `unknown_item_index`, which stands in for
+## legacy's silent early return.
+func _check_sell_failure(result: Variant, code: String, label: String) -> void:
+	check(result is BootData.SellResult,
+		label + " returns the typed result")
+	if not (result is BootData.SellResult):
+		return
+	var typed: BootData.SellResult = result
+	check(not typed.ok, label + " is a structured failure")
+	check_eq(typed.error_code, code, label + " names the endpoint's code")
+	check(typed.removed == null, label + " carries no partial removed row")
 	check(typed.resources == null, label + " carries no partial resources")
 
 

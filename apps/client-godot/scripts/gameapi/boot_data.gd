@@ -10,6 +10,14 @@ extends RefCounted
 ## design D4). Nothing about the row distinguishes the two; only the
 ## request contract and the endpoint path differ.
 ##
+## The sell command needs its own result class for one reason only: its
+## eight-field row is the one AS READ BEFORE EXECUTION (building-sell
+## design D5), because the persisted save no longer holds it and
+## reconstructing it afterwards would be fabrication. `SellResult` reuses
+## the very same typed entry class (`Placement`) for that row, so the
+## shape is never duplicated — only the envelope and the parse function
+## are the command's own.
+##
 ## Presentation code never receives raw transport dictionaries: every
 ## GameApi operation returns one of the result classes below, and the two
 ## legacy JSON payloads (game config, player info) are wrapped in payload
@@ -162,6 +170,32 @@ class PurchaseResult:
 	var error_message := ""
 
 
+## Result of `sell_building()`: the legacy result plus the authoritative
+## superset (building-sell design D5) — the eight-field row AS READ BEFORE
+## EXECUTION (the authoritative record of exactly what the client asked
+## to remove; the persisted save no longer holds it) and the current
+## resources — or a structured failure with no partial payload. The
+## removed row reuses the typed `Placement` entry class, so the shape is
+## never duplicated. The client removes the selected typed placement and
+## frees its rendered object on success, and never computes a resource
+## delta: the derived price vector is NEUTRAL, so a sale claims no refund.
+class SellResult:
+	extends RefCounted
+	var ok := false
+	var protocol := ""
+	var game_version := ""
+	## Wall-clock seconds the legacy server stamped (a time-dependent field,
+	## so tests assert positivity, never a fixed value).
+	var server_time := 0
+	## The legacy result string ("success"); "" on failure.
+	var result := ""
+	## The removed row exactly as it was read before execution.
+	var removed: Placement = null
+	var resources: Resources = null
+	var error_code := ""
+	var error_message := ""
+
+
 ## Structured failure for `list_sessions()` (never a partial payload).
 static func save_list_failure(code: String, message: String) -> SaveListResult:
 	var result := SaveListResult.new()
@@ -192,6 +226,15 @@ static func placement_failure(code: String, message: String) -> PlacementResult:
 ## Structured failure for `purchase_item()` (never a partial payload).
 static func purchase_failure(code: String, message: String) -> PurchaseResult:
 	var result := PurchaseResult.new()
+	result.ok = false
+	result.error_code = code
+	result.error_message = message
+	return result
+
+
+## Structured failure for `sell_building()` (never a partial payload).
+static func sell_failure(code: String, message: String) -> SellResult:
+	var result := SellResult.new()
 	result.ok = false
 	result.error_code = code
 	result.error_message = message
@@ -346,6 +389,51 @@ static func parse_purchase(payload: Variant) -> PurchaseResult:
 	return result
 
 
+## Parses a v0 sell envelope — success or structured error — into the
+## typed result. Shared by `FakeApi` (which synthesizes the envelope from
+## the committed sell fixture's before-state after applying the documented
+## in-memory semantics) and `LegacyV0Api` (which decodes the HTTP body), so
+## both implementations yield the same typed shape by construction. The
+## removed row goes through the SAME fail-closed entry parser the
+## placement response uses, so a row can never be read with two rules.
+static func parse_sell(payload: Variant) -> SellResult:
+	if not (payload is Dictionary):
+		return sell_failure("bad_response", "response is not a JSON object")
+	var envelope: Dictionary = payload
+	if envelope.get("ok") != true:
+		return _sell_error(envelope)
+	if str(envelope.get("protocol", "")) != PROTOCOL:
+		return sell_failure("protocol_mismatch",
+			"expected protocol %s, got %s" % [PROTOCOL,
+			str(envelope.get("protocol"))])
+	if str(envelope.get("result", "")) != "success":
+		return sell_failure("bad_response",
+			"sell response did not report the legacy success result")
+	var removed := _parse_placement_entry(envelope.get("removed"))
+	if removed == null:
+		return sell_failure("bad_response",
+			"removed row is not the legacy eight-field array")
+	var resources_raw: Variant = envelope.get("resources")
+	if not (resources_raw is Dictionary):
+		return sell_failure("bad_response",
+			"sell response carries no resources object")
+	var resources := _parse_resources(resources_raw)
+	if resources == null:
+		return sell_failure("bad_response",
+			"sell resources are not seven non-negative integers")
+	var result := SellResult.new()
+	result.ok = true
+	result.protocol = PROTOCOL
+	result.game_version = str(envelope.get("game_version", ""))
+	result.server_time = _parse_epoch(envelope.get("server_time"))
+	if result.server_time < 0:
+		return sell_failure("bad_response", "server_time is not a number")
+	result.result = "success"
+	result.removed = removed
+	result.resources = resources
+	return result
+
+
 ## The storage mapping -> `{str(item_id): int}` with integral floats
 ## canonicalized to ints (the JSON transport widens them on the pinned engine
 ## while Dictionary equality is type-strict there — the same tolerance
@@ -489,6 +577,18 @@ static func _purchase_error(envelope: Dictionary) -> PurchaseResult:
 		code = str(typed.get("code", code))
 		message = str(typed.get("message", message))
 	return purchase_failure(code, message)
+
+
+## Structured error fields of a failed sell envelope (code + message).
+static func _sell_error(envelope: Dictionary) -> SellResult:
+	var code := "bad_response"
+	var message := "response reported failure without a structured error"
+	var error: Variant = envelope.get("error")
+	if error is Dictionary:
+		var typed: Dictionary = error
+		code = str(typed.get("code", code))
+		message = str(typed.get("message", message))
+	return sell_failure(code, message)
 
 
 ## Eight-field legacy entry -> typed `Placement`; null when malformed

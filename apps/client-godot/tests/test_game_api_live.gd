@@ -3,16 +3,17 @@ extends "res://tests/test_base.gd"
 ## "Boot live against Compatibility API"; extended by the
 ## building-placement change's task 3.2 with the placement parity of spec
 ## "Place through either implementation", by `building-purchase` with the
-## purchase parity of spec "Purchase through either implementation", and by
+## purchase parity of spec "Purchase through either implementation", by
 ## `building-move` with the move parity of spec "Move through either
-## implementation").
+## implementation", and by `building-sell` with the sell parity of spec
+## "Sell through either implementation").
 ##
 ## Requires a running Compatibility API v0 on loopback — verify-boot.ps1
 ## wraps this suite with `compat_live_phase.py`, which starts
 ## `apps/compat-api/run.py` (disposable corpus) and tears it down again. The
 ## suite compares every live typed result against the fake implementation's,
-## so both must yield the same boot data and the same placement and purchase
-## results (time-dependent fields excepted).
+## so both must yield the same boot data and the same placement, purchase,
+## move, and sell results (time-dependent fields excepted).
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 
@@ -38,6 +39,16 @@ const MOVE_CELL := Vector2i(58, 47)
 ## resolves it before executing and answers 404 `unknown_item_index`, so
 ## legacy's silent no-op is never reported as a success.
 const MOVE_UNKNOWN_INDEX := 9999
+## The executed-legacy sell transaction's target: the Turret I (item 22) at
+## legacy map key 20, anchored at (41,48) — the one sale both
+## implementations must answer identically.
+const SELL_ITEM := 22
+const SELL_INDEX := 20
+const SELL_CELL := Vector2i(41, 48)
+## An integer index that names no row in the corpus save: the sell endpoint
+## resolves it before executing and answers 404 `unknown_item_index`, so
+## legacy's silent no-op early return is never reported as a success.
+const SELL_UNKNOWN_INDEX := 9999
 
 
 func run_scenario() -> void:
@@ -159,11 +170,12 @@ func run_scenario() -> void:
 	await _check_live_placement(api, endpoint, user_id)
 	await _check_live_purchase(api, endpoint, user_id)
 	await _check_live_move(api, endpoint, user_id)
-	# The live corpus now carries both mutating transactions, so this suite's
+	await _check_live_sell(api, endpoint, user_id)
+	# The live corpus now carries every mutating transaction, so this suite's
 	# parity claim is stated once, explicitly: the two implementations are
 	# compared on the fields each own, and each side's resource bag is
-	# compared against ITS OWN pre-purchase bootstrap (the live side has the
-	# placement's wood already spent, the fake side does not).
+	# compared against ITS OWN pre-transaction bootstrap (the live side has
+	# the placement's wood already spent, the fake side does not).
 
 	info("legacy_v0 matched the fake reference over loopback %s" % endpoint)
 
@@ -550,6 +562,134 @@ func _check_live_move(api: Variant, endpoint: String,
 	print("[test] live-move applied item_index=%d cell=(%d, %d) xp=%d gold=%d"
 		% [MOVE_INDEX, live.placement.x, live.placement.y,
 		live.resources.xp, live.resources.gold])
+
+
+## Sell through both implementations (building-sell task 3.3, spec "Sell
+## through either implementation"): the same typed shape from both, the live
+## removed row matching the executed fixture's pre-execution row for every
+## stable field, the neutral price vector leaving the resource bag
+## untouched (and therefore claiming no refund), and the endpoint's
+## structured codes passing through unchanged.
+##
+## The corpus in this phase already carries the placement, purchase, and move
+## transactions, so the live side's resources are its own — the honest claim
+## is the one the contract makes: a sale removes exactly the row the intent
+## names and changes nothing else, and both implementations produce the same
+## typed shape and the same removed row.
+func _check_live_sell(api: Variant, endpoint: String, user_id: String) -> void:
+	# The live side's pre-sale resources, read from the corpus itself.
+	api.configure("legacy_v0", endpoint)
+	var live_before: BootData.Resources = await _live_resources(api, endpoint,
+		user_id)
+	check(live_before != null,
+		"the live corpus pre-sale resources resolve")
+
+	var live_ref: Variant = await api.sell_building(user_id, SELL_INDEX)
+	check(live_ref is BootData.SellResult,
+		"live sell_building returns the typed result")
+	if not (live_ref is BootData.SellResult):
+		return
+	var live: BootData.SellResult = live_ref
+	check(live.ok, "live sale resolves over loopback: %s"
+		% live.error_message)
+	if not live.ok:
+		return
+	check_eq(live.protocol, BootData.PROTOCOL,
+		"live sell protocol is compat-v0")
+	check(live.game_version != "",
+		"the live sell response carries the game version")
+	check(live.server_time > 0,
+		"live server_time is a positive wall-clock epoch (time-dependent)")
+	check_eq(live.result, "success",
+		"live sale reports the legacy success result")
+	check(live.removed != null and live.resources != null,
+		"the live sell response carries the removed row and resources")
+	if live.removed == null or live.resources == null:
+		return
+	# The row is the one read BEFORE execution (design D5): the anchor the
+	# save carried, and every other field untouched.
+	check_eq(live.removed.item_id, SELL_ITEM,
+		"the live removed row names the Turret I")
+	check_eq(live.removed.x, SELL_CELL.x,
+		"the live removed row carries x=41")
+	check_eq(live.removed.y, SELL_CELL.y,
+		"the live removed row carries y=48")
+	check_eq(live.removed.player, 1,
+		"the live removed row keeps the player's team field")
+	if live_before != null:
+		# The derived price vector is neutral, so a sale changes NO resource
+		# (design D2) — and therefore claims no refund at all. This is the
+		# strongest available assertion, and the reason the committed
+		# fixture's before/after resource bags are identical.
+		for key in ["gold", "wood", "oil", "steel", "mana", "xp", "cash"]:
+			check_eq(int(live.resources.get(key)), int(live_before.get(key)),
+				"%s is untouched by the sale (neutral vector, design D2)"
+					% key)
+
+	# Fake reference: an independent in-memory state over the committed
+	# sell-fixture before-state.
+	api.configure("fake")
+	var fake_ref: Variant = await api.sell_building(user_id, SELL_INDEX)
+	check(fake_ref is BootData.SellResult,
+		"fake sell_building returns the typed result")
+	if not (fake_ref is BootData.SellResult):
+		return
+	var fake: BootData.SellResult = fake_ref
+	check(fake.ok, "fake sale reference resolves: %s" % fake.error_message)
+	if not fake.ok or fake.removed == null or fake.resources == null:
+		return
+	check_eq(live.protocol, fake.protocol,
+		"live sell protocol equals the fake's")
+	check_eq(live.result, fake.result,
+		"live sell result string equals the fake's")
+	check_eq(live.removed.item_id, fake.removed.item_id,
+		"live sell item id equals the fake's")
+	check_eq(live.removed.x, fake.removed.x,
+		"live sell x equals the fake's")
+	check_eq(live.removed.y, fake.removed.y,
+		"live sell y equals the fake's")
+	check_eq(live.removed.orientation, fake.removed.orientation,
+		"live sell orientation equals the fake's (unchanged by a sale)")
+	check_eq(live.removed.player, fake.removed.player,
+		"live sell player field equals the fake's")
+	check_eq(live.removed.store.size(), fake.removed.store.size(),
+		"live sell store equals the fake's (unchanged by a sale)")
+	check(live.removed.attr == fake.removed.attr,
+		"live sell attr equals the fake's (live=%s fake=%s)"
+		% [JSON.stringify(live.removed.attr),
+		JSON.stringify(fake.removed.attr)])
+	# The fake's own row: the executed fixture's pre-execution row, verbatim.
+	check_eq(fake.removed.x, 41, "the fake reproduces the fixture's removed x")
+	check_eq(fake.removed.y, 48, "the fake reproduces the fixture's removed y")
+	check_eq(fake.removed.timestamp, 0,
+		"the fake never restamps the removed row's timestamp")
+
+	# Structured service errors pass through with their original codes, and
+	# the fake derives the same code for the same intent offline.
+	api.configure("legacy_v0", endpoint)
+	var live_unknown: Variant = await api.sell_building(user_id,
+		SELL_UNKNOWN_INDEX)
+	check(live_unknown is BootData.SellResult,
+		"the live unknown index returns the typed result")
+	if live_unknown is BootData.SellResult:
+		var unknown: BootData.SellResult = live_unknown
+		check(not unknown.ok,
+			"an index the corpus does not name is a structured failure")
+		check_eq(unknown.error_code, "unknown_item_index",
+			"the live structured error passes through with the endpoint's code")
+		check(unknown.removed == null and unknown.resources == null,
+			"the live structured failure carries no partial payload")
+	api.configure("fake")
+	var fake_unknown: Variant = await api.sell_building(user_id,
+		SELL_UNKNOWN_INDEX)
+	check(fake_unknown is BootData.SellResult and not fake_unknown.ok,
+		"fake fails the same intent offline")
+	if fake_unknown is BootData.SellResult:
+		check_eq(fake_unknown.error_code, "unknown_item_index",
+			"structured codes match between implementations")
+	print("[test] live-sell applied item_index=%d cell=(%d, %d) xp=%d gold=%d"
+		% [SELL_INDEX, live.removed.x, live.removed.y, live.resources.xp,
+			live.resources.gold])
 
 
 ## The seven stored resources of the running corpus, as the typed

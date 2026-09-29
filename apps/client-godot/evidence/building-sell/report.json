@@ -1,0 +1,113 @@
+{
+	"bootstrap_requests": 1,
+	"capture": {
+		"implementation": "fake GameApi (a deterministic test double, not a parity oracle)",
+		"parity_pointer": "real-execution parity is established by the fixture-replay tests and the verify-boot sell-live phase",
+		"path": "apps/client-godot/evidence/building-sell/building-sell.png",
+		"sha256": "a33f2f41206baf759a2ec71d7bca7da14ebc2d954bccfc58f5420d1af07c1ab4"
+	},
+	"constants": {
+		"derivation_status": "derived-provisional",
+		"evidence_gap": "the legacy SWF's static iso-engine identifiers (TILE_SIZE, EI_TILE_HEIGHT_PIXELS, gridWidth/Height, numCols/numRows) were never extracted; pixel parity with the Flash client is not claimed",
+		"grid_extent": 100,
+		"origin_x": 2000.0,
+		"origin_y": 10.0,
+		"tile_height": 20.0,
+		"tile_width": 40.0,
+		"world_rect": [
+			0.0,
+			0.0,
+			4000.0,
+			2000.0
+		]
+	},
+	"counts": {
+		"objects_after": 39,
+		"objects_before": 40,
+		"placements_after": 39,
+		"placements_before": 40
+	},
+	"inputs": {
+		"bootstrap_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/get_player_info/response.body",
+			"sha256": "facedf76784d3dc03a3a45e81756a8546f90f7647dbff8917593404d9e401709"
+		},
+		"save_list_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json",
+			"sha256": "ad0404c2c340a48f06e2e49ae7eb7973978cd2ccb02ac6ff7bfba4eb75f6d9f4"
+		},
+		"sell_after": {
+			"path": "tests/fixtures/godot-building-sell/steps/command_sell/after.json",
+			"sha256": "8b5205b367031ac8d92aa64276b9b5e4a0d5ea258d0d275ecf216aaa8eb9316f"
+		},
+		"sell_request": {
+			"path": "tests/fixtures/godot-building-sell/steps/command_sell/request.json",
+			"sha256": "fb2a4f57b74743e69626642273b4160c6a259cc175d69c54ee9e38896881e194"
+		},
+		"sell_response": {
+			"path": "tests/fixtures/godot-building-sell/steps/command_sell/response.body",
+			"sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87"
+		},
+		"terrain": {
+			"path": "assets/images/en/mapa1.jpg",
+			"sha256": "35c4ded53e82be187eb67c54ee7c7023b698c3986954db4b6f9613a2a45cdd3f"
+		}
+	},
+	"intent": {
+		"item_index": 20,
+		"user_id": "00000000-0000-4000-8000-000000000001"
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed",
+		"the derived sell reason and the neutral price vector are derived, never observed from the Flash client",
+		"no refund is claimed: the committed configuration records no building-sale refund rule and the legacy refund travels in client-sent resource deltas this contract refuses to accept; a sale removes the building and changes no balance",
+		"the legacy combat reason that would route a row through the resurrectable-unit path is never reached: the endpoint accepts no reason from the client, so only the derived empty log label is sent",
+		"parity covers one recorded transaction against the fresh-player corpus, not progressed players",
+		"sellability and addressability are client-side rules only; the endpoint enforces structural input validity and no server-authoritative validation exists",
+		"no pixel-parity oracle against the legacy client exists",
+		"the capture runs the fake GameApi implementation; real-execution parity is established by the fixture-replay tests and the verify-boot sell-live phase"
+	],
+	"resources": {
+		"after": {
+			"cash": 5,
+			"coins": 2000,
+			"energy": 50,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2000,
+			"xp": 4
+		},
+		"before": {
+			"cash": 5,
+			"coins": 2000,
+			"energy": 50,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2000,
+			"xp": 4
+		}
+	},
+	"schema": "sell-report-v1",
+	"sell_requests": 1,
+	"sold_building": {
+		"cell": [
+			41,
+			48
+		],
+		"legacy_id": 22,
+		"name": "Turret I",
+		"removed_row": [
+			22,
+			41,
+			48,
+			0,
+			0,
+			[],
+			{},
+			1
+		],
+		"slot": 20
+	}
+}

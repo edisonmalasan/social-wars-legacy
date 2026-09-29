@@ -5,8 +5,9 @@ extends Node
 ## Reads only the committed executed-legacy fixture files under
 ## `tests/fixtures/godot-compatibility-boot/`, for placement under
 ## `tests/fixtures/godot-building-placement/`, for purchase under
-## `tests/fixtures/godot-item-purchase/`, and for move under
-## `tests/fixtures/godot-building-move/` at the repository root: no
+## `tests/fixtures/godot-item-purchase/`, for move under
+## `tests/fixtures/godot-building-move/`, and for sell under
+## `tests/fixtures/godot-building-sell/` at the repository root: no
 ## process, no server, no socket. It synthesizes the documented v0 envelopes
 ## from those files and parses them with the same `BootData` functions the
 ## live implementation uses, so both implementations yield identical typed
@@ -22,7 +23,9 @@ extends Node
 ## same determinism (its `server_time` is the fixture's recorded epoch, not
 ## the wall clock). `move_building()` applies the documented move semantics
 ## in memory over the committed move-fixture state with that same
-## determinism. Parity against executed legacy is owned exclusively by
+## determinism, and `sell_building()` deletes exactly the row its intent
+## names from the committed sell-fixture state with it. Parity against
+## executed legacy is owned exclusively by
 ## the compat fixture-replay tests; this double exists so the client flow can
 ## be tested hermetically and is NEVER itself a parity oracle.
 
@@ -59,6 +62,18 @@ const MOVE_BEFORE_FIXTURE := \
 ## running on an inconsistent oracle.
 const MOVE_AFTER_FIXTURE := \
 	"tests/fixtures/godot-building-move/steps/command_move/after.json"
+## The executed-legacy sell fixture's before-state (which again equals the
+## fresh-player corpus the boot fixtures carry): the double's starting save
+## for `sell_building()`.
+const SELL_BEFORE_FIXTURE := \
+	"tests/fixtures/godot-building-sell/steps/command_sell/before.json"
+## The same fixture's after-state — the real legacy server's record of the
+## one executed `sell` (Turret I at map slot 20, anchored at `(41,48)`,
+## whose key is absent afterwards while every other row and every resource
+## is byte-identical). Read (never written) so a malformed capture cannot
+## leave the double running on an inconsistent oracle.
+const SELL_AFTER_FIXTURE := \
+	"tests/fixtures/godot-building-sell/steps/command_sell/after.json"
 
 ## Anchor grid extent the v0 endpoint validates against (anchors 0..99;
 ## footprints may extend past the edge — design D5). Must match
@@ -104,6 +119,14 @@ var _move_state: Dictionary = {}
 var _move_pid := ""
 var _move_loaded := false
 var _move_error := ""
+
+# Mutable in-memory sell state (building-sell design D8): one save, with rows
+# removed only by successful sales inside this process. Never written
+# anywhere.
+var _sell_state: Dictionary = {}
+var _sell_pid := ""
+var _sell_loaded := false
+var _sell_error := ""
 
 
 ## The session envelope synthesized from the committed fixtures.
@@ -345,6 +368,68 @@ func move_building(user_id: String, item_index: int, x: int,
 		"result": "success",
 		"placement": entry,
 		"resources": resources,
+	})
+
+
+## Deterministic in-memory sell double (building-sell design D8): the
+## documented semantics of the unchanged legacy `sell` branch — resolve the
+## row with the item's map index, apply the pre-dispatch resource vector
+## (the derived vector is NEUTRAL, so every stored resource is unchanged),
+## and delete that row and NOTHING else (no re-keying, no storage write, no
+## bookkeeping) — applied over the committed sell fixture's before-state,
+## mutating only this process. No process, no server, no socket; parity
+## against executed legacy is owned exclusively by the compat
+## fixture-replay tests, so this double is a test fixture, never an oracle.
+##
+## The response mirrors the v0 endpoint's authoritative superset: the legacy
+## result, the eight-field row AS IT WAS READ BEFORE EXECUTION (design D5 —
+## the save no longer holds it, and reconstructing it afterwards would be
+## fabrication), and the current resources.
+##
+## Structural failures mirror the endpoint's codes (design D5): unknown or
+## empty save id, an integer index that names no row in the fixture's map
+## (`unknown_item_index` — the endpoint's 404, resolved BEFORE execution so
+## legacy's silent no-op early return is never reported as a success), and
+## an unreadable fixture (`fixture_unreadable`). Ownership, price, and
+## refund are gameplay/economic concerns this contract refuses: the derived
+## price vector is neutral, so the double accepts no refund from any caller
+## and claims none.
+func sell_building(user_id: String, item_index: int) -> BootData.SellResult:
+	if user_id.strip_edges() == "":
+		return _sell_failure("missing_user_id",
+			"user_id must be a non-empty string")
+	if not _ensure_loaded():
+		return _sell_failure("fixture_unreadable", _load_error)
+	if not _ensure_sell_loaded():
+		return _sell_failure("fixture_unreadable", _sell_error)
+	if user_id != _sell_pid:
+		return _sell_failure("unknown_user_id",
+			"no save exists for user_id '%s'" % user_id)
+	var row: Variant = (_sell_state["items"] as Dictionary).get(
+		str(item_index))
+	if not (row is Array) or (row as Array).size() != 8:
+		# The endpoint resolves the index against the corpus before
+		# executing (design D3/D5), so a stale or unknown index is a
+		# structured failure with no mutation, never a silent success.
+		return _sell_failure("unknown_item_index",
+			"no placement with index %d in this save's map" % item_index)
+	# The pre-execution row: read first, then the one write the branch
+	# performs (the delete). Nothing else is touched — no re-keying, no
+	# storage, no bookkeeping — exactly as the executed fixture records.
+	var removed: Array = (row as Array).duplicate()
+	(_sell_state["items"] as Dictionary).erase(str(item_index))
+	# Same envelope shape the service returns; the shared parser yields the
+	# typed result (identical shapes by construction, design D5).
+	return BootData.parse_sell({
+		"protocol": BootData.PROTOCOL,
+		"ok": true,
+		"game_version": str(_save_list_doc.get("game_version", "")),
+		# Time-dependent field: the fixture capture's legacy server epoch,
+		# never the wall clock (deterministic by construction).
+		"server_time": _fixture_server_time(),
+		"result": "success",
+		"removed": removed,
+		"resources": _sell_resources(),
 	})
 
 
@@ -637,6 +722,122 @@ func _move_resources() -> Dictionary:
 	var resources := {}
 	for key: String in RESOURCE_KEYS:
 		resources[key] = int(_move_state[key])
+	return resources
+
+
+# --- sell double (building-sell design D8) ----------------------------------
+
+
+## Structured failure in the service's error envelope shape, parsed by the
+## same shared parser the live implementation uses.
+func _sell_failure(code: String, message: String) -> BootData.SellResult:
+	return BootData.parse_sell({
+		"protocol": BootData.PROTOCOL,
+		"ok": false,
+		"error": {"code": code, "message": message},
+	})
+
+
+## Loads the committed sell fixture's before-state into mutable process
+## state (once). Structural failures are named with the offending field; the
+## boot, placement, purchase, and move fixtures' error state is untouched
+## (independent sinks).
+func _ensure_sell_loaded() -> bool:
+	if _sell_loaded:
+		return _sell_error == ""
+	_sell_loaded = true
+	var before_sink := {"error": ""}
+	var before := _read_json_into(SELL_BEFORE_FIXTURE, before_sink)
+	if str(before_sink["error"]) != "":
+		_sell_error = str(before_sink["error"])
+		return false
+	var after_sink := {"error": ""}
+	# The after-state is read (never written) so a malformed capture cannot
+	# leave the double running on an inconsistent oracle.
+	_read_json_into(SELL_AFTER_FIXTURE, after_sink)
+	if str(after_sink["error"]) != "":
+		_sell_error = str(after_sink["error"])
+		return false
+	return _init_sell_state(before)
+
+
+## Validates the sell fixture's before-state and builds the in-memory save
+## state. Every consumed field is checked, so a malformed fixture fails
+## closed instead of crashing the double. The placements are kept as the
+## save's own `items` map keyed by their legacy index, so an index resolves
+## exactly as `engine.map_get_item(map, index)` resolves it — and the one
+## write a sale performs is the one delete that branch performs.
+func _init_sell_state(before: Dictionary) -> bool:
+	var maps: Variant = before.get("maps")
+	if not (maps is Array) or (maps as Array).is_empty():
+		_sell_error = "sell fixture before state carries no maps array"
+		return false
+	if not ((maps as Array)[0] is Dictionary):
+		_sell_error = "sell fixture before state first map is not an object"
+		return false
+	var map: Dictionary = (maps as Array)[0]
+	var items: Variant = map.get("items")
+	if not (items is Dictionary):
+		_sell_error = "sell fixture before state carries no items map"
+		return false
+	var info: Variant = before.get("playerInfo")
+	var priv: Variant = before.get("privateState")
+	if not (info is Dictionary) or not (priv is Dictionary):
+		_sell_error = "sell fixture before state lacks playerInfo/privateState"
+		return false
+	for key in ["xp", "gold", "wood", "oil", "steel"]:
+		var value: Variant = map.get(key)
+		if not (value is int or value is float) \
+				or float(value) != floor(float(value)):
+			_sell_error = "sell fixture before state lacks map %s" % key
+			return false
+	var pid: Variant = (info as Dictionary).get("pid")
+	var cash: Variant = (info as Dictionary).get("cash")
+	var mana: Variant = (priv as Dictionary).get("mana")
+	if not (pid is String) or not (cash is int or cash is float) \
+			or not (mana is int or mana is float):
+		_sell_error = "sell fixture before state lacks save fields"
+		return false
+	# Every placement must be the documented eight-field row under a
+	# positive integer index (the shape the sell's own resolution depends
+	# on); an unusable key is a malformed capture, never a coerced index.
+	var typed_items := {}
+	for key: Variant in (items as Dictionary):
+		var index: Variant = BootData._parse_int(key)
+		if key is String and str(key).is_valid_int():
+			index = str(key).to_int()
+		if index == null or int(index) <= 0:
+			_sell_error = "sell fixture placement key '%s' is not a " \
+				% str(key) + "positive integer index"
+			return false
+		var row: Variant = (items as Dictionary)[key]
+		if not (row is Array) or (row as Array).size() != 8:
+			_sell_error = "sell fixture placement '%s' is not the " \
+				% str(key) + "eight-field array"
+			return false
+		typed_items[str(int(index))] = (row as Array).duplicate()
+	_sell_state = {
+		"items": typed_items,
+		"xp": int(map.get("xp")),
+		"gold": int(map.get("gold")),
+		"wood": int(map.get("wood")),
+		"oil": int(map.get("oil")),
+		"steel": int(map.get("steel")),
+		"cash": int(cash),
+		"mana": int(mana),
+	}
+	_sell_pid = pid
+	return true
+
+
+## The seven stored resource values of the in-memory sell state. A sell
+## derives a neutral vector (design D2), so these are the state's own
+## values — reported verbatim, never a computed delta, and no refund is
+## claimed.
+func _sell_resources() -> Dictionary:
+	var resources := {}
+	for key: String in RESOURCE_KEYS:
+		resources[key] = int(_sell_state[key])
 	return resources
 
 

@@ -2,7 +2,8 @@ extends Node
 ## `LegacyV0Api` — GameApi implementation that speaks JSON over loopback HTTP
 ## to Compatibility API v0 (design D5, specs "Boot live against Compatibility
 ## API", "Place through either implementation", "Purchase through either
-## implementation", and "Move through either implementation").
+## implementation", "Move through either implementation", and "Sell through
+## either implementation").
 ##
 ## This is the ONLY project file allowed to name the compat endpoint or to
 ## use the built-in HTTP request/enumeration types; the scope test restricts
@@ -20,6 +21,7 @@ const BOOTSTRAP_PATH := "/v0/bootstrap"
 const PLACE_PATH := "/v0/place"
 const PURCHASE_PATH := "/v0/purchase"
 const MOVE_PATH := "/v0/move"
+const SELL_PATH := "/v0/sell"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -130,6 +132,29 @@ func move_building(user_id: String, item_index: int, x: int,
 			str(outcome.get("code", "bad_response")),
 			str(outcome.get("message", "")))
 	return BootData.parse_placement(outcome.get("payload"))
+
+
+## One sell intent over loopback HTTP: the client sends only the intent
+## (`user_id` and the legacy `item_index` of an existing placement) — no
+## price, no refund, no sell reason, no resource deltas — and the service
+## derives the legacy `sell` envelope server-side (design D3), so the typed
+## result's removed row and resources are authoritative (design D5). The
+## removed row is the one the service read BEFORE execution, so the client
+## removes exactly the building the response names. Structured service
+## errors pass through with their original codes — notably
+## `unknown_item_index` for a stale or unknown index, which the client
+## surfaces instead of removing anything; transport failures keep the boot
+## failure rules, never a partial payload.
+func sell_building(user_id: String, item_index: int) -> BootData.SellResult:
+	var outcome := await _call("POST", SELL_PATH, JSON.stringify({
+		"user_id": user_id,
+		"item_index": item_index,
+	}))
+	if not outcome.get("ok", false):
+		return BootData.sell_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return BootData.parse_sell(outcome.get("payload"))
 
 
 ## One HTTP round trip. Success returns `{ok: true, payload: Dictionary}`;

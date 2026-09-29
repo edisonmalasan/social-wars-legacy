@@ -177,6 +177,45 @@ shape as `/v0/place`:
   cells excluded), and refusing a no-op move are gameplay rules the client
   enforces (design D5); there is no server-authoritative validation.
 
+`POST /v0/sell` with body `{"user_id", "item_index"}` is the fourth
+state-mutating surface (the `building-sell` change). The body is an **intent
+only**: extra keys - including a `reason`, a price, a refund, or a resource
+delta - are ignored, so the legacy combat reason that would route a row through
+the resurrectable-unit path is unreachable through this endpoint. The endpoint
+resolves `item_index` against the save's own `map["items"]` and reads that row
+**before** executing (legacy's missing-item path is a silent early return that
+still persists, so accepting it would claim a removal that never happened), then
+derives the legacy batch envelope internally (one `sell` command with arguments
+`[item_index, reason]`, the reason **derived** as the empty string legacy
+compares against `"KILL"` and otherwise uses as a log label, and a **neutral**
+resource vector, design D2 of `building-sell`) and executes the unchanged legacy
+`command()` dispatcher in-process over the service corpus. Success returns the
+legacy answer plus an authoritative superset naming the removal:
+
+```json
+{"protocol": "compat-v0", "ok": true, "game_version": "alpha 0.02",
+ "server_time": 1790665230, "result": "success",
+ "removed": [22, 41, 48, 0, 0, [], {}, 1],
+ "resources": {"xp": 4, "gold": 2000, "wood": 2000, "oil": 2000,
+               "steel": 2000, "cash": 5, "mana": 0}}
+```
+
+- `removed` is the eight-field row **as read before execution** (`item, x, y,
+  timestamp, orientation, store, attr, player`), so the client can match exactly
+  what disappeared; the service separately proves the key is absent from the
+  persisted save after execution and fails closed otherwise. `resources` are the
+  authoritative current values.
+- **No refund is claimed.** The derived vector is neutral because the committed
+  configuration records no building-sale refund rule (item `cost`/`cost_type`
+  are dead fields, `costs` prices the purchase only, and
+  `MARKET_SELL_PERCENTAGE` governs the resource market), the legacy refund
+  travels only in client-sent deltas this contract refuses, and refund economics
+  belong to Server v1 (M13) and the later *resources* line. A sale therefore
+  removes the building and changes no balance.
+- Validation is structural only: a JSON object body, a resolvable save id, and a
+  strict-int `item_index` present in the save. Sellability and addressability are
+  client-side rules (design D6); no server-authoritative validation exists.
+
 ### Structured errors
 
 Always JSON, always `ok:false`, keys exactly
@@ -197,6 +236,7 @@ Always JSON, always `ok:false`, keys exactly
 | `missing_item_index` | 400 | `/v0/move` body carries no `item_index` |
 | `invalid_item_index` | 400 | `item_index` present but not an integer (`bool` excluded) |
 | `unknown_item_index` | 404 | integer index that names no placement in the save's `map["items"]` (legacy would silently no-op) |
+| `invalid_reason` | 400 | server-side only: the derived sell reason is not a string (unreachable through the contract) |
 | `bad_request` | 400 | other malformed requests Flask rejects |
 | `not_found` | 404 | unknown path |
 | `method_not_allowed` | 405 | known path, unsupported method |
@@ -206,14 +246,14 @@ Always JSON, always `ok:false`, keys exactly
 
 All run from the repository root on Windows x64 with the pinned interpreter
 (CPython 3.9.13); exit codes are the real observed ones (bootstrap-era
-counts 2026-09-27; placement-, purchase-, and move-era counts 2026-09-29):
+counts 2026-09-27; placement-, purchase-, move-, and sell-era counts 2026-09-29):
 
 ```bash
 python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
 ```
 
-→ `Ran 227 tests ... OK`, exit `0` (90 before `building-purchase`, 157 before
-`building-move`).
+→ `Ran 306 tests ... OK`, exit `0` (90 before `building-purchase`, 157 before
+`building-move`, 227 before `building-sell`).
 Covers envelope/error shapes, bootstrap and
 session parity against the committed fixtures, pre/post save SHA-256 identity,
 the no-persistence source guard, and the offline socket guard (the suite opens
@@ -285,6 +325,14 @@ invocation, exit code `0`, and containment record:
 python -B apps/compat-api/capture_move_fixture.py
 ```
 
+Sell fixture capture (the `building-sell` change's executed-legacy oracle,
+one-shot) - see `tests/fixtures/godot-building-sell/README.md` for its
+invocation, exit code `0`, and containment record:
+
+```bash
+python -B apps/compat-api/capture_sell_fixture.py
+```
+
 ## Layout
 
 - `compat_legacy.py` — corpus build/layout checks and the in-process adapter
@@ -306,7 +354,11 @@ python -B apps/compat-api/capture_move_fixture.py
 - `move_envelope.py` - the derived-provisional `/v0/move` envelope (argument
   list, neutral resource vector, the `frame`/`string` placeholders legacy
   discards), reusing the placement module's shared helpers unchanged.
+- `sell_envelope.py` - the derived-provisional `/v0/sell` envelope (argument
+  list, neutral resource vector, derived reason), reusing the placement
+  module's shared helpers unchanged.
 - `capture_move_fixture.py` - executed-legacy move fixture capture.
+- `capture_sell_fixture.py` - executed-legacy sell fixture capture.
 - `tests/` — `test_compat_v0.py` (service + containment), `test_parity.py`
   (offline replay against the committed boot fixtures),
   `test_placement_envelope.py` (offline envelope derivation/sanitization),
@@ -320,6 +372,11 @@ python -B apps/compat-api/capture_move_fixture.py
   bounds), `test_move_endpoint.py` (structural contract, unknown-index
   fail-closed, neutral resources, corpus-only persistence),
   `test_move_parity.py` (offline move replay against the executed fixture),
+  `test_sell_envelope.py` (offline sell envelope derivation: argument list,
+  neutral vector, derived reason), `test_sell_endpoint.py` (structural
+  contract, post-execution removal proof, unknown-index fail-closed, no client
+  reason), `test_sell_parity.py` (offline sell replay against the executed
+  fixture),
   `compat_test_harness.py`,
   `smoke_loopback.py` (opt-in loopback smoke).
 
@@ -342,6 +399,10 @@ time-dependent fields). Since the `building-move` change it establishes **move
 parity for one recorded `move` transaction**: `POST /v0/move` replayed against
 the executed-legacy move fixture equals its response and after-state for every
 stable field (the envelope `ts` and the HTTP `Date` header are the documented
+time-dependent fields). Since the `building-sell` change it establishes **sell
+parity for one recorded `sell` transaction**: `POST /v0/sell` replayed against
+the executed-legacy sell fixture equals its response and after-state for every
+stable field (the envelope `ts` and the HTTP `Date` header are the documented
 time-dependent fields).
 
 It does **not** establish authentication security, progressed-player coverage,
@@ -353,11 +414,17 @@ nothing about whether a resource-priced storage purchase exists in the legacy
 client, and for the **move command's argument values**, the **arguments legacy
 discards** (`frame`, `string`), and the **neutral move price vector** — the
 service therefore claims neither that moving is free in the legacy client nor
-that it costs anything. Insufficient resources reproduce the legacy
-`max(…, 0)` clamp, never a rejection (authoritative server-side validation
+that it costs anything. The **sell reason** is derived the same way (the empty
+string, which legacy compares against `"KILL"` and otherwise uses as a log
+label) and the **sell price vector** is neutral for the same reason the move
+one is, so the change **claims no refund at all**: the committed configuration
+records no building-sale refund rule and the legacy refund travels only in
+client-sent deltas this contract refuses. Insufficient resources reproduce the
+legacy `max(…, 0)` clamp, never a rejection (authoritative server-side validation
 belongs to Server v1 / M13), and occupancy, grid-bounds, level-gate,
-cash-affordability, and no-op-move rules are enforced client-side only.
-Persistence is confined to the disposable service corpus: `POST /v0/place`,
-`POST /v0/purchase`, and `POST /v0/move` persist through the legacy dispatcher
-into the corpus `saves/`, while the session and bootstrap endpoints remain
-strictly non-persisting, and the working tree is never written.
+cash-affordability, no-op-move, sellability, and addressability rules are
+enforced client-side only. Persistence is confined to the disposable service
+corpus: `POST /v0/place`, `POST /v0/purchase`, `POST /v0/move`, and
+`POST /v0/sell` persist through the legacy dispatcher into the corpus `saves/`,
+while the session and bootstrap endpoints remain strictly non-persisting, and
+the working tree is never written.
