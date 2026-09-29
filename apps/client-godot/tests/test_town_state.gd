@@ -1,6 +1,7 @@
 extends "res://tests/test_base.gd"
 ## Typed town-state suite (OpenSpec `godot-town-rendering` "Typed town
-## state loading", change task 2.1).
+## state loading", change task 2.1; extended by `building-purchase` task
+## 4.1 with the typed storage mapping).
 ##
 ## Scenarios:
 ##   fresh       the committed fresh-save bootstrap fixture parses into
@@ -15,6 +16,14 @@ extends "res://tests/test_base.gd"
 ##               recorded while the rest of the save parses;
 ##   absent      a resource field absent from the payload is recorded in
 ##               `missing` instead of being fabricated or defaulted;
+##   storage     the typed storage mapping: the fresh save's present-but-
+##               empty `map.store` parses as an empty (not missing)
+##               inventory, the preserved village's `{"302": 1}` parses
+##               verbatim, quantity `0` and an unresolvable id are kept,
+##               an absent field is recorded in `missing` under
+##               `storage` rather than defaulted, and a non-object field,
+##               a non-item-id key, or a non-integer quantity each fail
+##               closed naming the offender;
 ##   village     the preserved `villages/Scarlet.json` (`maps[0]` shape)
 ##               parses: 576 placements, the six content-unknown ids
 ##               recorded, House I and Wild Elephant resolved.
@@ -60,6 +69,7 @@ func run_scenario() -> void:
 	_check_malformed(payload, registry)
 	_check_unresolved_id(payload, registry)
 	_check_absent_field(payload, registry)
+	_check_storage(payload, registry)
 	_check_registry_precondition()
 	_check_village_parse(registry)
 
@@ -221,6 +231,125 @@ func _check_absent_field(payload: Variant, registry: Variant) -> void:
 		"an absent field never drops placements")
 
 
+## The typed storage mapping (building-purchase task 4.1, design D7):
+## present-but-empty parses as an empty inventory (NOT missing), the
+## village's real entry parses verbatim, quantity `0` and an id the
+## content package cannot resolve are kept, an absent field is recorded in
+## `missing` under `storage` instead of being defaulted, and every
+## present-but-invalid shape fails closed naming the offending key.
+func _check_storage(payload: Variant, registry: Variant) -> void:
+	# The fresh save carries `map.store = {}`: an empty inventory is a
+	# real, observed state and must not be reported as a missing field.
+	var fresh: Dictionary = TownState.parse(payload, registry)
+	check(bool(fresh.get("ok", false)),
+		"the fresh storage parses: %s" % fresh.get("error"))
+	if bool(fresh.get("ok", false)):
+		var state = fresh["state"]
+		check_eq(state.storage, {},
+			"the fresh save's present-but-empty storage parses as {}")
+		check(not state.missing.has(TownState.STORAGE_MISSING_KEY),
+			"a present storage field is never recorded missing")
+
+	# Entries are kept verbatim, including a quantity of 0 and an id the
+	# content package cannot resolve.
+	var stocked: Dictionary = (payload as Dictionary).duplicate(true)
+	(stocked["map"] as Dictionary)["store"] = {
+		"302": 2, "999999": 0}
+	var result: Dictionary = TownState.parse(stocked, registry)
+	check(bool(result.get("ok", false)),
+		"a populated storage parses: %s" % result.get("error"))
+	if bool(result.get("ok", false)):
+		var state = result["state"]
+		check_eq(state.storage, {"302": 2, "999999": 0},
+			"quantities are verbatim, quantity 0 included, unresolved ids "
+			+ "included")
+		check_eq(state.placements.size(), 40,
+			"a populated storage never drops placements")
+
+	# An int key is canonicalized to the documented string form.
+	var int_keys: Dictionary = (payload as Dictionary).duplicate(true)
+	(int_keys["map"] as Dictionary)["store"] = {302: 2}
+	result = TownState.parse(int_keys, registry)
+	check(bool(result.get("ok", false)),
+		"an int storage key parses: %s" % result.get("error"))
+	if bool(result.get("ok", false)):
+		check_eq((result["state"] as Variant).storage, {"302": 2},
+			"an int key canonicalizes to the stringified item id")
+
+	# Absent -> recorded in `missing`, never defaulted to an empty one.
+	var without_store: Dictionary = (payload as Dictionary).duplicate(true)
+	(without_store["map"] as Dictionary).erase("store")
+	result = TownState.parse(without_store, registry)
+	check(bool(result.get("ok", false)),
+		"an absent storage field does not fail the save: %s"
+		% result.get("error"))
+	if bool(result.get("ok", false)):
+		var state = result["state"]
+		check(state.missing.has(TownState.STORAGE_MISSING_KEY),
+			"the absent storage field is recorded for the readout "
+			+ "(missing: %s)" % str(state.missing))
+		check_eq(state.storage, {},
+			"an absent field yields no fabricated inventory")
+		check("energy" not in state.missing,
+			"the storage record never displaces the HUD's own fields")
+
+	# Present-but-invalid: each shape fails closed naming the offender.
+	_expect_storage_reject(_with_store(payload, "nope"), "not an object")
+	_expect_storage_reject(_with_store(payload, []), "not an object")
+	_expect_storage_reject(_with_store(payload, {"mystery": 1}),
+		"storage entry key 'mystery' is not an item id")
+	_expect_storage_reject(_with_store(payload, {"105": "one"}),
+		"storage entry '105' quantity")
+	_expect_storage_reject(_with_store(payload, {"105": 1.5}),
+		"storage entry '105' quantity")
+	_expect_storage_reject(_with_store(payload, {"-1": 1}),
+		"storage entry key '-1' is not an item id")
+	_expect_storage_reject(_with_store(payload, {"105": -3}),
+		"storage entry '105' quantity")
+
+	# The shared parser the purchase apply reuses is the same function:
+	# the response's `store` mapping goes through exactly these rules.
+	var response: Dictionary = TownState.storage_of({"105": 1.0})
+	check(bool(response.get("ok", false)),
+		"the shared storage parser accepts a response mapping")
+	check(bool(response.get("present", false)),
+		"a response mapping is always present")
+	check_eq(response.get("storage", {}), {"105": 1},
+		"the shared parser canonicalizes the transport's integral float")
+	var response_bad: Dictionary = TownState.storage_of({"105": null})
+	check(not bool(response_bad.get("ok", true)),
+		"the shared parser rejects a null quantity fail-closed")
+	var response_absent: Dictionary = TownState.storage_of(null)
+	check(bool(response_absent.get("present", true)) == false,
+		"the shared parser reports an absent mapping as not present")
+	check_eq(response_absent.get("storage", {}), {},
+		"an absent mapping yields no fabricated inventory")
+
+
+## A rejected storage parse: `{ok: false}` with an error naming the
+## offender and no state produced.
+func _expect_storage_reject(payload: Dictionary, needle: String) -> void:
+	var result: Dictionary = TownState.parse(payload, registry_of(payload))
+	check(not bool(result.get("ok", true)),
+		"'%s' fails closed" % needle)
+	check(result.get("state") == null, "'%s' yields no state" % needle)
+	check(str(result.get("error", "")).find(needle) != -1,
+		"the error names '%s' (got: %s)" % [needle,
+		str(result.get("error", ""))])
+
+
+## The ContentRegistry autoload (the payload scenarios all share it).
+func registry_of(_payload: Dictionary) -> Variant:
+	return root.get_node_or_null("ContentRegistry")
+
+
+## The payload with one crafted `map.store` value.
+func _with_store(payload: Dictionary, value: Variant) -> Dictionary:
+	var crafted: Dictionary = (payload as Dictionary).duplicate(true)
+	(crafted["map"] as Dictionary)["store"] = value
+	return crafted
+
+
 func _check_registry_precondition() -> void:
 	var cold = load("res://scripts/content_registry.gd").new()
 	root.add_child(cold)
@@ -252,6 +381,8 @@ func _check_village_parse(registry: Variant) -> void:
 	check(state.missing.is_empty(),
 		"no displayed field is missing from the village payload (missing: %s)"
 		% str(state.missing))
+	check_eq(state.storage, {"302": 1},
+		"the village's real storage entry parses verbatim")
 	var elephant = null
 	var house = null
 	for placement in state.placements:

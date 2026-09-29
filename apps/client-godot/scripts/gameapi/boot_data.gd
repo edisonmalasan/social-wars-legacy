@@ -129,6 +129,31 @@ class PlacementResult:
 	var error_message := ""
 
 
+## Result of `purchase_item()`: the legacy result plus the authoritative
+## superset (design D4) — the FULL post-execution storage mapping
+## (`{str(item_id): int}`) and the same `Resources` object the placement
+## response carries — or a structured failure with no partial payload. The
+## client replaces its storage view and its resource values from these
+## fields verbatim; it never computes a delta (design D7 carry-forward).
+class PurchaseResult:
+	extends RefCounted
+	var ok := false
+	var protocol := ""
+	var game_version := ""
+	## Wall-clock seconds the legacy server stamped (a time-dependent field,
+	## so tests assert positivity, never a fixed value).
+	var server_time := 0
+	## The legacy result string ("success"); "" on failure.
+	var result := ""
+	## The whole storage mapping: string item id -> integer quantity. Quantity
+	## `0` is preserved (observed in real saves) and an id the content package
+	## cannot resolve is carried verbatim, never dropped.
+	var store: Dictionary = {}
+	var resources: Resources = null
+	var error_code := ""
+	var error_message := ""
+
+
 ## Structured failure for `list_sessions()` (never a partial payload).
 static func save_list_failure(code: String, message: String) -> SaveListResult:
 	var result := SaveListResult.new()
@@ -150,6 +175,15 @@ static func bootstrap_failure(code: String, message: String) -> BootstrapResult:
 ## Structured failure for `place_building()` (never a partial payload).
 static func placement_failure(code: String, message: String) -> PlacementResult:
 	var result := PlacementResult.new()
+	result.ok = false
+	result.error_code = code
+	result.error_message = message
+	return result
+
+
+## Structured failure for `purchase_item()` (never a partial payload).
+static func purchase_failure(code: String, message: String) -> PurchaseResult:
+	var result := PurchaseResult.new()
 	result.ok = false
 	result.error_code = code
 	result.error_message = message
@@ -261,6 +295,91 @@ static func parse_placement(payload: Variant) -> PlacementResult:
 	return result
 
 
+## Parses a v0 purchase envelope — success or structured error — into the
+## typed result. Shared by `FakeApi` (which synthesizes the envelope from the
+## committed purchase fixture's before-state after applying the documented
+## in-memory semantics) and `LegacyV0Api` (which decodes the HTTP body), so
+## both implementations yield the same typed shape by construction.
+static func parse_purchase(payload: Variant) -> PurchaseResult:
+	if not (payload is Dictionary):
+		return purchase_failure("bad_response", "response is not a JSON object")
+	var envelope: Dictionary = payload
+	if envelope.get("ok") != true:
+		return _purchase_error(envelope)
+	if str(envelope.get("protocol", "")) != PROTOCOL:
+		return purchase_failure("protocol_mismatch",
+			"expected protocol %s, got %s" % [PROTOCOL,
+			str(envelope.get("protocol"))])
+	if str(envelope.get("result", "")) != "success":
+		return purchase_failure("bad_response",
+			"purchase response did not report the legacy success result")
+	var store: Variant = _parse_store(envelope.get("store"))
+	if store == null:
+		return purchase_failure("bad_response",
+			"purchase store is not a string-item-id to integer-quantity map")
+	var resources_raw: Variant = envelope.get("resources")
+	if not (resources_raw is Dictionary):
+		return purchase_failure("bad_response",
+			"purchase response carries no resources object")
+	var resources := _parse_resources(resources_raw)
+	if resources == null:
+		return purchase_failure("bad_response",
+			"purchase resources are not seven non-negative integers")
+	var result := PurchaseResult.new()
+	result.ok = true
+	result.protocol = PROTOCOL
+	result.game_version = str(envelope.get("game_version", ""))
+	result.server_time = _parse_epoch(envelope.get("server_time"))
+	if result.server_time < 0:
+		return purchase_failure("bad_response", "server_time is not a number")
+	result.result = "success"
+	result.store = store
+	result.resources = resources
+	return result
+
+
+## The storage mapping -> `{str(item_id): int}` with integral floats
+## canonicalized to ints (the JSON transport widens them on the pinned engine
+## while Dictionary equality is type-strict there — the same tolerance
+## `_parse_placement_entry` documents). Null when a value is not a
+## non-negative integer: quantities are counts, and a negative or fractional
+## quantity is not a shape this contract carries.
+static func _parse_store(value: Variant) -> Variant:
+	if not (value is Dictionary):
+		return null
+	var store := {}
+	for key: Variant in (value as Dictionary):
+		var id: Variant = _store_key(key)
+		if id == null:
+			return null
+		var quantity: Variant = _parse_int((value as Dictionary)[key])
+		if quantity == null or int(quantity) < 0:
+			return null
+		store[str(int(id))] = int(quantity)
+	return store
+
+
+## One storage key -> its non-negative integer item id, or null when the
+## key is not an item id. Legacy `engine.add_store_item` writes
+## `map["store"][str(item_id)]`, so a digit string is the documented shape
+## and the JSON transport always yields one; an int key is accepted and
+## canonicalized to the same string form so both implementations produce
+## identical typed shapes. Nothing else is coerced.
+static func _store_key(key: Variant) -> Variant:
+	if key is String:
+		var text := str(key)
+		if text.is_empty() or text.length() > 16:
+			return null
+		for character in text:
+			if character < "0" or character > "9":
+				return null
+		return text.to_int()
+	var parsed: Variant = _parse_int(key)
+	if parsed == null or int(parsed) < 0:
+		return null
+	return parsed
+
+
 ## Summary for one save id, or null when the list does not name it.
 static func summary_for(saves: Array[SaveInfo], user_id: String) -> PlayerSummary:
 	for save in saves:
@@ -350,6 +469,18 @@ static func _placement_error(envelope: Dictionary) -> PlacementResult:
 		code = str(typed.get("code", code))
 		message = str(typed.get("message", message))
 	return placement_failure(code, message)
+
+
+## Structured error fields of a failed purchase envelope (code + message).
+static func _purchase_error(envelope: Dictionary) -> PurchaseResult:
+	var code := "bad_response"
+	var message := "response reported failure without a structured error"
+	var error: Variant = envelope.get("error")
+	if error is Dictionary:
+		var typed: Dictionary = error
+		code = str(typed.get("code", code))
+		message = str(typed.get("message", message))
+	return purchase_failure(code, message)
 
 
 ## Eight-field legacy entry -> typed `Placement`; null when malformed

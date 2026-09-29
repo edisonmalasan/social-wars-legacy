@@ -8,9 +8,10 @@ extends RefCounted
 ## code receives only the typed `State` — never the raw payload.
 ##
 ## Fail-closed contract (spec): structural violations (no default map,
-## malformed placement rows, non-integer coordinates, present-but-invalid
-## field types) return `{ok: false, error}` naming the offending field and
-## produce no state; nothing is fabricated, defaulted, or dropped. Content
+## malformed placement rows, non-integer coordinates, a malformed storage
+## mapping, present-but-invalid field types) return `{ok: false, error}`
+## naming the offending field and produce no state; nothing is fabricated,
+## defaulted, or dropped. Content
 ## resolution failures are different by design: a legacy save may
 ## legitimately contain ids the content package lacks, so those placements
 ## are kept verbatim with the failure recorded (`content_error`,
@@ -45,6 +46,11 @@ const SUMMARY_FIELDS := {
 	"level": "map.level",
 	"xp": "map.xp",
 }
+## The storage field of the default map and the key it is recorded under in
+## `State.missing` when the payload carries no storage at all (design D7:
+## absent is named, never defaulted to an empty inventory).
+const STORAGE_FIELD := "map.store"
+const STORAGE_MISSING_KEY := "storage"
 
 
 ## One placement exactly as the legacy save carries it: the eight
@@ -110,6 +116,12 @@ class State:
 	## Parsed resource and summary values.
 	var resources := Resources.new()
 	var summary := Summary.new()
+	## The player's storage: string item id -> integer quantity, preserved
+	## verbatim (quantity `0` included, unresolved ids included). Empty ONLY
+	## when the payload carried a storage object with no entries; an absent
+	## field is recorded in `missing` under `STORAGE_MISSING_KEY` instead of
+	## being defaulted here (design D7).
+	var storage: Dictionary = {}
 	## Displayed field keys the payload did not carry (HUD names them).
 	var missing: Array = []
 	## Distinct placed legacy ids ContentRegistry could not resolve.
@@ -137,6 +149,13 @@ static func parse(payload: Variant, registry: RegistryScript) -> Dictionary:
 	var rows: Variant = _placement_rows(map)
 	if rows == null:
 		return reject.call("field 'items' is missing or invalid")
+	# Storage (design D7): absent is named in `missing`, never defaulted to
+	# an empty inventory; a present-but-invalid mapping rejects the parse
+	# naming the offending key, through the one shared parser the purchase
+	# apply reuses for the response's `store`.
+	var storage: Dictionary = _storage_of(map)
+	if not bool(storage.get("ok", false)):
+		return reject.call(str(storage.get("error", "")))
 
 	var state := State.new()
 	# Resource/summary lookup roots: the extracted default map (root `map`
@@ -178,6 +197,9 @@ static func parse(payload: Variant, registry: RegistryScript) -> Dictionary:
 			state.unresolved_ids.append(placement.item)
 		state.placements.append(placement)
 
+	state.storage = storage["storage"]
+	if not bool(storage["present"]):
+		state.missing.append(STORAGE_MISSING_KEY)
 	for hud_key in RESOURCE_FIELDS:
 		var source: String = RESOURCE_FIELDS[hud_key]
 		var cell_value: Variant = _payload_value(values, source)
@@ -204,6 +226,96 @@ static func parse(payload: Variant, registry: RegistryScript) -> Dictionary:
 				return reject.call("field '%s' is not an integer" % source)
 			(state.summary as Summary).set(hud_key, number as int)
 	return {"ok": true, "error": "", "state": state}
+
+
+## The player's storage from a default map: `{ok, present, storage, error}`
+## (design D7). One parser serves BOTH entry points — this bootstrap/village
+## parse and the purchase apply, which feeds it the response's `store`
+## mapping — so a response can never be read with different rules than the
+## payload it replaces.
+##
+## Rules (fail-closed, nothing guessed):
+##   * the field absent -> `present: false` with an EMPTY mapping: the state
+##     records the key in `missing` and the readout names it, rather than
+##     presenting an empty inventory as fact;
+##   * present but not an object, a key that is not an item id, or a
+##     quantity that is not a non-negative integer -> `{ok: false}` with an
+##     error naming the offending key, exactly as the placement rows do;
+##   * quantity `0` is preserved verbatim (observed in real saves) and an id
+##     the content package cannot resolve is carried through untouched —
+##     the parser never drops what it does not understand.
+static func storage_of(value: Variant) -> Dictionary:
+	if value == null:
+		return {"ok": true, "present": false, "storage": {}, "error": ""}
+	if not (value is Dictionary):
+		return _storage_reject("field '%s' is not an object" % STORAGE_FIELD)
+	var storage := {}
+	for key: Variant in (value as Dictionary):
+		var id: Variant = _item_id(key)
+		if id == null:
+			return _storage_reject("storage entry key '%s' is not an item id"
+				% str(key))
+		var quantity: Variant = _integer((value as Dictionary)[key])
+		if quantity == null or int(quantity) < 0:
+			return _storage_reject(
+				"storage entry '%s' quantity is not a non-negative integer"
+				% str(int(id)))
+		storage[str(int(id))] = int(quantity)
+	return {"ok": true, "present": true, "storage": storage, "error": ""}
+
+
+## The default map's storage field through `storage_of()` (the payload's
+## own entry point; the purchase apply calls `storage_of()` directly).
+static func _storage_of(map: Variant) -> Dictionary:
+	if not (map is Dictionary):
+		return _storage_reject("field '%s' has no default map" % STORAGE_FIELD)
+	return storage_of((map as Dictionary).get("store"))
+
+
+## The resolved content name for one legacy item id, or "" when the content
+## package does not know it (design D7: the storage readout renders the raw
+## item id in that case — a name is never guessed). Searches the same
+## domains, in the same order, as the placement resolution.
+static func content_name(item_id: int, registry: RegistryScript) -> String:
+	if registry == null or not registry.is_loaded():
+		return ""
+	var id_text := str(item_id)
+	for domain in CONTENT_DOMAINS:
+		if not registry.has_domain(domain):
+			continue
+		var result: Dictionary = registry.get_entry(domain, id_text)
+		if not bool(result.get("found", false)):
+			continue
+		var entry: Variant = result.get("entry")
+		if not (entry is Dictionary):
+			continue
+		return str((entry as Dictionary).get("name", ""))
+	return ""
+
+
+## One storage key -> its non-negative integer id, or null when the key is
+## not an item id. The legacy save keys storage by the stringified item id
+## (`engine.add_store_item` writes `map["store"][str(item_id)]`), so a digit
+## string is the documented shape; an int key is accepted and canonicalized
+## to its string form. Nothing else is ever coerced.
+static func _item_id(key: Variant) -> Variant:
+	if key is int:
+		return int(key) if int(key) >= 0 else null
+	if key is String:
+		var text := str(key)
+		if text.is_empty() or text.length() > 16:
+			return null
+		for character in text:
+			if character < "0" or character > "9":
+				return null
+		return text.to_int()
+	return null
+
+
+## The house storage rejection envelope: names the offending field or key.
+static func _storage_reject(message: String) -> Dictionary:
+	return {"ok": false, "present": true, "storage": {},
+		"error": "[town] parse rejected: " + message}
 
 
 ## The payload's default map: root `map` (get_player_info response) or

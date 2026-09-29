@@ -1,14 +1,15 @@
 extends "res://tests/test_base.gd"
 ## Headless GameApi suite for the fake implementation (spec "Boot offline
-## with the fake implementation" and "Place through either implementation";
-## tasks 3.1/3.2).
+## with the fake implementation", "Place through either implementation",
+## and "Purchase through either implementation"; tasks 3.1/3.2/3.3).
 ##
 ## Hermetic by construction: no Compatibility API is started — verify-boot
 ## runs this suite before any service exists — and the scope test restricts
 ## the compat endpoint and the HTTP request client to the legacy-v0
 ## implementation file, which this suite never selects. Expected values are
 ## read from the committed executed-legacy fixtures (read-only), including
-## the placement fixture the placement double mutates in memory over.
+## the placement and purchase fixtures the two doubles mutate in memory
+## over.
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 
@@ -18,6 +19,10 @@ const FIXTURE_PLACE_BEFORE := \
 	"tests/fixtures/godot-building-placement/steps/command_buy/before.json"
 const FIXTURE_PLACE_AFTER := \
 	"tests/fixtures/godot-building-placement/steps/command_buy/after.json"
+const FIXTURE_PURCHASE_BEFORE := \
+	"tests/fixtures/godot-item-purchase/steps/command_buy_stored_item_cash/before.json"
+const FIXTURE_PURCHASE_AFTER := \
+	"tests/fixtures/godot-item-purchase/steps/command_buy_stored_item_cash/after.json"
 
 
 func run_scenario() -> void:
@@ -109,6 +114,7 @@ func run_scenario() -> void:
 			"unknown save id names the failure")
 
 	await _check_placement(api, user_id)
+	await _check_purchase(api, user_id)
 
 	info("fake implementation resolved %d save(s) with no server and no socket"
 		% save_list.saves.size())
@@ -243,6 +249,112 @@ func _check_placement_failure(result: Variant, code: String,
 	check(not typed.ok, label + " is a structured failure")
 	check_eq(typed.error_code, code, label + " names the endpoint's code")
 	check(typed.placement == null, label + " carries no partial placement")
+	check(typed.resources == null, label + " carries no partial resources")
+
+
+## Purchase double coverage (task 3.2, design D9): typed shapes, the
+## documented in-memory semantics over the committed purchase fixture's
+## before-state (cash-only config price, the legacy `max(…, 0)` clamp, the
+## storage increment, the bought-units record), the endpoint's structured
+## failure codes, and the intent counter — all with no process, no server,
+## and no socket. Expected values come from the purchase fixture: item 105
+## "Victory Arch" `costs {"c": 5}`, the fresh save's `cash` 5, an empty
+## storage, and an empty `boughtUnits`.
+func _check_purchase(api: Variant, user_id: String) -> void:
+	var before := _read_fixture_object(FIXTURE_PURCHASE_BEFORE)
+	var after := _read_fixture_object(FIXTURE_PURCHASE_AFTER)
+	if before.is_empty() or after.is_empty():
+		return
+	var before_map: Dictionary = before["maps"][0]
+	var after_map: Dictionary = after["maps"][0]
+	# The executed transaction, read from the fixture (never written): the
+	# after-state's three changed leaves are the whole oracle. The JSON
+	# transport widens numbers to floats, so the expected mapping is
+	# canonicalized to the typed int form the client actually receives.
+	var executed_store := {"105": int(after_map["store"]["105"])}
+	check_eq(before_map["store"], {}, "the fixture before storage is empty")
+	check_eq(executed_store, {"105": 1},
+		"the fixture after storage carries item 105 with quantity 1")
+	check_eq(int(before["playerInfo"]["cash"]), 5,
+		"the fixture before cash is exactly the 5 price")
+	check_eq(int(after["playerInfo"]["cash"]), 0,
+		"the fixture after cash is zero under the legacy clamp")
+	var requests_before: int = api.purchase_requests
+
+	# --- success: Victory Arch for the fresh player's 5 cash -----------
+	var bought: Variant = await api.purchase_item(user_id, 105)
+	check(bought is BootData.PurchaseResult,
+		"purchase_item returns the typed result")
+	if not (bought is BootData.PurchaseResult):
+		return
+	var first: BootData.PurchaseResult = bought
+	check(first.ok, "fake purchase resolves offline: %s"
+		% first.error_message)
+	if not first.ok:
+		return
+	check_eq(first.protocol, BootData.PROTOCOL, "purchase protocol is compat-v0")
+	check_eq(first.game_version, "alpha 0.02",
+		"the game version is the fixture's")
+	check(first.server_time > 0,
+		"server_time is the positive fixture epoch (time-dependent field)")
+	check_eq(first.result, "success", "legacy result string is reported")
+	check(first.resources != null, "typed resources are carried")
+	if first.resources == null:
+		return
+	check_eq(first.store, executed_store,
+		"the double reproduces the executed fixture's storage exactly")
+	check_eq(first.resources.cash, int(after["playerInfo"]["cash"]),
+		"the derived cash price is deducted with the legacy clamp")
+	check_eq(first.resources.gold, int(before_map["gold"]), "gold unchanged")
+	check_eq(first.resources.wood, int(before_map["wood"]), "wood unchanged")
+	check_eq(first.resources.oil, int(before_map["oil"]), "oil unchanged")
+	check_eq(first.resources.steel, int(before_map["steel"]), "steel unchanged")
+	check_eq(first.resources.xp, int(before_map["xp"]), "xp unchanged")
+	check_eq(first.resources.mana, int(before["privateState"]["mana"]),
+		"mana unchanged")
+
+	# --- structured failures: endpoint codes, no partial payload --------
+	var ghost: Variant = await api.purchase_item("ghost-0000", 105)
+	_check_purchase_failure(ghost, "unknown_user_id", "unknown save id")
+	var empty: Variant = await api.purchase_item("", 105)
+	_check_purchase_failure(empty, "missing_user_id", "empty save id")
+	var unknown_item: Variant = await api.purchase_item(user_id, 999999999)
+	_check_purchase_failure(unknown_item, "unknown_item_id", "unknown item id")
+	# House I is priced in wood: this command's price is not derivable, so
+	# the endpoint (and the double) fail closed with `costs_not_cash`
+	# rather than inventing a price.
+	var wood: Variant = await api.purchase_item(user_id, 1)
+	_check_purchase_failure(wood, "costs_not_cash", "wood-priced item")
+
+	# --- second success: storage accumulated, the failures applied nothing
+	var second: Variant = await api.purchase_item(user_id, 106)
+	check(second is BootData.PurchaseResult and second.ok,
+		"a second purchase succeeds after the failed attempts")
+	if second is BootData.PurchaseResult and second.ok:
+		var typed: BootData.PurchaseResult = second
+		check_eq(typed.store, {"105": 1, "106": 1},
+			"the storage increment accumulates (Fountain cash 10 clamps)")
+		check_eq(typed.resources.cash, 0,
+			"a second price above the remaining cash clamps at zero")
+
+	check_eq(api.purchase_requests, requests_before + 6,
+		"every purchase call increments the intent counter exactly once")
+	info("purchase double resolved 2 successes and 4 structured failures "
+		+ "with no server and no socket")
+
+
+## Every purchase failure carries the endpoint's code and no partial
+## payload (design D5).
+func _check_purchase_failure(result: Variant, code: String,
+		label: String) -> void:
+	check(result is BootData.PurchaseResult,
+		label + " returns the typed result")
+	if not (result is BootData.PurchaseResult):
+		return
+	var typed: BootData.PurchaseResult = result
+	check(not typed.ok, label + " is a structured failure")
+	check_eq(typed.error_code, code, label + " names the endpoint's code")
+	check(typed.store.is_empty(), label + " carries no partial storage")
 	check(typed.resources == null, label + " carries no partial resources")
 
 
