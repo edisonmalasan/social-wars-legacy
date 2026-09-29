@@ -258,6 +258,73 @@ two-sided authoritative superset:
   a strict-int `item_index` present in the save. Storability and addressability
   are client-side rules (design D5); no server-authoritative validation exists.
 
+`POST /v0/upgrade` with body `{"user_id", "item_index"}` is the sixth
+state-mutating surface (the `building-upgrade` change) and the first one whose
+legacy contract was **established by investigation** rather than chosen. The
+body is an **intent only**: extra keys - including a target tier, a reason,
+coordinates, an orientation, a player, a price, or a resource delta - are
+ignored. The endpoint resolves the target tier from the committed configuration
+(`upgrades_to`, with `-1`, `0`, and unresolvable values meaning "no path"), reads
+the row before executing, and derives **both** legacy commands from the row's own
+cell, orientation, and player:
+
+```json
+{"accessToken":"", "commands":[
+   [0, "sell", [12, "UPGR"], [0,0,0,0,0,0,0,0]],
+   [0, "buy",  [12, 24, 45, 49, 1, 0, 0, ""], [0,0,0,0,0,0,0,0]]],
+ "first_number":0, "publishActions":[], "tries":1, "ts":<capture time>}
+```
+
+Success returns the legacy answer plus an authoritative superset naming both sides
+of the replacement:
+
+```json
+{"protocol": "compat-v0", "ok": true, "game_version": "alpha 0.02",
+ "server_time": 1790683377, "result": "success",
+ "removed": [23, 45, 49, 0, 0, [], {}, 1],
+ "upgraded": [24, 45, 49, 1790683377, 0, [], {"nc": 0}, 1],
+ "resources": {"xp": 4, "gold": 2000, "wood": 2000, "oil": 2000,
+               "steel": 2000, "cash": 5, "mana": 0}}
+```
+
+`removed` is the row **as read before execution** and `upgraded` is that row
+**re-read after execution**; both are the same eight-field entry the other
+gameplay surfaces use. `upgraded[3]` is a fresh wall-clock `timestamp` and
+`upgraded[6]` is the `{"nc": 0}` construction seed `engine.map_add_item` writes for
+items with `clicks_to_build > 0` - reported as it arrives and deliberately not
+consumed, because the construction timers belong to the next M7 deliver line.
+
+- **The order is forced and success is not proof.** The dispatcher has no
+  `upgrade` branch, so an upgrade must be a pair; the reason is the committed
+  constant `constants.py:970` `SELL_REASON_UPGRADE = "UPGR"`; and `buy` takes a
+  **client-supplied** map key and cell (`command.py:42-58`), so the pair can reuse
+  the exact key. The reverse order also answers `{"result":"success"}` and leaves
+  the key **absent** (40 -> 39 placements) - legacy reports success either way, so
+  the endpoint requires three post-execution facts before it reports success: the
+  key still exists, its item id equals the derived target tier, and its cell equals
+  the pre-execution cell. Anything else is a fail-closed `internal_error`.
+- A placement with no resolvable next tier answers `no_upgrade_path` (400)
+  **before** the dispatcher runs: a building that cannot be upgraded must never be
+  reduced to a bare sale.
+- **No upgrade cost is claimed.** Both commands carry the neutral derived vector:
+  no configuration field prices an upgrade (item `cost`/`cost_type` are dead
+  fields, `costs` prices the purchase only, and the 139 `premium_upgrade_costs`
+  entries belong to the unproven premium path), and a client-sent delta would let
+  any client mint resources.
+- Validation is structural only: a JSON object body, a resolvable save id, a
+  strict-int `item_index` present in the save, and a resolvable upgrade path.
+  Upgradability is a client-side rule (design D7); no server-authoritative
+  validation exists.
+
+**Provenance - established versus derived.** Established from committed legacy
+source and executed-legacy captures: there is no upgrade command among the 63 named
+branches; the `UPGR` reason constant; `buy`'s client-supplied key and cell; the
+fresh-row semantics (`timestamp_now()`, `store: []`, the `{"nc": 0}` seed); the
+`bought_unit_add` record (appended only when the tier is not already listed,
+`engine.py:86-89`); the forced order; and the resulting state. Derived and never
+observed from the Flash client: that the client sends exactly this pair, the buy
+half's `orientation`/`playerID`/`unknown`/`reason` arguments, and the price vector.
+
 ### Structured errors
 
 Always JSON, always `ok:false`, keys exactly
@@ -279,6 +346,7 @@ Always JSON, always `ok:false`, keys exactly
 | `invalid_item_index` | 400 | `item_index` present but not an integer (`bool` excluded) |
 | `unknown_item_index` | 404 | integer index that names no placement in the save's `map["items"]` (legacy would silently no-op) |
 | `invalid_reason` | 400 | server-side only: the derived sell reason is not a string (unreachable through the contract) |
+| `no_upgrade_path` | 400 | `/v0/upgrade` placement's item has no resolvable next tier in the committed configuration (`upgrades_to` is absent, `-1`, `0`, or unresolvable) |
 | `bad_request` | 400 | other malformed requests Flask rejects |
 | `not_found` | 404 | unknown path |
 | `method_not_allowed` | 405 | known path, unsupported method |
@@ -288,15 +356,16 @@ Always JSON, always `ok:false`, keys exactly
 
 All run from the repository root on Windows x64 with the pinned interpreter
 (CPython 3.9.13); exit codes are the real observed ones (bootstrap-era
-counts 2026-09-27; placement-, purchase-, move-, sell-, and store-era counts
-2026-09-29):
+counts 2026-09-27; placement-, purchase-, move-, sell-, store-, and
+upgrade-era counts 2026-09-29):
 
 ```bash
 python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
 ```
 
-→ `Ran 390 tests ... OK`, exit `0` (90 before `building-purchase`, 157 before
-`building-move`, 227 before `building-sell`, 306 before `building-store`).
+→ `Ran 491 tests ... OK`, exit `0` (90 before `building-purchase`, 157 before
+`building-move`, 227 before `building-sell`, 306 before `building-store`, 390 before
+`building-upgrade`).
 Covers envelope/error shapes, bootstrap and
 session parity against the committed fixtures, pre/post save SHA-256 identity,
 the no-persistence source guard, and the offline socket guard (the suite opens
@@ -384,6 +453,15 @@ invocation, exit code `0`, and containment record:
 python -B apps/compat-api/capture_store_fixture.py
 ```
 
+Upgrade fixture capture (the `building-upgrade` change's executed-legacy
+oracle, one-shot; the request carries the two-command batch) - see
+`tests/fixtures/godot-building-upgrade/README.md` for its invocation, exit
+code `0`, its containment record, and the reverse-order negative oracle:
+
+```bash
+python -B apps/compat-api/capture_upgrade_fixture.py
+```
+
 ## Layout
 
 - `compat_legacy.py` — corpus build/layout checks and the in-process adapter
@@ -413,6 +491,10 @@ python -B apps/compat-api/capture_store_fixture.py
 - `store_envelope.py` - the derived-provisional `/v0/store` envelope (single
   argument, neutral resource vector).
 - `capture_store_fixture.py` - executed-legacy store fixture capture.
+- `upgrade_envelope.py` - the derived-provisional `/v0/upgrade` envelope: the
+  two-command batch (`sell` with the committed `UPGR` reason, then `buy` of
+  the target tier) with neutral resource vectors.
+- `capture_upgrade_fixture.py` - executed-legacy upgrade fixture capture.
 - `tests/` — `test_compat_v0.py` (service + containment), `test_parity.py`
   (offline replay against the committed boot fixtures),
   `test_placement_envelope.py` (offline envelope derivation/sanitization),
@@ -476,10 +558,10 @@ records no building-sale refund rule and the legacy refund travels only in
 client-sent deltas this contract refuses. Insufficient resources reproduce the
 legacy `max(…, 0)` clamp, never a rejection (authoritative server-side validation
 belongs to Server v1 / M13), and occupancy, grid-bounds, level-gate,
-cash-affordability, no-op-move, sellability, storability, and addressability
-rules are enforced client-side only. Persistence is confined to the disposable service
+cash-affordability, no-op-move, sellability, storability, upgradability, and
+addressability rules are enforced client-side only. Persistence is confined to the disposable service
 corpus: `POST /v0/place`, `POST /v0/purchase`, `POST /v0/move`,
-`POST /v0/sell`, and `POST /v0/store` persist through the legacy dispatcher into
-the corpus `saves/`,
+`POST /v0/sell`, `POST /v0/store`, and `POST /v0/upgrade` persist through the
+legacy dispatcher into the corpus `saves/`,
 while the session and bootstrap endpoints remain strictly non-persisting, and
 the working tree is never written.
