@@ -15,14 +15,14 @@
        GameApi, boot scene (default scenario), session, game clock,
        camera controls, UI foundation, settings, audio manager, and the
        town vertical slice (projection, town state, town scene, HUD,
-       selection, placement, purchase, move, sell, no-Flash gate) (the loop
+       selection, placement, purchase, move, sell, store, no-Flash gate) (the loop
        passes the dead endpoint to every suite: the session and game-clock
        suites use it for their failure phase, the placement, purchase, move,
-       and sell suites use it for their transport-failure checks, and suites
-       that ignore user args are unaffected)
+       sell, and store suites use it for their transport-failure checks, and
+       suites that ignore user args are unaffected)
     6. boot-scene unreachable-endpoint failure scenario, run with no service
        at all
-    7. seven live phases against the real Compatibility API: the main-scene
+    7. eight live phases against the real Compatibility API: the main-scene
        boot (success, compared with the committed fixture save), the legacy-v0
        GameApi suite, the structured API-error boot scenario, the
        placement phase (one intent through the v0 placement endpoint with
@@ -30,8 +30,10 @@
        (one intent through the v0 purchase endpoint with the disposable
        corpus save asserted mutated), the move phase (one intent
        through the v0 move endpoint with the disposable corpus save
-       asserted mutated), and the sell phase (one intent through the v0
-       sell endpoint with the disposable corpus save asserted mutated)
+       asserted mutated), the sell phase (one intent through the v0
+       sell endpoint with the disposable corpus save asserted mutated), and
+       the store phase (one intent through the v0 store endpoint with the
+       disposable corpus save asserted mutated)
     8. Compatibility API guard baseline, post-run, must equal the pre-run
        digests
     9. teardown assertions: loopback port released, no working-tree saves/
@@ -291,14 +293,15 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_gate")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_gate")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a
         # previously active session / clears a previous clock anchor), and
         # test_town_placement / test_town_purchase / test_town_move /
-        # test_town_sell dial it for their transport-failure checks; suites
-        # that ignore user args are unaffected.
+        # test_town_sell / test_town_store dial it for their
+        # transport-failure checks; suites that ignore user args are
+        # unaffected.
         $run = Invoke-Logged -FileName $GodotExe -Arguments @(
             "--headless", "--path", $projectRel,
             "--script", "res://tests/$suite.gd",
@@ -403,6 +406,17 @@ try {
                 "--", "--scenario=live-sell",
                 "--gameapi-endpoint=$endpoint"
             )
+        },
+        @{
+            Name = "store-live"
+            Assertions = "store live phase"
+            ExpectSaveMutation = $true
+            Arguments = @(
+                "--headless", "--path", $projectRel,
+                "--script", "res://tests/test_town_store.gd",
+                "--", "--scenario=live-store",
+                "--gameapi-endpoint=$endpoint"
+            )
         }
     )
 
@@ -413,9 +427,9 @@ try {
             "--port", "$Port", "--name", $phase.Name
         )
         if ($phase.ContainsKey("ExpectSaveMutation")) {
-            # placement-live, purchase-live, move-live, and sell-live: the
-            # harness snapshots the disposable corpus saves before the Godot
-            # run and fails unless one changed after.
+            # placement-live, purchase-live, move-live, sell-live, and
+            # store-live: the harness snapshots the disposable corpus saves
+            # before the Godot run and fails unless one changed after.
             $phaseArgs += "--expect-save-mutation"
         }
         $phaseArgs += @("--", $GodotExe) + $phase.Arguments
@@ -531,6 +545,21 @@ try {
     # --expect-save-mutation.
     Report-Result ($sellOut -match "(?m)^PASS corpus save mutated by the live placement") `
         "sell live phase mutated the disposable corpus save"
+
+    # The store live phase must show a typed success through the real
+    # endpoint, and the harness must have observed the corpus save change.
+    $storeOut = ""
+    if ($phaseLogs.ContainsKey("store-live")) { $storeOut = $phaseLogs["store-live"] }
+    Report-Result ($storeOut -match "\[test\] PASS script=res://tests/test_town_store\.gd") `
+        "store live phase asserts its scenario"
+    Report-Result ($storeOut -match '\[test\] live-store applied item_index=2 cell=\(53, 39\) xp=4 gold=2000') `
+        "store live phase drove one store through the v0 endpoint"
+    # As with the purchase, move, and sell phases above, the harness's
+    # save-mutation check is labelled for the placement phase; the marker is
+    # what proves a corpus save changed under the store-live phase's
+    # --expect-save-mutation.
+    Report-Result ($storeOut -match "(?m)^PASS corpus save mutated by the live placement") `
+        "store live phase mutated the disposable corpus save"
 
     # --- 8. guard baseline, post-run ---------------------------------------
 

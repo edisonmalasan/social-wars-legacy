@@ -1,15 +1,16 @@
 extends "res://tests/test_base.gd"
 ## Headless GameApi suite for the fake implementation (spec "Boot offline
 ## with the fake implementation", "Place through either implementation",
-## and "Purchase through either implementation"; tasks 3.1/3.2/3.3).
+## "Purchase through either implementation", and "Store through either
+## implementation"; tasks 3.1/3.2/3.3).
 ##
 ## Hermetic by construction: no Compatibility API is started — verify-boot
 ## runs this suite before any service exists — and the scope test restricts
 ## the compat endpoint and the HTTP request client to the legacy-v0
 ## implementation file, which this suite never selects. Expected values are
 ## read from the committed executed-legacy fixtures (read-only), including
-## the placement and purchase fixtures the two doubles mutate in memory
-## over.
+## the placement, purchase, move, sell, and store fixtures the five doubles
+## mutate in memory over.
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 
@@ -31,6 +32,34 @@ const FIXTURE_SELL_BEFORE := \
 	"tests/fixtures/godot-building-sell/steps/command_sell/before.json"
 const FIXTURE_SELL_AFTER := \
 	"tests/fixtures/godot-building-sell/steps/command_sell/after.json"
+const FIXTURE_STORE_BEFORE := \
+	"tests/fixtures/godot-building-store/steps/command_store_item/before.json"
+const FIXTURE_STORE_AFTER := \
+	"tests/fixtures/godot-building-store/steps/command_store_item/after.json"
+
+## The executed-legacy store transaction's constants (fixture facts, read
+## from the committed capture): the Tree decoration (item 905, 1x1) at
+## legacy map key "2", anchored at `(53,39)`, whose row
+## `[905, 53, 39, 0, 0, [], {}, 1]` is popped while the fresh save's empty
+## storage becomes `{"905": 1}` — the two writes of the one branch, landing
+## together.
+const STORE_ITEM := 905
+const STORE_INDEX := 2
+const STORE_ROW := [STORE_ITEM, 53, 39, 0, 0, [], {}, 1]
+## The two other Turret I rows the double uses to prove that a SECOND store
+## of the SAME item increments the existing entry instead of replacing it
+## (the fresh save carries no second Tree, and the double never rewrites the
+## committed fixture).
+const STORE_SAME_ITEM_INDEX_A := 11
+const STORE_SAME_ITEM_INDEX_B := 20
+const STORE_SAME_ITEM := 22
+## An unrelated, still-present row the double resolves after the failed
+## attempts, proving the state was not corrupted by them.
+const STORE_UNRELATED_INDEX := 12
+const STORE_UNRELATED_ITEM := 23
+## An index the map does not name (the endpoint's 404, resolved before
+## execution), and index 0, which is never a real legacy key.
+const STORE_UNKNOWN_INDEX := 9999
 
 
 func run_scenario() -> void:
@@ -125,6 +154,7 @@ func run_scenario() -> void:
 	await _check_purchase(api, user_id)
 	await _check_move(api, user_id)
 	await _check_sell(api, user_id)
+	await _check_store(api, user_id)
 
 	info("fake implementation resolved %d save(s) with no server and no socket"
 		% save_list.saves.size())
@@ -698,6 +728,212 @@ func _check_sell_failure(result: Variant, code: String, label: String) -> void:
 	check(not typed.ok, label + " is a structured failure")
 	check_eq(typed.error_code, code, label + " names the endpoint's code")
 	check(typed.removed == null, label + " carries no partial removed row")
+	check(typed.resources == null, label + " carries no partial resources")
+
+
+## Store double coverage (building-store task 3.2, design D8): the documented
+## in-memory semantics over the committed store fixture's before-state (the
+## index resolves against the save's own placements, ONLY that row is popped
+## and its item's storage entry incremented by legacy's default quantity of
+## exactly 1, NOTHING ELSE is written — including the bought-units list,
+## which the legacy branch deliberately never touches — and the derived
+## neutral resource vector leaves every resource unchanged), the endpoint's
+## structured failure codes, and the intent counter — all with no process, no
+## server, and no socket.
+##
+## The executed transaction, read from the fixture (never written): the
+## after-state's two changed leaves (`items["2"]` gone, `store["905"] == 1`)
+## are the whole oracle, and the double's response must equal them exactly.
+func _check_store(api: Variant, user_id: String) -> void:
+	var before := _read_fixture_object(FIXTURE_STORE_BEFORE)
+	var after := _read_fixture_object(FIXTURE_STORE_AFTER)
+	if before.is_empty() or after.is_empty():
+		return
+	var before_map: Dictionary = before["maps"][0]
+	var after_map: Dictionary = after["maps"][0]
+	var before_items: Dictionary = before_map["items"]
+	var after_items: Dictionary = after_map["items"]
+	check_eq(before_items.size(), 40,
+		"the store fixture before map carries 40 placements")
+	check_eq(after_items.size(), 39,
+		"the executed store left 39 placements (exactly one row popped)")
+	check(after_items.has("2") == false,
+		"the executed store left no row under key 2")
+	# The popped row, in the typed form the client receives.
+	var removed_before := _typed_row(before_items["2"])
+	check_eq(removed_before, STORE_ROW,
+		"the fixture anchors the Tree at (53,39) under key 2")
+	# The other half of the move: the storage mapping gains exactly that
+	# item's id with legacy's default quantity of 1.
+	check_eq(before_map["store"], {},
+		"the store fixture before storage is empty")
+	check_eq({"905": int(after_map["store"]["905"])}, {"905": 1},
+		"the executed store put item 905 in storage with quantity 1")
+	check_eq(int(after_map["store"].size()), 1,
+		"the executed store added exactly one storage entry")
+	# Every OTHER row is byte-identical: the one pop is the only map write.
+	var other_keys: Array = []
+	for key: Variant in before_items:
+		if str(key) != "2":
+			other_keys.append(str(key))
+	other_keys.sort()
+	var untouched := true
+	for key: String in other_keys:
+		if _typed_row(before_items[key]) != _typed_row(after_items[key]):
+			untouched = false
+	check(untouched,
+		"the executed store changed no other row (39 rows stay byte-identical)")
+	# The neutral derived vector means the resource bag is unchanged, and the
+	# whole private state is too — the legacy branch calls no bookkeeping
+	# helper, so `boughtUnits` stays empty (design D2/D8, reproduced exactly).
+	for key in ["xp", "gold", "wood", "oil", "steel"]:
+		check_eq(before_map[key], after_map[key],
+			"the executed store left %s unchanged" % key)
+	check_eq(before["playerInfo"]["cash"], after["playerInfo"]["cash"],
+		"the executed store left cash unchanged (no cost is claimed)")
+	check_eq(before["privateState"]["mana"], after["privateState"]["mana"],
+		"the executed store left mana unchanged")
+	check_eq(before["privateState"]["boughtUnits"],
+		after["privateState"]["boughtUnits"],
+		"the executed store left boughtUnits unchanged ([] — the branch "
+		+ "deliberately writes no bookkeeping)")
+	var requests_before: int = api.store_requests
+
+	# --- success: the Tree at key 2 ----------------------------------
+	var stored: Variant = await api.store_building(user_id, STORE_INDEX)
+	check(stored is BootData.StoreResult,
+		"store_building returns the typed result")
+	if not (stored is BootData.StoreResult):
+		return
+	var first: BootData.StoreResult = stored
+	check(first.ok, "fake store resolves offline: %s" % first.error_message)
+	if not first.ok:
+		return
+	check_eq(first.protocol, BootData.PROTOCOL, "store protocol is compat-v0")
+	check_eq(first.game_version, "alpha 0.02",
+		"the game version is the fixture's")
+	check(first.server_time > 0,
+		"server_time is the positive fixture epoch (time-dependent field)")
+	check_eq(first.result, "success", "legacy result string is reported")
+	check(first.removed != null, "the removed row is carried")
+	check(first.resources != null, "typed resources are carried")
+	if first.removed == null or first.resources == null:
+		return
+	# The response carries the row AS READ BEFORE EXECUTION (design D4/D5)
+	# and the FULL post-execution storage mapping.
+	check_eq(first.removed.item_id, STORE_ITEM,
+		"the removed row names the Tree")
+	check_eq(first.removed.x, 53, "the removed row carries its saved x")
+	check_eq(first.removed.y, 39, "the removed row carries its saved y")
+	check_eq(first.removed.timestamp, 0,
+		"the removed row keeps the save's timestamp (never restamped)")
+	check_eq(first.removed.orientation, 0, "the removed row keeps its orientation")
+	check_eq(first.removed.store, [], "the removed row keeps its store")
+	check_eq(first.removed.attr, {}, "the removed row keeps its attr")
+	check_eq(first.removed.player, 1,
+		"the removed row keeps the player's team field")
+	check_eq(first.store, {"905": 1},
+		"the double reproduces the executed fixture's storage mapping exactly")
+	# The neutral derived vector means the resource bag is the fresh save's
+	# own values (design D2) — never a computed delta, and no storing cost.
+	check_eq(first.resources.gold, int(before_map["gold"]),
+		"gold is unchanged by the neutral vector")
+	check_eq(first.resources.wood, int(before_map["wood"]),
+		"wood is unchanged by the neutral vector")
+	check_eq(first.resources.oil, int(before_map["oil"]),
+		"oil is unchanged by the neutral vector")
+	check_eq(first.resources.steel, int(before_map["steel"]),
+		"steel is unchanged by the neutral vector")
+	check_eq(first.resources.xp, int(before_map["xp"]),
+		"xp is unchanged by the neutral vector")
+	check_eq(first.resources.cash, int(before["playerInfo"]["cash"]),
+		"cash is unchanged by the neutral vector")
+	check_eq(first.resources.mana, int(before["privateState"]["mana"]),
+		"mana is unchanged by the neutral vector")
+
+	# --- the stale index: the row this very call popped is gone, so the
+	# endpoint's pre-execution resolution (design D3) answers 404 rather
+	# than reporting a store that never happened.
+	var stale: Variant = await api.store_building(user_id, STORE_INDEX)
+	_check_store_failure(stale, "unknown_item_index",
+		"a stale index after the pop")
+
+	# --- structured failures: endpoint codes, no partial payload ----
+	var ghost: Variant = await api.store_building("ghost-0000", STORE_INDEX)
+	_check_store_failure(ghost, "unknown_user_id", "unknown save id")
+	var empty: Variant = await api.store_building("", STORE_INDEX)
+	_check_store_failure(empty, "missing_user_id", "empty save id")
+	var unknown_index: Variant = await api.store_building(
+		user_id, STORE_UNKNOWN_INDEX)
+	_check_store_failure(unknown_index, "unknown_item_index",
+		"an index the map does not name")
+	var zero: Variant = await api.store_building(user_id, 0)
+	_check_store_failure(zero, "unknown_item_index",
+		"index 0 (never a real legacy key)")
+
+	# --- a second store of the SAME item: the existing entry is
+	# INCREMENTED, not replaced, and the pre-existing Tree entry survives —
+	# the whole mapping is what the response reports, so the client does no
+	# arithmetic of its own.
+	var same_first: Variant = await api.store_building(
+		user_id, STORE_SAME_ITEM_INDEX_A)
+	check(same_first is BootData.StoreResult and same_first.ok,
+		"the first Turret I stores")
+	if same_first is BootData.StoreResult and same_first.ok:
+		var typed_a: BootData.StoreResult = same_first
+		check_eq(typed_a.store, {"905": 1, "22": 1},
+			"the mapping keeps the Tree and adds the Turret I with quantity 1")
+		check_eq(typed_a.removed.item_id, STORE_SAME_ITEM,
+			"the first same-item row names the Turret I")
+	var same_second: Variant = await api.store_building(
+		user_id, STORE_SAME_ITEM_INDEX_B)
+	check(same_second is BootData.StoreResult and same_second.ok,
+		"a second store of the same item succeeds")
+	if same_second is BootData.StoreResult and same_second.ok:
+		var typed_b: BootData.StoreResult = same_second
+		check_eq(typed_b.store, {"905": 1, "22": 2},
+			"the second store increments the existing entry instead of "
+			+ "replacing it")
+		check_eq(typed_b.removed.item_id, STORE_SAME_ITEM,
+			"the second same-item row names the other Turret I")
+		check_eq(typed_b.removed.x, 41,
+			"the second same-item row carries its own saved x")
+		check_eq(typed_b.removed.y, 48,
+			"the second same-item row carries its own saved y")
+		check_eq(typed_b.resources.gold, int(before_map["gold"]),
+			"the second store also leaves gold unchanged")
+
+	# --- the failures applied nothing: key 2 and key 11 are gone, and
+	# every other row still resolves to its own item (state not corrupted).
+	var unrelated: Variant = await api.store_building(
+		user_id, STORE_UNRELATED_INDEX)
+	check(unrelated is BootData.StoreResult and unrelated.ok,
+		"an unrelated row still resolves after the failed attempts")
+	if unrelated is BootData.StoreResult and unrelated.ok:
+		check_eq((unrelated as BootData.StoreResult).removed.item_id,
+			STORE_UNRELATED_ITEM,
+			"the unrelated row resolves to its own item (state not corrupted)")
+
+	check_eq(api.store_requests, requests_before + 9,
+		"every store_building call increments the intent counter exactly once")
+	info("store double resolved the executed fixture's two-sided move plus 4 "
+		+ "structured failures with no server and no socket")
+
+
+## Every store failure carries the endpoint's code and no partial payload
+## (design D5) — including the 404 `unknown_item_index`, which stands in for
+## legacy's silent early return, and a storage mapping that must never be
+## reported from a failed response.
+func _check_store_failure(result: Variant, code: String, label: String) -> void:
+	check(result is BootData.StoreResult,
+		label + " returns the typed result")
+	if not (result is BootData.StoreResult):
+		return
+	var typed: BootData.StoreResult = result
+	check(not typed.ok, label + " is a structured failure")
+	check_eq(typed.error_code, code, label + " names the endpoint's code")
+	check(typed.removed == null, label + " carries no partial removed row")
+	check(typed.store.is_empty(), label + " carries no partial storage mapping")
 	check(typed.resources == null, label + " carries no partial resources")
 
 

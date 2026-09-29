@@ -18,6 +18,14 @@ extends RefCounted
 ## shape is never duplicated — only the envelope and the parse function
 ## are the command's own.
 ##
+## The store command needs its own result class for the same one reason
+## (`removed` is the pre-execution row), plus the FULL post-execution
+## storage mapping, which names the other half of the move
+## (building-store design D4): `StoreResult` therefore reuses the typed
+## entry class for `removed` AND the very same storage parser the
+## purchase response uses for `store`, so the storage mapping can never
+## be read by two rule sets.
+##
 ## Presentation code never receives raw transport dictionaries: every
 ## GameApi operation returns one of the result classes below, and the two
 ## legacy JSON payloads (game config, player info) are wrapped in payload
@@ -196,6 +204,39 @@ class SellResult:
 	var error_message := ""
 
 
+## Result of `store_building()`: the legacy result plus the two-sided
+## authoritative superset (building-store design D4) — the eight-field row
+## AS READ BEFORE EXECUTION (the persisted save no longer holds it, and
+## reconstructing it afterwards would be fabrication) AND the FULL
+## post-execution storage mapping (`{str(item_id): int}`, the very shape
+## `PurchaseResult.store` carries, parsed by the very same helper) plus the
+## current resources — or a structured failure with no partial payload.
+## The client removes the selected typed placement, frees its rendered
+## object, replaces its storage view from `store` through the shared
+## `TownState` storage parser, and takes the resource values verbatim: the
+## derived price vector is NEUTRAL, so a store claims no cost and no
+## capacity rule, and it deliberately writes no bought-units bookkeeping.
+class StoreResult:
+	extends RefCounted
+	var ok := false
+	var protocol := ""
+	var game_version := ""
+	## Wall-clock seconds the legacy server stamped (a time-dependent field,
+	## so tests assert positivity, never a fixed value).
+	var server_time := 0
+	## The legacy result string ("success"); "" on failure.
+	var result := ""
+	## The removed row exactly as it was read before execution.
+	var removed: Placement = null
+	## The whole post-execution storage mapping: string item id -> integer
+	## quantity, in the same shape and through the same parser the
+	## purchase response uses (one storage rule, three entry points).
+	var store: Dictionary = {}
+	var resources: Resources = null
+	var error_code := ""
+	var error_message := ""
+
+
 ## Structured failure for `list_sessions()` (never a partial payload).
 static func save_list_failure(code: String, message: String) -> SaveListResult:
 	var result := SaveListResult.new()
@@ -235,6 +276,15 @@ static func purchase_failure(code: String, message: String) -> PurchaseResult:
 ## Structured failure for `sell_building()` (never a partial payload).
 static func sell_failure(code: String, message: String) -> SellResult:
 	var result := SellResult.new()
+	result.ok = false
+	result.error_code = code
+	result.error_message = message
+	return result
+
+
+## Structured failure for `store_building()` (never a partial payload).
+static func store_failure(code: String, message: String) -> StoreResult:
+	var result := StoreResult.new()
 	result.ok = false
 	result.error_code = code
 	result.error_message = message
@@ -434,6 +484,57 @@ static func parse_sell(payload: Variant) -> SellResult:
 	return result
 
 
+## Parses a v0 store envelope — success or structured error — into the typed
+## result. Shared by `FakeApi` (which synthesizes the envelope from the
+## committed store fixture's before-state after applying the documented
+## in-memory semantics) and `LegacyV0Api` (which decodes the HTTP body), so
+## both implementations yield the same typed shape by construction. The
+## removed row goes through the SAME fail-closed entry parser the placement
+## and sell responses use, and the storage mapping through the SAME parser
+## the purchase response uses (design D4): one row rule, one storage rule.
+static func parse_store(payload: Variant) -> StoreResult:
+	if not (payload is Dictionary):
+		return store_failure("bad_response", "response is not a JSON object")
+	var envelope: Dictionary = payload
+	if envelope.get("ok") != true:
+		return _store_error(envelope)
+	if str(envelope.get("protocol", "")) != PROTOCOL:
+		return store_failure("protocol_mismatch",
+			"expected protocol %s, got %s" % [PROTOCOL,
+			str(envelope.get("protocol"))])
+	if str(envelope.get("result", "")) != "success":
+		return store_failure("bad_response",
+			"store response did not report the legacy success result")
+	var removed := _parse_placement_entry(envelope.get("removed"))
+	if removed == null:
+		return store_failure("bad_response",
+			"removed row is not the legacy eight-field array")
+	var store: Variant = _parse_store(envelope.get("store"))
+	if store == null:
+		return store_failure("bad_response",
+			"store mapping is not a string-item-id to integer-quantity map")
+	var resources_raw: Variant = envelope.get("resources")
+	if not (resources_raw is Dictionary):
+		return store_failure("bad_response",
+			"store response carries no resources object")
+	var resources := _parse_resources(resources_raw)
+	if resources == null:
+		return store_failure("bad_response",
+			"store resources are not seven non-negative integers")
+	var result := StoreResult.new()
+	result.ok = true
+	result.protocol = PROTOCOL
+	result.game_version = str(envelope.get("game_version", ""))
+	result.server_time = _parse_epoch(envelope.get("server_time"))
+	if result.server_time < 0:
+		return store_failure("bad_response", "server_time is not a number")
+	result.result = "success"
+	result.removed = removed
+	result.store = store
+	result.resources = resources
+	return result
+
+
 ## The storage mapping -> `{str(item_id): int}` with integral floats
 ## canonicalized to ints (the JSON transport widens them on the pinned engine
 ## while Dictionary equality is type-strict there — the same tolerance
@@ -589,6 +690,18 @@ static func _sell_error(envelope: Dictionary) -> SellResult:
 		code = str(typed.get("code", code))
 		message = str(typed.get("message", message))
 	return sell_failure(code, message)
+
+
+## Structured error fields of a failed store envelope (code + message).
+static func _store_error(envelope: Dictionary) -> StoreResult:
+	var code := "bad_response"
+	var message := "response reported failure without a structured error"
+	var error: Variant = envelope.get("error")
+	if error is Dictionary:
+		var typed: Dictionary = error
+		code = str(typed.get("code", code))
+		message = str(typed.get("message", message))
+	return store_failure(code, message)
 
 
 ## Eight-field legacy entry -> typed `Placement`; null when malformed

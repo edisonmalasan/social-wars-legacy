@@ -1,0 +1,123 @@
+{
+	"bootstrap_requests": 1,
+	"capture": {
+		"implementation": "fake GameApi (a deterministic test double, not a parity oracle)",
+		"parity_pointer": "real-execution parity is established by the fixture-replay tests and the verify-boot store-live phase",
+		"path": "apps/client-godot/evidence/building-store/building-store.png",
+		"sha256": "b8d57f870f3bfc1cf5808ea0099282f286745b97ebbf2c16032e1ebb5b1270a7"
+	},
+	"constants": {
+		"derivation_status": "derived-provisional",
+		"evidence_gap": "the legacy SWF's static iso-engine identifiers (TILE_SIZE, EI_TILE_HEIGHT_PIXELS, gridWidth/Height, numCols/numRows) were never extracted; pixel parity with the Flash client is not claimed",
+		"grid_extent": 100,
+		"origin_x": 2000.0,
+		"origin_y": 10.0,
+		"tile_height": 20.0,
+		"tile_width": 40.0,
+		"world_rect": [
+			0.0,
+			0.0,
+			4000.0,
+			2000.0
+		]
+	},
+	"counts": {
+		"objects_after": 39,
+		"objects_before": 40,
+		"placements_after": 39,
+		"placements_before": 40
+	},
+	"inputs": {
+		"bootstrap_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/get_player_info/response.body",
+			"sha256": "facedf76784d3dc03a3a45e81756a8546f90f7647dbff8917593404d9e401709"
+		},
+		"save_list_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json",
+			"sha256": "ad0404c2c340a48f06e2e49ae7eb7973978cd2ccb02ac6ff7bfba4eb75f6d9f4"
+		},
+		"store_after": {
+			"path": "tests/fixtures/godot-building-store/steps/command_store_item/after.json",
+			"sha256": "e70df2480e492005cfb821239041ada29720f0c95d1b7305b2221a5b4dbdb1fd"
+		},
+		"store_request": {
+			"path": "tests/fixtures/godot-building-store/steps/command_store_item/request.json",
+			"sha256": "3ffd877e461672b433380a305e3daac105eb92f2a1aeea7d3da7b15ecfd1f0b2"
+		},
+		"store_response": {
+			"path": "tests/fixtures/godot-building-store/steps/command_store_item/response.body",
+			"sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87"
+		},
+		"terrain": {
+			"path": "assets/images/en/mapa1.jpg",
+			"sha256": "35c4ded53e82be187eb67c54ee7c7023b698c3986954db4b6f9613a2a45cdd3f"
+		}
+	},
+	"intent": {
+		"item_index": 2,
+		"user_id": "00000000-0000-4000-8000-000000000001"
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed",
+		"the command's argument value and the neutral price vector are derived, never observed from the Flash client",
+		"no storing cost and no capacity rule are claimed: the committed configuration records neither and the legacy server has no capacity check, so the neutral vector is a derivation boundary, not a claim about the legacy client",
+		"the bought-units list is deliberately not written by the legacy branch (it calls no bookkeeping helper), and that is reproduced exactly rather than fixed",
+		"this line only moves a building into storage: stored items are not yet playable, and the reverse legacy command (taking a stored item back onto the map) remains open",
+		"parity covers one recorded transaction against the fresh-player corpus, not progressed players",
+		"storability and addressability are client-side rules only; the endpoint enforces structural input validity and no server-authoritative validation exists",
+		"no pixel-parity oracle against the legacy client exists",
+		"the capture runs the fake GameApi implementation; real-execution parity is established by the fixture-replay tests and the verify-boot store-live phase"
+	],
+	"readout": [
+		"Tree  x1  (item 905)"
+	],
+	"resources": {
+		"after": {
+			"cash": 5,
+			"coins": 2000,
+			"energy": 50,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2000,
+			"xp": 4
+		},
+		"before": {
+			"cash": 5,
+			"coins": 2000,
+			"energy": 50,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2000,
+			"xp": 4
+		}
+	},
+	"schema": "store-report-v1",
+	"storage": {
+		"after": {
+			"905": 1
+		},
+		"before": {}
+	},
+	"store_requests": 1,
+	"stored_building": {
+		"cell": [
+			53,
+			39
+		],
+		"legacy_id": 905,
+		"name": "Tree",
+		"removed_row": [
+			905,
+			53,
+			39,
+			0,
+			0,
+			[],
+			{},
+			1
+		],
+		"slot": 2
+	}
+}

@@ -59,12 +59,14 @@ extends Node2D
 ## The placement, purchase, and move evidence steps mirror that pattern
 ## exactly one level down: `--placement-capture=<path>` /
 ## `--purchase-capture=<path>` / `--move-capture=<path>` /
-## `--sell-capture=<path>` drive their flow
-## (picker / shop / selection-then-move / selection-then-sell) before the
+## `--sell-capture=<path>` / `--store-capture=<path>` drive their flow
+## (picker / shop / selection-then-move / selection-then-sell /
+## selection-then-store) before the
 ## frame is written, and `--placement-report=<path>` /
 ## `--purchase-report=<path>` / `--move-report=<path>` /
-## `--sell-report=<path>` write their deterministic `placement-report-v1` /
-## `purchase-report-v1` / `move-report-v1` / `sell-report-v1` reports.
+## `--sell-report=<path>` / `--store-report=<path>` write their deterministic
+## `placement-report-v1` / `purchase-report-v1` / `move-report-v1` /
+## `sell-report-v1` / `store-report-v1` reports.
 ##
 ## Move mode (building-move, spec "Move flow"): a move surface in its OWN
 ## UI-foundation slot, armed from the delivered selection path — selecting a
@@ -96,6 +98,31 @@ extends Node2D
 ## back if any step fails (design D9). A placement with no addressable
 ## legacy key is refused with the move flow's own explicit reason. The
 ## derived price vector is NEUTRAL, so a sale claims NO refund.
+##
+## Store mode (building-store, spec "Store flow"): a THIRD mode on the SAME
+## delivered selection-driven surface — beside `Move` and `Sell`, exactly one
+## of the three can be armed at a time — so selecting a placed building that
+## has an addressable legacy key offers a `Store` action, and pressing it
+## arms the store. The armed surface reuses that panel's status line and its
+## confirm/cancel row in a third, TARGETLESS mode (design D7: a store has no
+## grid cell and no preview, and a fourth panel would duplicate the
+## selection affordance): the confirm names the building and reports where it
+## will land (its item id in the player's storage) and sends exactly one
+## `GameApi.store_building()` intent, cancellation sends nothing and leaves
+## the town byte-identical, and success applies only the authoritative
+## response — the selected typed placement removed, its rendered object
+## freed, the remaining objects keeping the committed depth order, the typed
+## storage replaced through the SAME fail-closed `TownState` parser the
+## payload parse and the purchase apply use, the storage readout re-rendered
+## from it, and the HUD resources and XP from the response — with every write
+## snapshotted and rolled back if any step fails (design D8). A placement
+## with no addressable legacy key is refused with the move flow's own
+## explicit reason, and a selection that no longer names the armed building
+## is refused by name rather than silently re-targeted. The derived price
+## vector is NEUTRAL, so a store claims NO cost and NO capacity rule, and it
+## writes NO bought-units bookkeeping — the legacy branch does not, and this
+## reproduces that exactly. This line only moves a building INTO storage:
+## stored items are not yet playable and `place_stored_item` remains open.
 
 const Iso = preload("res://scripts/town/iso.gd")
 const TownState = preload("res://scripts/town/town_state.gd")
@@ -211,6 +238,29 @@ const DEFAULT_SELL_REPORT_PATH := "evidence/building-sell/report.json"
 const SELL_INTENT_INDEX := 20
 const SELL_INTENT_ITEM := 22
 const SELL_INTENT_CELL := Vector2i(41, 48)
+## Store evidence (building-store, design D9): the executed-legacy store
+## fixture the parity suite replays and the committed fake capture the store
+## report points at (repository-relative).
+const REPORT_STORE_REQUEST := \
+	"tests/fixtures/godot-building-store/steps/command_store_item/request.json"
+const REPORT_STORE_RESPONSE := \
+	"tests/fixtures/godot-building-store/steps/command_store_item/response.body"
+const REPORT_STORE_AFTER := \
+	"tests/fixtures/godot-building-store/steps/command_store_item/after.json"
+const REPORT_CAPTURE_STORE := \
+	"apps/client-godot/evidence/building-store/building-store.png"
+## Default store report destination for the bare `--store-report` flag
+## (project-relative, resolved against the project directory).
+const DEFAULT_STORE_REPORT_PATH := "evidence/building-store/report.json"
+## The single store intent the store evidence records: the Tree decoration
+## (item 905) at legacy map key 2, anchored at (53,39) — the
+## executed-legacy fixture's transaction, driven through the same
+## selection -> arm -> confirm flow a player uses. The fixture's slot differs
+## from the move fixture's 11 and the sell fixture's 20, so the three
+## fixtures stay independently readable.
+const STORE_INTENT_INDEX := 2
+const STORE_INTENT_ITEM := 905
+const STORE_INTENT_CELL := Vector2i(53, 39)
 ## Default placement report destination for the bare
 ## `--placement-report` flag (project-relative, resolved against the
 ## project directory).
@@ -339,6 +389,40 @@ const SELL_NON_CLAIMS := [
 		+ "verify-boot sell-live phase",
 ]
 
+## The store evidence's explicit non-claims (spec "Store evidence and claim
+## limits"): the carried-forward claims, the derived argument value and
+## neutral vector, the NO-COST and NO-CAPACITY limits design D2 and D9 add,
+## the deliberately unwritten bought-units list, the one-way trip design D9
+## names, the one-transaction parity scope, the client-only validation split,
+## the no-pixel-parity claim, and the fake-capture pointer. The runtime
+## tokens in the first claim are assembled from fragments for the same
+## project-scope reason as the lists above.
+const STORE_NON_CLAIMS := [
+	"no Flash, " + "Ruf" + "fle" + ", " + "Action" + "Script"
+		+ ", or browser executed",
+	"the command's argument value and the neutral price vector are derived, "
+		+ "never observed from the Flash client",
+	"no storing cost and no capacity rule are claimed: the committed "
+		+ "configuration records neither and the legacy server has no "
+		+ "capacity check, so the neutral vector is a derivation boundary, "
+		+ "not a claim about the legacy client",
+	"the bought-units list is deliberately not written by the legacy branch "
+		+ "(it calls no bookkeeping helper), and that is reproduced exactly "
+		+ "rather than fixed",
+	"this line only moves a building into storage: stored items are not yet "
+		+ "playable, and the reverse legacy command (taking a stored item "
+		+ "back onto the map) remains open",
+	"parity covers one recorded transaction against the fresh-player "
+		+ "corpus, not progressed players",
+	"storability and addressability are client-side rules only; the "
+		+ "endpoint enforces structural input validity and no "
+		+ "server-authoritative validation exists",
+	"no pixel-parity oracle against the legacy client exists",
+	"the capture runs the fake GameApi implementation; real-execution "
+		+ "parity is established by the fixture-replay tests and the "
+		+ "verify-boot store-live phase",
+]
+
 ## View states (spec: never claim a rendered town without one).
 const STATE_EMPTY := "empty"
 const STATE_BUILT := "built"
@@ -461,6 +545,19 @@ var _sell_active := false
 ## the state holds, so the apply removes exactly the row the player chose.
 var _sell_placement: Variant = null
 
+## Store flow (building-store, spec "Store flow"). The surface is not a
+## fourth panel: it is a THIRD mode of the SAME selection-driven surface
+## (design D7), so it owns no slot, no preview, and no grid target — only its
+## own armed state, the placement being stored, and the explicit failure the
+## spec requires. The move and sell modes, their previews, and their confirm
+## state machines are untouched.
+var store_error := ""
+var _store_active := false
+## The placement being stored (TownState.Placement or null). The SAME
+## instance the state holds, so the apply removes exactly the row the player
+## chose.
+var _store_placement: Variant = null
+
 ## Visual hierarchy + texture caches (shared across rebuilds of this view).
 var _visuals := TownVisuals.new()
 ## The committed HUD builder once attached.
@@ -486,6 +583,11 @@ var _move_capture := false
 ## D10): the sell flow runs before the capture so the frame shows the town
 ## WITHOUT the sold building.
 var _sell_capture := false
+## True when the capture flag was `--store-capture=` (building-store, design
+## D9): the store flow runs before the capture so the frame shows the town
+## WITHOUT the stored building and with its storage readout carrying the
+## stored item.
+var _store_capture := false
 
 @onready var terrain: TownTerrain = $Terrain
 @onready var objects_layer: Node2D = $Objects
@@ -535,10 +637,17 @@ func _ready() -> void:
 			and get_script().resource_path == "res://scripts/town/town.gd":
 		await _write_sell_report(sell_report_path)
 		return
+	# The store report shares that gate for the same reason.
+	var store_report_path := _store_report_path_arg()
+	if not store_report_path.is_empty() \
+			and get_script().resource_path == "res://scripts/town/town.gd":
+		await _write_store_report(store_report_path)
+		return
 	_capture_path = _user_arg("--town-capture=")
 	_purchase_capture = false
 	_move_capture = false
 	_sell_capture = false
+	_store_capture = false
 	if _capture_path.is_empty():
 		_capture_path = _user_arg("--placement-capture=")
 		_placement_capture = not _capture_path.is_empty()
@@ -551,6 +660,9 @@ func _ready() -> void:
 	if _capture_path.is_empty():
 		_capture_path = _user_arg("--sell-capture=")
 		_sell_capture = not _capture_path.is_empty()
+	if _capture_path.is_empty():
+		_capture_path = _user_arg("--store-capture=")
+		_store_capture = not _capture_path.is_empty()
 	if state != null:
 		build()
 	_maybe_start_capture()
@@ -1641,11 +1753,17 @@ func arm_move() -> Dictionary:
 	if _move_active:
 		return _move_reject("move_already_active", "the move is already armed")
 	if _sell_active:
-		# The two modes share one selection-driven surface and never stack
-		# (building-sell design D8). Unreachable in the delivered move flow,
-		# which never arms a sale.
+		# The modes share one selection-driven surface and never stack
+		# (building-sell design D8, extended by building-store design D7).
+		# Unreachable in the delivered move flow, which never arms a sale or
+		# a store.
 		return _move_reject("sell_already_active",
 			"a sale is armed; cancel it before moving")
+	if _store_active:
+		# The same one-surface rule for the third mode: a store is armed, so
+		# a move is refused by name rather than silently re-targeting it.
+		return _move_reject("store_already_active",
+			"a store is armed; cancel it before moving")
 	if selected == null:
 		return _move_reject("move_no_selection",
 			"no placed building is selected")
@@ -1706,39 +1824,55 @@ func refresh_move_action() -> Dictionary:
 
 
 ## Renders the move panel's current state into its committed controls (the
-## selection line, the status line, the two selection-path actions' states,
+## selection line, the status line, the three selection-path actions' states,
 ## and the shared confirm row) so the panel text always names the live
 ## selection. A no-op while no panel is built.
 ##
-## The panel carries BOTH modes of this selection-driven surface (design
-## D8): `Move` and `Sell` are armed from the same selection, exactly one of
-## them can be armed at a time, and the single confirm row names whichever
-## mode is armed. The move arming, its preview, and its target requirements
-## are untouched by the sell mode.
+## The panel carries ALL THREE modes of this selection-driven surface (design
+## D8, extended by building-store design D7): `Move`, `Sell`, and `Store` are
+## armed from the same selection, exactly one of them can be armed at a time,
+## and the single confirm row names whichever mode is armed. The move arming,
+## its preview, and its target requirements are untouched by the other two,
+## and the sell arming is untouched by the store.
 func _refresh_move_panel() -> void:
 	var arm_button: Variant = _move_panel_button("move")
 	if arm_button is Button:
 		var available := move_selection_available()
 		(arm_button as Button).disabled = _move_active or _sell_active \
-			or not available
+			or _store_active or not available
 		(arm_button as Button).text = "Move" if available \
 			else "Move (unavailable)"
 	var sell_button: Variant = _move_panel_button("sell")
 	if sell_button is Button:
 		var sell_available := sell_selection_available()
 		(sell_button as Button).disabled = _sell_active or _move_active \
-			or not sell_available
+			or _store_active or not sell_available
 		(sell_button as Button).text = "Sell" if sell_available \
 			else "Sell (unavailable)"
+	var store_button: Variant = _move_panel_button("store")
+	if store_button is Button:
+		var store_available := store_selection_available()
+		(store_button as Button).disabled = _store_active or _move_active \
+			or _sell_active or not store_available
+		(store_button as Button).text = "Put in storage" if store_available \
+			else "Put in storage (unavailable)"
 	var confirm_button: Variant = _move_panel_button("confirm")
 	if confirm_button is Button:
-		# A sale has no grid target, so its confirm is offered as soon as
-		# the sale is armed; a move's only once a valid target is committed
-		# (the move suite's own gate, unchanged).
-		(confirm_button as Button).visible = _move_active or _sell_active
+		# A sale and a store have no grid target, so their confirm is offered
+		# as soon as the mode is armed; a move's only once a valid target is
+		# committed (the move suite's own gate, unchanged).
+		(confirm_button as Button).visible = _move_active or _sell_active \
+			or _store_active
 		(confirm_button as Button).text = "Sell" if _sell_active \
-			else "Move here"
+			else ("Put in storage" if _store_active else "Move here")
 	if _move_status == null or not is_instance_valid(_move_status):
+		return
+	if _store_active:
+		if _store_placement is TownState.Placement:
+			_set_move_status("armed: store %s (save key %d) from (%d, %d) "
+				% [_move_label(_store_placement), int(_store_placement.slot),
+					_store_placement.cell.x, _store_placement.cell.y]
+				+ "-> storage | cost: none claimed, capacity: none claimed")
 		return
 	if _sell_active:
 		if _sell_placement is TownState.Placement:
@@ -2075,8 +2209,14 @@ func _build_move_panel(armed: bool) -> Dictionary:
 	# the live selection; the initial text names the armed placement when
 	# there is one, and the selection instruction otherwise. A sale states
 	# the same boundary on its side: the derived price vector is neutral, so
-	# NO refund is claimed (building-sell design D2).
-	if _sell_active:
+	# NO refund is claimed (building-sell design D2). A store states it too:
+	# the derived vector is neutral and the committed configuration records
+	# no storing price, so NO cost and NO capacity rule are claimed
+	# (building-store design D2/D9).
+	if _store_active:
+		selection.text = "storing: %s | cost: none claimed, capacity: none " \
+			% _move_label(_store_placement) + "claimed (derived, never observed)"
+	elif _sell_active:
 		selection.text = "selling: %s | refund: none claimed (derived, " \
 			% _move_label(_sell_placement) + "never observed)"
 	elif not armed:
@@ -2093,10 +2233,11 @@ func _build_move_panel(armed: bool) -> Dictionary:
 	_move_status = status
 	var row := HBoxContainer.new()
 	row.name = "actions"
-	# The selection-path arm actions (design D8): a `Move` and a `Sell`
-	# button the player presses after selecting a placed building. Both
-	# belong to this one selection-driven surface, and exactly one of them
-	# can be armed at a time.
+	# The selection-path arm actions (design D8, extended by building-store
+	# design D7): a `Move`, a `Sell`, and a `Put in storage` button the
+	# player presses after selecting a placed building. All three belong to
+	# this one selection-driven surface, and exactly one of them can be
+	# armed at a time.
 	var arm := Button.new()
 	arm.name = "move"
 	arm.text = "Move"
@@ -2107,16 +2248,22 @@ func _build_move_panel(armed: bool) -> Dictionary:
 	sell.text = "Sell"
 	sell.pressed.connect(_on_sell_action)
 	row.add_child(sell)
+	var store := Button.new()
+	store.name = "store"
+	store.text = "Put in storage"
+	store.pressed.connect(_on_store_action)
+	row.add_child(store)
 	# The confirm exists only while armed: unarmed, the surface offers the
 	# arm actions alone, so no confirm can be pressed before a target (or,
-	# for a sale, before a building is armed). It serves BOTH modes and
-	# dispatches to whichever one is armed (design D8).
+	# for a sale or a store, before a building is armed). It serves ALL THREE
+	# modes and dispatches to whichever one is armed (design D7).
 	var confirm := Button.new()
 	confirm.name = "confirm"
-	confirm.text = "Sell" if _sell_active else "Move here"
+	confirm.text = "Sell" if _sell_active \
+		else ("Put in storage" if _store_active else "Move here")
 	confirm.pressed.connect(_on_surface_confirm)
 	row.add_child(confirm)
-	if not armed and not _sell_active:
+	if not armed and not _sell_active and not _store_active:
 		confirm.visible = false
 	var cancel := Button.new()
 	cancel.name = "cancel"
@@ -2176,20 +2323,26 @@ func _object_depth_less(a: Variant, b: Variant) -> bool:
 	return _depth_less(a.placement, b.placement)
 
 
-## The shared confirm row (design D8): one button serves both modes of this
-## selection-driven surface, so its press dispatches to whichever mode is
-## armed. With neither mode armed the button is hidden, so a bare press can
-## never reach an intent.
+## The shared confirm row (design D8, extended by building-store design D7):
+## one button serves all three modes of this selection-driven surface, so its
+## press dispatches to whichever mode is armed. With no mode armed the button
+## is hidden, so a bare press can never reach an intent.
 func _on_surface_confirm() -> void:
+	if _store_active:
+		await confirm_store()
+		return
 	if _sell_active:
 		await confirm_sell()
 		return
 	await confirm_move()
 
 
-## The shared cancel row (design D8): the same dispatch, no request either
-## way.
+## The shared cancel row (design D8, extended by building-store design D7):
+## the same dispatch, no request either way.
 func _on_surface_cancel() -> void:
+	if _store_active:
+		cancel_store()
+		return
 	if _sell_active:
 		cancel_sell()
 		return
@@ -2254,6 +2407,11 @@ func arm_sell() -> Dictionary:
 	if _move_active:
 		return _sell_reject("move_already_active",
 			"a move is armed; cancel it before selling")
+	if _store_active:
+		# The three modes of this one surface never stack (building-store
+		# design D7), so a store in progress refuses the sale by name.
+		return _sell_reject("store_already_active",
+			"a store is armed; cancel it before selling")
 	if selected == null:
 		return _sell_reject("sell_no_selection",
 			"no placed building is selected")
@@ -2487,6 +2645,320 @@ func _on_sell_action() -> void:
 	arm_sell()
 
 
+# ---------------------------------------------------------------------------
+# Store flow (building-store, spec "Store flow")
+# ---------------------------------------------------------------------------
+
+
+## True while the store is armed.
+func store_active() -> bool:
+	return _store_active
+
+
+## The placement the armed store targets (TownState.Placement or null).
+func store_placement() -> Variant:
+	return _store_placement
+
+
+## The addressable index the armed store names (-1 when unaddressable or
+## unarmed) — the item index a store intent carries.
+func store_slot() -> int:
+	if _store_placement == null:
+		return TownState.NO_SLOT
+	return int(_store_placement.slot)
+
+
+## True when the current selection is a placed building a store intent can
+## name. The addressability rule is the move flow's own, read from the same
+## one predicate — a legacy key that is not a positive integer is refused by
+## name, never coerced (design D7 carried forward from building-move).
+func store_selection_available() -> bool:
+	if selected == null or not (selected is TownObject):
+		return false
+	var object: TownObject = selected
+	return TownState.is_addressable(object.placement)
+
+
+## Arms the store on the current selection (spec "the player selects a
+## placed building, chooses the store action, and confirms"). Fail-closed: an
+## unbuilt view, no selection, a selection that is not a placement, an
+## unaddressable legacy key, an already-armed store, an armed move, an armed
+## sale, or a missing panel each reject with an explicit error naming the
+## condition. It adds no state and no request of its own: nothing leaves the
+## client until a confirm, and a store has no grid target, so no preview is
+## shown (design D7).
+func arm_store() -> Dictionary:
+	if view_state != STATE_BUILT:
+		return _store_reject("town_not_built", "the town view is not built")
+	if _store_active:
+		return _store_reject("store_already_active",
+			"the store is already armed")
+	if _move_active:
+		return _store_reject("move_already_active",
+			"a move is armed; cancel it before storing")
+	if _sell_active:
+		return _store_reject("sell_already_active",
+			"a sale is armed; cancel it before storing")
+	if selected == null:
+		return _store_reject("store_no_selection",
+			"no placed building is selected")
+	if not (selected is TownObject):
+		return _store_reject("store_no_selection",
+			"the selection is not a placed building")
+	var object: TownObject = selected
+	var placement: Variant = object.placement
+	if not (placement is TownState.Placement):
+		return _store_reject("store_no_selection",
+			"the selected object carries no typed placement")
+	if not TownState.is_addressable(placement):
+		# The move flow's own explicit reason, which the sell flow already
+		# reuses (spec: "A placement with no addressable legacy key SHALL be
+		# refused with the same explicit reason the move flow already uses").
+		# The index is never coerced, because a coerced index would name a
+		# different row.
+		return _store_reject(MoveFlow.REASON_UNADDRESSABLE,
+			"the selected placement's save key '%s' is not a positive integer"
+			% str(placement.slot_key))
+	_store_active = true
+	_store_placement = placement
+	store_error = ""
+	var panel := _build_move_panel(true)
+	if not bool(panel.get("ok", false)):
+		return _store_reject("store_panel", str(panel.get("error", "")))
+	if ui != null and ui.has_slot(SLOT_MOVE) \
+			and not ui.is_slot_visible(SLOT_MOVE):
+		ui.set_slot_visible(SLOT_MOVE, true)
+	_refresh_move_panel()
+	return {"ok": true, "error": "", "slot": int(placement.slot),
+		"item": int(placement.item)}
+
+
+## Sends exactly one store intent (spec "a confirm that sends exactly one
+## intent") and applies only the authoritative response. Nothing is sent
+## unless the store is armed, the armed building is still the committed
+## selection and addressable, an active session exists, and the API is
+## registered: each missing condition rejects locally with the explicit error
+## and NO request. A structured or transport failure surfaces its code with
+## the building still on the map, the storage unchanged, and no resource
+## changed. Awaits the GameApi call.
+##
+## The intent carries the legacy index and nothing else — no price, no
+## quantity, no capacity, no resource delta (design D3).
+func confirm_store() -> Dictionary:
+	if not _store_active:
+		return _store_reject("store_not_active", "the store is not armed")
+	if _store_placement == null \
+			or not (_store_placement is TownState.Placement):
+		return _store_reject("store_no_selection",
+			"no building is being stored")
+	if not TownState.is_addressable(_store_placement):
+		return _store_reject(MoveFlow.REASON_UNADDRESSABLE,
+			"the armed placement's save key '%s' is not a positive integer"
+			% str(_store_placement.slot_key))
+	if selected == null or not (selected is TownObject) \
+			or (selected as TownObject).placement != _store_placement:
+		# A press while the store is armed can move the selection (a store
+		# owns no grid target, so it does not own the press the way an armed
+		# move does). Storing something other than the committed selection is
+		# refused by name rather than guessed.
+		return _store_reject("store_selection_changed",
+			"the selection no longer names the armed building; "
+			+ "cancel and press Put in storage again")
+	var session: Variant = get_node_or_null("/root/Session")
+	if session == null or not session.is_active() \
+			or str(session.user_id()).strip_edges() == "":
+		return _store_reject("session_unavailable",
+			"no active save to store from")
+	var api: Variant = get_node_or_null("/root/GameApi")
+	if api == null:
+		return _store_reject("gameapi_unavailable",
+			"the GameApi autoload is not registered")
+	var response: Variant = await api.store_building(session.user_id(),
+		int(_store_placement.slot))
+	if not (response is BootData.StoreResult):
+		return _store_reject("bad_response",
+			"GameApi returned no typed store result")
+	var typed: BootData.StoreResult = response
+	if not typed.ok:
+		# Structured or transport failure: one contract — the explicit error
+		# names the code and message, nothing was applied.
+		store_error = "[town] store failed: %s: %s" % [
+			typed.error_code, typed.error_message]
+		_set_move_status(store_error)
+		return {"ok": false, "error": store_error, "code": typed.error_code}
+	# The label and the landing item are read BEFORE the apply, which
+	# releases the armed placement.
+	var label := _move_label(_store_placement)
+	var quantity := 0
+	if typed.removed != null:
+		quantity = int(typed.store.get(str(int(typed.removed.item_id)), 0))
+	var applied: Dictionary = _apply_store(typed)
+	if not bool(applied.get("ok", false)):
+		return _store_reject("apply_failed", str(applied.get("error", "")))
+	store_error = ""
+	_store_active = false
+	_store_placement = null
+	_set_move_status("stored %s (x%d in storage) | one-way in this change"
+		% [label, quantity])
+	return {"ok": true, "error": "", "result": typed}
+
+
+## Applies the authoritative response (building-store design D8): the typed
+## placement leaves the state and its rendered object is freed, the REMAINING
+## objects keep the committed depth order a removal preserves (nothing is
+## re-sorted, because removing one element from a sorted list leaves it
+## sorted), the typed storage mapping is replaced through the SAME fail-closed
+## `TownState` parser the payload parse and the purchase apply use (never a
+## computed delta, never a partial write, never a locally incremented
+## quantity), the storage readout re-renders from it, and the stored resources
+## and XP take the response's values (never a computed delta) with the HUD
+## re-attached.
+##
+## Everything the apply touches is snapshotted FIRST — the placement's index
+## in the state (which restores the placement itself, never mutated), the
+## object's index in the draw order, the object itself, the committed
+## selection, the storage mapping, the readout's own state, the missing-field
+## list, the resource bag, and the XP — so the only post-mutation failure (a
+## rejected HUD re-attach) restores every one of them from the snapshot,
+## including re-attaching the object that was detached but NOT yet freed. A
+## failed apply therefore leaves the building on the map, the storage view,
+## the readout, and the HUD exactly as before.
+func _apply_store(result: BootData.StoreResult) -> Dictionary:
+	if state == null:
+		return {"ok": false, "error": "the town state is unavailable"}
+	if ui == null or _hud == null:
+		return {"ok": false, "error": "the town HUD is not attached"}
+	if _store_placement == null \
+			or not (_store_placement is TownState.Placement):
+		return {"ok": false, "error": "no typed placement is being stored"}
+	var removed: BootData.Placement = result.removed
+	var resources: BootData.Resources = result.resources
+	if removed == null or resources == null:
+		return {"ok": false, "error": "the store response is incomplete"}
+	var placement: TownState.Placement = _store_placement
+	var placement_index: int = state.placements.find(placement)
+	if placement_index < 0:
+		return {"ok": false,
+			"error": "the stored placement is not part of the town state"}
+	# The object to remove: the rendered node of THIS placement, found by
+	# identity so the very object the player selected is the one freed.
+	var object: Variant = null
+	var object_index := -1
+	for i in range(objects.size()):
+		var candidate: Variant = objects[i]
+		if candidate != null and candidate.placement == placement:
+			object = candidate
+			object_index = i
+			break
+	if object == null:
+		return {"ok": false,
+			"error": "the stored placement has no rendered object"}
+	# The response's storage is read with the payload's own parser: one rule
+	# set, so a response can never be interpreted differently than the save
+	# it replaces. A rejected mapping fails BEFORE any mutation.
+	var storage: Dictionary = TownState.storage_of(result.store)
+	if not bool(storage.get("ok", false)):
+		return {"ok": false, "error": str(storage.get("error", ""))}
+	var previous := {
+		"placement_index": placement_index,
+		"object_index": object_index,
+		"selected": selected,
+		"storage": (state.storage as Dictionary).duplicate(),
+		"missing": (state.missing as Array).duplicate(),
+		"coins": state.resources.coins,
+		"wood": state.resources.wood,
+		"steel": state.resources.steel,
+		"oil": state.resources.oil,
+		"cash": state.resources.cash,
+		"mana": state.resources.mana,
+		"xp": state.summary.xp,
+	}
+	# The response supplies values the payload may have lacked, so those keys
+	# are no longer missing; the snapshot restores them verbatim on rollback.
+	for key in ["coins", "wood", "steel", "oil", "cash", "mana"]:
+		state.missing.erase(key)
+	state.missing.erase("xp")
+	state.missing.erase(TownState.STORAGE_MISSING_KEY)
+	state.placements.remove_at(placement_index)
+	objects.remove_at(object_index)
+	objects_layer.remove_child(object)
+	if selected == object:
+		selected = null
+	state.storage = (storage["storage"] as Dictionary).duplicate()
+	state.resources.coins = resources.gold
+	state.resources.wood = resources.wood
+	state.resources.steel = resources.steel
+	state.resources.oil = resources.oil
+	state.resources.cash = resources.cash
+	state.resources.mana = resources.mana
+	state.summary.xp = resources.xp
+	var hud_result: Dictionary = _hud.attach(ui, state)
+	if not bool(hud_result.get("ok", false)):
+		# Roll every mutation back from the snapshot alone: a failed apply
+		# changes nothing, and the building is back on the map at its own
+		# index with its own object re-attached.
+		state.placements.insert(int(previous["placement_index"]), placement)
+		objects.insert(int(previous["object_index"]), object)
+		objects_layer.add_child(object)
+		objects_layer.move_child(object, int(previous["object_index"]))
+		selected = previous["selected"]
+		if selected != null and is_instance_valid(selected as Node):
+			(selected as TownObject).set_selected(true)
+		state.storage = previous["storage"]
+		state.missing = previous["missing"]
+		state.resources.coins = previous["coins"]
+		state.resources.wood = previous["wood"]
+		state.resources.steel = previous["steel"]
+		state.resources.oil = previous["oil"]
+		state.resources.cash = previous["cash"]
+		state.resources.mana = previous["mana"]
+		state.summary.xp = previous["xp"]
+		_render_storage()
+		return {"ok": false, "error": str(hud_result.get("error", ""))}
+	# The removal is committed: the object is detached and nothing else can
+	# fail, so it is freed now (never before the last fallible step, so a
+	# rollback could re-attach it).
+	object.free()
+	# The readout is re-rendered from the state's own mapping (the purchase
+	# apply's precedent), so the player sees the stored item at once.
+	_render_storage()
+	return {"ok": true, "error": ""}
+
+
+## Closes the armed store without sending anything: the mode-local placement
+## drops, the slot hides, and the town state, the storage view, the readout,
+## the committed selection, and the resources stay byte-identical.
+func cancel_store() -> Dictionary:
+	if not _store_active:
+		return _store_reject("store_not_active", "the store is not armed")
+	_store_active = false
+	_store_placement = null
+	if ui != null and ui.has_slot(SLOT_MOVE) \
+			and ui.is_slot_visible(SLOT_MOVE):
+		ui.set_slot_visible(SLOT_MOVE, false)
+	_set_move_status("store closed")
+	return {"ok": true, "error": "", "cancelled": true}
+
+
+## The house store failure envelope: records the explicit error naming the
+## code and condition, shows it in the surface's status line, and returns
+## {ok:false} without touching town state, storage, readout, selection,
+## resources, or the committed draw order.
+func _store_reject(code: String, message: String) -> Dictionary:
+	store_error = "[town] store rejected: %s: %s" % [code, message]
+	_set_move_status(store_error)
+	return {"ok": false, "error": store_error, "code": code}
+
+
+## The selection-path `Store` action (building-store design D7): selecting an
+## addressable placed building offers this action beside `Move` and `Sell`,
+## and pressing it arms the store. It is a pure wiring step over `arm_store` —
+## no state, no request of its own — so the delivered selection behavior is
+## unchanged.
+func _on_store_action() -> void:
+	arm_store()
+
+
 ## Shop button wiring: a press selects that entry.
 func _on_shop_pick(item_id: int) -> void:
 	pick_shop_item(item_id)
@@ -2569,6 +3041,11 @@ func _reset_view() -> void:
 	_move_status = null
 	_sell_active = false
 	_sell_placement = null
+	# The armed store drops with the rest of the view, in its own right
+	# (building-store design D7): a rebuild never leaves a stale armed store
+	# behind either.
+	_store_active = false
+	_store_placement = null
 	if ui != null and ui.has_slot(SLOT_MOVE) \
 			and ui.is_slot_visible(SLOT_MOVE):
 		ui.set_slot_visible(SLOT_MOVE, false)
@@ -2615,13 +3092,14 @@ func _commit_selection(object: Variant) -> void:
 	if object != null:
 		object.set_selected(true)
 	# Design D8: the selection is what arms this surface, so a committed
-	# selection refreshes its `Move` and `Sell` actions. It is
+	# selection refreshes its `Move`, `Sell`, and `Store` actions. It is
 	# presentational only — the selection itself, its highlight, and the
 	# picker's routing are exactly as delivered, and arming still requires a
 	# separate press. An armed mode is never refreshed: it already names the
-	# placement it will act on, and `confirm_sell` refuses a changed
-	# selection by name instead of silently re-targeting.
-	if not _move_active and not _sell_active and view_state == STATE_BUILT:
+	# placement it will act on, and `confirm_sell` / `confirm_store` refuse a
+	# changed selection by name instead of silently re-targeting.
+	if not _move_active and not _sell_active and not _store_active \
+			and view_state == STATE_BUILT:
 		refresh_move_action()
 
 
@@ -2649,6 +3127,9 @@ func _maybe_start_capture() -> void:
 	if not build_ok:
 		return
 	_capture_started = true
+	if _store_capture:
+		_capture_store_and_quit()
+		return
 	if _move_capture:
 		_capture_move_and_quit()
 		return
@@ -2850,6 +3331,60 @@ func _capture_sell_and_quit() -> void:
 ## never leaves an open window or a misleading frame.
 func _sell_capture_fail(step: String, detail: String) -> void:
 	print("[town] sell-capture state=error step=%s detail=%s" % [
+		step, detail])
+	get_tree().quit(1)
+
+
+## Store capture (building-store, design D9): drives exactly one confirmed
+## intent through the same flow a player uses — select the recorded
+## building, arm the store, confirm — and then captures the town WITHOUT the
+## stored building, with its storage readout carrying the stored item. Any
+## failed step prints an explicit marker and exits 1 instead of capturing a
+## town that still shows the building on the map.
+func _capture_store_and_quit() -> void:
+	# The shop is opened first so its storage READOUT is on screen: a store
+	# re-renders that readout from the response's mapping, and the frame must
+	# show the stored item in the player's storage (the purchase capture's
+	# own reason for opening the shop, reused here).
+	var entered_shop: Dictionary = enter_shop()
+	if not bool(entered_shop.get("ok", false)):
+		_store_capture_fail("shop", str(entered_shop.get("error", "")))
+		return
+	var object: Variant = _object_for_cell(STORE_INTENT_CELL)
+	if object == null:
+		_store_capture_fail("select",
+			"no rendered object at the recorded cell (%d, %d)"
+			% [STORE_INTENT_CELL.x, STORE_INTENT_CELL.y])
+		return
+	var pressed: Dictionary = handle_pointer_press(
+		Iso.grid_to_screen(object.cell))
+	if not bool(pressed.get("ok", false)):
+		_store_capture_fail("select", str(pressed.get("error", "")))
+		return
+	if selection() != object:
+		_store_capture_fail("select",
+			"the press at (%d, %d) did not select the recorded building"
+			% [STORE_INTENT_CELL.x, STORE_INTENT_CELL.y])
+		return
+	var armed: Dictionary = arm_store()
+	if not bool(armed.get("ok", false)):
+		_store_capture_fail("arm", str(armed.get("error", "")))
+		return
+	var confirmed: Dictionary = await confirm_store()
+	if not bool(confirmed.get("ok", false)):
+		_store_capture_fail("confirm", str(confirmed.get("error", "")))
+		return
+	print("[town] store-capture applied item_index=%d cell=(%d, %d) objects=%d "
+		% [int(armed.get("slot", -1)), STORE_INTENT_CELL.x,
+			STORE_INTENT_CELL.y, objects.size()]
+		+ "storage=%s" % JSON.stringify(_storage_record()))
+	_capture_and_quit()
+
+
+## A named store-capture failure: explicit marker + exit 1, so a failed flow
+## never leaves an open window or a misleading frame.
+func _store_capture_fail(step: String, detail: String) -> void:
+	print("[town] store-capture state=error step=%s detail=%s" % [
 		step, detail])
 	get_tree().quit(1)
 
@@ -3873,4 +4408,209 @@ func _sell_capture_record() -> Dictionary:
 		+ "double, not a parity oracle)"
 	record["parity_pointer"] = "real-execution parity is established " \
 		+ "by the fixture-replay tests and the verify-boot sell-live phase"
+	return record
+
+
+# ---------------------------------------------------------------------------
+# Store evidence report (building-store, design D9)
+# ---------------------------------------------------------------------------
+
+
+## The store report output path from the user arguments:
+## `--store-report=<path>` (relative paths resolve against the project
+## directory), the bare `--store-report` flag's default evidence path, or ""
+## when absent.
+func _store_report_path_arg() -> String:
+	for argument in OS.get_cmdline_user_args():
+		if argument == "--store-report":
+			return Paths.project_dir().path_join(DEFAULT_STORE_REPORT_PATH)
+		if argument.begins_with("--store-report="):
+			var value := argument.trim_prefix("--store-report=")
+			if value.is_absolute_path():
+				return value
+			return Paths.project_dir().path_join(value)
+	return ""
+
+
+## Runs the store report flow and quits with the documented exit code: 0 when
+## the deterministic report is written, 1 with an explicit marker naming the
+## first failed step (the town/placement/purchase/move/sell report pattern).
+func _write_store_report(report_path: String) -> void:
+	var problem: String = await _store_report_into(report_path)
+	if problem == "" and not FileAccess.file_exists(report_path):
+		problem = "[report] report file was not created at %s" % report_path
+	if problem != "":
+		print("[town] store-report state=error message=", problem)
+		get_tree().quit(1)
+		return
+	print("[town] store-report state=written path=", report_path)
+	get_tree().quit(0)
+
+
+## Computes the whole store report (design D9): the bootstrap payload in hand
+## parses fail-closed (exactly one bootstrap request, no second config call),
+## the town builds from the committed save, the recorded building is selected
+## and one store intent runs through the same flow a player uses (select, arm,
+## confirm against the fake implementation), and the structural report records
+## the intent, the stored building's row and cell, the storage mapping and
+## placement/object counts before and after, the resources, the request
+## counts, input digests, the projection constants pointer, the fake capture
+## pointer, and every required non-claim. Returns "" on success or the first
+## failure as an explicit message.
+func _store_report_into(report_path: String) -> String:
+	var registry: Variant = get_node_or_null("/root/ContentRegistry")
+	if registry == null:
+		return "[report] content registry is not registered"
+	if not bool(registry.is_loaded()):
+		var content: Dictionary = registry.load_content()
+		if not bool(content.get("ok", false)):
+			return "[report] content load failed: %s" % content.get("error", "")
+	if not bool(registry.assets_loaded()):
+		var assets: Dictionary = registry.load_asset_registry()
+		if not bool(assets.get("ok", false)):
+			return "[report] asset registry load failed: %s" % assets.get("error", "")
+	var api: Variant = get_node_or_null("/root/GameApi")
+	if api == null:
+		return "[report] GameApi is not registered"
+	var session: Variant = get_node_or_null("/root/Session")
+	if session == null:
+		return "[report] Session is not registered"
+	var sessions: Variant = await api.list_sessions()
+	if not bool(sessions.ok):
+		return "[report] save list failed: %s" % str(sessions.error_message)
+	if sessions.saves.size() == 0:
+		return "[report] save list carries no saves"
+	var pid := str(sessions.saves[0].id)
+	var boot: Variant = await api.get_bootstrap(pid)
+	if not bool(boot.ok):
+		return "[report] bootstrap failed: %s" % str(boot.error_message)
+	var player_info: Variant = boot.player_info
+	if player_info == null:
+		return "[report] bootstrap carried no player info"
+	var parsed: Dictionary = TownState.parse(player_info.raw, registry)
+	if not bool(parsed.get("ok", false)):
+		return "[report] town state rejected: %s" % parsed.get("error", "")
+	state = parsed["state"]
+	var built: Dictionary = build()
+	if not bool(built.get("ok", false)):
+		return "[report] town failed to build: %s" % built.get("error", "")
+	if objects.is_empty():
+		return "[report] town rendered no objects"
+	# The session the confirm needs: a real launch activates it during boot,
+	# while this headless report flow commits it here.
+	var summary := BootData.PlayerSummary.new()
+	summary.user_id = pid
+	summary.name = state.summary.name
+	summary.level = state.summary.level
+	summary.xp = state.summary.xp
+	var activation: Dictionary = session.activate(pid, summary)
+	if not bool(activation.get("ok", false)):
+		return "[report] session activation failed: %s" \
+			% activation.get("error", "")
+	var stored: Variant = _placement_for_slot(STORE_INTENT_INDEX)
+	if stored == null:
+		return "[report] no placement carries the recorded legacy key %d" \
+			% STORE_INTENT_INDEX
+	if stored.cell != STORE_INTENT_CELL:
+		return "[report] the recorded building sits at (%d, %d), not (%d, %d)" \
+			% [stored.cell.x, stored.cell.y, STORE_INTENT_CELL.x,
+				STORE_INTENT_CELL.y]
+	if int(stored.item) != STORE_INTENT_ITEM:
+		return "[report] the recorded building is item %d, not %d" \
+			% [int(stored.item), STORE_INTENT_ITEM]
+	var placements_before: int = state.placements.size()
+	var objects_before: int = objects.size()
+	var storage_before: Dictionary = _storage_record()
+	var resources_before: Dictionary = _report_resources()
+	var row_before := _typed_row(stored.raw)
+	# The player's own selection path: press the recorded building's cell,
+	# arm the store, and confirm. Nothing here bypasses the flow a player
+	# uses.
+	var pressed: Dictionary = handle_pointer_press(
+		Iso.grid_to_screen(STORE_INTENT_CELL))
+	if not bool(pressed.get("ok", false)):
+		return "[report] selection probe rejected: %s" % pressed.get("error", "")
+	if selection_legacy_id() != STORE_INTENT_ITEM:
+		return "[report] the press did not select item %d (selected %d)" \
+			% [STORE_INTENT_ITEM, selection_legacy_id()]
+	var armed: Dictionary = arm_store()
+	if not bool(armed.get("ok", false)):
+		return "[report] store arm rejected: %s" % armed.get("error", "")
+	if int(armed.get("slot", -1)) != STORE_INTENT_INDEX:
+		return "[report] the armed store names key %d, not %d" \
+			% [int(armed.get("slot", -1)), STORE_INTENT_INDEX]
+	var confirmed: Dictionary = await confirm_store()
+	if not bool(confirmed.get("ok", false)):
+		return "[report] store confirm failed: %s" % confirmed.get("error", "")
+	# A store removes exactly one row: the counts must fall by one, the
+	# recorded key must be gone from the typed state, and the item's id must
+	# have landed in the storage mapping with the response's quantity.
+	if state.placements.size() != placements_before - 1:
+		return "[report] the store did not remove exactly one placement " \
+			+ "(before=%d after=%d)" % [placements_before,
+				state.placements.size()]
+	if objects.size() != objects_before - 1:
+		return "[report] the store did not remove exactly one object " \
+			+ "(before=%d after=%d)" % [objects_before, objects.size()]
+	if _placement_for_slot(STORE_INTENT_INDEX) != null:
+		return "[report] the stored placement is still addressable by key %d" \
+			% STORE_INTENT_INDEX
+	var storage_after: Dictionary = _storage_record()
+	if int(storage_after.get(str(STORE_INTENT_ITEM), 0)) != 1:
+		return "[report] the stored building did not land in storage (got %s)" \
+			% JSON.stringify(storage_after)
+	return _write_report_file(report_path, {
+		"schema": "store-report-v1",
+		"bootstrap_requests": int(api.bootstrap_requests),
+		"store_requests": int(api.store_requests),
+		"intent": {
+			"user_id": pid,
+			"item_index": STORE_INTENT_INDEX,
+		},
+		"stored_building": {
+			"legacy_id": int(stored.item),
+			"slot": int(stored.slot),
+			"name": str(stored.name),
+			"cell": [STORE_INTENT_CELL.x, STORE_INTENT_CELL.y],
+			"removed_row": row_before,
+		},
+		"storage": {
+			"before": storage_before,
+			"after": storage_after,
+		},
+		"readout": storage_texts(),
+		"counts": {
+			"placements_before": placements_before,
+			"placements_after": state.placements.size(),
+			"objects_before": objects_before,
+			"objects_after": objects.size(),
+		},
+		"resources": {
+			"before": resources_before,
+			"after": _report_resources(),
+		},
+		"inputs": {
+			"save_list_fixture": _digest_record(REPORT_SAVE_LIST),
+			"bootstrap_fixture": _digest_record(REPORT_BOOTSTRAP),
+			"store_request": _digest_record(REPORT_STORE_REQUEST),
+			"store_response": _digest_record(REPORT_STORE_RESPONSE),
+			"store_after": _digest_record(REPORT_STORE_AFTER),
+			"terrain": _digest_record(_terrain_runtime(registry)),
+		},
+		"constants": _constants_record(),
+		"capture": _store_capture_record(),
+		"non_claims": STORE_NON_CLAIMS,
+	})
+
+
+## The fake-capture pointer (building-store design D9): the committed
+## windowed capture with its digest plus the plain statement of what it
+## proves — so no reader can mistake the screenshot for executed-legacy
+## proof.
+func _store_capture_record() -> Dictionary:
+	var record := _digest_record(REPORT_CAPTURE_STORE)
+	record["implementation"] = "fake GameApi (a deterministic test " \
+		+ "double, not a parity oracle)"
+	record["parity_pointer"] = "real-execution parity is established " \
+		+ "by the fixture-replay tests and the verify-boot store-live phase"
 	return record

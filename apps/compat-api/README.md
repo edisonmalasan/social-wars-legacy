@@ -216,6 +216,48 @@ legacy answer plus an authoritative superset naming the removal:
   strict-int `item_index` present in the save. Sellability and addressability are
   client-side rules (design D6); no server-authoritative validation exists.
 
+`POST /v0/store` with body `{"user_id", "item_index"}` is the fifth
+state-mutating surface (the `building-store` change). The body is an **intent
+only**: extra keys - including a price, a quantity, or a resource delta - are
+ignored. The endpoint resolves `item_index` against the save's own
+`map["items"]` and reads that row **before** executing (legacy's missing-item
+path is a silent early return that still persists), then derives the legacy
+batch envelope internally (one `store_item` command whose single argument is
+the item index, and a **neutral** resource vector, design D2 of
+`building-store`) and executes the unchanged legacy `command()` dispatcher
+in-process over the service corpus. Success returns the legacy answer plus a
+two-sided authoritative superset:
+
+```json
+{"protocol": "compat-v0", "ok": true, "game_version": "alpha 0.02",
+ "server_time": 1790670611, "result": "success",
+ "removed": [905, 53, 39, 0, 0, [], {}, 1],
+ "store": {"905": 1},
+ "resources": {"xp": 4, "gold": 2000, "wood": 2000, "oil": 2000,
+               "steel": 2000, "cash": 5, "mana": 0}}
+```
+
+- `removed` is the eight-field row **as read before execution** (the same
+  record the sell line established); `store` is the **full** post-execution
+  storage mapping, exactly what the purchase response carries, so the client
+  needs no arithmetic for pre-existing contents; `resources` are the
+  authoritative current values.
+- The service proves both halves after execution: the popped key is absent
+  from the map and the storage entry is present, failing closed with
+  `internal_error` otherwise.
+- **No storing cost and no capacity rule are claimed.** The derived vector is
+  neutral because the committed configuration records no price for storing
+  (item `cost`/`cost_type` are dead fields, `costs` prices the purchase only)
+  and the catalog records that the legacy server has no capacity check; the
+  refund-style economics belong to Server v1 (M13) and the later *resources*
+  line.
+- Unlike `buy`, `place_stored_item`, and `buy_stored_item_cash`, the
+  `store_item` branch does **not** write `boughtUnits`; the endpoint reproduces
+  that exactly rather than "fixing" it.
+- Validation is structural only: a JSON object body, a resolvable save id, and
+  a strict-int `item_index` present in the save. Storability and addressability
+  are client-side rules (design D5); no server-authoritative validation exists.
+
 ### Structured errors
 
 Always JSON, always `ok:false`, keys exactly
@@ -246,14 +288,15 @@ Always JSON, always `ok:false`, keys exactly
 
 All run from the repository root on Windows x64 with the pinned interpreter
 (CPython 3.9.13); exit codes are the real observed ones (bootstrap-era
-counts 2026-09-27; placement-, purchase-, move-, and sell-era counts 2026-09-29):
+counts 2026-09-27; placement-, purchase-, move-, sell-, and store-era counts
+2026-09-29):
 
 ```bash
 python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
 ```
 
-→ `Ran 306 tests ... OK`, exit `0` (90 before `building-purchase`, 157 before
-`building-move`, 227 before `building-sell`).
+→ `Ran 390 tests ... OK`, exit `0` (90 before `building-purchase`, 157 before
+`building-move`, 227 before `building-sell`, 306 before `building-store`).
 Covers envelope/error shapes, bootstrap and
 session parity against the committed fixtures, pre/post save SHA-256 identity,
 the no-persistence source guard, and the offline socket guard (the suite opens
@@ -333,6 +376,14 @@ invocation, exit code `0`, and containment record:
 python -B apps/compat-api/capture_sell_fixture.py
 ```
 
+Store fixture capture (the `building-store` change's executed-legacy oracle,
+one-shot) - see `tests/fixtures/godot-building-store/README.md` for its
+invocation, exit code `0`, and containment record:
+
+```bash
+python -B apps/compat-api/capture_store_fixture.py
+```
+
 ## Layout
 
 - `compat_legacy.py` — corpus build/layout checks and the in-process adapter
@@ -359,6 +410,9 @@ python -B apps/compat-api/capture_sell_fixture.py
   module's shared helpers unchanged.
 - `capture_move_fixture.py` - executed-legacy move fixture capture.
 - `capture_sell_fixture.py` - executed-legacy sell fixture capture.
+- `store_envelope.py` - the derived-provisional `/v0/store` envelope (single
+  argument, neutral resource vector).
+- `capture_store_fixture.py` - executed-legacy store fixture capture.
 - `tests/` — `test_compat_v0.py` (service + containment), `test_parity.py`
   (offline replay against the committed boot fixtures),
   `test_placement_envelope.py` (offline envelope derivation/sanitization),
@@ -422,9 +476,10 @@ records no building-sale refund rule and the legacy refund travels only in
 client-sent deltas this contract refuses. Insufficient resources reproduce the
 legacy `max(…, 0)` clamp, never a rejection (authoritative server-side validation
 belongs to Server v1 / M13), and occupancy, grid-bounds, level-gate,
-cash-affordability, no-op-move, sellability, and addressability rules are
-enforced client-side only. Persistence is confined to the disposable service
-corpus: `POST /v0/place`, `POST /v0/purchase`, `POST /v0/move`, and
-`POST /v0/sell` persist through the legacy dispatcher into the corpus `saves/`,
+cash-affordability, no-op-move, sellability, storability, and addressability
+rules are enforced client-side only. Persistence is confined to the disposable service
+corpus: `POST /v0/place`, `POST /v0/purchase`, `POST /v0/move`,
+`POST /v0/sell`, and `POST /v0/store` persist through the legacy dispatcher into
+the corpus `saves/`,
 while the session and bootstrap endpoints remain strictly non-persisting, and
 the working tree is never written.
