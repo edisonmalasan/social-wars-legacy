@@ -1,12 +1,12 @@
 {
     "schema":  "godot-compatibility-boot/verify-boot-v1",
-    "generated_utc":  "2026-09-29T09:57:47Z",
+    "generated_utc":  "2026-09-29T13:09:30Z",
     "environment":  {
                         "engine_executable":  "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
                         "engine_version":  "4.7.2.stable.official.ed1daf0bf",
                         "python_executable":  "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
                         "python_version":  "3.9.13",
-                        "git_commit":  "91344a3b5e8dfdd482bbf5fcf5bb53e6b87bd9fb",
+                        "git_commit":  "41ad5614ced4275e05ac45893325a6e5db6e457f",
                         "display_session":  false,
                         "network":  "loopback only (127.0.0.1)"
                     },
@@ -427,6 +427,22 @@
                          "log":  "apps/client-godot/.godot/verify-boot/25-test_town_store.out.txt"
                      },
                      {
+                         "name":  "test_town_upgrade",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_town_upgrade.gd",
+                                         "--",
+                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/26-test_town_upgrade.out.txt"
+                     },
+                     {
                          "name":  "test_town_gate",
                          "command":  [
                                          "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
@@ -440,7 +456,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/26-test_town_gate.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/27-test_town_gate.out.txt"
                      },
                      {
                          "name":  "boot-unreachable",
@@ -458,7 +474,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/27-boot-unreachable.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/28-boot-unreachable.out.txt"
                      },
                      {
                          "name":  "boot-main-live",
@@ -481,7 +497,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/28-boot-main-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/29-boot-main-live.out.txt"
                      },
                      {
                          "name":  "gameapi-live",
@@ -505,7 +521,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/29-gameapi-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/30-gameapi-live.out.txt"
                      },
                      {
                          "name":  "boot-api-error-live",
@@ -532,7 +548,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/30-boot-api-error-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/31-boot-api-error-live.out.txt"
                      },
                      {
                          "name":  "placement-live",
@@ -558,7 +574,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/31-placement-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/32-placement-live.out.txt"
                      },
                      {
                          "name":  "purchase-live",
@@ -584,7 +600,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/32-purchase-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/33-purchase-live.out.txt"
                      },
                      {
                          "name":  "move-live",
@@ -610,7 +626,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/33-move-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/34-move-live.out.txt"
                      },
                      {
                          "name":  "sell-live",
@@ -636,7 +652,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/34-sell-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/35-sell-live.out.txt"
                      },
                      {
                          "name":  "store-live",
@@ -662,7 +678,33 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/35-store-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/36-store-live.out.txt"
+                     },
+                     {
+                         "name":  "upgrade-live",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+                                         "-B",
+                                         "apps/client-godot/compat_live_phase.py",
+                                         "--port",
+                                         "5056",
+                                         "--name",
+                                         "upgrade-live",
+                                         "--expect-save-mutation",
+                                         "--",
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_town_upgrade.gd",
+                                         "--",
+                                         "--scenario=live-upgrade",
+                                         "--gameapi-endpoint=http://127.0.0.1:5056"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/37-upgrade-live.out.txt"
                      },
                      {
                          "name":  "guard-post",
@@ -674,7 +716,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/36-guard-post.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/38-guard-post.out.txt"
                      }
                  ],
     "assertions":  [
@@ -879,6 +921,14 @@
                            "ok":  true
                        },
                        {
+                           "name":  "test_town_upgrade exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_town_upgrade reports PASS",
+                           "ok":  true
+                       },
+                       {
                            "name":  "test_town_gate exits 0 (got 0)",
                            "ok":  true
                        },
@@ -964,6 +1014,14 @@
                        },
                        {
                            "name":  "store live phase: live-phase summary records ok with clean teardown",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "upgrade live phase: live phase exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "upgrade live phase: live-phase summary records ok with clean teardown",
                            "ok":  true
                        },
                        {
@@ -1068,6 +1126,18 @@
                        },
                        {
                            "name":  "store live phase mutated the disposable corpus save",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "upgrade live phase asserts its scenario",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "upgrade live phase drove one upgrade through the v0 endpoint, reusing the pre-request key and cell",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "upgrade live phase mutated the disposable corpus save",
                            "ok":  true
                        },
                        {

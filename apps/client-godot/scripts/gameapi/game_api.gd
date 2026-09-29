@@ -5,8 +5,8 @@ extends Node
 ## Client code calls `list_sessions()` / `get_bootstrap()` for boot data,
 ## `place_building()` for one placement intent, `purchase_item()` for one
 ## purchase intent, `move_building()` for one move intent,
-## `sell_building()` for one sell intent, and `store_building()` for one
-## store intent, receiving
+## `sell_building()` for one sell intent, `store_building()` for one
+## store intent, and `upgrade_building()` for one upgrade intent, receiving
 ## typed results
 ## (`scripts/gameapi/boot_data.gd`); raw transport dictionaries never reach
 ## presentation code, and no other script references a transport.
@@ -20,8 +20,9 @@ extends Node
 ##               `tests/fixtures/godot-item-purchase/` (purchase),
 ##               `tests/fixtures/godot-building-move/` (move),
 ##               `tests/fixtures/godot-building-sell/` (sell), and
-##               `tests/fixtures/godot-building-store/` (store); no process,
-##               no server, no socket.
+##               `tests/fixtures/godot-building-store/` (store), and
+##               `tests/fixtures/godot-building-upgrade/` (upgrade); no
+##               process, no server, no socket.
 ##   legacy_v0 - JSON over loopback HTTP to Compatibility API v0 through the
 ##               built-in HTTP request client; endpoint from the project
 ##               setting `gameapi/endpoint` (default: loopback 127.0.0.1 on
@@ -86,6 +87,12 @@ var sell_requests := 0
 ## Monotonic for the same reason: `configure()` swaps the implementation
 ## without hiding history.
 var store_requests := 0
+## Number of upgrade intents this process has issued (building-upgrade flow
+## contract: exactly one per confirm, zero for every local refusal — the
+## upgrade suite snapshots this counter exactly like `placement_requests`).
+## Monotonic for the same reason: `configure()` swaps the implementation
+## without hiding history.
+var upgrade_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -212,6 +219,25 @@ func store_building(user_id: String,
 		item_index: int) -> BootData.StoreResult:
 	store_requests += 1
 	var result: BootData.StoreResult = await _impl.store_building(
+		user_id, item_index)
+	return result
+
+
+## One upgrade intent (the legacy map index of an existing placement) from
+## the selected implementation. The contract carries NO target tier, NO
+## reason, NO coordinates, NO orientation, NO player, NO quantity, NO
+## price, and NO resource deltas: the service derives the target tier from
+## the committed configuration, the reason from the committed legacy
+## constant, and the cell, orientation, and player from the row being
+## replaced (design D2/D3), so the typed result's two rows and resources
+## are authoritative (design D5). The response carries the row as read
+## BEFORE execution and the row re-read AFTER it — the same key and cell
+## holding the new tier — so presentation code replaces the selected typed
+## placement's row with `upgraded` and takes the resource values verbatim.
+func upgrade_building(user_id: String,
+		item_index: int) -> BootData.UpgradeResult:
+	upgrade_requests += 1
+	var result: BootData.UpgradeResult = await _impl.upgrade_building(
 		user_id, item_index)
 	return result
 

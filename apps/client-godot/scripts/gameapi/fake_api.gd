@@ -8,7 +8,8 @@ extends Node
 ## `tests/fixtures/godot-item-purchase/`, for move under
 ## `tests/fixtures/godot-building-move/`, for sell under
 ## `tests/fixtures/godot-building-sell/`, and for store under
-## `tests/fixtures/godot-building-store/` at the repository root: no
+## `tests/fixtures/godot-building-store/`, and for upgrade under
+## `tests/fixtures/godot-building-upgrade/` at the repository root: no
 ## process, no server, no socket. It synthesizes the documented v0 envelopes
 ## from those files and parses them with the same `BootData` functions the
 ## live implementation uses, so both implementations yield identical typed
@@ -28,7 +29,11 @@ extends Node
 ## names from the committed sell-fixture state with it, and
 ## `store_building()` pops exactly the row its intent names from the
 ## committed store-fixture state and increments that item's storage entry
-## with it. Parity against
+## with it, and `upgrade_building()` replaces exactly the row its intent
+## names in place — same key, same cell, the target tier derived from the
+## fixture's own item reference, the fresh row's timestamp pinned to the
+## capture's recorded epoch — and appends that tier to the bought-units list.
+## Parity against
 ## executed legacy is owned exclusively by
 ## the compat fixture-replay tests; this double exists so the client flow can
 ## be tested hermetically and is NEVER itself a parity oracle.
@@ -90,6 +95,19 @@ const STORE_BEFORE_FIXTURE := \
 ## capture cannot leave the double running on an inconsistent oracle.
 const STORE_AFTER_FIXTURE := \
 	"tests/fixtures/godot-building-store/steps/command_store_item/after.json"
+## The executed-legacy upgrade fixture's before-state (which again equals the
+## fresh-player corpus the boot fixtures carry): the double's starting save
+## for `upgrade_building()`.
+const UPGRADE_BEFORE_FIXTURE := \
+	"tests/fixtures/godot-building-upgrade/steps/command_upgrade/before.json"
+## The same fixture's after-state — the real legacy server's record of the one
+## executed two-command upgrade (the Wall I at map slot 12, anchored at
+## (45,49), REPLACED IN PLACE by the Wall II at the same key and cell). Read
+## (never written) so a malformed capture cannot leave the double running on
+## an inconsistent oracle; its recorded wall-clock timestamp of the new row
+## is the deterministic epoch this double stamps.
+const UPGRADE_AFTER_FIXTURE := \
+	"tests/fixtures/godot-building-upgrade/steps/command_upgrade/after.json"
 
 ## Anchor grid extent the v0 endpoint validates against (anchors 0..99;
 ## footprints may extend past the edge — design D5). Must match
@@ -151,6 +169,19 @@ var _store_state: Dictionary = {}
 var _store_pid := ""
 var _store_loaded := false
 var _store_error := ""
+
+# Mutable in-memory upgrade state (building-upgrade design D8): one save, with
+# exactly one row replaced in place and at most one bought-units append per
+# successful upgrade inside this process. Never written anywhere.
+var _upgrade_state: Dictionary = {}
+var _upgrade_pid := ""
+## The capture's recorded wall-clock epoch of the fresh row the executed
+## upgrade wrote — the deterministic stamp this double reuses (it never reads
+## the wall clock, exactly as the placement double reuses the placement
+## capture's epoch).
+var _upgrade_epoch := 0
+var _upgrade_loaded := false
+var _upgrade_error := ""
 
 
 ## The session envelope synthesized from the committed fixtures.
@@ -532,6 +563,112 @@ func store_building(user_id: String,
 		"removed": removed,
 		"store": (_store_state["store"] as Dictionary).duplicate(),
 		"resources": _store_resources(),
+	})
+
+
+## Deterministic in-memory upgrade double (building-upgrade design D8): the
+## documented semantics of the unchanged legacy pair the service derives —
+## read the row the intent names AS IT IS BEFORE the writes, apply the
+## pre-dispatch resource vector (the derived vector is NEUTRAL, so every
+## stored resource is unchanged), and then replace that row IN PLACE at the
+## same key with a FRESH row for the target tier at the same cell, the same
+## orientation, and the same player field: a new timestamp, `store: []`, and
+## the `{"nc": 0}` attribute seed the config's `clicks_to_build > 0` rule
+## produces (design D5) — plus the purchase half's bought-units append,
+## which records the target tier only when it is not already listed. Applied
+## over the committed upgrade fixture's before-state, mutating only this
+## process. No process, no server, no socket; parity against executed legacy
+## is owned exclusively by the compat fixture-replay tests, so this double is
+## a test fixture, never an oracle.
+##
+## The response mirrors the v0 endpoint's two-sided superset (design D5): the
+## legacy result, the row AS IT WAS READ BEFORE EXECUTION, the row re-read
+## from the save after execution, and the current resources — so the client
+## needs no arithmetic of its own and never restamps a row locally.
+##
+## Structural failures mirror the endpoint's codes (design D3/D5): unknown or
+## empty save id, an integer index that names no row in the fixture's map
+## (`unknown_item_index` — the endpoint's 404, resolved BEFORE execution so
+## legacy's silent no-op is never reported as a success), a placement whose
+## item has no resolvable next tier (`no_upgrade_path` — the endpoint's 400,
+## answered before the dispatcher runs so an un-upgradeable building is never
+## reduced to a bare sale), and an unreadable fixture (`fixture_unreadable`).
+## Level gating, a daily-upgrade limit, and a space check are legacy-client
+## rules the repository cannot reproduce and this change deliberately does not
+## implement (design D6) — the same derived vector claims no upgrade cost, and
+## the same key and cell are reused, so there is no space question.
+func upgrade_building(user_id: String,
+		item_index: int) -> BootData.UpgradeResult:
+	if user_id.strip_edges() == "":
+		return _upgrade_failure("missing_user_id",
+			"user_id must be a non-empty string")
+	if not _ensure_loaded():
+		return _upgrade_failure("fixture_unreadable", _load_error)
+	if not _ensure_upgrade_loaded():
+		return _upgrade_failure("fixture_unreadable", _upgrade_error)
+	if user_id != _upgrade_pid:
+		return _upgrade_failure("unknown_user_id",
+			"no save exists for user_id '%s'" % user_id)
+	var row: Variant = (_upgrade_state["items"] as Dictionary).get(
+		str(item_index))
+	if not (row is Array) or (row as Array).size() != 8:
+		# The endpoint resolves the index against the corpus before
+		# executing (design D3/D5), so a stale or unknown index is a
+		# structured failure with no mutation, never a silent success.
+		return _upgrade_failure("unknown_item_index",
+			"no placement with index %d in this save's map" % item_index)
+	var source: Array = row as Array
+	# The target tier comes from the committed configuration's `upgrades_to`
+	# reference, never from the caller (design D2) — the same rule the
+	# endpoint applies, down to the `-1`/`0` and unresolvable sentinels.
+	var target: Variant = _upgrade_target(int(source[0]))
+	if target == null:
+		# The endpoint answers 400 no_upgrade_path for the same input, before
+		# the dispatcher runs, so a building that cannot be upgraded is never
+		# reduced to a bare sale (design D3).
+		return _upgrade_failure("no_upgrade_path",
+			"item %d has no resolvable next tier in the configuration"
+			% int(source[0]))
+	var target_item: Dictionary = target
+	# The fresh row's attribute rules come from the TARGET's own config; an
+	# unresolvable committed config fails closed BEFORE any mutation (the
+	# endpoint answers 500 internal_error for the same input, and the fake
+	# mirrors that code — the placement double's precedent).
+	var attr: Variant = _entry_attr(target_item)
+	if attr == null:
+		return _upgrade_failure("internal_error",
+			"config properties not derivable for item %d"
+			% int(target_item["id"]))
+	# The pre-execution row: read first, then the one write the pair performs
+	# (the in-place replacement). Nothing else is touched — no re-keying, no
+	# storage, no resource delta — exactly as the executed fixture records.
+	var removed: Array = source.duplicate()
+	# The purchase half writes a FRESH row at the SAME key and cell: the
+	# row's own cell, orientation, and player are reused, the timestamp is
+	# the deterministic fixture epoch, and `store` plus the configuration's
+	# attribute rules are rebuilt from the target's own config (design D5).
+	var entry := [int(target_item["id"]), int(source[1]), int(source[2]),
+		_upgrade_epoch, int(source[4]), [], attr, int(source[7])]
+	(_upgrade_state["items"] as Dictionary)[str(item_index)] = entry
+	# `engine.bought_unit_add` appends the item only when it is not already
+	# listed, so re-upgrading into an already-bought tier leaves the list
+	# alone (the fixture records `[]` -> `[24]`).
+	var bought: Array = _upgrade_state["bought_units"]
+	if not bought.has(int(target_item["id"])):
+		bought.append(int(target_item["id"]))
+	# Same envelope shape the service returns; the shared parser yields the
+	# typed result (identical shapes by construction, design D5).
+	return BootData.parse_upgrade({
+		"protocol": BootData.PROTOCOL,
+		"ok": true,
+		"game_version": str(_save_list_doc.get("game_version", "")),
+		# Time-dependent field: the fixture capture's legacy server epoch,
+		# never the wall clock (deterministic by construction).
+		"server_time": _fixture_server_time(),
+		"result": "success",
+		"removed": removed,
+		"upgraded": entry,
+		"resources": _upgrade_resources(),
 	})
 
 
@@ -1074,6 +1211,213 @@ func _store_resources() -> Dictionary:
 	var resources := {}
 	for key: String in RESOURCE_KEYS:
 		resources[key] = int(_store_state[key])
+	return resources
+
+
+# --- upgrade double (building-upgrade design D8) ----------------------------
+
+
+## Structured failure in the service's error envelope shape, parsed by the
+## same shared parser the live implementation uses.
+func _upgrade_failure(code: String, message: String) -> BootData.UpgradeResult:
+	return BootData.parse_upgrade({
+		"protocol": BootData.PROTOCOL,
+		"ok": false,
+		"error": {"code": code, "message": message},
+	})
+
+
+## The committed configuration's next tier for one item id, or null when the
+## item has no upgrade path. The reference is `upgrades_to`, resolved with the
+## documented `-1`/`0`-and-unresolvable-means-none rule (design D2), against
+## the same one item index the placement and purchase doubles read — so the
+## double derives the target tier exactly the way the endpoint does, and never
+## from the caller.
+func _upgrade_target(item_id: int) -> Variant:
+	var item: Variant = _config_items.get(str(item_id))
+	if not (item is Dictionary):
+		return null
+	var reference: Variant = _config_reference(
+		(item as Dictionary).get("upgrades_to"))
+	if reference == null or int(reference) <= 0:
+		return null
+	var target: Variant = _config_items.get(str(int(reference)))
+	if not (target is Dictionary):
+		return null
+	return target
+
+
+## The committed configuration's string-encoded numeric reference -> its
+## integer value, or null when the field is absent or is not an integer at
+## all. `upgrades_to` is a STRING in the committed payload (`"24"`, `"-1"`)
+## exactly as `costs` is, and the endpoint coerces it the same way
+## (`compat_legacy.item_upgrade_to`: `int(str(raw).strip())`), so a
+## whitespace-trimmed signed digit string is the documented shape. Nothing
+## else is ever coerced — a non-numeric reference is simply no path.
+static func _config_reference(value: Variant) -> Variant:
+	if value == null:
+		return null
+	if value is int or value is float:
+		return BootData._parse_int(value)
+	if not (value is String):
+		return null
+	var text := str(value).strip_edges()
+	if text.is_empty() or text.length() > 16:
+		return null
+	var digits := text
+	if digits.begins_with("-") or digits.begins_with("+"):
+		digits = digits.substr(1)
+	if digits.is_empty():
+		return null
+	for character in digits:
+		if character < "0" or character > "9":
+			return null
+	return text.to_int()
+
+
+## Loads the committed upgrade fixture into mutable process state (once).
+## Structural failures are named with the offending field; the boot,
+## placement, purchase, move, sell, and store fixtures' error state is
+## untouched (independent sinks).
+func _ensure_upgrade_loaded() -> bool:
+	if _upgrade_loaded:
+		return _upgrade_error == ""
+	_upgrade_loaded = true
+	var before_sink := {"error": ""}
+	var before := _read_json_into(UPGRADE_BEFORE_FIXTURE, before_sink)
+	if str(before_sink["error"]) != "":
+		_upgrade_error = str(before_sink["error"])
+		return false
+	var after_sink := {"error": ""}
+	var after := _read_json_into(UPGRADE_AFTER_FIXTURE, after_sink)
+	if str(after_sink["error"]) != "":
+		_upgrade_error = str(after_sink["error"])
+		return false
+	return _init_upgrade_state(before, after)
+
+
+## Validates the upgrade fixture's before- and after-states and builds the
+## in-memory save state. Every consumed field is checked, so a malformed
+## fixture fails closed instead of crashing the double. The placements are
+## kept as the save's own `items` map keyed by their legacy index, so an index
+## resolves exactly as `engine.map_get_item(map, index)` resolves it — and the
+## one write an upgrade performs is the one in-place row replacement that pair
+## performs. The after-state is read for its recorded wall-clock epoch: the
+## key is REUSED, so the double takes the epoch of the row the capture wrote
+## rather than naming a key (which is the placement double's job, not this
+## one's).
+func _init_upgrade_state(before: Dictionary, after: Dictionary) -> bool:
+	var maps: Variant = before.get("maps")
+	if not (maps is Array) or (maps as Array).is_empty():
+		_upgrade_error = "upgrade fixture before state carries no maps array"
+		return false
+	if not ((maps as Array)[0] is Dictionary):
+		_upgrade_error = "upgrade fixture before state first map is not an object"
+		return false
+	var map: Dictionary = (maps as Array)[0]
+	var items: Variant = map.get("items")
+	if not (items is Dictionary):
+		_upgrade_error = "upgrade fixture before state carries no items map"
+		return false
+	var info: Variant = before.get("playerInfo")
+	var priv: Variant = before.get("privateState")
+	if not (info is Dictionary) or not (priv is Dictionary):
+		_upgrade_error = "upgrade fixture before state lacks playerInfo/privateState"
+		return false
+	for key in ["xp", "gold", "wood", "oil", "steel"]:
+		var value: Variant = map.get(key)
+		if not (value is int or value is float) \
+				or float(value) != floor(float(value)):
+			_upgrade_error = "upgrade fixture before state lacks map %s" % key
+			return false
+	var pid: Variant = (info as Dictionary).get("pid")
+	var cash: Variant = (info as Dictionary).get("cash")
+	var mana: Variant = (priv as Dictionary).get("mana")
+	var bought: Variant = (priv as Dictionary).get("boughtUnits")
+	if not (pid is String) or not (cash is int or cash is float) \
+			or not (mana is int or mana is float) or not (bought is Array):
+		_upgrade_error = "upgrade fixture before state lacks save fields"
+		return false
+	# Every placement must be the documented eight-field row under a
+	# positive integer index (the shape the upgrade's own resolution depends
+	# on); an unusable key is a malformed capture, never a coerced index.
+	var typed_items := {}
+	for key: Variant in (items as Dictionary):
+		var index: Variant = BootData._parse_int(key)
+		if key is String and str(key).is_valid_int():
+			index = str(key).to_int()
+		if index == null or int(index) <= 0:
+			_upgrade_error = "upgrade fixture placement key '%s' is not a " \
+				% str(key) + "positive integer index"
+			return false
+		var row: Variant = (items as Dictionary)[key]
+		if not (row is Array) or (row as Array).size() != 8:
+			_upgrade_error = "upgrade fixture placement '%s' is not the " \
+				% str(key) + "eight-field array"
+			return false
+		typed_items[str(int(index))] = (row as Array).duplicate()
+	# The executed pair REUSES its key, so the after-state carries exactly as
+	# many placements as the before-state; anything else means the capture is
+	# not the transaction this double reproduces. Exactly one row differs, and
+	# its recorded wall-clock timestamp is the deterministic epoch.
+	var after_maps: Variant = after.get("maps")
+	if not (after_maps is Array) or (after_maps as Array).is_empty():
+		_upgrade_error = "upgrade fixture after state carries no maps array"
+		return false
+	if not ((after_maps as Array)[0] is Dictionary):
+		_upgrade_error = "upgrade fixture after state first map is not an object"
+		return false
+	var after_items: Variant = ((after_maps as Array)[0] as Dictionary).get(
+		"items")
+	if not (after_items is Dictionary):
+		_upgrade_error = "upgrade fixture after state carries no items map"
+		return false
+	if (after_items as Dictionary).size() != typed_items.size():
+		_upgrade_error = ("upgrade fixture after state must reuse the same "
+			+ "placement keys, found %d against %d") % [
+			(after_items as Dictionary).size(), typed_items.size()]
+		return false
+	var replaced: Array = []
+	for key: String in typed_items:
+		if not (after_items as Dictionary).has(key):
+			_upgrade_error = ("upgrade fixture after state dropped key %s "
+				% key + "(an upgrade must reuse its key)")
+			return false
+		if (after_items as Dictionary)[key] != typed_items[key]:
+			replaced.append(key)
+	if replaced.size() != 1:
+		_upgrade_error = ("upgrade fixture after state must replace exactly "
+			+ "one row in place, found %d") % replaced.size()
+		return false
+	var entry: Variant = (after_items as Dictionary)[replaced[0]]
+	var stamp: Variant = (entry as Array)[3]
+	if not (stamp is int or stamp is float) or int(stamp) <= 0 \
+			or float(stamp) != floor(float(stamp)):
+		_upgrade_error = "upgrade fixture fresh row timestamp is not a positive integer"
+		return false
+	_upgrade_state = {
+		"items": typed_items,
+		"xp": int(map.get("xp")),
+		"gold": int(map.get("gold")),
+		"wood": int(map.get("wood")),
+		"oil": int(map.get("oil")),
+		"steel": int(map.get("steel")),
+		"cash": int(cash),
+		"mana": int(mana),
+		"bought_units": (bought as Array).duplicate(),
+	}
+	_upgrade_pid = pid
+	_upgrade_epoch = int(stamp)
+	return true
+
+
+## The seven stored resource values of the in-memory upgrade state. An upgrade
+## derives a neutral vector (design D4), so these are the state's own values —
+## reported verbatim, never a computed delta, and no upgrade cost is claimed.
+func _upgrade_resources() -> Dictionary:
+	var resources := {}
+	for key: String in RESOURCE_KEYS:
+		resources[key] = int(_upgrade_state[key])
 	return resources
 
 

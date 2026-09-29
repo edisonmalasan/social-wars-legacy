@@ -3,7 +3,7 @@ extends Node
 ## to Compatibility API v0 (design D5, specs "Boot live against Compatibility
 ## API", "Place through either implementation", "Purchase through either
 ## implementation", "Move through either implementation", "Sell through
-## either implementation", and "Store through either implementation").
+## either implementation", and "Upgrade through either implementation").
 ##
 ## This is the ONLY project file allowed to name the compat endpoint or to
 ## use the built-in HTTP request/enumeration types; the scope test restricts
@@ -23,6 +23,7 @@ const PURCHASE_PATH := "/v0/purchase"
 const MOVE_PATH := "/v0/move"
 const SELL_PATH := "/v0/sell"
 const STORE_PATH := "/v0/store"
+const UPGRADE_PATH := "/v0/upgrade"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -182,6 +183,38 @@ func store_building(user_id: String,
 			str(outcome.get("code", "bad_response")),
 			str(outcome.get("message", "")))
 	return BootData.parse_store(outcome.get("payload"))
+
+
+## One upgrade intent over loopback HTTP: the client sends only the intent
+## (`user_id` and the legacy `item_index` of an existing placement) — no
+## target tier, no reason, no coordinates, no orientation, no player, no
+## quantity, no price, and no resource deltas. The service derives both
+## derived legacy commands server-side (design D2/D3): the target tier from
+## the committed configuration's `upgrades_to`, the reason from the
+## committed legacy constant, the cell, orientation, and player from the row
+## being replaced, and a NEUTRAL resource vector for both — so **no upgrade
+## cost of any kind is claimed** (design D4).
+##
+## The response is the two-sided authoritative superset (design D5): the
+## row as read BEFORE execution and the row re-read AFTER it — the derived
+## target tier at the SAME key and cell — plus the current resources, parsed
+## by the one shared entry parser every other response uses. Structured
+## service errors pass through with their original codes — notably
+## `unknown_item_index` for a stale or unknown index and `no_upgrade_path`
+## for a placement whose item has no resolvable next tier, which the client
+## surfaces instead of upgrading anything; transport failures keep the boot
+## failure rules, never a partial payload.
+func upgrade_building(user_id: String,
+		item_index: int) -> BootData.UpgradeResult:
+	var outcome := await _call("POST", UPGRADE_PATH, JSON.stringify({
+		"user_id": user_id,
+		"item_index": item_index,
+	}))
+	if not outcome.get("ok", false):
+		return BootData.upgrade_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return BootData.parse_upgrade(outcome.get("payload"))
 
 
 ## One HTTP round trip. Success returns `{ok: true, payload: Dictionary}`;

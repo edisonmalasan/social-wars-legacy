@@ -9,10 +9,11 @@ extends "res://tests/test_base.gd"
 ## the compat endpoint and the HTTP request client to the legacy-v0
 ## implementation file, which this suite never selects. Expected values are
 ## read from the committed executed-legacy fixtures (read-only), including
-## the placement, purchase, move, sell, and store fixtures the five doubles
-## mutate in memory over.
+## the placement, purchase, move, sell, store, and upgrade fixtures the six
+## doubles mutate in memory over.
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
+const FakeApi = preload("res://scripts/gameapi/fake_api.gd")
 
 const FIXTURE_SAVE_LIST := \
 	"tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json"
@@ -36,6 +37,10 @@ const FIXTURE_STORE_BEFORE := \
 	"tests/fixtures/godot-building-store/steps/command_store_item/before.json"
 const FIXTURE_STORE_AFTER := \
 	"tests/fixtures/godot-building-store/steps/command_store_item/after.json"
+const FIXTURE_UPGRADE_BEFORE := \
+	"tests/fixtures/godot-building-upgrade/steps/command_upgrade/before.json"
+const FIXTURE_UPGRADE_AFTER := \
+	"tests/fixtures/godot-building-upgrade/steps/command_upgrade/after.json"
 
 ## The executed-legacy store transaction's constants (fixture facts, read
 ## from the committed capture): the Tree decoration (item 905, 1x1) at
@@ -60,6 +65,32 @@ const STORE_UNRELATED_ITEM := 23
 ## An index the map does not name (the endpoint's 404, resolved before
 ## execution), and index 0, which is never a real legacy key.
 const STORE_UNKNOWN_INDEX := 9999
+
+## The executed-legacy upgrade transaction's constants (fixture facts, read
+## from the committed capture): the Wall I (item 23, 1x1) at legacy map key
+## "12", anchored at `(45,49)`, whose row `[23, 45, 49, 0, 0, [], {}, 1]` is
+## REPLACED IN PLACE by the Wall II (item 24) at the SAME key and the SAME
+## cell with a fresh timestamp and the `{"nc": 0}` construction seed, while
+## the bought-units list gains the new tier and every other row and every
+## resource stays byte-identical.
+const UPGRADE_ITEM := 23
+const UPGRADE_TARGET := 24
+const UPGRADE_INDEX := 12
+const UPGRADE_ROW := [UPGRADE_ITEM, 45, 49, 0, 0, [], {}, 1]
+const UPGRADE_CELL_X := 45
+const UPGRADE_CELL_Y := 49
+## The Tree decoration at legacy key 2: the committed configuration records
+## `upgrades_to` `-1` for it, so it has NO resolvable next tier and must fail
+## closed instead of becoming a bare sale.
+const UPGRADE_NO_PATH_INDEX := 2
+const UPGRADE_NO_PATH_ITEM := 905
+## The Wall II's own next tier, the same configuration fact the double
+## derives a second time: upgrading the SAME key again replaces it in place
+## once more — which is the point, because the key is reused.
+const UPGRADE_SECOND_TARGET := 25
+## An integer index the map does not name (the endpoint's 404, resolved
+## before execution), and index 0, which is never a real legacy key.
+const UPGRADE_UNKNOWN_INDEX := 9999
 
 
 func run_scenario() -> void:
@@ -155,6 +186,7 @@ func run_scenario() -> void:
 	await _check_move(api, user_id)
 	await _check_sell(api, user_id)
 	await _check_store(api, user_id)
+	await _check_upgrade(api, user_id)
 
 	info("fake implementation resolved %d save(s) with no server and no socket"
 		% save_list.saves.size())
@@ -935,6 +967,279 @@ func _check_store_failure(result: Variant, code: String, label: String) -> void:
 	check(typed.removed == null, label + " carries no partial removed row")
 	check(typed.store.is_empty(), label + " carries no partial storage mapping")
 	check(typed.resources == null, label + " carries no partial resources")
+
+
+## Upgrade double coverage (building-upgrade task 3.2, design D8): the
+## documented in-memory semantics over the committed upgrade fixture's
+## before-state (the index resolves against the save's own placements, the
+## target tier is DERIVED from the committed configuration's own
+## `upgrades_to` reference — never from the caller — the row is REPLACED IN
+## PLACE at the same key and cell with a fresh timestamp and the purchase
+## half's `{"nc": 0}` seed, the bought-units list gains the new tier, and the
+## derived neutral resource vector leaves every resource unchanged), the
+## endpoint's structured failure codes, and the intent counter — all with no
+## process, no server, and no socket.
+##
+## The executed transaction, read from the fixture (never written): the
+## after-state's single replaced key (`items["12"]`, the Wall I at `(45,49)`
+## becoming the Wall II at the SAME cell) plus `boughtUnits` gaining the new
+## tier while the placement count and every other row and resource stay
+## byte-identical is the whole oracle, and the double's response must equal
+## it exactly.
+func _check_upgrade(api: Variant, user_id: String) -> void:
+	var before := _read_fixture_object(FIXTURE_UPGRADE_BEFORE)
+	var after := _read_fixture_object(FIXTURE_UPGRADE_AFTER)
+	if before.is_empty() or after.is_empty():
+		return
+	var before_map: Dictionary = before["maps"][0]
+	var after_map: Dictionary = after["maps"][0]
+	var before_items: Dictionary = before_map["items"]
+	var after_items: Dictionary = after_map["items"]
+	check_eq(before_items.size(), 40,
+		"the upgrade fixture before map carries 40 placements")
+	check_eq(after_items.size(), 40,
+		"the executed upgrade kept 40 placements (the key is REUSED)")
+	check(after_items.has("12"),
+		"the executed upgrade left the row at key 12 (in place)")
+	# The two rows the executed pair produced, in the typed form the client
+	# receives.
+	var row_before := _typed_row(before_items["12"])
+	var row_after := _typed_row(after_items["12"])
+	check_eq(row_before, UPGRADE_ROW,
+		"the fixture anchors the Wall I at (45,49) under key 12")
+	check_eq(int(row_after[0]), UPGRADE_TARGET,
+		"the executed upgrade put the Wall II at that same key")
+	check_eq([int(row_after[1]), int(row_after[2])],
+		[UPGRADE_CELL_X, UPGRADE_CELL_Y],
+		"the executed upgrade reused the very same cell")
+	check(int(row_after[3]) > 0,
+		"the executed upgrade stamped a fresh positive wall-clock timestamp")
+	check_eq(row_after[4], 0, "the fresh row carries the orientation")
+	check_eq(row_after[5], [], "the fresh row's store is empty")
+	var seeded: Variant = row_after[6]
+	check(seeded is Dictionary and (seeded as Dictionary).size() == 1 \
+			and int((seeded as Dictionary)["nc"]) == 0,
+		"the fresh row carries the clicks_to_build construction seed")
+	check_eq(int(row_after[7]), 1, "the fresh row carries the player's team field")
+	# The other 39 rows are byte-identical: the one in-place replacement is
+	# the only map write.
+	var other_keys: Array = []
+	for key: Variant in before_items:
+		if str(key) != "12":
+			other_keys.append(str(key))
+	other_keys.sort()
+	var untouched := true
+	for key: String in other_keys:
+		if _typed_row(before_items[key]) != _typed_row(after_items[key]):
+			untouched = false
+	check(untouched,
+		"the executed upgrade changed no other row (39 rows stay "
+		+ "byte-identical)")
+	# The neutral derived vector means the resource bag and the storage are
+	# unchanged, and the purchase half's bought-units record is the one other
+	# write the executed transaction made.
+	for key in ["xp", "gold", "wood", "oil", "steel"]:
+		check_eq(before_map[key], after_map[key],
+			"the executed upgrade left %s unchanged" % key)
+	check_eq(before["playerInfo"]["cash"], after["playerInfo"]["cash"],
+		"the executed upgrade left cash unchanged (no cost is claimed)")
+	check_eq(before["privateState"]["mana"], after["privateState"]["mana"],
+		"the executed upgrade left mana unchanged")
+	check_eq(after_map["store"], {},
+		"the executed upgrade left storage empty (it touches no storage)")
+	check_eq(before["privateState"]["boughtUnits"], [],
+		"the executed upgrade started from an empty bought-units list")
+	var recorded_bought: Array = []
+	for each: Variant in (after["privateState"]["boughtUnits"] as Array):
+		recorded_bought.append(int(each))
+	check_eq(recorded_bought, [UPGRADE_TARGET],
+		"the executed upgrade recorded the new tier in boughtUnits")
+	var requests_before: int = api.upgrade_requests
+
+	# --- success: the Wall I at key 12 -> the Wall II at the same cell --
+	var upgraded: Variant = await api.upgrade_building(user_id, UPGRADE_INDEX)
+	check(upgraded is BootData.UpgradeResult,
+		"upgrade_building returns the typed result")
+	if not (upgraded is BootData.UpgradeResult):
+		return
+	var first: BootData.UpgradeResult = upgraded
+	check(first.ok, "fake upgrade resolves offline: %s" % first.error_message)
+	if not first.ok:
+		return
+	check_eq(first.protocol, BootData.PROTOCOL, "upgrade protocol is compat-v0")
+	check_eq(first.game_version, "alpha 0.02", "the game version is the fixture's")
+	check(first.server_time > 0,
+		"server_time is the positive fixture epoch (time-dependent field)")
+	check_eq(first.result, "success", "legacy result string is reported")
+	check(first.removed != null, "the pre-execution row is carried")
+	check(first.upgraded != null, "the post-execution row is carried")
+	check(first.resources != null, "typed resources are carried")
+	if first.removed == null or first.upgraded == null \
+			or first.resources == null:
+		return
+	# The response carries BOTH sides: the row AS READ BEFORE EXECUTION and
+	# the row the purchase half wrote (design D5).
+	check_eq(_boot_row(first.removed), UPGRADE_ROW,
+		"the removed row is the executed fixture's pre-execution row")
+	check_eq(first.removed.item_id, UPGRADE_ITEM, "the removed row names the Wall I")
+	check_eq(first.removed.timestamp, 0,
+		"the removed row keeps the save's timestamp (never restamped)")
+	check_eq(first.removed.orientation, 0, "the removed row keeps its orientation")
+	check_eq(first.removed.store, [], "the removed row keeps its store")
+	check_eq(first.removed.attr, {}, "the removed row keeps its attr")
+	check_eq(first.removed.player, 1,
+		"the removed row keeps the player's team field")
+	check_eq(first.upgraded.item_id, UPGRADE_TARGET,
+		"the upgraded row names the derived target tier (Wall II)")
+	check_eq(first.upgraded.x, UPGRADE_CELL_X,
+		"the upgraded row reuses the pre-execution x")
+	check_eq(first.upgraded.y, UPGRADE_CELL_Y,
+		"the upgraded row reuses the pre-execution y")
+	check_eq(first.upgraded.timestamp, int(row_after[3]),
+		"the upgraded row is stamped with the capture's recorded epoch "
+		+ "(the deterministic double never reads the wall clock)")
+	check_eq(first.upgraded.orientation, int(row_after[4]),
+		"the upgraded row carries the row's own orientation")
+	check_eq(first.upgraded.store, [], "the upgraded row's store is fresh and empty")
+	check_eq(first.upgraded.attr, {"nc": 0},
+		"the upgraded row carries the construction seed and nothing else")
+	check_eq(first.upgraded.player, int(row_after[7]),
+		"the upgraded row carries the row's own player field")
+	# The neutral derived vector means the resource bag is the fresh save's
+	# own values (design D4) — never a computed delta, and no upgrade cost.
+	check_eq(first.resources.gold, int(before_map["gold"]),
+		"gold is unchanged by the neutral vector")
+	check_eq(first.resources.wood, int(before_map["wood"]),
+		"wood is unchanged by the neutral vector")
+	check_eq(first.resources.oil, int(before_map["oil"]),
+		"oil is unchanged by the neutral vector")
+	check_eq(first.resources.steel, int(before_map["steel"]),
+		"steel is unchanged by the neutral vector")
+	check_eq(first.resources.xp, int(before_map["xp"]),
+		"xp is unchanged by the neutral vector")
+	check_eq(first.resources.cash, int(before["playerInfo"]["cash"]),
+		"cash is unchanged by the neutral vector")
+	check_eq(first.resources.mana, int(before["privateState"]["mana"]),
+		"mana is unchanged by the neutral vector")
+	# The purchase half's bookkeeping: the target tier is recorded exactly
+	# once, which is the fixture's own `boughtUnits` fact reproduced in the
+	# double's in-memory state.
+	check_eq(_bought_units(api), [UPGRADE_TARGET],
+		"the double recorded the new tier in the bought-units list once")
+
+	# --- no upgrade path: the Tree's config reference is the -1 sentinel,
+	# so the intent fails closed BEFORE anything is written and the row is
+	# never reduced to a bare sale (design D3).
+	var no_path: Variant = await api.upgrade_building(
+		user_id, UPGRADE_NO_PATH_INDEX)
+	_check_upgrade_failure(no_path, "no_upgrade_path",
+		"a building with no resolvable next tier")
+
+	# --- structured failures: endpoint codes, no partial payload ----
+	var ghost: Variant = await api.upgrade_building("ghost-0000", UPGRADE_INDEX)
+	_check_upgrade_failure(ghost, "unknown_user_id", "unknown save id")
+	var empty: Variant = await api.upgrade_building("", UPGRADE_INDEX)
+	_check_upgrade_failure(empty, "missing_user_id", "empty save id")
+	var unknown_index: Variant = await api.upgrade_building(
+		user_id, UPGRADE_UNKNOWN_INDEX)
+	_check_upgrade_failure(unknown_index, "unknown_item_index",
+		"an index the map does not name")
+	var zero: Variant = await api.upgrade_building(user_id, 0)
+	_check_upgrade_failure(zero, "unknown_item_index",
+		"index 0 (never a real legacy key)")
+
+	# --- the reused key stays addressable: upgrading the SAME key again
+	# replaces it in place once more, which is this command's distinguishing
+	# fact (a move rewrites coordinates, a sale and a store drop the key).
+	var again: Variant = await api.upgrade_building(user_id, UPGRADE_INDEX)
+	check(again is BootData.UpgradeResult and again.ok,
+		"the reused key is still addressable after the first upgrade")
+	if again is BootData.UpgradeResult and again.ok:
+		var second: BootData.UpgradeResult = again
+		check_eq(second.removed.item_id, UPGRADE_TARGET,
+			"the second upgrade removed the row the first one wrote")
+		check_eq(second.upgraded.item_id, UPGRADE_SECOND_TARGET,
+			"the second upgrade derived the next tier from the same reference")
+		check_eq(second.upgraded.x, UPGRADE_CELL_X,
+			"the second upgrade still reuses the same cell")
+		check_eq(second.upgraded.y, UPGRADE_CELL_Y,
+			"the second upgrade still reuses the same cell")
+		var second_row := _boot_row(second.removed)
+		check_eq([int(second_row[1]), int(second_row[2])],
+			[UPGRADE_CELL_X, UPGRADE_CELL_Y],
+			"the row the first upgrade wrote kept the pre-execution cell")
+	# The bought-units record is a SET, not a log: both new tiers are
+	# recorded, the already-listed one is never repeated.
+	check_eq(_bought_units(api), [UPGRADE_TARGET, UPGRADE_SECOND_TARGET],
+		"each new tier is recorded exactly once in the bought-units list")
+
+	# --- the failures applied nothing: an unrelated row still resolves to
+	# its own item (state not corrupted), and the Tree is still on the map.
+	var unrelated: Variant = await api.upgrade_building(user_id, 11)
+	check(unrelated is BootData.UpgradeResult and unrelated.ok,
+		"an unrelated row still resolves after the failed attempts")
+	if unrelated is BootData.UpgradeResult and unrelated.ok:
+		check_eq((unrelated as BootData.UpgradeResult).removed.item_id, 22,
+			"the unrelated row resolves to its own item (state not corrupted)")
+	var tree_again: Variant = await api.upgrade_building(
+		user_id, UPGRADE_NO_PATH_INDEX)
+	_check_upgrade_failure(tree_again, "no_upgrade_path",
+		"the un-upgradeable row is still on the map after the failures")
+	check_eq(int((_read_fixture_object(FIXTURE_UPGRADE_AFTER)["maps"][0]
+		as Dictionary)["items"]["12"][0]), UPGRADE_TARGET,
+		"the committed after-state still holds the upgraded tier at that key")
+
+	check_eq(api.upgrade_requests, requests_before + 9,
+		"every upgrade_building call increments the intent counter exactly "
+		+ "once")
+	info("upgrade double resolved the executed fixture's in-place replacement "
+		+ "plus 5 structured failures with no server and no socket")
+
+
+## Every upgrade failure carries the endpoint's code and no partial payload
+## (design D5) — including the 404 `unknown_item_index`, which stands in for
+## legacy's silent no-op, and the 400 `no_upgrade_path`, which keeps an
+## un-upgradeable building from being reduced to a bare sale.
+func _check_upgrade_failure(result: Variant, code: String,
+		label: String) -> void:
+	check(result is BootData.UpgradeResult,
+		label + " returns the typed result")
+	if not (result is BootData.UpgradeResult):
+		return
+	var typed: BootData.UpgradeResult = result
+	check(not typed.ok, label + " is a structured failure")
+	check_eq(typed.error_code, code, label + " names the endpoint's code")
+	check(typed.removed == null, label + " carries no partial removed row")
+	check(typed.upgraded == null, label + " carries no partial upgraded row")
+	check(typed.resources == null, label + " carries no partial resources")
+	check_eq(typed.result, "",
+		label + " reports no legacy result for a failed upgrade")
+
+
+## One typed `BootData.Placement` back in the legacy eight-field array, so
+## the double's two sides can be compared with the fixture's own rows.
+func _boot_row(entry: Variant) -> Array:
+	if entry == null or not (entry is BootData.Placement):
+		return []
+	var typed: BootData.Placement = entry
+	return [typed.item_id, typed.x, typed.y, typed.timestamp,
+		typed.orientation, typed.store, typed.attr, typed.player]
+
+
+## The fake double's own in-memory bought-units list, read from the LIVE
+## implementation instance the facade selected (`GameApi._impl`, not a name
+## lookup — a reconfigured node stays a child until the frame ends, so a name
+## lookup can return the replaced instance). This is the double's observable
+## in-process state (the purchase half's bookkeeping the typed response does
+## not carry), never a transport payload: the executed fixture's own
+## `boughtUnits` is the oracle it is compared against.
+func _bought_units(api: Variant) -> Array:
+	var double: Variant = api._impl
+	if double == null or not (double is FakeApi):
+		check(false, "the fake double instance is reachable for its "
+			+ "in-memory state")
+		return []
+	return (double._upgrade_state["bought_units"] as Array).duplicate()
 
 
 ## The capture's recorded entry timestamp — the entry the after-state adds
