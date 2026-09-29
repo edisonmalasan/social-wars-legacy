@@ -386,6 +386,63 @@ oracle exists; the committed capture runs the fake implementation, so real-execu
 parity rests on the fixture-replay tests and the live phase. No Flash, Ruffle,
 ActionScript, or browser executes in any of these commands.
 
+Verified building-construction commands (milestone M7; Godot 4.7.2.stable and
+pinned CPython 3.9.13, Windows x64; `python` denotes the pinned interpreter, never
+the PATH alias). This is the second deliver line whose legacy contract was
+established by investigation before implementation; the investigation record is
+`docs/legacy-construction-timing.md`:
+
+```bash
+python -B apps/compat-api/capture_construction_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_town_construction.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-09-29): the construction fixture capture
+(one-shot executed-legacy oracle; the request carries the derived two-command batch
+`[[0,"activate",[11,5],[0x8]],[0,"add_click",[11],[0x8]]]` - the Turret I (item 22) at
+map slot 11 started at its committed build time of 5 seconds and given one build
+click, so the row becomes `[22, 58, 48, <start time>, 0, [], {"cp": 5, "nc": 1}, 1]`
+while the placement count stays 40 and the whole private state, the storage, the
+player info, and all seven resources are byte-identical; the completing command is
+recorded but not captured, with its effect established by the earlier investigation
+probe and covered by the endpoint's `finish` post-execution proof; exit codes and
+containment recorded in `tests/fixtures/godot-building-construction/README.md`), the
+compat suite including the three command derivations, the `/v0/construction`
+endpoint with its closed action set, its content-derived start duration, its
+`no_build_time` guard, and its per-action post-execution proofs, and executed-legacy
+parity tests (observed `Ran 616 tests ... OK`, exit `0`), the hermetic
+construction-flow suite (observed 363 checks, PASS), both batteries in the final
+state (each exit `0`; the second embeds the `construction-live` phase, which walks
+one row through start, click, and finish, asserts each typed response and its
+post-condition, and asserts that a disposable corpus save mutated), and the
+preservation manifest (3,258 entries, exit `0`). The compatibility service listens
+on `127.0.0.1:5056` only, and every network call in these commands is loopback. The
+evidence capture and report steps are documented in `apps/client-godot/README.md`
+("Building construction"); committed evidence lives under
+`apps/client-godot/evidence/building-construction/`. Claim limits: the three
+commands and the start duration are **derived**, never observed from the Flash
+client, while their shapes, effects, and recorded result are **established**;
+parity covers one recorded transaction against the fresh-player corpus; **no
+building cost is claimed** and the speedup prices are out of scope; the click
+threshold and the remaining time are client-side derivations with no server
+enforcement, and the steps are player-triggered; friend assistance is out of scope;
+the attribute-bag-clearing command is never used as a cancel; a running countdown
+with a consumed counter is indistinguishable from a freshly started build, so the
+flow offers no step in-session and a finished build can be clicked again after a
+view rebuild, which is what the legacy command permits; the `no_build_time` refusal
+is exercised through an in-memory row because no placed building in the corpus has
+a non-positive committed build time; buildability and addressability are
+client-side rules only, with the endpoint enforcing structural input validity and
+the per-action proof, and no server-authoritative validation (that belongs to
+Server v1 / M13); no pixel-parity oracle exists; the committed capture runs the fake
+implementation, so real-execution parity rests on the fixture-replay tests and the
+live phase. No Flash, Ruffle, ActionScript, or browser executes in any of these
+commands.
+
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 

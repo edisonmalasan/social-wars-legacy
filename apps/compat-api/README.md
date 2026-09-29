@@ -325,6 +325,75 @@ fresh-row semantics (`timestamp_now()`, `store: []`, the `{"nc": 0}` seed); the
 observed from the Flash client: that the client sends exactly this pair, the buy
 half's `orientation`/`playerID`/`unknown`/`reason` arguments, and the price vector.
 
+`POST /v0/construction` with body `{"user_id", "item_index", "action"}` is
+the seventh state-mutating surface (the `building-construction` change) and the
+second whose contract was established by investigation rather than chosen - the
+investigation is committed as `docs/legacy-construction-timing.md`. The body is
+an **intent only**: the client names a placement and one of three documented
+actions, and the endpoint derives the legacy command and every one of its
+arguments. A `start` action derives its countdown from the item's **committed
+`build_time`**, so - unlike every earlier surface - no client value can influence
+it at all; extra keys such as a `duration` are ignored.
+
+```
+action     derived command                derived arguments
+--------   ----------------------------   ---------------------------------
+"start"    [0, "activate",        [i, D]]  D = the item's committed build_time
+"click"    [0, "add_click",       [i]]     -
+"finish"   [0, "activate_item_click", [i]] -
+```
+
+Success returns the legacy answer plus an authoritative superset naming both sides
+of the in-place update:
+
+```json
+{"protocol": "compat-v0", "ok": true, "game_version": "alpha 0.02",
+ "server_time": 1790690555, "result": "success",
+ "previous": [22, 58, 48, 0, 0, [], {}, 1],
+ "row": [22, 58, 48, 1790690555, 0, [], {"cp": 5, "nc": 1}, 1],
+ "action": "start",
+ "resources": {"xp": 4, "gold": 2000, "wood": 2000, "oil": 2000,
+               "steel": 2000, "cash": 5, "mana": 0}}
+```
+
+- `previous` is the row **as read before execution** and `row` is that row
+  **re-read after execution**; both are the same eight-field entry the other
+  gameplay surfaces use. `row[3]` is the construction's start instant (wall-clock,
+  and the fixture's one documented time-dependent field).
+- **A per-action post-execution proof is required before success is reported**
+  (design D3): the row must still exist and its `attr` be a mapping, then `start` ->
+  `attr["cp"]` equals the derived duration, `click` -> `attr["nc"]` is an integer of
+  at least `1`, `finish` -> `attr["nc"]` is absent. Anything else is a fail-closed
+  `internal_error`. The upgrade line showed that legacy answers
+  `{"result":"success"}` for a batch that *destroys* the row, so this check is
+  load-bearing rather than decorative.
+- The `activate` branch that clears the row's whole attribute bag (destroying the
+  click counter and any friend-assistance state) is **never used**: the contract
+  only ever sends a positive derived duration and exposes no cancel.
+- **No building cost is claimed.** Every action carries the neutral derived
+  vector: no configuration field prices a build, and the speedup prices
+  (`BUILD_SPEEDUP_PRICING`, `BUILD_SPEEDUP_MIN_TIME`, `UPGRADE_SPEEDUP_PRICING`)
+  price speedups, which are out of scope. The click threshold and the remaining
+  time are **client-side derivations** with no server enforcement - no branch
+  compares the counter with the item's click requirement, and the countdown minus
+  the elapsed time is never computed server-side.
+- Validation is structural only: a JSON object body, a resolvable save id, a
+  strict-int `item_index` present in the save, an action in the documented set,
+  and - for `start` only - a resolvable positive committed build time
+  (`no_build_time`). Whether a build may start on a row that already carries
+  construction state, and the click threshold, are client-side rules (design D7).
+
+**Provenance - established versus derived.** Established from committed legacy
+source and executed-legacy captures: the three commands' argument shapes and
+effects (`command.py:412-428`, `525-535`, `537-548`; `engine.py:125-135`); that
+they write only the row's `item[3]` timestamp and `item[6]` attribute bag; that
+the click counter is **seeded by the purchase half** (`engine.py:25-28`); the
+countdown's recorded shape `attr["cp"] = duration`; and that no server-side
+completion rule exists. Derived and never observed from the Flash client: that a
+real construction sends these commands, and that the duration is the item's
+committed `build_time` rather than its `activation` field or a speedup-adjusted
+figure.
+
 ### Structured errors
 
 Always JSON, always `ok:false`, keys exactly
@@ -347,6 +416,10 @@ Always JSON, always `ok:false`, keys exactly
 | `unknown_item_index` | 404 | integer index that names no placement in the save's `map["items"]` (legacy would silently no-op) |
 | `invalid_reason` | 400 | server-side only: the derived sell reason is not a string (unreachable through the contract) |
 | `no_upgrade_path` | 400 | `/v0/upgrade` placement's item has no resolvable next tier in the committed configuration (`upgrades_to` is absent, `-1`, `0`, or unresolvable) |
+| `missing_action` | 400 | `/v0/construction` body carries no `action` |
+| `invalid_action` | 400 | `action` present but not one of `start`, `click`, `finish` (the legacy command names are never accepted) |
+| `no_build_time` | 400 | `/v0/construction` `start` on an item with no resolvable positive committed `build_time` (absent, non-integer, or `0`) |
+| `invalid_duration` | 400 | envelope-level only: a derived start duration that is not a positive integer (unreachable through the contract) |
 | `bad_request` | 400 | other malformed requests Flask rejects |
 | `not_found` | 404 | unknown path |
 | `method_not_allowed` | 405 | known path, unsupported method |
@@ -356,16 +429,16 @@ Always JSON, always `ok:false`, keys exactly
 
 All run from the repository root on Windows x64 with the pinned interpreter
 (CPython 3.9.13); exit codes are the real observed ones (bootstrap-era
-counts 2026-09-27; placement-, purchase-, move-, sell-, store-, and
-upgrade-era counts 2026-09-29):
+counts 2026-09-27; placement-, purchase-, move-, sell-, store-, upgrade-, and
+construction-era counts 2026-09-29):
 
 ```bash
 python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
 ```
 
-→ `Ran 491 tests ... OK`, exit `0` (90 before `building-purchase`, 157 before
+→ `Ran 616 tests ... OK`, exit `0` (90 before `building-purchase`, 157 before
 `building-move`, 227 before `building-sell`, 306 before `building-store`, 390 before
-`building-upgrade`).
+`building-upgrade`, 491 before `building-construction`).
 Covers envelope/error shapes, bootstrap and
 session parity against the committed fixtures, pre/post save SHA-256 identity,
 the no-persistence source guard, and the offline socket guard (the suite opens
@@ -462,6 +535,16 @@ code `0`, its containment record, and the reverse-order negative oracle:
 python -B apps/compat-api/capture_upgrade_fixture.py
 ```
 
+Construction fixture capture (the `building-construction` change's
+executed-legacy oracle, one-shot) - see
+`tests/fixtures/godot-building-construction/README.md` for its invocation,
+exit code `0`, its containment record, and why the completing command is
+recorded but not captured:
+
+```bash
+python -B apps/compat-api/capture_construction_fixture.py
+```
+
 ## Layout
 
 - `compat_legacy.py` — corpus build/layout checks and the in-process adapter
@@ -495,6 +578,11 @@ python -B apps/compat-api/capture_upgrade_fixture.py
   two-command batch (`sell` with the committed `UPGR` reason, then `buy` of
   the target tier) with neutral resource vectors.
 - `capture_upgrade_fixture.py` - executed-legacy upgrade fixture capture.
+- `construction_envelope.py` - the derived-provisional `/v0/construction`
+  envelopes: one command per documented action, with the start duration
+  derived from committed content and neutral resource vectors.
+- `capture_construction_fixture.py` - executed-legacy construction fixture
+  capture.
 - `tests/` — `test_compat_v0.py` (service + containment), `test_parity.py`
   (offline replay against the committed boot fixtures),
   `test_placement_envelope.py` (offline envelope derivation/sanitization),
@@ -558,10 +646,11 @@ records no building-sale refund rule and the legacy refund travels only in
 client-sent deltas this contract refuses. Insufficient resources reproduce the
 legacy `max(…, 0)` clamp, never a rejection (authoritative server-side validation
 belongs to Server v1 / M13), and occupancy, grid-bounds, level-gate,
-cash-affordability, no-op-move, sellability, storability, upgradability, and
-addressability rules are enforced client-side only. Persistence is confined to the disposable service
+cash-affordability, no-op-move, sellability, storability, upgradability,
+buildability, and addressability rules are enforced client-side only. Persistence is confined to the disposable service
 corpus: `POST /v0/place`, `POST /v0/purchase`, `POST /v0/move`,
-`POST /v0/sell`, `POST /v0/store`, and `POST /v0/upgrade` persist through the
-legacy dispatcher into the corpus `saves/`,
+`POST /v0/sell`, `POST /v0/store`, `POST /v0/upgrade`, and
+`POST /v0/construction` persist through the legacy dispatcher into the
+corpus `saves/`,
 while the session and bootstrap endpoints remain strictly non-persisting, and
 the working tree is never written.
