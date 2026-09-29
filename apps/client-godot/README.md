@@ -940,5 +940,139 @@ and purchase request counts (exactly one each), and the fake-capture pointer.
   a parity oracle.
 
 These non-claims are recorded verbatim in `evidence/purchase/report.json`.
-Remaining deliver lines of M7 (separate changes): move, sell, store, upgrade,
-build timers, income, expansion, resources, and XP.
+
+## Building move
+
+The move slice (OpenSpec `building-move`, milestone M7) makes a town the player
+already owns rearrangeable: a placed building is selected, moved to a free cell,
+and confirmed as one typed intent executed by the unchanged legacy `move` path
+inside Compatibility API v0, with an executed-legacy move fixture as the parity
+oracle. No purchase and no storage change is involved — the building is already
+in the save, and a move rewrites only its coordinates.
+
+### Flow
+
+1. **Addressable placements** — `town_state.gd` parses each placement's legacy
+   map key next to its item id, cell, and raw row, so the client can name the
+   item a move targets. A key that is not a positive integer is recorded as
+   having no addressable index and is **never coerced** (coercing to 0 would
+   address a different row); moving such a placement is refused with an explicit
+   reason.
+2. **Arming** — selecting a placed building enables a `Move` action in the move
+   surface's own UI-foundation slot (beside the build picker and the shop, both
+   untouched). Pressing it arms the move with that building's current cell as
+   the starting target.
+3. **Preview** — the pointer's world point inverse-projects to a grid cell
+   through the same iso projection the placement flow uses, and the existing
+   footprint preview shows the footprint with the moving building's **own cells
+   excluded** from occupancy. A target is marked invalid — and never sent — when
+   the anchor is outside the `0..99` grid (`out_of_grid`), when the footprint
+   covers another placement (`occupied`), or when it is the cell the building
+   already occupies (`same_cell`).
+4. **Confirm** — exactly one `GameApi.move_building(user_id, item_index, x, y)`
+   intent. On success only the authoritative response is applied: the typed row
+   is replaced by the response's persisted entry, the same rendered object
+   repositions at the new cell and is re-sorted with the existing depth
+   comparator, and HUD resources and XP take the response values. A failed
+   apply rolls every write back; a structured or transport failure surfaces its
+   code and moves nothing.
+
+### Endpoint contract and envelope derivations
+
+`POST /v0/move` accepts only the intent `{user_id, item_index, x, y}` — the
+full contract, response example, structured error codes, validation split, and
+corpus-only persistence scope are documented in `apps/compat-api/README.md`. The
+endpoint resolves `item_index` against the save before executing (legacy's
+missing-item path is a silent early return that would otherwise be reported as
+success), and the legacy batch envelope is derived server-side and marked
+**derived-provisional**: one `move` command with arguments
+`[item_index, x, y, frame, string]`, the `frame`/`string` placeholders legacy
+reads and discards, and a **neutral** all-zero resource vector, plus the shared
+placeholders `accessToken=""`, `publishActions=[]`, `tries=1`,
+`first_number=0`. The config records no move price anywhere (item `cost` and
+`cost_type` are dead fields over all 778 items, `costs` prices the purchase
+only, and no global holds a move cost), so no price is derivable and a
+client-sent one is never accepted — the service claims neither that moving is
+free in the legacy client nor that it costs anything. Validation split (design
+D5): the client owns the gameplay rules (bounds, occupancy, no-op) and the
+endpoint owns structural fail-closed input validity only; authoritative
+validation belongs to Server v1 (M13). The response reuses the placement
+superset shape (`result` + the persisted eight-field `placement` entry +
+`resources`), so the typed result and its parser are shared with `/v0/place`.
+
+### Verification (commands actually executed)
+
+```bash
+# Move fixture capture (one-shot, executed-legacy oracle): the exact command,
+# exit codes, and containment are recorded in
+# tests/fixtures/godot-building-move/README.md
+python -B apps/compat-api/capture_move_fixture.py
+
+# Move envelope + endpoint + executed-legacy parity tests (inside the compat
+# suite; observed: Ran 227 tests ... OK, exit 0)
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+
+# The hermetic move-flow suite standalone (observed: 288 checks, PASS)
+godot --headless --path apps/client-godot --script res://tests/test_town_move.gd
+
+# Full batteries in the final state (each embeds the move suites and the
+# move-live phase; both observed exit 0)
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+```
+
+`verify-boot.ps1` includes the hermetic `test_town_move` suite (the move flow
+over the fake double — arming from a selection, an unaddressable-placement
+refusal, one request per confirm, every invalid-target refusal, the
+authoritative apply, and transport/structured-failure rollback) and a sixth live
+phase `move-live`, which starts the Compatibility API over a disposable corpus,
+sends one intent through `POST /v0/move`, asserts the typed response, and — via
+`compat_live_phase.py --expect-save-mutation` — asserts a corpus save file
+actually mutated, then tears down asserting the port is released, the corpus is
+removed, and no working-tree `saves/` exists.
+
+### Evidence capture (two-step, as the delivered slices)
+
+```bash
+# 1. Windowed fake-API launch: boot -> town, select the Turret I at slot 11,
+#    arm the move, preview (58, 47), confirm, then capture the frame (writes
+#    building-move.png at the legacy 1400x600 stage, exits 0; a failed flow
+#    exits 1 with an explicit [town] move-capture state=error marker)
+godot --path apps/client-godot res://scenes/boot.tscn -- --gameapi=fake --move-capture=<repo>/apps/client-godot/evidence/building-move/building-move.png
+
+# 2. Headless deterministic report (writes report.json; a rerun is
+#    byte-identical; the bare --move-report flag defaults to
+#    evidence/building-move/report.json)
+godot --headless --path apps/client-godot res://scenes/town.tscn -- --move-report=<repo>/apps/client-godot/evidence/building-move/report.json
+```
+
+The report (`schema move-report-v1`) records the inputs and digests, the intent
+`{user_id, item_index: 11, x: 58, y: 47}`, the moved building (Turret I, slot
+11) with its cell `(58, 48)` → `(58, 47)` and its row before and after, counts
+before/after (40 placements and objects — a move never changes how many
+buildings a town has), resources before/after (unchanged), the
+projection-constants pointer, the bootstrap and move request counts (exactly one
+each), and the fake-capture pointer.
+
+### Move claim limits
+
+- no Flash, Ruffle, ActionScript, or browser executed;
+- the move command's argument values, the `frame`/`string` arguments legacy
+  discards, and the neutral price vector are derived, never observed from the
+  Flash client — no claim is made about what moving costs in the legacy client;
+- parity covers one recorded transaction against the fresh-player corpus, not
+  progressed players and no other row;
+- occupancy, the no-op cell, and grid bounds are client-side display rules only;
+  the endpoint enforces structural validity and there is no server-authoritative
+  validation;
+- an unaddressable legacy key is never coerced, so such a placement cannot be
+  moved through this flow;
+- no pixel-parity oracle against the legacy client exists, and the move surface's
+  layout and labels are documented placeholders;
+- the committed capture runs the fake GameApi — a deterministic test double, not
+  a parity oracle.
+
+These non-claims are recorded verbatim in
+`evidence/building-move/report.json`.
+Remaining deliver lines of M7 (separate changes): sell, store, upgrade, build
+timers, income, expansion, resources, and XP.

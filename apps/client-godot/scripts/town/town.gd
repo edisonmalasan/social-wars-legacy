@@ -56,11 +56,28 @@ extends Node2D
 ## provenance — so reruns are byte-identical. Any failure prints an
 ## explicit `[town] report state=error` marker and exits 1.
 ##
-## The placement and purchase evidence steps mirror that pattern exactly
-## one level down: `--placement-capture=<path>` / `--purchase-capture=<path>`
-## drive their flow (picker / shop) before the frame is written, and
-## `--placement-report=<path>` / `--purchase-report=<path>` write their
-## deterministic `placement-report-v1` / `purchase-report-v1` reports.
+## The placement, purchase, and move evidence steps mirror that pattern
+## exactly one level down: `--placement-capture=<path>` /
+## `--purchase-capture=<path>` / `--move-capture=<path>` drive their flow
+## (picker / shop / selection-then-move) before the frame is written, and
+## `--placement-report=<path>` / `--purchase-report=<path>` /
+## `--move-report=<path>` write their deterministic `placement-report-v1` /
+## `purchase-report-v1` / `move-report-v1` reports.
+##
+## Move mode (building-move, spec "Move flow"): a move surface in its OWN
+## UI-foundation slot, armed from the delivered selection path — selecting a
+## placed building that has an addressable legacy key offers a `Move`
+## action, and pressing it arms the move. The armed surface reuses the
+## existing footprint preview over the shared iso projection with the moving
+## building's own cells excluded from the occupancy check, a confirm that
+## sends exactly one intent through GameApi, and an apply that trusts only
+## the authoritative response: the same rendered object repositioned at the
+## response's cell and re-sorted in depth order, the typed row replaced by
+## the response's persisted entry, HUD resources from the response — with
+## every write rolled back if any step fails. Invalid targets and the
+## building's current cell are refused locally with an explicit reason and
+## NO request (design D5: the client owns the gameplay rules the legacy
+## server never enforced). The move requires no purchase.
 
 const Iso = preload("res://scripts/town/iso.gd")
 const TownState = preload("res://scripts/town/town_state.gd")
@@ -76,6 +93,7 @@ const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const PlacementCatalog = preload("res://scripts/town/placement_catalog.gd")
 const PlacementFlow = preload("res://scripts/town/placement_flow.gd")
 const ShopFlow = preload("res://scripts/town/shop_flow.gd")
+const MoveFlow = preload("res://scripts/town/move_flow.gd")
 
 ## Report-mode inputs and captures (repository-relative paths; the
 ## fixture paths mirror the fake GameApi's own committed constants and
@@ -128,6 +146,30 @@ const PLACEMENT_INTENT_ORIENTATION := 0
 ## executed-legacy fixture's transaction, driven through the same shop flow
 ## a player uses.
 const PURCHASE_INTENT_ITEM := 105
+## Move evidence (building-move, design D9): the executed-legacy move
+## fixture the parity suite replays and the committed fake capture the move
+## report points at (repository-relative).
+const REPORT_MOVE_REQUEST := \
+	"tests/fixtures/godot-building-move/steps/command_move/request.json"
+const REPORT_MOVE_RESPONSE := \
+	"tests/fixtures/godot-building-move/steps/command_move/response.body"
+const REPORT_MOVE_AFTER := \
+	"tests/fixtures/godot-building-move/steps/command_move/after.json"
+const REPORT_CAPTURE_MOVE := \
+	"apps/client-godot/evidence/building-move/building-move.png"
+## Default move report destination for the bare `--move-report` flag
+## (project-relative, resolved against the project directory).
+const DEFAULT_MOVE_REPORT_PATH := "evidence/building-move/report.json"
+## The single move intent the move evidence records: Turret I (item 22) at
+## legacy map key 11, from its saved cell (58,48) to (58,47) — the
+## executed-legacy fixture's transaction, driven through the same
+## selection -> arm -> preview -> confirm flow a player uses. The target is
+## the fixture's documented derived rule (the Manhattan-nearest free
+## one-step neighbour, ties broken row-major).
+const MOVE_INTENT_INDEX := 11
+const MOVE_INTENT_ITEM := 22
+const MOVE_INTENT_FROM := Vector2i(58, 48)
+const MOVE_INTENT_TO := Vector2i(58, 47)
 ## Default placement report destination for the bare
 ## `--placement-report` flag (project-relative, resolved against the
 ## project directory).
@@ -199,6 +241,31 @@ const PURCHASE_NON_CLAIMS := [
 		+ "enforces structural input validity",
 ]
 
+## The move evidence's explicit non-claims (spec "Move evidence and claim
+## limits"): the carried-forward claims, the derived argument values, the
+## arguments legacy discards, the neutral price vector, the one-transaction
+## parity scope, the client-only validation split, the no-pixel-parity
+## claim, and the fake-capture pointer. The runtime tokens in the first
+## claim are assembled from fragments for the same project-scope reason as
+## the lists above.
+const MOVE_NON_CLAIMS := [
+	"no Flash, " + "Ruf" + "fle" + ", " + "Action" + "Script"
+		+ ", or browser executed",
+	"the command's argument values, the arguments the legacy branch "
+		+ "discards, and the neutral price vector are derived, never "
+		+ "observed from the Flash client; no claim is made about what "
+		+ "moving costs in the legacy client",
+	"parity covers one recorded transaction against the fresh-player "
+		+ "corpus, not progressed players",
+	"occupancy, the no-op cell, and grid-bounds rules are enforced "
+		+ "client-side only; the endpoint enforces structural input "
+		+ "validity and no server-authoritative validation exists",
+	"no pixel-parity oracle against the legacy client exists",
+	"the capture runs the fake GameApi implementation; real-execution "
+		+ "parity is established by the fixture-replay tests and the "
+		+ "verify-boot move-live phase",
+]
+
 ## View states (spec: never claim a rendered town without one).
 const STATE_EMPTY := "empty"
 const STATE_BUILT := "built"
@@ -214,12 +281,20 @@ const SLOT_PLACEMENT := "placement"
 ## fail-closed catalog"). Beside the picker, never inside it (design D8):
 ## the two surfaces own separate slots, entries, and lifecycle.
 const SLOT_SHOP := "shop"
+## UI-foundation slot the move surface occupies (building-move, design D8).
+## Its OWN slot beside the picker and the shop: the move's flow, selection,
+## and preview state are never the picker's or the shop's, and neither
+## delivered surface is modified by it.
+const SLOT_MOVE := "move"
 ## Picker panel width in pixels (provisional presentation — no legacy
 ## picker layout has been captured).
 const PLACEMENT_PANEL_WIDTH := 300.0
 ## Shop panel width in pixels (provisional presentation for the same
 ## reason).
 const SHOP_PANEL_WIDTH := 300.0
+## Move panel width in pixels (provisional presentation for the same
+## reason).
+const MOVE_PANEL_WIDTH := 300.0
 ## The storage readout's indicator lines: the payload carried no storage
 ## field at all (design D7 — the missing field is named, never presented as
 ## an empty inventory), and the payload carried a storage object with no
@@ -279,6 +354,28 @@ var _shop_status: Variant = null
 ## The storage readout container (null while no panel is built).
 var _shop_storage: Variant = null
 
+## Move flow (building-move, spec "Move flow"). The surface is BESIDE the
+## picker and the shop (design D8): it owns its own UI-foundation slot, its
+## own status line, and its own preview evaluation, and it never touches the
+## picker's or the shop's state. It is ARMED FROM THE SELECTION PATH
+## (design D8): selecting an addressable placed building offers a `Move`
+## action, and pressing it enters move mode with that building's footprint
+## previewed through the same iso projection and `placement_preview`
+## overlay the picker uses — with the moving building's own cells excluded
+## from the occupancy check.
+var move_error := ""
+var _move_active := false
+## The placement being moved (TownState.Placement or null). The
+## SAME instance the state holds, so the pure helper's identity-based
+## exclusion of its own cells stays correct.
+var _move_placement: Variant = null
+## The committed preview evaluation ({ok, error, valid, reason, cells, …});
+## empty while no target is committed.
+var _move_evaluation: Dictionary = {}
+var _move_cell := Vector2i.ZERO
+## The move panel's status label (null while no panel is built).
+var _move_status: Variant = null
+
 ## Visual hierarchy + texture caches (shared across rebuilds of this view).
 var _visuals := TownVisuals.new()
 ## The committed HUD builder once attached.
@@ -296,6 +393,10 @@ var _placement_capture := false
 ## shop flow runs before the capture so the frame shows the town whose
 ## storage readout carries the purchased item.
 var _purchase_capture := false
+## True when the capture flag was `--move-capture=` (building-move, design
+## D9): the move flow runs before the capture so the frame shows the town
+## containing the building at its new cell.
+var _move_capture := false
 
 @onready var terrain: TownTerrain = $Terrain
 @onready var objects_layer: Node2D = $Objects
@@ -331,14 +432,26 @@ func _ready() -> void:
 			and get_script().resource_path == "res://scripts/town/town.gd":
 		await _write_purchase_report(purchase_report_path)
 		return
+	# The move report shares the same scene-own-script gate: the nested slice
+	# instance must fall through to its committed-state build instead of
+	# re-entering any report flow.
+	var move_report_path := _move_report_path_arg()
+	if not move_report_path.is_empty() \
+			and get_script().resource_path == "res://scripts/town/town.gd":
+		await _write_move_report(move_report_path)
+		return
 	_capture_path = _user_arg("--town-capture=")
 	_purchase_capture = false
+	_move_capture = false
 	if _capture_path.is_empty():
 		_capture_path = _user_arg("--placement-capture=")
 		_placement_capture = not _capture_path.is_empty()
 	if _capture_path.is_empty():
 		_capture_path = _user_arg("--purchase-capture=")
 		_purchase_capture = not _capture_path.is_empty()
+	if _capture_path.is_empty():
+		_capture_path = _user_arg("--move-capture=")
+		_move_capture = not _capture_path.is_empty()
 	if state != null:
 		build()
 	_maybe_start_capture()
@@ -1354,6 +1467,584 @@ func _shop_reject(code: String, message: String) -> Dictionary:
 	return {"ok": false, "error": shop_error, "code": code}
 
 
+# ---------------------------------------------------------------------------
+# Move flow (building-move, spec "Move flow")
+# ---------------------------------------------------------------------------
+
+
+## True while the move surface is armed.
+func move_active() -> bool:
+	return _move_active
+
+
+## The placement the armed move targets (TownState.Placement or null).
+func move_placement() -> Variant:
+	return _move_placement
+
+
+## The addressable index the armed move names (-1 when unaddressable or
+## unarmed) — the item index a move intent carries.
+func move_slot() -> int:
+	if _move_placement == null:
+		return TownState.NO_SLOT
+	return int(_move_placement.slot)
+
+
+## The overlay's committed cells for the armed move (anchor order; [] when
+## hidden).
+func move_preview_cells() -> Array:
+	var preview: Variant = _placement_preview()
+	return [] if preview == null else preview.cells
+
+
+## The overlay's committed validity for the armed move (false while hidden).
+func move_preview_valid() -> bool:
+	var preview: Variant = _placement_preview()
+	return preview != null and preview.target_valid
+
+
+## True while a footprint preview is displayed for the armed move.
+func move_preview_shown() -> bool:
+	var preview: Variant = _placement_preview()
+	return preview != null and preview.is_shown()
+
+
+## The armed move's committed evaluation (empty while no target is
+## committed) — the same evaluation the confirm reads.
+func move_evaluation() -> Dictionary:
+	return _move_evaluation
+
+
+## True when the current selection is a placed building a move intent can
+## name (spec "Placements carry their legacy key": an unaddressable key is
+## never coerced, so it is never offered). False with no selection.
+func move_selection_available() -> bool:
+	if selected == null or not (selected is TownObject):
+		return false
+	var object: TownObject = selected
+	return TownState.is_addressable(object.placement)
+
+
+## Arms the move on the current selection (spec "the player selects a placed
+## building, arms the move"). Fail-closed: an unbuilt view, no selection, a
+## selection that is not a placement, an unaddressable legacy key, an
+## already-armed move, or a missing panel each reject with an explicit error
+## naming the condition; a successful arm resets the mode-local target,
+## previews the building's CURRENT footprint through the shared overlay (so
+## the player sees what is being moved), and commits the panel into its own
+## UI-foundation slot.
+##
+## It is armed from the selection path only (design D8) and adds no state
+## and no request: nothing leaves the client until a confirm.
+func arm_move() -> Dictionary:
+	if view_state != STATE_BUILT:
+		return _move_reject("town_not_built", "the town view is not built")
+	if _move_active:
+		return _move_reject("move_already_active", "the move is already armed")
+	if selected == null:
+		return _move_reject("move_no_selection",
+			"no placed building is selected")
+	if not (selected is TownObject):
+		return _move_reject("move_no_selection",
+			"the selection is not a placed building")
+	var object: TownObject = selected
+	var placement: Variant = object.placement
+	if not (placement is TownState.Placement):
+		return _move_reject("move_no_selection",
+			"the selected object carries no typed placement")
+	if not TownState.is_addressable(placement):
+		# Design D7: refused by name. The index is never coerced, because a
+		# coerced index would address a different row.
+		return _move_reject(MoveFlow.REASON_UNADDRESSABLE,
+			"the selected placement's save key '%s' is not a positive integer"
+			% str(placement.slot_key))
+	_move_active = true
+	_move_placement = placement
+	_move_evaluation = {}
+	_move_cell = Vector2i.ZERO
+	move_error = ""
+	var panel := _build_move_panel(true)
+	if not bool(panel.get("ok", false)):
+		return _move_reject("move_panel", str(panel.get("error", "")))
+	var overlay: Variant = _placement_preview()
+	if overlay != null:
+		# The building's current footprint, so the armed state shows what is
+		# being moved before any target is committed.
+		overlay.show_cells(MoveFlow.footprint_cells(placement.cell,
+			placement.footprint), true)
+	if ui != null and ui.has_slot(SLOT_MOVE) \
+			and not ui.is_slot_visible(SLOT_MOVE):
+		ui.set_slot_visible(SLOT_MOVE, true)
+	_refresh_move_panel()
+	return {"ok": true, "error": "", "slot": int(placement.slot),
+		"item": int(placement.item)}
+
+
+## The selection-path `Move` action (design D8). Selecting a placed building
+## that has an addressable legacy key offers a `Move` button in the move
+## surface's own slot; pressing it arms the move. Fail-closed and purely
+## presentational: an unbuilt view, or a selection the move flow refuses,
+## disables the action and names the reason rather than hiding the state, so
+## a player learns why an unaddressable row cannot be moved (design D7). It
+## adds no state and no request of its own and never alters the delivered
+## selection behavior.
+func refresh_move_action() -> Dictionary:
+	if view_state != STATE_BUILT or ui == null:
+		return _move_reject("town_not_built", "the town view is not built")
+	var panel := _build_move_panel(false)
+	if not bool(panel.get("ok", false)):
+		return _move_reject("move_panel", str(panel.get("error", "")))
+	_refresh_move_panel()
+	if not _move_active and selected != null:
+		ui.set_slot_visible(SLOT_MOVE, true)
+	return {"ok": true, "error": ""}
+
+
+## Renders the move panel's current state into its committed controls (the
+## selection line, the status line, and the arm action's availability) so
+## the panel text always names the live selection. A no-op while no panel is
+## built.
+func _refresh_move_panel() -> void:
+	var arm_button: Variant = _move_panel_button("move")
+	if arm_button is Button:
+		var available := move_selection_available()
+		(arm_button as Button).disabled = _move_active or not available
+		(arm_button as Button).text = "Move" if available \
+			else "Move (unavailable)"
+	if _move_status == null or not is_instance_valid(_move_status):
+		return
+	if not _move_active:
+		if selected == null:
+			_set_move_status("select a placed building to move it")
+		elif not move_selection_available():
+			var chosen: Variant = selected.placement
+			_set_move_status("not movable: save key '%s' is not a positive "
+				% str(chosen.slot_key)
+				+ "integer, so no move can name this row")
+		else:
+			_set_move_status("selected %s (save key %d): press Move"
+				% [_move_label(selected.placement),
+					int(selected.placement.slot)])
+		return
+	if _move_placement is TownState.Placement:
+		_set_move_status("armed: %s (save key %d) at (%d, %d) | free: no price"
+			% [_move_label(_move_placement), int(_move_placement.slot),
+				_move_placement.cell.x, _move_placement.cell.y])
+
+
+## The named button anywhere inside the move panel (the action row nests the
+## arm/confirm/cancel trio), or null.
+func _move_panel_button(button_name: String) -> Variant:
+	if ui == null or not ui.has_slot(SLOT_MOVE):
+		return null
+	var root: Control = ui.slot_root(SLOT_MOVE)
+	if root == null or root.get_child_count() == 0:
+		return null
+	return _named_button(root.get_child(0) as Node, button_name)
+
+
+## The named button inside one panel subtree, or null.
+func _named_button(panel: Node, button_name: String) -> Variant:
+	for child: Variant in panel.get_children():
+		if child is Button and String((child as Button).name) == button_name:
+			return child
+		if child is Node:
+			var nested: Variant = _named_button(child as Node, button_name)
+			if nested != null:
+				return nested
+	return null
+
+
+## Commits a preview target (spec "previews a free in-grid cell ... with a
+## footprint preview"): the overlay shows the footprint colored by validity
+## — with the moving building's own cells excluded from occupancy, so a
+## target overlapping only itself stays valid — the status names the reason
+## while invalid, and the evaluation is returned for assertions. Invalid
+## targets are shown and marked, never sent.
+func preview_move_cell(cell: Vector2i) -> Dictionary:
+	if not _move_active:
+		return _move_reject("move_not_active", "the move is not armed")
+	if _move_placement == null:
+		return _move_reject("move_no_selection", "no building is selected")
+	var evaluation: Dictionary = MoveFlow.preview(state, _move_placement, cell)
+	if not bool(evaluation.get("ok", false)):
+		return _move_reject("preview_unavailable",
+			str(evaluation.get("error", "")))
+	_move_cell = cell
+	_move_evaluation = evaluation
+	var overlay: Variant = _placement_preview()
+	if overlay != null:
+		overlay.show_cells(evaluation["cells"], bool(evaluation["valid"]))
+	var target := "%s at (%d, %d)" % [_move_label(_move_placement), cell.x,
+		cell.y]
+	if bool(evaluation["valid"]):
+		_set_move_status("move: %s | free: no price" % target)
+	else:
+		_set_move_status("move: %s | invalid: %s"
+			% [target, MoveFlow.refusal_text(evaluation)])
+	return evaluation
+
+
+## Left press in move mode: converts to a cell and previews it; a press off
+## the ground drops the target without leaving the mode (the selection path
+## clears the same way).
+func handle_move_press(world_point: Vector2) -> Dictionary:
+	if not _move_active:
+		return _move_reject("move_not_active", "the move is not armed")
+	if not world_point.is_finite():
+		return _move_reject("non_finite_press", "the press is not finite")
+	var grid: Dictionary = Iso.screen_to_grid(world_point)
+	if not bool(grid.get("ok", false)):
+		_move_cell = Vector2i.ZERO
+		_move_evaluation = {}
+		var overlay: Variant = _placement_preview()
+		if overlay != null:
+			overlay.clear()
+		_set_move_status("no target")
+		return {"ok": true, "error": "", "cleared": true}
+	return preview_move_cell(grid["cell"])
+
+
+## Sends exactly one move intent (spec "confirms exactly one intent") and
+## applies only the authoritative response. Nothing is sent unless the mode,
+## a selected placement, a valid target, an active session, and a registered
+## API are all committed: an invalid target, a missing session, or a missing
+## API rejects locally with the explicit error and NO request (design D5 —
+## these are the gameplay rules the client owns). A structured or transport
+## failure surfaces its code with nothing moved. Awaits the GameApi call.
+func confirm_move() -> Dictionary:
+	if not _move_active:
+		return _move_reject("move_not_active", "the move is not armed")
+	if _move_placement == null:
+		return _move_reject("move_no_selection", "no building is selected")
+	if _move_evaluation.is_empty():
+		return _move_reject("move_no_target",
+			"no preview target is committed")
+	if not bool(_move_evaluation.get("valid", false)):
+		return _move_reject("invalid_target",
+			MoveFlow.refusal_text(_move_evaluation))
+	var session: Variant = get_node_or_null("/root/Session")
+	if session == null or not session.is_active() \
+			or str(session.user_id()).strip_edges() == "":
+		return _move_reject("session_unavailable",
+			"no active save to move in")
+	var api: Variant = get_node_or_null("/root/GameApi")
+	if api == null:
+		return _move_reject("gameapi_unavailable",
+			"the GameApi autoload is not registered")
+	# The intent carries the legacy index and the target cell and nothing
+	# else — no price, no orientation, no resource delta (design D3).
+	var response: Variant = await api.move_building(session.user_id(),
+		int(_move_placement.slot), _move_cell.x, _move_cell.y)
+	if not (response is BootData.PlacementResult):
+		return _move_reject("bad_response",
+			"GameApi returned no typed placement result")
+	var typed: BootData.PlacementResult = response
+	if not typed.ok:
+		# Structured or transport failure: one contract — the explicit
+		# error names the code and message, nothing was applied.
+		move_error = "[town] move failed: %s: %s" % [
+			typed.error_code, typed.error_message]
+		_set_move_status(move_error)
+		return {"ok": false, "error": move_error, "code": typed.error_code}
+	var applied: Dictionary = _apply_move(typed)
+	if not bool(applied.get("ok", false)):
+		return _move_reject("apply_failed", str(applied.get("error", "")))
+	move_error = ""
+	_move_evaluation = {}
+	_move_cell = Vector2i.ZERO
+	var overlay: Variant = _placement_preview()
+	if overlay != null:
+		overlay.clear()
+	_set_move_status("moved %s to (%d, %d)" % [_move_label(_move_placement),
+		typed.placement.x, typed.placement.y])
+	return {"ok": true, "error": "", "result": typed}
+
+
+## Applies the authoritative response (design D4/D7): the SAME rendered
+## object is repositioned to the response's cell and re-sorted with the
+## existing depth comparator, the typed row is replaced by the response's
+## persisted eight-field entry, and the stored resources and XP take the
+## response's values (never a computed delta) with the HUD re-attached. The
+## placement count never changes: a move rewrites one row in place. Pre-
+## checks run before any mutation; the only post-mutation failure — a
+## rejected HUD re-attach — rolls EVERY write back (cell, row, resources,
+## XP, and the object's draw order), so a failed apply changes nothing.
+func _apply_move(result: BootData.PlacementResult) -> Dictionary:
+	if state == null:
+		return {"ok": false, "error": "the town state is unavailable"}
+	if ui == null or _hud == null:
+		return {"ok": false, "error": "the town HUD is not attached"}
+	if _move_placement == null \
+			or not (_move_placement is TownState.Placement):
+		return {"ok": false, "error": "no typed placement is being moved"}
+	var entry: BootData.Placement = result.placement
+	var resources: BootData.Resources = result.resources
+	if entry == null or resources == null:
+		return {"ok": false, "error": "the move response is incomplete"}
+	var placement: TownState.Placement = _move_placement
+	if not (placement in state.placements):
+		return {"ok": false,
+			"error": "the moving placement is not part of the town state"}
+	# The object to reposition: the rendered node of THIS placement, found by
+	# identity so the very object the player selected is the one moved.
+	var object: Variant = null
+	for candidate: Variant in objects:
+		if candidate != null and candidate.placement == placement:
+			object = candidate
+			break
+	if object == null:
+		return {"ok": false,
+			"error": "the moving placement has no rendered object"}
+	var previous := {
+		"cell": placement.cell,
+		"raw": placement.raw.duplicate(),
+		"timestamp": placement.timestamp,
+		"orientation": placement.orientation,
+		"store": placement.store,
+		"attr": placement.attr,
+		"player": placement.player,
+		"object_cell": object.cell,
+		"order": (objects as Array).duplicate(),
+		"coins": state.resources.coins,
+		"wood": state.resources.wood,
+		"steel": state.resources.steel,
+		"oil": state.resources.oil,
+		"cash": state.resources.cash,
+		"mana": state.resources.mana,
+		"xp": state.summary.xp,
+	}
+	# The response's persisted entry replaces the typed row verbatim; the
+	# legacy key, save order, and resolved content are the placement's own —
+	# a move rewrites coordinates, never identity.
+	placement.item = entry.item_id
+	placement.cell = Vector2i(entry.x, entry.y)
+	placement.timestamp = entry.timestamp
+	placement.orientation = entry.orientation
+	placement.store = entry.store
+	placement.attr = entry.attr
+	placement.player = entry.player
+	placement.raw = [entry.item_id, entry.x, entry.y, entry.timestamp,
+		entry.orientation, entry.store, entry.attr, entry.player]
+	# The same object repositions: its rendered node moves to the response's
+	# footprint rect and it is re-sorted into the committed draw order with
+	# the existing depth comparator (design D8's rollback structure, applied
+	# to a move).
+	object.cell = placement.cell
+	object.position = Iso.footprint_rect(placement.cell,
+		object.footprint.x, object.footprint.y).position
+	_resort_objects()
+	state.resources.coins = resources.gold
+	state.resources.wood = resources.wood
+	state.resources.steel = resources.steel
+	state.resources.oil = resources.oil
+	state.resources.cash = resources.cash
+	state.resources.mana = resources.mana
+	state.summary.xp = resources.xp
+	var hud_result: Dictionary = _hud.attach(ui, state)
+	if not bool(hud_result.get("ok", false)):
+		# Roll every mutation back: a failed apply changes nothing.
+		placement.cell = previous["cell"]
+		placement.raw = previous["raw"]
+		placement.timestamp = previous["timestamp"]
+		placement.orientation = previous["orientation"]
+		placement.store = previous["store"]
+		placement.attr = previous["attr"]
+		placement.player = previous["player"]
+		object.cell = previous["object_cell"]
+		object.position = Iso.footprint_rect(object.cell, object.footprint.x,
+			object.footprint.y).position
+		objects = previous["order"]
+		_sync_object_order()
+		state.resources.coins = previous["coins"]
+		state.resources.wood = previous["wood"]
+		state.resources.steel = previous["steel"]
+		state.resources.oil = previous["oil"]
+		state.resources.cash = previous["cash"]
+		state.resources.mana = previous["mana"]
+		state.summary.xp = previous["xp"]
+		return {"ok": false, "error": str(hud_result.get("error", ""))}
+	# The response supplies values the payload may have lacked.
+	for key in ["coins", "wood", "steel", "oil", "cash", "mana"]:
+		state.missing.erase(key)
+	state.missing.erase("xp")
+	return {"ok": true, "error": ""}
+
+
+## Closes the armed move without sending anything: mode-local selection,
+## target, and overlay drop, the slot hides, and the town state, the
+## committed selection, and the resources stay byte-identical.
+func cancel_move() -> Dictionary:
+	if not _move_active:
+		return _move_reject("move_not_active", "the move is not armed")
+	_move_active = false
+	_move_placement = null
+	_move_evaluation = {}
+	_move_cell = Vector2i.ZERO
+	var overlay: Variant = _placement_preview()
+	if overlay != null:
+		overlay.clear()
+	if ui != null and ui.has_slot(SLOT_MOVE) \
+			and ui.is_slot_visible(SLOT_MOVE):
+		ui.set_slot_visible(SLOT_MOVE, false)
+	_set_move_status("move closed")
+	return {"ok": true, "error": "", "cancelled": true}
+
+
+## Builds the move panel into its OWN UI-foundation slot (registered once,
+## contents replaced per arm — the picker/shop/HUD attach precedent). The
+## panel is hidden while building; `arm_move` shows it once committed.
+## Fail-closed envelope: a rejected registration or missing slot root
+## returns {ok:false} and commits no visible panel.
+func _build_move_panel(armed: bool) -> Dictionary:
+	if ui == null:
+		return {"ok": false, "error": "the UI foundation is unavailable"}
+	if not ui.has_slot(SLOT_MOVE):
+		var registration: Dictionary = ui.register_slot(SLOT_MOVE)
+		if not bool(registration.get("ok", false)):
+			return {"ok": false,
+				"error": str(registration.get("error", "rejected"))}
+	if ui.is_slot_visible(SLOT_MOVE):
+		ui.set_slot_visible(SLOT_MOVE, false)
+	var root: Control = ui.slot_root(SLOT_MOVE)
+	if root == null:
+		return {"ok": false, "error": "the move slot root is unavailable"}
+	for child in root.get_children():
+		root.remove_child(child)
+		child.free()
+	_move_status = null
+	var panel := VBoxContainer.new()
+	panel.name = "move"
+	panel.anchor_left = 1.0
+	panel.anchor_right = 1.0
+	panel.offset_left = -MOVE_PANEL_WIDTH
+	panel.offset_right = -8.0
+	panel.offset_top = 8.0
+	panel.offset_bottom = -8.0
+	panel.add_theme_constant_override("separation", 2)
+	root.add_child(panel)
+	var title := Label.new()
+	title.name = "title"
+	title.text = "Move"
+	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_style_placement_label(title)
+	panel.add_child(title)
+	var selection := Label.new()
+	selection.name = "selection"
+	selection.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	selection.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_style_placement_label(selection)
+	panel.add_child(selection)
+	# The move requires NO purchase (spec "Moving SHALL NOT require or
+	# perform a purchase"), so the panel states the derived neutral price
+	# rather than showing one. `_refresh_move_panel` rewrites this line from
+	# the live selection; the initial text names the armed placement when
+	# there is one, and the selection instruction otherwise.
+	selection.text = "select a placed building to move it" if not armed \
+		else "moving: %s | price: free (derived, never observed)" \
+			% _move_label(_move_placement)
+	var status := Label.new()
+	status.name = "status"
+	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	status.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_style_placement_label(status)
+	panel.add_child(status)
+	_move_status = status
+	var row := HBoxContainer.new()
+	row.name = "actions"
+	# The selection-path arm action (design D8): a `Move` button the player
+	# presses after selecting a placed building.
+	var arm := Button.new()
+	arm.name = "move"
+	arm.text = "Move"
+	arm.pressed.connect(_on_move_action)
+	row.add_child(arm)
+	# The confirm exists only while armed: unarmed, the surface offers the
+	# arm action alone, so no confirm can be pressed before a target.
+	var confirm := Button.new()
+	confirm.name = "confirm"
+	confirm.text = "Move here"
+	confirm.pressed.connect(_on_move_confirm)
+	row.add_child(confirm)
+	if not armed:
+		confirm.visible = false
+	var cancel := Button.new()
+	cancel.name = "cancel"
+	cancel.text = "Cancel"
+	cancel.pressed.connect(_on_move_cancel)
+	row.add_child(cancel)
+	panel.add_child(row)
+	return {"ok": true, "error": ""}
+
+
+## Writes the move panel's status line (no-op before a panel exists).
+func _set_move_status(text: String) -> void:
+	if _move_status != null and is_instance_valid(_move_status):
+		(_move_status as Label).text = text
+
+
+## The moving placement's display label: the resolved content name when one
+## exists, the raw legacy id otherwise (never a guessed name).
+func _move_label(placement: Variant) -> String:
+	if placement == null or not (placement is TownState.Placement):
+		return "the selected building"
+	var typed: TownState.Placement = placement
+	if typed.name != "":
+		return "%s (item %d)" % [typed.name, int(typed.item)]
+	return "item %d" % int(typed.item)
+
+
+## The house move failure envelope: records the explicit error naming the
+## code and condition, shows it in the move status when armed, and returns
+## {ok:false} without touching town state, selection, resources, or the
+## committed draw order.
+func _move_reject(code: String, message: String) -> Dictionary:
+	move_error = "[town] move rejected: %s: %s" % [code, message]
+	_set_move_status(move_error)
+	return {"ok": false, "error": move_error, "code": code}
+
+
+## Re-sorts the committed draw order with the existing depth comparator
+## (depth, then grid y, then grid x, then save order) and syncs the
+## objects layer's child order to it, so the rendered z-order stays exactly
+## what a full rebuild would produce after the move.
+func _resort_objects() -> void:
+	objects.sort_custom(_object_depth_less)
+	_sync_object_order()
+
+
+## The objects layer's children follow the committed `objects` order.
+func _sync_object_order() -> void:
+	for index in range(objects.size()):
+		objects_layer.move_child(objects[index], index)
+
+
+## Depth comparator over rendered objects (the town build's `_depth_less`
+## applied to each object's placement, so one rule orders both the build
+## and the move).
+func _object_depth_less(a: Variant, b: Variant) -> bool:
+	return _depth_less(a.placement, b.placement)
+
+
+## Move button wiring: confirm sends (awaits the one intent).
+func _on_move_confirm() -> void:
+	await confirm_move()
+
+
+## Move button wiring: cancel closes with no request.
+func _on_move_cancel() -> void:
+	cancel_move()
+
+
+## The selection-path `Move` action (design D8): selecting an addressable
+## placed building offers this action, and pressing it arms the move. It is
+## a pure wiring step over `arm_move` — no state, no request of its own —
+## so the delivered selection behavior is unchanged: the press that
+## selected the building is the delivered one, and this action only arms.
+func _on_move_action() -> void:
+	arm_move()
+
+
 ## Shop button wiring: a press selects that entry.
 func _on_shop_pick(item_id: int) -> void:
 	pick_shop_item(item_id)
@@ -1379,6 +2070,10 @@ func _input(event: InputEvent) -> void:
 		if button.pressed and button.button_index == MOUSE_BUTTON_LEFT:
 			if _placement_active:
 				handle_placement_press(get_global_mouse_position())
+			elif _move_active:
+				# Move mode owns the press exactly as placement mode does
+				# (design D8); the picker's routing is untouched.
+				handle_move_press(get_global_mouse_position())
 			else:
 				handle_pointer_press(get_global_mouse_position())
 
@@ -1420,6 +2115,17 @@ func _reset_view() -> void:
 	if ui != null and ui.has_slot(SLOT_SHOP) \
 			and ui.is_slot_visible(SLOT_SHOP):
 		ui.set_slot_visible(SLOT_SHOP, false)
+	# The move drops with the rest of the view, in its own right (design
+	# D8): a rebuild never leaves a stale armed move, target, overlay, or
+	# status behind, and the picker's and the shop's slots are untouched.
+	_move_active = false
+	_move_placement = null
+	_move_evaluation = {}
+	_move_cell = Vector2i.ZERO
+	_move_status = null
+	if ui != null and ui.has_slot(SLOT_MOVE) \
+			and ui.is_slot_visible(SLOT_MOVE):
+		ui.set_slot_visible(SLOT_MOVE, false)
 
 
 ## Enters the explicit error state: names the failure on the view, keeps
@@ -1462,6 +2168,12 @@ func _commit_selection(object: Variant) -> void:
 	selected = object
 	if object != null:
 		object.set_selected(true)
+	# Design D8: the selection is what arms a move, so a committed selection
+	# refreshes the move surface's `Move` action. It is presentational only —
+	# the selection itself, its highlight, and the picker's routing are
+	# exactly as delivered, and arming still requires a separate press.
+	if not _move_active and view_state == STATE_BUILT:
+		refresh_move_action()
 
 
 ## Isometric depth order with the documented deterministic tie-break:
@@ -1488,6 +2200,9 @@ func _maybe_start_capture() -> void:
 	if not build_ok:
 		return
 	_capture_started = true
+	if _move_capture:
+		_capture_move_and_quit()
+		return
 	if _purchase_capture:
 		_capture_purchase_and_quit()
 		return
@@ -1592,6 +2307,65 @@ func _purchase_capture_fail(step: String, detail: String) -> void:
 	print("[town] purchase-capture state=error step=%s detail=%s" % [
 		step, detail])
 	get_tree().quit(1)
+
+
+## Move capture (building-move, design D9): drives exactly one confirmed
+## intent through the same flow a player uses — select the recorded
+## building, arm the move, preview the recorded target, confirm — and then
+## captures the town containing the building at its new cell. Any failed
+## step prints an explicit marker and exits 1 instead of capturing a town
+## that never received the move.
+func _capture_move_and_quit() -> void:
+	var object: Variant = _object_for_cell(MOVE_INTENT_FROM)
+	if object == null:
+		_move_capture_fail("select",
+			"no rendered object at the recorded cell (%d, %d)"
+			% [MOVE_INTENT_FROM.x, MOVE_INTENT_FROM.y])
+		return
+	var pressed: Dictionary = handle_pointer_press(
+		Iso.grid_to_screen(object.cell))
+	if not bool(pressed.get("ok", false)):
+		_move_capture_fail("select", str(pressed.get("error", "")))
+		return
+	if selection() != object:
+		_move_capture_fail("select",
+			"the press at (%d, %d) did not select the recorded building"
+			% [MOVE_INTENT_FROM.x, MOVE_INTENT_FROM.y])
+		return
+	var armed: Dictionary = arm_move()
+	if not bool(armed.get("ok", false)):
+		_move_capture_fail("arm", str(armed.get("error", "")))
+		return
+	var preview: Dictionary = preview_move_cell(MOVE_INTENT_TO)
+	if not bool(preview.get("valid", false)):
+		_move_capture_fail("preview", str(preview.get("reason", "")))
+		return
+	var confirmed: Dictionary = await confirm_move()
+	if not bool(confirmed.get("ok", false)):
+		_move_capture_fail("confirm", str(confirmed.get("error", "")))
+		return
+	print("[town] move-capture applied item_index=%d cell=(%d, %d) objects=%d" % [
+		int(armed.get("slot", -1)), MOVE_INTENT_TO.x, MOVE_INTENT_TO.y,
+		objects.size()])
+	_capture_and_quit()
+
+
+## A named move-capture failure: explicit marker + exit 1, so a failed flow
+## never leaves an open window or a misleading frame.
+func _move_capture_fail(step: String, detail: String) -> void:
+	print("[town] move-capture state=error step=%s detail=%s" % [
+		step, detail])
+	get_tree().quit(1)
+
+
+## The depth-topmost rendered object covering a cell (the same rule the
+## press path applies: the last object in draw order wins), or null.
+func _object_for_cell(cell: Vector2i) -> Variant:
+	var hit: Variant = null
+	for object: Variant in objects:
+		if object != null and object.contains_cell(cell):
+			hit = object
+	return hit
 
 
 ## Reads a `--<prefix><value>` user argument (boot/gd precedent).
@@ -2180,4 +2954,235 @@ func _purchase_capture_record() -> Dictionary:
 	record["parity_pointer"] = "real-execution parity is established " \
 		+ "by the fixture-replay tests and the verify-boot purchase " \
 		+ "live phase"
+	return record
+
+
+# ---------------------------------------------------------------------------
+# Move evidence report (building-move, design D9)
+# ---------------------------------------------------------------------------
+
+
+## The move report output path from the user arguments:
+## `--move-report=<path>` (relative paths resolve against the project
+## directory), the bare `--move-report` flag's default evidence path, or ""
+## when absent.
+func _move_report_path_arg() -> String:
+	for argument in OS.get_cmdline_user_args():
+		if argument == "--move-report":
+			return Paths.project_dir().path_join(DEFAULT_MOVE_REPORT_PATH)
+		if argument.begins_with("--move-report="):
+			var value := argument.trim_prefix("--move-report=")
+			if value.is_absolute_path():
+				return value
+			return Paths.project_dir().path_join(value)
+	return ""
+
+
+## Runs the move report flow and quits with the documented exit code: 0 when
+## the deterministic report is written, 1 with an explicit marker naming the
+## first failed step (the town/placement/purchase report pattern).
+func _write_move_report(report_path: String) -> void:
+	var problem: String = await _move_report_into(report_path)
+	if problem == "" and not FileAccess.file_exists(report_path):
+		problem = "[report] report file was not created at %s" % report_path
+	if problem != "":
+		print("[town] move-report state=error message=", problem)
+		get_tree().quit(1)
+		return
+	print("[town] move-report state=written path=", report_path)
+	get_tree().quit(0)
+
+
+## Computes the whole move report (design D9): the bootstrap payload in hand
+## parses fail-closed (exactly one bootstrap request, no second config
+## call), the town builds from the committed save, the recorded building is
+## selected and one move intent runs through the same flow a player uses
+## (select, arm, preview, confirm against the fake implementation), and the
+## structural report records the intent, the building's cell before and
+## after, the placement/object counts, the resources, the request counts,
+## input digests, the projection constants pointer, the fake capture
+## pointer, and every required non-claim. Returns "" on success or the first
+## failure as an explicit message.
+func _move_report_into(report_path: String) -> String:
+	var registry: Variant = get_node_or_null("/root/ContentRegistry")
+	if registry == null:
+		return "[report] content registry is not registered"
+	if not bool(registry.is_loaded()):
+		var content: Dictionary = registry.load_content()
+		if not bool(content.get("ok", false)):
+			return "[report] content load failed: %s" % content.get("error", "")
+	if not bool(registry.assets_loaded()):
+		var assets: Dictionary = registry.load_asset_registry()
+		if not bool(assets.get("ok", false)):
+			return "[report] asset registry load failed: %s" % assets.get("error", "")
+	var api: Variant = get_node_or_null("/root/GameApi")
+	if api == null:
+		return "[report] GameApi is not registered"
+	var session: Variant = get_node_or_null("/root/Session")
+	if session == null:
+		return "[report] Session is not registered"
+	var sessions: Variant = await api.list_sessions()
+	if not bool(sessions.ok):
+		return "[report] save list failed: %s" % str(sessions.error_message)
+	if sessions.saves.size() == 0:
+		return "[report] save list carries no saves"
+	var pid := str(sessions.saves[0].id)
+	var boot: Variant = await api.get_bootstrap(pid)
+	if not bool(boot.ok):
+		return "[report] bootstrap failed: %s" % str(boot.error_message)
+	var player_info: Variant = boot.player_info
+	if player_info == null:
+		return "[report] bootstrap carried no player info"
+	var parsed: Dictionary = TownState.parse(player_info.raw, registry)
+	if not bool(parsed.get("ok", false)):
+		return "[report] town state rejected: %s" % parsed.get("error", "")
+	state = parsed["state"]
+	var built: Dictionary = build()
+	if not bool(built.get("ok", false)):
+		return "[report] town failed to build: %s" % built.get("error", "")
+	if objects.is_empty():
+		return "[report] town rendered no objects"
+	# The session the confirm needs: a real launch activates it during boot,
+	# while this headless report flow commits it here.
+	var summary := BootData.PlayerSummary.new()
+	summary.user_id = pid
+	summary.name = state.summary.name
+	summary.level = state.summary.level
+	summary.xp = state.summary.xp
+	var activation: Dictionary = session.activate(pid, summary)
+	if not bool(activation.get("ok", false)):
+		return "[report] session activation failed: %s" \
+			% activation.get("error", "")
+	var moving: Variant = _placement_for_slot(MOVE_INTENT_INDEX)
+	if moving == null:
+		return "[report] no placement carries the recorded legacy key %d" \
+			% MOVE_INTENT_INDEX
+	if moving.cell != MOVE_INTENT_FROM:
+		return "[report] the recorded building sits at (%d, %d), not (%d, %d)" \
+			% [moving.cell.x, moving.cell.y, MOVE_INTENT_FROM.x,
+				MOVE_INTENT_FROM.y]
+	if int(moving.item) != MOVE_INTENT_ITEM:
+		return "[report] the recorded building is item %d, not %d" \
+			% [int(moving.item), MOVE_INTENT_ITEM]
+	var placements_before: int = state.placements.size()
+	var objects_before: int = objects.size()
+	var resources_before: Dictionary = _report_resources()
+	var row_before := _typed_row(moving.raw)
+	# The player's own selection path: press the recorded building's cell,
+	# then arm, preview the recorded target, and confirm. Nothing here
+	# bypasses the flow a player uses.
+	var pressed: Dictionary = handle_pointer_press(
+		Iso.grid_to_screen(MOVE_INTENT_FROM))
+	if not bool(pressed.get("ok", false)):
+		return "[report] selection probe rejected: %s" % pressed.get("error", "")
+	if selection_legacy_id() != MOVE_INTENT_ITEM:
+		return "[report] the press did not select item %d (selected %d)" \
+			% [MOVE_INTENT_ITEM, selection_legacy_id()]
+	var armed: Dictionary = arm_move()
+	if not bool(armed.get("ok", false)):
+		return "[report] move arm rejected: %s" % armed.get("error", "")
+	if int(armed.get("slot", -1)) != MOVE_INTENT_INDEX:
+		return "[report] the armed move names key %d, not %d" \
+			% [int(armed.get("slot", -1)), MOVE_INTENT_INDEX]
+	var preview: Dictionary = preview_move_cell(MOVE_INTENT_TO)
+	if not bool(preview.get("valid", false)):
+		return "[report] move preview rejected: %s" % preview.get("reason", "")
+	var confirmed: Dictionary = await confirm_move()
+	if not bool(confirmed.get("ok", false)):
+		return "[report] move confirm failed: %s" % confirmed.get("error", "")
+	# A move rewrites one row in place: the counts must be unchanged, and the
+	# row must now carry the target cell and nothing else new.
+	if state.placements.size() != placements_before:
+		return "[report] the move changed the placement count " \
+			+ "(before=%d after=%d)" % [placements_before,
+				state.placements.size()]
+	if objects.size() != objects_before:
+		return "[report] the move changed the object count " \
+			+ "(before=%d after=%d)" % [objects_before, objects.size()]
+	if moving.cell != MOVE_INTENT_TO:
+		return "[report] the building did not land at (%d, %d) (got (%d, %d))" \
+			% [MOVE_INTENT_TO.x, MOVE_INTENT_TO.y, moving.cell.x,
+				moving.cell.y]
+	return _write_report_file(report_path, {
+		"schema": "move-report-v1",
+		"bootstrap_requests": int(api.bootstrap_requests),
+		"move_requests": int(api.move_requests),
+		"intent": {
+			"user_id": pid,
+			"item_index": MOVE_INTENT_INDEX,
+			"x": MOVE_INTENT_TO.x,
+			"y": MOVE_INTENT_TO.y,
+		},
+		"moved_building": {
+			"legacy_id": int(moving.item),
+			"slot": int(moving.slot),
+			"name": str(moving.name),
+			"cell_before": [MOVE_INTENT_FROM.x, MOVE_INTENT_FROM.y],
+			"cell_after": [moving.cell.x, moving.cell.y],
+			"row_before": row_before,
+			"row_after": _typed_row(moving.raw),
+		},
+		"counts": {
+			"placements_before": placements_before,
+			"placements_after": state.placements.size(),
+			"objects_before": objects_before,
+			"objects_after": objects.size(),
+		},
+		"resources": {
+			"before": resources_before,
+			"after": _report_resources(),
+		},
+		"inputs": {
+			"save_list_fixture": _digest_record(REPORT_SAVE_LIST),
+			"bootstrap_fixture": _digest_record(REPORT_BOOTSTRAP),
+			"move_request": _digest_record(REPORT_MOVE_REQUEST),
+			"move_response": _digest_record(REPORT_MOVE_RESPONSE),
+			"move_after": _digest_record(REPORT_MOVE_AFTER),
+			"terrain": _digest_record(_terrain_runtime(registry)),
+		},
+		"constants": _constants_record(),
+		"capture": _move_capture_record(),
+		"non_claims": MOVE_NON_CLAIMS,
+	})
+
+
+## One persisted eight-field row in the canonical typed form the report
+## records: the JSON transport widens the save's ints to floats on the
+## pinned engine, and a report whose before/after rows differ only by
+## `58` vs `58.0` would hide the actual change. Every integral number
+## becomes an `int`; the nested `store`/`attr` structures pass through
+## untouched, so only the representation is normalized, never the value.
+func _typed_row(value: Variant) -> Array:
+	var row: Array = []
+	if not (value is Array):
+		return row
+	for element: Variant in (value as Array):
+		if element is int or element is float:
+			row.append(int(element) if float(element) == floor(
+				float(element)) else element)
+		else:
+			row.append(element)
+	return row
+
+
+## The committed placement carrying the given addressable legacy key, or
+## null when the save names no such row (fail-closed, never a substitute).
+func _placement_for_slot(slot: int) -> Variant:
+	if state == null:
+		return null
+	for placement: Variant in state.placements:
+		if placement != null and int(placement.slot) == slot:
+			return placement
+	return null
+
+
+## The fake-capture pointer (design D9): the committed windowed capture with
+## its digest plus the plain statement of what it proves — so no reader can
+## mistake the screenshot for executed-legacy proof.
+func _move_capture_record() -> Dictionary:
+	var record := _digest_record(REPORT_CAPTURE_MOVE)
+	record["implementation"] = "fake GameApi (a deterministic test " \
+		+ "double, not a parity oracle)"
+	record["parity_pointer"] = "real-execution parity is established " \
+		+ "by the fixture-replay tests and the verify-boot move-live phase"
 	return record

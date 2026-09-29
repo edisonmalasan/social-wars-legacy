@@ -3,8 +3,9 @@ extends Node
 ## data (design D5, spec "GameApi abstraction").
 ##
 ## Client code calls `list_sessions()` / `get_bootstrap()` for boot data,
-## `place_building()` for one placement intent, and `purchase_item()` for one
-## purchase intent, receiving typed results
+## `place_building()` for one placement intent, `purchase_item()` for one
+## purchase intent, and `move_building()` for one move intent, receiving
+## typed results
 ## (`scripts/gameapi/boot_data.gd`); raw transport dictionaries never reach
 ## presentation code, and no other script references a transport.
 ##
@@ -13,9 +14,10 @@ extends Node
 ##
 ##   fake      - reads the committed executed-legacy fixtures under
 ##               `tests/fixtures/godot-compatibility-boot/` (boot),
-##               `tests/fixtures/godot-building-placement/` (placement), and
-##               `tests/fixtures/godot-item-purchase/` (purchase);
-##               no process, no server, no socket.
+##               `tests/fixtures/godot-building-placement/` (placement),
+##               `tests/fixtures/godot-item-purchase/` (purchase), and
+##               `tests/fixtures/godot-building-move/` (move); no process,
+##               no server, no socket.
 ##   legacy_v0 - JSON over loopback HTTP to Compatibility API v0 through the
 ##               built-in HTTP request client; endpoint from the project
 ##               setting `gameapi/endpoint` (default: loopback 127.0.0.1 on
@@ -62,6 +64,12 @@ var placement_requests := 0
 ## for the same reason: `configure()` swaps the implementation without
 ## hiding history.
 var purchase_requests := 0
+## Number of move intents this process has issued (building-move flow
+## contract: exactly one per confirm, zero for every local refusal — the
+## move suite snapshots this counter exactly like `placement_requests`).
+## Monotonic for the same reason: `configure()` swaps the implementation
+## without hiding history.
+var move_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -140,6 +148,23 @@ func purchase_item(user_id: String, item_id: int) -> BootData.PurchaseResult:
 	purchase_requests += 1
 	var result: BootData.PurchaseResult = await _impl.purchase_item(
 		user_id, item_id)
+	return result
+
+
+## One move intent (the legacy map index of an existing placement and its
+## target cell in the shared 0..99 grid) from the selected implementation.
+## The contract carries NO price and NO resource deltas: the service
+## derives the legacy envelope server-side (design D2/D3), and the
+## authoritative "this row now sits at this cell" superset is the SAME one
+## the placement command returns, so the delivered typed placement result
+## and parse function are reused verbatim (design D4). Presentation code
+## therefore applies only these values — it never writes the cell it
+## previewed, only the one the response reports.
+func move_building(user_id: String, item_index: int, x: int,
+		y: int) -> BootData.PlacementResult:
+	move_requests += 1
+	var result: BootData.PlacementResult = await _impl.move_building(
+		user_id, item_index, x, y)
 	return result
 
 

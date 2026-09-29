@@ -2,6 +2,14 @@ extends RefCounted
 ## Typed boot data crossing the GameApi boundary (design D5, spec
 ## "GameApi abstraction").
 ##
+## The `PlacementResult` class serves BOTH mutating map commands: the
+## placement command and the move command answer with the identical
+## authoritative superset — the legacy result, the persisted eight-field
+## placement entry re-read from the save, and the current resources — so
+## one result class and one parse function back both (building-move
+## design D4). Nothing about the row distinguishes the two; only the
+## request contract and the endpoint path differ.
+##
 ## Presentation code never receives raw transport dictionaries: every
 ## GameApi operation returns one of the result classes below, and the two
 ## legacy JSON payloads (game config, player info) are wrapped in payload

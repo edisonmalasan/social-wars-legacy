@@ -144,6 +144,39 @@ authoritative superset:
   (design D5), while insufficient cash reproduces the legacy `max(…, 0)` clamp
   rather than a rejection.
 
+`POST /v0/move` with body `{"user_id", "item_index", "x", "y"}` is the third
+state-mutating surface (the `building-move` change). The body is an **intent
+only**: extra keys, including a client-supplied price, `resources_changed`, or
+the arguments legacy discards (`frame`, `string`), are ignored. The endpoint
+resolves `item_index` against the save's own `map["items"]` **before** executing
+— legacy's missing-item path is a silent early return that still persists, so
+reporting it as success would claim a change that never happened — then derives
+the legacy batch envelope internally (one `move` command whose arguments are
+`[item_index, x, y, frame, string]`, the `frame`/`string` placeholders legacy
+discards, and a **neutral** resource vector, design D2 of `building-move`) and
+executes the unchanged legacy `command()` dispatcher in-process over the service
+corpus. Success returns the legacy answer plus the same authoritative superset
+shape as `/v0/place`:
+
+```json
+{"protocol": "compat-v0", "ok": true, "game_version": "alpha 0.02",
+ "server_time": 1790657765, "result": "success",
+ "placement": [22, 58, 47, 0, 0, [], {}, 1],
+ "resources": {"xp": 4, "gold": 2000, "wood": 2000, "oil": 2000,
+               "steel": 2000, "cash": 5, "mana": 0}}
+```
+
+- `placement` is the persisted eight-field row **re-read from the save after
+  execution** (`item, x, y, timestamp, orientation, store, attr, player`), so
+  the client reuses the placement result type; `resources` are the authoritative
+  current values. A move derives a neutral vector because the committed config
+  records no move price, so a real move never changes resources.
+- Validation is structural only: a JSON object body, a resolvable save id, a
+  strict-int `item_index` present in the save, and anchor-based `x`/`y` in
+  `0..99`. Grid bounds, footprint occupancy (with the moving building's own
+  cells excluded), and refusing a no-op move are gameplay rules the client
+  enforces (design D5); there is no server-authoritative validation.
+
 ### Structured errors
 
 Always JSON, always `ok:false`, keys exactly
@@ -161,6 +194,9 @@ Always JSON, always `ok:false`, keys exactly
 | `invalid_coordinates` | 400 | `x`/`y` missing, not integers, or outside `0..99` |
 | `invalid_orientation` | 400 | `orientation` present but not an integer |
 | `costs_not_cash` | 400 | `/v0/purchase` item's config `costs` is not exactly a cash price (absent, empty, another resource, or mixed) |
+| `missing_item_index` | 400 | `/v0/move` body carries no `item_index` |
+| `invalid_item_index` | 400 | `item_index` present but not an integer (`bool` excluded) |
+| `unknown_item_index` | 404 | integer index that names no placement in the save's `map["items"]` (legacy would silently no-op) |
 | `bad_request` | 400 | other malformed requests Flask rejects |
 | `not_found` | 404 | unknown path |
 | `method_not_allowed` | 405 | known path, unsupported method |
@@ -170,14 +206,14 @@ Always JSON, always `ok:false`, keys exactly
 
 All run from the repository root on Windows x64 with the pinned interpreter
 (CPython 3.9.13); exit codes are the real observed ones (bootstrap-era
-counts 2026-09-27; placement-era counts 2026-09-29; purchase-era counts
-2026-09-29):
+counts 2026-09-27; placement-, purchase-, and move-era counts 2026-09-29):
 
 ```bash
 python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
 ```
 
-→ `Ran 157 tests ... OK`, exit `0` (90 before the `building-purchase` change).
+→ `Ran 227 tests ... OK`, exit `0` (90 before `building-purchase`, 157 before
+`building-move`).
 Covers envelope/error shapes, bootstrap and
 session parity against the committed fixtures, pre/post save SHA-256 identity,
 the no-persistence source guard, and the offline socket guard (the suite opens
@@ -241,6 +277,14 @@ for its invocation, exit code `0`, and containment record:
 python -B apps/compat-api/capture_purchase_fixture.py
 ```
 
+Move fixture capture (the `building-move` change's executed-legacy oracle,
+one-shot) — see `tests/fixtures/godot-building-move/README.md` for its
+invocation, exit code `0`, and containment record:
+
+```bash
+python -B apps/compat-api/capture_move_fixture.py
+```
+
 ## Layout
 
 - `compat_legacy.py` — corpus build/layout checks and the in-process adapter
@@ -258,7 +302,11 @@ python -B apps/compat-api/capture_purchase_fixture.py
 - `field_stability.py` — derive the field-stability record from two captures.
 - `capture_legacy_fixtures.py` — executed-legacy boot fixture capture.
 - `capture_placement_fixture.py` — executed-legacy placement fixture capture.
-- `capture_purchase_fixture.py` — executed-legacy purchase fixture capture.
+- `capture_purchase_fixture.py` - executed-legacy purchase fixture capture.
+- `move_envelope.py` - the derived-provisional `/v0/move` envelope (argument
+  list, neutral resource vector, the `frame`/`string` placeholders legacy
+  discards), reusing the placement module's shared helpers unchanged.
+- `capture_move_fixture.py` - executed-legacy move fixture capture.
 - `tests/` — `test_compat_v0.py` (service + containment), `test_parity.py`
   (offline replay against the committed boot fixtures),
   `test_placement_envelope.py` (offline envelope derivation/sanitization),
@@ -267,7 +315,12 @@ python -B apps/compat-api/capture_purchase_fixture.py
   fixture), `test_purchase_envelope.py` (offline cash-only purchase
   derivation), `test_purchase_endpoint.py` (structural contract, clamp,
   corpus-only persistence), `test_purchase_parity.py` (offline purchase replay
-  against the executed fixture), `compat_test_harness.py`,
+  against the executed fixture), `test_move_envelope.py` (offline move envelope
+  derivation: argument list, neutral vector, discarded placeholders, grid
+  bounds), `test_move_endpoint.py` (structural contract, unknown-index
+  fail-closed, neutral resources, corpus-only persistence),
+  `test_move_parity.py` (offline move replay against the executed fixture),
+  `compat_test_harness.py`,
   `smoke_loopback.py` (opt-in loopback smoke).
 
 ## Claim limits
@@ -285,6 +338,10 @@ additionally establishes **purchase parity for one recorded
 `buy_stored_item_cash` transaction**: `POST /v0/purchase` replayed against the
 executed-legacy purchase fixture equals its response and after-state for every
 stable field (the envelope `ts` and the HTTP `Date` header are the documented
+time-dependent fields). Since the `building-move` change it establishes **move
+parity for one recorded `move` transaction**: `POST /v0/move` replayed against
+the executed-legacy move fixture equals its response and after-state for every
+stable field (the envelope `ts` and the HTTP `Date` header are the documented
 time-dependent fields).
 
 It does **not** establish authentication security, progressed-player coverage,
@@ -293,10 +350,14 @@ slot choice are derived-provisional — never observed from the Flash client; th
 same holds for the **choice of `buy_stored_item_cash` as the purchase command**
 and for the **cash-only price derivation**, which also means the service claims
 nothing about whether a resource-priced storage purchase exists in the legacy
-client. Insufficient resources reproduce the legacy `max(…, 0)` clamp, never a
-rejection (authoritative server-side validation belongs to Server v1 / M13),
-and occupancy, grid-bounds, level-gate, and cash-affordability rules are
-enforced client-side only. Persistence is confined to the disposable service
-corpus: `POST /v0/place` and `POST /v0/purchase` persist through the legacy
-dispatcher into the corpus `saves/`, while the session and bootstrap endpoints
-remain strictly non-persisting, and the working tree is never written.
+client, and for the **move command's argument values**, the **arguments legacy
+discards** (`frame`, `string`), and the **neutral move price vector** — the
+service therefore claims neither that moving is free in the legacy client nor
+that it costs anything. Insufficient resources reproduce the legacy
+`max(…, 0)` clamp, never a rejection (authoritative server-side validation
+belongs to Server v1 / M13), and occupancy, grid-bounds, level-gate,
+cash-affordability, and no-op-move rules are enforced client-side only.
+Persistence is confined to the disposable service corpus: `POST /v0/place`,
+`POST /v0/purchase`, and `POST /v0/move` persist through the legacy dispatcher
+into the corpus `saves/`, while the session and bootstrap endpoints remain
+strictly non-persisting, and the working tree is never written.

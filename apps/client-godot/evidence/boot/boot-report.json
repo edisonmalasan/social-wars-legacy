@@ -1,12 +1,12 @@
 {
     "schema":  "godot-compatibility-boot/verify-boot-v1",
-    "generated_utc":  "2026-09-29T03:53:34Z",
+    "generated_utc":  "2026-09-29T06:09:50Z",
     "environment":  {
                         "engine_executable":  "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
                         "engine_version":  "4.7.2.stable.official.ed1daf0bf",
                         "python_executable":  "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
                         "python_version":  "3.9.13",
-                        "git_commit":  "b341904acc74f3837da37727cda560974ac0d9dc",
+                        "git_commit":  "0511379893f9753cfad99b14959bd603fe9dcfac",
                         "display_session":  false,
                         "network":  "loopback only (127.0.0.1)"
                     },
@@ -379,6 +379,22 @@
                          "log":  "apps/client-godot/.godot/verify-boot/22-test_town_purchase.out.txt"
                      },
                      {
+                         "name":  "test_town_move",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_town_move.gd",
+                                         "--",
+                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/23-test_town_move.out.txt"
+                     },
+                     {
                          "name":  "test_town_gate",
                          "command":  [
                                          "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
@@ -392,7 +408,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/23-test_town_gate.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/24-test_town_gate.out.txt"
                      },
                      {
                          "name":  "boot-unreachable",
@@ -410,7 +426,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/24-boot-unreachable.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/25-boot-unreachable.out.txt"
                      },
                      {
                          "name":  "boot-main-live",
@@ -433,7 +449,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/25-boot-main-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/26-boot-main-live.out.txt"
                      },
                      {
                          "name":  "gameapi-live",
@@ -457,7 +473,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/26-gameapi-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/27-gameapi-live.out.txt"
                      },
                      {
                          "name":  "boot-api-error-live",
@@ -484,7 +500,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/27-boot-api-error-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/28-boot-api-error-live.out.txt"
                      },
                      {
                          "name":  "placement-live",
@@ -510,7 +526,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/28-placement-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/29-placement-live.out.txt"
                      },
                      {
                          "name":  "purchase-live",
@@ -536,7 +552,33 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/29-purchase-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/30-purchase-live.out.txt"
+                     },
+                     {
+                         "name":  "move-live",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+                                         "-B",
+                                         "apps/client-godot/compat_live_phase.py",
+                                         "--port",
+                                         "5056",
+                                         "--name",
+                                         "move-live",
+                                         "--expect-save-mutation",
+                                         "--",
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_town_move.gd",
+                                         "--",
+                                         "--scenario=live-move",
+                                         "--gameapi-endpoint=http://127.0.0.1:5056"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/31-move-live.out.txt"
                      },
                      {
                          "name":  "guard-post",
@@ -548,7 +590,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/30-guard-post.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/32-guard-post.out.txt"
                      }
                  ],
     "assertions":  [
@@ -729,6 +771,14 @@
                            "ok":  true
                        },
                        {
+                           "name":  "test_town_move exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_town_move reports PASS",
+                           "ok":  true
+                       },
+                       {
                            "name":  "test_town_gate exits 0 (got 0)",
                            "ok":  true
                        },
@@ -790,6 +840,14 @@
                        },
                        {
                            "name":  "purchase live phase: live-phase summary records ok with clean teardown",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "move live phase: live phase exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "move live phase: live-phase summary records ok with clean teardown",
                            "ok":  true
                        },
                        {
@@ -858,6 +916,18 @@
                        },
                        {
                            "name":  "purchase live phase mutated the disposable corpus save",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "move live phase asserts its scenario",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "move live phase drove one move through the v0 endpoint",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "move live phase mutated the disposable corpus save",
                            "ok":  true
                        },
                        {
