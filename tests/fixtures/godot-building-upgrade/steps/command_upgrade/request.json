@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-09-29T11:54:19+00:00",
+  "form": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "data": "981232c61b4a58c71c32c5cb0b9b4d9abc5b482918a5b9e8e9e75bc99fc9cb81;{\"accessToken\":\"\",\"commands\":[[0,\"sell\",[12,\"UPGR\"],[0,0,0,0,0,0,0,0]],[0,\"buy\",[12,24,45,49,1,0,0,\"\"],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1790682859}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "command.php form (USERID, user_key, language, data) with the derived <64-hex>;<json> envelope carrying exactly two commands in the forced order: a sell whose two arguments are the legacy map index and the committed upgrade reason (constants.py:970 SELL_REASON_UPGRADE, derived server-side and never client-chosen, so no client can claim the combat KILL reason), then a buy whose eight arguments are the same key, the target tier the committed configuration's upgrades_to names, the row's own cell and orientation, the row's own player team, and the two documented placeholders legacy discards; both commands carry the neutral all-zero resources_changed vector (no upgrade cost is claimed); user_key is redacted in this record; accessToken is the crafted empty placeholder, never a token value.",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}

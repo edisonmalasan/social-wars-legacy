@@ -1,0 +1,443 @@
+{
+  "cleanup": {
+    "disposable_removed_before_manifest_write": true,
+    "server_stopped_within_run": true
+  },
+  "containment": {
+    "disposable_copy_removed": true,
+    "fixture_output": "tests/fixtures/godot-building-upgrade",
+    "identical": true,
+    "loopback_only": true,
+    "method": "SHA-256 snapshot of every read working-tree group before the run and after the server stopped; equal or the run fails before writing fixtures. The already committed boot, placement, purchase, move, sell, and store fixtures are digest-pinned for the same reason.",
+    "no_flash_browser_external_network": true,
+    "only_working_tree_writes": "fixture files under --out",
+    "post_combined_sha256": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "post_run": {
+      "config": {
+        "exists": true,
+        "files": 12,
+        "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+      },
+      "mods": {
+        "exists": true,
+        "files": 2,
+        "sha256": "81b3c6e1f426e8813d96028b9035a853c1fbff8716256e84e956d8826f136ba3"
+      },
+      "root_python": {
+        "exists": true,
+        "files": 11,
+        "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+      },
+      "saves": {
+        "exists": false,
+        "files": 0,
+        "sha256": "absent"
+      },
+      "templates": {
+        "exists": true,
+        "files": 19,
+        "sha256": "2dffe0ca8746b63cf64fd1062a7f259ba2bb85a2fc54f7a2cd2bd2564ffee4ef"
+      },
+      "tests/saves": {
+        "exists": true,
+        "files": 3,
+        "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+      },
+      "villages": {
+        "exists": true,
+        "files": 31,
+        "sha256": "92429a07402766d8183b16fb32178b5c51f1e555df69d3cb46085a7d977f96ea"
+      }
+    },
+    "pre_combined_sha256": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "pre_run": {
+      "config": {
+        "exists": true,
+        "files": 12,
+        "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+      },
+      "mods": {
+        "exists": true,
+        "files": 2,
+        "sha256": "81b3c6e1f426e8813d96028b9035a853c1fbff8716256e84e956d8826f136ba3"
+      },
+      "root_python": {
+        "exists": true,
+        "files": 11,
+        "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+      },
+      "saves": {
+        "exists": false,
+        "files": 0,
+        "sha256": "absent"
+      },
+      "templates": {
+        "exists": true,
+        "files": 19,
+        "sha256": "2dffe0ca8746b63cf64fd1062a7f259ba2bb85a2fc54f7a2cd2bd2564ffee4ef"
+      },
+      "tests/saves": {
+        "exists": true,
+        "files": 3,
+        "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+      },
+      "villages": {
+        "exists": true,
+        "files": 31,
+        "sha256": "92429a07402766d8183b16fb32178b5c51f1e555df69d3cb46085a7d977f96ea"
+      }
+    },
+    "protected_fixtures": {
+      "identical": true,
+      "paths": [
+        "tests/fixtures/godot-compatibility-boot",
+        "tests/fixtures/godot-building-placement",
+        "tests/fixtures/godot-item-purchase",
+        "tests/fixtures/godot-building-move",
+        "tests/fixtures/godot-building-sell",
+        "tests/fixtures/godot-building-store"
+      ],
+      "post_run": {
+        "godot-building-move": {
+          "exists": true,
+          "files": 12,
+          "sha256": "b3c477a7947fbe409330f03a8658cdca707a2631b52d1d4c5127f440619799c1"
+        },
+        "godot-building-placement": {
+          "exists": true,
+          "files": 12,
+          "sha256": "546a5f00e5e45319ffd17f5ee67201dd2b72cb21de833a3e35e8a9a98d60c5a8"
+        },
+        "godot-building-sell": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fa85af3fb12ef8b9298203a64632b6d7b31c1ed48f8d1ba716151f25ec7ab1c4"
+        },
+        "godot-building-store": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d4dff84132353a60e3a005c42d067185772ec8d6a2548ffdc5aa4779a2055194"
+        },
+        "godot-compatibility-boot": {
+          "exists": true,
+          "files": 31,
+          "sha256": "4d389707e0f18676fb23b3a2a8a47031b4e233366e4066437f8bad6854e15234"
+        },
+        "godot-item-purchase": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d05e5b92b26a1222774bb32e76a42417c692e65ee1b87abdb8a2f4e6cd84e813"
+        }
+      },
+      "pre_run": {
+        "godot-building-move": {
+          "exists": true,
+          "files": 12,
+          "sha256": "b3c477a7947fbe409330f03a8658cdca707a2631b52d1d4c5127f440619799c1"
+        },
+        "godot-building-placement": {
+          "exists": true,
+          "files": 12,
+          "sha256": "546a5f00e5e45319ffd17f5ee67201dd2b72cb21de833a3e35e8a9a98d60c5a8"
+        },
+        "godot-building-sell": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fa85af3fb12ef8b9298203a64632b6d7b31c1ed48f8d1ba716151f25ec7ab1c4"
+        },
+        "godot-building-store": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d4dff84132353a60e3a005c42d067185772ec8d6a2548ffdc5aa4779a2055194"
+        },
+        "godot-compatibility-boot": {
+          "exists": true,
+          "files": 31,
+          "sha256": "4d389707e0f18676fb23b3a2a8a47031b4e233366e4066437f8bad6854e15234"
+        },
+        "godot-item-purchase": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d05e5b92b26a1222774bb32e76a42417c692e65ee1b87abdb8a2f4e6cd84e813"
+        }
+      }
+    },
+    "working_tree_saves_unchanged": true
+  },
+  "corpus": {
+    "login_preserved_seed": true,
+    "pid": "00000000-0000-4000-8000-000000000001",
+    "seed": {
+      "file_sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+      "path": "tests/saves/fresh-player.json",
+      "saves_group_sha256_before_server_start": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6"
+    },
+    "seeded_as": "saves/<pid>.save.json in the disposable copy",
+    "startup_preserved_seed": true
+  },
+  "executed_at_utc": "2026-09-29T11:54:19+00:00",
+  "exit_code": 0,
+  "intent": {
+    "bounds_rule": "not applicable: an upgrade has no target cell of its own \u2014 the buy half reuses the replaced row's own cell, so the only grid input is that recorded anchor",
+    "derived": {
+      "buy": {
+        "args": [
+          12,
+          24,
+          45,
+          49,
+          1,
+          0,
+          0,
+          ""
+        ],
+        "command": "buy",
+        "key_and_cell_status": "established from committed legacy source: buy takes its map key and cell from the client (command.py:42-58 -> engine.map_add_item(map, item_index, item_id, x, y, ...)), which is how the pair reuses the very same key and cell",
+        "orientation_player_unknown_reason_status": "derived, never observed from the Flash client: the buy half's orientation and playerID come from the replaced row, and unknown=0 / reason=\"\" are the documented placeholders legacy binds and discards",
+        "resources_changed": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "command_order": [
+        "sell",
+        "buy"
+      ],
+      "envelope_keys": [
+        "accessToken",
+        "commands",
+        "first_number",
+        "publishActions",
+        "tries",
+        "ts"
+      ],
+      "resource_vector": "unknown, xp, gold, wood, oil, steel, cash, mana",
+      "sell": {
+        "args": [
+          12,
+          "UPGR"
+        ],
+        "command": "sell",
+        "reason": "UPGR",
+        "reason_status": "established from committed legacy source: constants.py:970 SELL_REASON_UPGRADE = \"UPGR\", the committed value; derived server-side, so no client can claim another reason and in particular cannot claim \"KILL\" and reach push_dead_unit",
+        "resources_changed": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "status": "established: the composed pair, its order, the UPGR reason, the client-supplied key and cell of buy, the fresh-row semantics of engine.map_add_item, and the bought_unit_add record \u2014 all from committed legacy source, and the resulting state from this executed transaction. derived and never observed from the Flash client: that the Flash client sends exactly this pair, the buy half's orientation / player / unknown / reason values, and the price vector. The committed configuration records no upgrade price anywhere, so both derived vectors are neutral and NO upgrade cost is claimed",
+      "target_tier_status": "established from committed legacy source: the item's own upgrades_to (config/main.json), resolved with the documented -1/0-and-unresolvable-means-none rule (packages/game-content/tools/build_items.py:547-550); never client-supplied"
+    },
+    "from_cell": [
+      45,
+      49
+    ],
+    "item_id": 23,
+    "item_index": 12,
+    "item_name": "Wall I",
+    "target_item_id": 24,
+    "target_item_name": "Wall II",
+    "target_rule": "the Wall I (item id 23) at map slot 12 anchored at (45,49) in the committed fresh save, upgraded to the Wall II (item id 24) its config upgrades_to names \u2014 a wall segment, so this fixture's target differs from the move fixture's slot 11, the sell fixture's slot 20, and the store fixture's slot 2 and every delivered fixture stays independently readable; the buy half reuses the row's own key and cell, so an upgrade has no target cell of its own",
+    "to_cell": [
+      45,
+      49
+    ]
+  },
+  "interpreter": {
+    "executable": "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+    "requirement": "CPython 3.9.x (pinned baseline for this change)",
+    "version": "3.9.13 (tags/v3.9.13:6de2ca5, May 17 2022, 16:36:42) [MSC v.1929 64 bit (AMD64)]"
+  },
+  "invocation": "python -B apps/compat-api/capture_upgrade_fixture.py",
+  "negative_oracle": {
+    "bought_units_after": [
+      24
+    ],
+    "consequence": "legacy answers 200 {\"result\":\"success\"} for a batch that DELETES the building, so the command order is forced (sell first) and a success status is not evidence of an upgrade; the Compatibility API v0 endpoint therefore proves the post-state with three facts \u2014 the key still exists, its item id equals the derived target tier, and its cell equals the pre-execution cell \u2014 and fails closed with internal_error otherwise",
+    "envelope_commands": [
+      [
+        0,
+        "buy",
+        [
+          12,
+          24,
+          45,
+          49,
+          1,
+          0,
+          0,
+          ""
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      [
+        0,
+        "sell",
+        [
+          12,
+          "UPGR"
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ]
+    ],
+    "evidence": "executed-legacy probe recorded in the change design (Context, probe 2); re-derived offline against the unchanged legacy dispatcher by apps/compat-api/tests/test_upgrade_endpoint.py",
+    "http_status": 200,
+    "key_12_afterwards": "absent \u2014 the building is destroyed, not upgraded",
+    "placement_count_after": 39,
+    "placement_count_before": 40,
+    "response_body": "{\"result\": \"success\"}",
+    "what": "the same two derived commands sent in the reverse order \u2014 buy first, sell second \u2014 against the same fresh-player corpus"
+  },
+  "purpose": "Executed request/before/response/after fixtures for one legacy two-command upgrade transaction; the executed-legacy parity oracle for the Compatibility API v0 upgrade endpoint.",
+  "schema": "godot-building-upgrade/legacy-capture-v1",
+  "server": {
+    "command": [
+      "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+      "-B",
+      "server.py"
+    ],
+    "command_recorder_env": "SOCIALWARS_COMMAND_RECORD_DIR stripped from child",
+    "cwd": "<disposable copy under the system temp root>",
+    "host": "127.0.0.1",
+    "output_logs": "server.stdout.log / server.stderr.log inside the disposable copy (removed with the copy; not committed)",
+    "port": 5055,
+    "port_free_after_stop": true,
+    "port_free_before_start": true,
+    "readiness": "TCP connect loop on 127.0.0.1:5055 (no extra HTTP request)",
+    "stopped_by": "taskkill /T /F <pid>, wait, then port-free re-check"
+  },
+  "time_dependent_fields": {
+    "documented_normalization": "upgrade parity compares the new row's timestamp as a positive integer greater than the replaced row's, never by value: legacy stamps it with timestamp_now() and no clock field is otherwise written",
+    "leaves": [
+      "/captured_at_utc in every request.json and response.meta.json",
+      "/executed_at_utc in capture-manifest.json",
+      "/headers/Date in both response.meta.json files",
+      "the envelope ts inside command_upgrade/request.json's /form/data (and therefore that field's sha256 digest), because ts is the current time",
+      "the upgraded row's wall-clock timestamp: /maps/0/items/12/3 in command_upgrade/after.json, and the two manifest leaves derived from it \u2014 /transaction/upgraded_row_after/3 and /transaction/steps/1/save_after_sha256"
+    ],
+    "rule": "every other leaf of every committed file is byte-identical across reruns; the leaves below are the whole documented time-dependent surface and were verified by a leaf-level diff of two consecutive runs (11 differing leaves in total, every one of them named here)"
+  },
+  "transaction": {
+    "bought_units_after": [
+      24
+    ],
+    "bought_units_before": [],
+    "count": 2,
+    "dead_heroes_after": {},
+    "entry_field_order": [
+      "item",
+      "x",
+      "y",
+      "timestamp",
+      "orientation",
+      "store",
+      "attr",
+      "player"
+    ],
+    "fresh_row_semantics": "engine.map_add_item writes a fresh eight-field row: a new wall-clock timestamp, store [], and attr {\"nc\": 0} because the target's config has clicks_to_build > 0 (engine.py:25-29) \u2014 the construction counter the construction-timers deliver line will consume. The replaced row's timestamp, store, and attr are NOT carried over, and this change reproduces that exactly rather than fixing it (design D5)",
+    "key_reused": "12",
+    "other_rows_unchanged": true,
+    "placement_count_after": 40,
+    "placement_count_before": 40,
+    "player_info_unchanged": true,
+    "premium_upgrade_costs_used": false,
+    "private_state_unchanged_beside_bought_units": true,
+    "replaced_row_before": [
+      23,
+      45,
+      49,
+      0,
+      0,
+      [],
+      {},
+      1
+    ],
+    "resources_after": {
+      "cash": 5,
+      "gold": 2000,
+      "mana": 0,
+      "oil": 2000,
+      "steel": 2000,
+      "wood": 2000,
+      "xp": 4
+    },
+    "response_body": "{\"result\": \"success\"}",
+    "state_writes": [
+      "command.sell deletes exactly the addressed row with engine.map_delete_item (command.py:162; engine.py:48-52) and writes nothing else",
+      "the committed reason is 'UPGR', never 'KILL', so push_dead_unit never runs and the rest of privateState (deadHeroes included) stands",
+      "command.buy with playerID == 1 records the target tier with bought_unit_add (command.py:52-53; engine.py:86-89 appends only when the item is not already listed), so boughtUnits gains the new tier",
+      "command.buy writes a fresh row at the same key and cell with engine.map_add_item (command.py:55; engine.py:8-31)",
+      "engine.apply_resources applies the derived neutral delta on both commands with max(..., 0), so no resource changes"
+    ],
+    "steps": [
+      {
+        "method": "POST",
+        "name": "login_post",
+        "path": "/",
+        "response_bytes": 207,
+        "response_sha256": "2de230237d9f4055670576b9485897dbc06581889ca90527504cbdbd4933ec01",
+        "save_after_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_before_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_unchanged_by_call": true,
+        "status": 302,
+        "target": "/"
+      },
+      {
+        "method": "POST",
+        "name": "command_upgrade",
+        "path": "/dynamic/menvswomen/srvsexwars/command.php",
+        "response_bytes": 21,
+        "response_sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87",
+        "save_after_sha256": "198d2088bed00ed62d5bca016333be97dee49dff64989323783bd8736f9bd585",
+        "save_before_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_unchanged_by_call": false,
+        "status": 200,
+        "target": "/dynamic/menvswomen/srvsexwars/command.php"
+      }
+    ],
+    "store_after": {},
+    "upgrade_cost_claimed": false,
+    "upgraded_row_after": [
+      24,
+      45,
+      49,
+      1790682859,
+      0,
+      [],
+      {
+        "nc": 0
+      },
+      1
+    ]
+  }
+}

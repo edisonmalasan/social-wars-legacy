@@ -64,6 +64,14 @@ from hashing import directory_entries, sha256_file  # noqa: E402
 # Directories the legacy boot modules read through bundle.py's "." paths.
 CORPUS_COPY_DIRS = ("config", "mods", "villages")
 
+# ``upgrades_to`` / ``trains_ids`` sentinels that mean "no path", copied
+# verbatim from the normalized content package's own rule
+# (``packages/game-content/tools/build_items.py``: ``RELATION_NONE = (-1, 0)``
+# at line 66, applied by ``validate_relations`` at lines 546-557).  Duplicated
+# here rather than imported so the Compatibility API keeps depending only on
+# the legacy modules it already wraps.
+RELATION_NONE = (-1, 0)
+
 _STATE: Dict[str, object] = {}
 
 
@@ -210,6 +218,50 @@ class LegacyBoot:
     def item_costs(self, item_id: int) -> Optional[str]:
         """Raw config ``costs`` attribute (JSON string), or ``None``."""
         return self._config.get_attribute_from_item_id(item_id, "costs")
+
+    def item_upgrade_to(self, item_id: int) -> Optional[int]:
+        """The resolved next tier of ``item_id`` from the committed config.
+
+        Every item carries an ``upgrades_to`` reference, read here exactly as
+        ``item_costs`` reads ``costs`` — through the loaded legacy
+        configuration, never from a save or a client.  The reference is
+        **string-encoded** in the committed config (``"24"``), is coerced to an
+        ``int`` here, and ``None`` is returned for every value that means *no
+        path*:
+
+        * the attribute is absent from the config (``None`` from legacy's
+          ``get_attribute_from_item_id``), or the item id itself is not one the
+          config resolves;
+        * the ``-1`` / ``0`` sentinels, which the normalized content package
+          documents as "none"
+          (``packages/game-content/tools/build_items.py``:
+          ``RELATION_NONE = (-1, 0)`` at line 66, applied by
+          ``validate_relations`` at lines 546-557);
+        * a reference that is not an integer at all; and
+        * a reference naming an id the config does **not** resolve, checked
+          with the same ``has_item`` lookup every other resolution uses.
+
+        Returning ``None`` rather than raising is deliberate and fail-closed:
+        the upgrade endpoint turns it into a structured ``no_upgrade_path``
+        error **before** the legacy dispatcher runs, so a building that cannot
+        be upgraded is never reduced to a bare sale.
+        """
+        try:
+            raw = self._config.get_attribute_from_item_id(item_id, "upgrades_to")
+        except (TypeError, ValueError, KeyError, IndexError):
+            # An id the loaded config cannot even index is simply no path.
+            return None
+        if raw is None:
+            return None
+        try:
+            reference = int(str(raw).strip())
+        except (TypeError, ValueError):
+            return None
+        if reference in RELATION_NONE:
+            return None
+        if not self.has_item(reference):
+            return None
+        return reference
 
     def save_document(self, user_id: str) -> dict:
         """The in-memory save document for ``user_id`` (legacy ``session()``)."""

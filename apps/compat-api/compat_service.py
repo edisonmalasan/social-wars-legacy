@@ -102,6 +102,47 @@ Surface (loopback only, port :5056):
     (the popped key is absent from the map **and** the item's id is present in
     the storage), failing closed with ``internal_error`` if either is untrue.
 
+``POST /v0/upgrade`` with JSON ``{"user_id", "item_index"}``
+    ``{protocol, ok, game_version, server_time, result, removed, upgraded,
+    resources}`` — an intent only, and the sixth state-mutating surface.  An
+    upgrade is **one legacy batch with two commands in a forced order**: a
+    ``sell`` carrying the committed upgrade reason ``"UPGR"``
+    (``constants.py:970``) followed by a ``buy`` of the target tier that
+    reuses the row's own map key, cell, orientation, and player team
+    (``command.py:42-58``: ``buy`` takes its key and cell from the client,
+    which is exactly how the pair replaces the row in place).  The legacy batch
+    envelope is derived internally — the target tier from the committed
+    configuration's ``upgrades_to``, the reason from the committed legacy
+    constant, the cell / orientation / player from the row being replaced, and
+    the **neutral** derived resource vector on **both** commands (design
+    D2/D4 of the ``building-upgrade`` change) — the unchanged legacy
+    ``command()`` dispatcher executes it in-process, and the answer carries
+    the legacy ``result`` plus the two-sided authoritative superset: the
+    eight-field row **as it was read before execution** (``removed``), the
+    eight-field row **re-read from the persisted save after execution**
+    (``upgraded``), and the current ``resources`` (design D5).  The contract
+    accepts no client-supplied target tier, reason, coordinates, orientation,
+    player, quantity, price, or resource deltas — the extra keys are ignored.
+
+    Because the committed configuration records no upgrade price anywhere, the
+    derived vector is neutral and **this service claims no upgrade cost of any
+    kind** — not the target tier's ``costs``, not the difference between
+    tiers, and nothing about ``premium_upgrade_costs``.  ``item_index`` must
+    resolve to a row in the corpus save *before* the dispatcher runs, because
+    legacy's missing-item path is a silent early return that still persists
+    the save; a placement whose item has no resolvable next tier answers
+    ``no_upgrade_path`` (400) before the dispatcher runs, so a building that
+    cannot be upgraded is never reduced to a bare sale; and after execution
+    the endpoint proves **all three** facts of the replacement — the key still
+    exists, its item id equals the derived target tier, and its cell equals the
+    pre-execution cell — failing closed with ``internal_error`` otherwise.
+    That proof exists because legacy answers ``{"result":"success"}`` for the
+    *reverse* command order while leaving the key absent, so a success status
+    is not evidence of an upgrade.  The legacy client's own upgrade rules — the
+    level gate, the daily-upgrade limit, and the space check — are known to
+    exist and are deliberately **not** enforced here: none is enforced by the
+    legacy server and none can be reproduced from the repository.
+
 Deviation recorded for review: the bootstrap envelope also carries ``saves``
 (the session envelope plus ``config`` and ``player_info``). Design D3 lists
 only ``config`` and ``player_info``; the extra key is a superset of D3 and
@@ -119,12 +160,18 @@ code                     HTTP  when
 ``missing_item_id``      400  ``/v0/place`` or ``/v0/purchase`` body carries no ``item_id``
 ``invalid_item_id``      400  ``item_id`` present but not an integer (``bool`` excluded)
 ``unknown_item_id``      404  integer id absent from the loaded config
-``missing_item_index``   400  ``/v0/move``, ``/v0/sell``, or ``/v0/store`` body
-                                carries no ``item_index``
+``missing_item_index``   400  ``/v0/move``, ``/v0/sell``, ``/v0/store``, or
+                                ``/v0/upgrade`` body carries no ``item_index``
 ``invalid_item_index``   400  ``item_index`` present but not an integer (``bool``
                                 excluded)
 ``unknown_item_index``   404  integer index that names no row in the save's
                                 ``map["items"]`` (legacy would silently no-op)
+``no_upgrade_path``      400  ``/v0/upgrade``: the addressed placement's item
+                                has no resolvable next tier in the committed
+                                configuration (missing reference, the ``-1`` /
+                                ``0`` sentinels, or an unresolvable id) — the
+                                legacy dispatcher never runs, so such a row is
+                                never reduced to a bare sale
 ``invalid_reason``       400  derived reason is not a string (server-side
                                 derivation failure; never client input)
 ``invalid_coordinates``  400  ``x``/``y`` missing, not integers, or outside ``0..99``
@@ -142,8 +189,8 @@ Persistence scope (design D6, spec ``godot-compatibility-boot``): the
 session and bootstrap endpoints never persist — this module never calls
 ``sessions.save_session`` for them and every call leaves the saves
 byte-identical. ``POST /v0/place``, ``POST /v0/purchase``,
-``POST /v0/move``, ``POST /v0/sell``, and ``POST /v0/store`` execute the
-unchanged legacy
+``POST /v0/move``, ``POST /v0/sell``, ``POST /v0/store``, and
+``POST /v0/upgrade`` execute the unchanged legacy
 ``command()`` dispatcher, which
 persists through legacy ``save_session`` into the **service corpus's**
 ``saves/`` and nowhere else; the service never opens a working-tree file for
@@ -163,6 +210,7 @@ import placement_envelope
 import purchase_envelope
 import sell_envelope
 import store_envelope
+import upgrade_envelope
 
 PROTOCOL = "compat-v0"
 HOST = "127.0.0.1"
@@ -178,6 +226,7 @@ ERROR_UNKNOWN_ITEM_ID = "unknown_item_id"
 ERROR_MISSING_ITEM_INDEX = "missing_item_index"
 ERROR_INVALID_ITEM_INDEX = "invalid_item_index"
 ERROR_UNKNOWN_ITEM_INDEX = "unknown_item_index"
+ERROR_NO_UPGRADE_PATH = "no_upgrade_path"
 ERROR_INVALID_REASON = "invalid_reason"
 ERROR_INVALID_COORDINATES = "invalid_coordinates"
 ERROR_INVALID_ORIENTATION = "invalid_orientation"
@@ -888,6 +937,221 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
                 result="success",
                 removed=removed_row,
                 store=store,
+                resources=resources,
+            ),
+            200,
+        )
+
+    @app.post("/v0/upgrade")
+    def v0_upgrade() -> Tuple[Dict[str, Any], int]:
+        """Execute one upgrade intent through the unchanged legacy path.
+
+        An upgrade is one legacy batch with **two** commands in a forced
+        order — a ``sell`` with the committed ``UPGR`` reason followed by a
+        ``buy`` of the target tier reusing the row's own key and cell
+        (design D1).  Validation is structural fail-closed (design D3/D7): a
+        JSON object body, a resolvable save, an integer item index that names
+        a row in the corpus save, and a placement whose item has a resolvable
+        next tier in the committed configuration.  Whether the building is
+        upgradeable *today* is the client's job — legacy performs no
+        validation of any kind — and the legacy client's level gate, daily
+        limit, and space check are deliberately not implemented (design D6);
+        authoritative validation belongs to Server v1 (M13).  The index is
+        resolved here rather than left to legacy, because legacy's
+        missing-item path (``command.py:154-156``) is a silent early return
+        that still persists the save: reporting that as a success would claim an
+        upgrade that never happened.
+
+        Nothing but the index enters the contract: no target tier, no reason,
+        no coordinates, no orientation, no player, no quantity, no price, and
+        no resource deltas are accepted from a client — the extra keys are
+        ignored.  Because the committed configuration records no upgrade
+        price, the derived vector is neutral, so **this endpoint claims no
+        upgrade cost of any kind** (design D4).
+
+        After execution the endpoint proves the replacement from the persisted
+        save with all three documented facts (design D3) and fails closed with
+        ``internal_error`` on any other outcome — including the outcome the
+        *reverse* command order produces, which the legacy server itself
+        reports as a success.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404,
+                ERROR_UNKNOWN_USER_ID,
+                "no save exists for user_id %r" % user_id,
+            )
+
+        if "item_index" not in payload:
+            return error_response(
+                400, ERROR_MISSING_ITEM_INDEX, "item_index is required"
+            )
+        item_index = payload["item_index"]
+        if not upgrade_envelope.is_strict_int(item_index):
+            return error_response(
+                400, ERROR_INVALID_ITEM_INDEX, "item_index must be an integer"
+            )
+
+        # Resolve the index against the corpus before deriving, and read the
+        # eight-field row while it is still there: an index that names no row
+        # must fail closed, never reach legacy's silent no-op, and the row the
+        # client asked to upgrade is the one the two derived commands replace.
+        try:
+            known = boot.has_map_item(user_id, item_index)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not known:
+            return error_response(
+                404,
+                ERROR_UNKNOWN_ITEM_INDEX,
+                "no placement with index %d in this save's map" % item_index,
+            )
+        try:
+            removed = boot.map_item(user_id, item_index)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not isinstance(removed, list):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the addressed placement is not a row this service can report",
+            )
+        # Copies: the legacy dispatcher deletes this very list from the map
+        # and writes a new one in its place, so the response must never alias
+        # live state.
+        removed_row = list(removed)
+        if len(removed_row) != 8:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the addressed placement is not an eight-field row",
+            )
+        source_item_id = removed_row[0]
+        if not upgrade_envelope.is_strict_int(source_item_id):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the addressed placement carries no integer item id to upgrade",
+            )
+        # The cell, orientation, and player come from the row being replaced:
+        # the buy half reuses the very same key and cell so the pair upgrades
+        # in place instead of re-keying the building (design D2).
+        source_x, source_y = removed_row[1], removed_row[2]
+        source_orientation = removed_row[4]
+        source_player = removed_row[7]
+
+        # The target tier comes from the committed configuration's
+        # ``upgrades_to``, never from the client.  ``None`` means the item has
+        # no upgrade path (missing reference, the -1/0 sentinels, or an id the
+        # config does not resolve), and answering here — before the dispatcher
+        # runs — is exactly what keeps an un-upgradeable building from being
+        # reduced to a bare sale (design D3).
+        try:
+            target_item_id = boot.item_upgrade_to(source_item_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if target_item_id is None:
+            return error_response(
+                400,
+                ERROR_NO_UPGRADE_PATH,
+                "item %d has no resolvable next tier in the configuration"
+                % source_item_id,
+            )
+
+        # Derive the legacy envelope (design D2/D4/D8): the committed reason,
+        # the neutral resource vector on both commands, and the buy half's
+        # discarded placeholders are the module's, never the client's.
+        try:
+            envelope_payload = upgrade_envelope.build_envelope(
+                item_index=item_index,
+                target_item_id=target_item_id,
+                x=source_x,
+                y=source_y,
+                player=source_player,
+                orientation=source_orientation,
+            )
+        except upgrade_envelope.EnvelopeError as failure:
+            return error_response(400, failure.code, str(failure))
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        # Execute the unchanged legacy command dispatcher in-process.  It
+        # persists via legacy save_session into this corpus only; the legacy
+        # HTTP route returns {"result": "success"} whenever command()
+        # returns without raising, so reaching here IS the legacy result —
+        # which is precisely why it is NOT taken as proof of an upgrade.
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        # Prove the replacement from the persisted save (design D3).  All three
+        # facts are required: the key still exists, its item id is the derived
+        # target tier, and its cell is the pre-execution cell.  The reverse
+        # command order — which legacy also reports as a success — leaves the
+        # key absent and is caught by the first check; reporting either row
+        # without proving it would be a fabricated authoritative answer.
+        try:
+            still_present = boot.has_map_item(user_id, item_index)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not still_present:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy execution did not keep the placement entry at its key",
+            )
+        try:
+            upgraded = boot.map_item(user_id, item_index)
+            resources = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not isinstance(upgraded, list):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy execution did not persist the upgraded placement entry",
+            )
+        upgraded_row = list(upgraded)
+        if len(upgraded_row) != 8 or not upgrade_envelope.is_strict_int(
+            upgraded_row[0]
+        ):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy execution did not persist an eight-field upgraded row",
+            )
+        if upgraded_row[0] != target_item_id:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the row at index %d holds item %r after execution, not the "
+                "derived target tier %r"
+                % (item_index, upgraded_row[0], target_item_id),
+            )
+        if [upgraded_row[1], upgraded_row[2]] != [source_x, source_y]:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the row at index %d sits at %r after execution, not at the "
+                "pre-execution cell %r"
+                % (item_index, [upgraded_row[1], upgraded_row[2]], [source_x, source_y]),
+            )
+        return (
+            envelope(
+                boot,
+                result="success",
+                removed=removed_row,
+                upgraded=upgraded_row,
                 resources=resources,
             ),
             200,
