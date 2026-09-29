@@ -215,6 +215,45 @@ implementation, so real-execution parity rests on the fixture-replay tests and
 the live phase. No Flash, Ruffle, ActionScript, or browser executes in any of
 these commands.
 
+Verified building-move commands (milestone M7; Godot 4.7.2.stable and pinned
+CPython 3.9.13, Windows x64; `python` denotes the pinned interpreter, never the
+PATH alias):
+
+```bash
+python -B apps/compat-api/capture_move_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_town_move.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-09-29): the move fixture capture (one-shot
+executed-legacy `move` oracle — Turret I at map slot 11 moved from `(58, 48)` to
+the derived free cell `(58, 47)`; exit codes and containment recorded in
+`tests/fixtures/godot-building-move/README.md`), the compat suite including the
+move envelope, `/v0/move` endpoint, and executed-legacy parity tests (observed
+`Ran 227 tests ... OK`, exit `0`), the hermetic move-flow suite (observed 288
+checks, PASS; runs without a service and routes its transport-failure check
+against the dead endpoint the loop passes), both batteries in the final state
+(each exit `0`; the second embeds the `move-live` phase that asserts a
+disposable corpus save mutated), and the preservation manifest (3,258 entries,
+exit `0`). The compatibility service listens on `127.0.0.1:5056` only, and every
+network call in these commands is loopback. The evidence capture and report
+steps are documented in `apps/client-godot/README.md` ("Building move");
+committed evidence lives under `apps/client-godot/evidence/building-move/`.
+Claim limits: parity covers one recorded transaction against the fresh-player
+corpus; the move command's argument values, the `frame`/`string` arguments
+legacy discards, and the neutral price vector are derived-provisional, never
+observed from the Flash client, so no claim is made about what moving costs in
+the legacy client (the committed config records no move price); occupancy, the
+no-op cell, and grid bounds are enforced client-side only, with no
+server-authoritative validation (that belongs to Server v1 / M13); an
+unaddressable legacy map key is never coerced; no pixel-parity oracle exists;
+the committed capture runs the fake implementation, so real-execution parity
+rests on the fixture-replay tests and the live phase. No Flash, Ruffle,
+ActionScript, or browser executes in any of these commands.
+
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 
