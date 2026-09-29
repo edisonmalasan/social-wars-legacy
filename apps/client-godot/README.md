@@ -1332,5 +1332,146 @@ one each), and the fake-capture pointer.
 
 These non-claims are recorded verbatim in
 `evidence/building-store/report.json`.
-Remaining deliver lines of M7 (separate changes): upgrade, build timers, income,
-expansion, resources, and XP.
+
+## Building upgrade
+
+The upgrade slice (OpenSpec `building-upgrade`, milestone M7) is the first line
+in this family whose legacy contract was **established by investigation** before
+any code was written. It is also the only one that sends **two** legacy commands
+for one player action: the dispatcher has no upgrade command, so an upgrade is a
+`sell` with the committed `UPGR` reason followed by a `buy` of the next tier that
+reuses the same map key and cell.
+
+### Flow
+
+1. **Action** - an `Upgrade` action beside the delivered `Move`, `Sell`, and
+   `Store` actions, offered only while a placed building is selected, addressable,
+   **and** has a resolvable next tier in the typed catalog; the four modes are
+   mutually exclusive. A building with no upgrade path (a Tree, a Bridge) shows
+   the action disabled and any attempt is refused with an explicit reason.
+2. **Confirm** - names the current tier and the target tier. Confirming sends
+   exactly one `GameApi.upgrade_building(user_id, item_index)` intent; cancelling,
+   or a pointer press that changes the selection, sends nothing.
+3. **Apply** - only the authoritative response is applied: the **same object**
+   now carrying the target tier at the **same cell and key**, in the same depth
+   position, with the typed row replaced by the response's post-execution row and
+   HUD resources and XP taken from the response. The storage view and readout are
+   left untouched. The apply snapshots everything it touches first, and it even
+   refuses **before** any mutation if a response ever moved the building, which
+   this contract never does.
+
+### Endpoint contract, envelope, and provenance
+
+`POST /v0/upgrade` accepts only the intent `{user_id, item_index}` - the full
+contract, response example, structured error codes, validation split, and
+corpus-only persistence scope are documented in `apps/compat-api/README.md`. The
+endpoint derives everything else: the target tier from the committed
+`upgrades_to` reference, the reason from `constants.py:970`
+`SELL_REASON_UPGRADE = "UPGR"`, and the cell, orientation, and player from the row
+being replaced; both commands carry a **neutral** resource vector.
+
+*Established from committed legacy source and executed-legacy capture:* there is no
+`upgrade` command among the 63 named branches; the `UPGR` constant; `buy` taking a
+**client-supplied** map key and cell (`command.py:42-58` -> `map_add_item`); the
+fresh row `map_add_item` writes (a new wall-clock `timestamp`, `store: []`, and the
+`{"nc": 0}` construction seed for items with `clicks_to_build > 0`); the
+`bought_unit_add` record, which appends the tier only when it is not already listed
+(`engine.py:86-89`); that the order is forced; and the resulting state.
+
+*Derived, never observed from the Flash client:* that the client sends exactly this
+pair; the buy half's `orientation`, `playerID`, `unknown`, and `reason` arguments;
+and the price vector.
+
+*Why the endpoint proves the post-state:* legacy answers `{"result":"success"}`
+for the **reverse** order too, and that batch leaves the key absent (40 -> 39
+placements). The service therefore requires three facts before reporting success -
+the key still exists, its item id equals the derived target tier, and its cell
+equals the pre-execution cell - and fails closed otherwise.
+
+### Verification (commands actually executed)
+
+```bash
+# Upgrade fixture capture (one-shot, executed-legacy oracle; the request carries
+# the two-command batch): the exact command, exit codes, containment, and the
+# reverse-order negative oracle are recorded in
+# tests/fixtures/godot-building-upgrade/README.md
+python -B apps/compat-api/capture_upgrade_fixture.py
+
+# Upgrade envelope + endpoint + executed-legacy parity tests (inside the compat
+# suite; observed: Ran 491 tests ... OK, exit 0)
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+
+# The hermetic upgrade-flow suite standalone (observed: 272 checks, PASS)
+godot --headless --path apps/client-godot --script res://tests/test_town_upgrade.gd
+
+# Full batteries in the final state (each embeds the upgrade suite and the
+# upgrade-live phase; both observed exit 0)
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+```
+
+`verify-boot.ps1` includes the hermetic `test_town_upgrade` suite and a ninth live
+phase `upgrade-live`, which starts the Compatibility API over a disposable corpus,
+sends one intent through `POST /v0/upgrade`, asserts the typed response **and that
+the response reuses the pre-request key and cell**, asserts via
+`compat_live_phase.py --expect-save-mutation` that a corpus save file actually
+mutated, then tears down asserting the port is released, the corpus is removed, and
+no working-tree `saves/` exists.
+
+### Evidence capture (two-step, as the delivered slices)
+
+```bash
+# 1. Windowed fake-API launch: boot -> town, select the Wall I at slot 12,
+#    upgrade, confirm, then capture the frame (writes building-upgrade.png at the
+#    legacy 1400x600 stage; a failed flow exits 1 with an explicit [town]
+#    upgrade-capture state=error marker)
+godot --path apps/client-godot res://scenes/boot.tscn -- --gameapi=fake --upgrade-capture=<repo>/apps/client-godot/evidence/building-upgrade/building-upgrade.png
+
+# 2. Headless deterministic report (writes report.json; a rerun is
+#    byte-identical; the bare --upgrade-report flag defaults to
+#    evidence/building-upgrade/report.json)
+godot --headless --path apps/client-godot res://scenes/town.tscn -- --upgrade-report=<repo>/apps/client-godot/evidence/building-upgrade/report.json
+```
+
+The report (`schema upgrade-report-v1`) records the inputs and digests, the intent
+`{user_id, item_index: 12}`, the upgrade (Wall I `23` -> Wall II `24`, slot 12, cell
+`(45, 49)` before and after, both rows), the bought-units change (`[]` -> `[24]`,
+with a note that the list is not carried by the typed state), counts before/after
+(40 -> 40 placements and objects - the key is reused), resources before/after
+(unchanged), the **established-versus-derived provenance split** as its own
+section, the projection-constants pointer, the bootstrap and upgrade request counts
+(exactly one each), and ten non-claims.
+
+### Upgrade claim limits
+
+- no Flash, Ruffle, ActionScript, or browser executed;
+- the composed two-command pair is **derived** - that the Flash client sends
+  exactly this batch is never observed - while its shape, reason, ordering, and
+  result are **established** by committed source and executed-legacy capture;
+- **no upgrade cost is claimed**: the config prices no upgrade, both commands carry
+  the neutral derived vector, and the 139 `premium_upgrade_costs` entries (the
+  premium path) are not used;
+- the `{"nc": 0}` construction counter the purchase half seeds is reported but
+  deliberately **not consumed** - the construction timers belong to the next M7
+  deliver line;
+- the legacy client's **level gate**, **daily-upgrade limit**, and **space check**
+  are known to exist (static SWF text and fields) and are deliberately **not
+  implemented** here; the level gate in particular cannot be enforced on the
+  committed corpus, where `maps[0].level` is 1 and no *placed* building's next tier
+  is reachable at that level, and enforcing it would make this line unreachable on
+  the corpus the project preserves;
+- parity covers one recorded transaction against the fresh-player corpus, not
+  progressed players;
+- upgradability and addressability are client-side rules only; the endpoint
+  enforces structural input validity and the post-state proof, and no
+  server-authoritative validation exists;
+- no pixel-parity oracle against the legacy client exists, and the surface's
+  layout and labels are documented placeholders (the panel is the delivered shared
+  presentation, so long tier names clip at its right edge);
+- the committed capture runs the fake GameApi - a deterministic test double, not a
+  parity oracle.
+
+These non-claims are recorded verbatim in
+`evidence/building-upgrade/report.json`.
+Remaining deliver lines of M7 (separate changes): construction timers, collect
+income, town expansion, resources, and XP.

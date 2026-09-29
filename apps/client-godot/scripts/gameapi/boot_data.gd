@@ -26,6 +26,16 @@ extends RefCounted
 ## purchase response uses for `store`, so the storage mapping can never
 ## be read by two rule sets.
 ##
+## The upgrade command needs its own result class because its response is
+## TWO-SIDED and both sides are the same shape: the row AS READ BEFORE
+## EXECUTION (`removed`, the very row the client named) and the row re-read
+## from the save after execution (`upgraded`). Nothing in the envelope
+## distinguishes the sides but the key, so both go through the one typed
+## entry parser every other response uses — a row can never be read with
+## two rule sets (building-upgrade design D5). The upgraded row's timestamp
+## is the documented time-dependent field (the purchase half stamps a fresh
+## wall-clock epoch), so no test asserts it by value.
+##
 ## Presentation code never receives raw transport dictionaries: every
 ## GameApi operation returns one of the result classes below, and the two
 ## legacy JSON payloads (game config, player info) are wrapped in payload
@@ -291,6 +301,48 @@ static func store_failure(code: String, message: String) -> StoreResult:
 	return result
 
 
+## Result of `upgrade_building()`: the legacy result plus the two-sided
+## authoritative superset (building-upgrade design D5) — the eight-field row
+## AS READ BEFORE EXECUTION (`removed`, the row the client asked to replace)
+## AND the same eight-field row RE-READ FROM THE SAVE after execution
+## (`upgraded`, holding the derived target tier at the same key and cell) —
+## plus the current resources — or a structured failure with no partial
+## payload. The client replaces the selected typed placement's row with
+## `upgraded`, keeps the placement's own legacy key, cell, and depth order,
+## and takes the resource values verbatim: the derived vector is NEUTRAL, so
+## an upgrade claims NO cost of any kind, and the `{"nc": 0}` construction
+## counter the purchase half seeds is reported as it arrives and deliberately
+## NOT consumed (the construction-timer line owns it).
+class UpgradeResult:
+	extends RefCounted
+	var ok := false
+	var protocol := ""
+	var game_version := ""
+	## Wall-clock seconds the legacy server stamped (a time-dependent field,
+	## so tests assert positivity, never a fixed value).
+	var server_time := 0
+	## The legacy result string ("success"); "" on failure.
+	var result := ""
+	## The row exactly as it was read before execution.
+	var removed: Placement = null
+	## The row re-read from the save after execution (the target tier at the
+	## same key and cell, with a fresh timestamp and the purchase half's
+	## attribute seed).
+	var upgraded: Placement = null
+	var resources: Resources = null
+	var error_code := ""
+	var error_message := ""
+
+
+## Structured failure for `upgrade_building()` (never a partial payload).
+static func upgrade_failure(code: String, message: String) -> UpgradeResult:
+	var result := UpgradeResult.new()
+	result.ok = false
+	result.error_code = code
+	result.error_message = message
+	return result
+
+
 ## Parses any v0 session envelope — success or structured error — into the
 ## typed result. Shared by `FakeApi` (which synthesizes the envelope from the
 ## committed fixtures) and `LegacyV0Api` (which decodes the HTTP body).
@@ -535,6 +587,56 @@ static func parse_store(payload: Variant) -> StoreResult:
 	return result
 
 
+## Parses a v0 upgrade envelope — success or structured error — into the
+## typed result. Shared by `FakeApi` (which synthesizes the envelope from the
+## committed upgrade fixture's before-state after applying the documented
+## in-memory semantics) and `LegacyV0Api` (which decodes the HTTP body), so
+## both implementations yield the same typed shape by construction. BOTH rows
+## go through the SAME fail-closed entry parser the placement, sell, and
+## store responses use (design D5): one row rule, five entry points.
+static func parse_upgrade(payload: Variant) -> UpgradeResult:
+	if not (payload is Dictionary):
+		return upgrade_failure("bad_response", "response is not a JSON object")
+	var envelope: Dictionary = payload
+	if envelope.get("ok") != true:
+		return _upgrade_error(envelope)
+	if str(envelope.get("protocol", "")) != PROTOCOL:
+		return upgrade_failure("protocol_mismatch",
+			"expected protocol %s, got %s" % [PROTOCOL,
+			str(envelope.get("protocol"))])
+	if str(envelope.get("result", "")) != "success":
+		return upgrade_failure("bad_response",
+			"upgrade response did not report the legacy success result")
+	var removed := _parse_placement_entry(envelope.get("removed"))
+	if removed == null:
+		return upgrade_failure("bad_response",
+			"removed row is not the legacy eight-field array")
+	var upgraded := _parse_placement_entry(envelope.get("upgraded"))
+	if upgraded == null:
+		return upgrade_failure("bad_response",
+			"upgraded row is not the legacy eight-field array")
+	var resources_raw: Variant = envelope.get("resources")
+	if not (resources_raw is Dictionary):
+		return upgrade_failure("bad_response",
+			"upgrade response carries no resources object")
+	var resources := _parse_resources(resources_raw)
+	if resources == null:
+		return upgrade_failure("bad_response",
+			"upgrade resources are not seven non-negative integers")
+	var result := UpgradeResult.new()
+	result.ok = true
+	result.protocol = PROTOCOL
+	result.game_version = str(envelope.get("game_version", ""))
+	result.server_time = _parse_epoch(envelope.get("server_time"))
+	if result.server_time < 0:
+		return upgrade_failure("bad_response", "server_time is not a number")
+	result.result = "success"
+	result.removed = removed
+	result.upgraded = upgraded
+	result.resources = resources
+	return result
+
+
 ## The storage mapping -> `{str(item_id): int}` with integral floats
 ## canonicalized to ints (the JSON transport widens them on the pinned engine
 ## while Dictionary equality is type-strict there — the same tolerance
@@ -702,6 +804,21 @@ static func _store_error(envelope: Dictionary) -> StoreResult:
 		code = str(typed.get("code", code))
 		message = str(typed.get("message", message))
 	return store_failure(code, message)
+
+
+## Structured error fields of a failed upgrade envelope (code + message) —
+## the same one envelope rule the other five commands use, so a code the
+## service named (`no_upgrade_path`, `unknown_item_index`,
+## `internal_error`, …) reaches the client unchanged.
+static func _upgrade_error(envelope: Dictionary) -> UpgradeResult:
+	var code := "bad_response"
+	var message := "response reported failure without a structured error"
+	var error: Variant = envelope.get("error")
+	if error is Dictionary:
+		var typed: Dictionary = error
+		code = str(typed.get("code", code))
+		message = str(typed.get("message", message))
+	return upgrade_failure(code, message)
 
 
 ## Eight-field legacy entry -> typed `Placement`; null when malformed

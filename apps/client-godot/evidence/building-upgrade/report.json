@@ -1,0 +1,224 @@
+{
+	"bootstrap_requests": 1,
+	"bought_units": {
+		"after": [
+			24
+		],
+		"before": [],
+		"evidence": "tests/fixtures/godot-building-upgrade privateState.boughtUnits",
+		"list_carried_by_the_typed_state": false,
+		"recorded_by_the_executed_fixture": [
+			24
+		]
+	},
+	"capture": {
+		"implementation": "fake GameApi (a deterministic test double, not a parity oracle)",
+		"parity_pointer": "real-execution parity is established by the fixture-replay tests and the verify-boot upgrade-live phase",
+		"path": "apps/client-godot/evidence/building-upgrade/building-upgrade.png",
+		"sha256": "62cabc59095a85ac87a5ec3fe2d22f6bf97aedb29801d98e6f8ca4e52df9d0e1"
+	},
+	"constants": {
+		"derivation_status": "derived-provisional",
+		"evidence_gap": "the legacy SWF's static iso-engine identifiers (TILE_SIZE, EI_TILE_HEIGHT_PIXELS, gridWidth/Height, numCols/numRows) were never extracted; pixel parity with the Flash client is not claimed",
+		"grid_extent": 100,
+		"origin_x": 2000.0,
+		"origin_y": 10.0,
+		"tile_height": 20.0,
+		"tile_width": 40.0,
+		"world_rect": [
+			0.0,
+			0.0,
+			4000.0,
+			2000.0
+		]
+	},
+	"counts": {
+		"objects_after": 40,
+		"objects_before": 40,
+		"placements_after": 40,
+		"placements_before": 40
+	},
+	"inputs": {
+		"bootstrap_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/get_player_info/response.body",
+			"sha256": "facedf76784d3dc03a3a45e81756a8546f90f7647dbff8917593404d9e401709"
+		},
+		"save_list_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json",
+			"sha256": "ad0404c2c340a48f06e2e49ae7eb7973978cd2ccb02ac6ff7bfba4eb75f6d9f4"
+		},
+		"terrain": {
+			"path": "assets/images/en/mapa1.jpg",
+			"sha256": "35c4ded53e82be187eb67c54ee7c7023b698c3986954db4b6f9613a2a45cdd3f"
+		},
+		"upgrade_after": {
+			"path": "tests/fixtures/godot-building-upgrade/steps/command_upgrade/after.json",
+			"sha256": "5e4718df028b4b6423246f83283920d70e6c57d6031d4c6bb2ddf6ab56c3af80"
+		},
+		"upgrade_request": {
+			"path": "tests/fixtures/godot-building-upgrade/steps/command_upgrade/request.json",
+			"sha256": "7dccd4a738432bd709fe72387e0bdf733ed280bf98ac9169bce12a6cc143badc"
+		},
+		"upgrade_response": {
+			"path": "tests/fixtures/godot-building-upgrade/steps/command_upgrade/response.body",
+			"sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87"
+		}
+	},
+	"intent": {
+		"item_index": 12,
+		"user_id": "00000000-0000-4000-8000-000000000001"
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed",
+		"the composed two-command pair is derived, never observed from the Flash client, even though its shape, its reason, its ordering, and its result are established by committed legacy source and the executed-legacy probes",
+		"no upgrade cost is claimed: the committed configuration records no upgrade price and both derived commands carry the neutral vector, so the neutral vector is a derivation boundary, not a claim about what the legacy client charged",
+		"the construction counter the purchase half seeds (attr {\"nc\": 0}) is reported as it arrives and deliberately NOT consumed; the construction-timer line owns it",
+		"the premium upgrade price field (premium_upgrade_costs) is not used by this contract: it belongs to a distinct premium path whose relationship to the normal upgrade is unproven",
+		"the legacy client's level gate, daily-upgrade limit, and space check are known to exist and are deliberately not implemented here; the level gate could not be enforced on the committed corpus anyway (the fresh save is level 1 and no placed building's next tier is reachable at that level, the lowest reachable being level 5), and the space check is vacuous because the same key and cell are reused",
+		"parity covers one recorded transaction against the fresh-player corpus, not progressed players",
+		"upgradability and addressability are client-side rules only; the endpoint enforces structural input validity plus the documented post-execution proof, and no server-authoritative validation exists",
+		"no pixel-parity oracle against the legacy client exists",
+		"the capture runs the fake GameApi implementation; real-execution parity is established by the fixture-replay tests and the verify-boot upgrade-live phase"
+	],
+	"provenance": {
+		"derived": [
+			{
+				"evidence": "never observed; no Flash, Ruffle, ActionScript, or browser execution in this change",
+				"fact": "the Flash client sends exactly this two-command pair"
+			},
+			{
+				"evidence": "documented placeholders this contract derives; the values are the replaced row's own or fixed",
+				"fact": "the buy half's orientation, player, and discarded arguments (the unknown flag and the empty reason)"
+			},
+			{
+				"evidence": "no upgrade price exists in the committed configuration, so no cost is computed and none is claimed",
+				"fact": "the resource vector carried by both derived commands is neutral"
+			}
+		],
+		"established": [
+			{
+				"evidence": "docs/legacy-protocol/commands.json (committed source-grounded command catalog)",
+				"fact": "there is no upgrade command: the dispatcher has 63 named command.py branches and none is named upgrade"
+			},
+			{
+				"evidence": "constants.py:970 SELL_REASON_UPGRADE (committed legacy server source)",
+				"fact": "the upgrade sell reason is \"UPGR\""
+			},
+			{
+				"evidence": "command.py:42-58 map_add_item(map, item_index, item_id, x, y, orientation, player)",
+				"fact": "a purchase takes a client-supplied map key and cell, so a sale followed by a purchase can reuse the exact key and cell"
+			},
+			{
+				"evidence": "engine.py:10-34 map_add_item",
+				"fact": "the purchase half writes a fresh row: a new wall-clock timestamp, store [], and attr {\"nc\": 0} when the item's config has clicks_to_build > 0"
+			},
+			{
+				"evidence": "command.py:52-53 bought_unit_add; engine.py:86-89",
+				"fact": "the purchase half records the new tier in the bought-units list, and only when it is not already listed"
+			},
+			{
+				"evidence": "packages/game-content normalized items and their documented upgrades_to rule",
+				"fact": "the target tier is in the configuration: every item carries upgrades_to, and -1/0 mean none while other values resolve against the item set (Wall I 23 -> Wall II 24)"
+			},
+			{
+				"evidence": "the executed-legacy reverse-order probe answers {\"result\":\"success\"} and leaves the key absent (40 -> 39), so a success status alone is not proof of an upgrade",
+				"fact": "the order is forced: sell first, then buy"
+			},
+			{
+				"evidence": "the committed executed-legacy fixture tests/fixtures/godot-building-upgrade/",
+				"fact": "the executed result: the row at key 12 holds the Wall II at the same cell, the placement count stays 40, boughtUnits gains the new tier, and every other row and resource is unchanged"
+			}
+		]
+	},
+	"readout": [
+		"(empty)"
+	],
+	"resources": {
+		"after": {
+			"cash": 5,
+			"coins": 2000,
+			"energy": 50,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2000,
+			"xp": 4
+		},
+		"before": {
+			"cash": 5,
+			"coins": 2000,
+			"energy": 50,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2000,
+			"xp": 4
+		}
+	},
+	"schema": "upgrade-report-v1",
+	"storage": {
+		"after": {},
+		"before": {},
+		"touched": false
+	},
+	"upgrade_requests": 1,
+	"upgraded_building": {
+		"cell_after": [
+			45,
+			49
+		],
+		"cell_before": [
+			45,
+			49
+		],
+		"key_reused": true,
+		"legacy_id_after": 24,
+		"legacy_id_before": 23,
+		"name_after": "Wall II",
+		"response_removed_row": [
+			23,
+			45,
+			49,
+			0,
+			0,
+			[],
+			{},
+			1
+		],
+		"response_upgraded_row": [
+			24,
+			45,
+			49,
+			1790682859,
+			0,
+			[],
+			{
+				"nc": 0
+			},
+			1
+		],
+		"row_removed": [
+			23,
+			45,
+			49,
+			0,
+			0,
+			[],
+			{},
+			1
+		],
+		"row_upgraded": [
+			24,
+			45,
+			49,
+			1790682859,
+			0,
+			[],
+			{
+				"nc": 0
+			},
+			1
+		],
+		"slot": 12
+	}
+}

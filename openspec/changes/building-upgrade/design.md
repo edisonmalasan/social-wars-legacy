@@ -17,6 +17,7 @@ traceable, and so a later change does not have to repeat it.
 | A purchase writes a *fresh* row | `engine.py:10-34`: `map_add_item` defaults `timestamp` to `timestamp_now()`, `store` to `[]`, and, when `player == 1` and the item's config has `clicks_to_build > 0`, seeds `attr["nc"] = 0` (the click-to-build counter) |
 | A purchase records the new tier | `command.py:52-53`: `buy` with `playerID == 1` calls `bought_unit_add(save, item_id)` |
 | The target tier is in the config | every item carries `upgrades_to`; the normalized package documents `-1`/`0` as "none" and resolves other values against the item set (`packages/game-content/tools/build_items.py:547-550`); Wall I (23) → Wall II (24) |
+| The bought-units record is a set, not a log | `engine.py:86-89`: `bought_unit_add` appends the item **only when it is not already listed**, so an upgrade adds the target tier while it is new and leaves the list alone when the tier is already present |
 | No upgrade price exists | item `cost` is `"0"` and `cost_type` is `null` across all 778 items (dead fields), `costs` prices the *purchase* only, and the 139 `premium_upgrade_costs` entries (`{"c":20}`, mostly unique decorations such as "Nice fountain", "Orange Tree", "Chickens") belong to the premium path, whose relationship to the normal upgrade is unproven |
 | The client gates upgrades | static SWF inventory (no execution): `CmdUpgrade`, `PopupUpgradeBuilding`, `btnUpgrade`, `btnUpgradeCash`, `upgradeinfo`, `getUpgradeBuilding`, `upgrades_to`, `premium_upgrade`, `premium_upgrade_costs`, `numUpgradesToday`, `lastUpgrades/`, `upgradeDateString`, `"No space to upgrade"`, `"You need to be level #0# to upgrade this building."`, `"Upgrade instantly for"` (matching the `UPGRADE_SPEEDUP_PRICING` global), plus tutorial copy ("Let's upgrade our CC!", "UPGRADE TO WALL III") |
 
@@ -134,9 +135,13 @@ this building."), a daily limit (`numUpgradesToday`, `lastUpgrades/`), and a spa
 check ("No space to upgrade"). None is enforced by the legacy server, and none can
 be reproduced from the repository: the gate's semantics (which level field, and
 whether it is the target's `min_level`) are unobserved. The level gate is also
-*inexercisable on the committed corpus*: the fresh save's `maps[0].level` is 1 and
-**no** item's next tier has `min_level ≤ 1` (the lowest is 5, Turret II), so
-enforcing the gate would make the whole deliver line unreachable on the corpus the
+*inexercisable on the committed corpus*: the fresh save's `maps[0].level` is 1, and
+while exactly one item pair in the whole configuration has a next tier at or below
+level 1 (Silo II `200` → "Chained Revolution Bonus 99" `10042`, `min_level "1"`),
+**Silo II is not placed in the fresh-player corpus**, so no corpus placement has a
+reachable next tier that a level-1 gate would allow — the lowest reachable is 5
+(Turret II), and this change's own target (Wall II) needs 9. Enforcing the gate
+would therefore make the whole deliver line unreachable on the corpus the
 project preserves. The space check is vacuous for this contract, since the same
 key and cell are reused. Each rule is named in the delta's non-claims with its
 evidence, and the level gate is listed as an explicit follow-up.
@@ -185,9 +190,11 @@ the fallback for the unavailable dedicated verification workflow.
 - **The upgraded building's `nc` seed is unconsumed** → documented as belonging to
   the construction-timers line (D5), with the evidence that `map_add_item` sets it
   and that `activate` / `add_click` consume it.
-- **`boughtUnits` grows on every upgrade** → that is legacy's own behavior for
-  `buy` with `playerID == 1`; the fixture proves it and the client mirrors the
-  response, never computing the list itself.
+- **`boughtUnits` records the new tier only while it is new** → `engine.py:86-89`
+  appends only when the item is not already listed, so re-upgrading into an
+  already-bought tier leaves the list unchanged; the fixture (`[]` → `[24]`) and
+  the compat tests encode the real rule, and the client mirrors the response
+  rather than computing the list itself.
 - **A fourth mode on one surface** → modes stay mutually exclusive, each keeps its
   own state, and the four delivered suites must stay green, so a regression shows
   up in an existing suite instead of hiding behind the new one.

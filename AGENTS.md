@@ -336,6 +336,56 @@ committed capture runs the fake implementation, so real-execution parity rests
 on the fixture-replay tests and the live phase. No Flash, Ruffle, ActionScript,
 or browser executes in any of these commands.
 
+Verified building-upgrade commands (milestone M7; Godot 4.7.2.stable and pinned
+CPython 3.9.13, Windows x64; `python` denotes the pinned interpreter, never the
+PATH alias). This is the first deliver line whose legacy contract was established
+by investigation before implementation:
+
+```bash
+python -B apps/compat-api/capture_upgrade_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_town_upgrade.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-09-29): the upgrade fixture capture (one-shot
+executed-legacy oracle; the request carries the derived two-command batch
+`[[0,"sell",[12,"UPGR"],[0x8]],[0,"buy",[12,24,45,49,1,0,0,""],[0x8]]]` - Wall I
+item 23 at map slot 12 upgraded to Wall II item 24 at the **same key and cell**, so
+the row becomes `[24, 45, 49, <timestamp>, 0, [], {"nc": 0}, 1]`, the placement
+count stays 40, `boughtUnits` goes `[]` to `[24]`, and every other row, the storage,
+the rest of the private state, the player info, and all seven resources are
+byte-identical; the reverse command order also answers `{"result":"success"}` and
+leaves the key absent, which is why the endpoint proves the post-state; exit codes
+and containment recorded in `tests/fixtures/godot-building-upgrade/README.md`), the
+compat suite including the two-command envelope, the `/v0/upgrade` endpoint with its
+`no_upgrade_path` guard and three post-execution proofs, and executed-legacy parity
+tests (observed `Ran 491 tests ... OK`, exit `0`), the hermetic upgrade-flow suite
+(observed 272 checks, PASS), both batteries in the final state (each exit `0`; the
+second embeds the `upgrade-live` phase, which asserts the typed response reuses the
+pre-request key and cell and that a disposable corpus save mutated), and the
+preservation manifest (3,258 entries, exit `0`). The compatibility service listens
+on `127.0.0.1:5056` only, and every network call in these commands is loopback. The
+evidence capture and report steps are documented in
+`apps/client-godot/README.md` ("Building upgrade"); committed evidence lives under
+`apps/client-godot/evidence/building-upgrade/`. Claim limits: the composed pair is
+**derived** (that the Flash client sends exactly this batch is never observed) while
+its shape, reason, ordering, and result are **established**; parity covers one
+recorded transaction against the fresh-player corpus; **no upgrade cost is claimed**
+and the premium upgrade price field is unused; the `{"nc": 0}` construction counter
+is reported but deliberately not consumed (the construction-timers deliver line owns
+it); the legacy client's level gate, daily-upgrade limit, and space check are
+deliberately not implemented (the level gate cannot be enforced on the committed
+corpus, where the map level is 1 and no placed building's next tier is reachable at
+that level); upgradability and addressability are client-side rules only, with the
+endpoint enforcing structural input validity and the post-state proof, and no
+server-authoritative validation (that belongs to Server v1 / M13); no pixel-parity
+oracle exists; the committed capture runs the fake implementation, so real-execution
+parity rests on the fixture-replay tests and the live phase. No Flash, Ruffle,
+ActionScript, or browser executes in any of these commands.
+
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 

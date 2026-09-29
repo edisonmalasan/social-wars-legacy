@@ -6,15 +6,17 @@ extends "res://tests/test_base.gd"
 ## purchase parity of spec "Purchase through either implementation", by
 ## `building-move` with the move parity of spec "Move through either
 ## implementation", by `building-sell` with the sell parity of spec "Sell
-## through either implementation", and by `building-store` with the store
-## parity of spec "Store through either implementation").
+## through either implementation", by `building-store` with the store
+## parity of spec "Store through either implementation", and by
+## `building-upgrade` with the upgrade parity of spec "Upgrade through either
+## implementation").
 ##
 ## Requires a running Compatibility API v0 on loopback — verify-boot.ps1
 ## wraps this suite with `compat_live_phase.py`, which starts
 ## `apps/compat-api/run.py` (disposable corpus) and tears it down again. The
 ## suite compares every live typed result against the fake implementation's,
 ## so both must yield the same boot data and the same placement, purchase,
-## move, sell, and store results (time-dependent fields excepted).
+## move, sell, store, and upgrade results (time-dependent fields excepted).
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 
@@ -60,6 +62,27 @@ const STORE_CELL := Vector2i(53, 39)
 ## resolves it before executing and answers 404 `unknown_item_index`, so
 ## legacy's silent early return is never reported as a success.
 const STORE_UNKNOWN_INDEX := 9999
+## The executed-legacy upgrade transaction's target: the Wall I (item 23) at
+## legacy map key 12, anchored at (45,49), REPLACED IN PLACE by the Wall II
+## (item 24) at the same key and the same cell — the one upgrade both
+## implementations must answer identically, and the one transaction whose
+## reused key the live response proves.
+const UPGRADE_ITEM := 23
+const UPGRADE_TARGET := 24
+const UPGRADE_INDEX := 12
+const UPGRADE_CELL := Vector2i(45, 49)
+## A placed building whose committed configuration reference means NO PATH
+## (a Bridge, `upgrades_to` `-1`): both implementations must fail closed with
+## `no_upgrade_path` instead of reducing it to a bare sale. The Bridge at
+## legacy key 35 is used rather than the Tree at key 2 because this phase's
+## own store transaction has already popped the Tree from that key.
+const UPGRADE_NO_PATH_INDEX := 35
+const UPGRADE_NO_PATH_ITEM := 929
+## An integer index that names no row in the corpus save: the upgrade
+## endpoint resolves it before executing and answers 404
+## `unknown_item_index`, so legacy's silent no-op is never reported as a
+## success.
+const UPGRADE_UNKNOWN_INDEX := 9999
 
 
 func run_scenario() -> void:
@@ -183,6 +206,7 @@ func run_scenario() -> void:
 	await _check_live_move(api, endpoint, user_id)
 	await _check_live_sell(api, endpoint, user_id)
 	await _check_live_store(api, endpoint, user_id)
+	await _check_live_upgrade(api, endpoint, user_id)
 	# The live corpus now carries every mutating transaction, so this suite's
 	# parity claim is stated once, explicitly: the two implementations are
 	# compared on the fields each own, and each side's resource bag is
@@ -846,6 +870,235 @@ func _check_live_store(api: Variant, endpoint: String, user_id: String) -> void:
 	print("[test] live-store applied item_index=%d cell=(%d, %d) xp=%d gold=%d"
 		% [STORE_INDEX, live.removed.x, live.removed.y, live.resources.xp,
 			live.resources.gold])
+
+
+## Upgrade through both implementations (building-upgrade task 3.3, spec
+## "Upgrade through either implementation"): the same typed shape from both,
+## the live two-sided response whose key and cell match the pre-request row
+## (the reused key is this command's distinguishing fact), the live upgraded
+## row holding the derived target tier, the neutral price vector leaving the
+## resource bag untouched (and therefore claiming no upgrade cost at all), and
+## the endpoint's structured codes passing through unchanged — including
+## `no_upgrade_path` for a building the configuration says cannot be upgraded.
+##
+## The corpus in this phase already carries the placement, purchase, move,
+## sell, and store transactions, so the live side's resources are its own —
+## the honest claim is the one the contract makes: an upgrade replaces exactly
+## the row the intent names, in place, and changes nothing else, and both
+## implementations produce the same typed shape and the same two rows.
+func _check_live_upgrade(api: Variant, endpoint: String,
+		user_id: String) -> void:
+	# The live side's pre-upgrade resources and its own row at the key, both
+	# read from the corpus itself (this phase has already mutated it).
+	api.configure("legacy_v0", endpoint)
+	var live_before: BootData.Resources = await _live_resources(api, endpoint,
+		user_id)
+	check(live_before != null,
+		"the live corpus pre-upgrade resources resolve")
+	var row_before: Variant = await _live_row(api, endpoint, user_id,
+		UPGRADE_INDEX)
+	check(row_before != null, "the live corpus pre-upgrade row resolves")
+	if row_before == null:
+		return
+
+	var live_ref: Variant = await api.upgrade_building(user_id, UPGRADE_INDEX)
+	check(live_ref is BootData.UpgradeResult,
+		"live upgrade_building returns the typed result")
+	if not (live_ref is BootData.UpgradeResult):
+		return
+	var live: BootData.UpgradeResult = live_ref
+	check(live.ok, "live upgrade resolves over loopback: %s"
+		% live.error_message)
+	if not live.ok or live.removed == null or live.upgraded == null \
+			or live.resources == null:
+		return
+	check_eq(live.protocol, BootData.PROTOCOL,
+		"live upgrade protocol is compat-v0")
+	check(live.game_version != "",
+		"the live upgrade response carries the game version")
+	check(live.server_time > 0,
+		"live server_time is a positive wall-clock epoch (time-dependent)")
+	check_eq(live.result, "success",
+		"live upgrade reports the legacy success result")
+	# `removed` is the row read BEFORE execution and `upgraded` the row
+	# re-read from the save after it (design D5). The corpus's own pre-request
+	# row is the reference, so the reused key and cell are compared against the
+	# state the service actually held.
+	var prior := row_before as Array
+	check_eq(live.removed.item_id, int(prior[0]),
+		"the live removed row names the corpus's own item")
+	check_eq([live.removed.x, live.removed.y], [int(prior[1]), int(prior[2])],
+		"the live removed row carries the corpus's own cell")
+	check_eq(live.removed.player, int(prior[7]),
+		"the live removed row keeps the player's team field")
+	check_eq(live.upgraded.item_id, UPGRADE_TARGET,
+		"the live upgraded row holds the derived target tier (Wall II)")
+	check_eq([live.upgraded.x, live.upgraded.y], [int(prior[1]), int(prior[2])],
+		"the live upgraded row sits at the pre-execution cell (the key is "
+		+ "reused)")
+	check_eq(live.upgraded.orientation, int(prior[4]),
+		"the live upgraded row carries the row's own orientation")
+	check_eq(live.upgraded.player, int(prior[7]),
+		"the live upgraded row carries the row's own player field")
+	check_eq(live.upgraded.store.size(), 0,
+		"the live upgraded row's store is fresh and empty")
+	check(live.upgraded.attr == {"nc": 0},
+		"the live upgraded row carries the construction seed (live=%s)"
+			% JSON.stringify(live.upgraded.attr))
+	check(live.upgraded.timestamp > 0,
+		"the live upgraded row is freshly stamped (time-dependent field, "
+		+ "never asserted by value)")
+	if live_before != null:
+		# The derived vector is neutral, so an upgrade changes NO resource
+		# (design D4) — and therefore claims no upgrade cost of any kind.
+		for key in ["gold", "wood", "oil", "steel", "mana", "xp", "cash"]:
+			check_eq(int(live.resources.get(key)), int(live_before.get(key)),
+				"%s is untouched by the upgrade (neutral vector, design D4)"
+					% key)
+	# The key survives the pair: the corpus still names it, now holding the
+	# new tier at the same cell (the row was replaced, not consumed).
+	var row_after: Variant = await _live_row(api, endpoint, user_id,
+		UPGRADE_INDEX)
+	check(row_after != null, "the live corpus post-upgrade row resolves")
+	if row_after != null:
+		check_eq(int((row_after as Array)[0]), UPGRADE_TARGET,
+			"the corpus still holds the upgraded tier at the same key")
+		check_eq([int((row_after as Array)[1]), int((row_after as Array)[2])],
+			[int(prior[1]), int(prior[2])],
+			"the corpus still holds that cell (the key was reused, not re-keyed)")
+
+	# Fake reference: an independent in-memory state over the committed
+	# upgrade-fixture before-state.
+	api.configure("fake")
+	var fake_ref: Variant = await api.upgrade_building(user_id, UPGRADE_INDEX)
+	check(fake_ref is BootData.UpgradeResult,
+		"fake upgrade_building returns the typed result")
+	if not (fake_ref is BootData.UpgradeResult):
+		return
+	var fake: BootData.UpgradeResult = fake_ref
+	check(fake.ok, "fake upgrade reference resolves: %s" % fake.error_message)
+	if not fake.ok or fake.removed == null or fake.upgraded == null \
+			or fake.resources == null:
+		return
+	check_eq(live.protocol, fake.protocol,
+		"live upgrade protocol equals the fake's")
+	check_eq(live.result, fake.result,
+		"live upgrade result string equals the fake's")
+	check_eq(live.removed.item_id, fake.removed.item_id,
+		"live upgrade removed item id equals the fake's")
+	check_eq([live.removed.x, live.removed.y],
+		[fake.removed.x, fake.removed.y],
+		"live upgrade removed cell equals the fake's")
+	check_eq(live.upgraded.item_id, fake.upgraded.item_id,
+		"live upgrade target tier equals the fake's")
+	check_eq([live.upgraded.x, live.upgraded.y],
+		[fake.upgraded.x, fake.upgraded.y],
+		"live upgrade cell equals the fake's")
+	check_eq(live.upgraded.orientation, fake.upgraded.orientation,
+		"live upgrade orientation equals the fake's")
+	check_eq(live.upgraded.player, fake.upgraded.player,
+		"live upgrade player field equals the fake's")
+	check_eq(live.upgraded.store.size(), fake.upgraded.store.size(),
+		"live upgrade store equals the fake's")
+	check(live.upgraded.attr == fake.upgraded.attr,
+		"live upgrade attr equals the fake's (live=%s fake=%s)"
+			% [JSON.stringify(live.upgraded.attr),
+				JSON.stringify(fake.upgraded.attr)])
+	# The fake's own side: the executed fixture's two-sided outcome, verbatim
+	# (its fresh timestamp is the capture's recorded epoch, not the wall
+	# clock, so it is asserted as the fixture's value the fake pins).
+	check_eq(fake.removed.item_id, UPGRADE_ITEM,
+		"the fake reproduces the fixture's pre-execution item")
+	check_eq(fake.removed.timestamp, 0,
+		"the fake never restamps the removed row's timestamp")
+	check_eq(fake.upgraded.item_id, UPGRADE_TARGET,
+		"the fake reproduces the fixture's upgraded tier")
+	check_eq(fake.upgraded.x, UPGRADE_CELL.x, "the fake reuses the fixture's x")
+	check_eq(fake.upgraded.y, UPGRADE_CELL.y, "the fake reuses the fixture's y")
+
+	# A building with no resolvable next tier fails closed with the endpoint's
+	# own code instead of becoming a bare sale (design D3).
+	api.configure("legacy_v0", endpoint)
+	var live_no_path: Variant = await api.upgrade_building(user_id,
+		UPGRADE_NO_PATH_INDEX)
+	check(live_no_path is BootData.UpgradeResult,
+		"the live no-upgrade-path row returns the typed result")
+	if live_no_path is BootData.UpgradeResult:
+		var no_path: BootData.UpgradeResult = live_no_path
+		check(not no_path.ok,
+			"a row with no resolvable next tier is a structured failure")
+		check_eq(no_path.error_code, "no_upgrade_path",
+			"the live structured error passes through with the endpoint's code")
+		check(no_path.removed == null and no_path.upgraded == null
+			and no_path.resources == null,
+			"the live no-upgrade-path failure carries no partial payload")
+	var no_path_row: Variant = await _live_row(api, endpoint, user_id,
+		UPGRADE_NO_PATH_INDEX)
+	if no_path_row != null:
+		check_eq(int((no_path_row as Array)[0]), UPGRADE_NO_PATH_ITEM,
+			"the refused row is still on the map, unmolested")
+
+	# Structured service errors pass through with their original codes, and
+	# the fake derives the same codes for the same intents offline.
+	var live_unknown: Variant = await api.upgrade_building(user_id,
+		UPGRADE_UNKNOWN_INDEX)
+	check(live_unknown is BootData.UpgradeResult,
+		"the live unknown index returns the typed result")
+	if live_unknown is BootData.UpgradeResult:
+		var unknown: BootData.UpgradeResult = live_unknown
+		check(not unknown.ok,
+			"an index the corpus does not name is a structured failure")
+		check_eq(unknown.error_code, "unknown_item_index",
+			"the live structured error passes through with the endpoint's code")
+		check(unknown.removed == null and unknown.upgraded == null
+			and unknown.resources == null,
+			"the live structured failure carries no partial payload")
+	api.configure("fake")
+	var fake_unknown: Variant = await api.upgrade_building(user_id,
+		UPGRADE_UNKNOWN_INDEX)
+	check(fake_unknown is BootData.UpgradeResult and not fake_unknown.ok,
+		"fake fails the same intent offline")
+	if fake_unknown is BootData.UpgradeResult:
+		check_eq(fake_unknown.error_code, "unknown_item_index",
+			"structured codes match between implementations")
+	var fake_no_path: Variant = await api.upgrade_building(user_id,
+		UPGRADE_NO_PATH_INDEX)
+	check(fake_no_path is BootData.UpgradeResult and not fake_no_path.ok,
+		"the fake fails the no-upgrade-path intent offline too")
+	if fake_no_path is BootData.UpgradeResult:
+		check_eq(fake_no_path.error_code, "no_upgrade_path",
+			"the no-upgrade-path code matches between implementations")
+	print("[test] live-upgrade applied item_index=%d cell=(%d, %d) tier=%d "
+		% [UPGRADE_INDEX, live.upgraded.x, live.upgraded.y,
+			live.upgraded.item_id]
+		+ "xp=%d gold=%d" % [live.resources.xp, live.resources.gold])
+
+
+## The corpus's own eight-field row at one legacy key, read from its
+## bootstrap payload, or null when it cannot be read. This is the
+## pre-request reference the live upgrade's reused key and cell are compared
+## against — read from the service's own state, never from the fake's
+## fixture, because the live side has already executed every earlier
+## transaction in this phase.
+func _live_row(api: Variant, endpoint: String, user_id: String,
+		item_index: int) -> Variant:
+	api.configure("legacy_v0", endpoint)
+	var boot: Variant = await api.get_bootstrap(user_id)
+	if not (boot is BootData.BootstrapResult) or not bool(boot.ok):
+		check(false, "the live corpus row bootstrap resolves")
+		return null
+	var info: Variant = (boot as BootData.BootstrapResult).player_info
+	if info == null:
+		check(false, "the live corpus row payload is readable")
+		return null
+	var raw: Dictionary = (info as BootData.PlayerInfoPayload).raw
+	var map: Dictionary = raw.get("map", {}) as Dictionary
+	var row: Variant = (map.get("items", {}) as Dictionary).get(str(item_index))
+	if not (row is Array) or (row as Array).size() != 8:
+		check(false, "the live corpus row at key %d is an eight-field array"
+			% item_index)
+		return null
+	return (row as Array).duplicate()
 
 
 ## The seven stored resources of the running corpus, as the typed
