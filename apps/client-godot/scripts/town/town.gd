@@ -194,6 +194,58 @@ extends Node2D
 ## (`buy_si_help` / `finish_si`, the `attr["si"]` bag) are deliberately out of
 ## scope: this line never hires or finishes a friend and never applies a
 ## speedup (design D9).
+##
+## Collect mode (building-collect, spec "Collection flow"): a SIXTH mode on
+## the SAME delivered selection-driven surface — beside `Move`, `Sell`,
+## `Store`, `Upgrade`, and `Build`, exactly one of the six can be armed at a
+## time — so selecting a placed building that has an addressable legacy key and
+## resolvable committed income offers a `Collect` action, and pressing it arms
+## the collection. A collection readout renders for ANY selected
+## income-bearing building: what the next collection would yield, in which
+## resource, the committed ladder rung the row has reached, and how long until
+## the next one, all derived through the pure helpers in
+## `collection_flow.gd` from the SAME committed content (`collect`,
+## `collect_type`, `collect_xp`, `max_collects`, `COLLECT_MINUTES`,
+## `COLLECT_MULTIPLIER`) the service derives from. The armed surface reuses
+## that panel's selection line, status line, readout, and confirm/cancel row in
+## a sixth, TARGETLESS mode whose confirm names the derived payout **as
+## derived** and sends exactly ONE `GameApi.collect_income()` intent — the
+## legacy index and nothing else, never an amount, a resource, a tier, a time,
+## a price, or a resource delta. Cancellation sends nothing and leaves the
+## town byte-identical. Success applies only the authoritative response — the
+## typed row replaced by the response's post-execution row, the SAME rendered
+## object retained in depth order (a collection rewrites no item, cell, or
+## footprint), the HUD balances and experience from the response, and the
+## readout re-evaluated against the response's OWN `reference_time` rather
+## than the local clock — with every field the apply touches snapshotted and
+## rolled back if any step fails (design D8, the same contract
+## `_apply_construction` implements).
+##
+## **This is the first delivered line whose derived resource vector is
+## deliberately NOT neutral.** Every number in the payout is
+## derived-provisional — the amount formula, the experience scaling, the
+## sub-first-rung refusal, the cap refusal, the shared-field refusal, and the
+## cash/experience mapping (design D1-D6) — because no legacy branch reads any
+## of it, and the claim is "a payout that grows in four committed rungs derived
+## from the item's committed income fields", never any specific amount the
+## legacy client pays. The client's own arithmetic is therefore NEVER applied:
+## the response's balances win, even when the two disagree, and the confirm
+## says the amount is derived rather than authoritative.
+##
+## The `Collect` action is NOT offered and any attempt is refused with an
+## explicit reason and NO request for a row that records no committed income,
+## whose resource type is outside the committed set, whose item records a
+## non-zero collection cap, that carries construction state, that has reached
+## no committed rung, or whose legacy key is not a positive integer. The
+## construction-state refusal is the client half of a deliberate TWO-LAYER
+## rule (design D5): the executed probe shows a collection on a just-started
+## construction overwrites the build's start instant while the recorded
+## countdown survives — silently restarting an active build's timer — while the
+## legacy server answers success, so the service refuses the same row
+## independently and a client that ignores this rule still cannot corrupt the
+## timers the delivered construction line depends on. Cap semantics, friend
+## assistance, speedups, and any server-authoritative rule are deliberately
+## absent (design D9/D10).
 
 const Iso = preload("res://scripts/town/iso.gd")
 const TownState = preload("res://scripts/town/town_state.gd")
@@ -211,6 +263,7 @@ const PlacementFlow = preload("res://scripts/town/placement_flow.gd")
 const ShopFlow = preload("res://scripts/town/shop_flow.gd")
 const MoveFlow = preload("res://scripts/town/move_flow.gd")
 const ConstructionFlow = preload("res://scripts/town/construction_flow.gd")
+const CollectionFlow = preload("res://scripts/town/collection_flow.gd")
 
 ## Report-mode inputs and captures (repository-relative paths; the
 ## fixture paths mirror the fake GameApi's own committed constants and
@@ -401,6 +454,47 @@ const CONSTRUCTION_INTENT_CLICKS := 1
 ## capture's own wall clock and is therefore never asserted by value.
 const CONSTRUCTION_INTENT_ROW := [CONSTRUCTION_INTENT_ITEM, 58, 48, 0, 0, [],
 	{}, 1]
+## Collect evidence (building-collect, design D10): the executed-legacy
+## collect fixture the parity suite replays and the committed fake capture the
+## collect report points at (repository-relative).
+const REPORT_COLLECT_REQUEST := \
+	"tests/fixtures/godot-building-collect/steps/command_collect/request.json"
+const REPORT_COLLECT_RESPONSE := \
+	"tests/fixtures/godot-building-collect/steps/command_collect/response.body"
+const REPORT_COLLECT_AFTER := \
+	"tests/fixtures/godot-building-collect/steps/command_collect/after.json"
+const REPORT_CAPTURE_COLLECT := \
+	"apps/client-godot/evidence/building-collect/building-collect.png"
+## Default collect report destination for the bare `--collect-report` flag
+## (project-relative, resolved against the project directory).
+const DEFAULT_COLLECT_REPORT_PATH := "evidence/building-collect/report.json"
+## The single collect intent the collect evidence records: the Tree decoration
+## (item 905) at legacy map key 2, anchored at (53,39) — the executed-legacy
+## fixture's transaction, driven through the same
+## selection -> arm -> confirm flow a player uses. The fixture's slot is the
+## same row the store fixture puts into storage in ITS OWN independent
+## transaction (each capture seeds a fresh corpus from the same committed
+## save), so the two fixtures stay independently readable.
+const COLLECT_INTENT_INDEX := 2
+const COLLECT_INTENT_ITEM := 905
+const COLLECT_INTENT_CELL := Vector2i(53, 39)
+## The committed configuration facts the client derives for that item and the
+## service derives server-side: the collection amount, the resource it is paid
+## in, the collection experience, and the collection cap. NONE of them is ever
+## sent — the intent carries the legacy index and nothing else. Cross-checked
+## against the executed fixture's own recorded payout before anything is sent.
+const COLLECT_INTENT_AMOUNT := 20
+const COLLECT_INTENT_TYPE := "w"
+const COLLECT_INTENT_XP := 1
+const COLLECT_INTENT_CAP := 0
+## The row the executed fixture recorded BEFORE execution, and the committed
+## payout the service derived for it at the top rung — the two facts this report
+## cross-checks the client state against before it drives the intent. The
+## collection instant is `0` (never collected), so the elapsed time is
+## unbounded and the top rung applies in every run.
+const COLLECT_INTENT_ROW := [COLLECT_INTENT_ITEM, 53, 39, 0, 0, [], {}, 1]
+const COLLECT_INTENT_PAYOUT := [0, 3, 0, 60, 0, 0, 0, 0]
+const COLLECT_INTENT_TIER := 3
 ## Default placement report destination for the bare
 ## `--placement-report` flag (project-relative, resolved against the
 ## project directory).
@@ -799,6 +893,155 @@ const CONSTRUCTION_PROVENANCE := {
 	],
 }
 
+## The collect evidence's explicit non-claims (spec "Collection evidence,
+## provenance, and claim limits"). The runtime tokens in the first claim are
+## assembled from fragments for the same project-scope reason as the lists
+## above.
+const COLLECT_NON_CLAIMS := [
+	"no Flash, " + "Ruf" + "fle" + ", " + "Action" + "Script"
+		+ ", or browser executed",
+	"every number in the payout is derived-provisional and was never observed "
+		+ "from the Flash client: the amount formula (D1), the experience "
+		+ "scaling (D2), the sub-first-rung refusal (D3), the cap semantics "
+		+ "(D4), the shared-field refusal (D5), and the cash/experience mapping "
+		+ "(D6). The claim is that a payout grows in four committed rungs "
+		+ "derived from the item's committed income fields, never any specific "
+		+ "amount the legacy client pays",
+	"the clamp is not exercised by the fixture: legacy's max(current + delta, "
+		+ "0) only bites when a delta would drive a balance below zero, and the "
+		+ "derived payout is a credit added to balances far above zero; "
+		+ "observing it would need a delta larger than the balance",
+	"the committed corpus's only income-bearing rows are decorations — the "
+		+ "Tree and the eight forest rows — because the real factories and "
+		+ "depots are not placed, so this payout is a decoration's; nothing is "
+		+ "claimed about what a factory would pay beyond its own committed "
+		+ "income fields and the committed ladder",
+	"no cap semantics are implemented: only a committed max_collects of 0 is, a "
+		+ "non-zero cap is refused with capped_collection rather than "
+		+ "interpreted, and that refusal is stub-covered because no placed "
+		+ "corpus item carries one",
+	"the sub-first-rung refusal is stub-covered for the same reason: no corpus "
+		+ "row records a recent collection instant (all 40 rows carry item[3] == "
+		+ "0), so the top rung applies deterministically in every run",
+	"the shared item[3] overlap is closed by REFUSAL, not by interpretation: a "
+		+ "collection on a row under construction is refused in both layers "
+		+ "rather than modelled, and this contract never treats a construction "
+		+ "stamp as a collection stamp or the reverse",
+	"the ladder's lower rungs are unit-covered at the pure-helper level with "
+		+ "explicit instants, never against a live wall clock; the committed "
+		+ "thresholds are MINUTES and the conversion to the Unix seconds both "
+		+ "instants use is the single named constant the suite asserts at every "
+		+ "boundary from both sides",
+	"the friend-assist cluster is out of scope: a row carrying only the "
+		+ "attr[\"si\"] bag is collectible, because the construction-state "
+		+ "refusal names exactly cp and nc",
+	"parity covers one recorded transaction against the fresh-player corpus, "
+		+ "not progressed players",
+	"collectibility, the sub-first-rung rule, and the next-rung countdown are "
+		+ "client-side rules only; the endpoint enforces structural input "
+		+ "validity, the content refusals, the construction-state and "
+		+ "sub-first-rung guards, and the value-level post-execution proof, and "
+		+ "no server-authoritative validation exists",
+	"no pixel-parity oracle against the legacy client exists",
+	"the capture runs the fake GameApi implementation; real-execution parity is "
+		+ "established by the fixture-replay tests and the verify-boot "
+		+ "collect-live phase",
+]
+
+## The established-versus-derived provenance split the collect report records
+## as its own section (spec "Collection evidence, provenance, and claim
+## limits"). Every row names the evidence a reader can go and check, so no
+## reader has to take the split on trust.
+const COLLECT_PROVENANCE := {
+	"established": [
+		{"fact": "the collect branch takes exactly one positional argument and "
+			+ "writes ONLY item[3] = time_now(); a missing row logs an error and "
+			+ "returns early, still persisting the batch",
+			"evidence": "command.py:136-147 and the collect row of "
+				+ "docs/legacy-protocol/commands.json (committed legacy "
+				+ "server source and its source-grounded command catalog)"},
+		{"fact": "the income is NOT computed by the server: the pre-dispatch "
+			+ "apply_resources applies the client-sent eight-slot vector "
+			+ "verbatim, per resource, as max(current + delta, 0), and the "
+			+ "command catalog's resource_effects state both facts outright",
+			"evidence": "command.py:40; engine.py:251-271; "
+				+ "docs/legacy-protocol/commands.json"},
+		{"fact": "the per-item income content is committed: collect (amount), "
+			+ "collect_type (which resource), collect_xp (experience), and "
+			+ "max_collects (a cap where non-zero)",
+			"evidence": "packages/game-content normalized items; the census in "
+				+ "docs/legacy-collect-income.md records collect 0 for 727 of "
+				+ "778 stored items, collect_type g/w/o/s/c, collect_xp 0 for 419, "
+				+ "and max_collects 0 for 767 with 25 and 100 for the rest"},
+		{"fact": "the collection ladder is committed: COLLECT_MINUTES "
+			+ "[5, 60, 240, 480] paired with COLLECT_MULTIPLIER [0.25, 1, 2, 3], "
+			+ "in MINUTES",
+			"evidence": "the loaded globals of config/main.json, normalized to "
+				+ "packages/game-content/normalized/globals.json"},
+		{"fact": "a collection on a just-started construction overwrites the "
+			+ "build's start instant while the recorded countdown SURVIVES, and "
+			+ "the legacy server answers {\"result\":\"success\"}",
+			"evidence": "executed-legacy probe 2 recorded in "
+				+ "docs/legacy-collect-income.md and in the committed fixture "
+				+ "manifest: [22, 58, 48, 0, 0, [], {}, 1] -> "
+				+ "[22, 58, 48, <ts>, 0, [], {\"cp\": 3600}, 1]"},
+		{"fact": "the executed result: the row at key 2 keeps its key, cell, "
+			+ "item, orientation, store, attribute bag, and player and carries a "
+			+ "re-stamped collection instant, the placement count stays 40, the "
+			+ "derived payout lands in exactly the wood and experience slots, and "
+			+ "every other row, the storage, the private state, and the player "
+			+ "info are byte-identical",
+			"evidence": "the committed executed-legacy fixture "
+				+ "tests/fixtures/godot-building-collect/"},
+	],
+	"derived": [
+		{"fact": "the amount formula: collect scaled by the reached rung's "
+			+ "committed multiplier, clamped at the top rung (D1)",
+			"evidence": "derived: no legacy branch reads either ladder global; "
+				+ "the two are parallel four-element arrays and the amount is "
+				+ "otherwise a constant, so a ladder that did not scale the "
+				+ "amount would have no effect at all. A flat amount and "
+				+ "extrapolation past the last rung are the recorded rejected "
+				+ "alternatives"},
+		{"fact": "the experience scaling: collect_xp by the SAME rung (D2)",
+			"evidence": "derived: the experience is part of the same payout, so "
+				+ "scaling only the amount would leave the vector internally "
+				+ "inconsistent; a flat collect_xp is the recorded rejected "
+				+ "alternative"},
+		{"fact": "the sub-first-rung behaviour: no collection is offered and "
+			+ "none is executed below 300 s, so the 0.25 multiplier never "
+			+ "derives a speculative amount (D3)",
+			"evidence": "derived: five minutes in, a quarter of the full amount "
+				+ "leaves the sub-rung case unspecified (a quarter, nothing, or "
+				+ "a refusal), and the safe reading is the one that invents no "
+				+ "amount"},
+		{"fact": "the cap semantics: only a committed max_collects of 0 is "
+			+ "implemented and a non-zero cap is refused (D4)",
+			"evidence": "derived: 0 on 767 of 778 items reads as no cap, but "
+				+ "nothing in the repository says whether a non-zero cap limits "
+				+ "one collection, a daily total, or a building's lifetime "
+				+ "output, and the three readings imply different payouts"},
+		{"fact": "the shared item[3] rule: a row carrying construction state "
+			+ "is refused in both the client and the service (D5)",
+			"evidence": "derived as a RULE from an ESTABLISHED risk: probe 2 "
+				+ "shows legacy does not prevent the corruption and reports "
+				+ "success, so refusing is the safest evidence-supported "
+				+ "behaviour; what the legacy client itself would do is never "
+				+ "observed"},
+		{"fact": "the cash and experience mapping: g/w/o/s/c onto gold, wood, "
+				+ "oil, steel, and cash, with the unread unknown slot and the "
+				+ "never-produced mana slot always zero (D6)",
+			"evidence": "derived: no item records a mana collect type, and a "
+				+ "type outside the committed five is refused rather than "
+				+ "coerced; a \"m\" mapping for a value no item records is the "
+				+ "recorded rejected alternative"},
+		{"fact": "the legacy client sends exactly this single-command envelope "
+			+ "carrying the derived vector",
+			"evidence": "never observed; no Flash, " + "Ruf" + "fle" + ", "
+				+ "Action" + "Script" + ", or browser execution in this change"},
+	],
+}
+
 ## View states (spec: never claim a rendered town without one).
 const STATE_EMPTY := "empty"
 const STATE_BUILT := "built"
@@ -979,6 +1222,29 @@ var _construction_completed: Dictionary = {}
 ## The construction readout label (null while no panel is built).
 var _construction_readout: Variant = null
 
+## Collect flow (building-collect, spec "Collection flow"). The surface is not
+## a seventh panel: it is a SIXTH mode of the SAME selection-driven surface
+## (design D8), so it owns no slot, no preview, and no grid target — only its
+## own armed state, the placement being collected, the explicit failure the
+## spec requires, and the readout the spec requires. The move, sell, store,
+## upgrade, and build modes, their previews, and their confirm state machines
+## are untouched.
+var collect_error := ""
+var _collect_active := false
+## The placement being collected (TownState.Placement or null). The SAME
+## instance the state holds, so the apply replaces exactly the row the player
+## chose.
+var _collect_placement: Variant = null
+## The instant the collection readout is evaluated at. It is the local clock
+## until a collection succeeds, and the RESPONSE's own `reference_time`
+## afterwards — never the client's own clock once a server has spoken
+## (design D8/D9), which is what keeps the deterministic report byte-identical
+## across reruns. Held per session and dropped by a rebuild, because it is a
+## property of the last authoritative response rather than of the save.
+var _collect_reference := 0
+## The collection readout label (null while no panel is built).
+var _collect_readout: Variant = null
+
 ## Visual hierarchy + texture caches (shared across rebuilds of this view).
 var _visuals := TownVisuals.new()
 ## The committed HUD builder once attached.
@@ -1018,6 +1284,11 @@ var _upgrade_capture := false
 ## so the frame shows the town carrying a building under construction with its
 ## construction readout on screen.
 var _construction_capture := false
+## True when the capture flag was `--collect-capture=`
+## (building-collect, design D10): the collect flow runs before the capture so
+## the frame shows the town whose collection readout carries the re-stamped
+## clock and the HUD balances the response reported.
+var _collect_capture := false
 
 @onready var terrain: TownTerrain = $Terrain
 @onready var objects_layer: Node2D = $Objects
@@ -1085,6 +1356,12 @@ func _ready() -> void:
 			and get_script().resource_path == "res://scripts/town/town.gd":
 		await _write_construction_report(construction_report_path)
 		return
+	# The collect report shares that gate for the same reason.
+	var collect_report_path := _collect_report_path_arg()
+	if not collect_report_path.is_empty() \
+			and get_script().resource_path == "res://scripts/town/town.gd":
+		await _write_collect_report(collect_report_path)
+		return
 	_capture_path = _user_arg("--town-capture=")
 	_purchase_capture = false
 	_move_capture = false
@@ -1092,6 +1369,7 @@ func _ready() -> void:
 	_store_capture = false
 	_upgrade_capture = false
 	_construction_capture = false
+	_collect_capture = false
 	if _capture_path.is_empty():
 		_capture_path = _user_arg("--placement-capture=")
 		_placement_capture = not _capture_path.is_empty()
@@ -1113,6 +1391,9 @@ func _ready() -> void:
 	if _capture_path.is_empty():
 		_capture_path = _user_arg("--construction-capture=")
 		_construction_capture = not _capture_path.is_empty()
+	if _capture_path.is_empty():
+		_capture_path = _user_arg("--collect-capture=")
+		_collect_capture = not _capture_path.is_empty()
 	if state != null:
 		build()
 	_maybe_start_capture()
@@ -2224,6 +2505,11 @@ func arm_move() -> Dictionary:
 		# design D7): a build is armed, so a move is refused by name.
 		return _move_reject("construction_already_active",
 			"a build is armed; cancel it before moving")
+	if _collect_active:
+		# The same one-surface rule for the sixth mode (building-collect design
+		# D8): a collection is armed, so a move is refused by name.
+		return _move_reject("collect_already_active",
+			"a collection is armed; cancel it before moving")
 	if selected == null:
 		return _move_reject("move_no_selection",
 			"no placed building is selected")
@@ -2284,25 +2570,27 @@ func refresh_move_action() -> Dictionary:
 
 
 ## Renders the move panel's current state into its committed controls (the
-## selection line, the status line, the five selection-path actions' states,
-## the construction readout, and the shared confirm row) so the panel text
-## always names the live selection. A no-op while no panel is built.
+## selection line, the status line, the six selection-path actions' states,
+## the construction and collection readouts, and the shared confirm row) so
+## the panel text always names the live selection. A no-op while no panel is
+## built.
 ##
-## The panel carries ALL FIVE modes of this selection-driven surface (design
-## D8, extended by building-store design D7, building-upgrade design D8, and
-## building-construction design D7): `Move`, `Sell`, `Store`, `Upgrade`, and
-## `Build` are armed from the same selection, exactly one of them can be armed
-## at a time, and the single confirm row names whichever mode is armed. The
-## move arming, its preview, and its target requirements are untouched by the
-## other four, the sell arming is untouched by the store, and the upgrade and
-## build armings are untouched by all of them.
+## The panel carries ALL SIX modes of this selection-driven surface (design
+## D8, extended by building-store design D7, building-upgrade design D8,
+## building-construction design D7, and building-collect design D8): `Move`,
+## `Sell`, `Store`, `Upgrade`, `Build`, and `Collect` are armed from the same
+## selection, exactly one of them can be armed at a time, and the single
+## confirm row names whichever mode is armed. The move arming, its preview,
+## and its target requirements are untouched by the other five, the sell
+## arming is untouched by the store, and the upgrade, build, and collect
+## armings are untouched by all of them.
 func _refresh_move_panel() -> void:
 	var arm_button: Variant = _move_panel_button("move")
 	if arm_button is Button:
 		var available := move_selection_available()
 		(arm_button as Button).disabled = _move_active or _sell_active \
 			or _store_active or _upgrade_active or _construction_active \
-			or not available
+			or _collect_active or not available
 		(arm_button as Button).text = "Move" if available \
 			else "Move (unavailable)"
 	var sell_button: Variant = _move_panel_button("sell")
@@ -2310,7 +2598,7 @@ func _refresh_move_panel() -> void:
 		var sell_available := sell_selection_available()
 		(sell_button as Button).disabled = _sell_active or _move_active \
 			or _store_active or _upgrade_active or _construction_active \
-			or not sell_available
+			or _collect_active or not sell_available
 		(sell_button as Button).text = "Sell" if sell_available \
 			else "Sell (unavailable)"
 	var store_button: Variant = _move_panel_button("store")
@@ -2318,7 +2606,7 @@ func _refresh_move_panel() -> void:
 		var store_available := store_selection_available()
 		(store_button as Button).disabled = _store_active or _move_active \
 			or _sell_active or _upgrade_active or _construction_active \
-			or not store_available
+			or _collect_active or not store_available
 		(store_button as Button).text = "Put in storage" if store_available \
 			else "Put in storage (unavailable)"
 	var upgrade_button: Variant = _move_panel_button("upgrade")
@@ -2328,7 +2616,7 @@ func _refresh_move_panel() -> void:
 		var upgrade_available := upgrade_selection_available()
 		(upgrade_button as Button).disabled = _upgrade_active or _move_active \
 			or _sell_active or _store_active or _construction_active \
-			or not upgrade_available
+			or _collect_active or not upgrade_available
 		(upgrade_button as Button).text = "Upgrade" if upgrade_available \
 			else "Upgrade (unavailable)"
 	var build_button: Variant = _move_panel_button("build")
@@ -2339,25 +2627,63 @@ func _refresh_move_panel() -> void:
 		var build_available := construction_selection_available()
 		(build_button as Button).disabled = _construction_active \
 			or _move_active or _sell_active or _store_active or _upgrade_active \
-			or not build_available
+			or _collect_active or not build_available
 		(build_button as Button).text = "Build" if build_available \
 			else "Build (unavailable)"
+	var collect_button: Variant = _move_panel_button("collect")
+	if collect_button is Button:
+		# The collect action additionally needs resolvable committed income, so
+		# a building that produces nothing — or one under construction, or one
+		# that has reached no committed rung — is never offered it (design
+		# D3/D5/D9).
+		var collect_available := collect_selection_available()
+		(collect_button as Button).disabled = _collect_active or _move_active \
+			or _sell_active or _store_active or _upgrade_active \
+			or _construction_active or not collect_available
+		(collect_button as Button).text = CollectionFlow.collect_label() \
+			if collect_available \
+			else (CollectionFlow.collect_label() + " (unavailable)")
 	var confirm_button: Variant = _move_panel_button("confirm")
 	if confirm_button is Button:
-		# A sale, a store, an upgrade, and a build have no grid target, so
-		# their confirm is offered as soon as the mode is armed; a move's only
-		# once a valid target is committed (the move suite's own gate,
-		# unchanged).
+		# A sale, a store, an upgrade, a build, and a collection have no grid
+		# target, so their confirm is offered as soon as the mode is armed; a
+		# move's only once a valid target is committed (the move suite's own
+		# gate, unchanged).
 		(confirm_button as Button).visible = _move_active or _sell_active \
-			or _store_active or _upgrade_active or _construction_active
+			or _store_active or _upgrade_active or _construction_active \
+			or _collect_active
 		(confirm_button as Button).text = "Sell" if _sell_active \
 			else ("Put in storage" if _store_active \
 				else ("Upgrade" if _upgrade_active \
 					else (ConstructionFlow.step_label(
 						_construction_step_text()) if _construction_active \
-						else "Move here")))
+						else (CollectionFlow.collect_label() if _collect_active \
+							else "Move here"))))
 	_refresh_construction_readout()
+	_refresh_collect_readout()
 	if _move_status == null or not is_instance_valid(_move_status):
+		return
+	if _collect_active:
+		var collect_evaluation: Dictionary = _collect_evaluation(
+			_collect_placement)
+		if str(collect_evaluation.get("reason", "")) != "":
+			# A refusal names itself; a structural rejection (which arming
+			# already prevents) falls back to the named error rather than an
+			# empty line.
+			var refusal := CollectionFlow.refusal_text(collect_evaluation)
+			_set_move_status("[town] collect: %s" % (refusal if refusal != ""
+				else str(collect_evaluation.get("error", "not collectable"))))
+		else:
+			_set_move_status("armed: collect %s (save key %d) at (%d, %d) | "
+				% [_move_label(_collect_placement),
+					int((_collect_placement as TownState.Placement).slot),
+					(_collect_placement as TownState.Placement).cell.x,
+					(_collect_placement as TownState.Placement).cell.y]
+				+ "derived: %s at rung %d | the service decides the amount"
+				% [CollectionFlow.payout_text(
+					collect_evaluation.get("payout", [])),
+					int(collect_evaluation.get("tier",
+						CollectionFlow.NO_TIER))])
 		return
 	if _construction_active:
 		var build_evaluation: Dictionary = _construction_evaluation(
@@ -2707,6 +3033,7 @@ func _build_move_panel(armed: bool) -> Dictionary:
 		child.free()
 	_move_status = null
 	_construction_readout = null
+	_collect_readout = null
 	var panel := VBoxContainer.new()
 	panel.name = "move"
 	panel.anchor_left = 1.0
@@ -2747,6 +3074,16 @@ func _build_move_panel(armed: bool) -> Dictionary:
 			% [_move_label(_upgrade_placement),
 				_upgrade_label(_upgrade_placement)]
 			+ "(derived, never observed)")
+	elif _collect_active:
+		# A collection states the boundary the delivered lines state, and more:
+		# its amount is NOT neutral and NOT authoritative — it is DERIVED from
+		# the item's committed income fields and the committed ladder, and the
+		# response is what actually moves a balance (design D7/D9).
+		selection.text = ("collecting: %s | derived payout: %s (derived, never "
+			% [_move_label(_collect_placement),
+				CollectionFlow.payout_text(
+					_collect_evaluation(_collect_placement).get("payout", []))]
+			+ "observed) | the service decides the amount")
 	elif _construction_active:
 		# A build states the same boundary on its side: the derived resource
 		# vector is neutral and the committed configuration records no price for
@@ -2790,6 +3127,21 @@ func _build_move_panel(armed: bool) -> Dictionary:
 	_style_placement_label(readout)
 	panel.add_child(readout)
 	_construction_readout = readout
+	# The collection readout (building-collect design D8): a line of its own,
+	# rendered for ANY selected placement whose item records committed income
+	# (what the next collection would yield and in which resource, the committed
+	# rung the row has reached, and how long until the next one). Empty while
+	# the selection produces nothing — which is the whole fresh-player corpus
+	# apart from its decorations, so the line starts blank rather than
+	# implying an income that is not there.
+	var income_readout := Label.new()
+	income_readout.name = "collect"
+	income_readout.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	income_readout.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	income_readout.text = ""
+	_style_placement_label(income_readout)
+	panel.add_child(income_readout)
+	_collect_readout = income_readout
 	var row := HBoxContainer.new()
 	row.name = "actions"
 	# The selection-path arm actions (design D8, extended by building-store
@@ -2823,10 +3175,16 @@ func _build_move_panel(armed: bool) -> Dictionary:
 	build.text = "Build"
 	build.pressed.connect(_on_construction_action)
 	row.add_child(build)
+	var collect := Button.new()
+	collect.name = "collect"
+	collect.text = CollectionFlow.collect_label()
+	collect.pressed.connect(_on_collect_action)
+	row.add_child(collect)
 	# The confirm exists only while armed: unarmed, the surface offers the
 	# arm actions alone, so no confirm can be pressed before a target (or,
-	# for a sale, a store, an upgrade, or a build, before a building is armed).
-	# It serves ALL FIVE modes and dispatches to whichever one is armed
+	# for a sale, a store, an upgrade, a build, or a collection, before a
+	# building is armed).
+	# It serves ALL SIX modes and dispatches to whichever one is armed
 	# (design D7/D8). A build's label is its own offered step, because the step
 	# follows the row's state and must never be a generic "Confirm".
 	var confirm := Button.new()
@@ -2835,11 +3193,14 @@ func _build_move_panel(armed: bool) -> Dictionary:
 		else ("Put in storage" if _store_active \
 			else ("Upgrade" if _upgrade_active \
 				else (ConstructionFlow.step_label(_construction_step_text())
-					if _construction_active else "Move here")))
+					if _construction_active \
+					else (CollectionFlow.collect_label() if _collect_active \
+						else "Move here"))))
 	confirm.pressed.connect(_on_surface_confirm)
 	row.add_child(confirm)
 	if not armed and not _sell_active and not _store_active \
-			and not _upgrade_active and not _construction_active:
+			and not _upgrade_active and not _construction_active \
+			and not _collect_active:
 		confirm.visible = false
 	var cancel := Button.new()
 	cancel.name = "cancel"
@@ -2896,6 +3257,31 @@ func _construction_step_text() -> String:
 	return str(evaluation.get("step", ConstructionFlow.STEP_COMPLETE))
 
 
+## Writes the collection readout line (no-op before a panel exists). The
+## readout renders for ANY selected placement whose item records committed
+## income — armed or not — so a player sees what a collection would yield
+## without arming anything, and sees it update from every authoritative
+## response.
+func _set_collect_readout(text: String) -> void:
+	if _collect_readout != null and is_instance_valid(_collect_readout):
+		(_collect_readout as Label).text = text
+
+
+## Re-renders the collection readout from the live row: the armed placement
+## while a collection is armed, otherwise the committed selection. Empty text
+## means the row's item records no committed income, which is the whole
+## fresh-player corpus apart from its decorations.
+func _refresh_collect_readout() -> void:
+	var target: Variant = _collect_placement if _collect_active else null
+	if target == null:
+		if selected == null or not (selected is TownObject):
+			_set_collect_readout("")
+			return
+		target = (selected as TownObject).placement
+	_set_collect_readout(CollectionFlow.readout_text(
+		_collect_evaluation(target)))
+
+
 ## The moving placement's display label: the resolved content name when one
 ## exists, the raw legacy id otherwise (never a guessed name).
 func _move_label(placement: Variant) -> String:
@@ -2940,11 +3326,15 @@ func _object_depth_less(a: Variant, b: Variant) -> bool:
 
 
 ## The shared confirm row (design D8, extended by building-store design D7,
-## building-upgrade design D8, and building-construction design D7): one button
-## serves all five modes of this selection-driven surface, so its press
-## dispatches to whichever mode is armed. With no mode armed the button is
-## hidden, so a bare press can never reach an intent.
+## building-upgrade design D8, building-construction design D7, and
+## building-collect design D8): one button serves all six modes of this
+## selection-driven surface, so its press dispatches to whichever mode is
+## armed. With no mode armed the button is hidden, so a bare press can never
+## reach an intent.
 func _on_surface_confirm() -> void:
+	if _collect_active:
+		await confirm_collect()
+		return
 	if _construction_active:
 		await confirm_construction()
 		return
@@ -2961,11 +3351,15 @@ func _on_surface_confirm() -> void:
 
 
 ## The shared cancel row (design D8, extended by building-store design D7,
-## building-upgrade design D8, and building-construction design D7): the same
-## dispatch, no request either way. Cancelling a build sends nothing and
-## clears only mode-local state — it can never reach the legacy command that
-## would clear the building's attribute bag (design D6).
+## building-upgrade design D8, building-construction design D7, and
+## building-collect design D8): the same dispatch, no request either way.
+## Cancelling a build sends nothing and clears only mode-local state — it can
+## never reach the legacy command that would clear the building's attribute bag
+## (design D6).
 func _on_surface_cancel() -> void:
+	if _collect_active:
+		cancel_collect()
+		return
 	if _construction_active:
 		cancel_construction()
 		return
@@ -3054,6 +3448,11 @@ func arm_sell() -> Dictionary:
 		# design D7), so a build in progress refuses the sale by name.
 		return _sell_reject("construction_already_active",
 			"a build is armed; cancel it before selling")
+	if _collect_active:
+		# The six modes of this one surface never stack (building-collect
+		# design D8), so a collection in progress refuses the sale by name.
+		return _sell_reject("collect_already_active",
+			"a collection is armed; cancel it before selling")
 	if selected == null:
 		return _sell_reject("sell_no_selection",
 			"no placed building is selected")
@@ -3351,6 +3750,11 @@ func arm_store() -> Dictionary:
 		# design D7), so a build in progress refuses the store by name.
 		return _store_reject("construction_already_active",
 			"a build is armed; cancel it before storing")
+	if _collect_active:
+		# The six modes of this one surface never stack (building-collect
+		# design D8), so a collection in progress refuses the store by name.
+		return _store_reject("collect_already_active",
+			"a collection is armed; cancel it before storing")
 	if selected == null:
 		return _store_reject("store_no_selection",
 			"no placed building is selected")
@@ -3694,6 +4098,11 @@ func arm_upgrade() -> Dictionary:
 		# design D7), so a build in progress refuses the upgrade by name.
 		return _upgrade_reject("construction_already_active",
 			"a build is armed; cancel it before upgrading")
+	if _collect_active:
+		# The six modes of this one surface never stack (building-collect
+		# design D8), so a collection in progress refuses the upgrade by name.
+		return _upgrade_reject("collect_already_active",
+			"a collection is armed; cancel it before upgrading")
 	if selected == null:
 		return _upgrade_reject("upgrade_no_selection",
 			"no placed building is selected")
@@ -4289,6 +4698,9 @@ func arm_construction() -> Dictionary:
 	if _upgrade_active:
 		return _construction_reject("upgrade_already_active",
 			"an upgrade is armed; cancel it before building")
+	if _collect_active:
+		return _construction_reject("collect_already_active",
+			"a collection is armed; cancel it before building")
 	if selected == null:
 		return _construction_reject("construction_no_selection",
 			"no placed building is selected")
@@ -4625,6 +5037,613 @@ func _construction_evaluation_for_selection() -> Dictionary:
 	return _construction_evaluation((selected as TownObject).placement)
 
 
+# ---------------------------------------------------------------------------
+# Collect flow (building-collect, spec "Collection flow")
+# ---------------------------------------------------------------------------
+
+
+## True while the collection is armed.
+func collect_active() -> bool:
+	return _collect_active
+
+
+## The placement the armed collection targets (TownState.Placement or null).
+func collect_placement() -> Variant:
+	return _collect_placement
+
+
+## The addressable index the armed collection names (-1 when unaddressable or
+## unarmed) — the item index a collection intent carries, and the ONLY thing
+## the intent carries.
+func collect_slot() -> int:
+	if _collect_placement == null:
+		return TownState.NO_SLOT
+	return int(_collect_placement.slot)
+
+
+## The committed income facts the client derives for the armed collection (or
+## for the committed selection while no collection is armed):
+## `{ok, item, name, amount, resource_type, experience, cap, reason}`. Every
+## field comes from the typed content package — the very committed fields the
+## service derives from — and NONE of them is ever sent: the intent carries the
+## legacy index and nothing else (design D7).
+func collect_income() -> Dictionary:
+	var target: Variant = _collect_placement if _collect_active else null
+	if target == null:
+		if selected == null or not (selected is TownObject):
+			return {"ok": false, "item": 0, "name": "", "amount": 0,
+				"resource_type": "", "experience": 0, "cap": 0,
+				"reason": "no placed building is selected"}
+		target = (selected as TownObject).placement
+	return _collect_income_of(target)
+
+
+## The armed collection's committed evaluation (the pure flow's envelope,
+## empty while no collection is armed) — the same evaluation the confirm reads.
+func collect_evaluation() -> Dictionary:
+	if not _collect_active:
+		return {}
+	return _collect_evaluation(_collect_placement)
+
+
+## The on-screen collection readout for the live selection ("" while the panel
+## does not exist or the row's item records no committed income).
+func collect_readout() -> String:
+	if _collect_readout == null or not is_instance_valid(_collect_readout):
+		return ""
+	return (_collect_readout as Label).text
+
+
+## The committed income facts the client derives for one placement from the
+## typed content package: the item's collection amount (`collect`), the
+## resource it is paid in (`collect_type`), its collection experience
+## (`collect_xp`), and its collection cap (`max_collects`).
+## `{ok, item, name, amount, resource_type, experience, cap, reason}`.
+##
+## Fail-closed: no registry, an unloaded package, an item the package does not
+## know, an amount or experience that is not a non-negative integer, or a cap
+## that is not a non-negative integer all answer `{ok: false}` with a named
+## reason — never a guessed amount. A committed `max_collects` of `0` and a
+## `collect_type` inside the committed set are reported as facts and the pure
+## helpers decide what they mean (design D4/D6): a non-zero cap and a type
+## outside the set are REFUSALS, not values this view may reinterpret.
+##
+## The committed ladder is cross-checked here too: the content package's own
+## `COLLECT_MINUTES` / `COLLECT_MULTIPLIER` globals must equal the ladder the
+## pure helpers hold, or no collection is offered at all. That is what ties the
+## readout to the committed content rather than to a stale local copy — and it
+## is why the readout and the service can never derive from different ladders.
+func _collect_income_of(placement: Variant) -> Dictionary:
+	var absent := func(item: int, name: String,
+			reason: String) -> Dictionary:
+		return {"ok": false, "item": item, "name": name, "amount": 0,
+			"resource_type": "", "experience": 0, "cap": 0, "reason": reason}
+	if placement == null or not (placement is TownState.Placement):
+		return absent.call(0, "", "no typed placement to collect from")
+	var registry: Variant = get_node_or_null("/root/ContentRegistry") \
+		if _registry == null else _registry
+	if registry == null or not bool(registry.is_loaded()):
+		return absent.call(int((placement as TownState.Placement).item), "",
+			"the content package is not loaded")
+	var ladder: Dictionary = _committed_collection_ladder(registry)
+	if not bool(ladder.get("ok", false)):
+		return absent.call(int((placement as TownState.Placement).item), "",
+			str(ladder.get("reason", "")))
+	var item_id := int((placement as TownState.Placement).item)
+	var entry := _content_entry(registry, item_id)
+	if entry.is_empty():
+		return absent.call(item_id, "",
+			"item %d is not in the content package" % item_id)
+	var amount: Variant = BootData._parse_int(entry.get("collect"))
+	if amount == null or int(amount) < 0:
+		return absent.call(item_id, str(entry.get("name", "")),
+			"item %d resolves no committed collection amount" % item_id)
+	var experience: Variant = BootData._parse_int(entry.get("collect_xp"))
+	if experience == null or int(experience) < 0:
+		return absent.call(item_id, str(entry.get("name", "")),
+			"item %d resolves no committed collection experience" % item_id)
+	var cap: Variant = BootData._parse_int(entry.get("max_collects"))
+	if cap == null or int(cap) < 0:
+		return absent.call(item_id, str(entry.get("name", "")),
+			"item %d resolves no committed collection cap" % item_id)
+	var facts := CollectionFlow.income_of(int(amount),
+		str(entry.get("collect_type", "")), int(experience), int(cap))
+	facts["item"] = item_id
+	facts["name"] = str(entry.get("name", ""))
+	# The pure helper names its refusal in `error`; the view's own envelope
+	# names it in `reason`, so the arming path and the readout can both report
+	# the same condition through the same key the delivered flows use.
+	if not bool(facts.get("ok", false)):
+		facts["reason"] = str(facts.get("error", ""))
+	return facts
+
+
+## The content package's own committed collection ladder cross-checked against
+## the one the pure helpers hold: `{ok, reason, minutes, multipliers}`. Both
+## halves are read from the `globals` domain and compared element for element;
+## any disagreement, an absent half, or an unloaded package fails closed with a
+## named reason, so the readout and the confirm can never derive from a ladder
+## the service does not use.
+func _committed_collection_ladder(registry: Variant) -> Dictionary:
+	var absent := func(reason: String) -> Dictionary:
+		return {"ok": false, "reason": reason, "minutes": [],
+			"multipliers": []}
+	if registry == null or not registry.has_domain("globals"):
+		return absent.call("the committed collection ladder is not in the "
+			+ "content package")
+	var minutes: Array = []
+	var multipliers: Array = []
+	for entry: Array in [["COLLECT_MINUTES", "minutes"],
+			["COLLECT_MULTIPLIER", "multipliers"]]:
+		var result: Dictionary = registry.get_entry("globals", str(entry[0]))
+		if not bool(result.get("found", false)):
+			return absent.call("the committed global %s is not in the content "
+				% str(entry[0]) + "package")
+		var value: Variant = (result.get("entry") as Dictionary).get("value")
+		if not (value is Array):
+			return absent.call("the committed global %s is not an array"
+				% str(entry[0]))
+		var collected: Array = []
+		for element: Variant in (value as Array):
+			collected.append(float(element) if element is float
+				else element)
+		if str(entry[1]) == "minutes":
+			minutes = collected
+		else:
+			multipliers = collected
+	if not _ladder_matches(minutes, CollectionFlow.ladder_minutes()):
+		return absent.call("the committed collection ladder's thresholds do not "
+			+ "match the ladder this client implements")
+	if not _ladder_matches(multipliers, CollectionFlow.ladder_multipliers()):
+		return absent.call("the committed collection ladder's multipliers do "
+			+ "not match the ladder this client implements")
+	return {"ok": true, "reason": "", "minutes": minutes,
+		"multipliers": multipliers}
+
+
+## Two numeric sequences equal element for element. A `bool` is never a number
+## here, and a shorter or longer ladder never matches: the comparison is
+## fail-closed, so a content change cannot be silently half-adopted.
+static func _ladder_matches(committed: Array, implemented: Array) -> bool:
+	if committed.size() != implemented.size():
+		return false
+	for index in range(committed.size()):
+		var left: Variant = BootData._parse_int(committed[index])
+		if left == null:
+			# A fractional multiplier is legitimate (the committed quarter
+			# rung), so the integers fall back to an exact float comparison.
+			if not (committed[index] is float) \
+					or not (implemented[index] is int or implemented[index]
+						is float) \
+					or float(committed[index]) != float(implemented[index]):
+				return false
+			continue
+		if int(left) != int(implemented[index]):
+			return false
+	return true
+
+
+## One placement's committed evaluation through the PURE flow helpers
+## (design D9): the same functions the suite calls directly, fed with the
+## committed income facts and a reference instant this view supplies — never
+## the helpers reading a clock of their own.
+func _collect_evaluation(placement: Variant,
+		reference: int = 0) -> Dictionary:
+	var income: Dictionary = _collect_income_of(placement)
+	return CollectionFlow.evaluate(state, placement, income,
+		reference if reference > 0 else _collect_now())
+
+
+## The instant the collection readout is evaluated at. It is the RESPONSE's own
+## `reference_time` once a collection has succeeded — so the displayed rung and
+## countdown are the ones the service actually derived, and a deterministic
+## report stays byte-identical — and the local clock before that. One place, so
+## the readout, the confirm, and the evidence report can never disagree about
+## which instant they are describing.
+func _collect_now() -> int:
+	if _collect_reference > 0:
+		return _collect_reference
+	return int(Time.get_unix_time_from_system())
+
+
+## True when the current selection is a placed building a collection intent can
+## name: the addressability rule is the move flow's own, read from the same one
+## predicate, AND the item must resolve committed income the flow can derive
+## from AND the evaluation must actually OFFER a collection. A row that
+## produces nothing, one whose cap or resource type is unusable, one under
+## construction, and one that has reached no committed rung are therefore never
+## offered the action at all (design D3/D5/D9) — the refusal still names itself
+## if arming is attempted.
+func collect_selection_available() -> bool:
+	if selected == null or not (selected is TownObject):
+		return false
+	var object: TownObject = selected
+	if not bool(CollectionFlow.construction_of(object.placement)["ok"]):
+		return false
+	if not TownState.is_addressable(object.placement):
+		return false
+	return CollectionFlow.offers_collect(
+		_collect_evaluation(object.placement))
+
+
+## Arms the collection on the current selection (spec "the player selects a
+## placed building that has reached a committed rung, chooses the collect
+## action, and confirms"). Fail-closed: an unbuilt view, no selection, a
+## selection that is not a placement, an unaddressable legacy key, a row with
+## no readable attribute bag or collection clock, an already-armed collection,
+## an armed move, sale, store, upgrade, or build, and a missing panel each
+## reject with an explicit error naming the condition. It adds no state and no
+## request of its own: nothing leaves the client until a confirm, and a
+## collection has no grid target, so no preview is shown (design D8).
+func arm_collect() -> Dictionary:
+	if view_state != STATE_BUILT:
+		return _collect_reject("town_not_built", "the town view is not built")
+	if _collect_active:
+		return _collect_reject("collect_already_active",
+			"the collection is already armed")
+	if _move_active:
+		return _collect_reject("move_already_active",
+			"a move is armed; cancel it before collecting")
+	if _sell_active:
+		return _collect_reject("sell_already_active",
+			"a sale is armed; cancel it before collecting")
+	if _store_active:
+		return _collect_reject("store_already_active",
+			"a store is armed; cancel it before collecting")
+	if _upgrade_active:
+		return _collect_reject("upgrade_already_active",
+			"an upgrade is armed; cancel it before collecting")
+	if _construction_active:
+		return _collect_reject("construction_already_active",
+			"a build is armed; cancel it before collecting")
+	if selected == null:
+		return _collect_reject("collect_no_selection",
+			"no placed building is selected")
+	if not (selected is TownObject):
+		return _collect_reject("collect_no_selection",
+			"the selection is not a placed building")
+	var object: TownObject = selected
+	var placement: Variant = object.placement
+	if not (placement is TownState.Placement):
+		return _collect_reject("collect_no_selection",
+			"the selected object carries no typed placement")
+	var construction: Dictionary = CollectionFlow.construction_of(placement)
+	if not bool(construction["ok"]):
+		return _collect_reject(CollectionFlow.REASON_UNREADABLE_STATE,
+			str(construction["error"]))
+	if not bool(TownState.collection_of(placement).get("ok", false)):
+		return _collect_reject(CollectionFlow.REASON_UNREADABLE_STATE,
+			str(TownState.collection_of(placement).get("error", "")))
+	if not TownState.is_addressable(placement):
+		# The move flow's own explicit reason, which the sell, store, upgrade,
+		# and build flows already reuse. The index is never coerced, because a
+		# coerced index would name a different row.
+		return _collect_reject(MoveFlow.REASON_UNADDRESSABLE,
+			"the selected placement's save key '%s' is not a positive integer"
+			% str(placement.slot_key))
+	# Every content and clock refusal is evaluated BEFORE the mode is armed, so
+	# an uncollectable row opens nothing and the explicit reason names itself
+	# (design D3/D5/D9).
+	var evaluation: Dictionary = _collect_evaluation(placement)
+	if not CollectionFlow.offers_collect(evaluation):
+		var refusal := CollectionFlow.refusal_text(evaluation)
+		return _collect_reject(str(evaluation.get("reason", "no_income")),
+			refusal if refusal != "" else str(evaluation.get("error",
+				"not collectable")))
+	_collect_active = true
+	_collect_placement = placement
+	collect_error = ""
+	var panel := _build_move_panel(true)
+	if not bool(panel.get("ok", false)):
+		return _collect_reject("collect_panel", str(panel.get("error", "")))
+	if ui != null and ui.has_slot(SLOT_MOVE) \
+			and not ui.is_slot_visible(SLOT_MOVE):
+		ui.set_slot_visible(SLOT_MOVE, true)
+	_refresh_move_panel()
+	return {"ok": true, "error": "", "slot": int(placement.slot),
+		"item": int(placement.item),
+		"payout": (evaluation.get("payout", []) as Array).duplicate(),
+		"tier": int(evaluation.get("tier", CollectionFlow.NO_TIER))}
+
+
+## Sends exactly one collection intent (spec "a confirm that sends exactly one
+## intent") and applies only the authoritative response. Nothing is sent unless
+## the collection is armed, the armed building is still the committed selection
+## and addressable, the row still offers a collection at all, an active session
+## exists, and the API is registered: each missing condition rejects locally
+## with the explicit error and NO request. A structured or transport failure
+## surfaces its code with the row keeping its previous collection instant, the
+## storage untouched, and no resource changed. Awaits the GameApi call.
+##
+## The intent carries the legacy index and NOTHING else — no amount, no
+## resource, no tier, no time, no price, and no resource delta (design D7): the
+## service derives the legacy `collect` envelope, the content-derived payout,
+## and the committed ladder rung server-side from the addressed item's own
+## content and the row's own state.
+func confirm_collect() -> Dictionary:
+	if not _collect_active:
+		return _collect_reject("collect_not_active",
+			"the collection is not armed")
+	if _collect_placement == null \
+			or not (_collect_placement is TownState.Placement):
+		return _collect_reject("collect_no_selection",
+			"no building is being collected")
+	if not TownState.is_addressable(_collect_placement):
+		return _collect_reject(MoveFlow.REASON_UNADDRESSABLE,
+			"the armed placement's save key '%s' is not a positive integer"
+			% str(_collect_placement.slot_key))
+	if selected == null or not (selected is TownObject) \
+			or (selected as TownObject).placement != _collect_placement:
+		# A press while the collection is armed can move the selection (a
+		# collection owns no grid target, so it does not own the press the way
+		# an armed move does). Collecting something other than the committed
+		# selection is refused by name rather than guessed.
+		return _collect_reject("collect_selection_changed",
+			"the selection no longer names the armed building; "
+			+ "cancel and press Collect again")
+	var evaluation: Dictionary = _collect_evaluation(_collect_placement)
+	if not CollectionFlow.offers_collect(evaluation):
+		# No committed income, an unusable cap or resource type, a row under
+		# construction, or a clock that has reached no rung. All are named, and
+		# all send nothing (design D3/D5/D9).
+		var refusal := CollectionFlow.refusal_text(evaluation)
+		return _collect_reject(str(evaluation.get("reason", "no_income")),
+			refusal if refusal != "" else str(evaluation.get("error",
+				"not collectable")))
+	var session: Variant = get_node_or_null("/root/Session")
+	if session == null or not session.is_active() \
+			or str(session.user_id()).strip_edges() == "":
+		return _collect_reject("session_unavailable",
+			"no active save to collect in")
+	var api: Variant = get_node_or_null("/root/GameApi")
+	if api == null:
+		return _collect_reject("gameapi_unavailable",
+			"the GameApi autoload is not registered")
+	var response: Variant = await api.collect_income(session.user_id(),
+		int(_collect_placement.slot))
+	if not (response is BootData.CollectResult):
+		return _collect_reject("bad_response",
+			"GameApi returned no typed collect result")
+	var typed: BootData.CollectResult = response
+	if not typed.ok:
+		# Structured or transport failure: one contract — the explicit error
+		# names the code and message, nothing was applied, and the row keeps the
+		# collection instant it had.
+		collect_error = "[town] collect failed: %s: %s" % [
+			typed.error_code, typed.error_message]
+		_set_move_status(collect_error)
+		_refresh_collect_readout()
+		return {"ok": false, "error": collect_error, "code": typed.error_code}
+	# The label is read BEFORE the apply, which releases the armed placement.
+	var label := _move_label(_collect_placement)
+	var applied: Dictionary = _apply_collect(typed)
+	if not bool(applied.get("ok", false)):
+		return _collect_reject("apply_failed", str(applied.get("error", "")))
+	collect_error = ""
+	_collect_active = false
+	_collect_placement = null
+	# The readout's reference instant comes from the RESPONSE, not from the local
+	# clock: the rung and the countdown the player is shown are the ones the
+	# service actually derived, and the deterministic report is byte-identical
+	# across reruns because of it (design D8/D9).
+	_collect_reference = int(typed.reference_time)
+	_set_collect_readout(CollectionFlow.readout_text(
+		_collect_evaluation_for_selection()))
+	_set_move_status("collected %s: rung %d, %s applied by the service"
+		% [label, int(typed.tier),
+			CollectionFlow.payout_text(typed.payout)])
+	return {"ok": true, "error": "", "result": typed}
+
+
+## Applies the authoritative response (building-collect design D8): the typed
+## row is replaced by the response's POST-EXECUTION row verbatim while the
+## placement stays IN the state, the SAME rendered object is retained at the
+## SAME index in the committed draw order (a collection rewrites no item, cell,
+## or footprint — only the row's collection instant — so the visual is
+## untouched and nothing is re-sorted), the storage mapping and its readout are
+## left UNTOUCHED, and the stored resources and XP take the RESPONSE's values.
+##
+## The client's own derived payout is **discarded, not added**: the response
+## wins even where the two disagree, so a wrong derivation can never be
+## silently compounded (design D8, the spec's response-wins rule).
+##
+## Everything the apply touches is snapshotted FIRST — the placement's own row
+## and its collection clock, the missing-field list, the resource bag, and the
+## XP — so the only post-mutation failure (a rejected HUD re-attach) restores
+## every one of them from the snapshot. A failed apply therefore leaves the
+## building on the map with its previous row, its previous collection instant,
+## its readout, and its HUD exactly as before.
+##
+## Pre-checks run before any mutation and fail closed: a response naming a
+## different item or a different cell, or a collection instant that did not
+## move forward, would be a different transaction than this one, so it is
+## reported instead of applied.
+func _apply_collect(result: BootData.CollectResult) -> Dictionary:
+	if state == null:
+		return {"ok": false, "error": "the town state is unavailable"}
+	if ui == null or _hud == null:
+		return {"ok": false, "error": "the town HUD is not attached"}
+	if _collect_placement == null \
+			or not (_collect_placement is TownState.Placement):
+		return {"ok": false, "error": "no typed placement is being collected"}
+	var entry: BootData.Placement = result.row
+	var resources: BootData.Resources = result.resources
+	if entry == null or resources == null:
+		return {"ok": false, "error": "the collect response is incomplete"}
+	var placement: TownState.Placement = _collect_placement
+	# The placement stays IN the state (a collection rewrites one row in place,
+	# so no container is touched); the check only proves the armed placement is
+	# really this town's, never a stale instance.
+	if not (placement in state.placements):
+		return {"ok": false,
+			"error": "the collected placement is not part of the town state"}
+	if result.payout.size() != BootData.COLLECT_VECTOR_SLOTS:
+		return {"ok": false,
+			"error": "the collect response carries no documented payout vector"}
+	if entry.item_id != int(placement.item):
+		return {"ok": false,
+			"error": ("the collect response changed the building from item %d to "
+				% [int(placement.item), entry.item_id]
+				+ "item %d, which this contract never does" % entry.item_id)}
+	# The contract reuses the same key and the same cell: a response that moved
+	# the building would be a different command than this one, so it fails
+	# closed BEFORE any mutation instead of being applied.
+	if Vector2i(entry.x, entry.y) != placement.cell:
+		return {"ok": false,
+			"error": ("the collect response moved the building from (%d, %d) to "
+				% [placement.cell.x, placement.cell.y]
+				+ "(%d, %d), which this contract never does"
+				% [entry.x, entry.y])}
+	var previous := {
+		"raw": placement.raw.duplicate(),
+		"timestamp": placement.timestamp,
+		"orientation": placement.orientation,
+		"store": placement.store,
+		"attr": placement.attr,
+		"player": placement.player,
+		"clicks": placement.clicks,
+		"countdown": placement.countdown,
+		"started_at": placement.started_at,
+		"collected_at": placement.collected_at,
+		"missing": (state.missing as Array).duplicate(),
+		"coins": state.resources.coins,
+		"wood": state.resources.wood,
+		"steel": state.resources.steel,
+		"oil": state.resources.oil,
+		"cash": state.resources.cash,
+		"mana": state.resources.mana,
+		"xp": state.summary.xp,
+	}
+	placement.timestamp = entry.timestamp
+	placement.orientation = entry.orientation
+	placement.store = entry.store
+	placement.attr = entry.attr
+	placement.player = entry.player
+	placement.raw = [entry.item_id, entry.x, entry.y, entry.timestamp,
+		entry.orientation, entry.store, entry.attr, entry.player]
+	# The typed collection clock is re-read through the SAME fail-closed parser
+	# the payload parse used, so the readout and the refusal rules can never read
+	# the row by a second rule set. A response row the parser rejects is an
+	# apply failure with a full rollback, not a half-written state.
+	var collection: Dictionary = TownState._collection_of(placement.raw,
+		placement.slot_key)
+	if bool(collection.get("fatal", false)):
+		placement.timestamp = previous["timestamp"]
+		placement.orientation = previous["orientation"]
+		placement.store = previous["store"]
+		placement.attr = previous["attr"]
+		placement.player = previous["player"]
+		placement.raw = previous["raw"]
+		return {"ok": false, "error": str(collection.get("error", ""))}
+	placement.collected_at = collection["collected_at"]
+	# The construction state is re-read through its own shared parser too, so a
+	# collection that somehow arrived on a building state stays consistent with
+	# what the delivered construction line reads.
+	var construction: Dictionary = TownState._construction_of(placement.raw,
+		placement.slot_key)
+	if bool(construction.get("fatal", false)):
+		placement.timestamp = previous["timestamp"]
+		placement.orientation = previous["orientation"]
+		placement.store = previous["store"]
+		placement.attr = previous["attr"]
+		placement.player = previous["player"]
+		placement.raw = previous["raw"]
+		placement.collected_at = previous["collected_at"]
+		return {"ok": false, "error": str(construction.get("error", ""))}
+	placement.clicks = construction["clicks"]
+	placement.countdown = construction["countdown"]
+	placement.started_at = construction["started_at"]
+	# The response supplies values the payload may have lacked, so those keys
+	# are no longer missing; the snapshot restores them verbatim on rollback.
+	for key in ["coins", "wood", "steel", "oil", "cash", "mana"]:
+		state.missing.erase(key)
+	state.missing.erase("xp")
+	# The response's balances win outright. The client's own derived payout is
+	# NOT added to them: the response-wins rule is what makes a wrong
+	# derivation detectable instead of compounded.
+	state.resources.coins = resources.gold
+	state.resources.wood = resources.wood
+	state.resources.steel = resources.steel
+	state.resources.oil = resources.oil
+	state.resources.cash = resources.cash
+	state.resources.mana = resources.mana
+	state.summary.xp = resources.xp
+	var hud_result: Dictionary = _hud.attach(ui, state)
+	if not bool(hud_result.get("ok", false)):
+		# Roll every mutation back from the snapshot alone: a failed apply
+		# changes nothing, and the building keeps its previous row, its previous
+		# collection instant, and its HUD.
+		placement.raw = previous["raw"]
+		placement.timestamp = previous["timestamp"]
+		placement.orientation = previous["orientation"]
+		placement.store = previous["store"]
+		placement.attr = previous["attr"]
+		placement.player = previous["player"]
+		placement.clicks = previous["clicks"]
+		placement.countdown = previous["countdown"]
+		placement.started_at = previous["started_at"]
+		placement.collected_at = previous["collected_at"]
+		state.missing = previous["missing"]
+		state.resources.coins = previous["coins"]
+		state.resources.wood = previous["wood"]
+		state.resources.steel = previous["steel"]
+		state.resources.oil = previous["oil"]
+		state.resources.cash = previous["cash"]
+		state.resources.mana = previous["mana"]
+		state.summary.xp = previous["xp"]
+		return {"ok": false, "error": str(hud_result.get("error", ""))}
+	# The storage view, the construction state, and the rendered object are
+	# deliberately untouched: a collection changes none of them, and
+	# re-rendering them would suggest otherwise.
+	return {"ok": true, "error": ""}
+
+
+## Closes the armed collection without sending anything: the mode-local
+## placement drops, the slot hides, and the town state, the row's collection
+## instant, both readouts, the storage view, the committed selection, and the
+## resources stay byte-identical.
+func cancel_collect() -> Dictionary:
+	if not _collect_active:
+		return _collect_reject("collect_not_active",
+			"the collection is not armed")
+	_collect_active = false
+	_collect_placement = null
+	if ui != null and ui.has_slot(SLOT_MOVE) \
+			and ui.is_slot_visible(SLOT_MOVE):
+		ui.set_slot_visible(SLOT_MOVE, false)
+	_set_move_status("collect closed (nothing was sent)")
+	return {"ok": true, "error": "", "cancelled": true}
+
+
+## The house collection failure envelope: records the explicit error naming the
+## code and condition, shows it in the surface's status line, and returns
+## {ok:false} without touching town state, the row's collection instant, either
+## readout, the storage view, selection, resources, or the committed draw
+## order.
+func _collect_reject(code: String, message: String) -> Dictionary:
+	collect_error = "[town] collect rejected: %s: %s" % [code, message]
+	_set_move_status(collect_error)
+	return {"ok": false, "error": collect_error, "code": code}
+
+
+## The selection-path `Collect` action (building-collect design D8): selecting
+## a placed building with an addressable legacy key and resolvable committed
+## income offers this action beside `Move`, `Sell`, `Store`, `Upgrade`, and
+## `Build`, and pressing it arms the collection. It is a pure wiring step over
+## `arm_collect` — no state, no request of its own — so the delivered selection
+## behavior is unchanged.
+func _on_collect_action() -> void:
+	arm_collect()
+
+
+## The committed selection's own collection evaluation, for the readout the
+## confirm re-renders after the armed placement is released.
+func _collect_evaluation_for_selection() -> Dictionary:
+	if selected == null or not (selected is TownObject):
+		return CollectionFlow.evaluate(state, null, {}, _collect_now())
+	return _collect_evaluation((selected as TownObject).placement)
+
+
 ## Shop button wiring: a press selects that entry.
 func _on_shop_pick(item_id: int) -> void:
 	pick_shop_item(item_id)
@@ -4726,6 +5745,16 @@ func _reset_view() -> void:
 	_construction_placement = null
 	_construction_completed = {}
 	_construction_readout = null
+	# The armed collection drops with the rest of the view, in its own right
+	# (building-collect design D8): a rebuild never leaves a stale armed
+	# collection behind, and it drops the readout's reference instant with it —
+	# that instant is a property of the last authoritative RESPONSE, not of the
+	# save, so a fresh view of a fresh save evaluates against its own clock
+	# until a server speaks again.
+	_collect_active = false
+	_collect_placement = null
+	_collect_reference = 0
+	_collect_readout = null
 	if ui != null and ui.has_slot(SLOT_MOVE) \
 			and ui.is_slot_visible(SLOT_MOVE):
 		ui.set_slot_visible(SLOT_MOVE, false)
@@ -4772,17 +5801,17 @@ func _commit_selection(object: Variant) -> void:
 	if object != null:
 		object.set_selected(true)
 	# Design D8: the selection is what arms this surface, so a committed
-	# selection refreshes its `Move`, `Sell`, `Store`, `Upgrade`, and `Build`
-	# actions (and its construction readout). It is presentational only — the
-	# selection itself, its highlight, and the picker's routing are exactly as
-	# delivered, and arming still requires a separate press. An armed mode is
-	# never refreshed: it already names the placement it will act on, and
-	# `confirm_sell` / `confirm_store` / `confirm_upgrade` /
-	# `confirm_construction` refuse a changed selection by name instead of
-	# silently re-targeting.
+	# selection refreshes its `Move`, `Sell`, `Store`, `Upgrade`, `Build`, and
+	# `Collect` actions (and its construction and collection readouts). It is
+	# presentational only — the selection itself, its highlight, and the
+	# picker's routing are exactly as delivered, and arming still requires a
+	# separate press. An armed mode is never refreshed: it already names the
+	# placement it will act on, and `confirm_sell` / `confirm_store` /
+	# `confirm_upgrade` / `confirm_construction` / `confirm_collect` refuse a
+	# changed selection by name instead of silently re-targeting.
 	if not _move_active and not _sell_active and not _store_active \
 			and not _upgrade_active and not _construction_active \
-			and view_state == STATE_BUILT:
+			and not _collect_active and view_state == STATE_BUILT:
 		refresh_move_action()
 
 
@@ -4810,6 +5839,9 @@ func _maybe_start_capture() -> void:
 	if not build_ok:
 		return
 	_capture_started = true
+	if _collect_capture:
+		_capture_collect_and_quit()
+		return
 	if _construction_capture:
 		_capture_construction_and_quit()
 		return
@@ -5210,6 +6242,74 @@ func _capture_construction_and_quit() -> void:
 ## flow never leaves an open window or a misleading frame.
 func _construction_capture_fail(step: String, detail: String) -> void:
 	print("[town] construction-capture state=error step=%s detail=%s" % [
+		step, detail])
+	get_tree().quit(1)
+
+
+## Collect capture (building-collect, design D10): drives exactly one
+## confirmed intent through the same flow a player uses — select the recorded
+## income building, arm the collection, confirm — and then captures the town
+## carrying the collection readout with its re-stamped clock and the HUD
+## balances the response reported. Any failed step prints an explicit marker
+## and exits 1 instead of capturing a town that never received the collection.
+##
+## The frame is taken after the confirm, so the readout shows the NEW clock
+## rather than the rung the collection was taken at: the yield the confirm
+## named is still on the status line, and the readout names how long until the
+## next collection. Both are derived; the balances on the HUD are the
+## response's own.
+func _capture_collect_and_quit() -> void:
+	var object: Variant = _object_for_cell(COLLECT_INTENT_CELL)
+	if object == null:
+		_collect_capture_fail("select",
+			"no rendered object at the recorded cell (%d, %d)"
+			% [COLLECT_INTENT_CELL.x, COLLECT_INTENT_CELL.y])
+		return
+	var pressed: Dictionary = handle_pointer_press(
+		Iso.grid_to_screen(object.cell))
+	if not bool(pressed.get("ok", false)):
+		_collect_capture_fail("select", str(pressed.get("error", "")))
+		return
+	if selection() != object:
+		_collect_capture_fail("select",
+			"the press at (%d, %d) did not select the recorded building"
+			% [COLLECT_INTENT_CELL.x, COLLECT_INTENT_CELL.y])
+		return
+	var armed: Dictionary = arm_collect()
+	if not bool(armed.get("ok", false)):
+		_collect_capture_fail("arm", str(armed.get("error", "")))
+		return
+	if int(armed.get("slot", -1)) != COLLECT_INTENT_INDEX:
+		_collect_capture_fail("arm",
+			"the armed collection names key %d, not %d"
+			% [int(armed.get("slot", -1)), COLLECT_INTENT_INDEX])
+		return
+	if (armed.get("payout", []) as Array) != COLLECT_INTENT_PAYOUT:
+		_collect_capture_fail("arm",
+			"the derived payout is %s, not the fixture's %s"
+			% [JSON.stringify(armed.get("payout", [])),
+				JSON.stringify(COLLECT_INTENT_PAYOUT)])
+		return
+	var confirmed: Dictionary = await confirm_collect()
+	if not bool(confirmed.get("ok", false)):
+		_collect_capture_fail("confirm", str(confirmed.get("error", "")))
+		return
+	# The readout renders for the live selection, so the captured frame carries
+	# the re-stamped clock and the next-rung countdown.
+	refresh_move_action()
+	print("[town] collect-capture applied item_index=%d cell=(%d, %d) tier=%d "
+		% [COLLECT_INTENT_INDEX, COLLECT_INTENT_CELL.x, COLLECT_INTENT_CELL.y,
+			int((confirmed.get("result") as BootData.CollectResult).tier)]
+		+ "payout=%s objects=%d readout=%s" % [
+			JSON.stringify((confirmed.get("result") as BootData.CollectResult).payout),
+			objects.size(), collect_readout()])
+	_capture_and_quit()
+
+
+## A named collect-capture failure: explicit marker + exit 1, so a failed flow
+## never leaves an open window or a misleading frame.
+func _collect_capture_fail(step: String, detail: String) -> void:
+	print("[town] collect-capture state=error step=%s detail=%s" % [
 		step, detail])
 	get_tree().quit(1)
 
@@ -7059,3 +8159,417 @@ func _boot_row(entry: Variant) -> Array:
 	var typed: BootData.Placement = entry
 	return [typed.item_id, typed.x, typed.y, typed.timestamp,
 		typed.orientation, typed.store, typed.attr, typed.player]
+
+
+# ---------------------------------------------------------------------------
+# Collect evidence report (building-collect, design D10)
+# ---------------------------------------------------------------------------
+
+
+## The collect report output path from the user arguments:
+## `--collect-report=<path>` (relative paths resolve against the project
+## directory), the bare `--collect-report` flag's default evidence path, or ""
+## when absent.
+func _collect_report_path_arg() -> String:
+	for argument in OS.get_cmdline_user_args():
+		if argument == "--collect-report":
+			return Paths.project_dir().path_join(DEFAULT_COLLECT_REPORT_PATH)
+		if argument.begins_with("--collect-report="):
+			var value := argument.trim_prefix("--collect-report=")
+			if value.is_absolute_path():
+				return value
+			return Paths.project_dir().path_join(value)
+	return ""
+
+
+## Runs the collect report flow and quits with the documented exit code: 0 when
+## the deterministic report is written, 1 with an explicit marker naming the
+## first failed step (the town/placement/upgrade/construction report pattern).
+func _write_collect_report(report_path: String) -> void:
+	var problem: String = await _collect_report_into(report_path)
+	if problem == "" and not FileAccess.file_exists(report_path):
+		problem = "[report] report file was not created at %s" % report_path
+	if problem != "":
+		print("[town] collect-report state=error message=", problem)
+		get_tree().quit(1)
+		return
+	print("[town] collect-report state=written path=", report_path)
+	get_tree().quit(0)
+
+
+## Computes the whole collect report (design D10): the bootstrap payload in hand
+## parses fail-closed (exactly one bootstrap request, no second config call), the
+## town builds from the committed save, the recorded income building is checked
+## against the executed fixture's own before-row, and the flow a player uses is
+## walked (select, arm, confirm against the fake implementation), recording the
+## intent, both rows, the derived payout and the rung it came from, the committed
+## ladder in BOTH units, the next-rung countdown computed against the RESPONSE's
+## reference instant, the resource movement before and after, the placement and
+## object counts, the request counts, the input digests, the projection
+## constants pointer, the established-versus-derived provenance split as its own
+## section, the fake capture pointer, and every required non-claim. Returns ""
+## on success or the first failure as an explicit message.
+##
+## Every number in the payout and the rung is derived-provisional, exactly as the
+## provenance section records; the report's claim is a payout that grows in four
+## committed rungs derived from committed content, never any specific amount the
+## legacy client pays. Nothing here reads the wall clock: the readout is
+## evaluated against the response's own `reference_time`, which is what makes
+## the report byte-identical across reruns.
+func _collect_report_into(report_path: String) -> String:
+	var registry: Variant = get_node_or_null("/root/ContentRegistry")
+	if registry == null:
+		return "[report] content registry is not registered"
+	if not bool(registry.is_loaded()):
+		var content: Dictionary = registry.load_content()
+		if not bool(content.get("ok", false)):
+			return "[report] content load failed: %s" % content.get("error", "")
+	if not bool(registry.assets_loaded()):
+		var assets: Dictionary = registry.load_asset_registry()
+		if not bool(assets.get("ok", false)):
+			return "[report] asset registry load failed: %s" % assets.get("error", "")
+	var api: Variant = get_node_or_null("/root/GameApi")
+	if api == null:
+		return "[report] GameApi is not registered"
+	var session: Variant = get_node_or_null("/root/Session")
+	if session == null:
+		return "[report] Session is not registered"
+	var sessions: Variant = await api.list_sessions()
+	if not bool(sessions.ok):
+		return "[report] save list failed: %s" % str(sessions.error_message)
+	if sessions.saves.size() == 0:
+		return "[report] save list carries no saves"
+	var pid := str(sessions.saves[0].id)
+	var boot: Variant = await api.get_bootstrap(pid)
+	if not bool(boot.ok):
+		return "[report] bootstrap failed: %s" % str(boot.error_message)
+	var player_info: Variant = boot.player_info
+	if player_info == null:
+		return "[report] bootstrap carried no player info"
+	var parsed: Dictionary = TownState.parse(player_info.raw, registry)
+	if not bool(parsed.get("ok", false)):
+		return "[report] town state rejected: %s" % parsed.get("error", "")
+	state = parsed["state"]
+	var built: Dictionary = build()
+	if not bool(built.get("ok", false)):
+		return "[report] town failed to build: %s" % built.get("error", "")
+	if objects.is_empty():
+		return "[report] town rendered no objects"
+	# The session the confirm needs: a real launch activates it during boot,
+	# while this headless report flow commits it here.
+	var summary := BootData.PlayerSummary.new()
+	summary.user_id = pid
+	summary.name = state.summary.name
+	summary.level = state.summary.level
+	summary.xp = state.summary.xp
+	var activation: Dictionary = session.activate(pid, summary)
+	if not bool(activation.get("ok", false)):
+		return "[report] session activation failed: %s" \
+			% activation.get("error", "")
+	var income_building: Variant = _placement_for_slot(COLLECT_INTENT_INDEX)
+	if income_building == null:
+		return "[report] no placement carries the recorded legacy key %d" \
+			% COLLECT_INTENT_INDEX
+	if income_building.cell != COLLECT_INTENT_CELL:
+		return "[report] the recorded building sits at (%d, %d), not (%d, %d)" \
+			% [income_building.cell.x, income_building.cell.y,
+				COLLECT_INTENT_CELL.x, COLLECT_INTENT_CELL.y]
+	if int(income_building.item) != COLLECT_INTENT_ITEM:
+		return "[report] the recorded building is item %d, not %d" \
+			% [int(income_building.item), COLLECT_INTENT_ITEM]
+	if _typed_row(income_building.raw) != COLLECT_INTENT_ROW:
+		return "[report] the recorded row is %s, not the executed fixture's %s" \
+			% [JSON.stringify(_typed_row(income_building.raw)),
+				JSON.stringify(COLLECT_INTENT_ROW)]
+	# The committed income fields and the committed ladder the client derives
+	# from the content package — the very facts the service derives server-side —
+	# are cross-checked against the executed fixture's own recorded payout
+	# BEFORE anything is sent.
+	var facts: Dictionary = _collect_income_of(income_building)
+	if not bool(facts.get("ok", false)):
+		return "[report] the recorded building has no committed income: %s" \
+			% str(facts.get("reason", ""))
+	var ladder: Dictionary = _committed_collection_ladder(registry)
+	if not bool(ladder.get("ok", false)):
+		return "[report] the committed ladder does not resolve: %s" \
+			% str(ladder.get("reason", ""))
+	if int(facts.get("amount", 0)) != COLLECT_INTENT_AMOUNT \
+			or str(facts.get("resource_type", "")) != COLLECT_INTENT_TYPE \
+			or int(facts.get("experience", 0)) != COLLECT_INTENT_XP \
+			or int(facts.get("cap", 0)) != COLLECT_INTENT_CAP:
+		return ("[report] the derived income is %d %s / %d xp / cap %d, not "
+			% [int(facts.get("amount", 0)), str(facts.get("resource_type", "")),
+				int(facts.get("experience", 0)), int(facts.get("cap", 0))]
+			+ "the fixture's %d %s / %d xp / cap %d" % [COLLECT_INTENT_AMOUNT,
+				COLLECT_INTENT_TYPE, COLLECT_INTENT_XP, COLLECT_INTENT_CAP])
+	var placements_before: int = state.placements.size()
+	var objects_before: int = objects.size()
+	var resources_before: Dictionary = _report_resources()
+	var storage_before: Dictionary = _storage_record()
+	var row_before := _typed_row(income_building.raw)
+	# The player's own path: press the recorded building's cell, arm the
+	# collection, and confirm. Nothing here bypasses the flow a player uses.
+	var pressed: Dictionary = handle_pointer_press(
+		Iso.grid_to_screen(COLLECT_INTENT_CELL))
+	if not bool(pressed.get("ok", false)):
+		return "[report] selection probe rejected: %s" % pressed.get("error", "")
+	if selection_legacy_id() != COLLECT_INTENT_ITEM:
+		return "[report] the press did not select item %d (selected %d)" \
+			% [COLLECT_INTENT_ITEM, selection_legacy_id()]
+	var armed: Dictionary = arm_collect()
+	if not bool(armed.get("ok", false)):
+		return "[report] collect arm rejected: %s" % armed.get("error", "")
+	if int(armed.get("slot", -1)) != COLLECT_INTENT_INDEX:
+		return "[report] the armed collection names key %d, not %d" \
+			% [int(armed.get("slot", -1)), COLLECT_INTENT_INDEX]
+	if (armed.get("payout", []) as Array) != COLLECT_INTENT_PAYOUT:
+		return ("[report] the client's derived payout is %s, not the executed "
+			% JSON.stringify(armed.get("payout", []))
+			+ "fixture's %s" % JSON.stringify(COLLECT_INTENT_PAYOUT))
+	if int(armed.get("tier", -1)) != COLLECT_INTENT_TIER:
+		return "[report] the client's derived rung is %d, not %d" \
+			% [int(armed.get("tier", -1)), COLLECT_INTENT_TIER]
+	var confirmed: Dictionary = await confirm_collect()
+	if not bool(confirmed.get("ok", false)):
+		return "[report] collect confirm failed: %s" % confirmed.get("error", "")
+	if int(api.collect_requests) != 1:
+		return "[report] the collection issued %d intents, not exactly one" \
+			% int(api.collect_requests)
+	# A collection REUSES its key: the counts must be unchanged and the recorded
+	# key must still name the same placement instance.
+	if state.placements.size() != placements_before:
+		return "[report] a collection changed the placement count " \
+			+ "(before=%d after=%d)" % [placements_before,
+				state.placements.size()]
+	if objects.size() != objects_before:
+		return "[report] a collection changed the object count " \
+			+ "(before=%d after=%d)" % [objects_before, objects.size()]
+	var collected: Variant = _placement_for_slot(COLLECT_INTENT_INDEX)
+	if collected != income_building:
+		return "[report] the collected key no longer names the same placement"
+	if collected.cell != COLLECT_INTENT_CELL:
+		return "[report] the collected building moved to (%d, %d)" % [
+			collected.cell.x, collected.cell.y]
+	if int(collected.item) != COLLECT_INTENT_ITEM:
+		return "[report] the collected building is now item %d, not %d" \
+			% [int(collected.item), COLLECT_INTENT_ITEM]
+	var response: Variant = confirmed.get("result")
+	if not (response is BootData.CollectResult):
+		return "[report] the collect confirm carried no typed result"
+	var typed: BootData.CollectResult = response
+	if typed.previous == null or typed.row == null or typed.resources == null:
+		return "[report] the collect response carried no rows or resources"
+	# The endpoint's OWN value-level post-execution proof, asserted here on the
+	# typed row the client applied: the collection instant moved FORWARD, and
+	# every stored resource changed by exactly the derived delta (design D8).
+	if typed.row.timestamp <= typed.previous.timestamp:
+		return ("[report] the collection instant did not move forward (%d is "
+			% typed.row.timestamp + "not greater than %d)"
+			% typed.previous.timestamp)
+	var expected: Variant = _collect_expected_resources(resources_before,
+		typed.payout)
+	if expected == null:
+		return "[report] the response's payout is not the documented vector"
+	for key: String in expected:
+		if int(typed.resources.get(key)) != int(expected[key]):
+			return ("[report] the response's %s is %d, not the derived %d "
+				% [key, int(typed.resources.get(key)), int(expected[key])]
+				+ "(the endpoint's value-level proof)")
+	if typed.tier < 0 or typed.tier >= CollectionFlow.ladder_size():
+		return ("[report] the response names tier %d, outside the committed ladder"
+			% typed.tier)
+	# The next-rung countdown is computed against the RESPONSE's reference
+	# instant, not the local clock, so the recorded number is the one the
+	# service derived and the report is byte-identical across reruns.
+	var readout: String = collect_readout()
+	var after_evaluation: Dictionary = _collect_evaluation(collected,
+		typed.reference_time)
+	return _write_report_file(report_path, {
+		"schema": "collect-report-v1",
+		"bootstrap_requests": int(api.bootstrap_requests),
+		"collect_requests": int(api.collect_requests),
+		"intent": {
+			"user_id": pid,
+			"item_index": COLLECT_INTENT_INDEX,
+			"sent_by_the_client": ["item_index"],
+			"note": "the intent carries the legacy map index and nothing else: "
+				+ "no amount, no resource, no tier, no time, no price, and no "
+				+ "resource delta reach the service",
+		},
+		"committed_income": {
+			"amount": int(facts.get("amount", 0)),
+			"resource_type": str(facts.get("resource_type", "")),
+			"experience": int(facts.get("experience", 0)),
+			"cap": int(facts.get("cap", 0)),
+			"committed_fields": ["collect", "collect_type", "collect_xp",
+				"max_collects"],
+			"source": "the normalized content package, resolved client-side "
+				+ "for the readout and derived again server-side by the service",
+			"sent_by_the_client": false,
+		},
+		"derived_payout": {
+			"vector": typed.payout,
+			"vector_shape": "[unknown, xp, gold, wood, oil, steel, cash, mana]",
+			"tier": int(typed.tier),
+			"tier_minutes": CollectionFlow.threshold_minutes(int(typed.tier)),
+			"tier_seconds": CollectionFlow.threshold_seconds(int(typed.tier)),
+			"multiplier": float(CollectionFlow.ladder_multipliers()[
+				int(typed.tier)]),
+			"as_text": CollectionFlow.payout_text(typed.payout),
+			"matched_by_the_executed_fixture": (typed.payout
+				== COLLECT_INTENT_PAYOUT),
+			"derivation_status": "derived-provisional (D1/D2/D6)",
+			"note": "every number here is derived: the amount formula, the "
+				+ "experience scaling, and the resource mapping are all "
+				+ "derivations no legacy branch reads. The claim is a payout "
+				+ "that grows in four committed rungs, never any specific "
+				+ "amount the legacy client pays",
+		},
+		"committed_ladder": {
+			"committed_fields": ["COLLECT_MINUTES", "COLLECT_MULTIPLIER"],
+			"unit_in_the_configuration": "minutes",
+			"unit_the_comparison_uses": "seconds",
+			"seconds_per_committed_minute":
+				CollectionFlow.SECONDS_PER_COMMITTED_MINUTE,
+			"rungs": CollectionFlow.ladder_record(),
+			"clamped_at_the_top_rung": true,
+			"extrapolated_past_the_top_rung": false,
+			"read_from_the_content_package": {
+				"minutes": (ladder.get("minutes", []) as Array).duplicate(),
+				"multipliers": (ladder.get("multipliers", []) as Array)
+					.duplicate(),
+			},
+			"note": "the thresholds are committed in MINUTES while both "
+				+ "instants are Unix SECONDS, so the comparison converts "
+				+ "through the single named constant above; comparing the two "
+				+ "units directly would pay the top rung within five seconds",
+		},
+		"next_rung": {
+			"reference_instant": int(typed.reference_time),
+			"reference_source": "the response's own reference_time, not the "
+				+ "local clock, so the recorded countdown is the one the "
+				+ "service derived and this report is byte-identical across "
+				+ "reruns",
+			"collected_at_after": int(after_evaluation.get("collected_at", 0)),
+			"elapsed_seconds_after": int(after_evaluation.get(
+				"elapsed_seconds", 0)),
+			"tier_after": int(after_evaluation.get("tier",
+				CollectionFlow.NO_TIER)),
+			"next_remaining_seconds": after_evaluation.get(
+				"next_remaining_seconds", null),
+			"readout_after": readout,
+		},
+		"building": {
+			"legacy_id": int(collected.item),
+			"name": str(collected.name),
+			"slot": int(collected.slot),
+			"key_reused": int(collected.slot) == COLLECT_INTENT_INDEX,
+			"cell": [collected.cell.x, collected.cell.y],
+			"object_retained": _object_for_cell(COLLECT_INTENT_CELL) != null,
+			"visual_touched": false,
+		},
+		"rows": {
+			"row_previous": row_before,
+			"row_after": _typed_row(collected.raw),
+			"response_previous_row": _boot_row(typed.previous),
+			"response_row": _boot_row(typed.row),
+			"row_in_state_matches_response": (_typed_row(collected.raw)
+				== _boot_row(typed.row)),
+			"only_the_collection_instant_moved": _collect_only_instant_moved(
+				row_before, _typed_row(collected.raw)),
+		},
+		"counts": {
+			"placements_before": placements_before,
+			"placements_after": state.placements.size(),
+			"objects_before": objects_before,
+			"objects_after": objects.size(),
+		},
+		"resources": {
+			"before": resources_before,
+			"after": _report_resources(),
+			"movement": _collect_movement(resources_before,
+				_report_resources()),
+			"source_of_truth": "the response's own resources; the client's "
+				+ "derived payout is recorded, never applied (the response "
+				+ "wins even where the two disagree)",
+		},
+		"storage": {
+			"before": storage_before,
+			"after": _storage_record(),
+			"touched": false,
+		},
+		"inputs": {
+			"save_list_fixture": _digest_record(REPORT_SAVE_LIST),
+			"bootstrap_fixture": _digest_record(REPORT_BOOTSTRAP),
+			"collect_request": _digest_record(REPORT_COLLECT_REQUEST),
+			"collect_response": _digest_record(REPORT_COLLECT_RESPONSE),
+			"collect_after": _digest_record(REPORT_COLLECT_AFTER),
+			"terrain": _digest_record(_terrain_runtime(registry)),
+		},
+		"constants": _constants_record(),
+		"provenance": COLLECT_PROVENANCE,
+		"capture": _collect_capture_record(),
+		"non_claims": COLLECT_NON_CLAIMS,
+	})
+
+
+## The stored resource values a correct application of `payout` must produce,
+## keyed by the `BootData.Resources` FIELD names the response carries, or null
+## when the payout is not the documented eight-slot vector. This is the CLIENT's
+## mirror of the endpoint's value-level post-execution proof: the report asserts
+## it rather than trusting the response (design D8). The HUD's own name for the
+## gold slot is `coins`, so `before` is translated through `COLLECT_HUD_SLOTS`
+## rather than read with the wrong key.
+func _collect_expected_resources(before: Dictionary,
+		payout: Variant) -> Variant:
+	if not (payout is Array) or (payout as Array).size() \
+			!= BootData.COLLECT_VECTOR_SLOTS:
+		return null
+	var vector: Array = payout as Array
+	var expected := {}
+	# `typed resource name -> (hud snapshot key, vector slot)`. The unread
+	# `unknown` slot 0 is absent on purpose: no legacy branch reads it, so it
+	# moves nothing.
+	for entry in [["gold", "coins", 2], ["wood", "wood", 3], ["oil", "oil", 4],
+			["steel", "steel", 5], ["cash", "cash", 6], ["mana", "mana", 7],
+			["xp", "xp", 1]]:
+		var name := str(entry[0])
+		var current: int = int(before.get(str(entry[1]), 0))
+		expected[name] = maxi(current + int(vector[int(entry[2])]), 0)
+	return expected
+
+
+## The per-resource movement between two `_report_resources()` snapshots, as
+## the report records it: the delta the applied vector produced, never a
+## recomputed payout.
+func _collect_movement(before: Dictionary, after: Dictionary) -> Dictionary:
+	var movement := {}
+	for key: String in after:
+		movement[key] = int(after[key]) - int(before.get(key, 0))
+	return movement
+
+
+## True when the only field that differs between the pre-execution row and the
+## post-execution row is the collection instant (`item[3]`) — the branch's
+## single established write.
+func _collect_only_instant_moved(before: Array, after: Array) -> bool:
+	if before.size() != after.size():
+		return false
+	for index in range(before.size()):
+		if index == 3:
+			continue
+		if before[index] != after[index]:
+			return false
+	return true
+
+
+## The fake-capture pointer (building-collect design D10): the committed
+## windowed capture with its digest plus the plain statement of what it proves
+## — so no reader can mistake the screenshot for executed-legacy proof.
+func _collect_capture_record() -> Dictionary:
+	var record := _digest_record(REPORT_CAPTURE_COLLECT)
+	record["implementation"] = "fake GameApi (a deterministic test " \
+		+ "double, not a parity oracle)"
+	record["parity_pointer"] = "real-execution parity is established " \
+		+ "by the fixture-replay tests and the verify-boot collect-live phase"
+	return record

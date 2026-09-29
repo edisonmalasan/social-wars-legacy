@@ -59,6 +59,14 @@ overlap is not ambiguous - it is corruption, and the safe rule (D5) is forced.
 (derived).** `amount = collect × COLLECT_MULTIPLIER[r]`, where `r` is the highest
 index whose `COLLECT_MINUTES[r]` threshold the elapsed time `now - item[3]` has
 reached; the elapsed time is clamped at the top rung rather than extrapolated.
+**The committed ladder is in minutes and both instants are Unix seconds**, so the
+comparison converts through a single documented constant
+(`SECONDS_PER_COMMITTED_MINUTE = 60`, giving thresholds of 300 s, 3 600 s,
+14 400 s, and 28 800 s) and each boundary is asserted from both sides
+(299/300, 3599/3600, 14399/14400, 28799/28800). This was found during the Apply
+stage, after the compat worker's first implementation compared the two directly -
+which would have paid the top rung within five *seconds*. Experience is rounded
+half-up, so the 0.25 rung of the Tree's `collect_xp 1` pays `0`.
 Evidence that supports the pairing: the two globals are parallel four-element
 arrays and the collection amount is otherwise a constant, so a ladder that did
 not scale the amount would have no effect at all. No branch reads them, so the

@@ -1,0 +1,329 @@
+{
+	"bootstrap_requests": 1,
+	"building": {
+		"cell": [
+			53,
+			39
+		],
+		"key_reused": true,
+		"legacy_id": 905,
+		"name": "Tree",
+		"object_retained": true,
+		"slot": 2,
+		"visual_touched": false
+	},
+	"capture": {
+		"implementation": "fake GameApi (a deterministic test double, not a parity oracle)",
+		"parity_pointer": "real-execution parity is established by the fixture-replay tests and the verify-boot collect-live phase",
+		"path": "apps/client-godot/evidence/building-collect/building-collect.png",
+		"sha256": "db338d74086ef37796e2e69c35c205a0200a151c35bb535b96411d27ae33c275"
+	},
+	"collect_requests": 1,
+	"committed_income": {
+		"amount": 20,
+		"cap": 0,
+		"committed_fields": [
+			"collect",
+			"collect_type",
+			"collect_xp",
+			"max_collects"
+		],
+		"experience": 1,
+		"resource_type": "w",
+		"sent_by_the_client": false,
+		"source": "the normalized content package, resolved client-side for the readout and derived again server-side by the service"
+	},
+	"committed_ladder": {
+		"clamped_at_the_top_rung": true,
+		"committed_fields": [
+			"COLLECT_MINUTES",
+			"COLLECT_MULTIPLIER"
+		],
+		"extrapolated_past_the_top_rung": false,
+		"note": "the thresholds are committed in MINUTES while both instants are Unix SECONDS, so the comparison converts through the single named constant above; comparing the two units directly would pay the top rung within five seconds",
+		"read_from_the_content_package": {
+			"minutes": [
+				5.0,
+				60.0,
+				240.0,
+				480.0
+			],
+			"multipliers": [
+				0.25,
+				1.0,
+				2.0,
+				3.0
+			]
+		},
+		"rungs": [
+			{
+				"minutes": 5,
+				"multiplier": 0.25,
+				"seconds": 300,
+				"tier": 0
+			},
+			{
+				"minutes": 60,
+				"multiplier": 1.0,
+				"seconds": 3600,
+				"tier": 1
+			},
+			{
+				"minutes": 240,
+				"multiplier": 2.0,
+				"seconds": 14400,
+				"tier": 2
+			},
+			{
+				"minutes": 480,
+				"multiplier": 3.0,
+				"seconds": 28800,
+				"tier": 3
+			}
+		],
+		"seconds_per_committed_minute": 60,
+		"unit_in_the_configuration": "minutes",
+		"unit_the_comparison_uses": "seconds"
+	},
+	"constants": {
+		"derivation_status": "derived-provisional",
+		"evidence_gap": "the legacy SWF's static iso-engine identifiers (TILE_SIZE, EI_TILE_HEIGHT_PIXELS, gridWidth/Height, numCols/numRows) were never extracted; pixel parity with the Flash client is not claimed",
+		"grid_extent": 100,
+		"origin_x": 2000.0,
+		"origin_y": 10.0,
+		"tile_height": 20.0,
+		"tile_width": 40.0,
+		"world_rect": [
+			0.0,
+			0.0,
+			4000.0,
+			2000.0
+		]
+	},
+	"counts": {
+		"objects_after": 40,
+		"objects_before": 40,
+		"placements_after": 40,
+		"placements_before": 40
+	},
+	"derived_payout": {
+		"as_text": "60 wood, 3 xp",
+		"derivation_status": "derived-provisional (D1/D2/D6)",
+		"matched_by_the_executed_fixture": true,
+		"multiplier": 3.0,
+		"note": "every number here is derived: the amount formula, the experience scaling, and the resource mapping are all derivations no legacy branch reads. The claim is a payout that grows in four committed rungs, never any specific amount the legacy client pays",
+		"tier": 3,
+		"tier_minutes": 480,
+		"tier_seconds": 28800,
+		"vector": [
+			0,
+			3,
+			0,
+			60,
+			0,
+			0,
+			0,
+			0
+		],
+		"vector_shape": "[unknown, xp, gold, wood, oil, steel, cash, mana]"
+	},
+	"inputs": {
+		"bootstrap_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/get_player_info/response.body",
+			"sha256": "facedf76784d3dc03a3a45e81756a8546f90f7647dbff8917593404d9e401709"
+		},
+		"collect_after": {
+			"path": "tests/fixtures/godot-building-collect/steps/command_collect/after.json",
+			"sha256": "dcb2a940f1e70649a3f7233020283884a6ca9875b30dc390361583224e20a562"
+		},
+		"collect_request": {
+			"path": "tests/fixtures/godot-building-collect/steps/command_collect/request.json",
+			"sha256": "e6d97bd0c60ed1656c1b51fa0be955cc5a3d25061f28ab98ce2541655f6fa744"
+		},
+		"collect_response": {
+			"path": "tests/fixtures/godot-building-collect/steps/command_collect/response.body",
+			"sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87"
+		},
+		"save_list_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json",
+			"sha256": "ad0404c2c340a48f06e2e49ae7eb7973978cd2ccb02ac6ff7bfba4eb75f6d9f4"
+		},
+		"terrain": {
+			"path": "assets/images/en/mapa1.jpg",
+			"sha256": "35c4ded53e82be187eb67c54ee7c7023b698c3986954db4b6f9613a2a45cdd3f"
+		}
+	},
+	"intent": {
+		"item_index": 2,
+		"note": "the intent carries the legacy map index and nothing else: no amount, no resource, no tier, no time, no price, and no resource delta reach the service",
+		"sent_by_the_client": [
+			"item_index"
+		],
+		"user_id": "00000000-0000-4000-8000-000000000001"
+	},
+	"next_rung": {
+		"collected_at_after": 1790705901,
+		"elapsed_seconds_after": 0,
+		"next_remaining_seconds": 300,
+		"readout_after": "collect: item 905 | no committed rung reached | derived payout: none (too early) | next rung in 300 s",
+		"reference_instant": 1790705901,
+		"reference_source": "the response's own reference_time, not the local clock, so the recorded countdown is the one the service derived and this report is byte-identical across reruns",
+		"tier_after": -1
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed",
+		"every number in the payout is derived-provisional and was never observed from the Flash client: the amount formula (D1), the experience scaling (D2), the sub-first-rung refusal (D3), the cap semantics (D4), the shared-field refusal (D5), and the cash/experience mapping (D6). The claim is that a payout grows in four committed rungs derived from the item's committed income fields, never any specific amount the legacy client pays",
+		"the clamp is not exercised by the fixture: legacy's max(current + delta, 0) only bites when a delta would drive a balance below zero, and the derived payout is a credit added to balances far above zero; observing it would need a delta larger than the balance",
+		"the committed corpus's only income-bearing rows are decorations — the Tree and the eight forest rows — because the real factories and depots are not placed, so this payout is a decoration's; nothing is claimed about what a factory would pay beyond its own committed income fields and the committed ladder",
+		"no cap semantics are implemented: only a committed max_collects of 0 is, a non-zero cap is refused with capped_collection rather than interpreted, and that refusal is stub-covered because no placed corpus item carries one",
+		"the sub-first-rung refusal is stub-covered for the same reason: no corpus row records a recent collection instant (all 40 rows carry item[3] == 0), so the top rung applies deterministically in every run",
+		"the shared item[3] overlap is closed by REFUSAL, not by interpretation: a collection on a row under construction is refused in both layers rather than modelled, and this contract never treats a construction stamp as a collection stamp or the reverse",
+		"the ladder's lower rungs are unit-covered at the pure-helper level with explicit instants, never against a live wall clock; the committed thresholds are MINUTES and the conversion to the Unix seconds both instants use is the single named constant the suite asserts at every boundary from both sides",
+		"the friend-assist cluster is out of scope: a row carrying only the attr[\"si\"] bag is collectible, because the construction-state refusal names exactly cp and nc",
+		"parity covers one recorded transaction against the fresh-player corpus, not progressed players",
+		"collectibility, the sub-first-rung rule, and the next-rung countdown are client-side rules only; the endpoint enforces structural input validity, the content refusals, the construction-state and sub-first-rung guards, and the value-level post-execution proof, and no server-authoritative validation exists",
+		"no pixel-parity oracle against the legacy client exists",
+		"the capture runs the fake GameApi implementation; real-execution parity is established by the fixture-replay tests and the verify-boot collect-live phase"
+	],
+	"provenance": {
+		"derived": [
+			{
+				"evidence": "derived: no legacy branch reads either ladder global; the two are parallel four-element arrays and the amount is otherwise a constant, so a ladder that did not scale the amount would have no effect at all. A flat amount and extrapolation past the last rung are the recorded rejected alternatives",
+				"fact": "the amount formula: collect scaled by the reached rung's committed multiplier, clamped at the top rung (D1)"
+			},
+			{
+				"evidence": "derived: the experience is part of the same payout, so scaling only the amount would leave the vector internally inconsistent; a flat collect_xp is the recorded rejected alternative",
+				"fact": "the experience scaling: collect_xp by the SAME rung (D2)"
+			},
+			{
+				"evidence": "derived: five minutes in, a quarter of the full amount leaves the sub-rung case unspecified (a quarter, nothing, or a refusal), and the safe reading is the one that invents no amount",
+				"fact": "the sub-first-rung behaviour: no collection is offered and none is executed below 300 s, so the 0.25 multiplier never derives a speculative amount (D3)"
+			},
+			{
+				"evidence": "derived: 0 on 767 of 778 items reads as no cap, but nothing in the repository says whether a non-zero cap limits one collection, a daily total, or a building's lifetime output, and the three readings imply different payouts",
+				"fact": "the cap semantics: only a committed max_collects of 0 is implemented and a non-zero cap is refused (D4)"
+			},
+			{
+				"evidence": "derived as a RULE from an ESTABLISHED risk: probe 2 shows legacy does not prevent the corruption and reports success, so refusing is the safest evidence-supported behaviour; what the legacy client itself would do is never observed",
+				"fact": "the shared item[3] rule: a row carrying construction state is refused in both the client and the service (D5)"
+			},
+			{
+				"evidence": "derived: no item records a mana collect type, and a type outside the committed five is refused rather than coerced; a \"m\" mapping for a value no item records is the recorded rejected alternative",
+				"fact": "the cash and experience mapping: g/w/o/s/c onto gold, wood, oil, steel, and cash, with the unread unknown slot and the never-produced mana slot always zero (D6)"
+			},
+			{
+				"evidence": "never observed; no Flash, Ruffle, ActionScript, or browser execution in this change",
+				"fact": "the legacy client sends exactly this single-command envelope carrying the derived vector"
+			}
+		],
+		"established": [
+			{
+				"evidence": "command.py:136-147 and the collect row of docs/legacy-protocol/commands.json (committed legacy server source and its source-grounded command catalog)",
+				"fact": "the collect branch takes exactly one positional argument and writes ONLY item[3] = time_now(); a missing row logs an error and returns early, still persisting the batch"
+			},
+			{
+				"evidence": "command.py:40; engine.py:251-271; docs/legacy-protocol/commands.json",
+				"fact": "the income is NOT computed by the server: the pre-dispatch apply_resources applies the client-sent eight-slot vector verbatim, per resource, as max(current + delta, 0), and the command catalog's resource_effects state both facts outright"
+			},
+			{
+				"evidence": "packages/game-content normalized items; the census in docs/legacy-collect-income.md records collect 0 for 727 of 778 stored items, collect_type g/w/o/s/c, collect_xp 0 for 419, and max_collects 0 for 767 with 25 and 100 for the rest",
+				"fact": "the per-item income content is committed: collect (amount), collect_type (which resource), collect_xp (experience), and max_collects (a cap where non-zero)"
+			},
+			{
+				"evidence": "the loaded globals of config/main.json, normalized to packages/game-content/normalized/globals.json",
+				"fact": "the collection ladder is committed: COLLECT_MINUTES [5, 60, 240, 480] paired with COLLECT_MULTIPLIER [0.25, 1, 2, 3], in MINUTES"
+			},
+			{
+				"evidence": "executed-legacy probe 2 recorded in docs/legacy-collect-income.md and in the committed fixture manifest: [22, 58, 48, 0, 0, [], {}, 1] -> [22, 58, 48, <ts>, 0, [], {\"cp\": 3600}, 1]",
+				"fact": "a collection on a just-started construction overwrites the build's start instant while the recorded countdown SURVIVES, and the legacy server answers {\"result\":\"success\"}"
+			},
+			{
+				"evidence": "the committed executed-legacy fixture tests/fixtures/godot-building-collect/",
+				"fact": "the executed result: the row at key 2 keeps its key, cell, item, orientation, store, attribute bag, and player and carries a re-stamped collection instant, the placement count stays 40, the derived payout lands in exactly the wood and experience slots, and every other row, the storage, the private state, and the player info are byte-identical"
+			}
+		]
+	},
+	"resources": {
+		"after": {
+			"cash": 5,
+			"coins": 2000,
+			"energy": 50,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2060,
+			"xp": 7
+		},
+		"before": {
+			"cash": 5,
+			"coins": 2000,
+			"energy": 50,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2000,
+			"xp": 4
+		},
+		"movement": {
+			"cash": 0,
+			"coins": 0,
+			"energy": 0,
+			"mana": 0,
+			"oil": 0,
+			"steel": 0,
+			"wood": 60,
+			"xp": 3
+		},
+		"source_of_truth": "the response's own resources; the client's derived payout is recorded, never applied (the response wins even where the two disagree)"
+	},
+	"rows": {
+		"only_the_collection_instant_moved": true,
+		"response_previous_row": [
+			905,
+			53,
+			39,
+			0,
+			0,
+			[],
+			{},
+			1
+		],
+		"response_row": [
+			905,
+			53,
+			39,
+			1790705901,
+			0,
+			[],
+			{},
+			1
+		],
+		"row_after": [
+			905,
+			53,
+			39,
+			1790705901,
+			0,
+			[],
+			{},
+			1
+		],
+		"row_in_state_matches_response": true,
+		"row_previous": [
+			905,
+			53,
+			39,
+			0,
+			0,
+			[],
+			{},
+			1
+		]
+	},
+	"schema": "collect-report-v1",
+	"storage": {
+		"after": {},
+		"before": {},
+		"touched": false
+	}
+}

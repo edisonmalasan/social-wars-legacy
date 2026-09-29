@@ -43,6 +43,28 @@ extends RefCounted
 ## bag instead) each reject the save naming the offending field. The click
 ## requirement and the derived duration are NOT here: both come from
 ## committed content, and the service derives them the same way.
+##
+## Collection clock (building-collect task 4.1, design D5): the SAME row field
+## the construction reading above uses is also the row's recorded
+## last-collection instant — the legacy `collect` branch writes only
+## `item[3] = time_now()`, while `activate` writes the same field as a build's
+## start instant. The two readings are therefore named separately and kept
+## distinguishable in the typed state, so no code can confuse them:
+##   * `started_at`  (construction) the build's start instant — present ONLY
+##                    while a countdown is recorded and only when the row's
+##                    timestamp is positive, because a zero timestamp means
+##                    nothing stamped the row;
+##   * `collected_at` (collection) the row's recorded collection instant — the
+##                    same `item[3]` read on its own terms, ALWAYS present when
+##                    the parse succeeded, with `0` as the documented
+##                    "never collected" value the whole fresh-player corpus
+##                    carries.
+## A timestamp that is not a non-negative integer REJECTS the save naming the
+## row, exactly as an invalid counter or countdown does: it is the collection
+## clock's only source, and a nonsense instant is not a shape legacy writes.
+## Whether a collection may be executed on a row that also carries
+## construction state is NOT decided here — that is the collection flow's
+## refusal, in the same two layers the delivered construction line owns.
 
 ## Content domains searched, in order, for a placed legacy id (the
 ## normalized package splits items into buildings/units/specials; ids do
@@ -126,6 +148,14 @@ class Placement:
 	## flow refuses it by name rather than reading a number out of a value that
 	## is not a bag.
 	var construction_readable := true
+	## The row's recorded COLLECTION instant (`item[3]`) as a non-negative
+	## integer, read on its own terms and always distinct from `started_at`
+	## above: `0` is the documented "never collected" value, and legacy's
+	## `collect` branch overwrites this very field with the wall clock. Null
+	## only for a placement built outside the parser (the flow applies), where
+	## a non-integer or negative instant is an apply failure rather than a
+	## guess.
+	var collected_at: Variant = null
 	## Save order — the deterministic last tie-break of the depth sort.
 	var order := 0
 	## True when ContentRegistry resolved the placed legacy id.
@@ -266,6 +296,15 @@ static func parse(payload: Variant, registry: RegistryScript) -> Dictionary:
 		placement.clicks = construction["clicks"]
 		placement.countdown = construction["countdown"]
 		placement.started_at = construction["started_at"]
+		# The collection clock (building-collect design D5): the SAME row field
+		# read on its own terms, parsed fail-closed in this one pass so the
+		# collection flow and the construction flow can never read the row by
+		# two rule sets. Unlike `started_at` it is present even when it is `0`,
+		# because `0` is the documented value every fresh row carries.
+		var collection: Dictionary = _collection_of(row, str(key))
+		if collection.get("fatal", false):
+			return reject.call(str(collection.get("error", "")))
+		placement.collected_at = collection["collected_at"]
 		_resolve_content(placement, registry)
 		if not placement.content_ok \
 				and not (placement.item in state.unresolved_ids):
@@ -504,6 +543,52 @@ static func _construction_of(row: Array, key: String) -> Dictionary:
 			started = stamp
 	return {"ok": true, "error": "", "fatal": false, "clicks": clicks,
 		"countdown": countdown, "started_at": started}
+
+
+## The collection clock of one placement as the pure flow helpers read it:
+## `{ok, error, collected_at}` — the row's recorded collection instant
+## (`item[3]`) as a non-negative integer, `0` included as the documented
+## "never collected" value (building-collect design D5). The public form of
+## `_collection_of`, so the readout, the refusal rules, and the shared
+## placement parser all consume ONE rule set about the row's shared timestamp
+## field — and so the construction reading (`started_at`) and the collection
+## reading (`collected_at`) stay two named, distinguishable facts about the
+## same byte.
+static func collection_of(placement: Variant) -> Dictionary:
+	if placement == null or not (placement is Placement):
+		return {"ok": false, "error": "[town] no typed placement to read",
+			"collected_at": null}
+	var typed: Placement = placement
+	if typed.collected_at == null:
+		return {"ok": false,
+			"error": "the row records no readable collection instant",
+			"collected_at": null}
+	return {"ok": true, "error": "", "collected_at": int(typed.collected_at)}
+
+
+## One eight-field row -> its collection clock, fail-closed.
+##
+## The clock lives in `item[3]` — the very field the delivered construction
+## line reads as a build's start instant and the very field legacy's `collect`
+## branch overwrites with `time_now()` — and nothing else. The rules:
+##   * `item[3]` must be a NON-NEGATIVE integer. `0` is a real value: it is
+##     what every row of a fresh save records, meaning "never collected", and
+##     treating it as absent would make an uncollected row's elapsed time
+##     underivable. A non-integer, non-finite, or negative instant REJECTS the
+##     save naming the row — a nonsensical collection instant is not a shape
+##     legacy writes, and guessing one would invent a payout basis;
+##   * the row's attribute bag is NOT consulted here: whether a collection may
+##     run on a row that carries construction state is the collection flow's
+##     refusal, evaluated through the ONE shared construction accessor, so the
+##     two facts about the shared field stay separate and a row carrying only
+##     the friend-assist `si` bag is never mistaken for a row under build.
+static func _collection_of(row: Array, key: String) -> Dictionary:
+	var stamp: Variant = _integer(row[3])
+	if stamp == null or int(stamp) < 0:
+		return {"fatal": true, "collected_at": null,
+			"error": "collection instant of placement '%s' is not a " % key
+				+ "non-negative integer"}
+	return {"fatal": false, "collected_at": stamp}
 
 
 ## The house storage rejection envelope: names the offending field or key.

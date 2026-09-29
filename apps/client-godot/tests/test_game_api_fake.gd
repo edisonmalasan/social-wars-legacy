@@ -45,6 +45,62 @@ const FIXTURE_CONSTRUCTION_BEFORE := \
 	"tests/fixtures/godot-building-construction/steps/command_construction/before.json"
 const FIXTURE_CONSTRUCTION_AFTER := \
 	"tests/fixtures/godot-building-construction/steps/command_construction/after.json"
+const FIXTURE_COLLECT_BEFORE := \
+	"tests/fixtures/godot-building-collect/steps/command_collect/before.json"
+const FIXTURE_COLLECT_AFTER := \
+	"tests/fixtures/godot-building-collect/steps/command_collect/after.json"
+
+## The executed-legacy collect transaction's constants (fixture facts, read
+## from the committed capture): the Tree decoration (item 905, 1x1) at legacy
+## map key "2", anchored at `(53,39)`, whose row `[905, 53, 39, 0, 0, [], {},
+## 1]` is mutated IN PLACE — the placement count stays 40, the key and cell are
+## reused, and ONLY `item[3]` changes — while the content-derived payout
+## `[0, 3, 0, 60, 0, 0, 0, 0]` lands in exactly two resource slots. The
+## collection instant is the capture's own wall clock, so it is asserted as a
+## positive integer and never by value.
+const COLLECT_ITEM := 905
+const COLLECT_INDEX := 2
+const COLLECT_CELL_X := 53
+const COLLECT_CELL_Y := 39
+const COLLECT_ROW := [COLLECT_ITEM, 53, 39, 0, 0, [], {}, 1]
+## The item's committed income fields in the loaded configuration (`collect`
+## "20", `collect_type` "w", `collect_xp` "1", `max_collects` "0" — all
+## string-encoded) and the payout they derive at the TOP committed rung, which
+## is what every corpus row reaches because every corpus row records
+## `item[3] == 0` and the elapsed time is therefore unbounded.
+const COLLECT_AMOUNT := 20
+const COLLECT_TYPE := "w"
+const COLLECT_XP := 1
+const COLLECT_CAP := 0
+const COLLECT_PAYOUT := [0, 3, 0, 60, 0, 0, 0, 0]
+const COLLECT_TIER := 3
+## An integer index the map does not name (the endpoint's 404, resolved before
+## execution) and index 0, which is never a real legacy key.
+const COLLECT_UNKNOWN_INDEX := 9999
+## A placed row the double can still resolve after the failed attempts, used to
+## prove the refusals left the in-memory state uncorrupted: the Trees
+## decoration at key 21 (item 930, the same committed income as the Tree).
+const COLLECT_SPARE_INDEX := 21
+const COLLECT_SPARE_ITEM := 930
+## A THIRD income row the corpus leaves untouched (the second Trees
+## decoration), used for the recovery check after the refusals: key 21 has
+## already been collected by then, so its own clock reads as too early.
+const COLLECT_RECOVERY_INDEX := 22
+const COLLECT_RECOVERY_ITEM := 930
+## The three refusals that no placed corpus row can produce, so the double's
+## IN-MEMORY state carries a crafted row and (for the content two) a crafted
+## config item — the client-side mirror of the compat suite's own accessor
+## stub. The committed fixture is never written.
+const COLLECT_CAPPED_INDEX := 4242
+const COLLECT_CAPPED_ITEM := 960
+const COLLECT_UNMAPPABLE_INDEX := 4243
+const COLLECT_UNMAPPABLE_ITEM := 961
+const COLLECT_BUILDING_INDEX := 4244
+const COLLECT_FRESH_INDEX := 4245
+## The first committed rung's threshold in SECONDS (5 committed minutes): a
+## row stamped one second short of it reaches NO rung, which is the only
+## `too_early` path the corpus itself cannot produce.
+const COLLECT_FIRST_RUNG_SECONDS := 300
 
 ## The executed-legacy store transaction's constants (fixture facts, read
 ## from the committed capture): the Tree decoration (item 905, 1x1) at
@@ -232,6 +288,7 @@ func run_scenario() -> void:
 	await _check_store(api, user_id)
 	await _check_upgrade(api, user_id)
 	await _check_construction(api, user_id)
+	await _check_collect(api, user_id)
 
 	info("fake implementation resolved %d save(s) with no server and no socket"
 		% save_list.saves.size())
@@ -1541,6 +1598,344 @@ func _check_construction_failure(result: Variant, code: String,
 		label + " reports no legacy result for a failed construction")
 	check_eq(typed.action, "",
 		label + " reports no resolved action for a failed construction")
+
+
+# ---------------------------------------------------------------------------
+# Collect double (task 3.2, building-collect design D8)
+# ---------------------------------------------------------------------------
+
+
+## Collect double coverage: the committed executed transaction reproduced over
+## the fixture's own before-state, with the payout derived from the FIXTURE'S
+## OWN committed content and the row's pre-execution instant (never from the
+## caller), the collection instant re-stamped deterministically, both rows
+## carried, the value-level post-state checked, and every structural and
+## content refusal answered with the endpoint's own code — including the two
+## (`capped_collection`, `unknown_collect_type`) and the clock one
+## (`too_early`) that no placed corpus row can produce, which is why they are
+## stubbed in the double's own in-memory state and never written to the
+## committed fixture.
+func _check_collect(api: Variant, user_id: String) -> void:
+	var before := _read_fixture_object(FIXTURE_COLLECT_BEFORE)
+	var after := _read_fixture_object(FIXTURE_COLLECT_AFTER)
+	if before.is_empty() or after.is_empty():
+		return
+	var before_map: Dictionary = before["maps"][0]
+	var after_map: Dictionary = after["maps"][0]
+	var before_items: Dictionary = before_map["items"]
+	var after_items: Dictionary = after_map["items"]
+	check_eq(before_items.size(), 40,
+		"the collect fixture before map carries 40 placements")
+	check_eq(after_items.size(), 40,
+		"the executed collection kept 40 placements (the key is REUSED)")
+	check(after_items.has("2"),
+		"the executed collection left the row at key 2 (in place)")
+	var row_before := _typed_row(before_items["2"])
+	var row_after := _typed_row(after_items["2"])
+	check_eq(row_before, COLLECT_ROW,
+		"the fixture anchors the Tree at (53,39) under key 2")
+	check_eq(int(row_after[0]), COLLECT_ITEM,
+		"the executed collection kept the row's own item")
+	check_eq([int(row_after[1]), int(row_after[2])],
+		[COLLECT_CELL_X, COLLECT_CELL_Y],
+		"the executed collection reused the very same cell")
+	check(int(row_after[3]) > int(row_before[3]),
+		"the executed collection re-stamped the row with a later wall-clock "
+		+ "collection instant (time-dependent field, never asserted by value)")
+	check_eq(row_after[4], row_before[4],
+		"the executed collection left the row's own orientation alone")
+	check_eq(row_after[5], row_before[5], "the executed collection wrote no store")
+	check_eq(row_after[6], row_before[6],
+		"the executed collection left the row's empty attribute bag alone")
+	check_eq(row_after[7], row_before[7],
+		"the executed collection kept the row's own player field")
+	# ONLY item[3] differs: that is the branch's single established write.
+	var changed: Array = []
+	for index in range(8):
+		if row_before[index] != row_after[index]:
+			changed.append(index)
+	check_eq(changed, [3],
+		"the executed collection changed exactly one field of the addressed "
+		+ "row: its collection instant")
+	# Every other row is byte-identical: the one in-place timestamp write is
+	# the only map write the executed transaction made.
+	var other_keys: Array = []
+	for key: Variant in before_items:
+		if str(key) != "2":
+			other_keys.append(str(key))
+	other_keys.sort()
+	var untouched := true
+	for key: String in other_keys:
+		if _typed_row(before_items[key]) != _typed_row(after_items[key]):
+			untouched = false
+	check(untouched,
+		"the executed collection changed no other row (39 rows stay "
+		+ "byte-identical)")
+	# The content-derived payout, the executed resource movement, and the
+	# storages the branch never touches.
+	check_eq(int(after_map["xp"]) - int(before_map["xp"]), 3,
+		"the executed collection paid the derived 3 experience")
+	check_eq(int(after_map["wood"]) - int(before_map["wood"]), 60,
+		"the executed collection paid the derived 60 wood")
+	for key in ["gold", "oil", "steel"]:
+		check_eq(before_map[key], after_map[key],
+			"the executed collection left %s unchanged (the derived vector "
+			% key + "names only wood and experience)")
+	check_eq(before["playerInfo"]["cash"], after["playerInfo"]["cash"],
+		"the executed collection left cash unchanged")
+	check_eq(before["privateState"]["mana"], after["privateState"]["mana"],
+		"the executed collection left mana unchanged")
+	check_eq(after_map["store"], {},
+		"the executed collection left storage empty (it stores nothing)")
+	check_eq(before["privateState"]["boughtUnits"], [],
+		"the executed collection started from an empty bought-units list")
+	check_eq(after["privateState"]["boughtUnits"], [],
+		"the executed collection wrote no bought-units bookkeeping")
+	var requests_before: int = api.collect_requests
+
+	# --- the collected income. The amount, resource, and experience are derived
+	# from the fixture's OWN loaded configuration and the row's pre-execution
+	# instant; the double re-stamps with the capture's own recorded epoch, so
+	# the reached rung is the same in every run.
+	var collected: Variant = await api.collect_income(user_id, COLLECT_INDEX)
+	check(collected is BootData.CollectResult,
+		"collect_income returns the typed result")
+	if not (collected is BootData.CollectResult):
+		return
+	var first: BootData.CollectResult = collected
+	check(first.ok, "fake collection resolves offline: %s" % first.error_message)
+	if not first.ok:
+		return
+	check_eq(first.protocol, BootData.PROTOCOL,
+		"collect protocol is compat-v0")
+	check_eq(first.game_version, "alpha 0.02",
+		"the collect game version is the fixture's")
+	check(first.server_time > 0,
+		"collect server_time is the positive fixture epoch (time-dependent)")
+	check_eq(first.result, "success", "legacy result string is reported")
+	check_eq(_boot_row(first.previous), COLLECT_ROW,
+		"the previous row is the executed fixture's pre-execution row")
+	check_eq(first.row.item_id, COLLECT_ITEM,
+		"the post-execution row names the row's own item")
+	check_eq([first.row.x, first.row.y],
+		[COLLECT_CELL_X, COLLECT_CELL_Y],
+		"the post-execution row reuses the pre-execution cell")
+	check_eq(first.row.attr, {},
+		"the post-execution row carries no attribute bag entry")
+	check_eq(first.row.orientation, int(row_after[4]),
+		"the post-execution row carries the row's own orientation")
+	check_eq(first.row.player, int(row_after[7]),
+		"the post-execution row carries the row's own player field")
+	check(first.row.timestamp > int(COLLECT_ROW[3]),
+		"the post-execution row is re-stamped with a later collection instant "
+		+ "(the deterministic double never reads the wall clock)")
+	check_eq(first.row.timestamp, int(row_after[3]),
+		"the re-stamp reuses the capture's recorded epoch, exactly as the "
+		+ "placement, upgrade, and construction doubles reuse theirs")
+	check_eq(first.row.timestamp, first.reference_time,
+		"the reference instant IS the deterministic re-stamp, so the derived "
+		+ "rung is the same in every run")
+	# The derived payout, its rung, and the two slots that can never be filled.
+	check_eq(first.payout, COLLECT_PAYOUT,
+		"the derived payout is the documented eight-slot vector, matching the "
+		+ "executed fixture's own applied vector")
+	check_eq(int(first.payout[0]), 0,
+		"the derived payout's unread unknown slot is zero (D6)")
+	check_eq(int(first.payout[7]), 0,
+		"the derived payout's never-produced mana slot is zero (D6)")
+	check_eq(first.tier, COLLECT_TIER,
+		"the payout came from the top committed rung, which the fixture's own "
+		+ "unbounded elapsed time (item[3] == 0) makes deterministic")
+	check_eq(int(first.payout[1]), COLLECT_XP * COLLECT_TIER,
+		"the experience is the committed collect_xp scaled by the rung (D2)")
+	check_eq(int(first.payout[3]), COLLECT_AMOUNT * COLLECT_TIER,
+		"the wood is the committed collect scaled by the rung (D1)")
+	check_eq(int(first.payout[2]) + int(first.payout[4]) + int(first.payout[5])
+			+ int(first.payout[6]), 0,
+		"the derived vector names exactly the committed collect_type's slot")
+	# The value-level post-state: every stored resource moved by exactly the
+	# derived delta, and the other five are untouched.
+	check_eq(first.resources.wood, int(before_map["wood"]) + 60,
+		"the applied wood is the fresh save's own value plus the derived delta")
+	check_eq(first.resources.xp, int(before_map["xp"]) + 3,
+		"the applied experience is the fresh save's own value plus the delta")
+	check_eq(first.resources.gold, int(before_map["gold"]),
+		"gold is untouched by the derived vector")
+	check_eq(first.resources.oil, int(before_map["oil"]),
+		"oil is untouched by the derived vector")
+	check_eq(first.resources.steel, int(before_map["steel"]),
+		"steel is untouched by the derived vector")
+	check_eq(first.resources.cash, int(before["playerInfo"]["cash"]),
+		"cash is untouched by the derived vector")
+	check_eq(first.resources.mana, int(before["privateState"]["mana"]),
+		"mana is untouched by the derived vector")
+
+	# --- a SECOND collection on the same row is now TOO EARLY: the re-stamp
+	# moved the clock to the deterministic reference, so no committed rung is
+	# reached and nothing is derived (design D3). This is the double being a
+	# faithful model of the branch's state machine, not a once-only answer.
+	var second: Variant = await api.collect_income(user_id, COLLECT_INDEX)
+	_check_collect_failure(second, "too_early",
+		"a second collection on the just-collected row")
+	var unchanged: Variant = await api.collect_income(user_id,
+		COLLECT_SPARE_INDEX)
+	check(unchanged is BootData.CollectResult and unchanged.ok,
+		"a sibling income row still collects offline")
+	if unchanged is BootData.CollectResult and unchanged.ok:
+		check_eq(unchanged.tier, COLLECT_TIER,
+			"the sibling row also reaches the top committed rung")
+		check_eq((unchanged as BootData.CollectResult).previous.item_id,
+			COLLECT_SPARE_ITEM,
+			"the sibling row resolves to its own item (state not corrupted)")
+		check_eq((unchanged as BootData.CollectResult).resources.wood,
+			int(before_map["wood"]) + 120,
+			"the sibling collection applied the SAME derived payout on top of "
+			+ "the first one's, which is what a per-collection credit means")
+
+	# --- structured failures: endpoint codes, no partial payload ----
+	var ghost: Variant = await api.collect_income("ghost-0000", COLLECT_INDEX)
+	_check_collect_failure(ghost, "unknown_user_id", "unknown save id")
+	var empty: Variant = await api.collect_income("", COLLECT_INDEX)
+	_check_collect_failure(empty, "missing_user_id", "empty save id")
+	var unknown_index: Variant = await api.collect_income(user_id,
+		COLLECT_UNKNOWN_INDEX)
+	_check_collect_failure(unknown_index, "unknown_item_index",
+		"an index the map does not name")
+	var zero: Variant = await api.collect_income(user_id, 0)
+	_check_collect_failure(zero, "unknown_item_index",
+		"index 0 (never a real legacy key)")
+	# A no-income row: the Turret I at key 11 records `collect 0`, so the
+	# service answers 409 no_income BEFORE the dispatcher runs.
+	var no_income: Variant = await api.collect_income(user_id, 11)
+	_check_collect_failure(no_income, "no_income",
+		"a row whose item records no committed income")
+	# The two content refusals and the clock refusal no placed corpus row can
+	# produce: a crafted config item and a crafted row, both in the double's
+	# OWN in-memory state (the committed fixture is never written).
+	_park_collect_row(api, COLLECT_CAPPED_INDEX, COLLECT_CAPPED_ITEM, {}, 0,
+		{"id": str(COLLECT_CAPPED_ITEM), "name": "Capped fixture",
+			"collect": "20", "collect_type": "w", "collect_xp": "1",
+			"max_collects": "25"})
+	var capped: Variant = await api.collect_income(user_id, COLLECT_CAPPED_INDEX)
+	_check_collect_failure(capped, "capped_collection",
+		"an item with a non-zero committed collection cap")
+	_park_collect_row(api, COLLECT_UNMAPPABLE_INDEX, COLLECT_UNMAPPABLE_ITEM,
+		{}, 0, {"id": str(COLLECT_UNMAPPABLE_ITEM), "name": "Unmappable fixture",
+			"collect": "20", "collect_type": "m", "collect_xp": "1",
+			"max_collects": "0"})
+	var unmappable: Variant = await api.collect_income(user_id,
+		COLLECT_UNMAPPABLE_INDEX)
+	_check_collect_failure(unmappable, "unknown_collect_type",
+		"an item whose collect_type is outside the committed set")
+	# Design D5's construction-state refusal, in the DOUBLE as well as the
+	# service: a row carrying a countdown is refused before anything is
+	# derived, so the timers the delivered construction line depends on can
+	# never be overwritten from this layer either.
+	_park_collect_row(api, COLLECT_BUILDING_INDEX, COLLECT_ITEM, {"cp": 180},
+		1790690000, null)
+	var building: Variant = await api.collect_income(user_id,
+		COLLECT_BUILDING_INDEX)
+	_check_collect_failure(building, "construction_in_progress",
+		"a row carrying a recorded countdown")
+	var built_row: Array = (api._impl as FakeApi)._collect_state["items"][
+		str(COLLECT_BUILDING_INDEX)] as Array
+	check_eq(built_row[3], 1790690000,
+		"the refused row's START INSTANT is untouched: the corruption probe 2 "
+		+ "showed legacy permits is prevented here")
+	check_eq(built_row[6], {"cp": 180},
+		"the refused row's recorded countdown survives untouched")
+	# Design D3's clock refusal: a row stamped one second short of the first
+	# committed rung (5 committed MINUTES = 300 SECONDS) reaches no rung, and
+	# nothing is derived.
+	_park_collect_row(api, COLLECT_FRESH_INDEX, COLLECT_ITEM, {}, 0, null)
+	var epoch: int = (api._impl as FakeApi)._collect_epoch
+	((api._impl as FakeApi)._collect_state["items"]
+		[str(COLLECT_FRESH_INDEX)] as Array)[3] = epoch \
+		- COLLECT_FIRST_RUNG_SECONDS + 1
+	var early: Variant = await api.collect_income(user_id, COLLECT_FRESH_INDEX)
+	_check_collect_failure(early, "too_early",
+		"a row one second short of the first committed rung")
+	# The same row one second FURTHER along reaches the first rung and is paid
+	# the quarter multiplier's amount with its experience rounded to zero (D1).
+	((api._impl as FakeApi)._collect_state["items"]
+		[str(COLLECT_FRESH_INDEX)] as Array)[3] = epoch \
+		- COLLECT_FIRST_RUNG_SECONDS
+	var first_rung: Variant = await api.collect_income(user_id,
+		COLLECT_FRESH_INDEX)
+	check(first_rung is BootData.CollectResult and first_rung.ok,
+		"a row exactly at the first committed rung collects offline")
+	if first_rung is BootData.CollectResult and first_rung.ok:
+		check_eq(first_rung.tier, 0,
+			"exactly at the first committed threshold the FIRST rung is reached")
+		check_eq(first_rung.payout, [0, 0, 0, 5, 0, 0, 0, 0],
+			"the first rung pays a quarter of the committed amount and rounds "
+			+ "the committed experience of 1 down to zero")
+
+	# --- the refusals applied nothing: a THIRD income row still resolves to
+	# its own item (state not corrupted) and the committed after-state still
+	# holds its own recorded instant.
+	var unrelated: Variant = await api.collect_income(user_id,
+		COLLECT_RECOVERY_INDEX)
+	check(unrelated is BootData.CollectResult and unrelated.ok,
+		"an untouched sibling row still resolves after the failed attempts")
+	if unrelated is BootData.CollectResult and unrelated.ok:
+		check_eq((unrelated as BootData.CollectResult).previous.item_id,
+			COLLECT_RECOVERY_ITEM,
+			"the untouched sibling resolves to its own item (state not "
+			+ "corrupted)")
+	check_eq(int((_read_fixture_object(FIXTURE_COLLECT_AFTER)["maps"][0]
+		as Dictionary)["items"]["2"][3]), int(row_after[3]),
+		"the committed after-state still holds its own recorded instant")
+
+	# Every call increments the intent counter exactly once, including the
+	# refusals: a refused intent is still an intent this client issued.
+	check_eq(api.collect_requests, requests_before + 14,
+		"every collect_income call increments the intent counter exactly once "
+		+ "(three collected rows, one natural too-early re-collect, and ten "
+		+ "structured refusals)")
+	info("collect double reproduced the executed fixture's transaction and "
+		+ "answered eleven structured refusals with no server and no socket")
+
+
+## Every collect failure carries the endpoint's code and no partial payload
+## (design D7/D8) — including the 404 `unknown_item_index`, the 409s
+## `no_income` / `capped_collection` / `unknown_collect_type` /
+## `too_early` / `construction_in_progress`, and the two save-id codes.
+func _check_collect_failure(result: Variant, code: String,
+		label: String) -> void:
+	check(result is BootData.CollectResult,
+		label + " returns the typed result")
+	if not (result is BootData.CollectResult):
+		return
+	var typed: BootData.CollectResult = result
+	check(not typed.ok, label + " is a structured failure")
+	check_eq(typed.error_code, code, label + " names the endpoint's code")
+	check(typed.previous == null, label + " carries no partial previous row")
+	check(typed.row == null, label + " carries no partial post-execution row")
+	check(typed.resources == null, label + " carries no partial resources")
+	check_eq(typed.payout, [],
+		label + " carries no partial payout vector")
+	check_eq(typed.tier, -1, label + " reports no rung for a failed collection")
+	check_eq(typed.result, "",
+		label + " reports no legacy result for a failed collection")
+
+
+## Parks one extra row (and, when supplied, one extra config item) inside the
+## double's OWN in-memory state, so the refusals no placed corpus row can
+## produce become reachable offline. The committed fixture is never written.
+## `stamp` is the row's collection instant, so a crafted row can sit a second
+## short of a committed rung.
+func _park_collect_row(api: Variant, index: int, item_id: int,
+		attr: Dictionary, stamp: int, config_item: Variant) -> void:
+	var double: Variant = api._impl
+	if double == null or not (double is FakeApi):
+		check(false, "the fake double instance is reachable for its "
+			+ "in-memory state")
+		return
+	(double._collect_state["items"] as Dictionary)[str(index)] = [
+		item_id, 5, 5, stamp, 0, [], attr, 1]
+	if config_item is Dictionary:
+		(double._config_items as Dictionary)[str(item_id)] = config_item
 
 
 ## Parks one extra row under a key the committed corpus does not name, inside

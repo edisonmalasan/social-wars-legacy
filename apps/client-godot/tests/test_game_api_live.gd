@@ -10,15 +10,17 @@ extends "res://tests/test_base.gd"
 ## parity of spec "Store through either implementation", and by
 ## `building-upgrade` with the upgrade parity of spec "Upgrade through either
 ## implementation", and by `building-construction` with the construction
-## parity of spec "Construction through either implementation").
+## parity of spec "Construction through either implementation", and by
+## `building-collect` with the collection parity of spec "Collect through
+## either implementation").
 ##
 ## Requires a running Compatibility API v0 on loopback — verify-boot.ps1
 ## wraps this suite with `compat_live_phase.py`, which starts
 ## `apps/compat-api/run.py` (disposable corpus) and tears it down again. The
 ## suite compares every live typed result against the fake implementation's,
 ## so both must yield the same boot data and the same placement, purchase,
-## move, sell, store, upgrade, and construction results (time-dependent fields
-## excepted).
+## move, sell, store, upgrade, construction, and collect results
+## (time-dependent fields excepted).
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 
@@ -108,6 +110,28 @@ const CONSTRUCTION_FINISH := "finish"
 ## `unknown_item_index`, so legacy's silent no-op is never reported as a
 ## success.
 const CONSTRUCTION_UNKNOWN_INDEX := 9999
+## The live collection this phase drives: the **Trees decoration at legacy key
+## 21** (item 930), NOT the Tree at key 2 the fixture records — this phase runs
+## after the store phase, which popped the Tree at key 2 in its own
+## independent transaction, and after the construction phase, which left key
+## 11 under construction. Key 21 is untouched by either and records the same
+## committed income (`collect 20`, `collect_type "w"`, `collect_xp 1`, `max_collects
+## 0`), so it exercises the identical content-derived derivation. Every corpus
+## row records `item[3] == 0`, so the elapsed time is unbounded and the TOP
+## committed rung applies deterministically.
+const COLLECT_ITEM := 930
+const COLLECT_INDEX := 21
+const COLLECT_AMOUNT := 20
+const COLLECT_XP := 1
+const COLLECT_PAYOUT := [0, 3, 0, 60, 0, 0, 0, 0]
+const COLLECT_TIER := 3
+## The row the construction-live phase left carrying a recorded countdown, so
+## this phase's construction-state refusal is genuinely reachable.
+const COLLECT_BUILT_INDEX := 11
+## An integer index that names no row in the corpus save: the collect endpoint
+## resolves it before executing and answers 404 `unknown_item_index`, so
+## legacy's silent no-op is never reported as a success.
+const COLLECT_UNKNOWN_INDEX := 9999
 
 
 func run_scenario() -> void:
@@ -233,6 +257,7 @@ func run_scenario() -> void:
 	await _check_live_store(api, endpoint, user_id)
 	await _check_live_upgrade(api, endpoint, user_id)
 	await _check_live_construction(api, endpoint, user_id)
+	await _check_live_collect(api, endpoint, user_id)
 	# The live corpus now carries every mutating transaction, so this suite's
 	# parity claim is stated once, explicitly: the two implementations are
 	# compared on the fields each own, and each side's resource bag is
@@ -1315,6 +1340,210 @@ func _check_live_construction(api: Variant, endpoint: String,
 		+ "countdown=%d clicks_consumed=true xp=%d gold=%d" % [
 			int((third.row.attr as Dictionary).get("cp", 0)),
 			third.resources.xp, third.resources.gold])
+
+
+## Collection through both implementations (task 3.3, spec "Collect through
+## either implementation"): one collection over the corpus's own income row,
+## asserted against the endpoint's OWN value-level post-state proof — the
+## collection instant moved forward AND every stored resource changed by
+## exactly the derived delta — plus the reused key and cell, both rows, the
+## content-derived payout with its rung, the reference instant, and the
+## two-layer construction-state refusal. The fake reference is compared on
+## every stable field, so both implementations must answer the same typed
+## shapes and the same derived payout.
+func _check_live_collect(api: Variant, endpoint: String,
+		user_id: String) -> void:
+	api.configure("legacy_v0", endpoint)
+	var before_row: Variant = await _live_row(api, endpoint, user_id,
+		COLLECT_INDEX)
+	var before_resources: BootData.Resources = await _live_resources(api,
+		endpoint, user_id)
+	check(before_row != null and before_resources != null,
+		"the live corpus pre-collect row and balances resolve")
+	if before_row == null or before_resources == null:
+		return
+	var prior := before_row as Array
+	var collected: Variant = await api.collect_income(user_id, COLLECT_INDEX)
+	check(collected is BootData.CollectResult,
+		"live collect_income returns the typed result")
+	if not (collected is BootData.CollectResult):
+		return
+	var typed: BootData.CollectResult = collected
+	check(typed.ok, "live collection resolves over loopback: %s"
+		% typed.error_message)
+	if not typed.ok or typed.previous == null or typed.row == null \
+			or typed.resources == null:
+		return
+	check_eq(typed.protocol, BootData.PROTOCOL,
+		"live collect protocol is compat-v0")
+	check(typed.game_version != "",
+		"the live collect response carries the game version")
+	check(typed.server_time > 0,
+		"live collect server_time is a positive wall-clock epoch "
+		+ "(time-dependent)")
+	check_eq(typed.result, "success",
+		"live collect reports the legacy success result")
+	check_eq(typed.payout, COLLECT_PAYOUT,
+		"the live derived payout is the documented eight-slot vector, matching "
+		+ "the executed fixture's applied vector")
+	check_eq(int(typed.payout[0]), 0,
+		"the live derived payout's unread unknown slot is zero (D6)")
+	check_eq(int(typed.payout[7]), 0,
+		"the live derived payout's never-produced mana slot is zero (D6)")
+	check_eq(int(typed.payout[1]), COLLECT_XP * COLLECT_TIER,
+		"the live experience is the committed collect_xp scaled by the rung (D2)")
+	check_eq(int(typed.payout[3]), COLLECT_AMOUNT * COLLECT_TIER,
+		"the live wood is the committed collect scaled by the rung (D1)")
+	check_eq(typed.tier, COLLECT_TIER,
+		"the live payout came from the top committed rung (every corpus row "
+		+ "records a never-collected instant of 0)")
+	check(typed.reference_time > 0,
+		"the live reference instant is a positive epoch")
+	check(typed.reference_time >= typed.row.timestamp,
+		"the live reference instant is not older than the instant it stamped")
+	# The reused key and cell: a collection rewrites one row IN PLACE.
+	check_eq(typed.previous.item_id, int(prior[0]),
+		"the live previous row names the corpus's own item")
+	check_eq([typed.previous.x, typed.previous.y], [int(prior[1]), int(prior[2])],
+		"the live previous row carries the corpus's own cell")
+	check_eq(typed.row.item_id, int(prior[0]),
+		"the live post-execution row names the same item")
+	check_eq([typed.row.x, typed.row.y], [int(prior[1]), int(prior[2])],
+		"the live post-execution row reuses the same cell (the key is reused)")
+	check(typed.row.timestamp > int(prior[3]),
+		"the live post-execution row's collection instant moved forward "
+		+ "(the endpoint's own post-condition)")
+	check_eq(typed.row.attr, prior[6],
+		"the live post-execution row carries the same attribute bag (a "
+		+ "collection writes none)")
+	check_eq(int(typed.row.player), int(prior[7]),
+		"the live post-execution row keeps the row's own player field")
+	# The endpoint's value-level post-state proof: every stored resource moved
+	# by exactly the derived delta, so a reduced or diverging payout is
+	# impossible (D8). This is the first delivered line whose proof checks a
+	# VALUE the client would otherwise trust.
+	check_eq(int(typed.resources.wood), before_resources.wood + 60,
+		"the live wood balance is the corpus's own value plus the derived delta")
+	check_eq(int(typed.resources.xp), before_resources.xp + 3,
+		"the live experience is the corpus's own value plus the derived delta")
+	for name in ["gold", "oil", "steel", "mana", "cash"]:
+		check_eq(int(typed.resources.get(name)),
+			int(before_resources.get(name)),
+			"the live %s balance is untouched by the derived vector" % name)
+	var after_row: Variant = await _live_row(api, endpoint, user_id,
+		COLLECT_INDEX)
+	check(after_row != null, "the live corpus post-collect row resolves")
+	if after_row != null:
+		check_eq([int((after_row as Array)[1]), int((after_row as Array)[2])],
+			[int(prior[1]), int(prior[2])],
+			"the corpus still holds that cell (the key was reused, not "
+			+ "re-keyed)")
+		check_eq(int((after_row as Array)[0]), int(prior[0]),
+			"the corpus still holds the row's own item")
+		check_eq((after_row as Array)[6], prior[6],
+			"the corpus row still carries the same attribute bag")
+		check(int((after_row as Array)[3]) > int(prior[3]),
+			"the corpus row's collection instant moved forward")
+	# Fake reference: an independent in-memory state over the committed
+	# collect-fixture before-state. Only the fields BOTH sides own are compared,
+	# and each side's row is its own — this phase's live corpus has already
+	# executed every earlier transaction, so the live row is the CORPUS's row
+	# while the fake's is its fixture's.
+	api.configure("fake")
+	var fake: Variant = await api.collect_income(user_id, COLLECT_INDEX)
+	check(fake is BootData.CollectResult and fake.ok,
+		"fake collection resolves offline")
+	if fake is BootData.CollectResult and fake.ok:
+		var reference: BootData.CollectResult = fake
+		check_eq(reference.payout, typed.payout,
+			"live and fake derive the SAME content-derived payout")
+		check_eq(reference.tier, typed.tier,
+			"live and fake reach the SAME committed rung")
+		check_eq(int(reference.payout[1]), int(typed.payout[1]),
+			"live and fake scale the committed experience identically (D2)")
+		check_eq(int(reference.payout[3]), int(typed.payout[3]),
+			"live and fake scale the committed amount identically (D1)")
+		check_eq(reference.row.item_id, typed.row.item_id,
+			"live and fake rows name the same item")
+		check_eq(reference.previous.item_id, typed.previous.item_id,
+			"live and fake previous rows name the same item")
+		check_eq(reference.row.orientation, typed.row.orientation,
+			"live and fake rows carry the same orientation")
+		check_eq(reference.row.player, typed.row.player,
+			"live and fake rows carry the same player field")
+		check_eq(_typed_attr(reference.row.attr), _typed_attr(typed.row.attr),
+			"live and fake post-execution rows carry the same attribute bag")
+		check(reference.row.timestamp > 0,
+			"the fake's row carries the capture's recorded epoch (a "
+			+ "time-dependent field, never compared by value)")
+	# Structured service errors pass through with their original codes, and the
+	# fake derives the same codes for the same intents offline.
+	api.configure("legacy_v0", endpoint)
+	var live_unknown: Variant = await api.collect_income(user_id,
+		COLLECT_UNKNOWN_INDEX)
+	check(live_unknown is BootData.CollectResult,
+		"the live unknown index returns the typed result")
+	if live_unknown is BootData.CollectResult:
+		var unknown: BootData.CollectResult = live_unknown
+		check(not unknown.ok,
+			"an index the corpus does not name is a structured failure")
+		check_eq(unknown.error_code, "unknown_item_index",
+			"the live structured error passes through with the endpoint's code")
+		check(unknown.previous == null and unknown.row == null
+				and unknown.resources == null and unknown.payout == [],
+			"the live structured failure carries no partial payload")
+	# Design D5's two-layer rule, service half: the row this phase's own corpus
+	# left under construction is refused BEFORE the dispatcher runs, so the
+	# build's start instant and recorded countdown are byte-identical
+	# afterwards — the corruption probe 2 showed legacy permits.
+	var built_before: Variant = await _live_row(api, endpoint, user_id,
+		COLLECT_BUILT_INDEX)
+	if built_before is Array and (built_before as Array).size() == 8:
+		var refused: Variant = await api.collect_income(user_id,
+			COLLECT_BUILT_INDEX)
+		check(refused is BootData.CollectResult and not refused.ok,
+			"a collection on a row under construction is refused")
+		if refused is BootData.CollectResult:
+			check_eq(refused.error_code, "construction_in_progress",
+				"the refusal is the service's own two-layer guard: %s"
+					% refused.error_message)
+		var built_after: Variant = await _live_row(api, endpoint, user_id,
+			COLLECT_BUILT_INDEX)
+		check(built_after != null
+				and (built_after as Array)[6] == (built_before as Array)[6],
+			"the refused row's recorded countdown survives untouched")
+		check(built_after != null
+				and int((built_after as Array)[3])
+				== int((built_before as Array)[3]),
+			"the refused row's START INSTANT survives untouched: the delivered "
+			+ "construction countdown is not silently restarted")
+	api.configure("fake")
+	var fake_unknown: Variant = await api.collect_income(user_id,
+		COLLECT_UNKNOWN_INDEX)
+	check(fake_unknown is BootData.CollectResult and not fake_unknown.ok,
+		"fake fails the same intent offline")
+	if fake_unknown is BootData.CollectResult:
+		check_eq(fake_unknown.error_code, "unknown_item_index",
+			"structured codes match between implementations")
+	api.configure("legacy_v0", endpoint)
+	print("[test] live-collect applied item_index=%d cell=(%d, %d) tier=%d "
+		% [COLLECT_INDEX, typed.row.x, typed.row.y, typed.tier]
+		+ "payout=%s wood=%d xp=%d" % [JSON.stringify(typed.payout),
+			typed.resources.wood, typed.resources.xp])
+
+
+## One recorded attribute bag in the canonical typed form (the JSON transport
+## widens the save's ints to floats on the pinned engine), so two
+## implementations' bags compare field for field.
+func _typed_attr(value: Variant) -> Dictionary:
+	var out := {}
+	if not (value is Dictionary):
+		return out
+	for key: Variant in (value as Dictionary):
+		var amount: Variant = (value as Dictionary)[key]
+		out[str(key)] = int(amount) if (amount is int or amount is float) \
+			else amount
+	return out
 
 
 ## The corpus's own eight-field row at one legacy key, read from its

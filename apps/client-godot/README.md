@@ -1627,5 +1627,147 @@ own section, the bootstrap and construction request counts, and the non-claims.
 
 These non-claims are recorded verbatim in
 `evidence/building-construction/report.json`.
-Remaining deliver lines of M7 (separate changes): collect income, town expansion,
-resources, and XP.
+
+## Building collection
+
+The collection slice (OpenSpec `building-collect`, milestone M7) closes the loop:
+every delivered line derives a **neutral** resource vector on purpose, because the
+committed configuration records no price for building, buying, moving, selling,
+storing, upgrading, or starting a build. This is the first line whose vector is
+**derived from committed content** - the amount, resource, experience, and the
+four-rung ladder all come from the config - so a town finally produces something.
+
+### Flow
+
+1. **Readout** - a selected income-bearing building shows what its next collection
+   would yield, which resource it would be paid in, the committed rungs, and how
+   long until the next one. The countdown is computed against the **response's**
+   reference instant, not a local clock, so it is stable and reviewable.
+2. **Action** - a `Collect` action beside the delivered `Move`, `Sell`, `Store`,
+   `Upgrade`, and `Build` actions, offered only for a selected addressable
+   building with committed income that has reached a rung; the six modes are
+   mutually exclusive.
+3. **Confirm** - names the **derived** payout, labelled as derived rather than
+   authoritative, and sends exactly one `GameApi.collect_income(user_id,
+   item_index)` intent. Cancelling sends nothing.
+4. **Apply** - only the authoritative response is applied: the typed row is
+   replaced from the response's post-execution row, the same object is retained in
+   depth order, and the HUD balances, experience, and readout are taken **from the
+   response** - if the client's own arithmetic disagrees with the server's payout,
+   the server's numbers win and the client's are discarded rather than added. The
+   apply snapshots everything it touches first and rolls all of it back on failure.
+
+### Endpoint contract, derivation, and provenance
+
+`POST /v0/collect` accepts only the intent `{user_id, item_index}` - the full
+contract, response example, the five 409 refusals, the two-part post-execution
+proof, and corpus-only persistence are documented in `apps/compat-api/README.md`.
+The service derives the payout from the item's committed `collect`,
+`collect_type`, and `collect_xp`, scaled by the committed
+`COLLECT_MINUTES` / `COLLECT_MULTIPLIER` rung the row has reached.
+
+*One conversion matters:* the committed ladder is in **minutes** while both row
+instants are Unix **seconds**, so the comparison goes through a single named
+constant (300 / 3 600 / 14 400 / 28 800 seconds) with every boundary covered from
+both sides. Comparing the units directly would pay the top rung within five
+seconds - that bug was found and corrected during implementation.
+
+*Established:* `collect` writes only the collection instant, the vector is applied
+verbatim per resource under the documented clamp, and a collection on a
+just-started construction overwrites the build's start instant while the countdown
+survives, with the legacy server answering success. *Derived, never observed from
+the Flash client - all six:* the amount formula, the experience scaling, the
+sub-first-rung refusal, the cap refusal, the shared-field refusal, and the
+cash/experience mapping.
+
+### Verification (commands actually executed)
+
+```bash
+# Collect fixture capture (one-shot, executed-legacy oracle): the exact command,
+# exit codes, containment, both recorded probes, and the six derived decisions
+# are in tests/fixtures/godot-building-collect/README.md
+python -B apps/compat-api/capture_collect_fixture.py
+
+# Collect envelope + endpoint + executed-legacy parity tests (inside the compat
+# suite; observed: Ran 768 tests ... OK, exit 0)
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+
+# The hermetic collection-flow suite standalone (observed: 379 checks, PASS)
+godot --headless --path apps/client-godot --script res://tests/test_town_collect.gd
+
+# Full batteries in the final state (each embeds the collect suite and the
+# collect-live phase; both observed exit 0)
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+```
+
+`verify-boot.ps1` includes the hermetic `test_town_collect` suite and an eleventh
+live phase `collect-live`, which starts the Compatibility API over a disposable
+corpus, drives one content-derived collection against `POST /v0/collect`, asserts
+the typed response and its value-level post-state proof, asserts that a refused
+collection left a construction's timers untouched, asserts via
+`compat_live_phase.py --expect-save-mutation` that a corpus save file actually
+mutated, then tears down asserting the port is released, the corpus is removed,
+and no working-tree `saves/` exists.
+
+### Evidence capture (two-step, as the delivered slices)
+
+```bash
+# 1. Windowed fake-API launch: boot -> town, select the Tree at slot 2, collect,
+#    confirm, then capture the frame (writes building-collect.png at the legacy
+#    1400x600 stage; a failed flow exits 1 with an explicit [town] collect-capture
+#    state=error marker)
+godot --path apps/client-godot res://scenes/boot.tscn -- --gameapi=fake --collect-capture=<repo>/apps/client-godot/evidence/building-collect/building-collect.png
+
+# 2. Headless deterministic report (writes report.json; a rerun is byte-identical;
+#    the bare --collect-report flag defaults to
+#    evidence/building-collect/report.json)
+godot --headless --path apps/client-godot res://scenes/town.tscn -- --collect-report=<repo>/apps/client-godot/evidence/building-collect/report.json
+```
+
+The report (`schema collect-report-v1`) records the inputs and digests, the intent,
+both rows, the derived payout and the rung it came from, the committed ladder **in
+both minutes and seconds**, the next-rung countdown against the response's
+reference instant, the resource movement before/after, the
+established-versus-derived provenance split as its own section, the bootstrap and
+collect request counts, and the non-claims.
+
+### Collection claim limits
+
+- no Flash, Ruffle, ActionScript, or browser executed;
+- **every payout number is derived**, never observed: the claim is that a payout
+  grows in four committed rungs derived from the item's committed income fields,
+  never any specific amount the legacy client pays;
+- the **clamp is never exercised** by the fixture, because a derived payout never
+  drives a balance below zero;
+- the corpus's only income-bearing rows are **decorations** - the Tree and the
+  tree clusters - because the real factories are not placed, so the fixture
+  exercises a decoration's payout, not a factory's;
+- **no cap semantics are implemented**: an item with a non-zero committed cap is
+  refused rather than paid under a guessed reading of the cap;
+- a collection is **refused on a row under construction, in both layers** - the
+  client offers no action and the service fails closed - because executing one
+  overwrites the build's start instant while the countdown survives; the legacy
+  client's own behavior is still unobserved;
+- below the first committed rung no collection is offered and none is executed, so
+  no sub-rung amount is ever derived;
+- the unobservable resource-type refusal is covered at the helper and double level
+  rather than through the town view, because the committed package records only
+  the five known types;
+- the lower ladder rungs are covered at the pure-helper level; a live wall clock
+  only ever reaches the top rung on this corpus, since every row has never been
+  collected;
+- parity covers one recorded transaction against the fresh-player corpus, not
+  progressed players;
+- collectability and addressability are client-side rules only; the endpoint
+  enforces structural input validity, the content refusals, and the two-part
+  proof, and no server-authoritative validation exists;
+- no pixel-parity oracle against the legacy client exists, and the surface's
+  layout and labels are documented placeholders;
+- the committed capture runs the fake GameApi - a deterministic test double, not
+  a parity oracle.
+
+These non-claims are recorded verbatim in
+`evidence/building-collect/report.json`.
+Remaining deliver lines of M7 (separate changes): town expansion, resources, and
+XP basics.
