@@ -30,4 +30,40 @@
 ## 6. Documentation and integration review
 
 - [x] 6.1 Document the placement slice in `apps/client-godot/README.md` and `apps/compat-api` docs (flow, endpoint contract, envelope derivations with derived-provisional status, evidence paths, claim limits) and add the actually executed verification commands to `AGENTS.md` — verify: each documented command matches one that was run successfully in this change, with its purpose and constraints stated.
-- [ ] 6.2 Perform the integration review: re-read the final diff against `proposal.md`/`specs/`/`design.md`, run `openspec validate building-placement --strict` and both batteries once more, and record residual gaps (derived price/envelope placeholders, legacy clamping preserved, no progressed-player coverage, purchase/shop deliver lines still open) — verify: strict validation exits 0, both batteries exit 0, and every spec requirement maps to a passing check or a recorded claim limit.
+- [x] 6.2 Perform the integration review: re-read the final diff against `proposal.md`/`specs/`/`design.md`, run `openspec validate building-placement --strict` and both batteries once more, and record residual gaps (derived price/envelope placeholders, legacy clamping preserved, no progressed-player coverage, purchase/shop deliver lines still open) — verify: strict validation exits 0, both batteries exit 0, and every spec requirement maps to a passing check or a recorded claim limit.
+
+## Integration review record (2026-09-29)
+
+- `openspec validate building-placement --strict` exited `0` ("Change 'building-placement' is valid").
+- Both batteries re-run in the final state: `verify.ps1` exited `0` and
+  `verify-boot.ps1` exited `0` (guard digest
+  `6978b9594f52b3f87ebe043b7d1ce0da67632d0a0537f0af7ea3d22f2e7ff348`
+  identical before/after; `placement-live` PASS with
+  `PASS corpus save mutated by the live placement`; port released; no
+  working-tree `saves/`), and `hash_manifest.py verify` exited `0`
+  (3,258 entries). The final diff touches no legacy source, config,
+  village, template, or `tests/saves/` path.
+- Every requirement and scenario in both delta specs maps to a passing
+  check: fixture capture/replay (capture tool + `test_place_parity`,
+  offline, 90 compat tests OK), endpoint contract/clamp/fail-closed/
+  corpus-only/loopback (`test_place_endpoint`,
+  `test_placement_envelope`), client flow/gating/invalid-targets/
+  failure-rollback/catalog-fail-closed (`test_town_placement`, 284
+  checks), evidence + byte-identical report rerun
+  (`evidence/placement/`), batteries/containment (both batteries + hash
+  manifest), GameApi abstraction + either-implementation placement
+  (`test_game_api_fake`, `test_game_api_live`, `placement-live`),
+  documented commands (AGENTS.md + both READMEs).
+- Residual gaps recorded, all also stated as claim limits in
+  `apps/client-godot/README.md` and `apps/compat-api/README.md`:
+  1. the price vector, envelope placeholders (`accessToken`,
+     `publishActions`, `tries`, `first_number`, `unknown`, `reason`), and
+     the next-free-slot choice are **derived-provisional** — never
+     observed from the Flash client;
+  2. insufficient resources reproduce the legacy `max(…, 0)` clamp by
+     design — rejection-style validation is deferred to Server v1 (M13);
+  3. parity covers one recorded `buy` transaction against the fresh-player
+     corpus — no progressed-player coverage and no other commands;
+  4. the remaining M7 deliver lines (purchase/shop, move, sell, store,
+     upgrade, build timers, income, expansion, resources, XP) and M8+ are
+     still open by scope.
