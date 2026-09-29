@@ -1,0 +1,405 @@
+{
+  "cleanup": {
+    "disposable_removed_before_manifest_write": true,
+    "server_stopped_within_run": true
+  },
+  "containment": {
+    "disposable_copy_removed": true,
+    "fixture_output": "tests/fixtures/godot-building-construction",
+    "identical": true,
+    "loopback_only": true,
+    "method": "SHA-256 snapshot of every read working-tree group before the run and after the server stopped; equal or the run fails before writing fixtures. The already committed boot, placement, purchase, move, sell, store, and upgrade fixtures are digest-pinned for the same reason.",
+    "no_flash_browser_external_network": true,
+    "only_working_tree_writes": "fixture files under --out",
+    "post_combined_sha256": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "post_run": {
+      "config": {
+        "exists": true,
+        "files": 12,
+        "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+      },
+      "mods": {
+        "exists": true,
+        "files": 2,
+        "sha256": "81b3c6e1f426e8813d96028b9035a853c1fbff8716256e84e956d8826f136ba3"
+      },
+      "root_python": {
+        "exists": true,
+        "files": 11,
+        "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+      },
+      "saves": {
+        "exists": false,
+        "files": 0,
+        "sha256": "absent"
+      },
+      "templates": {
+        "exists": true,
+        "files": 19,
+        "sha256": "2dffe0ca8746b63cf64fd1062a7f259ba2bb85a2fc54f7a2cd2bd2564ffee4ef"
+      },
+      "tests/saves": {
+        "exists": true,
+        "files": 3,
+        "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+      },
+      "villages": {
+        "exists": true,
+        "files": 31,
+        "sha256": "92429a07402766d8183b16fb32178b5c51f1e555df69d3cb46085a7d977f96ea"
+      }
+    },
+    "pre_combined_sha256": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "pre_run": {
+      "config": {
+        "exists": true,
+        "files": 12,
+        "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+      },
+      "mods": {
+        "exists": true,
+        "files": 2,
+        "sha256": "81b3c6e1f426e8813d96028b9035a853c1fbff8716256e84e956d8826f136ba3"
+      },
+      "root_python": {
+        "exists": true,
+        "files": 11,
+        "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+      },
+      "saves": {
+        "exists": false,
+        "files": 0,
+        "sha256": "absent"
+      },
+      "templates": {
+        "exists": true,
+        "files": 19,
+        "sha256": "2dffe0ca8746b63cf64fd1062a7f259ba2bb85a2fc54f7a2cd2bd2564ffee4ef"
+      },
+      "tests/saves": {
+        "exists": true,
+        "files": 3,
+        "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+      },
+      "villages": {
+        "exists": true,
+        "files": 31,
+        "sha256": "92429a07402766d8183b16fb32178b5c51f1e555df69d3cb46085a7d977f96ea"
+      }
+    },
+    "protected_fixtures": {
+      "identical": true,
+      "paths": [
+        "tests/fixtures/godot-compatibility-boot",
+        "tests/fixtures/godot-building-placement",
+        "tests/fixtures/godot-item-purchase",
+        "tests/fixtures/godot-building-move",
+        "tests/fixtures/godot-building-sell",
+        "tests/fixtures/godot-building-store",
+        "tests/fixtures/godot-building-upgrade"
+      ],
+      "post_run": {
+        "godot-building-move": {
+          "exists": true,
+          "files": 12,
+          "sha256": "b3c477a7947fbe409330f03a8658cdca707a2631b52d1d4c5127f440619799c1"
+        },
+        "godot-building-placement": {
+          "exists": true,
+          "files": 12,
+          "sha256": "546a5f00e5e45319ffd17f5ee67201dd2b72cb21de833a3e35e8a9a98d60c5a8"
+        },
+        "godot-building-sell": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fa85af3fb12ef8b9298203a64632b6d7b31c1ed48f8d1ba716151f25ec7ab1c4"
+        },
+        "godot-building-store": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d4dff84132353a60e3a005c42d067185772ec8d6a2548ffdc5aa4779a2055194"
+        },
+        "godot-building-upgrade": {
+          "exists": true,
+          "files": 12,
+          "sha256": "398675ad94928dd75f7fbcd9f62e082d73ee973d3c973f5bbdf44a083a9c0521"
+        },
+        "godot-compatibility-boot": {
+          "exists": true,
+          "files": 31,
+          "sha256": "4d389707e0f18676fb23b3a2a8a47031b4e233366e4066437f8bad6854e15234"
+        },
+        "godot-item-purchase": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d05e5b92b26a1222774bb32e76a42417c692e65ee1b87abdb8a2f4e6cd84e813"
+        }
+      },
+      "pre_run": {
+        "godot-building-move": {
+          "exists": true,
+          "files": 12,
+          "sha256": "b3c477a7947fbe409330f03a8658cdca707a2631b52d1d4c5127f440619799c1"
+        },
+        "godot-building-placement": {
+          "exists": true,
+          "files": 12,
+          "sha256": "546a5f00e5e45319ffd17f5ee67201dd2b72cb21de833a3e35e8a9a98d60c5a8"
+        },
+        "godot-building-sell": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fa85af3fb12ef8b9298203a64632b6d7b31c1ed48f8d1ba716151f25ec7ab1c4"
+        },
+        "godot-building-store": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d4dff84132353a60e3a005c42d067185772ec8d6a2548ffdc5aa4779a2055194"
+        },
+        "godot-building-upgrade": {
+          "exists": true,
+          "files": 12,
+          "sha256": "398675ad94928dd75f7fbcd9f62e082d73ee973d3c973f5bbdf44a083a9c0521"
+        },
+        "godot-compatibility-boot": {
+          "exists": true,
+          "files": 31,
+          "sha256": "4d389707e0f18676fb23b3a2a8a47031b4e233366e4066437f8bad6854e15234"
+        },
+        "godot-item-purchase": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d05e5b92b26a1222774bb32e76a42417c692e65ee1b87abdb8a2f4e6cd84e813"
+        }
+      }
+    },
+    "working_tree_saves_unchanged": true
+  },
+  "corpus": {
+    "login_preserved_seed": true,
+    "pid": "00000000-0000-4000-8000-000000000001",
+    "seed": {
+      "file_sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+      "path": "tests/saves/fresh-player.json",
+      "saves_group_sha256_before_server_start": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6"
+    },
+    "seeded_as": "saves/<pid>.save.json in the disposable copy",
+    "startup_preserved_seed": true
+  },
+  "executed_at_utc": "2026-09-29T14:02:36+00:00",
+  "exit_code": 0,
+  "intent": {
+    "actions": [
+      "start",
+      "click"
+    ],
+    "bounds_rule": "not applicable: a construction has no target cell of its own \u2014 the pair rewrites only the addressed row's timestamp and attribute bag, and the cell is the recorded anchor the capture pins",
+    "cell": [
+      58,
+      48
+    ],
+    "derived": {
+      "activate": {
+        "args": [
+          11,
+          5
+        ],
+        "clearing_branch": "activate with a non-positive duration would clear the row's WHOLE attribute bag (command.py:425-427), destroying nc and any si entries; this contract only ever sends the positive derived duration and exposes no cancel action",
+        "command": "activate",
+        "duration_status": "derived from committed content: the addressed row's item's committed build_time, read through config/main.json and never accepted from a client; the committed configuration also records an 'activation' field, but using it would be a different claim with no evidence, and a speedup-adjusted figure would fabricate a price for a mechanism deliberately out of scope",
+        "resources_changed": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "add_click": {
+        "args": [
+          11
+        ],
+        "command": "add_click",
+        "counter_status": "established: add_click raises attr['nc'] and seeds it to 1 when absent (command.py:525-536; engine.py:125-130). The counter is SEEDED by the purchase half \u2014 engine.map_add_item writes attr['nc'] = 0 for a player == 1 item whose config has clicks_to_build > 0 (engine.py:25-28) \u2014 and the fresh corpus's row carries attr {} only because it was placed before the corpus was recorded",
+        "resources_changed": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "threshold_status": "no server-side completion rule exists: no branch compares nc with clicks_to_build, so the threshold is the client's"
+      },
+      "clicks_to_build": 1,
+      "command_order": [
+        "activate",
+        "add_click"
+      ],
+      "duration": 5,
+      "duration_source": "item 22's committed build_time in config/main.json",
+      "envelope_keys": [
+        "accessToken",
+        "commands",
+        "first_number",
+        "publishActions",
+        "tries",
+        "ts"
+      ],
+      "resource_vector": "unknown, xp, gold, wood, oil, steel, cash, mana",
+      "status": "established: the three commands' argument shapes and effects, that they write only the row's timestamp and attribute bag, that the click counter is seeded by the purchase half, the cp/timestamp shape of an activation, that a non-positive duration clears the whole bag, that no server-side completion rule exists, and the resulting state from this executed transaction. derived and never observed from the Flash client: that a real construction sends these commands, and that the duration a client sends is the item's committed build_time rather than its activation field or a speedup-adjusted figure. The committed configuration records no price for building, so both derived vectors are neutral and NO building cost is claimed"
+    },
+    "item_id": 22,
+    "item_index": 11,
+    "item_name": "Turret I",
+    "target_rule": "the placed Turret I (item id 22) at map slot 11 anchored at (58,48) in the committed fresh save, whose committed build_time is 5 and whose clicks_to_build is 1 \u2014 the fresh corpus has no construction in progress (every row's attr is {} and every timestamp is 0), so this fixture starts one and leaves both the countdown and the click counter visible; slot 11 is the same row the move fixture repositions in its own independent transaction, so the two fixtures stay independently readable"
+  },
+  "interpreter": {
+    "executable": "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+    "requirement": "CPython 3.9.x (pinned baseline for this change)",
+    "version": "3.9.13 (tags/v3.9.13:6de2ca5, May 17 2022, 16:36:42) [MSC v.1929 64 bit (AMD64)]"
+  },
+  "invocation": "python -B apps/compat-api/capture_construction_fixture.py",
+  "omitted_step": {
+    "args": [
+      11
+    ],
+    "command": "activate_item_click",
+    "covered_by": "the Compatibility API v0 /v0/construction endpoint's per-action post-execution proof: after a 'finish' the row's attribute bag must NOT contain 'nc', and any other outcome fails closed with internal_error",
+    "established_by": "the executed-legacy investigation probe recorded in docs/legacy-construction-timing.md (probe C: add_click, then activate_item_click, then a zero-duration activate), and by the unchanged legacy dispatcher itself \u2014 command.py:537-548 calls engine.activate_item_click (engine.py:132-135), which deletes attr['nc'] and writes nothing else",
+    "not_observed_from_client": "whether the Flash client sends activate_item_click immediately at nc == clicks_to_build or only after a visual build effect \u2014 never observed, because Flash is never executed in this repository",
+    "what": "the third construction command, activate_item_click, which completes the build by deleting attr['nc']",
+    "why_not_captured": "the executed fixture sends the two-command form \u2014 a start followed by a build click \u2014 because it leaves BOTH the countdown and the click counter visible in the committed after-state, which is what makes it a useful oracle; adding the completing command would delete the counter and hide the counter's value"
+  },
+  "purpose": "Executed request/before/response/after fixtures for one legacy two-command construction transaction; the executed-legacy parity oracle for the Compatibility API v0 construction endpoint.",
+  "schema": "godot-building-construction/legacy-capture-v1",
+  "server": {
+    "command": [
+      "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+      "-B",
+      "server.py"
+    ],
+    "command_recorder_env": "SOCIALWARS_COMMAND_RECORD_DIR stripped from child",
+    "cwd": "<disposable copy under the system temp root>",
+    "host": "127.0.0.1",
+    "output_logs": "server.stdout.log / server.stderr.log inside the disposable copy (removed with the copy; not committed)",
+    "port": 5055,
+    "port_free_after_stop": true,
+    "port_free_before_start": true,
+    "readiness": "TCP connect loop on 127.0.0.1:5055 (no extra HTTP request)",
+    "stopped_by": "taskkill /T /F <pid>, wait, then port-free re-check"
+  },
+  "time_dependent_fields": {
+    "documented_normalization": "construction parity compares the row's start time as a positive integer greater than the before-state's, never by value: legacy stamps it with timestamp_now() and the remaining time is cp - (now - item[3]), a client derivation no server branch ever computes; no other clock field is written",
+    "leaves": [
+      "/captured_at_utc in every request.json and response.meta.json",
+      "/executed_at_utc in capture-manifest.json",
+      "/headers/Date in both response.meta.json files",
+      "the envelope ts inside command_construction/request.json's /form/data (and therefore that field's sha256 digest), because ts is the current time",
+      "the constructed row's wall-clock start instant: /maps/0/items/11/3 in command_construction/after.json, and the two manifest leaves derived from it \u2014 /transaction/row_after/3 and /transaction/steps/1/save_after_sha256"
+    ],
+    "rule": "every other leaf of every committed file is byte-identical across reruns; the leaves below are the whole documented time-dependent surface and were verified by a leaf-level diff of two consecutive runs (11 differing leaves in total, every one of them named here)"
+  },
+  "transaction": {
+    "attr_after": {
+      "cp": 5,
+      "nc": 1
+    },
+    "attr_before": {},
+    "bought_units_after": [],
+    "bought_units_before": [],
+    "building_cost_claimed": false,
+    "cancel_action_offered": false,
+    "construction_writes": [
+      "command.activate with a positive duration writes item[3] = timestamp_now() and item[6]['cp'] = duration, and nothing else (command.py:421-424)",
+      "command.add_click writes only item[6]['nc'] through engine.add_click (command.py:533; engine.py:125-130)",
+      "engine.apply_resources applies the derived neutral delta on both commands with max(..., 0), so no resource changes",
+      "no branch compares nc with clicks_to_build, and no branch writes privateState, maps[0].store, or playerInfo"
+    ],
+    "count": 2,
+    "dead_heroes_after": {},
+    "entry_field_order": [
+      "item",
+      "x",
+      "y",
+      "timestamp",
+      "orientation",
+      "store",
+      "attr",
+      "player"
+    ],
+    "friend_assist_in_scope": false,
+    "key_reused": "11",
+    "other_rows_unchanged": true,
+    "placement_count_after": 40,
+    "placement_count_before": 40,
+    "player_info_unchanged": true,
+    "private_state_unchanged": true,
+    "resources_after": {
+      "cash": 5,
+      "gold": 2000,
+      "mana": 0,
+      "oil": 2000,
+      "steel": 2000,
+      "wood": 2000,
+      "xp": 4
+    },
+    "response_body": "{\"result\": \"success\"}",
+    "row_after": [
+      22,
+      58,
+      48,
+      1790690555,
+      0,
+      [],
+      {
+        "cp": 5,
+        "nc": 1
+      },
+      1
+    ],
+    "row_before": [
+      22,
+      58,
+      48,
+      0,
+      0,
+      [],
+      {},
+      1
+    ],
+    "speedups_in_scope": false,
+    "steps": [
+      {
+        "method": "POST",
+        "name": "login_post",
+        "path": "/",
+        "response_bytes": 207,
+        "response_sha256": "2de230237d9f4055670576b9485897dbc06581889ca90527504cbdbd4933ec01",
+        "save_after_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_before_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_unchanged_by_call": true,
+        "status": 302,
+        "target": "/"
+      },
+      {
+        "method": "POST",
+        "name": "command_construction",
+        "path": "/dynamic/menvswomen/srvsexwars/command.php",
+        "response_bytes": 21,
+        "response_sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87",
+        "save_after_sha256": "99f5183aa7f26c19169b8905385709dab6b3d0301f4e20c2b450a04866a23bd6",
+        "save_before_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_unchanged_by_call": false,
+        "status": 200,
+        "target": "/dynamic/menvswomen/srvsexwars/command.php"
+      }
+    ],
+    "store_after": {}
+  }
+}
