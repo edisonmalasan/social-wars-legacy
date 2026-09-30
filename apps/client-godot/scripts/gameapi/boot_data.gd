@@ -81,6 +81,27 @@ extends RefCounted
 ## so the two disagreeing is detectable rather than silent — the response-wins
 ## rule the collect line also carries.
 ##
+## The level-up command needs its own result class, and its own `LevelCurve`
+## block, for four reasons no earlier class can absorb. First, the response is
+## the only delivered one whose **target is derived server-side**: the client
+## sends a save identity and nothing else, the service derives the level the
+## committed curve implies for the stored experience, and both the derived level
+## and the recorded level BEFORE execution are reported so the client can see
+## what the service decided (building-xp design D3). Second, the recorded level
+## is re-read after execution as `level_after` and the service REQUIRES it to
+## equal the derived level, so the two-sided shape the expand class carries is
+## here a level rather than a ledger. Third, the curve block's `next_level`,
+## `next_name`, `next_exp_required`, and `remaining` are **genuinely nullable**
+## — at the curve's top level there is no next level, and the spec requires that
+## to be reported rather than turned into a sentinel value. Fourth, the curve
+## block carries design D1's three machine-readable constants, which this parser
+## CHECKS against its own copies: a response reporting a different index base
+## would be describing a different curve interpretation, and adopting it
+## silently is exactly the off-by-one the line exists to prevent. The committed
+## `reward_type` / `reward_amount` are **deliberately absent** from `LevelCurve`:
+## no legacy branch reads either, so their structural absence is the statement
+## that no reward is paid or displayed (design D7).
+##
 ## `server_time` is the documented time-dependent field here (the legacy
 ## dispatcher stamps the wall clock into the envelope), so it is asserted as a
 ## positive integer and never by value. Nothing in the expand response is
@@ -612,6 +633,267 @@ static func expand_failure(code: String, message: String) -> ExpandResult:
 	result.error_code = code
 	result.error_message = message
 	return result
+
+
+## Design D1, recorded in machine-readable form so the typed result, the client
+## model, the tests, and the structural report all state the same three facts.
+## They mirror the Compatibility API v0 module's own constants of the same names
+## (`apps/compat-api/level_envelope.py`, read-only here). The interpretation is
+## **derived-provisional**; the **rejected** alternative is the **zero-based**
+## reading, which the committed corpus contradicts (a player with 4 experience
+## is recorded as level 1 while the zero-based curve says level 1 begins at 40).
+const LEVEL_INDEX_BASE := "one-based"
+const LEVEL_DERIVATION_STATUS := "derived-provisional"
+const LEVEL_REJECTED_ALTERNATIVE := "zero-based"
+
+
+## The committed curve facts one level-up response reports, verbatim
+## (building-xp design D5/D8). Every level here was resolved by the service
+## through the ONE named conversion, so the client never re-derives any of them:
+## it displays the service's own view of the curve it used.
+##
+## The nullable fields are **genuinely nullable**, not sentinels: at the curve's
+## top level there is no next level, and the spec requires that to be reported
+## rather than turned into a value. `next_level`, `next_name`,
+## `next_exp_required`, and `remaining` are therefore `null` at the top and an
+## integer / non-empty string / non-negative integer / non-negative integer
+## below it. `entry_name` is null only when the committed entry records no name
+## at all, which the readout renders as a **named absence** and never as a
+## placeholder.
+##
+## `reward_type` and `reward_amount` are **deliberately absent from this class**:
+## the committed curve carries them and no legacy branch reads either, so paying
+## or displaying one would invent an economy. Their absence from the typed
+## result is the structural statement of that decision (design D7).
+class LevelCurve:
+	extends RefCounted
+	## The committed curve's entry count (100).
+	var entries := 0
+	## Design D1's three constants, echoed so the client can display the
+	## interpretation the service used rather than assuming one.
+	var index_base := ""
+	var derivation_status := ""
+	var rejected_alternative := ""
+	## The DERIVED level's OWN committed entry: its label and its threshold.
+	var entry_name: Variant = null
+	var entry_exp_required := 0
+	## The level AFTER the derived one, or null at the curve's top level.
+	var next_level: Variant = null
+	var next_name: Variant = null
+	var next_exp_required: Variant = null
+	## The experience still needed to reach the next level, or null at the top.
+	var remaining: Variant = null
+	## The stored experience the derivation read (the vector's slot 1).
+	var xp := 0
+
+
+## Result of `level_up_town()`: the legacy result plus the authoritative
+## recorded-level superset and the committed curve facts the service used
+## (building-xp design D3/D5/D8) — the **derived** level, the recorded level as
+## read BEFORE execution (`level_before`), and the SAME field RE-READ FROM THE
+## SAVE after execution (`level_after`, which the service requires to equal the
+## derived level) — plus the `curve` block and the current `resources` — or a
+## structured failure with no partial payload.
+##
+## **No stored resource is expected to move**: a level change is dispatched like
+## every other command with a client-sent vector, and the service's second
+## post-execution proof half requires every stored resource to be **unchanged**,
+## which is what forecloses a client smuggling a non-neutral vector through this
+## command. The `resources` are therefore reported for the readout's benefit and
+## the client's own arithmetic is never applied to them.
+##
+## The client applies `level_after` and `resources` **verbatim** and treats the
+## `curve` block as a read-only record of what the service derived: the response
+## always wins over the client's own model, even when the two disagree — so a
+## wrong client-side derivation can never be silently compounded (the spec's
+## response-wins rule).
+class LevelUpResult:
+	extends RefCounted
+	var ok := false
+	var protocol := ""
+	var game_version := ""
+	## Wall-clock seconds the legacy server stamped (a time-dependent field,
+	## so tests assert positivity, never a fixed value).
+	var server_time := 0
+	## The legacy result string ("success"); "" on failure.
+	var result := ""
+	## The level the committed curve implies for the stored experience, derived
+	## SERVER-SIDE. The client never supplies it and never trusts its own.
+	var derived_level := -1
+	## The recorded level as the service read it BEFORE execution, and the same
+	## field re-read AFTER it.
+	var level_before := -1
+	var level_after := -1
+	## The committed curve facts the service used.
+	var curve: LevelCurve = null
+	var resources: Resources = null
+	var error_code := ""
+	var error_message := ""
+
+
+## Structured failure for `level_up_town()` (never a partial payload).
+static func level_up_failure(code: String, message: String) -> LevelUpResult:
+	var result := LevelUpResult.new()
+	result.ok = false
+	result.error_code = code
+	result.error_message = message
+	return result
+
+
+## Parses a v0 level-up envelope — success or structured error — into the typed
+## result, fail-closed in both directions (spec "A structured failure carries no
+## partial payload"). The rules mirror `parse_expand()`: the envelope must be a
+## JSON object reporting `ok: true`, the protocol must be the v0 one, the legacy
+## result string must be `success`, the three level integers must be present and
+## non-negative, the `curve` block must carry the three design-D1 constants
+## verbatim plus a readable derived entry, and `resources` must be the seven
+## non-negative integers every other response carries.
+##
+## The response is the AUTHORITATIVE record of what the service did; nothing
+## here re-derives a level, a name, or a threshold from the curve.
+static func parse_level_up(payload: Variant) -> LevelUpResult:
+	if not (payload is Dictionary):
+		return level_up_failure("bad_response",
+			"response is not a JSON object")
+	var envelope: Dictionary = payload
+	if envelope.get("ok") != true:
+		return _level_up_error(envelope)
+	if str(envelope.get("protocol", "")) != PROTOCOL:
+		return level_up_failure("protocol_mismatch",
+			"expected protocol %s, got %s" % [PROTOCOL,
+			str(envelope.get("protocol"))])
+	if str(envelope.get("result", "")) != "success":
+		return level_up_failure("bad_response",
+			"level_up response did not report the legacy success result")
+	var levels := {}
+	for field in ["derived_level", "level_before", "level_after"]:
+		var value: Variant = _parse_int(envelope.get(field))
+		if value == null or int(value) < 0:
+			return level_up_failure("bad_response",
+				"the level-up response carries no non-negative %s" % field)
+		levels[field] = int(value)
+	var curve := _parse_level_curve(envelope.get("curve"))
+	if curve == null:
+		return level_up_failure("bad_response",
+			"the level-up response carries no readable committed curve block")
+	var resources_raw: Variant = envelope.get("resources")
+	if not (resources_raw is Dictionary):
+		return level_up_failure("bad_response",
+			"level_up response carries no resources object")
+	var resources := _parse_resources(resources_raw)
+	if resources == null:
+		return level_up_failure("bad_response",
+			"level_up resources are not seven non-negative integers")
+	var result := LevelUpResult.new()
+	result.ok = true
+	result.protocol = PROTOCOL
+	result.game_version = str(envelope.get("game_version", ""))
+	result.server_time = _parse_epoch(envelope.get("server_time"))
+	if result.server_time < 0:
+		return level_up_failure("bad_response", "server_time is not a number")
+	result.result = "success"
+	result.derived_level = int(levels["derived_level"])
+	result.level_before = int(levels["level_before"])
+	result.level_after = int(levels["level_after"])
+	result.curve = curve
+	result.resources = resources
+	return result
+
+
+## The response's `curve` block -> typed `LevelCurve`; null when the value is not
+## an object carrying the documented facts. Every level in the block was already
+## resolved by the service through the one named conversion, so the parser only
+## checks the SHAPE and never re-derives a value.
+##
+## The three design-D1 constants are checked against this module's own copies:
+## a response that reported a different index base would be describing a
+## different curve interpretation, and silently adopting it is exactly the
+## off-by-one this line exists to prevent. The nullable fields accept only null
+## (the curve's top level) or a well-typed value, so a partially populated block
+## fails closed instead of reading as a completed curve.
+static func _parse_level_curve(value: Variant) -> LevelCurve:
+	if not (value is Dictionary):
+		return null
+	var source: Dictionary = value
+	for field in ["index_base", "derivation_status", "rejected_alternative"]:
+		if not (source.get(field) is String):
+			return null
+	if str(source["index_base"]) != LEVEL_INDEX_BASE:
+		return null
+	if str(source["derivation_status"]) != LEVEL_DERIVATION_STATUS:
+		return null
+	if str(source["rejected_alternative"]) != LEVEL_REJECTED_ALTERNATIVE:
+		return null
+	var entries: Variant = _parse_int(source.get("entries"))
+	if entries == null or int(entries) <= 0:
+		return null
+	var threshold: Variant = _parse_int(source.get("entry_exp_required"))
+	if threshold == null or int(threshold) < 0:
+		return null
+	var xp: Variant = _parse_int(source.get("xp"))
+	if xp == null or int(xp) < 0:
+		return null
+	var curve := LevelCurve.new()
+	curve.entries = int(entries)
+	curve.index_base = str(source["index_base"])
+	curve.derivation_status = str(source["derivation_status"])
+	curve.rejected_alternative = str(source["rejected_alternative"])
+	curve.entry_exp_required = int(threshold)
+	curve.xp = int(xp)
+	# A name is a LABEL: a null entry_name is the committed entry recording no
+	# name, which the readout renders as a named absence. A non-string is a
+	# malformed response and fails closed.
+	if source.get("entry_name") != null and not (source.get("entry_name")
+			is String):
+		return null
+	curve.entry_name = source.get("entry_name")
+	# The three next-level facts are all-or-nothing: either there is a next
+	# level and every one of them is a well-typed value, or the curve has
+	# ended and all three are null. A partially populated block is a shape this
+	# contract does not carry.
+	var nullable := {}
+	for field in ["next_level", "next_name", "next_exp_required", "remaining"]:
+		nullable[field] = source.get(field)
+	var present := 0
+	for field in nullable:
+		if nullable[field] != null:
+			present += 1
+	if present != 0 and present != nullable.size():
+		return null
+	if present == nullable.size():
+		var next_level: Variant = _parse_int(nullable["next_level"])
+		var next_threshold: Variant = _parse_int(nullable["next_exp_required"])
+		var remaining: Variant = _parse_int(nullable["remaining"])
+		if next_level == null or int(next_level) < 0:
+			return null
+		if next_threshold == null or int(next_threshold) < 0:
+			return null
+		if remaining == null or int(remaining) < 0:
+			return null
+		if not (nullable["next_name"] is String) \
+				or str(nullable["next_name"]).is_empty():
+			return null
+		curve.next_level = int(next_level)
+		curve.next_exp_required = int(next_threshold)
+		curve.remaining = int(remaining)
+		curve.next_name = str(nullable["next_name"])
+	return curve
+
+
+## Structured error fields of a failed level-up envelope (code + message) — the
+## same one envelope rule the other nine commands use, so a code the service
+## named (`level_already_current`, `xp_below_threshold`, `missing_user_id`,
+## `invalid_user_id`, `unknown_user_id`, `invalid_payload`, `internal_error`, …)
+## reaches the client unchanged.
+static func _level_up_error(envelope: Dictionary) -> LevelUpResult:
+	var code := "bad_response"
+	var message := "response reported failure without a structured error"
+	var error: Variant = envelope.get("error")
+	if error is Dictionary:
+		var typed: Dictionary = error
+		code = str(typed.get("code", code))
+		message = str(typed.get("message", message))
+	return level_up_failure(code, message)
 
 
 ## Parses any v0 session envelope — success or structured error — into the

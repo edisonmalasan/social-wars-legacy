@@ -5,7 +5,8 @@ extends Node
 ## implementation", "Move through either implementation", "Sell through
 ## either implementation", "Upgrade through either implementation", and
 ## "Construction through either implementation", "Collect through either
-## implementation", and "Expand through either implementation").
+## implementation", "Expand through either implementation", and "Level up
+## through either implementation").
 ##
 ## This is the ONLY project file allowed to name the compat endpoint or to
 ## use the built-in HTTP request/enumeration types; the scope test restricts
@@ -29,6 +30,7 @@ const UPGRADE_PATH := "/v0/upgrade"
 const CONSTRUCTION_PATH := "/v0/construction"
 const COLLECT_PATH := "/v0/collect"
 const EXPAND_PATH := "/v0/expand"
+const LEVEL_UP_PATH := "/v0/level_up"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -317,6 +319,40 @@ func expand_town(user_id: String,
 			str(outcome.get("code", "bad_response")),
 			str(outcome.get("message", "")))
 	return BootData.parse_expand(outcome.get("payload"))
+
+
+## One level-up intent over loopback HTTP: the client sends ONLY the save
+## identity — no level, no new level, no experience, no threshold, no reward,
+## and no resource deltas. Any `level` / `new_level` / `xp` /
+## `experience` / `reward_type` / `reward_amount` / `resources_changed` /
+## `vector` key the service receives alongside the identity is **ignored**
+## server-side, exactly as the collect and expand endpoints ignore
+## client-supplied amounts and prices (design D3): the service reads the stored
+## experience, derives the level the committed curve implies for it through the
+## one named one-based conversion, and executes the unchanged legacy `level_up`
+## branch with a NEUTRAL vector (design D5), so the typed result's
+## `derived_level`, `level_before`, `level_after`, `curve`, and `resources` are
+## authoritative (design D8). The response's second post-execution proof half
+## requires every stored resource to be **unchanged**, because a level change
+## moves none.
+##
+## Structured service errors pass through with their original codes — notably
+## `level_already_current` (the recorded level already equals the level the
+## committed curve derives, which is the committed corpus's own state at
+## `xp 4 / level 1`) and `xp_below_threshold` (the stored experience cannot
+## reach the recorded level's own committed threshold), both of which the client
+## surfaces instead of advancing anything, plus `missing_user_id`,
+## `invalid_user_id`, `unknown_user_id`, `invalid_payload`, and `internal_error`;
+## transport failures keep the boot failure rules, never a partial payload.
+func level_up_town(user_id: String) -> BootData.LevelUpResult:
+	var outcome := await _call("POST", LEVEL_UP_PATH, JSON.stringify({
+		"user_id": user_id,
+	}))
+	if not outcome.get("ok", false):
+		return BootData.level_up_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return BootData.parse_level_up(outcome.get("payload"))
 
 
 ## One HTTP round trip. Success returns `{ok: true, payload: Dictionary}`;

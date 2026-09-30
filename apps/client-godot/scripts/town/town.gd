@@ -293,6 +293,46 @@ extends Node2D
 ## requirements rule NONE of them could have been bought, the readout shows
 ## them as owned-and-not-repurchasable, and the only purchasable entries in the
 ## whole 98-row table are the free indexes `0..3`.
+##
+## Level mode (building-xp, spec "Level-up client flow"): the **eighth**
+## building-xp mode, and the first that is mutually exclusive with the placement
+## and shop surfaces as well as with the seven selection-driven and map-level
+## ones — a player arms one intent at a time on this view, and each direction of
+## the exclusion names the ARMED mode. Like the expansion it names **no
+## placement**: a level is a property of the MAP (its intent carries a save id
+## and nothing else), so it owns its own UI-foundation slot beside the
+## selection-driven panel rather than an eighth building-targeted row of buttons
+## that would imply a target which does not exist.
+##
+## The readout shows the level the committed `levels` curve implies for the
+## stored experience, that level's committed NAME, the stored experience, the
+## next level's committed threshold, the experience remaining to reach it, the
+## progress across the derived level's own committed span, and an **explicit
+## agreement or disagreement line naming BOTH values and the stored experience
+## that separates them** (design D2). The recorded level is **unverified against
+## the curve** — the legacy branch writes it from a client-supplied integer with
+## no validation — so the disagreement is reported and **never reconciled**: this
+## view prefers neither value, normalises neither, and rewrites nothing.
+##
+## The armed confirm names the **derived** level as derived and sends exactly
+## ONE `GameApi.level_up_town()` intent carrying the save id and nothing else —
+## no level, no experience, no threshold, no reward, no resource delta. Success
+## applies only the authoritative response: the recorded level from
+## `level_after` and the HUD balances and experience from `resources`, with
+## every field the apply touches snapshotted and rolled back if any step fails.
+## The client's own derived level is **discarded, not applied**: the response
+## wins even where the two disagree, so a wrong client-side derivation can never
+## be silently compounded.
+##
+## **No reward is paid and none is displayed** (design D7): `reward_type` and
+## `reward_amount` are committed on every curve entry and no legacy branch reads
+## either, so paying one would invent an economy. **Unit experience and tutorial
+## progression are out of scope** because the committed corpus cannot exercise
+## them. The committed `exp_required` thresholds are preserved **verbatim** — no
+## rebalancing, smoothing, or interpolation. The curve's index base is
+## **one-based and derived-provisional**: the single named conversion lives in
+## `level_flow.gd` and the **rejected zero-based alternative** is contradicted
+## by the committed corpus, which records `xp 4` against `level 1`.
 
 const Iso = preload("res://scripts/town/iso.gd")
 const TownState = preload("res://scripts/town/town_state.gd")
@@ -312,6 +352,13 @@ const MoveFlow = preload("res://scripts/town/move_flow.gd")
 const ConstructionFlow = preload("res://scripts/town/construction_flow.gd")
 const CollectionFlow = preload("res://scripts/town/collection_flow.gd")
 const ExpandFlow = preload("res://scripts/town/expand_flow.gd")
+## The ONE committed-curve level model (OpenSpec `godot-building-xp` "Committed-
+## curve level model" / "Level and progress readout" / "Stored-versus-derived
+## disagreement is reported", design D1/D2/D6/D7). It holds the one named
+## one-based schedule conversion every level lookup on this view resolves
+## through, so the readout, the confirm, the apply, and the structural report
+## can never index the committed curve by their own arithmetic.
+const LevelFlow = preload("res://scripts/town/level_flow.gd")
 ## The ONE canonical resource projection (OpenSpec `godot-building-resources`
 ## "Canonical resource projection", design D1-D5): the readout's only source of
 ## which fields exist, what they are named, and where they live. This report
@@ -571,6 +618,22 @@ const REPORT_CAPTURE_RESOURCES := \
 	"apps/client-godot/evidence/building-resources/resources.png"
 const DEFAULT_RESOURCES_REPORT_PATH := \
 	"evidence/building-resources/report.json"
+## XP evidence (building-xp, design D8): the executed-legacy level fixture the
+## parity suite replays and the committed fake capture the XP report points at
+## (repository-relative).
+const REPORT_LEVEL_REQUEST := \
+	"tests/fixtures/godot-building-xp/steps/command_level_up/request.json"
+const REPORT_LEVEL_RESPONSE := \
+	"tests/fixtures/godot-building-xp/steps/command_level_up/response.body"
+const REPORT_LEVEL_BEFORE := \
+	"tests/fixtures/godot-building-xp/steps/command_level_up/before.json"
+const REPORT_LEVEL_AFTER := \
+	"tests/fixtures/godot-building-xp/steps/command_level_up/after.json"
+const REPORT_CAPTURE_LEVEL := \
+	"apps/client-godot/evidence/building-xp/level-up.png"
+## Default XP report destination for the bare `--xp-report` flag
+## (project-relative, resolved against the project directory).
+const DEFAULT_XP_REPORT_PATH := "evidence/building-xp/report.json"
 ## The committed corpus's OWN stored values for every canonical projection row
 ## (repository-relative ground truth, NOT a restatement of the projection): the
 ## fresh-player save the report parses. The report asserts the readout against
@@ -621,6 +684,12 @@ const EXPAND_INTENT_DEBIT := [0, 0, 0, 0, 0, 0, 0, 0]
 ## the 40 rendered objects and every cell are untouched by a ledger that grew.
 const EXPAND_INTENT_CELL := Vector2i(53, 39)
 const EXPAND_INTENT_ITEM := 905
+## The level capture's selection (building-xp, design D8): the same still-present
+## Tree the expansion capture selects, because a level-up names NO placement and
+## this map-level surface is only reached through the delivered press path. The
+## selection exists to render the readout; it is not the level-up's target.
+const LEVEL_INTENT_CELL := Vector2i(53, 39)
+const LEVEL_INTENT_ITEM := 905
 ## Default placement report destination for the bare
 ## `--placement-report` flag (project-relative, resolved against the
 ## project directory).
@@ -1412,6 +1481,13 @@ const SLOT_MOVE := "move"
 ## seventh building-targeted row would have implied a target that does not
 ## exist. The six delivered modes' panel, buttons, and lifecycle are untouched.
 const SLOT_EXPAND := "expand"
+## UI-foundation slot the level readout and its `Level up` action occupy
+## (building-xp, design D7/D8). Its OWN slot beside the placement-bound panel and
+## the expansion panel, and deliberately so: a level is a property of the MAP —
+## its intent names a save id and nothing else — so an eighth building-targeted
+## row would have implied a target that does not exist. The seven delivered
+## building-xp modes' panel, buttons, and lifecycles are untouched.
+const SLOT_LEVEL := "level"
 ## Picker panel width in pixels (provisional presentation — no legacy
 ## picker layout has been captured).
 const PLACEMENT_PANEL_WIDTH := 300.0
@@ -1424,6 +1500,14 @@ const MOVE_PANEL_WIDTH := 300.0
 ## Expansion panel width in pixels (provisional presentation for the same
 ## reason: no legacy expansion popup has been captured).
 const EXPAND_PANEL_WIDTH := 340.0
+## Level panel width in pixels (provisional presentation for the same reason: no
+## legacy progression panel has been captured).
+const LEVEL_PANEL_WIDTH := 420.0
+## The typed content package's own domain name for the committed level curve
+## (`packages/game-content/normalized/levels.json`). The same table the service
+## derives from, so the readout, the confirm, and the service can never place a
+## level from different content.
+const LEVEL_CURVE_DOMAIN := "levels"
 ## The storage readout's indicator lines: the payload carried no storage
 ## field at all (design D7 — the missing field is named, never presented as
 ## an empty inventory), and the payload carried a storage object with no
@@ -1619,6 +1703,23 @@ var _expand_status: Variant = null
 var _expand_arm: Variant = null
 var _expand_confirm: Variant = null
 
+## Level-up flow (building-xp, spec "Level-up client flow"). The EIGHTH
+## building-xp mode, the first that is mutually exclusive with the placement and
+## shop surfaces as well as with the seven delivered selection-driven and
+## map-level ones. Like the expansion it names **no placement**: a level is a
+## property of the MAP, so it owns its own UI-foundation slot, no grid target,
+## no preview, and no placement state at all — only its own armed state, the
+## explicit failure the spec requires, the readout the spec requires, and the
+## recorded level the apply takes off the response. The seven delivered modes,
+## their panel, their buttons, and their previews are untouched.
+var level_error := ""
+var _level_active := false
+## The level readout's own labels (null while no panel is built).
+var _level_readout: Variant = null
+var _level_status: Variant = null
+var _level_arm: Variant = null
+var _level_confirm: Variant = null
+
 ## Visual hierarchy + texture caches (shared across rebuilds of this view).
 var _visuals := TownVisuals.new()
 ## The committed HUD builder once attached.
@@ -1668,6 +1769,11 @@ var _collect_capture := false
 ## frame shows the town whose expansion readout carries the AUTHORITATIVE
 ## ledger the response reported and the HUD balances it moved.
 var _expand_capture := false
+## True when the capture flag was `--level-capture=` (building-xp, design D8):
+## the level flow runs before the capture so the frame shows the town whose
+## level readout carries the AUTHORITATIVE recorded level the response reported
+## and the HUD balances it left unchanged.
+var _level_capture := false
 
 @onready var terrain: TownTerrain = $Terrain
 @onready var objects_layer: Node2D = $Objects
@@ -1753,6 +1859,12 @@ func _ready() -> void:
 			and get_script().resource_path == "res://scripts/town/town.gd":
 		await _write_resources_report(resources_report_path)
 		return
+	# The XP report shares that gate for the same reason.
+	var xp_report_path := _xp_report_path_arg()
+	if not xp_report_path.is_empty() \
+			and get_script().resource_path == "res://scripts/town/town.gd":
+		await _write_xp_report(xp_report_path)
+		return
 	_capture_path = _user_arg("--town-capture=")
 	_purchase_capture = false
 	_move_capture = false
@@ -1762,6 +1874,7 @@ func _ready() -> void:
 	_construction_capture = false
 	_collect_capture = false
 	_expand_capture = false
+	_level_capture = false
 	if _capture_path.is_empty():
 		_capture_path = _user_arg("--placement-capture=")
 		_placement_capture = not _capture_path.is_empty()
@@ -1789,6 +1902,9 @@ func _ready() -> void:
 	if _capture_path.is_empty():
 		_capture_path = _user_arg("--expand-capture=")
 		_expand_capture = not _capture_path.is_empty()
+	if _capture_path.is_empty():
+		_capture_path = _user_arg("--level-capture=")
+		_level_capture = not _capture_path.is_empty()
 	if state != null:
 		build()
 	_maybe_start_capture()
@@ -1962,6 +2078,12 @@ func enter_placement() -> Dictionary:
 	if _placement_active:
 		return _placement_reject("placement_already_active",
 			"the build picker is already open")
+	if _level_active:
+		# The level-up mode's half of the symmetric exclusion (building-xp
+		# design D8): a player arms one intent at a time on this view, and the
+		# refusal names the ARMED mode, never the one the player tried to arm.
+		return _placement_reject("level_up_already_active",
+			"a level up is armed; cancel it before building")
 	if not (placement_catalog_result is Dictionary):
 		return _placement_reject("placement_unavailable",
 			"the placement catalog was never provided")
@@ -2426,6 +2548,12 @@ func enter_shop() -> Dictionary:
 		return _shop_reject("town_not_built", "the town view is not built")
 	if _shop_active:
 		return _shop_reject("shop_already_active", "the shop is already open")
+	if _level_active:
+		# The level-up mode's half of the symmetric exclusion (building-xp
+		# design D8): a player arms one intent at a time on this view, and the
+		# refusal names the ARMED mode, never the one the player tried to arm.
+		return _shop_reject("level_up_already_active",
+			"a level up is armed; cancel it before shopping")
 	if not (shop_catalog_result is Dictionary):
 		return _shop_reject("shop_unavailable",
 			"the shop catalog was never provided")
@@ -2912,6 +3040,13 @@ func arm_move() -> Dictionary:
 		# about a target.
 		return _move_reject("expand_already_active",
 			"an expansion is armed; cancel it before moving")
+	if _level_active:
+		# The eighth mode's half of the symmetric exclusion (building-xp design
+		# D8): a level up is armed, so a move is refused by name. It names no
+		# placement either, so the refusal is about the MODE, never about a
+		# target.
+		return _move_reject("level_up_already_active",
+			"a level up is armed; cancel it before moving")
 	if selected == null:
 		return _move_reject("move_no_selection",
 			"no placed building is selected")
@@ -3860,6 +3995,12 @@ func arm_sell() -> Dictionary:
 		# design D8).
 		return _sell_reject("expand_already_active",
 			"an expansion is armed; cancel it before selling")
+	if _level_active:
+		# The eighth mode's half of the symmetric exclusion (building-xp design
+		# D8): a level up names no placement either, so the refusal is about the
+		# MODE, never about a target.
+		return _sell_reject("level_up_already_active",
+			"a level up is armed; cancel it before selling")
 	if selected == null:
 		return _sell_reject("sell_no_selection",
 			"no placed building is selected")
@@ -4167,6 +4308,11 @@ func arm_store() -> Dictionary:
 		# design D8).
 		return _store_reject("expand_already_active",
 			"an expansion is armed; cancel it before storing")
+	if _level_active:
+		# The eighth mode's half of the symmetric exclusion (building-xp design
+		# D8).
+		return _store_reject("level_up_already_active",
+			"a level up is armed; cancel it before storing")
 	if selected == null:
 		return _store_reject("store_no_selection",
 			"no placed building is selected")
@@ -4520,6 +4666,11 @@ func arm_upgrade() -> Dictionary:
 		# design D8).
 		return _upgrade_reject("expand_already_active",
 			"an expansion is armed; cancel it before upgrading")
+	if _level_active:
+		# The eighth mode's half of the symmetric exclusion (building-xp design
+		# D8).
+		return _upgrade_reject("level_up_already_active",
+			"a level up is armed; cancel it before upgrading")
 	if selected == null:
 		return _upgrade_reject("upgrade_no_selection",
 			"no placed building is selected")
@@ -5123,6 +5274,11 @@ func arm_construction() -> Dictionary:
 		# design D8).
 		return _construction_reject("expand_already_active",
 			"an expansion is armed; cancel it before building")
+	if _level_active:
+		# The eighth mode's half of the symmetric exclusion (building-xp design
+		# D8).
+		return _construction_reject("level_up_already_active",
+			"a level up is armed; cancel it before building")
 	if selected == null:
 		return _construction_reject("construction_no_selection",
 			"no placed building is selected")
@@ -5723,6 +5879,11 @@ func arm_collect() -> Dictionary:
 		# design D8).
 		return _collect_reject("expand_already_active",
 			"an expansion is armed; cancel it before collecting")
+	if _level_active:
+		# The eighth mode's half of the symmetric exclusion (building-xp design
+		# D8).
+		return _collect_reject("level_up_already_active",
+			"a level up is armed; cancel it before collecting")
 	if selected == null:
 		return _collect_reject("collect_no_selection",
 			"no placed building is selected")
@@ -6286,11 +6447,12 @@ func arm_expand() -> Dictionary:
 			["_store_active", "store_already_active", "a store"],
 			["_upgrade_active", "upgrade_already_active", "an upgrade"],
 			["_construction_active", "construction_already_active", "a build"],
-			["_collect_active", "collect_already_active", "a collection"]]:
+			["_collect_active", "collect_already_active", "a collection"],
+			["_level_active", "level_up_already_active", "a level up"]]:
 		if bool(get(str(entry[0]))):
 			# The refusal names the ARMED mode, never the one the player tried
 			# to arm — the same one-surface rule the six delivered modes already
-			# follow, extended to the seventh.
+			# follow, extended to the seventh and then the eighth.
 			return _expand_reject(str(entry[1]),
 				"%s is armed; cancel it before expanding" % str(entry[2]))
 	if selected == null or not (selected is TownObject):
@@ -6723,6 +6885,560 @@ func _set_expand_status(text: String) -> void:
 		(_expand_status as Label).text = text
 
 
+# Level flow (building-xp, spec "Level-up client flow")
+# ----------------------------------------------------
+
+
+## True while the level-up mode is armed.
+func level_active() -> bool:
+	return _level_active
+
+
+## The player's RECORDED level, verbatim from the typed state (`map.level`) —
+## the value the save records, which the legacy branch wrote from a
+## client-supplied integer and which this contract therefore treats as
+## **unverified against the curve** (design D2). Never the derived level and
+## never a coerced value: a payload with no readable level reads as
+## `LevelFlow.NO_LEVEL` and the evaluation refuses by name.
+func level_recorded() -> int:
+	if state == null:
+		return LevelFlow.NO_LEVEL
+	return int(state.summary.level)
+
+
+## The player's stored experience, verbatim from the typed state (`map.xp`) —
+## the legacy eight-slot vector's slot 1, and the ONLY experience the server
+## maintains. Every level on this surface is derived from this value and from
+## nothing else (design D1).
+func level_experience() -> int:
+	if state == null:
+		return 0
+	return int(state.summary.xp)
+
+
+## The committed level curve this view derives from, read through the typed
+## content package's own `levels` domain — the SAME table the service derives
+## from, so the readout, the confirm, and the service can never place a level
+## from different content. `[]` when the package is not loaded or the table is
+## absent, which every caller treats as fail-closed.
+##
+## The table has no stable stored id (`legacy_id` is its 0-based positional
+## index), so the whole positional table is read through the registry's own entry
+## count and the rows are re-read by POSITION — never by a level, and never by
+## this view's own arithmetic. Every level lookup below resolves its position
+## through `LevelFlow.entry_index_for_level`, the one named conversion.
+func level_schedule() -> Array:
+	var registry: Variant = get_node_or_null("/root/ContentRegistry") \
+		if _registry == null else _registry
+	if registry == null or not bool(registry.is_loaded()):
+		return []
+	if not registry.has_domain(LEVEL_CURVE_DOMAIN):
+		return []
+	var schedule: Array = []
+	var size: int = registry.count(LEVEL_CURVE_DOMAIN)
+	if size <= 0:
+		return []
+	for position in range(size):
+		var row: Dictionary = registry.get_entry(LEVEL_CURVE_DOMAIN,
+			str(position))
+		if not bool(row.get("found", false)):
+			break
+		schedule.append((row.get("entry", {}) as Dictionary).duplicate())
+	return schedule
+
+
+## The committed curve's own facts, as the readout and the evidence report
+## record them: entry count, addressable level range, the first thresholds, the
+## final threshold, the distinct-name count, and the level from which every name
+## reads the same. `{ok: false}` when the content package cannot supply a usable
+## curve, which the readout renders as a refusal rather than as an empty curve.
+func level_curve_summary() -> Dictionary:
+	return LevelFlow.curve_summary(level_schedule())
+
+
+## The whole progression evaluation for the committed state (the pure flow's
+## envelope): the derived level, its committed name, the stored experience, the
+## next level's threshold, the remaining experience, the progress ratio, the
+## agreement/disagreement decision, and the refusal reason when one applies.
+##
+## It renders for the SELECTED MAP whether or not a level-up is armed, so a
+## player sees their position without arming anything.
+func level_evaluation() -> Dictionary:
+	return LevelFlow.evaluate(level_schedule(), level_recorded(),
+		level_experience())
+
+
+## The on-screen level readout line ("" while the panel does not exist or the
+## committed curve cannot be read).
+func level_readout() -> String:
+	if _level_readout == null or not is_instance_valid(_level_readout):
+		return ""
+	return (_level_readout as Label).text
+
+
+## The on-screen level status line ("" while the panel does not exist).
+func level_status() -> String:
+	if _level_status == null or not is_instance_valid(_level_status):
+		return ""
+	return (_level_status as Label).text
+
+
+## True when the current selection is a map a level-up could advance: the town is
+## built, a map is selected, the committed curve resolves, and the evaluation
+## actually OFFERS a level-up — the recorded level differs from the derived one
+## AND the stored experience reaches the recorded level's own committed
+## threshold. An already-current level, an unreachable experience, an unreadable
+## curve, and an unreadable state are therefore never offered the action at all;
+## the refusal still names itself if arming is attempted (design D2/D4).
+func level_selection_available() -> bool:
+	if view_state != STATE_BUILT:
+		return false
+	if selected == null or not (selected is TownObject):
+		return false
+	return LevelFlow.offers_level_up(level_evaluation())
+
+
+## Rebuilds the level panel and shows it for a committed selection. A no-op while
+## the town is not built or nothing is selected, and never while a level-up is
+## already armed (an armed mode already names the level it will act on, and the
+## readout is re-rendered from the response after the apply).
+func refresh_level_action() -> Dictionary:
+	if view_state != STATE_BUILT or ui == null:
+		return _level_reject("town_not_built", "the town view is not built")
+	if selected == null or not (selected is TownObject):
+		if ui.has_slot(SLOT_LEVEL) and ui.is_slot_visible(SLOT_LEVEL):
+			ui.set_slot_visible(SLOT_LEVEL, false)
+		return {"ok": true, "error": ""}
+	var panel := _build_level_panel(false)
+	if not bool(panel.get("ok", false)):
+		return _level_reject("level_panel", str(panel.get("error", "")))
+	_refresh_level_panel()
+	if not _level_active:
+		ui.set_slot_visible(SLOT_LEVEL, true)
+	return {"ok": true, "error": ""}
+
+
+## Arms the level-up on the current selection (spec "the player chooses the
+## level-up action on a progression surface whose recorded level differs from
+## the derived level, and confirms").
+##
+## Fail-closed: an unbuilt view, no selection, an already-armed level-up, ANY of
+## the nine other delivered modes already armed (placement, shop, move, sale,
+## store, upgrade, build, collection, and expansion), an unreadable committed
+## curve, an unreadable recorded level or experience, a level that is already
+## current, and an experience that cannot reach the next level each reject with
+## an explicit error naming the condition. It adds no state and no request of its
+## own: nothing leaves the client until a confirm, and a level-up has no grid
+## target, so no preview is shown.
+##
+## The armed surface names the **derived** level as derived; the intent itself
+## carries the save id and NOTHING else, because the service derives the level
+## again server-side (design D3).
+func arm_level_up() -> Dictionary:
+	if view_state != STATE_BUILT:
+		return _level_reject("town_not_built", "the town view is not built")
+	if _level_active:
+		return _level_reject("level_up_already_active",
+			"the level up is already armed")
+	# Each delivered mode's refusal reuses the code that mode's OWN arming
+	# refuses with (`sell_already_active`, `expand_already_active`, …), so the
+	# two directions of the exclusion name the same condition. The refusal names
+	# the ARMED mode, never the one the player tried to arm.
+	for entry: Array in [["_placement_active", "placement_already_active",
+			"a placement"],
+			["_shop_active", "shop_already_active", "a shop"],
+			["_move_active", "move_already_active", "a move"],
+			["_sell_active", "sell_already_active", "a sale"],
+			["_store_active", "store_already_active", "a store"],
+			["_upgrade_active", "upgrade_already_active", "an upgrade"],
+			["_construction_active", "construction_already_active",
+				"a build"],
+			["_collect_active", "collect_already_active", "a collection"],
+			["_expand_active", "expand_already_active", "an expansion"]]:
+		if bool(get(str(entry[0]))):
+			return _level_reject(str(entry[1]),
+				"%s is armed; cancel it before levelling up" % str(entry[2]))
+	if selected == null or not (selected is TownObject):
+		return _level_reject("level_no_selection", "no map is selected")
+	# Every content and progression refusal is evaluated BEFORE the mode is
+	# armed, so a level that is already current (or an experience that cannot
+	# reach the next level) opens nothing and the explicit reason names itself
+	# (design D4).
+	var evaluation: Dictionary = level_evaluation()
+	if not LevelFlow.offers_level_up(evaluation):
+		var refusal := LevelFlow.refusal_text(evaluation)
+		return _level_reject(str(evaluation.get("reason",
+			LevelFlow.REASON_UNREADABLE_SCHEDULE)),
+			refusal if refusal != "" else str(evaluation.get("error",
+				"no level up to offer")))
+	_level_active = true
+	level_error = ""
+	var panel := _build_level_panel(true)
+	if not bool(panel.get("ok", false)):
+		return _level_reject("level_panel", str(panel.get("error", "")))
+	if ui != null and ui.has_slot(SLOT_LEVEL) \
+			and not ui.is_slot_visible(SLOT_LEVEL):
+		ui.set_slot_visible(SLOT_LEVEL, true)
+	_refresh_level_panel()
+	# The armed line names the derived level AS DERIVED, so it is never presented
+	# as authoritative: the service decides the level, not this client.
+	_set_level_status(LevelFlow.confirm_text(evaluation))
+	return {"ok": true, "error": "",
+		"derived_level": int(evaluation.get("derived_level",
+			LevelFlow.NO_LEVEL)),
+		"recorded_level": int(evaluation.get("recorded_level",
+			LevelFlow.NO_LEVEL)),
+		"name": evaluation.get("name", null)}
+
+
+## Sends exactly one level-up intent (spec "a confirm that sends exactly one
+## intent") and applies only the authoritative response. Nothing is sent unless
+## the level-up is armed, the evaluation still OFFERS one against the CURRENT
+## committed state, an active session exists, and the API is registered: each
+## missing condition rejects locally with the explicit error and NO request. A
+## structured or transport failure surfaces its code with the recorded level
+## keeping its previous value and no balance moved. Awaits the GameApi call.
+##
+## The intent carries the save id and NOTHING else — no level, no experience, no
+## threshold, no reward, and no resource delta (design D3): the service reads the
+## stored experience, derives the level the committed curve implies, and executes
+## the unchanged legacy `level_up` branch with a NEUTRAL vector.
+func confirm_level_up() -> Dictionary:
+	if not _level_active:
+		return _level_reject("level_not_active", "the level up is not armed")
+	var evaluation: Dictionary = level_evaluation()
+	if not LevelFlow.offers_level_up(evaluation):
+		# Already current, or the experience cannot reach the next level. Both are
+		# named, and both send nothing (design D4).
+		var refusal := LevelFlow.refusal_text(evaluation)
+		return _level_reject(str(evaluation.get("reason",
+			LevelFlow.REASON_UNREADABLE_SCHEDULE)),
+			refusal if refusal != "" else str(evaluation.get("error",
+				"no level up to offer")))
+	var session: Variant = get_node_or_null("/root/Session")
+	if session == null or not session.is_active() \
+			or str(session.user_id()).strip_edges() == "":
+		return _level_reject("session_unavailable",
+			"no active save to level up in")
+	var api: Variant = get_node_or_null("/root/GameApi")
+	if api == null:
+		return _level_reject("gameapi_unavailable",
+			"the GameApi autoload is not registered")
+	var response: Variant = await api.level_up_town(session.user_id())
+	if not (response is BootData.LevelUpResult):
+		return _level_reject("bad_response",
+			"GameApi returned no typed level-up result")
+	var typed: BootData.LevelUpResult = response
+	if not typed.ok:
+		# Structured or transport failure: one contract — the explicit error
+		# names the code and message, nothing was applied, the recorded level
+		# keeps its previous value, and no balance moved.
+		level_error = "[town] level up failed: %s: %s" % [
+			typed.error_code, typed.error_message]
+		_set_level_status(level_error)
+		_refresh_level_panel()
+		return {"ok": false, "error": level_error, "code": typed.error_code}
+	var applied: Dictionary = _apply_level(typed)
+	if not bool(applied.get("ok", false)):
+		return _level_reject("apply_failed", str(applied.get("error", "")))
+	level_error = ""
+	_level_active = false
+	# The readout is re-rendered from the RESPONSE's recorded level, never from
+	# the client's own derivation: the applied level is the authoritative one, so
+	# this is also what keeps the deterministic report byte-identical across
+	# reruns.
+	_refresh_level_panel()
+	_set_level_status("level %d applied by the service (derived from %d xp; "
+		% [int(typed.level_after), int(typed.curve.xp)
+			if typed.curve != null else 0]
+		+ "no resource moved)")
+	return {"ok": true, "error": "", "result": typed}
+
+
+## Applies the authoritative response (building-xp design D8): the recorded
+## level is REPLACED by the response's `level_after` — the value the service
+## re-read from the save after execution, which it requires to equal the derived
+## level — and the stored resources and experience take the RESPONSE's
+## `resources`, with the missing-field record updated exactly the way the other
+## applies do. The client's own derived level is **discarded, not applied**: the
+## response wins even where the two disagree, so a wrong client-side derivation
+## can never be silently compounded (the spec's response-wins rule).
+##
+## **Nothing else is touched.** No placement, no cell, no footprint, no depth
+## order, no rendered object, the owned-expansions ledger, the storage, and the
+## tutorial state: a level-up writes a single int into the map record
+## (`command.py:81-85`) and this slice deliberately grows nothing else.
+##
+## Everything the apply touches is snapshotted FIRST — the recorded level, the
+## missing-field list, the resource bag, and the experience — so the only
+## post-mutation failure (a rejected HUD re-attach) restores every one of them.
+## A failed apply therefore leaves the recorded level, the balances, and the HUD
+## exactly as they were.
+##
+## Pre-checks run before any mutation and fail closed: a response whose
+## `level_before` is not the recorded level this client held, or whose
+## `level_after` is not its own `derived_level`, would be a different
+## transaction than this one, so it is reported instead of applied.
+func _apply_level(result: BootData.LevelUpResult) -> Dictionary:
+	if state == null:
+		return {"ok": false, "error": "the town state is unavailable"}
+	if ui == null or _hud == null:
+		return {"ok": false, "error": "the town HUD is not attached"}
+	if not _level_active:
+		return {"ok": false, "error": "no level up is being applied"}
+	var resources: BootData.Resources = result.resources
+	if resources == null or result.curve == null:
+		return {"ok": false, "error": "the level-up response is incomplete"}
+	# The endpoint's OWN structural half of the post-execution proof, re-checked
+	# here on the typed response: the pre-execution recorded level is the one
+	# this client actually held.
+	if int(result.level_before) != level_recorded():
+		return {"ok": false,
+			"error": "the level-up response names a pre-execution level %d this "
+				% int(result.level_before) + "client does not hold (%d)"
+				% level_recorded()}
+	# And the service's own value-level guarantee's level half: the recorded
+	# level after execution IS the derived level, or the response describes a
+	# different transaction than this one.
+	if int(result.level_after) != int(result.derived_level):
+		return {"ok": false,
+			"error": "the level-up response reports level %d after execution, "
+				% int(result.level_after)
+				+ "not the derived level %d it also reports"
+				% int(result.derived_level)}
+	var previous := {
+		"level": state.summary.level,
+		"missing": (state.missing as Array).duplicate(),
+		"coins": state.resources.coins,
+		"wood": state.resources.wood,
+		"steel": state.resources.steel,
+		"oil": state.resources.oil,
+		"cash": state.resources.cash,
+		"mana": state.resources.mana,
+		"xp": state.summary.xp,
+	}
+	# The RESPONSE's recorded level wins outright. The client's own derived level
+	# is NOT applied to it: the response-wins rule is what makes a wrong client
+	# derivation detectable instead of compounded.
+	state.summary.level = int(result.level_after)
+	# The response supplies values the payload may have lacked, so the summary's
+	# own keys are no longer missing; the snapshot restores them verbatim on
+	# rollback.
+	state.missing.erase("level")
+	for key in ["coins", "wood", "steel", "oil", "cash", "mana"]:
+		state.missing.erase(key)
+	state.missing.erase("xp")
+	state.resources.coins = resources.gold
+	state.resources.wood = resources.wood
+	state.resources.steel = resources.steel
+	state.resources.oil = resources.oil
+	state.resources.cash = resources.cash
+	state.resources.mana = resources.mana
+	state.summary.xp = resources.xp
+	var hud_result: Dictionary = _hud.attach(ui, state)
+	if not bool(hud_result.get("ok", false)):
+		# Roll every mutation back from the snapshot alone: a failed apply
+		# changes nothing, and the recorded level, the balances, and the HUD keep
+		# the values they had.
+		state.summary.level = int(previous["level"])
+		state.missing = previous["missing"]
+		state.resources.coins = previous["coins"]
+		state.resources.wood = previous["wood"]
+		state.resources.steel = previous["steel"]
+		state.resources.oil = previous["oil"]
+		state.resources.cash = previous["cash"]
+		state.resources.mana = previous["mana"]
+		state.summary.xp = previous["xp"]
+		return {"ok": false, "error": str(hud_result.get("error", ""))}
+	# The placements, the rendered objects, the depth order, the storage, the
+	# owned-expansions ledger, and the draw order are deliberately untouched: a
+	# level-up changes none of them, and re-rendering them would suggest
+	# otherwise.
+	return {"ok": true, "error": ""}
+
+
+## Closes the armed level-up without sending anything: the mode-local state
+## drops, the slot hides, and the town state, the recorded level, the readout,
+## the storage view, the committed selection, and the resources stay
+## byte-identical.
+func cancel_level_up() -> Dictionary:
+	if not _level_active:
+		return _level_reject("level_not_active", "the level up is not armed")
+	_level_active = false
+	if ui != null and ui.has_slot(SLOT_LEVEL) \
+			and ui.is_slot_visible(SLOT_LEVEL):
+		ui.set_slot_visible(SLOT_LEVEL, false)
+	_set_level_status("level up closed (nothing was sent)")
+	return {"ok": true, "error": "", "cancelled": true}
+
+
+## The house level-up failure envelope: records the explicit error naming the
+## code and condition, shows it in the surface's own status line, and returns
+## {ok:false} without touching the town state, the recorded level, the readout,
+## the storage view, the selection, the resources, or the committed draw order.
+func _level_reject(code: String, message: String) -> Dictionary:
+	level_error = "[town] level up rejected: %s: %s" % [code, message]
+	_set_level_status(level_error)
+	return {"ok": false, "error": level_error, "code": code}
+
+
+## The `Level up` action's button wiring: pressing it arms the level-up. It is a
+## pure wiring step over `arm_level_up` — no state and no request of its own — so
+## the delivered selection behavior is unchanged.
+func _on_level_action() -> void:
+	arm_level_up()
+
+
+## The armed surface's confirm wiring: a press sends (awaits) the one intent.
+func _on_level_confirm() -> void:
+	await confirm_level_up()
+
+
+## The armed surface's cancel wiring: a press closes with no request.
+func _on_level_cancel() -> void:
+	cancel_level_up()
+
+
+## Builds (or rebuilds) the level panel in its OWN UI-foundation slot: a title,
+## the selection line, the status line, the readout the spec requires (the
+## committed curve's facts, the derived level and its committed name, the stored
+## experience, the next level's committed threshold, the experience remaining,
+## the progress ratio, and the explicit agreement/disagreement line naming both
+## values), the `Level up` action, and — armed only — the confirm that names the
+## derived level AS DERIVED plus a cancel. The seven delivered modes' panel,
+## buttons, and lifecycle are untouched.
+##
+## **No reward is rendered anywhere on this surface** (design D7): the committed
+## `reward_type` / `reward_amount` are consumed by no legacy behaviour, so paying
+## or showing one would invent an economy.
+func _build_level_panel(armed: bool) -> Dictionary:
+	if ui == null:
+		return {"ok": false, "error": "the UI foundation is unavailable"}
+	if not ui.has_slot(SLOT_LEVEL):
+		var registration: Dictionary = ui.register_slot(SLOT_LEVEL)
+		if not bool(registration.get("ok", false)):
+			return {"ok": false,
+				"error": str(registration.get("error", "rejected"))}
+	if ui.is_slot_visible(SLOT_LEVEL):
+		ui.set_slot_visible(SLOT_LEVEL, false)
+	var root: Control = ui.slot_root(SLOT_LEVEL)
+	if root == null:
+		return {"ok": false, "error": "the level slot root is unavailable"}
+	for child in root.get_children():
+		root.remove_child(child)
+		child.free()
+	_level_readout = null
+	_level_status = null
+	_level_arm = null
+	_level_confirm = null
+	var panel := VBoxContainer.new()
+	panel.name = "level"
+	panel.anchor_left = 1.0
+	panel.anchor_right = 1.0
+	# Beside the expansion and placement-bound panels in the same column, never
+	# over either: the three surfaces are independent, so neither one's layout
+	# may depend on the other's. The gap is the same 8 px inset the panel itself
+	# uses.
+	panel.offset_left = -LEVEL_PANEL_WIDTH - EXPAND_PANEL_WIDTH \
+		- MOVE_PANEL_WIDTH - 48.0
+	panel.offset_right = -EXPAND_PANEL_WIDTH - MOVE_PANEL_WIDTH - 24.0
+	panel.offset_top = 8.0
+	panel.offset_bottom = 8.0 + 300.0
+	panel.add_theme_constant_override("separation", 2)
+	root.add_child(panel)
+	var title := Label.new()
+	title.name = "title"
+	title.text = "Level"
+	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_style_placement_label(title)
+	panel.add_child(title)
+	var selection := Label.new()
+	selection.name = "selection"
+	selection.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	selection.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_style_placement_label(selection)
+	# An armed level-up names the DERIVED level and says so: the level comes from
+	# the client's own reading of the committed curve and the service derives it
+	# again server-side, so it is never presented as authoritative here.
+	if _level_active:
+		selection.text = LevelFlow.confirm_text(level_evaluation())
+	else:
+		selection.text = "select a map to see its level"
+	panel.add_child(selection)
+	var status := Label.new()
+	status.name = "status"
+	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	status.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_style_placement_label(status)
+	panel.add_child(status)
+	_level_status = status
+	var readout := Label.new()
+	readout.name = "level"
+	readout.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	readout.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	readout.text = ""
+	_style_placement_label(readout)
+	panel.add_child(readout)
+	_level_readout = readout
+	var row := HBoxContainer.new()
+	row.name = "actions"
+	var arm := Button.new()
+	arm.name = "level_up"
+	arm.text = LevelFlow.level_up_label()
+	arm.pressed.connect(_on_level_action)
+	row.add_child(arm)
+	_level_arm = arm
+	# The confirm exists only while armed, and it carries the mode's OWN label
+	# so a player never presses a generic "Confirm" for a level-up.
+	var confirm := Button.new()
+	confirm.name = "confirm"
+	confirm.text = LevelFlow.level_up_label()
+	confirm.pressed.connect(_on_level_confirm)
+	row.add_child(confirm)
+	_level_confirm = confirm
+	if not armed:
+		confirm.visible = false
+	var cancel := Button.new()
+	cancel.name = "cancel"
+	cancel.text = "Cancel"
+	cancel.pressed.connect(_on_level_cancel)
+	row.add_child(cancel)
+	if not armed:
+		cancel.visible = false
+	panel.add_child(row)
+	return {"ok": true, "error": ""}
+
+
+## Renders the level panel's committed controls (the action's enabled state and
+## its own unavailability label, the status line, and the readout) from the live
+## state. A no-op while no panel is built.
+func _refresh_level_panel() -> void:
+	if _level_arm is Button and is_instance_valid(_level_arm):
+		var available := level_selection_available()
+		(_level_arm as Button).disabled = _level_active or not available
+		(_level_arm as Button).text = LevelFlow.level_up_label() if available \
+			else (LevelFlow.level_up_label() + " (unavailable)")
+	if _level_confirm is Button and is_instance_valid(_level_confirm):
+		(_level_confirm as Button).visible = _level_active
+	_set_level_readout(LevelFlow.readout_text(level_evaluation(),
+		level_curve_summary()))
+
+
+## Writes the level readout line (no-op before a panel exists). The readout
+## renders for the SELECTED MAP whether or not a level-up is armed, so a player
+## sees their position without arming anything, and sees it update from every
+## authoritative response.
+func _set_level_readout(text: String) -> void:
+	if _level_readout != null and is_instance_valid(_level_readout):
+		(_level_readout as Label).text = text
+
+
+## Writes the level status line (no-op before a panel exists).
+func _set_level_status(text: String) -> void:
+	if _level_status != null and is_instance_valid(_level_status):
+		(_level_status as Label).text = text
+
+
 
 
 
@@ -6905,13 +7621,15 @@ func _commit_selection(object: Variant) -> void:
 	# never refreshed: it already names the placement it will act on, and
 	# `confirm_sell` / `confirm_store` / `confirm_upgrade` /
 	# `confirm_construction` / `confirm_collect` refuse a changed selection by
-	# name instead of silently re-targeting.
+	# name instead of silently re-targeting. The map-level expansion and level
+	# readouts refresh beside them.
 	if not _move_active and not _sell_active and not _store_active \
 			and not _upgrade_active and not _construction_active \
 			and not _collect_active and not _expand_active \
-			and view_state == STATE_BUILT:
+			and not _level_active and view_state == STATE_BUILT:
 		refresh_move_action()
 		refresh_expand_action()
+		refresh_level_action()
 
 
 ## Isometric depth order with the documented deterministic tie-break:
@@ -6938,6 +7656,9 @@ func _maybe_start_capture() -> void:
 	if not build_ok:
 		return
 	_capture_started = true
+	if _level_capture:
+		_capture_level_and_quit()
+		return
 	if _expand_capture:
 		_capture_expand_and_quit()
 		return
@@ -6996,6 +7717,86 @@ func _capture_and_quit() -> void:
 	print("[town] capture written: %s (%sx%s)" % [
 		_capture_path, image.get_size().x, image.get_size().y])
 	get_tree().quit(0)
+
+
+## Level capture (building-xp, design D8): drives the level progression flow a
+## player uses — select the recorded map, render the level readout, attempt the
+## level-up, confirm — and then captures the town whose level readout carries the
+## recorded level and the explicit agreement line. Any failed step prints an
+## explicit marker and exits 1 instead of capturing a town whose level was never
+## examined.
+##
+## **The committed corpus is already consistent under the one-based reading**, so
+## this capture cannot advance it: `xp 4` derives level 1 and the save records
+## level 1, which the service refuses with `level_already_current`. The capture
+## therefore drives the **refused** path — which is the honest one and the only
+## one the committed corpus can reach — and asserts that the action is not
+## offered, that arming refuses locally with no request, and that the recorded
+## level is untouched. Nothing is faked to make a transaction happen, and the
+## successful apply is covered hermetically against the fake double with an
+## in-memory experience this change never writes to a fixture.
+func _capture_level_and_quit() -> void:
+	var object: Variant = _object_for_cell(LEVEL_INTENT_CELL)
+	if object == null:
+		_level_capture_fail("select",
+			"no rendered object at the recorded cell (%d, %d)"
+			% [LEVEL_INTENT_CELL.x, LEVEL_INTENT_CELL.y])
+		return
+	var pressed: Dictionary = handle_pointer_press(
+		Iso.grid_to_screen(object.cell))
+	if not bool(pressed.get("ok", false)):
+		_level_capture_fail("select", str(pressed.get("error", "")))
+		return
+	if selection() != object:
+		_level_capture_fail("select",
+			"the press at (%d, %d) did not select the recorded building"
+			% [LEVEL_INTENT_CELL.x, LEVEL_INTENT_CELL.y])
+		return
+	var evaluation := level_evaluation()
+	if not bool(evaluation.get("ok", false)):
+		_level_capture_fail("select",
+			"the committed corpus does not resolve an evaluation: %s"
+			% str(evaluation.get("error", "")))
+		return
+	refresh_level_action()
+	var readout_before: String = level_readout()
+	if not readout_before.contains(LevelFlow.agreement_text(evaluation)):
+		_level_capture_fail("select",
+			"the level readout renders the agreement line: %s" % readout_before)
+		return
+	if LevelFlow.offers_level_up(evaluation):
+		# Unreachable on the committed corpus (xp 4 derives level 1, and the save
+		# records level 1), and deliberately NOT worked around: a capture that
+		# had to invent a disagreement would be evidence of nothing.
+		_level_capture_fail("select",
+			"the committed corpus is already consistent, so no level-up is "
+			+ "offered; the captured frame shows the agreement line")
+		return
+	var armed: Dictionary = arm_level_up()
+	if bool(armed.get("ok", false)):
+		_level_capture_fail("arm",
+			"arming a level-up the evaluation refuses should never succeed")
+		return
+	var confirmed: Dictionary = await confirm_level_up()
+	if bool(confirmed.get("ok", false)):
+		_level_capture_fail("confirm",
+			"confirming a level-up the evaluation refuses should never succeed")
+		return
+	refresh_level_action()
+	print("[town] level-capture applied level=%d derived=%d xp=%d objects=%d "
+		% [level_recorded(),
+			int(evaluation.get("derived_level", LevelFlow.NO_LEVEL)),
+			level_experience(), objects.size()]
+		+ "readout=%s" % level_readout())
+	_capture_and_quit()
+
+
+## A named level-capture failure: explicit marker + exit 1, so a failed flow
+## never leaves an open window or a misleading frame.
+func _level_capture_fail(step: String, detail: String) -> void:
+	print("[town] level-capture state=error step=%s detail=%s" % [
+		step, detail])
+	get_tree().quit(1)
 
 
 ## Placement capture (design D11): drives exactly one confirmed intent
@@ -10462,3 +11263,390 @@ func _resources_capture_record() -> Dictionary:
 		+ "save, so the projection's correctness rests on the headless " \
 		+ "projection and readout suites, not on the screenshot"
 	return record
+
+
+# ---------------------------------------------------------------------------
+# XP evidence report (building-xp, design D8)
+# ---------------------------------------------------------------------------
+
+
+## The report output path from the user arguments: `--xp-report=<path>` (relative
+## paths resolve against the project directory), the bare `--xp-report` flag's
+## default evidence path, or "" when absent.
+func _xp_report_path_arg() -> String:
+	for argument in OS.get_cmdline_user_args():
+		if argument == "--xp-report":
+			return Paths.project_dir().path_join(DEFAULT_XP_REPORT_PATH)
+		if argument.begins_with("--xp-report="):
+			var value := argument.trim_prefix("--xp-report=")
+			if value.is_absolute_path():
+				return value
+			return Paths.project_dir().path_join(value)
+	return ""
+
+
+## Runs the XP report flow and quits with the documented exit code: 0 when the
+## deterministic report is written, 1 with an explicit marker naming the first
+## failed step (the resource report's pattern).
+func _write_xp_report(report_path: String) -> void:
+	var problem: String = await _xp_report_into(report_path)
+	if problem == "" and not FileAccess.file_exists(report_path):
+		problem = "[report] report file was not created at %s" % report_path
+	if problem != "":
+		print("[town] xp-report state=error message=", problem)
+		get_tree().quit(1)
+		return
+	print("[town] xp-report state=written path=", report_path)
+	get_tree().quit(0)
+
+
+## Computes the whole committed-curve level report (building-xp design D8).
+##
+## The report is **READ-ONLY about the save**: it parses the committed fresh
+## save fail-closed (exactly one bootstrap request, no second config call),
+## builds the town, and records the committed curve's facts, the derived level,
+## the recorded level, the disagreement state, the stored values the readout
+## displayed, the request counts that prove no state-mutating intent was sent,
+## the input digests, the projection-constants pointer, the
+## established-versus-derived provenance split as its own section, the executed
+## fixture's own transaction facts, the fake-capture pointer, and every required
+## non-claim. Returns "" on success or the first failure as an explicit message.
+##
+## **EVERY curve fact comes from `level_flow.gd`** — its `curve_record()` for the
+## table and its `PROVENANCE` / `NON_CLAIMS` for the evidence sections — and
+## every level is resolved through that module's one named conversion, so this
+## function never indexes the committed schedule by its own arithmetic and never
+## restates a threshold the schedule already carries.
+##
+## Nothing here reads the wall clock and nothing here sends an intent, which is
+## what makes the report byte-identical across reruns.
+func _xp_report_into(report_path: String) -> String:
+	var registry: Variant = get_node_or_null("/root/ContentRegistry")
+	if registry == null:
+		return "[report] content registry is not registered"
+	if not bool(registry.is_loaded()):
+		var content: Dictionary = registry.load_content()
+		if not bool(content.get("ok", false)):
+			return "[report] content load failed: %s" % content.get("error", "")
+	if not bool(registry.assets_loaded()):
+		var assets: Dictionary = registry.load_asset_registry()
+		if not bool(assets.get("ok", false)):
+			return "[report] asset registry load failed: %s" % assets.get("error", "")
+	var api: Variant = get_node_or_null("/root/GameApi")
+	if api == null:
+		return "[report] GameApi is not registered"
+	var sessions: Variant = await api.list_sessions()
+	if not bool(sessions.ok):
+		return "[report] save list failed: %s" % str(sessions.error_message)
+	if sessions.saves.size() == 0:
+		return "[report] save list carries no saves"
+	var pid := str(sessions.saves[0].id)
+	var boot: Variant = await api.get_bootstrap(pid)
+	if not bool(boot.ok):
+		return "[report] bootstrap failed: %s" % str(boot.error_message)
+	var player_info: Variant = boot.player_info
+	if player_info == null:
+		return "[report] bootstrap carried no player info"
+	var parsed: Dictionary = TownState.parse(player_info.raw, registry)
+	if not bool(parsed.get("ok", false)):
+		return "[report] town state rejected: %s" % parsed.get("error", "")
+	state = parsed["state"]
+	var built: Dictionary = build()
+	if not bool(built.get("ok", false)):
+		return "[report] town failed to build: %s" % built.get("error", "")
+	if objects.is_empty():
+		return "[report] town rendered no objects"
+	if hud() == null:
+		return "[report] town rendered no readout"
+	var schedule := level_schedule()
+	var curve := LevelFlow.curve_record(schedule)
+	if not bool(curve.get("ok", false)):
+		return "[report] %s" % str(curve.get("error", ""))
+	# The committed curve's committed shape, asserted against the corpus rather
+	# than against a restated count: 100 entries, the first eight thresholds,
+	# the final one, and 44 distinct names over 100 entries.
+	if int(curve["entries"]) != LevelFlow.SCHEDULE_ENTRIES:
+		return ("[report] the committed curve carries %d entries, not the %d "
+			% [int(curve["entries"]), LevelFlow.SCHEDULE_ENTRIES]
+			+ "recorded by the normalization")
+	if (curve["first_thresholds"] as Array) != LevelFlow.FIRST_THRESHOLDS:
+		return ("[report] the committed curve's first thresholds are %s, not %s"
+			% [JSON.stringify(curve["first_thresholds"]),
+				JSON.stringify(LevelFlow.FIRST_THRESHOLDS)])
+	if int(curve["final_threshold"]) != LevelFlow.FINAL_THRESHOLD:
+		return ("[report] the committed curve's final threshold is %d, not %d"
+			% [int(curve["final_threshold"]), LevelFlow.FINAL_THRESHOLD])
+	if int(curve["distinct_names"]) != LevelFlow.DISTINCT_NAMES:
+		return ("[report] the committed curve carries %d distinct names, not %d "
+			% [int(curve["distinct_names"]), LevelFlow.DISTINCT_NAMES]
+			+ "— a name is a label, not an identifier, and this count is what "
+			+ "records that")
+	if int(curve["saturated_name_level"]) != LevelFlow.SATURATED_NAME_LEVEL:
+		return ("[report] every committed name reads the same from level %d, "
+			% int(curve["saturated_name_level"])
+			+ "not from level %d" % LevelFlow.SATURATED_NAME_LEVEL)
+	# The corpus's own experience and recorded level, read from the typed state
+	# and asserted against the committed save's values (never against a
+	# restatement of the curve).
+	var xp := level_experience()
+	var recorded := level_recorded()
+	if xp != LevelFlow.CORPUS_XP:
+		return "[report] the committed corpus's stored experience is %d, not %d" \
+			% [xp, LevelFlow.CORPUS_XP]
+	if recorded != LevelFlow.CORPUS_LEVEL:
+		return "[report] the committed corpus's recorded level is %d, not %d" \
+			% [recorded, LevelFlow.CORPUS_LEVEL]
+	# The conversion's round trip over EVERY entry of the committed curve: the
+	# one named conversion and its documented inverse agree at every position,
+	# and both refuse outside the curve rather than coercing an index.
+	var round_trip_failures: Array = []
+	for level in range(LevelFlow.FIRST_LEVEL,
+			int(curve["entries"]) + LevelFlow.FIRST_LEVEL):
+		var index: Variant = LevelFlow.entry_index_for_level(level,
+			int(curve["entries"]))
+		if index == null or LevelFlow.level_for_entry_index(index) != level:
+			round_trip_failures.append(level)
+	if not round_trip_failures.is_empty():
+		return ("[report] the one named conversion's round trip fails for %s"
+			% JSON.stringify(round_trip_failures))
+	if LevelFlow.entry_index_for_level(0, int(curve["entries"])) != null \
+			or LevelFlow.entry_index_for_level(
+				int(curve["entries"]) + 1, int(curve["entries"])) != null:
+		return "[report] the one named conversion resolved a level outside the curve"
+	# The whole evaluation, from the module the view itself uses — never from a
+	# second rule set.
+	var evaluation := level_evaluation()
+	if not bool(evaluation.get("ok", false)):
+		return "[report] %s" % str(evaluation.get("error", ""))
+	var derived := int(evaluation.get("derived_level", LevelFlow.NO_LEVEL))
+	# Design D1's own consequence on the committed corpus: at `xp 4` the
+	# one-based reading makes the corpus self-consistent, so the derived level
+	# EQUALS the recorded one and the service would refuse the intent. The
+	# report states that rather than hiding it, and the readout is the frame that
+	# says so to a player.
+	var agrees := bool(evaluation.get("agrees", false))
+	if agrees != (derived == recorded):
+		return "[report] the agreement decision contradicts the two levels"
+	if not agrees:
+		return ("[report] the committed corpus disagrees under the one-based "
+			+ "reading (derived %d, recorded %d), which the corpus evidence "
+				% [derived, recorded]
+			+ "contradicts")
+	var stored := {
+		"xp": xp,
+		"level": recorded,
+		"gold": int(state.resources.coins),
+		"wood": int(state.resources.wood),
+		"steel": int(state.resources.steel),
+		"oil": int(state.resources.oil),
+		"cash": int(state.resources.cash),
+		"mana": int(state.resources.mana),
+		"energy": int(state.resources.energy),
+	}
+	# The readout's OWN display map, read back from the built HUD rather than
+	# recomputed, so the report records what is actually on screen. The level and
+	# the experience rows are the canonical projection's own rows, never a
+	# second table.
+	var display: Dictionary = (hud() as Variant).displayed_fields()
+	for name in ["level", "xp"]:
+		if not display.has(name):
+			return "[report] the readout renders no %s row" % name
+		if str(display[name]) != str(stored[name]):
+			return ("[report] the readout displays %s for %s, not the stored %s"
+				% [JSON.stringify(str(display[name])), name,
+					JSON.stringify(str(stored[name]))])
+	# The report is read-only about the save: exactly one bootstrap request and
+	# no state-mutating intent at all. Every counter is recorded, never assumed.
+	if int(api.bootstrap_requests) != 1:
+		return "[report] the flow issued %d bootstrap requests, not one" \
+			% int(api.bootstrap_requests)
+	var intents := {
+		"placement": int(api.placement_requests),
+		"purchase": int(api.purchase_requests),
+		"move": int(api.move_requests),
+		"sell": int(api.sell_requests),
+		"store": int(api.store_requests),
+		"upgrade": int(api.upgrade_requests),
+		"construction": int(api.construction_requests),
+		"collect": int(api.collect_requests),
+		"expand": int(api.expand_requests),
+		"level_up": int(api.level_up_requests),
+	}
+	for key: String in intents:
+		if int(intents[key]) != 0:
+			return ("[report] the read-only flow issued %d %s intents"
+				% [int(intents[key]), key])
+	# The readout the flow's own panel renders, and the executed fixture's own
+	# transaction facts — read from the committed capture, never restated.
+	var readout := LevelFlow.readout_text(evaluation, level_curve_summary())
+	var fixture := _level_fixture_facts()
+	if str(fixture.get("error", "")) != "":
+		return "[report] %s" % str(fixture.get("error", ""))
+	return _write_report_file(report_path, {
+		"schema": "xp-report-v1",
+		"curve": curve,
+		"curve_note": "every level on this report — the derived one, the next "
+			+ "one, the recorded one, and the round trip over all %d entries — "
+				% int(curve["entries"])
+			+ "was resolved through level_flow.gd's one named one-based "
+			+ "conversion; no component indexes the committed schedule by its "
+			+ "own arithmetic",
+		"position": {
+			"stored_experience": xp,
+			"recorded_level": recorded,
+			"derived_level": derived,
+			"derived_name": evaluation.get("name", null),
+			"derived_threshold": evaluation.get("threshold", null),
+			"next_level": evaluation.get("next_level", null),
+			"next_name": evaluation.get("next_name", null),
+			"next_threshold": evaluation.get("next_threshold", null),
+			"remaining": evaluation.get("remaining", null),
+			"progress_ratio": evaluation.get("progress", null),
+			"agrees": agrees,
+			"disagrees": not agrees,
+			"agreement_text": LevelFlow.agreement_text(evaluation),
+			"offers_level_up": LevelFlow.offers_level_up(evaluation),
+			"refusal_reason": str(evaluation.get("reason", "")),
+			"refusal_text": LevelFlow.refusal_text(evaluation),
+			"disagreement_policy": "the recorded level is unverified against the "
+				+ "committed curve (the legacy branch writes it from a "
+				+ "client-supplied integer with no validation), so a "
+				+ "disagreement is REPORTED with both values and never "
+				+ "reconciled: this change prefers neither value and rewrites "
+				+ "nothing",
+		},
+		"readout": {
+			"text": readout,
+			"displayed_level": str(display.get("level", "")),
+			"displayed_xp": str(display.get("xp", "")),
+			"displayed_fields_are_the_stored_values": true,
+			"source_of_truth": "level_flow.gd's own model plus the canonical "
+				+ "resource projection the HUD renders through, so the readout "
+				+ "can neither display a level no committed content carries nor "
+				+ "display a resource twice",
+		},
+		"reward": {
+			"fields": (LevelFlow.REWARD_FIELDS as Array).duplicate(),
+			"paid": false,
+			"displayed": false,
+			"note": "the committed curve carries a reward type and amount on "
+				+ "every entry and NO legacy branch reads either, so none is paid "
+				+ "and none is displayed: paying one would invent an economy",
+		},
+		"fixture": fixture,
+		"stored_values": stored,
+		"requests": {
+			"bootstrap": int(api.bootstrap_requests),
+			"state_mutating_intents": intents,
+			"read_only": true,
+			"note": "the report sends nothing: it reads the parsed save and the "
+				+ "committed curve, so every state-mutating counter is zero",
+		},
+		"counts": {
+			"placements": state.placements.size(),
+			"objects": objects.size(),
+		},
+		"inputs": {
+			"save_list_fixture": _digest_record(REPORT_SAVE_LIST),
+			"bootstrap_fixture": _digest_record(REPORT_BOOTSTRAP),
+			"level_module": _digest_record(
+				"apps/client-godot/scripts/town/level_flow.gd"),
+			"projection_module": _digest_record(
+				"apps/client-godot/scripts/town/resource_projection.gd"),
+			"terrain": _digest_record(_terrain_runtime(registry)),
+		},
+		"constants": _constants_record(),
+		"provenance": LevelFlow.PROVENANCE,
+		"capture": _level_capture_record(),
+		"non_claims": LevelFlow.NON_CLAIMS,
+	})
+
+
+## The committed executed-legacy level capture's OWN transaction facts, read from
+## the recorded request / response / before / after files rather than restated:
+## the legacy command the execution carried, the legacy result it answered, the
+## recorded level and the stored experience before and after, and the two
+## structural facts the committed corpus decides — the level is unchanged by the
+## execution, and every stored resource is unchanged too.
+func _level_fixture_facts() -> Dictionary:
+	var before := _read_report_json(REPORT_LEVEL_BEFORE)
+	var after := _read_report_json(REPORT_LEVEL_AFTER)
+	if before.is_empty() or after.is_empty():
+		return {"error": "the committed level fixture could not be read"}
+	var before_map: Variant = (before["maps"] as Array)[0]
+	var after_map: Variant = (after["maps"] as Array)[0]
+	if not (before_map is Dictionary) or not (after_map is Dictionary):
+		return {"error": "the committed level fixture carries no first map"}
+	var resources: Array = []
+	for key in ["xp", "gold", "wood", "oil", "steel"]:
+		resources.append({"field": "map.%s" % key,
+			"before": int((before_map as Dictionary).get(key, -1)),
+			"after": int((after_map as Dictionary).get(key, -1)),
+			"moved": int((before_map as Dictionary).get(key, -1))
+				!= int((after_map as Dictionary).get(key, -1))})
+	return {
+		"error": "",
+		"request": _digest_record(REPORT_LEVEL_REQUEST),
+		"response": _digest_record(REPORT_LEVEL_RESPONSE),
+		"before": _digest_record(REPORT_LEVEL_BEFORE),
+		"after": _digest_record(REPORT_LEVEL_AFTER),
+		"recorded_level_before": int((before_map as Dictionary).get("level",
+			-1)),
+		"recorded_level_after": int((after_map as Dictionary).get("level", -1)),
+		"level_moved": int((before_map as Dictionary).get("level", -1))
+			!= int((after_map as Dictionary).get("level", -1)),
+		"stored_experience_before": int((before_map as Dictionary).get("xp",
+			-1)),
+		"stored_experience_after": int((after_map as Dictionary).get("xp", -1)),
+		"resources": resources,
+		"no_resource_moved": _level_no_resource_moved(resources),
+		"note": "at the committed corpus the level the curve derives for the "
+			+ "stored experience ALREADY equals the recorded one, so the "
+			+ "executed level_up rewrote an identical value and every leaf of "
+			+ "the save is unchanged — which is itself the evidence for the "
+			+ "endpoint's level_already_current refusal and for the corpus's "
+			+ "self-consistency under the one-based reading",
+	}
+
+
+## True when no recorded resource moved across the committed execution.
+func _level_no_resource_moved(resources: Array) -> bool:
+	for entry: Dictionary in resources:
+		if bool(entry.get("moved", true)):
+			return false
+	return true
+
+
+## The fake-capture pointer (building-xp): the committed windowed capture of the
+## level readout with its digest plus the plain statement of what it proves — so
+## no reader can mistake the screenshot for executed-legacy proof, and so the
+## fact that the captured frame shows the REFUSED path is stated rather than
+## glossed over.
+func _level_capture_record() -> Dictionary:
+	var record := _digest_record(REPORT_CAPTURE_LEVEL)
+	record["implementation"] = "fake GameApi (a deterministic test " \
+		+ "double, not a parity oracle)"
+	record["path_taken"] = "the committed corpus is already consistent under " \
+		+ "the one-based reading, so the captured frame shows the level " \
+		+ "readout and the local refusal with NO request sent"
+	record["parity_pointer"] = "the committed executed-legacy transaction in " \
+		+ "the `fixture` section is the parity evidence; the screenshot is the " \
+		+ "presentation of the readout only"
+	return record
+
+
+## One repository-relative JSON fixture, parsed read-only, or {} when it cannot
+## be read or is not a JSON object.
+func _read_report_json(relative: String) -> Dictionary:
+	var path := Paths.repo_root().path_join(relative)
+	if not FileAccess.file_exists(path):
+		return {}
+	var handle := FileAccess.open(path, FileAccess.READ)
+	if handle == null:
+		return {}
+	var text := handle.get_as_text()
+	handle = null
+	var parsed: Variant = JSON.parse_string(text)
+	if not (parsed is Dictionary):
+		return {}
+	return parsed

@@ -12,7 +12,8 @@ extends Node
 ## `tests/fixtures/godot-building-upgrade/`, for construction under
 ## `tests/fixtures/godot-building-construction/`, and for collection under
 ## `tests/fixtures/godot-building-collect/`, and for expansion under
-## `tests/fixtures/godot-building-expand/` at the repository root: no
+## `tests/fixtures/godot-building-expand/`, and for level under
+## `tests/fixtures/godot-building-xp/` at the repository root: no
 ## process, no server, no socket. It synthesizes the documented v0 envelopes
 ## from those files and parses them with the same `BootData` functions the
 ## live implementation uses, so both implementations yield identical typed
@@ -61,6 +62,16 @@ extends Node
 ## debit. Its debit is derived-provisional exactly like the service's: the
 ## id-space indexing, the requirements refusal, the affordability refusal, and
 ## the debit's sign and shape are all derivations no legacy branch reads.
+## `level_up_town()` applies the matching in-place rule over the committed
+## level fixture: the level the fixture's OWN loaded `levels` schedule implies
+## for the stored experience — resolved through the one named one-based
+## conversion that mirrors the service's — written into the recorded level and
+## NOTHING else, because a level change moves no resource (design D5) and no
+## legacy branch reads the curve's reward fields (design D7). It is therefore
+## the THIRD double with a deliberately NEUTRAL vector, and its index-base
+## interpretation is derived-provisional exactly like the service's: the
+## one-based reading is derived and the zero-based reading is rejected by the
+## committed corpus.
 ## Parity against
 ## executed legacy is owned exclusively by
 ## the compat fixture-replay tests; this double exists so the client flow can
@@ -179,6 +190,22 @@ const EXPAND_BEFORE_FIXTURE := \
 ## inconsistent oracle.
 const EXPAND_AFTER_FIXTURE := \
 	"tests/fixtures/godot-building-expand/steps/command_expand/after.json"
+## The executed-legacy level fixture's before-state (which again equals the
+## fresh-player corpus the boot fixtures carry): the double's starting save for
+## `level_up_town()`, recording `level 1` and `xp 4`.
+const LEVEL_BEFORE_FIXTURE := \
+	"tests/fixtures/godot-building-xp/steps/command_level_up/before.json"
+## The same fixture's after-state — the real legacy server's record of the one
+## executed `level_up`. **It records the same level as the before-state**, and
+## that is not a capture defect: at the committed corpus the level the committed
+## curve derives for `xp 4` IS 1, so the executed `level_up(1)` rewrote an
+## identical value and every byte of the save is unchanged. The committed
+## execution is therefore itself the evidence for the endpoint's
+## `level_already_current` refusal. Read (never written) so a malformed capture
+## cannot leave the double running on an inconsistent oracle, and validated
+## against the before-state so the double only runs on a level-only capture.
+const LEVEL_AFTER_FIXTURE := \
+	"tests/fixtures/godot-building-xp/steps/command_level_up/after.json"
 
 ## Anchor grid extent the v0 endpoint validates against (anchors 0..99;
 ## footprints may extend past the edge — design D5). Must match
@@ -243,6 +270,39 @@ const EXPANSION_DEBIT_FIELDS := [
 ## the loaded configuration in `expand_town()`, so a content change fails
 ## closed there instead of being half-adopted here.
 const EXPANSION_SCHEDULE_ENTRIES := 98
+## The committed level curve key in the loaded configuration
+## (`config/main.json` -> `levels`): 100 POSITIONAL entries with no stable
+## stored id, so the index is a POSITION and the stored level resolves to it
+## through the one named one-based conversion below (building-xp design D1,
+## derived). The row is never rewritten and the reward fields are never read.
+const LEVELS_KEY := "levels"
+## The committed curve's expected size (100 POSITIONAL entries). Used by the
+## double only to bound the derived level; the ADDRESSABLE range itself is read
+## from the loaded configuration in `level_up_town()`, so a content change fails
+## closed there instead of being half-adopted here.
+const LEVEL_SCHEDULE_ENTRIES := 100
+## The ONE named one-based schedule conversion, mirroring the Compatibility API
+## v0 module's equally named `level_envelope.entry_index_for_level` (design D1).
+## Stored level *n* is `levels[n - 1]`: the index base is **one-based**, the
+## interpretation is **derived-provisional**, and the **rejected** alternative is
+## the **zero-based** reading, which the committed corpus contradicts — at
+## `xp 4` it implies level 0 while the save records level 1, so a player with 4
+## experience would be recorded as level 1 while the curve says level 1 begins
+## at 40 experience. Guessing zero-based would shift every level in the game by
+## one. The edges refuse gracefully and never raise: a level below 1, a level
+## above the curve, and a non-integer all return `LEVEL_NO_INDEX`.
+const LEVEL_INDEX_BASE := BootData.LEVEL_INDEX_BASE
+const LEVEL_DERIVATION_STATUS := BootData.LEVEL_DERIVATION_STATUS
+const LEVEL_REJECTED_ALTERNATIVE := BootData.LEVEL_REJECTED_ALTERNATIVE
+## The conversion's "no such entry" sentinel. Never `0`: index 0 is the curve's
+## real first entry, and confusing "none" with it would advance a player to the
+## wrong level.
+const LEVEL_NO_INDEX := -1
+## The curve's first threshold, and the committed corpus's own experience and
+## recorded level. Together they are the evidence for the one-based reading.
+const LEVEL_FLOOR := 0
+const LEVEL_CORPUS_XP := 4
+const LEVEL_CORPUS_LEVEL := 1
 
 var _save_list_doc: Dictionary = {}
 var _config_payload: Dictionary = {}
@@ -351,6 +411,22 @@ var _expand_error := ""
 ## committed fixture and the committed configuration are never written: this
 ## lives entirely in this process's memory.
 var _expand_schedule_backup: Dictionary = {}
+
+# Mutable in-memory level state (building-xp design D8): one save, whose
+# recorded level is written to the level the committed curve derives and
+# NOTHING else — a level change moves no resource, so no balance is ever
+# mutated and the derived vector is the neutral one. Never written anywhere.
+var _level_state: Dictionary = {}
+var _level_pid := ""
+var _level_loaded := false
+var _level_error := ""
+## The double's own backup of the curve thresholds a test stubbed in memory, so
+## a refusal the committed curve cannot produce (a curve whose FLOOR sits above
+## the stored experience, so no level is derivable at all) is reachable offline —
+## and so a later check can read the REAL committed ladder again. The committed
+## fixture and the committed configuration are never written: this lives entirely
+## in this process's memory.
+var _level_schedule_backup: Dictionary = {}
 
 
 ## The session envelope synthesized from the committed fixtures.
@@ -1468,6 +1544,384 @@ func _expand_resources() -> Dictionary:
 	var resources := {}
 	for key: String in RESOURCE_KEYS:
 		resources[key] = int(_expand_state[key])
+	return resources
+
+
+# --- level-up double (building-xp design D8) -------------------------------
+
+
+## One level-up intent (the save identity and NOTHING else) over the committed
+## executed-legacy level fixture. The intent carries no level, no experience, no
+## threshold, and no reward: the target is DERIVED here, from the fixture's OWN
+## loaded `levels` schedule and the stored experience, through the one named
+## one-based conversion (design D3) — the same shape the real service derives, so
+## both implementations answer the same intent identically.
+##
+## The refusals mirror the endpoint's own, in the endpoint's order (design D4):
+## the save-identity codes first (`missing_user_id`, `unknown_user_id`), then
+## `level_already_current` when the recorded level already equals the derived
+## one, then `xp_below_threshold` when the recorded level has no entry in the
+## curve or the stored experience cannot reach that level's own committed
+## threshold. **At the committed corpus the derived level IS the recorded one**
+## (`xp 4` places level 1 and the save records level 1), so the corpus is
+## self-consistent under the one-based reading and this intent is refused — which
+## is exactly what the executed fixture records.
+##
+## On success the ONLY write is the recorded level: a level change moves no
+## resource, so the derived vector is the neutral one and every stored balance
+## is reported unchanged (design D5).
+func level_up_town(user_id: String) -> BootData.LevelUpResult:
+	if user_id.strip_edges() == "":
+		return _level_failure("missing_user_id",
+			"user_id must be a non-empty string")
+	if not _ensure_loaded():
+		return _level_failure("fixture_unreadable", _load_error)
+	if not _ensure_level_loaded():
+		return _level_failure("fixture_unreadable", _level_error)
+	if user_id != _level_pid:
+		return _level_failure("unknown_user_id",
+			"no save exists for user_id '%s'" % user_id)
+	var curve: Variant = _level_schedule()
+	if curve == null or (curve as Array).is_empty():
+		# A curve the loaded configuration cannot produce is a server-side
+		# content failure, never a client value (design D5).
+		return _level_failure("internal_error",
+			"the committed level curve does not resolve")
+	var thresholds: Variant = _level_thresholds(curve)
+	if thresholds == null:
+		return _level_failure("internal_error",
+			"the committed level curve records no strictly increasing "
+			+ "exp_required ladder")
+	var ladder: Array = thresholds
+	var xp := int(_level_state["xp"])
+	var recorded := int(_level_state["level"])
+	var derived: Variant = _level_derived_for(xp, ladder)
+	if derived == null:
+		# The curve's floor sits above this player's experience, so NO level is
+		# derivable. A content/state failure, never a value this contract may
+		# round into place.
+		return _level_failure("internal_error",
+			"the committed level curve begins at %d experience and this player "
+			% int(ladder[0]) + "has %d" % xp)
+	# Design D4, first refusal: there is nothing to do. Answered BEFORE any
+	# write, which is what keeps an already-consistent level from being rewritten
+	# as a transaction.
+	if recorded == int(derived):
+		return _level_failure("level_already_current",
+			"the recorded level is already %d, which is the level the committed "
+			% int(derived)
+			+ "curve derives for %d stored experience" % xp)
+	# Design D4, second refusal, and design D2's reported disagreement: the
+	# recorded level sits above what the stored experience supports, so no
+	# advancement is derivable. Reported with both values and the threshold that
+	# separates them; never reconciled, never paid for.
+	var recorded_index: Variant = _level_entry_index(recorded,
+		(curve as Array).size())
+	if recorded_index == null:
+		return _level_failure("xp_below_threshold",
+			"the recorded level %d has no entry in the committed curve (which "
+			% recorded + "holds %d levels), so the stored experience %d cannot "
+			% [(curve as Array).size(), xp] + "be checked against it")
+	var recorded_threshold: Variant = _level_row_threshold(curve,
+		int(recorded_index))
+	if recorded_threshold == null:
+		return _level_failure("internal_error",
+			"the committed level curve holds no readable entry for level %d"
+			% recorded)
+	if xp < int(recorded_threshold):
+		return _level_failure("xp_below_threshold",
+			"the stored experience %d cannot reach the recorded level %d, whose "
+			% [xp, recorded] + "committed threshold is %d; the committed curve "
+			% int(recorded_threshold) + "derives level %d" % int(derived))
+	# The ONE write the branch performs: `map["level"] = new_level` with the
+	# DERIVED level. No placement, no storage, no bought-units bookkeeping, no
+	# private state, and — because a level change moves no resource — no
+	# balance (design D5).
+	_level_state["level"] = int(derived)
+	# Same envelope shape the service returns; the shared parser yields the
+	# typed result (identical shapes by construction, design D8).
+	return BootData.parse_level_up({
+		"protocol": BootData.PROTOCOL,
+		"ok": true,
+		"game_version": str(_save_list_doc.get("game_version", "")),
+		# Time-dependent field: the fake reports the fixture capture's legacy
+		# server timestamp instead of "now" (never the wall clock).
+		"server_time": _fixture_server_time(),
+		"result": "success",
+		"derived_level": int(derived),
+		"level_before": recorded,
+		"level_after": int(_level_state["level"]),
+		"curve": _level_curve_block(curve, ladder, xp),
+		"resources": _level_resources(),
+	})
+
+
+## Structured failure in the service's error envelope shape, parsed by the same
+## shared parser the live implementation uses.
+func _level_failure(code: String, message: String) -> BootData.LevelUpResult:
+	return BootData.parse_level_up({
+		"protocol": BootData.PROTOCOL,
+		"ok": false,
+		"error": {"code": code, "message": message},
+	})
+
+
+## Loads the committed level fixture's before-state into mutable process state
+## (once). Structural failures are named with the offending field; every other
+## double's error state is untouched (independent sinks).
+func _ensure_level_loaded() -> bool:
+	if _level_loaded:
+		return _level_error == ""
+	_level_loaded = true
+	var before_sink := {"error": ""}
+	var before := _read_json_into(LEVEL_BEFORE_FIXTURE, before_sink)
+	if str(before_sink["error"]) != "":
+		_level_error = str(before_sink["error"])
+		return false
+	var after_sink := {"error": ""}
+	# The after-state is read (never written) so a malformed capture cannot
+	# leave the double running on an inconsistent oracle.
+	_read_json_into(LEVEL_AFTER_FIXTURE, after_sink)
+	if str(after_sink["error"]) != "":
+		_level_error = str(after_sink["error"])
+		return false
+	return _init_level_state(before)
+
+
+## Validates the level fixture's before-state and builds the in-memory save
+## state. Every consumed field is checked, so a malformed fixture fails closed
+## instead of crashing the double. **Only the recorded level and the seven
+## stored balances are kept**: the executed level-up writes nothing else (not
+## `items`, not `store`, not `boughtUnits`, not `privateState`, not the rest of
+## `playerInfo`), so keeping more would be inventing state this line never
+## touches.
+##
+## The after-state is validated to hold exactly the documented transaction — the
+## recorded level UNCHANGED (at the committed corpus the derived level already
+## equals the recorded one, so the executed `level_up` rewrote an identical
+## value) and every stored balance unchanged — so a capture that is not the
+## transaction this double reproduces fails closed here.
+func _init_level_state(before: Dictionary) -> bool:
+	var maps: Variant = before.get("maps")
+	if not (maps is Array) or (maps as Array).is_empty():
+		_level_error = "level fixture before state carries no maps array"
+		return false
+	if not ((maps as Array)[0] is Dictionary):
+		_level_error = "level fixture before state first map is not an object"
+		return false
+	var map: Dictionary = (maps as Array)[0]
+	var level: Variant = BootData._parse_int(map.get("level"))
+	if level == null or int(level) < 0:
+		_level_error = "level fixture before state lacks map level"
+		return false
+	for key in ["xp", "gold", "wood", "oil", "steel"]:
+		var value: Variant = map.get(key)
+		if value == null or int(value) < 0:
+			_level_error = "level fixture before state lacks map %s" % key
+			return false
+	var info: Variant = before.get("playerInfo")
+	var priv: Variant = before.get("privateState")
+	if not (info is Dictionary) or not (priv is Dictionary):
+		_level_error = "level fixture before state lacks playerInfo/privateState"
+		return false
+	var pid: Variant = (info as Dictionary).get("pid")
+	var cash: Variant = (info as Dictionary).get("cash")
+	var mana: Variant = (priv as Dictionary).get("mana")
+	if not (pid is String) or cash == null or mana == null \
+			or int(cash) < 0 or int(mana) < 0:
+		_level_error = "level fixture before state lacks save fields"
+		return false
+	var after_sink := {"error": ""}
+	var after := _read_json_into(LEVEL_AFTER_FIXTURE, after_sink)
+	if str(after_sink["error"]) != "":
+		_level_error = str(after_sink["error"])
+		return false
+	var after_maps: Variant = after.get("maps")
+	if not (after_maps is Array) or (after_maps as Array).is_empty() \
+			or not ((after_maps as Array)[0] is Dictionary):
+		_level_error = "level fixture after state carries no first map"
+		return false
+	var after_map: Dictionary = (after_maps as Array)[0] as Dictionary
+	var after_level: Variant = BootData._parse_int(after_map.get("level"))
+	if after_level == null or int(after_level) != int(level):
+		_level_error = ("the executed level fixture must record the SAME level "
+			+ "before and after: at the committed corpus the derived level "
+			+ "already equals the recorded one, so the executed level_up "
+			+ "rewrote an identical value")
+		return false
+	for key in ["xp", "gold", "wood", "oil", "steel"]:
+		var moved: Variant = BootData._parse_int(after_map.get(key))
+		if moved == null or int(moved) != int(map.get(key)):
+			_level_error = "the executed level fixture moved map %s" % key
+			return false
+	if (after as Dictionary).get("playerInfo") != before.get("playerInfo") \
+			or (after as Dictionary).get("privateState") != before.get(
+				"privateState"):
+		_level_error = "the executed level fixture moved the player info or " \
+			+ "the private state"
+		return false
+	_level_state = {
+		"level": int(level),
+		"xp": int(map.get("xp")),
+		"gold": int(map.get("gold")),
+		"wood": int(map.get("wood")),
+		"oil": int(map.get("oil")),
+		"steel": int(map.get("steel")),
+		"cash": int(cash),
+		"mana": int(mana),
+	}
+	_level_pid = str(pid)
+	return true
+
+
+## The ONE named one-based schedule conversion, mirroring the service's equally
+## named `level_envelope.entry_index_for_level` (design D1): stored level *n* is
+## entry *n* minus one. The interpretation is **derived-provisional** and the
+## **rejected** alternative is the **zero-based** reading, which the committed
+## corpus contradicts (`xp 4` implies level 0 there while the save records
+## level 1). A level below 1, a level above the curve, and a non-integer all
+## return `LEVEL_NO_INDEX`; nothing raises, and nothing coerces.
+func _level_entry_index(level: int, entries: int) -> Variant:
+	if level < 1:
+		return LEVEL_NO_INDEX
+	if entries > 0 and level > entries:
+		return LEVEL_NO_INDEX
+	return level - 1
+
+
+## The committed curve's `exp_required` ladder in committed positional order,
+## read verbatim, or null when the loaded configuration cannot describe a
+## strictly increasing non-negative ladder. Nothing is rebalanced, smoothed, or
+## interpolated (design D7), so a content drift fails closed here rather than
+## producing a silently different level model.
+func _level_thresholds(curve: Array) -> Variant:
+	var thresholds: Array = []
+	for position in range(curve.size()):
+		var row: Variant = curve[position]
+		if not (row is Dictionary):
+			return null
+		var value: Variant = BootData._parse_int((row as Dictionary).get(
+			"exp_required"))
+		if value == null or int(value) < 0:
+			return null
+		if not thresholds.is_empty() \
+				and int(value) <= int(thresholds[thresholds.size() - 1]):
+			return null
+		thresholds.append(int(value))
+	if thresholds.is_empty():
+		return null
+	return thresholds
+
+
+## The level the committed curve implies for a stored experience: the highest
+## level whose threshold the experience meets, resolved through the one named
+## conversion. Null when the curve's floor sits above the experience, when the
+## experience is not a non-negative integer, or when the ladder is unreadable.
+func _level_derived_for(xp: int, thresholds: Array) -> Variant:
+	if xp < 0:
+		return null
+	if xp < int(thresholds[0]):
+		return null
+	var index := 0
+	for position in range(thresholds.size()):
+		if xp >= int(thresholds[position]):
+			index = position
+		else:
+			break
+	return index + 1
+
+
+## One committed curve entry's non-negative `exp_required`, or null. The
+## position is a POSITION, never a level: a caller that wants a level resolves
+## it through the one named conversion first.
+func _level_row_threshold(curve: Array, position: int) -> Variant:
+	if position < 0 or position >= curve.size():
+		return null
+	var row: Variant = curve[position]
+	if not (row is Dictionary):
+		return null
+	var value: Variant = BootData._parse_int((row as Dictionary).get(
+		"exp_required"))
+	if value == null or int(value) < 0:
+		return null
+	return int(value)
+
+
+## One committed curve entry's `name`, or null when the entry records none. A
+## name is a **label, not an identifier** (44 distinct names over 100 entries),
+## so it is read for display only and never used to resolve a level. The reward
+## fields are deliberately NEVER read: no legacy branch reads them, so paying
+## or showing one would invent an economy (design D7).
+func _level_row_name(curve: Array, level: int) -> Variant:
+	var index: Variant = _level_entry_index(level, curve.size())
+	if index == null or int(index) == LEVEL_NO_INDEX:
+		return null
+	var row: Variant = curve[int(index)]
+	if not (row is Dictionary):
+		return null
+	var value: Variant = (row as Dictionary).get("name")
+	if not (value is String) or str(value).is_empty():
+		return null
+	return str(value)
+
+
+## The committed curve the double derives from: the fixture's OWN loaded
+## configuration, read at its positional index and never through a level — the
+## same separation the service keeps, so a caller's own arithmetic can never
+## index the curve.
+func _level_schedule() -> Variant:
+	return _config_payload.get(LEVELS_KEY)
+
+
+## The response's `curve` block: the committed facts the service used, with every
+## level resolved through the one named conversion. The `next_*` fields and
+## `remaining` are **null at the curve's top level** rather than a sentinel value,
+## because "there is no next level" is a reported state and not an error.
+func _level_curve_block(curve: Array, thresholds: Array, xp: int) -> Dictionary:
+	var derived: int = int(_level_derived_for(xp, thresholds))
+	# The next level is resolved through the one named conversion and reported as
+	# a LEVEL, never as the conversion's positional index: the two differ by
+	# exactly the index base D1 settles, so reporting the index here would be the
+	# off-by-one this line exists to prevent.
+	var following_index: Variant = _level_entry_index(derived + 1, curve.size())
+	var following: Variant = null
+	if following_index != null and int(following_index) != LEVEL_NO_INDEX:
+		following = int(following_index) + 1
+	var next_threshold: Variant = null
+	var next_name: Variant = null
+	var remaining: Variant = null
+	if following != null:
+		var own_index: Variant = _level_entry_index(int(following), curve.size())
+		if own_index != null and int(own_index) != LEVEL_NO_INDEX:
+			next_threshold = _level_row_threshold(curve, int(own_index))
+			next_name = _level_row_name(curve, int(following))
+			if next_threshold != null:
+				var left := int(next_threshold) - xp
+				remaining = left if left > 0 else 0
+	return {
+		"entries": curve.size(),
+		"index_base": LEVEL_INDEX_BASE,
+		"derivation_status": LEVEL_DERIVATION_STATUS,
+		"rejected_alternative": LEVEL_REJECTED_ALTERNATIVE,
+		"entry_name": _level_row_name(curve, derived),
+		"entry_exp_required": int(_level_row_threshold(curve,
+			_level_entry_index(derived, curve.size()))),
+		"next_level": following,
+		"next_name": next_name,
+		"next_exp_required": next_threshold,
+		"remaining": remaining,
+		"xp": xp,
+	}
+
+
+## The seven stored resource values of the in-memory level state, reported
+## verbatim as the response's authoritative `resources`. A level-up moves none of
+## them, so these are the same values the intent started from — which is the
+## strongest form of the "nothing moved" proof the endpoint requires.
+func _level_resources() -> Dictionary:
+	var resources := {}
+	for key: String in RESOURCE_KEYS:
+		resources[key] = int(_level_state[key])
 	return resources
 
 

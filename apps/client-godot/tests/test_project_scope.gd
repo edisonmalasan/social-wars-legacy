@@ -13,11 +13,11 @@ extends "res://tests/test_base.gd"
 ## UI-foundation work (the component script and its suite), and the
 ## settings/audio-manager work (the Settings and AudioManager autoloads
 ## with their scripts and suites), and the town-rendering work (the
-## seventeen town scripts under `scripts/town/`, the town and town-slice
-## scenes, their sixteen town suites, the thirteen committed evidence
+## eighteen town scripts under `scripts/town/`, the town and town-slice
+## scenes, their seventeen town suites, the fourteen committed evidence
 ## captures,
 ## and the placement, purchase, move, sell, store, upgrade, construction,
-## collect, expand, and resources evidence reports):
+## collect, expand, resources, and level (xp) evidence reports):
 ## no other game system, no scene beyond the allow-list, no script outside
 ## the allow-list, no Flash-related runtime, no legacy protocol token
 ## anywhere, and no transport reference outside the legacy-v0
@@ -64,6 +64,7 @@ const ALLOWED := [
 	"scripts/town/collection_flow.gd",
 	"scripts/town/construction_flow.gd",
 	"scripts/town/expand_flow.gd",
+	"scripts/town/level_flow.gd",
 	"scripts/town/move_flow.gd",
 	"scripts/town/placement_catalog.gd",
 	"scripts/town/placement_flow.gd",
@@ -97,6 +98,7 @@ const ALLOWED := [
 	"tests/test_town_collect.gd",
 	"tests/test_town_construction.gd",
 	"tests/test_town_expand.gd",
+	"tests/test_town_xp.gd",
 	"tests/test_town_hud.gd",
 	"tests/test_town_iso.gd",
 	"tests/test_town_move.gd",
@@ -127,6 +129,8 @@ const ALLOWED := [
 	"evidence/building-store/report.json",
 	"evidence/building-upgrade/building-upgrade.png",
 	"evidence/building-upgrade/report.json",
+	"evidence/building-xp/level-up.png",
+	"evidence/building-xp/report.json",
 	"evidence/first-render/first-render.png",
 	"evidence/first-render/report.json",
 	"evidence/placement/placement.png",
