@@ -19,9 +19,11 @@ extends "res://tests/test_base.gd"
 ## and the placement, purchase, move, sell, store, upgrade, construction,
 ## collect, expand, resources, and level (xp) evidence reports), and the
 ## unit-definitions work (the two `scripts/units/` definition modules, its
-## suite, and the `unit-definitions` evidence report), and the unit-instances
+## suite, and the `unit-definitions` evidence report), the unit-instances
 ## work (the two `scripts/units/` instance modules, its suite, and the
-## `unit-instances` evidence report):
+## `unit-instances` evidence report), and the unit-queues work (the two
+## `scripts/units/` queue modules, its suite, and the `unit-queues` evidence
+## report):
 ## no other game system, no scene beyond the allow-list, no script outside
 ## the allow-list, no Flash-related runtime, no legacy protocol token
 ## anywhere, and no transport reference outside the legacy-v0
@@ -87,6 +89,8 @@ const ALLOWED := [
 	"scripts/units/unit_definition.gd",
 	"scripts/units/unit_instance.gd",
 	"scripts/units/unit_instance_projection.gd",
+	"scripts/units/unit_queue.gd",
+	"scripts/units/queue_flow.gd",
 	"scripts/verification.gd",
 	"tests/test_asset_ids.gd",
 	"tests/test_audio_manager.gd",
@@ -122,6 +126,7 @@ const ALLOWED := [
 	"tests/test_ui_foundation.gd",
 	"tests/test_unit_definitions.gd",
 	"tests/test_unit_instances.gd",
+	"tests/test_unit_queues.gd",
 	"evidence/boot/boot-report.json",
 	"evidence/building-move/building-move.png",
 	"evidence/building-move/report.json",
@@ -152,6 +157,7 @@ const ALLOWED := [
 	"evidence/town/town-slice.png",
 	"evidence/unit-definitions/report.json",
 	"evidence/unit-instances/report.json",
+	"evidence/unit-queues/report.json",
 ]
 
 ## The exact scene set the project may declare (set equality below).

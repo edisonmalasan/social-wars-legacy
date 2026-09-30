@@ -5,8 +5,8 @@ extends Node
 ## implementation", "Move through either implementation", "Sell through
 ## either implementation", "Upgrade through either implementation", and
 ## "Construction through either implementation", "Collect through either
-## implementation", "Expand through either implementation", and "Level up
-## through either implementation").
+## implementation", "Expand through either implementation", "Level up
+## through either implementation", and "Queue through either implementation").
 ##
 ## This is the ONLY project file allowed to name the compat endpoint or to
 ## use the built-in HTTP request/enumeration types; the scope test restricts
@@ -31,6 +31,7 @@ const CONSTRUCTION_PATH := "/v0/construction"
 const COLLECT_PATH := "/v0/collect"
 const EXPAND_PATH := "/v0/expand"
 const LEVEL_UP_PATH := "/v0/level_up"
+const QUEUE_PATH := "/v0/queue"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -353,6 +354,71 @@ func level_up_town(user_id: String) -> BootData.LevelUpResult:
 			str(outcome.get("code", "bad_response")),
 			str(outcome.get("message", "")))
 	return BootData.parse_level_up(outcome.get("payload"))
+
+
+## One production-queue **push** intent over loopback HTTP: the client sends the
+## save identity and the target row's key and NOTHING else — no count, no cost,
+## no duration, no training time, no readiness, and no resource deltas. Any
+## `cost` / `duration` / `count` / `ready` / `training_time` /
+## `resources_changed` / `vector` key the service receives alongside the
+## identity is **ignored** server-side, exactly as the collect and expand
+## endpoints ignore client-supplied amounts and prices (unit-queues design D2/D5):
+## the service derives `push_queue_unit` from the closed action vocabulary,
+## reads nothing but the addressed row, and executes the unchanged legacy branch
+## with a NEUTRAL vector (design D4), so the typed result's two rows, `queue`,
+## and `resources` are authoritative (design D8).
+##
+## **No unit is created by this intent**: no legacy command completes a queue
+## or materialises a unit from one, so a push moves a count and a start instant
+## and nothing else (design D1/D2). The response's second post-execution proof
+## half requires every stored resource to be **unchanged**, because a queue
+## moves none.
+##
+## Structured service errors pass through with their original codes — notably
+## `unknown_map_key` for a key that names no row in the save, and the shared
+## `missing_user_id` / `invalid_user_id` / `unknown_user_id` /
+## `invalid_payload` / `internal_error` family — all of which the client
+## surfaces instead of queueing anything; transport failures keep the boot
+## failure rules, never a partial payload.
+func push_queue_unit_town(user_id: String,
+		map_key: int) -> BootData.QueueResult:
+	var outcome := await _call("POST", QUEUE_PATH, JSON.stringify({
+		"user_id": user_id,
+		"map_key": map_key,
+		"action": "push",
+	}))
+	if not outcome.get("ok", false):
+		return BootData.queue_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return BootData.parse_queue(outcome.get("payload"))
+
+
+## One production-queue **pop** intent over loopback HTTP, under the same wire
+## contract as the push: the save identity and the target key, nothing else, and
+## any client-supplied outcome key ignored server-side. The legacy branch's own
+## rules are the whole contract — it decrements the count, re-stamps the start
+## instant on a partial decrement, and **deletes `nu`, `ts`, and `ui` together**
+## at zero (design D1/D3) — and no producer, duration, level, or count check is
+## added on top, with **no maximum count applied** because the legacy engine
+## sets none (design D5).
+##
+## A pop against a row whose bag carries no count is an **inert recorded
+## no-op**: the endpoint answers success with an unchanged bag rather than
+## refusing, and this client surfaces that answer verbatim instead of inventing
+## a local refusal code.
+func pop_queue_unit_town(user_id: String,
+		map_key: int) -> BootData.QueueResult:
+	var outcome := await _call("POST", QUEUE_PATH, JSON.stringify({
+		"user_id": user_id,
+		"map_key": map_key,
+		"action": "pop",
+	}))
+	if not outcome.get("ok", false):
+		return BootData.queue_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return BootData.parse_queue(outcome.get("payload"))
 
 
 ## One HTTP round trip. Success returns `{ok: true, payload: Dictionary}`;

@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-09-30T19:43:35+00:00",
+  "form": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "data": "ceff3828aed593d370dddce55e96ec5a43a77bc15459a4a0369ef426d9392aa3;{\"accessToken\":\"\",\"commands\":[[0,\"push_queue_unit\",[1],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1790797415}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "command.php form (USERID, user_key, language, data) with the derived <64-hex>;<json> envelope carrying exactly one command: [[0,\"push_queue_unit\",[1],[0,0,0,0,0,0,0,0]]] against map key 1 \u2014 the committed corpus's real placed training producer, id 26 Command Center, with an empty attribute bag. The map index is the command's ONLY argument; no cost, duration, training time, count, readiness, or outcome is sent, and the resources_changed is the NEUTRAL vector because a queue's price is a client-sent delta (do_command applies it before the branch). The branch's own effect \u2014 nu set to 1 and ts stamped \u2014 and the ABSENCE of any validation (no producer check, no training_time, no min_level, no count bound) are ESTABLISHED. user_key is redacted in this record; accessToken is the crafted empty placeholder, never a token value.",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}

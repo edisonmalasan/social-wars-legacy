@@ -1,0 +1,405 @@
+{
+	"command_rule": "each of the three branches does nothing but resolve a map row, call an engine helper, and print (command.py:676-708). The map index is the ONLY positional argument, and the atom-fusion variant's unit id is a CLIENT-SUPPLIED argument no evidence constrains, which is why no intent derives it (design D7)",
+	"commands": {
+		"attr_slot": 6,
+		"commands": [
+			{
+				"args": [
+					"map index"
+				],
+				"command": "push_queue_unit",
+				"effect": "nu becomes (nu + 1) when present and 1 when absent; ts is stamped with timestamp_now(); nothing else is written",
+				"offered": true,
+				"source": "command.py:676-685 -> engine.py:183-189",
+				"validation": "none: not producer-ness, not training_time, not min_level, and no bound on the count"
+			},
+			{
+				"args": [
+					"map index"
+				],
+				"command": "pop_queue_unit",
+				"effect": "with nu ABSENT the helper returns and nothing is written (an inert, recorded no-op); otherwise nu is decremented, and a positive result writes nu and re-stamps ts, while zero DELETES nu, ts, and ui together",
+				"offered": true,
+				"source": "command.py:699-708 -> engine.py:191-204",
+				"validation": "none: not producer-ness, not training_time, not min_level, and no bound on the count"
+			},
+			{
+				"args": [
+					"map index",
+					"unit_id"
+				],
+				"command": "push_queue_unit2",
+				"effect": "the same push, plus ui = the client-supplied unit id",
+				"offered": false,
+				"source": "command.py:687-697 -> engine.py:206-213",
+				"validation": "none: the unit id is not checked against the content",
+				"why_not_offered": "the id is a CLIENT-SUPPLIED argument and no evidence establishes which ids a client actually sends, so no intent here may derive it: the projection reports an unresolvable ui with its recorded value intact rather than coercing one (design D7)"
+			}
+		],
+		"inert_pop": "a pop against a row whose attribute bag carries no count is an INERT recorded no-op, not an error: engine.pop_queue_unit returns without writing anything when nu is absent (engine.py:193-194), and the endpoint answers success with an unchanged bag. The client does not offer it, and offers_pop() reports false for such a row",
+		"keys": [
+			"nu",
+			"ts",
+			"ui"
+		],
+		"no_elapsed_time": "NO ELAPSED-TIME EVALUATION IS IMPLEMENTED. Every occurrence of attr['ts'] in the legacy source is a WRITE (engine.py:189, engine.py:198) or a DELETION (engine.py:202); the single branch that reads it back is soulmixer_speedup, which is not a general queue path. The dispatcher has 63 named branches and the complete_* family is exactly complete_collection, complete_goal, and complete_tutorial: NO command completes a queue and no command materialises a unit from one. There is therefore no server-side 'is this queue ready?' rule to reproduce, so this contract computes NO readiness, NO remaining time, NO progress ratio, and NO completion (design D1/D2). The absence is a recorded property of the legacy contract, not a missing feature; a future line may introduce completion only as its own deliverable, with its own evidence",
+		"no_validation": "NO VALIDATION IS PERFORMED BY THE LEGACY SERVER AND NONE IS IMPLEMENTED HERE. push_queue_unit, pop_queue_unit, and push_queue_unit2 do not check that the item is a training producer, do not read training_time, do not check min_level, and do not cap nu. Any placed row can be queued, a row that already carries a queue can be queued again, and the queue length is unbounded. The recorded absence of a count bound is NOT permission to invent one (design D5): a cap the engine does not set would be a rule the legacy server does not have, and an authoritative limit belongs to a later server-authoritative milestone",
+		"non_readiness": [
+			{
+				"absent_because": "no legacy command completes a queue and no command materialises a unit from one, so there is no server-side completion to reproduce",
+				"helper": "is_complete"
+			},
+			{
+				"absent_because": "no legacy branch evaluates a queue's elapsed time: every occurrence of attr['ts'] is a write or a deletion, and the only reader is the soul-mixer speedup, which is not a general queue path",
+				"helper": "remaining"
+			},
+			{
+				"absent_because": "a ratio needs a duration, and NO queue branch reads training_time or sm_training_time, so there is no committed denominator",
+				"helper": "progress_ratio"
+			},
+			{
+				"absent_because": "the start instant is reported verbatim and nothing derives an instant from it",
+				"helper": "ready_at"
+			},
+			{
+				"absent_because": "completion is a server-authoritative decision and this milestone delivers none; it belongs to a later line with its own evidence",
+				"helper": "complete"
+			}
+		],
+		"teardown": "when the count reaches zero, pop_queue_unit deletes nu, ts, and ui TOGETHER (engine.py:198-204): the three keys are never torn down independently, no committed branch deletes one of them on its own, and a save therefore never carries a partial queue teardown"
+	},
+	"content": {
+		"buildings": {
+			"distinct_values": 0,
+			"domain": "buildings",
+			"field": "sm_training_time",
+			"maximum": 0,
+			"minimum": 0,
+			"missing": 470,
+			"of": 470,
+			"with_field": 0
+		},
+		"buildings_file": "packages/game-content/normalized/buildings.json",
+		"coverage_note": "sm_training_time is a SOUL-MIXER field, not a general training duration, and the coverage above is measured by the suite from the verified registry rather than trusted from prose. It is recorded as CONTENT and applied as no rule: no queue branch reads either duration field (design D5)",
+		"duration_field": "sm_training_time",
+		"enumeration": "ContentRegistry.legacy_ids(domain), the registry's own public accessor over the index it built during its verified load, so every count in this report crosses the same byte-count and digest gate as every other read",
+		"manifest_bytes_verified": 1905917,
+		"manifest_outputs_verified": 22,
+		"package_files": 67,
+		"package_sha256": "dba0a98b25c6fafdb7b752436d2f70fcfc8641ef5f977166aa2002a3f4b44ea0",
+		"training_time_opposite": "training_time is the opposite: a positive one on 130 of the 470 committed buildings and on 0 of 429 units, and the target Command Center records training_time 5 with min_level 1 and group_type COMMAND_CENTER",
+		"units": {
+			"distinct_values": 84,
+			"domain": "units",
+			"field": "sm_training_time",
+			"maximum": 480000,
+			"minimum": 4000,
+			"missing": 129,
+			"of": 429,
+			"with_field": 300
+		},
+		"units_file": "packages/game-content/normalized/units.json"
+	},
+	"corpus": {
+		"bought_units": [],
+		"claim": "the committed corpus carries NO queue key on any of its 40 rows and its only placed producer carries an empty bag. That zero is asserted by the suite and is a fact about the corpus, not evidence that a queue can be obtained, seen, or finished",
+		"map_index": 0,
+		"map_level": 1,
+		"owned_expansions": [
+			35.0,
+			36.0,
+			45.0,
+			46.0
+		],
+		"player_store": {},
+		"queue_keys_carried": [],
+		"resources": {
+			"cash": 5,
+			"gold": 2000,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2000,
+			"xp": 4
+		},
+		"rows": 40,
+		"save": "tests/saves/fresh-player.json",
+		"save_bytes": 15628,
+		"save_sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+		"target": {
+			"attr_before": {},
+			"group_type": "COMMAND_CENTER",
+			"item_id": 26,
+			"item_name": "Command Center",
+			"map_key": 1,
+			"min_level": 1,
+			"row": [
+				26,
+				51,
+				41,
+				0,
+				0,
+				[],
+				{},
+				1
+			],
+			"target_rule": "the committed corpus's own REAL placed training producer, with an EMPTY attribute bag, so both queue commands are exercisable with NO fabricated player state",
+			"training_time": 5
+		}
+	},
+	"determinism": {
+		"byte_identical_across_reruns": true,
+		"reason": "no timestamp, no absolute path, no wall clock, no request, and no saved state: every table is derived from the model's own constants, the verified registry, and the committed corpus and fixture bytes, and every derived set is sorted before it is written",
+		"serialization": "JSON.stringify(report, tab, sort_keys=true) plus one trailing newline; every number written is an integer - the pinned engine's integral floats are normalised on the way in, which changes no value - so no float formatting varies between runs",
+		"time_dependent_fields": "the ONLY time-dependent value in this line's evidence is the start instant the legacy push stamped, which the fixture fixed at one run and the suite asserts by value; the double stamps that same committed value rather than reading a clock"
+	},
+	"fixture": {
+		"completion_captured": false,
+		"completion_command_exists": false,
+		"completion_note": "a PUSH and a POP were captured and NO COMPLETION WAS CAPTURED, because the legacy server has no completion command at all. The fixture therefore evidences a push and a pop ONLY and says nothing about a finished queue; the missing completion is on the record here rather than left for a reader to find",
+		"directory": "tests/fixtures/godot-unit-queues",
+		"executed_legacy": true,
+		"fabricated_state": false,
+		"fixture_scope": "one recorded push and one recorded pop against the fresh-player corpus: no progressed save and no other command",
+		"manifest": "tests/fixtures/godot-unit-queues/capture-manifest.json",
+		"proof": "two-part: the recorded bag matches the DERIVED result (exact count, stamped instant by shape and direction, and the three-key teardown by presence) AND every stored resource is byte-identical. The 'nothing moved' half is what makes the neutral-vector claim non-tautological",
+		"resources": {
+			"cash": 5,
+			"gold": 2000,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2000,
+			"xp": 4
+		},
+		"resources_unchanged": true,
+		"rows_unchanged": 40,
+		"schema": "godot-unit-queues/legacy-capture-v1",
+		"steps": [
+			{
+				"action": "push",
+				"attr_after": {
+					"nu": 1,
+					"ts": 1790797415
+				},
+				"attr_before": {},
+				"command": "push_queue_unit"
+			},
+			{
+				"action": "pop",
+				"attr_after": {},
+				"attr_before": {
+					"nu": 1,
+					"ts": 1790797415
+				},
+				"command": "pop_queue_unit"
+			}
+		]
+	},
+	"generated_by": "apps/client-godot/tests/test_unit_queues.gd --report=<path>",
+	"intents": {
+		"action_vocabulary": [
+			"push",
+			"pop"
+		],
+		"argument_count": 2,
+		"argument_count_rule": "each operation takes EXACTLY the save identity and the target row's key, so there is NO parameter through which a client could send a count, a cost, a duration, or a readiness: the structural form of the 'a client-supplied outcome is ignored' claim, asserted by the suite from the facade's own method list",
+		"carries": [
+			"user_id",
+			"map_key"
+		],
+		"carries_not": [
+			"count",
+			"cost",
+			"price",
+			"duration",
+			"training time",
+			"readiness",
+			"progress",
+			"outcome",
+			"resources_changed"
+		],
+		"endpoint": "POST /v0/queue, named only inside the legacy-v0 implementation",
+		"ignored_server_side": "any cost, duration, count, or readiness key the service receives alongside the identity is ignored, exactly as the collect and expand endpoints ignore client-supplied amounts and prices",
+		"no_atom_fusion_intent": "push_queue_unit2 is deliberately NOT derivable from any action: its unit id is a client-supplied argument no evidence constrains (design D7)",
+		"operations": [
+			"push_queue_unit_town(user_id, map_key)",
+			"pop_queue_unit_town(user_id, map_key)"
+		],
+		"vector": "NEUTRAL, because a queue's price is a client-sent delta: the legacy dispatcher applies the request's per-command vector BEFORE the branch (command.py:40, engine.py:251-271), so any price a client attached would be a client-trusted mint or burn"
+	},
+	"no_elapsed_time": {
+		"attr_ts_uses": {
+			"deletions": [
+				"engine.py:202"
+			],
+			"readers": [
+				"command.py:733 (soulmixer_speedup only, and not a general queue path)"
+			],
+			"writes": [
+				"engine.py:189",
+				"engine.py:198"
+			]
+		},
+		"completion": "the dispatcher's complete_* family is exactly complete_collection, complete_goal, and complete_tutorial, so no command completes a queue and no command materialises a unit from one. A queue can be pushed and popped and nothing server-side ever finishes it",
+		"helpers_present": [],
+		"implemented": false,
+		"inventory_proof": "both delivered modules' whole function inventories are asserted against a pinned list by the suite, so a readiness, remaining-time, progress, or completion helper fails the run wherever it is added",
+		"non_readiness": [
+			{
+				"absent_because": "no legacy command completes a queue and no command materialises a unit from one, so there is no server-side completion to reproduce",
+				"helper": "is_complete"
+			},
+			{
+				"absent_because": "no legacy branch evaluates a queue's elapsed time: every occurrence of attr['ts'] is a write or a deletion, and the only reader is the soul-mixer speedup, which is not a general queue path",
+				"helper": "remaining"
+			},
+			{
+				"absent_because": "a ratio needs a duration, and NO queue branch reads training_time or sm_training_time, so there is no committed denominator",
+				"helper": "progress_ratio"
+			},
+			{
+				"absent_because": "the start instant is reported verbatim and nothing derives an instant from it",
+				"helper": "ready_at"
+			},
+			{
+				"absent_because": "completion is a server-authoritative decision and this milestone delivers none; it belongs to a later line with its own evidence",
+				"helper": "complete"
+			}
+		],
+		"rule": "NO ELAPSED-TIME EVALUATION IS IMPLEMENTED. Every occurrence of attr['ts'] in the legacy source is a WRITE (engine.py:189, engine.py:198) or a DELETION (engine.py:202); the single branch that reads it back is soulmixer_speedup, which is not a general queue path. The dispatcher has 63 named branches and the complete_* family is exactly complete_collection, complete_goal, and complete_tutorial: NO command completes a queue and no command materialises a unit from one. There is therefore no server-side 'is this queue ready?' rule to reproduce, so this contract computes NO readiness, NO remaining time, NO progress ratio, and NO completion (design D1/D2). The absence is a recorded property of the legacy contract, not a missing feature; a future line may introduce completion only as its own deliverable, with its own evidence"
+	},
+	"no_validation": {
+		"authoritative_limit": "an authoritative producer, duration, level, or count rule belongs to Server v1 / M13",
+		"count_bound": false,
+		"count_bound_note": "NO maximum count is applied anywhere, at any value: the legacy engine sets none, and the suite projects counts of 1, 2, 5, 64, 9999, and 1000000 and asserts each one verbatim. The recorded absence of a bound is NOT permission to invent a cap (design D5)",
+		"duration_check": false,
+		"implemented": false,
+		"level_check": false,
+		"producer_check": false,
+		"rule": "NO VALIDATION IS PERFORMED BY THE LEGACY SERVER AND NONE IS IMPLEMENTED HERE. push_queue_unit, pop_queue_unit, and push_queue_unit2 do not check that the item is a training producer, do not read training_time, do not check min_level, and do not cap nu. Any placed row can be queued, a row that already carries a queue can be queued again, and the queue length is unbounded. The recorded absence of a count bound is NOT permission to invent one (design D5): a cap the engine does not set would be a rule the legacy server does not have, and an authoritative limit belongs to a later server-authoritative milestone"
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed",
+		"NO COMPLETION AND NO ELAPSED-TIME EVALUATION ARE IMPLEMENTED, BECAUSE THE LEGACY SERVER HAS NEITHER: no command completes a queue and no command materialises a unit from one, so a queue can never be shown to finish and the absence is a recorded contract rather than a gap filled here",
+		"NO COST AND NO TIMER ARE IMPLEMENTED: the legacy soulmixer_speedup branch charges nothing and its own author labelled its ceil(remaining / 3600) formula quite useless, so the contract is recorded and no balance is ever changed",
+		"NO COUNT BOUND IS IMPLEMENTED: the legacy engine sets none, and a cap it does not have would be an invented rule (design D5)",
+		"NO UNIT IS PRODUCED, TRAINED, OR PLACED: no unit is rendered, animated, or played, and nothing here creates a unit from a queue",
+		"NO ACQUISITION IS CLAIMED: this line reads and reports a queue and sends two guarded intents; where a queue comes from is not established",
+		"no training duration semantics are claimed: training_time is a building field no queue branch reads, and sm_training_time is the soul-mixer path's own field",
+		"the fixture covers a PUSH AND A POP ONLY, so it evidences nothing about a finished queue, a produced unit, or any progressed player",
+		"no producer, duration, level, or readiness rule is implemented, and the recorded absence of validation is not permission: none of those checks is the client's to add here",
+		"the atom-fusion push is NOT offered, because its unit id is a client-supplied argument no evidence constrains (design D7)",
+		"no compatibility route beyond the two guarded intents this line delivers exists for a queue, and the service adds no server-authoritative validation of producer-ness, duration, level, or count - that belongs to Server v1 / M13",
+		"no pixel-parity oracle exists",
+		"the committed capture runs the fake GameApi implementation for the client-side evidence, a deterministic test double rather than a parity oracle; the executed-legacy parity rests on the committed fixture and the live phase"
+	],
+	"provenance": {
+		"derived": [
+			{
+				"evidence": "derived (design D1): the service's own derivation raises invalid_attr on a non-strict or negative count, so the client fails closed on the same shapes rather than comparing against a coerced value. The ui is deliberately NOT shape-checked, because only a client-supplied argument ever writes it and no evidence constrains what a client sends (design D7)",
+				"fact": "the projection refuses a malformed nu, a negative nu, and a non-integer ts, and reports a ui verbatim without a shape check"
+			},
+			{
+				"evidence": "derived (design D7): the resolution follows the established shape of a content reference, while the handling of an id that does not resolve is a decision - report, never drop and never substitute - taken because the id is client-supplied",
+				"fact": "a queued unit id is resolved through the content registry's units domain and an unresolvable one is reported with its value intact"
+			},
+			{
+				"evidence": "derived: no authentic legacy queue panel has been captured, so the wording is the delivered provisional convention, never a claim about what the legacy client displayed",
+				"fact": "the readout's labels and the composition of its lines"
+			}
+		],
+		"established": [
+			{
+				"evidence": "engine.py:183-213; docs/legacy-production-queues.md; the executed push and pop in tests/fixtures/godot-unit-queues/steps/",
+				"fact": "a production queue occupies exactly three keys of a placed row's attr bag: nu (count), ts (start instant), and ui (the optional queued unit id the atom-fusion variant alone writes)"
+			},
+			{
+				"evidence": "command.py:676-685 and 699-708 -> engine.py:183-204; the committed executed fixture records both",
+				"fact": "push_queue_unit takes ONLY the map index, sets nu to (nu + 1) when present and 1 when absent, and stamps ts with timestamp_now(); pop_queue_unit takes only the map index, and with nu absent returns without writing anything"
+			},
+			{
+				"evidence": "engine.py:198-204; the committed pop step's after state carries an EMPTY bag again",
+				"fact": "a decrement to zero DELETES nu, ts, and ui together, and no committed branch deletes one of them on its own"
+			},
+			{
+				"evidence": "command.py:676-708 - each branch is a map lookup, an engine helper call, and a print",
+				"fact": "the three branches validate nothing: not producer-ness, not training_time, not min_level, and no bound on nu, so the queue length is unbounded"
+			},
+			{
+				"evidence": "engine.py:189, 198, 202 against 727-743; docs/legacy-production-queues.md; the command catalog's 63 named branches",
+				"fact": "every occurrence of attr['ts'] is a write or a deletion; the only reader is soulmixer_speedup, which is not a general queue path. Of 63 named dispatcher branches the complete_* family is exactly complete_collection, complete_goal, and complete_tutorial: no command completes a queue and none materialises a unit from one"
+			},
+			{
+				"evidence": "command.py:40; engine.py:251-271",
+				"fact": "the resource vector is applied BEFORE the dispatched branch, verbatim, as max(current + delta, 0), so any price a client attached to a queue would be a client-sent mint or burn"
+			},
+			{
+				"evidence": "tests/saves/fresh-player.json; the committed normalized content package; the fixture's own manifest",
+				"fact": "the committed corpus places id 26, Command Center, at map key 1 with training_time 5, min_level 1, group_type COMMAND_CENTER, and an EMPTY attribute bag"
+			}
+		]
+	},
+	"queue_model": {
+		"absent_is_absent": "a bag carrying none of the three keys is reported as ABSENT with a null count and a null instant, never as a count of zero paired with an instant of zero: the three-key teardown deletes the keys at zero, so that pair is unreachable in a legacy save and reporting it would be indistinguishable from a queue that had just been emptied",
+		"attr_slot": 6,
+		"attr_slot_source": "engine.py:31, the placed row's seventh slot",
+		"key_meanings": {
+			"nu": "the queue COUNT: incremented when present and set to 1 when absent",
+			"ts": "the queue START INSTANT, stamped with timestamp_now() by a push and re-stamped by a partial decrement",
+			"ui": "the OPTIONAL queued unit id, written by the atom-fusion push alone"
+		},
+		"keys": [
+			"nu",
+			"ts",
+			"ui"
+		],
+		"read_only": "the model holds copies of the three values and declares no setter, no mutating method, and no writable public field; every reader returns a committed value, a named absence, or a fresh copy, and the suite asserts the save's bag is byte-identical after every read",
+		"resolution_vocabulary": [
+			"absent",
+			"resolved",
+			"unresolvable"
+		],
+		"unit_domain": "units",
+		"verbatim_rule": "the count and the instant are reported exactly as the bag holds them - no scaling, rounding, defaulting, or clamping - and a malformed value fails closed with the key named. The queued unit id is reported VERBATIM with no shape check at all, because only a client-supplied argument ever writes it (design D7)"
+	},
+	"schema": "unit-queues-report-v1",
+	"speedup": {
+		"command": "soulmixer_speedup",
+		"contract": "RECORDED VERBATIM AND IMPLEMENTED NOT AT ALL. The legacy soulmixer_speedup branch (command.py:727-743) requires BOTH ts AND ui in the addressed row's attribute bag, so it raises KeyError on a fresh row; it reads the training duration from the QUEUED UNIT (get_attribute_from_item_id(...['ui'], 'sm_training_time')) rather than from the building; it reads that value as SECONDS (remaining = sm_training_time - (now - start), cost = ceil(remaining / 3600)); it CHARGES NOTHING, printing only a cost; and it sets ts = 0 so a later refresh sees no timer. Its own source comment reads 'Quite useless cost calculation for understanding it'. NO cost is computed here, NO balance is changed, and NO speedup is offered: reproducing a formula the legacy source itself labels useless, and which never charges anything, would invent an economy (design D6). Where the legacy branch would fail on a missing key, this contract REFUSES with a named reason instead of raising",
+		"cost_divisor": 3600,
+		"cost_formula": "ceil(remaining_seconds / 3600)",
+		"cost_implemented": false,
+		"cost_note": "the shape above is RECORDED for completeness only. No cost is computed, no balance is changed, and no speedup purchase is offered anywhere in this repository, because the legacy branch charges nothing and its own author labelled the calculation useless",
+		"duration_field": "sm_training_time",
+		"duration_reading": "seconds",
+		"duration_source": "the QUEUED unit, not the building: get_attribute_from_item_id(attr['ui'], 'sm_training_time')",
+		"field_coverage": "sm_training_time is a SOUL-MIXER field, not a general training duration: it is present on 300 of the 429 committed units, absent from the other 129 (including 923 Gorilla, 933 Wild Elephant, 1001 Worker I, and 1013 Truck), takes 84 distinct values beginning at 4000, and is present on 0 of the 470 committed buildings. training_time is the opposite: 130 of 470 buildings carry a positive one and 0 of 429 units do, and NO queue branch reads either field (design D5)",
+		"implemented": false,
+		"legacy_verdict": "the committed source comment reads 'Quite useless cost calculation for understanding it'",
+		"precondition_keys": [
+			"ts",
+			"ui"
+		],
+		"precondition_reason_missing_start": "missing_start_instant",
+		"precondition_reason_missing_unit_id": "missing_queued_unit_id",
+		"refusal_note": "the legacy branch RAISES KeyError when the attribute bag lacks ts or ui, and would raise again inside int(...) for a queued unit that carries no sm_training_time (129 of the 429 committed units). This contract reproduces neither crash: it names the unmet precondition and refuses, and it never reads the duration field at all",
+		"source": "command.py:727-743",
+		"start_instant_teardown": "the branch sets ts = 0, so a later refresh sees no timer; that write is NOT reproduced either, because the cost it reports is never charged"
+	},
+	"speedup_precondition": {
+		"cost_implemented": false,
+		"keys_present": [
+			"ts",
+			"ui"
+		],
+		"met_on_the_committed_shape": true,
+		"reason": "",
+		"reasons": [
+			"absent_queue",
+			"missing_start_instant",
+			"missing_queued_unit_id"
+		],
+		"refuses_instead_of_raising": false
+	}
+}

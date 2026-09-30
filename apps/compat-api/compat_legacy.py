@@ -67,6 +67,13 @@ from hashing import directory_entries, sha256_file  # noqa: E402
 # Directories the legacy boot modules read through bundle.py's "." paths.
 CORPUS_COPY_DIRS = ("config", "mods", "villages")
 
+# The committed shape of a placed map row, ``[item, x, y, timestamp,
+# orientation, store, attr, player]`` (``engine.py:31``), and the index of the
+# attribute bag the production queue occupies.  Recorded here so every accessor
+# that validates a row agrees on one shape and one slot.
+MAP_ROW_SLOTS = 8
+MAP_ROW_SLOT_ATTR = 6
+
 # ``upgrades_to`` / ``trains_ids`` sentinels that mean "no path", copied
 # verbatim from the normalized content package's own rule
 # (``packages/game-content/tools/build_items.py``: ``RELATION_NONE = (-1, 0)``
@@ -711,6 +718,46 @@ class LegacyBoot:
         does for the purchase superset).
         """
         return self.map_items(user_id).get(str(index))
+
+    def map_item_attr(self, user_id: str, index: int) -> Dict[str, Any]:
+        """``map["items"][str(index)][6]`` — a row's attribute bag, as a **copy**.
+
+        The production-queue deliver line's accessor.  The queue occupies three
+        keys of this bag (``nu``, ``ts``, ``ui``; ``engine.py:183-213``) and
+        nothing else, so this is the only row field the queue endpoint reads.
+
+        A **copy** is deliberate: both legacy queue helpers mutate that very
+        ``dict`` **in place** (``engine.py:185-189`` writes ``attr["nu"]`` and
+        ``attr["ts"]``; ``engine.py:200-204`` deletes three keys), so the
+        endpoint reads it for the pre-execution derivation and the response's
+        "previous" row, and a bag returned by reference would alias the live dict
+        and report the after-state as the before-state.
+
+        The row is validated as an **eight-field** entry carrying an **object**
+        bag, and every unreadable shape raises ``LegacyBootError`` rather than
+        reading as an empty queue: an empty bag and a missing one are the same
+        state, but a bag that is not a bag is a different one.
+        """
+        row = self.map_item(user_id, index)
+        if not isinstance(row, list):
+            raise LegacyBootError(
+                "invalid_save_state",
+                "no row at map key %r in the save for user id %r" % (index, user_id),
+            )
+        if len(row) != MAP_ROW_SLOTS:
+            raise LegacyBootError(
+                "invalid_save_state",
+                "the row at map key %r has %d fields, not the committed %d"
+                % (index, len(row), MAP_ROW_SLOTS),
+            )
+        bag = row[MAP_ROW_SLOT_ATTR]
+        if not isinstance(bag, dict):
+            raise LegacyBootError(
+                "invalid_save_state",
+                "the row at map key %r carries an attribute bag of type %s, not "
+                "an object" % (index, type(bag).__name__),
+            )
+        return dict(bag)
 
     def map_store(self, user_id: str) -> Dict[str, object]:
         """``save["maps"][0]["store"]`` — the player's storage mapping.

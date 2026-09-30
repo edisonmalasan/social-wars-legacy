@@ -9,8 +9,9 @@ extends Node
 ## store intent, `upgrade_building()` for one upgrade intent,
 ## `build_construction()` for one construction intent,
 ## `collect_income()` for one collection intent, `expand_town()` for one
-## expansion intent, and `level_up_town()` for one level-up intent, receiving
-## typed results
+## expansion intent, `level_up_town()` for one level-up intent, and
+## `push_queue_unit_town()` / `pop_queue_unit_town()` for one production-queue
+## intent each, receiving typed results
 ## (`scripts/gameapi/boot_data.gd`); raw transport dictionaries never reach
 ## presentation code, and no other script references a transport.
 ##
@@ -28,8 +29,9 @@ extends Node
 ##               `tests/fixtures/godot-building-construction/`
 ##               (construction), `tests/fixtures/godot-building-collect/`
 ##               (collection), and `tests/fixtures/godot-building-expand/`
-##               (expansion), and `tests/fixtures/godot-building-xp/`
-##               (level); no process, no server, no socket.
+##               (expansion), `tests/fixtures/godot-building-xp/`
+##               (level), and `tests/fixtures/godot-unit-queues/`
+##               (queue); no process, no server, no socket.
 ##   legacy_v0 - JSON over loopback HTTP to Compatibility API v0 through the
 ##               built-in HTTP request client; endpoint from the project
 ##               setting `gameapi/endpoint` (default: loopback 127.0.0.1 on
@@ -124,6 +126,12 @@ var expand_requests := 0
 ## for the same reason: `configure()` swaps the implementation without hiding
 ## history.
 var level_up_requests := 0
+## Number of production-queue intents this process has issued — the push and the
+## pop together (unit-queues flow contract: exactly one per confirm, zero for
+## every local refusal — the queue suite snapshots this counter exactly like
+## `placement_requests`). Monotonic for the same reason: `configure()` swaps the
+## implementation without hiding history.
+var queue_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -350,6 +358,50 @@ func expand_town(user_id: String,
 func level_up_town(user_id: String) -> BootData.LevelUpResult:
 	level_up_requests += 1
 	var result: BootData.LevelUpResult = await _impl.level_up_town(user_id)
+	return result
+
+
+## One production-queue **push** intent (the save identity and the target row's
+## key, and NOTHING else) from the selected implementation. The contract carries
+## NO count, NO cost, NO duration, NO training time, NO readiness, and NO
+## resource deltas: the service derives `push_queue_unit` from the closed action
+## vocabulary, reads nothing but the addressed row, and executes the unchanged
+## legacy branch with a NEUTRAL vector (unit-queues design D2/D4/D5) — so a
+## client-supplied outcome key is ignored exactly as a client-supplied amount or
+## price is ignored elsewhere, and the typed result's two rows, `queue`, and
+## `resources` are authoritative (design D8). The response's second
+## post-execution proof half requires every stored resource to be
+## **unchanged**, because a queue moves none.
+##
+## **No unit is created by this intent**: the legacy server has no command that
+## completes a queue or materialises a unit from one, so a push is a count and a
+## start instant and nothing more (design D1/D2).
+func push_queue_unit_town(user_id: String,
+		map_key: int) -> BootData.QueueResult:
+	queue_requests += 1
+	var result: BootData.QueueResult = await _impl.push_queue_unit_town(
+		user_id, map_key)
+	return result
+
+
+## One production-queue **pop** intent (the save identity and the target row's
+## key, and NOTHING else) from the selected implementation. The contract carries
+## no count, cost, duration, or outcome: the service derives
+## `pop_queue_unit`, and the legacy branch's own rules are the whole contract —
+## it decrements the count, re-stamps the start instant on a partial decrement,
+## and **deletes `nu`, `ts`, and `ui` together** at zero (design D1/D3). No
+## producer, duration, level, or count check is added, and **no maximum count is
+## applied** anywhere, because the legacy engine sets none (design D5).
+##
+## A pop against a row whose bag carries no count is an **inert recorded
+## no-op**, not an error: the endpoint answers success with an unchanged bag. The
+## client simply does not offer it (`queue_flow.offers_pop()`), and this facade
+## adds no gate of its own — the service's own guards decide.
+func pop_queue_unit_town(user_id: String,
+		map_key: int) -> BootData.QueueResult:
+	queue_requests += 1
+	var result: BootData.QueueResult = await _impl.pop_queue_unit_town(
+		user_id, map_key)
 	return result
 
 

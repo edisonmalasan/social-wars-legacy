@@ -1,0 +1,651 @@
+{
+  "captured": {
+    "completion": false,
+    "completion_captured": false,
+    "completion_command_exists": false,
+    "no_server_side_completion": {
+      "attr_ts_uses": {
+        "deletions": [
+          "engine.py:202"
+        ],
+        "readers": [
+          "command.py:733 (soulmixer_speedup only, and not a general queue path)"
+        ],
+        "writes": [
+          "engine.py:189",
+          "engine.py:198"
+        ]
+      },
+      "complete_family": [
+        "complete_collection",
+        "complete_goal",
+        "complete_tutorial"
+      ],
+      "consequence": "a queue can be pushed and popped and nothing server-side ever finishes it; the production line owns that missing completion as its finding, and this line refuses to invent a readiness rule the legacy server does not have",
+      "dispatcher_named_branches": 63,
+      "queue_completion_command": null,
+      "unit_materialising_command": null
+    },
+    "note": "A PUSH and a POP were captured, and NO COMPLETION WAS CAPTURED \u2014 because the legacy server has no completion command at all. The dispatcher has 63 named branches and the complete_* family is exactly complete_collection, complete_goal, and complete_tutorial; no command completes a queue and no command materialises a unit from one. Every occurrence of attr['ts'] in the legacy source is a WRITE (engine.py:189, engine.py:198) or a DELETION (engine.py:202), so there is no server-side elapsed-time evaluation either and no readiness rule to reproduce. This fixture therefore evidences a push and a pop ONLY and says nothing about a finished queue; the missing completion is on the record here rather than left for a reader to find",
+    "pop": true,
+    "push": true
+  },
+  "cleanup": {
+    "disposable_removed_before_manifest_write": true,
+    "server_stopped_within_run": true
+  },
+  "containment": {
+    "disposable_copy_removed": true,
+    "fixture_output": "tests/fixtures/godot-unit-queues",
+    "identical": true,
+    "loopback_only": true,
+    "method": "SHA-256 snapshot of every read working-tree group before the run and after the server stopped; equal or the run fails before writing fixtures. The already committed boot, placement, purchase, move, sell, store, upgrade, construction, collect, and expand fixtures are digest-pinned for the same reason.",
+    "no_flash_browser_external_network": true,
+    "only_working_tree_writes": "fixture files under --out",
+    "post_combined_sha256": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "post_run": {
+      "config": {
+        "exists": true,
+        "files": 12,
+        "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+      },
+      "mods": {
+        "exists": true,
+        "files": 2,
+        "sha256": "81b3c6e1f426e8813d96028b9035a853c1fbff8716256e84e956d8826f136ba3"
+      },
+      "root_python": {
+        "exists": true,
+        "files": 11,
+        "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+      },
+      "saves": {
+        "exists": false,
+        "files": 0,
+        "sha256": "absent"
+      },
+      "templates": {
+        "exists": true,
+        "files": 19,
+        "sha256": "2dffe0ca8746b63cf64fd1062a7f259ba2bb85a2fc54f7a2cd2bd2564ffee4ef"
+      },
+      "tests/saves": {
+        "exists": true,
+        "files": 3,
+        "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+      },
+      "villages": {
+        "exists": true,
+        "files": 31,
+        "sha256": "92429a07402766d8183b16fb32178b5c51f1e555df69d3cb46085a7d977f96ea"
+      }
+    },
+    "pre_combined_sha256": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "pre_run": {
+      "config": {
+        "exists": true,
+        "files": 12,
+        "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+      },
+      "mods": {
+        "exists": true,
+        "files": 2,
+        "sha256": "81b3c6e1f426e8813d96028b9035a853c1fbff8716256e84e956d8826f136ba3"
+      },
+      "root_python": {
+        "exists": true,
+        "files": 11,
+        "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+      },
+      "saves": {
+        "exists": false,
+        "files": 0,
+        "sha256": "absent"
+      },
+      "templates": {
+        "exists": true,
+        "files": 19,
+        "sha256": "2dffe0ca8746b63cf64fd1062a7f259ba2bb85a2fc54f7a2cd2bd2564ffee4ef"
+      },
+      "tests/saves": {
+        "exists": true,
+        "files": 3,
+        "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+      },
+      "villages": {
+        "exists": true,
+        "files": 31,
+        "sha256": "92429a07402766d8183b16fb32178b5c51f1e555df69d3cb46085a7d977f96ea"
+      }
+    },
+    "protected_fixtures": {
+      "identical": true,
+      "paths": [
+        "tests/fixtures/godot-compatibility-boot",
+        "tests/fixtures/godot-building-placement",
+        "tests/fixtures/godot-item-purchase",
+        "tests/fixtures/godot-building-move",
+        "tests/fixtures/godot-building-sell",
+        "tests/fixtures/godot-building-store",
+        "tests/fixtures/godot-building-upgrade",
+        "tests/fixtures/godot-building-construction",
+        "tests/fixtures/godot-building-collect",
+        "tests/fixtures/godot-building-expand"
+      ],
+      "post_run": {
+        "godot-building-collect": {
+          "exists": true,
+          "files": 12,
+          "sha256": "c2ebf3b0778a994e97310b5247809fda57b940cb04b1d1215db787dd81009fa8"
+        },
+        "godot-building-construction": {
+          "exists": true,
+          "files": 12,
+          "sha256": "8efdebcf8e5b91251a48f17d840380da8cd48ea33a922656c67acb115d3c3751"
+        },
+        "godot-building-expand": {
+          "exists": true,
+          "files": 12,
+          "sha256": "08829b34c70979ffd8e887e98bb77d5d6b53774817b393f6388795ff5eb98d19"
+        },
+        "godot-building-move": {
+          "exists": true,
+          "files": 12,
+          "sha256": "b3c477a7947fbe409330f03a8658cdca707a2631b52d1d4c5127f440619799c1"
+        },
+        "godot-building-placement": {
+          "exists": true,
+          "files": 12,
+          "sha256": "546a5f00e5e45319ffd17f5ee67201dd2b72cb21de833a3e35e8a9a98d60c5a8"
+        },
+        "godot-building-sell": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fa85af3fb12ef8b9298203a64632b6d7b31c1ed48f8d1ba716151f25ec7ab1c4"
+        },
+        "godot-building-store": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d4dff84132353a60e3a005c42d067185772ec8d6a2548ffdc5aa4779a2055194"
+        },
+        "godot-building-upgrade": {
+          "exists": true,
+          "files": 12,
+          "sha256": "398675ad94928dd75f7fbcd9f62e082d73ee973d3c973f5bbdf44a083a9c0521"
+        },
+        "godot-compatibility-boot": {
+          "exists": true,
+          "files": 31,
+          "sha256": "4d389707e0f18676fb23b3a2a8a47031b4e233366e4066437f8bad6854e15234"
+        },
+        "godot-item-purchase": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d05e5b92b26a1222774bb32e76a42417c692e65ee1b87abdb8a2f4e6cd84e813"
+        }
+      },
+      "pre_run": {
+        "godot-building-collect": {
+          "exists": true,
+          "files": 12,
+          "sha256": "c2ebf3b0778a994e97310b5247809fda57b940cb04b1d1215db787dd81009fa8"
+        },
+        "godot-building-construction": {
+          "exists": true,
+          "files": 12,
+          "sha256": "8efdebcf8e5b91251a48f17d840380da8cd48ea33a922656c67acb115d3c3751"
+        },
+        "godot-building-expand": {
+          "exists": true,
+          "files": 12,
+          "sha256": "08829b34c70979ffd8e887e98bb77d5d6b53774817b393f6388795ff5eb98d19"
+        },
+        "godot-building-move": {
+          "exists": true,
+          "files": 12,
+          "sha256": "b3c477a7947fbe409330f03a8658cdca707a2631b52d1d4c5127f440619799c1"
+        },
+        "godot-building-placement": {
+          "exists": true,
+          "files": 12,
+          "sha256": "546a5f00e5e45319ffd17f5ee67201dd2b72cb21de833a3e35e8a9a98d60c5a8"
+        },
+        "godot-building-sell": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fa85af3fb12ef8b9298203a64632b6d7b31c1ed48f8d1ba716151f25ec7ab1c4"
+        },
+        "godot-building-store": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d4dff84132353a60e3a005c42d067185772ec8d6a2548ffdc5aa4779a2055194"
+        },
+        "godot-building-upgrade": {
+          "exists": true,
+          "files": 12,
+          "sha256": "398675ad94928dd75f7fbcd9f62e082d73ee973d3c973f5bbdf44a083a9c0521"
+        },
+        "godot-compatibility-boot": {
+          "exists": true,
+          "files": 31,
+          "sha256": "4d389707e0f18676fb23b3a2a8a47031b4e233366e4066437f8bad6854e15234"
+        },
+        "godot-item-purchase": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d05e5b92b26a1222774bb32e76a42417c692e65ee1b87abdb8a2f4e6cd84e813"
+        }
+      }
+    },
+    "working_tree_saves_unchanged": true
+  },
+  "corpus": {
+    "login_preserved_seed": true,
+    "pid": "00000000-0000-4000-8000-000000000001",
+    "seed": {
+      "file_sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+      "path": "tests/saves/fresh-player.json",
+      "saves_group_sha256_before_server_start": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6"
+    },
+    "seeded_as": "saves/<pid>.save.json in the disposable copy",
+    "startup_preserved_seed": true
+  },
+  "executed_at_utc": "2026-09-30T19:43:35+00:00",
+  "exit_code": 0,
+  "intent": {
+    "command_contract": [
+      {
+        "args": [
+          "map index"
+        ],
+        "command": "push_queue_unit",
+        "effect": "nu becomes (nu + 1) when present and 1 when absent; ts is stamped with timestamp_now(); nothing else is written",
+        "offered_by_the_endpoint": true,
+        "source": "command.py:676-685 -> engine.py:183-189",
+        "validation": "none: not producer-ness, not training_time, not min_level, and no bound on the count"
+      },
+      {
+        "args": [
+          "map index"
+        ],
+        "command": "pop_queue_unit",
+        "effect": "with nu ABSENT the helper returns and nothing is written (an inert, recorded no-op); otherwise nu is decremented, and a positive result writes nu and re-stamps ts, while zero DELETES nu, ts, and ui together",
+        "offered_by_the_endpoint": true,
+        "source": "command.py:699-708 -> engine.py:191-204",
+        "validation": "none: not producer-ness, not training_time, not min_level, and no bound on the count"
+      },
+      {
+        "args": [
+          "map index",
+          "unit_id"
+        ],
+        "command": "push_queue_unit2",
+        "effect": "the same push, plus ui = the client-supplied unit id",
+        "offered_by_the_endpoint": false,
+        "source": "command.py:687-697 -> engine.py:206-213",
+        "validation": "none: the unit id is not checked against the content",
+        "why_not_offered": "the id is a CLIENT-SUPPLIED argument and no evidence establishes which ids a client actually sends, so this endpoint offers no intent that would have to invent one; the client projection reports an unresolvable ui with its recorded value intact rather than coercing it (design D7)"
+      }
+    ],
+    "derived": {
+      "commands_per_batch": 1,
+      "envelope_keys": [
+        "accessToken",
+        "commands",
+        "first_number",
+        "publishActions",
+        "tries",
+        "ts"
+      ],
+      "pop": {
+        "args": [
+          1
+        ],
+        "command": "pop_queue_unit",
+        "resources_changed": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "push": {
+        "args": [
+          1
+        ],
+        "command": "push_queue_unit",
+        "resources_changed": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "resource_vector": "unknown, xp, gold, wood, oil, steel, cash, mana",
+      "vector_is_neutral": true
+    },
+    "map_key_rule": "the legacy map index is the queue commands' ONLY argument (command.py:677, command.py:700); no producer, duration, count, readiness, or outcome is accepted, and the extra keys a client might add are ignored",
+    "map_key_sent": 1,
+    "no_elapsed_time": "NO ELAPSED-TIME EVALUATION IS IMPLEMENTED. Every occurrence of attr['ts'] in the legacy source is a WRITE (engine.py:189, engine.py:198) or a DELETION (engine.py:202); the single branch that reads it back is soulmixer_speedup, which is not a general queue path. The dispatcher has 63 named branches and the complete_* family is exactly complete_collection, complete_goal, and complete_tutorial: NO command completes a queue and no command materialises a unit from one. There is therefore no server-side 'is this queue ready?' rule to reproduce, so this contract computes NO readiness, NO remaining time, NO progress ratio, and NO completion (design D1/D2). The absence is a recorded property of the legacy contract, not a missing feature; a future line may introduce completion only as its own deliverable, with its own evidence",
+    "no_validation": "NO VALIDATION IS PERFORMED BY THE LEGACY SERVER AND NONE IS IMPLEMENTED HERE. push_queue_unit, pop_queue_unit, and push_queue_unit2 do not check that the item is a training producer, do not read training_time, do not check min_level, and do not cap nu. Any placed row can be queued, a row that already carries a queue can be queued again, and the queue length is unbounded. The recorded absence of a count bound is NOT permission to invent one (design D5): a cap the engine does not set would be a rule the legacy server does not have, and an authoritative limit belongs to a later server-authoritative milestone",
+    "speedup_contract": {
+      "author_verdict": "Quite useless cost calculation for understanding it (command.py:732)",
+      "charges_anything": false,
+      "cost_formula": "ceil(remaining_seconds / 3600)",
+      "duration_source": "the QUEUED UNIT's sm_training_time, not the building's training_time",
+      "endpoint_action": "none: this endpoint offers no speedup intent at all",
+      "field_coverage": "sm_training_time is a SOUL-MIXER field, not a general training duration: it is present on 300 of the 429 committed units, absent from the other 129 (including 923 Gorilla, 933 Wild Elephant, 1001 Worker I, and 1013 Truck), takes 84 distinct values beginning at 4000, and is present on 0 of the 470 committed buildings. training_time is the opposite: 130 of 470 buildings carry a positive one and 0 of 429 units do, and NO queue branch reads either field (design D5)",
+      "implemented": false,
+      "precondition": "ts AND ui in the addressed row's attribute bag; the legacy branch raises KeyError without either",
+      "recorded": true,
+      "refusal_instead_of_a_crash": "the legacy branch RAISES KeyError when the attribute bag lacks ts or ui, and would raise again inside int(...) for a queued unit that carries no sm_training_time (129 of the 429 committed units). This contract reproduces neither crash: it names the unmet precondition and refuses, and it never reads the duration field at all",
+      "teardown": "sets ts = 0 so a later refresh sees no timer",
+      "unit_reading": "SECONDS (the cost divides by an hour)"
+    },
+    "status": "established: the three branches' exact argument lists and effects, the ABSENCE of any validation among them, that every attr['ts'] use is a write or a deletion except soulmixer_speedup's read, that branch's four lines and its comment, the 63-branch dispatcher and the absence of any queue-completion command, apply_resources running before dispatch with a request-supplied vector, the committed sm_training_time coverage, and the resulting states of these two executed transactions. DERIVED and never observed from the Flash client: that a real client sends exactly these two batches, and that the derived vectors are neutral. The claim is about what the legacy server does with a map index, NEVER about what a Flash client sent, and no cost, timer, readiness, completion, or produced unit is claimed",
+    "teardown": "when the count reaches zero, pop_queue_unit deletes nu, ts, and ui TOGETHER (engine.py:198-204): the three keys are never torn down independently, no committed branch deletes one of them on its own, and a save therefore never carries a partial queue teardown",
+    "vector_rule": "NO queue cost is claimed or implemented (design D4): a queue's price would be a CLIENT-SENT delta, because do_command applies the request's per-command vector before the branch (command.py:40; engine.py:251-271) as max(current + delta, 0). The derived vector is NEUTRAL and the endpoint's second post-execution proof half requires every stored resource to be UNCHANGED"
+  },
+  "interpreter": {
+    "executable": "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+    "requirement": "CPython 3.9.x (pinned baseline for this change)",
+    "version": "3.9.13 (tags/v3.9.13:6de2ca5, May 17 2022, 16:36:42) [MSC v.1929 64 bit (AMD64)]"
+  },
+  "invocation": "python -B apps/compat-api/capture_queue_fixture.py",
+  "probes": [
+    {
+      "attr_after": {
+        "nu": 1,
+        "ts": 1790797415
+      },
+      "changed_top_level_map_keys": [
+        "items",
+        "xp"
+      ],
+      "commands": [
+        "push_queue_unit([1]) with a CLIENT-SENT vector [0, 500, 0, 0, 0, 0, 0, 0]"
+      ],
+      "established": "the branch writes ONLY the addressed row's attribute bag (command.py:676-685 -> engine.py:183-189): nu is set to 1 when absent and incremented when present, and ts is stamped with timestamp_now(). The experience move is entirely client-sent: apply_resources runs BEFORE the branch (command.py:40; engine.py:251-271) and applies the 8-slot vector verbatim per resource as max(current + delta, 0)",
+      "executed_in_this_capture": true,
+      "leaf_differences": [
+        "/maps/0/items/1/6/nu",
+        "/maps/0/items/1/6/ts",
+        "/maps/0/xp"
+      ],
+      "other_resources": "gold 2000, wood 2000, oil 2000, steel 2000, playerInfo.cash 5 and privateState.mana 0 all unchanged",
+      "probe": 1,
+      "question": "what does a queue command actually write, and what happens when the client-sent resource vector is not neutral?",
+      "resources_after": {
+        "cash": 5,
+        "gold": 2000,
+        "mana": 0,
+        "oil": 2000,
+        "steel": 2000,
+        "wood": 2000,
+        "xp": 504
+      },
+      "resources_before": {
+        "cash": 5,
+        "gold": 2000,
+        "mana": 0,
+        "oil": 2000,
+        "steel": 2000,
+        "wood": 2000,
+        "xp": 4
+      },
+      "response": "{\"result\":\"success\"}",
+      "why_it_matters": "this is the executed evidence for the derived NEUTRAL vector and for the endpoint's second post-execution proof half. A queue command that carried a non-zero vector would move a balance through this very branch, so proving after execution that EVERY stored resource is unchanged is what distinguishes a correct queue intent from a resource-minting exploit wearing its clothes (design D4). Without probe 1 the 'nothing moved' proof would be a tautology",
+      "xp_after": 504,
+      "xp_before": 4
+    }
+  ],
+  "purpose": "Executed request/before/response/after fixtures for a legacy production-queue push followed by a pop on the committed corpus's own real placed training producer; the executed-legacy parity oracle for the Compatibility API v0 queue endpoint.",
+  "schema": "godot-unit-queues/legacy-capture-v1",
+  "server": {
+    "command": [
+      "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+      "-B",
+      "server.py"
+    ],
+    "command_recorder_env": "SOCIALWARS_COMMAND_RECORD_DIR stripped from child",
+    "cwd": "<disposable copy under the system temp root>",
+    "host": "127.0.0.1",
+    "output_logs": "server.stdout.log / server.stderr.log inside the disposable copy (removed with the copy; not committed)",
+    "port": 5055,
+    "port_free_after_stop": true,
+    "port_free_before_start": true,
+    "readiness": "TCP connect loop on 127.0.0.1:5055 (no extra HTTP request)",
+    "stopped_by": "taskkill /T /F <pid>, wait, then port-free re-check"
+  },
+  "target": {
+    "attr_before": {},
+    "cell": [
+      51,
+      41
+    ],
+    "fabricated_state": false,
+    "group_type": "COMMAND_CENTER",
+    "item_id": 26,
+    "item_name": "Command Center",
+    "map_key": 1,
+    "min_level": 1,
+    "row_before": [
+      26,
+      51,
+      41,
+      0,
+      0,
+      [],
+      {},
+      1
+    ],
+    "target_rule": "the committed corpus's own REAL placed training producer: maps[0].items['1'] is [26, 51, 41, 0, 0, [], {}, 1] \u2014 id 26, Command Center, training_time 5, min_level 1, group_type COMMAND_CENTER \u2014 with an EMPTY attribute bag. Both queue commands are therefore exercisable against the corpus as committed, with NO fabricated player state, which is what makes this the first M8 line that can own a real executed-legacy queue fixture. The map key is the legacy map index the branches read as args[0] and nothing more",
+    "training_time": 5
+  },
+  "time_dependent_fields": {
+    "documented_normalization": "queue parity applies NO clock normalization: the recorded count is compared by value (exactly the derived count), the three-key teardown is compared by presence, every key the branch does not own is compared by value, and every stored resource is compared by value (exactly unchanged, because the derived vector is neutral). The ONLY comparison that is not by value is the start instant, which is checked for being a strict integer and for NOT moving backwards: engine.timestamp_now has one-second resolution, so two commands inside one second legitimately stamp the same value and a 'strictly later' rule would refuse a correct transaction. The branch's own ts stamp is the only clock in the recorded state",
+    "leaves": [
+      "/captured_at_utc in steps/login_post/request.json",
+      "/captured_at_utc in steps/login_post/response.meta.json",
+      "/captured_at_utc in steps/command_push_queue_unit/request.json",
+      "/captured_at_utc in steps/command_push_queue_unit/response.meta.json",
+      "/captured_at_utc in steps/command_pop_queue_unit/request.json",
+      "/captured_at_utc in steps/command_pop_queue_unit/response.meta.json",
+      "/executed_at_utc in capture-manifest.json",
+      "/headers/Date in steps/login_post/response.meta.json",
+      "/headers/Date in steps/command_push_queue_unit/response.meta.json",
+      "/headers/Date in steps/command_pop_queue_unit/response.meta.json",
+      "the envelope ts inside each command step's request.json /form/data (and therefore that whole field's string, because the digest covers the payload), since ts is the current time"
+    ],
+    "rule": "the recorded STATE and the recorded RESPONSE carry exactly ONE time-dependent VALUE, appearing in exactly two files: push_queue_unit stamps attr['ts'] with the wall clock (engine.py:189), so that stamp is in the push step's after.json and in the pop step's before.json \u2014 the latter because the pop runs after the push, on the row the push queued. The pop step's AFTER-state carries no stamp at all, because the three-key teardown removed it: that after-state is the seed byte-for-byte. The leaves below are the whole record-metadata and envelope-clock surface, and the claim is machine-checkable: a leaf-level diff of two consecutive runs must differ at exactly these paths and nowhere else",
+    "stable_by_derivation": "the pushed count, the three-key teardown, every placement count, and all seven stored resources are byte-stable because the derivation is fixed: a push always derives count 1 on a row whose bag is empty, a pop at that count always tears the three keys down, and the derived vectors are neutral. Only the wall-clock instant the branch stamps is not derivable, and it is compared by SHAPE (a strict integer, not earlier than the pre-execution one) rather than by value",
+    "stable_state_leaves": [
+      "steps/command_push_queue_unit/before.json is byte-stable",
+      "steps/command_pop_queue_unit/after.json is byte-stable AND equal to the seed, because the teardown removed the queue",
+      "the login step's before.json and after.json are both byte-stable and identical to each other"
+    ],
+    "state_leaves": [
+      "/maps/0/items/1/6/ts in steps/command_push_queue_unit/after.json (and therefore that whole row's serialization, because the digest covers the payload)",
+      "/maps/0/items/1/6/ts in steps/command_pop_queue_unit/before.json (the same stamp, read by the pop's own derivation)"
+    ]
+  },
+  "transaction": {
+    "bought_units_after": [],
+    "bought_units_before": [],
+    "clamp_exercised": false,
+    "clamp_note": "legacy's max(current + delta, 0) only bites when a delta would drive a balance below zero; the derived vector is the NEUTRAL all-zero vector, so no balance moves at all and the clamp is never exercised by this fixture. That the vector really is client-sent and really would move a balance through this very branch is established by probe 1 above",
+    "count": 3,
+    "count_bound_applied": false,
+    "count_bound_note": "NO maximum count is applied: the engine sets none, and a documented absence is not a licence to invent a cap (design D5)",
+    "dead_heroes_after": {},
+    "increased_population_after": 0,
+    "increased_population_before": 0,
+    "map_key": 1,
+    "map_key_set_unchanged": true,
+    "map_sizes_present_after": false,
+    "map_sizes_present_before": false,
+    "other_map_fields_unchanged": true,
+    "other_rows_unchanged": true,
+    "placement_count_after": 40,
+    "placement_count_before": 40,
+    "player_info_unchanged": true,
+    "private_state_unchanged": true,
+    "queue_writes": [
+      "engine.apply_resources applies the derived NEUTRAL vector on the single command with max(..., 0) per resource, BEFORE the branch (command.py:40; engine.py:251-271)",
+      "engine.push_queue_unit sets attr['nu'] to 1 when absent and increments it when present, and stamps attr['ts'] with timestamp_now() (engine.py:183-189) \u2014 nothing else",
+      "engine.pop_queue_unit returns without writing anything when attr['nu'] is absent, otherwise decrements, re-stamps attr['ts'] on a partial decrement, and at zero DELETES attr['nu'], attr['ts'], and attr['ui'] together (engine.py:191-204) \u2014 nothing else"
+    ],
+    "readiness_computed": false,
+    "readiness_note": "NO readiness, remaining time, or progress ratio is computed anywhere in this contract, because the legacy server evaluates no queue's elapsed time (design D1/D2)",
+    "resource_delta": {
+      "cash": 0,
+      "gold": 0,
+      "mana": 0,
+      "oil": 0,
+      "steel": 0,
+      "wood": 0,
+      "xp": 0
+    },
+    "resources_after": {
+      "cash": 5,
+      "gold": 2000,
+      "mana": 0,
+      "oil": 2000,
+      "steel": 2000,
+      "wood": 2000,
+      "xp": 4
+    },
+    "resources_before": {
+      "cash": 5,
+      "gold": 2000,
+      "mana": 0,
+      "oil": 2000,
+      "steel": 2000,
+      "wood": 2000,
+      "xp": 4
+    },
+    "response_body": "{\"result\": \"success\"}",
+    "steps": [
+      {
+        "method": "POST",
+        "name": "login_post",
+        "path": "/",
+        "response_bytes": 207,
+        "response_sha256": "2de230237d9f4055670576b9485897dbc06581889ca90527504cbdbd4933ec01",
+        "save_after_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_before_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_unchanged_by_call": true,
+        "status": 302,
+        "target": "/"
+      },
+      {
+        "method": "POST",
+        "name": "command_push_queue_unit",
+        "path": "/dynamic/menvswomen/srvsexwars/command.php",
+        "response_bytes": 21,
+        "response_sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87",
+        "save_after_sha256": "c2bf784af679284048e13af506b28d1a5d6a709e28f93e1c83dc03fd551b08b8",
+        "save_before_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_unchanged_by_call": false,
+        "status": 200,
+        "target": "/dynamic/menvswomen/srvsexwars/command.php"
+      },
+      {
+        "method": "POST",
+        "name": "command_pop_queue_unit",
+        "path": "/dynamic/menvswomen/srvsexwars/command.php",
+        "response_bytes": 21,
+        "response_sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87",
+        "save_after_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_before_sha256": "c2bf784af679284048e13af506b28d1a5d6a709e28f93e1c83dc03fd551b08b8",
+        "save_unchanged_by_call": false,
+        "status": 200,
+        "target": "/dynamic/menvswomen/srvsexwars/command.php"
+      }
+    ],
+    "store_after": {},
+    "unit_note": "NO unit is created, trained, spawned, or placed by either captured command. The legacy server has no command that materialises a unit from a queue, so a captured push is not a captured production",
+    "unit_produced": false
+  },
+  "transactions": [
+    {
+      "action": "push",
+      "attr_after": {
+        "nu": 1,
+        "ts": 1790797415
+      },
+      "attr_before": {},
+      "changed_leaves": [
+        "/maps/0/items/1/6/nu",
+        "/maps/0/items/1/6/ts"
+      ],
+      "changed_row_pointer": "/maps/0/items/1/6",
+      "command": "push_queue_unit",
+      "derived": {
+        "action": "push",
+        "changed": true,
+        "command": "push_queue_unit",
+        "count": 1,
+        "keeps_unit_id": false,
+        "no_op": false,
+        "other_keys": [],
+        "queued_unit_id": null,
+        "start_instant": true,
+        "teardown": false
+      },
+      "projection_after": {
+        "absent_is_absent": true,
+        "count": 1,
+        "keys": [
+          "nu",
+          "ts"
+        ],
+        "present": true,
+        "queued_unit_id": null,
+        "start_instant": 1790797415
+      }
+    },
+    {
+      "action": "pop",
+      "attr_after": {},
+      "attr_before": {
+        "nu": 1,
+        "ts": 1790797415
+      },
+      "changed_leaves": [
+        "/maps/0/items/1/6/nu",
+        "/maps/0/items/1/6/ts"
+      ],
+      "changed_row_pointer": "/maps/0/items/1/6",
+      "command": "pop_queue_unit",
+      "derived": {
+        "action": "pop",
+        "changed": true,
+        "command": "pop_queue_unit",
+        "count": null,
+        "keeps_unit_id": false,
+        "no_op": false,
+        "other_keys": [],
+        "queued_unit_id": null,
+        "start_instant": false,
+        "teardown": true
+      },
+      "projection_after": {
+        "absent_is_absent": true,
+        "count": null,
+        "keys": [],
+        "present": false,
+        "queued_unit_id": null,
+        "start_instant": null
+      }
+    }
+  ]
+}
