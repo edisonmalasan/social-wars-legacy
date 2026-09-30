@@ -257,6 +257,97 @@ Surface (loopback only, port :5056):
     pre-execution ``resources`` are read **before** dispatch so the comparison
     is against the state the batch actually started from.
 
+``POST /v0/expand`` with JSON ``{"user_id", "expansion_id"}``
+    ``{protocol, ok, game_version, server_time, result, expansions_before,
+    expansions_after, debit, price, resources}`` — an intent only, and the
+    ninth state-mutating surface.  The unchanged legacy ``command()``
+    dispatcher executes one ``expand`` command in-process; that branch writes
+    **only** ``map["expansions"] += [int(expansion)]`` (``command.py:211-216``)
+    and the price is the client-sent 8-slot vector applied verbatim per
+    resource as ``max(current + delta, 0)`` by ``engine.apply_resources``
+    before the branch runs (``engine.py:251-271``), so the **debit** this
+    service derives is **the vector it sends**.  The answer carries the legacy
+    ``result`` plus the authoritative superset: the owned-expansions list
+    **before** execution, the same list **after** execution, the derived
+    ``debit``, the committed schedule ``price`` row it came from, and the
+    current ``resources`` (design D5).
+
+    Nothing but the save id and the expansion id enters the contract: no
+    amount, resource, price, time, requirement flag, or resource delta is
+    accepted from a client — the extra keys (``coins``, ``cash``, ``price``,
+    ``amount``, ``neighbors``, ``inventory_qte``, ``time``,
+    ``resources_changed``, …) are ignored.  The debit is therefore derived
+    entirely from committed content: the cost from the id's own row in the
+    98-entry positional ``expansion_prices`` schedule (design D1, derived),
+    the schedule's gold-named ``coins`` into the server's ``gold`` resource and
+    its ``cash`` into the server's ``cash`` resource (design D2, **established
+    by committed client asset names** — ``assets/images/en/expansion_gold.jpg``
+    and ``expansion_cash.jpg`` are the popup's two price components), as a
+    **debit**, so a zero-cost row derives the all-zero vector and is legal.
+    Six of the eight slots are always zero: the unread ``unknown`` slot 0 and
+    every slot no expansion price names (experience, wood, oil, steel, mana).
+
+    Three content/guard conflicts fail closed with **409** and no mutation,
+    each answering **before** the dispatcher runs: ``unknown_expansion_id``
+    (404) for an id outside the committed schedule, ``already_expanded`` (409)
+    for an id the player's own list already contains, and
+    ``expansion_requirements_unmet`` (409) for a row recording a positive
+    ``neighbors`` or ``inventory_qte``.  A fourth, ``insufficient_resources``
+    (409), refuses a balance that does not cover the derived debit.
+
+    The first two guards are **required, not defensive** (design D1): the
+    legacy server does no range check and no dedup at all, and an
+    executed-legacy probe had ``expand(999)``, a duplicate ``expand(35)``, and
+    ``expand(-1)`` all answer ``{"result":"success"}`` — so a client that
+    ignored the client's own rules could buy an expansion no committed row
+    prices and could append a repeat, corrupting the only ledger this line
+    maintains.
+
+    The requirements refusal is **refusal, not omission** (design D3): the
+    server ignores both fields and nothing the delivered stack can read
+    evaluates either — no neighbour count and no inventory quantity is exposed
+    by the bootstrap, the client's ``GameApi``, or the corpus.  The consequence
+    is recorded rather than worked around: **every id the corpus owns
+    (``35, 36, 45, 46``) records ``neighbors 15`` and ``inventory_qte 30``, so
+    none of them could have been bought under this rule, and 94 of the 98
+    committed rows record a positive requirement** — the only purchasable
+    entries in the whole schedule are the free indexes ``0..3``.
+
+    The affordability refusal is the **rejected alternative to reproducing the
+    clamp** (design D6).  An executed-legacy probe showed the clamp is
+    reachable for the first time in this family: a client-sent ``-2500`` gold
+    debit against a ``2000`` balance landed on ``0``, not ``-500``.  Because the
+    debit here is **server-derived**, the endpoint can know whether the balance
+    covers it, and silently under-charging would make the post-state proof
+    ambiguous (a balance that moved by less than the derived debit is
+    indistinguishable from a bug), so the refusal is the safe direction.
+
+    After execution the endpoint proves the post-state in **two** ways
+    (design D5) and fails closed with ``internal_error`` on any other outcome:
+    the owned list grew by **exactly one** entry, equal to the sent id,
+    **at the end**, with every existing entry unchanged and in order and never
+    reordered or deduplicated; **and every** stored resource changed by
+    **exactly** the derived debit.  The second half is what makes a wrong
+    server-derived price *reported* rather than trusted — this is the first
+    endpoint whose value-level proof exists specifically to catch a derivation
+    that would mint or burn the wrong amount — and the pre-execution
+    ``resources`` are read **before** dispatch so the comparison is against
+    the state the batch actually started from.
+
+    **No land, grid, or cell effect is claimed or implemented** (design D4):
+    nothing here reads a terrain, a grid extent, a cell, a footprint, or a
+    placement bound, and no claim is made that a bought expansion makes any
+    area of the town buildable.  The committed evidence establishes the
+    *vocabulary* — the SWF symbols ``PopupExpandMC`` and
+    ``btnBuyExpandTileMC`` plus ``assets/images/en/expansion.png`` show the
+    client's model is a purchasable **tile** bought through a popup, and the
+    two committed price-component images show it is priced in gold and cash —
+    but the committed SWF inspection is symbols-and-tags only and its own
+    scope statement disclaims timeline semantics, script behavior, and
+    rendering, so the **tile → cell geometry is not derivable from the
+    preserved evidence**.  The gap is a known evidence gap that bounds visual
+    land growth; closing it needs new evidence, not a derivation.
+
 Deviation recorded for review: the bootstrap envelope also carries ``saves``
 (the session envelope plus ``config`` and ``player_info``). Design D3 lists
 only ``config`` and ``player_info``; the extra key is a superset of D3 and
@@ -300,6 +391,46 @@ code                     HTTP  when
 ``invalid_duration``     400  derived start duration is not a positive integer
                                 (server-side derivation failure; never client
                                 input)
+``missing_expansion_id`` 400  ``/v0/expand`` body carries no ``expansion_id``
+``invalid_expansion_id`` 400  ``expansion_id`` present but not an integer
+                                (``bool`` excluded).  Legacy would raise
+                                ``int("abc")`` out of the branch and answer an
+                                unhandled HTTP 500
+``unknown_expansion_id`` 404  integer id outside the committed
+                                ``expansion_prices`` schedule.  The legacy
+                                server does **no** range check at all — an
+                                executed-legacy probe had ``expand(999)``
+                                answer success — and an id the table does not
+                                price must never be bought at a price no
+                                committed row states
+``already_expanded``     409  ``/v0/expand``: the expansion id is already in the
+                                player's ``map["expansions"]`` ledger.  Legacy
+                                neither deduplicates nor orders (a duplicate
+                                ``expand(35)`` answered success in the
+                                executed-legacy probe), so a repeat is refused
+                                rather than appended
+``expansion_requirements_unmet``
+                          409  ``/v0/expand``: the addressed committed row
+                                records a positive ``neighbors`` or
+                                ``inventory_qte`` requirement (94 of the 98
+                                stored rows, including **every** id the
+                                committed corpus owns).  The legacy server
+                                ignores both fields and nothing the delivered
+                                stack can read evaluates either — no neighbour
+                                count and no inventory quantity is exposed by
+                                the bootstrap, the client's ``GameApi``, or the
+                                corpus — so the requirement is refused, never
+                                invented
+``insufficient_resources``
+                          409  ``/v0/expand``: a stored balance does not cover
+                                the **server-derived** debit.  The legacy
+                                per-resource clamp would silently under-charge
+                                (an executed-legacy probe had a ``-2500`` gold
+                                debit against a ``2000`` balance land on
+                                ``0``), and a partially applied debit is
+                                indistinguishable from a wrong derivation, so
+                                the refusal is the recorded alternative to
+                                reproducing the clamp
 ``capped_collection``    409  ``/v0/collect``: the addressed placement's item
                                 records a **non-zero** committed ``max_collects``
                                 — only ``0`` is implemented, because nothing in
@@ -358,7 +489,8 @@ session and bootstrap endpoints never persist — this module never calls
 ``sessions.save_session`` for them and every call leaves the saves
 byte-identical. ``POST /v0/place``, ``POST /v0/purchase``,
 ``POST /v0/move``, ``POST /v0/sell``, ``POST /v0/store``,
-``POST /v0/upgrade``, ``POST /v0/construction``, and ``POST /v0/collect``
+``POST /v0/upgrade``, ``POST /v0/construction``, ``POST /v0/collect``, and
+``POST /v0/expand``
 execute the unchanged legacy ``command()`` dispatcher, which
 persists through legacy ``save_session`` into the **service corpus's**
 ``saves/`` and nowhere else; the service never opens a working-tree file for
@@ -375,6 +507,7 @@ from flask import Flask, Response, jsonify, request
 import compat_legacy
 import collect_envelope
 import construction_envelope
+import expand_envelope
 import move_envelope
 import placement_envelope
 import purchase_envelope
@@ -410,6 +543,12 @@ ERROR_INVALID_COORDINATES = "invalid_coordinates"
 ERROR_INVALID_ORIENTATION = "invalid_orientation"
 ERROR_INVALID_DURATION = "invalid_duration"
 ERROR_COSTS_NOT_CASH = "costs_not_cash"
+ERROR_MISSING_EXPANSION_ID = "missing_expansion_id"
+ERROR_INVALID_EXPANSION_ID = "invalid_expansion_id"
+ERROR_UNKNOWN_EXPANSION_ID = "unknown_expansion_id"
+ERROR_ALREADY_EXPANDED = "already_expanded"
+ERROR_EXPANSION_REQUIREMENTS_UNMET = "expansion_requirements_unmet"
+ERROR_INSUFFICIENT_RESOURCES = "insufficient_resources"
 ERROR_BAD_REQUEST = "bad_request"
 ERROR_NOT_FOUND = "not_found"
 ERROR_METHOD_NOT_ALLOWED = "method_not_allowed"
@@ -1967,6 +2106,318 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
                 payout=payout,
                 tier=tier,
                 reference_time=reference_time,
+                resources=resources_after,
+            ),
+            200,
+        )
+
+    @app.post("/v0/expand")
+    def v0_expand() -> Tuple[Dict[str, Any], int]:
+        """Execute one expansion intent through the unchanged legacy path.
+
+        One call carries **exactly one** legacy ``expand`` command, whose single
+        argument is the expansion id the client addressed
+        (``command.py:211-216``).  That branch writes **only**
+        ``map["expansions"] += [int(expansion)]``; the price travels in the
+        client-sent 8-slot resource vector, which ``engine.apply_resources``
+        applies before the branch runs as ``max(current + delta, 0)`` per
+        resource (``command.py:40``, ``engine.py:251-271``).  This line is the
+        second in the family whose derived vector is **not** neutral, and the
+        first whose vector is a **debit** — so the vector is derived from
+        committed content and never from a client.
+
+        Validation is structural fail-closed first, then the two guards and the
+        two content refusals, all **before** the dispatcher runs (design
+        D1/D3/D6): a JSON object body, a resolvable save, an integer expansion
+        id, an id the committed ``expansion_prices`` schedule prices, an id the
+        player's own ledger does not already contain, a row recording no
+        positive ``neighbors`` / ``inventory_qte`` requirement, and a balance
+        that covers the derived debit.
+
+        The range and duplicate guards are **required, not defensive**.  The
+        legacy server does neither: an executed-legacy probe had ``expand(999)``
+        (an id the schedule does not price), a duplicate ``expand(35)``, and
+        ``expand(-1)`` all answer ``{"result":"success"}``, and no branch reads,
+        validates, prices, orders, or deduplicates ``map["expansions"]`` at all.
+        So this contract refuses the two things the server lets through and
+        that would corrupt the only ledger it maintains, before the dispatcher
+        ever runs.
+
+        The requirements refusal is **refusal, not omission**.  The server
+        ignores both fields and nothing the delivered stack can read evaluates
+        either: no neighbour count and no inventory quantity is exposed by the
+        bootstrap, the client's ``GameApi``, or the corpus.  The consequence is
+        stated rather than worked around — every id the corpus owns records
+        ``neighbors 15`` / ``inventory_qte 30``, and 94 of the 98 committed
+        rows record a positive requirement, so the only purchasable entries are
+        the free indexes ``0..3``.
+
+        The affordability refusal is the recorded alternative to reproducing
+        the clamp (design D6).  The clamp is **reachable**: an executed-legacy
+        probe had a client-sent ``-2500`` gold debit against a ``2000`` balance
+        land on ``0`` rather than ``-500``.  Because the debit here is
+        server-derived, the endpoint can know whether the balance covers it, and
+        silently under-charging would make the post-state proof ambiguous — a
+        balance that moved by less than the derived debit is indistinguishable
+        from a wrong derivation.
+
+        Nothing but the save id and the id enters the contract: no amount,
+        resource, price, time, requirement flag, or resource delta is accepted
+        from a client — the extra keys are ignored, so no client value can
+        influence the debit.  Legacy performs no ownership, state, or gameplay
+        validation of any kind, so the endpoint's own validation is structural
+        fail-closed plus the two guards and two content refusals named above.
+
+        After execution the endpoint proves the post-state in **two** ways
+        (design D5) and fails closed with ``internal_error`` on any other
+        outcome: the owned list grew by **exactly one** entry equal to the sent
+        id **at the end**, with every existing entry unchanged and in order and
+        never reordered or deduplicated; **and every** stored resource changed by
+        **exactly** the derived debit.  The value-level half is what turns a
+        wrong server-derived price into a reported failure instead of a trusted
+        success — a derivation with the wrong sign, slot, or magnitude would
+        otherwise mint or burn the wrong amount and be reported as a success —
+        and the pre-execution ``resources`` are read before dispatch so the
+        comparison starts from the state the batch actually saw.
+
+        **No land, grid, cell, or placement-bound effect** is read, derived, or
+        claimed (design D4); see the module docstring for the committed
+        evidence that establishes the tile vocabulary and the committed scope
+        statement that excludes the tile → cell geometry.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404,
+                ERROR_UNKNOWN_USER_ID,
+                "no save exists for user_id %r" % user_id,
+            )
+
+        if "expansion_id" not in payload:
+            return error_response(
+                400, ERROR_MISSING_EXPANSION_ID, "expansion_id is required"
+            )
+        expansion_id = payload["expansion_id"]
+        if not expand_envelope.is_strict_int(expansion_id):
+            # Legacy would raise int("abc") out of the branch and answer an
+            # unhandled HTTP 500, so the value never reaches the dispatcher.
+            return error_response(
+                400, ERROR_INVALID_EXPANSION_ID, "expansion_id must be an integer"
+            )
+        # A negative id is a structurally unresolvable value, not an
+        # out-of-range one: the committed schedule's id space is
+        # ``0..size-1`` and Python would otherwise resolve ``-1`` to the
+        # schedule's **last** row, pricing a negative id from a positive one.
+        if expansion_id < 0:
+            return error_response(
+                400,
+                ERROR_INVALID_EXPANSION_ID,
+                "expansion_id must not be negative, got %d" % expansion_id,
+            )
+
+        # Both pre-execution reads happen **before** dispatch: the owned
+        # ledger, for the range / duplicate checks and the structural half of
+        # the post-execution proof, and the resources, for the value-level half
+        # (design D5).  ``map_expansions`` returns a copy, because the legacy
+        # dispatcher appends to that very list in place.
+        try:
+            expansions_before = boot.map_expansions(user_id)
+            resources_before = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        for entry in expansions_before:
+            if not expand_envelope.is_strict_int(entry):
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "the owned-expansions ledger carries an entry this service "
+                    "cannot reason about: %r" % (entry,),
+                )
+        # Design D1: the id space is the committed schedule's positional index.
+        # The length is the one number the range rule needs, read from the
+        # loaded configuration and never from a client.
+        try:
+            schedule_size = boot.expansion_price_count()
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if schedule_size is None:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the committed expansion schedule does not resolve",
+            )
+        if expansion_id < 0 or expansion_id >= schedule_size:
+            return error_response(
+                404,
+                ERROR_UNKNOWN_EXPANSION_ID,
+                "the committed expansion schedule has no price row for id %d "
+                "(it holds %d rows, indexes 0..%d)"
+                % (expansion_id, schedule_size, schedule_size - 1),
+            )
+        # Design D1, second guard: the legacy server neither deduplicates nor
+        # orders the ledger — a duplicate expand(35) answered success in the
+        # executed-legacy probe — so a repeat is refused rather than appended.
+        if expansion_id in expansions_before:
+            return error_response(
+                409,
+                ERROR_ALREADY_EXPANDED,
+                "expansion %d is already in this player's owned-expansions list"
+                % expansion_id,
+            )
+
+        # The committed row, verbatim and never coerced.  A row the loaded
+        # configuration cannot produce (a schedule drift) is a server-side
+        # derivation failure, reported rather than priced against.
+        try:
+            row = boot.expansion_price(expansion_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if row is None:
+            # The range check above already passed, so the loaded
+            # configuration genuinely cannot produce a row for an id it says it
+            # holds: a server-side content failure, never a client value, and
+            # never a price invented from an absent row.
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the committed expansion schedule holds %d rows but produced no "
+                "row for id %d" % (schedule_size, expansion_id),
+            )
+
+        # Design D3: an unevaluable requirement is refused, never invented.
+        try:
+            unmet = expand_envelope.unmet_requirements(row)
+        except expand_envelope.EnvelopeError as failure:
+            return error_response(500, ERROR_INTERNAL, failure.code)
+        if unmet:
+            return error_response(
+                409,
+                ERROR_EXPANSION_REQUIREMENTS_UNMET,
+                "expansion %d records %s requirements (%s), and nothing this "
+                "service can read evaluates them"
+                % (
+                    expansion_id,
+                    " and ".join(unmet),
+                    ", ".join(
+                        "%s=%r" % (field, row.get(field)) for field in unmet
+                    ),
+                ),
+            )
+
+        # Design D2: the debit is derived from the committed row alone.
+        try:
+            debit = expand_envelope.resource_vector_for(row)
+        except expand_envelope.EnvelopeError as failure:
+            # invalid_price / invalid_cost are server-side derivation
+            # failures: the committed content produced something this contract
+            # must never send, and no client value is involved.
+            return error_response(500, ERROR_INTERNAL, failure.code)
+
+        # Design D6: refuse an unaffordable balance rather than reproduce the
+        # clamp.  A named slot whose balance plus its (negative) debit would
+        # fall below zero is refused, because legacy's max(..., 0) would
+        # under-charge silently and the value-level proof could then no longer
+        # distinguish a short charge from a wrong derivation.
+        slot_of = {"gold": expand_envelope.GOLD_SLOT, "cash": expand_envelope.CASH_SLOT}
+        for name in sorted(slot_of):
+            delta = debit[slot_of[name]]
+            if delta == 0:
+                continue
+            if resources_before[name] + delta < 0:
+                return error_response(
+                    409,
+                    ERROR_INSUFFICIENT_RESOURCES,
+                    "expansion %d costs %d %s and this player holds %d; the "
+                    "derived debit would leave a negative balance"
+                    % (expansion_id, -delta, name, resources_before[name]),
+                )
+
+        # Derive the legacy envelope (design D1/D2): the command, its single
+        # argument, and the content-derived debit are the module's, never the
+        # client's.
+        try:
+            envelope_payload = expand_envelope.build_envelope(
+                expansion_id=expansion_id, vector=debit
+            )
+        except expand_envelope.EnvelopeError as failure:
+            if failure.code in ("invalid_price", "invalid_cost", "invalid_vector"):
+                return error_response(500, ERROR_INTERNAL, failure.code)
+            return error_response(400, failure.code, str(failure))
+
+        # Execute the unchanged legacy command dispatcher in-process.  It
+        # persists via legacy save_session into this corpus only; the legacy
+        # HTTP route returns {"result": "success"} whenever command() returns
+        # without raising, so reaching here IS the legacy result — which is
+        # precisely why it is NOT taken as proof that the right id was appended
+        # and the right amount was charged.
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        # Prove the post-state (design D5).  Part one: the owned list grew by
+        # exactly one entry, equal to the sent id, at the end, with every
+        # existing entry unchanged and in order.  Legacy's branch is an
+        # append, so anything else is a ledger corruption.
+        try:
+            expansions_after = boot.map_expansions(user_id)
+            resources_after = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        expected_list = list(expansions_before) + [expansion_id]
+        if expansions_after != expected_list:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the owned-expansions list is %r after execution, not the "
+                "documented %r (the sent id %d appended once, at the end, with "
+                "every existing entry unchanged and in order)"
+                % (expansions_after, expected_list, expansion_id),
+            )
+        # Part two: every stored resource changed by **exactly** the derived
+        # debit.  The affordability refusal above makes the clamp a no-op, so
+        # the exact sum is unambiguous.
+        debit_by_name = {
+            "xp": debit[1],
+            "gold": debit[expand_envelope.GOLD_SLOT],
+            "wood": debit[3],
+            "oil": debit[4],
+            "steel": debit[5],
+            "cash": debit[expand_envelope.CASH_SLOT],
+            "mana": debit[7],
+        }
+        for name in sorted(debit_by_name):
+            expected = resources_before[name] + debit_by_name[name]
+            if resources_after[name] != expected:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "resource %s is %r after execution, not the derived %r "
+                    "(it was %r, the derived debit is %r)"
+                    % (
+                        name,
+                        resources_after[name],
+                        expected,
+                        resources_before[name],
+                        debit_by_name[name],
+                    ),
+                )
+        return (
+            envelope(
+                boot,
+                result="success",
+                expansions_before=list(expansions_before),
+                expansions_after=list(expansions_after),
+                debit=debit,
+                price=dict(row) if hasattr(row, "items") else row,
                 resources=resources_after,
             ),
             200,
