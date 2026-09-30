@@ -508,6 +508,71 @@ committed capture runs the fake implementation, so real-execution parity rests o
 the fixture-replay tests and the live phase. No Flash, Ruffle, ActionScript, or
 browser executes in any of these commands.
 
+Verified building-expand commands (milestone M7; Godot 4.7.2.stable and pinned
+CPython 3.9.13, Windows x64; `python` denotes the pinned interpreter, never the
+PATH alias). This is the first deliver line whose derived vector is a **debit**,
+and the first whose two guards exist because an executed probe showed the legacy
+server omits them; the investigation record `docs/legacy-town-expansion.md` was
+committed before the proposal (PR #188):
+
+```bash
+python -B apps/compat-api/capture_expand_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_town_expand.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-09-30): the expand fixture capture (one-shot
+executed-legacy oracle; the request carries `[[0,"expand",[0],[0,0,0,0,0,0,0,0]]]`
+- expansion id 0, the free committed row - so `expansions` goes
+`[35, 36, 45, 46]` to `[35, 36, 45, 46, 0]`, growing by exactly one entry at the
+end with the existing four unchanged, in order, and **not** deduplicated, while all
+40 items, the map level, the storage, the whole private state, the player info, and
+**all seven resources** stay byte-identical; there is **no** time-dependent field in
+the after-state, so a rerun reproduces the committed bytes exactly; exit codes and
+containment recorded in `tests/fixtures/godot-building-expand/README.md`), the compat
+suite including the schedule derivation, the `/v0/expand` endpoint with its **two
+guards the legacy server omits** (`unknown_expansion_id` for an id outside the
+98-entry table and `already_expanded` for an owned id, justified by a probe in which
+the real server accepted `expand(999)`, a duplicate `expand(35)`, and `expand(-1)`,
+all answering success), its `expansion_requirements_unmet` and
+`insufficient_resources` refusals, and its **two-part** post-execution proof that
+checks the owned list grew by exactly one appended id **and** every stored resource
+changed by exactly the derived debit, and executed-legacy parity tests with **no
+normalization** (observed `Ran 947 tests ... OK`, exit `0`), the hermetic
+expansion-flow suite (observed 615 checks, PASS), both batteries in the final state
+(each exit `0`; the second embeds the `expand-live` phase, which asserts the typed
+response, its two-part post-state proof, that a refused expansion left the corpus
+byte-identical, and that a disposable corpus save mutated), and the preservation
+manifest (3,258 entries, exit `0`). The compatibility service listens on
+`127.0.0.1:5056` only, and every network call in these commands is loopback. The
+evidence capture and report steps are documented in `apps/client-godot/README.md`
+("Town expansion"); committed evidence lives under
+`apps/client-godot/evidence/building-expand/`. Claim limits: **the tile-to-cell
+geometry is a known evidence gap**, so no terrain, grid, buildable-cell, or
+placement-bound behavior is claimed or implemented, and closing the gap requires new
+evidence rather than a derivation; the **id-space indexing is derived** and the claim
+is that the debit is the one the committed positional table assigns to that id,
+never the price a coherent player pays; `coins` is **established as the client's
+`gold`** by the committed images `expansion_gold.jpg` and `expansion_cash.jpg`; the
+`neighbors` and `inventory_qte` requirements are refused rather than invented, which
+means **94 of 98 rows are unpurchasable, including all four ids the corpus owns**,
+so **the delivered transaction is a zero-cost expansion and no balance moves** and
+the priced path and the affordability refusal are covered only through stubbed
+schedule rows; the per-resource clamp is **reachable** (a client-sent 2500 gold debit
+against a 2000 balance landed on `0`, not `-500`, which is why the endpoint derives
+the debit server-side) but is **not exercised** by the fixture; a negative id is
+refused as `invalid_expansion_id` because Python would otherwise index the schedule
+from its end; expandability and addressability are client-side rules only, with the
+endpoint enforcing structural input validity, the two guards, the two refusals, and
+the two-part proof, and no server-authoritative validation (that belongs to
+Server v1 / M13); no pixel-parity oracle exists; the committed capture runs the fake
+implementation, so real-execution parity rests on the fixture-replay tests and the
+live phase. No Flash, Ruffle, ActionScript, or browser executes in any of these
+commands.
+
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 

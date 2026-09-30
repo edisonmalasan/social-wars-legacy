@@ -1767,7 +1767,129 @@ collect request counts, and the non-claims.
 - the committed capture runs the fake GameApi - a deterministic test double, not
   a parity oracle.
 
-These non-claims are recorded verbatim in
-`evidence/building-collect/report.json`.
-Remaining deliver lines of M7 (separate changes): town expansion, resources, and
-XP basics.
+## Town expansion
+
+The expansion slice (OpenSpec `building-expand`, milestone M7) delivers the
+**unlock ledger**: read the committed expansion schedule, refuse what the evidence
+does not support, send one intent, and prove the committed list grew by exactly the
+sent id.
+
+### Flow
+
+1. **Readout** - the committed schedule summary, the player's owned expansion ids,
+   and the next purchasable entry with its derived cost and affordability.
+2. **Action** - an `Expand` action mutually exclusive with the delivered `Move`,
+   `Sell`, `Store`, `Upgrade`, `Build`, and `Collect` modes. It lives in its own
+   UI-foundation slot rather than as a seventh button in the building panel:
+   an expansion names **no placement**, so a building-targeted row would imply a
+   target that does not exist.
+3. **Confirm** - names the **derived** debit, labelled as derived, and sends
+   exactly one `GameApi.expand_town(user_id, expansion_id)` intent. Cancelling
+   sends nothing.
+4. **Apply** - only the authoritative response is applied: the owned list and the
+   HUD balances come **from the response**, and if the client's own arithmetic
+   disagrees the server's numbers win. The apply also **fails closed** when the
+   client's ledger view differs from the service's, leaving the state
+   byte-identical.
+
+### The schedule the readout mirrors
+
+`expansion_prices` is **98 positional entries with no stable id** - the index *is*
+the id, range 0..97. **Only indexes 0..3 are purchasable**, because 94 of 98 rows
+record a positive `neighbors` or `inventory_qte` requirement that nothing the
+delivered stack can evaluate. All four ids the corpus owns (`35, 36, 45, 46`) are
+in that refused set, so they read as **owned and not repurchasable** rather than as
+offered. A row priced `coins C, cash K` derives the debit
+`[0, 0, -C, 0, 0, 0, -K, 0]`; six of the eight slots are always zero.
+
+### The land gap
+
+**No terrain, grid, buildable-cell, or placement-bound behavior is claimed or
+implemented.** The committed evidence establishes the *vocabulary* - the SWF
+symbols `PopupExpandMC` and `btnBuyExpandTileMC` and `expansion.png` show an
+expansion is a purchasable **tile**, and `expansion_gold.jpg` /
+`expansion_cash.jpg` are its two price components - but nothing preserved maps a
+tile to a cell, because the committed SWF inspection is symbols-and-tags only and
+its own scope statement disclaims timeline semantics, script behavior, and
+rendering. **Closing that gap requires new evidence, not a derivation.** The
+absence is asserted at runtime (placements, objects, draw order, and cells are
+byte-identical after an expansion) and by a structural token scan.
+
+### Verification (commands actually executed)
+
+```bash
+# Expand fixture capture (one-shot, executed-legacy oracle): the exact command,
+# exit codes, containment, the three recorded probes, and the four resolved
+# decisions are in tests/fixtures/godot-building-expand/README.md
+python -B apps/compat-api/capture_expand_fixture.py
+
+# Expand envelope + endpoint + executed-legacy parity tests (inside the compat
+# suite; observed: Ran 947 tests ... OK, exit 0)
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+
+# The hermetic expansion-flow suite standalone (observed: 615 checks, PASS)
+godot --headless --path apps/client-godot --script res://tests/test_town_expand.gd
+
+# Full batteries in the final state (each embeds the expand suite and the
+# expand-live phase; both observed exit 0)
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+```
+
+`verify-boot.ps1` includes the hermetic `test_town_expand` suite and a twelfth live
+phase `expand-live`, which starts the Compatibility API over a disposable corpus,
+drives one expansion against `POST /v0/expand`, asserts the typed response and its
+**two-part** post-state proof, asserts that a refused expansion left the corpus
+byte-identical, asserts via `compat_live_phase.py --expect-save-mutation` that a
+corpus save file actually mutated, then tears down asserting the port is released,
+the corpus is removed, and no working-tree `saves/` exists.
+
+### Evidence capture (two-step, as the delivered slices)
+
+```bash
+# 1. Windowed fake-API launch: boot -> town -> expand -> confirm, then capture
+#    the frame (writes building-expand.png at the legacy 1400x600 stage)
+godot --path apps/client-godot res://scenes/boot.tscn -- --gameapi=fake --expand-capture=<repo>/apps/client-godot/evidence/building-expand/building-expand.png
+
+# 2. Headless deterministic report (writes report.json; a rerun is byte-identical;
+#    the bare --expand-report flag defaults to
+#    evidence/building-expand/report.json)
+godot --headless --path apps/client-godot res://scenes/town.tscn -- --expand-report=<repo>/apps/client-godot/evidence/building-expand/report.json
+```
+
+The report (`schema expand-report-v1`) records the inputs and digests, the intent,
+both owned lists, the derived debit, the committed schedule row used, the schedule
+summary, the established-versus-derived provenance split as its own section, the
+request counts, and the non-claims.
+
+### Expansion claim limits
+
+- no Flash, Ruffle, ActionScript, or browser executed;
+- **the id-space indexing is derived**, never observed: the legacy server accepted
+  `expand(999)`, a duplicate, and `expand(-1)` alike, so it cannot arbitrate. The
+  claim is that the debit is the one the committed positional table assigns to that
+  id, never the price a coherent player pays. The corpus's own four owned ids are
+  recorded as incoherent under the chosen schedule and tolerated verbatim;
+- **the delivered transaction is a zero-cost expansion**: 94 of 98 rows are
+  requirement-blocked and every id the corpus owns is among them, so the derived
+  debit is the all-zero vector and **no balance moves**. The value-level proof is
+  therefore the strictest form but the least discriminating about a non-zero price,
+  and the priced path and the affordability refusal are covered only through
+  stubbed schedule rows;
+- **no land, grid, buildable-cell, or placement-bound behavior** - see the land gap
+  above;
+- the clamp is **not exercised** by this fixture, and the endpoint refuses an
+  insufficient balance rather than absorbing it;
+- parity covers one recorded transaction against the fresh-player corpus, not
+  progressed players;
+- expandability and addressability are client-side rules only; the endpoint
+  enforces structural input validity, the two guards, the requirements and
+  affordability refusals, and the two-part proof, and no server-authoritative
+  validation exists;
+- no pixel-parity oracle against the legacy client exists, and the presentation is
+  the delivered provisional convention;
+- the committed capture runs the fake GameApi - a deterministic test double, not a
+  parity oracle.
+
+These non-claims are recorded in `evidence/building-expand/report.json`.
+Remaining deliver lines of M7 (separate changes): resources, XP basics.
