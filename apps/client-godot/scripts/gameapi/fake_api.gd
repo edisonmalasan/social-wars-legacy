@@ -72,6 +72,20 @@ extends Node
 ## interpretation is derived-provisional exactly like the service's: the
 ## one-based reading is derived and the zero-based reading is rejected by the
 ## committed corpus.
+## `push_queue_unit_town()` / `pop_queue_unit_town()` apply the legacy queue
+## branches' own recorded effects over the committed executed queue fixture: the
+## addressed row's ATTRIBUTE BAG is the only thing either writes — the push sets
+## `nu` to `(nu + 1)` (or `1`) and stamps `ts` with the fixture's committed
+## instant, the pop decrements and re-stamps, and a decrement to zero deletes
+## `nu`, `ts`, and `ui` TOGETHER — and NOTHING else moves: no placement count, no
+## storage, no bookkeeping, no private state, and no balance, because a queue
+## moves no resource (design D4/D5). It is therefore the FOURTH double with a
+## deliberately NEUTRAL vector. It applies **no** producer, duration, level, or
+## count check (the three legacy branches validate nothing and the recorded
+## absence is not permission), it **caps nothing** (the engine sets no bound),
+## and it **creates no unit**: no legacy command completes a queue or
+## materialises one, so this double can never be read as evidence that a queue
+## finishes (design D1/D2).
 ## Parity against
 ## executed legacy is owned exclusively by
 ## the compat fixture-replay tests; this double exists so the client flow can
@@ -206,6 +220,32 @@ const LEVEL_BEFORE_FIXTURE := \
 ## against the before-state so the double only runs on a level-only capture.
 const LEVEL_AFTER_FIXTURE := \
 	"tests/fixtures/godot-building-xp/steps/command_level_up/after.json"
+## The executed-legacy queue fixture's before-state for the **push**: the
+## committed fresh-player corpus, whose Command Center at map key 1 carries an
+## **empty** attribute bag. Read (never written) as the double's starting save
+## for both queue intents.
+const QUEUE_PUSH_BEFORE_FIXTURE := \
+	"tests/fixtures/godot-unit-queues/steps/command_push_queue_unit/before.json"
+## The same fixture's after-state — the real legacy server's record of the one
+## executed `push_queue_unit`: the addressed row's bag gains `nu` = 1 and a
+## stamped `ts`, and **nothing else in the save changes**. Read (never written)
+## and validated against the before-state, so a capture that is not this
+## transaction cannot leave the double running on an inconsistent oracle.
+const QUEUE_PUSH_AFTER_FIXTURE := \
+	"tests/fixtures/godot-unit-queues/steps/command_push_queue_unit/after.json"
+## The executed-legacy queue fixture's before-state for the **pop**: the corpus
+## as the push left it, with `nu` = 1 and a stamped `ts` at map key 1. It is
+## compared against the push's after-state so the double runs the pair as one
+## recorded transaction rather than two unrelated ones.
+const QUEUE_POP_BEFORE_FIXTURE := \
+	"tests/fixtures/godot-unit-queues/steps/command_pop_queue_unit/before.json"
+## The same fixture's after-state — the record of the one executed
+## `pop_queue_unit`: the count reached zero and the **three-key teardown** deleted
+## `nu`, `ts`, and `ui` together, so the bag is empty again and every stored
+## resource, every other row, the storage, the private state, and the player info
+## are byte-identical. Read (never written) and validated the same way.
+const QUEUE_POP_AFTER_FIXTURE := \
+	"tests/fixtures/godot-unit-queues/steps/command_pop_queue_unit/after.json"
 
 ## Anchor grid extent the v0 endpoint validates against (anchors 0..99;
 ## footprints may extend past the edge — design D5). Must match
@@ -303,6 +343,31 @@ const LEVEL_NO_INDEX := -1
 const LEVEL_FLOOR := 0
 const LEVEL_CORPUS_XP := 4
 const LEVEL_CORPUS_LEVEL := 1
+
+## The three committed production-queue keys and the row slot they live in,
+## mirroring `unit_queue.gd` (established, `engine.py:183-213` and
+## `engine.py:31`). They are repeated here rather than imported so this module
+## keeps no dependency on the units model: the double writes committed BYTES, and
+## the projection that reads them is the model's job.
+const QUEUE_KEY_COUNT := "nu"
+const QUEUE_KEY_START := "ts"
+const QUEUE_KEY_UNIT_ID := "ui"
+const QUEUE_ATTR_SLOT := 6
+## The committed number of slots a legacy map row has — the only row length the
+## fixture may carry.
+const QUEUE_ROW_SLOTS := 8
+## The committed corpus's real placed training producer: **id 26, Command
+## Center, at map key 1**, with an EMPTY attribute bag and `training_time` 5. The
+## double validates the executed fixture against exactly this row, so a capture
+## taken somewhere else fails closed instead of producing a different double.
+const QUEUE_TARGET_MAP_KEY := 1
+const QUEUE_TARGET_KEY := "1"
+const QUEUE_TARGET_ITEM := 26
+## The start instant the double stamps — READ FROM the committed executed push,
+## never from a clock and never from a hard-coded literal. The legacy branch
+## stamps `timestamp_now()`, so the committed fixture is the only authority for
+## that value; reading it here means a re-capture of the fixture moves the
+## double with it instead of silently disagreeing (design D8).
 
 var _save_list_doc: Dictionary = {}
 var _config_payload: Dictionary = {}
@@ -427,6 +492,19 @@ var _level_error := ""
 ## fixture and the committed configuration are never written: this lives entirely
 ## in this process's memory.
 var _level_schedule_backup: Dictionary = {}
+
+# Mutable in-memory production-queue state (unit-queues design D8): one save,
+# whose addressed row's ATTRIBUTE BAG is the only thing a push or a pop writes
+# — a queue moves no resource, so no balance is ever mutated and the derived
+# vector is the neutral one. Never written anywhere.
+var _queue_state: Dictionary = {}
+var _queue_pid := ""
+var _queue_loaded := false
+var _queue_error := ""
+## The start instant the committed executed push stamped, read out of that
+## capture before any expectation is built. It is the only authority for the
+## value the branch stamps: the double never reads a clock (design D8).
+var _queue_fixture_stamp := 0
 
 
 ## The session envelope synthesized from the committed fixtures.
@@ -1923,6 +2001,497 @@ func _level_resources() -> Dictionary:
 	for key: String in RESOURCE_KEYS:
 		resources[key] = int(_level_state[key])
 	return resources
+
+
+# --- production-queue double (unit-queues design D8) ------------------------
+
+
+## One production-queue **push** intent (the save identity and the target row's
+## key, and NOTHING else) over the committed executed-legacy queue fixture. The
+## intent carries no count, no cost, no duration, no training time, and no
+## readiness: the **action** names the outcome and the double applies the legacy
+## branch's own recorded effect — `nu` becomes `(nu + 1)` when present and `1`
+## when absent, and `ts` is stamped with a **fixture** instant (never the wall
+## clock, so the double stays deterministic).
+##
+## **No producer, duration, level, or count check is applied** (design D5): the
+## three legacy branches validate nothing and the recorded absence of validation
+## is not permission to add one here, so any readable row may be queued, an
+## already-queued row may be queued again, and the count is **never** capped.
+##
+## The refusals mirror the endpoint's own, in the endpoint's order (design D4):
+## the save-identity codes first (`missing_user_id`, `unknown_user_id`), then
+## `invalid_map_key`, then `unknown_map_key` — the endpoint resolves the key
+## against the save **before** deriving, because legacy's missing-item path
+## returns early **while the batch still persists**, so accepting one here would
+## report a queue change that never happened.
+##
+## On success the ONLY write is the addressed row's attribute bag: no placement
+## count, no storage, no bought-units bookkeeping, no private state, and —
+## because a queue moves no resource — no balance (design D4/D5).
+func push_queue_unit_town(user_id: String,
+		map_key: int) -> BootData.QueueResult:
+	return _queue_intent(user_id, map_key, "push")
+
+
+## One production-queue **pop** intent under the same contract. The branch's own
+## rules are the whole effect: with `nu` **absent** it returns without writing
+## anything — an **inert recorded no-op** the endpoint answers `success` to — and
+## otherwise it decrements, re-stamping `ts` on a partial decrement and
+## **deleting `nu`, `ts`, and `ui` together** at zero.
+func pop_queue_unit_town(user_id: String,
+		map_key: int) -> BootData.QueueResult:
+	return _queue_intent(user_id, map_key, "pop")
+
+
+## The one place both queue intents run, so the wire contract, the refusal order,
+## and the recorded effect can never drift between the push and the pop.
+func _queue_intent(user_id: String, map_key: int,
+		action: String) -> BootData.QueueResult:
+	if user_id.strip_edges() == "":
+		return _queue_failure("missing_user_id",
+			"user_id must be a non-empty string")
+	if not _ensure_loaded():
+		return _queue_failure("fixture_unreadable", _load_error)
+	if not _ensure_queue_loaded():
+		return _queue_failure("fixture_unreadable", _queue_error)
+	if user_id != _queue_pid:
+		return _queue_failure("unknown_user_id",
+			"no save exists for user_id '%s'" % user_id)
+	if map_key < 0:
+		return _queue_failure("invalid_map_key",
+			"map_key must be an integer, got %d" % map_key)
+	if not (_queue_state["rows"] as Dictionary).has(str(map_key)):
+		return _queue_failure("unknown_map_key",
+			"no placement with key %d in this save's map" % map_key)
+	var key := str(map_key)
+	var before_row: Variant = ((_queue_state["rows"] as Dictionary)[key]
+		as Array).duplicate(true)
+	var before_attr: Dictionary = before_row[QUEUE_ATTR_SLOT] as Dictionary
+	var effect := _queue_effect(before_attr, action)
+	if not bool(effect.get("ok", false)):
+		# A server-side shape failure of the addressed row's bag: legacy would
+		# raise out of its helper, and the endpoint answers internal_error.
+		return _queue_failure("internal_error", str(effect.get("error", "")))
+	var after_attr: Dictionary = (before_attr as Dictionary).duplicate(true)
+	if bool(effect.get("no_op", false)):
+		# engine.py:193-194: nothing at all is written. That is a SUCCESS.
+		after_attr = (before_attr as Dictionary).duplicate(true)
+	else:
+		for removed: String in (effect.get("removed", []) as Array):
+			after_attr.erase(removed)
+		for written: String in (effect.get("written", []) as Array):
+			after_attr[written] = _queue_stamp_for(written, effect)
+	var after_row: Variant = before_row.duplicate(true)
+	(after_row as Array)[QUEUE_ATTR_SLOT] = after_attr
+	(_queue_state["rows"] as Dictionary)[key] = after_row
+	# The same envelope shape the service returns; the shared parser yields the
+	# typed result (identical shapes by construction, design D8).
+	return BootData.parse_queue({
+		"protocol": BootData.PROTOCOL,
+		"ok": true,
+		"game_version": str(_save_list_doc.get("game_version", "")),
+		# Time-dependent field: the fake reports the fixture capture's legacy
+		# server timestamp instead of "now" (never the wall clock).
+		"server_time": _fixture_server_time(),
+		"result": "success",
+		"action": action,
+		"map_key": map_key,
+		"previous": before_row,
+		"row": after_row,
+		"queue": _queue_block(after_attr),
+		"resources": _queue_resources(),
+	})
+
+
+## Structured failure in the service's error envelope shape, parsed by the same
+## shared parser the live implementation uses.
+func _queue_failure(code: String, message: String) -> BootData.QueueResult:
+	return BootData.parse_queue({
+		"protocol": BootData.PROTOCOL,
+		"ok": false,
+		"error": {"code": code, "message": message},
+	})
+
+
+## The recorded legacy effect of one queue command on a bag — DERIVED here, never
+## read from a response. Returns
+##   `{ok, error, removed, written, count, stamp, no_op, teardown}`
+##
+## The count is exact (`(nu + 1)`, `1`, or `nu - 1`); the start instant is a
+## **fixture** value because the branch stamps the wall clock and the double
+## never reads one (design D8), which keeps every run byte-identical. Every bag
+## key the branch does **not** own is left in place by construction, because
+## this function returns the keys to remove and the keys to write and nothing
+## else touches the bag.
+func _queue_effect(before_attr: Dictionary, action: String) -> Dictionary:
+	var empty := {
+		"ok": true, "error": "", "removed": [] as Array, "written": [] as Array,
+		"count": null, "stamp": 0, "no_op": false, "teardown": false,
+	}
+	if action == "push":
+		var count: Variant = before_attr.get(QUEUE_KEY_COUNT, null)
+		if count != null and not (count is int):
+			return {
+				"ok": false,
+				"error": "the addressed row's %r is %r, not an integer"
+					% [QUEUE_KEY_COUNT, count],
+			}
+		return {
+			"ok": true, "error": "", "removed": [] as Array,
+			"written": [QUEUE_KEY_COUNT, QUEUE_KEY_START],
+			"count": (int(count) + 1) if count != null else 1,
+			"stamp": _queue_stamp_value(), "no_op": false, "teardown": false,
+		}
+	# pop
+	if not before_attr.has(QUEUE_KEY_COUNT):
+		# engine.py:193-194: the helper returns without writing anything.
+		return {
+			"ok": true, "error": "", "removed": [] as Array,
+			"written": [] as Array, "count": null, "stamp": 0,
+			"no_op": true, "teardown": false,
+		}
+	var current: Variant = before_attr.get(QUEUE_KEY_COUNT)
+	if not (current is int) or int(current) < 0:
+		return {
+			"ok": false,
+			"error": "the addressed row's %r is %r, not a non-negative count"
+				% [QUEUE_KEY_COUNT, current],
+		}
+	if int(current) - 1 > 0:
+		return {
+			"ok": true, "error": "", "removed": [] as Array,
+			"written": [QUEUE_KEY_COUNT, QUEUE_KEY_START],
+			"count": int(current) - 1, "stamp": _queue_stamp_value(),
+			"no_op": false, "teardown": false,
+		}
+	# The three-key teardown: nu, ts, and ui die TOGETHER (engine.py:198-204).
+	return {
+		"ok": true, "error": "",
+		"removed": [QUEUE_KEY_COUNT, QUEUE_KEY_START, QUEUE_KEY_UNIT_ID],
+		"written": [] as Array, "count": null, "stamp": 0,
+		"no_op": false, "teardown": true,
+	}
+
+
+## The value one written key takes: the derived count for `nu`, the fixture
+## instant for `ts`. The two are distinguished by name, so a future key cannot be
+## written with the count by accident.
+func _queue_stamp_for(key: String, effect: Dictionary) -> Variant:
+	if key == QUEUE_KEY_START:
+		return int(effect.get("stamp", 0))
+	return int(effect.get("count", 0))
+
+
+## The start instant a queue stamp takes in the double. The legacy branch stamps
+## `timestamp_now()`, which the double deliberately never reads: it reuses the
+## instant the committed executed push recorded, so an offline run is
+## deterministic and byte-identical. No elapsed-time rule is computed from it
+## either way — the legacy server has none (design D1/D2).
+func _queue_stamp_value() -> int:
+	return int(_queue_state.get("stamp", 0))
+
+
+## The double's own committed queue facts as the response's authoritative
+## `queue` block, mirroring the service's `project_queue`: the three committed
+## keys **verbatim**, a named absence rather than a zero, and the service's own
+## `absent_is_absent` statement. `ui` is reported verbatim and is never coerced
+## (design D7).
+func _queue_block(attr: Dictionary) -> Dictionary:
+	var carried: Array = []
+	for key: String in [QUEUE_KEY_COUNT, QUEUE_KEY_START, QUEUE_KEY_UNIT_ID]:
+		if attr.has(key):
+			carried.append(key)
+	return {
+		"present": not carried.is_empty(),
+		"count": attr.get(QUEUE_KEY_COUNT, null),
+		"start_instant": attr.get(QUEUE_KEY_START, null),
+		"queued_unit_id": attr.get(QUEUE_KEY_UNIT_ID, null),
+		"keys": carried,
+		"absent_is_absent": true,
+	}
+
+
+## The seven stored resource values of the in-memory queue state, reported
+## verbatim as the response's authoritative `resources`. A queue moves none of
+## them, so these are the same values the intent started from — the strongest
+## form of the "nothing moved" proof the endpoint requires (design D4).
+func _queue_resources() -> Dictionary:
+	var resources := {}
+	for key: String in RESOURCE_KEYS:
+		resources[key] = int(_queue_state[key])
+	return resources
+
+
+## Loads the committed queue fixture's before-state into mutable process state
+## (once). Structural failures are named with the offending field; every other
+## double's error state is untouched (independent sinks).
+func _ensure_queue_loaded() -> bool:
+	if _queue_loaded:
+		return _queue_error == ""
+	_queue_loaded = true
+	var before_sink := {"error": ""}
+	var before := _read_json_into(QUEUE_PUSH_BEFORE_FIXTURE, before_sink)
+	if str(before_sink["error"]) != "":
+		_queue_error = str(before_sink["error"])
+		return false
+	var after_sink := {"error": ""}
+	# The after-state is read (never written) so a malformed capture cannot
+	# leave the double running on an inconsistent oracle.
+	var push_after := _read_json_into(QUEUE_PUSH_AFTER_FIXTURE, after_sink)
+	if str(after_sink["error"]) != "":
+		_queue_error = str(after_sink["error"])
+		return false
+	if not _read_queue_stamp(push_after):
+		return false
+	if not _init_queue_state(before):
+		return false
+	if not _validate_queue_push_after(push_after):
+		return false
+	# The pop pair is validated as ONE transaction with the push: its
+	# before-state must be the push's after-state, so the two steps cannot drift
+	# into unrelated captures, and its after-state must be the teardown result.
+	var pop_before_sink := {"error": ""}
+	var pop_before := _read_json_into(QUEUE_POP_BEFORE_FIXTURE, pop_before_sink)
+	if str(pop_before_sink["error"]) != "":
+		_queue_error = str(pop_before_sink["error"])
+		return false
+	var pop_after_sink := {"error": ""}
+	var pop_after := _read_json_into(QUEUE_POP_AFTER_FIXTURE, pop_after_sink)
+	if str(pop_after_sink["error"]) != "":
+		_queue_error = str(pop_after_sink["error"])
+		return false
+	return _validate_queue_pop_after(pop_before, pop_after)
+
+
+## Reads the start instant the committed executed push stamped, so the double's
+## own stamp is the capture's value rather than a literal: the legacy branch
+## stamps `timestamp_now()`, so the capture is the only authority, and a
+## re-capture must move the double with it rather than silently disagree.
+## No elapsed-time rule is computed from the value either way (design D1/D2).
+func _read_queue_stamp(push_after: Dictionary) -> bool:
+	var items: Variant = (push_after.get("maps", []) as Array)[0].get("items", {})
+	var row: Variant = (items as Dictionary).get(QUEUE_TARGET_KEY, null)
+	if not (row is Array) or (row as Array).size() != QUEUE_ROW_SLOTS:
+		_queue_error = "queue fixture push after state carries no row at map key %s" \
+			% QUEUE_TARGET_KEY
+		return false
+	var bag: Variant = (row as Array)[QUEUE_ATTR_SLOT]
+	var stamp: Variant = BootData._parse_int((bag as Dictionary).get(
+		QUEUE_KEY_START, null))
+	if stamp == null or int(stamp) <= 0:
+		_queue_error = ("the executed queue push recorded no start instant at "
+			+ "map key %s: the branch stamps one, so this is a fixture defect"
+			% QUEUE_TARGET_KEY)
+		return false
+	_queue_fixture_stamp = int(stamp)
+	return true
+
+
+## Validates the queue fixture's before-state and builds the in-memory save
+## state. Every consumed field is checked, so a malformed fixture fails closed
+## instead of crashing the double. **Only the placement map and the seven stored
+## balances are kept**: a push and a pop write nothing else (not the storage,
+## not `boughtUnits`, not `privateState`, not the rest of `playerInfo`), so
+## keeping more would be inventing state this line never touches.
+##
+## Every row is kept as a **copy**, keyed by its committed string map key, so an
+## addressed row's `attr` bag can be rewritten without touching any other row —
+## which is what the endpoint's own "every other row byte-identical" proof
+## depends on, and what makes a refused intent leave the corpus untouched.
+func _init_queue_state(before: Dictionary) -> bool:
+	var maps: Variant = before.get("maps")
+	if not (maps is Array) or (maps as Array).is_empty():
+		_queue_error = "queue fixture before state carries no maps array"
+		return false
+	if not ((maps as Array)[0] is Dictionary):
+		_queue_error = "queue fixture before state first map is not an object"
+		return false
+	var map: Dictionary = (maps as Array)[0]
+	var items: Variant = map.get("items")
+	if not (items is Dictionary) or (items as Dictionary).is_empty():
+		_queue_error = "queue fixture before state carries no placement map"
+		return false
+	var rows: Dictionary = {}
+	for key: Variant in (items as Dictionary).keys():
+		var row: Variant = (items as Dictionary)[key]
+		if not (row is Array) or (row as Array).size() != QUEUE_ROW_SLOTS:
+			_queue_error = "queue fixture row %s is not an eight-field row" \
+				% str(key)
+			return false
+		if not ((row as Array)[QUEUE_ATTR_SLOT] is Dictionary):
+			_queue_error = "queue fixture row %s carries a non-object attr bag" \
+				% str(key)
+			return false
+		rows[str(key)] = (row as Array).duplicate(true)
+	if not rows.has(str(QUEUE_TARGET_MAP_KEY)):
+		_queue_error = ("queue fixture before state carries no placement at "
+			+ "map key %d" % QUEUE_TARGET_MAP_KEY)
+		return false
+	for name in ["xp", "gold", "wood", "oil", "steel"]:
+		var value: Variant = map.get(name)
+		if value == null or int(value) < 0:
+			_queue_error = "queue fixture before state lacks map %s" % name
+			return false
+	var info: Variant = before.get("playerInfo")
+	var priv: Variant = before.get("privateState")
+	if not (info is Dictionary) or not (priv is Dictionary):
+		_queue_error = "queue fixture before state lacks playerInfo/privateState"
+		return false
+	var pid: Variant = (info as Dictionary).get("pid")
+	var cash: Variant = (info as Dictionary).get("cash")
+	var mana: Variant = (priv as Dictionary).get("mana")
+	if not (pid is String) or cash == null or mana == null \
+			or int(cash) < 0 or int(mana) < 0:
+		_queue_error = "queue fixture before state lacks save fields"
+		return false
+	_queue_state = {
+		"rows": rows,
+		"stamp": _queue_fixture_stamp,
+		"xp": int(map.get("xp")),
+		"gold": int(map.get("gold")),
+		"wood": int(map.get("wood")),
+		"oil": int(map.get("oil")),
+		"steel": int(map.get("steel")),
+		"cash": int(cash),
+		"mana": int(mana),
+	}
+	_queue_pid = str(pid)
+	return true
+
+
+## Validates the executed **push** against the double's in-memory state: the
+## addressed row's bag gained `nu` = 1 and a stamped `ts`, every other key it
+## carried is untouched, **every other row is byte-identical**, and every stored
+## resource is byte-identical. A capture that is not this transaction fails
+## closed here rather than producing a differently-behaving double.
+func _validate_queue_push_after(push_after: Dictionary) -> bool:
+	var rows: Variant = (_queue_state["rows"] as Dictionary).duplicate(true)
+	var target: Variant = rows[QUEUE_TARGET_KEY]
+	(target as Array)[QUEUE_ATTR_SLOT] = {
+		QUEUE_KEY_COUNT: 1,
+		QUEUE_KEY_START: int(_queue_state["stamp"]),
+	}
+	rows[QUEUE_TARGET_KEY] = target
+	return _queue_after_matches(push_after, rows, "push")
+
+
+## Validates the executed **pop** against the double's in-memory state: the
+## pop's before-state is the push's after-state (so the pair runs as ONE recorded
+## transaction), and the pop's after-state is the push's before-state again — the
+## **three-key teardown** returned the bag to empty, leaving every other row and
+## every stored resource byte-identical.
+func _validate_queue_pop_after(pop_before: Dictionary,
+		pop_after: Dictionary) -> bool:
+	var queued: Dictionary = (_queue_state["rows"] as Dictionary).duplicate(true)
+	var target: Variant = queued[QUEUE_TARGET_KEY]
+	(target as Array)[QUEUE_ATTR_SLOT] = {
+		QUEUE_KEY_COUNT: 1,
+		QUEUE_KEY_START: int(_queue_state["stamp"]),
+	}
+	queued[QUEUE_TARGET_KEY] = target
+	if not _queue_rows_match(pop_before, queued,
+			"the pop's before state"):
+		return false
+	queued[QUEUE_TARGET_KEY] = _queue_original_target()
+	return _queue_after_matches(pop_after, queued, "pop")
+
+
+## The double's own documented teardown result for the addressed row: the bag
+## **empty again**, which is what the executed pop recorded.
+func _queue_original_target() -> Variant:
+	var row: Variant = ((_queue_state["rows"] as Dictionary)[QUEUE_TARGET_KEY]
+		as Array).duplicate(true)
+	(row as Array)[QUEUE_ATTR_SLOT] = {}
+	return row
+
+
+## Whether one committed after-state holds exactly the double's own expectation:
+## the same placement map, and all seven stored resources unchanged. A resource
+## the executed legacy transaction moved is a fixture defect, not a rule to
+## adopt, so it fails closed.
+func _queue_after_matches(after: Dictionary, rows: Dictionary,
+		label: String) -> bool:
+	var maps: Variant = after.get("maps")
+	if not (maps is Array) or (maps as Array).is_empty() \
+			or not ((maps as Array)[0] is Dictionary):
+		_queue_error = "queue fixture %s after state carries no first map" % label
+		return false
+	var map: Dictionary = (maps as Array)[0] as Dictionary
+	if not _queue_rows_match(after, rows, "the %s after state" % label):
+		return false
+	var info: Variant = after.get("playerInfo")
+	var priv: Variant = after.get("privateState")
+	if not (info is Dictionary) or not (priv is Dictionary):
+		_queue_error = "queue fixture %s after state lacks the save fields" \
+			% label
+		return false
+	var stored := {
+		"xp": map.get("xp"), "gold": map.get("gold"), "wood": map.get("wood"),
+		"oil": map.get("oil"), "steel": map.get("steel"),
+		"cash": (info as Dictionary).get("cash"),
+		"mana": (priv as Dictionary).get("mana"),
+	}
+	for name: String in RESOURCE_KEYS:
+		if int(stored[name]) != int(_queue_state[name]):
+			_queue_error = ("the executed %s moved the %s balance, which no queue "
+				% [label, name] + "command does: the double refuses to reproduce "
+				+ "a fixture that is not the recorded transaction")
+			return false
+	return true
+
+
+## Whether one committed save's placement map equals the double's own expectation,
+## row by row, so an unaddressed row changing is a failure rather than an
+## unreported difference.
+func _queue_rows_match(document: Dictionary, rows: Dictionary,
+		label: String) -> bool:
+	var maps: Variant = document.get("maps")
+	if not (maps is Array) or (maps as Array).is_empty() \
+			or not ((maps as Array)[0] is Dictionary):
+		_queue_error = "%s carries no first map" % label
+		return false
+	var items: Variant = ((maps as Array)[0] as Dictionary).get("items")
+	if not (items is Dictionary):
+		_queue_error = "%s carries no placement map" % label
+		return false
+	if (items as Dictionary).size() != rows.size():
+		_queue_error = ("%s holds %d placements, not the committed %d"
+			% [label, (items as Dictionary).size(), rows.size()])
+		return false
+	var differing: Array = []
+	for key: Variant in rows.keys():
+		if not (items as Dictionary).has(key) \
+				or _queue_normalize((items as Dictionary)[key]) \
+					!= _queue_normalize(rows[key]):
+			differing.append(str(key))
+	if not differing.is_empty():
+		_queue_error = "%s changed row(s) %s, which this queue transaction " \
+			% [label, ", ".join(PackedStringArray(differing))] \
+			+ "never writes"
+		return false
+	return true
+
+
+## The pinned engine's JSON parser widens every committed number to a float, so
+## both sides of a fixture comparison are normalised to integers first: a
+## captured `1.0` and the derived `1` are the same committed value, and
+## comparing them raw would report a difference no save ever had.
+func _queue_normalize(value: Variant) -> Variant:
+	if value is float:
+		var number := float(value)
+		return int(number) if number == floor(number) else number
+	if value is Array:
+		var list: Array = []
+		for entry: Variant in value as Array:
+			list.append(_queue_normalize(entry))
+		return list
+	if value is Dictionary:
+		var bag := {}
+		for key: Variant in (value as Dictionary).keys():
+			bag[key] = _queue_normalize((value as Dictionary)[key])
+		return bag
+	return value
 
 
 func _ensure_loaded() -> bool:

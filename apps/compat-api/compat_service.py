@@ -432,6 +432,75 @@ Surface (loopback only, port :5056):
     tutorial are out of scope: the committed corpus has no unit placements and
     0 of its 40 placed rows carry ``attr["xp"]``.
 
+``POST /v0/queue`` with JSON ``{"user_id", "map_key", "action"}``
+    ``{protocol, ok, game_version, server_time, result, action, map_key,
+    previous, row, queue, resources}`` — an intent only, and the **eleventh**
+    state-mutating surface, specified by the ``godot-unit-queues`` capability.
+    One call carries **exactly one** of the two legacy
+    queue commands, chosen by the **closed** action vocabulary (design D2):
+    ``"push"`` derives ``push_queue_unit`` and ``"pop"`` derives
+    ``pop_queue_unit``.  Both take **only** the legacy map index — no cost, no
+    duration, no training time, no count, no readiness, and no outcome is
+    accepted from a client, and the extra keys (``cost``, ``price``,
+    ``training_time``, ``sm_training_time``, ``duration``, ``count``, ``nu``,
+    ``ready``, ``remaining``, ``resources_changed``, ``vector``, ``unit_id``, …)
+    are **ignored** (design D4).  The unchanged legacy ``command()`` dispatcher
+    executes the batch in-process and the answer carries the legacy ``result``
+    plus the authoritative superset: the eight-field row **as read before
+    execution** (``previous``), the same row **re-read from the persisted save
+    after execution** (``row``), the resolved ``action`` and ``map_key``, the
+    **projected queue** (``queue``), and the current ``resources``.
+
+    **This is the first surface whose legacy command has no server-side rule at
+    all to reproduce** (design D1/D2/D5).  ``push_queue_unit``
+    (``command.py:676-685`` → ``engine.py:183-189``) increments ``nu`` or sets
+    it to ``1`` and stamps ``ts``; ``pop_queue_unit`` (``command.py:699-708`` →
+    ``engine.py:191-204``) decrements, re-stamps ``ts`` on a partial decrement, and
+    at **zero deletes ``nu``, ``ts``, and ``ui`` together**.  Nothing reads a
+    queue's elapsed time, **no command completes a queue**, and no command
+    materialises a unit from one — so this endpoint computes **no** readiness,
+    **no** remaining time, **no** progress ratio, and **no** completion, and
+    **no** count bound (the engine sets none, and a recorded absence is not
+    permission to invent a cap).
+
+    The atom-fusion push ``push_queue_unit2`` is **deliberately not exposed**
+    (design D7): it takes a **client-supplied** unit id and nothing in this
+    repository establishes which ids a client sends, so offering the intent would
+    mean inventing a value; the client-side projection reports an unresolvable
+    ``ui`` with its recorded value intact instead.
+
+    **No queue cost is implemented** (design D4): a queue's price would be a
+    **client-sent** delta, because ``do_command`` applies the request's vector
+    before the branch (``command.py:40``, ``engine.py:251-271``), so the derived
+    vector is **NEUTRAL** and the second post-execution proof half requires that
+    **every** stored resource be **unchanged**.  The ``soulmixer_speedup``
+    contract is **recorded and implemented not at all** (design D6): the legacy
+    branch needs ``ts`` **and** ``ui``, raises ``KeyError`` without them, reads
+    the duration from the queued unit, treats it as seconds, divides by an hour,
+    **charges nothing**, and its own author labelled the formula *"quite
+    useless"* — so no cost, no timer, and no speedup is offered here, and this
+    route has no speedup action at all.
+
+    Validation is structural fail-closed and **precedes** the dispatcher: a JSON
+    object body, a resolvable save, a target key, an action inside the closed
+    set, an addressable row, a readable attribute bag, and a derivable count.
+    ``map_key`` must resolve to a row in the corpus save **before** dispatch,
+    because legacy's missing-item path is a silent early return that still
+    persists the batch; every other failure below also returns before the
+    dispatcher runs, so the corpus is untouched on every error path.
+
+    After execution the endpoint proves the post-state in **two** ways
+    (design D4) and fails closed with ``internal_error`` on any other outcome:
+    the recorded ``attr`` bag matches the **derived** result for the action —
+    including the exact count, the three-key teardown, the inert no-op on a row
+    whose count is absent, and every key the branch does not own compared by
+    value; **and every** stored resource is **unchanged**.  The start instant is
+    compared by **shape** (a strict integer that does not move **backwards**)
+    because the branch stamps the wall clock and its value is not derivable;
+    ``engine.timestamp_now`` has one-second resolution, so two commands inside
+    one second legitimately stamp the same value and a "strictly later" rule
+    would refuse a correct transaction.
+
 Deviation recorded for review: the bootstrap envelope also carries ``saves``
 (the session envelope plus ``config`` and ``player_info``). Design D3 lists
 only ``config`` and ``player_info``; the extra key is a superset of D3 and
@@ -572,6 +641,18 @@ code                     HTTP  when
                                 legacy server answered success.  Refused before
                                 the dispatcher runs, so the delivered
                                 construction timers are never corrupted
+``missing_map_key``      400  ``/v0/queue`` body carries no ``map_key``
+``invalid_map_key``      400  ``map_key`` present but not an integer (``bool``
+                                excluded).  Legacy would raise out of
+                                ``map_get_item`` on a non-integer and answer an
+                                unhandled HTTP 500
+``unknown_map_key``      404  integer key that names no row in the save's
+                                ``map["items"]`` (legacy logs an error and returns
+                                early, a silent no-op that still persists the
+                                batch)
+``invalid_attr``         500  the addressed row carries no object attribute bag,
+                                or a ``nu`` that is not a non-negative integer —
+                                a server-side shape failure, never client input
 ``invalid_reason``       400  derived reason is not a string (server-side
                                 derivation failure; never client input)
 ``invalid_coordinates``  400  ``x``/``y`` missing, not integers, or outside ``0..99``
@@ -591,7 +672,7 @@ session and bootstrap endpoints never persist — this module never calls
 byte-identical. ``POST /v0/place``, ``POST /v0/purchase``,
 ``POST /v0/move``, ``POST /v0/sell``, ``POST /v0/store``,
 ``POST /v0/upgrade``, ``POST /v0/construction``, ``POST /v0/collect``,
-``POST /v0/expand``, and ``POST /v0/level_up``
+``POST /v0/expand``, ``POST /v0/level_up``, and ``POST /v0/queue``
 execute the unchanged legacy ``command()`` dispatcher, which
 persists through legacy ``save_session`` into the **service corpus's**
 ``saves/`` and nowhere else; the service never opens a working-tree file for
@@ -613,6 +694,7 @@ import level_envelope
 import move_envelope
 import placement_envelope
 import purchase_envelope
+import queue_envelope
 import sell_envelope
 import store_envelope
 import upgrade_envelope
@@ -653,6 +735,10 @@ ERROR_EXPANSION_REQUIREMENTS_UNMET = "expansion_requirements_unmet"
 ERROR_INSUFFICIENT_RESOURCES = "insufficient_resources"
 ERROR_LEVEL_ALREADY_CURRENT = "level_already_current"
 ERROR_XP_BELOW_THRESHOLD = "xp_below_threshold"
+ERROR_MISSING_MAP_KEY = "missing_map_key"
+ERROR_INVALID_MAP_KEY = "invalid_map_key"
+ERROR_UNKNOWN_MAP_KEY = "unknown_map_key"
+ERROR_INVALID_ATTR = "invalid_attr"
 ERROR_BAD_REQUEST = "bad_request"
 ERROR_NOT_FOUND = "not_found"
 ERROR_METHOD_NOT_ALLOWED = "method_not_allowed"
@@ -2542,6 +2628,234 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
     @app.errorhandler(500)
     def on_internal_error(_error: Any) -> Tuple[Dict[str, Any], int]:
         return error_response(500, ERROR_INTERNAL, "internal server error")
+
+    @app.post("/v0/queue")
+    def v0_queue() -> Tuple[Dict[str, Any], int]:
+        """Execute one production-queue intent through the unchanged legacy path.
+
+        One call carries **exactly one** of the two legacy queue commands, chosen
+        by the **closed** action vocabulary (design D2): ``"push"`` derives
+        ``push_queue_unit`` and ``"pop"`` derives ``pop_queue_unit``.  Each takes
+        **only** the legacy map index (``command.py:676-708``), so the intent
+        carries a save identity and a target key and nothing else.
+
+        Validation is structural fail-closed, and every failure below returns
+        **before** the legacy dispatcher runs, so the corpus is byte-identical on
+        every error path: a JSON object body, a resolvable save, an integer
+        ``map_key`` that names a row in the corpus save, an ``action`` inside the
+        closed set, a readable eight-field row with an object attribute bag, and
+        a derivable count.  The key is resolved here rather than left to legacy
+        because legacy's missing-item path (``command.py:680-682``,
+        ``702-704``) logs an error and returns early **while the batch still
+        persists** — reporting that as a success would claim a queue change that
+        never happened.
+
+        **Design D1/D2 — no readiness and no completion.**  Every occurrence of
+        ``attr["ts"]`` in the legacy source is a write or a deletion, and no
+        command completes a queue, so there is no server-side completion rule to
+        reproduce: this route computes **no** readiness, **no** remaining time,
+        **no** progress ratio, and **no** completion, and it materialises no unit
+        from a queue.  The absence is a recorded property of the legacy contract,
+        not a missing feature.
+
+        **Design D5 — no producer, duration, level, or count rule.**  The three
+        queue branches validate nothing: not that the item is a training
+        producer, not ``training_time``, not ``min_level``, and not a bound on
+        the count.  None of those is added here, and in particular **no maximum
+        count is applied** — the engine sets none, and an invented cap would be a
+        rule the legacy server does not have.
+
+        **Design D4 — a neutral vector and a two-part proof.**  A queue's cost
+        would be a **client-sent** delta, because ``do_command`` applies the
+        request's vector before the branch (``command.py:40``,
+        ``engine.py:251-271``), so the derived vector is neutral and the second
+        proof half requires that **every** stored resource be **unchanged**.  The
+        first half requires the persisted ``attr`` bag to match the **derived**
+        result for the action — the exact count, the three-key teardown, the
+        inert no-op on a row whose count is absent, and every key the branch does
+        not own compared by value.  The start instant is compared by **shape**
+        (a strict integer, not earlier than the pre-execution one) because the
+        branch stamps the wall clock and its value is not derivable;
+        ``engine.timestamp_now`` has one-second resolution, so two commands
+        inside one second legitimately stamp the same value.
+
+        **Design D6 — the atom-fusion speedup is recorded and not implemented.**
+        ``push_queue_unit2`` is not in the closed set because its unit id is a
+        client-supplied argument no evidence constrains, and
+        ``soulmixer_speedup`` has no action here at all: the legacy branch needs
+        ``ts`` **and** ``ui``, raises ``KeyError`` without them, reads the
+        duration from the queued unit, charges nothing, and its own author
+        labelled the formula *"quite useless"*.  No cost, no timer, and no
+        speedup is offered.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404,
+                ERROR_UNKNOWN_USER_ID,
+                "no save exists for user_id %r" % user_id,
+            )
+
+        if "map_key" not in payload:
+            return error_response(400, ERROR_MISSING_MAP_KEY, "map_key is required")
+        map_key = payload["map_key"]
+        if not queue_envelope.is_strict_int(map_key):
+            return error_response(
+                400, ERROR_INVALID_MAP_KEY, "map_key must be an integer"
+            )
+
+        if "action" not in payload:
+            return error_response(400, ERROR_MISSING_ACTION, "action is required")
+        action = payload["action"]
+        if not queue_envelope.is_action(action):
+            return error_response(
+                400,
+                ERROR_INVALID_ACTION,
+                "action must be one of %s"
+                % ", ".join(sorted(queue_envelope.ACTIONS)),
+            )
+
+        # Resolve the key against the corpus before deriving, and read the
+        # eight-field row while it is still there: a key that names no row must
+        # fail closed rather than reach legacy's silent early return, and the row
+        # the client addressed is the row the two commands mutate in place.
+        try:
+            known = boot.has_map_item(user_id, map_key)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not known:
+            return error_response(
+                404,
+                ERROR_UNKNOWN_MAP_KEY,
+                "no placement with key %d in this save's map" % map_key,
+            )
+        try:
+            previous = boot.map_item(user_id, map_key)
+            previous_attr = boot.map_item_attr(user_id, map_key)
+            resources_before = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not isinstance(previous, list) or len(previous) != 8:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the addressed placement is not an eight-field row",
+            )
+        # Copies: the legacy dispatcher mutates this very row **in place** — both
+        # helpers write or delete keys of the row's own attribute bag — so a
+        # shallow list copy would still alias the live bag and the "before" row
+        # would report the after-state.  The bag and the stored-unit payload are
+        # copied too.
+        previous_row = list(previous)
+        if isinstance(previous_row[6], dict):
+            previous_row[6] = dict(previous_row[6])
+        if isinstance(previous_row[5], list):
+            previous_row[5] = list(previous_row[5])
+
+        # The derived post-execution bag, computed BEFORE dispatch and against a
+        # copy of the live bag, so the derivation cannot be influenced by what
+        # execution writes.
+        try:
+            queue_envelope.derived_queue(previous_attr, action)
+        except queue_envelope.EnvelopeError as failure:
+            if failure.code == "invalid_action":
+                return error_response(400, failure.code, str(failure))
+            # invalid_attr is a server-side shape failure: the addressed row's
+            # bag or count is unreadable, never a client value.
+            return error_response(500, ERROR_INVALID_ATTR, str(failure))
+
+        # Derive the legacy envelope (design D2/D4): the command, its single
+        # argument, and the neutral resource vector are the module's, never the
+        # client's.  The contract carries no cost, duration, count, readiness, or
+        # outcome: the extra keys are ignored so a client value can never win.
+        try:
+            envelope_payload = queue_envelope.build_envelope(
+                map_key=map_key, action=action
+            )
+        except queue_envelope.EnvelopeError as failure:
+            if failure.code in ("invalid_vector", "invalid_timestamp"):
+                return error_response(500, ERROR_INTERNAL, failure.code)
+            return error_response(400, failure.code, str(failure))
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        # Execute the unchanged legacy command dispatcher in-process.  It
+        # persists via legacy save_session into this corpus only; the legacy HTTP
+        # route returns {"result": "success"} whenever command() returns without
+        # raising, so reaching here IS the legacy result — which is precisely why
+        # it is NOT taken as proof of a queue effect.
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        # Prove the post-state (design D4).  Part one: the persisted attribute bag
+        # matches the DERIVED result for the action.  Part two: every stored
+        # resource is unchanged, which is the neutral vector's own guarantee and
+        # what forecloses a smuggled vector.  Either half failing is a reported
+        # failure, not a success.
+        try:
+            still_present = boot.has_map_item(user_id, map_key)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not still_present:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy execution did not keep the placement entry at its key",
+            )
+        try:
+            updated = boot.map_item(user_id, map_key)
+            after_attr = boot.map_item_attr(user_id, map_key)
+            resources_after = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if not isinstance(updated, list) or len(updated) != 8:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy execution did not persist an eight-field placement row",
+            )
+        updated_row = list(updated)
+        divergence = queue_envelope.expected_attr(previous_attr, action, after_attr)
+        if divergence is not None:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the row at key %d does not carry the derived queue result: %s"
+                % (map_key, divergence),
+            )
+        for name in sorted(resources_after):
+            if resources_after[name] != resources_before[name]:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "resource %s is %r after execution, not the pre-execution "
+                    "%r: a queue moves no resource, so the derived neutral "
+                    "vector requires every stored resource to be unchanged"
+                    % (name, resources_after[name], resources_before[name]),
+                )
+        return (
+            envelope(
+                boot,
+                result="success",
+                action=action,
+                map_key=map_key,
+                previous=previous_row,
+                row=updated_row,
+                queue=queue_envelope.project_queue(after_attr),
+                resources=resources_after,
+            ),
+            200,
+        )
 
     @app.post("/v0/level_up")
     def v0_level_up() -> Tuple[Dict[str, Any], int]:

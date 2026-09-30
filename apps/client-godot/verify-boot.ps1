@@ -23,7 +23,10 @@
        player-owned unit instance projected out of a save already in hand,
        with its nested garrison, its fail-closed row parse, and the
        committed corpus's asserted zero instances, also with no endpoint,
-       no request, and no mutation)
+       no request, and no mutation), and the unit-queues suite (the typed
+       read-only production-queue projection and its recorded contracts, with
+       the committed executed-legacy push and pop fixture and the two-part
+       post-state proof, also with no endpoint, no request, and no mutation)
        (the loop passes the dead endpoint to every suite: the session and
        game-clock suites use it for their failure phase, the placement,
        purchase, move, sell, store, upgrade, construction, collect, and
@@ -31,7 +34,7 @@
        that ignore user args are unaffected)
     6. boot-scene unreachable-endpoint failure scenario, run with no service
        at all
-    7. thirteen live phases against the real Compatibility API: the main-scene
+    7. fourteen live phases against the real Compatibility API: the main-scene
        boot (success, compared with the committed fixture save), the legacy-v0
        GameApi suite, the structured API-error boot scenario, the
        placement phase (one intent through the v0 placement endpoint with
@@ -67,7 +70,13 @@
        corpus byte-identical; this phase deliberately asserts NO save mutation,
        because at 4 experience against level 1 the committed curve's one-based
        reading already places this corpus at level 1, so the endpoint answers
-       before the dispatcher runs)
+       before the dispatcher runs), and the queue phase (one push and one pop
+       through the v0 queue endpoint against the committed corpus's own real
+       placed training producer, whose responses must prove the TWO-part
+       post-state (the addressed row's bag carries exactly the derived count and
+       the stamped instant, then the three-key teardown removed nu, ts, and ui
+       together) and that EVERY stored resource is unchanged, with the
+       disposable corpus save asserted mutated)
     8. Compatibility API guard baseline, post-run, must equal the pre-run
        digests
     9. teardown assertions: loopback port released, no working-tree saves/
@@ -327,7 +336,7 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a
@@ -520,6 +529,22 @@ try {
                 "--", "--scenario=live-level-up",
                 "--gameapi-endpoint=$endpoint"
             )
+        },
+        @{
+            # The queue phase drives BOTH queue commands through the real v0
+            # endpoint against the committed corpus's own real placed training
+            # producer (id 26 Command Center at map key 1), so the unchanged
+            # legacy dispatcher executes both. --expect-save-mutation holds
+            # because the push writes the row's attribute bag.
+            Name = "queue-live"
+            Assertions = "queue live phase"
+            ExpectSaveMutation = $true
+            Arguments = @(
+                "--headless", "--path", $projectRel,
+                "--script", "res://tests/test_unit_queues.gd",
+                "--", "--scenario=live-queue",
+                "--gameapi-endpoint=$endpoint"
+            )
         }
     )
 
@@ -531,9 +556,9 @@ try {
         )
         if ($phase.ContainsKey("ExpectSaveMutation")) {
             # placement-live, purchase-live, move-live, sell-live, store-live,
-            # upgrade-live, construction-live, collect-live, and expand-live:
-            # the harness snapshots the disposable corpus saves before the Godot
-            # run and fails unless one changed after.
+            # upgrade-live, construction-live, collect-live, expand-live, and
+            # queue-live: the harness snapshots the disposable corpus saves
+            # before the Godot run and fails unless one changed after.
             $phaseArgs += "--expect-save-mutation"
         }
         $phaseArgs += @("--", $GodotExe) + $phase.Arguments
@@ -759,6 +784,23 @@ try {
         "level-up live phase drove the committed corpus's own level-up through the v0 endpoint and proved the refusal, its empty payload, and the corpus's byte-identity"
     Report-Result ($levelOut -match "save_mutation_checked" ) `
         "level-up live phase summary records the harness's mutation flag (expected false for this phase)"
+
+    # The queue live phase must show a typed success for BOTH queue commands
+    # through the real endpoint — including its TWO-part value-level post-state
+    # proof (the push's derived count and stamped instant landed in the
+    # addressed row's attribute bag, the pop's three-key teardown removed nu,
+    # ts, and ui together, AND every stored resource is unchanged, which is what
+    # makes the neutral-vector claim non-tautological) and the unknown-key
+    # refusal carrying the service's own code with no partial payload — and the
+    # harness must have observed the corpus save change.
+    $queueOut = ""
+    if ($phaseLogs.ContainsKey("queue-live")) { $queueOut = $phaseLogs["queue-live"] }
+    Report-Result ($queueOut -match "\[test\] PASS script=res://tests/test_unit_queues\.gd") `
+        "queue live phase asserts its scenario"
+    Report-Result ($queueOut -match '\[test\] live-queue applied map_key=1 push_count=1 pop_torn_down=true') `
+        "queue live phase drove a push and a pop through the v0 endpoint against the committed Command Center, with its two-part post-state proof"
+    Report-Result ($queueOut -match "(?m)^PASS corpus save mutated by the live placement") `
+        "queue live phase mutated the disposable corpus save"
 
     # --- 8. guard baseline, post-run ---------------------------------------
 

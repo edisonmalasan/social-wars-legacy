@@ -57,6 +57,32 @@ const FIXTURE_LEVEL_BEFORE := \
 	"tests/fixtures/godot-building-xp/steps/command_level_up/before.json"
 const FIXTURE_LEVEL_AFTER := \
 	"tests/fixtures/godot-building-xp/steps/command_level_up/after.json"
+## The executed-legacy queue fixture's four states: the push's before and after,
+## and the pop's before and after. The pop's before state is the push's after
+## state, so the pair is ONE recorded transaction.
+const FIXTURE_QUEUE_PUSH_BEFORE := \
+	"tests/fixtures/godot-unit-queues/steps/command_push_queue_unit/before.json"
+const FIXTURE_QUEUE_PUSH_AFTER := \
+	"tests/fixtures/godot-unit-queues/steps/command_push_queue_unit/after.json"
+const FIXTURE_QUEUE_POP_BEFORE := \
+	"tests/fixtures/godot-unit-queues/steps/command_pop_queue_unit/before.json"
+const FIXTURE_QUEUE_POP_AFTER := \
+	"tests/fixtures/godot-unit-queues/steps/command_pop_queue_unit/after.json"
+
+## The committed corpus's real placed training producer: **id 26, Command
+## Center, at map key 1**, with an EMPTY attribute bag. The instant the executed
+## push stamped, which the double reuses instead of reading a clock.
+const QUEUE_TARGET_MAP_KEY := 1
+const QUEUE_TARGET_KEY := "1"
+const QUEUE_TARGET_ROW := [26, 51, 41, 0, 0, [], {}, 1]
+## A key that names no placement in the committed save.
+const QUEUE_UNKNOWN_KEY := 9999999
+## The committed corpus's seven stored balances, which both queue commands leave
+## byte-identical (the derived neutral vector's own guarantee).
+const QUEUE_CORPUS_RESOURCES := {
+	"xp": 4, "gold": 2000, "wood": 2000, "oil": 2000, "steel": 2000,
+	"cash": 5, "mana": 0,
+}
 
 ## The executed-legacy collect transaction's constants (fixture facts, read
 ## from the committed capture): the Tree decoration (item 905, 1x1) at legacy
@@ -371,6 +397,7 @@ func run_scenario() -> void:
 	await _check_collect(api, user_id)
 	await _check_expand(api, user_id)
 	await _check_level(api, user_id)
+	await _check_queue(api, user_id)
 
 	info("fake implementation resolved %d save(s) with no server and no socket"
 		% save_list.saves.size())
@@ -2570,6 +2597,332 @@ func _check_level_top(api: Variant, user_id: String) -> void:
 	# And the endpoint's own first guard now refuses it by name.
 	_check_level_failure(await api.level_up_town(user_id), "level_already_current",
 		"the top level is already current")
+
+
+# --- production-queue double (unit-queues design D8) ------------------------
+
+
+## The committed executed-legacy queue fixture the double reproduces, asserted
+## against the double's own in-memory state first — a push, then the three-key
+## teardown, then every stored balance unchanged.
+func _check_queue(api: Variant, user_id: String) -> void:
+	var push_before := _read_fixture_object(FIXTURE_QUEUE_PUSH_BEFORE)
+	var push_after := _read_fixture_object(FIXTURE_QUEUE_PUSH_AFTER)
+	var pop_before := _read_fixture_object(FIXTURE_QUEUE_POP_BEFORE)
+	var pop_after := _read_fixture_object(FIXTURE_QUEUE_POP_AFTER)
+	if push_before.is_empty() or push_after.is_empty():
+		return
+	if pop_before.is_empty() or pop_after.is_empty():
+		return
+	var before_map: Dictionary = push_before["maps"][0]
+	var after_map: Dictionary = push_after["maps"][0]
+	var target: Array = _normalize(before_map["items"][QUEUE_TARGET_KEY]) as Array
+	# The instant the executed push stamped is READ from the capture, never a
+	# literal: the legacy branch stamps `timestamp_now()`, so the committed
+	# fixture is the only authority for it and a re-capture must move every
+	# assertion here with it.
+	var recorded_stamp := int((_queue_attr(push_after) as Dictionary).get(
+		"ts", 0))
+	check(recorded_stamp > 0,
+		"the executed queue push stamped a positive start instant")
+	check_eq(target, QUEUE_TARGET_ROW,
+		"the queue fixture's before state is the committed Command Center with an "
+			+ "empty bag")
+	check_eq(_queue_attr(push_before), {},
+		"the executed push started from an empty bag")
+	check_eq(_queue_attr(push_after), {"nu": 1, "ts": recorded_stamp},
+		"the executed push set the count to 1 and stamped the start instant")
+	check_eq(_queue_attr(pop_before), {"nu": 1, "ts": recorded_stamp},
+		"the executed pop's before state is the push's own after state")
+	check_eq(_queue_attr(pop_after), {},
+		"the executed pop's teardown removed nu, ts, and ui TOGETHER")
+	for key in ["xp", "gold", "wood", "oil", "steel", "expansions", "store"]:
+		check_eq(after_map[key], before_map[key],
+			"the executed queue transaction left map.%s byte-identical" % key)
+	var differing: Array = []
+	for key: Variant in before_map["items"].keys():
+		if after_map["items"][key] != before_map["items"][key]:
+			differing.append(str(key))
+	check_eq(differing, [QUEUE_TARGET_KEY],
+		"the executed queue transaction changed exactly the addressed row")
+	check_eq((after_map["items"] as Dictionary).size(),
+		(before_map["items"] as Dictionary).size(),
+		"the executed queue transaction left the placement count at 40")
+	check_eq(pop_after["playerInfo"], push_before["playerInfo"],
+		"the executed queue transaction left the player info byte-identical")
+	check_eq(pop_after["privateState"], push_before["privateState"],
+		"the executed queue transaction left the private state byte-identical")
+
+	var requests_before: int = api.queue_requests
+	# --- the push, against the committed corpus's own empty bag.
+	var pushed: Variant = await api.push_queue_unit_town(user_id,
+		QUEUE_TARGET_MAP_KEY)
+	check(pushed is BootData.QueueResult,
+		"push_queue_unit_town returns the typed result")
+	_check_typed_queue(pushed, "push")
+	if pushed is BootData.QueueResult and pushed.ok:
+		var typed: BootData.QueueResult = pushed
+		check_eq(typed.action, "push", "the echoed action is the push")
+		check_eq(typed.map_key, QUEUE_TARGET_MAP_KEY,
+			"the addressed key is the one the client named")
+		check_eq(int(typed.queue.count), 1,
+			"the push derived the committed count of 1")
+		check_eq(int(typed.queue.start_instant), recorded_stamp,
+			"the push stamped the fixture's committed instant, never a clock")
+		check_eq((typed.queue.keys as Array), ["nu", "ts"],
+			"the post-execution bag carries exactly nu and ts")
+		check_eq(bool(typed.queue.absent_is_absent), true,
+			"the service states its own absence rule")
+		check_eq(_typed_row_attr(typed.previous), {},
+			"the response's previous row is the row the client named, empty")
+		check_eq(_typed_row_attr(typed.row), {"nu": 1, "ts": recorded_stamp},
+			"the response's post-execution row carries the derived queue")
+		check_eq(int(typed.previous.x), int(typed.row.x),
+			"a queue command rewrites the row IN PLACE: the cell is unchanged")
+		# The value-level half of the endpoint's proof: a queue moves NO
+		# resource, so every stored balance is the value it started from.
+		for name: String in ["xp", "gold", "wood", "oil", "steel", "cash",
+				"mana"]:
+			check_eq(_typed_queue_resource(typed, name),
+				QUEUE_CORPUS_RESOURCES.get(name, -99),
+				"the %s balance is UNCHANGED by the push (the endpoint's "
+					% name + "value-level proof)")
+	# --- the pop, against the row the push just queued: the three-key teardown.
+	var popped: Variant = await api.pop_queue_unit_town(user_id,
+		QUEUE_TARGET_MAP_KEY)
+	check(popped is BootData.QueueResult,
+		"pop_queue_unit_town returns the typed result")
+	_check_typed_queue(popped, "pop")
+	if popped is BootData.QueueResult and popped.ok:
+		var typed: BootData.QueueResult = popped
+		check_eq(typed.action, "pop", "the echoed action is the pop")
+		check_eq(_typed_row_attr(typed.previous), {"nu": 1,
+			"ts": recorded_stamp},
+			"the pop's before row carried the pushed count and instant")
+		check_eq(_typed_row_attr(typed.row), {},
+			"the pop's teardown removed nu, ts, and ui TOGETHER")
+		check_eq(bool(typed.queue.present), false,
+			"the post-teardown projection reports the queue as ABSENT")
+		check_eq(typed.queue.count, null,
+			"the post-teardown count is null, which a zero cannot say")
+		check_eq((typed.queue.keys as Array), [],
+			"the post-teardown bag carries no committed key at all")
+		for name: String in ["xp", "gold", "wood", "oil", "steel", "cash",
+				"mana"]:
+			check_eq(_typed_queue_resource(typed, name),
+				QUEUE_CORPUS_RESOURCES.get(name, -99),
+				"the %s balance is UNCHANGED by the pop" % name)
+	# --- two pushes then a PARTIAL decrement: the branch's own middle case, where
+	# `nu` and `ts` are re-written and NO key is torn down. It is unreachable
+	# against the committed corpus (whose push only ever produces count 1), so it
+	# is exercised over the double's own in-memory state — never a fixture.
+	var first_again: Variant = await api.push_queue_unit_town(user_id,
+		QUEUE_TARGET_MAP_KEY)
+	if first_again is BootData.QueueResult and first_again.ok:
+		check_eq(int((first_again as BootData.QueueResult).queue.count), 1,
+			"a push onto a torn-down row sets the count to 1")
+	var twice: Variant = await api.push_queue_unit_town(user_id,
+		QUEUE_TARGET_MAP_KEY)
+	if twice is BootData.QueueResult and twice.ok:
+		check_eq(int((twice as BootData.QueueResult).queue.count), 2,
+			"a second push INCREMENTS the committed count to 2, which is the "
+				+ "engine's own (nu + 1) rule")
+	var partial: Variant = await api.pop_queue_unit_town(user_id,
+		QUEUE_TARGET_MAP_KEY)
+	if partial is BootData.QueueResult and partial.ok:
+		var typed_partial: BootData.QueueResult = partial
+		check_eq(int(typed_partial.queue.count), 1,
+			"a partial decrement leaves the count at 1")
+		check_eq(bool(typed_partial.queue.present), true,
+			"a partial decrement tears NOTHING down")
+		check_eq((typed_partial.queue.keys as Array), ["nu", "ts"],
+			"a partial decrement leaves both committed keys in place")
+		check_eq(_typed_row_attr(typed_partial.row), {"nu": 1,
+			"ts": recorded_stamp},
+			"a partial decrement re-writes nu and re-stamps ts")
+	await api.pop_queue_unit_town(user_id, QUEUE_TARGET_MAP_KEY)
+	# --- the inert pop: a row whose bag carries no count is a recorded NO-OP,
+	# not an error. Legacy's helper returns without writing anything, and the
+	# endpoint answers success — so the double must answer success too.
+	var inert: Variant = await api.pop_queue_unit_town(user_id,
+		QUEUE_TARGET_MAP_KEY)
+	check(inert is BootData.QueueResult and inert.ok,
+		"a pop against an already-torn-down row is an inert recorded no-op, "
+			+ "not an error: %s"
+			% ((inert as BootData.QueueResult).error_message
+				if inert is BootData.QueueResult else ""))
+	if inert is BootData.QueueResult and inert.ok:
+		check_eq(_typed_row_attr((inert as BootData.QueueResult).row), {},
+			"the inert pop wrote nothing at all")
+		check_eq(bool((inert as BootData.QueueResult).queue.present), false,
+			"the inert pop leaves the queue reported as absent")
+		check_eq(_typed_row_attr((inert as BootData.QueueResult).previous), {},
+			"the inert pop's previous row is already empty")
+	# --- every fail-closed code, in the endpoint's own order.
+	_check_queue_failure(await api.push_queue_unit_town("", QUEUE_TARGET_MAP_KEY),
+		"missing_user_id", "an empty save id")
+	_check_queue_failure(await api.push_queue_unit_town("no-such-save-000",
+		QUEUE_TARGET_MAP_KEY), "unknown_user_id", "an unknown save id")
+	_check_queue_failure(await api.pop_queue_unit_town(user_id, -1),
+		"invalid_map_key", "a negative key")
+	_check_queue_failure(await api.pop_queue_unit_town(user_id,
+		QUEUE_UNKNOWN_KEY), "unknown_map_key",
+		"a key that names no placement in the save")
+	# A refused intent leaves the addressed row byte-identical.
+	check_eq(_double_queue_attr(api), {},
+		"every refused queue intent left the addressed row's bag untouched")
+	for name: String in ["xp", "gold", "wood", "oil", "steel", "cash", "mana"]:
+		check_eq(_double_queue_resource(api, name),
+			QUEUE_CORPUS_RESOURCES.get(name, -99),
+			"the %s balance is unchanged by every refused queue intent" % name)
+	# --- the wire contract: the facade's two operations carry ONLY the save
+	# identity and the target key, so there is no channel through which a client
+	# could dictate a count, a cost, a duration, or a readiness.
+	check_eq(api.queue_requests, requests_before + 11,
+		"the facade counted every queue intent it issued: two for the recorded "
+			+ "pair, five for the two pushes, the partial decrement, the teardown "
+			+ "and the inert pop, and four refusals")
+	check(_queue_argument_count(api) == 2,
+		"each queue operation takes EXACTLY the save identity and the target "
+			+ "key: there is no parameter through which a client could send an "
+			+ "outcome")
+	check_eq(BootData.QUEUE_ACTIONS, ["push", "pop"],
+		"the closed action vocabulary is exactly the push and the pop")
+	info("queue double reproduced the executed fixture's push and three-key "
+		+ "teardown plus an inert no-op, and answered six structured refusals "
+		+ "with no server and no socket")
+
+
+## One typed queue result's own shape: two rows, the queue block, and the seven
+## resources — with no readiness, remaining time, progress, completion, or cost
+## field anywhere on either typed class.
+func _check_typed_queue(result: Variant, label: String) -> void:
+	if not (result is BootData.QueueResult):
+		check(false, "%s queue result is typed" % label)
+		return
+	var typed: BootData.QueueResult = result
+	check_eq(typed.protocol, BootData.PROTOCOL, "%s protocol is compat-v0" % label)
+	check_eq(typed.result, "success", "%s carries the legacy success result" % label)
+	check(typed.server_time > 0,
+		"%s server_time is a positive integer (time-dependent field)" % label)
+	check(typed.previous != null and typed.row != null,
+		"%s carries BOTH rows: the pre-execution row and the post-execution one"
+			% label)
+	check(typed.queue != null, "%s carries the queue projection" % label)
+	check(typed.resources != null, "%s carries the resources" % label)
+	if typed.queue != null:
+		check_eq(bool(typed.queue.absent_is_absent), true,
+			"%s states that an absent queue is absent" % label)
+
+
+## Structured failure for one queue intent: the service's own code, with no
+## partial payload.
+func _check_queue_failure(result: Variant, code: String, label: String) -> void:
+	check(result is BootData.QueueResult and not result.ok,
+		"%s fails with a structured result" % label)
+	if not (result is BootData.QueueResult):
+		return
+	var typed: BootData.QueueResult = result
+	check_eq(typed.error_code, code,
+		"%s names the service's own code (got %s: %s)"
+			% [label, typed.error_code, typed.error_message])
+	check(typed.previous == null and typed.row == null and typed.queue == null
+			and typed.resources == null and typed.result == "",
+		"%s carries no partial payload" % label)
+
+
+## One committed save's addressed row attribute bag, with the transport's integral
+## floats normalised to integers.
+func _queue_attr(document: Dictionary) -> Dictionary:
+	var items: Dictionary = document["maps"][0]["items"]
+	return _normalize((items[QUEUE_TARGET_KEY] as Array)[6]) as Dictionary
+
+
+## One typed row's attribute bag.
+func _typed_row_attr(row: Variant) -> Dictionary:
+	if row == null or not (row is BootData.Placement):
+		return {}
+	return _typed_attr((row as BootData.Placement).attr)
+
+
+## One typed result's stored balance, under the field's own name.
+func _typed_queue_resource(typed: BootData.QueueResult, name: String) -> int:
+	if typed.resources == null:
+		return -99
+	match name:
+		"xp":
+			return int(typed.resources.xp)
+		"gold":
+			return int(typed.resources.gold)
+		"wood":
+			return int(typed.resources.wood)
+		"oil":
+			return int(typed.resources.oil)
+		"steel":
+			return int(typed.resources.steel)
+		"cash":
+			return int(typed.resources.cash)
+		"mana":
+			return int(typed.resources.mana)
+	return -99
+
+
+## The double's own in-memory addressed bag, read from the LIVE implementation
+## instance — its observable in-process state, never a transport payload.
+func _double_queue_attr(api: Variant) -> Variant:
+	var double: Variant = api._impl
+	if double == null or not (double is FakeApi):
+		return "unreachable"
+	var rows: Dictionary = double._queue_state["rows"]
+	if not rows.has(QUEUE_TARGET_KEY):
+		return "no such row"
+	return _normalize(((rows[QUEUE_TARGET_KEY] as Array)[6]))
+
+
+## One stored balance of the double's own in-memory queue state.
+func _double_queue_resource(api: Variant, name: String) -> int:
+	var double: Variant = api._impl
+	if double == null or not (double is FakeApi):
+		return -99
+	return int(double._queue_state[name])
+
+
+## How many parameters the facade's own queue operations declare, read from the
+## method list rather than assumed: two are the save identity and the target
+## key, and any more would be a channel through which a client could dictate an
+## outcome, which design D2/D5 forbids.
+func _queue_argument_count(api: Variant) -> int:
+	var script: Variant = api.get_script()
+	if script == null:
+		return -1
+	var counts: Array = []
+	for method: Dictionary in script.get_script_method_list():
+		var name := str(method.get("name", ""))
+		if name == "push_queue_unit_town" or name == "pop_queue_unit_town":
+			counts.append((method.get("args", []) as Array).size())
+	if counts.size() != 2:
+		return -1
+	return int(counts[0])
+
+
+## The pinned engine's JSON parser widens every committed number to a float;
+## this normalises them to integers so a comparison against a literal holds
+## without weakening the value.
+func _normalize(value: Variant) -> Variant:
+	if value is float:
+		var number := float(value)
+		return int(number) if number == floor(number) else number
+	if value is Array:
+		var list: Array = []
+		for entry: Variant in value as Array:
+			list.append(_normalize(entry))
+		return list
+	if value is Dictionary:
+		var bag := {}
+		for key: Variant in (value as Dictionary).keys():
+			bag[key] = _normalize((value as Dictionary)[key])
+		return bag
+	return value
 
 
 ## The double's own in-memory recorded level, read from the LIVE implementation

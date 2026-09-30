@@ -107,6 +107,29 @@ extends RefCounted
 ## positive integer and never by value. Nothing in the expand response is
 ## otherwise time-dependent: the legacy branch writes an int the client sent.
 ##
+## The production-queue command needs its own result class for three reasons no
+## earlier class can absorb. First, its response is TWO-SIDED and both sides are
+## the same shape: the addressed row AS READ BEFORE execution (`previous`, the
+## very row the client named) and the same row re-read from the save after it
+## (`row` — a queue command rewrites one row's `attr` bag in place, exactly as
+## a construction or a collection does), so both go through the one shared entry
+## parser every other response uses and a row can never be read with two rule
+## sets. Second, it is the FIRST delivered response carrying a **nullable**
+## projection block: `QueueState.count`, `start_instant`, and `queued_unit_id`
+## are null when the bag carries no such key, which is what distinguishes an
+## **absent** queue from a count of zero (the legacy three-key teardown deletes
+## the keys at zero, so a committed zero is unreachable from these commands) —
+## and a `null` there must never be read as a zero. Third, the block carries the
+## service's own `absent_is_absent` statement, which this parser CHECKS against
+## its own copy for the same reason the level curve's index base is checked: a
+## response describing a different absence rule is a different contract.
+##
+## **No readiness, no remaining time, no progress, no completion, no cost, and
+## no count bound are represented here at all** (unit-queues design D1/D2/D5):
+## the legacy server has no such rule to report. The row's `attr` bag therefore
+## travels verbatim on both rows and is read through the queue projection
+## (`scripts/units/unit_queue.gd`), never re-derived here.
+##
 ## Presentation code never receives raw transport dictionaries: every
 ## GameApi operation returns one of the result classes below, and the two
 ## legacy JSON payloads (game config, player info) are wrapped in payload
@@ -124,6 +147,14 @@ const PROTOCOL := "compat-v0"
 ## the legacy command. The set is closed and echoed exactly as sent, so a
 ## response naming anything else is a `bad_response`, never a guess.
 const CONSTRUCTION_ACTIONS := ["start", "click", "finish"]
+
+## The closed action vocabulary of the v0 queue endpoint (unit-queues design D2).
+## These are the endpoint's OWN outcome names, NOT legacy command names: the
+## client chooses an outcome and the service chooses the legacy command (which
+## is why the atom-fusion push, `push_queue_unit2`, is absent from this set by
+## decision — design D7). The set is closed and echoed exactly as sent, so a
+## response naming anything else is a `bad_response`, never a guess.
+const QUEUE_ACTIONS := ["push", "pop"]
 
 
 ## One saved village exactly as the v0 session list reports it.
@@ -894,6 +925,240 @@ static func _level_up_error(envelope: Dictionary) -> LevelUpResult:
 		code = str(typed.get("code", code))
 		message = str(typed.get("message", message))
 	return level_up_failure(code, message)
+
+
+## The queue facts one queue response reports, verbatim (unit-queues design
+## D1/D5). Every value here is the one the save holds: the client computes no
+## readiness, no remaining time, no progress ratio, no completion, no cost, and
+## no count bound, because the legacy server has none of those rules to report.
+##
+## The three nullable fields are **genuinely nullable**, not sentinels: a bag
+## carrying no queue key is `present: false` with all three **null**, and that
+## is what distinguishes an absent queue from a count of zero — a pair the
+## legacy three-key teardown makes unreachable, since it deletes `nu`, `ts`,
+## and `ui` together at zero. `queued_unit_id` is reported **verbatim** and is
+## resolved through content by the queue projection, never coerced to a name.
+class QueueState:
+	extends RefCounted
+	## Whether the addressed row carried any of the three committed queue keys.
+	var present := false
+	## The committed count, or null when the bag carries no `nu`.
+	var count: Variant = null
+	## The committed start instant, or null when the bag carries no `ts`.
+	var start_instant: Variant = null
+	## The committed queued unit id **verbatim**, or null when absent.
+	var queued_unit_id: Variant = null
+	## The committed queue key names the bag carries, in the committed order.
+	var keys: Array = []
+	## The service's own statement that an absent queue is absent rather than a
+	## zero count with a zero instant. Checked against this module's copy.
+	var absent_is_absent := false
+
+
+## Result of `push_queue_unit_town()` / `pop_queue_unit_town()`: the legacy
+## result plus the authoritative two-sided superset (unit-queues design D4/D8) —
+## the addressed row AS READ BEFORE execution (`previous`, the very row the
+## client named) and the same row re-read from the save after it (`row`), plus
+## the service's `queue` projection and the current `resources` — or a
+## structured failure with no partial payload.
+##
+## **No stored resource is expected to move**: a queue command is dispatched
+## like every other command with a client-sent vector, and the service's second
+## post-execution proof half requires every stored resource to be
+## **unchanged**, which is what forecloses a client minting or burning a balance
+## through this path. The `resources` are reported for the readout's benefit and
+## the client's own arithmetic is never applied to them.
+##
+## The client applies `row` and `resources` **verbatim** — the response always
+## wins over the client's own model — and reads `queue` as the service's own
+## view of the three committed keys.
+class QueueResult:
+	extends RefCounted
+	var ok := false
+	var protocol := ""
+	var game_version := ""
+	## Wall-clock seconds the legacy server stamped (a time-dependent field, so
+	## tests assert positivity, never a fixed value).
+	var server_time := 0
+	## The legacy result string ("success"); "" on failure.
+	var result := ""
+	## The action the service resolved and executed, echoed exactly as sent.
+	var action := ""
+	## The legacy map key the row is stored under — the queue commands' ONLY
+	## positional argument.
+	var map_key := -1
+	## The addressed row as the service read it BEFORE execution, and the same
+	## row re-read AFTER it.
+	var previous: Placement = null
+	var row: Placement = null
+	## The service's projection of the row's committed queue keys.
+	var queue: QueueState = null
+	var resources: Resources = null
+	var error_code := ""
+	var error_message := ""
+
+
+## Structured failure for the queue intents (never a partial payload).
+static func queue_failure(code: String, message: String) -> QueueResult:
+	var result := QueueResult.new()
+	result.ok = false
+	result.error_code = code
+	result.error_message = message
+	return result
+
+
+## Parses a v0 queue envelope — success or structured error — into the typed
+## result, fail-closed in both directions (spec "A structured failure carries no
+## partial payload"). The rules mirror `parse_level_up()`: the envelope must be
+## a JSON object reporting `ok: true`, the protocol must be the v0 one, the
+## legacy result string must be `success`, the echoed action must be inside the
+## closed `QUEUE_ACTIONS` set, `map_key` must be a non-negative integer, both
+## rows must be readable eight-field entries, the `queue` block must carry the
+## three committed keys plus the service's `absent_is_absent` statement, and
+## `resources` must be the seven non-negative integers every other response
+## carries.
+##
+## The response is the AUTHORITATIVE record of what the service did. The
+## queue's own rules — presence, verbatim values, the teardown, the recorded
+## absences — belong to the queue projection (`scripts/units/unit_queue.gd`),
+## which reads a row's `attr` bag: this parser never re-derives a count, an
+## instant, a readiness, or a cost from anything.
+static func parse_queue(payload: Variant) -> QueueResult:
+	if not (payload is Dictionary):
+		return queue_failure("bad_response",
+			"response is not a JSON object")
+	var envelope: Dictionary = payload
+	if envelope.get("ok") != true:
+		return _queue_error(envelope)
+	if str(envelope.get("protocol", "")) != PROTOCOL:
+		return queue_failure("protocol_mismatch",
+			"expected protocol %s, got %s" % [PROTOCOL,
+			str(envelope.get("protocol"))])
+	if str(envelope.get("result", "")) != "success":
+		return queue_failure("bad_response",
+			"queue response did not report the legacy success result")
+	var action := str(envelope.get("action", ""))
+	if not QUEUE_ACTIONS.has(action):
+		return queue_failure("bad_response",
+			"the queue response echoed action '%s', which is outside the "
+				% action + "closed set %s" % ", ".join(PackedStringArray(
+				QUEUE_ACTIONS)))
+	var key: Variant = _parse_int(envelope.get("map_key"))
+	if key == null or int(key) < 0:
+		return queue_failure("bad_response",
+			"the queue response carries no non-negative map_key")
+	var previous := _parse_placement_entry(envelope.get("previous"))
+	if previous == null:
+		return queue_failure("bad_response",
+			"the queue response carries no readable eight-field previous row")
+	var row := _parse_placement_entry(envelope.get("row"))
+	if row == null:
+		return queue_failure("bad_response",
+			"the queue response carries no readable eight-field post-execution "
+				+ "row")
+	var queue := _parse_queue_state(envelope.get("queue"))
+	if queue == null:
+		return queue_failure("bad_response",
+			"the queue response carries no readable committed queue block")
+	var resources_raw: Variant = envelope.get("resources")
+	if not (resources_raw is Dictionary):
+		return queue_failure("bad_response",
+			"queue response carries no resources object")
+	var resources := _parse_resources(resources_raw)
+	if resources == null:
+		return queue_failure("bad_response",
+			"queue resources are not seven non-negative integers")
+	var result := QueueResult.new()
+	result.ok = true
+	result.protocol = PROTOCOL
+	result.game_version = str(envelope.get("game_version", ""))
+	result.server_time = _parse_epoch(envelope.get("server_time"))
+	if result.server_time < 0:
+		return queue_failure("bad_response", "server_time is not a number")
+	result.result = "success"
+	result.action = action
+	result.map_key = int(key)
+	result.previous = previous
+	result.row = row
+	result.queue = queue
+	result.resources = resources
+	return result
+
+
+## The response's `queue` block -> typed `QueueState`; null when the value is not
+## an object carrying the documented facts. The `absent_is_absent` statement is
+## checked against this module's own copy, for the same reason the level curve's
+## index base is checked: a response describing a different absence rule is a
+## different contract, and adopting it silently would make an absent queue and a
+## zero count indistinguishable.
+##
+## The nullable fields accept **either** null or a well-typed value, and the
+## shape is cross-checked against `present`: a present queue must carry at
+## least the key that makes it present, and an absent one must carry none. That
+## is what stops a response from reporting `present: true` with every value
+## null — a state no committed save holds and one this contract refuses to
+## render as a queue.
+static func _parse_queue_state(value: Variant) -> QueueState:
+	if not (value is Dictionary):
+		return null
+	var source: Dictionary = value
+	if source.get("absent_is_absent") != true:
+		return null
+	var present: Variant = source.get("present")
+	if not (present is bool):
+		return null
+	var raw_keys: Variant = source.get("keys")
+	if not (raw_keys is Array):
+		return null
+	var keys: Array = []
+	for key: Variant in raw_keys as Array:
+		if not (key is String):
+			return null
+		keys.append(str(key))
+	var nullable := {}
+	for field in ["count", "start_instant", "queued_unit_id"]:
+		var entry: Variant = source.get(field)
+		if field == "queued_unit_id":
+			# The queued unit id is reported VERBATIM: only the
+			# client-supplied atom-fusion argument ever writes it, so no shape
+			# is imposed here and nothing is coerced (design D7).
+			nullable[field] = entry
+			continue
+		if entry == null:
+			nullable[field] = null
+			continue
+		var number: Variant = _parse_int(entry)
+		if number == null or int(number) < 0:
+			return null
+		nullable[field] = int(number)
+	var queue := QueueState.new()
+	queue.present = bool(present)
+	queue.count = nullable["count"]
+	queue.start_instant = nullable["start_instant"]
+	queue.queued_unit_id = nullable["queued_unit_id"]
+	queue.keys = keys
+	queue.absent_is_absent = true
+	if queue.present and keys.is_empty():
+		return null
+	if not queue.present and not keys.is_empty():
+		return null
+	return queue
+
+
+## Structured error fields of a failed queue envelope (code + message) — the
+## same one envelope rule the other ten commands use, so a code the service
+## named (`missing_map_key`, `invalid_map_key`, `unknown_map_key`,
+## `missing_action`, `invalid_action`, `missing_user_id`, `invalid_user_id`,
+## `unknown_user_id`, `internal_error`, …) reaches the client unchanged.
+static func _queue_error(envelope: Dictionary) -> QueueResult:
+	var code := "bad_response"
+	var message := "response reported failure without a structured error"
+	var error: Variant = envelope.get("error")
+	if error is Dictionary:
+		var typed: Dictionary = error
+		code = str(typed.get("code", code))
+		message = str(typed.get("message", message))
+	return queue_failure(code, message)
 
 
 ## Parses any v0 session envelope — success or structured error — into the

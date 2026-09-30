@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-09-30T19:43:35+00:00",
+  "form": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "data": "d1569dbed18ec2eb658fcd6937c1923e646f44650df8bcfb197e226d964a3e1b;{\"accessToken\":\"\",\"commands\":[[0,\"pop_queue_unit\",[1],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1790797415}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "command.php form (USERID, user_key, language, data) with the derived <64-hex>;<json> envelope carrying exactly one command: [[0,\"pop_queue_unit\",[1],[0,0,0,0,0,0,0,0,0]]] against the same map key 1, immediately after the push, so the row carries nu 1 and the decrement reaches zero. The recorded effect is the THREE-KEY TEARDOWN: nu, ts, and ui are deleted TOGETHER (engine.py:198-204), which no inspection of the dispatcher would reveal. The map index is the only argument and the vector is NEUTRAL, exactly as for the push. This step is a POP, not a COMPLETION: the legacy server has no command that completes a queue, and nothing server-side turns a queue into a unit. user_key is redacted in this record; accessToken is the crafted empty placeholder, never a token value.",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}
