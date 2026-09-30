@@ -12,12 +12,14 @@ extends "res://tests/test_base.gd"
 ## camera-controls work (the component script and its suite), the
 ## UI-foundation work (the component script and its suite), and the
 ## settings/audio-manager work (the Settings and AudioManager autoloads
-## with their scripts and suites), and the town-rendering work (the
+## with their scripts and suites), the town-rendering work (the
 ## eighteen town scripts under `scripts/town/`, the town and town-slice
 ## scenes, their seventeen town suites, the fourteen committed evidence
 ## captures,
 ## and the placement, purchase, move, sell, store, upgrade, construction,
-## collect, expand, resources, and level (xp) evidence reports):
+## collect, expand, resources, and level (xp) evidence reports), and the
+## unit-definitions work (the two `scripts/units/` modules, its suite, and
+## the `unit-definitions` evidence report):
 ## no other game system, no scene beyond the allow-list, no script outside
 ## the allow-list, no Flash-related runtime, no legacy protocol token
 ## anywhere, and no transport reference outside the legacy-v0
@@ -79,6 +81,8 @@ const ALLOWED := [
 	"scripts/town/town_terrain.gd",
 	"scripts/town/town_visuals.gd",
 	"scripts/ui_foundation.gd",
+	"scripts/units/unit_catalog.gd",
+	"scripts/units/unit_definition.gd",
 	"scripts/verification.gd",
 	"tests/test_asset_ids.gd",
 	"tests/test_audio_manager.gd",
@@ -112,6 +116,7 @@ const ALLOWED := [
 	"tests/test_town_store.gd",
 	"tests/test_town_upgrade.gd",
 	"tests/test_ui_foundation.gd",
+	"tests/test_unit_definitions.gd",
 	"evidence/boot/boot-report.json",
 	"evidence/building-move/building-move.png",
 	"evidence/building-move/report.json",
@@ -140,6 +145,7 @@ const ALLOWED := [
 	"evidence/town/report.json",
 	"evidence/town/town-player.png",
 	"evidence/town/town-slice.png",
+	"evidence/unit-definitions/report.json",
 ]
 
 ## The exact scene set the project may declare (set equality below).

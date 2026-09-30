@@ -2115,3 +2115,139 @@ godot --headless --path apps/client-godot res://scenes/town.tscn -- --xp-report=
 
 **All eleven M7 deliver lines are now delivered** — placement, purchase, move, sell, store,
 upgrade, construction, collect income, town expansion, resources, and level progression.
+
+---
+
+## Unit definitions (M8 line 1)
+
+The first M8 deliver line, and the first M8 change that is **not** a legacy-behaviour
+derivation: everything it delivers is committed content that the client already verifies.
+
+### What is committed
+
+`packages/game-content/normalized/units.json` is a committed, manifest-verified M3 output: a
+bare list of **429 rows**, every one carrying `kind: "unit"` and `type: "u"`, a **distinct
+string `legacy_id`** spanning `923`..`1431`, and **58 committed fields** — 56 on every row,
+plus `breeding_order` and `sm_training_time` on 300 of 429 each. The committed
+`packages/game-content/schemas/unit.schema.json` declares exactly those 58 properties and 56
+required, and data and schema agree with no field in one and absent from the other.
+`ContentRegistry` verifies every output's byte count and SHA-256 **before** parsing and indexes
+each domain by `str(legacy_id)`, so `units` was already a loaded, verified domain before this
+change.
+
+### The model
+
+`scripts/units/unit_definition.gd` is a static, read-only, typed `UnitDefinition` parsed from
+one verified registry entry in five named field groups:
+
+| Group | Fields |
+| --- | --- |
+| identity and presentation | `legacy_id`, `name`, `img_name`, `type`, `kind`, `race`, `display_order` |
+| footprint and placement | `width`, `height`, `elevation`, `population`, `volume`, `max_elem_vol`, `max_frame` |
+| statistics | `attack`, `defense`, `life`, `attack_interval`, `attack_range`, `velocity`, `expiration`, `best_against`, `best_against_mult` |
+| economy | `costs`, `cost`, `cost_unit_cash`, `collect`, `collect_type`, `collect_xp`, `xp`, `unit_capacity` |
+| training and upgrade | `training_time`, `sm_training_time`, `breeding_order`, `upgrades_to`, `syringes`, `min_level`, `activation`, `clicks_to_build`, `build_time` |
+
+43 committed fields are typed and 15 stay reachable through the catalog's one documented
+`raw_entry()` escape hatch, so a new committed content field needs no model change and nothing
+is silently dropped. Parsing **fails closed** on any malformed field — the error names the
+offending definition and the field and produces no definition; nothing is guessed, defaulted,
+or coerced into a meaningful value. A conditionally-present or nullable field is recorded as
+**absent** behind its own `has_*` flag, never as zero, so an absent field stays
+distinguishable from a committed zero (the committed rows carry `committed_zero_present: 0` for
+all four, so the two cases never collide).
+
+`scripts/units/unit_catalog.gd` resolves everything **only** through `ContentRegistry`:
+`build()`, `lookup()`/`find()` by the committed string legacy ID, `has()`, `count()`,
+`legacy_ids()` in committed order, `find_by_name()`, `raw_entry()`, and `sprite_linkage()`. An
+unloaded registry, a registry with no `units` domain, a zero-entry domain, or an enumeration
+that disagrees with the registry's own `count()` all **fail closed** — never an empty catalog
+presented as a loaded one.
+
+### Two corrections the Apply stage forced
+
+Both were errors in the change's own planning artifacts, found by executing against the
+committed package rather than reading it, and both are recorded in the design:
+
+1. **`costs` and `properties` are committed objects, not embedded-JSON strings.** Content rule
+   R2 coerces them at build time, and the committed schema declares both `"type": "object"`
+   (with `costs` restricting `propertyNames` to `o/s/g/w/c`). The object form is the required
+   input; a JSON string is accepted only as the same transport tolerance the delivered
+   `placement_catalog.gd` applies to the served bootstrap payload, and both forms fail closed
+   identically. The `costs` letter vocabulary is **aliased** from `placement_catalog.gd`, never
+   restated, so a unit definition cannot disagree with what the unit would actually cost.
+2. **The field count is 58, not 53** (56 on every row, 2 optional). Independently re-verified
+   against both the data and the schema.
+
+### The public enumeration accessor
+
+The registry exposed no public id enumeration, so enumerating the 429 definitions would have
+required either re-reading `units.json` behind the registry's back — bypassing the digest gate
+that is the whole point of the registry — or reaching into its private index. Both were
+rejected. This change therefore adds a small public `ContentRegistry.legacy_ids(domain)`
+accessor returning the ids of the index the registry built during its verified load, and the
+catalog enumerates through it, cross-checking against the public `count()` and failing closed on
+disagreement. The `godot-content-registry` "Domain indexing and lookup" requirement gains the
+corresponding scenario, so it is a specified capability rather than an undocumented escape
+hatch. The accessor reports the **committed index order**, not a collation of the digit strings
+— the suite pins this with `units`, whose committed first id is `923` while a lexicographic
+sort of the same ids would begin `1001`.
+
+### Verification (commands actually executed)
+
+```bash
+godot --headless --path apps/client-godot --script res://tests/test_unit_definitions.gd
+godot --headless --path apps/client-godot --script res://tests/test_content_registry.gd
+godot --headless --path apps/client-godot --script res://tests/test_project_scope.gd
+godot --headless --path apps/client-godot --script res://tests/test_scene_build.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+```
+
+Observed 2026-10-01: `test_unit_definitions` **204 checks** (207 with `--report`), registered as
+the 28th hermetic suite; `test_content_registry` **87 checks** (was 52, +35 for the
+enumeration); `test_project_scope` **1339**; `test_scene_build` **36**; both batteries exit 0.
+No new live phase: this line has no endpoint and mutates nothing.
+
+### Evidence
+
+`evidence/unit-definitions/report.json`, schema `unit-definitions-report-v1`, written by the
+suite itself via `--report=<path>` (bare `--report` defaults to that path) so its tables are
+derived from the live model and registry and cannot drift from the code they document. It
+records the committed counts, the 58/56 field inventory, the legacy-ID range and distinctness,
+the content fingerprint and the `units.json` manifest digest, the per-group parsed fields, the
+absent-field coverage, the raw-entry escape hatch, the asset-linkage statuses, the
+static/instance boundary, the established-versus-derived provenance split, and every non-claim.
+Digest `f997eb2d…66d5`, byte-identical across reruns.
+
+### Unit definitions claim limits
+
+- no Flash, Ruffle, ActionScript, or browser executed;
+- **no unit is rendered, animated, or played** by this change;
+- **no unit instance, queue, production, collection, movement, animation, or behaviour is
+  implemented** — each is a separate later M8 deliver line (`unit instances` → `queues` →
+  `production` → `collection` → `movement` → `animations` → `basic behaviors`);
+- **no gameplay semantics are attached to any parsed statistic.** `attack: 10` is a committed
+  number, not a damage rule; there is deliberately no `damage()`, `can_defend()`, `speed()`,
+  `lifetime()`, or `next_attack()` helper on the model or the catalog, and the suite asserts
+  their absence;
+- the definitions are the committed normalized rows **verbatim** — no tuning, balancing,
+  scaling, rounding, or interpolation;
+- **asset linkage is reported and nothing more**: whether the committed `img_name` resolves
+  through the committed asset-ID registry and with which recorded status. No rendering
+  correctness, no animation correctness, no visual fidelity. (424 of 429 whole references
+  resolve — 419 `extracted`, 1 `converted`, 1 `missing_source`, 3 `pending`; the 5 rows naming
+  a comma-joined list resolve per part, 446 of 446);
+- the committed fresh-player corpus has **no unit placements at all**, so no instance behaviour
+  is evidenced here and nothing in this line speaks for a placed unit;
+- **no windowed capture is claimed** — this change alters nothing visual, so a capture would
+  assert nothing;
+- the committed `name` values are **not unique** (six are shared by two rows each), so
+  `find_by_name()` returns every match and never picks one;
+- the upgrade chain's committed `-1` is reproduced verbatim and the schema's "-1 and 0 mean
+  none" note is **not** interpreted; the `properties` flag bag is reproduced without
+  interpreting any key as a capability;
+- `best_against` is a string on all 429 rows while the schema also permits an integer code, so
+  the field is a variant and accepts either;
+- no pixel-parity oracle exists, and the committed definitions say nothing about what the Flash
+  client read.

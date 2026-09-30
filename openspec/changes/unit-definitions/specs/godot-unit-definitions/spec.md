@@ -13,7 +13,9 @@ semantics.
 
 The client SHALL expose each committed unit definition as a typed, read-only
 `UnitDefinition` resolved through `ContentRegistry` from the manifest-verified `units`
-domain, and SHALL preserve the definition's legacy ID **verbatim as a string**. A
+domain, enumerating that domain's legacy IDs through the registry's own public enumeration
+accessor rather than re-reading the committed file, and SHALL preserve the definition's
+legacy ID **verbatim as a string**. A
 definition SHALL carry no player state: it SHALL have no field that could hold a placement
 key, coordinates, an owner, current health, a garrison, or any other per-player value, and
 the model SHALL be immutable. Resolution SHALL go only through the content registry, so
@@ -75,11 +77,12 @@ through one documented raw-entry accessor rather than being silently dropped.
 
 Parsing a definition SHALL fail closed on any malformed field, returning a failure that
 names the offending definition and field and producing **no** definition; nothing SHALL be
-guessed, defaulted, or coerced into a meaningful value. The two embedded-JSON string fields
-SHALL be parsed, and the cost vocabulary SHALL match the mapping the delivered endpoints
-already implement; an unknown cost key or a non-integer amount SHALL fail closed. A field
-absent from the committed row SHALL be recorded as **absent**, never as zero, so an absent
-field is distinguishable from a committed zero.
+guessed, defaulted, or coerced into a meaningful value. The two committed object bags SHALL be
+parsed from the committed object form the content package's own coercion rule produces, and
+the cost vocabulary SHALL match the mapping the delivered endpoints already implement; an
+unknown cost key or a non-integer amount SHALL fail closed. A field absent from the
+committed row SHALL be recorded as **absent**, never as zero, so an absent field is
+distinguishable from a committed zero.
 
 #### Scenario: A malformed field produces no definition
 
@@ -114,6 +117,14 @@ garrison or production-queue state.
 
 - **WHEN** this change's diff is inspected for player state
 - **THEN** no unit instance type, save shape, instance parsing, garrison state, or production-queue state was added
+
+#### Scenario: Enumeration crosses the same verification gate
+
+- **WHEN** the catalog enumerates the domain's legacy IDs
+- **THEN** it does so through the content registry's public enumeration accessor over the
+  index built during the verified load, cross-checks the enumerated count against the
+  registry's reported count, and fails closed on disagreement, and no committed content file
+  is read behind the registry's back
 
 #### Scenario: Definitions are read, never fetched
 

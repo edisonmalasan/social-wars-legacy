@@ -11,11 +11,16 @@ verified by the registry.
 - **`packages/game-content/normalized/units.json`**: a bare list of **429 rows**. Every row
   carries `kind: "unit"` and `type: "u"`, a **distinct string `legacy_id`** spanning
   `923`..`1431`, `name`, `img_name`, `race`, `content_version`, `source_file`
-  (`config/main.json`), and `source_layer` (`stored`). **53 fields**, of which 51 are
+  (`config/main.json`), and `source_layer` (`stored`). **58 distinct fields**, of which 56 are
   present on every row and two — `breeding_order` and `sm_training_time` — on **300 of 429**
-  each. Two fields are embedded-JSON **strings** requiring parsing (`costs`,
-  `properties`), and three are nullable (`inventory_ids`, `premium_upgrade_costs`, plus
-  `best_against` as a meaningful empty string).
+  each; the committed schema declares exactly those 58 properties and 56 required, and
+  data and schema agree with no field present in one and absent from the other. `costs`
+  and `properties` are committed **objects**, not strings: content rule R2 coerces the
+  embedded JSON at build time, and the committed schema declares both `"type":
+  "object"` with `costs` restricting `propertyNames` to the `o/s/g/w/c` resource codes.
+  Two fields are nullable and record `null` on all 429 rows (`inventory_ids`,
+  `premium_upgrade_costs`); `best_against` is a string on all 429 rows and the schema
+  additionally permits an integer code, so it is a variant field.
 - **`packages/game-content/schemas/unit.schema.json`** already defines the contract for
   one normalized unit, so the field set is committed, not inferred.
 - **`ContentRegistry`** loads all 22 manifest outputs, names each domain by file basename,
@@ -50,6 +55,26 @@ through `ContentRegistry.get_entry("units", legacy_id)`, so the manifest's byte-
 digest verification and the registry's duplicate rejection remain the single gate — the
 model cannot see unverified content. A `ContentRegistry` that has not loaded, or that does
 not carry a `units` domain, is a **fail-closed** condition, never an empty catalogue.
+**Correction made during the Apply stage:** the registry exposed no public id enumeration, so
+enumerating the 429 definitions would have required either re-reading `units.json` behind the
+registry's back — bypassing the digest gate this decision names as the single gate — or
+reaching into the registry's private index. Both were rejected. This change therefore adds a
+public `ContentRegistry.legacy_ids(domain)` accessor that returns the ids of the index the
+registry already built during its verified load, and enumerates through it, cross-checking
+the result against the public `count()` and failing closed on disagreement. The
+`godot-content-registry` "Domain indexing and lookup" requirement gains the corresponding
+scenario, so the accessor is a specified capability rather than an undocumented escape
+hatch.
+**Correction made during the Apply stage:** the registry exposed no public id enumeration, so
+enumerating the 429 definitions would have required either re-reading `units.json` behind the
+registry's back — bypassing the digest gate this decision names as the single gate — or
+reaching into the registry's private index. Both were rejected. This change therefore adds a
+public `ContentRegistry.legacy_ids(domain)` accessor that returns the ids of the index the
+registry already built during its verified load, and enumerates through it, cross-checking
+the result against the public `count()` and failing closed on disagreement. The
+`godot-content-registry` "Domain indexing and lookup" requirement gains the corresponding
+scenario, so the accessor is a specified capability rather than an undocumented escape
+hatch.
 
 **D2 — the static/instance boundary is a stated requirement, not an implicit convention
 (established, and the point of the line).** `UnitDefinition` is content; a future
@@ -79,18 +104,23 @@ in the capability spec, and in the report's non-claims, because the alternative 
 to avoid. Fields outside the five groups stay reachable through one documented raw-entry
 accessor rather than being silently dropped.
 
-**D4 — fail closed on every malformed field, with the two embedded-JSON fields parsed and
-the three nullable ones accepted as absent (established precedent).** Mirroring
-`placement_catalog.gd`: a malformed field returns `{ok: false, error}` naming the item and
-field and produces **no** definition — nothing is guessed, defaulted, or coerced into a
-meaningful value. `costs` and `properties` are embedded-JSON strings in the committed
-package and are parsed with the **same letter vocabulary the delivered endpoints already
-use** (`g`/`c`/`w`/`o`/`s` onto gold/cash/wood/oil/steel), because the delivered purchase,
-shop, expand, and level lines already established that mapping and this line must not
-re-derive or contradict it; an unknown cost key or a non-integer amount fails closed.
-`inventory_ids`, `premium_upgrade_costs`, and `breeding_order`/`sm_training_time` when
-absent are **absent**, never zero — a zero would be indistinguishable from a committed
-zero.
+**D4 — fail closed on every malformed field, with the two committed object bags parsed and
+the nullable ones accepted as absent (established, and corrected by the Apply stage).**
+Mirroring `placement_catalog.gd`: a malformed field returns `{ok: false, error}` naming the
+item and field and produces **no** definition — nothing is guessed, defaulted, or coerced
+into a meaningful value. **Correction to an earlier reading of this decision:** `costs` and
+`properties` are committed **objects**, not embedded-JSON strings — content rule R2 coerces
+them at build time, so the committed schema declares both as `"type": "object"`. The
+committed object form is therefore the required input, and a JSON string is accepted only
+as the same documented transport tolerance the delivered `placement_catalog.gd` applies to
+the served bootstrap payload; both forms fail closed identically. `costs` is parsed with the
+**same letter vocabulary the delivered endpoints already use** (`g`/`c`/`w`/`o`/`s` onto
+gold/cash/wood/oil/steel), aliased from `placement_catalog.gd` rather than restated, because
+the delivered purchase, shop, expand, and level lines already established that mapping and
+this line must not re-derive or contradict it; an unknown cost key or a non-integer amount
+fails closed. `inventory_ids`, `premium_upgrade_costs`, and `breeding_order`/
+`sm_training_time` when absent are **absent**, never zero — a zero would be
+indistinguishable from a committed zero.
 
 **D5 — legacy IDs are preserved verbatim as strings, and uniqueness is asserted
 (established).** The registry already rejects duplicate `str(legacy_id)` within a domain,

@@ -185,6 +185,30 @@ func counts() -> Dictionary:
 	return out
 
 
+## Every `legacy_id` in `domain`, in the committed order the domain's entries
+## were indexed in, so a caller can enumerate a domain it did not hard-code.
+## Returns
+##   {"found": true, "error": "", "ids": [<legacy_id>, ...], "file": <repo-relative output>}
+## or
+##   {"found": false, "error": "<message naming domain>", "ids": [], "file": ""}
+## — an explicit not-found result, never a null, a guessed empty list, or a
+## guessed zero.
+##
+## This exists so a consumer enumerates the **verified** index rather than
+## re-reading the committed file behind the registry's back, which would bypass
+## the byte-count and digest verification `load_content` performed. The ids are
+## the same `String` keys `get_entry` accepts, and their count always equals
+## `count(domain)`; the order is the committed file's, not a collation.
+func legacy_ids(domain: String) -> Dictionary:
+	if not _domains.has(domain):
+		return {"found": false,
+			"error": "[content] unknown domain: %s" % domain, "ids": [],
+			"file": ""}
+	var ids: Array = (_domains[domain]["index"] as Dictionary).keys()
+	return {"found": true, "error": "", "ids": ids,
+		"file": str(_domains[domain]["file"])}
+
+
 ## Root `content_fingerprint` of the loaded manifest ("" before load).
 func content_fingerprint() -> String:
 	return _fingerprint

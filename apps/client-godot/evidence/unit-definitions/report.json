@@ -1,0 +1,377 @@
+{
+	"asset_linkage": {
+		"claim": "linkage only: whether the committed reference resolves through the asset-ID registry and with which recorded status. No rendering correctness, no animation correctness, no visual fidelity, and no claim that a unit can be drawn, animated, or played.",
+		"kind": "item_sprites",
+		"multi_part_definitions": 5,
+		"parts": {
+			"resolved": 446,
+			"statuses": {
+				"converted": 1,
+				"extracted": 441,
+				"missing_source": 1,
+				"pending": 3
+			},
+			"total": 446,
+			"unresolved": 0
+		},
+		"reference_form_note": "the committed img_name is a single reference on most rows and a comma-joined list on the rest; both the whole reference and each part are reported, because reporting only the whole string would misrepresent a comma-joined row as unresolvable when every one of its parts resolves",
+		"whole_reference": {
+			"resolved": 424,
+			"statuses": {
+				"converted": 1,
+				"extracted": 419,
+				"missing_source": 1,
+				"pending": 3
+			},
+			"unresolved": 5
+		}
+	},
+	"boundary": {
+		"endpoint": "none: a definition is read from the already-loaded registry, so no compatibility route was added, no client intent is sent, and no server- or client-supplied unit content is introduced",
+		"instance": "none: this change adds no UnitInstance type, no save shape, no instance parsing, no garrison state, and no production-queue state",
+		"note": "the boundary is structural, not conventional: a definition has no field that could be widened into an instance, so the later unit-instances line grows into a named edge",
+		"player_state_field_names_checked": [
+			"key",
+			"index",
+			"item_index",
+			"x",
+			"y",
+			"cell",
+			"pos",
+			"position",
+			"owner",
+			"user_id",
+			"player_id",
+			"health",
+			"current_health",
+			"hp",
+			"garrison",
+			"queue",
+			"queue_position",
+			"state",
+			"alive",
+			"target",
+			"level_state",
+			"slot",
+			"instance_id",
+			"map_key"
+		],
+		"player_state_fields": [],
+		"static": "UnitDefinition is committed content: typed, read-only, resolved through the content registry, carrying no player state",
+		"undelivered_lines": [
+			"unit instances",
+			"queues",
+			"production",
+			"collection",
+			"movement",
+			"animations",
+			"basic behaviors"
+		]
+	},
+	"conditionally_present": {
+		"has_breeding_order": {
+			"absent": 129,
+			"absent_is_not_zero": "an absent field is never given a value in place of the committed one: a conditionally-present integer keeps its declared default and the nullable bag keeps null, and the flag is what tells absent from committed",
+			"committed_zero_present": 0,
+			"field": "breeding_order",
+			"flag": "has_breeding_order",
+			"kind": "conditionally present integer",
+			"of": 429,
+			"present": 300
+		},
+		"has_inventory_ids": {
+			"absent": 429,
+			"absent_is_not_zero": "an absent field is never given a value in place of the committed one: a conditionally-present integer keeps its declared default and the nullable bag keeps null, and the flag is what tells absent from committed",
+			"committed_zero_present": 0,
+			"field": "inventory_ids",
+			"flag": "has_inventory_ids",
+			"kind": "nullable bag",
+			"of": 429,
+			"present": 0
+		},
+		"has_premium_upgrade_costs": {
+			"absent": 429,
+			"absent_is_not_zero": "an absent field is never given a value in place of the committed one: a conditionally-present integer keeps its declared default and the nullable bag keeps null, and the flag is what tells absent from committed",
+			"committed_zero_present": 0,
+			"field": "premium_upgrade_costs",
+			"flag": "has_premium_upgrade_costs",
+			"kind": "nullable bag",
+			"of": 429,
+			"present": 0
+		},
+		"has_sm_training_time": {
+			"absent": 129,
+			"absent_is_not_zero": "an absent field is never given a value in place of the committed one: a conditionally-present integer keeps its declared default and the nullable bag keeps null, and the flag is what tells absent from committed",
+			"committed_zero_present": 0,
+			"field": "sm_training_time",
+			"flag": "has_sm_training_time",
+			"kind": "conditionally present integer",
+			"of": 429,
+			"present": 300
+		}
+	},
+	"content_source": {
+		"content_fingerprint": "44e5b9edd1eba2910833bb8e2f063175e51c5754e38c35177648e4de779df501",
+		"domain": "units",
+		"enumeration": "ContentRegistry.legacy_ids(domain)",
+		"enumeration_note": "the catalog enumerates through ContentRegistry.legacy_ids(domain), a public accessor this change added, which returns the ids of the index the registry built during its verified load; the catalog cross-checks the enumerated count against the registry's own count() and fails closed on disagreement, and no file is re-read behind the registry's back, so the manifest's byte-count and digest verification stays the single gate",
+		"file": "packages/game-content/normalized/units.json",
+		"file_bytes": 680410,
+		"file_sha256": "6a7121cdefddf4835ac90c408c98da762b7ccd7de866aea749368beffdad36e0",
+		"manifest": "packages/game-content/manifest.json",
+		"manifest_and_file_agree": true,
+		"manifest_bytes": 680410,
+		"manifest_bytes_verified": 1905917,
+		"manifest_outputs_verified": 22,
+		"manifest_sha256": "6a7121cdefddf4835ac90c408c98da762b7ccd7de866aea749368beffdad36e0",
+		"schema": "packages/game-content/schemas/unit.schema.json"
+	},
+	"counts": {
+		"committed_fields_on_every_row": 56,
+		"committed_fields_union": 58,
+		"definitions": 429,
+		"group_field_counts": {
+			"economy": 8,
+			"footprint_placement": 7,
+			"identity_presentation": 7,
+			"statistics": 9,
+			"training_upgrade": 9
+		},
+		"note": "typed_committed_fields counts the committed field names the model parses; the presence flags are the model's own record of which of those fields the committed row carries, not committed fields themselves",
+		"typed_committed_fields": 43,
+		"typed_fields_including_presence_flags": 47,
+		"typed_presence_flags": 4,
+		"unparsed_committed_fields": 15
+	},
+	"determinism": {
+		"byte_identical_across_reruns": true,
+		"reason": "no timestamp, no absolute path, no wall clock, no request, and every table is derived from the parsed model and the verified registry; the catalog preserves the committed row order and every derived set is sorted before it is written",
+		"serialization": "JSON.stringify(report, tab, sort_keys=true) plus one trailing newline; every number written is an integer — the pinned engine's integral floats are normalised on the way in, which changes no value — so no float formatting varies between runs"
+	},
+	"embedded_json_bags": {
+		"committed_form": "the content package's rule R2 already coerced the legacy embedded-JSON strings, so the committed rows carry objects; the parser accepts the committed object and the delivered catalog's JSON-string transport tolerance, and both fail closed alike",
+		"costs": {
+			"group": "economy",
+			"non_integer_amounts": 0,
+			"note": "resource name -> integer amount; an empty committed object stays empty and is never filled in from `cost`",
+			"resources_used": {
+				"cash": 238,
+				"gold": 189,
+				"oil": 64,
+				"steel": 88,
+				"wood": 33
+			},
+			"unknown_keys": 0,
+			"vocabulary": {
+				"c": "cash",
+				"g": "gold",
+				"o": "oil",
+				"s": "steel",
+				"w": "wood"
+			},
+			"vocabulary_source": "aliased from placement_catalog.gd's own COST_RESOURCES, so this model cannot disagree with the delivered purchase, shop, expansion and level surfaces"
+		},
+		"properties": {
+			"committed_value_type": "string",
+			"distinct_keys": [
+				"animal",
+				"bulldozable",
+				"fireman",
+				"ft_armored",
+				"ft_building",
+				"ft_flying",
+				"ft_ground",
+				"harvester",
+				"healer",
+				"human",
+				"mechanic",
+				"resurrectable",
+				"seeStealthUnits",
+				"waterborne",
+				"worker"
+			],
+			"group": "outside the five groups: a free-form committed flag map, not one of design D3's five categories",
+			"note": "reproduced verbatim; no key is interpreted, so no property grants a capability, a movement mode, or a behaviour"
+		}
+	},
+	"field_groups": [
+		{
+			"count": 7,
+			"fields": [
+				"legacy_id",
+				"name",
+				"img_name",
+				"type",
+				"kind",
+				"race",
+				"display_order"
+			],
+			"group": "identity_presentation"
+		},
+		{
+			"count": 7,
+			"fields": [
+				"width",
+				"height",
+				"elevation",
+				"population",
+				"volume",
+				"max_elem_vol",
+				"max_frame"
+			],
+			"group": "footprint_placement"
+		},
+		{
+			"count": 9,
+			"fields": [
+				"attack",
+				"defense",
+				"life",
+				"attack_interval",
+				"attack_range",
+				"velocity",
+				"expiration",
+				"best_against",
+				"best_against_mult"
+			],
+			"group": "statistics"
+		},
+		{
+			"count": 8,
+			"fields": [
+				"costs",
+				"cost",
+				"cost_unit_cash",
+				"collect",
+				"collect_type",
+				"collect_xp",
+				"xp",
+				"unit_capacity"
+			],
+			"group": "economy"
+		},
+		{
+			"count": 9,
+			"fields": [
+				"training_time",
+				"sm_training_time",
+				"breeding_order",
+				"upgrades_to",
+				"syringes",
+				"min_level",
+				"activation",
+				"clicks_to_build",
+				"build_time"
+			],
+			"group": "training_upgrade"
+		}
+	],
+	"generated_by": "apps/client-godot/tests/test_unit_definitions.gd --report=<path>",
+	"legacy_ids": {
+		"committed_order_first": "923",
+		"committed_order_last": "1431",
+		"count": 429,
+		"distinct": 429,
+		"form": "string, preserved verbatim (design D5)",
+		"max": "1431",
+		"min": "923",
+		"order": "the committed row order of units.json, which is not a numeric sort: the ids are digit strings, so a collation would interleave them and misrepresent the committed order",
+		"range_note": "the ids are the legacy item ids the normalized package records, not its positional indices; coercing one to an integer would break the registry's own index, and the range is computed over the values rather than read off the order",
+		"wrong_form_fails_closed": [
+			"int",
+			"float",
+			"bool",
+			"array",
+			"object",
+			"null",
+			"padded string",
+			"zero-padded string",
+			"unknown id",
+			"empty string",
+			"name"
+		]
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed",
+		"no unit is rendered, animated, or played by this change",
+		"no unit instance, queue, production, collection, movement, animation, or behaviour is implemented: each is a separate later M8 deliver line, and this change adds no UnitInstance type, no save shape, no instance parsing, no garrison state, and no production-queue state",
+		"no gameplay semantics are attached to any parsed statistic: attack, defense, life, attack_interval, attack_range, velocity, expiration, best_against, and best_against_mult are committed numbers and no helper computes damage, a defence outcome, a speed, a lifetime, or an attack timing from them",
+		"the definitions are the committed normalized rows verbatim: no tuning, no balancing, no scaling, no rounding, and no interpolation is applied, and the committed thresholds and values are preserved exactly",
+		"asset linkage is reported and nothing more: the recorded resolution statuses establish no rendering correctness, no animation correctness, and no visual fidelity",
+		"the committed fresh-player corpus has no unit placements at all, so no instance behaviour is evidenced here and nothing in this report speaks for a placed unit",
+		"no windowed capture is claimed: this change alters nothing visual and no unit is drawn, so a capture would assert nothing",
+		"no compatibility route, response field, error code, or persistence behaviour was added, and no client intent is sent to obtain a definition: a definition is read from the already-loaded registry",
+		"the upgrade-chain reference's committed -1 is reproduced verbatim and no interpretation of the schema's '-1 and 0 mean none' note is applied, and the property bag's committed flags are reproduced without interpreting any key as a capability",
+		"no pixel-parity oracle against the legacy client exists"
+	],
+	"provenance": {
+		"derived": [
+			{
+				"evidence": "derived: design D3 names the groups, and this line parses them; it is a presentation of the committed row, not a claim about what any legacy consumer read",
+				"fact": "the five named field groups and which committed fields this line types"
+			},
+			{
+				"evidence": "derived by omission and asserted by the suite: no damage, defence, speed, lifetime, or timing helper exists on the model or the catalog, and the parsed numbers are the committed values verbatim",
+				"fact": "the model exposes no gameplay semantics on any statistic"
+			},
+			{
+				"evidence": "established: ContentRegistry.legacy_ids(domain) was added by this change and returns the ids of the index the registry built during its verified load, so enumeration crosses the same byte-count and digest gate as every other read and no committed file is re-read behind the registry's back; the catalog cross-checks the enumerated count against the public count() and fails closed on disagreement",
+				"fact": "the catalog enumerates the domain through the registry's own public enumeration accessor"
+			}
+		],
+		"established": [
+			{
+				"evidence": "packages/game-content/normalized/units.json, verified byte-count and SHA-256 against packages/game-content/manifest.json by ContentRegistry before parsing; the row contract is packages/game-content/schemas/unit.schema.json",
+				"fact": "the 429 committed unit definitions, their 58 committed fields, their distinct string legacy ids, and the 300/429 coverage of breeding_order and sm_training_time"
+			},
+			{
+				"evidence": "unit_definition.gd against the verified registry entry; the suite compares each parsed field with the committed row",
+				"fact": "the parsed field values themselves, parsed verbatim"
+			},
+			{
+				"evidence": "aliased from the delivered placement_catalog.gd COST_RESOURCES, which mirrors the compatibility endpoints' own mapping, so this model cannot disagree with what the unit would actually cost (design D4)",
+				"fact": "the g/c/w/o/s cost-letter vocabulary"
+			},
+			{
+				"evidence": "unit.schema.json declares breeding_order and sm_training_time optional and inventory_ids and premium_upgrade_costs nullable; the committed rows record null for both bags, so each is recorded absent with a has_* flag (design D4)",
+				"fact": "the absent-versus-zero rule for the two conditionally present fields and the two nullable bags"
+			},
+			{
+				"evidence": "tools/asset-registry/asset_ids.json as loaded by ContentRegistry.load_asset_registry, under the item_sprites kind (design D7)",
+				"fact": "the sprite reference resolution statuses"
+			}
+		]
+	},
+	"raw_entry_escape_hatch": {
+		"accessor": "UnitCatalog.raw_entry(registry, catalog, legacy_id)",
+		"count": 15,
+		"example": {
+			"field": "in_store",
+			"legacy_id": "923",
+			"value": 0
+		},
+		"note": "the typed groups are the typed VIEW of the committed row, not a filter over it: every field outside them stays reachable from the committed row, so a new content field needs no model change and nothing is silently dropped",
+		"unparsed_committed_fields": [
+			"building_limit_same_id",
+			"building_limit_same_scf",
+			"category_id",
+			"content_version",
+			"gift_level",
+			"giftable",
+			"group_type",
+			"in_store",
+			"max_collects",
+			"new_item",
+			"source_file",
+			"source_layer",
+			"subcat_functional",
+			"subcategory_id",
+			"trains_ids"
+		]
+	},
+	"schema": "unit-definitions-report-v1",
+	"verbatim": {
+		"claim": "each parsed field equals its committed value exactly: no scaling, rounding, defaulting, or coercion",
+		"transport_note": "the pinned engine's JSON parser represents every committed number as a float, including the integers the content package's rule R1 coerces, so an integer field stores the exact integer an integral float denotes. This is the documented transport tolerance the delivered placement_catalog.gd applies to the same field class, and it changes no value: a non-integral or out-of-range number can never match."
+	}
+}
