@@ -1,10 +1,10 @@
 # Tasks
 
-## 1. Canonical projection and the read-only energy path (Compatibility API v0)
+## 1. Compatibility API: no change required (recorded finding)
 
-- [ ] 1.1 Add one additive read-only accessor in `compat_legacy.py` for the stored energy value (`player_energy` or the delivered-accessor-style equivalent), reading `privateState.energy`, returning `None` for an absent or unusable value rather than coercing, documented with the committed evidence (`privateState.energy = 50` in the corpus, `COST_ENERGY = "e"` at `constants.py:899`, `TOKEN_ENERGY = 7`, `CAT_ENERGY = 8`) and with the explicit statement that `engine.apply_resources` never writes it and no committed source records a regeneration rule — verify: new `test_resources_projection.py` in `apps/compat-api/tests/` covers a resolving value, an absent value, and the real corpus.
-- [ ] 1.2 Expose that value on the bootstrap's player-overview path **without touching the shared `resources()` accessor** and without changing any state-mutating route, response, error code, or proof — verify: the new tests assert the value is present on the bootstrap path, that `resources()` still returns exactly the seven keys the nine proofs compare, and that every committed executed-legacy parity test for the nine delivered endpoints still passes unchanged.
-- [ ] 1.3 Update the compat README's surface and persistence-scope notes for the additive read-only field, explicitly recording that it is outside the mutation contract — verify: the documented surfaces list all nine state-mutating routes unchanged plus the read-only field, and no error-table row was added, removed, or reworded.
+- [x] 1.1 **Finding: the stored energy value already reaches the client, so no accessor is needed.** The design assumed `engine.apply_resources` never writes energy and therefore that the value had to be added to the service. Apply established the premise was false: `TownState.RESOURCE_FIELDS` already maps `energy` to `privateState.energy`, the committed fresh-save payload already carries the value, and the windowed capture renders `Energy: 50` with no absent-field indicator. Verified: `grep` for `displayed("coins")` across `apps/client-godot` returns no matches, and the evidence capture shows every row sourced.
+- [x] 1.2 **The shared `resources()` accessor is untouched**, so no compat test or response-shape change was required and all nine delivered endpoints' value-level proofs and their committed executed-legacy parity fixtures stay valid unchanged — confirmed by the compat suite's `Ran 947 tests ... OK` in the final state.
+- [x] 1.3 **The `godot-compatibility-boot` delta was narrowed** to the `GameApi` projection requirement; the bootstrap-service modification describing an additive energy path was removed, because no such path exists or is needed. The compat READMEs require no update for this change, and no error-table row was added, removed, or reworded.
 
 ## 2. Client projection and readout
 

@@ -59,22 +59,28 @@ explicit absent-field indicator rather than a guess or a zero.
 - **WHEN** the readout's tests build a payload
 - **THEN** the payload uses the field names the service actually produces, and no test supplies a resource field under a name the service does not produce
 
-### Requirement: The eighth resource is exposed with its gap recorded
+### Requirement: The eighth resource is displayed with its gap recorded
 
-The service SHALL expose the stored energy value the player save carries, read-only,
-under the name the save uses for it, and the client SHALL display it under that same
-name. The service SHALL NOT add the energy value to the shared resource accessor that
-the state-mutating endpoints' post-execution proofs compare, and SHALL NOT add it to
-the legacy resource mutation vector, because no delivered path mutates it and the
-vector is the legacy wire format. Because no committed source records how the stored
-energy value changes over time, the service and client SHALL NOT invent such a rule,
-and the absence SHALL be recorded as an explicit gap wherever the resource is
-described.
+The client SHALL display the stored energy value the player payload carries, under the
+name the save uses for it, and SHALL source it from that location. The service SHALL NOT
+be changed to provide it: the stored value already reaches the client through the
+delivered payload path, so no accessor, no field, and no route is added, and the shared
+resource accessor the state-mutating endpoints' post-execution proofs compare SHALL NOT
+be widened. The legacy resource mutation vector SHALL NOT gain a slot for it, because no
+delivered path mutates it and the vector is the legacy wire format. Because no committed
+source records how the stored energy value changes over time, neither the service nor the
+client SHALL invent such a rule, and the absence SHALL be recorded as an explicit gap
+wherever the resource is described.
 
-#### Scenario: The stored energy value is readable
+#### Scenario: The stored energy value is displayed by value
 
-- **WHEN** a player views their resource readout
-- **THEN** the stored energy value renders by value under the save's own name for it
+- **WHEN** a player views their resource readout against the delivered payload
+- **THEN** the stored energy value renders by value under the save's own name for it, sourced from that save location, and not as an absent-field indicator
+
+#### Scenario: No service change was needed and none was made
+
+- **WHEN** this change's diff is inspected against the Compatibility API
+- **THEN** no accessor, no response field, no route, and no error-table row was added or changed, and the shared resource accessor still returns exactly the seven keys the nine delivered post-execution proofs compare
 
 #### Scenario: No delivered path can change it, and nothing pretends otherwise
 
