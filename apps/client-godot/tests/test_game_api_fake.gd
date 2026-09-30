@@ -49,6 +49,10 @@ const FIXTURE_COLLECT_BEFORE := \
 	"tests/fixtures/godot-building-collect/steps/command_collect/before.json"
 const FIXTURE_COLLECT_AFTER := \
 	"tests/fixtures/godot-building-collect/steps/command_collect/after.json"
+const FIXTURE_EXPAND_BEFORE := \
+	"tests/fixtures/godot-building-expand/steps/command_expand/before.json"
+const FIXTURE_EXPAND_AFTER := \
+	"tests/fixtures/godot-building-expand/steps/command_expand/after.json"
 
 ## The executed-legacy collect transaction's constants (fixture facts, read
 ## from the committed capture): the Tree decoration (item 905, 1x1) at legacy
@@ -192,6 +196,37 @@ const CONSTRUCTION_SPARE_INDEX := 20
 ## written) — the client-side mirror of the compat suite's own stub.
 const CONSTRUCTION_NO_TIME_ITEM := 1001
 
+## The executed-legacy expand transaction's constants (fixture facts, read from
+## the committed capture): expansion id **0** — a FREE row of the 98-entry
+## POSITIONAL `expansion_prices` schedule, so its derived debit is the ALL-ZERO
+## eight-slot vector and **no** stored resource moves. The ledger
+## `[35, 36, 45, 46]` becomes `[35, 36, 45, 46, 0]`: grown by exactly one entry,
+## the sent id appended at the END, the existing entries unchanged, in order,
+## and never deduplicated, while all 40 items, the level, the storage, the
+## private state, and the player info are byte-identical. The fixture's first
+## captured state in this family records NO time-dependent state leaf at all.
+const EXPAND_ID := 0
+const EXPAND_SECOND_ID := 1
+const EXPAND_LAST_FREE_ID := 3
+const EXPAND_OWNED := [35, 36, 45, 46]
+const EXPAND_OWNED_AFTER := [35, 36, 45, 46, 0]
+const EXPAND_PRICE := {"coins": 0, "cash": 0, "neighbors": 0, "inventory_qte": 0}
+const EXPAND_DEBIT := [0, 0, 0, 0, 0, 0, 0, 0]
+## The committed row the schedule prices at index 4 (2500/5/1/1) and at its
+## saturated tail (index 97, 100000/20/15/30) — the bounds of the derived
+## debit's magnitude, asserted against the loaded configuration.
+const EXPAND_PRICED_ID := 4
+const EXPAND_PRICED_PRICE := {"coins": 2500, "cash": 5, "neighbors": 1,
+	"inventory_qte": 1}
+const EXPAND_SATURATED_ID := 97
+## The first FREE index, and the ids the committed schedule does not price or
+## cannot resolve structurally.
+const EXPAND_OUT_OF_RANGE_ID := 98
+const EXPAND_NEGATIVE_ID := -1
+## A real owned id the double's own schedule says nothing purchasable about, so
+## it proves the requirements refusal on committed content.
+const EXPAND_BLOCKED_OWNED_ID := 45
+
 
 func run_scenario() -> void:
 	var api: Variant = root.get_node_or_null("GameApi")
@@ -289,6 +324,7 @@ func run_scenario() -> void:
 	await _check_upgrade(api, user_id)
 	await _check_construction(api, user_id)
 	await _check_collect(api, user_id)
+	await _check_expand(api, user_id)
 
 	info("fake implementation resolved %d save(s) with no server and no socket"
 		% save_list.saves.size())
@@ -1918,6 +1954,333 @@ func _check_collect_failure(result: Variant, code: String,
 	check_eq(typed.tier, -1, label + " reports no rung for a failed collection")
 	check_eq(typed.result, "",
 		label + " reports no legacy result for a failed collection")
+
+
+## Expand double coverage (building-expand tasks 3.1/3.2, design D8): the
+## typed shape, the content-derived DEBIT over the FIXTURE'S OWN committed
+## schedule, the free row, the out-of-range / negative / duplicate / requirements
+## refusals, the affordability refusal the committed schedule cannot produce on
+## its own, and every fail-closed code — all with no server and no socket.
+func _check_expand(api: Variant, user_id: String) -> void:
+	var before := _read_fixture_object(FIXTURE_EXPAND_BEFORE)
+	var after := _read_fixture_object(FIXTURE_EXPAND_AFTER)
+	if before.is_empty() or after.is_empty():
+		return
+	var before_map: Dictionary = before["maps"][0]
+	var after_map: Dictionary = after["maps"][0]
+	# The committed ledger, in the save's OWN order, and the one the executed
+	# transaction produced.
+	var ledger_before: Array = []
+	for entry: Variant in (before_map["expansions"] as Array):
+		ledger_before.append(int(entry))
+	var ledger_after: Array = []
+	for entry: Variant in (after_map["expansions"] as Array):
+		ledger_after.append(int(entry))
+	check_eq(ledger_before, EXPAND_OWNED,
+		"the expand fixture's before state carries the corpus's own ledger")
+	check_eq(ledger_after, EXPAND_OWNED_AFTER,
+		"the executed expansion appended exactly one entry, the sent id, at "
+		+ "the end, with every existing entry unchanged and in order")
+	check_eq((after_map["items"] as Dictionary).size(),
+		(before_map["items"] as Dictionary).size(),
+		"the executed expansion changed NO placement (40 rows before and after)")
+	check(before_map["items"] == after_map["items"],
+		"every placement row is byte-identical after the expansion")
+	check_eq(after_map["level"], before_map["level"],
+		"the map level is unchanged")
+	check_eq(after_map["store"], before_map["store"],
+		"the storage is unchanged")
+	check_eq(after["privateState"], before["privateState"],
+		"the whole private state is byte-identical")
+	check_eq(after["playerInfo"], before["playerInfo"],
+		"the player info is byte-identical")
+	# The committed schedule the double prices from — the FIXTURE'S OWN loaded
+	# configuration, never a value from the caller.
+	var double: Variant = api._impl
+	if double == null or not (double is FakeApi):
+		check(false, "the fake double instance is reachable for its in-memory "
+			+ "state")
+		return
+	var schedule: Array = (double._config_payload as Dictionary).get(
+		"expansion_prices", []) as Array
+	check_eq(schedule.size(), 98,
+		"the double's own loaded configuration carries the committed 98-row "
+		+ "positional schedule")
+	check_eq([int(schedule[EXPAND_ID]["coins"]), int(schedule[EXPAND_ID]["cash"]),
+		int(schedule[EXPAND_ID]["neighbors"]),
+		int(schedule[EXPAND_ID]["inventory_qte"])], [0, 0, 0, 0],
+		"the committed row for id 0 is the all-zero free row")
+	check_eq([int(schedule[EXPAND_PRICED_ID]["coins"]),
+		int(schedule[EXPAND_PRICED_ID]["cash"]),
+		int(schedule[EXPAND_PRICED_ID]["neighbors"]),
+		int(schedule[EXPAND_PRICED_ID]["inventory_qte"])], [2500, 5, 1, 1],
+		"the committed row for id 4 is the cheapest priced row")
+	check_eq([int(schedule[EXPAND_SATURATED_ID]["coins"]),
+		int(schedule[EXPAND_SATURATED_ID]["cash"]),
+		int(schedule[EXPAND_SATURATED_ID]["neighbors"]),
+		int(schedule[EXPAND_SATURATED_ID]["inventory_qte"])],
+		[100000, 20, 15, 30], "the committed row for id 97 is the saturated row")
+	var requests_before: int = api.expand_requests
+
+	# --- the expanded town: the free row, the all-zero debit, and the ledger
+	# appended once at the end.
+	var expanded: Variant = await api.expand_town(user_id, EXPAND_ID)
+	check(expanded is BootData.ExpandResult,
+		"expand_town returns the typed result")
+	if not (expanded is BootData.ExpandResult):
+		return
+	var first: BootData.ExpandResult = expanded
+	check(first.ok, "fake expansion resolves offline: %s" % first.error_message)
+	if not first.ok:
+		return
+	check_eq(first.protocol, BootData.PROTOCOL,
+		"the expand protocol is compat-v0")
+	check_eq(first.game_version, "alpha 0.02",
+		"the expand game version is the fixture's")
+	check(first.server_time > 0,
+		"the expand server_time is the positive fixture epoch "
+		+ "(time-dependent, never asserted by value)")
+	check_eq(first.result, "success", "the legacy result string is reported")
+	check_eq(first.expansions_before, EXPAND_OWNED,
+		"the pre-execution ledger is the fixture's own, in the save's order")
+	check_eq(first.expansions_after, EXPAND_OWNED_AFTER,
+		"the post-execution ledger is the sent id appended ONCE at the end")
+	check_eq(first.expansions_after.size(),
+		first.expansions_before.size() + 1,
+		"the ledger grew by exactly one entry")
+	for index in range(EXPAND_OWNED.size()):
+		check_eq(int(first.expansions_after[index]),
+			int(first.expansions_before[index]),
+			"ledger entry %d is unchanged and still in order" % index)
+	check_eq(first.debit, EXPAND_DEBIT,
+		"the derived debit is the documented all-zero eight-slot vector")
+	for index: int in BootData.EXPAND_ALWAYS_ZERO_SLOTS:
+		check_eq(int(first.debit[index]), 0,
+			"slot %d of the derived debit stays zero" % index)
+	check(first.price != null, "the response carries the committed price row")
+	if first.price != null:
+		check_eq([first.price.coins, first.price.cash, first.price.neighbors,
+			first.price.inventory_qte], [0, 0, 0, 0],
+			"the committed row for a free id records all four fields zero")
+	# The value-level post-state: the derived debit is all zeros, so EVERY
+	# stored resource is unchanged — which is what the executed fixture records.
+	if first.resources != null:
+		check_eq(first.resources.gold, int(before_map["gold"]),
+			"gold is the fresh save's own value (the debit charges nothing)")
+		check_eq(first.resources.wood, int(before_map["wood"]),
+			"wood is the fresh save's own value")
+		check_eq(first.resources.oil, int(before_map["oil"]),
+			"oil is the fresh save's own value")
+		check_eq(first.resources.steel, int(before_map["steel"]),
+			"steel is the fresh save's own value")
+		check_eq(first.resources.cash, int(before["playerInfo"]["cash"]),
+			"cash is the fresh save's own value")
+		check_eq(first.resources.mana, int(before["privateState"]["mana"]),
+			"mana is the fresh save's own value")
+		check_eq(first.resources.xp, int(before_map["xp"]),
+			"experience is the fresh save's own value")
+	# The double's own in-memory ledger, read from the LIVE instance (never
+	# from the committed fixture, which is never written).
+	var in_memory: Array = (double._expand_state["expansions"] as Array) \
+		.duplicate()
+	check_eq(in_memory, EXPAND_OWNED_AFTER,
+		"the double's own in-memory ledger is the appended one")
+
+	# --- a SECOND free row: the ledger grows again, never a duplicate.
+	var second: Variant = await api.expand_town(user_id, EXPAND_SECOND_ID)
+	check(second is BootData.ExpandResult and second.ok,
+		"a second free row expands offline")
+	if second is BootData.ExpandResult and second.ok:
+		var next: BootData.ExpandResult = second
+		check_eq(next.expansions_before, EXPAND_OWNED_AFTER,
+			"the second expansion's pre-execution ledger is the first one's "
+			+ "result")
+		check_eq(next.expansions_after, [35, 36, 45, 46, 0, 1],
+			"the second expansion appends its own id at the end, never "
+			+ "replacing or reordering the first")
+		check_eq(next.debit, EXPAND_DEBIT,
+			"the second expansion derives the same all-zero free debit")
+
+	# --- structured failures: the endpoint's own codes, no partial payload.
+	_check_expand_failure(await api.expand_town("", EXPAND_ID),
+		"missing_user_id", "an empty save id")
+	_check_expand_failure(await api.expand_town("ghost-0000", EXPAND_ID),
+		"unknown_user_id", "an unknown save id")
+	_check_expand_failure(await api.expand_town(user_id, EXPAND_NEGATIVE_ID),
+		"invalid_expansion_id",
+		"a negative id (which Python would otherwise resolve to the schedule's "
+		+ "LAST row)")
+	_check_expand_failure(await api.expand_town(user_id, EXPAND_OUT_OF_RANGE_ID),
+		"unknown_expansion_id",
+		"an id the committed schedule prices nothing for — the guard the "
+		+ "executed probe showed the legacy server lacks")
+	_check_expand_failure(await api.expand_town(user_id, EXPAND_ID),
+		"already_expanded",
+		"an id the player's own ledger already contains — the guard the "
+		+ "executed probe showed the legacy server lacks")
+	_check_expand_failure(await api.expand_town(user_id, EXPAND_PRICED_ID),
+		"expansion_requirements_unmet",
+		"a row recording a positive neighbor/inventory requirement, which "
+		+ "nothing this service can read evaluates (design D3)")
+	# The whole free range 0..3 is purchasable: the last free row grows the
+	# ledger, and a repeat of it is refused by the duplicate guard.
+	var last_free: Variant = await api.expand_town(user_id, EXPAND_LAST_FREE_ID)
+	check(last_free is BootData.ExpandResult and last_free.ok,
+		"the last free row (id 3) is purchasable on the committed table")
+	if last_free is BootData.ExpandResult and last_free.ok:
+		check_eq((last_free as BootData.ExpandResult).expansions_after,
+			[35, 36, 45, 46, 0, 1, 3],
+			"the last free row is appended at the end too")
+	_check_expand_failure(await api.expand_town(user_id, EXPAND_LAST_FREE_ID),
+		"already_expanded",
+		"the LAST free row once it is already owned is refused by the "
+		+ "duplicate guard")
+	# Every id the corpus itself owns is requirement-blocked, so none of them
+	# could have been bought under the rule — the readout's
+	# owned-and-not-repurchasable case, asserted on the double too.
+	for id: int in EXPAND_OWNED:
+		_check_expand_failure(await api.expand_town(user_id, id),
+			"already_expanded",
+			"the corpus's own owned id %d (already expanded)" % id)
+	# The affordability refusal (design D6) is UNREACHABLE from the committed
+	# schedule — its only purchasable rows are free — so it is exercised the
+	# same way the collect suite exercises a capped item: the double's OWN
+	# in-memory schedule is stubbed for one row so a priced, requirement-free
+	# row exists. The committed fixture and configuration are never written.
+	_stub_expand_row(api, EXPAND_PRICED_ID, {"coins": 2500, "cash": 5,
+		"neighbors": 0, "inventory_qte": 0})
+	var unaffordable: Variant = await api.expand_town(user_id, EXPAND_PRICED_ID)
+	_check_expand_failure(unaffordable, "insufficient_resources",
+		"a priced row the fresh corpus cannot afford (2500 gold against 2000) "
+		+ "— refused rather than clamped (design D6)")
+	check_eq(_expand_ledger_of(api), [35, 36, 45, 46, 0, 1, 3],
+		"the refused affordability changed nothing in the ledger")
+	# A row the same stub makes affordable still charges its full derived debit
+	# and lands it in exactly the two named slots under the legacy clamp.
+	_top_up_expand_balance(api, 2500, 5)
+	var charged: Variant = await api.expand_town(user_id, EXPAND_PRICED_ID)
+	check(charged is BootData.ExpandResult and charged.ok,
+		"the same priced row succeeds once the balance covers it: %s"
+			% (charged as BootData.ExpandResult).error_message if
+				charged is BootData.ExpandResult else "")
+	if charged is BootData.ExpandResult and charged.ok:
+		var paid: BootData.ExpandResult = charged
+		check_eq(paid.debit, [0, 0, -2500, 0, 0, 0, -5, 0],
+			"a row priced coins 2500 and cash 5 derives "
+			+ "[0, 0, -2500, 0, 0, 0, -5, 0] (design D2)")
+		check_eq(int(paid.debit[1]), 0, "the experience slot stays zero")
+		check_eq(int(paid.debit[3]), 0, "the wood slot stays zero")
+		check_eq(int(paid.debit[4]), 0, "the oil slot stays zero")
+		check_eq(int(paid.debit[5]), 0, "the steel slot stays zero")
+		check_eq(int(paid.debit[7]), 0, "the never-produced mana slot stays "
+			+ "zero")
+		check_eq(paid.resources.gold, 0,
+			"the 2500-gold debit lands under the legacy max(..., 0) clamp, "
+			+ "driving the balance to exactly zero (the clamp Probe 1 showed "
+			+ "is reachable)")
+		check_eq(paid.resources.cash, 0,
+			"the 5-cash debit lands the same way")
+		check_eq(paid.resources.wood, int(before_map["wood"]),
+			"an expansion touches no resource its price does not name")
+		check_eq(paid.expansions_after, [35, 36, 45, 46, 0, 1, 3, 4],
+			"the priced expansion appended its id at the end of the ledger")
+	# The stubbed row is restored, so a still-unowned priced row reads the REAL
+	# committed table again.
+	_restore_expand_row(api, EXPAND_PRICED_ID)
+	_check_expand_failure(await api.expand_town(user_id, EXPAND_PRICED_ID + 1),
+		"expansion_requirements_unmet",
+		"the real committed row at index 5 is requirement-blocked again")
+
+	# Every call increments the intent counter exactly once, including the
+	# refusals: a refused intent is still an intent this client issued.
+	check_eq(api.expand_requests, requests_before + 17,
+		"every expand_town call increments the intent counter exactly once "
+		+ "(three expanded free rows, one priced row refused then paid, and "
+		+ "thirteen structured refusals)")
+	info("expand double reproduced the executed fixture's transaction and "
+		+ "answered thirteen structured refusals with no server and no socket")
+
+
+## Every expand failure carries the endpoint's code and NO partial payload
+## (design D5/D7) — including the 404 `unknown_expansion_id`, the 400
+## `invalid_expansion_id`, the 409s `already_expanded` /
+## `expansion_requirements_unmet` / `insufficient_resources`, and the two
+## save-id codes.
+func _check_expand_failure(result: Variant, code: String,
+		label: String) -> void:
+	check(result is BootData.ExpandResult,
+		label + " returns the typed result")
+	if not (result is BootData.ExpandResult):
+		return
+	var typed: BootData.ExpandResult = result
+	check(not typed.ok, label + " is a structured failure")
+	check_eq(typed.error_code, code, label + " names the endpoint's code")
+	check_eq(typed.expansions_before, [],
+		label + " carries no partial pre-execution ledger")
+	check_eq(typed.expansions_after, [],
+		label + " carries no partial post-execution ledger")
+	check_eq(typed.debit, [], label + " carries no partial debit vector")
+	check(typed.price == null, label + " carries no partial price row")
+	check(typed.resources == null, label + " carries no partial resources")
+	check_eq(typed.result, "",
+		label + " reports no legacy result for a failed expansion")
+
+
+## The double's own in-memory owned-expansions ledger, read from the LIVE
+## implementation instance the facade selected (`GameApi._impl`, not a name
+## lookup — a reconfigured node stays a child until the frame ends). This is
+## the double's observable in-process state, never a transport payload.
+func _expand_ledger_of(api: Variant) -> Array:
+	var double: Variant = api._impl
+	if double == null or not (double is FakeApi):
+		return []
+	return (double._expand_state["expansions"] as Array).duplicate()
+
+
+## Replaces ONE row of the double's OWN in-memory schedule, so a priced and
+## requirement-free row exists for the affordability refusal the committed
+## table cannot produce (the client-side mirror of the compat suite's own
+## accessor stub). The committed fixture and the committed configuration are
+## never written.
+func _stub_expand_row(api: Variant, index: int, row: Dictionary) -> void:
+	var double: Variant = api._impl
+	if double == null or not (double is FakeApi):
+		check(false, "the fake double instance is reachable for its schedule")
+		return
+	var schedule: Array = double._config_payload["expansion_prices"] as Array
+	if not (double._expand_schedule_backup.has("rows")):
+		double._expand_schedule_backup["rows"] = \
+			(schedule as Array).duplicate(true)
+	var rows: Array = double._expand_schedule_backup["rows"] as Array
+	(rows[index] as Dictionary)["coins"] = int(row["coins"])
+	(rows[index] as Dictionary)["cash"] = int(row["cash"])
+	(rows[index] as Dictionary)["neighbors"] = int(row["neighbors"])
+	(rows[index] as Dictionary)["inventory_qte"] = int(row["inventory_qte"])
+	(schedule as Array)[index] = (rows[index] as Dictionary).duplicate()
+
+
+## Restores the double's schedule row from the backup the stub took.
+func _restore_expand_row(api: Variant, index: int) -> void:
+	var double: Variant = api._impl
+	if double == null or not (double is FakeApi):
+		return
+	if not double._expand_schedule_backup.has("rows"):
+		return
+	var rows: Array = double._expand_schedule_backup["rows"] as Array
+	var schedule: Array = double._config_payload["expansion_prices"] as Array
+	(schedule as Array)[index] = (rows[index] as Dictionary).duplicate()
+
+
+## Raises the double's OWN in-memory gold and cash balances so a priced row the
+## fresh corpus could not afford becomes affordable. The committed corpus is
+## never written.
+func _top_up_expand_balance(api: Variant, gold: int, cash: int) -> void:
+	var double: Variant = api._impl
+	if double == null or not (double is FakeApi):
+		check(false, "the fake double instance is reachable for its balances")
+		return
+	double._expand_state["gold"] = gold
+	double._expand_state["cash"] = cash
 
 
 ## Parks one extra row (and, when supplied, one extra config item) inside the

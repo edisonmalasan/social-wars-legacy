@@ -246,6 +246,53 @@ extends Node2D
 ## timers the delivered construction line depends on. Cap semantics, friend
 ## assistance, speedups, and any server-authoritative rule are deliberately
 ## absent (design D9/D10).
+##
+## Expand mode (building-expand, spec "Expansion flow"): a SEVENTH mutually
+## exclusive mode, and — deliberately — one that names **no placement**. An
+## expansion is a property of the MAP, not of a selected building: its intent
+## carries a save id and an expansion id and nothing else, and its effect is an
+## int appended to the map's `expansions` ledger (`command.py:211-216`). So
+## where the six delivered modes all arm from a selected, addressable building
+## and share ONE placement-bound panel, the expansion readout and its `Expand`
+## action live in their OWN UI-foundation slot beside that panel (design D7/D8):
+## a seventh row of building-targeted buttons would have implied a target that
+## does not exist. It is armed only when the town is built and a map is
+## selected, it is refused with an explicit reason and NO request whenever the
+## six delivered modes are armed, and each of those six is refused with
+## `expand_already_active` whenever an expansion is — the exclusion is
+## symmetric.
+##
+## The expansion readout shows the committed schedule's summary, the player's
+## own owned ids, and the next purchasable entry with its **derived** cost and
+## whether the balances cover it, all derived through the pure helpers in
+## `expand_flow.gd` from the SAME committed `expansion_prices` table the service
+## derives from. The armed surface's confirm names the derived debit **as
+## derived** and sends exactly ONE `GameApi.expand_town()` intent — the save id
+## and the expansion id, never an amount, a price, a requirement flag, or a
+## resource delta. Cancellation sends nothing and leaves the town byte-
+## identical. Success applies only the authoritative response — the owned
+## ledger taken from the response's `expansions_after`, the HUD balances and
+## experience from the response's `resources`, and the readout re-rendered from
+## the same two — with every field the apply touches snapshotted and rolled
+## back if any step fails (design D5/D8, the same contract `_apply_collect`
+## implements). The client's own derived debit is **discarded, not applied**:
+## the response wins even where the two disagree, and the confirm says the
+## amount is derived rather than authoritative.
+##
+## **This mode has no land effect, and none is invented** (design D4). No
+## terrain growth, no grid enlargement, no new buildable cells, and no change
+## to the placement bounds the delivered placement line enforces: no committed
+## source maps an expansion id to land geometry, and the tile-to-cell mapping
+## is a recorded KNOWN EVIDENCE GAP. The committed evidence establishes the
+## vocabulary — a purchasable *tile*, bought through a popup, priced in gold and
+## cash (`PopupExpandMC`, `btnBuyExpandTileMC`, `expansion.png`,
+## `expansion_gold.jpg`, `expansion_cash.jpg`) — but the geometry is not in it.
+## This line delivers the **unlock ledger** and nothing more. The corpus
+## consequence is shown, not hidden: every id the fresh corpus owns (`35, 36,
+## 45, 46`) records `neighbors 15` / `inventory_qte 30`, so under the
+## requirements rule NONE of them could have been bought, the readout shows
+## them as owned-and-not-repurchasable, and the only purchasable entries in the
+## whole 98-row table are the free indexes `0..3`.
 
 const Iso = preload("res://scripts/town/iso.gd")
 const TownState = preload("res://scripts/town/town_state.gd")
@@ -264,6 +311,7 @@ const ShopFlow = preload("res://scripts/town/shop_flow.gd")
 const MoveFlow = preload("res://scripts/town/move_flow.gd")
 const ConstructionFlow = preload("res://scripts/town/construction_flow.gd")
 const CollectionFlow = preload("res://scripts/town/collection_flow.gd")
+const ExpandFlow = preload("res://scripts/town/expand_flow.gd")
 
 ## Report-mode inputs and captures (repository-relative paths; the
 ## fixture paths mirror the fake GameApi's own committed constants and
@@ -495,6 +543,59 @@ const COLLECT_INTENT_CAP := 0
 const COLLECT_INTENT_ROW := [COLLECT_INTENT_ITEM, 53, 39, 0, 0, [], {}, 1]
 const COLLECT_INTENT_PAYOUT := [0, 3, 0, 60, 0, 0, 0, 0]
 const COLLECT_INTENT_TIER := 3
+## Expand evidence (building-expand, design D8): the executed-legacy expand
+## fixture the parity suite replays and the committed fake capture the expand
+## report points at (repository-relative).
+const REPORT_EXPAND_REQUEST := \
+	"tests/fixtures/godot-building-expand/steps/command_expand/request.json"
+const REPORT_EXPAND_RESPONSE := \
+	"tests/fixtures/godot-building-expand/steps/command_expand/response.body"
+const REPORT_EXPAND_AFTER := \
+	"tests/fixtures/godot-building-expand/steps/command_expand/after.json"
+const REPORT_CAPTURE_EXPAND := \
+	"apps/client-godot/evidence/building-expand/building-expand.png"
+## Default expand report destination for the bare `--expand-report` flag
+## (project-relative, resolved against the project directory).
+const DEFAULT_EXPAND_REPORT_PATH := "evidence/building-expand/report.json"
+## The content-package domain the committed expansion schedule lives in
+## (`packages/game-content/normalized/expansion_prices.json`, the economy
+## extension's `expansion_prices` section) — the SAME table the service derives
+## its price and its debit from, read here through the typed content registry so
+## the readout, the confirm, and the service can never price an id from
+## different content.
+const EXPAND_SCHEDULE_DOMAIN := "expansion_prices"
+## The single expand intent the expand evidence records: the **free** committed
+## row at index 0 of the 98-entry positional `expansion_prices` schedule — the
+## executed-legacy fixture's transaction, driven through the same
+## readout -> arm -> confirm flow a player uses. Index 0 is the honest choice on
+## this corpus and the capture asserts why: under design D3's requirements rule
+## 94 of the 98 committed rows are refused, every id the corpus itself owns
+## (`35, 36, 45, 46`) is among them, and indexes `0..3` are the only
+## purchasable entries. The derived debit for a free row is the ALL-ZERO
+## vector, so this transaction moves no balance — which is exactly what the
+## committed fixture records, and is reported as a claim limit rather than
+## presented as a paid purchase.
+const EXPAND_INTENT_ID := 0
+## The player's own committed owned-expansions ledger, and the one the executed
+## transaction produced: the sent id appended ONCE at the END with every
+## existing entry unchanged, in order, and never deduplicated. The corpus's own
+## `[35, 36, 45, 46]` is incoherent under the chosen schedule and is recorded
+## verbatim — never rewritten, normalized, reordered, or deduplicated.
+const EXPAND_INTENT_OWNED := [35, 36, 45, 46]
+const EXPAND_INTENT_OWNED_AFTER := [35, 36, 45, 46, 0]
+## The committed schedule row index 0 records, and the debit it derives: all
+## four fields zero, so the derived eight-slot vector is the all-zero one.
+const EXPAND_INTENT_PRICE := {"coins": 0, "cash": 0, "neighbors": 0,
+	"inventory_qte": 0}
+const EXPAND_INTENT_DEBIT := [0, 0, 0, 0, 0, 0, 0, 0]
+## The Tree decoration (item 905) the windowed capture and the report SELECT to
+## make the selection-driven surface live before arming. An expansion names NO
+## placement: the intent carries the save id and the expansion id and nothing
+## else, so this cell exists only so a committed selection exists — which is
+## exactly what the capture and the report assert afterwards, by showing that
+## the 40 rendered objects and every cell are untouched by a ledger that grew.
+const EXPAND_INTENT_CELL := Vector2i(53, 39)
+const EXPAND_INTENT_ITEM := 905
 ## Default placement report destination for the bare
 ## `--placement-report` flag (project-relative, resolved against the
 ## project directory).
@@ -1042,6 +1143,223 @@ const COLLECT_PROVENANCE := {
 	],
 }
 
+## The expand evidence's explicit non-claims (spec "Expansion evidence,
+## provenance, and claim limits"). The runtime tokens in the first claim are
+## assembled from fragments for the same project-scope reason as the lists
+## above.
+const EXPAND_NON_CLAIMS := [
+	"no Flash, " + "Ruf" + "fle" + ", " + "Action" + "Script"
+		+ ", or browser executed",
+	"the id-space indexing is DERIVED, not observed: the executed-legacy probe "
+		+ "recorded that the legacy server accepts an out-of-range id, a "
+		+ "duplicate, and a negative id alike, so it offers no evidence to "
+		+ "arbitrate and the reading rests on the corpus's own [35, 36, 45, 46] "
+		+ "being a valid index into the 98-entry table and neither a valid "
+		+ "four-entry index nor a level set. The claim is the price the "
+		+ "committed table assigns to that id, never the price a coherent player "
+		+ "pays",
+	"the corpus's own four owned ids are recorded as INCOHERENT under the chosen "
+		+ "schedule (a level-1 fresh player owning four saturated-price "
+		+ "expansions is not a coherent game state) and that is a reason to "
+		+ "distrust the reading rather than to accept it; they are tolerated "
+		+ "verbatim, never rewritten, reordered, normalized, or deduplicated",
+	"no id the corpus owns could have been bought under the requirements rule: "
+		+ "all four record neighbors 15 and inventory_qte 30, and 94 of the 98 "
+		+ "committed rows record a positive requirement, so the only purchasable "
+		+ "entries are the free indexes 0..3 and the delivered end-to-end "
+		+ "transaction uses a ZERO-COST committed row. Nothing is claimed about "
+		+ "what a priced expansion would cost a player on this corpus: the "
+		+ "priced path is exercised by stubbing the committed row, never by a "
+		+ "committed price the requirements rule would let through",
+	"the debit's SIGN and SHAPE are derived: that a price is a debit, that the "
+		+ "schedule's gold-named field is negated into the gold slot and its cash "
+		+ "field into the cash slot, and that the six slots no expansion price "
+		+ "names stay zero. What is established is that the branch appends the id "
+		+ "and changes nothing else",
+	"the price's gold component is named gold by the client's OWN committed "
+		+ "assets expansion_gold.jpg and expansion_cash.jpg (two distinct "
+		+ "committed images), which is what settles the schedule's coins field "
+		+ "onto the server's gold slot; the SLOT NUMBER comes from the server's "
+		+ "own resource ordering",
+	"the clamp is not exercised by the committed transaction: the addressed row "
+		+ "is free, so the derived debit is the all-zero vector and no balance "
+		+ "moves. The clamp is REACHABLE and was established by the recorded "
+		+ "probe (a client-sent gold debit larger than the balance landed on "
+		+ "zero, not on a negative balance); the affordability refusal is "
+		+ "preferred over reproducing it, and that alternative is the recorded "
+		+ "rejected option",
+	"NO land, grid, cell, footprint, or placement-bound behavior is claimed or "
+		+ "implemented anywhere in this slice: no terrain growth, no grid "
+		+ "enlargement, no new buildable cells, and no change to the placement "
+		+ "bounds the delivered placement line enforces. The committed evidence "
+		+ "establishes the vocabulary (a purchasable tile, bought through a "
+		+ "popup, priced in gold and cash) but NOT the tile-to-cell geometry, "
+		+ "because the committed SWF inspection is symbols-and-tags only and its "
+		+ "own scope statement disclaims timeline semantics, script behavior, and "
+		+ "rendering. That is a KNOWN EVIDENCE GAP bounding visual land growth, "
+		+ "and closing it needs new evidence rather than a derivation. No claim "
+		+ "is made that any area of the town becomes buildable: the delivered "
+		+ "evidence establishes the unlock ledger only",
+	"the friend-assist mechanism, map_sizes, increasedPopulation, the "
+		+ "town-versus-map schedule disambiguation beyond what the corpus "
+		+ "decides, and the neighbor and inventory requirement IMPLEMENTATIONS "
+		+ "are all out of scope",
+	"parity covers one recorded transaction against the fresh-player corpus, "
+		+ "not progressed players, not a second expansion, and not other commands",
+	"purchasability, affordability, and addressability of the id space are "
+		+ "client-side rules only; the endpoint enforces structural input "
+		+ "validity, the range and duplicate guards, the two content refusals, "
+		+ "and the two-part post-execution proof, and no server-authoritative "
+		+ "validation exists",
+	"no pixel-parity oracle against the legacy client exists",
+	"the capture runs the fake GameApi implementation; real-execution parity is "
+		+ "established by the fixture-replay tests and the verify-boot expand-live "
+		+ "phase",
+]
+
+## The established-versus-derived provenance split the expand report records as
+## its own section (spec "Expansion evidence, provenance, and claim limits").
+## Every row names the evidence a reader can go and check, so no reader has to
+## take the split on trust.
+const EXPAND_PROVENANCE := {
+	"established": [
+		{"fact": "the expand branch takes exactly one positional argument, "
+			+ "coerces it with int(), appends it to map[\"expansions\"], and "
+			+ "writes NOTHING else: not items, not level, not map_sizes, not "
+			+ "increasedPopulation, not privateState, not the rest of playerInfo",
+			"evidence": "command.py:211-216 and the expand row of "
+				+ "docs/legacy-protocol/commands.json (committed legacy "
+				+ "server source and its source-grounded command catalog), which "
+				+ "also records the security note that the client unlocks any "
+				+ "expansion id with no adjacency, level, or cost verification"},
+		{"fact": "the price is NOT computed by the server: the client-sent "
+			+ "eight-slot vector is applied verbatim, per resource, as "
+			+ "max(current + delta, 0), and the application runs BEFORE the "
+			+ "branch",
+			"evidence": "command.py:40; engine.py:251-271; the catalog's "
+				+ "resource_effects state both facts outright"},
+		{"fact": "the per-resource CLAMP is REACHABLE, for the first time in this "
+			+ "family: a client-sent gold debit larger than the balance landed on "
+			+ "ZERO rather than on a negative balance",
+			"evidence": "executed-legacy probe 1 against this very server, "
+				+ "recorded in tests/fixtures/godot-building-expand/"
+				+ "capture-manifest.json and in docs/legacy-town-expansion.md: "
+				+ "a -5000 gold debit against a 2000 balance drove it to 0"},
+		{"fact": "the server CANNOT ARBITRATE the id space: an out-of-range id, "
+			+ "a duplicate the player already owned, and a negative id all "
+			+ "answered {\"result\":\"success\"}, and nothing in the server "
+			+ "reads, validates, prices, orders, or deduplicates the ledger",
+			"evidence": "executed-legacy probe 2 against this very server, "
+				+ "recorded in the same manifest: expand(999) produced "
+				+ "[35, 36, 45, 46, 999]"},
+		{"fact": "a non-integer id raises an unhandled server error, because the "
+			+ "branch coerces its argument with int() and does not guard it",
+			"evidence": "executed-legacy probe 3 against this very server, "
+				+ "recorded in the same manifest: expand(\"abc\") raised an "
+				+ "unhandled HTTP 500"},
+		{"fact": "the committed schedules: expansion_prices is 98 POSITIONAL rows "
+			+ "with NO stable id, all four fields fully native numbers, indexes "
+			+ "0..3 all zero, index 4 = 2500/5/1/1, index 5 = 5000/8/2/2, "
+			+ "per-field saturation at coins index 14, cash index 11, neighbors "
+			+ "index 18, and inventory_qte index 33, so the whole row equals "
+			+ "100000/20/15/30 from index 33 to 97; town_prices and map_prices "
+			+ "are 4 rows each with levels 15/25/35/45",
+			"evidence": "config/main.json joined over all 98 stored rows; "
+				+ "docs/game-content/census.md records \"No stable ID; positional "
+				+ "index\" for expansion_prices; packages/game-content/README.md "
+				+ "(economy extension) records the 98/4/4 normalization"},
+		{"fact": "the expansion price has exactly TWO components and the "
+			+ "client's own icon for one of them is named gold while the other is "
+			+ "named cash — so the schedule's coins field is the client's gold, "
+			+ "and the server's slot 2 is map[\"gold\"] while slot 6 is "
+			+ "playerInfo.cash",
+			"evidence": "the committed asset registry carries "
+				+ "assets/images/en/expansion_gold.jpg AND "
+				+ "assets/images/en/expansion_cash.jpg as two distinct images "
+				+ "with distinct sha256s; the server's resource ordering is "
+				+ "engine.py:259-267"},
+		{"fact": "an expansion is a purchasable TILE bought through a popup",
+			"evidence": "the committed SWF static inventory carries the symbols "
+				+ "PopupExpandMC and btnBuyExpandTileMC, alongside "
+				+ "assets/images/en/expansion.png"},
+		{"fact": "the TILE -> CELL GEOMETRY is not derivable from anything "
+			+ "preserved: the committed inspection is symbols-and-tags only",
+			"evidence": "tools/asset-registry/README.md's own scope statement: "
+				+ "the inspection establishes no conversion, timeline semantics, "
+				+ "script behavior, asset validity, gameplay parity, or Godot "
+				+ "rendering. This is the known evidence gap that BOUNDS visual "
+				+ "land growth rather than blocking the unlock-ledger slice"},
+		{"fact": "the corpus facts: a level-1 fresh player whose expansions "
+			+ "ledger is [35, 36, 45, 46] (identical in the pre-migration save), "
+			+ "40 placements, store {}, and xp 4 / gold 2000 / wood 2000 / oil "
+			+ "2000 / steel 2000 / playerInfo.cash 5 / privateState.mana 0, with "
+			+ "NO map_sizes field on the map record (map_sizes lives in "
+			+ "playerInfo)",
+			"evidence": "tests/saves/fresh-player.json and "
+				+ "fresh-player-pre-migration.json; the committed "
+				+ "tests/fixtures/godot-building-expand/steps/command_expand/ "
+				+ "before.json"},
+		{"fact": "the executed result: the ledger [35, 36, 45, 46] becomes "
+			+ "[35, 36, 45, 46, 0] — grown by exactly one entry, the sent id "
+			+ "appended at the END, the existing entries unchanged, in order, and "
+			+ "not deduplicated — while the placement count stays 40 and every "
+			+ "row, the level, the storage, the private state, the player info, "
+			+ "and all seven resources are byte-identical. Exactly ONE leaf "
+			+ "differs in the whole save: /maps/0/expansions/4",
+			"evidence": "the committed executed-legacy fixture "
+				+ "tests/fixtures/godot-building-expand/, whose first capture in "
+				+ "this family records NO time-dependent state leaf at all"},
+	],
+	"derived": [
+		{"fact": "the id-space indexing: the price is the id's own row in the "
+			+ "98-entry positional expansion_prices table (D1)",
+			"evidence": "derived: no legacy branch reads the schedule and probe 2 "
+				+ "shows the server accepts 999, a duplicate, and -1 alike, so it "
+				+ "cannot be settled by observing the server. The reading rests on "
+				+ "the corpus's own [35, 36, 45, 46] being a valid index into THIS "
+				+ "table and neither a valid four-entry index nor a level set "
+				+ "(the schedules' levels are 15/25/35/45, and while 35 and 45 "
+				+ "appear, 36 and 46 do not). Indexing the four-entry schedules by "
+				+ "level, and indexing by len(map[\"expansions\"]), are the "
+				+ "recorded rejected alternatives. The corpus's own four owned "
+				+ "ids are saturated-price, which is a reason to DISTRUST the "
+				+ "reading"},
+		{"fact": "the neighbors and inventory_qte requirements are REFUSED, never "
+			+ "invented (D3)",
+			"evidence": "derived: the server ignores both fields and nothing any "
+				+ "delivered surface can read evaluates either — no neighbour count "
+				+ "and no inventory quantity is exposed by the delivered "
+				+ "bootstrap, the client's GameApi, or the corpus. Enforcing a "
+				+ "neighbour count or an inventory quantity from state nothing "
+				+ "delivers, and ignoring the requirement, are the recorded "
+				+ "rejected alternatives. The consequence — 94 of 98 rows "
+				+ "unpurchasable and the delivered transaction therefore a "
+				+ "zero-cost one — is asserted by the tests, not hidden"},
+		{"fact": "the affordability refusal: an uncovered balance fails closed "
+			+ "with insufficient_resources rather than reproducing the clamp (D6)",
+			"evidence": "derived: because the debit is server-derived the service "
+				+ "CAN know whether the balance covers it, and a silently "
+				+ "under-charged debit is indistinguishable from a wrong "
+				+ "server-derived price — which is exactly what the value-level "
+				+ "post-execution proof exists to catch. Reproducing the clamp is "
+				+ "the recorded rejected option, and probe 1 establishes that the "
+				+ "clamp is reachable when a debit exceeds the balance"},
+		{"fact": "the debit's sign and shape: [0, 0, -C, 0, 0, 0, -K, 0] for a "
+			+ "row priced coins C and cash K, and the all-zero vector for a free "
+			+ "row (D2)",
+			"evidence": "derived: a price is a debit because the branch applies a "
+				+ "client-sent delta and a positive delta would be a mint; the "
+				+ "sign of each named slot and the six zero slots are what make "
+				+ "the value-level proof unambiguous. The GOLD NAMING itself is "
+				+ "not derived — it is established by the committed client asset "
+				+ "names expansion_gold.jpg and expansion_cash.jpg"},
+		{"fact": "the legacy client sends exactly this single-command envelope "
+			+ "carrying the derived debit",
+			"evidence": "never observed; no Flash, " + "Ruf" + "fle" + ", "
+				+ "Action" + "Script" + ", or browser execution in this change"},
+	],
+}
+
 ## View states (spec: never claim a rendered town without one).
 const STATE_EMPTY := "empty"
 const STATE_BUILT := "built"
@@ -1062,6 +1380,13 @@ const SLOT_SHOP := "shop"
 ## and preview state are never the picker's or the shop's, and neither
 ## delivered surface is modified by it.
 const SLOT_MOVE := "move"
+## UI-foundation slot the expansion readout and its `Expand` action occupy
+## (building-expand, design D7/D8). Its OWN slot beside the placement-bound
+## panel, and deliberately so: an expansion is a property of the MAP — its
+## intent names a save id and an expansion id and no placement at all — so a
+## seventh building-targeted row would have implied a target that does not
+## exist. The six delivered modes' panel, buttons, and lifecycle are untouched.
+const SLOT_EXPAND := "expand"
 ## Picker panel width in pixels (provisional presentation — no legacy
 ## picker layout has been captured).
 const PLACEMENT_PANEL_WIDTH := 300.0
@@ -1071,6 +1396,9 @@ const SHOP_PANEL_WIDTH := 300.0
 ## Move panel width in pixels (provisional presentation for the same
 ## reason).
 const MOVE_PANEL_WIDTH := 300.0
+## Expansion panel width in pixels (provisional presentation for the same
+## reason: no legacy expansion popup has been captured).
+const EXPAND_PANEL_WIDTH := 340.0
 ## The storage readout's indicator lines: the payload carried no storage
 ## field at all (design D7 — the missing field is named, never presented as
 ## an empty inventory), and the payload carried a storage object with no
@@ -1245,6 +1573,27 @@ var _collect_reference := 0
 ## The collection readout label (null while no panel is built).
 var _collect_readout: Variant = null
 
+## Expand flow (building-expand, spec "Expansion flow"). The SEVENTH mutually
+## exclusive mode, and the first that names NO placement: an expansion is a
+## property of the MAP, so it owns its own UI-foundation slot (design D7/D8) and
+## no grid target, no preview, and no placement state at all — only its own
+## armed id, the explicit failure the spec requires, the readout the spec
+## requires, and the authoritative ledger the apply takes off the response. The
+## six delivered modes, their panel, their buttons, and their previews are
+## untouched.
+var expand_error := ""
+var _expand_active := false
+## The expansion id the armed expansion will address (the next purchasable
+## entry the committed schedule and the player's committed ledger name). No
+## placement is involved: this is the ONLY thing the intent carries besides the
+## save id.
+var _expand_id := ExpandFlow.NO_EXPANSION
+## The expansion readout's own labels (null while no panel is built).
+var _expand_readout: Variant = null
+var _expand_status: Variant = null
+var _expand_arm: Variant = null
+var _expand_confirm: Variant = null
+
 ## Visual hierarchy + texture caches (shared across rebuilds of this view).
 var _visuals := TownVisuals.new()
 ## The committed HUD builder once attached.
@@ -1289,6 +1638,11 @@ var _construction_capture := false
 ## the frame shows the town whose collection readout carries the re-stamped
 ## clock and the HUD balances the response reported.
 var _collect_capture := false
+## True when the capture flag was `--expand-capture=`
+## (building-expand, design D8): the expand flow runs before the capture so the
+## frame shows the town whose expansion readout carries the AUTHORITATIVE
+## ledger the response reported and the HUD balances it moved.
+var _expand_capture := false
 
 @onready var terrain: TownTerrain = $Terrain
 @onready var objects_layer: Node2D = $Objects
@@ -1362,6 +1716,12 @@ func _ready() -> void:
 			and get_script().resource_path == "res://scripts/town/town.gd":
 		await _write_collect_report(collect_report_path)
 		return
+	# The expand report shares that gate for the same reason.
+	var expand_report_path := _expand_report_path_arg()
+	if not expand_report_path.is_empty() \
+			and get_script().resource_path == "res://scripts/town/town.gd":
+		await _write_expand_report(expand_report_path)
+		return
 	_capture_path = _user_arg("--town-capture=")
 	_purchase_capture = false
 	_move_capture = false
@@ -1370,6 +1730,7 @@ func _ready() -> void:
 	_upgrade_capture = false
 	_construction_capture = false
 	_collect_capture = false
+	_expand_capture = false
 	if _capture_path.is_empty():
 		_capture_path = _user_arg("--placement-capture=")
 		_placement_capture = not _capture_path.is_empty()
@@ -1394,6 +1755,9 @@ func _ready() -> void:
 	if _capture_path.is_empty():
 		_capture_path = _user_arg("--collect-capture=")
 		_collect_capture = not _capture_path.is_empty()
+	if _capture_path.is_empty():
+		_capture_path = _user_arg("--expand-capture=")
+		_expand_capture = not _capture_path.is_empty()
 	if state != null:
 		build()
 	_maybe_start_capture()
@@ -2510,6 +2874,13 @@ func arm_move() -> Dictionary:
 		# D8): a collection is armed, so a move is refused by name.
 		return _move_reject("collect_already_active",
 			"a collection is armed; cancel it before moving")
+	if _expand_active:
+		# The seventh mode's half of the symmetric exclusion (building-expand
+		# design D8): an expansion is armed, so a move is refused by name. It
+		# names no placement either, so the refusal is about the MODE, never
+		# about a target.
+		return _move_reject("expand_already_active",
+			"an expansion is armed; cancel it before moving")
 	if selected == null:
 		return _move_reject("move_no_selection",
 			"no placed building is selected")
@@ -3453,6 +3824,11 @@ func arm_sell() -> Dictionary:
 		# design D8), so a collection in progress refuses the sale by name.
 		return _sell_reject("collect_already_active",
 			"a collection is armed; cancel it before selling")
+	if _expand_active:
+		# The seventh mode's half of the symmetric exclusion (building-expand
+		# design D8).
+		return _sell_reject("expand_already_active",
+			"an expansion is armed; cancel it before selling")
 	if selected == null:
 		return _sell_reject("sell_no_selection",
 			"no placed building is selected")
@@ -3755,6 +4131,11 @@ func arm_store() -> Dictionary:
 		# design D8), so a collection in progress refuses the store by name.
 		return _store_reject("collect_already_active",
 			"a collection is armed; cancel it before storing")
+	if _expand_active:
+		# The seventh mode's half of the symmetric exclusion (building-expand
+		# design D8).
+		return _store_reject("expand_already_active",
+			"an expansion is armed; cancel it before storing")
 	if selected == null:
 		return _store_reject("store_no_selection",
 			"no placed building is selected")
@@ -4103,6 +4484,11 @@ func arm_upgrade() -> Dictionary:
 		# design D8), so a collection in progress refuses the upgrade by name.
 		return _upgrade_reject("collect_already_active",
 			"a collection is armed; cancel it before upgrading")
+	if _expand_active:
+		# The seventh mode's half of the symmetric exclusion (building-expand
+		# design D8).
+		return _upgrade_reject("expand_already_active",
+			"an expansion is armed; cancel it before upgrading")
 	if selected == null:
 		return _upgrade_reject("upgrade_no_selection",
 			"no placed building is selected")
@@ -4701,6 +5087,11 @@ func arm_construction() -> Dictionary:
 	if _collect_active:
 		return _construction_reject("collect_already_active",
 			"a collection is armed; cancel it before building")
+	if _expand_active:
+		# The seventh mode's half of the symmetric exclusion (building-expand
+		# design D8).
+		return _construction_reject("expand_already_active",
+			"an expansion is armed; cancel it before building")
 	if selected == null:
 		return _construction_reject("construction_no_selection",
 			"no placed building is selected")
@@ -5296,6 +5687,11 @@ func arm_collect() -> Dictionary:
 	if _construction_active:
 		return _collect_reject("construction_already_active",
 			"a build is armed; cancel it before collecting")
+	if _expand_active:
+		# The seventh mode's half of the symmetric exclusion (building-expand
+		# design D8).
+		return _collect_reject("expand_already_active",
+			"an expansion is armed; cancel it before collecting")
 	if selected == null:
 		return _collect_reject("collect_no_selection",
 			"no placed building is selected")
@@ -5644,6 +6040,661 @@ func _collect_evaluation_for_selection() -> Dictionary:
 	return _collect_evaluation((selected as TownObject).placement)
 
 
+# ---------------------------------------------------------------------------
+# Expand flow (building-expand, spec "Expansion flow")
+# ---------------------------------------------------------------------------
+
+
+## True while the expansion is armed.
+func expand_active() -> bool:
+	return _expand_active
+
+
+## The expansion id the armed expansion will address — the next purchasable
+## entry the committed schedule and the player's committed ledger name
+## (`ExpandFlow.NO_EXPANSION` when unarmed or when nothing is purchasable). It
+## is the ONLY thing the intent carries besides the save id, so it is an
+## accessor the suite asserts directly.
+func expand_id() -> int:
+	return _expand_id
+
+
+## The player's own owned-expansions ledger as the AUTHORITATIVE response last
+## left it: a copy of the typed state's own list after every applied
+## expansion, and the state's list verbatim before that. The flow never appends
+## an id here — the response owns the ledger (design D8).
+func owned_expansions() -> Array:
+	if state == null:
+		return []
+	return (state.owned_expansions as Array).duplicate()
+
+
+## True when the payload carried no owned-expansions ledger at all, so the
+## readout names the absence instead of presenting "this player owns nothing"
+## as fact (the storage mapping's own delivered rule, design D1/D5).
+func owned_expansions_missing() -> bool:
+	if state == null:
+		return true
+	return (state.missing as Array).has(TownState.EXPANSIONS_MISSING_KEY)
+
+
+## The committed expansion schedule the client derives from, read through the
+## typed content package's own `expansion_prices` domain — the SAME table the
+## service derives from, so the readout, the confirm, and the service can never
+## price an id from different content. `[]` when the package is not loaded or
+## the table is absent, which every caller treats as fail-closed.
+func expand_schedule() -> Array:
+	var registry: Variant = get_node_or_null("/root/ContentRegistry") \
+		if _registry == null else _registry
+	if registry == null or not bool(registry.is_loaded()):
+		return []
+	if not registry.has_domain(EXPAND_SCHEDULE_DOMAIN):
+		return []
+	var result: Dictionary = registry.get_entry(EXPAND_SCHEDULE_DOMAIN, "0")
+	if not bool(result.get("found", false)):
+		return []
+	# `get_entry` resolves by id, and the table has no stable id — so the whole
+	# positional table is read through the registry's own entry count and the
+	# rows are re-read by index through the SAME accessor. An id the table does
+	# not hold yields `found: false`, which is exactly the out-of-range
+	# behaviour the flow needs, so no separate range rule exists anywhere.
+	var schedule: Array = []
+	var size: int = registry.count(EXPAND_SCHEDULE_DOMAIN)
+	if size <= 0:
+		return []
+	for id in range(size):
+		var row: Dictionary = registry.get_entry(EXPAND_SCHEDULE_DOMAIN, str(id))
+		if not bool(row.get("found", false)):
+			break
+		schedule.append((row.get("entry", {}) as Dictionary).duplicate())
+	return schedule
+
+
+## The committed schedule's summary, as the readout and the evidence report
+## record it: entry count, addressable id range, the free index range, how many
+## rows are purchasable under the requirements rule, and the per-field
+## saturation indexes. `{ok: false}` when the content package cannot supply the
+## table at all, which the readout renders as a refusal rather than as an empty
+## schedule.
+func expand_schedule_summary() -> Dictionary:
+	return ExpandFlow.schedule_summary(expand_schedule())
+
+
+## The next purchasable entry for the CURRENT committed ledger:
+## `{ok, id, row, debit, reason, error}` with `id == ExpandFlow.NO_EXPANSION`
+## when the player's ledger already contains every purchasable entry (or the
+## schedule is unreadable).
+func expand_next() -> Dictionary:
+	return ExpandFlow.next_purchasable(expand_schedule(), owned_expansions())
+
+
+## The armed expansion's own evaluation (the pure flow's envelope, empty while
+## no expansion is armed) — the same evaluation the confirm reads. Armed on the
+## armed id; unarmed it evaluates the NEXT PURCHASABLE entry, so the readout and
+## the panel always describe a real, offerable id rather than the sentinel.
+func expand_evaluation() -> Dictionary:
+	if not _expand_active:
+		return {}
+	return _expand_evaluation(_expand_id)
+
+
+## One id's evaluation through the PURE flow helpers (design D7): the same
+## functions the suite calls directly, fed with the committed schedule the
+## content package supplies and the typed state's OWN balances. The balances
+## are translated once, at the one place that reads them, from the HUD's own
+## name for the gold slot (`coins`) to the `BootData.Resources` field name
+## (`gold`) the helper checks — so the pure module never learns the HUD's
+## vocabulary.
+func _expand_evaluation(expansion_id: int) -> Dictionary:
+	return ExpandFlow.evaluate(expand_schedule(), owned_expansions(),
+		_expand_balances(), expansion_id)
+
+
+## The typed state's own seven stored balances under the `BootData.Resources`
+## FIELD names the helper and the response use. Read verbatim, never computed:
+## after a successful expansion the HUD writes the response's values into the
+## same state, so this snapshot IS the authoritative one.
+func _expand_balances() -> Dictionary:
+	if state == null:
+		return {}
+	return {
+		"xp": int(state.summary.xp),
+		"gold": int(state.resources.coins),
+		"wood": int(state.resources.wood),
+		"oil": int(state.resources.oil),
+		"steel": int(state.resources.steel),
+		"cash": int(state.resources.cash),
+		"mana": int(state.resources.mana),
+	}
+
+
+## The on-screen expansion readout line ("" while the panel does not exist).
+func expand_readout() -> String:
+	if _expand_readout == null or not is_instance_valid(_expand_readout):
+		return ""
+	return (_expand_readout as Label).text
+
+
+## The on-screen expansion status line ("" while the panel does not exist).
+func expand_status() -> String:
+	if _expand_status == null or not is_instance_valid(_expand_status):
+		return ""
+	return (_expand_status as Label).text
+
+
+## True when the current selection is a map a player could expand: the town is
+## built, a map is selected, the committed schedule resolves, and the next
+## purchasable entry actually OFFERS an expansion (not out of range, not
+## already owned, not blocked by a requirement this client cannot evaluate, and
+## affordable). A ledger that already contains every purchasable entry, a
+## requirement-blocked entry, and an unaffordable entry are therefore never
+## offered the action at all — the refusal still names itself if arming is
+## attempted (design D3/D6/D7).
+func expand_selection_available() -> bool:
+	if view_state != STATE_BUILT:
+		return false
+	if selected == null or not (selected is TownObject):
+		return false
+	if owned_expansions_missing():
+		# A ledger this contract cannot enumerate is a ledger an intent cannot
+		# be checked against, so nothing is offered (the same rule the storage
+		# mapping follows: absent is named, never presented as empty).
+		return false
+	var next := expand_next()
+	if not bool(next.get("ok", false)):
+		return false
+	var id := int(next.get("id", ExpandFlow.NO_EXPANSION))
+	if id == ExpandFlow.NO_EXPANSION:
+		return false
+	return ExpandFlow.offers_expand(_expand_evaluation(id))
+
+
+## Rebuilds the expansion panel and shows it for a committed selection. A no-op
+## while the town is not built or nothing is selected, and never while an
+## expansion is already armed (an armed mode already names the id it will act
+## on, and the readout is re-rendered from the response after the apply).
+func refresh_expand_action() -> Dictionary:
+	if view_state != STATE_BUILT or ui == null:
+		return _expand_reject("town_not_built", "the town view is not built")
+	if selected == null or not (selected is TownObject):
+		if ui.has_slot(SLOT_EXPAND) and ui.is_slot_visible(SLOT_EXPAND):
+			ui.set_slot_visible(SLOT_EXPAND, false)
+		return {"ok": true, "error": ""}
+	var panel := _build_expand_panel(false)
+	if not bool(panel.get("ok", false)):
+		return _expand_reject("expand_panel", str(panel.get("error", "")))
+	_refresh_expand_panel()
+	if not _expand_active:
+		ui.set_slot_visible(SLOT_EXPAND, true)
+	return {"ok": true, "error": ""}
+
+
+## Arms the expansion on the current selection (spec "the player selects the
+## map, chooses the expand action on a purchasable id, and confirms").
+## Fail-closed: an unbuilt view, no selection, an already-armed expansion, any
+## of the SIX delivered modes already armed, an unreadable committed schedule,
+## no purchasable entry left, and a missing panel each reject with an explicit
+## error naming the condition. It adds no state and no request of its own:
+## nothing leaves the client until a confirm, and an expansion has no grid
+## target, so no preview is shown (design D8).
+##
+## The armed id is the next purchasable entry the committed schedule and the
+## player's committed ledger name — never a client-chosen id, and never one the
+## service would refuse.
+func arm_expand() -> Dictionary:
+	if view_state != STATE_BUILT:
+		return _expand_reject("town_not_built", "the town view is not built")
+	if _expand_active:
+		return _expand_reject("expand_already_active",
+			"the expansion is already armed")
+	# Each delivered mode's refusal reuses the code that mode's OWN arming
+	# refuses with (`sell_already_active`, `construction_already_active`, …), so
+	# the two directions of the exclusion name the same condition.
+	for entry: Array in [["_move_active", "move_already_active", "a move"],
+			["_sell_active", "sell_already_active", "a sale"],
+			["_store_active", "store_already_active", "a store"],
+			["_upgrade_active", "upgrade_already_active", "an upgrade"],
+			["_construction_active", "construction_already_active", "a build"],
+			["_collect_active", "collect_already_active", "a collection"]]:
+		if bool(get(str(entry[0]))):
+			# The refusal names the ARMED mode, never the one the player tried
+			# to arm — the same one-surface rule the six delivered modes already
+			# follow, extended to the seventh.
+			return _expand_reject(str(entry[1]),
+				"%s is armed; cancel it before expanding" % str(entry[2]))
+	if selected == null or not (selected is TownObject):
+		return _expand_reject("expand_no_selection", "no map is selected")
+	var summary := expand_schedule_summary()
+	if not bool(summary.get("ok", false)):
+		return _expand_reject(ExpandFlow.REASON_UNREADABLE_SCHEDULE,
+			"the committed expansion schedule does not resolve: %s"
+			% str(summary.get("error", "")))
+	if owned_expansions_missing():
+		# A ledger this contract cannot enumerate is a ledger an intent cannot
+		# be checked against, so nothing is offered and nothing is sent. The
+		# readout names the absence rather than claiming an empty ledger.
+		return _expand_reject("expand_ledger_missing",
+			"the payload records no owned-expansions ledger (%s), so no "
+			% TownState.EXPANSIONS_MISSING_KEY
+			+ "expansion can be checked against what the player already owns")
+	var next := expand_next()
+	if not bool(next.get("ok", false)):
+		return _expand_reject(str(next.get("reason",
+			ExpandFlow.REASON_UNREADABLE_SCHEDULE)), str(next.get("error", "")))
+	var id := int(next.get("id", ExpandFlow.NO_EXPANSION))
+	if id == ExpandFlow.NO_EXPANSION:
+		return _expand_reject(ExpandFlow.REASON_NOT_PURCHASABLE,
+			"the player's ledger already contains every purchasable entry the "
+			+ "committed schedule has")
+	# Every content and affordability refusal is evaluated BEFORE the mode is
+	# armed, so an unexpandable id opens nothing and the explicit reason names
+	# itself (design D3/D6/D7).
+	var evaluation: Dictionary = _expand_evaluation(id)
+	if not ExpandFlow.offers_expand(evaluation):
+		var refusal := ExpandFlow.refusal_text(evaluation)
+		return _expand_reject(str(evaluation.get("reason",
+			ExpandFlow.REASON_NOT_PURCHASABLE)),
+			refusal if refusal != "" else str(evaluation.get("error",
+				"not purchasable")))
+	_expand_active = true
+	_expand_id = id
+	expand_error = ""
+	var panel := _build_expand_panel(true)
+	if not bool(panel.get("ok", false)):
+		return _expand_reject("expand_panel", str(panel.get("error", "")))
+	if ui != null and ui.has_slot(SLOT_EXPAND) \
+			and not ui.is_slot_visible(SLOT_EXPAND):
+		ui.set_slot_visible(SLOT_EXPAND, true)
+	_refresh_expand_panel()
+	# The armed line names the id and repeats the derived debit with the
+	# same "derived, never observed" boundary the selection line carries, so
+	# the amount is never presented as authoritative anywhere on this surface.
+	if ExpandFlow.offers_expand(evaluation):
+		_set_expand_status("armed: expand id %d | derived debit: %s "
+			% [_expand_id, ExpandFlow.debit_text(
+				evaluation.get("debit", []))]
+			+ "(derived, never observed) | the service decides the amount")
+	return {"ok": true, "error": "", "id": _expand_id,
+		"debit": (evaluation.get("debit", []) as Array).duplicate(),
+		"row": (evaluation.get("row", {}) as Dictionary).duplicate(),
+		"owned": owned_expansions()}
+
+
+## Sends exactly one expansion intent (spec "a confirm that sends exactly one
+## intent") and applies only the authoritative response. Nothing is sent unless
+## the expansion is armed, the armed id is still purchasable and affordable
+## against the CURRENT committed ledger, an active session exists, and the API
+## is registered: each missing condition rejects locally with the explicit error
+## and NO request. A structured or transport failure surfaces its code with the
+## ledger keeping its previous contents and no balance moved. Awaits the GameApi
+## call.
+##
+## The intent carries the save id and the expansion id and NOTHING else — no
+## amount, no resource, no price, no requirement flag, and no resource delta
+## (design D5): the service reads the id's own committed row in the 98-entry
+## positional `expansion_prices` schedule, derives the eight-slot DEBIT from it,
+## and executes the unchanged legacy `expand` branch server-side.
+func confirm_expand() -> Dictionary:
+	if not _expand_active:
+		return _expand_reject("expand_not_active", "the expansion is not armed")
+	if _expand_id == ExpandFlow.NO_EXPANSION:
+		return _expand_reject("expand_not_active", "no expansion is armed")
+	var evaluation: Dictionary = _expand_evaluation(_expand_id)
+	if not ExpandFlow.offers_expand(evaluation):
+		# Already owned, out of range, blocked by an unevaluable requirement, or
+		# unaffordable. All are named, and all send nothing (design D3/D6/D7).
+		var refusal := ExpandFlow.refusal_text(evaluation)
+		return _expand_reject(str(evaluation.get("reason",
+			ExpandFlow.REASON_NOT_PURCHASABLE)),
+			refusal if refusal != "" else str(evaluation.get("error",
+				"not purchasable")))
+	var session: Variant = get_node_or_null("/root/Session")
+	if session == null or not session.is_active() \
+			or str(session.user_id()).strip_edges() == "":
+		return _expand_reject("session_unavailable",
+			"no active save to expand")
+	var api: Variant = get_node_or_null("/root/GameApi")
+	if api == null:
+		return _expand_reject("gameapi_unavailable",
+			"the GameApi autoload is not registered")
+	var response: Variant = await api.expand_town(session.user_id(),
+		_expand_id)
+	if not (response is BootData.ExpandResult):
+		return _expand_reject("bad_response",
+			"GameApi returned no typed expand result")
+	var typed: BootData.ExpandResult = response
+	if not typed.ok:
+		# Structured or transport failure: one contract — the explicit error
+		# names the code and message, nothing was applied, the ledger keeps its
+		# previous contents, and no balance moved.
+		expand_error = "[town] expand failed: %s: %s" % [
+			typed.error_code, typed.error_message]
+		_set_expand_status(expand_error)
+		_refresh_expand_panel()
+		return {"ok": false, "error": expand_error, "code": typed.error_code}
+	var applied: Dictionary = _apply_expand(typed)
+	if not bool(applied.get("ok", false)):
+		return _expand_reject("apply_failed", str(applied.get("error", "")))
+	expand_error = ""
+	_expand_active = false
+	_expand_id = ExpandFlow.NO_EXPANSION
+	# The readout is re-rendered from the RESPONSE's own ledger, never from the
+	# client's: the applied list is the authoritative one, so this is also what
+	# keeps the deterministic report byte-identical across reruns.
+	_set_expand_readout(ExpandFlow.readout_text(_expand_evaluation(
+		int(typed.expansions_after.size()) - 1
+			if not (typed.expansions_after as Array).is_empty()
+			else ExpandFlow.NO_EXPANSION),
+		owned_expansions(), expand_schedule_summary()))
+	_refresh_expand_panel()
+	_set_expand_status("expanded id %d: %s applied by the service"
+		% [int(typed.expansions_after[typed.expansions_after.size() - 1]),
+			ExpandFlow.debit_text(typed.debit)])
+	return {"ok": true, "error": "", "result": typed}
+
+
+## Applies the authoritative response (building-expand design D8): the player's
+## owned ledger is REPLACED by the response's `expansions_after` — verbatim, in
+## the response's order, never reordered, deduplicated, or normalized — the
+## stored resources and experience take the RESPONSE's `resources`, and the
+## missing-field record is updated exactly the way the other applies do. The
+## client's own derived debit is **discarded, not applied**: the response wins
+## even where the two disagree, so a wrong derivation can never be silently
+## compounded (the spec's response-wins rule).
+##
+## **Nothing else is touched.** No placement, no cell, no footprint, no depth
+## order, no rendered object, and no placement bound: an expansion writes an int
+## into a list (`command.py:211-216`) and this slice deliberately grows no land
+## (design D4).
+##
+## Everything the apply touches is snapshotted FIRST — the ledger, the
+## missing-field list, the resource bag, and the XP — so the only post-mutation
+## failure (a rejected HUD re-attach) restores every one of them. A failed
+## apply therefore leaves the ledger, the balances, and the HUD exactly as they
+## were.
+##
+## Pre-checks run before any mutation and fail closed: a response whose ledger
+## did not grow by exactly one appended entry equal to the sent id, or whose
+## debit is not the documented vector, would be a different transaction than
+## this one, so it is reported instead of applied.
+func _apply_expand(result: BootData.ExpandResult) -> Dictionary:
+	if state == null:
+		return {"ok": false, "error": "the town state is unavailable"}
+	if ui == null or _hud == null:
+		return {"ok": false, "error": "the town HUD is not attached"}
+	if not _expand_active:
+		return {"ok": false, "error": "no expansion is being applied"}
+	var resources: BootData.Resources = result.resources
+	if resources == null or result.debit.size() != BootData.EXPAND_VECTOR_SLOTS \
+			or result.price == null:
+		return {"ok": false, "error": "the expand response is incomplete"}
+	var before: Array = owned_expansions()
+	# The endpoint's OWN structural half of the post-execution proof, re-checked
+	# here on the typed response: the ledger grew by exactly one entry, equal
+	# to the sent id, at the END, with every existing entry unchanged and in
+	# order. A response that is not that transaction is reported, not applied.
+	if (result.expansions_before as Array).size() != before.size() \
+			or (result.expansions_before as Array) != before:
+		return {"ok": false,
+			"error": "the expand response names a pre-execution ledger this "
+				+ "client does not hold"}
+	var after: Array = result.expansions_after
+	if after.size() != before.size() + 1:
+		return {"ok": false,
+			"error": "the expand response's ledger is %d entries, not the "
+				% after.size() + "documented %d (one appended)"
+				% (before.size() + 1)}
+	for index in range(before.size()):
+		if int(after[index]) != int(before[index]):
+			return {"ok": false,
+				"error": "the expand response reordered or changed ledger "
+					+ "entry %d" % index}
+	if int(after[after.size() - 1]) != _expand_id:
+		return {"ok": false,
+			"error": "the expand response appended id %d, not the armed id %d"
+				% [int(after[after.size() - 1]), _expand_id]}
+	var previous := {
+		"expansions": before,
+		"missing": (state.missing as Array).duplicate(),
+		"coins": state.resources.coins,
+		"wood": state.resources.wood,
+		"steel": state.resources.steel,
+		"oil": state.resources.oil,
+		"cash": state.resources.cash,
+		"mana": state.resources.mana,
+		"xp": state.summary.xp,
+	}
+	# The ledger is taken from the RESPONSE, through the ONE shared fail-closed
+	# parser the payload parse used, so the readout and the refusal rules can
+	# never read the authoritative list by a second rule set. A ledger the
+	# parser rejects is an apply failure with a full rollback, not a
+	# half-written state.
+	var ledger: Dictionary = TownState.expansions_of(after)
+	if not bool(ledger.get("ok", false)):
+		return {"ok": false,
+			"error": "[town] parse rejected: " + str(ledger.get("error", ""))}
+	state.owned_expansions = (ledger["expansions"] as Array).duplicate()
+	# The response supplies values the payload may have lacked, so the ledger
+	# key is no longer missing; the snapshot restores it verbatim on rollback.
+	state.missing.erase(TownState.EXPANSIONS_MISSING_KEY)
+	for key in ["coins", "wood", "steel", "oil", "cash", "mana"]:
+		state.missing.erase(key)
+	state.missing.erase("xp")
+	# The RESPONSE's balances win outright. The client's own derived debit is
+	# NOT added to them: the response-wins rule is what makes a wrong
+	# derivation detectable instead of compounded.
+	state.resources.coins = resources.gold
+	state.resources.wood = resources.wood
+	state.resources.steel = resources.steel
+	state.resources.oil = resources.oil
+	state.resources.cash = resources.cash
+	state.resources.mana = resources.mana
+	state.summary.xp = resources.xp
+	var hud_result: Dictionary = _hud.attach(ui, state)
+	if not bool(hud_result.get("ok", false)):
+		# Roll every mutation back from the snapshot alone: a failed apply
+		# changes nothing, and the ledger, the balances, and the HUD keep the
+		# values they had.
+		state.owned_expansions = previous["expansions"]
+		state.missing = previous["missing"]
+		state.resources.coins = previous["coins"]
+		state.resources.wood = previous["wood"]
+		state.resources.steel = previous["steel"]
+		state.resources.oil = previous["oil"]
+		state.resources.cash = previous["cash"]
+		state.resources.mana = previous["mana"]
+		state.summary.xp = previous["xp"]
+		return {"ok": false, "error": str(hud_result.get("error", ""))}
+	# The placements, the rendered objects, the depth order, the storage, and
+	# the draw order are deliberately untouched: an expansion changes none of
+	# them, and re-rendering them would suggest otherwise (design D4).
+	return {"ok": true, "error": ""}
+
+
+## Closes the armed expansion without sending anything: the mode-local id
+## drops, the slot hides, and the town state, the owned ledger, the readout,
+## the storage view, the committed selection, and the resources stay
+## byte-identical.
+func cancel_expand() -> Dictionary:
+	if not _expand_active:
+		return _expand_reject("expand_not_active", "the expansion is not armed")
+	_expand_active = false
+	_expand_id = ExpandFlow.NO_EXPANSION
+	if ui != null and ui.has_slot(SLOT_EXPAND) \
+			and ui.is_slot_visible(SLOT_EXPAND):
+		ui.set_slot_visible(SLOT_EXPAND, false)
+	_set_expand_status("expand closed (nothing was sent)")
+	return {"ok": true, "error": "", "cancelled": true}
+
+
+## The house expansion failure envelope: records the explicit error naming the
+## code and condition, shows it in the surface's own status line, and returns
+## {ok:false} without touching the town state, the owned ledger, the readout, the
+## storage view, the selection, the resources, or the committed draw order.
+func _expand_reject(code: String, message: String) -> Dictionary:
+	expand_error = "[town] expand rejected: %s: %s" % [code, message]
+	_set_expand_status(expand_error)
+	return {"ok": false, "error": expand_error, "code": code}
+
+
+## The `Expand` action's button wiring: pressing it arms the expansion. It is a
+## pure wiring step over `arm_expand` — no state and no request of its own — so
+## the delivered selection behavior is unchanged.
+func _on_expand_action() -> void:
+	arm_expand()
+
+
+## The armed surface's confirm wiring: a press sends (awaits) the one intent.
+func _on_expand_confirm() -> void:
+	await confirm_expand()
+
+
+## The armed surface's cancel wiring: a press closes with no request.
+func _on_expand_cancel() -> void:
+	cancel_expand()
+
+
+## Builds (or rebuilds) the expansion panel in its OWN UI-foundation slot:
+## a title, the selection line, the status line, the readout the spec requires
+## (the committed schedule's summary, the player's own owned ids, and the next
+## purchasable entry with its derived cost and affordability), the `Expand`
+## action, and — armed only — the confirm that names the derived debit AS
+## DERIVED plus a cancel. The six delivered modes' panel, buttons, and
+## lifecycle are untouched (design D7/D8).
+func _build_expand_panel(armed: bool) -> Dictionary:
+	if ui == null:
+		return {"ok": false, "error": "the UI foundation is unavailable"}
+	if not ui.has_slot(SLOT_EXPAND):
+		var registration: Dictionary = ui.register_slot(SLOT_EXPAND)
+		if not bool(registration.get("ok", false)):
+			return {"ok": false,
+				"error": str(registration.get("error", "rejected"))}
+	if ui.is_slot_visible(SLOT_EXPAND):
+		ui.set_slot_visible(SLOT_EXPAND, false)
+	var root: Control = ui.slot_root(SLOT_EXPAND)
+	if root == null:
+		return {"ok": false, "error": "the expand slot root is unavailable"}
+	for child in root.get_children():
+		root.remove_child(child)
+		child.free()
+	_expand_readout = null
+	_expand_status = null
+	_expand_arm = null
+	_expand_confirm = null
+	var panel := VBoxContainer.new()
+	panel.name = "expand"
+	panel.anchor_left = 1.0
+	panel.anchor_right = 1.0
+	# Beside the placement-bound panel in the same column, never over it: the two
+	# surfaces are independent, so neither one's layout may depend on the
+	# other's. The gap is the same 8 px inset the panel itself uses.
+	panel.offset_left = -EXPAND_PANEL_WIDTH - MOVE_PANEL_WIDTH - 24.0
+	panel.offset_right = -MOVE_PANEL_WIDTH - 16.0
+	panel.offset_top = 8.0
+	panel.offset_bottom = 8.0 + 300.0
+	panel.add_theme_constant_override("separation", 2)
+	root.add_child(panel)
+	var title := Label.new()
+	title.name = "title"
+	title.text = "Expansions"
+	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_style_placement_label(title)
+	panel.add_child(title)
+	var selection := Label.new()
+	selection.name = "selection"
+	selection.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	selection.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_style_placement_label(selection)
+	# An armed expansion names the id and the DEBIT, and it says the amount is
+	# DERIVED: the price comes from the client's own derivation of the
+	# committed row, while the response is what actually moves a balance.
+	if _expand_active:
+		selection.text = ("expanding id %d | derived debit: %s (derived, "
+			% [_expand_id, ExpandFlow.debit_text(
+				_expand_evaluation(_expand_id).get("debit", []))]
+			+ "never observed) | the service decides the amount")
+	else:
+		selection.text = "select a map to expand it"
+	panel.add_child(selection)
+	var status := Label.new()
+	status.name = "status"
+	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	status.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_style_placement_label(status)
+	panel.add_child(status)
+	_expand_status = status
+	var readout := Label.new()
+	readout.name = "expansions"
+	readout.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	readout.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	readout.text = ""
+	_style_placement_label(readout)
+	panel.add_child(readout)
+	_expand_readout = readout
+	var row := HBoxContainer.new()
+	row.name = "actions"
+	var arm := Button.new()
+	arm.name = "expand"
+	arm.text = ExpandFlow.expand_label()
+	arm.pressed.connect(_on_expand_action)
+	row.add_child(arm)
+	_expand_arm = arm
+	# The confirm exists only while armed, and it carries the mode's OWN label
+	# so a player never presses a generic "Confirm" for an expansion.
+	var confirm := Button.new()
+	confirm.name = "confirm"
+	confirm.text = ExpandFlow.expand_label()
+	confirm.pressed.connect(_on_expand_confirm)
+	row.add_child(confirm)
+	_expand_confirm = confirm
+	if not armed:
+		confirm.visible = false
+	var cancel := Button.new()
+	cancel.name = "cancel"
+	cancel.text = "Cancel"
+	cancel.pressed.connect(_on_expand_cancel)
+	row.add_child(cancel)
+	if not armed:
+		cancel.visible = false
+	panel.add_child(row)
+	return {"ok": true, "error": ""}
+
+
+## Renders the expansion panel's committed controls (the action's enabled state
+## and its own unavailability label, the status line, and the readout) from the
+## live state. A no-op while no panel is built.
+func _refresh_expand_panel() -> void:
+	if _expand_arm is Button and is_instance_valid(_expand_arm):
+		var available := expand_selection_available()
+		(_expand_arm as Button).disabled = _expand_active or not available
+		(_expand_arm as Button).text = ExpandFlow.expand_label() if available \
+			else (ExpandFlow.expand_label() + " (unavailable)")
+	if _expand_confirm is Button and is_instance_valid(_expand_confirm):
+		(_expand_confirm as Button).visible = _expand_active
+	_set_expand_readout(ExpandFlow.readout_text(_expand_evaluation(
+		_expand_id if _expand_active
+			else int(expand_next().get("id", ExpandFlow.NO_EXPANSION))),
+		owned_expansions(), expand_schedule_summary()))
+
+
+## Writes the expansion readout line (no-op before a panel exists). The readout
+## renders for the SELECTED MAP whether or not an expansion is armed, so a
+## player sees the ledger without arming anything, and sees it update from
+## every authoritative response.
+func _set_expand_readout(text: String) -> void:
+	if _expand_readout != null and is_instance_valid(_expand_readout):
+		(_expand_readout as Label).text = text
+
+
+## Writes the expansion status line (no-op before a panel exists).
+func _set_expand_status(text: String) -> void:
+	if _expand_status != null and is_instance_valid(_expand_status):
+		(_expand_status as Label).text = text
+
+
+
+
+
 ## Shop button wiring: a press selects that entry.
 func _on_shop_pick(item_id: int) -> void:
 	pick_shop_item(item_id)
@@ -5755,6 +6806,20 @@ func _reset_view() -> void:
 	_collect_placement = null
 	_collect_reference = 0
 	_collect_readout = null
+	# The armed expansion drops with the rest of the view, in its own right
+	# (building-expand design D8): a rebuild never leaves a stale armed
+	# expansion behind, and it drops the armed id with it — that id is a
+	# property of the last committed ledger, so a fresh view of a fresh save
+	# re-derives the next purchasable entry from its own state.
+	_expand_active = false
+	_expand_id = ExpandFlow.NO_EXPANSION
+	_expand_readout = null
+	_expand_status = null
+	_expand_arm = null
+	_expand_confirm = null
+	if ui != null and ui.has_slot(SLOT_EXPAND) \
+			and ui.is_slot_visible(SLOT_EXPAND):
+		ui.set_slot_visible(SLOT_EXPAND, false)
 	if ui != null and ui.has_slot(SLOT_MOVE) \
 			and ui.is_slot_visible(SLOT_MOVE):
 		ui.set_slot_visible(SLOT_MOVE, false)
@@ -5802,17 +6867,20 @@ func _commit_selection(object: Variant) -> void:
 		object.set_selected(true)
 	# Design D8: the selection is what arms this surface, so a committed
 	# selection refreshes its `Move`, `Sell`, `Store`, `Upgrade`, `Build`, and
-	# `Collect` actions (and its construction and collection readouts). It is
-	# presentational only — the selection itself, its highlight, and the
-	# picker's routing are exactly as delivered, and arming still requires a
-	# separate press. An armed mode is never refreshed: it already names the
-	# placement it will act on, and `confirm_sell` / `confirm_store` /
-	# `confirm_upgrade` / `confirm_construction` / `confirm_collect` refuse a
-	# changed selection by name instead of silently re-targeting.
+	# `Collect` actions (and its construction and collection readouts) and the
+	# map-level expansion readout beside it. It is presentational only — the
+	# selection itself, its highlight, and the picker's routing are exactly as
+	# delivered, and arming still requires a separate press. An armed mode is
+	# never refreshed: it already names the placement it will act on, and
+	# `confirm_sell` / `confirm_store` / `confirm_upgrade` /
+	# `confirm_construction` / `confirm_collect` refuse a changed selection by
+	# name instead of silently re-targeting.
 	if not _move_active and not _sell_active and not _store_active \
 			and not _upgrade_active and not _construction_active \
-			and not _collect_active and view_state == STATE_BUILT:
+			and not _collect_active and not _expand_active \
+			and view_state == STATE_BUILT:
 		refresh_move_action()
+		refresh_expand_action()
 
 
 ## Isometric depth order with the documented deterministic tie-break:
@@ -5839,6 +6907,9 @@ func _maybe_start_capture() -> void:
 	if not build_ok:
 		return
 	_capture_started = true
+	if _expand_capture:
+		_capture_expand_and_quit()
+		return
 	if _collect_capture:
 		_capture_collect_and_quit()
 		return
@@ -6310,6 +7381,85 @@ func _capture_collect_and_quit() -> void:
 ## never leaves an open window or a misleading frame.
 func _collect_capture_fail(step: String, detail: String) -> void:
 	print("[town] collect-capture state=error step=%s detail=%s" % [
+		step, detail])
+	get_tree().quit(1)
+
+
+## Expand capture (building-expand, design D8): drives exactly one confirmed
+## intent through the same flow a player uses — select a map, arm the expansion
+## on the next purchasable entry, confirm — and then captures the town whose
+## expansion readout carries the AUTHORITATIVE ledger the response reported.
+## The target cell is a selected building only so the selection-driven surface
+## is live: an expansion names no placement, and the frame proves that by
+## showing a town whose 40 objects are untouched by the ledger's growth. Any
+## failed step prints an explicit marker and exits 1 instead of capturing a town
+## that never received the expansion.
+func _capture_expand_and_quit() -> void:
+	var object: Variant = _object_for_cell(EXPAND_INTENT_CELL)
+	if object == null:
+		_expand_capture_fail("select",
+			"no rendered object at the recorded cell (%d, %d)"
+			% [EXPAND_INTENT_CELL.x, EXPAND_INTENT_CELL.y])
+		return
+	var pressed: Dictionary = handle_pointer_press(
+		Iso.grid_to_screen(object.cell))
+	if not bool(pressed.get("ok", false)):
+		_expand_capture_fail("select", str(pressed.get("error", "")))
+		return
+	if selection() != object:
+		_expand_capture_fail("select",
+			"the press at (%d, %d) did not select the recorded building"
+			% [EXPAND_INTENT_CELL.x, EXPAND_INTENT_CELL.y])
+		return
+	var ledger_before: Array = owned_expansions()
+	if ledger_before != EXPAND_INTENT_OWNED:
+		_expand_capture_fail("select",
+			"the pre-expansion ledger is %s, not the corpus's %s"
+			% [JSON.stringify(ledger_before),
+				JSON.stringify(EXPAND_INTENT_OWNED)])
+		return
+	var armed: Dictionary = arm_expand()
+	if not bool(armed.get("ok", false)):
+		_expand_capture_fail("arm", str(armed.get("error", "")))
+		return
+	if int(armed.get("id", ExpandFlow.NO_EXPANSION)) != EXPAND_INTENT_ID:
+		_expand_capture_fail("arm",
+			"the armed expansion names id %d, not %d"
+			% [int(armed.get("id", ExpandFlow.NO_EXPANSION)),
+				EXPAND_INTENT_ID])
+		return
+	if (armed.get("debit", []) as Array) != EXPAND_INTENT_DEBIT:
+		_expand_capture_fail("arm",
+			"the derived debit is %s, not the fixture's %s"
+			% [JSON.stringify(armed.get("debit", [])),
+				JSON.stringify(EXPAND_INTENT_DEBIT)])
+		return
+	var confirmed: Dictionary = await confirm_expand()
+	if not bool(confirmed.get("ok", false)):
+		_expand_capture_fail("confirm", str(confirmed.get("error", "")))
+		return
+	if owned_expansions() != EXPAND_INTENT_OWNED_AFTER:
+		_expand_capture_fail("confirm",
+			"the applied ledger is %s, not the fixture's %s"
+			% [JSON.stringify(owned_expansions()),
+				JSON.stringify(EXPAND_INTENT_OWNED_AFTER)])
+		return
+	# The readout renders for the selected map, so the captured frame carries the
+	# authoritative ledger the response reported.
+	refresh_expand_action()
+	var typed: BootData.ExpandResult = confirmed.get("result")
+	var ledger: Array = typed.expansions_after
+	print("[town] expand-capture applied id=%d ledger=%s debit=%s objects=%d "
+		% [int(ledger[ledger.size() - 1]), JSON.stringify(ledger),
+			JSON.stringify(typed.debit), objects.size()]
+		+ "readout=%s" % expand_readout())
+	_capture_and_quit()
+
+
+## A named expand-capture failure: explicit marker + exit 1, so a failed flow
+## never leaves an open window or a misleading frame.
+func _expand_capture_fail(step: String, detail: String) -> void:
+	print("[town] expand-capture state=error step=%s detail=%s" % [
 		step, detail])
 	get_tree().quit(1)
 
@@ -8572,4 +9722,441 @@ func _collect_capture_record() -> Dictionary:
 		+ "double, not a parity oracle)"
 	record["parity_pointer"] = "real-execution parity is established " \
 		+ "by the fixture-replay tests and the verify-boot collect-live phase"
+	return record
+
+
+# ---------------------------------------------------------------------------
+# Expand evidence report (building-expand, design D8)
+# ---------------------------------------------------------------------------
+
+
+## The expand report output path from the user arguments:
+## `--expand-report=<path>` (relative paths resolve against the project
+## directory), the bare `--expand-report` flag's default evidence path, or ""
+## when absent.
+func _expand_report_path_arg() -> String:
+	for argument in OS.get_cmdline_user_args():
+		if argument == "--expand-report":
+			return Paths.project_dir().path_join(DEFAULT_EXPAND_REPORT_PATH)
+		if argument.begins_with("--expand-report="):
+			var value := argument.trim_prefix("--expand-report=")
+			if value.is_absolute_path():
+				return value
+			return Paths.project_dir().path_join(value)
+	return ""
+
+
+## Runs the expand report flow and quits with the documented exit code: 0 when
+## the deterministic report is written, 1 with an explicit marker naming the
+## first failed step (the collect report's pattern, one level down).
+func _write_expand_report(report_path: String) -> void:
+	var problem: String = await _expand_report_into(report_path)
+	if problem == "" and not FileAccess.file_exists(report_path):
+		problem = "[report] report file was not created at %s" % report_path
+	if problem != "":
+		print("[town] expand-report state=error message=", problem)
+		get_tree().quit(1)
+		return
+	print("[town] expand-report state=written path=", report_path)
+	get_tree().quit(0)
+
+
+## Computes the whole expand report (design D8): the bootstrap payload in hand
+## parses fail-closed (exactly one bootstrap request, no second config call), the
+## town builds from the committed save, the ledger and the committed schedule
+## are cross-checked against the executed fixture's own recorded intent, and the
+## flow a player uses is walked (select a map, arm, confirm against the fake
+## implementation), recording the intent, BOTH owned lists, the derived debit
+## with the committed schedule row it came from, the committed schedule's
+## summary, the placement and object counts (proving NO land, cell, or bound
+## changed), the request counts, the input digests, the projection-constants
+## pointer, the established-versus-derived provenance split as its own section,
+## the fake-capture pointer, and every required non-claim. Returns "" on
+## success or the first failure as an explicit message.
+##
+## Every number about a price is derived-provisional, exactly as the provenance
+## section records; the report's claim is a debit derived from the committed
+## schedule row the id names, never the price a coherent player pays. Nothing
+## here reads the wall clock for a decision: the ledger and the balances come
+## from the response, which is what makes the report byte-identical across
+## reruns.
+func _expand_report_into(report_path: String) -> String:
+	var registry: Variant = get_node_or_null("/root/ContentRegistry")
+	if registry == null:
+		return "[report] content registry is not registered"
+	if not bool(registry.is_loaded()):
+		var content: Dictionary = registry.load_content()
+		if not bool(content.get("ok", false)):
+			return "[report] content load failed: %s" % content.get("error", "")
+	if not bool(registry.assets_loaded()):
+		var assets: Dictionary = registry.load_asset_registry()
+		if not bool(assets.get("ok", false)):
+			return "[report] asset registry load failed: %s" % assets.get("error", "")
+	var api: Variant = get_node_or_null("/root/GameApi")
+	if api == null:
+		return "[report] GameApi is not registered"
+	var session: Variant = get_node_or_null("/root/Session")
+	if session == null:
+		return "[report] Session is not registered"
+	var sessions: Variant = await api.list_sessions()
+	if not bool(sessions.ok):
+		return "[report] save list failed: %s" % str(sessions.error_message)
+	if sessions.saves.size() == 0:
+		return "[report] save list carries no saves"
+	var pid := str(sessions.saves[0].id)
+	var boot: Variant = await api.get_bootstrap(pid)
+	if not bool(boot.ok):
+		return "[report] bootstrap failed: %s" % str(boot.error_message)
+	var player_info: Variant = boot.player_info
+	if player_info == null:
+		return "[report] bootstrap carried no player info"
+	var parsed: Dictionary = TownState.parse(player_info.raw, registry)
+	if not bool(parsed.get("ok", false)):
+		return "[report] town state rejected: %s" % parsed.get("error", "")
+	state = parsed["state"]
+	var built: Dictionary = build()
+	if not bool(built.get("ok", false)):
+		return "[report] town failed to build: %s" % built.get("error", "")
+	if objects.is_empty():
+		return "[report] town rendered no objects"
+	# The session the confirm needs: a real launch activates it during boot,
+	# while this headless report flow commits it here.
+	var summary := BootData.PlayerSummary.new()
+	summary.user_id = pid
+	summary.name = state.summary.name
+	summary.level = state.summary.level
+	summary.xp = state.summary.xp
+	var activation: Dictionary = session.activate(pid, summary)
+	if not bool(activation.get("ok", false)):
+		return "[report] session activation failed: %s" \
+			% activation.get("error", "")
+	# The committed schedule the client derives from and the service derives
+	# server-side: the SAME table, cross-checked against the committed fixture's
+	# recorded intent BEFORE anything is sent.
+	var schedule := expand_schedule()
+	var schedule_record := expand_schedule_summary()
+	if not bool(schedule_record.get("ok", false)):
+		return "[report] the committed expansion schedule does not resolve: %s" \
+			% str(schedule_record.get("error", ""))
+	if int(schedule_record.get("entries", 0)) != ExpandFlow.SCHEDULE_ENTRIES:
+		return ("[report] the committed schedule holds %d rows, not the "
+			% int(schedule_record.get("entries", 0))
+			+ "committed %d the flow mirrors" % ExpandFlow.SCHEDULE_ENTRIES)
+	if owned_expansions() != EXPAND_INTENT_OWNED:
+		return ("[report] the committed owned-expansions ledger is %s, not the "
+			% JSON.stringify(owned_expansions())
+			+ "corpus's %s" % JSON.stringify(EXPAND_INTENT_OWNED))
+	if owned_expansions_missing():
+		return "[report] the payload recorded no owned-expansions ledger, which " \
+			+ "the committed corpus does carry"
+	var priced := ExpandFlow.price_of(schedule, EXPAND_INTENT_ID)
+	if not bool(priced.get("ok", false)):
+		return "[report] the committed schedule prices no id %d: %s" % [
+			EXPAND_INTENT_ID, str(priced.get("error", ""))]
+	if (priced["row"] as Dictionary) != EXPAND_INTENT_PRICE:
+		return ("[report] the derived row is %s, not the fixture's %s"
+			% [JSON.stringify(priced["row"]),
+				JSON.stringify(EXPAND_INTENT_PRICE)])
+	var debit: Variant = ExpandFlow.debit_for(priced["row"])
+	if debit == null or debit != EXPAND_INTENT_DEBIT:
+		return ("[report] the derived debit is %s, not the fixture's %s"
+			% [JSON.stringify(debit), JSON.stringify(EXPAND_INTENT_DEBIT)])
+	var placements_before: int = state.placements.size()
+	var objects_before: int = objects.size()
+	var resources_before: Dictionary = _report_resources()
+	var storage_before: Dictionary = _storage_record()
+	var ledger_before: Array = owned_expansions()
+	var signature_before := _object_signature()
+	# The player's own path: press the recorded cell so the selection-driven
+	# surface is live, arm the next purchasable entry, and confirm. Nothing here
+	# bypasses the flow a player uses, and the expansion itself names NO
+	# placement: the selected building is only what makes a selection exist.
+	var object: Variant = _object_for_cell(EXPAND_INTENT_CELL)
+	if object == null:
+		return "[report] no rendered object at the recorded cell (%d, %d)" % [
+			EXPAND_INTENT_CELL.x, EXPAND_INTENT_CELL.y]
+	var pressed: Dictionary = handle_pointer_press(
+		Iso.grid_to_screen(object.cell))
+	if not bool(pressed.get("ok", false)):
+		return "[report] selection probe rejected: %s" % pressed.get("error", "")
+	if selection_legacy_id() != EXPAND_INTENT_ITEM:
+		return "[report] the press did not select item %d (selected %d)" \
+			% [EXPAND_INTENT_ITEM, selection_legacy_id()]
+	var armed: Dictionary = arm_expand()
+	if not bool(armed.get("ok", false)):
+		return "[report] expand arm rejected: %s" % armed.get("error", "")
+	if int(armed.get("id", ExpandFlow.NO_EXPANSION)) != EXPAND_INTENT_ID:
+		return "[report] the armed expansion names id %d, not %d" \
+			% [int(armed.get("id", ExpandFlow.NO_EXPANSION)),
+				EXPAND_INTENT_ID]
+	if (armed.get("debit", []) as Array) != EXPAND_INTENT_DEBIT:
+		return ("[report] the client's derived debit is %s, not the executed "
+			% JSON.stringify(armed.get("debit", []))
+			+ "fixture's %s" % JSON.stringify(EXPAND_INTENT_DEBIT))
+	var confirmed: Dictionary = await confirm_expand()
+	if not bool(confirmed.get("ok", false)):
+		return "[report] expand confirm failed: %s" % confirmed.get("error", "")
+	if int(api.expand_requests) != 1:
+		return "[report] the expansion issued %d intents, not exactly one" \
+			% int(api.expand_requests)
+	var response: Variant = confirmed.get("result")
+	if not (response is BootData.ExpandResult):
+		return "[report] the expand confirm carried no typed result"
+	var typed: BootData.ExpandResult = response
+	if typed.resources == null or typed.price == null:
+		return "[report] the expand response carried no price or resources"
+	# A ledger grows by one entry; NOTHING ELSE may change. This is the land-gap
+	# assertion in its strongest available form: an expansion adds no placement,
+	# moves no cell, and enlarges no grid, so both counts and the whole draw
+	# order must be byte-identical.
+	if state.placements.size() != placements_before:
+		return "[report] an expansion changed the placement count (before=%d " \
+			% placements_before + "after=%d)" % state.placements.size()
+	if objects.size() != objects_before:
+		return "[report] an expansion changed the object count (before=%d " \
+			% objects_before + "after=%d)" % objects.size()
+	if _object_signature() != signature_before:
+		return "[report] an expansion changed the committed draw order or any " \
+			+ "rendered cell (design D4: no land, grid, cell, or " \
+			+ "placement-bound effect is claimed or implemented)"
+	if owned_expansions() != EXPAND_INTENT_OWNED_AFTER:
+		return ("[report] the applied ledger is %s, not the executed fixture's %s"
+			% [JSON.stringify(owned_expansions()),
+				JSON.stringify(EXPAND_INTENT_OWNED_AFTER)])
+	# The endpoint's OWN two-part post-execution proof, asserted here on the
+	# typed response the client applied (design D5): the ledger grew by exactly
+	# one entry equal to the sent id AT THE END with every existing entry
+	# unchanged and in order, AND every stored resource changed by exactly the
+	# derived debit.
+	if (typed.expansions_before as Array) != ledger_before:
+		return ("[report] the response's pre-execution ledger is %s, not the "
+			% JSON.stringify(typed.expansions_before)
+			+ "client's own %s" % JSON.stringify(ledger_before))
+	if (typed.expansions_after as Array) != EXPAND_INTENT_OWNED_AFTER:
+		return ("[report] the response's post-execution ledger is %s, not the "
+			% JSON.stringify(typed.expansions_after)
+			+ "documented %s" % JSON.stringify(EXPAND_INTENT_OWNED_AFTER))
+	var expected: Variant = _expand_expected_resources(resources_before,
+		typed.debit)
+	if expected == null:
+		return "[report] the response's debit is not the documented vector"
+	for key: String in expected:
+		if int(typed.resources.get(key)) != int(expected[key]):
+			return ("[report] the response's %s is %d, not the derived %d "
+				% [key, int(typed.resources.get(key)), int(expected[key])]
+				+ "(the endpoint's value-level post-execution proof)")
+	refresh_expand_action()
+	return _write_report_file(report_path, {
+		"schema": "expand-report-v1",
+		"bootstrap_requests": int(api.bootstrap_requests),
+		"expand_requests": int(api.expand_requests),
+		"intent": {
+			"user_id": pid,
+			"expansion_id": EXPAND_INTENT_ID,
+			"sent_by_the_client": ["expansion_id"],
+			"note": "the intent carries the save id and the expansion id and "
+				+ "nothing else: no amount, no resource, no price, no "
+				+ "requirement flag, and no resource delta reach the service",
+		},
+		"owned_expansions": {
+			"before": ledger_before,
+			"after": owned_expansions(),
+			"response_before": (typed.expansions_before as Array).duplicate(),
+			"response_after": (typed.expansions_after as Array).duplicate(),
+			"in_state_matches_response": (owned_expansions()
+				== (typed.expansions_after as Array)),
+			"appended_at_the_end": int(typed.expansions_after[
+				(typed.expansions_after as Array).size() - 1])
+				== EXPAND_INTENT_ID,
+			"existing_entries_unchanged_and_in_order": _expand_ledger_prefix(
+				ledger_before, typed.expansions_after),
+			"never_reordered_never_deduplicated": true,
+			"matched_by_the_executed_fixture": (owned_expansions()
+				== EXPAND_INTENT_OWNED_AFTER),
+			"source": "the typed state's own list, replaced by the response's "
+				+ "expansions_after; the client never appends an id itself",
+		},
+		"derived_debit": {
+			"vector": typed.debit,
+			"vector_shape": "[unknown, xp, gold, wood, oil, steel, cash, mana]",
+			"direction": "a DEBIT: every entry is 0 or negative",
+			"always_zero_slots": (BootData.EXPAND_ALWAYS_ZERO_SLOTS
+				as Array).duplicate(),
+			"as_text": ExpandFlow.debit_text(typed.debit),
+			"matched_by_the_executed_fixture": (typed.debit
+				== EXPAND_INTENT_DEBIT),
+			"derivation_status": "derived-provisional (D1/D2/D3/D6)",
+			"note": "the debit's SIGN and SHAPE are derived and never observed "
+				+ "from the Flash client: that a price is a debit, that the "
+				+ "schedule's gold-named field is negated into the gold slot and "
+				+ "its cash field into the cash slot, and that the six slots no "
+				+ "expansion price names stay zero. The GOLD NAMING itself is "
+				+ "established by the committed client assets expansion_gold.jpg "
+				+ "and expansion_cash.jpg, and the slot numbers come from the "
+				+ "server's own resource ordering",
+		},
+		"committed_schedule_row": {
+			"expansion_id": EXPAND_INTENT_ID,
+			"row": {
+				"coins": int(typed.price.coins),
+				"cash": int(typed.price.cash),
+				"neighbors": int(typed.price.neighbors),
+				"inventory_qte": int(typed.price.inventory_qte),
+			},
+			"carried_verbatim": true,
+			"source": "the normalized content package's expansion_prices "
+				+ "domain, resolved client-side for the readout and derived "
+				+ "again server-side by the service",
+			"sent_by_the_client": false,
+		},
+		"committed_schedule": {
+			"domain": EXPAND_SCHEDULE_DOMAIN,
+			"entries": int(schedule_record.get("entries", 0)),
+			"addressable_id_range": [int(schedule_record.get("first_id", 0)),
+				int(schedule_record.get("last_id", 0))],
+			"indexing": "positional: the INDEX is the expansion id; the "
+				+ "committed table records no stable id (D1, derived)",
+			"free_index_range": [int(schedule_record.get("free_first_id", 0)),
+				int(schedule_record.get("free_last_id", 0))],
+			"free_rows": int(schedule_record.get("free", 0)),
+			"purchasable_rows": int(schedule_record.get("purchasable", 0)),
+			"requirement_blocked_rows": int(schedule_record.get(
+				"requirement_blocked", 0)),
+			"only_purchasable_rows_are_the_free_ones":
+				int(schedule_record.get("purchasable", 0))
+				== int(schedule_record.get("free", 0)),
+			"per_field_saturation_indexes": (schedule_record.get(
+				"saturation", {}) as Dictionary).duplicate(),
+			"note": "94 of the 98 committed rows record a positive neighbors or "
+				+ "inventory_qte requirement, and nothing this stack can read "
+				+ "evaluates either, so the only purchasable entries in the "
+				+ "whole table are the free indexes 0..3 (D3, derived). EVERY id "
+				+ "the corpus owns (35, 36, 45, 46) sits in the refused set, so "
+				+ "the delivered transaction uses a zero-cost committed row and "
+				+ "no balance moves at all",
+		},
+		"land_effect": {
+			"claimed": false,
+			"implemented": false,
+			"status": "a KNOWN EVIDENCE GAP bounding visual land growth",
+			"committed_evidence_that_establishes_the_vocabulary":
+				"an expansion is a purchasable tile bought through a popup, "
+				+ "priced in gold and cash (the SWF symbols PopupExpandMC and "
+				+ "btnBuyExpandTileMC, expansion.png, expansion_gold.jpg, "
+				+ "expansion_cash.jpg)",
+			"what_the_evidence_cannot_establish": "the tile -> cell geometry: "
+				+ "the committed SWF inspection is symbols-and-tags only and its "
+				+ "own scope statement disclaims timeline semantics, script "
+				+ "behavior, and rendering",
+			"closing_it_requires": "new evidence (an extracted geometry table, "
+				+ "a rendered reference, or an authoritative spec), never a "
+				+ "derivation",
+		},
+		"counts": {
+			"placements_before": placements_before,
+			"placements_after": state.placements.size(),
+			"objects_before": objects_before,
+			"objects_after": objects.size(),
+			"draw_order_unchanged": _object_signature() == signature_before,
+			"note": "an expansion writes an int into a list and nothing else, so "
+				+ "no placement, cell, footprint, depth position, or placement "
+				+ "bound may change",
+		},
+		"resources": {
+			"before": resources_before,
+			"after": _report_resources(),
+			"movement": _expand_movement(resources_before,
+				_report_resources()),
+			"source_of_truth": "the response's own resources; the client's "
+				+ "derived debit is recorded, never applied (the response wins "
+				+ "even where the two disagree)",
+		},
+		"storage": {
+			"before": storage_before,
+			"after": _storage_record(),
+			"touched": false,
+		},
+		"inputs": {
+			"save_list_fixture": _digest_record(REPORT_SAVE_LIST),
+			"bootstrap_fixture": _digest_record(REPORT_BOOTSTRAP),
+			"expand_request": _digest_record(REPORT_EXPAND_REQUEST),
+			"expand_response": _digest_record(REPORT_EXPAND_RESPONSE),
+			"expand_after": _digest_record(REPORT_EXPAND_AFTER),
+			"terrain": _digest_record(_terrain_runtime(registry)),
+		},
+		"constants": _constants_record(),
+		"provenance": EXPAND_PROVENANCE,
+		"capture": _expand_capture_record(),
+		"non_claims": EXPAND_NON_CLAIMS,
+	})
+
+
+## The stored resource values a correct application of `debit` must produce,
+## keyed by the `BootData.Resources` FIELD names the response carries, or null
+## when the debit is not the documented eight-slot vector. This is the CLIENT's
+## mirror of the endpoint's value-level post-execution proof: the report asserts
+## it rather than trusting the response (design D5/D8). The HUD's own name for
+## the gold slot is `coins`, so `before` is translated here rather than read
+## with the wrong key.
+func _expand_expected_resources(before: Dictionary, debit: Variant) -> Variant:
+	if not (debit is Array) or (debit as Array).size() \
+			!= BootData.EXPAND_VECTOR_SLOTS:
+		return null
+	var vector: Array = debit as Array
+	var expected := {}
+	# `typed resource name -> (hud snapshot key, vector slot)`.
+	for entry in [["gold", "coins", 2], ["wood", "wood", 3], ["oil", "oil", 4],
+			["steel", "steel", 5], ["cash", "cash", 6], ["mana", "mana", 7],
+			["xp", "xp", 1]]:
+		var name := str(entry[0])
+		var current: int = int(before.get(str(entry[1]), 0))
+		expected[name] = maxi(current + int(vector[int(entry[2])]), 0)
+	return expected
+
+
+## The per-resource movement between two `_report_resources()` snapshots, as the
+## report records it: the delta the applied debit produced, never a recomputed
+## price.
+func _expand_movement(before: Dictionary, after: Dictionary) -> Dictionary:
+	var movement := {}
+	for key: String in after:
+		movement[key] = int(after[key]) - int(before.get(key, 0))
+	return movement
+
+
+## True when the response's post-execution ledger begins with exactly the
+## client's own pre-execution ledger, unchanged and in order — the structural
+## half of the endpoint's post-execution proof, restated as a boolean.
+func _expand_ledger_prefix(before: Array, after: Variant) -> bool:
+	if not (after is Array):
+		return false
+	if (after as Array).size() != before.size() + 1:
+		return false
+	for index in range(before.size()):
+		if int((after as Array)[index]) != int(before[index]):
+			return false
+	return true
+
+
+## The committed draw order as one `item@cell` string per object, so the report
+## can prove an expansion changed no object's identity and no cell.
+func _object_signature() -> Array:
+	var rows: Array = []
+	for object: Variant in objects:
+		if object == null:
+			continue
+		rows.append("%d@%d,%d" % [int(object.legacy_id), int(object.cell.x),
+			int(object.cell.y)])
+	return rows
+
+
+## The fake-capture pointer (building-expand design D8): the committed windowed
+## capture with its digest plus the plain statement of what it proves — so no
+## reader can mistake the screenshot for executed-legacy proof.
+func _expand_capture_record() -> Dictionary:
+	var record := _digest_record(REPORT_CAPTURE_EXPAND)
+	record["implementation"] = "fake GameApi (a deterministic test " \
+		+ "double, not a parity oracle)"
+	record["parity_pointer"] = "real-execution parity is established " \
+		+ "by the fixture-replay tests and the verify-boot expand-live phase"
 	return record

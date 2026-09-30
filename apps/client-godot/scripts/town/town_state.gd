@@ -65,6 +65,34 @@ extends RefCounted
 ## Whether a collection may be executed on a row that also carries
 ## construction state is NOT decided here — that is the collection flow's
 ## refusal, in the same two layers the delivered construction line owns.
+##
+## Owned expansions (building-expand task 4.1, design D1/D5): the map record's
+## `expansions` ledger — the ints an `expand` intent appends to and the ONLY
+## state the branch writes — is parsed into `State.owned_expansions` through
+## the ONE shared parser, so the flow reads the authoritative list rather than
+## tracking its own. The rules mirror the storage mapping's exactly, because
+## they face the same asymmetry (a field that may legitimately be absent
+## versus one that may legitimately be malformed):
+##   * the field absent -> recorded in `missing` under
+##     `EXPANSIONS_MISSING_KEY` with an EMPTY list, never a fabricated one, and
+##     the readout names the absence instead of claiming a player owns nothing;
+##   * present but not an array, or an entry that is not an integer -> the save
+##     is REJECTED naming the offending field or entry. A ledger this contract
+##     cannot enumerate is not a ledger an expansion intent can be checked
+##     against, and coercing an entry would invent a fact;
+##   * the list is carried VERBATIM: never reordered, never deduplicated,
+##     never normalized, and never range-checked. The committed corpus's own
+##     `[35, 36, 45, 46]` is incoherent under the chosen schedule (a level-1
+##     fresh player owning four saturated-price expansions) and is tolerated
+##     exactly as recorded, because the legacy server neither orders nor
+##     deduplicates the ledger — an executed probe had a duplicate `expand(35)`
+##     answer success.
+##
+## **No land, grid, cell, or placement-bound effect is read, derived, or
+## claimed here.** No committed source maps an expansion id to land geometry;
+## the tile-to-cell mapping is a recorded known evidence gap, so nothing in the
+## typed state grows, and the placement bounds the delivered placement line
+## enforces are untouched.
 
 ## Content domains searched, in order, for a placed legacy id (the
 ## normalized package splits items into buildings/units/specials; ids do
@@ -94,6 +122,14 @@ const SUMMARY_FIELDS := {
 ## absent is named, never defaulted to an empty inventory).
 const STORAGE_FIELD := "map.store"
 const STORAGE_MISSING_KEY := "storage"
+## The owned-expansions field of the default map and the key it is recorded
+## under in `State.missing` when the payload carries no ledger at all
+## (building-expand design D1/D5: absent is named, never defaulted to a
+## player who owns nothing). The field lives on the MAP record — the map
+## carries no `map_sizes`, and `map_sizes` lives in `playerInfo`, so neither is
+## consulted here.
+const EXPANSIONS_FIELD := "map.expansions"
+const EXPANSIONS_MISSING_KEY := "owned_expansions"
 
 
 ## The addressable-index sentinel: a placement whose legacy map key is not
@@ -207,6 +243,13 @@ class State:
 	## field is recorded in `missing` under `STORAGE_MISSING_KEY` instead of
 	## being defaulted here (design D7).
 	var storage: Dictionary = {}
+	## The player's owned-expansions ledger exactly as the save holds it:
+	## integer ids in the save's OWN order, never reordered, deduplicated, or
+	## normalized, and never range-checked (building-expand design D1/D5).
+	## Empty ONLY when the payload carried no ledger object at all; an absent
+	## field is recorded in `missing` under `EXPANSIONS_MISSING_KEY` instead of
+	## being defaulted here, exactly as the storage mapping does.
+	var owned_expansions: Array = []
 	## Displayed field keys the payload did not carry (HUD names them).
 	var missing: Array = []
 	## Distinct placed legacy ids ContentRegistry could not resolve.
@@ -241,6 +284,13 @@ static func parse(payload: Variant, registry: RegistryScript) -> Dictionary:
 	var storage: Dictionary = _storage_of(map)
 	if not bool(storage.get("ok", false)):
 		return reject.call(str(storage.get("error", "")))
+	# The owned-expansions ledger (building-expand design D1/D5): absent is
+	# named in `missing`, never defaulted to a player who owns nothing; a
+	# present-but-non-array field or a non-integer entry REJECTS the save
+	# naming the offender, exactly as the storage mapping does.
+	var expansions: Dictionary = _expansions_of(map)
+	if not bool(expansions.get("ok", false)):
+		return reject.call(str(expansions.get("error", "")))
 
 	var state := State.new()
 	# Resource/summary lookup roots: the extracted default map (root `map`
@@ -314,6 +364,9 @@ static func parse(payload: Variant, registry: RegistryScript) -> Dictionary:
 	state.storage = storage["storage"]
 	if not bool(storage["present"]):
 		state.missing.append(STORAGE_MISSING_KEY)
+	state.owned_expansions = expansions["expansions"]
+	if not bool(expansions["present"]):
+		state.missing.append(EXPANSIONS_MISSING_KEY)
 	for hud_key in RESOURCE_FIELDS:
 		var source: String = RESOURCE_FIELDS[hud_key]
 		var cell_value: Variant = _payload_value(values, source)
@@ -384,6 +437,60 @@ static func _storage_of(map: Variant) -> Dictionary:
 	if not (map is Dictionary):
 		return _storage_reject("field '%s' has no default map" % STORAGE_FIELD)
 	return storage_of((map as Dictionary).get("store"))
+
+
+## The player's owned-expansions ledger as the pure flow helpers read it:
+## `{ok, present, expansions, error}`, where `expansions` is an `Array` of
+## integer ids in the save's OWN order (building-expand design D1/D5). The
+## public form of `_expansions_of`, so the readout, the refusal rules, the
+## shared parse, and the apply that takes the AUTHORITATIVE post-execution
+## ledger off an expand response all consume ONE rule set — a response can
+## never be read with different rules than the payload it replaces, exactly
+## the one-storage-rule claim the purchase and store lines make.
+##
+## Rules (fail-closed, nothing guessed):
+##   * the field absent -> `present: false` with an EMPTY list: the state
+##     records the key in `missing` and the readout names it, rather than
+##     presenting "this player owns no expansions" as fact;
+##   * present but not an array, or an entry that is not an integer -> `{ok:
+##     false}` with an error naming the offending field or entry;
+##   * the list is carried VERBATIM: no reordering, no deduplication, no
+##     normalization, and NO range check against the committed schedule. An id
+##     the schedule does not price is a real ledger entry (the committed corpus
+##     records four, `35, 36, 45, 46`, and every one of them is inside the
+##     schedule while the surrounding game state is incoherent under it), and
+##     the flow's own refusal rules — not this parser — decide what may be
+##     bought.
+static func expansions_of(value: Variant) -> Dictionary:
+	if value == null:
+		return {"ok": true, "present": false, "expansions": [], "error": ""}
+	if not (value is Array):
+		return _expansions_reject("field '%s' is not an array"
+			% EXPANSIONS_FIELD)
+	var ids: Array = []
+	for index in range((value as Array).size()):
+		var entry: Variant = _integer((value as Array)[index])
+		if entry == null:
+			return _expansions_reject(
+				"owned-expansions entry %d is not an integer" % index)
+		ids.append(int(entry))
+	return {"ok": true, "present": true, "expansions": ids, "error": ""}
+
+
+## The default map's owned-expansions field through `expansions_of()` (the
+## payload's own entry point; the expand apply calls `expansions_of()`
+## directly).
+static func _expansions_of(map: Variant) -> Dictionary:
+	if not (map is Dictionary):
+		return _expansions_reject("field '%s' has no default map"
+			% EXPANSIONS_FIELD)
+	return expansions_of((map as Dictionary).get("expansions"))
+
+
+## The owned-expansions rejection envelope: names the offending field or entry.
+static func _expansions_reject(message: String) -> Dictionary:
+	return {"ok": false, "present": true, "expansions": [],
+		"error": "[town] parse rejected: " + message}
 
 
 ## The resolved content name for one legacy item id, or "" when the content
