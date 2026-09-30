@@ -13,7 +13,7 @@ derivation — and the repository already holds everything it needs:
 - **`packages/game-content/normalized/units.json` is a committed, manifest-verified
   output** of the M3 content normalization: a bare list of **429 rows**, each with
   `kind: "unit"`, `type: "u"`, a **distinct string `legacy_id`** spanning `923`..`1431`,
-  53 normalized fields (51 present on every row plus `breeding_order` and
+  **58 normalized fields** (56 present on every row plus `breeding_order` and
   `sm_training_time` on 300 each), each row carrying its own `content_version`,
   `source_file`, and `source_layer`.
 - **`packages/game-content/schemas/unit.schema.json` already defines the contract** for

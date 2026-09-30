@@ -9,6 +9,9 @@ extends "res://tests/test_base.gd"
 ##   * the default load verifies all 22 manifest outputs (byte count +
 ##     SHA-256 before parse) and indexes them by `legacy_id`;
 ##   * lookups return exact stored entries or explicit not-found results;
+##   * the public id enumeration reports the committed index order (not a
+##     collation of the digit strings), agrees with `count()`, and reports an
+##     unknown domain as not-found;
 ##   * the content package's directory digest is identical before and after.
 ##
 ## Runs headless as part of `verify.ps1`.
@@ -21,6 +24,27 @@ const EXPECTED_COUNTS := {
 	"images": 607,
 	"sounds": 139,
 	"globals": 105,
+}
+## The first `legacy_id` of each enumerated domain in the **committed index
+## order** — the order the committed file lists its rows, not a collation of the
+## identifier strings. `units` is the discriminating case: its committed first id
+## is `923`, while a lexicographic sort of the same digit strings would begin
+## `1001`, so the two orders are unambiguous.
+const FIRST_ID := {
+	"buildings": "1",
+	"units": "923",
+	"levels": "0",
+	"sounds": "1",
+}
+## The manifest-verified entry totals of the four domains this suite enumerates.
+## `levels` is not in `EXPECTED_COUNTS` (which covers the domains the other
+## checks walk), so the enumeration carries its own committed totals rather than
+## borrowing a table that does not list every enumerated domain.
+const ENUMERATED_COUNTS := {
+	"buildings": 470,
+	"units": 429,
+	"levels": 100,
+	"sounds": 139,
 }
 
 
@@ -46,6 +70,7 @@ func run_scenario() -> void:
 
 	_check_default_load(registry, package_dir)
 	_check_lookups(registry, package_dir)
+	_check_enumeration(registry, package_dir)
 
 	var after := Paths.directory_digest(package_dir)
 	check_eq(after.get("sha256", ""), before.get("sha256", ""),
@@ -267,6 +292,60 @@ func _check_lookups(registry: Variant, package_dir: String) -> void:
 		"an unknown domain reports not-found")
 	check(str(no_domain.get("error", "")).contains("unknown domain"),
 		"the unknown-domain error says the domain is absent")
+
+
+## The public id enumeration this change added (spec "Domain indexing and
+## lookup"): a consumer enumerates the **verified** index instead of re-reading
+## the committed file, so the count agrees with `count()`, the order is the
+## committed index order rather than a collation of the digit strings, every id
+## resolves through `get_entry`, and an unknown domain reports not-found with an
+## empty list rather than a guessed empty enumeration.
+func _check_enumeration(registry: Variant, package_dir: String) -> void:
+	if registry == null or not registry.is_loaded():
+		return
+	for domain: String in ["buildings", "units", "levels", "sounds"]:
+		var result: Dictionary = registry.legacy_ids(domain)
+		check_eq(bool(result.get("found", false)), true,
+			"legacy_ids(%s) resolves a loaded domain" % domain)
+		var ids: Variant = result.get("ids")
+		check(ids is Array, "legacy_ids(%s) returns an array" % domain)
+		if not (ids is Array):
+			continue
+		var listed: Array = ids
+		check_eq(listed.size(), registry.count(domain),
+			"legacy_ids(%s) count agrees with count()" % domain)
+		check_eq(listed.size(), ENUMERATED_COUNTS[domain],
+			"legacy_ids(%s) matches the manifest-verified entry total" % domain)
+		# The committed index order, not a lexicographic sort of the digit
+		# strings: the first id of `units` is the file's first row, and a
+		# collation would interleave ids ("1001" before "923").
+		check_eq(str(listed[0]), FIRST_ID[domain],
+			"legacy_ids(%s) reports the committed index order, not a collation"
+			% domain)
+		var distinct := {}
+		for legacy_id: Variant in listed:
+			distinct[str(legacy_id)] = true
+		check_eq(distinct.size(), listed.size(),
+			"legacy_ids(%s) yields only distinct ids" % domain)
+		# Every enumerated id resolves through the public lookup.
+		var resolves := true
+		for legacy_id: Variant in listed:
+			var found: Dictionary = registry.get_entry(domain, str(legacy_id))
+			if not bool(found.get("found", false)):
+				resolves = false
+				break
+		check(resolves, "every legacy_ids(%s) entry resolves via get_entry" % domain)
+		check(str(result.get("file", "")).ends_with(".json"),
+			"legacy_ids(%s) names the verified output file" % domain)
+
+	var absent: Dictionary = registry.legacy_ids("no_such_domain")
+	check_eq(bool(absent.get("found", true)), false,
+		"legacy_ids() reports not-found for an unknown domain, not an empty list")
+	check(str(absent.get("error", "")).contains("unknown domain"),
+		"the unknown-domain enumeration error says the domain is absent")
+	var absent_ids: Variant = absent.get("ids")
+	check(absent_ids is Array and (absent_ids as Array).is_empty(),
+		"the not-found enumeration carries an empty id list")
 
 
 # ---------------------------------------------------------------------------
