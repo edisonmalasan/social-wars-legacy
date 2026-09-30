@@ -28,7 +28,7 @@ The repository SHALL provide a Compatibility API v0 service that serves modern J
 - **THEN** it listens on `127.0.0.1` at the documented port and the documented interface is the only one clients are told to use
 
 ### Requirement: GameApi abstraction
-The Godot client SHALL depend on a `GameApi` autoload for every server interaction, exposing typed `list_sessions()`, `get_bootstrap()`, `place_building()`, `purchase_item()`, `move_building()`, `sell_building()`, `store_building()`, `upgrade_building()`, `build_construction()`, `collect_income()`, and `expand_town()` operations with two interchangeable implementations — `LegacyV0Api`, speaking JSON over loopback HTTP to Compatibility API v0, and `FakeApi`, serving committed fixture data and applying the documented in-memory operation semantics with no process, server, or socket — and no boot or presentation code SHALL reference `command.php`, AMF, FlashVars, legacy form encoding, legacy URLs, or legacy command names.
+The Godot client SHALL depend on a `GameApi` autoload for every server interaction, exposing typed `list_sessions()`, `get_bootstrap()`, `place_building()`, `purchase_item()`, `move_building()`, `sell_building()`, `store_building()`, `upgrade_building()`, `build_construction()`, `collect_income()`, and `expand_town()` operations projecting every resource through one canonical mapping that names each resource exactly as the legacy server names it — the primary currency as `gold` and never `coins`, and the experience counter grouped with the player's summary — with two interchangeable implementations — `LegacyV0Api`, speaking JSON over loopback HTTP to Compatibility API v0, and `FakeApi`, serving committed fixture data and applying the documented in-memory operation semantics with no process, server, or socket — and no boot or presentation code SHALL reference `command.php`, AMF, FlashVars, legacy form encoding, legacy URLs, or legacy command names.
 
 #### Scenario: Boot offline with the fake implementation
 - **WHEN** headless tests run with the fake implementation selected
@@ -77,6 +77,10 @@ The Godot client SHALL depend on a `GameApi` autoload for every server interacti
 #### Scenario: Expand through either implementation
 - **WHEN** headless tests run the expansion flow with the fake implementation selected, and a live run expands against a running Compatibility API v0
 - **THEN** both implementations yield the same typed expansion result shapes consumed identically by the flow, the response's owned list and derived debit are applied rather than the client's own arithmetic, and the scope test still finds no forbidden legacy transport token outside the legacy-v0 implementation
+
+#### Scenario: Project every resource under its server name
+- **WHEN** headless tests render the resource readout against a payload produced by either implementation
+- **THEN** every resource the legacy resource application writes renders its real stored value under the name the service produces, no row renders an absent-field indicator for a resource the service does produce, a genuinely absent resource still renders the explicit absent-field indicator, and the scope test still finds no forbidden legacy transport token outside the legacy-v0 implementation
 
 ### Requirement: Boot scene
 The project SHALL provide a boot scene as the main scene that initializes the session, requests bootstrap, and displays engine version, connection state, and a player summary derived from the response; an unreachable endpoint or a structured API error SHALL surface as an explicit error state naming the failure, never as a blank screen or a partial success.
