@@ -87,7 +87,13 @@ limit belongs to Server v1 / M13, where authoritative validation lives.
 
 - `training_time > 0`: **130 of 470 buildings**, and **0 of 429 units**. Units
   carry no training time; the producer does.
-- `unit_capacity > 0`: **48 of 470 buildings**, and **0 of 429 units**.
+- `unit_capacity > 0`: **48 of 470 buildings**, and **5 of 429 units** —
+  `1013` Truck 4, `1018` Zodiac 4, `1019` Ship 6, `1032` Truck 3 6, and `1035`
+  Truck II 6, with the stored `config/main.json` agreeing. *(Corrected: this
+  record first said "0 of 429", which was asserted rather than measured —
+  the original probe iterated only buildings for this gate.)* Either way the
+  decision below is unaffected: the field has **no** legacy consumer, so
+  **no capacity rule is enforced regardless of its committed value.**
 - **Of the 130 training producers, none is garrison-capable** (all have capacity
   0). The two sets do not intersect.
 
@@ -160,8 +166,10 @@ Measured facts:
 - **0** rows are units.
 - **0** rows have a non-empty slot 5 — no garrison exists anywhere.
 - **Every** row's `attr` bag is `{}`. `nu`, `ui`, and `ts` appear on **no** row.
-- **3** placed rows are garrison-capable (905, 930, 931) — but all three are
-  `collect: 20` decorations, not factories.
+- **9** placed rows across **3** distinct item ids are garrison-capable
+  (905x1, 930x6, 931x2) — but every one is a `collect: 20` decoration, not a
+  factory. *(Corrected: this record first said "3 placed rows", which counted
+  distinct ids rather than rows.)*
 - **1** placed row is a training producer: **id 26, Command Center, key 1**, with
   `training_time` 5, `min_level` 1, row `[26, 51, 41, 0, 0, [], {}, 1]`.
 - `privateState.deadHeroes` is `{}` and `privateState.boughtUnits` is `[]`.
@@ -174,7 +182,7 @@ Measured facts:
 | Operation | Exercisable against the corpus? | Why |
 | --- | --- | --- |
 | `push_queue_unit` / `pop_queue_unit` / `push_queue_unit2` | **Yes** | The Command Center at key 1 is a real placed training producer with an empty `attr` bag. |
-| `push_unit` (garrison) | **Container only** | Three placed rows have a slot-5 list that would accept a row, but there is **no unit row to move**. |
+| `push_unit` (garrison) | **Container only** | Nine placed rows (3 distinct ids) have a slot-5 list that would accept a row, but there is **no unit row to move**. |
 | `pop_unit` (ungarrison) | **No** | No row has a non-empty slot 5. |
 | `push_dead_unit` / `resurrect_hero` | **No** | Requires a unit row on the player team; none exists. |
 | Observing any unit instance | **No** | There is no unit row anywhere in the corpus. |

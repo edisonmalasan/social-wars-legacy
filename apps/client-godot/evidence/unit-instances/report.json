@@ -1,0 +1,382 @@
+{
+	"boundary": {
+		"acquisition": "none claimed: in_store is 0 for all 429 committed units, and the committed unit sources are the offer-pack and darts systems, which are later milestones",
+		"definition": "UnitDefinition is committed content: typed, read-only, resolved through the content registry, and carrying no player state",
+		"endpoint": "none: an instance is read from a save already in hand, so no compatibility route, response field, error code, or persistence behaviour was added and no client intent is sent to obtain one",
+		"fixture": "none captured and none fabricated: the committed corpus has no unit row, so capturing one would mean fabricating a player state",
+		"instance": "UnitInstance is a distinct player-owned type that WRAPS a legacy map row together with its resolved definition; it does not extend or copy the definition, so no instance field can migrate into one and the boundary is structural rather than conventional",
+		"next_unit_fixture": "the production line, because the Command Center at map key 1 is a real placed training producer (training_time 5, min_level 1) and makes the queue genuinely exercisable against the corpus",
+		"read_only": "neither module declares a setter, a mutating method, or a writable public field, and the suite asserts that reading an instance through every accessor changes neither its row nor its definition and that a caller writing into the handed-out attribute bag cannot reach the save",
+		"undelivered_lines": [
+			"queues",
+			"production",
+			"collection",
+			"movement",
+			"animations",
+			"basic behaviors",
+			"acquisition",
+			"combat",
+			"targeting"
+		],
+		"unread_private_state": [
+			{
+				"field": "privateState.boughtUnits",
+				"owned_by": "the delivered building-purchase and building-store lines",
+				"why": "a bought-unit ledger is the `buy` command's record, not a placement: reading it here would restate another line's post-execution proof"
+			},
+			{
+				"field": "maps[n].store",
+				"owned_by": "the delivered building-store line",
+				"why": "player storage is a separate per-map dictionary (engine.py:70-75), NOT the row's fifth slot, and this projection is about instances"
+			},
+			{
+				"field": "maps[n].resources",
+				"owned_by": "the delivered building-collect and building-expand lines",
+				"why": "no resource or income rule exists in this capability"
+			}
+		]
+	},
+	"classification": {
+		"building_type": "b",
+		"classified_types": [
+			"b",
+			"u"
+		],
+		"committed_type_distribution": {
+			"buildings/b": 470,
+			"units/u": 429
+		},
+		"domains_required": [
+			"units",
+			"buildings"
+		],
+		"domains_required_note": "the projection needs BOTH domains: the units domain to type an instance and the buildings domain to recognise and report a non-unit row with no coercion, so a registry missing either fails closed",
+		"gate": "the committed item type, read from the resolved content entry",
+		"kind_artifact": "the normalized package gives every definition a kind ('unit' on 429 rows, 'building' on 470), but the STORED configuration carries type and no kind at all: kind is an artifact the normalization adds. Classification therefore reads the committed type, so a row is classified by a field the legacy save actually carries, and kind stays available on the definition as content without ever gating anything.",
+		"kind_is_never_a_gate": "neither module's code contains the token kind at all, so no comparison on the normalization artifact can exist; and a definition whose kind says 'building' while its committed type still says 'u' builds an instance unchanged, which the suite asserts",
+		"unclassified_type_branch": "a committed type outside {u, b}, and a units-domain row whose committed type is not 'u', are both refused with the committed type named. The second is exercised by the suite through a crafted definition; the first is unreachable against the committed content, whose measured distribution is units/u 429 and buildings/b 470, so it is defence in depth and the suite asserts the distribution that makes it unreachable",
+		"unit_type": "u",
+		"unresolvable_item_id": "an item id resolving in neither domain fails the whole projection closed, so no row is ever silently dropped"
+	},
+	"content_source": {
+		"content_fingerprint": "44e5b9edd1eba2910833bb8e2f063175e51c5754e38c35177648e4de779df501",
+		"enumeration": "ContentRegistry.legacy_ids(domain), the registry's own public accessor over the index it built during its verified load, so every enumeration and every capacity distribution in this report crosses the same byte-count and digest gate as every other read and no committed file is re-read behind the registry's back",
+		"manifest_bytes_verified": 1905917,
+		"manifest_outputs_verified": 22,
+		"package_files": 67,
+		"package_sha256": "dba0a98b25c6fafdb7b752436d2f70fcfc8641ef5f977166aa2002a3f4b44ea0",
+		"units_file": "packages/game-content/normalized/units.json",
+		"units_manifest_bytes": 680410,
+		"units_manifest_sha256": "6a7121cdefddf4835ac90c408c98da762b7ccd7de866aea749368beffdad36e0"
+	},
+	"corpus": {
+		"attr_bags_all_empty": true,
+		"bought_units": [],
+		"building_rows": 40,
+		"dead_heroes": {},
+		"distinct_item_ids": 11,
+		"garrison_capable_ids": [
+			"905",
+			"930",
+			"931"
+		],
+		"garrison_capable_item_ids": 3,
+		"garrison_capable_note": "the committed investigation record says '3 placed rows are garrison-capable (905, 930, 931)'; 3 is the DISTINCT-ITEM-ID count, and the committed corpus has 9 such rows (905 once, 930 six times, 931 twice). No decision changes: all nine are collect:20 decorations and all nine containers are empty.",
+		"garrison_capable_rows": 9,
+		"map_index": 0,
+		"non_default_orientations": 3,
+		"player_store": {},
+		"player_teams": {
+			"1": 20,
+			"3": 20
+		},
+		"reserved_keys_present": {},
+		"row_instants": {
+			"committed_zero": 40,
+			"of": 40
+		},
+		"rows": 40,
+		"rows_with_any_attr_key": 0,
+		"rows_with_non_empty_container": 0,
+		"save": "tests/saves/fresh-player.json",
+		"save_bytes": 15628,
+		"save_sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+		"sources": {
+			"bought_units, player_store": "read by the suite and recorded as a measurement only: the projection deliberately reads neither, and UNREAD_PRIVATE_STATE names why",
+			"rows, distinct ids, containers, attr bags, row shape": "measured from the committed save bytes by the suite",
+			"unit_rows, building_rows, reserved keys, dead counter": "the projection's own result over those same bytes"
+		},
+		"unit_rows": 0
+	},
+	"dead_unit_counter": {
+		"absent_rule": "a null or absent deadHeroes is REFUSED, not read as an empty count: version.py:26-30 writes null for a pre-version save, and a missing count is not a count of zero",
+		"corpus": {},
+		"no_instance_derived": true,
+		"no_instance_derived_note": "the suite projects the same row set with and without a non-empty dead counter and asserts the instance count is identical, so the count demonstrably derives no row, no corpse, and no recoverable instance",
+		"path": "privateState.deadHeroes",
+		"resurrectable_coverage": {
+			"of": 429,
+			"resurrectable_gt_0": 426
+		},
+		"resurrectable_evaluated": false,
+		"resurrectable_note": "the committed coverage of the resurrection property is recorded as CONTENT: neither module's code contains the token properties at all, so no resurrection predicate can be evaluated, and death and resurrection remain undelivered behaviour belonging to a combat line",
+		"rule": "the legacy dead-unit pool is an INTEGER COUNT KEYED BY ITEM ID, not a pool of rows: push_dead_unit (engine.py:149-170) requires item[7] == 1, a properties bag, and properties.resurrectable > 0, then increments the count and DISCARDS the row, and resurrect_hero (engine.py:172-181) decrements it and deletes the key at zero. A dead unit therefore leaves NO instance behind and this projection derives no row, no corpse, and no recoverable instance from the count."
+	},
+	"determinism": {
+		"byte_identical_across_reruns": true,
+		"reason": "no timestamp, no absolute path, no wall clock, no request, and no saved state: every table is derived from the model's own constants, the verified registry, and the committed corpus bytes, and every derived set is sorted before it is written",
+		"serialization": "JSON.stringify(report, tab, sort_keys=true) plus one trailing newline; every number written is an integer - the pinned engine's integral floats are normalised on the way in, which changes no value - so no float formatting varies between runs"
+	},
+	"garrison": {
+		"container_element": "a nested row, parsed as a UnitInstance in its own right - never a list of identifiers",
+		"container_row": "a placed row's container is parsed into unit instances whatever the container row's own committed type: the 48 garrison-capable committed rows are all buildings and none of them trains anything, so the container row in practice is a building",
+		"container_states": [
+			"empty",
+			"populated"
+		],
+		"corpus_max_depth": 0,
+		"corpus_non_empty_containers": 0,
+		"empty_is_not_absent": "a fifth slot holding [] is an empty garrison; a fifth slot that is missing or malformed is a refusal with NO instance at all, so the two can never be confused and there is no third state",
+		"garrisoned_row": "a row inside a container is always parsed as a UnitInstance, because push_unit moves a UNIT row into a container - a building id inside a container is refused",
+		"max_depth": 4,
+		"max_depth_provenance": "derived (design D2): the legacy engine nests exactly one level, because push_unit is called with a map row, so the committed corpus needs 1 and this bound is headroom against unbounded recursion over untrusted save input - not an observation",
+		"over_depth": "refused with the key, the slot path, and the depth named; never truncated, because a truncated garrison is a wrong answer presented as a correct one",
+		"slot": 5,
+		"slot_path_form": "5 for a placed row's container, 5[0] for its first member, 5[0]/5[0] for that member's own container, so a refusal names the exact nested row"
+	},
+	"generated_by": "apps/client-godot/tests/test_unit_instances.gd --report=<path>",
+	"instances": {
+		"asserted_zero": true,
+		"claim": "the committed corpus yields ZERO unit instances and every placed row classifies as a building. That zero is asserted by the suite and is a fact about the corpus, not evidence that a unit can be obtained, placed, or observed.",
+		"demonstration": "instances are demonstrated over a crafted in-memory row set the suite builds itself, which is test input and not evidence of any behaviour: 2 placed unit rows, 2 placed building rows, a placed building's container holding 5 nested unit rows against its committed capacity of 4, and a placed unit row whose container holds a unit, for 8 instances at depth 1",
+		"fabricated_save": false,
+		"fabrication_note": "no save, corpus, or fixture was written to hold a unit row, and the committed corpus save is byte-identical after the run; the suite asserts the digest of tests/saves and tests/fixtures is unchanged and that no working-tree saves/ directory exists",
+		"max_depth": 0,
+		"nested": 0,
+		"placed": 0,
+		"total": 0
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed",
+		"no unit is rendered, animated, or played by this change: nothing is drawn, no sprite is resolved for an instance, and no scene reads this projection",
+		"no windowed capture is claimed: this change alters nothing visual and the committed corpus has no unit to render, so a capture would assert nothing",
+		"no executed-legacy fixture was captured, because the committed corpus contains no unit row, and none was fabricated: no save, corpus, or fixture was written to hold a unit row, and the instances this projection does produce come from a crafted in-memory row set labelled as test input",
+		"the first executed-legacy unit fixture belongs to the production line, because the Command Center at map key 1 is a real placed training producer (training_time 5, min_level 1) and makes the queue genuinely exercisable against the corpus",
+		"no acquisition is claimed: no committed unit is store-listed (in_store is 0 for all 429), the committed unit sources are the offer-pack and darts systems which are later milestones, and no means of obtaining or placing a unit is implemented or claimed",
+		"no queueing, training, production, garrison-capacity, death, resurrection, movement, collection, animation, or basic behaviour is implemented: each is a separate later M8 deliver line, and the reserved queue keys are a content-level record only",
+		"no gameplay semantics are attached to any unit statistic: attack, defense, life, attack_interval, attack_range, velocity, expiration, best_against, and best_against_mult are committed numbers and no helper computes damage, a defence outcome, a speed, a lifetime, or an attack timing from them",
+		"no capacity rule is enforced: the committed unit_capacity has no legacy consumer, so no member is ever refused, dropped, or truncated, and an authoritative garrison limit belongs to a later server-authoritative milestone",
+		"the committed corpus yields ZERO unit instances and every placed row classifies as a building: that zero is asserted by the suite and is a fact about the corpus, not evidence that a unit can be obtained, placed, or observed",
+		"no compatibility route, response field, error code, or persistence behaviour was added, and no client intent is sent to obtain an instance: an instance is read from a save already in hand",
+		"the classification reads the committed type field and never the normalized kind, which is an artifact the normalization adds and which the stored configuration does not carry",
+		"no pixel-parity oracle against the legacy client exists"
+	],
+	"provenance": {
+		"derived": [
+			{
+				"evidence": "derived: design D1 chooses the composition. The established fact it rests on is that an instance IS a row, so the honest model is a view over the row plus the content it resolves to; the wrapping is what makes the M8 line 1 static/instance boundary structural",
+				"fact": "a UnitInstance wraps its row and its resolved definition rather than duplicating the definition's fields"
+			},
+			{
+				"evidence": "derived: the bound is this line's own guard against unbounded recursion over untrusted save input. The legacy engine nests exactly one level (push_unit is called with a map row), so the committed corpus needs 1 and the chosen bound of 4 is headroom, not an observation",
+				"fact": "nesting is bounded by a named MAX_GARRISON_DEPTH and a row set beyond it is refused rather than truncated"
+			},
+			{
+				"evidence": "derived: the established fact is that a garrisoned row is a row in some row's fifth slot, and the committed content puts unit_capacity on 48 of 470 buildings while 0 of those 48 train anything, so the container row in practice is a building. The spec's scenario is stated over a placed row's fifth slot, which is what is implemented",
+				"fact": "a placed BUILDING row's container is parsed into unit instances, not only a placed unit row's"
+			},
+			{
+				"evidence": "derived by the reachability table in docs/legacy-unit-instances.md section 7: the corpus has no unit row, so no executed-legacy fixture can be captured without fabricating a player state, and an instance is read from a save in hand rather than fetched",
+				"fact": "the line is read-only with no endpoint, no fixture, and no acquisition"
+			}
+		],
+		"established": [
+			{
+				"evidence": "engine.py:31, map_add_item's row literal, with the empty-container default at engine.py:11-12",
+				"fact": "the eight-slot row shape [item, x, y, timestamp, orientation, store, attr, player], and therefore that a unit instance IS a row"
+			},
+			{
+				"evidence": "engine.py:54-57 (push_unit) and engine.py:58-68 (pop_unit); command.py:365-397 are the only two dispatcher branches that reach them",
+				"fact": "a garrisoned unit is a row nested inside a row: push_unit appends a row to the container and stamps the container's own instant, and pop_unit scans the container for a matching item[0]"
+			},
+			{
+				"evidence": "engine.py:183-213; only push_queue_unit2 (engine.py:206-213) ever sets ui",
+				"fact": "the production queue is a counter, a start instant, and an optional queued unit id, torn down as three keys at once"
+			},
+			{
+				"evidence": "engine.py:149-170 (push_dead_unit) and engine.py:172-181 (resurrect_hero)",
+				"fact": "a dead unit leaves no instance: the surviving artefact is an integer count keyed by item id and the row is discarded"
+			},
+			{
+				"evidence": "the string occurs zero times in engine.py, command.py, sessions.py, server.py, and constants.py, and push_unit appends unconditionally",
+				"fact": "unit_capacity has no legacy consumer at all"
+			},
+			{
+				"evidence": "tests/saves/fresh-player.json maps[0].items, measured by this line's own suite against the committed bytes",
+				"fact": "the committed corpus holds 40 placed rows across 11 distinct item ids, all of committed type b, with 0 unit rows, 0 non-empty containers, and every attribute bag empty, and deadHeroes and boughtUnits both empty"
+			},
+			{
+				"evidence": "the stored config/main.json items carry type and no kind; the normalized kind is an artifact the normalization adds",
+				"fact": "the committed type is the only stored discriminator between a placed unit and a placed building"
+			}
+		]
+	},
+	"reserved_queue_keys": {
+		"corpus_presence": {},
+		"corpus_rows": 0,
+		"implemented": false,
+		"inventory": [
+			{
+				"established_from": "engine.py:183-189 (push_queue_unit increments or sets it to 1) and engine.py:191-198 (pop_queue_unit decrements it)",
+				"key": "nu",
+				"meaning": "the queued-unit COUNT, not a list and not a position",
+				"optional": false,
+				"read_only_here": "this projection reports whether a row carries the key and what committed value it holds, and writes nothing",
+				"type": "integer"
+			},
+			{
+				"established_from": "engine.py:189 and engine.py:212 stamp it with timestamp_now(); engine.py:198 refreshes it on a decrement",
+				"key": "ts",
+				"meaning": "the queue's START INSTANT, a Unix-seconds integer",
+				"optional": false,
+				"read_only_here": "this projection reports whether a row carries the key and what committed value it holds, and writes nothing; no elapsed-time or completion rule is computed from it",
+				"type": "integer"
+			},
+			{
+				"established_from": "engine.py:206-213 (push_queue_unit2) is the only branch that sets it",
+				"key": "ui",
+				"meaning": "the OPTIONAL queued unit id, set only by the atom-fusion path and by no other committed branch",
+				"optional": true,
+				"read_only_here": "this projection reports whether a row carries the key and what committed value it holds, and writes nothing; no queued-unit identity is resolved from it",
+				"type": "integer"
+			}
+		],
+		"names": [
+			"nu",
+			"ts",
+			"ui"
+		],
+		"read_only": "reading whether a row carries a reserved key and what committed value it holds is projection; WRITING one is behaviour and is not implemented. Neither module declares an increment, a decrement, a timestamp write, or a queue projection, and the suite asserts the row is byte-identical after every reserved-key read.",
+		"scope": "this inventory is CONTENT-LEVEL ONLY. It names the keys so the queues and production lines inherit a written contract, and this change adds no queue increment, no decrement, no timestamp write, and no queue projection, and implements no training, production, or queueing behaviour. Training, production, and queueing remain separate later M8 deliver lines.",
+		"teardown": "when the count reaches zero, pop_queue_unit deletes nu, ts, and ui TOGETHER (engine.py:198-204): the three keys are never torn down independently, no committed branch deletes one of them on its own, and a save therefore never carries a partial queue teardown",
+		"teardown_note": "the three keys are deleted TOGETHER when the count reaches zero, and no committed branch deletes one of them on its own - a contract no inspection of the dispatcher would reveal, which is why it is recorded here"
+	},
+	"row_contract": {
+		"identity_rule": "the instance's item id is read from the definition it wraps and cross-checked against the row's own slot 0, never restated from either alone; a row whose resolved definition carries a committed type other than 'u' is refused with that type named, never coerced",
+		"integer_transport_note": "the pinned engine's JSON parser represents every committed number as a float, so an integer slot accepts an int or an integral float - the documented transport tolerance the delivered building and unit catalogs apply to the same field class - and a numeric string is refused because no committed source stores one",
+		"row_length_rule": "a row of exactly the committed eight slots is the only accepted shape: a longer row is an uncommitted shape and a shorter one has no container slot at all",
+		"slots": 8,
+		"source": "engine.py:31, map_add_item's row literal [item, x, y, timestamp, orientation, store, attr, player]",
+		"table": [
+			{
+				"meaning": "the committed legacy item id, an integer",
+				"name": "item",
+				"slot": 0,
+				"source": "engine.py:31, map_add_item's row literal",
+				"used_by": "the instance's identity is read from the resolved definition and cross-checked against this slot, never restated"
+			},
+			{
+				"meaning": "the row's cell x coordinate, an integer",
+				"name": "x",
+				"slot": 1,
+				"source": "engine.py:31",
+				"used_by": "exposed verbatim as the instance's cell x"
+			},
+			{
+				"meaning": "the row's cell y coordinate, an integer",
+				"name": "y",
+				"slot": 2,
+				"source": "engine.py:31",
+				"used_by": "exposed verbatim as the instance's cell y"
+			},
+			{
+				"meaning": "the row's own Unix-seconds instant, an integer",
+				"name": "timestamp",
+				"slot": 3,
+				"source": "engine.py:31; re-stamped by push_unit at engine.py:56 when a row is moved into a garrison",
+				"used_by": "exposed verbatim; no elapsed-time rule is computed from it, so no queue or garrison timer is implied"
+			},
+			{
+				"meaning": "the row's committed orientation code, an integer",
+				"name": "orientation",
+				"slot": 4,
+				"source": "engine.py:31",
+				"used_by": "exposed verbatim; no rotation or facing rule is applied"
+			},
+			{
+				"meaning": "the garrison container: a LIST of nested ROWS, not a list of identifiers",
+				"name": "store",
+				"slot": 5,
+				"source": "engine.py:31 with the empty-list default at engine.py:11-12; push_unit appends a row at engine.py:55; pop_unit scans and pops a row at engine.py:61-67",
+				"used_by": "each element is parsed as a UnitInstance in its own right, recursively, under MAX_GARRISON_DEPTH"
+			},
+			{
+				"meaning": "the row's attribute bag, an object",
+				"name": "attr",
+				"slot": 6,
+				"source": "engine.py:31; the production-queue keys nu, ts, and ui live in this bag (engine.py:183-213)",
+				"used_by": "read verbatim and handed out as a deep copy; the reserved queue keys are recorded by the projection, never written"
+			},
+			{
+				"meaning": "the owning player id, an integer",
+				"name": "player",
+				"slot": 7,
+				"source": "engine.py:31; push_dead_unit requires item[7] == 1 at engine.py:151",
+				"used_by": "exposed verbatim as the instance's player team; no ownership or death rule is evaluated from it"
+			}
+		],
+		"wrapping": "an instance HOLDS its row and its definition by reference and reads every value back out of them, so there is no second copy that could drift from the save; the attribute bag is the one exception and is handed out as a deep copy so no reader can write back into the save"
+	},
+	"schema": "unit-instances-report-v1",
+	"unit_capacity": {
+		"buildings": {
+			"distribution": {
+				"0": 422,
+				"1": 7,
+				"10": 2,
+				"2": 15,
+				"3": 4,
+				"4": 17,
+				"6": 3
+			},
+			"of": 470,
+			"with_capacity": 48
+		},
+		"correction": "the committed investigation record states that 0 of 429 units carry unit_capacity; the committed content disagrees: 5 of 429 do (1013, 1018, 1019, 1032, 1035). The no-rule decision is unaffected, because the field has no legacy consumer in either case, but the distribution this module reports is measured from the committed package rather than restated from the record.",
+		"enforced": false,
+		"field": "unit_capacity",
+		"legacy_consumers": 0,
+		"legacy_modules_searched": [
+			"engine.py",
+			"command.py",
+			"sessions.py",
+			"server.py",
+			"constants.py"
+		],
+		"over_capacity_scenario": "a placed building whose committed capacity is 4 (905 Tree) holds FIVE nested unit rows in the crafted row set; all five are projected, none is refused and none is dropped, which is the observable form of the no-rule decision",
+		"rule": "NO CAPACITY RULE IS IMPLEMENTED. The committed unit_capacity field has zero legacy consumers: the string occurs in none of engine.py, command.py, sessions.py, server.py, or constants.py, and push_unit (engine.py:55) appends to the container unconditionally, so no member is refused, dropped, or truncated and no garrison size is compared against the committed number. The committed value is reported for reference only, and an authoritative garrison limit belongs to a later server-authoritative milestone.",
+		"training_and_garrison_are_disjoint": {
+			"buildings_with_both": 0,
+			"buildings_with_capacity": 48,
+			"buildings_with_training_time": 130,
+			"note": "the producer garrons nothing and the garrison-capable rows train nothing, so nothing in the committed content joins the two",
+			"units_with_training_time": 0
+		},
+		"units": {
+			"capacity_ids": [
+				"1013",
+				"1018",
+				"1019",
+				"1032",
+				"1035"
+			],
+			"distribution": {
+				"0": 424,
+				"4": 2,
+				"6": 3
+			},
+			"of": 429,
+			"with_capacity": 5
+		}
+	}
+}
