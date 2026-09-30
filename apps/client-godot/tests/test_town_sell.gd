@@ -496,8 +496,8 @@ func _check_applied_response(town: Node2D, state: Variant,
 	var hud: Variant = town.hud()
 	check(hud != null, "the HUD re-attaches to the mutated state")
 	if hud != null:
-		check_eq(hud.displayed("coins"), "2000",
-			"the HUD renders the authoritative coins")
+		check_eq(hud.displayed("gold"), "2000",
+			"the HUD renders the authoritative primary currency")
 		check_eq(hud.displayed("xp"), "4", "the HUD renders xp verbatim")
 	check_eq(town.sell_error, "", "success leaves no failure record")
 	check(String(_surface_status(town)).contains("sold"),

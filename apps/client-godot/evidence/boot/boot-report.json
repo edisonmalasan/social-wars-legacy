@@ -1,12 +1,12 @@
 {
     "schema":  "godot-compatibility-boot/verify-boot-v1",
-    "generated_utc":  "2026-09-30T04:40:57Z",
+    "generated_utc":  "2026-09-30T10:32:06Z",
     "environment":  {
                         "engine_executable":  "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
                         "engine_version":  "4.7.2.stable.official.ed1daf0bf",
                         "python_executable":  "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
                         "python_version":  "3.9.13",
-                        "git_commit":  "719d9d936100bdc1d78cc8bc417b6ea0fbe1f125",
+                        "git_commit":  "b05f6ad370dd2259441ec5e7a4cb404d74b74383",
                         "display_session":  false,
                         "network":  "loopback only (127.0.0.1)"
                     },
@@ -315,6 +315,22 @@
                          "log":  "apps/client-godot/.godot/verify-boot/18-test_town_hud.out.txt"
                      },
                      {
+                         "name":  "test_town_resources",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_town_resources.gd",
+                                         "--",
+                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/19-test_town_resources.out.txt"
+                     },
+                     {
                          "name":  "test_town_selection",
                          "command":  [
                                          "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
@@ -328,7 +344,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/19-test_town_selection.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/20-test_town_selection.out.txt"
                      },
                      {
                          "name":  "test_town_scene",
@@ -344,7 +360,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/20-test_town_scene.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/21-test_town_scene.out.txt"
                      },
                      {
                          "name":  "test_town_placement",
@@ -360,7 +376,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/21-test_town_placement.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/22-test_town_placement.out.txt"
                      },
                      {
                          "name":  "test_town_purchase",
@@ -376,7 +392,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/22-test_town_purchase.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/23-test_town_purchase.out.txt"
                      },
                      {
                          "name":  "test_town_move",
@@ -392,7 +408,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/23-test_town_move.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/24-test_town_move.out.txt"
                      },
                      {
                          "name":  "test_town_sell",
@@ -408,7 +424,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/24-test_town_sell.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/25-test_town_sell.out.txt"
                      },
                      {
                          "name":  "test_town_store",
@@ -424,7 +440,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/25-test_town_store.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/26-test_town_store.out.txt"
                      },
                      {
                          "name":  "test_town_upgrade",
@@ -440,7 +456,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/26-test_town_upgrade.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/27-test_town_upgrade.out.txt"
                      },
                      {
                          "name":  "test_town_construction",
@@ -456,7 +472,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/27-test_town_construction.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/28-test_town_construction.out.txt"
                      },
                      {
                          "name":  "test_town_collect",
@@ -472,7 +488,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/28-test_town_collect.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/29-test_town_collect.out.txt"
                      },
                      {
                          "name":  "test_town_expand",
@@ -488,7 +504,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/29-test_town_expand.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/30-test_town_expand.out.txt"
                      },
                      {
                          "name":  "test_town_gate",
@@ -504,7 +520,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/30-test_town_gate.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/31-test_town_gate.out.txt"
                      },
                      {
                          "name":  "boot-unreachable",
@@ -522,7 +538,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/31-boot-unreachable.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/32-boot-unreachable.out.txt"
                      },
                      {
                          "name":  "boot-main-live",
@@ -545,7 +561,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/32-boot-main-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/33-boot-main-live.out.txt"
                      },
                      {
                          "name":  "gameapi-live",
@@ -569,7 +585,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/33-gameapi-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/34-gameapi-live.out.txt"
                      },
                      {
                          "name":  "boot-api-error-live",
@@ -596,7 +612,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/34-boot-api-error-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/35-boot-api-error-live.out.txt"
                      },
                      {
                          "name":  "placement-live",
@@ -622,7 +638,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/35-placement-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/36-placement-live.out.txt"
                      },
                      {
                          "name":  "purchase-live",
@@ -648,7 +664,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/36-purchase-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/37-purchase-live.out.txt"
                      },
                      {
                          "name":  "move-live",
@@ -674,7 +690,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/37-move-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/38-move-live.out.txt"
                      },
                      {
                          "name":  "sell-live",
@@ -700,7 +716,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/38-sell-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/39-sell-live.out.txt"
                      },
                      {
                          "name":  "store-live",
@@ -726,7 +742,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/39-store-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/40-store-live.out.txt"
                      },
                      {
                          "name":  "upgrade-live",
@@ -752,7 +768,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/40-upgrade-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/41-upgrade-live.out.txt"
                      },
                      {
                          "name":  "construction-live",
@@ -778,7 +794,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/41-construction-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/42-construction-live.out.txt"
                      },
                      {
                          "name":  "collect-live",
@@ -804,7 +820,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/42-collect-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/43-collect-live.out.txt"
                      },
                      {
                          "name":  "expand-live",
@@ -830,7 +846,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/43-expand-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/44-expand-live.out.txt"
                      },
                      {
                          "name":  "guard-post",
@@ -842,7 +858,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/44-guard-post.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/45-guard-post.out.txt"
                      }
                  ],
     "assertions":  [
@@ -988,6 +1004,14 @@
                        },
                        {
                            "name":  "test_town_hud reports PASS",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_town_resources exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_town_resources reports PASS",
                            "ok":  true
                        },
                        {

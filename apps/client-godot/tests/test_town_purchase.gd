@@ -573,8 +573,8 @@ func _check_applied_response(town: Node2D, state: Variant,
 	if hud != null:
 		check_eq(hud.displayed("cash"), "0",
 			"the HUD renders the authoritative cash")
-		check_eq(hud.displayed("coins"), "2000",
-			"the HUD renders coins verbatim")
+		check_eq(hud.displayed("gold"), "2000",
+			"the HUD renders the primary currency verbatim")
 	check(not state.missing.has(TownState.STORAGE_MISSING_KEY),
 		"the response supplies the storage field")
 	check_eq(town.shop_error, "", "success leaves no failure record")

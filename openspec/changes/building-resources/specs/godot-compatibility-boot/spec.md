@@ -2,29 +2,6 @@
 
 ## MODIFIED Requirements
 
-### Requirement: Compatibility API v0 bootstrap service
-The repository SHALL provide a Compatibility API v0 service that serves modern JSON bootstrap data by adapting the unchanged legacy boot modules in-process, listens only on loopback at an explicit documented port, fails closed with structured JSON errors on inputs it cannot resolve, and never persists state from its session or bootstrap endpoints; it SHALL also expose the stored energy value a player save carries on its own additive read-only path rather than by widening the shared resource accessor the state-mutating endpoints' post-execution proofs compare, because no delivered path mutates that value: calling those endpoints SHALL leave every on-disk save byte-identical while the legacy in-memory boot semantics execute exactly as the legacy endpoints perform them. State-mutating gameplay execution is specified by the `godot-building-placement`, `godot-building-purchase`, `godot-building-move`, `godot-building-sell`, `godot-building-store`, `godot-building-upgrade`, `godot-building-construction`, `godot-building-collect`, and `godot-building-expand` capabilities and SHALL persist only through unchanged legacy command semantics into the service corpus, never into a working-tree save.
-
-#### Scenario: Serve the session list
-- **WHEN** a client requests the v0 session list
-- **THEN** the response contains each saved village's id, name, xp, and level exactly as the legacy `all_saves_info()` computes them for the corpus, together with the legacy game version and a server timestamp
-
-#### Scenario: Bootstrap a known user
-- **WHEN** a client requests bootstrap for an existing save id
-- **THEN** the response carries the legacy `get_game_config()` payload and the legacy `get_player_info()` payload (player info, default map, private state, neighbors) inside a documented envelope, equal to the captured legacy endpoint responses for every stable field
-
-#### Scenario: Preserve legacy boot semantics without writing
-- **WHEN** bootstrap resolves for a known user
-- **THEN** the legacy in-memory boot effects (`last_logged_in` update and `reset_stuff`) occur exactly as the legacy endpoint performs them while the pre/post SHA-256 of every save file on disk is identical
-
-#### Scenario: Fail closed on an unusable request
-- **WHEN** the user id is missing or names no save
-- **THEN** the service answers a structured JSON error identifying the problem with a non-2xx status and serves no config or player payload
-
-#### Scenario: Bind to loopback only
-- **WHEN** the service starts
-- **THEN** it listens on `127.0.0.1` at the documented port and the documented interface is the only one clients are told to use
-
 ### Requirement: GameApi abstraction
 The Godot client SHALL depend on a `GameApi` autoload for every server interaction, exposing typed `list_sessions()`, `get_bootstrap()`, `place_building()`, `purchase_item()`, `move_building()`, `sell_building()`, `store_building()`, `upgrade_building()`, `build_construction()`, `collect_income()`, and `expand_town()` operations projecting every resource through one canonical mapping that names each resource exactly as the legacy server names it — the primary currency as `gold` and never `coins`, and the experience counter grouped with the player's summary — with two interchangeable implementations — `LegacyV0Api`, speaking JSON over loopback HTTP to Compatibility API v0, and `FakeApi`, serving committed fixture data and applying the documented in-memory operation semantics with no process, server, or socket — and no boot or presentation code SHALL reference `command.php`, AMF, FlashVars, legacy form encoding, legacy URLs, or legacy command names.
 

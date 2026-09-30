@@ -58,7 +58,7 @@ const SLICE_COUNTS := {
 const SLICE_PLACEHOLDER_IDS := [5000, 5001, 5004, 5005, 5007, 5007, 5007, 5008]
 ## The village's HUD strings: `str(state.value)` over its own payload.
 const SLICE_HUD := {
-	"coins": "62395", "wood": "96060", "steel": "94869", "oil": "97521",
+	"gold": "62395", "wood": "96060", "steel": "94869", "oil": "97521",
 	"cash": "42", "energy": "50", "mana": "0",
 	"name": "Scarlet", "level": "33", "xp": "107694",
 }
@@ -249,7 +249,7 @@ func _check_built_view(town: Node2D, state: Variant) -> void:
 	if town.hud() == null:
 		return
 	check_eq(town.hud().displayed_fields(), {
-		"coins": "2000", "wood": "2000", "steel": "2000", "oil": "2000",
+		"gold": "2000", "wood": "2000", "steel": "2000", "oil": "2000",
 		"cash": "5", "energy": "50", "mana": "0",
 		"name": "Warrior", "level": "1", "xp": "4",
 	}, "HUD strings equal str(state.value) for every field")

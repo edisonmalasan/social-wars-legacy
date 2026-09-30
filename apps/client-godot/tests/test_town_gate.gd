@@ -65,7 +65,7 @@ const SCOPE_SUITE := "tests/test_project_scope.gd"
 ## The fresh save's verbatim HUD strings (fixture ground truth, shared
 ## with `test_town_hud`).
 const FRESH_HUD := {
-	"coins": "2000", "wood": "2000", "steel": "2000", "oil": "2000",
+	"gold": "2000", "wood": "2000", "steel": "2000", "oil": "2000",
 	"cash": "5", "energy": "50", "mana": "0",
 	"name": "Warrior", "level": "1", "xp": "4",
 }

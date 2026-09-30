@@ -615,8 +615,8 @@ func _check_applied_response(town: Node2D, state: Variant,
 	if hud != null:
 		check_eq(hud.displayed("wood"), "1970",
 			"the HUD renders the authoritative wood")
-		check_eq(hud.displayed("coins"), "2000",
-			"the HUD renders coins verbatim")
+		check_eq(hud.displayed("gold"), "2000",
+			"the HUD renders the primary currency verbatim")
 		check_eq(hud.displayed("xp"), "4", "the HUD renders xp verbatim")
 	check(not state.missing.has("wood"),
 		"the response supplies the wood field")

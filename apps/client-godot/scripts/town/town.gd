@@ -312,6 +312,12 @@ const MoveFlow = preload("res://scripts/town/move_flow.gd")
 const ConstructionFlow = preload("res://scripts/town/construction_flow.gd")
 const CollectionFlow = preload("res://scripts/town/collection_flow.gd")
 const ExpandFlow = preload("res://scripts/town/expand_flow.gd")
+## The ONE canonical resource projection (OpenSpec `godot-building-resources`
+## "Canonical resource projection", design D1-D5): the readout's only source of
+## which fields exist, what they are named, and where they live. This report
+## records that projection verbatim through its `record()` and never restates
+## or re-derives a single row of it.
+const ResourceProjection = preload("res://scripts/town/resource_projection.gd")
 
 ## Report-mode inputs and captures (repository-relative paths; the
 ## fixture paths mirror the fake GameApi's own committed constants and
@@ -557,6 +563,25 @@ const REPORT_CAPTURE_EXPAND := \
 ## Default expand report destination for the bare `--expand-report` flag
 ## (project-relative, resolved against the project directory).
 const DEFAULT_EXPAND_REPORT_PATH := "evidence/building-expand/report.json"
+## Resource-projection evidence (building-resources): the committed windowed
+## capture of the corrected readout this report points at, and the default
+## destination for the bare `--resources-report` flag (project-relative,
+## resolved against the project directory).
+const REPORT_CAPTURE_RESOURCES := \
+	"apps/client-godot/evidence/building-resources/resources.png"
+const DEFAULT_RESOURCES_REPORT_PATH := \
+	"evidence/building-resources/report.json"
+## The committed corpus's OWN stored values for every canonical projection row
+## (repository-relative ground truth, NOT a restatement of the projection): the
+## fresh-player save the report parses. The report asserts the readout against
+## this so a drifting projection or a drifting save fails closed instead of
+## quietly printing whatever it found. The seven server-written values are
+## `engine.apply_resources`' own writes, and `energy` is the save's own
+## `privateState.energy`. The readout's strings are `str()` of these.
+const RESOURCES_CORPUS_VALUES := {
+	"gold": 2000, "wood": 2000, "steel": 2000, "oil": 2000, "cash": 5,
+	"energy": 50, "mana": 0, "name": "Warrior", "level": 1, "xp": 4,
+}
 ## The content-package domain the committed expansion schedule lives in
 ## (`packages/game-content/normalized/expansion_prices.json`, the economy
 ## extension's `expansion_prices` section) — the SAME table the service derives
@@ -1721,6 +1746,12 @@ func _ready() -> void:
 	if not expand_report_path.is_empty() \
 			and get_script().resource_path == "res://scripts/town/town.gd":
 		await _write_expand_report(expand_report_path)
+		return
+	# The resource-projection report shares that gate for the same reason.
+	var resources_report_path := _resources_report_path_arg()
+	if not resources_report_path.is_empty() \
+			and get_script().resource_path == "res://scripts/town/town.gd":
+		await _write_resources_report(resources_report_path)
 		return
 	_capture_path = _user_arg("--town-capture=")
 	_purchase_capture = false
@@ -10159,4 +10190,275 @@ func _expand_capture_record() -> Dictionary:
 		+ "double, not a parity oracle)"
 	record["parity_pointer"] = "real-execution parity is established " \
 		+ "by the fixture-replay tests and the verify-boot expand-live phase"
+	return record
+
+
+# ---------------------------------------------------------------------------
+# Resource-projection evidence report (building-resources, design D1-D5)
+# ---------------------------------------------------------------------------
+
+
+## The resource-projection report output path from the user arguments:
+## `--resources-report=<path>` (relative paths resolve against the project
+## directory), the bare `--resources-report` flag's default evidence path, or ""
+## when absent. The expand report's pattern, verbatim.
+func _resources_report_path_arg() -> String:
+	for argument in OS.get_cmdline_user_args():
+		if argument == "--resources-report":
+			return Paths.project_dir().path_join(DEFAULT_RESOURCES_REPORT_PATH)
+		if argument.begins_with("--resources-report="):
+			var value := argument.trim_prefix("--resources-report=")
+			if value.is_absolute_path():
+				return value
+			return Paths.project_dir().path_join(value)
+	return ""
+
+
+## Runs the resource-projection report flow and quits with the documented exit
+## code: 0 when the deterministic report is written, 1 with an explicit marker
+## naming the first failed step (the expand report's pattern, one level down).
+func _write_resources_report(report_path: String) -> void:
+	var problem: String = await _resources_report_into(report_path)
+	if problem == "" and not FileAccess.file_exists(report_path):
+		problem = "[report] report file was not created at %s" % report_path
+	if problem != "":
+		print("[town] resources-report state=error message=", problem)
+		get_tree().quit(1)
+		return
+	print("[town] resources-report state=written path=", report_path)
+	get_tree().quit(0)
+
+
+## Computes the whole resource-projection report (design D1-D5). The readout is
+## READ-ONLY, so this flow sends no state-mutating intent at all: it parses the
+## committed save fail-closed (exactly one bootstrap request, no second config
+## call), builds the town, and records the canonical projection the readout
+## renders through, the stored values it displayed, the readout's own committed
+## display map, the request counts that prove no intent was sent, the input
+## digests, the projection-constants pointer, the established-versus-derived
+## provenance split as its own section, the energy regeneration gap, the
+## fake-capture pointer, and every required non-claim. Returns "" on success or
+## the first failure as an explicit message.
+##
+## EVERY fact about the projection comes from `resource_projection.gd` — its
+## `record()` for the table, its `PROVENANCE` / `NON_CLAIMS` / `ENERGY_GAP`
+## for the evidence sections, and its `SERVER_RESOURCE_NAMES` /
+## `MUTATION_VECTOR_SLOTS` for the vector's shape. This function never restates
+## or re-derives a row: `RESOURCES_CORPUS_VALUES` is the SAVE's own ground
+## truth, not a second copy of the projection.
+##
+## Nothing here reads the wall clock and nothing here sends an intent, which is
+## what makes the report byte-identical across reruns.
+func _resources_report_into(report_path: String) -> String:
+	var registry: Variant = get_node_or_null("/root/ContentRegistry")
+	if registry == null:
+		return "[report] content registry is not registered"
+	if not bool(registry.is_loaded()):
+		var content: Dictionary = registry.load_content()
+		if not bool(content.get("ok", false)):
+			return "[report] content load failed: %s" % content.get("error", "")
+	if not bool(registry.assets_loaded()):
+		var assets: Dictionary = registry.load_asset_registry()
+		if not bool(assets.get("ok", false)):
+			return "[report] asset registry load failed: %s" % assets.get("error", "")
+	var api: Variant = get_node_or_null("/root/GameApi")
+	if api == null:
+		return "[report] GameApi is not registered"
+	var sessions: Variant = await api.list_sessions()
+	if not bool(sessions.ok):
+		return "[report] save list failed: %s" % str(sessions.error_message)
+	if sessions.saves.size() == 0:
+		return "[report] save list carries no saves"
+	var pid := str(sessions.saves[0].id)
+	var boot: Variant = await api.get_bootstrap(pid)
+	if not bool(boot.ok):
+		return "[report] bootstrap failed: %s" % str(boot.error_message)
+	var player_info: Variant = boot.player_info
+	if player_info == null:
+		return "[report] bootstrap carried no player info"
+	var parsed: Dictionary = TownState.parse(player_info.raw, registry)
+	if not bool(parsed.get("ok", false)):
+		return "[report] town state rejected: %s" % parsed.get("error", "")
+	state = parsed["state"]
+	var built: Dictionary = build()
+	if not bool(built.get("ok", false)):
+		return "[report] town failed to build: %s" % built.get("error", "")
+	if objects.is_empty():
+		return "[report] town rendered no objects"
+	if hud() == null:
+		return "[report] town rendered no readout"
+	# The readout's OWN committed display map, read back from the built HUD
+	# rather than recomputed, so the report records what is actually on screen.
+	var display: Dictionary = (hud() as Variant).displayed_fields()
+	var rows: Array = ResourceProjection.rows()
+	# The delivered ten-row layout, asserted against the corpus rather than
+	# against a restated count: every committed value has exactly one row.
+	if rows.size() != RESOURCES_CORPUS_VALUES.size():
+		return ("[report] the projection carries %d rows, not the %d the "
+			% [rows.size(), RESOURCES_CORPUS_VALUES.size()]
+			+ "committed corpus supplies values for")
+	# No key outside the projection, none missing, and the display ORDER is the
+	# projection's order: the readout's keys are exactly the canonical names, in
+	# order. A name the server never produces can therefore never appear.
+	var display_keys: Array = display.keys()
+	var canonical_names: Array = []
+	for entry: Dictionary in rows:
+		canonical_names.append(str(entry["name"]))
+	if display_keys != canonical_names:
+		return ("[report] the readout's keys are %s, not the projection's %s"
+			% [JSON.stringify(display_keys), JSON.stringify(canonical_names)])
+	# The readout's committed claim, asserted value by value: every row displays
+	# the stored value verbatim, and nothing here is computed, clamped, or
+	# substituted. This is what "displays what the save stores" means.
+	var stored := {}
+	var expected_text := {}
+	for entry: Dictionary in rows:
+		var row_name := str(entry["name"])
+		var stored_value: Variant = ResourceProjection.value_of(state, row_name)
+		if stored_value == null:
+			return ("[report] the payload carried no stored value for the %s row"
+				% row_name)
+		if not RESOURCES_CORPUS_VALUES.has(row_name):
+			return ("[report] the committed corpus records no value for the %s row"
+				% row_name)
+		if stored_value != RESOURCES_CORPUS_VALUES[row_name]:
+			return ("[report] the stored %s is %s, not the committed corpus's %s"
+				% [row_name, JSON.stringify(str(stored_value)),
+					JSON.stringify(str(RESOURCES_CORPUS_VALUES[row_name]))])
+		if str(display[row_name]) != str(stored_value):
+			return ("[report] the readout displays %s for %s, not the stored %s"
+				% [JSON.stringify(str(display[row_name])), row_name,
+					JSON.stringify(str(stored_value))])
+		stored[row_name] = stored_value
+		expected_text[row_name] = str(stored_value)
+	# A complete payload renders no absent-field indicator; recorded either way,
+	# because the indicator is a deliverable of the readout, not a fallback.
+	var absent: Array = ResourceProjection.absent_rows(state)
+	if not absent.is_empty():
+		return ("[report] the readout rendered the absent-field indicator for "
+			+ JSON.stringify(absent) + " on a complete payload")
+	# The vector's shape, from the projection's own constants: every one of the
+	# seven resources the legacy resource application writes has a row, the
+	# vector has exactly the legacy eight slots, and its unread slot 0 is
+	# claimed by no row.
+	var server_rows: Array = ResourceProjection.server_resource_rows()
+	if server_rows.size() != ResourceProjection.SERVER_RESOURCE_NAMES.size():
+		return ("[report] only %d of the %d server-written resources have a row"
+			% [server_rows.size(), ResourceProjection.SERVER_RESOURCE_NAMES.size()])
+	var claimed_slots: Array = []
+	for entry: Dictionary in rows:
+		var slot := int(entry["vector_slot"])
+		if slot == ResourceProjection.NO_VECTOR_SLOT:
+			continue
+		claimed_slots.append(slot)
+	if claimed_slots.has(ResourceProjection.UNREAD_VECTOR_SLOT):
+		return ("[report] a row claims the mutation vector's unread slot %d"
+			% ResourceProjection.UNREAD_VECTOR_SLOT)
+	# The readout is read-only: this flow sent the one bootstrap request and no
+	# state-mutating intent at all. Every counter is recorded, never assumed.
+	if int(api.bootstrap_requests) != 1:
+		return "[report] the flow issued %d bootstrap requests, not one" \
+			% int(api.bootstrap_requests)
+	var intents := {
+		"placement": int(api.placement_requests),
+		"purchase": int(api.purchase_requests),
+		"move": int(api.move_requests),
+		"sell": int(api.sell_requests),
+		"store": int(api.store_requests),
+		"upgrade": int(api.upgrade_requests),
+		"construction": int(api.construction_requests),
+		"collect": int(api.collect_requests),
+		"expand": int(api.expand_requests),
+	}
+	for key: String in intents:
+		if int(intents[key]) != 0:
+			return ("[report] the read-only flow issued %d %s intents"
+				% [int(intents[key]), key])
+	return _write_report_file(report_path, {
+		"schema": "resources-report-v1",
+		"readout": {
+			"rows": ResourceProjection.record(),
+			"row_count": rows.size(),
+			"displayed": display.duplicate(),
+			"displayed_order": display_keys.duplicate(),
+			"displayed_values_are_the_stored_values": display == expected_text,
+			"absent_rows": absent.duplicate(),
+			"no_field_is_computed_or_substituted": true,
+			"source_of_truth": "resource_projection.gd's own table: the readout "
+				+ "projects through it, so a row can neither claim a field the "
+				+ "legacy server does not produce nor display a resource twice",
+		},
+		"stored_values": stored,
+		"stored_values_note": "the typed state's own fields, read through the "
+			+ "projection; every entry equals the committed corpus's value, so "
+			+ "the readout displays the save and never a derived number",
+		"typed_state_bag_note": "the typed bag's primary-currency property is "
+			+ "still named `coins` and TownState.RESOURCE_FIELDS maps it onto "
+			+ "`map.gold`: the projection records the typed field beside the "
+			+ "canonical one in every row and no row is keyed by the typed "
+			+ "field, so the readout's keys and its display map are canonical",
+		"mutation_vector": {
+			"slots": ResourceProjection.MUTATION_VECTOR_SLOTS,
+			"shape": "[unknown, xp, gold, wood, oil, steel, cash, mana]",
+			"server_resource_names": (ResourceProjection.SERVER_RESOURCE_NAMES
+				as Array).duplicate(),
+			"server_resources_with_a_row": server_rows.duplicate(),
+			"unread_slot": ResourceProjection.UNREAD_VECTOR_SLOT,
+			"unread_slot_claimed_by_no_row": not claimed_slots.has(
+				ResourceProjection.UNREAD_VECTOR_SLOT),
+			"no_vector_slot_sentinel": ResourceProjection.NO_VECTOR_SLOT,
+			"rows_outside_the_vector": _resources_rows_outside_vector(rows),
+			"note": "the vector is the legacy wire format and this change never "
+				+ "widens it: the stored energy value has no slot in it, which "
+				+ "is why no rule for how it changes is claimed",
+		},
+		"requests": {
+			"bootstrap": int(api.bootstrap_requests),
+			"state_mutating_intents": intents,
+			"read_only": true,
+			"note": "the readout sends nothing: it reads the parsed save and "
+				+ "renders it, so every state-mutating counter is zero",
+		},
+		"counts": {
+			"placements": state.placements.size(),
+			"objects": objects.size(),
+		},
+		"inputs": {
+			"save_list_fixture": _digest_record(REPORT_SAVE_LIST),
+			"bootstrap_fixture": _digest_record(REPORT_BOOTSTRAP),
+			"projection_module": _digest_record(
+				"apps/client-godot/scripts/town/resource_projection.gd"),
+			"readout_module": _digest_record(
+				"apps/client-godot/scripts/town/town_hud.gd"),
+			"terrain": _digest_record(_terrain_runtime(registry)),
+		},
+		"constants": _constants_record(),
+		"provenance": ResourceProjection.PROVENANCE,
+		"energy_gap": ResourceProjection.ENERGY_GAP,
+		"capture": _resources_capture_record(),
+		"non_claims": ResourceProjection.NON_CLAIMS,
+	})
+
+
+## The canonical names of the projection's rows that carry
+## `NO_VECTOR_SLOT` — the rows no delivered path can mutate. Read from the
+## projection's own sentinel, never from a restated list.
+func _resources_rows_outside_vector(rows: Array) -> Array:
+	var out: Array = []
+	for entry: Dictionary in rows:
+		if int(entry["vector_slot"]) == ResourceProjection.NO_VECTOR_SLOT:
+			out.append(str(entry["name"]))
+	return out
+
+
+## The fake-capture pointer (building-resources): the committed windowed capture
+## of the corrected readout with its digest plus the plain statement of what it
+## proves — so no reader can mistake the screenshot for executed-legacy proof.
+func _resources_capture_record() -> Dictionary:
+	var record := _digest_record(REPORT_CAPTURE_RESOURCES)
+	record["implementation"] = "fake GameApi (a deterministic test " \
+		+ "double, not a parity oracle)"
+	record["parity_pointer"] = "the readout is a pure projection of the parsed " \
+		+ "save, so the projection's correctness rests on the headless " \
+		+ "projection and readout suites, not on the screenshot"
 	return record

@@ -541,6 +541,24 @@ that the price's gold component is named `gold` by the client's own committed
 asset. **Derived and never observed from the Flash client:** the id-space indexing,
 the requirements refusal, the affordability refusal, and the debit's sign and shape.
 
+## No change from the resources projection
+
+The `building-resources` change corrected the client's resource readout and left this
+service **completely untouched**: no accessor, no response field, no route, no
+error-table row, and no widening of the `resources()` accessor that all nine
+state-mutating endpoints' value-level post-execution proofs compare. The seven keys
+`resources()` returns are unchanged and remain the `apply_resources` contract.
+
+That is worth stating explicitly because the change's design originally expected an
+additive read-only accessor for the stored energy value. Apply established it was not
+needed: the client's `TownState.RESOURCE_FIELDS` already maps `energy` to
+`privateState.energy` and the delivered payload already carries it, so the row was
+unsourced only in the client's display table. The client-side detail is documented in
+`apps/client-godot/README.md` ("Resource readout") and in
+`docs/legacy-resources.md`; the recorded gap — that **no committed source records how
+`privateState.energy` changes over time**, `apply_resources` never writes it, and the
+eight-slot mutation vector has no slot for it — holds on this side exactly as recorded.
+
 ### Structured errors
 
 Always JSON, always `ok:false`, keys exactly

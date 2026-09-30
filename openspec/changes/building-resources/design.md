@@ -89,15 +89,7 @@ it displays the stored value and records the absence. `energy` is also not added
 the 8-slot mutation vector, because the vector is the legacy wire format and
 `apply_resources` has exactly eight slots.
 
-**D4 — the energy value travels on its own additive path, and the shared `resources`
-accessor is NOT widened (established blast-radius reasoning).** `resources()` is the
-`apply_resources` contract that all nine state-mutating endpoints' value-level
-post-execution proofs compare, and its shape is baked into nine committed parity
-fixtures and their tests. Adding an eighth key to it would change nine response
-shapes and re-baseline nine proven fixtures **for no behavioural gain** — energy is
-never mutated by any delivered path. So the stored value is exposed additively
-(read-only, on the bootstrap/player-overview path) and documented as deliberately
-outside the mutation contract.
+**D4 — no Compatibility API change at all, and the shared `resources` accessor is NOT widened (established; corrected during Apply).** This decision originally read that the stored energy value had to reach the client on a new additive read-only path, because `resources()` is the `apply_resources` contract all nine state-mutating endpoints' value-level proofs compare and its shape is baked into nine committed executed-legacy parity fixtures — widening it would re-baseline nine proven fixtures for no gain. **Apply established that the premise was false**: the client's town state already maps `energy` to `privateState.energy` (`TownState.RESOURCE_FIELDS`), the stored value is already inside the payload the client receives, and the captured readout renders `Energy: 50`. So the energy row is *sourced*, not fail-closed, and **the endpoint needs no accessor, no field, and no route change** — the whole change is client-side. The narrowing reasoning still holds and is recorded as the reason the shared accessor is untouched: it remains the `apply_resources` contract, and nothing in this change widens it.
 
 **D5 — a single-source projection, and no duplicate or invented rows.** One module
 owns the mapping from save location to display label for every row, so no row can
@@ -138,3 +130,26 @@ dedicated verification workflow.
   suites must stay green unchanged, and the resource rows they read (`gold`, `cash`,
   `xp`, `mana`) keep their values, so a regression would surface in an existing suite
   rather than hiding behind the new one.
+
+### Correction made during the Apply stage
+
+**The design's premise about energy needing a service accessor was wrong, and the change was
+narrowed rather than implemented as designed.** The design assumed the stored energy value had
+to be added to the service because `engine.apply_resources` never writes it. Apply established
+that it does not have to be added: the client's `TownState.RESOURCE_FIELDS` already maps
+`energy` to `privateState.energy`, the committed fresh-save payload already carries the value,
+and the windowed capture renders `Energy: 50`. So:
+
+- **the Compatibility API is not modified at all** — no accessor, no bootstrap field, no route,
+  no response shape, and no error-table row;
+- the spec's service-side requirement to *expose* the energy value is replaced by a requirement
+  to **display the value the payload already carries** and to record that no delivered path
+  changes it;
+- the `godot-compatibility-boot` delta keeps only the `GameApi` projection requirement; the
+  bootstrap-service modification describing an additive energy path is **removed**, because no
+  such path exists or is needed;
+- and D4's narrowing reasoning is retained as the documented reason the shared `resources`
+  accessor stays untouched.
+
+This is the narrowest possible change to the defect, and it keeps the promise that no
+state-mutating surface — nor the read-only ones — is disturbed.
