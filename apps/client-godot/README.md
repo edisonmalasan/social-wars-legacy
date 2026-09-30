@@ -2251,3 +2251,114 @@ Digest `f997eb2d…66d5`, byte-identical across reruns.
   the field is a variant and accepts either;
 - no pixel-parity oracle exists, and the committed definitions say nothing about what the Flash
   client read.
+
+---
+
+## Production queues (M8 line 3)
+
+The first M8 line that is behaviour-bearing, and the **first to own a real executed-legacy
+unit fixture** — scoped by the committed investigation `docs/legacy-production-queues.md`.
+
+### What a queue actually is
+
+Not a collection. A production queue is **three keys in a placed row's `attr` bag** (slot 6):
+
+| Key | Meaning | Written by |
+| --- | --- | --- |
+| `nu` | the **count** | `push_queue_unit`, `push_queue_unit2`, `pop_queue_unit` |
+| `ts` | the **start instant** | the same three |
+| `ui` | the **optional queued unit id** | `push_queue_unit2` only (the atom-fusion path) |
+
+`pop_queue_unit` **deletes all three together** when the count reaches zero
+(`engine.py:191-205`). `scripts/units/unit_queue.gd` projects exactly that as a typed
+read-only `Queue` — values verbatim, an absent queue reported as **absent** (never a count of
+zero paired with a zero instant), and a malformed value per key failing closed. A queued `ui`
+is resolved through the registry's `units` domain, and one that does not resolve is reported
+**with its recorded value intact** — never dropped, never coerced, because the id comes from a
+client-supplied argument.
+
+### What is deliberately absent, and why
+
+**Every `attr["ts"]` use in the legacy source is a write or a deletion.** Nothing reads a
+queue's start instant to evaluate elapsed time. So this line implements **no** readiness,
+**no** remaining time, **no** progress ratio, and **no** completion — a queue can never be
+shown to finish, because the legacy server has no rule that would finish it. That absence is
+a **recorded property of the legacy contract, stated as a spec requirement**, not a missing
+feature, so the `production` line inherits a named gap instead of discovering one.
+
+Three more refusals, each stated in the spec so a later line cannot read a documented absence
+as a rule:
+
+- **No cost** — `do_command` calls `apply_resources` with the request's per-command vector
+  *before* dispatch, so any queueing cost is a client-sent delta.
+- **No duration semantics** — a building's `training_time` is read by no queue branch, and
+  `sm_training_time` is present on only **300 of 429** units and **0 of 470** buildings, so it
+  is a *soul mixer* field, not a general training duration.
+- **No bound on the count** — the engine sets none, and a documented absence is not permission
+  to invent a cap.
+
+### `soulmixer_speedup`: recorded verbatim, implemented not at all
+
+The only branch that reads `ts` back, and the legacy author's own comment on its calculation
+is *"Quite useless cost calculation for understanding it"*. Recorded: it needs **both** `ts`
+and `ui` (so it raises `KeyError` on a fresh row — the client **refuses** with a named error
+instead), it reads the duration from the **queued unit** rather than the building, it treats
+the value as **seconds** (`ceil(remaining / 3600)`), it **charges nothing** (it only *prints*
+the cost), and it clears the start instant. Implemented: **no cost, no timer, no speedup**.
+Reproducing a formula the legacy source itself labels useless, and which never charges
+anything, would invent an economy.
+
+### The executed-legacy fixture
+
+The committed corpus places **id 26, Command Center, at map key 1** with `training_time` 5,
+`min_level` 1`, and an **empty `attr` bag** — a real placed training producer, so `push` and
+`pop` are exercisable **without fabricating a player state**. Read from the committed capture:
+
+| Step | Command Center `attr` | Stored resources |
+| --- | --- | --- |
+| login | `{}` | gold 2000, wood 2000, steel 2000, oil 2000, xp 4, energy 50, mana 0 |
+| **push** | `{'nu': 1, 'ts': <instant>}` | **byte-identical** |
+| **pop** | `{}` — both keys removed together | **byte-identical** |
+
+That is what makes the endpoint's *"no resource moved"* proof **non-tautological**: the
+transaction really happened while no balance moved, foreclosing the client-sent
+`apply_resources` path for a command that must not move a balance. The manifest records that
+a push and a pop were captured, that **no completion was captured**, and that **no completion
+command exists**.
+
+### Verification (commands actually executed)
+
+```bash
+python -B apps/compat-api/capture_queue_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_unit_queues.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+```
+
+Observed 2026-10-01: `test_unit_queues` **411 checks** (423 with `--report`), the 30th
+hermetic suite; the **grown** compat suite `Ran 1257 tests ... OK` (from 1109, **+148** — this
+line adds an endpoint); `verify-boot.ps1` exit 0 with **30 hermetic suites and 14 live
+phases**, guard digest identical pre/post. The recorded wall-clock instant is **read from the
+committed capture** rather than re-pinned as a literal, so a re-capture cannot silently
+desynchronize the double and the suite.
+
+### Production queue claim limits
+
+- **A queue can never be shown to finish.** No completion, no elapsed-time evaluation, because
+  the legacy server has neither.
+- **No cost, no timer, no speedup cost, and no count bound** are implemented, for the reasons
+  above.
+- **No unit is produced, trained, or placed**, and **no acquisition is claimed** — no committed
+  unit is store-listed, and the real sources are the later-milestone `offer_packs` and
+  `darts_items`.
+- `sm_training_time` is **absent from 129 units and all 470 buildings**.
+- Parity covers **one recorded push/pop transaction** against the fresh-player corpus, which
+  places only one training producer; no progressed-player save is available.
+- Production, collection, movement, animations, and basic behaviors remain undelivered.
+- No pixel-parity oracle exists, and nothing here speaks for what the Flash client displayed.
+
+**Known-flaky guard:** `verify-boot.ps1` treats any `^ERROR:` line as a script error, so a
+nondeterministic engine-shutdown RID-leak warning can fail the battery even though the suite
+exits 0. Observed once on `test_town_xp`; two reruns passed clean. **Re-run before treating
+such a failure as a regression.**

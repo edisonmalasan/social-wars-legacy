@@ -651,6 +651,97 @@ Always JSON, always `ok:false`, keys exactly
 | `method_not_allowed` | 405 | known path, unsupported method |
 | `internal_error` | 500 | unhandled server failure, including legacy execution raising after validation passed |
 
+## `POST /v0/queue`
+
+M8 line 3, the eleventh state-mutating surface and the first to own a real
+executed-legacy **unit** fixture. The committed contract is in
+`docs/legacy-production-queues.md`.
+
+### What it does
+
+Two guarded intents on a production queue, derived from a map key and the
+committed legacy command's own effect:
+
+| Action | Legacy command | Recorded effect on the row's `attr` |
+| --- | --- | --- |
+| `push` | `push_queue_unit` | `nu` incremented (or set to 1), `ts` stamped with the server's own instant |
+| `pop` | `pop_queue_unit` | `nu` decremented; at zero **`nu`, `ts`, and `ui` are deleted together** |
+
+`queue_envelope.py` holds the single shared derivation for both batch envelopes — exactly one
+command each, carrying a **neutral** resource vector — plus the derived post-execution `attr`
+bag, the pure `expected_attr` proof, the read-only `project_queue`, the recorded
+`soulmixer_speedup` contract with its named refusals, and the pinned corpus constants. The
+post-execution proof asserts **two things**: the recorded `attr` bag matches the derived
+result, **and every stored resource is unchanged**.
+
+### Why the resource proof is the load-bearing half
+
+`do_command` calls `apply_resources(save, map, resources_changed)` with the request's
+per-command vector **before** dispatching the branch, so a queueing cost would be a
+**client-sent delta**. The neutral vector plus the "every stored resource unchanged" proof
+forecloses minting or burning a balance through this path. This is the family's **third** proof
+form, alongside `collect`'s "moved by exactly a derived delta", `expand`'s "moved by exactly a
+derived debit", and `level_up`'s "proven not to move at all".
+
+### What it deliberately does not do
+
+- **No cost is derived and no balance is touched.** The legacy server applies a client-sent
+  vector, so any cost would have to be invented or trusted.
+- **No completion, and no readiness.** Every `attr["ts"]` use in the legacy source is a write
+  or a deletion — nothing evaluates elapsed time — and **no `complete_queue_unit` command
+  exists** (the `complete_*` family is exactly `complete_collection`, `complete_goal`,
+  `complete_tutorial`). A queue therefore can never be shown to finish through this service.
+- **No speedup cost and no timer.** `soulmixer_speedup` is the only branch that reads `ts`
+  back; its own source comment calls its calculation *"Quite useless cost calculation for
+  understanding it"*, it reads the duration from the **queued unit**, treats the value as
+  **seconds**, computes `ceil(remaining / 3600)`, and **charges nothing**. It is recorded, not
+  implemented. Where the legacy code would raise `KeyError` on a row lacking `ts` or `ui`, the
+  service **refuses** with a named error.
+- **No bound on the count**, because the engine sets none.
+- **No unit is produced, trained, or placed**, and no acquisition is claimed: no committed unit
+  is store-listed, and the real sources are the later-milestone `offer_packs` and `darts_items`.
+
+### Refusals
+
+| Code | HTTP | Meaning |
+| --- | --- | --- |
+| `missing_map_key` | 409 | the request carries no target row key |
+| `invalid_map_key` | 409 | the key is not a string or is not a placed row |
+| `unknown_map_key` | 409 | the row is not resolvable in the map |
+| `invalid_attr` | 409 | the row's `attr` bag is not an object, so the queue state cannot be projected |
+| `internal_error` | 500 | unhandled server failure |
+
+Any client-supplied **cost, duration, count, or readiness** key is **ignored**, exactly as a
+client-supplied level is ignored by `/v0/level_up`.
+
+### The executed-legacy fixture
+
+`tests/fixtures/godot-unit-queues/` captures a `push` then a `pop` against the committed
+corpus's **real placed training producer** — **id 26, Command Center, at map key 1**, row
+`[26, 51, 41, 0, 0, [], {}, 1]`, `training_time` 5, `min_level` 1, **empty `attr` bag**. No
+player state is fabricated. Read from the committed bytes:
+
+| Step | Command Center `attr` | Stored resources |
+| --- | --- | --- |
+| login | `{}` | gold 2000, wood 2000, steel 2000, oil 2000, xp 4, energy 50, mana 0 |
+| **push** | `{'nu': 1, 'ts': <instant>}` | **byte-identical** |
+| **pop** | `{}` — both keys deleted together | **byte-identical** |
+
+The manifest records that a push and a pop were captured, that **no completion was captured**,
+and that **no completion command exists** — so the gap is on the record rather than implied.
+
+The recorded wall-clock instant is **read from the committed capture** in the fake double and
+the hermetic suite rather than re-pinned as a literal, so re-running the capture cannot
+silently desynchronize them. The load-bearing assertions are unchanged: count exactly 1,
+pop-before **is** push-after, teardown returns the bag to empty, and every resource unchanged.
+
+### A placement constraint worth knowing
+
+The `/v0/queue` route is declared **above** `v0_level_up`. Two delivered level tests slice the
+service source from `def v0_level_up()` to the closing `app.config` line, so a route decorator
+inserted between them broke their dedent. Keep new routes out of that span, or narrow those two
+tests' source slice.
+
 ## Commands actually executed
 
 All run from the repository root on Windows x64 with the pinned interpreter
