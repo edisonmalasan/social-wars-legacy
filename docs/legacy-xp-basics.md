@@ -79,8 +79,15 @@ grant experience to.
   `items[].costs`** that the expand and resources investigations recorded, not the
   server's resource names.
 - `reward_amount` takes exactly three values (`1`, `50`, `250`).
-- `name` is **not** distinct: 44 distinct names across 100 entries (from level 49
-  onward every entry is `"Conqueror"`), so the name is a label, not an identifier.
+- `name` is **not** distinct: 44 distinct names across 100 entries, so the name is a
+  label, not an identifier. Every entry from **one-based level 45** onward is
+  `"Conqueror"`.
+
+  **Correction (made during Apply):** this record originally wrote "from level 49
+  onward", which was a **zero-based position** while the curve's index base is
+  one-based (see below) — the first `"Conqueror"` row is at curve index 44, i.e.
+  one-based level **45**. The delivered client module derives the one-based value
+  and records the discrepancy rather than carrying the slip forward.
 
 **And nothing consumes `reward_type`/`reward_amount`.** No legacy branch reads them, so
 a level's reward is content with no server behaviour behind it — the same situation as
@@ -161,3 +168,51 @@ the established-versus-derived split naming the index base as derived.
 
 After this line, all eleven M7 deliver lines are delivered and the M7 exit criterion can
 be assessed.
+
+## Resolution, after the `building-xp` proposal and Apply (2026-09-30)
+
+### D1 confirmed empirically, not just by the corpus contradiction
+
+The one-based interpretation was resolved in the design from the corpus's contradiction
+(the 0-based reading is impossible for `xp 4 / level 1`), and the compat slice then
+**confirmed it directly**: its derivation returns **level 1** for the corpus's `xp 4`,
+matching the recorded level. So the committed corpus is self-consistent under one-based,
+exactly as the investigation predicted, and the conversion lives in exactly one named
+function per layer — `level_envelope.entry_index_for_level` on the service side and
+`LevelFlow.entry_index_for_level` on the client side, each with a named inverse and a
+round-trip assertion across all 100 entries.
+
+### An honest consequence: the delivered corpus is already at its derived level
+
+Because the corpus is consistent, `POST /v0/level_up` **refuses** it with
+`level_already_current`, before the dispatcher runs. Two things follow, both recorded:
+
+- the committed fixture's own `level_up` transaction therefore moves **nothing** —
+  `level` 1 → 1 and **all seven resources byte-identical** — recorded as
+  `level_moved: false` with a `level_moved_note`, and the level *movement* itself is
+  established by a recorded probe in the same run (`level_up([2])` with a client-sent
+  experience vector moved `level 1 → 2` and `xp 4 → 504`, with the changed map keys
+  exactly `['level', 'xp']`). That probe is what makes the endpoint's "no resource
+  moved" proof non-tautological: it demonstrates the vector *would* have moved a
+  resource had one been sent.
+- the `level-up-live` battery phase therefore **cannot** assert a corpus save mutation
+  and deliberately does not pass the mutation flag; it asserts the refusal, its code, its
+  empty payload, and the corpus's byte-identity, and `verify-boot.ps1` carries a marker
+  recording the deliberate absence. The success path rests on the fake double and the
+  hermetic flow over an in-memory experience, and this is a recorded claim limit rather
+  than an unexercised assertion.
+
+### What was closed, and what stayed open
+
+Closed: the committed-curve level model with the one named conversion; the level and
+progress readout; **explicit stored-versus-derived disagreement reporting** with no
+silent preference or reconciliation; a guarded level-up intent whose target the service
+derives and whose client-supplied level is ignored exactly as a client-supplied amount
+or price is ignored elsewhere; and the two-part post-state proof.
+
+Stayed open, as designed: **no level reward is paid** — `reward_type` and
+`reward_amount` are committed on every entry and consumed by no legacy branch, so paying
+them would invent an economy; **unit XP and tutorial progression remain out of scope**
+because the corpus cannot exercise them (0 of 40 placed rows carry `attr["xp"]`, and there
+are no unit placements); and the **committed thresholds are preserved verbatim** with no
+rebalancing.

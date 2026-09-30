@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-09-30T12:41:40+00:00",
+  "form": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "data": "6ac1eef0106b312caff5c7f474994fd889e92bbd1929c5ba25972e1a9a9326ba;{\"accessToken\":\"\",\"commands\":[[0,\"level_up\",[1],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1790772100}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "command.php form (USERID, user_key, language, data) with the derived <64-hex>;<json> envelope carrying exactly one command: a level_up whose single argument is the SERVICE-DERIVED LEVEL and whose resources_changed is the NEUTRAL VECTOR [0, 0, 0, 0, 0, 0, 0, 0] \u2014 the level the committed one-based levels curve (design D1) implies for the corpus's own 4 stored experience. No level, experience, reward, time, or resource delta is client-supplied: the level is DERIVED, and the one-based index interpretation is DERIVED-PROVISIONAL with the rejected zero-based alternative contradicted by the corpus (xp 4 would imply level 0 while the save records 1). The branch's single assignment from a client integer with no range check and no experience validation, and the verbatim per-resource application under the max(..., 0) clamp before it, are ESTABLISHED. user_key is redacted in this record; accessToken is the crafted empty placeholder, never a token value.",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}

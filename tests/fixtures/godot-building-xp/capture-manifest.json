@@ -1,0 +1,536 @@
+{
+  "cleanup": {
+    "disposable_removed_before_manifest_write": true,
+    "server_stopped_within_run": true
+  },
+  "containment": {
+    "disposable_copy_removed": true,
+    "fixture_output": "tests/fixtures/godot-building-xp",
+    "identical": true,
+    "loopback_only": true,
+    "method": "SHA-256 snapshot of every read working-tree group before the run and after the server stopped; equal or the run fails before writing fixtures. The already committed boot, placement, purchase, move, sell, store, upgrade, construction, collect, and expand fixtures are digest-pinned for the same reason.",
+    "no_flash_browser_external_network": true,
+    "only_working_tree_writes": "fixture files under --out",
+    "post_combined_sha256": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "post_run": {
+      "config": {
+        "exists": true,
+        "files": 12,
+        "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+      },
+      "mods": {
+        "exists": true,
+        "files": 2,
+        "sha256": "81b3c6e1f426e8813d96028b9035a853c1fbff8716256e84e956d8826f136ba3"
+      },
+      "root_python": {
+        "exists": true,
+        "files": 11,
+        "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+      },
+      "saves": {
+        "exists": false,
+        "files": 0,
+        "sha256": "absent"
+      },
+      "templates": {
+        "exists": true,
+        "files": 19,
+        "sha256": "2dffe0ca8746b63cf64fd1062a7f259ba2bb85a2fc54f7a2cd2bd2564ffee4ef"
+      },
+      "tests/saves": {
+        "exists": true,
+        "files": 3,
+        "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+      },
+      "villages": {
+        "exists": true,
+        "files": 31,
+        "sha256": "92429a07402766d8183b16fb32178b5c51f1e555df69d3cb46085a7d977f96ea"
+      }
+    },
+    "pre_combined_sha256": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "pre_run": {
+      "config": {
+        "exists": true,
+        "files": 12,
+        "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+      },
+      "mods": {
+        "exists": true,
+        "files": 2,
+        "sha256": "81b3c6e1f426e8813d96028b9035a853c1fbff8716256e84e956d8826f136ba3"
+      },
+      "root_python": {
+        "exists": true,
+        "files": 11,
+        "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+      },
+      "saves": {
+        "exists": false,
+        "files": 0,
+        "sha256": "absent"
+      },
+      "templates": {
+        "exists": true,
+        "files": 19,
+        "sha256": "2dffe0ca8746b63cf64fd1062a7f259ba2bb85a2fc54f7a2cd2bd2564ffee4ef"
+      },
+      "tests/saves": {
+        "exists": true,
+        "files": 3,
+        "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+      },
+      "villages": {
+        "exists": true,
+        "files": 31,
+        "sha256": "92429a07402766d8183b16fb32178b5c51f1e555df69d3cb46085a7d977f96ea"
+      }
+    },
+    "protected_fixtures": {
+      "identical": true,
+      "paths": [
+        "tests/fixtures/godot-compatibility-boot",
+        "tests/fixtures/godot-building-placement",
+        "tests/fixtures/godot-item-purchase",
+        "tests/fixtures/godot-building-move",
+        "tests/fixtures/godot-building-sell",
+        "tests/fixtures/godot-building-store",
+        "tests/fixtures/godot-building-upgrade",
+        "tests/fixtures/godot-building-construction",
+        "tests/fixtures/godot-building-collect",
+        "tests/fixtures/godot-building-expand"
+      ],
+      "post_run": {
+        "godot-building-collect": {
+          "exists": true,
+          "files": 12,
+          "sha256": "c2ebf3b0778a994e97310b5247809fda57b940cb04b1d1215db787dd81009fa8"
+        },
+        "godot-building-construction": {
+          "exists": true,
+          "files": 12,
+          "sha256": "8efdebcf8e5b91251a48f17d840380da8cd48ea33a922656c67acb115d3c3751"
+        },
+        "godot-building-expand": {
+          "exists": true,
+          "files": 12,
+          "sha256": "08829b34c70979ffd8e887e98bb77d5d6b53774817b393f6388795ff5eb98d19"
+        },
+        "godot-building-move": {
+          "exists": true,
+          "files": 12,
+          "sha256": "b3c477a7947fbe409330f03a8658cdca707a2631b52d1d4c5127f440619799c1"
+        },
+        "godot-building-placement": {
+          "exists": true,
+          "files": 12,
+          "sha256": "546a5f00e5e45319ffd17f5ee67201dd2b72cb21de833a3e35e8a9a98d60c5a8"
+        },
+        "godot-building-sell": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fa85af3fb12ef8b9298203a64632b6d7b31c1ed48f8d1ba716151f25ec7ab1c4"
+        },
+        "godot-building-store": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d4dff84132353a60e3a005c42d067185772ec8d6a2548ffdc5aa4779a2055194"
+        },
+        "godot-building-upgrade": {
+          "exists": true,
+          "files": 12,
+          "sha256": "398675ad94928dd75f7fbcd9f62e082d73ee973d3c973f5bbdf44a083a9c0521"
+        },
+        "godot-compatibility-boot": {
+          "exists": true,
+          "files": 31,
+          "sha256": "4d389707e0f18676fb23b3a2a8a47031b4e233366e4066437f8bad6854e15234"
+        },
+        "godot-item-purchase": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d05e5b92b26a1222774bb32e76a42417c692e65ee1b87abdb8a2f4e6cd84e813"
+        }
+      },
+      "pre_run": {
+        "godot-building-collect": {
+          "exists": true,
+          "files": 12,
+          "sha256": "c2ebf3b0778a994e97310b5247809fda57b940cb04b1d1215db787dd81009fa8"
+        },
+        "godot-building-construction": {
+          "exists": true,
+          "files": 12,
+          "sha256": "8efdebcf8e5b91251a48f17d840380da8cd48ea33a922656c67acb115d3c3751"
+        },
+        "godot-building-expand": {
+          "exists": true,
+          "files": 12,
+          "sha256": "08829b34c70979ffd8e887e98bb77d5d6b53774817b393f6388795ff5eb98d19"
+        },
+        "godot-building-move": {
+          "exists": true,
+          "files": 12,
+          "sha256": "b3c477a7947fbe409330f03a8658cdca707a2631b52d1d4c5127f440619799c1"
+        },
+        "godot-building-placement": {
+          "exists": true,
+          "files": 12,
+          "sha256": "546a5f00e5e45319ffd17f5ee67201dd2b72cb21de833a3e35e8a9a98d60c5a8"
+        },
+        "godot-building-sell": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fa85af3fb12ef8b9298203a64632b6d7b31c1ed48f8d1ba716151f25ec7ab1c4"
+        },
+        "godot-building-store": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d4dff84132353a60e3a005c42d067185772ec8d6a2548ffdc5aa4779a2055194"
+        },
+        "godot-building-upgrade": {
+          "exists": true,
+          "files": 12,
+          "sha256": "398675ad94928dd75f7fbcd9f62e082d73ee973d3c973f5bbdf44a083a9c0521"
+        },
+        "godot-compatibility-boot": {
+          "exists": true,
+          "files": 31,
+          "sha256": "4d389707e0f18676fb23b3a2a8a47031b4e233366e4066437f8bad6854e15234"
+        },
+        "godot-item-purchase": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d05e5b92b26a1222774bb32e76a42417c692e65ee1b87abdb8a2f4e6cd84e813"
+        }
+      }
+    },
+    "working_tree_saves_unchanged": true
+  },
+  "corpus": {
+    "login_preserved_seed": true,
+    "pid": "00000000-0000-4000-8000-000000000001",
+    "seed": {
+      "file_sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+      "path": "tests/saves/fresh-player.json",
+      "saves_group_sha256_before_server_start": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6"
+    },
+    "seeded_as": "saves/<pid>.save.json in the disposable copy",
+    "startup_preserved_seed": true
+  },
+  "executed_at_utc": "2026-09-30T12:41:40+00:00",
+  "exit_code": 0,
+  "intent": {
+    "derived": {
+      "args": [
+        1
+      ],
+      "command": "level_up",
+      "conversion": "entry_index_for_level(level, entries) -> level - 1, the single named one-based conversion",
+      "curve": {
+        "derivation_status": "derived-provisional",
+        "distinct_names": 44,
+        "duplicate_thresholds": 0,
+        "entries": 100,
+        "fields": [
+          "name",
+          "exp_required",
+          "reward_type",
+          "reward_amount"
+        ],
+        "final_entry": [
+          [
+            "name",
+            "Conqueror"
+          ],
+          [
+            "exp_required",
+            2016089205
+          ],
+          [
+            "reward_type",
+            "c"
+          ],
+          [
+            "reward_amount",
+            1
+          ]
+        ],
+        "final_threshold": 2016089205,
+        "first_entry": [
+          [
+            "name",
+            "Slave"
+          ],
+          [
+            "exp_required",
+            0
+          ],
+          [
+            "reward_type",
+            "s"
+          ],
+          [
+            "reward_amount",
+            50
+          ]
+        ],
+        "first_thresholds": [
+          0,
+          40,
+          60,
+          100,
+          200,
+          350,
+          550,
+          800
+        ],
+        "id_space": "the stored level 1..100",
+        "index_base": "one-based",
+        "key": "levels",
+        "name_is_a_label": true,
+        "read_by_the_legacy_server": false,
+        "rejected_alternative": "zero-based",
+        "reward_amounts": [
+          1,
+          50,
+          250
+        ],
+        "reward_types": [
+          "c",
+          "g",
+          "s",
+          "w"
+        ],
+        "second_entry": [
+          [
+            "name",
+            "Servant"
+          ],
+          [
+            "exp_required",
+            40
+          ],
+          [
+            "reward_type",
+            "w"
+          ],
+          [
+            "reward_amount",
+            250
+          ]
+        ],
+        "stable_id": false,
+        "strictly_increasing": true
+      },
+      "decisions": {
+        "D1_index_base": "the committed curve is ONE-BASED: stored level n is levels[n - 1], and the conversion lives in exactly one named function (level_envelope.entry_index_for_level) so a later change with better evidence revises one function rather than auditing the codebase. DERIVED-PROVISIONAL. The REJECTED alternative is the ZERO-BASED reading, and the corpus CONTRADICTS it: at xp 4 the zero-based curve implies level 0 while the save records level 1, while the one-based reading maps level 1 to levels[0] ('Slave', exp_required 0) and 4 >= 0 holds. Guessing zero-based would shift EVERY level by one and the error would stay invisible until a player saw the wrong level name",
+        "D2_recorded_level_unverified": "the recorded level is written from a client-supplied integer with no range check and no experience validation, so it is NOT evidence of anything the curve implies. Two distinct facts exist and are never conflated: the derived level and the recorded level. The endpoint reports BOTH and refuses rather than reconciling a disagreement (level_already_current when they are equal, xp_below_threshold when the recorded level sits above what the stored experience supports)",
+        "D3_derived_target": "the request carries only the save id. The target level is derived server-side from the stored experience and the committed curve; a client-supplied level (or new_level, or xp) key is IGNORED, exactly as the collect and expand endpoints ignore client-supplied amounts and prices. This closes the legacy hole where any client could set level 99",
+        "D4_fail_closed_refusals": "both refusals are answered BEFORE the dispatcher runs, so the corpus is byte-identical on every error path: level_already_current (409) and xp_below_threshold (409)",
+        "D5_two_part_proof": "after execution the endpoint requires BOTH that the recorded level is EXACTLY the derived level AND that EVERY stored resource is UNCHANGED. The second half is what forecloses vector smuggling: level_up is dispatched with a client-sent vector like every other command, so a non-zero vector would move a balance through this very branch (probe 1 executes that), and proving that NOTHING moved is what distinguishes a correct level-up from a resource-minting exploit wearing its clothes",
+        "D6_unaffordable_next_level": "the curve's next threshold and the remaining experience are REPORTED as information only \u2014 no gate, no penalty, no skip. The endpoint simply refuses a request the stored experience cannot support (xp_below_threshold)",
+        "D7_no_tuning_no_rewards": "the committed exp_required values are preserved VERBATIM: nothing is rebalanced, smoothed, or interpolated. reward_type / reward_amount are consumed by no legacy branch and are therefore REFUSED rather than invented. Unit experience and the tutorial are out of scope because the corpus cannot exercise them"
+      },
+      "envelope_keys": [
+        "accessToken",
+        "commands",
+        "first_number",
+        "publishActions",
+        "tries",
+        "ts"
+      ],
+      "resource_vector": "unknown, xp, gold, wood, oil, steel, cash, mana",
+      "resources_changed": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "status": "established: the command's argument shape and its single effect (map['level'] = new_level, command.py:81-85), that the client-sent 8-slot vector is applied verbatim per resource as max(current + delta, 0) and applied BEFORE the branch (command.py:40; engine.py:251-271), that NOTHING in the legacy server reads the committed levels curve (zero references across command.py, engine.py, sessions.py, server.py, constants.py), the committed curve and its census, that 0 of the corpus's 40 placed rows carry unit experience, and the resulting state of this executed transaction. DERIVED and never observed from the Flash client: D1 (the one-based index interpretation, with the rejected zero-based alternative stated), D2 (reporting the recorded-versus-derived disagreement rather than reconciling it), and D3 (the derived target itself). The claim is that the recorded level is the one the committed curve implies for the stored experience, NEVER one observed a Flash client send, and no reward is claimed for any level",
+      "vector_is_neutral": true
+    },
+    "index_base_rule": "the committed levels curve is ONE-BASED: stored level n is levels[n - 1], and the conversion lives in exactly one named function (level_envelope.entry_index_for_level). This is DERIVED-PROVISIONAL (design D1) and the REJECTED alternative is the ZERO-BASED reading, which the committed corpus CONTRADICTS: at xp 4 it implies level 0 while the save records level 1, whereas the one-based reading places level 1 at 0 experience and 4 >= 0 holds",
+    "level_sent": 1,
+    "reward_rule": "NO level reward is paid and none is derived (design D7): every committed entry carries reward_type and reward_amount, and NO legacy branch reads either, so paying one would invent an economy \u2014 the same discipline the expansion neighbors / inventory_qte requirements received",
+    "target_rule": "the level the committed one-based curve derives for the corpus's own stored experience (maps[0].xp = 4): the ladder starts 0, 40, 60, 100, \u2026 so the highest level the experience meets is 1, and the corpus already records level 1. The level is therefore DERIVED (design D1/D3) \u2014 never client-supplied \u2014 and the recorded transaction re-writes the identical value, which is exactly the condition behind the endpoint's level_already_current refusal. The level MOVEMENT the success path promises is established by probe 1, executed against this same server",
+    "unit_xp_rule": "unit experience (add_xp_unit) is OUT OF SCOPE: the committed corpus has no unit placements and 0 of its 40 placed rows carry attr['xp']"
+  },
+  "interpreter": {
+    "executable": "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+    "requirement": "CPython 3.9.x (pinned baseline for this change)",
+    "version": "3.9.13 (tags/v3.9.13:6de2ca5, May 17 2022, 16:36:42) [MSC v.1929 64 bit (AMD64)]"
+  },
+  "invocation": "python -B apps/compat-api/capture_level_fixture.py",
+  "probes": [
+    {
+      "changed_top_level_map_keys": [
+        "level",
+        "xp"
+      ],
+      "commands": [
+        "level_up([2]) with a CLIENT-SENT vector [0, 500, 0, 0, 0, 0, 0, 0]"
+      ],
+      "established": "the branch assigns args[0] to map['level'] and writes NOTHING else (command.py:81-85): not the placements, not store, not map_sizes, not increasedPopulation, not privateState, not playerInfo. The experience move is entirely client-sent: apply_resources runs BEFORE the branch (command.py:40; engine.py:251-271) and applies the 8-slot vector verbatim per resource as max(current + delta, 0)",
+      "executed_in_this_capture": true,
+      "leaf_differences": [
+        "/maps/0/level",
+        "/maps/0/xp"
+      ],
+      "level_after": 2,
+      "level_before": 1,
+      "other_resources": "gold 2000, wood 2000, oil 2000, steel 2000, playerInfo.cash 5 and privateState.mana 0 all unchanged",
+      "probe": 1,
+      "question": "what does the level_up branch actually write, and what happens when the client-sent resource vector is not neutral?",
+      "resources_after": {
+        "cash": 5,
+        "gold": 2000,
+        "mana": 0,
+        "oil": 2000,
+        "steel": 2000,
+        "wood": 2000,
+        "xp": 504
+      },
+      "resources_before": {
+        "cash": 5,
+        "gold": 2000,
+        "mana": 0,
+        "oil": 2000,
+        "steel": 2000,
+        "wood": 2000,
+        "xp": 4
+      },
+      "response": "{\"result\":\"success\"}",
+      "why_it_matters": "this is the executed evidence for the derived NEUTRAL vector and for the endpoint's second post-execution proof half. A level-up that carried a non-zero vector would move a balance through this very branch, so proving after execution that EVERY stored resource is unchanged is what distinguishes a correct level-up from a resource-minting exploit wearing its clothes (design D5). Without probe 1 the 'nothing moved' proof would be a tautology",
+      "xp_after": 504,
+      "xp_before": 4
+    }
+  ],
+  "purpose": "Executed request/before/response/after fixtures for one legacy level_up transaction carrying the service-derived level and the neutral vector; the executed-legacy parity oracle for the Compatibility API v0 level_up endpoint.",
+  "schema": "godot-building-xp/legacy-capture-v1",
+  "server": {
+    "command": [
+      "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+      "-B",
+      "server.py"
+    ],
+    "command_recorder_env": "SOCIALWARS_COMMAND_RECORD_DIR stripped from child",
+    "cwd": "<disposable copy under the system temp root>",
+    "host": "127.0.0.1",
+    "output_logs": "server.stdout.log / server.stderr.log inside the disposable copy (removed with the copy; not committed)",
+    "port": 5055,
+    "port_free_after_stop": true,
+    "port_free_before_start": true,
+    "readiness": "TCP connect loop on 127.0.0.1:5055 (no extra HTTP request)",
+    "stopped_by": "taskkill /T /F <pid>, wait, then port-free re-check"
+  },
+  "time_dependent_fields": {
+    "documented_normalization": "level parity applies NO clock normalization: the recorded level is compared by value (exactly the derived level) and every stored resource by value (exactly unchanged, because the derived vector is neutral). The only clock in the transaction is the envelope ts, which legacy parses and never reads, and the legacy branch writes no clock of its own",
+    "leaves": [
+      "/captured_at_utc in steps/login_post/request.json",
+      "/captured_at_utc in steps/login_post/response.meta.json",
+      "/captured_at_utc in steps/command_level_up/request.json",
+      "/captured_at_utc in steps/command_level_up/response.meta.json",
+      "/executed_at_utc in capture-manifest.json",
+      "/headers/Date in steps/login_post/response.meta.json",
+      "/headers/Date in steps/command_level_up/response.meta.json",
+      "the envelope ts inside steps/command_level_up/request.json's /form/data (and therefore that whole field's string, because the digest covers the payload), since ts is the current time"
+    ],
+    "rule": "the recorded STATE and the recorded RESPONSE carry NO time-dependent leaf at all: level_up writes the integer the client sent into the map and the derived vector is the neutral all-zero vector, so steps/*/before.json, steps/*/after.json, and steps/*/response.body are byte-identical across reruns. The leaves below are the whole record-metadata and envelope-clock surface, and the claim is machine-checkable: a leaf-level diff of two consecutive runs must differ at exactly these 8 paths and nowhere else",
+    "stable_by_derivation": "the recorded level and every resource are byte-stable because the derivation is fixed: the committed ladder's floor is 0, the corpus's stored experience is 4, and the one-based conversion therefore always derives level 1, so /transaction/level_after, /transaction/resources_after, /transaction/resource_delta, /transaction/save_after_sha256, /transaction/recorded_leaf_differences and every leaf of the two save documents are stable. There is no wall-clock reading anywhere in the recorded state \u2014 unlike collect's item[3] = time_now(), the level_up branch writes no clock of its own",
+    "state_leaves": []
+  },
+  "transaction": {
+    "bought_units_after": [],
+    "bought_units_before": [],
+    "clamp_exercised": false,
+    "clamp_note": "legacy's max(current + delta, 0) only bites when a delta would drive a balance below zero; the derived vector is the NEUTRAL all-zero vector, so no balance moves at all and the clamp is never exercised by this fixture. That the vector really is client-sent and really would move a balance through this very branch is established by probe 1 above",
+    "count": 2,
+    "dead_heroes_after": {},
+    "derived_level": 1,
+    "increased_population_after": 0,
+    "increased_population_before": 0,
+    "level_after": 1,
+    "level_before": 1,
+    "level_moved": false,
+    "level_moved_note": "the recorded level did NOT move on this corpus, and that is the honest recorded fact: the service-derived level for xp 4 is 1 and the corpus already records 1, so the branch wrote an identical value. This is exactly the condition behind the endpoint's level_already_current refusal, and probe 1 (executed in this same run against this same server) is the evidence that the branch moves the level when the derived level differs",
+    "level_up_writes": [
+      "engine.apply_resources applies the derived NEUTRAL vector on the single command with max(..., 0) per resource, BEFORE the branch (command.py:40; engine.py:251-271)",
+      "command.level_up assigns args[0] to map['level'] and writes NOTHING else (command.py:81-85)",
+      "no branch reads, validates, ranges, or derives map['level'] against map['xp'], and NOTHING in the legacy server reads the committed levels curve \u2014 a repository-wide search finds zero references to it in command.py, engine.py, sessions.py, server.py, and constants.py"
+    ],
+    "map_key_set_unchanged": true,
+    "map_sizes_present_after": false,
+    "map_sizes_present_before": false,
+    "other_map_fields_unchanged": true,
+    "other_rows_unchanged": true,
+    "placement_count_after": 40,
+    "placement_count_before": 40,
+    "player_info_unchanged": true,
+    "private_state_unchanged": true,
+    "recorded_leaf_differences": [],
+    "resource_delta": {
+      "cash": 0,
+      "gold": 0,
+      "mana": 0,
+      "oil": 0,
+      "steel": 0,
+      "wood": 0,
+      "xp": 0
+    },
+    "resources_after": {
+      "cash": 5,
+      "gold": 2000,
+      "mana": 0,
+      "oil": 2000,
+      "steel": 2000,
+      "wood": 2000,
+      "xp": 4
+    },
+    "resources_before": {
+      "cash": 5,
+      "gold": 2000,
+      "mana": 0,
+      "oil": 2000,
+      "steel": 2000,
+      "wood": 2000,
+      "xp": 4
+    },
+    "response_body": "{\"result\": \"success\"}",
+    "reward_note": "NO level reward is paid and none is derived: every committed entry carries reward_type and reward_amount and NO legacy branch reads either, so the neutral vector is the whole economic content of a level-up under this contract (design D7)",
+    "reward_paid": false,
+    "steps": [
+      {
+        "method": "POST",
+        "name": "login_post",
+        "path": "/",
+        "response_bytes": 207,
+        "response_sha256": "2de230237d9f4055670576b9485897dbc06581889ca90527504cbdbd4933ec01",
+        "save_after_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_before_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_unchanged_by_call": true,
+        "status": 302,
+        "target": "/"
+      },
+      {
+        "method": "POST",
+        "name": "command_level_up",
+        "path": "/dynamic/menvswomen/srvsexwars/command.php",
+        "response_bytes": 21,
+        "response_sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87",
+        "save_after_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_before_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_unchanged_by_call": true,
+        "status": 200,
+        "target": "/dynamic/menvswomen/srvsexwars/command.php"
+      }
+    ],
+    "store_after": {},
+    "stored_xp_before": 4
+  }
+}
