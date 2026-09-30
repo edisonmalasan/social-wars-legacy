@@ -925,31 +925,71 @@ func _check_boundary(catalog: Variant) -> void:
 		UnitDefinition.GROUP_IDENTITY] as Array).size(), 7,
 		"the field inventory is a fresh copy, never the constant itself")
 
-	# No instance surface exists anywhere in the client. Both this suite's own
-	# token lists and the recorded non-claims in `unit_catalog.gd` necessarily
-	# name what they forbid, so the scan drops comment lines AND string-literal
-	# content before searching — what remains is the code a reader would
-	# compile. This suite is skipped as well, the way the project-scope suite
-	# skips itself.
-	var instance_files: Array = []
-	var queue_files: Array = []
-	for relative: String in _project_sources():
-		if relative == "tests/test_unit_definitions.gd":
-			continue
+	# The static/instance BOUNDARY, not a repository-wide absence. An earlier
+	# version of this block asserted that NO client source anywhere declared a
+	# unit instance or a garrison, which was a stronger claim than the
+	# requirement makes and which the very next deliver line
+	# (`godot-unit-instances`) is chartered to falsify — the assertion had to be
+	# weakened or the delivered suite would have rotted the moment the boundary
+	# it drew was crossed. What is permanent is narrower and stronger: the two
+	# modules THIS capability delivers declare no instance or queue state, and
+	# where an instance type does exist it is a DISTINCT type that holds this
+	# definition rather than extending it. Both this suite's own token lists and
+	# the recorded non-claims in `unit_catalog.gd` necessarily name what they
+	# forbid, so the scan drops comment lines AND string-literal content before
+	# searching — what remains is the code a reader would compile.
+	for relative: String in ["scripts/units/unit_definition.gd",
+			"scripts/units/unit_catalog.gd"]:
 		var code := _code_only(relative)
-		if code.find("UnitInstance") != -1 or code.find("unit_instance") != -1:
-			instance_files.append(relative)
-		if code.find("garrison") != -1 or code.find("production_queue") != -1 \
-				or code.find("train_queue") != -1:
-			queue_files.append(relative)
-	check_eq(instance_files, [],
-		"no client source DECLARES a unit instance, instance parsing, or a "
-			+ "garrison or production-queue state")
-	check_eq(queue_files, [],
-		"no client source DECLARES garrison or production-queue state")
-	check(not FileAccess.file_exists(Paths.project_dir()
-			.path_join("scripts/units/unit_instance.gd")),
-		"there is no unit-instance script in the client")
+		check_eq(code.find("UnitInstance"), -1,
+			"%s declares no unit-instance type: the instance is a distinct "
+				% relative + "type owned by a later capability")
+		check_eq(code.find("garrison"), -1,
+			"%s declares no garrison state" % relative)
+		check_eq(code.find("production_queue"), -1,
+			"%s declares no production-queue state" % relative)
+		check_eq(code.find("train_queue"), -1,
+			"%s declares no train-queue state" % relative)
+
+	# Where an instance type exists, the boundary still holds: it is a separate
+	# script, it is not this definition, and the definition it holds carries the
+	# same fields as every other definition with no player state among them. This
+	# is what makes the instance line an extension of this contract rather than a
+	# contradiction of it, and it holds whether or not that line has landed yet.
+	var instance_path := Paths.project_dir().path_join(
+		"scripts/units/unit_instance.gd")
+	if FileAccess.file_exists(instance_path):
+		var instance_script: Variant = load(instance_path)
+		check(instance_script != null, "the unit-instance type is its own script")
+		check(instance_script != UnitDefinition,
+			"a unit instance is a DISTINCT type from UnitDefinition, not a "
+				+ "widening of it")
+		# Every definition in the catalog must still expose the same script
+		# variables and none of them may be player state, which is exactly the
+		# inventory asserted above — re-asserted here so a future instance type
+		# cannot satisfy the distinctness check while quietly widening the
+		# definition it holds.
+		var held_stateful: Array = []
+		var held_inventory := 0
+		for held_id: Variant in UnitCatalog.legacy_ids(catalog):
+			var held_definition = UnitCatalog.find(catalog, held_id)
+			for property: Dictionary in held_definition.get_property_list():
+				if (int(property["usage"]) & PROPERTY_USAGE_SCRIPT_VARIABLE) == 0:
+					continue
+				held_inventory += 1
+				if PLAYER_STATE_NAMES.has(str(property["name"])):
+					held_stateful.append(str(held_id) + "." + str(property["name"]))
+		check_eq(held_stateful, [],
+			"the definition an instance holds still carries no field that "
+				+ "could hold player state")
+		check(held_inventory == inventory.size(),
+			"every definition still exposes the same field inventory: no "
+				+ "player state migrated into the definition")
+	else:
+		check(true,
+			"no unit-instance type exists yet: the boundary holds trivially "
+				+ "until the instance capability lands")
+
 	check_eq(_saved_shape_names(catalog), [],
 		"no player-owned unit state is stored by this line: nothing here "
 			+ "writes, and no save shape is introduced")

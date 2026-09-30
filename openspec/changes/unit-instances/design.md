@@ -14,7 +14,10 @@ restated compactly because every decision below rests on them:
   (`engine.py:183-213`).
 - `unit_capacity` has **zero** occurrences in five legacy modules.
 - `training_time` is on 130 of 470 buildings, `unit_capacity` on 48 of 470, and the two
-  sets are **disjoint**. 0 of 429 units carry either.
+  sets are **disjoint**. 0 of 429 units carry `training_time`; **5 of 429 do carry a
+  non-zero `unit_capacity`** (1013, 1018, 1019, 1032, 1035) — *corrected during Apply;
+  this design first said 0 of 429 carried either, which was asserted rather than
+  measured.* Neither fact changes D5, because the field has no legacy consumer at all.
 - `in_store` is 0 for all 429 units; `offer_packs` (109 refs) and `darts_items` (44) are
   the only committed unit sources.
 - `push_dead_unit` stores a **count** in `privateState["deadHeroes"][item_id]` and

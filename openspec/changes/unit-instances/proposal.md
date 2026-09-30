@@ -39,7 +39,9 @@ Three content findings constrain the line, and each has no legacy consequence:
   invented into a rule.
 - **The 130 training producers and the 48 garrison-capable buildings are disjoint
   sets** — no producer garrons, and no garrison-capable building trains.
-  `training_time` lives on buildings, not units (0 of 429 units have it).
+  `training_time` lives on buildings, not units (0 of 429 units have it), and a
+  non-zero `unit_capacity` appears on only **5 of 429** units (the ships and trucks)
+  — *corrected during Apply: this proposal first said units carry neither.*
 - **No unit is store-listed** (`in_store` is 0 for all 429). The only committed
   tables referencing unit ids are `offer_packs` (109 refs) and `darts_items` (44) —
   **later milestones**, not this one.

@@ -84,8 +84,9 @@ classification.
 The client SHALL impose **no** garrison capacity limit, because the committed
 `unit_capacity` field has **no** legacy consumer: it is not read by any legacy branch.
 The client MAY report the committed capacity of a garrison-capable definition for
-reference, and SHALL state that no capacity rule is implemented and that authoritative
-validation belongs to a later server-authoritative milestone.
+reference — 48 of 470 committed buildings and **5 of 429 committed units** carry a
+non-zero value — and SHALL state that no capacity rule is implemented and that
+authoritative validation belongs to a later server-authoritative milestone.
 
 #### Scenario: No capacity is refused or truncated
 
