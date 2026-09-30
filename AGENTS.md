@@ -643,6 +643,77 @@ digest, projection constant, camera, or selection block changed; leaving them st
 would have broken the M6 deliverable's claim that rerunning the report reproduces its
 bytes. No Flash, Ruffle, ActionScript, or browser executes in any of these commands.
 
+Verified building-xp commands (milestone M7; Godot 4.7.2.stable and pinned
+CPython 3.9.13, Windows x64; `python` denotes the pinned interpreter, never the
+PATH alias). This is the **eleventh and final** M7 deliver line; the investigation record
+`docs/legacy-xp-basics.md` was committed before the proposal (PR #198):
+
+```bash
+python -B apps/compat-api/capture_level_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_town_xp.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-09-30): the level fixture capture (one-shot
+executed-legacy oracle; the request carries `[[0,"level_up",[1],[0,0,0,0,0,0,0,0]]]` with a
+**neutral** vector, and **at the committed corpus the transaction moves nothing** — the save
+already records level 1 and the committed curve derives level 1 for `xp 4` — so the row is
+unchanged and **all seven resources, the 40 placements, every other row, the storage, the
+whole private state, and the player info are byte-identical**; the manifest records this as
+`level_moved: false` with a note, and a **recorded probe in the same run establishes level
+*movement* itself** — `level_up([2])` with a client-sent experience vector moved `level 1` to
+`2` and `xp 4` to `504` with the changed map keys exactly `['level', 'xp']` — which is what
+makes the endpoint's "no resource moved" proof non-tautological; exit codes and containment
+recorded in `tests/fixtures/godot-building-xp/README.md`), the compat suite including the
+committed-schedule derivation, the `/v0/level_up` endpoint accepting **only** `{user_id}`
+with a client-supplied level **ignored** exactly as a client amount or price is ignored
+elsewhere, its two 409 refusals (`level_already_current`, `xp_below_threshold`) resolved
+before the dispatcher runs, and its **two-part** post-execution proof that checks the
+recorded level equals the derived level **and that every stored resource is unchanged** — the
+family's third proof form, which forecloses vector smuggling through a command dispatched
+like any other with a client-sent resource vector — and executed-legacy parity tests
+(observed `Ran 1109 tests ... OK`, exit `0`), the hermetic progression suite (observed 767
+checks, PASS), both batteries in the final state (each exit `0`; `verify-boot.ps1` now runs
+**27 hermetic suites and 13 live phases**), and the preservation manifest (3,258 entries, exit
+`0`). The compatibility service listens on `127.0.0.1:5056` only, and every network call in
+these commands is loopback. The evidence capture and report steps are documented in
+`apps/client-godot/README.md` ("Level progression"); committed evidence lives under
+`apps/client-godot/evidence/building-xp/`. **The one consequential decision:** the committed
+`levels` schedule has 100 entries with `exp_required` **strictly increasing** (no
+duplicates, no non-positive gap, `0, 40, 60, 100, 200, 350, 550, 800, …` to `2016089205`),
+and **nothing in the legacy server reads it** — zero references across `command.py`,
+`engine.py`, `sessions.py`, `server.py`, `constants.py` — while the legacy `level_up` branch
+writes the level from a **client integer with no range check and no XP validation**, so a
+client could set level 99. The curve's index base was resolved from the committed corpus, and
+**zero-based is actively contradicted**: at `xp 4` it implies level 0 while the save records
+level 1, since the curve says level 1 begins at 40 experience, whereas **one-based** gives
+`4 >= exp_required(1) = 0`. Guessing zero-based would shift **every** level in the game by
+one, invisibly, until a player noticed the wrong level name — so the interpretation is
+**derived-provisional everywhere it is recorded with the rejected zero-based alternative
+retained**, and the conversion lives in **exactly one named function per layer**
+(`level_envelope.entry_index_for_level` and `LevelFlow.entry_index_for_level`, each with a
+named inverse and a round trip asserted across all 100 entries; `town.gd` contains no curve
+indexing of its own), and the compat slice then confirmed it empirically by deriving level 1
+for the corpus's `xp 4`. Claim limits: **the level is the one the committed curve implies for
+the stored experience, never one observed from the Flash client**, and the one-based index is
+derived from **one** corpus data point; **no level reward is paid and none displayed**
+(`reward_type` and `reward_amount` are committed on every entry and consumed by no legacy
+branch, so paying one would invent an economy); **unit XP and tutorial progression are out of
+scope** because the corpus cannot exercise them (0 of 40 placed rows carry `attr["xp"]`; no
+unit placements exist); the committed thresholds are **preserved verbatim** with no
+rebalancing; the stored-versus-derived **disagreement reporting deliberately does not
+reconcile**, surfacing both values instead, because the recorded level is unverified against
+the curve; **a successful live level-up is unproven** — the committed corpus is already at its
+derived level, so the `level-up-live` phase **deliberately does not assert a save mutation**
+but asserts the refusal, its code, its empty payload, and the corpus's byte-identity, with a
+marker in `verify-boot.ps1` recording the deliberate absence; parity covers one recorded
+transaction against the fresh-player corpus; no pixel-parity oracle exists; the committed
+capture shows the refused path and runs the fake implementation. No Flash, Ruffle,
+ActionScript, or browser executes in any of these commands.
+
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 
