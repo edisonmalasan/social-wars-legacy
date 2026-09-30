@@ -559,6 +559,56 @@ unsourced only in the client's display table. The client-side detail is document
 `privateState.energy` changes over time**, `apply_resources` never writes it, and the
 eight-slot mutation vector has no slot for it — holds on this side exactly as recorded.
 
+## `POST /v0/level_up`
+
+The **eleventh and final** state-mutating surface (the `building-xp` change). Its body is
+`{"user_id"}` and **nothing else** — any `level`, `new_level`, `xp`, `experience`,
+`reward_type`, `reward_amount`, `resources_changed`, or `vector` key is ignored, so the client
+cannot dictate the outcome.
+
+That matters because the legacy branch is one line with **no range check and no XP
+validation** (`command.py:81-85`): `map["level"] = new_level`, and a client could set level
+99 with `{"result":"success"}`. This endpoint closes that hole by **deriving** the target
+server-side from the stored experience and the committed 100-entry `levels` schedule.
+
+```json
+{"protocol": "compat-v0", "ok": true, "game_version": "alpha 0.02",
+ "server_time": 1790737317, "result": "success",
+ "derived_level": 1, "level_before": 1, "level_after": 1,
+ "curve": {"entries": 100, "index_base": "one-based",
+           "derivation_status": "derived-provisional",
+           "rejected_alternative": "zero-based",
+           "entry_name": "Servant", "entry_exp_required": 40,
+           "next_level": 5, "next_name": "Villager",
+           "next_exp_required": 200, "remaining": 100, "xp": 4},
+ "resources": {"xp": 4, "gold": 2000, "wood": 2000, "oil": 2000,
+               "steel": 2000, "cash": 5, "mana": 0}}
+```
+
+- **The index base is derived-provisional, and the rejected alternative is retained.** The
+  curve is **one-based**: stored level *n* is entry *n − 1*. At the corpus's `xp 4` the
+  zero-based reading implies level 0 while the save records level 1 — a direct
+  contradiction, since the curve says level 1 begins at 40 — whereas one-based gives
+  `4 >= exp_required(1) = 0`. The conversion is one named function,
+  `level_envelope.entry_index_for_level`, with a named inverse and a round trip asserted
+  across all 100 entries; the module raises `invalid_level` only for a non-integer and
+  returns `None` for out-of-range values and for a `bool`.
+- **The post-state is proved twice**: the recorded level equals the derived level **and
+  every stored resource is unchanged**. The second half is the point — `level_up` is
+  dispatched like every other command with a client-sent resource vector, so proving that
+  *nothing* moved is what forecloses smuggling. A neutral vector is used, and a recorded
+  probe (`level_up([2])` with a client-sent experience vector) moved `level 1 → 2` and
+  `xp 4 → 504` to demonstrate the proof is not tautological.
+- **Two 409 refusals, both before the dispatcher runs**, so the corpus is untouched:
+  `level_already_current` (the recorded level already equals the derived level) and
+  `xp_below_threshold` (the experience cannot reach the next level).
+- **No level reward is paid.** `reward_type` and `reward_amount` are committed on every
+  curve entry and **no legacy branch reads either**, so paying one would invent an economy.
+  The committed thresholds are preserved verbatim.
+- At the committed corpus the endpoint **refuses**: the save records level 1 and the curve
+  derives level 1 for `xp 4`, so there is nothing to do. That is the honest outcome for this
+  corpus and is recorded as a claim limit.
+
 ### Structured errors
 
 Always JSON, always `ok:false`, keys exactly
@@ -594,6 +644,8 @@ Always JSON, always `ok:false`, keys exactly
 | `already_expanded` | 409 | `/v0/expand` the id is already in the player's owned list; the legacy server accepts duplicates |
 | `expansion_requirements_unmet` | 409 | `/v0/expand` the row records a positive `neighbors` or `inventory_qte` requirement, which nothing in the delivered stack can evaluate |
 | `insufficient_resources` | 409 | `/v0/expand` a balance is below the server-derived debit; refused rather than absorbed by the per-resource clamp |
+| `level_already_current` | 409 | `/v0/level_up` the recorded level already equals the level the committed curve derives from the stored experience |
+| `xp_below_threshold` | 409 | `/v0/level_up` the stored experience cannot reach the next level |
 | `bad_request` | 400 | other malformed requests Flask rejects |
 | `not_found` | 404 | unknown path |
 | `method_not_allowed` | 405 | known path, unsupported method |
@@ -605,15 +657,16 @@ All run from the repository root on Windows x64 with the pinned interpreter
 (CPython 3.9.13); exit codes are the real observed ones (bootstrap-era
 counts 2026-09-27; placement-, purchase-, move-, sell-, store-, upgrade-,
 construction-, and collect-era counts 2026-09-29 and 2026-09-30;
-expand-era counts 2026-09-30):
+expand-era counts 2026-09-30;
+level-era counts 2026-09-30):
 
 ```bash
 python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
 ```
 
-→ `Ran 947 tests ... OK`, exit `0` (90 before `building-purchase`, 157 before
+→ `Ran 1109 tests ... OK`, exit `0` (90 before `building-purchase`, 157 before
 `building-move`, 227 before `building-sell`, 306 before `building-store`, 390 before
-`building-upgrade`, 491 before `building-construction`, 616 before `building-collect`, 768 before `building-expand`).
+`building-upgrade`, 491 before `building-construction`, 616 before `building-collect`, 768 before `building-expand`, 947 before `building-xp`).
 Covers envelope/error shapes, bootstrap and
 session parity against the committed fixtures, pre/post save SHA-256 identity,
 the no-persistence source guard, and the offline socket guard (the suite opens
@@ -738,6 +791,17 @@ This capture has **no** time-dependent field, so a rerun reproduces its bytes ex
 python -B apps/compat-api/capture_expand_fixture.py
 ```
 
+Level fixture capture (the `building-xp` change's executed-legacy oracle, one-shot) -
+see `tests/fixtures/godot-building-xp/README.md` for its invocation, exit code `0`,
+its containment record, and the derived one-based interpretation with its rejected
+zero-based alternative. **At the committed corpus the transaction moves nothing**,
+because the save already records the level the curve derives; the manifest records
+that as `level_moved: false` with a note.
+
+```bash
+python -B apps/compat-api/capture_level_fixture.py
+```
+
 ## Layout
 
 - `compat_legacy.py` — corpus build/layout checks and the in-process adapter
@@ -844,7 +908,8 @@ buildability, collectability, expandability, and addressability rules are
 enforced client-side only, and the expansion land effect is deliberately absent: Persistence is confined to the disposable service
 corpus: `POST /v0/place`, `POST /v0/purchase`, `POST /v0/move`,
 `POST /v0/sell`, `POST /v0/store`, `POST /v0/upgrade`,
-`POST /v0/construction`, `POST /v0/collect`, and `POST /v0/expand` persist through the legacy
+`POST /v0/construction`, `POST /v0/collect`, `POST /v0/expand`, and
+`POST /v0/level_up` persist through the legacy
 dispatcher into the corpus `saves/`,
 while the session and bootstrap endpoints remain strictly non-persisting, and
 the working tree is never written.

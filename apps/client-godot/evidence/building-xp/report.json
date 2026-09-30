@@ -1,0 +1,268 @@
+{
+	"capture": {
+		"implementation": "fake GameApi (a deterministic test double, not a parity oracle)",
+		"parity_pointer": "the committed executed-legacy transaction in the `fixture` section is the parity evidence; the screenshot is the presentation of the readout only",
+		"path": "apps/client-godot/evidence/building-xp/level-up.png",
+		"path_taken": "the committed corpus is already consistent under the one-based reading, so the captured frame shows the level readout and the local refusal with NO request sent",
+		"sha256": "b33f4398937ecf2acfdb6f39bedebfa4bb5d0a38cc1130089bf70aa29cedfc09"
+	},
+	"constants": {
+		"derivation_status": "derived-provisional",
+		"evidence_gap": "the legacy SWF's static iso-engine identifiers (TILE_SIZE, EI_TILE_HEIGHT_PIXELS, gridWidth/Height, numCols/numRows) were never extracted; pixel parity with the Flash client is not claimed",
+		"grid_extent": 100,
+		"origin_x": 2000.0,
+		"origin_y": 10.0,
+		"tile_height": 20.0,
+		"tile_width": 40.0,
+		"world_rect": [
+			0.0,
+			0.0,
+			4000.0,
+			2000.0
+		]
+	},
+	"counts": {
+		"objects": 40,
+		"placements": 40
+	},
+	"curve": {
+		"corpus_contradiction": "corpus xp = 4 | stored level = 1 | level the zero-based curve implies = 0 — which is why the zero-based reading is REJECTED, not merely unsupported",
+		"corpus_level": 1,
+		"corpus_xp": 4,
+		"derivation_status": "derived-provisional",
+		"distinct_names": 44,
+		"entries": 100,
+		"entry_fields": [
+			"name",
+			"exp_required",
+			"reward_type",
+			"reward_amount"
+		],
+		"error": "",
+		"final_threshold": 2016089205,
+		"first_level": 1,
+		"first_thresholds": [
+			0,
+			40,
+			60,
+			100,
+			200,
+			350,
+			550,
+			800
+		],
+		"index_base": "one-based",
+		"index_base_conversion": "entry_index_for_level(level, entries) — the one named conversion; returns level - 1 for 1 <= level <= entries and null otherwise (never raises), and its documented inverse is level_for_entry_index(index) = index + 1",
+		"last_level": 100,
+		"ok": true,
+		"rejected_alternative": "zero-based",
+		"reward_fields_never_consumed": [
+			"reward_type",
+			"reward_amount"
+		],
+		"saturated_name_level": 45
+	},
+	"curve_note": "every level on this report — the derived one, the next one, the recorded one, and the round trip over all 100 entries — was resolved through level_flow.gd's one named one-based conversion; no component indexes the committed schedule by its own arithmetic",
+	"fixture": {
+		"after": {
+			"path": "tests/fixtures/godot-building-xp/steps/command_level_up/after.json",
+			"sha256": "fd3aee7c05504984498b3232f6ba83c0ae37c84b354dba78eb39345e96958c22"
+		},
+		"before": {
+			"path": "tests/fixtures/godot-building-xp/steps/command_level_up/before.json",
+			"sha256": "fd3aee7c05504984498b3232f6ba83c0ae37c84b354dba78eb39345e96958c22"
+		},
+		"error": "",
+		"level_moved": false,
+		"no_resource_moved": true,
+		"note": "at the committed corpus the level the curve derives for the stored experience ALREADY equals the recorded one, so the executed level_up rewrote an identical value and every leaf of the save is unchanged — which is itself the evidence for the endpoint's level_already_current refusal and for the corpus's self-consistency under the one-based reading",
+		"recorded_level_after": 1,
+		"recorded_level_before": 1,
+		"request": {
+			"path": "tests/fixtures/godot-building-xp/steps/command_level_up/request.json",
+			"sha256": "8b876446412431fb4e01de9a2fb186e17180b4218ba1c39ed1f1b11230b70ee7"
+		},
+		"resources": [
+			{
+				"after": 4,
+				"before": 4,
+				"field": "map.xp",
+				"moved": false
+			},
+			{
+				"after": 2000,
+				"before": 2000,
+				"field": "map.gold",
+				"moved": false
+			},
+			{
+				"after": 2000,
+				"before": 2000,
+				"field": "map.wood",
+				"moved": false
+			},
+			{
+				"after": 2000,
+				"before": 2000,
+				"field": "map.oil",
+				"moved": false
+			},
+			{
+				"after": 2000,
+				"before": 2000,
+				"field": "map.steel",
+				"moved": false
+			}
+		],
+		"response": {
+			"path": "tests/fixtures/godot-building-xp/steps/command_level_up/response.body",
+			"sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87"
+		},
+		"stored_experience_after": 4,
+		"stored_experience_before": 4
+	},
+	"inputs": {
+		"bootstrap_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/get_player_info/response.body",
+			"sha256": "facedf76784d3dc03a3a45e81756a8546f90f7647dbff8917593404d9e401709"
+		},
+		"level_module": {
+			"path": "apps/client-godot/scripts/town/level_flow.gd",
+			"sha256": "008bea8a06f8e3dd3627571266367187e46b2e05cee2b8deee2c58ce8d0fa134"
+		},
+		"projection_module": {
+			"path": "apps/client-godot/scripts/town/resource_projection.gd",
+			"sha256": "449c71323f6f48f86c0b6edfc9c6b12aff39f555018dcc5c920eedc84f51b92c"
+		},
+		"save_list_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json",
+			"sha256": "ad0404c2c340a48f06e2e49ae7eb7973978cd2ccb02ac6ff7bfba4eb75f6d9f4"
+		},
+		"terrain": {
+			"path": "assets/images/en/mapa1.jpg",
+			"sha256": "35c4ded53e82be187eb67c54ee7c7023b698c3986954db4b6f9613a2a45cdd3f"
+		}
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed",
+		"the level shown is the one the committed curve implies for the stored experience under the derived-provisional one-based reading, never one observed from the legacy client",
+		"no level reward is paid and none is displayed, because no legacy branch reads the committed reward fields: paying one would invent an economy",
+		"unit experience (add_xp_unit) and tutorial progression (complete_tutorial) are out of scope because the committed corpus cannot exercise them: 0 of the 40 placed rows carry attr[\"xp\"] and the fresh save has no unit placements",
+		"the committed exp_required thresholds are preserved verbatim: nothing is rebalanced, smoothed, or interpolated",
+		"the recorded-versus-derived disagreement is REPORTED and deliberately never reconciled: the legacy server writes the level from a client-supplied integer, so neither value is authoritative and this change rewrites nothing",
+		"parity covers one recorded transaction against the fresh-player corpus: no progressed player and no other command",
+		"the derivation is client-side only: the service adds no server-authoritative level validation beyond its one guard, which belongs to Server v1 / M13",
+		"no pixel-parity oracle against the legacy client exists",
+		"the committed capture runs the fake GameApi implementation, a deterministic test double rather than a parity oracle"
+	],
+	"position": {
+		"agreement_text": "recorded level 1 agrees with the derived level 1 at 4 xp",
+		"agrees": true,
+		"derived_level": 1,
+		"derived_name": "Slave",
+		"derived_threshold": 0,
+		"disagreement_policy": "the recorded level is unverified against the committed curve (the legacy branch writes it from a client-supplied integer with no validation), so a disagreement is REPORTED with both values and never reconciled: this change prefers neither value and rewrites nothing",
+		"disagrees": false,
+		"next_level": 2,
+		"next_name": "Servant",
+		"next_threshold": 40,
+		"offers_level_up": false,
+		"progress_ratio": 0.1,
+		"recorded_level": 1,
+		"refusal_reason": "level_already_current",
+		"refusal_text": "no level up to offer: the recorded level 1 already equals the derived level 1",
+		"remaining": 36,
+		"stored_experience": 4
+	},
+	"provenance": {
+		"derived": [
+			{
+				"evidence": "derived-provisional (design D1). The REJECTED alternative is the ZERO-BASED reading, under which map[\"level\"] IS the index. The committed corpus contradicts it directly: corpus xp = 4 | stored level = 1 | level the zero-based curve implies = 0, so a player with 4 experience would be recorded as level 1 while the curve says level 1 begins at 40 experience. Under one-based, stored level 1 is levels[0] (\"Slave\", exp_required 0) and 4 >= 0 holds, so the corpus is self-consistent. Guessing zero-based would shift every level in the game by one",
+				"fact": "the curve's index base is ONE-BASED: stored level n is entry n minus one, and the conversion lives in exactly one named function (entry_index_for_level) that the client model, the service, the tests, and the structural report all share"
+			},
+			{
+				"evidence": "derived: no authentic legacy progression panel has been captured, so the wording is the delivered provisional convention, never a claim about what the legacy client displayed",
+				"fact": "the readout's labels and the composition of its lines"
+			}
+		],
+		"established": [
+			{
+				"evidence": "command.py:81-85 (committed legacy server source); the level_up row of docs/legacy-protocol/commands.json; the committed execution in tests/fixtures/godot-building-xp/steps/command_level_up/",
+				"fact": "the legacy level_up branch writes map[\"level\"] = new_level from a CLIENT-SUPPLIED integer, with no range check and no XP validation, and changes nothing else"
+			},
+			{
+				"evidence": "engine.py:251-271; command.py:40; the resource_effects column of docs/legacy-protocol/commands.json",
+				"fact": "the eight-slot resource vector is applied BEFORE the dispatched branch, verbatim, as max(current + delta, 0)"
+			},
+			{
+				"evidence": "docs/legacy-xp-basics.md; the endpoint's own consequence, which is why the level curve is content the client owns entirely",
+				"fact": "nothing in the legacy server reads the committed levels schedule: zero references across command.py, engine.py, sessions.py, server.py, and constants.py"
+			},
+			{
+				"evidence": "config/main.json's levels; the normalized package packages/game-content/normalized/levels.json; packages/game-content/README.md (tables extension)",
+				"fact": "the committed curve holds 100 entries whose exp_required is strictly increasing with no duplicates and no non-positive gap, from 0, 40, 60, 100, 200, 350, 550, 800 to 2016089205"
+			},
+			{
+				"evidence": "the same committed curve; recorded so a name is never used to resolve a level. NOTE the index base: the committed investigation record's \"from level 49\" is a ZERO-BASED position, and the derived ONE-BASED saturation level is 45. This report records the value it reads from the curve rather than restating either phrasing",
+				"fact": "a level's name is a LABEL, not an identifier: 44 distinct names over 100 entries, and every level from 45 onward reads Conqueror"
+			},
+			{
+				"evidence": "the same committed curve; docs/legacy-xp-basics.md. This is why no reward is paid or displayed (design D7)",
+				"fact": "reward_type is one of s, w, g, c and reward_amount is one of 1, 50, 250, and NO legacy branch reads either"
+			},
+			{
+				"evidence": "tests/saves/fresh-player.json; docs/legacy-xp-basics.md. The unit-experience path is therefore unexercisable and is out of scope",
+				"fact": "0 of the 40 placed corpus rows carry attr[\"xp\"], and the fresh save contains no unit placements at all"
+			},
+			{
+				"evidence": "engine.py:251-271; command.py:81-85; the committed corpus save",
+				"fact": "maps[0].xp is the player's cumulative experience (the vector's slot 1, written by engine.apply_resources) and maps[0].level is written ONLY by level_up; the committed corpus records xp 4 and level 1"
+			}
+		]
+	},
+	"readout": {
+		"displayed_fields_are_the_stored_values": true,
+		"displayed_level": "1",
+		"displayed_xp": "4",
+		"source_of_truth": "level_flow.gd's own model plus the canonical resource projection the HUD renders through, so the readout can neither display a level no committed content carries nor display a resource twice",
+		"text": "curve: 100 levels, one-based, derived-provisional | derived level: 1 (Slave) | experience: 4 | level 1 requires: 0 | next: level 2 (Servant) at 40 xp | remaining: 36 | progress: 10% | recorded level 1 agrees with the derived level 1 at 4 xp | no level up to offer: the recorded level 1 already equals the derived level 1"
+	},
+	"requests": {
+		"bootstrap": 1,
+		"note": "the report sends nothing: it reads the parsed save and the committed curve, so every state-mutating counter is zero",
+		"read_only": true,
+		"state_mutating_intents": {
+			"collect": 0,
+			"construction": 0,
+			"expand": 0,
+			"level_up": 0,
+			"move": 0,
+			"placement": 0,
+			"purchase": 0,
+			"sell": 0,
+			"store": 0,
+			"upgrade": 0
+		}
+	},
+	"reward": {
+		"displayed": false,
+		"fields": [
+			"reward_type",
+			"reward_amount"
+		],
+		"note": "the committed curve carries a reward type and amount on every entry and NO legacy branch reads either, so none is paid and none is displayed: paying one would invent an economy",
+		"paid": false
+	},
+	"schema": "xp-report-v1",
+	"stored_values": {
+		"cash": 5,
+		"energy": 50,
+		"gold": 2000,
+		"level": 1,
+		"mana": 0,
+		"oil": 2000,
+		"steel": 2000,
+		"wood": 2000,
+		"xp": 4
+	}
+}

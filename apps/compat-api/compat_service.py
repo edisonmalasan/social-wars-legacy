@@ -348,6 +348,90 @@ Surface (loopback only, port :5056):
     preserved evidence**.  The gap is a known evidence gap that bounds visual
     land growth; closing it needs new evidence, not a derivation.
 
+``POST /v0/level_up`` with JSON ``{"user_id"}``
+    ``{protocol, ok, game_version, server_time, result, derived_level,
+    level_before, level_after, curve, resources}`` — an intent only, and the
+    **tenth** state-mutating surface.  This is the first line in this family
+    whose legacy command carries **no committed content behind it at all**:
+    ``command.level_up`` takes one positional argument and writes
+    ``map["level"] = new_level`` — one line, with **no range check and no
+    experience validation** (``command.py:81-85``; the catalog's own security
+    note reads "Client sets the map level directly; XP/level consistency is not
+    verified server-side") — and **nothing in the legacy server reads the
+    committed ``levels`` curve** (zero references across ``command.py``,
+    ``engine.py``, ``sessions.py``, ``server.py``, ``constants.py``).  That
+    absence is what makes this the first surface where a **real guard** is
+    possible rather than merely an intent-only refusal: the curve that
+    constrains the level is committed content, and the committed corpus decides
+    its index base.
+
+    Only the save id enters the contract: **no level, no experience, no reward,
+    no time, and no resource delta is accepted from a client** — the extra keys
+    (``level``, ``new_level``, ``xp``, ``experience``, ``reward_type``,
+    ``reward_amount``, ``resources_changed``, …) are ignored, so no client value
+    can influence the target (design D3).  The endpoint reads the stored
+    experience, derives the level the committed curve implies for it, refuses
+    anything but that outcome, and dispatches the unchanged legacy ``command()``
+    with the **derived** level and a **neutral** vector.
+
+    Two refusals fail closed with **409** and no mutation, both answering
+    **before** the dispatcher runs (design D4): ``level_already_current`` when
+    the recorded level already equals the derived level (there is nothing to do,
+    and executing ``level_up`` would rewrite an identical value), and
+    ``xp_below_threshold`` when the stored experience cannot support advancing
+    past the recorded level — a recorded level the curve places *above* the
+    stored experience, or one the curve has no entry for.  **The committed
+    corpus lands in the first refusal**: it records ``xp 4`` / ``level 1`` and
+    the curve places level 1 at ``0``, so the derived level already equals the
+    recorded one and the endpoint answers ``level_already_current``.  The
+    success path is therefore reachable only from a state whose recorded level
+    is **below** the curve's derived level — a recorded-versus-derived
+    disagreement the legacy server has no opinion about.
+
+    The **recorded** level is treated as unverified against the curve (design
+    D2): the server wrote it from a client integer, so it is evidence of what a
+    client once asked for and of nothing else.  Two distinct facts therefore
+    exist and are never conflated — the derived level, and the recorded level,
+    reported as ``level_before`` and ``level_after``.
+
+    The ``curve`` block reports the **committed facts used** and the provenance
+    of the interpretation, so a client never has to re-derive any of it:
+    ``entries`` (the committed length), ``index_base`` (``"one-based"``),
+    ``derivation_status`` (``"derived-provisional"``), ``rejected_alternative``
+    (``"zero-based"``), the derived level's own ``entry_name`` /
+    ``entry_exp_required``, the next level's ``next_level`` / ``next_name`` /
+    ``next_exp_required``, the ``remaining`` experience, and the stored ``xp``
+    the ladder was applied to.  The ``next_*`` and ``remaining`` fields are
+    ``null`` at the curve's top level — a completed curve is reported, never
+    extended.
+
+    The one-based conversion lives in exactly one named function,
+    ``level_envelope.entry_index_for_level``, and the endpoint resolves every
+    level through it.  The rejected **zero-based** reading is reported in the
+    ``curve`` block because the committed corpus contradicts it directly: at
+    ``xp 4`` the zero-based reading implies level 0 while the save records
+    level 1.
+
+    After execution the endpoint proves the post-state in **two** ways (design
+    D5) and fails closed with ``internal_error`` on any other outcome: the
+    recorded level is **exactly** the derived level; **and every** stored
+    resource is **unchanged**.  The second half is the family's third proof and
+    the reason it matters here: ``level_up`` is dispatched with a client-sent
+    vector like every other command, so a non-neutral vector would silently move
+    a balance — proving that *nothing* moved is what distinguishes a correct
+    level-up from a resource-minting exploit wearing its clothes.  The
+    pre-execution ``resources`` are read **before** dispatch so the comparison
+    starts from the state the batch actually saw.
+
+    **No level reward is paid** (design D7): every committed entry carries
+    ``reward_type`` and ``reward_amount``, and **no legacy branch reads either**,
+    so paying one would invent an economy — the same discipline the expansion
+    ``neighbors`` / ``inventory_qte`` requirements received.  The committed
+    ``exp_required`` values are preserved **verbatim**; nothing is rebalanced,
+    smoothed, or interpolated.  Unit experience (``add_xp_unit``) and the
+    tutorial are out of scope: the committed corpus has no unit placements and
+    0 of its 40 placed rows carry ``attr["xp"]``.
+
 Deviation recorded for review: the bootstrap envelope also carries ``saves``
 (the session envelope plus ``config`` and ``player_info``). Design D3 lists
 only ``config`` and ``player_info``; the extra key is a superset of D3 and
@@ -431,6 +515,23 @@ code                     HTTP  when
                                 indistinguishable from a wrong derivation, so
                                 the refusal is the recorded alternative to
                                 reproducing the clamp
+``level_already_current``
+                          409  ``/v0/level_up``: the recorded level already
+                                equals the level the committed curve derives
+                                for the stored experience.  The committed
+                                corpus lands here (``xp 4`` / ``level 1``, and
+                                the curve places level 1 at ``0``): there is
+                                nothing to do, and executing ``level_up`` would
+                                rewrite an identical value.  The legacy
+                                dispatcher never runs
+``xp_below_threshold``    409  ``/v0/level_up``: the stored experience cannot
+                                support advancing past the recorded level — a
+                                recorded level the committed curve places above
+                                the stored experience, or one the curve has no
+                                entry for.  The recorded level is client-sourced
+                                and unverified (design D2), so a disagreement is
+                                **reported**, never reconciled, and never paid
+                                for.  The legacy dispatcher never runs
 ``capped_collection``    409  ``/v0/collect``: the addressed placement's item
                                 records a **non-zero** committed ``max_collects``
                                 — only ``0`` is implemented, because nothing in
@@ -489,8 +590,8 @@ session and bootstrap endpoints never persist — this module never calls
 ``sessions.save_session`` for them and every call leaves the saves
 byte-identical. ``POST /v0/place``, ``POST /v0/purchase``,
 ``POST /v0/move``, ``POST /v0/sell``, ``POST /v0/store``,
-``POST /v0/upgrade``, ``POST /v0/construction``, ``POST /v0/collect``, and
-``POST /v0/expand``
+``POST /v0/upgrade``, ``POST /v0/construction``, ``POST /v0/collect``,
+``POST /v0/expand``, and ``POST /v0/level_up``
 execute the unchanged legacy ``command()`` dispatcher, which
 persists through legacy ``save_session`` into the **service corpus's**
 ``saves/`` and nowhere else; the service never opens a working-tree file for
@@ -508,6 +609,7 @@ import compat_legacy
 import collect_envelope
 import construction_envelope
 import expand_envelope
+import level_envelope
 import move_envelope
 import placement_envelope
 import purchase_envelope
@@ -549,6 +651,8 @@ ERROR_UNKNOWN_EXPANSION_ID = "unknown_expansion_id"
 ERROR_ALREADY_EXPANDED = "already_expanded"
 ERROR_EXPANSION_REQUIREMENTS_UNMET = "expansion_requirements_unmet"
 ERROR_INSUFFICIENT_RESOURCES = "insufficient_resources"
+ERROR_LEVEL_ALREADY_CURRENT = "level_already_current"
+ERROR_XP_BELOW_THRESHOLD = "xp_below_threshold"
 ERROR_BAD_REQUEST = "bad_request"
 ERROR_NOT_FOUND = "not_found"
 ERROR_METHOD_NOT_ALLOWED = "method_not_allowed"
@@ -2438,6 +2542,291 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
     @app.errorhandler(500)
     def on_internal_error(_error: Any) -> Tuple[Dict[str, Any], int]:
         return error_response(500, ERROR_INTERNAL, "internal server error")
+
+    @app.post("/v0/level_up")
+    def v0_level_up() -> Tuple[Dict[str, Any], int]:
+        """Execute one level-up intent through the unchanged legacy path.
+
+        One call carries **exactly one** legacy ``level_up`` command, whose
+        single argument is the **service-derived** target level
+        (``command.py:81-85``).  That branch takes exactly one positional
+        argument and writes ``map["level"] = new_level`` — one line, with **no
+        range check and no experience validation** — and **nothing in the legacy
+        server reads the committed ``levels`` curve**: zero references across
+        ``command.py``, ``engine.py``, ``sessions.py``, ``server.py``, and
+        ``constants.py``.  The curve is therefore content the client owns, and
+        this contract derives the target from it rather than reading it from the
+        client (design D3).
+
+        Nothing but the save id enters the request: no level, no experience, no
+        reward, no time, and no resource delta is accepted from a client — the
+        extra keys are ignored, so a request carrying ``level: 99`` changes
+        nothing and the legacy hole where any client could set level 99 is
+        closed here.
+
+        **Design D1 — the curve is one-based and the conversion lives in exactly
+        one named function.**  Stored level *n* is ``levels[n - 1]``; every
+        level this route resolves goes through
+        :func:`level_envelope.entry_index_for_level`, and no other place in the
+        repository indexes the curve by its own arithmetic.  The interpretation
+        is **derived-provisional** and the rejected **zero-based** alternative
+        is contradicted by the committed corpus: at ``xp 4`` the zero-based
+        reading implies level 0 while the save records level 1.  Both facts are
+        reported in the ``curve`` block, so a client mirrors them rather than
+        re-deriving them.
+
+        **Design D2 — the recorded level is unverified and a disagreement is
+        reported, never smoothed.**  The legacy branch wrote it from a client
+        integer, so the stored value is evidence of what a client once asked for
+        and nothing else.  The derived level and the recorded level are two
+        distinct facts and are never conflated: the response reports both
+        (``derived_level``, ``level_before``, ``level_after``) and the two
+        refusals below exist precisely so neither value is silently reconciled.
+
+        **Design D4 — both refusals precede the dispatcher**, so the corpus is
+        byte-identical on every error path: ``level_already_current`` when the
+        recorded level already equals the derived level (there is nothing to do,
+        and executing ``level_up`` would rewrite an identical value — **this is
+        what the committed corpus does**, recording ``xp 4`` / ``level 1`` while
+        the curve places level 1 at ``0``), and ``xp_below_threshold`` when the
+        stored experience cannot support advancing past the recorded level.
+
+        **Design D5 — the post-state proof is the level *and the absence of
+        resource movement*.**  ``level_up`` is dispatched with a client-sent
+        vector like every other command, and the derived vector is **neutral**:
+        proving after execution that **every** stored resource is **unchanged**
+        is what forecloses vector smuggling — a resource-minting exploit
+        wearing a level-up's clothes — and is why a correct level-up cannot be
+        confused with a moved balance.  Both halves fail closed with
+        ``internal_error`` rather than reporting the legacy success.
+
+        **Design D7 — nothing is tuned and no reward is paid.**  The committed
+        ``exp_required`` values are used verbatim; the committed
+        ``reward_type`` / ``reward_amount`` are consumed by no legacy branch, so
+        they are refused rather than invented, and unit experience and the
+        tutorial are out of scope.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404,
+                ERROR_UNKNOWN_USER_ID,
+                "no save exists for user_id %r" % user_id,
+            )
+
+        # Both pre-execution reads happen **before** dispatch: the recorded
+        # level, for the two refusals and the structural half of the
+        # post-execution proof, and the resources, for the value-level half and
+        # for the stored experience the level is derived from (design D5).
+        try:
+            level_before = boot.map_level(user_id)
+            resources_before = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if level_before is None:
+            # The recorded level is absent or not an integer.  It is never
+            # coerced into a starting point for the comparison below, because
+            # coercing it would invent authority the legacy server never had.
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "this save records no level this service can read as an integer",
+            )
+
+        # The committed curve, read from the loaded configuration through the
+        # delivered accessors: the entry count first, then every entry at its
+        # own **positional** index (never through the level conversion, which
+        # is the envelope module's single named function).
+        try:
+            entry_count = boot.level_entry_count()
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if entry_count is None:
+            return error_response(
+                500, ERROR_INTERNAL, "the committed level curve does not resolve"
+            )
+        try:
+            rows = [boot.level_entry(position) for position in range(entry_count)]
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        try:
+            thresholds = level_envelope.thresholds_from_entries(rows)
+        except level_envelope.EnvelopeError as failure:
+            # A server-side content failure: the committed curve cannot supply a
+            # strictly increasing ladder, so no level is derivable from it.
+            return error_response(500, ERROR_INTERNAL, failure.code)
+
+        # The curve facts the answer reports.  Every level is resolved through
+        # the one named conversion.
+        try:
+            derived = level_envelope.derived_level_for(
+                resources_before["xp"], thresholds
+            )
+            curve_entry = level_envelope.entry_for_level(derived, rows)
+            next_position = level_envelope.entry_index_for_level(
+                derived + 1, entry_count
+            )
+            next_threshold = level_envelope.next_threshold(
+                resources_before["xp"], thresholds
+            )
+            remaining = level_envelope.remaining_for(
+                resources_before["xp"], thresholds
+            )
+            recorded_threshold = level_envelope.threshold_for(
+                level_before, thresholds
+            )
+        except level_envelope.EnvelopeError as failure:
+            return error_response(500, ERROR_INTERNAL, failure.code)
+        if derived is None:
+            # The committed curve's floor sits above this player's experience,
+            # so no level is derivable at all.  A content/state failure, never a
+            # value this contract may round into place.
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the committed level curve begins at %d experience and this "
+                "player has %d" % (thresholds[0], resources_before["xp"]),
+            )
+        if not isinstance(curve_entry, dict) or not isinstance(
+            curve_entry.get("exp_required"), int
+        ):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the committed level curve holds no readable entry for level %d"
+                % derived,
+            )
+        try:
+            next_entry = (
+                boot.level_entry(next_position)
+                if next_position is not None
+                else None
+            )
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        # Design D4, first refusal: there is nothing to do.  Answering here —
+        # before the dispatcher runs — is what keeps a level that already
+        # equals the derived one from being rewritten as a transaction.
+        if level_before == derived:
+            return error_response(
+                409,
+                ERROR_LEVEL_ALREADY_CURRENT,
+                "the recorded level is already %d, which is the level the "
+                "committed curve derives for %d stored experience"
+                % (derived, resources_before["xp"]),
+            )
+        # Design D4, second refusal, and the recorded-versus-derived
+        # disagreement (design D2): the recorded level sits **above** what the
+        # stored experience supports, so no advancement is derivable.  Reported
+        # with both values and the threshold that separates them; never
+        # reconciled, never paid for.
+        if recorded_threshold is None:
+            return error_response(
+                409,
+                ERROR_XP_BELOW_THRESHOLD,
+                "the recorded level %d has no entry in the committed curve "
+                "(which holds %d levels), so the stored experience %d cannot be "
+                "checked against it" % (level_before, entry_count, resources_before["xp"]),
+            )
+        if resources_before["xp"] < recorded_threshold:
+            return error_response(
+                409,
+                ERROR_XP_BELOW_THRESHOLD,
+                "the stored experience %d cannot reach the recorded level %d, "
+                "whose committed threshold is %d; the committed curve derives "
+                "level %d" % (
+                    resources_before["xp"],
+                    level_before,
+                    recorded_threshold,
+                    derived,
+                ),
+            )
+
+        # Derive the legacy envelope (design D1/D3/D5): the command, the
+        # **derived** level, and the **neutral** vector are the module's, never
+        # the client's.
+        try:
+            envelope_payload = level_envelope.build_envelope(level=derived)
+        except level_envelope.EnvelopeError as failure:
+            if failure.code in ("invalid_level", "invalid_vector", "invalid_timestamp"):
+                return error_response(500, ERROR_INTERNAL, failure.code)
+            return error_response(400, failure.code, str(failure))
+
+        # Execute the unchanged legacy command dispatcher in-process.  It
+        # persists via legacy save_session into this corpus only; the legacy
+        # HTTP route returns {"result": "success"} whenever command() returns
+        # without raising, so reaching here IS the legacy result — which is
+        # precisely why it is NOT taken as proof that the right level was written
+        # and that nothing else moved.
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        # Prove the post-state (design D5).  Part one: the recorded level is
+        # exactly the derived level.  Part two: **every** stored resource is
+        # unchanged — the neutral vector's own guarantee, and what forecloses a
+        # smuggled vector.  Either half failing is a reported failure, not a
+        # success.
+        try:
+            level_after = boot.map_level(user_id)
+            resources_after = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if level_after != derived:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the recorded level is %r after execution, not the derived %d"
+                % (level_after, derived),
+            )
+        for name in sorted(resources_after):
+            if resources_after[name] != resources_before[name]:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "resource %s is %r after execution, not the pre-execution %r: "
+                    "a level-up moves no resource, so the derived neutral vector "
+                    "requires every stored resource to be unchanged"
+                    % (name, resources_after[name], resources_before[name]),
+                )
+        return (
+            envelope(
+                boot,
+                result="success",
+                derived_level=derived,
+                level_before=level_before,
+                level_after=level_after,
+                curve={
+                    "entries": entry_count,
+                    "index_base": level_envelope.INDEX_BASE,
+                    "derivation_status": level_envelope.DERIVATION_STATUS,
+                    "rejected_alternative": level_envelope.REJECTED_ALTERNATIVE,
+                    "entry_name": curve_entry.get("name"),
+                    "entry_exp_required": curve_entry["exp_required"],
+                    "next_level": derived + 1 if next_position is not None else None,
+                    "next_name": (
+                        next_entry.get("name")
+                        if isinstance(next_entry, dict)
+                        else None
+                    ),
+                    "next_exp_required": next_threshold,
+                    "remaining": remaining,
+                    "xp": resources_before["xp"],
+                },
+                resources=resources_after,
+            ),
+            200,
+        )
 
     app.config["COMPAT_LEGACY_CORPUS"] = str(boot.corpus)
     return app

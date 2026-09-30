@@ -16,7 +16,7 @@
        camera controls, UI foundation, settings, audio manager, and the
        town vertical slice (projection, town state, town HUD, resource
        projection, town scene, selection, placement, purchase, move, sell,
-       store, upgrade, construction, collect, expand, no-Flash gate)
+       store, upgrade, construction, collect, expand, xp, no-Flash gate)
        (the loop passes the dead endpoint to every suite: the session and
        game-clock suites use it for their failure phase, the placement,
        purchase, move, sell, store, upgrade, construction, collect, and
@@ -24,7 +24,7 @@
        that ignore user args are unaffected)
     6. boot-scene unreachable-endpoint failure scenario, run with no service
        at all
-    7. twelve live phases against the real Compatibility API: the main-scene
+    7. thirteen live phases against the real Compatibility API: the main-scene
        boot (success, compared with the committed fixture save), the legacy-v0
        GameApi suite, the structured API-error boot scenario, the
        placement phase (one intent through the v0 placement endpoint with
@@ -53,7 +53,14 @@
        existing entry unchanged and in order, and every stored resource
        changed by exactly the derived debit) and whose range, duplicate, and
        requirements refusals must each leave the corpus byte-identical,
-       with the disposable corpus save asserted mutated)
+       with the disposable corpus save asserted mutated), and the level-up
+       phase (the committed corpus's OWN already-consistent level-up through the
+       v0 level endpoint, which must be refused with the endpoint's own
+       level_already_current code, carry no partial payload, and leave the
+       corpus byte-identical; this phase deliberately asserts NO save mutation,
+       because at 4 experience against level 1 the committed curve's one-based
+       reading already places this corpus at level 1, so the endpoint answers
+       before the dispatcher runs)
     8. Compatibility API guard baseline, post-run, must equal the pre-run
        digests
     9. teardown assertions: loopback port released, no working-tree saves/
@@ -313,14 +320,15 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_gate")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a
         # previously active session / clears a previous clock anchor), and
         # test_town_placement / test_town_purchase / test_town_move /
         # test_town_sell / test_town_store / test_town_upgrade /
-        # test_town_construction / test_town_collect / test_town_expand dial
+        # test_town_construction / test_town_collect / test_town_expand /
+        # test_town_xp dial
         # it for their transport-failure checks; suites that ignore user
         # args are unaffected — test_town_resources among them, which is
         # hermetic and reads no endpoint at all.
@@ -481,6 +489,28 @@ try {
                 "--headless", "--path", $projectRel,
                 "--script", "res://tests/test_town_expand.gd",
                 "--", "--scenario=live-expand",
+                "--gameapi-endpoint=$endpoint"
+            )
+        },
+        @{
+            # NO ExpectSaveMutation, and the omission is deliberate. The
+            # committed corpus records 4 experience against level 1, and the
+            # committed curve's one-based reading places 4 experience at level
+            # 1, so the corpus is ALREADY consistent: the endpoint answers
+            # level_already_current before the dispatcher runs and no corpus
+            # save can change. Asserting a mutation here would either fail
+            # honestly or force a different command into this phase and
+            # misattribute its evidence. The phase instead proves the refusal,
+            # its empty payload, and the corpus's byte-identity; the POSITIVE
+            # half of the two-part post-execution proof is covered hermetically
+            # by test_town_xp and test_game_api_fake over an in-memory
+            # disagreement.
+            Name = "level-up-live"
+            Assertions = "level-up live phase"
+            Arguments = @(
+                "--headless", "--path", $projectRel,
+                "--script", "res://tests/test_town_xp.gd",
+                "--", "--scenario=live-level-up",
                 "--gameapi-endpoint=$endpoint"
             )
         }
@@ -705,6 +735,23 @@ try {
     # expand-live phase's --expect-save-mutation.
     Report-Result ($expandOut -match "(?m)^PASS corpus save mutated by the live placement") `
         "expand live phase mutated the disposable corpus save"
+
+    # The level-up live phase must show the committed corpus's own
+    # already-consistent level-up refused BY THE REAL ENDPOINT with its own
+    # level_already_current code, carrying no partial payload, and must leave the
+    # corpus byte-identical. It deliberately asserts NO save mutation: at 4
+    # experience against level 1 the committed curve's one-based reading already
+    # places this corpus at level 1, so the endpoint answers before the
+    # dispatcher runs and no corpus save can change. The positive half of the
+    # two-part post-execution proof is covered hermetically.
+    $levelOut = ""
+    if ($phaseLogs.ContainsKey("level-up-live")) { $levelOut = $phaseLogs["level-up-live"] }
+    Report-Result ($levelOut -match "\[test\] PASS script=res://tests/test_town_xp\.gd") `
+        "level-up live phase asserts its scenario"
+    Report-Result ($levelOut -match '\[test\] live-level-up applied level=\d+ derived=\d+ xp=\d+ refused=level_already_current resources_unchanged=true') `
+        "level-up live phase drove the committed corpus's own level-up through the v0 endpoint and proved the refusal, its empty payload, and the corpus's byte-identity"
+    Report-Result ($levelOut -match "save_mutation_checked" ) `
+        "level-up live phase summary records the harness's mutation flag (expected false for this phase)"
 
     # --- 8. guard baseline, post-run ---------------------------------------
 

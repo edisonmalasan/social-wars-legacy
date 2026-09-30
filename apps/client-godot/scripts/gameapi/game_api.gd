@@ -8,8 +8,8 @@ extends Node
 ## `sell_building()` for one sell intent, `store_building()` for one
 ## store intent, `upgrade_building()` for one upgrade intent,
 ## `build_construction()` for one construction intent,
-## `collect_income()` for one collection intent, and `expand_town()` for one
-## expansion intent, receiving
+## `collect_income()` for one collection intent, `expand_town()` for one
+## expansion intent, and `level_up_town()` for one level-up intent, receiving
 ## typed results
 ## (`scripts/gameapi/boot_data.gd`); raw transport dictionaries never reach
 ## presentation code, and no other script references a transport.
@@ -28,7 +28,8 @@ extends Node
 ##               `tests/fixtures/godot-building-construction/`
 ##               (construction), `tests/fixtures/godot-building-collect/`
 ##               (collection), and `tests/fixtures/godot-building-expand/`
-##               (expansion); no process, no server, no socket.
+##               (expansion), and `tests/fixtures/godot-building-xp/`
+##               (level); no process, no server, no socket.
 ##   legacy_v0 - JSON over loopback HTTP to Compatibility API v0 through the
 ##               built-in HTTP request client; endpoint from the project
 ##               setting `gameapi/endpoint` (default: loopback 127.0.0.1 on
@@ -117,6 +118,12 @@ var collect_requests := 0
 ## Monotonic for the same reason: `configure()` swaps the implementation
 ## without hiding history.
 var expand_requests := 0
+## Number of level-up intents this process has issued (building-xp flow
+## contract: exactly one per confirm, zero for every local refusal — the XP
+## suite snapshots this counter exactly like `placement_requests`). Monotonic
+## for the same reason: `configure()` swaps the implementation without hiding
+## history.
+var level_up_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -322,6 +329,27 @@ func expand_town(user_id: String,
 	expand_requests += 1
 	var result: BootData.ExpandResult = await _impl.expand_town(
 		user_id, expansion_id)
+	return result
+
+
+## One level-up intent (the save identity and NOTHING else) from the selected
+## implementation. The contract carries NO level, NO new level, NO experience,
+## NO threshold, NO reward, and NO resource deltas: the service reads the
+## stored experience, derives the level the committed `levels` curve implies
+## for it through the ONE named one-based conversion, and executes the
+## unchanged legacy `level_up` branch with a NEUTRAL vector (design D3/D5) — so
+## a client-supplied level key is ignored exactly as a client-supplied amount or
+## price is ignored elsewhere, and the typed result's `derived_level`,
+## `level_before`, `level_after`, `curve`, and `resources` are authoritative
+## (design D8). The response's second post-execution proof half requires every
+## stored resource to be **unchanged**, because a level change moves none.
+##
+## The client applies the recorded level and the balances from the response
+## **verbatim** and discards its own derived level even where the two disagree,
+## so a wrong client-side derivation can never be silently compounded.
+func level_up_town(user_id: String) -> BootData.LevelUpResult:
+	level_up_requests += 1
+	var result: BootData.LevelUpResult = await _impl.level_up_town(user_id)
 	return result
 
 

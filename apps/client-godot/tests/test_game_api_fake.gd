@@ -53,6 +53,10 @@ const FIXTURE_EXPAND_BEFORE := \
 	"tests/fixtures/godot-building-expand/steps/command_expand/before.json"
 const FIXTURE_EXPAND_AFTER := \
 	"tests/fixtures/godot-building-expand/steps/command_expand/after.json"
+const FIXTURE_LEVEL_BEFORE := \
+	"tests/fixtures/godot-building-xp/steps/command_level_up/before.json"
+const FIXTURE_LEVEL_AFTER := \
+	"tests/fixtures/godot-building-xp/steps/command_level_up/after.json"
 
 ## The executed-legacy collect transaction's constants (fixture facts, read
 ## from the committed capture): the Tree decoration (item 905, 1x1) at legacy
@@ -226,6 +230,47 @@ const EXPAND_NEGATIVE_ID := -1
 ## A real owned id the double's own schedule says nothing purchasable about, so
 ## it proves the requirements refusal on committed content.
 const EXPAND_BLOCKED_OWNED_ID := 45
+## The executed-legacy level transaction (building-xp, fixture facts): the
+## carried command is `level_up` with the DERIVED level and a NEUTRAL vector, and
+## **the recorded level and every stored resource are UNCHANGED** — because at
+## the committed corpus the level the curve derives for `xp 4` already equals the
+## recorded level 1, so the executed command rewrote an identical value and every
+## leaf of the save stayed the same. The capture is therefore itself the evidence
+## for the endpoint's `level_already_current` refusal and for the corpus's
+## self-consistency under the ONE-BASED reading.
+const LEVEL_CORPUS_XP := 4
+const LEVEL_CORPUS_LEVEL := 1
+## The experience that makes the committed curve derive a level ABOVE the
+## recorded one, so the advancement is derivable. The committed curve's first
+## five thresholds are 0, 40, 60, 100, 200, so `200` places level 5
+## ("Villager") and level 6 ("Scout") is next at 350.
+const LEVEL_DISAGREE_XP := 200
+const LEVEL_DERIVED := 5
+const LEVEL_NEXT := 6
+const LEVEL_NEXT_NAME := "Scout"
+const LEVEL_NEXT_THRESHOLD := 350
+const LEVEL_NEXT_REMAINING := 150
+const LEVEL_DERIVED_NAME := "Villager"
+const LEVEL_DERIVED_THRESHOLD := 200
+## A second disagreement, for the response's own curve facts at a different rung.
+const LEVEL_LOW_XP := 100
+const LEVEL_LOW_DERIVED := 4
+## A recorded level the stored experience cannot reach, for the
+## `xp_below_threshold` refusal. Level 50's committed threshold is far above 4
+## experience, so a save recording it is a disagreement nothing can advance.
+const LEVEL_UNREACHABLE := 50
+## The curve floor a stub installs so the content failure the committed curve
+## cannot produce becomes reachable offline. It replaces the curve's own first
+## threshold (`0`) with the curve's second (`40`), which keeps the ladder
+## strictly increasing and puts the floor above the corpus's `xp 4`.
+const LEVEL_STUBBED_FLOOR := 40
+## The committed curve's own shape, asserted against the double's loaded
+## configuration rather than against a restatement.
+const LEVEL_ENTRIES := 100
+const LEVEL_FIRST_THRESHOLDS := [0, 40, 60, 100, 200, 350, 550, 800]
+const LEVEL_FINAL_THRESHOLD := 2016089205
+const LEVEL_TOP := 100
+const LEVEL_TOP_NAME := "Conqueror"
 
 
 func run_scenario() -> void:
@@ -325,6 +370,7 @@ func run_scenario() -> void:
 	await _check_construction(api, user_id)
 	await _check_collect(api, user_id)
 	await _check_expand(api, user_id)
+	await _check_level(api, user_id)
 
 	info("fake implementation resolved %d save(s) with no server and no socket"
 		% save_list.saves.size())
@@ -2235,6 +2281,377 @@ func _expand_ledger_of(api: Variant) -> Array:
 	if double == null or not (double is FakeApi):
 		return []
 	return (double._expand_state["expansions"] as Array).duplicate()
+
+
+## The level-up double over the committed executed-legacy level fixture: the
+## corpus's own already-consistent state, the two refusals in the endpoint's own
+## order, a real advancement over an in-memory disagreement, the neutral vector's
+## value-level proof, the typed curve block, the ignored-client-level discipline,
+## and every fail-closed code.
+func _check_level(api: Variant, user_id: String) -> void:
+	var before := _read_fixture_object(FIXTURE_LEVEL_BEFORE)
+	var after := _read_fixture_object(FIXTURE_LEVEL_AFTER)
+	if before.is_empty() or after.is_empty():
+		return
+	var before_map: Dictionary = before["maps"][0]
+	var after_map: Dictionary = after["maps"][0]
+	check_eq(int(before_map["level"]), LEVEL_CORPUS_LEVEL,
+		"the level fixture's before state records level 1")
+	check_eq(int(before_map["xp"]), LEVEL_CORPUS_XP,
+		"the level fixture's before state records 4 experience")
+	# The executed transaction itself: the level did NOT move and NO resource
+	# did, because the derived level already equalled the recorded one.
+	check_eq(int(after_map["level"]), int(before_map["level"]),
+		"the executed level_up left the recorded level UNCHANGED (the derived "
+			+ "level already equalled it at the committed corpus)")
+	for key in ["xp", "gold", "wood", "oil", "steel", "expansions", "store"]:
+		check_eq(after_map[key], before_map[key],
+			"the executed level_up left map.%s byte-identical" % key)
+	check_eq((after_map["items"] as Dictionary),
+		(before_map["items"] as Dictionary),
+		"the executed level_up changed NO placement row")
+	check_eq(after["playerInfo"], before["playerInfo"],
+		"the executed level_up left the player info byte-identical")
+	check_eq(after["privateState"], before["privateState"],
+		"the executed level_up left the private state byte-identical")
+	# The committed curve the double derives from: the FIXTURE'S OWN loaded
+	# configuration, never a value from the caller.
+	var double: Variant = api._impl
+	if double == null or not (double is FakeApi):
+		check(false, "the fake double instance is reachable for its in-memory "
+			+ "state")
+		return
+	var curve: Array = (double._config_payload as Dictionary).get(
+		"levels", []) as Array
+	check_eq(curve.size(), LEVEL_ENTRIES,
+		"the double's own loaded configuration carries the committed 100-entry "
+			+ "level curve")
+	var thresholds: Array = []
+	for row: Variant in curve:
+		thresholds.append(int((row as Dictionary)["exp_required"]))
+	check_eq((thresholds.slice(0, LEVEL_FIRST_THRESHOLDS.size()) as Array),
+		LEVEL_FIRST_THRESHOLDS,
+		"the committed ladder's first eight thresholds, read from the double's "
+			+ "own configuration")
+	check_eq(int(thresholds[thresholds.size() - 1]), LEVEL_FINAL_THRESHOLD,
+		"the committed ladder's final threshold, read from the double's own "
+			+ "configuration")
+	var non_increasing: Array = []
+	for position in range(1, thresholds.size()):
+		if int(thresholds[position]) <= int(thresholds[position - 1]):
+			non_increasing.append(position)
+	check_eq(non_increasing, [],
+		"the committed ladder is strictly increasing: no duplicate and no "
+			+ "non-positive gap")
+	# The one named one-based conversion, read out of the double's own source
+	# rather than restated: the committed corpus's `xp 4` places level 1, which
+	# is the curve's FIRST entry, and the zero-based reading would place it at 0
+	# -- the contradiction that settles design D1.
+	check_eq(str(curve[0]["name"]), "Slave",
+		"the curve's FIRST entry is Slave at 0 experience")
+	check_eq(str(curve[1]["name"]), "Servant",
+		"the curve's SECOND entry is Servant at 40 experience")
+	var requests_before: int = api.level_up_requests
+
+	# --- the committed corpus's own state: the endpoint's first refusal.
+	var corpus: Variant = await api.level_up_town(user_id)
+	check(corpus is BootData.LevelUpResult,
+		"level_up_town returns the typed result")
+	_check_level_failure(corpus, "level_already_current",
+		"the committed corpus (xp 4, level 1), which is already consistent "
+			+ "under the one-based reading")
+	check_eq(_level_recorded_of(api), LEVEL_CORPUS_LEVEL,
+		"the refused intent changed no recorded level")
+	# --- the endpoint's second refusal: a recorded level the experience cannot
+	# reach. It is set in the double's OWN in-memory state, never in a fixture.
+	_set_level_state(api, LEVEL_CORPUS_XP, LEVEL_UNREACHABLE)
+	_check_level_failure(await api.level_up_town(user_id),
+		"xp_below_threshold",
+		"a recorded level the stored experience cannot reach")
+	check_eq(_level_recorded_of(api), LEVEL_UNREACHABLE,
+		"the refused intent changed no recorded level")
+
+	# --- a real advancement, over an in-memory disagreement the committed
+	# corpus is not in (xp 200 places level 5, the save records level 1).
+	_set_level_state(api, LEVEL_DISAGREE_XP, LEVEL_CORPUS_LEVEL)
+	var raised: Variant = await api.level_up_town(user_id)
+	check(raised is BootData.LevelUpResult and raised.ok,
+		"a recorded level below the derived one levels up offline: %s"
+			% ((raised as BootData.LevelUpResult).error_message
+				if raised is BootData.LevelUpResult else ""))
+	_check_typed_level(raised)
+	if raised is BootData.LevelUpResult and raised.ok:
+		var typed: BootData.LevelUpResult = raised
+		# The value-level half of the post-execution proof, in its strongest
+		# form: a level change moves NO resource, so every stored balance is the
+		# value the intent started from.
+		for name: String in ["xp", "gold", "wood", "oil", "steel", "cash",
+				"mana"]:
+			var before_value := _level_resource_of(api, name)
+			check_eq(_typed_resource(typed, name), before_value,
+				"the %s balance is UNCHANGED by the level-up (the endpoint's "
+					% name + "value-level proof)")
+		check_eq(_level_recorded_of(api), LEVEL_DERIVED,
+			"the double's own in-memory recorded level is the derived one")
+		# An immediate repeat is refused by the endpoint's own first guard, now
+		# against a state the double actually advanced.
+		_check_level_failure(await api.level_up_town(user_id),
+			"level_already_current",
+			"a repeat once the recorded level IS the derived one")
+	# A second disagreement at a different rung, so the curve block's facts are
+	# read at more than one level.
+	_set_level_state(api, LEVEL_LOW_XP, LEVEL_CORPUS_LEVEL)
+	var lower: Variant = await api.level_up_town(user_id)
+	if lower is BootData.LevelUpResult and lower.ok:
+		var low: BootData.LevelUpResult = lower
+		check_eq(low.derived_level, LEVEL_LOW_DERIVED,
+			"100 experience places the curve's level 4")
+		check_eq(low.curve.entry_name, "Peasant",
+			"level 4's committed name is Peasant")
+		check_eq(low.level_after, LEVEL_LOW_DERIVED,
+			"the recorded level moved to exactly the derived level")
+	else:
+		check(false, "a second disagreement levels up offline")
+	# The completed curve: the top level with genuinely NO next level.
+	_check_level_top(api, user_id)
+
+	# --- a curve whose FLOOR sits above the experience: the content failure the
+	# committed curve cannot produce, reachable by stubbing the double's OWN
+	# in-memory first threshold (design D1's ladder check then fails closed).
+	_set_level_state(api, LEVEL_CORPUS_XP, LEVEL_CORPUS_LEVEL)
+	_stub_level_floor(api, LEVEL_STUBBED_FLOOR)
+	_check_level_failure(await api.level_up_town(user_id), "internal_error",
+		"a curve whose floor sits above the stored experience, so NO level is "
+			+ "derivable at all")
+	_restore_level_floor(api)
+	# With the REAL committed curve back, the corpus's own state is refused
+	# again, which proves the stub was fully undone.
+	_check_level_failure(await api.level_up_town(user_id), "level_already_current",
+		"the restored committed curve refuses the corpus's own state again")
+
+	# --- the save-identity codes.
+	_check_level_failure(await api.level_up_town(""), "missing_user_id",
+		"an empty save id")
+	_check_level_failure(await api.level_up_town("ghost-0000"), "unknown_user_id",
+		"an unknown save id")
+	# --- the client can never dictate the outcome: the intent carries a save id
+	# and NOTHING else, so there is no key through which a level could be sent.
+	# The typed result's own field list is the structural proof: it has no
+	# client-supplied level, only the service's three reported ones.
+	var succeeded: Variant = await api.level_up_town(user_id)
+	if succeeded is BootData.LevelUpResult and succeeded.ok:
+		var done: BootData.LevelUpResult = succeeded
+		check_eq(done.level_after, done.derived_level,
+			"whatever the client sent, the recorded level equals the level the "
+				+ "SERVICE derived")
+		check(done.level_after >= 1 and done.level_after <= LEVEL_TOP,
+			"the derived level is always inside the committed curve")
+	else:
+		check(true, "the corpus's own state is refused, so no level is applied")
+	check_eq(api.level_up_requests, requests_before + 12,
+		"every level_up_town call increments the intent counter exactly once "
+			+ "(twelve calls: the corpus refusal, the below-threshold refusal, "
+			+ "two advancements, the repeat refusal, the top-level advance and "
+			+ "its repeat refusal, the stubbed-floor refusal, the "
+			+ "restored-corpus refusal, the two save-identity refusals, and the "
+			+ "client-dictation check)")
+	info("level double reproduced the executed fixture's transaction, advanced a "
+		+ "derived level over an in-memory disagreement, reached the completed "
+		+ "curve, and answered seven structured refusals with no server and no "
+		+ "socket")
+
+
+## Every level failure carries the endpoint's code and NO partial payload
+## (design D4/D7) - including the 409s `level_already_current` and
+## `xp_below_threshold`, the 500 `internal_error`, and the two save-identity
+## codes.
+func _check_level_failure(result: Variant, code: String,
+		label: String) -> void:
+	check(result is BootData.LevelUpResult, label + " returns the typed result")
+	if not (result is BootData.LevelUpResult):
+		return
+	var typed: BootData.LevelUpResult = result
+	check(not typed.ok, label + " is a structured failure")
+	check_eq(typed.error_code, code, label + " names the endpoint's code")
+	check(typed.curve == null, label + " carries no partial curve block")
+	check(typed.resources == null, label + " carries no partial resources")
+	check_eq(typed.result, "", label + " reports no legacy result")
+	check_eq(typed.derived_level, -1, label + " carries no partial derived level")
+	check_eq(typed.level_before, -1,
+		label + " carries no partial pre-execution level")
+	check_eq(typed.level_after, -1,
+		label + " carries no partial post-execution level")
+	check_eq(typed.protocol, "", label + " carries no partial protocol")
+
+
+## The typed result of one level-up: protocol, version, legacy result, the
+## derived level, BOTH recorded levels, the committed curve facts, and the
+## resources. The wall-clock field is asserted as a positive integer and never
+## by value.
+func _check_typed_level(result: Variant) -> void:
+	check(result is BootData.LevelUpResult,
+		"the level-up carries the typed result")
+	if not (result is BootData.LevelUpResult):
+		return
+	var typed: BootData.LevelUpResult = result
+	check(typed.ok, "the level-up response is a success: %s"
+		% typed.error_message)
+	if not typed.ok:
+		return
+	check_eq(typed.protocol, BootData.PROTOCOL,
+		"the level-up protocol is compat-v0")
+	check_eq(typed.game_version, "alpha 0.02",
+		"the level-up response carries the game version")
+	check(typed.server_time > 0,
+		"the level-up server_time is the fixture epoch (time-dependent)")
+	check_eq(typed.result, "success", "the legacy result string is verbatim")
+	check_eq(typed.level_before, LEVEL_CORPUS_LEVEL,
+		"the pre-execution recorded level is the corpus's own")
+	check_eq(typed.level_after, LEVEL_DERIVED,
+		"the post-execution recorded level IS the derived level")
+	check_eq(typed.level_after, typed.derived_level,
+		"the service's own value-level guarantee: the recorded level after "
+			+ "execution equals the derived level")
+	check(typed.curve != null, "the response carries the committed curve facts")
+	if typed.curve == null:
+		return
+	check_eq(typed.curve.entries, LEVEL_ENTRIES,
+		"the curve block reports the committed entry count")
+	check_eq(typed.curve.index_base, "one-based",
+		"the curve block reports the ONE-BASED index base the double derived "
+			+ "under (design D1)")
+	check_eq(typed.curve.derivation_status, "derived-provisional",
+		"the curve block reports the derived-provisional status")
+	check_eq(typed.curve.rejected_alternative, "zero-based",
+		"the curve block reports the REJECTED zero-based alternative")
+	check_eq(typed.curve.entry_name, LEVEL_DERIVED_NAME,
+		"the curve block reports the derived level's committed name")
+	check_eq(typed.curve.entry_exp_required, LEVEL_DERIVED_THRESHOLD,
+		"the curve block reports the derived level's committed threshold")
+	check_eq(typed.curve.next_level, LEVEL_NEXT,
+		"the curve block reports the NEXT LEVEL as a level, not as the "
+			+ "conversion's positional index")
+	check_eq(typed.curve.next_name, LEVEL_NEXT_NAME,
+		"the curve block reports the next level's committed name")
+	check_eq(typed.curve.next_exp_required, LEVEL_NEXT_THRESHOLD,
+		"the curve block reports the next level's committed threshold")
+	check_eq(typed.curve.remaining, LEVEL_NEXT_REMAINING,
+		"the curve block reports the experience remaining")
+	check_eq(typed.curve.xp, LEVEL_DISAGREE_XP,
+		"the curve block reports the experience it derived from")
+	check(typed.resources != null, "the response carries the resources")
+
+
+## The completed curve: at the final threshold the derived level is the TOP one
+## and there is genuinely NO next level, which the typed result reports as null
+## rather than as a sentinel value.
+func _check_level_top(api: Variant, user_id: String) -> void:
+	_set_level_state(api, LEVEL_FINAL_THRESHOLD, LEVEL_CORPUS_LEVEL)
+	var top: Variant = await api.level_up_town(user_id)
+	check(top is BootData.LevelUpResult and top.ok,
+		"an experience above the final threshold derives the TOP level")
+	if not (top is BootData.LevelUpResult) or not top.ok:
+		return
+	var typed: BootData.LevelUpResult = top
+	check_eq(typed.derived_level, LEVEL_TOP,
+		"the derived level is the curve's last entry")
+	check_eq(typed.curve.entry_name, LEVEL_TOP_NAME,
+		"the top level's committed name is Conqueror")
+	check(typed.curve.next_level == null,
+		"a completed curve reports NO next level, not a sentinel")
+	check(typed.curve.next_name == null,
+		"a completed curve reports NO next name")
+	check(typed.curve.next_exp_required == null,
+		"a completed curve reports NO next threshold")
+	check(typed.curve.remaining == null,
+		"a completed curve reports NO remaining experience")
+	check_eq(typed.level_after, LEVEL_TOP,
+		"the recorded level moved to the top level")
+	# And the endpoint's own first guard now refuses it by name.
+	_check_level_failure(await api.level_up_town(user_id), "level_already_current",
+		"the top level is already current")
+
+
+## The double's own in-memory recorded level, read from the LIVE implementation
+## instance the facade selected. This is the double's observable in-process
+## state, never a transport payload.
+func _level_recorded_of(api: Variant) -> int:
+	var double: Variant = api._impl
+	if double == null or not (double is FakeApi):
+		return -99
+	return int(double._level_state["level"])
+
+
+## One stored balance of the double's own in-memory state.
+func _level_resource_of(api: Variant, name: String) -> int:
+	var double: Variant = api._impl
+	if double == null or not (double is FakeApi):
+		return -99
+	return int(double._level_state[name])
+
+
+## One typed result's stored balance, under the field's own name.
+func _typed_resource(typed: BootData.LevelUpResult, name: String) -> int:
+	if typed.resources == null:
+		return -99
+	match name:
+		"xp":
+			return int(typed.resources.xp)
+		"gold":
+			return int(typed.resources.gold)
+		"wood":
+			return int(typed.resources.wood)
+		"oil":
+			return int(typed.resources.oil)
+		"steel":
+			return int(typed.resources.steel)
+		"cash":
+			return int(typed.resources.cash)
+		"mana":
+			return int(typed.resources.mana)
+	return -99
+
+
+## Parks the double's OWN in-memory experience and recorded level, so the
+## advancement the committed corpus cannot reach becomes reachable offline. The
+## committed fixture and the committed configuration are never written: this
+## lives entirely in this process's memory.
+func _set_level_state(api: Variant, xp: int, level: int) -> void:
+	var double: Variant = api._impl
+	if double == null or not (double is FakeApi):
+		check(false, "the fake double instance is reachable for its level state")
+		return
+	double._level_state["xp"] = xp
+	double._level_state["level"] = level
+
+
+## Replaces the double's OWN in-memory curve FLOOR, so the content failure the
+## committed curve cannot produce becomes reachable offline (the client-side
+## mirror of the compat suite's own accessor stub). The committed configuration
+## is never written.
+func _stub_level_floor(api: Variant, threshold: int) -> void:
+	var double: Variant = api._impl
+	if double == null or not (double is FakeApi):
+		check(false, "the fake double instance is reachable for its curve")
+		return
+	var curve: Array = double._config_payload["levels"] as Array
+	if not (double._level_schedule_backup.has("curve")):
+		double._level_schedule_backup["curve"] = curve.duplicate(true)
+	(curve[0] as Dictionary)["exp_required"] = int(threshold)
+
+
+## Restores the double's own curve floor from the backup the stub took, so a
+## later check reads the REAL committed ladder again.
+func _restore_level_floor(api: Variant) -> void:
+	var double: Variant = api._impl
+	if double == null or not (double is FakeApi):
+		return
+	if not double._level_schedule_backup.has("curve"):
+		return
+	var backup: Array = double._level_schedule_backup["curve"] as Array
+	var curve: Array = double._config_payload["levels"] as Array
+	(curve[0] as Dictionary)["exp_required"] = \
+		int((backup[0] as Dictionary)["exp_required"])
 
 
 ## Replaces ONE row of the double's OWN in-memory schedule, so a priced and

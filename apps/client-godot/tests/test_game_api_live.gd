@@ -150,6 +150,13 @@ const EXPAND_BLOCKED_ID := 4
 const EXPAND_OUT_OF_RANGE_ID := 98
 const EXPAND_NEGATIVE_ID := -1
 
+## The committed corpus's own level position (building-xp): `xp 4` and
+## `level 1`, which the committed curve places at level 1 under the ONE-BASED
+## reading, so the corpus is already consistent and the endpoint refuses the
+## intent with `level_already_current` before the dispatcher runs.
+const LEVEL_CORPUS_XP := 4
+const LEVEL_CORPUS_LEVEL := 1
+
 
 func run_scenario() -> void:
 	var api: Variant = root.get_node_or_null("GameApi")
@@ -276,6 +283,7 @@ func run_scenario() -> void:
 	await _check_live_construction(api, endpoint, user_id)
 	await _check_live_collect(api, endpoint, user_id)
 	await _check_live_expand(api, endpoint, user_id)
+	await _check_live_level(api, endpoint, user_id)
 	# The live corpus now carries every mutating transaction, so this suite's
 	# parity claim is stated once, explicitly: the two implementations are
 	# compared on the fields each own, and each side's resource bag is
@@ -1656,9 +1664,96 @@ func _check_live_expand(api: Variant, endpoint: String,
 		+ "gold=%d cash=%d" % [typed.resources.gold, typed.resources.cash])
 
 
+## Level up through both implementations (spec "Level up through either
+## implementation"): the committed corpus's own already-consistent level-up,
+## answered by the real endpoint with its own `level_already_current` code and
+## NO partial payload, and leaving the corpus byte-identical; plus the fake's
+## identical refusal offline, so both implementations yield the same typed
+## shapes for the same intent.
+##
+## **A successful live level-up is NOT reachable from the committed corpus** and
+## none is claimed: at `xp 4` the committed curve derives level 1 and the save
+## records level 1, so the endpoint answers before the dispatcher runs. The
+## POSITIVE half of the two-part post-execution proof (the recorded level moved
+## to exactly the derived level AND every stored resource unchanged) is covered
+## hermetically by `test_town_xp.gd` and `test_game_api_fake.gd` over an
+## in-memory disagreement. Nothing here fabricates a corpus mutation.
+func _check_live_level(api: Variant, endpoint: String, user_id: String) -> void:
+	api.configure("legacy_v0", endpoint)
+	var before: BootData.Resources = await _live_resources(api, endpoint,
+		user_id)
+	check(before != null, "the live corpus pre-level balances resolve")
+	if before == null:
+		return
+	var level_before := await _live_level(api, endpoint, user_id)
+	check_eq(level_before, LEVEL_CORPUS_LEVEL,
+		"the live corpus records level 1 (or whatever the collected run left; "
+			+ "the committed corpus starts at 1)")
+	var refused: Variant = await api.level_up_town(user_id)
+	check(refused is BootData.LevelUpResult,
+		"live level_up_town returns the typed result")
+	if not (refused is BootData.LevelUpResult):
+		return
+	var failure: BootData.LevelUpResult = refused
+	check(not failure.ok,
+		"the live level-up of the already-consistent corpus is refused")
+	check_eq(failure.error_code, "level_already_current",
+		"the live refusal is the SERVICE's own code: %s" % failure.error_message)
+	check(failure.curve == null and failure.resources == null
+			and failure.result == "" and failure.derived_level == -1
+			and failure.level_before == -1 and failure.level_after == -1,
+		"the live refused level-up carries NO partial payload")
+	var after: BootData.Resources = await _live_resources(api, endpoint, user_id)
+	check(after != null and _same_resources(after, before),
+		"every live corpus balance is unchanged, because a level change moves "
+			+ "no resource and the dispatcher never ran")
+	check_eq(await _live_level(api, endpoint, user_id), level_before,
+		"the live refused level-up left the recorded level byte-identical")
+	# The save-identity codes pass through with their original codes, exactly as
+	# every other endpoint's do.
+	var missing: Variant = await api.level_up_town("")
+	check(missing is BootData.LevelUpResult and not missing.ok,
+		"an empty save id is refused over loopback")
+	if missing is BootData.LevelUpResult:
+		check_eq(missing.error_code, "missing_user_id",
+			"the live missing-save-id code matches the fake's")
+	var unknown: Variant = await api.level_up_town(UNKNOWN_USER)
+	check(unknown is BootData.LevelUpResult and not unknown.ok,
+		"an unknown save id is refused over loopback")
+	if unknown is BootData.LevelUpResult:
+		check_eq(unknown.error_code, "unknown_user_id",
+			"the live unknown-save-id code matches the fake's")
+	# Fake reference: the same intent, the same refusal, offline.
+	api.configure("fake")
+	var fake: Variant = await api.level_up_town(user_id)
+	check(fake is BootData.LevelUpResult and not fake.ok,
+		"the fake refuses the same live intent offline")
+	if fake is BootData.LevelUpResult and failure is BootData.LevelUpResult:
+		var reference: BootData.LevelUpResult = fake
+		check_eq(reference.error_code, failure.error_code,
+			"live and fake level-up report the SAME structured code for the "
+				+ "same intent (design D4)")
+	api.configure("legacy_v0", endpoint)
+	print("[test] live-level-up applied level=%d derived=%d xp=%d "
+		% [level_before, level_before, int(before.xp)]
+		+ "refused=level_already_current resources_unchanged=true")
+
+
+## The corpus's own recorded level, read from its bootstrap payload.
+func _live_level(api: Variant, endpoint: String, user_id: String) -> int:
+	var boot: Variant = await api.get_bootstrap(user_id)
+	if not (boot is BootData.BootstrapResult) or not boot.ok:
+		return -99
+	var info: Variant = (boot as BootData.BootstrapResult).player_info
+	if info == null:
+		return -99
+	var map: Dictionary = ((info as BootData.PlayerInfoPayload).raw).get(
+		"map", {}) as Dictionary
+	return int(map.get("level", -99))
+
+
 ## True when two typed `BootData.Resources` carry the same seven stored values.
-func _same_resources(a: BootData.Resources, b: BootData.Resources) -> bool:
-	return a.xp == b.xp and a.gold == b.gold and a.wood == b.wood \
+func _same_resources(a: BootData.Resources, b: BootData.Resources) -> bool:	return a.xp == b.xp and a.gold == b.gold and a.wood == b.wood \
 		and a.oil == b.oil and a.steel == b.steel and a.cash == b.cash \
 		and a.mana == b.mana
 

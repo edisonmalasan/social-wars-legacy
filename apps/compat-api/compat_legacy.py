@@ -61,6 +61,7 @@ if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 import collect_envelope  # noqa: E402
 import expand_envelope  # noqa: E402
+import level_envelope  # noqa: E402
 from hashing import directory_entries, sha256_file  # noqa: E402
 
 # Directories the legacy boot modules read through bundle.py's "." paths.
@@ -557,6 +558,102 @@ class LegacyBoot:
                 "first map of save for user id %r has no expansions list" % user_id,
             )
         return list(expansions)
+
+    def map_level(self, user_id: str) -> Optional[int]:
+        """``save["maps"][0]["level"]`` — the **recorded** level, or ``None``.
+
+        Design **D2**: the recorded level is *unverified* against the committed
+        curve.  ``command.level_up`` writes it straight from a client-supplied
+        integer with no range check and no experience validation
+        (``command.py:81-85``), so it is evidence of what a client once asked
+        for and of nothing else.  The accessor's only job is to report it
+        faithfully so the endpoint can compare it with the level the committed
+        curve derives and **report** any disagreement rather than prefer one
+        value silently.
+
+        ``None`` is returned for an absent or non-integer level, exactly as the
+        other delivered accessors report absent or unusable content: a level
+        this service cannot read as an integer is never coerced into one, and
+        the endpoint fails closed with ``internal_error`` rather than inventing
+        a starting point for its comparison.  A ``bool`` is excluded because it
+        is an ``int`` in Python.
+        """
+        value = self.first_map(user_id).get("level")
+        if not level_envelope.is_strict_int(value):
+            return None
+        return int(value)
+
+    # --- level curve content (godot-building-xp) --------------------------
+    # The two accessors below read the loaded legacy configuration's committed
+    # ``levels`` curve exactly as ``expansion_price_count`` reads
+    # ``expansion_prices`` and ``collect_ladder`` reads the ladder globals —
+    # never from a client.  Nothing in the legacy server reads this curve at all
+    # (zero references across ``command.py``, ``engine.py``, ``sessions.py``,
+    # ``server.py``, and ``constants.py``): the level model is content the
+    # client owns, which is precisely why the endpoint's target level is derived
+    # here instead.  The committed census (``docs/game-content/census.md``,
+    # ``docs/game-content/field-types.md``, the committed normalization
+    # package's tables extension, and the investigation record
+    # ``docs/legacy-xp-basics.md``) records **100** entries with ``legacy_id``
+    # as the 0-based positional index, four fully native fields each
+    # (``name``, ``exp_required``, ``reward_type``, ``reward_amount``), an
+    # ``exp_required`` ladder that is **strictly increasing** from ``0`` to
+    # ``2016089205`` with no duplicate and no non-positive gap
+    # (``0, 40, 60, 100, 200, 350, 550, 800, …``), a ``name`` that is **not**
+    # distinct (44 names across 100 entries, so it is a label and not an
+    # identifier), and ``reward_type`` / ``reward_amount`` that **nothing
+    # consumes**.  Design D1's one-based conversion is applied by the envelope
+    # module's single named function, never here.
+
+    def level_entry_count(self) -> Optional[int]:
+        """The committed level curve's length, or ``None`` if unusable.
+
+        The **level space** of design D1 is exactly ``1 <= level <= this
+        value``, so the length is the one number every range decision needs and
+        it lives here rather than being re-derived by each caller.  The
+        committed value is ``100``.
+
+        ``None`` is returned for a configuration whose ``levels`` is not a
+        non-empty sequence of entries — a content-side problem, never client
+        input — and the endpoint fails closed with ``internal_error`` on it
+        rather than deriving a level from a curve it could not read.
+        """
+        return level_envelope.schedule_length(self._config.get_game_config().get("levels"))
+
+    def level_entry(self, position: Any) -> Optional[Any]:
+        """The committed level-curve entry at a **0-based** position, or ``None``.
+
+        The positional twin of :meth:`level_entry_count`, mirroring
+        :meth:`expansion_price`'s "``None`` means the committed table has no row
+        here" contract.  ``position`` is the schedule's own index and carries no
+        level semantics at all: the level/entry conversion is
+        :func:`level_envelope.entry_index_for_level`, one named function, and
+        this accessor deliberately performs none.
+
+        A non-integer position, a ``bool`` (an ``int`` in Python, so it would
+        read the first entry), a **negative** position (which Python would
+        resolve from the end of the list), and an out-of-range one are all
+        ``None`` here — each would otherwise be a silently wrong entry rather
+        than a refusal.
+
+        The entry is returned **verbatim** as a shallow **copy** and never
+        coerced, defaulted, or filtered: the commitment to preserve
+        ``exp_required`` exactly as committed is structural, and the copy is
+        what keeps a caller that mutates the returned mapping from reaching the
+        loaded legacy configuration.
+        """
+        entries = self._config.get_game_config().get("levels")
+        size = level_envelope.schedule_length(entries)
+        if size is None:
+            return None
+        if not level_envelope.is_strict_int(position):
+            return None
+        if position < 0 or position >= size:
+            return None
+        row = entries[position]  # type: ignore[index]
+        if isinstance(row, dict):
+            return dict(row)
+        return row
 
     def save_document(self, user_id: str) -> dict:
         """The in-memory save document for ``user_id`` (legacy ``session()``)."""

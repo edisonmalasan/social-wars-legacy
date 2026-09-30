@@ -2003,4 +2003,115 @@ established-versus-derived split, and the non-claims.
 Two committed M6 artifacts (`evidence/town/town-player.png` and
 `evidence/town/report.json`) were regenerated because the label correction invalidated
 their bytes; the town report differs **only** in the two `hud` blocks.
-Remaining deliver lines of M7 (separate changes): XP basics.
+## Level progression
+
+The level slice (OpenSpec `building-xp`, milestone M7) is the **eleventh and final**
+M7 deliver line. It closes the loop's progression: the town carries `xp` and `level`,
+the readout shows both as bare numbers, and this line connects experience to a level.
+
+### The curve, and the one decision that mattered
+
+`config/main.json`'s `levels` has **100 entries** with `exp_required` **strictly
+increasing**, no duplicates and no non-positive gap (`0, 40, 60, 100, 200, 350, 550, 800,
+…` to `2016089205`). **Nothing in the legacy server reads it** — zero references across
+`command.py`, `engine.py`, `sessions.py`, `server.py`, `constants.py` — so the curve is
+content the client owns entirely. The legacy `level_up` branch writes
+`map["level"] = new_level` from a **client integer with no range check and no XP
+validation**.
+
+Two index readings were possible and they disagree by one level. **The committed corpus
+decides, and zero-based is contradicted:**
+
+```
+corpus xp = 4 | stored level = 1 | level the zero-based curve implies = 0
+```
+
+At 4 experience the zero-based curve implies level 0, while the save records level 1 —
+a direct contradiction, since the curve says level 1 begins at 40 experience. **One-based**
+maps level 1 to `entries[0]` (`"Slave"`, `exp_required` 0) and `4 >= 0` holds. Guessing
+zero-based would shift **every** level in the game by one, invisibly, until a player saw
+the wrong level name.
+
+So the interpretation is **derived-provisional everywhere it is recorded, with the rejected
+zero-based alternative retained**, and the conversion lives in **exactly one named
+function per layer** — `LevelFlow.entry_index_for_level` here, mirroring
+`level_envelope.entry_index_for_level` on the service side, each with a named inverse and
+a round-trip assertion across all 100 entries. `town.gd` contains no curve indexing of its
+own. The compat slice then confirmed it empirically: the derivation returns **level 1** for
+the corpus's `xp 4`, matching the recorded level.
+
+### The readout, and honest disagreement
+
+The readout shows the derived level, its committed name, the stored experience, the next
+threshold and the remaining experience — and an **explicit agreement or disagreement
+line**. Because the recorded level comes from a client integer with no validation, it is
+**unverified against the curve**, so when the two disagree the readout **names both values
+and the experience that separates them**. It never silently prefers either, never
+reconciles them, and never rewrites the save: with no authoritative level to apply, hiding
+the conflict would be inventing authority.
+
+`name` is a **label, not an identifier** — 44 distinct names across 100 entries, every entry
+from one-based level 45 onward being `"Conqueror"`. Above the final threshold the derived
+level is 100 and there is no next level, reported as `null` rather than raised.
+
+### The guarded intent
+
+`level_up_town(user_id)` sends exactly one intent and **no level**: the service derives
+the allowed target from the stored experience, and a client-supplied level is ignored
+exactly as a client-supplied amount or price is ignored elsewhere. The post-state is proved
+twice — the recorded level equals the derived level **and every stored resource is
+unchanged** — which forecloses vector smuggling through a command dispatched like any
+other with a client-sent resource vector. This is the family's third proof form, alongside
+the collect line's "moved by exactly a derived delta" and the expand line's "moved by
+exactly a derived debit".
+
+### Verification (commands actually executed)
+
+```bash
+# The hermetic progression suite (observed: 767 checks, PASS)
+godot --headless --path apps/client-godot --script res://tests/test_town_xp.gd
+
+# Full batteries in the final state (both observed exit 0; verify-boot.ps1 now runs
+# 27 hermetic suites and 13 live phases)
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+```
+
+The `level-up-live` phase **deliberately does not** assert a corpus save mutation: the
+committed corpus already records the level the curve derives for its experience, so the
+endpoint refuses `level_already_current` before the dispatcher runs and no corpus save can
+change. The phase asserts the refusal, its code, its empty payload and the corpus's
+byte-identity, and `verify-boot.ps1` carries a marker recording the deliberate absence. The
+success path rests on the fake double and the hermetic flow over an in-memory experience.
+
+### Evidence (two-step, as the delivered slices)
+
+```bash
+# 1. Windowed fake-API capture of the level readout
+godot --path apps/client-godot res://scenes/boot.tscn -- --gameapi=fake --level-capture=<repo>/apps/client-godot/evidence/building-xp/level-up.png
+
+# 2. Headless deterministic report (bare --xp-report defaults to
+#    evidence/building-xp/report.json)
+godot --headless --path apps/client-godot res://scenes/town.tscn -- --xp-report=<repo>/apps/client-godot/evidence/building-xp/report.json
+```
+
+### Level progression claim limits
+
+- no Flash, Ruffle, ActionScript, or browser executed;
+- **the level is the one the committed curve implies for the stored experience**, never one
+  observed from the Flash client; the one-based index is **derived-provisional from one
+  corpus data point**, with the rejected zero-based alternative quoted in the report;
+- **no level reward is paid and none displayed** — `reward_type` and `reward_amount` are
+  committed on every entry and consumed by no legacy branch, so paying one would invent an
+  economy;
+- **unit XP and tutorial progression are out of scope** because the corpus cannot exercise
+  them (0 of 40 placed rows carry `attr["xp"]`; no unit placements exist);
+- the committed thresholds are **preserved verbatim**; nothing is rebalanced;
+- the disagreement reporting deliberately **does not reconcile** — it surfaces the conflict;
+- a **successful live level-up is unproven** (unreachable from the committed corpus); parity
+  covers one recorded transaction against the fresh-player corpus, not progressed players;
+- no pixel-parity oracle exists, the presentation is the delivered provisional convention,
+  and the committed capture shows the refused path and runs the fake double.
+
+**All eleven M7 deliver lines are now delivered** — placement, purchase, move, sell, store,
+upgrade, construction, collect income, town expansion, resources, and level progression.
