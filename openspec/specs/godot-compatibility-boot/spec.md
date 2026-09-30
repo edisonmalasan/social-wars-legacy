@@ -5,7 +5,7 @@ Boot the Godot client against a Compatibility API v0 that adapts the unchanged l
 ## Requirements
 
 ### Requirement: Compatibility API v0 bootstrap service
-The repository SHALL provide a Compatibility API v0 service that serves modern JSON bootstrap data by adapting the unchanged legacy boot modules in-process, listens only on loopback at an explicit documented port, fails closed with structured JSON errors on inputs it cannot resolve, and never persists state from its session or bootstrap endpoints: calling those endpoints SHALL leave every on-disk save byte-identical while the legacy in-memory boot semantics execute exactly as the legacy endpoints perform them. State-mutating gameplay execution is specified by the `godot-building-placement`, `godot-building-purchase`, `godot-building-move`, `godot-building-sell`, `godot-building-store`, `godot-building-upgrade`, `godot-building-construction`, and `godot-building-collect` capabilities and SHALL persist only through unchanged legacy command semantics into the service corpus, never into a working-tree save.
+The repository SHALL provide a Compatibility API v0 service that serves modern JSON bootstrap data by adapting the unchanged legacy boot modules in-process, listens only on loopback at an explicit documented port, fails closed with structured JSON errors on inputs it cannot resolve, and never persists state from its session or bootstrap endpoints: calling those endpoints SHALL leave every on-disk save byte-identical while the legacy in-memory boot semantics execute exactly as the legacy endpoints perform them. State-mutating gameplay execution is specified by the `godot-building-placement`, `godot-building-purchase`, `godot-building-move`, `godot-building-sell`, `godot-building-store`, `godot-building-upgrade`, `godot-building-construction`, `godot-building-collect`, and `godot-building-expand` capabilities and SHALL persist only through unchanged legacy command semantics into the service corpus, never into a working-tree save.
 
 #### Scenario: Serve the session list
 - **WHEN** a client requests the v0 session list
@@ -28,7 +28,7 @@ The repository SHALL provide a Compatibility API v0 service that serves modern J
 - **THEN** it listens on `127.0.0.1` at the documented port and the documented interface is the only one clients are told to use
 
 ### Requirement: GameApi abstraction
-The Godot client SHALL depend on a `GameApi` autoload for every server interaction, exposing typed `list_sessions()`, `get_bootstrap()`, `place_building()`, `purchase_item()`, `move_building()`, `sell_building()`, `store_building()`, `upgrade_building()`, `build_construction()`, and `collect_income()` operations with two interchangeable implementations — `LegacyV0Api`, speaking JSON over loopback HTTP to Compatibility API v0, and `FakeApi`, serving committed fixture data and applying the documented in-memory operation semantics with no process, server, or socket — and no boot or presentation code SHALL reference `command.php`, AMF, FlashVars, legacy form encoding, legacy URLs, or legacy command names.
+The Godot client SHALL depend on a `GameApi` autoload for every server interaction, exposing typed `list_sessions()`, `get_bootstrap()`, `place_building()`, `purchase_item()`, `move_building()`, `sell_building()`, `store_building()`, `upgrade_building()`, `build_construction()`, `collect_income()`, and `expand_town()` operations with two interchangeable implementations — `LegacyV0Api`, speaking JSON over loopback HTTP to Compatibility API v0, and `FakeApi`, serving committed fixture data and applying the documented in-memory operation semantics with no process, server, or socket — and no boot or presentation code SHALL reference `command.php`, AMF, FlashVars, legacy form encoding, legacy URLs, or legacy command names.
 
 #### Scenario: Boot offline with the fake implementation
 - **WHEN** headless tests run with the fake implementation selected
@@ -73,6 +73,10 @@ The Godot client SHALL depend on a `GameApi` autoload for every server interacti
 #### Scenario: Collect through either implementation
 - **WHEN** headless tests run the collection flow with the fake implementation selected, and a live run collects against a running Compatibility API v0
 - **THEN** both implementations yield the same typed collection result shapes consumed identically by the flow, and the scope test still finds no forbidden legacy transport token outside the legacy-v0 implementation
+
+#### Scenario: Expand through either implementation
+- **WHEN** headless tests run the expansion flow with the fake implementation selected, and a live run expands against a running Compatibility API v0
+- **THEN** both implementations yield the same typed expansion result shapes consumed identically by the flow, the response's owned list and derived debit are applied rather than the client's own arithmetic, and the scope test still finds no forbidden legacy transport token outside the legacy-v0 implementation
 
 ### Requirement: Boot scene
 The project SHALL provide a boot scene as the main scene that initializes the session, requests bootstrap, and displays engine version, connection state, and a player summary derived from the response; an unreachable endpoint or a structured API error SHALL surface as an explicit error state naming the failure, never as a blank screen or a partial success.
