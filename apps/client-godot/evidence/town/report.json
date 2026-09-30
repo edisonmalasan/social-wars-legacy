@@ -72,8 +72,8 @@
 		},
 		"hud": {
 			"cash": "5",
-			"coins": "2000",
 			"energy": "50",
+			"gold": "2000",
 			"level": "1",
 			"mana": "0",
 			"name": "Warrior",
@@ -110,8 +110,8 @@
 		},
 		"hud": {
 			"cash": "42",
-			"coins": "62395",
 			"energy": "50",
+			"gold": "62395",
 			"level": "33",
 			"mana": "0",
 			"name": "Scarlet",

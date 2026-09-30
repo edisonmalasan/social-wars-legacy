@@ -889,7 +889,7 @@ func _check_expanded(town: Node2D, state: Variant, api: Variant) -> void:
 	var hud: Variant = town.hud()
 	check(hud != null, "the HUD re-attaches to the mutated state")
 	if hud != null:
-		check_eq(hud.displayed("coins"), str(FRESH_GOLD),
+		check_eq(hud.displayed("gold"), str(FRESH_GOLD),
 			"the HUD renders the AUTHORITATIVE gold, not the client's own 4242")
 		check_eq(hud.displayed("xp"), str(FRESH_XP),
 			"the HUD renders the authoritative experience")

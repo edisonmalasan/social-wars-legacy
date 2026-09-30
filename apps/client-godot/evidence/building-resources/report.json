@@ -1,0 +1,283 @@
+{
+	"capture": {
+		"implementation": "fake GameApi (a deterministic test double, not a parity oracle)",
+		"parity_pointer": "the readout is a pure projection of the parsed save, so the projection's correctness rests on the headless projection and readout suites, not on the screenshot",
+		"path": "apps/client-godot/evidence/building-resources/resources.png",
+		"sha256": "4e16aea033e5e39e430d06811f6751d9af07fce27453d6741326a5a329ade7e2"
+	},
+	"constants": {
+		"derivation_status": "derived-provisional",
+		"evidence_gap": "the legacy SWF's static iso-engine identifiers (TILE_SIZE, EI_TILE_HEIGHT_PIXELS, gridWidth/Height, numCols/numRows) were never extracted; pixel parity with the Flash client is not claimed",
+		"grid_extent": 100,
+		"origin_x": 2000.0,
+		"origin_y": 10.0,
+		"tile_height": 20.0,
+		"tile_width": 40.0,
+		"world_rect": [
+			0.0,
+			0.0,
+			4000.0,
+			2000.0
+		]
+	},
+	"counts": {
+		"objects": 40,
+		"placements": 40
+	},
+	"energy_gap": "no committed source records a regeneration rule for privateState.energy: engine.apply_resources never writes it, the legacy eight-slot mutation vector has no slot for it, and no legacy branch touches it, so the readout displays the stored value and no rule is claimed for how it changes",
+	"inputs": {
+		"bootstrap_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/get_player_info/response.body",
+			"sha256": "facedf76784d3dc03a3a45e81756a8546f90f7647dbff8917593404d9e401709"
+		},
+		"projection_module": {
+			"path": "apps/client-godot/scripts/town/resource_projection.gd",
+			"sha256": "449c71323f6f48f86c0b6edfc9c6b12aff39f555018dcc5c920eedc84f51b92c"
+		},
+		"readout_module": {
+			"path": "apps/client-godot/scripts/town/town_hud.gd",
+			"sha256": "7d77e2a50a34a411af3707484a618e647942f19635b9c1b0f0e5201e0edcb723"
+		},
+		"save_list_fixture": {
+			"path": "tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json",
+			"sha256": "ad0404c2c340a48f06e2e49ae7eb7973978cd2ccb02ac6ff7bfba4eb75f6d9f4"
+		},
+		"terrain": {
+			"path": "assets/images/en/mapa1.jpg",
+			"sha256": "35c4ded53e82be187eb67c54ee7c7023b698c3986954db4b6f9613a2a45cdd3f"
+		}
+	},
+	"mutation_vector": {
+		"no_vector_slot_sentinel": -1,
+		"note": "the vector is the legacy wire format and this change never widens it: the stored energy value has no slot in it, which is why no rule for how it changes is claimed",
+		"rows_outside_the_vector": [
+			"energy",
+			"name",
+			"level"
+		],
+		"server_resource_names": [
+			"xp",
+			"gold",
+			"wood",
+			"oil",
+			"steel",
+			"cash",
+			"mana"
+		],
+		"server_resources_with_a_row": [
+			"xp",
+			"gold",
+			"wood",
+			"oil",
+			"steel",
+			"cash",
+			"mana"
+		],
+		"shape": "[unknown, xp, gold, wood, oil, steel, cash, mana]",
+		"slots": 8,
+		"unread_slot": 0,
+		"unread_slot_claimed_by_no_row": true
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed",
+		"the readout claims to display what the save stores, never a value the legacy client would have displayed",
+		"no rule is claimed for how the stored energy value changes over time: no committed source records a regeneration interval, no legacy branch touches the field, and this change invents none",
+		"the readout's labels, display order, and ten-row layout are the delivered provisional convention pending capture of an authentic legacy HUD",
+		"the market and trade counters (trade_resource, set_resource_allies, whose arguments the committed command catalog records as read but unused) and the item-cost mapping from the g/c/w/o/s/e letter vocabulary onto the named resources are out of scope",
+		"the readout is read-only: it adds no endpoint, changes no response shape, moves no balance, and adds no server-authoritative resource validation",
+		"no pixel-parity oracle against the legacy client exists",
+		"the committed capture runs the fake GameApi implementation; the shared resources accessor the nine state-mutating endpoints' post-execution proofs compare is deliberately NOT widened with the energy value"
+	],
+	"provenance": {
+		"derived": [
+			{
+				"evidence": "derived: no authentic legacy HUD layout has been captured, so the labels and layout are the delivered provisional convention, never a claim about what the legacy client displayed",
+				"fact": "the display labels, the display order, and the ten-row layout"
+			},
+			{
+				"evidence": "derived from the committed model: xp is the vector's slot 1 and the value the levels schedule consumes, and no legacy branch spends it",
+				"fact": "which value is a spendable resource and which is the experience counter, and therefore that xp belongs to the summary group"
+			}
+		],
+		"established": [
+			{
+				"evidence": "engine.py:251-271; command.py:40 (committed legacy server source) and the resource_effects column of docs/legacy-protocol/commands.json",
+				"fact": "the legacy resource application writes EXACTLY seven slots, per resource, as max(current + delta, 0), and the application runs BEFORE the dispatched branch"
+			},
+			{
+				"evidence": "engine.py:251-271; the committed corpus tests/saves/fresh-player.json carries xp 4, gold 2000, wood 2000, oil 2000, steel 2000, cash 5, mana 0",
+				"fact": "the seven save locations are that function's own writes: maps[0].xp, maps[0].gold, maps[0].wood, maps[0].oil, maps[0].steel, playerInfo.cash, privateState.mana"
+			},
+			{
+				"evidence": "engine.py:252 (the legacy comment names it the cheat-detection slot)",
+				"fact": "slot 0 of the vector is read and discarded and has no stored value, so it has no row in the readout"
+			},
+			{
+				"evidence": "engine.py:259-267; the committed corpus map record; apps/compat-api/compat_legacy.py (read-only) lines 453 and 456; docs/legacy-resources.md",
+				"fact": "the primary currency's field is gold, never coins: the map record carries `gold` and no `coins`, the shared resources accessor returns `gold` and exposes no `coins` accessor, and the module's only occurrences of the word are comments about the expansion price schedule"
+			},
+			{
+				"evidence": "the committed corpus; constants.py:899, constants.py:1054, constants.py:74",
+				"fact": "the stored energy value exists in the save and in the committed constants: privateState.energy = 50, COST_ENERGY = \"e\", TOKEN_ENERGY = 7, CAT_ENERGY = 8"
+			},
+			{
+				"evidence": "engine.py:251-271 — the seven writes above are the function's complete set",
+				"fact": "apply_resources never writes the stored energy value, and the eight-slot vector has no slot for it"
+			}
+		]
+	},
+	"readout": {
+		"absent_rows": [],
+		"displayed": {
+			"cash": "5",
+			"energy": "50",
+			"gold": "2000",
+			"level": "1",
+			"mana": "0",
+			"name": "Warrior",
+			"oil": "2000",
+			"steel": "2000",
+			"wood": "2000",
+			"xp": "4"
+		},
+		"displayed_order": [
+			"gold",
+			"wood",
+			"steel",
+			"oil",
+			"cash",
+			"energy",
+			"mana",
+			"name",
+			"level",
+			"xp"
+		],
+		"displayed_values_are_the_stored_values": true,
+		"no_field_is_computed_or_substituted": true,
+		"row_count": 10,
+		"rows": [
+			{
+				"group": "resources",
+				"label": "Gold",
+				"location": "map.gold",
+				"name": "gold",
+				"row": 0,
+				"typed_state_field": "coins",
+				"vector_slot": 2
+			},
+			{
+				"group": "resources",
+				"label": "Wood",
+				"location": "map.wood",
+				"name": "wood",
+				"row": 1,
+				"typed_state_field": "wood",
+				"vector_slot": 3
+			},
+			{
+				"group": "resources",
+				"label": "Steel",
+				"location": "map.steel",
+				"name": "steel",
+				"row": 2,
+				"typed_state_field": "steel",
+				"vector_slot": 5
+			},
+			{
+				"group": "resources",
+				"label": "Oil",
+				"location": "map.oil",
+				"name": "oil",
+				"row": 3,
+				"typed_state_field": "oil",
+				"vector_slot": 4
+			},
+			{
+				"group": "resources",
+				"label": "Cash",
+				"location": "playerInfo.cash",
+				"name": "cash",
+				"row": 4,
+				"typed_state_field": "cash",
+				"vector_slot": 6
+			},
+			{
+				"group": "resources",
+				"label": "Energy",
+				"location": "privateState.energy",
+				"name": "energy",
+				"row": 5,
+				"typed_state_field": "energy",
+				"vector_slot": -1
+			},
+			{
+				"group": "resources",
+				"label": "Mana",
+				"location": "privateState.mana",
+				"name": "mana",
+				"row": 6,
+				"typed_state_field": "mana",
+				"vector_slot": 7
+			},
+			{
+				"group": "summary",
+				"label": "Name",
+				"location": "playerInfo.name",
+				"name": "name",
+				"row": 7,
+				"typed_state_field": "name",
+				"vector_slot": -1
+			},
+			{
+				"group": "summary",
+				"label": "Level",
+				"location": "map.level",
+				"name": "level",
+				"row": 8,
+				"typed_state_field": "level",
+				"vector_slot": -1
+			},
+			{
+				"group": "summary",
+				"label": "XP",
+				"location": "map.xp",
+				"name": "xp",
+				"row": 9,
+				"typed_state_field": "xp",
+				"vector_slot": 1
+			}
+		],
+		"source_of_truth": "resource_projection.gd's own table: the readout projects through it, so a row can neither claim a field the legacy server does not produce nor display a resource twice"
+	},
+	"requests": {
+		"bootstrap": 1,
+		"note": "the readout sends nothing: it reads the parsed save and renders it, so every state-mutating counter is zero",
+		"read_only": true,
+		"state_mutating_intents": {
+			"collect": 0,
+			"construction": 0,
+			"expand": 0,
+			"move": 0,
+			"placement": 0,
+			"purchase": 0,
+			"sell": 0,
+			"store": 0,
+			"upgrade": 0
+		}
+	},
+	"schema": "resources-report-v1",
+	"stored_values": {
+		"cash": 5,
+		"energy": 50,
+		"gold": 2000,
+		"level": 1,
+		"mana": 0,
+		"name": "Warrior",
+		"oil": 2000,
+		"steel": 2000,
+		"wood": 2000,
+		"xp": 4
+	},
+	"stored_values_note": "the typed state's own fields, read through the projection; every entry equals the committed corpus's value, so the readout displays the save and never a derived number",
+	"typed_state_bag_note": "the typed bag's primary-currency property is still named `coins` and TownState.RESOURCE_FIELDS maps it onto `map.gold`: the projection records the typed field beside the canonical one in every row and no row is keyed by the typed field, so the readout's keys and its display map are canonical"
+}
