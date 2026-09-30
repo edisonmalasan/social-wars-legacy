@@ -201,8 +201,11 @@ includes the one-based index interpretation and **the rejected zero-based altern
 with the evidence that contradicts it**. The non-claims SHALL state: no Flash, Ruffle,
 ActionScript, or browser executed; the level is the one the committed curve implies for
 the stored experience, never one observed from the Flash client; no level reward is paid
-because no legacy branch reads the committed reward fields; unit experience and tutorial
-progression are out of scope because the corpus cannot exercise them; the committed
+because no legacy branch reads the committed reward fields; unit experience and tutorial progression are out of scope because the corpus cannot
+exercise them — unit **experience** because no placed corpus row carries
+`attr["xp"]`, and the player-owned unit **instance** because the corpus contains no unit row
+at all, which the `godot-unit-instances` capability now specifies separately and where the same
+limitation is recorded as a claim limit rather than worked around; the committed
 thresholds are preserved verbatim and nothing is rebalanced; and parity covers one
 recorded transaction against the fresh-player corpus. The report SHALL be byte-identical
 across reruns.
@@ -216,6 +219,10 @@ across reruns.
 
 - **WHEN** the report step is rerun against the same inputs
 - **THEN** it reproduces its committed bytes exactly
+
+#### Scenario: The unit-instance gap is specified elsewhere, not forgotten
+- **WHEN** this requirement's out-of-scope note is read
+- **THEN** it distinguishes unit experience (no placed row carries `attr["xp"]`) from the unit instance (the corpus contains no unit row at all), and it points to the `godot-unit-instances` capability rather than leaving the instance half unowned
 
 ### Requirement: Containment and preservation
 All execution SHALL stay on loopback under the pinned CPython 3.9.13 with the existing
