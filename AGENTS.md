@@ -833,6 +833,82 @@ Command Center at map key 1 is a real placed training producer and makes the que
 genuinely exercisable. No Flash, Ruffle, ActionScript, or browser executes in any
 of these commands, and no network is used.
 
+Verified unit-queues commands (milestone M8 line 3; Godot 4.7.2.stable, Windows x64;
+`python` denotes the pinned interpreter, never the PATH alias). M8's first
+behaviour-bearing line and the **first to own a real executed-legacy unit
+fixture**, scoped by the committed investigation `docs/legacy-production-queues.md`:
+
+```bash
+python -B apps/compat-api/capture_queue_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_unit_queues.gd
+godot --headless --path apps/client-godot --script res://tests/test_unit_definitions.gd
+godot --headless --path apps/client-godot --script res://tests/test_unit_instances.gd
+godot --headless --path apps/client-godot --script res://tests/test_content_registry.gd
+godot --headless --path apps/client-godot --script res://tests/test_game_api_fake.gd
+godot --headless --path apps/client-godot --script res://tests/test_project_scope.gd
+godot --headless --path apps/client-godot --script res://tests/test_scene_build.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-10-01): the executed-legacy fixture capture
+(exit 0, containment identical, re-runnable) recording a `push_queue_unit` then
+`pop_queue_unit` against the committed corpus's **real placed training producer,
+id 26 Command Center at map key 1** with an empty `attr` bag — the push sets
+`{'nu': 1, 'ts': <instant>}` and the pop removes both keys **together**, while
+**every stored resource (gold, wood, steel, oil, xp, energy, mana) is
+byte-identical across all three steps**, which is what makes the endpoint's "no
+resource moved" half of its two-part proof non-tautological; the fixture manifest
+records that a push and a pop were captured, that **no completion was captured**,
+and that **no completion command exists**; the hermetic unit-queues suite
+(observed **411 checks**, 423 with `--report`; the 30th hermetic suite); the
+sibling unit suites (**213** and **437**), the content registry (**87**), the fake
+GameApi (**1205**, was 1106), the scope suite (**1441**, was 1339), and the scene
+build (**36**); both batteries in the final state (each exit `0`;
+`verify-boot.ps1` now runs **30 hermetic suites and 14 live phases**, guard digest
+identical pre/post, `6978b959…ff348`); the **grown** compat suite (observed
+**`Ran 1257 tests ... OK`**, exit `0` — up from 1109 by **+148**, because this line
+adds a state-mutating endpoint, unlike the previous two M8 lines where it stayed
+unchanged); the content validator (exit `0`, `result: valid`, 21 schemas); and the
+preservation manifest (3,258 entries, exit `0`). `git status` showed no legacy,
+config, save, content-package, or prior-fixture byte changed. The evidence is the
+deterministic `unit-queues-report-v1` report under
+`apps/client-godot/evidence/unit-queues/` (digest `807477db…92090`, byte-identical
+across reruns). **The line implements no readiness, no remaining time, no progress
+ratio, no completion, no cost, and no count bound**, because the legacy server has
+none to reproduce: every `attr["ts"]` use in the legacy source is a write or a
+deletion, `apply_resources` applies a **client-sent** vector before dispatch, and
+the engine sets no bound on the count — so a documented absence is recorded as a
+property and never read as permission to invent a rule. `soulmixer_speedup` is
+recorded **verbatim and implemented not at all**: its two-key `ts`+`ui` precondition
+(the legacy code raises `KeyError` without both, and the client **refuses** with a
+named error instead), the duration read from the **queued unit** rather than the
+building, the **seconds** reading, the `ceil(remaining/3600)` shape, the fact that
+it **charges nothing**, and the legacy author's own *"Quite useless cost calculation
+for understanding it"* verdict. Claim limits: **a queue can never be shown to
+finish** — that absence is the finding and is the `production` line's to own;
+`sm_training_time` is **absent from 129 units and all 470 buildings**, so it is a
+soul-mixer field and not a general training duration; **no acquisition is claimed**
+(no committed unit is store-listed; the real sources are the later-milestone
+`offer_packs` and `darts_items`); **no unit is produced, trained, or placed**;
+production, collection, movement, animations, and basic behaviors remain
+undelivered; parity covers **one recorded push/pop transaction** against the
+fresh-player corpus, which places only one training producer, and no
+progressed-player save is available; no pixel-parity oracle exists. No Flash,
+Ruffle, ActionScript, or browser executes in any of these commands, and every
+network call is loopback.
+
+**Known-flaky guard:** `verify-boot.ps1` treats any line matching `^ERROR:` as a
+script error, so a **nondeterministic** engine shutdown line —
+`ERROR: 1 RID allocations of type '…ShapedTextDataAdvanced…' were leaked at exit` —
+can fail the battery even though the suite itself exits 0 and passes. It was
+observed once on `test_town_xp`; two consecutive reruns passed clean. **Re-run
+before treating such a failure as a regression.** Narrowing the guard to
+`SCRIPT ERROR` or a fatal-error allowlist is a recorded follow-up.
+
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 
