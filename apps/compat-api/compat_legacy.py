@@ -49,7 +49,7 @@ import os
 import shutil
 import sys
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 sys.dont_write_bytecode = True
 
@@ -60,6 +60,7 @@ SEED_SAVE = REPO_ROOT / "tests" / "saves" / "fresh-player.json"
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 import collect_envelope  # noqa: E402
+import expand_envelope  # noqa: E402
 from hashing import directory_entries, sha256_file  # noqa: E402
 
 # Directories the legacy boot modules read through bundle.py's "." paths.
@@ -440,6 +441,122 @@ class LegacyBoot:
             return collect_envelope.collect_ladder(pair)
         except collect_envelope.EnvelopeError:
             return None
+
+    # --- town expansion content (godot-building-expand) -------------------
+    # The three accessors below read the loaded legacy configuration and the
+    # loaded save exactly as ``item_costs`` reads ``costs`` and ``collect_ladder``
+    # reads the ladder globals — never from a client.  The committed expansion
+    # content census (``docs/game-content/census.md`` and
+    # ``docs/game-content/field-types.md``, and the committed normalization
+    # package's economy section) records **98** ``expansion_prices`` entries with
+    # **no stable id** — the id space is the positional index, and all four
+    # fields are fully native numbers: ``coins``, ``cash``, ``neighbors``, and
+    # ``inventory_qte`` on every stored row, with indexes ``0..3`` all zero
+    # (the free expansions), index ``4`` at ``2500 / 5 / 1 / 1``, index ``5`` at
+    # ``5000 / 8 / 2 / 2``, and per-field saturation at ``coins`` index ``14``,
+    # ``cash`` index ``11``, ``neighbors`` index ``18``, and ``inventory_qte``
+    # index ``33`` — so the whole row equals ``100000 / 20 / 15 / 30`` from
+    # index ``33`` to ``97`` and is unchanged in between.  ``town_prices`` and
+    # ``map_prices`` are
+    # separate four-entry schedules (levels ``15 / 25 / 35 / 45``) and are
+    # deliberately never used by this line: the corpus's own
+    # ``[35, 36, 45, 46]`` is a valid index into the 98-entry schedule and is
+    # neither a valid four-entry index nor a level set (36 and 46 are not
+    # levels).  The rules below follow that census and refuse anything it does
+    # not describe rather than coercing it.
+
+    def expansion_price_count(self) -> Optional[int]:
+        """The committed expansion schedule's length, or ``None`` if unusable.
+
+        The **id space** of design D1 is exactly ``0 <= expansion_id <
+        this value`` against the loaded configuration's ``expansion_prices``
+        list, so the length is the one number every range decision needs and
+        it lives here rather than being re-derived by each caller.  The
+        committed value is ``98``.
+
+        ``None`` is returned for a configuration whose ``expansion_prices`` is
+        not a non-empty sequence of rows — a content-side problem, never client
+        input — and the endpoint fails closed with ``internal_error`` on it
+        rather than pricing against a schedule it could not read.
+        """
+        schedule = self._config.get_game_config().get("expansion_prices")
+        return expand_envelope.schedule_length(schedule)
+
+    def expansion_price(self, expansion_id: Any) -> Optional[Any]:
+        """The committed price row for ``expansion_id``, verbatim, or ``None``.
+
+        Design **D1**: the id indexes the positional ``expansion_prices``
+        schedule, and the corpus's own ``[35, 36, 45, 46]`` is only valid under
+        that reading.  ``None`` therefore means exactly **"the committed
+        schedule has no row for this id"**, and the endpoint turns it into the
+        structured ``unknown_expansion_id`` conflict.  That refusal is
+        load-bearing rather than defensive: the legacy server does **no** range
+        check, so an executed-legacy probe had ``expand(999)`` answer
+        ``{"result":"success"}``.
+
+        A non-integer id, a ``bool`` (an ``int`` in Python, so it would index
+        the list as ``1``), a **negative** id (which Python would resolve from
+        the end of the list), and an out-of-range one are all ``None`` here,
+        and the endpoint's own ``invalid_expansion_id`` structural check
+        answers first for the non-integer case — the endpoint never lets a
+        non-integer reach the dispatcher, where legacy's ``int("abc")`` would
+        raise out of the branch and answer an unhandled HTTP 500.
+
+        The row is returned **verbatim** as a shallow **copy** and never
+        coerced, defaulted, or filtered, exactly as :meth:`item_collect_type`
+        returns its committed string; the copy is what keeps a caller that
+        mutates the returned mapping from reaching the loaded legacy
+        configuration.  A row that is not a mapping reaches the derivation,
+        which refuses it with ``invalid_price`` — the real committed schedule
+        has all 98 rows as mappings, so that path is only reachable against a
+        configuration drift, and failing closed is the honest response to one.
+        """
+        schedule = self._config.get_game_config().get("expansion_prices")
+        size = expand_envelope.schedule_length(schedule)
+        if size is None:
+            return None
+        # ``is_strict_int`` excludes ``bool`` (which is an ``int`` in Python and
+        # would index the list as ``1``), and the explicit bounds check
+        # excludes a **negative** index, which Python would resolve from the
+        # end of the list.  Both would otherwise be a silently wrong price row
+        # rather than a refusal.
+        if not expand_envelope.is_strict_int(expansion_id):
+            return None
+        if expansion_id < 0 or expansion_id >= size:
+            return None
+        row = schedule[expansion_id]  # type: ignore[index]
+        # A **copy**, so a caller mutating the returned mapping can never reach
+        # the loaded legacy configuration, and so two reads of the same id
+        # return equal but independent mappings.
+        if isinstance(row, dict):
+            return dict(row)
+        return row
+
+    def map_expansions(self, user_id: str) -> List[Any]:
+        """``save["maps"][0]["expansions"]`` — the owned-expansions ledger.
+
+        Legacy ``command.expand`` appends to this list in place
+        (``map["expansions"] += [int(expansion)]``, ``command.py:214``), so the
+        accessor returns a **copy**: the endpoint reads the pre-execution list
+        for its range/duplicate checks and its first post-execution proof half,
+        and a list returned by reference would alias the live list and report
+        the after-state as the before-state — exactly the aliasing the collect
+        endpoint avoids with its row copy.
+
+        A map with no ``expansions`` list is a state this service cannot reason
+        about, so it raises ``LegacyBootError("invalid_save_state")`` rather
+        than inventing an empty ledger.  Entries are **never** rewritten,
+        normalized, reordered, or deduplicated here: the committed corpus's own
+        ids are recorded as incoherent under the chosen schedule and the
+        endpoint must tolerate them exactly as they are.
+        """
+        expansions = self.first_map(user_id).get("expansions")
+        if not isinstance(expansions, list):
+            raise LegacyBootError(
+                "invalid_save_state",
+                "first map of save for user id %r has no expansions list" % user_id,
+            )
+        return list(expansions)
 
     def save_document(self, user_id: str) -> dict:
         """The in-memory save document for ``user_id`` (legacy ``session()``)."""

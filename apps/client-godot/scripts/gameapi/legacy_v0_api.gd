@@ -4,8 +4,8 @@ extends Node
 ## API", "Place through either implementation", "Purchase through either
 ## implementation", "Move through either implementation", "Sell through
 ## either implementation", "Upgrade through either implementation", and
-## "Construction through either implementation", and "Collect through either
-## implementation").
+## "Construction through either implementation", "Collect through either
+## implementation", and "Expand through either implementation").
 ##
 ## This is the ONLY project file allowed to name the compat endpoint or to
 ## use the built-in HTTP request/enumeration types; the scope test restricts
@@ -28,6 +28,7 @@ const STORE_PATH := "/v0/store"
 const UPGRADE_PATH := "/v0/upgrade"
 const CONSTRUCTION_PATH := "/v0/construction"
 const COLLECT_PATH := "/v0/collect"
+const EXPAND_PATH := "/v0/expand"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -281,6 +282,41 @@ func collect_income(user_id: String,
 			str(outcome.get("code", "bad_response")),
 			str(outcome.get("message", "")))
 	return BootData.parse_collect(outcome.get("payload"))
+
+
+## One expansion intent over loopback HTTP: the client sends only the intent
+## (`user_id` and the expansion `expansion_id` it addresses the committed
+## positional schedule with) — no amount, no resource, no price, no
+## requirement flag, and no resource deltas — and the service reads the id's
+## own committed row in the 98-entry `expansion_prices` schedule, derives the
+## eight-slot **debit** from it, and executes the unchanged legacy `expand`
+## branch server-side (design D1/D2/D5), so the typed result's two owned
+## lists, debit, committed row, and resources are authoritative (design D8).
+## The response carries the owned ledger as read BEFORE execution and the same
+## ledger re-read AFTER it, so the client takes the ledger and the balances
+## from the response verbatim and never appends an id or applies a debit
+## locally.
+##
+## Structured service errors pass through with their original codes — notably
+## `invalid_expansion_id` for a negative or non-integer id,
+## `unknown_expansion_id` for an id the committed schedule does not price,
+## `already_expanded` for an id the player's own ledger already contains,
+## `expansion_requirements_unmet` for a row recording a neighbour or inventory
+## requirement nothing this service can read evaluates, and
+## `insufficient_resources` for a balance that does not cover the derived
+## debit — all of which the client surfaces instead of expanding anything;
+## transport failures keep the boot failure rules, never a partial payload.
+func expand_town(user_id: String,
+		expansion_id: int) -> BootData.ExpandResult:
+	var outcome := await _call("POST", EXPAND_PATH, JSON.stringify({
+		"user_id": user_id,
+		"expansion_id": expansion_id,
+	}))
+	if not outcome.get("ok", false):
+		return BootData.expand_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return BootData.parse_expand(outcome.get("payload"))
 
 
 ## One HTTP round trip. Success returns `{ok: true, payload: Dictionary}`;

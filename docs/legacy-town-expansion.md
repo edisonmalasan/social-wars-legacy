@@ -173,3 +173,73 @@ derived-provisional):
 Non-goals: the neighbor/inventory requirement implementation, the town-versus-map
 schedule disambiguation beyond what the corpus decides, `map_sizes`, terrain
 growth, and server-authoritative validation (Server v1 / M13).
+
+## Resolution, after the `building-expand` proposal (2026-09-30)
+
+All four questions are now answered. The investigation text above is preserved
+unchanged as the evidence base; this section records the resolutions, the two new
+committed-evidence findings, the two additional probe results, and one correction
+to a claim made above.
+
+### Corrections to the investigation record
+
+- **The saturation index above was imprecise.** It said the price "saturates at
+  coins 100000, cash 20, neighbors 15, inventory_qte 30 from index 34". Computed
+  per field from the real table, saturation begins much earlier: `cash` at index
+  11, `coins` at 14, `neighbors` at 18, and `inventory_qte` at 33 — and the whole
+  row reads `100000/20/15/30` from index 33 to 97. The committed capture manifest
+  records the computed census rather than the hand-written number, and the `34`
+  claim was not carried into any implementation or document.
+- **`map_sizes` is not a map field.** The investigation listed it among
+  `maps[0]`'s expansion-related fields; in the committed corpus `map_sizes` lives
+  in `playerInfo` (`[0]`) and is **absent** from the map record entirely. The
+  capture confirms it is absent before and after.
+
+### Two new committed-evidence findings (no execution required)
+
+- **Q2 settled — `coins` is the client's `gold`.** The asset registry carries
+  `assets/images/en/expansion_gold.jpg` and `assets/images/en/expansion_cash.jpg`
+  as two distinct committed images (sha256 `7918b5f6…` and `73daf476…`). They are
+  the expansion popup's two price components, the server's slot 2 is `gold` and
+  slot 6 is `cash`, and a row priced `coins C, cash K` derives
+  `[0, 0, -C, 0, 0, 0, -K, 0]`. A smaller finding corrects the vocabulary:
+  `items[].costs` uses the *letter* set (`g` 279, `c` 375, `w` 128, `s` 110,
+  `o` 69), so the schedules' *word* vocabulary is a second naming layer, not a
+  slip.
+- **Q4 partially settled — an expansion is a purchasable *tile*.** The committed
+  SWF symbols name `PopupExpandMC` and `btnBuyExpandTileMC`, and the registry
+  carries `assets/images/en/expansion.png`. So the tile, the popup, and the two
+  price components are all real client concepts.
+
+### The two additional probe results
+
+- **The server cannot arbitrate the id space at all.** Against the corpus,
+  `expand(999)` → success (`[…, 999]`), a duplicate `expand(35)` → success, and
+  `expand(-1)` → success. This is exactly the evidence for the delivered
+  endpoint's two guards: the legacy server omits the range check and the
+  duplicate check, so a client could otherwise "buy" expansion 999 for a price
+  derived from a row that does not exist.
+- **The clamp is reachable for the first time in this family.** The priced batch
+  asked for 2500 gold against a 2000 balance and `engine.py:251-271`'s
+  `max(current + delta, 0)` landed the balance on **0**, not `-500`; the 5 cash
+  against 5 cash reached 0 exactly. The clamp is reachable precisely when a
+  client-sent debit exceeds the balance, which is what makes a client-sent price
+  a client-trusted mint or burn — and it is why the delivered endpoint derives the
+  debit server-side and proves the resulting balances by value.
+
+### The four resolutions
+
+| # | Question | Resolution |
+| --- | --- | --- |
+| D1 | which schedule, which index space | `expansion_prices`, **indexed by the expansion id itself** — **derived**. The corpus's `[35, 36, 45, 46]` is valid only in the 98-entry table, invalid for the 4-entry schedules (0–3), and not a level set (levels 15/25/35/45; 36 and 46 are not levels). It must be derived because the probe shows the server offers no evidence to arbitrate. The claim is "the price the committed table assigns to that id", never "the price a coherent player pays" |
+| D2 | which resource `coins` means | the client's `gold`, server slot 2 — **established by the committed client asset names**, with the letter-vs-word vocabulary note above |
+| D3 | the `neighbors` / `inventory_qte` requirements | **refused, never invented** — **derived**. Nothing the delivered stack can read evaluates either. Consequence, recorded not worked around: **94 of 98 rows are unpurchasable, including all four ids the corpus owns**, so only the free indexes 0–3 can be bought and the delivered transaction is a zero-cost one |
+| D4 | what an expansion does for the player | a **known evidence gap** — the vocabulary is established (tile, popup, two price components), the **tile → cell geometry is not**, because the committed inspection is symbols-and-tags only and its own scope statement disclaims timeline semantics, script behavior, and rendering. The delivered scope is the **unlock ledger**, with terrain, grid, buildable cells, and placement bounds explicitly **not** invented. Closing the gap needs new evidence, not a derivation |
+
+Two further delivered decisions: **D5** the endpoint proves its post-state **twice**
+— the owned list grew by exactly one appended id, *and* every stored resource
+changed by exactly the derived debit — and **D6** an insufficient balance fails
+closed `insufficient_resources` rather than reproducing the clamp, because the
+debit is server-derived here, so a silent partial charge would make the
+value-level proof ambiguous.
+

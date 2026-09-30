@@ -1,0 +1,551 @@
+{
+  "cleanup": {
+    "disposable_removed_before_manifest_write": true,
+    "server_stopped_within_run": true
+  },
+  "containment": {
+    "disposable_copy_removed": true,
+    "fixture_output": "tests/fixtures/godot-building-expand",
+    "identical": true,
+    "loopback_only": true,
+    "method": "SHA-256 snapshot of every read working-tree group before the run and after the server stopped; equal or the run fails before writing fixtures. The already committed boot, placement, purchase, move, sell, store, upgrade, construction, and collect fixtures are digest-pinned for the same reason.",
+    "no_flash_browser_external_network": true,
+    "only_working_tree_writes": "fixture files under --out",
+    "post_combined_sha256": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "post_run": {
+      "config": {
+        "exists": true,
+        "files": 12,
+        "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+      },
+      "mods": {
+        "exists": true,
+        "files": 2,
+        "sha256": "81b3c6e1f426e8813d96028b9035a853c1fbff8716256e84e956d8826f136ba3"
+      },
+      "root_python": {
+        "exists": true,
+        "files": 11,
+        "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+      },
+      "saves": {
+        "exists": false,
+        "files": 0,
+        "sha256": "absent"
+      },
+      "templates": {
+        "exists": true,
+        "files": 19,
+        "sha256": "2dffe0ca8746b63cf64fd1062a7f259ba2bb85a2fc54f7a2cd2bd2564ffee4ef"
+      },
+      "tests/saves": {
+        "exists": true,
+        "files": 3,
+        "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+      },
+      "villages": {
+        "exists": true,
+        "files": 31,
+        "sha256": "92429a07402766d8183b16fb32178b5c51f1e555df69d3cb46085a7d977f96ea"
+      }
+    },
+    "pre_combined_sha256": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "pre_run": {
+      "config": {
+        "exists": true,
+        "files": 12,
+        "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+      },
+      "mods": {
+        "exists": true,
+        "files": 2,
+        "sha256": "81b3c6e1f426e8813d96028b9035a853c1fbff8716256e84e956d8826f136ba3"
+      },
+      "root_python": {
+        "exists": true,
+        "files": 11,
+        "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+      },
+      "saves": {
+        "exists": false,
+        "files": 0,
+        "sha256": "absent"
+      },
+      "templates": {
+        "exists": true,
+        "files": 19,
+        "sha256": "2dffe0ca8746b63cf64fd1062a7f259ba2bb85a2fc54f7a2cd2bd2564ffee4ef"
+      },
+      "tests/saves": {
+        "exists": true,
+        "files": 3,
+        "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+      },
+      "villages": {
+        "exists": true,
+        "files": 31,
+        "sha256": "92429a07402766d8183b16fb32178b5c51f1e555df69d3cb46085a7d977f96ea"
+      }
+    },
+    "protected_fixtures": {
+      "identical": true,
+      "paths": [
+        "tests/fixtures/godot-compatibility-boot",
+        "tests/fixtures/godot-building-placement",
+        "tests/fixtures/godot-item-purchase",
+        "tests/fixtures/godot-building-move",
+        "tests/fixtures/godot-building-sell",
+        "tests/fixtures/godot-building-store",
+        "tests/fixtures/godot-building-upgrade",
+        "tests/fixtures/godot-building-construction",
+        "tests/fixtures/godot-building-collect"
+      ],
+      "post_run": {
+        "godot-building-collect": {
+          "exists": true,
+          "files": 12,
+          "sha256": "c2ebf3b0778a994e97310b5247809fda57b940cb04b1d1215db787dd81009fa8"
+        },
+        "godot-building-construction": {
+          "exists": true,
+          "files": 12,
+          "sha256": "8efdebcf8e5b91251a48f17d840380da8cd48ea33a922656c67acb115d3c3751"
+        },
+        "godot-building-move": {
+          "exists": true,
+          "files": 12,
+          "sha256": "b3c477a7947fbe409330f03a8658cdca707a2631b52d1d4c5127f440619799c1"
+        },
+        "godot-building-placement": {
+          "exists": true,
+          "files": 12,
+          "sha256": "546a5f00e5e45319ffd17f5ee67201dd2b72cb21de833a3e35e8a9a98d60c5a8"
+        },
+        "godot-building-sell": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fa85af3fb12ef8b9298203a64632b6d7b31c1ed48f8d1ba716151f25ec7ab1c4"
+        },
+        "godot-building-store": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d4dff84132353a60e3a005c42d067185772ec8d6a2548ffdc5aa4779a2055194"
+        },
+        "godot-building-upgrade": {
+          "exists": true,
+          "files": 12,
+          "sha256": "398675ad94928dd75f7fbcd9f62e082d73ee973d3c973f5bbdf44a083a9c0521"
+        },
+        "godot-compatibility-boot": {
+          "exists": true,
+          "files": 31,
+          "sha256": "4d389707e0f18676fb23b3a2a8a47031b4e233366e4066437f8bad6854e15234"
+        },
+        "godot-item-purchase": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d05e5b92b26a1222774bb32e76a42417c692e65ee1b87abdb8a2f4e6cd84e813"
+        }
+      },
+      "pre_run": {
+        "godot-building-collect": {
+          "exists": true,
+          "files": 12,
+          "sha256": "c2ebf3b0778a994e97310b5247809fda57b940cb04b1d1215db787dd81009fa8"
+        },
+        "godot-building-construction": {
+          "exists": true,
+          "files": 12,
+          "sha256": "8efdebcf8e5b91251a48f17d840380da8cd48ea33a922656c67acb115d3c3751"
+        },
+        "godot-building-move": {
+          "exists": true,
+          "files": 12,
+          "sha256": "b3c477a7947fbe409330f03a8658cdca707a2631b52d1d4c5127f440619799c1"
+        },
+        "godot-building-placement": {
+          "exists": true,
+          "files": 12,
+          "sha256": "546a5f00e5e45319ffd17f5ee67201dd2b72cb21de833a3e35e8a9a98d60c5a8"
+        },
+        "godot-building-sell": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fa85af3fb12ef8b9298203a64632b6d7b31c1ed48f8d1ba716151f25ec7ab1c4"
+        },
+        "godot-building-store": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d4dff84132353a60e3a005c42d067185772ec8d6a2548ffdc5aa4779a2055194"
+        },
+        "godot-building-upgrade": {
+          "exists": true,
+          "files": 12,
+          "sha256": "398675ad94928dd75f7fbcd9f62e082d73ee973d3c973f5bbdf44a083a9c0521"
+        },
+        "godot-compatibility-boot": {
+          "exists": true,
+          "files": 31,
+          "sha256": "4d389707e0f18676fb23b3a2a8a47031b4e233366e4066437f8bad6854e15234"
+        },
+        "godot-item-purchase": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d05e5b92b26a1222774bb32e76a42417c692e65ee1b87abdb8a2f4e6cd84e813"
+        }
+      }
+    },
+    "working_tree_saves_unchanged": true
+  },
+  "corpus": {
+    "login_preserved_seed": true,
+    "pid": "00000000-0000-4000-8000-000000000001",
+    "seed": {
+      "file_sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+      "path": "tests/saves/fresh-player.json",
+      "saves_group_sha256_before_server_start": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6"
+    },
+    "seeded_as": "saves/<pid>.save.json in the disposable copy",
+    "startup_preserved_seed": true
+  },
+  "executed_at_utc": "2026-09-30T03:01:58+00:00",
+  "exit_code": 0,
+  "intent": {
+    "derived": {
+      "always_zero_slots": [
+        0,
+        1,
+        3,
+        4,
+        5,
+        7
+      ],
+      "args": [
+        0
+      ],
+      "command": "expand",
+      "decisions": {
+        "D1_id_space": "the price comes from expansion_prices, indexed by the expansion id ITSELF. DERIVED. Supporting evidence: the corpus's own [35, 36, 45, 46] is a valid index into the 98-entry table and is NOT a valid index into the 4-entry town_prices/map_prices schedules nor a level set (36 and 46 are not levels). The executed probe is exactly why it is derived: the server accepted expand(999), a duplicate expand(35), and expand(-1), all answering success, so the id space cannot be settled by observing the server. Two consequences are carried: a level-1 fresh player owning four saturated-price (coins 100000) expansions is not a coherent game state, which is recorded as a reason to distrust the reading and bounds the claim to 'the price the committed table assigns to the id'; and because the server does not range-check, an id outside the schedule is REFUSED (unknown_expansion_id 404) and an owned id is REFUSED (already_expanded 409). Rejected alternatives: indexing the four-entry schedules by level, and indexing by len(map['expansions'])",
+        "D2_gold_naming": "the schedule's gold-named 'coins' field is the client's 'gold' and lands in server slot 2, with 'cash' landing in slot 6. ESTABLISHED BY COMMITTED ASSET EVIDENCE: assets/images/en/expansion_gold.jpg and expansion_cash.jpg are two distinct committed images \u2014 the expansion popup's two price components \u2014 and the client's own icon for one of them is named gold. Note the config's two resource namings: items[].costs uses the letter set (g/c/w/o/s) while the price schedules use the word set (coins/cash), so a word key is a second naming layer and the committed asset name is the bridge, not an inference. Rejected alternative: reading 'coins' as an unlabelled resource and guessing its slot",
+        "D3_requirements": "a row recording a POSITIVE 'neighbors' or 'inventory_qte' fails closed with expansion_requirements_unmet (409); nothing the delivered stack can read (no neighbour count, no inventory quantity in the bootstrap, the GameApi, or the corpus) evaluates either, and the legacy server ignores both. DERIVED. Rejected alternatives: enforcing a neighbour count or an inventory quantity from state nothing delivers, and ignoring the requirement. CONSEQUENCE, stated not hidden: 94 of the 98 committed rows record a positive requirement \u2014 including EVERY id the corpus owns (35, 36, 45, 46, all at neighbors 15 / inventory_qte 30), so none of them could have been bought and the only purchasable entries in the whole schedule are the free indexes 0..3. The line therefore delivers a real ZERO-COST expansion on this corpus and refuses the priced ones, which is correct under the evidence and wrong for gameplay",
+        "D4_land_gap": "this change delivers the unlock LEDGER and nothing about land. NOT IMPLEMENTED and NOT CLAIMED: no terrain growth, no grid enlargement, no new buildable cells, and no change to the placement bounds the delivered placement line enforces. The committed evidence establishes the vocabulary (a purchasable TILE bought through a popup, priced in gold and cash) but NOT the tile -> cell geometry, because the committed SWF inspection is symbols-and-tags only and its own scope statement disclaims timeline semantics, script behavior, and rendering. A known evidence gap that bounds visual land growth; closing it requires new evidence (an extracted geometry table, a rendered reference, or an authoritative spec), not a derivation",
+        "D5_intent_and_proof": "the request carries only the save id and the expansion id; the price, the debit, the requirement check, and the time are the service's own. After execution the endpoint requires BOTH that the owned list grew by exactly one entry equal to the sent id AT THE END with every existing entry unchanged and in order and never reordered or deduplicated, AND that every stored resource changed by EXACTLY the derived debit; any other outcome fails closed with internal_error rather than reporting the legacy success. The second half is the first endpoint's value-level proof to exist specifically to catch a wrong SERVER-DERIVED price, which would otherwise mint or burn the wrong amount",
+        "D6_affordability": "a balance that does not cover the server-derived debit fails closed with insufficient_resources (409) BEFORE execution. DERIVED. Rejected alternative: reproducing legacy's per-resource max(current + delta, 0) clamp, whose reachability is established by the executed probe (a client-sent -5000 gold debit against a 2000 balance landed on 0, not -500). Because the debit here is server-derived, the endpoint can know whether the balance covers it, and silently under-charging would make the post-state proof ambiguous \u2014 a balance that moved by less than the derived debit is indistinguishable from a wrong derivation"
+      },
+      "envelope_keys": [
+        "accessToken",
+        "commands",
+        "first_number",
+        "publishActions",
+        "tries",
+        "ts"
+      ],
+      "price": {
+        "cash": 0,
+        "coins": 0,
+        "inventory_qte": 0,
+        "neighbors": 0
+      },
+      "price_fields": {
+        "cash": "the client's cash; lands in server slot 6 (playerInfo.cash, engine.py:267) negated",
+        "coins": "the client's gold, ESTABLISHED by the committed assets expansion_gold.jpg and expansion_cash.jpg; lands in server slot 2 (map['gold'], engine.py:259) negated",
+        "inventory_qte": "an UNEVALUABLE requirement; a positive value is refused with expansion_requirements_unmet (409)",
+        "neighbors": "an UNEVALUABLE requirement; a positive value is refused with expansion_requirements_unmet (409)"
+      },
+      "resource_vector": "unknown, xp, gold, wood, oil, steel, cash, mana",
+      "resources_changed": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "schedule": {
+        "cheapest_non_zero": [
+          [
+            "coins",
+            2500
+          ],
+          [
+            "cash",
+            5
+          ],
+          [
+            "neighbors",
+            1
+          ],
+          [
+            "inventory_qte",
+            1
+          ]
+        ],
+        "entries": 98,
+        "field_saturation_first_index": {
+          "cash": 11,
+          "coins": 14,
+          "inventory_qte": 33,
+          "neighbors": 18
+        },
+        "fields": [
+          "coins",
+          "cash",
+          "neighbors",
+          "inventory_qte"
+        ],
+        "first_index_whose_row_equals_the_last_row": 33,
+        "id_space": "the positional index 0..97",
+        "key": "expansion_prices",
+        "requirement_free_indexes": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "rows_recording_a_requirement": 94,
+        "saturated_row": [
+          [
+            "coins",
+            100000
+          ],
+          [
+            "cash",
+            20
+          ],
+          [
+            "neighbors",
+            15
+          ],
+          [
+            "inventory_qte",
+            30
+          ]
+        ],
+        "stable_id": false,
+        "unused_schedules": {
+          "map_prices": 4,
+          "note": "both carry levels 15/25/35/45 and are deliberately NOT used by this line",
+          "town_prices": 4
+        },
+        "zero_cost_indexes": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "status": "established: the command's argument shape and its single effect (map['expansions'] += [int(expansion)], command.py:211-216), that the price is the client-sent 8-slot vector applied verbatim per resource as max(current + delta, 0) and applied BEFORE the branch (command.py:40, engine.py:251-271), that the clamp is REACHABLE, that the server accepts an out-of-range id, a duplicate, and a negative id, that a non-integer id raises an unhandled server error, the committed expansion_prices / town_prices / map_prices schedules and their census, the committed client asset names that settle coins->gold, and the resulting state of this executed transaction. DERIVED and never observed from the Flash client: D1 (the id-space indexing), D3 (the requirements refusal), D4 (the land gap boundary), and D6 (the affordability refusal) together with the debit's sign and shape. The claim is that a debit is derived from the committed schedule row the id names, NEVER that it is the price a coherent player pays",
+      "vector_is_a_debit": true
+    },
+    "expansion_id": 0,
+    "land_rule": "NOT APPLICABLE, and deliberately: this line is the unlock LEDGER only. No terrain, grid, cell, footprint, or placement-bound effect is derived, implemented, or claimed (design D4). The committed evidence establishes the vocabulary (the SWF symbols PopupExpandMC and btnBuyExpandTileMC plus assets/images/en/expansion.png show the client's model is a purchasable TILE bought through a popup; expansion_gold.jpg and expansion_cash.jpg show the two price components) but the committed SWF inspection is symbols-and-tags only and its own scope statement disclaims timeline semantics, script behavior, and rendering, so the tile -> cell geometry is NOT derivable from the preserved evidence. That is a known evidence gap that bounds visual land growth, and closing it needs new evidence rather than a derivation",
+    "schedule_rule": "the expansion price comes from the 98-entry positional expansion_prices schedule, indexed by the expansion id itself (design D1, DERIVED: the legacy server accepted expand(999), a duplicate, and expand(-1) alike, so it offers no evidence to arbitrate the id space; the corpus's own [35, 36, 45, 46] is only a valid index into THIS 98-row table and is neither a valid 4-entry town_prices/map_prices index nor a level set). Because the server does no range check, the endpoint answers unknown_expansion_id (404) for an id outside the table and already_expanded (409) for an id the player's own ledger already contains",
+    "target_rule": "expansion id 0 \u2014 a FREE row of the committed 98-entry positional expansion_prices schedule (indexes 0..3 all record coins 0, cash 0, neighbors 0, inventory_qte 0), so the derived debit is the all-zero vector. It is the only kind of expansion this corpus can honestly buy: design D3 refuses any row recording a positive neighbors or inventory_qte requirement, and 94 of the 98 committed rows record one \u2014 including EVERY id the corpus itself owns (35, 36, 45, 46, all at neighbors 15 and inventory_qte 30), so none of them could have been bought. The requirement refusal is stated, never worked around"
+  },
+  "interpreter": {
+    "executable": "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+    "requirement": "CPython 3.9.x (pinned baseline for this change)",
+    "version": "3.9.13 (tags/v3.9.13:6de2ca5, May 17 2022, 16:36:42) [MSC v.1929 64 bit (AMD64)]"
+  },
+  "invocation": "python -B apps/compat-api/capture_expand_fixture.py",
+  "probes": [
+    {
+      "changed_top_level_map_keys": [
+        "expansions",
+        "gold"
+      ],
+      "clamp_reached": "the per-resource clamp finally bit, for real, for the first time in this family: a client-sent -5000 gold debit against a 2000 balance landed on 0 rather than -500, and the 5 cash against 5 cash reached 0 exactly. That is the strongest available argument for a SERVER-DERIVED price and for refusing an unaffordable expansion instead of reproducing the clamp (design D6)",
+      "commands": [
+        "expand(4) with the neutral vector [0,0,0,0,0,0,0,0]",
+        "expand(5) with the expansion_prices[5] debit [0,0,-5000,0,0,0,-8,0]"
+      ],
+      "established": "the branch appends and changes NOTHING else (command.py:211-216): not items, not level, not map_sizes, not increasedPopulation, not privateState, not the rest of playerInfo. The price is entirely client-sent and applied verbatim per resource as max(current + delta, 0) (engine.py:251-271)",
+      "expansions_after": [
+        35,
+        36,
+        45,
+        46,
+        4,
+        5
+      ],
+      "expansions_before": [
+        35,
+        36,
+        45,
+        46
+      ],
+      "probe": 1,
+      "question": "what does the expand branch actually write, and what happens when the client-sent debit exceeds the balance?",
+      "resources": "gold 2000 -> 0; playerInfo.cash 5 -> 0; xp, wood, oil, steel, mana unchanged",
+      "response": "{\"result\":\"success\"} for both batches"
+    },
+    {
+      "commands": [
+        "expand(999)",
+        "expand(35) (a duplicate the corpus already owns)",
+        "expand(-1)"
+      ],
+      "consequence": "this is the evidence for the endpoint's TWO guards, and for the derived D1 id space: unknown_expansion_id (404) for an id the committed schedule does not price, and already_expanded (409) for an id the player's own ledger already contains. Without them a client could buy an expansion no committed row prices and could append a repeat, corrupting the only ledger this line maintains",
+      "established": "NO. The server accepts 999 (an id the 98-row committed schedule does not price), a duplicate of an owned id, and a negative id, all answering success. There is no range check, no dedup, no ordering rule, no level gate, and no requirement check; a repository-wide search finds exactly three references to map['expansions'] in the whole legacy server, all three inside the branch",
+      "expansions_after_999": [
+        35,
+        36,
+        45,
+        46,
+        999
+      ],
+      "probe": 2,
+      "question": "can the legacy server arbitrate the expansion id space at all?",
+      "responses": "all three answered {\"result\":\"success\"}"
+    },
+    {
+      "commands": [
+        "expand(\"abc\")"
+      ],
+      "consequence": "this is the evidence for the endpoint's structural invalid_expansion_id (400) check: the value is refused before the dispatcher runs, so a client can never turn a malformed id into an unhandled server error",
+      "established": "the branch coerces its argument with int() and does not guard it, so a non-integer id crashes the request instead of being refused",
+      "probe": 3,
+      "question": "what happens when the expansion id is not an integer?",
+      "response": "an unhandled HTTP 500 raised by int(\"abc\") inside the branch"
+    }
+  ],
+  "purpose": "Executed request/before/response/after fixtures for one legacy expand transaction carrying the content-derived debit; the executed-legacy parity oracle for the Compatibility API v0 expand endpoint.",
+  "schema": "godot-building-expand/legacy-capture-v1",
+  "server": {
+    "command": [
+      "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+      "-B",
+      "server.py"
+    ],
+    "command_recorder_env": "SOCIALWARS_COMMAND_RECORD_DIR stripped from child",
+    "cwd": "<disposable copy under the system temp root>",
+    "host": "127.0.0.1",
+    "output_logs": "server.stdout.log / server.stderr.log inside the disposable copy (removed with the copy; not committed)",
+    "port": 5055,
+    "port_free_after_stop": true,
+    "port_free_before_start": true,
+    "readiness": "TCP connect loop on 127.0.0.1:5055 (no extra HTTP request)",
+    "stopped_by": "taskkill /T /F <pid>, wait, then port-free re-check"
+  },
+  "time_dependent_fields": {
+    "documented_normalization": "expand parity applies NO clock normalization: the owned list is compared by value (exactly the sent id appended at the end) and every stored resource by value (exactly the derived debit), because neither carries a clock reading. The only clock in the transaction is the envelope ts, which legacy parses and never reads, and the legacy branch writes no clock of its own \u2014 unlike collect's item[3] = time_now()",
+    "leaves": [
+      "/captured_at_utc in steps/login_post/request.json",
+      "/captured_at_utc in steps/login_post/response.meta.json",
+      "/captured_at_utc in steps/command_expand/request.json",
+      "/captured_at_utc in steps/command_expand/response.meta.json",
+      "/executed_at_utc in capture-manifest.json",
+      "/headers/Date in steps/login_post/response.meta.json",
+      "/headers/Date in steps/command_expand/response.meta.json",
+      "the envelope ts inside steps/command_expand/request.json's /form/data (and therefore that whole field's string, because the digest covers the payload), since ts is the current time"
+    ],
+    "rule": "the recorded STATE and the recorded RESPONSE carry NO time-dependent leaf at all: an expansion writes an int the client sent into a list and the derived debit is the all-zero vector, so steps/*/before.json, steps/*/after.json, and steps/*/response.body are byte-identical across reruns. The leaves below are the whole record-metadata and envelope-clock surface, and the claim is machine-checkable: a leaf-level diff of two consecutive runs must differ at exactly these 8 paths and nowhere else",
+    "stable_by_derivation": "the ledger, every resource, and every other map field are byte-stable because the derivation is fixed: the fixture id 0 is a committed free row, so the debit is always the all-zero vector [0, 0, 0, 0, 0, 0, 0, 0] and the committed ledger is always [35, 36, 45, 46], making /transaction/expansions_after, /transaction/resources_after, /transaction/resource_delta, /transaction/save_after_sha256, and every leaf of the two save documents stable. There is no wall-clock reading anywhere in the recorded state \u2014 this is the first delivered fixture in the family with no time-dependent state leaf at all",
+    "state_leaves": []
+  },
+  "transaction": {
+    "bought_units_after": [],
+    "bought_units_before": [],
+    "clamp_exercised": false,
+    "clamp_note": "legacy's max(current + delta, 0) only bites when a delta would drive a balance below zero; the fixture's committed row is FREE, so the derived debit is the all-zero vector and no balance moves at all. The clamp's REACHABILITY is established by probe 1 above (a client-sent -5000 gold debit against a 2000 balance landed on 0), and it is exactly what design D6's insufficient_resources refusal exists to avoid reproducing",
+    "count": 2,
+    "dead_heroes_after": {},
+    "deduplicated": false,
+    "existing_entries_reordered": false,
+    "existing_entries_unchanged": true,
+    "expand_writes": [
+      "engine.apply_resources applies the derived debit on the single command with max(..., 0) per resource, BEFORE the branch (command.py:40; engine.py:251-271)",
+      "command.expand appends int(args[0]) to map['expansions'] and writes NOTHING else (command.py:211-216)",
+      "no branch reads, validates, prices, orders, or deduplicates map['expansions'] \u2014 a repository-wide search finds exactly three references to the word in the whole legacy server, all three inside the branch"
+    ],
+    "expansion_id_sent": 0,
+    "expansions_after": [
+      35,
+      36,
+      45,
+      46,
+      0
+    ],
+    "expansions_before": [
+      35,
+      36,
+      45,
+      46
+    ],
+    "increased_population_after": 0,
+    "increased_population_before": 0,
+    "land_effect": false,
+    "land_note": "NOT claimed and NOT implemented: no land, grid, cell, footprint, or placement-bound effect (design D4). This fixture establishes the unlock ledger only: an int appended to a list",
+    "ledger_grew_by": 1,
+    "map_key_set_unchanged": true,
+    "map_level_after": 1,
+    "map_level_before": 1,
+    "map_sizes_present_after": false,
+    "map_sizes_present_before": false,
+    "other_map_fields_unchanged": true,
+    "other_rows_unchanged": true,
+    "placement_count_after": 40,
+    "placement_count_before": 40,
+    "player_info_unchanged": true,
+    "private_state_unchanged": true,
+    "requirements_note": "the endpoint refuses a row recording a positive neighbors or inventory_qte with expansion_requirements_unmet (409). The fixture's own committed row records 0 for both, so it is purchasable; the 94 rows that do record a requirement \u2014 including every id the corpus owns \u2014 are not, and that is stated rather than worked around",
+    "requirements_rule_enforced": true,
+    "resource_delta": {
+      "cash": 0,
+      "gold": 0,
+      "mana": 0,
+      "oil": 0,
+      "steel": 0,
+      "wood": 0,
+      "xp": 0
+    },
+    "resources_after": {
+      "cash": 5,
+      "gold": 2000,
+      "mana": 0,
+      "oil": 2000,
+      "steel": 2000,
+      "wood": 2000,
+      "xp": 4
+    },
+    "resources_before": {
+      "cash": 5,
+      "gold": 2000,
+      "mana": 0,
+      "oil": 2000,
+      "steel": 2000,
+      "wood": 2000,
+      "xp": 4
+    },
+    "response_body": "{\"result\": \"success\"}",
+    "steps": [
+      {
+        "method": "POST",
+        "name": "login_post",
+        "path": "/",
+        "response_bytes": 207,
+        "response_sha256": "2de230237d9f4055670576b9485897dbc06581889ca90527504cbdbd4933ec01",
+        "save_after_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_before_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_unchanged_by_call": true,
+        "status": 302,
+        "target": "/"
+      },
+      {
+        "method": "POST",
+        "name": "command_expand",
+        "path": "/dynamic/menvswomen/srvsexwars/command.php",
+        "response_bytes": 21,
+        "response_sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87",
+        "save_after_sha256": "2566198773e1e28c57be83ca408b0b711c794852abbe099fd2f666522266298f",
+        "save_before_sha256": "4977dfffd8741df93dcc9289e0598ca6525de773e2324d1b9e0f6006cc592e91",
+        "save_unchanged_by_call": false,
+        "status": 200,
+        "target": "/dynamic/menvswomen/srvsexwars/command.php"
+      }
+    ],
+    "store_after": {}
+  }
+}

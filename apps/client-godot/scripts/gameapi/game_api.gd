@@ -6,9 +6,10 @@ extends Node
 ## `place_building()` for one placement intent, `purchase_item()` for one
 ## purchase intent, `move_building()` for one move intent,
 ## `sell_building()` for one sell intent, `store_building()` for one
-## store intent, `upgrade_building()` for one upgrade intent, and
-## `build_construction()` for one construction intent, and
-## `collect_income()` for one collection intent, receiving
+## store intent, `upgrade_building()` for one upgrade intent,
+## `build_construction()` for one construction intent,
+## `collect_income()` for one collection intent, and `expand_town()` for one
+## expansion intent, receiving
 ## typed results
 ## (`scripts/gameapi/boot_data.gd`); raw transport dictionaries never reach
 ## presentation code, and no other script references a transport.
@@ -25,8 +26,9 @@ extends Node
 ##               `tests/fixtures/godot-building-store/` (store),
 ##               `tests/fixtures/godot-building-upgrade/` (upgrade), and
 ##               `tests/fixtures/godot-building-construction/`
-##               (construction), and `tests/fixtures/godot-building-collect/`
-##               (collection); no process, no server, no socket.
+##               (construction), `tests/fixtures/godot-building-collect/`
+##               (collection), and `tests/fixtures/godot-building-expand/`
+##               (expansion); no process, no server, no socket.
 ##   legacy_v0 - JSON over loopback HTTP to Compatibility API v0 through the
 ##               built-in HTTP request client; endpoint from the project
 ##               setting `gameapi/endpoint` (default: loopback 127.0.0.1 on
@@ -109,6 +111,12 @@ var construction_requests := 0
 ## Monotonic for the same reason: `configure()` swaps the implementation
 ## without hiding history.
 var collect_requests := 0
+## Number of expansion intents this process has issued (building-expand flow
+## contract: exactly one per confirm, zero for every local refusal — the expand
+## suite snapshots this counter exactly like `placement_requests`).
+## Monotonic for the same reason: `configure()` swaps the implementation
+## without hiding history.
+var expand_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -294,6 +302,26 @@ func collect_income(user_id: String,
 	collect_requests += 1
 	var result: BootData.CollectResult = await _impl.collect_income(
 		user_id, item_index)
+	return result
+
+
+## One expansion intent (a save id and the expansion id the client addressed
+## the committed positional schedule with) from the selected implementation.
+## The contract carries NO amount, NO resource, NO price, NO requirement flag,
+## and NO resource deltas: the service reads the id's own committed row in the
+## 98-entry `expansion_prices` schedule, derives the eight-slot **debit** from
+## it, and executes the unchanged legacy `expand` branch (design D1/D2/D5), so
+## the typed result's two owned lists, debit, committed row, and resources are
+## authoritative (design D8). The response carries the owned ledger as read
+## BEFORE execution and the same ledger re-read AFTER it, so presentation code
+## takes the ledger and the balances from the response verbatim and never
+## appends an id, never applies a debit, and never uses its own arithmetic —
+## the response wins even where the two disagree.
+func expand_town(user_id: String,
+		expansion_id: int) -> BootData.ExpandResult:
+	expand_requests += 1
+	var result: BootData.ExpandResult = await _impl.expand_town(
+		user_id, expansion_id)
 	return result
 
 

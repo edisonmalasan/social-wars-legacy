@@ -49,6 +49,15 @@ extends "res://tests/test_base.gd"
 ##               records NO state and is marked unreadable without rejecting
 ##               the delivered save, and a present-but-invalid counter or
 ##               countdown each fail closed naming the row;
+##   owned       the typed owned-expansions ledger (building-expand task 4.1,
+##               design D1/D5): the fresh save's own `[35, 36, 45, 46]` parses
+##               verbatim in the save's own order, an absent field is recorded
+##               in `missing` under `owned_expansions` rather than defaulted to
+##               a player who owns nothing, a list containing ids the committed
+##               schedule does not cover is carried through untouched (and
+##               never range-checked, reordered, or deduplicated), and a
+##               non-array field or a non-integer entry each fail closed
+##               naming the offender;
 ##   village     the preserved `villages/Scarlet.json` (`maps[0]` shape)
 ##               parses: 576 placements, the six content-unknown ids
 ##               recorded, House I and Wild Elephant resolved.
@@ -98,6 +107,7 @@ func run_scenario() -> void:
 	_check_addressable_keys(payload, registry)
 	_check_construction_state(payload, registry)
 	_check_collection_clock(payload, registry)
+	_check_owned_expansions(payload, registry)
 	_check_registry_precondition()
 	_check_village_parse(registry)
 
@@ -762,6 +772,115 @@ func _expect_construction_reject(payload: Dictionary, needle: String) -> void:
 		% [needle, str(result.get("error", ""))])
 
 
+## The typed owned-expansions ledger (building-expand task 4.1, design D1/D5):
+## the fresh save's own list parses verbatim in the save's own order; an absent
+## field is recorded in `missing` rather than defaulted; a list carrying ids the
+## committed schedule does not cover — a repeat, an out-of-order id, and a
+## negative id — is carried through untouched; and a non-array field or a
+## non-integer entry each fail closed naming the offender.
+func _check_owned_expansions(payload: Variant, registry: Variant) -> void:
+	var fresh: Dictionary = TownState.parse(payload, registry)
+	check(bool(fresh.get("ok", false)),
+		"the fresh ledger parses: %s" % fresh.get("error"))
+	if bool(fresh.get("ok", false)):
+		var state = fresh["state"]
+		check_eq(state.owned_expansions, [35, 36, 45, 46],
+			"the fresh save's own ledger parses verbatim, in the save's order")
+		check(not state.missing.has(TownState.EXPANSIONS_MISSING_KEY),
+			"a present ledger is never recorded missing")
+		check_eq(state.placements.size(), 40,
+			"a present ledger never drops placements")
+	# The parser NEVER reorders, deduplicates, normalizes, or range-checks the
+	# ledger: the legacy branch neither orders nor deduplicates it, and the
+	# committed corpus's own ids are tolerated exactly as recorded.
+	var verbatim: Dictionary = (payload as Dictionary).duplicate(true)
+	(verbatim["map"] as Dictionary)["expansions"] = [46, 36, 36, 35, -1, 999]
+	var result: Dictionary = TownState.parse(verbatim, registry)
+	check(bool(result.get("ok", false)),
+		"a ledger with repeat, out-of-order, negative, and uncovered ids "
+		+ "parses: %s" % result.get("error"))
+	if bool(result.get("ok", false)):
+		check_eq((result["state"] as Variant).owned_expansions,
+			[46, 36, 36, 35, -1, 999],
+			"every entry is carried verbatim: never reordered, never "
+			+ "deduplicated, never range-checked against the committed schedule")
+		check_eq((result["state"] as Variant).owned_expansions.size(), 6,
+			"the ledger's length is the save's own, never normalized")
+		check_eq((result["state"] as Variant).placements.size(), 40,
+			"an unusual ledger never drops placements")
+	# An empty list is a real, observed state (a player who owns nothing) and
+	# must not be reported as a missing field.
+	var empty: Dictionary = (payload as Dictionary).duplicate(true)
+	(empty["map"] as Dictionary)["expansions"] = []
+	result = TownState.parse(empty, registry)
+	check(bool(result.get("ok", false)),
+		"an empty ledger parses: %s" % result.get("error"))
+	if bool(result.get("ok", false)):
+		var state = result["state"]
+		check_eq(state.owned_expansions, [],
+			"an empty ledger parses as an empty list")
+		check(not state.missing.has(TownState.EXPANSIONS_MISSING_KEY),
+			"a present-but-empty ledger is never recorded missing")
+	# Absent -> recorded in `missing`, never defaulted to a fabricated list.
+	var without: Dictionary = (payload as Dictionary).duplicate(true)
+	(without["map"] as Dictionary).erase("expansions")
+	result = TownState.parse(without, registry)
+	check(bool(result.get("ok", false)),
+		"an absent ledger does not fail the save: %s" % result.get("error"))
+	if bool(result.get("ok", false)):
+		var state = result["state"]
+		check(state.missing.has(TownState.EXPANSIONS_MISSING_KEY),
+			"the absent ledger is recorded for the readout (missing: %s)"
+			% str(state.missing))
+		check_eq(state.owned_expansions, [],
+			"an absent ledger yields no fabricated entries")
+		check("energy" not in state.missing,
+			"the ledger record never displaces the HUD's own fields")
+	# Present-but-invalid: each shape fails closed naming the offender.
+	_expect_expansions_reject(_with_expansions(payload, "nope"),
+		"is not an array")
+	_expect_expansions_reject(_with_expansions(payload, {}),
+		"is not an array")
+	_expect_expansions_reject(_with_expansions(payload, [35, "one"]),
+		"entry 1 is not an integer")
+	_expect_expansions_reject(_with_expansions(payload, [35, 1.5]),
+		"entry 1 is not an integer")
+	_expect_expansions_reject(_with_expansions(payload, [null]),
+		"entry 0 is not an integer")
+	# The shared parser the expand apply reuses is the same function: the
+	# response's authoritative `expansions_after` goes through exactly these
+	# rules, so a response can never be read with different rules than the
+	# payload it replaces.
+	var response: Dictionary = TownState.expansions_of([35, 36, 45, 46, 0])
+	check(bool(response.get("ok", false)),
+		"the shared ledger parser accepts a response list")
+	check(bool(response.get("present", false)),
+		"a response list is always present")
+	check_eq(response.get("expansions", []), [35, 36, 45, 46, 0],
+		"the shared parser keeps the response's own order and length")
+	var floats: Dictionary = TownState.expansions_of([35.0, 36.0])
+	check(bool(floats.get("ok", false))
+			and floats.get("expansions", []) == [35, 36],
+		"the shared parser canonicalizes the transport's integral floats")
+	check(TownState.expansions_of(null).get("present", true) == false,
+		"an absent list is reported as not present")
+	check(not bool(TownState.expansions_of(["x"]).get("ok", true)),
+		"the shared parser rejects a non-integer entry fail-closed")
+
+
+## A rejected owned-expansions parse: `{ok: false}` with an error naming the
+## offender and no state produced.
+func _expect_expansions_reject(payload: Dictionary, needle: String) -> void:
+	var result: Dictionary = TownState.parse(payload, registry_of(payload))
+	check(not bool(result.get("ok", true)),
+		"an invalid ledger (%s) fails closed" % needle)
+	check(result.get("state") == null,
+		"an invalid ledger (%s) yields no state" % needle)
+	check(str(result.get("error", "")).find(needle) != -1,
+		"the error names the invalid ledger (%s, got: %s)"
+			% [needle, str(result.get("error", ""))])
+
+
 ## The committed placement carrying an addressable index (null when absent).
 func _placement_by_slot(state: Variant, slot: Variant) -> Variant:
 	if state == null:
@@ -819,6 +938,13 @@ func _expect_collection_reject(payload: Dictionary, needle: String) -> void:
 			and str(result.get("error", "")).find("11") != -1,
 		"the error names the invalid %s and the offending row (got: %s)"
 			% [needle, str(result.get("error", ""))])
+
+
+## The payload with one crafted `map.expansions` value.
+func _with_expansions(payload: Dictionary, value: Variant) -> Dictionary:
+	var crafted: Dictionary = (payload as Dictionary).duplicate(true)
+	(crafted["map"] as Dictionary)["expansions"] = value
+	return crafted
 
 
 ## The payload with one crafted `map.store` value.

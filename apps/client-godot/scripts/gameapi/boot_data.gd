@@ -66,6 +66,26 @@ extends RefCounted
 ## the collection instant with `time_now()`), so it and `reference_time` are
 ## asserted as positive integers and never by value.
 ##
+## The expand command needs its own result class for four reasons the collect
+## class cannot absorb: its response is TWO-SIDED and both sides are the same
+## shape (`expansions_before`, the owned ledger the service READ before
+## execution, and `expansions_after`, the same ledger re-read after it — the
+## legacy branch is a bare append, so the two differ by exactly one entry at the
+## end), and it is the SECOND delivered line whose resource vector is
+## deliberately NOT neutral: the service derives a content-derived eight-slot
+## **debit** from the addressed id's own committed row in the 98-entry
+## positional expansion schedule and reports that committed row verbatim as
+## `price` (building-expand design D1/D2/D5). The client's balances come from
+## the response's `resources` and its owned ledger from the response's
+## `expansions_after`, never from the debit and never from its own arithmetic,
+## so the two disagreeing is detectable rather than silent — the response-wins
+## rule the collect line also carries.
+##
+## `server_time` is the documented time-dependent field here (the legacy
+## dispatcher stamps the wall clock into the envelope), so it is asserted as a
+## positive integer and never by value. Nothing in the expand response is
+## otherwise time-dependent: the legacy branch writes an int the client sent.
+##
 ## Presentation code never receives raw transport dictionaries: every
 ## GameApi operation returns one of the result classes below, and the two
 ## legacy JSON payloads (game config, player info) are wrapped in payload
@@ -493,6 +513,101 @@ class CollectResult:
 ## Structured failure for `collect_income()` (never a partial payload).
 static func collect_failure(code: String, message: String) -> CollectResult:
 	var result := CollectResult.new()
+	result.ok = false
+	result.error_code = code
+	result.error_message = message
+	return result
+
+
+## The derived expansion **debit**'s fixed width: the legacy eight-slot
+## `resources_changed` vector `[unknown, xp, gold, wood, oil, steel, cash,
+## mana]`. The expansion price names exactly two of those slots (the schedule's
+## gold-named field and its cash field), so the other six are always zero.
+const EXPAND_VECTOR_SLOTS := 8
+## The six slots an expansion debit can never fill: slot 0 is unread by every
+## legacy branch, slot 1 is experience, and slots 3/4/5/7 are wood/oil/steel
+## and mana, none of which the committed expansion schedule names.
+const EXPAND_ALWAYS_ZERO_SLOTS := [0, 1, 3, 4, 5, 7]
+## The two slots a priced expansion's debit fills: the schedule's gold-named
+## field into `gold` (slot 2) and its `cash` field into `cash` (slot 6). The
+## gold naming is **established** by the client's own committed asset names
+## `expansion_gold.jpg` / `expansion_cash.jpg`; the slot numbers are the
+## server's own ordering (building-expand design D2).
+const EXPAND_GOLD_SLOT := 2
+const EXPAND_CASH_SLOT := 6
+
+
+## One committed expansion price row exactly as the v0 endpoint reports it
+## verbatim: the 98-entry positional `expansion_prices` schedule's four
+## fields. **No stable id exists in the committed table** — the index IS the id
+## (design D1, derived) — so the row itself carries no identifier and the
+## caller pairs it with the id it addressed.
+##
+## `neighbors` and `inventory_qte` are requirements, not prices. Nothing any
+## delivered surface can read evaluates either, so a row recording a positive
+## value is REFUSED by the endpoint with `expansion_requirements_unmet`
+## (design D3) — the row is still carried verbatim on success, where both are
+## necessarily zero.
+class ExpansionPrice:
+	extends RefCounted
+	var coins := 0
+	var cash := 0
+	var neighbors := 0
+	var inventory_qte := 0
+
+
+## Result of `expand_town()`: the legacy result plus the two-sided
+## authoritative superset and the content-derived debit with the committed
+## schedule row it came from (building-expand design D5/D8) — the owned ledger
+## AS READ BEFORE EXECUTION (`expansions_before`, the service's own
+## pre-execution read) and the SAME ledger RE-READ FROM THE SAVE after
+## execution (`expansions_after`, carrying the appended id at the end with
+## every existing entry unchanged, in order, and never deduplicated), plus the
+## derived `debit`, the committed `price` row, and the current resources — or a
+## structured failure with no partial payload.
+##
+## The owned lists are typed as plain `Array` of integers rather than a
+## dedicated class because they ARE the save's own list, verbatim: this
+## contract never reorders, rewrites, normalizes, or deduplicates the ids it
+## finds there (the committed corpus's own `[35, 36, 45, 46]` is incoherent
+## under the chosen schedule and is tolerated exactly as recorded).
+##
+## The client applies `resources` and `expansions_after` verbatim and treats
+## `debit` and `price` as a read-only record of what the service derived: the
+## response always wins over the client's own arithmetic, even when the two
+## disagree. The debit's SIGN and SHAPE are derived (design D2) — never
+## observed from the Flash client.
+class ExpandResult:
+	extends RefCounted
+	var ok := false
+	var protocol := ""
+	var game_version := ""
+	## Wall-clock seconds the legacy server stamped (a time-dependent field,
+	## so tests assert positivity, never a fixed value).
+	var server_time := 0
+	## The legacy result string ("success"); "" on failure.
+	var result := ""
+	## The player's owned-expansions ledger exactly as the service read it
+	## BEFORE execution, in the save's own order.
+	var expansions_before: Array = []
+	## The same ledger RE-READ from the save AFTER execution: the sent id
+	## appended once at the end, every existing entry unchanged and in order.
+	var expansions_after: Array = []
+	## The derived eight-slot `debit` the service applied,
+	## `[unknown, xp, gold, wood, oil, steel, cash, mana]`. Every entry is `0`
+	## or negative; the six slots in `EXPAND_ALWAYS_ZERO_SLOTS` are always
+	## zero. Read-only evidence: the client never applies this vector itself.
+	var debit: Array = []
+	## The committed schedule row the service priced, verbatim.
+	var price: ExpansionPrice = null
+	var resources: Resources = null
+	var error_code := ""
+	var error_message := ""
+
+
+## Structured failure for `expand_town()` (never a partial payload).
+static func expand_failure(code: String, message: String) -> ExpandResult:
+	var result := ExpandResult.new()
 	result.ok = false
 	result.error_code = code
 	result.error_message = message
@@ -927,6 +1042,142 @@ static func parse_collect(payload: Variant) -> CollectResult:
 	return result
 
 
+## Parses a v0 expand envelope — success or structured error — into the
+## typed result. Shared by `FakeApi` (which synthesizes the envelope from the
+## committed expand fixture after applying the documented in-memory semantics)
+## and `LegacyV0Api` (which decodes the HTTP body), so both implementations
+## yield the same typed shape by construction (design D5).
+##
+## Fail-closed throughout: an owned list that is not an array of integers, a
+## debit that is not exactly eight non-positive integers (or that fills one of
+## the six slots the committed schedule never names), a price row that is not
+## four non-negative integers, and resources that are not seven non-negative
+## integers each answer `bad_response` rather than a partially trusted payload.
+## The wall-clock-dependent `server_time` is shape-checked, never
+## value-checked.
+static func parse_expand(payload: Variant) -> ExpandResult:
+	if not (payload is Dictionary):
+		return expand_failure("bad_response", "response is not a JSON object")
+	var envelope: Dictionary = payload
+	if envelope.get("ok") != true:
+		return _expand_error(envelope)
+	if str(envelope.get("protocol", "")) != PROTOCOL:
+		return expand_failure("protocol_mismatch",
+			"expected protocol %s, got %s" % [PROTOCOL,
+			str(envelope.get("protocol"))])
+	if str(envelope.get("result", "")) != "success":
+		return expand_failure("bad_response",
+			"expand response did not report the legacy success result")
+	var before: Variant = _parse_expansion_ids(envelope.get("expansions_before"))
+	if before == null:
+		return expand_failure("bad_response",
+			"the pre-execution owned list is not an array of integers")
+	var after: Variant = _parse_expansion_ids(envelope.get("expansions_after"))
+	if after == null:
+		return expand_failure("bad_response",
+			"the post-execution owned list is not an array of integers")
+	var debit: Variant = _parse_expand_debit(envelope.get("debit"))
+	if debit == null:
+		return expand_failure("bad_response",
+			"the expand debit is not eight non-positive integers with six "
+			+ "unfilled slots")
+	var price := _parse_expansion_price(envelope.get("price"))
+	if price == null:
+		return expand_failure("bad_response",
+			"the expand price is not four non-negative integers")
+	var resources_raw: Variant = envelope.get("resources")
+	if not (resources_raw is Dictionary):
+		return expand_failure("bad_response",
+			"expand response carries no resources object")
+	var resources := _parse_resources(resources_raw)
+	if resources == null:
+		return expand_failure("bad_response",
+			"expand resources are not seven non-negative integers")
+	var result := ExpandResult.new()
+	result.ok = true
+	result.protocol = PROTOCOL
+	result.game_version = str(envelope.get("game_version", ""))
+	result.server_time = _parse_epoch(envelope.get("server_time"))
+	if result.server_time < 0:
+		return expand_failure("bad_response", "server_time is not a number")
+	result.result = "success"
+	result.expansions_before = before
+	result.expansions_after = after
+	result.debit = debit
+	result.price = price
+	result.resources = resources
+	return result
+
+
+## One owned-expansions ledger -> its integer ids in the save's own order, or
+## null when the value is not an array of integers. Entries are canonicalized
+## to `int` (the JSON transport widens them on the pinned engine, and Array
+## equality is type-strict there) — only the representation is normalized, never
+## the value, and NEVER the order, the length, or the multiplicity: the legacy
+## branch neither orders nor deduplicates, so a repeat is a real ledger entry
+## and this parser keeps it. A negative entry is tolerated for the same reason a
+## negative id was accepted by the executed probe: the ledger is the save's own
+## data, and this contract reports it rather than repairing it.
+static func _parse_expansion_ids(value: Variant) -> Variant:
+	if not (value is Array):
+		return null
+	var ids: Array = []
+	for element: Variant in (value as Array):
+		var id: Variant = _parse_int(element)
+		if id == null:
+			return null
+		ids.append(int(id))
+	return ids
+
+
+## The derived eight-slot expansion debit, or null when it is not exactly eight
+## non-positive integers with the six unfilled slots at zero. A POSITIVE entry
+## is not a shape this contract carries: a price is a debit, and an entry that
+## would credit a resource is refused rather than trusted (it would be a mint,
+## and the endpoint's own value-level post-state proof exists to catch exactly
+## that).
+static func _parse_expand_debit(value: Variant) -> Variant:
+	if not (value is Array):
+		return null
+	var raw: Array = value
+	if raw.size() != EXPAND_VECTOR_SLOTS:
+		return null
+	var debit: Array = []
+	for element: Variant in raw:
+		var amount: Variant = _parse_int(element)
+		if amount == null or int(amount) > 0:
+			return null
+		debit.append(int(amount))
+	for index: int in EXPAND_ALWAYS_ZERO_SLOTS:
+		if int(debit[index]) != 0:
+			return null
+	return debit
+
+
+## One committed expansion price row -> typed `ExpansionPrice`; null when the
+## value is not an object carrying exactly four non-negative integer fields. A
+## negative cost is not a shape this contract carries: the schedule prices an
+## expansion, and a negative price would be a credit.
+static func _parse_expansion_price(value: Variant) -> ExpansionPrice:
+	if not (value is Dictionary):
+		return null
+	var source: Dictionary = value
+	var amounts := {}
+	for field in ["coins", "cash", "neighbors", "inventory_qte"]:
+		if not source.has(field):
+			return null
+		var amount: Variant = _parse_int(source[field])
+		if amount == null or int(amount) < 0:
+			return null
+		amounts[field] = int(amount)
+	var price := ExpansionPrice.new()
+	price.coins = amounts["coins"]
+	price.cash = amounts["cash"]
+	price.neighbors = amounts["neighbors"]
+	price.inventory_qte = amounts["inventory_qte"]
+	return price
+
+
 ## The derived eight-slot payout vector, or null when it is not exactly eight
 ## non-negative integers. Entries are canonicalized to `int` (the JSON
 ## transport widens them on the pinned engine, and Dictionary equality is
@@ -1161,6 +1412,23 @@ static func _collect_error(envelope: Dictionary) -> CollectResult:
 		code = str(typed.get("code", code))
 		message = str(typed.get("message", message))
 	return collect_failure(code, message)
+
+
+## Structured error fields of a failed expand envelope (code + message) — the
+## same one envelope rule the other eight commands use, so a code the service
+## named (`unknown_expansion_id`, `already_expanded`,
+## `expansion_requirements_unmet`, `insufficient_resources`,
+## `invalid_expansion_id`, `missing_expansion_id`, `internal_error`, …) reaches
+## the client unchanged.
+static func _expand_error(envelope: Dictionary) -> ExpandResult:
+	var code := "bad_response"
+	var message := "response reported failure without a structured error"
+	var error: Variant = envelope.get("error")
+	if error is Dictionary:
+		var typed: Dictionary = error
+		code = str(typed.get("code", code))
+		message = str(typed.get("message", message))
+	return expand_failure(code, message)
 
 
 ## Eight-field legacy entry -> typed `Placement`; null when malformed

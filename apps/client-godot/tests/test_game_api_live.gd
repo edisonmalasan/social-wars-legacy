@@ -133,6 +133,23 @@ const COLLECT_BUILT_INDEX := 11
 ## legacy's silent no-op is never reported as a success.
 const COLLECT_UNKNOWN_INDEX := 9999
 
+## The expansion this live suite drives (building-expand, design D8): the FREE
+## committed row at index 0 of the 98-entry positional `expansion_prices`
+## schedule, which is the only purchasable entry set on this corpus under
+## design D3's requirements rule (94 of the 98 rows record a positive
+## neighbour or inventory requirement, and every id the corpus itself owns —
+## 35, 36, 45, 46 — is among them). Its derived debit is therefore the
+## ALL-ZERO eight-slot vector and no stored resource moves, which makes this the
+## STRICTEST form of the value-level post-state proof: a wrong derived price
+## would move one. The duplicate and the requirement-blocked ids are the two
+## guards the executed-legacy probe showed the legacy server lacks.
+const EXPAND_ID := 0
+const EXPAND_OWNED := [35, 36, 45, 46]
+const EXPAND_DUPLICATE_ID := 35
+const EXPAND_BLOCKED_ID := 4
+const EXPAND_OUT_OF_RANGE_ID := 98
+const EXPAND_NEGATIVE_ID := -1
+
 
 func run_scenario() -> void:
 	var api: Variant = root.get_node_or_null("GameApi")
@@ -258,6 +275,7 @@ func run_scenario() -> void:
 	await _check_live_upgrade(api, endpoint, user_id)
 	await _check_live_construction(api, endpoint, user_id)
 	await _check_live_collect(api, endpoint, user_id)
+	await _check_live_expand(api, endpoint, user_id)
 	# The live corpus now carries every mutating transaction, so this suite's
 	# parity claim is stated once, explicitly: the two implementations are
 	# compared on the fields each own, and each side's resource bag is
@@ -1530,6 +1548,200 @@ func _check_live_collect(api: Variant, endpoint: String,
 		% [COLLECT_INDEX, typed.row.x, typed.row.y, typed.tier]
 		+ "payout=%s wood=%d xp=%d" % [JSON.stringify(typed.payout),
 			typed.resources.wood, typed.resources.xp])
+
+
+## Expansion through both implementations (building-expand tasks 3.1/3.3,
+## design D8): the same typed shape from both, the content-derived DEBIT over
+## the same committed schedule, the two guards the executed-legacy probe showed
+## the legacy server lacks (an out-of-range id, a duplicate, and a negative id
+## all answered success there) passing through with their own codes, and each
+## side's ledger and balances checked against ITS OWN pre-request state.
+##
+## The live side runs LAST in this suite, so its corpus already carries every
+## earlier transaction; the honest parity claim is the one the contract makes:
+## both implementations produce the same typed shape and the same
+## content-derived debit for the same id, and the live side's own two-part
+## post-state proof is asserted against the corpus's own pre-request ledger and
+## balances.
+func _check_live_expand(api: Variant, endpoint: String,
+		user_id: String) -> void:
+	api.configure("legacy_v0", endpoint)
+	var ledger_before: Array = await _live_ledger(api, endpoint, user_id)
+	var balances_before: BootData.Resources = await _live_resources(api,
+		endpoint, user_id)
+	check(ledger_before.size() == 4 and balances_before != null,
+		"the live corpus pre-expand ledger and balances resolve")
+	if balances_before == null:
+		return
+	# The guards the executed-legacy probe showed the legacy server lacks, plus
+	# the two content refusals: all of them are answered with the endpoint's own
+	# code and carry NO partial payload, and each leaves the corpus
+	# byte-identical.
+	for entry: Array in [[EXPAND_DUPLICATE_ID, "already_expanded"],
+			[EXPAND_BLOCKED_ID, "expansion_requirements_unmet"],
+			[EXPAND_OUT_OF_RANGE_ID, "unknown_expansion_id"],
+			[EXPAND_NEGATIVE_ID, "invalid_expansion_id"]]:
+		var refused: Variant = await api.expand_town(user_id, int(entry[0]))
+		check(refused is BootData.ExpandResult,
+			"the live refusal for id %d returns the typed result" % int(entry[0]))
+		if refused is BootData.ExpandResult:
+			var failure: BootData.ExpandResult = refused
+			check(not failure.ok,
+				"the live expansion of id %d is refused" % int(entry[0]))
+			check_eq(failure.error_code, str(entry[1]),
+				"the live refusal for id %d is the service's own code: %s"
+					% [int(entry[0]), failure.error_message])
+			check(failure.expansions_before.is_empty()
+					and failure.expansions_after.is_empty()
+					and failure.debit.is_empty() and failure.price == null
+					and failure.resources == null,
+				"the live refused expansion carries no partial payload")
+		check_eq(await _live_ledger(api, endpoint, user_id), ledger_before,
+			"the live refused expansion id %d left the corpus ledger "
+				% int(entry[0]) + "byte-identical")
+		var after_refusal: BootData.Resources = await _live_resources(api,
+			endpoint, user_id)
+		check(after_refusal != null
+				and _same_resources(after_refusal, balances_before),
+			"the live refused expansion id %d left every corpus balance "
+				% int(entry[0]) + "byte-identical")
+	var expanded: Variant = await api.expand_town(user_id, EXPAND_ID)
+	check(expanded is BootData.ExpandResult,
+		"live expand_town returns the typed result")
+	if not (expanded is BootData.ExpandResult):
+		return
+	var typed: BootData.ExpandResult = expanded
+	_check_live_expand_result(typed, ledger_before, balances_before)
+	# The service half of the post-state proof, read from the service's own
+	# state rather than from the response.
+	var expected: Array = ledger_before.duplicate()
+	expected.append(EXPAND_ID)
+	check_eq(await _live_ledger(api, endpoint, user_id), expected,
+		"the live corpus ledger grew by exactly the sent id at the end, with "
+		+ "every existing entry unchanged and in order")
+	var after: BootData.Resources = await _live_resources(api, endpoint,
+		user_id)
+	check(after != null and _same_resources(after, balances_before),
+		"every live corpus balance is unchanged, because the committed row for "
+		+ "the addressed id is free and the derived debit is the all-zero vector")
+	# Fake reference: an independent in-memory state over the committed expand
+	# fixture's before-state. The typed shape and the derived debit must match
+	# the live side's exactly.
+	api.configure("fake")
+	var fake: Variant = await api.expand_town(user_id, EXPAND_ID)
+	check(fake is BootData.ExpandResult and fake.ok,
+		"fake expansion resolves offline")
+	if fake is BootData.ExpandResult and fake.ok:
+		var reference: BootData.ExpandResult = fake
+		check_eq(reference.protocol, typed.protocol,
+			"live and fake expand protocols agree")
+		check_eq(reference.result, typed.result,
+			"live and fake expand report the same legacy result")
+		check_eq(reference.debit, typed.debit,
+			"live and fake derive the SAME content-derived debit for the same "
+			+ "committed id (design D2)")
+		check_eq(reference.expansions_before, EXPAND_OWNED,
+			"the fake's pre-execution ledger is the committed fixture's own")
+		check_eq(reference.expansions_after, [35, 36, 45, 46, 0],
+			"the fake appends the sent id once at the end, exactly as the "
+			+ "executed fixture records")
+		check_eq([reference.price.coins, reference.price.cash,
+			reference.price.neighbors, reference.price.inventory_qte],
+			[0, 0, 0, 0],
+			"the fake prices the free row from its OWN loaded configuration")
+	api.configure("legacy_v0", endpoint)
+	var ledger: Array = typed.expansions_after
+	print("[test] live-expand applied expansion_id=%d ledger=%s debit=%s "
+		% [EXPAND_ID, JSON.stringify(ledger), JSON.stringify(typed.debit)]
+		+ "gold=%d cash=%d" % [typed.resources.gold, typed.resources.cash])
+
+
+## True when two typed `BootData.Resources` carry the same seven stored values.
+func _same_resources(a: BootData.Resources, b: BootData.Resources) -> bool:
+	return a.xp == b.xp and a.gold == b.gold and a.wood == b.wood \
+		and a.oil == b.oil and a.steel == b.steel and a.cash == b.cash \
+		and a.mana == b.mana
+
+
+## One live expansion's typed response and its TWO-part value-level
+## post-execution proof, compared against the corpus's own pre-request ledger
+## and balances.
+func _check_live_expand_result(typed: BootData.ExpandResult, prior: Array,
+		before: BootData.Resources) -> void:
+	check(typed.ok, "the live expansion resolves over loopback: %s / %s"
+		% [typed.error_code, typed.error_message])
+	if not typed.ok or typed.resources == null or typed.price == null:
+		return
+	check_eq(typed.protocol, BootData.PROTOCOL,
+		"the live expand protocol is compat-v0")
+	check(typed.game_version != "",
+		"the live expand response carries the game version")
+	check(typed.server_time > 0,
+		"the live expand server_time is a positive wall-clock epoch "
+		+ "(time-dependent, never asserted by value)")
+	check_eq(typed.result, "success",
+		"the live expand reports the legacy success result")
+	# Proof part one (structural): the ledger grew by exactly the sent id, at
+	# the end, with every existing entry unchanged and in order.
+	var expected: Array = prior.duplicate()
+	expected.append(EXPAND_ID)
+	check_eq(typed.expansions_before, prior,
+		"the live pre-execution ledger is the corpus's own, in the save's order")
+	check_eq(typed.expansions_after, expected,
+		"the live post-execution ledger is the sent id appended ONCE at the end "
+		+ "(the endpoint's own structural proof)")
+	check_eq(typed.expansions_after.size(),
+		typed.expansions_before.size() + 1,
+		"the live ledger grew by exactly one entry")
+	# The committed row, carried verbatim.
+	check_eq([typed.price.coins, typed.price.cash, typed.price.neighbors,
+		typed.price.inventory_qte], [0, 0, 0, 0],
+		"the live committed price row is the free row's, verbatim")
+	# Proof part two (value-level): every stored resource changed by EXACTLY the
+	# derived debit. The addressed row is free, so the derived debit is the
+	# all-zero vector and EVERY balance must be unchanged — the strictest form
+	# of the proof, because a wrong derived price would move one.
+	check_eq(typed.debit.size(), BootData.EXPAND_VECTOR_SLOTS,
+		"the live derived debit is the documented eight-slot vector")
+	for index: int in BootData.EXPAND_ALWAYS_ZERO_SLOTS:
+		check_eq(int(typed.debit[index]), 0,
+			"the live derived debit's slot %d stays zero" % index)
+	check(_same_resources(typed.resources, before),
+		"every live stored resource equals the corpus's own pre-request value "
+		+ "(the endpoint's value-level post-execution proof): %s"
+			% JSON.stringify({"before": {"xp": before.xp, "gold": before.gold,
+				"wood": before.wood, "oil": before.oil,
+				"steel": before.steel, "cash": before.cash,
+				"mana": before.mana},
+				"after": {"xp": typed.resources.xp, "gold": typed.resources.gold,
+				"wood": typed.resources.wood, "oil": typed.resources.oil,
+				"steel": typed.resources.steel, "cash": typed.resources.cash,
+				"mana": typed.resources.mana}}))
+
+
+## The corpus's own owned-expansions ledger, read from its bootstrap payload
+## under the typed int names, or [] when the payload carries none. This is the
+## pre-request reference the live expansion's appended id is compared against —
+## read from the service's own state, never from the fake's fixture.
+func _live_ledger(api: Variant, endpoint: String, user_id: String) -> Array:
+	api.configure("legacy_v0", endpoint)
+	var boot: Variant = await api.get_bootstrap(user_id)
+	if not (boot is BootData.BootstrapResult) or not bool(boot.ok):
+		check(false, "the live corpus ledger bootstrap resolves")
+		return []
+	var info: Variant = (boot as BootData.BootstrapResult).player_info
+	if info == null:
+		check(false, "the live corpus ledger payload is readable")
+		return []
+	var raw: Dictionary = (info as BootData.PlayerInfoPayload).raw
+	var owned: Variant = (raw.get("map", {}) as Dictionary).get("expansions",
+		[])
+	if not (owned is Array):
+		return []
+	var ids: Array = []
+	for entry: Variant in (owned as Array):
+		ids.append(int(entry))
+	return ids
 
 
 ## One recorded attribute bag in the canonical typed form (the JSON transport

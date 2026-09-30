@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-09-30T03:01:57+00:00",
+  "form": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "data": "8f9c358c932596a0a47d1ac452cbd6ba6fcc2f1f32773c9d3d33c8e4eb365f5f;{\"accessToken\":\"\",\"commands\":[[0,\"expand\",[0],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1790737317}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "command.php form (USERID, user_key, language, data) with the derived <64-hex>;<json> envelope carrying exactly one command: an expand whose single argument is the expansion id and whose resources_changed is the CONTENT-DERIVED DEBIT [0, 0, 0, 0, 0, 0, 0, 0] \u2014 the id's own committed row in the 98-entry positional expansion_prices schedule records coins 0 and cash 0, so both components are zero and the vector is legally all-zero; the six slots no expansion price names are zero as well. No amount, resource, price, time, or resource delta is client-supplied. The id-space indexing is DERIVED (design D1: the corpus's own [35, 36, 45, 46] is only a valid index into this table), the coins->gold naming is ESTABLISHED by the committed client assets expansion_gold.jpg and expansion_cash.jpg (design D2), and the branch's single append with the verbatim per-resource application under the max(..., 0) clamp is ESTABLISHED. user_key is redacted in this record; accessToken is the crafted empty placeholder, never a token value.",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}

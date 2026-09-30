@@ -466,6 +466,81 @@ cap refusal, the shared-field refusal, and the cash/experience mapping. The clai
 is that a payout grows in four committed rungs derived from the item's committed
 income fields, never any specific amount the legacy client pays.
 
+`POST /v0/expand` with body `{"user_id", "expansion_id"}` is the ninth
+state-mutating surface (the `building-expand` change) and the first whose derived
+vector is a **debit**. Extra keys — a price, a cost, an amount, a requirement, a
+time, a resource delta — are ignored, so the client cannot influence what it pays.
+
+The legacy branch is one line of state change (`command.py:211-216`):
+`map["expansions"] += [int(expansion)]`. It changes nothing else, and the price is
+**entirely client-sent**, applied verbatim per resource as `max(current + delta, 0)`.
+The investigation's probe found the clamp **reachable for the first time in this
+family**: a client-sent 2500 gold debit against a 2000 balance landed on **0**, not
+`-500`. That is what a client-sent price buys, and it is why this endpoint derives
+the debit from committed content instead.
+
+| Source | Role |
+| --- | --- |
+| `expansion_prices` (98 entries, positional, no stable id) | `coins`, `cash`, `neighbors`, `inventory_qte` per expansion id |
+| `assets/images/en/expansion_gold.jpg`, `expansion_cash.jpg` | the popup's two price components: the config's `coins` field is the client's `gold` |
+
+The debit for a row priced `coins C, cash K` is `[0, 0, -C, 0, 0, 0, -K, 0]`; six
+of the eight slots are always zero, and a zero-cost row derives the all-zero
+vector, which is legal — indexes 0–3 are free.
+
+```json
+{"protocol": "compat-v0", "ok": true, "game_version": "alpha 0.02",
+ "server_time": 1790737317, "result": "success",
+ "expansions_before": [35, 36, 45, 46],
+ "expansions_after": [35, 36, 45, 46, 0],
+ "debit": [0, 0, 0, 0, 0, 0, 0, 0],
+ "price": {"coins": 0, "cash": 0, "neighbors": 0, "inventory_qte": 0},
+ "resources": {"xp": 4, "gold": 2000, "wood": 2000, "oil": 2000,
+               "steel": 2000, "cash": 5, "mana": 0}}
+```
+
+- **The two guards the legacy server omits** — `unknown_expansion_id` (404, an id
+  outside the 98-entry table) and `already_expanded` (409) — exist because an
+  executed probe showed the real server accepting `expand(999)`, a duplicate
+  `expand(35)`, and `expand(-1)`, all answering `{"result":"success"}`. Without
+  them a client could buy expansion 999 for a price derived from a row that does
+  not exist.
+- **`expansion_requirements_unmet` (409)** refuses any row recording a positive
+  `neighbors` or `inventory_qte`, because nothing the delivered stack can read
+  evaluates either requirement. **94 of 98 rows are refused this way, including
+  all four ids the corpus owns** (`35, 36, 45, 46`, each `neighbors 15` /
+  `inventory_qte 30`), so the only purchasable entries are the free indexes 0–3
+  and the delivered end-to-end transaction is a **zero-cost** expansion. That is
+  the correct outcome under the evidence and the wrong outcome for gameplay; it is
+  recorded as a claim limit rather than patched by lowering the bar.
+- **`insufficient_resources` (409)** refuses a balance below the derived debit
+  instead of reproducing the clamp, because the debit is server-derived here: a
+  silent partial charge would move a balance by less than the debit, which the
+  value-level proof could not distinguish from a bug.
+- **The post-state is proved twice**: the owned list grew by **exactly one** entry
+  equal to the sent id **at the end**, with every existing entry unchanged, in
+  order, and never reordered or deduplicated; **and** every stored resource changed
+  by **exactly** the derived debit.
+- A negative id is refused `invalid_expansion_id` (400) rather than treated as a
+  range miss, because Python would otherwise resolve it to the schedule's last row.
+- **No land, grid, buildable-cell, or placement-bound effect is claimed or
+  implemented.** The committed SWF symbols (`PopupExpandMC`, `btnBuyExpandTileMC`)
+  establish that an expansion is a purchasable **tile**, and the committed images
+  establish the two price components — but nothing preserved maps a tile to a
+  cell, because the SWF inspection is symbols-and-tags only and its own scope
+  statement disclaims timeline semantics, script behavior, and rendering. This
+  endpoint delivers the **unlock ledger**; closing the geometry gap requires new
+  evidence, not a derivation.
+
+**Provenance - established versus derived.** Established from committed legacy
+source, executed-legacy probes, and committed asset evidence: that the branch
+appends and changes nothing else; that the price is client-sent and applied
+verbatim under the documented clamp; that the clamp is reachable; that the server
+accepts out-of-range, duplicate, and negative ids and raises on a non-integer; and
+that the price's gold component is named `gold` by the client's own committed
+asset. **Derived and never observed from the Flash client:** the id-space indexing,
+the requirements refusal, the affordability refusal, and the debit's sign and shape.
+
 ### Structured errors
 
 Always JSON, always `ok:false`, keys exactly
@@ -497,6 +572,10 @@ Always JSON, always `ok:false`, keys exactly
 | `unknown_collect_type` | 409 | `/v0/collect` the item's committed resource type is outside the committed five |
 | `too_early` | 409 | `/v0/collect` the row's elapsed time has not reached the first committed ladder rung |
 | `construction_in_progress` | 409 | `/v0/collect` the addressed row carries a countdown or a build-click counter: collecting there would overwrite the build's start instant |
+| `unknown_expansion_id` | 404 | `/v0/expand` the expansion id names no row in the committed 98-entry schedule; the legacy server performs no range check |
+| `already_expanded` | 409 | `/v0/expand` the id is already in the player's owned list; the legacy server accepts duplicates |
+| `expansion_requirements_unmet` | 409 | `/v0/expand` the row records a positive `neighbors` or `inventory_qte` requirement, which nothing in the delivered stack can evaluate |
+| `insufficient_resources` | 409 | `/v0/expand` a balance is below the server-derived debit; refused rather than absorbed by the per-resource clamp |
 | `bad_request` | 400 | other malformed requests Flask rejects |
 | `not_found` | 404 | unknown path |
 | `method_not_allowed` | 405 | known path, unsupported method |
@@ -507,15 +586,16 @@ Always JSON, always `ok:false`, keys exactly
 All run from the repository root on Windows x64 with the pinned interpreter
 (CPython 3.9.13); exit codes are the real observed ones (bootstrap-era
 counts 2026-09-27; placement-, purchase-, move-, sell-, store-, upgrade-,
-construction-, and collect-era counts 2026-09-29 and 2026-09-30):
+construction-, and collect-era counts 2026-09-29 and 2026-09-30;
+expand-era counts 2026-09-30):
 
 ```bash
 python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
 ```
 
-→ `Ran 768 tests ... OK`, exit `0` (90 before `building-purchase`, 157 before
+→ `Ran 947 tests ... OK`, exit `0` (90 before `building-purchase`, 157 before
 `building-move`, 227 before `building-sell`, 306 before `building-store`, 390 before
-`building-upgrade`, 491 before `building-construction`, 616 before `building-collect`).
+`building-upgrade`, 491 before `building-construction`, 616 before `building-collect`, 768 before `building-expand`).
 Covers envelope/error shapes, bootstrap and
 session parity against the committed fixtures, pre/post save SHA-256 identity,
 the no-persistence source guard, and the offline socket guard (the suite opens
@@ -631,6 +711,15 @@ the six derived decisions the request carries:
 python -B apps/compat-api/capture_collect_fixture.py
 ```
 
+Expand fixture capture (the `building-expand` change's executed-legacy oracle, one-shot) -
+see `tests/fixtures/godot-building-expand/README.md` for its invocation, exit code `0`,
+its containment record, the three recorded probes, and the four resolved decisions.
+This capture has **no** time-dependent field, so a rerun reproduces its bytes exactly:
+
+```bash
+python -B apps/compat-api/capture_expand_fixture.py
+```
+
 ## Layout
 
 - `compat_legacy.py` — corpus build/layout checks and the in-process adapter
@@ -733,10 +822,11 @@ client-sent deltas this contract refuses. Insufficient resources reproduce the
 legacy `max(…, 0)` clamp, never a rejection (authoritative server-side validation
 belongs to Server v1 / M13), and occupancy, grid-bounds, level-gate,
 cash-affordability, no-op-move, sellability, storability, upgradability,
-buildability, collectability, and addressability rules are enforced client-side only. Persistence is confined to the disposable service
+buildability, collectability, expandability, and addressability rules are
+enforced client-side only, and the expansion land effect is deliberately absent: Persistence is confined to the disposable service
 corpus: `POST /v0/place`, `POST /v0/purchase`, `POST /v0/move`,
 `POST /v0/sell`, `POST /v0/store`, `POST /v0/upgrade`,
-`POST /v0/construction`, and `POST /v0/collect` persist through the legacy
+`POST /v0/construction`, `POST /v0/collect`, and `POST /v0/expand` persist through the legacy
 dispatcher into the corpus `saves/`,
 while the session and bootstrap endpoints remain strictly non-persisting, and
 the working tree is never written.

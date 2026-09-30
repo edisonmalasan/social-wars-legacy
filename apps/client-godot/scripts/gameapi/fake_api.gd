@@ -11,7 +11,8 @@ extends Node
 ## `tests/fixtures/godot-building-store/`, for upgrade under
 ## `tests/fixtures/godot-building-upgrade/`, for construction under
 ## `tests/fixtures/godot-building-construction/`, and for collection under
-## `tests/fixtures/godot-building-collect/` at the repository root: no
+## `tests/fixtures/godot-building-collect/`, and for expansion under
+## `tests/fixtures/godot-building-expand/` at the repository root: no
 ## process, no server, no socket. It synthesizes the documented v0 envelopes
 ## from those files and parses them with the same `BootData` functions the
 ## live implementation uses, so both implementations yield identical typed
@@ -50,7 +51,16 @@ extends Node
 ## its payout is derived-provisional exactly like the service's: the amount
 ## formula, the experience scaling, the sub-first-rung refusal, the cap
 ## refusal, and the resource-type mapping are all derivations that no legacy
-## branch reads.
+## branch reads. `expand_town()` applies the matching in-place rule over the
+## committed expand fixture — the addressed id's own committed row in the
+## fixture's loaded `expansion_prices` schedule turned into a DEBIT, applied to
+## exactly the named slots under legacy's `max(current + delta, 0)` clamp, and
+## the id appended AT THE END of the player's owned ledger with every existing
+## entry unchanged, in order, and never deduplicated — so this is the SECOND
+## double whose derived vector is not neutral and the first whose vector is a
+## debit. Its debit is derived-provisional exactly like the service's: the
+## id-space indexing, the requirements refusal, the affordability refusal, and
+## the debit's sign and shape are all derivations no legacy branch reads.
 ## Parity against
 ## executed legacy is owned exclusively by
 ## the compat fixture-replay tests; this double exists so the client flow can
@@ -156,6 +166,19 @@ const COLLECT_BEFORE_FIXTURE := \
 ## deterministic `reference_time` it derives the rung against.
 const COLLECT_AFTER_FIXTURE := \
 	"tests/fixtures/godot-building-collect/steps/command_collect/after.json"
+## The executed-legacy expand fixture's before-state (which again equals the
+## fresh-player corpus the boot fixtures carry): the double's starting save for
+## `expand_town()`.
+const EXPAND_BEFORE_FIXTURE := \
+	"tests/fixtures/godot-building-expand/steps/command_expand/before.json"
+## The same fixture's after-state — the real legacy server's record of the one
+## executed `expand` (the ledger `[35, 36, 45, 46]` gaining exactly one appended
+## `0` at the end while all 40 items, the level, the storage, the private
+## state, the player info, and all seven resources are byte-identical). Read
+## (never written) so a malformed capture cannot leave the double running on an
+## inconsistent oracle.
+const EXPAND_AFTER_FIXTURE := \
+	"tests/fixtures/godot-building-expand/steps/command_expand/after.json"
 
 ## Anchor grid extent the v0 endpoint validates against (anchors 0..99;
 ## footprints may extend past the edge — design D5). Must match
@@ -196,6 +219,30 @@ const COLLECT_RESOURCE_SLOTS := {"g": 2, "w": 3, "o": 4, "s": 5, "c": 6}
 const COLLECT_EXPERIENCE_SLOT := 1
 ## The two slots this derivation can never fill (design D6).
 const COLLECT_ALWAYS_ZERO_SLOTS := [0, 7]
+## The committed `expansion_prices` schedule key in the loaded configuration:
+## 98 POSITIONAL rows with no stable id, so the INDEX is the expansion id
+## (building-expand design D1, derived). The row is carried verbatim.
+const EXPANSION_PRICES_KEY := "expansion_prices"
+## The four fields a committed expansion price row records. `neighbors` and
+## `inventory_qte` are REQUIREMENTS, not prices: nothing any delivered surface
+## can read evaluates either, so a positive value is refused rather than paid
+## under an invented requirement rule (design D3).
+const EXPANSION_PRICE_FIELDS := ["coins", "cash", "neighbors", "inventory_qte"]
+## The two fields of a committed row this derivation turns into a DEBIT, and
+## the resource each pays: the schedule's gold-named field into `gold` and its
+## `cash` field into `cash`. The gold naming is ESTABLISHED by the client's own
+## committed assets `expansion_gold.jpg` / `expansion_cash.jpg` (design D2);
+## the sign and shape of the vector are DERIVED.
+const EXPANSION_DEBIT_FIELDS := [
+	["field", "coins", "resource", "gold", "slot", BootData.EXPAND_GOLD_SLOT],
+	["field", "cash", "resource", "cash", "slot", BootData.EXPAND_CASH_SLOT],
+]
+## The committed schedule's expected size (98 POSITIONAL rows, no stable id —
+## the index IS the id, design D1). Used by the double only to bound the
+## executed fixture's appended id; the ADDRESSABLE range itself is read from
+## the loaded configuration in `expand_town()`, so a content change fails
+## closed there instead of being half-adopted here.
+const EXPANSION_SCHEDULE_ENTRIES := 98
 
 var _save_list_doc: Dictionary = {}
 var _config_payload: Dictionary = {}
@@ -284,6 +331,26 @@ var _collect_pid := ""
 var _collect_epoch := 0
 var _collect_loaded := false
 var _collect_error := ""
+
+# Mutable in-memory expansion state (building-expand design D8): one save, whose
+# owned-expansions ledger grows by exactly one appended id per successful
+# expansion inside this process and whose balances carry the derived debit
+# applied under legacy's `max(current + delta, 0)` clamp. Never written
+# anywhere. The ledger is kept EXACTLY as the save holds it: never reordered,
+# never deduplicated, never normalized — the committed corpus's own
+# `[35, 36, 45, 46]` is incoherent under the chosen schedule and is tolerated
+# verbatim.
+var _expand_state: Dictionary = {}
+var _expand_pid := ""
+var _expand_loaded := false
+var _expand_error := ""
+## The double's own backup of the schedule rows a test stubbed in memory, so a
+## refusal the committed table cannot produce (an unaffordable PRICE, which
+## design D3's requirements rule leaves unreachable from committed content) is
+## reachable offline — and so a later check can read the REAL row again. The
+## committed fixture and the committed configuration are never written: this
+## lives entirely in this process's memory.
+var _expand_schedule_backup: Dictionary = {}
 
 
 ## The session envelope synthesized from the committed fixtures.
@@ -1070,6 +1137,338 @@ func collect_income(user_id: String,
 		"reference_time": reference_time,
 		"resources": _collect_resources(),
 	})
+
+
+## Deterministic in-memory expansion double (building-expand design D8): the
+## documented semantics of the unchanged legacy `expand` branch — read the
+## player's owned-expansions ledger, apply the pre-dispatch resource vector
+## (which is the DERIVED DEBIT, not a neutral one) per resource as
+## `max(current + delta, 0)`, and append the addressed id AT THE END of that
+## ledger, changing nothing else — applied over the committed expand fixture's
+## before-state, mutating only this process. No process, no server, no socket;
+## parity against executed legacy is owned exclusively by the compat
+## fixture-replay tests, so this double is a test fixture, never an oracle.
+##
+## The debit is derived from the FIXTURE'S OWN loaded configuration and the
+## player's committed ledger, never from the caller (design D1/D2): the price
+## from the addressed id's own row in the 98-entry positional
+## `expansion_prices` schedule, the schedule's gold-named field into `gold` and
+## its `cash` field into `cash`, both negated, and the six slots no expansion
+## price names left zero. A row costing nothing derives the ALL-ZERO vector,
+## which is legal — the committed free rows `0..3` exist and are the only
+## purchasable entries under the requirements rule.
+##
+## The response mirrors the v0 endpoint's two-sided superset (design D5): the
+## legacy result, the owned ledger AS READ BEFORE EXECUTION, the SAME ledger
+## re-read from the state after the append, the derived debit, the committed
+## schedule row used, and the current resources — so the client needs no
+## arithmetic of its own and never appends an id locally.
+##
+## Structural failures mirror the endpoint's codes (design D5/D7): unknown or
+## empty save id, a negative expansion id (`invalid_expansion_id` — a negative
+## index would otherwise resolve the schedule's LAST row, pricing a negative
+## id from a positive one), an id the committed schedule does not price
+## (`unknown_expansion_id`), an id the player's ledger already contains
+## (`already_expanded` — the legacy server neither orders nor deduplicates the
+## ledger, so a repeat would corrupt it), a row recording a positive
+## `neighbors` or `inventory_qte` requirement (`expansion_requirements_unmet`),
+## a balance that does not cover the derived debit
+## (`insufficient_resources` — refused rather than reproduced as the clamp, so
+## a partially applied debit can never be mistaken for a correct one), an
+## unreadable fixture (`fixture_unreadable`), and a ledger the service cannot
+## reason about (`internal_error`).
+##
+## Ownership of the id space, the requirement semantics, and any server-
+## authoritative validation are out of scope: this double accepts NO amount,
+## NO price, NO requirement flag, and NO resource delta from any caller, and it
+## makes no claim that any area of the town becomes buildable.
+func expand_town(user_id: String,
+		expansion_id: int) -> BootData.ExpandResult:
+	if user_id.strip_edges() == "":
+		return _expand_failure("missing_user_id",
+			"user_id must be a non-empty string")
+	if not _ensure_loaded():
+		return _expand_failure("fixture_unreadable", _load_error)
+	if not _ensure_expand_loaded():
+		return _expand_failure("fixture_unreadable", _expand_error)
+	if user_id != _expand_pid:
+		return _expand_failure("unknown_user_id",
+			"no save exists for user_id '%s'" % user_id)
+	# Design D1: the committed schedule's id space is its POSITIONAL index,
+	# `0..size-1`. A negative id is a structurally unresolvable value, not an
+	# out-of-range one: Python would resolve `-1` to the schedule's last row,
+	# pricing a negative id from a positive one.
+	if expansion_id < 0:
+		return _expand_failure("invalid_expansion_id",
+			"expansion_id must not be negative, got %d" % expansion_id)
+	var owned: Array = _expand_state["expansions"] as Array
+	for entry: Variant in owned:
+		if not (entry is int) and not (entry is float):
+			# The service cannot reason about a ledger entry that is not an
+			# integer, and repairing it would be fabrication: fail closed.
+			return _expand_failure("internal_error",
+				"the owned-expansions ledger carries an entry this service "
+				+ "cannot reason about")
+	var schedule: Variant = _config_payload.get(EXPANSION_PRICES_KEY)
+	if not (schedule is Array) or (schedule as Array).is_empty():
+		# A schedule the loaded configuration cannot produce is a server-side
+		# content failure, never a client value (design D5).
+		return _expand_failure("internal_error",
+			"the committed expansion schedule does not resolve")
+	var size := (schedule as Array).size()
+	if expansion_id >= size:
+		# The executed probe showed legacy accepts 999, -1, and a duplicate
+		# alike, so the range guard is REQUIRED, not defensive.
+		return _expand_failure("unknown_expansion_id",
+			"the committed expansion schedule has no price row for id %d "
+			% expansion_id + "(it holds %d rows, indexes 0..%d)"
+			% [size, size - 1])
+	if owned.has(expansion_id):
+		return _expand_failure("already_expanded",
+			"expansion %d is already in this player's owned-expansions list"
+			% expansion_id)
+	var row: Variant = (schedule as Array)[expansion_id]
+	if not (row is Dictionary):
+		return _expand_failure("internal_error",
+			"the committed expansion schedule produced no row for id %d"
+			% expansion_id)
+	var price: Variant = _expand_price_row(row as Dictionary)
+	if price == null:
+		return _expand_failure("internal_error",
+			"the committed expansion schedule's row for id %d is not four "
+			% expansion_id + "non-negative integers")
+	# Design D3: an unevaluable requirement is REFUSED, never invented.
+	var unmet: Array = _expand_unmet_requirements(price)
+	if not unmet.is_empty():
+		return _expand_failure("expansion_requirements_unmet",
+			"expansion %d records %s requirements, and nothing this service "
+			% [expansion_id, " and ".join(unmet)]
+			+ "can read evaluates them")
+	var debit: Array = _expand_debit_for(price)
+	# Design D6: refuse an unaffordable balance rather than reproduce the
+	# clamp, so the resulting post-state is unambiguous.
+	for entry: Array in EXPANSION_DEBIT_FIELDS:
+		var delta: int = debit[int(entry[5])]
+		if delta == 0:
+			continue
+		var resource := str(entry[3])
+		if int(_expand_state[resource]) + delta < 0:
+			return _expand_failure("insufficient_resources",
+				"expansion %d costs %d %s and this player holds %d; the "
+				% [expansion_id, -delta, resource,
+					int(_expand_state[resource])]
+				+ "derived debit would leave a negative balance")
+	# The pre-execution ledger is read FIRST (above), then the two writes the
+	# branch performs: the pre-dispatch resource application and the single
+	# append. Nothing else is touched — no item, no level, no storage, no
+	# bought-units bookkeeping, no private state — exactly as the executed
+	# fixture records.
+	for entry: Array in EXPANSION_DEBIT_FIELDS:
+		var slot: int = int(entry[5])
+		var delta: int = debit[slot]
+		if delta != 0:
+			_expand_state[str(entry[3])] = maxi(
+				int(_expand_state[str(entry[3])]) + delta, 0)
+	owned.append(expansion_id)
+	# Same envelope shape the service returns; the shared parser yields the
+	# typed result (identical shapes by construction, design D5).
+	return BootData.parse_expand({
+		"protocol": BootData.PROTOCOL,
+		"ok": true,
+		"game_version": str(_save_list_doc.get("game_version", "")),
+		# Time-dependent field: the fake reports the fixture capture's legacy
+		# server timestamp instead of "now" (never the wall clock).
+		"server_time": _fixture_server_time(),
+		"result": "success",
+		"expansions_before": (owned.slice(0, owned.size() - 1) as Array)
+			.duplicate(),
+		"expansions_after": owned.duplicate(),
+		"debit": debit,
+		"price": price,
+		"resources": _expand_resources(),
+	})
+
+
+## Structured failure in the service's error envelope shape, parsed by the same
+## shared parser the live implementation uses.
+func _expand_failure(code: String, message: String) -> BootData.ExpandResult:
+	return BootData.parse_expand({
+		"protocol": BootData.PROTOCOL,
+		"ok": false,
+		"error": {"code": code, "message": message},
+	})
+
+
+## Loads the committed expand fixture's before-state into mutable process state
+## (once). Structural failures are named with the offending field; the boot,
+## placement, purchase, move, sell, store, upgrade, construction, and collect
+## fixtures' error state is untouched (independent sinks).
+func _ensure_expand_loaded() -> bool:
+	if _expand_loaded:
+		return _expand_error == ""
+	_expand_loaded = true
+	var before_sink := {"error": ""}
+	var before := _read_json_into(EXPAND_BEFORE_FIXTURE, before_sink)
+	if str(before_sink["error"]) != "":
+		_expand_error = str(before_sink["error"])
+		return false
+	var after_sink := {"error": ""}
+	# The after-state is read (never written) so a malformed capture cannot
+	# leave the double running on an inconsistent oracle.
+	_read_json_into(EXPAND_AFTER_FIXTURE, after_sink)
+	if str(after_sink["error"]) != "":
+		_expand_error = str(after_sink["error"])
+		return false
+	return _init_expand_state(before)
+
+
+## Validates the expand fixture's before-state and builds the in-memory save
+## state. Every consumed field is checked, so a malformed fixture fails closed
+## instead of crashing the double. **Only the ledger and the seven stored
+## balances are kept**: the executed expansion writes nothing else (not
+## `items`, not `level`, not `store`, not `privateState`, not the rest of
+## `playerInfo`), so keeping more would be inventing state this line never
+## touches. The after-state is validated to hold exactly the documented
+## transaction — the ledger grown by one entry equal to the sent id, appended
+## at the end, with every existing entry unchanged and in order, and every
+## stored resource unchanged — so a capture that is not the transaction this
+## double reproduces fails closed here.
+func _init_expand_state(before: Dictionary) -> bool:
+	var maps: Variant = before.get("maps")
+	if not (maps is Array) or (maps as Array).is_empty():
+		_expand_error = "expand fixture before state carries no maps array"
+		return false
+	if not ((maps as Array)[0] is Dictionary):
+		_expand_error = "expand fixture before state first map is not an object"
+		return false
+	var map: Dictionary = (maps as Array)[0]
+	var owned: Variant = map.get("expansions")
+	if not (owned is Array):
+		_expand_error = "expand fixture before state carries no expansions list"
+		return false
+	var typed_owned: Array = []
+	for entry: Variant in (owned as Array):
+		var id: Variant = BootData._parse_int(entry)
+		if id == null:
+			_expand_error = "the fixture's owned-expansions ledger carries a " \
+				+ "non-integer entry"
+			return false
+		typed_owned.append(int(id))
+	for key in ["xp", "gold", "wood", "oil", "steel"]:
+		var value: Variant = map.get(key)
+		if not (value is int or value is float) \
+				or float(value) != floor(float(value)) or int(value) < 0:
+			_expand_error = "expand fixture before state lacks map %s" % key
+			return false
+	var info: Variant = before.get("playerInfo")
+	var priv: Variant = before.get("privateState")
+	if not (info is Dictionary) or not (priv is Dictionary):
+		_expand_error = "expand fixture before state lacks playerInfo/privateState"
+		return false
+	var pid: Variant = (info as Dictionary).get("pid")
+	var cash: Variant = (info as Dictionary).get("cash")
+	var mana: Variant = (priv as Dictionary).get("mana")
+	if not (pid is String) or not (cash is int or cash is float) \
+			or not (mana is int or mana is float) or int(mana) < 0:
+		_expand_error = "expand fixture before state lacks save fields"
+		return false
+	# The executed transaction must be exactly what the double reproduces: the
+	# ledger grew by ONE entry, at the END, equal to the sent id, and every
+	# stored balance is unchanged (the committed row is free, so the derived
+	# debit is the all-zero vector).
+	var after_sink := {"error": ""}
+	var after := _read_json_into(EXPAND_AFTER_FIXTURE, after_sink)
+	if str(after_sink["error"]) != "":
+		_expand_error = str(after_sink["error"])
+		return false
+	var after_maps: Variant = after.get("maps")
+	if not (after_maps is Array) or (after_maps as Array).is_empty() \
+			or not ((after_maps as Array)[0] is Dictionary):
+		_expand_error = "expand fixture after state carries no first map"
+		return false
+	var after_map: Dictionary = (after_maps as Array)[0] as Dictionary
+	var after_owned: Variant = after_map.get("expansions")
+	if not (after_owned is Array) \
+			or (after_owned as Array).size() != typed_owned.size() + 1:
+		_expand_error = "expand fixture after state must append exactly one id"
+		return false
+	for index in range(typed_owned.size()):
+		if int((after_owned as Array)[index]) != int(typed_owned[index]):
+			_expand_error = "expand fixture after state reordered or changed " \
+				+ "an existing ledger entry"
+			return false
+	var appended: Variant = BootData._parse_int((after_owned as Array)[
+		(after_owned as Array).size() - 1])
+	if appended == null or int(appended) < 0 \
+			or int(appended) >= EXPANSION_SCHEDULE_ENTRIES:
+		_expand_error = "expand fixture after state appended no priced id"
+		return false
+	_expand_state = {
+		"expansions": typed_owned,
+		"xp": int(map.get("xp")),
+		"gold": int(map.get("gold")),
+		"wood": int(map.get("wood")),
+		"oil": int(map.get("oil")),
+		"steel": int(map.get("steel")),
+		"cash": int(cash),
+		"mana": int(mana),
+	}
+	_expand_pid = pid
+	return true
+
+
+## One committed schedule row -> the four non-negative integers the service
+## prices, or null when the loaded configuration cannot produce them. JSON
+## transports numbers as floats on the pinned engine, so integral floats are
+## valid costs. Nothing is defaulted and nothing is coerced: a row the schedule
+## cannot describe fails closed with the endpoint's own code.
+func _expand_price_row(row: Dictionary) -> Variant:
+	var amounts := {}
+	for field: String in EXPANSION_PRICE_FIELDS:
+		var value: Variant = BootData._parse_int(row.get(field))
+		if value == null or int(value) < 0:
+			return null
+		amounts[field] = int(value)
+	return amounts
+
+
+## The requirement fields a committed row records at a POSITIVE value — the
+## two this contract refuses rather than invents (design D3). Order is fixed
+## (neighbors first) so a refusal message is deterministic.
+func _expand_unmet_requirements(price: Dictionary) -> Array:
+	var unmet: Array = []
+	for field in ["neighbors", "inventory_qte"]:
+		if int(price.get(field, 0)) > 0:
+			unmet.append(field)
+	return unmet
+
+
+## The derived eight-slot DEBIT for one committed row (design D2): the row's
+## gold-named cost negated into the gold slot, its cash cost negated into the
+## cash slot, and the six slots no expansion price names left zero. A fresh
+## vector on every call, so a caller can never mutate the derivation for the
+## next one.
+func _expand_debit_for(price: Dictionary) -> Array:
+	var debit: Array = []
+	debit.resize(BootData.EXPAND_VECTOR_SLOTS)
+	for index in range(BootData.EXPAND_VECTOR_SLOTS):
+		debit[index] = 0
+	for entry: Array in EXPANSION_DEBIT_FIELDS:
+		debit[int(entry[5])] = -int(price.get(str(entry[1]), 0))
+	for index: int in BootData.EXPAND_ALWAYS_ZERO_SLOTS:
+		debit[index] = 0
+	return debit
+
+
+## The seven stored resource values of the in-memory expansion state, after the
+## derived debit has been applied under legacy's `max(current + delta, 0)`
+## clamp. Reported verbatim as the response's authoritative `resources`: the
+## client takes these values and never applies the debit itself.
+func _expand_resources() -> Dictionary:
+	var resources := {}
+	for key: String in RESOURCE_KEYS:
+		resources[key] = int(_expand_state[key])
+	return resources
 
 
 func _ensure_loaded() -> bool:
