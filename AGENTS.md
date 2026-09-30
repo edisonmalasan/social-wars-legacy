@@ -714,6 +714,66 @@ transaction against the fresh-player corpus; no pixel-parity oracle exists; the 
 capture shows the refused path and runs the fake implementation. No Flash, Ruffle,
 ActionScript, or browser executes in any of these commands.
 
+Verified unit-definitions commands (milestone M8 line 1; Godot 4.7.2.stable, Windows x64;
+`python` denotes the pinned interpreter, never the PATH alias). This is the first M8
+deliver line and the first one that is **not** a legacy-behaviour derivation — everything
+it delivers is committed content the client already verifies:
+
+```bash
+godot --headless --path apps/client-godot --script res://tests/test_unit_definitions.gd
+godot --headless --path apps/client-godot --script res://tests/test_content_registry.gd
+godot --headless --path apps/client-godot --script res://tests/test_project_scope.gd
+godot --headless --path apps/client-godot --script res://tests/test_scene_build.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-10-01): the hermetic unit-definitions suite
+(observed **204 checks**, 207 with `--report`; the 28th hermetic suite) over a typed
+read-only `UnitDefinition` covering the **429 committed unit definitions** of
+`packages/game-content/normalized/units.json` — **58 committed fields** (56 on every row
+plus `breeding_order`/`sm_training_time` on 300 each), distinct string `legacy_id`s over
+`923`..`1431`, five named field groups, fail-closed on every malformed field, absent fields
+kept distinct from committed zeros, and one documented raw-entry accessor; the corrected
+content-registry suite (observed **87 checks**, was 52) covering the **public
+`ContentRegistry.legacy_ids(domain)` accessor** this change added, including the
+committed-order-not-collation contract; the scope suite (**1339**) and scene build (**36**);
+both batteries in the final state (each exit `0`; `verify-boot.ps1` now runs **28 hermetic
+suites and 13 live phases**, and its guard digest is identical before and after,
+`6978b959…ff348`); the **unchanged** compat suite (observed `Ran 1109 tests ... OK`, exit `0`,
+because this line adds no endpoint and no save shape); the content validator (exit `0`,
+`result: valid`, 21 schemas); and the preservation manifest (3,258 entries, exit `0`).
+`git status` showed no content-package, fixture, save, config, village,
+conversion-package, or legacy-source byte changed. The evidence is the deterministic
+`unit-definitions-report-v1` report under `apps/client-godot/evidence/unit-definitions/`,
+written by the suite itself via `--report=<path>` so its tables are derived from the live
+model and registry and cannot drift from the code they document (digest `f997eb2d…66d5`,
+byte-identical across three consecutive runs). **Two design premises in the change's own
+artifacts were disproved by the Apply stage and corrected rather than shipped** — `costs`
+and `properties` are committed **objects**, not embedded-JSON strings (content rule R2
+coerces them and `unit.schema.json` declares both `"type": "object"`), and the field count
+is **58, not 53**; **a third was narrowed rather than implemented as designed**, because
+reaching into the registry's private index was replaced with the public accessor above
+rather than re-reading the committed file behind the registry's back. Claim limits: **no
+unit is rendered, animated, or played**; **no unit instance, queue, production, collection,
+movement, animation, or behaviour is implemented** — each is a separate later M8 deliver
+line; **no gameplay semantics are attached to any parsed statistic** (`attack: 10` is a
+committed number, not a damage rule, and the suite asserts the absence of any
+behaviour-computing helper); the definitions are the committed normalized rows verbatim with
+no tuning, balancing, scaling, rounding, or interpolation; **asset linkage is reported and
+nothing more** (424/429 whole `img_name` references resolve — 419 `extracted`, 1
+`converted`, 1 `missing_source`, 3 `pending` — and the 5 comma-joined rows resolve per part,
+446/446), establishing no rendering correctness, animation correctness, or visual fidelity;
+**no windowed capture is claimed** because the change alters nothing visual; the committed
+`name` values are not unique (six shared by two rows), so `find_by_name()` returns every
+match; the committed `-1` upgrade-chain value and every `properties` flag key are reproduced
+without interpretation; and the committed corpus has **no unit placements at all**, so no
+instance behaviour is evidenced. No Flash, Ruffle, ActionScript, or browser executes in any
+of these commands, and no non-loopback traffic is used.
+
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 
