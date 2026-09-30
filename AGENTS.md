@@ -573,6 +573,76 @@ implementation, so real-execution parity rests on the fixture-replay tests and t
 live phase. No Flash, Ruffle, ActionScript, or browser executes in any of these
 commands.
 
+Verified building-resource commands (milestone M7; Godot 4.7.2.stable and
+pinned CPython 3.9.13, Windows x64; `python` denotes the pinned interpreter, never the
+PATH alias). This is the first deliver line whose legacy contract needed **no
+derivation at all** — the seven stored resource slots and their save locations are
+already established by `engine.apply_resources` (`engine.py:251-271`), the corpus
+agrees exactly, and the Compatibility API's `resources()` accessor already returns
+exactly those seven keys — so the defect was entirely inside the modern client's
+projection. The investigation record `docs/legacy-resources.md` was committed before the
+proposal (PR #193):
+
+```bash
+godot --headless --path apps/client-godot --script res://tests/test_town_resources.gd
+godot --headless --path apps/client-godot --script res://tests/test_town_hud.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-09-30): the hermetic projection/readout suite
+(observed 101 checks, PASS — every resource row, the summary group, both absent-field
+paths, the response-driven update path, and the assertion that no delivered line's
+semantics change) and the corrected HUD suite (observed 38 checks, PASS, was 28);
+both batteries in the final state (each exit `0`; `verify-boot.ps1` now runs **26
+hermetic suites and 12 live phases**); the compat suite, which is **unchanged** at
+`Ran 947 tests ... OK`, exit `0`, because the Compatibility API is not modified at all;
+and the preservation manifest (3,258 entries, exit `0`). The evidence steps are
+documented in `apps/client-godot/README.md` ("Resource readout"); committed evidence
+lives under `apps/client-godot/evidence/building-resources/` (a windowed capture plus
+the deterministic `resources-report-v1` report, byte-identical across reruns, whose
+projection table is generated from the projection module's own data so it cannot drift
+from the code it documents). **What the change fixed:** `town_hud.gd` keyed its first
+resource row `coins`, a field nothing produces — the server's field is `gold`,
+`maps[0]` has `gold` and no `coins`, and the compat module's only occurrences of the
+word are comments about the expansion price schedule — so the fail-closed readout
+rendered an explicit missing-field indicator and **the player's primary currency was
+displayed as missing and its real value never appeared**; the existing HUD suite
+*pinned* that defect by supplying `coins` and `energy` in a crafted payload shape
+nothing real produces. The fix is minimal because the table was never mis-shaped: its
+own header named the intended set as "coins, wood, steel, oil, cash, energy, mana",
+which is exactly its ten-row shape, so **one key was misnamed** and no row was added,
+removed, or reordered. **A second recorded gap is closed:** `energy` is a real eighth
+resource (`privateState.energy = 50`; `COST_ENERGY = "e"` at `constants.py:899`;
+`TOKEN_ENERGY = 7`; `CAT_ENERGY = 8`) and is now displayed by value under the save's
+own name. Claim limits: the readout claims to display **what the save stores**, never
+what the legacy client displayed, and no pixel-parity oracle against it exists; **no
+rule is claimed for how the stored energy value changes over time** (`apply_resources`
+never writes it, the eight-slot mutation vector has no slot for it, no legacy branch
+touches it, and no committed source records a regeneration interval); **the design's
+premise that this value had to be added to the service was wrong and the change was
+narrowed rather than implemented as designed** — the client already maps `energy` to
+`privateState.energy`, so **the Compatibility API is not modified at all** and the
+shared `resources()` accessor the nine delivered value-level proofs compare stays
+untouched; the market and trade counters and item-cost mapping onto the resource
+vocabulary are out of scope (`trade_resource`'s arguments are recorded as *read but
+unused*, so its resource movement is client-sent — the untrusted pattern collect and
+expand already refuse); eleven mechanical `displayed("coins")` → `displayed("gold")`
+query-key renames across ten delivered suites follow the correction, with **no change
+to any assertion value, threshold, or intent**; `TownState.Resources` still declares an
+internal `coins` field aliasing `map.gold` that **no readout row is keyed by**, and
+retiring it is a separate correction; labels and layout are the delivered provisional
+convention; no pixel-parity oracle exists; the committed capture runs the fake
+implementation. Two committed M6 artifacts (`evidence/town/town-player.png`,
+`evidence/town/report.json`) were **regenerated** because the label correction
+invalidated their bytes — the town report differs only in the two `hud` blocks, where
+the key moves from `coins` to `gold` in both the fresh and slice views, with no count,
+digest, projection constant, camera, or selection block changed; leaving them stale
+would have broken the M6 deliverable's claim that rerunning the report reproduces its
+bytes. No Flash, Ruffle, ActionScript, or browser executes in any of these commands.
+
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 

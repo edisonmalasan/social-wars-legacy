@@ -1891,5 +1891,116 @@ request counts, and the non-claims.
 - the committed capture runs the fake GameApi - a deterministic test double, not a
   parity oracle.
 
-These non-claims are recorded in `evidence/building-expand/report.json`.
-Remaining deliver lines of M7 (separate changes): resources, XP basics.
+## Resource readout
+
+The resource slice (OpenSpec `building-resources`, milestone M7) fixes the other half of
+what every earlier line proves. Those lines move resources correctly **server-side** —
+the unchanged legacy `apply_resources` applies the 8-slot vector verbatim per resource
+under the documented clamp, collect derives its payout from committed content, and
+expand derives its debit and proves the balances by value. This line makes them
+**readable**, and it found that the primary currency was not.
+
+### The defect
+
+`town_hud.gd` keyed its first resource row **`coins`, a field nothing produces**. The
+server's field is `gold` (`maps[0]` has `gold` and no `coins`), and the Compatibility
+API's only occurrences of the word are *comments about the expansion price schedule*.
+Because the readout is fail-closed by design and renders an explicit
+`[missing: <field>]` indicator, **the player's primary currency was displayed as missing
+and its real value never appeared on screen.** The existing HUD suite *pinned* the
+defect by supplying `"coins": "2000"` and `"energy": "50"` in a crafted payload shape
+nothing real produces.
+
+The fix is minimal because the table was never mis-shaped: its own header named the
+intended set as "coins, wood, steel, oil, cash, energy, mana", which is exactly its
+ten-row shape (seven resource rows plus `name`, `level`, `xp`). **One key was
+misnamed.** No row was added, removed, or reordered.
+
+### The projection
+
+`scripts/town/resource_projection.gd` is the single source of truth: one entry per
+displayed row carrying its canonical name **as the server names it**, its save
+location, its group, its label, its typed-state field, and its legacy vector slot. The
+readout projects through it, so a row can neither claim a field the server does not
+produce nor display the same resource twice.
+
+| Row | Canonical name | Save location | Group | Vector slot |
+| --- | --- | --- | --- | --- |
+| 0 | `gold` | `map.gold` | resources | 2 |
+| 1 | `wood` | `map.wood` | resources | 3 |
+| 2 | `steel` | `map.steel` | resources | 5 |
+| 3 | `oil` | `map.oil` | resources | 4 |
+| 4 | `cash` | `playerInfo.cash` | resources | 6 |
+| 5 | `energy` | `privateState.energy` | resources | none (`-1`) |
+| 6 | `mana` | `privateState.mana` | resources | 7 |
+| 7 | `name` | `playerInfo.name` | summary | none |
+| 8 | `level` | `map.level` | summary | none |
+| 9 | `xp` | `map.xp` | summary | 1 |
+
+`xp` is grouped with the summary because it is the experience counter, not a spendable
+currency — nothing spends it.
+
+### `energy`, and the gap that stays open
+
+`energy` is a real eighth resource in the save (`privateState.energy = 50` in the
+corpus; `COST_ENERGY = "e"` at `constants.py:899`; `TOKEN_ENERGY = 7`;
+`CAT_ENERGY = 8`) and `items[].costs` may name it. **The change's design assumed it had
+to be added to the service; Apply proved that wrong** — `TownState.RESOURCE_FIELDS`
+already maps it to `privateState.energy` and the payload already carries it, so **the
+Compatibility API is not modified at all**. The regeneration rule stays a recorded gap:
+`apply_resources` never writes it, the eight-slot mutation vector has no slot for it,
+no legacy branch touches it, and **no committed source records how it changes**.
+
+### Verification (commands actually executed)
+
+```bash
+# The hermetic projection/readout suite (observed: 101 checks, PASS)
+godot --headless --path apps/client-godot --script res://tests/test_town_resources.gd
+
+# The corrected HUD suite (observed: 38 checks, PASS, was 28)
+godot --headless --path apps/client-godot --script res://tests/test_town_hud.gd
+
+# Full batteries in the final state (both observed exit 0; verify-boot.ps1 now runs
+# 26 hermetic suites and 12 live phases)
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+```
+
+### Evidence (two-step, as the delivered slices)
+
+```bash
+# 1. Windowed fake-API capture of the readout with every row sourced
+godot --path apps/client-godot res://scenes/boot.tscn -- --gameapi=fake --town-capture=<repo>/apps/client-godot/evidence/building-resources/resources.png
+
+# 2. Headless deterministic report (bare --resources-report defaults to
+#    evidence/building-resources/report.json)
+godot --headless --path apps/client-godot res://scenes/town.tscn -- --resources-report=<repo>/apps/client-godot/evidence/building-resources/report.json
+```
+
+The report (`resources-report-v1`) records the projection table from the module's own
+data, the observed stored values, the input digests, the request counts, the
+established-versus-derived split, and the non-claims.
+
+### Resource readout claim limits
+
+- no Flash, Ruffle, ActionScript, or browser executed;
+- the readout claims to display **what the save stores**, never what the legacy client
+  displayed, and no pixel-parity oracle against it exists;
+- **no rule is claimed for how the stored energy value changes over time**;
+- labels and layout are the delivered provisional convention, and the shared 300px
+  panel clips long labels — a pre-existing cosmetic note;
+- the market and trade counters and item-cost mapping onto the resource vocabulary are
+  **out of scope** (`trade_resource`'s arguments are recorded as *read but unused*, so
+  its resource movement is client-sent — the untrusted pattern collect and expand already
+  refuse);
+- `TownState.Resources` still declares an internal `coins` field aliasing `map.gold`;
+  **no readout row is keyed by it**, and retiring that internal name is a separate
+  correction;
+- the report pins the projection and readout modules' digests, so editing either one
+  makes it stale and it must be regenerated — the same coupling the sibling reports have;
+- the committed capture runs the fake GameApi, a deterministic test double.
+
+Two committed M6 artifacts (`evidence/town/town-player.png` and
+`evidence/town/report.json`) were regenerated because the label correction invalidated
+their bytes; the town report differs **only** in the two `hud` blocks.
+Remaining deliver lines of M7 (separate changes): XP basics.

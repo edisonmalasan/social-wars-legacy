@@ -141,3 +141,68 @@ Non-goals: the market and trade counters, item cost mapping, energy regeneration
 server-authoritative resource validation (Server v1 / M13), any balance change, and any
 new endpoint — none of the nine delivered state-mutating surfaces needs to change,
 because the defect is entirely in how the client names what the server already sends.
+
+## Resolution, after the `building-resources` proposal and Apply (2026-09-30)
+
+Both gaps are closed, and one of the change's own premises was wrong.
+
+### Gap 1 — closed, and it was exactly one key
+
+`town_hud.gd`'s `FIELDS` const is gone; the readout now projects through the new
+single-source `scripts/town/resource_projection.gd`, whose primary-currency row is
+named **`gold`** — the field `apply_resources` writes and the corpus stores. A reading
+from the investigation turned out to make the fix obviously minimal: the table's own
+header named the intended set as "coins, wood, steel, oil, cash, energy, mana", which
+is **exactly** the table's ten-row shape (seven resource rows plus `name`, `level`,
+`xp`). So the table was never mis-shaped — one key was misnamed. No row was added,
+removed, or reordered, and the captured readout now renders every row by value:
+`Gold: 2000, Wood: 2000, Steel: 2000, Oil: 2000, Cash: 5, Energy: 50, Mana: 0,
+Name: Warrior, Level: 1, XP: 4`, with **no** absent-field indicator.
+
+The suite that had pinned the defect is corrected: its crafted payload now uses the
+field names the service actually produces (`gold`, `energy`) instead of the fabricated
+`coins`, and new assertions pin that `gold` renders its real stored value, that no row
+is keyed `coins`, that `energy` renders its stored value, and that a genuinely absent
+resource still renders the explicit absent-field indicator without affecting other
+rows.
+
+### Gap 2 — closed, and the design's premise about it was wrong
+
+The change's design assumed the stored energy value had to be **added to the service**,
+because `apply_resources` never writes it and no accessor exposed it. **Apply
+established the premise was false.** `TownState.RESOURCE_FIELDS` already maps
+`energy` to `privateState.energy`, the delivered payload already carries the value,
+and the capture renders `Energy: 50` — so the row was only ever unsourced *in the
+display table*, never absent from the data.
+
+Consequently **the Compatibility API is not modified at all**: no accessor, no
+response field, no route, no error-table row, and no widening of the shared
+`resources()` accessor that all nine state-mutating endpoints' value-level
+post-execution proofs compare. The change is entirely client-side, which is the
+narrowest possible response to a client-side defect. The narrowing reasoning is
+retained in design D4 as the documented reason the shared accessor stays untouched,
+and the change was narrowed rather than implemented as designed.
+
+The regeneration gap is unchanged and still unclaimed: no committed source records
+how `privateState.energy` changes over time, `apply_resources` never writes it, the
+eight-slot mutation vector has no slot for it (its vector slot is recorded as `-1`),
+and no legacy branch touches it. The readout displays the stored value and the report
+records the absence.
+
+### One residual misnomer, recorded rather than widened over
+
+`TownState.Resources` still declares `var coins` with `RESOURCE_FIELDS["coins"] =
+"map.gold"`. **No readout row is keyed by it** — the projection is the single place
+that knows, and each row records its own typed-state field. Retiring the internal
+name would touch nine further `state.resources.coins` sites plus `state.missing`, so
+it is left as a separate correction rather than folded into this one.
+
+### Evidence consequence, sanctioned and bounded
+
+The label correction invalidated two committed M6 evidence artifacts, because
+`evidence/town/report.json`'s `hud` block is produced by `hud.displayed_fields()`. They
+were regenerated — sanctioned for exactly this case — and `evidence/town/report.json`
+differs **only** in the two `hud` blocks, where the key moves from `coins` to `gold` in
+both the fresh and slice views. No count, digest, projection constant, camera, or
+selection block changed. Leaving them stale would have broken the M6 deliverable's
+claim that rerunning the report step reproduces its committed bytes.
