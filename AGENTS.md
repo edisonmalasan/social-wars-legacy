@@ -774,6 +774,65 @@ without interpretation; and the committed corpus has **no unit placements at all
 instance behaviour is evidenced. No Flash, Ruffle, ActionScript, or browser executes in any
 of these commands, and no non-loopback traffic is used.
 
+Verified unit-instances commands (milestone M8 line 2; Godot 4.7.2.stable, Windows x64;
+`python` denotes the pinned interpreter, never the PATH alias). M8's first
+behaviour-shaped line, scoped by the committed investigation
+`docs/legacy-unit-instances.md`:
+
+```bash
+godot --headless --path apps/client-godot --script res://tests/test_unit_instances.gd
+godot --headless --path apps/client-godot --script res://tests/test_unit_definitions.gd
+godot --headless --path apps/client-godot --script res://tests/test_project_scope.gd
+godot --headless --path apps/client-godot --script res://tests/test_scene_build.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-10-01): the hermetic unit-instances suite
+(observed **437 checks**, 440 with `--report`; the 29th hermetic suite) over a
+typed read-only `UnitInstance` that **wraps** a legacy map row plus its resolved
+definition, with nested-garrison parsing, a named fail-closed depth bound, and
+classification by **committed `type`**; the corrected definition suite (observed
+**213 checks**, was 204) whose boundary assertion was **rewritten** — it had
+asserted that no client source *anywhere* declared a unit instance, a stronger
+claim than its requirement made and one this line is chartered to falsify, and it
+now asserts the boundary instead (the two delivered modules declare no instance or
+queue state, and where an instance type exists it is a distinct script whose held
+definition carries the same field inventory and no player state); the scope suite
+(**1390**); both batteries in the final state (each exit `0`;
+`verify-boot.ps1` now runs **29 hermetic suites and 13 live phases**, guard digest
+identical pre/post, `6978b959…ff348`); the **unchanged** compat suite
+(observed `Ran 1109 tests ... OK`, exit `0`); the content validator (exit `0`,
+`result: valid`, 21 schemas); and the preservation manifest (3,258 entries, exit
+`0`). `git status` showed no content-package, fixture, save, config, village,
+conversion-package, or legacy-source byte changed. The evidence is the
+deterministic `unit-instances-report-v1` report under
+`apps/client-godot/evidence/unit-instances/`, written by the suite itself via
+`--report=<path>` (digest `A02EEDC8…57BBA0`, byte-identical across three runs).
+**Three investigation figures were found to be asserted rather than measured and
+were corrected** — `unit_capacity` is non-zero on **5 of 429** units, not 0; the
+garrison-capable placed count is **9 rows across 3 distinct item ids**, not 3
+rows; and the design's "units carry neither" is restated per field. The capacity
+decision is unaffected: the field has **zero** occurrences across five legacy
+modules, so **no capacity rule is enforced** regardless of its committed value.
+Claim limits: **no executed-legacy fixture, and none fabricated** — the committed
+corpus has no unit row (40 rows, 11 distinct ids, all committed `type` `b`, 0
+non-empty garrisons, every `attr` bag `{}`), so the zero-instance result is
+asserted and instances are demonstrated over **crafted in-memory test input** only;
+**no acquisition is claimed** (no committed unit is store-listed; the only
+committed unit sources are the later-milestone `offer_packs` and `darts_items`);
+**no queue, training, production, collection, movement, animation, or behaviour is
+implemented**; the queue keys `nu`/`ts`/`ui` are **reserved and named, not
+implemented**; the dead-unit pool is read as an integer count because
+`push_dead_unit` discards the row; **no windowed capture is claimed**; and **the
+first executed-legacy unit fixture belongs to the `production` line**, because the
+Command Center at map key 1 is a real placed training producer and makes the queue
+genuinely exercisable. No Flash, Ruffle, ActionScript, or browser executes in any
+of these commands, and no network is used.
+
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 
