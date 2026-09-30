@@ -72,7 +72,75 @@ without explicit authorization. The squash stands on the permanent record, this 
 accompanies it, and **every subsequent PR used a merge commit** — #210 (`02dbfa6`) and #211
 (`84f7af9`) are both proper merge commits.
 
-### Resume point (persisted 2026-10-01, orchestrator)
+### Resume point (updated 2026-10-01, orchestrator)
+
+**Done and archived, M8 lines 1 and 2:**
+
+| Line | Archive | PRs |
+| --- | --- | --- |
+| `unit definitions` | `2026-10-01-unit-definitions` | #204 (`cf13a5b`), #205 (`72f87a3`), #206 (`43b8ed4`), #207 (`5e43bc0`) |
+| `unit instances` | `2026-10-01-unit-instances` | #209 (**`0710038`, squash — see the disclosure above**), #210 (`02dbfa6`), #211 (`84f7af9`), #212 (`435db4e`) |
+
+`main` = `435db4e`, tree clean, no branches, **no active OpenSpec change**, 50 specs.
+
+**Baselines in the final state (re-run by the orchestrator, not taken on trust):**
+`verify.ps1` exit 0; `verify-boot.ps1` exit 0 with **29 hermetic suites and 13 live
+phases**, guard digest `6978b959...ff348` identical pre/post; compat **`Ran 1109 tests
+... OK`** unchanged across both lines; `validate_content.py` exit 0 (`result: valid`, 21
+schemas); hash manifest 3,258 entries exit 0; `openspec validate --all --strict`
+**50/50** (51 with a change active); the unit-definitions report `f997eb2d...66d5` and
+the unit-instances report `A02EEDC8...57BBA0` are each byte-identical across three runs.
+
+**Committed investigations:** `docs/legacy-unit-instances.md` (PR #208) and
+**`docs/legacy-production-queues.md`** (the `queues` line, on the branch that committed
+it).
+
+**Next objective, in order:**
+
+1. **Propose M8 line 3, `queues`**, on the committed contract in
+   `docs/legacy-production-queues.md`. That investigation established the decisive facts
+   and the two structural gaps:
+   - the three queue commands take **only a map index** (plus a unit id for atom fusion)
+     and perform **no validation at all** — not that the item is a training producer,
+     not `training_time`, not `min_level`, not a cap on the count;
+   - **the legacy server never evaluates a queue's elapsed time** — every `attr["ts"]`
+     use is a write or a deletion, so a queue's progress is entirely client-side and
+     **no server-side "is it complete?" rule exists to reproduce**;
+   - the **only** branch that reads `ts` back is `soulmixer_speedup`, whose own source
+     comment calls its calculation *"Quite useless cost calculation for understanding
+     it"*, which reads the duration from the **queued unit's** `sm_training_time`
+     (present on **300 of 429** units, absent from all 470 buildings, 84 distinct
+     values), treats it as **seconds**, computes `ceil(remaining / 3600)`, **charges
+     nothing**, and sets `ts = 0`; it also raises `KeyError` on a row whose `attr` lacks
+     `ts`;
+   - **no command completes a queue or materialises a unit** (the `complete_*` family is
+     exactly `complete_collection`, `complete_goal`, `complete_tutorial`), so **the legacy
+     server has no production path at all**;
+   - a queue's **cost is client-sent** — `apply_resources` runs before dispatch with the
+     request's vector — so no cost may be implemented;
+   - the corpus places **id 26, Command Center, at map key 1** with an **empty `attr`
+     bag**, so `push_queue_unit` / `pop_queue_unit` are genuinely exercisable **without
+     fabricating a player state**. The push/pop pair is the natural fixture oracle for
+     the **`production`** line, where the missing completion *is* the finding.
+2. Carry `queues` through Propose -> Apply -> Sync -> Archive, then `production`, then
+   `collection`, `movement`, `animations`, `basic behaviors`.
+3. After all eight, assess the M8 exit criterion **"Core unit gameplay works"**.
+
+**Do not re-derive:** the 429 typed definitions; that a unit instance is a map row with a
+nested garrison; that the queue keys are `nu`/`ts`/`ui` with a three-key teardown; that
+`unit_capacity` has no legacy consumer; that no unit is store-listed; and the three
+corrected figures (`unit_capacity` non-zero on 5 of 429 units, 9 garrison-capable placed
+rows across 3 distinct ids, and the per-field restatement of what units carry).
+
+**Discipline learned on these two lines, to carry forward:** measure a figure before
+asserting it — three of the orchestrator's own investigation figures turned out to be
+asserted rather than measured, and an earlier one was miscounted. Re-verify a worker's
+factual claim independently before accepting it. Prefer a **public** accessor over
+reaching into another module's private state. And prefer a **boundary assertion** over a
+**repository-wide absence** in a delivered suite, or it will rot on the very next line —
+which is exactly what happened.
+
+## Resume point (persisted 2026-10-01, orchestrator)
 
 **Done and archived:** `unit-definitions` (M8 line 1) — proposal PR #204 (`cf13a5b`), Apply PR
 #205 (`72f87a3`), spec-sync PR #206 (`43b8ed4`), archive PR #207 (`5e43bc0`). `main` = `5e43bc0`,
