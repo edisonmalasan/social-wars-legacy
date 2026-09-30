@@ -20,7 +20,7 @@ The client SHALL provide a `ContentRegistry` autoload that loads the committed n
 - **THEN** the SHA-256 directory digest of `packages/game-content/` is identical before and after, and no registry script contains a legacy protocol, network, or Flash-related token
 
 ### Requirement: Domain indexing and lookup
-The registry SHALL index each domain's entries by `legacy_id`, SHALL reject a duplicate `legacy_id` within a domain at load time with an error naming that domain, and SHALL expose lookups — the domain list, existence check, entry retrieval, entry count, and the package content fingerprint — that return an explicit not-found result for an unknown domain or reference rather than a null or guessed value.
+The registry SHALL index each domain's entries by `legacy_id`, SHALL reject a duplicate `legacy_id` within a domain at load time with an error naming that domain, and SHALL expose lookups — the domain list, existence check, entry retrieval, entry count, domain id enumeration, and the package content fingerprint — that return an explicit not-found result for an unknown domain or reference rather than a null or guessed value. Domain id enumeration SHALL report the committed index order rather than a collation of the identifier strings, because the identifiers are digit strings and a lexicographic sort would interleave them.
 
 #### Scenario: Look up known definitions
 - **WHEN** lookups ask for known `legacy_id` values in several domains (a building, a quest, a sound)
@@ -33,6 +33,19 @@ The registry SHALL index each domain's entries by `legacy_id`, SHALL reject a du
 #### Scenario: Reject duplicate identifiers
 - **WHEN** an altered copy of a domain contains a repeated `legacy_id`
 - **THEN** the load fails with an error naming that domain and no partial index is exposed
+
+#### Scenario: Enumerate a domain's identifiers
+- **WHEN** a caller asks a loaded registry for the legacy ids of a domain it did not
+  hard-code
+- **THEN** the registry returns those ids in the committed order they were indexed in,
+  their count equals the domain's reported entry count, and the result comes from the
+  index built during the manifest-verified load, so a consumer enumerates verified content
+  instead of re-reading the committed file behind the registry's back
+
+#### Scenario: Report an unknown domain when enumerating
+- **WHEN** an enumeration names a domain that is not loaded
+- **THEN** the result explicitly reports not-found with an empty list and a message naming
+  the domain, never a guessed empty enumeration presented as a loaded one
 
 ### Requirement: Deterministic asset ID registry
 The repository SHALL provide an offline builder that joins every distinct content asset reference from the four reference domains — image paths, item sprites, magic sprites, and sound files — with the committed corpus registry and the M4 conversion and extraction evidence, and writes `tools/asset-registry/asset_ids.json` recording for each reference exactly one runtime status from the closed vocabulary `converted`, `extracted`, `passthrough`, `pending`, `ambiguous`, `missing_source`, together with a runtime path only where one truthfully exists. The output SHALL reconcile with the committed coverage counts and the conversion and extraction manifests, SHALL be byte-identical on rerun without tree changes, SHALL run under the pinned CPython 3.9.13 interpreter with no new dependencies, and SHALL write only its own output file.
