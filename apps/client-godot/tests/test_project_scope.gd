@@ -28,7 +28,10 @@ extends "res://tests/test_base.gd"
 ## and the `unit-production` evidence report), and the unit-collection work (the
 ## two `scripts/units/` collection modules — the committed-prize projection and
 ## the pure flow that classifies the acquisition routes and records the two
-## authority gaps — its suite, and the `unit-collection` evidence report):
+## authority gaps — its suite, and the `unit-collection` evidence report), and
+## the unit-movement work (the `scripts/units/unit_movement.gd` placement
+## projection with the movement-command inventory and the content-only refusals,
+## its suite, and the `unit-movement` evidence report):
 ## no other game system, no scene beyond the allow-list, no script outside
 ## the allow-list, no Flash-related runtime, no legacy protocol token
 ## anywhere, and no transport reference outside the legacy-v0
@@ -99,6 +102,7 @@ const ALLOWED := [
 	"scripts/units/production_flow.gd",
 	"scripts/units/collection_prize.gd",
 	"scripts/units/collection_flow.gd",
+	"scripts/units/unit_movement.gd",
 	"scripts/verification.gd",
 	"tests/test_asset_ids.gd",
 	"tests/test_audio_manager.gd",
@@ -137,6 +141,8 @@ const ALLOWED := [
 	"tests/test_unit_queues.gd",
 	"tests/test_unit_production.gd",
 	"tests/test_unit_collection.gd",
+	"tests/test_unit_movement.gd",
+	"tests/test_unit_movement.gd",
 	"evidence/boot/boot-report.json",
 	"evidence/building-move/building-move.png",
 	"evidence/building-move/report.json",
@@ -170,6 +176,8 @@ const ALLOWED := [
 	"evidence/unit-queues/report.json",
 	"evidence/unit-production/report.json",
 	"evidence/unit-collection/report.json",
+	"evidence/unit-movement/report.json",
+	"evidence/unit-movement/report.json",
 ]
 
 ## The exact scene set the project may declare (set equality below).

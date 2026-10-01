@@ -1,0 +1,676 @@
+{
+  "schema": "unit-movement-report-v1",
+  "generated_by": "apps/client-godot/tests/test_unit_movement.gd --report=<path>",
+  "determinism": {
+    "byte_identical_across_reruns": true,
+    "reason": "no timestamp, no absolute path, no wall clock, no request, and no network: every table is derived from the delivered module, the verified content registry, the committed corpus bytes, and the measurements this run performed"
+  },
+  "placement": {
+    "fields": [
+      {
+        "name": "cell_x",
+        "source": "row slot 1 (x)",
+        "source_kind": "row",
+        "slot": 1,
+        "committed_field": "",
+        "verbatim": true,
+        "note": "the row's own cell x coordinate, exactly as committed"
+      },
+      {
+        "name": "cell_y",
+        "source": "row slot 2 (y)",
+        "source_kind": "row",
+        "slot": 2,
+        "committed_field": "",
+        "verbatim": true,
+        "note": "the row's own cell y coordinate, exactly as committed"
+      },
+      {
+        "name": "orientation",
+        "source": "row slot 4 (orientation)",
+        "source_kind": "row",
+        "slot": 4,
+        "committed_field": "",
+        "verbatim": true,
+        "note": "the row's committed orientation code, verbatim; no rotation, facing, or turning rule is applied to it"
+      },
+      {
+        "name": "row_instant",
+        "source": "row slot 3 (timestamp)",
+        "source_kind": "row",
+        "slot": 3,
+        "committed_field": "",
+        "verbatim": true,
+        "note": "OPAQUE. Reported verbatim and treated as a recorded value only: no elapsed time, no remaining time, and no readiness is computed from it, because fast_forward lets a client rewrite it"
+      },
+      {
+        "name": "velocity",
+        "source": "committed definition field 'velocity'",
+        "source_kind": "committed-content",
+        "slot": -1,
+        "committed_field": "velocity",
+        "verbatim": true,
+        "note": "CONTENT ONLY. Positive on all 429 committed units and read by NO legacy branch; no travel time, speed, or duration is derived from it"
+      },
+      {
+        "name": "width",
+        "source": "committed definition field 'width'",
+        "source_kind": "committed-content",
+        "slot": -1,
+        "committed_field": "width",
+        "verbatim": true,
+        "note": "CONTENT ONLY. Reported as a committed number; no offset, rectangle, or covered cell is computed from it here"
+      },
+      {
+        "name": "height",
+        "source": "committed definition field 'height'",
+        "source_kind": "committed-content",
+        "slot": -1,
+        "committed_field": "height",
+        "verbatim": true,
+        "note": "CONTENT ONLY. Reported as a committed number; no offset, rectangle, or covered cell is computed from it here"
+      },
+      {
+        "name": "elevation",
+        "source": "committed definition field 'elevation'",
+        "source_kind": "committed-content",
+        "slot": -1,
+        "committed_field": "elevation",
+        "verbatim": true,
+        "note": "CONTENT ONLY. Reported as a committed number; no position is computed from it and no terrain interaction is derived, partly because the legacy tile geometry was never extracted"
+      }
+    ],
+    "field_names": [
+      "cell_x",
+      "cell_y",
+      "orientation",
+      "row_instant",
+      "velocity",
+      "width",
+      "height",
+      "elevation"
+    ],
+    "row_sourced_count": 4,
+    "content_sourced_count": 4,
+    "row_slots": 8,
+    "no_derivation": "NO VALUE IN THIS PROJECTION IS DERIVED FROM ANOTHER. A coordinate is never computed from a velocity, no offset is computed from a footprint, no position is computed from an elevation, and no intermediate position is computed between two instants. The suite proves it structurally in three ways: each reported field names its own source and no two fields share one, a definition carrying an absurd velocity, footprint, and elevation leaves the reported cell untouched, and the same row stamped at two different instants differs in the reported instant and in nothing else (design D1)",
+    "cell_refusal": "A ROW WHOSE COMMITTED COORDINATES ARE ABSENT OR MALFORMED IS REPORTED AS UNRESOLVABLE WITH ITS RECORDED STATE INTACT, AND IS NEVER DEFAULTED TO THE ORIGIN. No legacy branch can produce such a row - move writes client-supplied coordinates into it whatever they are - so this is the client failing closed on untrusted input, not a legacy rule. cell_x and cell_y are reported as null beside the UNTOUCHED recorded slots in cell_recorded, so (0, 0) can never be mistaken for a resolved cell (design D1)",
+    "type_agnostic": true,
+    "type_agnostic_note": "THE PLACEMENT PROJECTION IS TYPE-AGNOSTIC, EXACTLY AS THE ONLY LEGACY COORDINATE WRITER IS. move never reads the addressed row's committed item type, so it would rewrite a unit row's coordinates exactly as it rewrites a building's. Gating this projection on committed type 'u' would therefore invent a rule the legacy server does not have, so the delivered use is the unit row and the projection itself refuses nothing about a row's type",
+    "unit_placed": false,
+    "unit_moved": false
+  },
+  "refusal": {
+    "measured": {
+      "refusals": 6,
+      "invalid_definition": true
+    },
+    "reasons": [
+      "invalid_row",
+      "unresolvable_cell",
+      "invalid_definition"
+    ],
+    "recorded_slots_travel_untouched": true,
+    "origin_never_defaulted": true
+  },
+  "movement_fields": {
+    "fields": [
+      "velocity",
+      "width",
+      "height",
+      "elevation"
+    ],
+    "footprint_fields": [
+      "width",
+      "height",
+      "elevation"
+    ],
+    "reported_as_content_only": true,
+    "used_as_a_rule": false,
+    "consumer_count": 0,
+    "consumer_count_per_field": {
+      "velocity": 0,
+      "width": 0,
+      "height": 0,
+      "elevation": 0
+    },
+    "searched_modules": [
+      "command.py",
+      "engine.py",
+      "sessions.py",
+      "server.py",
+      "constants.py",
+      "get_game_config.py",
+      "version.py"
+    ],
+    "rule": "THE COMMITTED velocity, width, height, AND elevation ARE CONTENT, NEVER RULES. All FOUR have ZERO legacy consumers: measured as occurrences of each string across command.py, engine.py, sessions.py, server.py, constants.py, get_game_config.py, and version.py, each is ZERO, in every one of the seven modules. So NO velocity-based travel time, NO path, NO terrain or elevation interaction, NO occupancy rule, NO bounds rule, NO readiness, and NO interpolation is derived from any of them, and this module provides no helper that would (design D2/D4)",
+    "coverage": "velocity is positive on ALL 429 committed units - the sharpest case in this project, because a field that looks exactly like a movement rule is read by nothing - and on 145 of the 470 committed buildings, taking exactly three values there (0 on 325, 1 on 138, 3 on 7). width, height, and elevation are positive on all 429 units and all 470 buildings, and on every unit the trio takes the SINGLE value 1, so the committed unit footprint is uniformly one cell square with elevation 1: a footprint that needs no geometry to be reported. The coverage is reported for reference ONLY: no legacy branch reads any of these fields, so no rule may be derived from it (design D2)",
+    "zero_consumer_precedents": [
+      {
+        "field": "unit_capacity",
+        "line": "M8 line 2 (unit instances)",
+        "fact": "carried by every one of the 429 committed units and non-zero on only 5 of them (4 on Truck and Zodiac, 6 on Ship, Truck 3, and Truck II), with zero occurrences across the legacy modules; push_unit appends to a garrison unconditionally, so no capacity rule is enforced"
+      },
+      {
+        "field": "reward_type / reward_amount",
+        "line": "M7's XP line",
+        "fact": "committed on every one of the 100 level entries and read by no legacy branch, so no level reward is paid"
+      },
+      {
+        "field": "collect / collect_type / collect_xp / max_collects",
+        "line": "M8 line 5 (unit collection)",
+        "fact": "the committed unit-collection income fields; no collect field is ever read and max_collects is zero on every unit, so no unit income, cap, or payout is derived"
+      },
+      {
+        "field": "training_time",
+        "line": "M8 line 4 (unit production)",
+        "fact": "carried by every one of the 899 committed items with a positive value on only 130 of the 470 buildings, and read by no legacy branch, so no production duration is derived from it"
+      },
+      {
+        "field": "harvester (properties flag)",
+        "line": "M8 line 5 (unit collection)",
+        "fact": "a properties flag key on 5 units (Worker I-IV and Orc Worker), every one of them with collect 0, so the flag names no income the content does not also carry"
+      }
+    ],
+    "sibling_zero_consumer_fields": [
+      "max_elem_vol",
+      "attack_range",
+      "ft_flying",
+      "ft_ground"
+    ],
+    "units_file": "packages/game-content/normalized/units.json",
+    "buildings_file": "packages/game-content/normalized/buildings.json",
+    "travel_time_computed": false,
+    "path_computed": false,
+    "terrain_interaction": false,
+    "elevation_interaction": false,
+    "occupancy_enforced": false,
+    "bounds_enforced": false,
+    "tile_geometry_gap": "THE LEGACY TILE GEOMETRY WAS NEVER EXTRACTED, AND IT STAYS A GAP. The delivered M6 town work recorded that the legacy SWF's TILE_SIZE, EI_TILE_HEIGHT_PIXELS, and grid dimensions were never extracted from the Flash client, so pixel parity with it is not claimed. Because `elevation` is read by no legacy branch AND the tile geometry is unrecorded, NO terrain-aware movement could be derived from either source even if a rule were invented: this line implements none and fills the gap with no assumed geometry (design D2)",
+    "distribution_measured": {
+      "units": {},
+      "buildings": {},
+      "sibling_fields": {}
+    }
+  },
+  "movement_fields_measured": {
+    "units_positive": 429,
+    "units_total": 429,
+    "buildings_positive": 145,
+    "buildings_total": 470,
+    "flying_units": 0,
+    "units_flying": 135,
+    "units_elevated": 429,
+    "buildings_flying": 8,
+    "buildings_elevated": 470
+  },
+  "committed_flag_encoding": {
+    "note": "the normalized package stores the `properties` flags as STRINGS (\"1\"/\"0\") and leaves most of them ABSENT, so a flag read through GDScript truthiness (`int(value or 0)`) counts the two units the content marks \"0\" as set, giving 137 instead of 135. The figures below are read through the committed encoding.",
+    "ft_flying_set_units": 135,
+    "ft_flying_set_buildings": 8,
+    "velocity_positive_units": 429,
+    "velocity_positive_buildings": 145
+  },
+  "movement_commands": {
+    "implemented": false,
+    "command_count": 4,
+    "commands": [
+      {
+        "command": "move",
+        "site": "command.py:119-134",
+        "kind": "coordinate-writer",
+        "writes": "row slot 1 (x) and row slot 2 (y), from client arguments, verbatim and with no transformation",
+        "checks": "that the addressed row exists: map_get_item returns a falsy row and the branch prints 'Error: item not found.' and returns (command.py:127-129)",
+        "does_not_check": [
+          "the addressed row's committed item type - the row may be a unit, a building, or anything else, and the branch never reads the type",
+          "occupancy: no other row's cells are examined, so a move may land on an occupied cell",
+          "bounds: no grid, map size, or cell range is consulted, so a move may land outside any grid",
+          "terrain: no tile, elevation, or footprint is consulted",
+          "speed or duration: no velocity, no distance, and no elapsed time is read, so a move consumes no time and travels no speed",
+          "cost: no price, resource, or ownership check of any kind"
+        ],
+        "type_agnostic": true,
+        "already_delivered_as": "godot-building-move",
+        "arguments": [
+          "args[0] item_index - the addressed row's map key",
+          "args[1] x - written to slot 1",
+          "args[2] y - written to slot 2",
+          "args[3] frame - READ AND UNUSED (command.py:123)",
+          "args[4] string - READ AND UNUSED (command.py:124)"
+        ],
+        "unused_arguments": [
+          "frame (args[3])",
+          "string (args[4])"
+        ],
+        "implemented_here": false,
+        "note": "this is the ONLY branch in the committed source that moves an existing row between cells, and it is a map write plus a print. It already ships as M7's godot-building-move, which recorded the two unused arguments and the client-side-only occupancy and bounds rules. This line references that capability and reimplements nothing"
+      },
+      {
+        "command": "orient",
+        "site": "command.py:198-207",
+        "kind": "orientation-writer",
+        "writes": "row slot 4 (orientation), as int(orientation) - the ONE coercion anywhere in the movement surface, and it is the legacy's",
+        "checks": "that the addressed row exists: map_get_item returns a falsy row and the branch prints 'Error: item not found.' and returns (command.py:203-205)",
+        "does_not_check": [
+          "that the value is a valid orientation: any client value that int() accepts is written, so an unaddressable orientation is stored",
+          "a range, an angle, or a snap: no rotation rule of any kind is applied",
+          "terrain, occupancy, or bounds",
+          "cost, ownership, or elapsed time"
+        ],
+        "type_agnostic": true,
+        "already_delivered_as": "",
+        "arguments": [
+          "args[0] item_index - the addressed row's map key",
+          "args[1] orientation - written to slot 4 through int()"
+        ],
+        "unused_arguments": [],
+        "implemented_here": false,
+        "note": "a PLAIN client-supplied slot write: the only writer of slot 4 in the whole committed source. This projection therefore reports the orientation verbatim and applies no rotation, facing, or turning rule to it"
+      },
+      {
+        "command": "pop_unit",
+        "site": "command.py:383-408, with engine.pop_unit at engine.py:58-68 and engine.map_add_item_from_item at engine.py:33-34",
+        "kind": "coordinate-writer",
+        "writes": "row slot 0 (item), slot 1 (x), slot 2 (y), and slot 7 (player team), then re-inserts the row under the client-sent map key index_unit - the ONLY other command that writes coordinates, and it OVERWRITES the popped row's committed item with the client's",
+        "checks": "that the addressed building row exists (command.py:392-395) and that a garrison row matching the client item id is present (engine.py:58-68), printing and returning when either is absent",
+        "does_not_check": [
+          "that the client item id matches the row it pops: engine.pop_unit matches on that same client id, and command.py:403 then writes it back, so the check is self-confirming and the popped row's own committed item is lost",
+          "that the popped row is a unit, that the placed row is free, that the cell is within bounds, or that the terrain admits it",
+          "speed, duration, path, or cost"
+        ],
+        "type_agnostic": false,
+        "already_delivered_as": "",
+        "arguments": [
+          "args[0] index_building - the garrison host row's map key",
+          "args[1] index_unit - the map key the popped row is re-inserted under (command.py:408, via engine.py:33-34), so it is READ, not unused",
+          "args[2] item_id - the garrison match AND the written slot 0",
+          "args[3] x - written to slot 1",
+          "args[4] y - written to slot 2",
+          "args[5] playerID - the written slot 7 (team)",
+          "args[6] unknown - UNUSED"
+        ],
+        "unused_arguments": [
+          "unknown (args[6])"
+        ],
+        "implemented_here": false,
+        "note": "a row LEAVING a garrison is placed on the map at client-supplied coordinates with its item overwritten. It is recorded here so the inventory of coordinate writers is complete and so its item overwrite stays visible; this line implements no part of it"
+      },
+      {
+        "command": "fast_forward",
+        "site": "command.py:905-946",
+        "kind": "time-writer",
+        "writes": "EVERY row's slot-3 instant (command.py:934) and every row's attr['ts'] queue start instant (command.py:939), both backwards by a CLIENT-SUPPLIED number of seconds",
+        "checks": "nothing: the branch performs no validation of any kind",
+        "does_not_check": [
+          "that the requested shift is sane, bounded, or authorised: any client value is applied",
+          "the sign: a negative seconds shifts every instant FORWARD as symmetrically as a positive one shifts it back",
+          "whether any row's shifted instant is meaningful, because nothing evaluates one"
+        ],
+        "type_agnostic": true,
+        "already_delivered_as": "",
+        "arguments": [
+          "args[0] seconds - the CLIENT-SUPPLIED shift applied to every row's instant and queue start instant"
+        ],
+        "unused_arguments": [],
+        "implemented_here": false,
+        "note": "it has NO observable effect, and that is the finding rather than a defect: because no legacy branch evaluates a row's elapsed time, shifting the instant changes no outcome. It is recorded because it is the CLIENT-WRITABLE INSTANT a client-side readiness check would trust - precisely the invented rule the delivered godot-unit-production capability refuses. Beyond the rows it also shifts the map's four timestamps, the private-state timestamps, every research timer, and every quest time"
+      }
+    ],
+    "command_names": [
+      "move",
+      "orient",
+      "pop_unit",
+      "fast_forward"
+    ],
+    "coordinate_writers": [
+      "move",
+      "pop_unit"
+    ],
+    "coordinate_writer_count": 2,
+    "slot_0_2_write_count": 5,
+    "slot_0_2_write_lines": [
+      "command.py:132",
+      "command.py:133",
+      "command.py:403",
+      "command.py:404",
+      "command.py:405"
+    ],
+    "named_dispatch_branches": 63,
+    "movement_named_branches": [
+      "move",
+      "orient"
+    ],
+    "type_agnostic": true,
+    "type_agnostic_note": "THE PLACEMENT PROJECTION IS TYPE-AGNOSTIC, EXACTLY AS THE ONLY LEGACY COORDINATE WRITER IS. move never reads the addressed row's committed item type, so it would rewrite a unit row's coordinates exactly as it rewrites a building's. Gating this projection on committed type 'u' would therefore invent a rule the legacy server does not have, so the delivered use is the unit row and the projection itself refuses nothing about a row's type",
+    "move_already_delivered_as": "godot-building-move",
+    "move_reimplemented_here": false,
+    "no_unit_specific_command": "NO UNIT-SPECIFIC MOVEMENT COMMAND EXISTS IN THE LEGACY SOURCE, AND NONE IS INVENTED HERE. Across command.py, engine.py, sessions.py, server.py, constants.py, get_game_config.py, and version.py there are exactly FIVE assignments to a row's slots 0, 1, or 2 - command.py:132 and 133 (move) and command.py:403, 404, and 405 (pop_unit) - and therefore exactly TWO branches that write coordinates, both inventoried above. Of the dispatcher's 63 named branches, only move and orient carry a movement or orientation name. move is TYPE-AGNOSTIC, checks nothing beyond the row's existence, and ALREADY SHIPS as godot-building-move, so this capability adds NO new server behaviour and reimplements nothing; pop_unit writes coordinates only when a row leaves a garrison and overwrites the item it pops. There is no move_unit, no step, no path, no arrive, and no movement command of any other kind (design D3/D6)",
+    "corrections": [
+      {
+        "figure": "the number of writes to a row's slots 0-2 across the seven legacy modules",
+        "investigation_states": 6,
+        "measured": 5,
+        "lines_measured": [
+          "command.py:132",
+          "command.py:133",
+          "command.py:403",
+          "command.py:404",
+          "command.py:405"
+        ],
+        "why": "the investigation's third table row cites engine.py:62 as 'item[0] = ...', but that line is `if item[0] == item_id:` - a COMPARISON inside engine.pop_unit's garrison scan, not an assignment. Measured over the same seven modules with an assignment pattern that excludes '==', the count is FIVE",
+        "what_is_unaffected": "the investigation's actual conclusion is CORRECT and independently re-measured: exactly TWO branches write coordinates (move and pop_unit), and orient is the only writer of slot 4"
+      },
+      {
+        "figure": "the committed units carrying the properties flag ft_flying",
+        "investigation_states": 135,
+        "measured": 137,
+        "measured_values": {
+          "0": 2,
+          "1": 135
+        },
+        "measured_value_type": "string: the normalized package carries the flag as the string '1' or the string '0', never as a boolean",
+        "lines_measured": [],
+        "why": "measured from the verified registry's units domain, the key is PRESENT on 137 of the 429 committed units, and its committed value reads '1' on 135 of them and '0' on 2 (id 1357, Bonecrusha' Drone). So the investigation's 135 is the count of units whose flag reads '1' and two further units carry the key as '0'; an earlier draft of this record wrongly reported 137 as a boolean-true count with no false value present, which measurement contradicts",
+        "what_is_unaffected": "ft_flying is one of the four sibling zero-consumer fields recorded for reference, not one of the four fields this capability reports as content, and its zero-consumer status is unaffected: the string occurs in none of the seven legacy modules"
+      }
+    ],
+    "note": "UNIT MOVEMENT IS CONTENT, NOT A SERVER OPERATION. The placement, the committed footprint, and the committed velocity are all read from the committed content package and the committed row already in hand, so there is no intent to send, no route to add, and nothing to authorise: NO compatibility API endpoint is added, NO client intent is issued, and NO persistence behaviour changes, which is why the compatibility test suite stays green UNCHANGED. The only legacy command that moves a row is already delivered by godot-building-move and is referenced here, never reimplemented (design D5/D6)"
+  },
+  "movement_commands_measured": {
+    "commands": 4,
+    "coordinate_writers": 2,
+    "named_branches": 63
+  },
+  "instant": {
+    "recorded": {
+      "command": "fast_forward",
+      "site": "command.py:905-946",
+      "seconds_source": "client args[0], with no validation of any kind",
+      "row_instant_write": "command.py:934 - data[3] = max(0, data[3] - seconds) for EVERY row in map['items']",
+      "queue_start_instant_write": "command.py:939 - data[6]['ts'] = max(0, data[6]['ts'] - seconds) for every row whose bag carries 'ts'",
+      "clamp": "max(0, ...) on both, so a shifted instant can never go negative and a large enough shift simply reads as zero",
+      "other_instants_shifted": [
+        "map['timestamp'] (910)",
+        "map['timestampLastChapter'] (911)",
+        "map['timestampLastTreasure'] (912)",
+        "map['timestampLastTrade'] (913)",
+        "privateState['timestampLastBonus'] (914)",
+        "privateState['timestampLastAllianceBonus'] (916)",
+        "privateState['timeStampDartsNewFree'] (918)",
+        "privateState['tsAttacksReset'] (919)",
+        "privateState['tsSpyingsReset'] (920)",
+        "every research timer in privateState['timeStampDoResearch'] (926-928)",
+        "every quest time in map['questTimes'] (943-944)"
+      ],
+      "client_writable": true,
+      "observable_effect": "NONE, and that is the finding: because no legacy branch evaluates a row's elapsed time, shifting the instant changes no outcome. It is recorded because it is the input a client-side readiness check would trust",
+      "treated_as": "an opaque recorded value",
+      "derived_from_it": false,
+      "rule": "THE ROW INSTANT IS CLIENT-WRITABLE, SO NO READINESS IS DERIVED FROM IT. fast_forward subtracts a client-supplied number of seconds from every row's recorded instant AND from every row's queue start instant, which means a client can rewrite both. The placement projection therefore reports the instant verbatim as an OPAQUE RECORDED VALUE and computes no elapsed time, no remaining time, and no readiness from it, consistent with the delivered godot-unit-queues and godot-unit-production refusals (design D4)"
+    },
+    "measured": {
+      "fast_forward_writes": 1,
+      "fast_forward_attr_ts": 2,
+      "other_instants_shifted": 11
+    },
+    "treatment": "opaque-recorded-value"
+  },
+  "tile_geometry_gap": "THE LEGACY TILE GEOMETRY WAS NEVER EXTRACTED, AND IT STAYS A GAP. The delivered M6 town work recorded that the legacy SWF's TILE_SIZE, EI_TILE_HEIGHT_PIXELS, and grid dimensions were never extracted from the Flash client, so pixel parity with it is not claimed. Because `elevation` is read by no legacy branch AND the tile geometry is unrecorded, NO terrain-aware movement could be derived from either source even if a rule were invented: this line implements none and fills the gap with no assumed geometry (design D2)",
+  "movement_implemented": false,
+  "no_endpoint": {
+    "added": false,
+    "movement_implemented": false,
+    "request_issued": false,
+    "route": "none: unit movement is committed content read through the content registry plus the committed row already in hand, so there is no intent to send and nothing to authorise",
+    "persistence_changed": false,
+    "compat_suite": "unchanged: no route, response field, error code, or persistence behaviour is added, so its test count does not move",
+    "unit_placed": false,
+    "unit_moved": false,
+    "building_move_referenced": "godot-building-move (M7), referenced and not reimplemented",
+    "note": "UNIT MOVEMENT IS CONTENT, NOT A SERVER OPERATION. The placement, the committed footprint, and the committed velocity are all read from the committed content package and the committed row already in hand, so there is no intent to send, no route to add, and nothing to authorise: NO compatibility API endpoint is added, NO client intent is issued, and NO persistence behaviour changes, which is why the compatibility test suite stays green UNCHANGED. The only legacy command that moves a row is already delivered by godot-building-move and is referenced here, never reimplemented (design D5/D6)"
+  },
+  "fixture": {
+    "captured": false,
+    "reason": "NO EXECUTED-LEGACY MOVEMENT FIXTURE WAS CAPTURED, AND THE REASON IS THE STRONGER ONE: there is NO unit-specific movement behaviour TO CAPTURE, not merely a corpus that could not exercise it. There is no movement rule, no movement command, and no unit row in the committed corpus (40 rows across 11 distinct ids, every one of committed type 'b'), so a fixture here would have to fabricate the state it claims to observe. The move command that DOES exist is already delivered, with its own executed-legacy fixture under tests/fixtures/godot-building-move/ and its own windowed capture and report under apps/client-godot/evidence/building-move/ - and that command's fixture is about a BUILDING row being rewritten, which is the same type-agnostic write a unit row would receive, not movement",
+    "reason_kind": "no unit-specific movement behaviour to capture, which is stronger than a corpus limitation",
+    "corpus_distinction": "the committed corpus also holds no unit row (40 rows, 11 distinct ids, all committed type 'b'), which is a SECOND and independent reason, deliberately kept separate from the first",
+    "existing_move_fixture": "the type-agnostic move command's own executed-legacy fixture is already delivered under tests/fixtures/godot-building-move/, with its windowed capture and deterministic report under apps/client-godot/evidence/building-move/ - and it records a BUILDING row's coordinates being rewritten, which is the same write a unit row would receive",
+    "fabricated_row": false
+  },
+  "absent_helpers": [
+    {
+      "helper": "travel_time",
+      "absent_because": "the committed velocity has zero legacy consumers, so a duration derived from it would invent the rule this line records as absent"
+    },
+    {
+      "helper": "speed",
+      "absent_because": "no legacy branch reads velocity at all, so there is no committed speed for anything to report as one"
+    },
+    {
+      "helper": "distance",
+      "absent_because": "no legacy branch computes a distance and the tile geometry was never extracted, so there is no committed distance function to reproduce"
+    },
+    {
+      "helper": "path",
+      "absent_because": "move writes a destination in a single assignment; no legacy branch plans, stores, or follows a route"
+    },
+    {
+      "helper": "find_path",
+      "absent_because": "the same absence: there is no committed search to reproduce, and the grid a path would search is the unrecorded tile geometry"
+    },
+    {
+      "helper": "terrain_at",
+      "absent_because": "the legacy SWF's tile geometry was never extracted, so no terrain lookup is possible from committed evidence"
+    },
+    {
+      "helper": "elevation_offset",
+      "absent_because": "elevation is read by no legacy branch, so no position may be computed from it, and no committed projection exists to copy"
+    },
+    {
+      "helper": "footprint_cells",
+      "absent_because": "footprint GEOMETRY belongs to the delivered town placement and move flows, which own it for every item; this module reports the committed numbers verbatim and computes no cell from them, which the measured uniform 1x1 unit footprint makes unnecessary anyway"
+    },
+    {
+      "helper": "is_occupied",
+      "absent_because": "move performs no occupancy check, and the delivered building-move flow records its occupancy rule as CLIENT-SIDE ONLY with no server-authoritative validation behind it"
+    },
+    {
+      "helper": "in_bounds",
+      "absent_because": "move performs no bounds check and consults no grid size; the delivered building-move flow's 0..99 grid is a client-side convention of that surface, not a committed legacy rule"
+    },
+    {
+      "helper": "is_arrived",
+      "absent_because": "nothing in the legacy source can answer whether a row has arrived: no command completes a journey and nothing evaluates elapsed time"
+    },
+    {
+      "helper": "is_ready",
+      "absent_because": "the row instant is client-writable through fast_forward, so a readiness answer computed here would trust a value the client can rewrite"
+    },
+    {
+      "helper": "elapsed",
+      "absent_because": "no legacy branch evaluates elapsed time; every occurrence of a row instant is a write or a deletion, and the one reader is the soul-mixer speedup, which is not a movement path"
+    },
+    {
+      "helper": "interpolate",
+      "absent_because": "no legacy branch computes an intermediate position, and the only two instants this projection could interpolate between are both client-writable through fast_forward"
+    },
+    {
+      "helper": "position_at",
+      "absent_because": "the same absence as interpolate, stated as a reader: asking this projection for a position at a moment would be asking for a rule the legacy server never had"
+    },
+    {
+      "helper": "rotate_to",
+      "absent_because": "orient is a plain client-supplied slot write with no rotation rule, so no facing, turning, or shortest-arc computation may be added here"
+    },
+    {
+      "helper": "animate_move",
+      "absent_because": "animation is a separate later line, and the M4 converted unit package establishes asset and timeline LINKAGE only, never playback correctness or gameplay behaviour"
+    },
+    {
+      "helper": "apply_velocity",
+      "absent_because": "the committed velocity is content only: reporting it is the whole contract, and applying it would be the invented rule the zero-consumer measurement exists to prevent"
+    }
+  ],
+  "non_claims": [
+    "no Flash, Ruffle, ActionScript, or browser executed",
+    "NO VELOCITY-BASED TRAVEL TIME, PATH, TERRAIN OR ELEVATION INTERACTION, OCCUPANCY, BOUNDS, READINESS, OR INTERPOLATION IS IMPLEMENTED: each is a recorded refusal with its reason attached, not an omission",
+    "THE COMMITTED MOVEMENT FIELDS ARE READ BY NO LEGACY BRANCH and are reported as CONTENT ONLY: velocity, width, height, and elevation each have zero occurrences across the seven legacy modules",
+    "NO UNIT-SPECIFIC MOVEMENT COMMAND EXISTS IN THE LEGACY SOURCE AND NONE WAS INVENTED: exactly two branches write coordinates and the one that moves an existing row is type-agnostic, already delivered, and checks nothing",
+    "NO UNIT IS PLACED OR MOVED, and the committed corpus holds NO unit row: 40 rows across 11 distinct ids, every one of committed type 'b'",
+    "NO EXECUTED-LEGACY FIXTURE WAS CAPTURED, and the reason is the absence of behaviour rather than only the corpus's missing unit row; the move command that does exist is already delivered with its own fixture",
+    "NO ANIMATION IS IMPLEMENTED: the converted unit package establishes asset and timeline linkage only, never playback correctness",
+    "NO PIXEL PARITY IS CLAIMED and the legacy tile geometry remains a recorded gap, never an assumed one",
+    "no windowed capture is claimed: nothing is rendered and no unit exists to render",
+    "NO ENDPOINT AND NO CLIENT INTENT: unit movement is committed content read through the content registry, so the compatibility suite stays green unchanged",
+    "godot-building-move is REFERENCED, never reimplemented: this line adds the unit placement VIEW and the recorded facts about the command, and touches no endpoint, flow, or evidence of that line",
+    "a reader who wanted a travel-time or terrain rule out of the reported content must bring evidence the legacy contract does not contain"
+  ],
+  "provenance": {
+    "established": [
+      {
+        "fact": "move rewrites a row's slots 1 and 2 from client arguments and performs no type, occupancy, bounds, terrain, or speed check; its args[3] frame and args[4] string are read and unused",
+        "evidence": "command.py:119-134, the whole branch; the suite re-derives the branch name, its five argument reads, its two assignments, and the two unused arguments out of the committed dispatcher"
+      },
+      {
+        "fact": "exactly FIVE assignments to a row's slots 0-2 exist across the seven legacy root modules, and therefore exactly TWO branches write coordinates: move, and pop_unit",
+        "evidence": "command.py:132, 133, 403, 404, 405, measured with an assignment pattern that excludes '==' over command.py, engine.py, sessions.py, server.py, constants.py, get_game_config.py, and version.py"
+      },
+      {
+        "fact": "pop_unit overwrites the popped row's committed item with the client-sent id, so its garrison match check is self-confirming",
+        "evidence": "command.py:397-405 against engine.py:58-68, where the popped row is matched on the same client id that is then written back into its slot 0"
+      },
+      {
+        "fact": "orient is a plain client-supplied slot-4 write and the only writer of slot 4 in the committed source",
+        "evidence": "command.py:198-207, and a measurement of every assignment to slot 4 across the seven modules"
+      },
+      {
+        "fact": "fast_forward subtracts a client-supplied seconds from every row's slot-3 instant and every row's attr['ts'], and validates nothing",
+        "evidence": "command.py:905-946, in particular 934 and 939"
+      },
+      {
+        "fact": "velocity, width, height, elevation, max_elem_vol, attack_range, ft_flying, and ft_ground each have ZERO occurrences across the seven legacy root modules",
+        "evidence": "a substring search per field over command.py, engine.py, sessions.py, server.py, constants.py, get_game_config.py, and version.py, which the suite repeats for all eight fields"
+      },
+      {
+        "fact": "velocity is positive on all 429 committed units and on 145 of the 470 committed buildings, taking exactly three building values",
+        "evidence": "the committed normalized content package, measured by the suite through the verified registry"
+      },
+      {
+        "fact": "the committed unit footprint is uniform: width, height, and elevation are positive on all 429 units and the trio takes the single value 1 on every one of them",
+        "evidence": "the same measured content package; a footprint needing no geometry is a measurement, not an assumption"
+      },
+      {
+        "fact": "the dispatcher has 63 named branches, and only move and orient carry a movement or orientation name",
+        "evidence": "command.py's own if/elif chain, measured by the suite, which compares the measured names against MOVEMENT_NAMED_BRANCHES"
+      },
+      {
+        "fact": "the committed corpus places 40 rows across 11 distinct item ids, all of committed type 'b', with an empty storage, an empty inventory, and 40 empty attribute bags",
+        "evidence": "tests/saves/fresh-player.json, measured by the suite"
+      },
+      {
+        "fact": "the legacy SWF's tile geometry was never extracted, so pixel parity with the Flash client is not claimed",
+        "evidence": "the recorded M6 town-vertical-slice evidence gap, restated here and implemented not at all"
+      }
+    ],
+    "derived": [
+      {
+        "fact": "the line's deliverable is a placement projection plus an auditable refusal rather than a movement mechanism",
+        "evidence": "derived (design D1): with no movement rule, no movement-named command, and no unit row in the corpus, any mechanism would be invented, while a velocity positive on every unit definition is the specific trap this record closes"
+      },
+      {
+        "fact": "the movement-command inventory belongs to this line rather than to a later animation line",
+        "evidence": "derived (design D3): the classification is what makes the absence auditable rather than asserted, so it had to arrive with the refusal it supports. Its scope is closed over the committed legacy source, and a later line extends it explicitly"
+      },
+      {
+        "fact": "no endpoint is warranted while no server-derived movement exists",
+        "evidence": "derived (design D5): there is no intent to send and nothing to authorise, so the compatibility test suite stays green unchanged, exactly as M8 lines 1, 2, and 4 concluded"
+      },
+      {
+        "fact": "the placement projection is type-agnostic",
+        "evidence": "derived from an ESTABLISHED fact: move - the only command that moves an existing row - never reads the addressed row's committed type, so a type gate here would be a rule the legacy contract does not have. The delivered USE is the unit row; the projection itself refuses nothing about a row's type"
+      },
+      {
+        "fact": "the placement view reads its slot indices from the instance model rather than re-deriving the row shape",
+        "evidence": "derived (D6 and the godot-unit-instances delta): the instance capability owns the row and this one owns the placement reading of it, so a shared index is the only way the two cannot drift"
+      }
+    ]
+  },
+  "investigation_corrections": [
+    {
+      "figure": "the number of writes to a row's slots 0-2 across the seven legacy modules",
+      "investigation_states": 6,
+      "measured": 5,
+      "lines_measured": [
+        "command.py:132",
+        "command.py:133",
+        "command.py:403",
+        "command.py:404",
+        "command.py:405"
+      ],
+      "why": "the investigation's third table row cites engine.py:62 as 'item[0] = ...', but that line is `if item[0] == item_id:` - a COMPARISON inside engine.pop_unit's garrison scan, not an assignment. Measured over the same seven modules with an assignment pattern that excludes '==', the count is FIVE",
+      "what_is_unaffected": "the investigation's actual conclusion is CORRECT and independently re-measured: exactly TWO branches write coordinates (move and pop_unit), and orient is the only writer of slot 4"
+    },
+    {
+      "figure": "the committed units carrying the properties flag ft_flying",
+      "investigation_states": 135,
+      "measured": 137,
+      "measured_values": {
+        "0": 2,
+        "1": 135
+      },
+      "measured_value_type": "string: the normalized package carries the flag as the string '1' or the string '0', never as a boolean",
+      "lines_measured": [],
+      "why": "measured from the verified registry's units domain, the key is PRESENT on 137 of the 429 committed units, and its committed value reads '1' on 135 of them and '0' on 2 (id 1357, Bonecrusha' Drone). So the investigation's 135 is the count of units whose flag reads '1' and two further units carry the key as '0'; an earlier draft of this record wrongly reported 137 as a boolean-true count with no false value present, which measurement contradicts",
+      "what_is_unaffected": "ft_flying is one of the four sibling zero-consumer fields recorded for reference, not one of the four fields this capability reports as content, and its zero-consumer status is unaffected: the string occurs in none of the seven legacy modules"
+    }
+  ],
+  "legacy_measured": {
+    "modules": 7,
+    "slot_0_2_writes": [
+      "command.py:132",
+      "command.py:133",
+      "command.py:403",
+      "command.py:404",
+      "command.py:405"
+    ],
+    "named_branches": 63,
+    "movement_branches": [
+      "move",
+      "orient"
+    ],
+    "zero_consumer_fields": [
+      "velocity",
+      "width",
+      "height",
+      "elevation",
+      "max_elem_vol",
+      "attack_range",
+      "ft_flying",
+      "ft_ground"
+    ],
+    "move_argument_count": 5
+  },
+  "corpus": {
+    "placement_rows": 40,
+    "non_empty_garrisons": 0,
+    "unit_rows": 0,
+    "unit_row_note": "the committed corpus holds no unit row, so no unit placement and no unit move exist to observe",
+    "sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5"
+  },
+  "projection_measured": {
+    "rows": 1,
+    "corpus_rows": 40,
+    "corpus_all_buildings": true,
+    "corpus_non_empty_garrisons": 0
+  },
+  "inputs": {
+    "content_package": {
+      "manifest": "packages/game-content/manifest.json",
+      "outputs_verified": 22,
+      "bytes_verified": 1905917,
+      "fingerprint": "",
+      "units_json_sha256": "6a7121cdefddf4835ac90c408c98da762b7ccd7de866aea749368beffdad36e0",
+      "buildings_json_sha256": "13ac38e95312af44819a5e8e7af4d7efa306afe879415da872e66914721b2f4d"
+    }
+  }
+}
