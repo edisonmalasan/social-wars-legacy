@@ -113,7 +113,11 @@ no request, and no client intent to create, complete, or award a unit. The compa
 suite SHALL remain green **unchanged**. Any client-supplied acquisition key — an item id, a
 package id, or an item list — SHALL be recorded as client-supplied and SHALL NOT be treated as
 authorising, and the content it might otherwise be validated against is named as belonging to a
-later capability.
+later capability. **This finding is completed, not amended**, by the `godot-unit-collection`
+capability: the committed collection completion route derives its grant from the committed
+collection table and is the **only** content-derived acquisition path, so no committed unit is
+obtainable through the client-supplied routes named here — but a unit **is** obtainable
+through that one content-derived route, and it is the sole exception.
 
 #### Scenario: No compatibility surface is added
 
@@ -129,6 +133,12 @@ later capability.
 
 - **WHEN** an item id, package id, or item list originates from a client argument
 - **THEN** it is recorded as client-supplied, and the committed table it might otherwise be validated against is named as a later capability's work rather than enforced or trusted here
+
+#### Scenario: The acquisition finding names the one content-derived route
+- **WHEN** this requirement's acquisition finding is read
+- **THEN** it names the client-supplied routes as unusable **and** points to the
+  `godot-unit-collection` capability for the single content-derived route, so the finding is not
+  read as "no committed unit is obtainable anywhere"
 
 ### Requirement: Unit-production evidence and claim limits
 
