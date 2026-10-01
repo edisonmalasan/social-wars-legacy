@@ -1,0 +1,650 @@
+{
+  "acquisition": {
+    "client_supplied_routes": [
+      {
+        "branch": "buy_offer_pack",
+        "classification": "client-supplied",
+        "implemented": false,
+        "input": "client args[1], a JSON array of ids",
+        "note": "reads `package_id` and never uses it, then json.loads a client-sent array with NO lookup into the committed offer_packs table",
+        "site": "command.py:716"
+      },
+      {
+        "branch": "buy_stored_item_cash",
+        "classification": "client-supplied",
+        "implemented": false,
+        "input": "client args[0], one id",
+        "note": "the same shape with a single client-sent id stored with no check at all",
+        "site": "command.py:479"
+      }
+    ],
+    "client_supplied_routes_implemented": 0,
+    "content_derived_routes": [
+      {
+        "branch": "complete_collection",
+        "call": "add_store_item",
+        "classification": "content-derived",
+        "implemented": true,
+        "input": "committed content: the collection's own `prize` bag",
+        "note": "the ONE route whose stored ids come from committed content: `get_collection_prize(collection_id)` returns `json.loads(collections[index]['prize'])` and the branch stores every entry of it. This line implements this route and no other",
+        "site": "command.py:513"
+      }
+    ],
+    "not_an_acquisition_route": "`unit_collections_completed` (command.py:482-489) calls engine.unit_collection_complete, which only APPENDS an id to privateState['unitCollectionsCompleted'] (engine.py:91-94) and grants nothing at all. It is a unit COLLECTION TRACKER, a different concept from the `collections` table this line completes, and it is not an acquisition route. The committed `unit_collection_categories` table (20 rows) is read by no branch either, and `collect_mission` (command.py:430) writes `idCurrentMission` and a timestamp and is unrelated to items",
+    "note": "EXACTLY ONE ACQUISITION ROUTE IS CONTENT-DERIVED AND IT IS THIS ONE. `complete_collection` stores ids that come out of the committed `collections` table, so the server decides what a caller receives; the two plausible unit sources recorded by the delivered godot-unit-production capability (`buy_offer_pack` and `buy_stored_item_cash`) are unvalidated CLIENT-SENT lists, and this line implements NEITHER of them, issues NO request for either, and treats no client-supplied item id, package id, or item list as authorising. That is the completion the production line's acquisition finding needed: the finding is COMPLETE, not contradicted \u2014 a committed unit IS obtainable, and only through this one route"
+  },
+  "captured": {
+    "completion": true,
+    "note": "A complete_collection WAS captured and the stored-item placement step was NOT CHAINED. The two together form a committed, server-derived path by which a unit enters a town (complete_collection -> map['store'] -> place_stored_item), but the round trip is a SEPARATE carried follow-up and delivering it here would widen this line past its contract. THIS FIXTURE THEREFORE EVIDENCES A GRANT INTO STORAGE AND NOT A UNIT PLACED ON THE MAP; the placement count is unchanged at 40 across the whole transaction and no map row is written",
+    "stored_item_placement_chained": false
+  },
+  "cleanup": {
+    "disposable_removed_before_manifest_write": true,
+    "server_stopped_within_run": true
+  },
+  "containment": {
+    "disposable_copy_removed": true,
+    "fixture_output": "tests/fixtures/godot-unit-collection",
+    "identical": true,
+    "loopback_only": true,
+    "method": "SHA-256 snapshot of every read working-tree group before the run and after the server stopped; equal or the run fails before writing fixtures. The twelve already committed boot, placement, purchase, move, sell, store, upgrade, construction, collect, expand, level, and queue fixtures are digest-pinned for the same reason.",
+    "no_flash_browser_external_network": true,
+    "only_working_tree_writes": "fixture files under --out",
+    "post_combined_sha256": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "post_run": {
+      "config": {
+        "exists": true,
+        "files": 12,
+        "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+      },
+      "mods": {
+        "exists": true,
+        "files": 2,
+        "sha256": "81b3c6e1f426e8813d96028b9035a853c1fbff8716256e84e956d8826f136ba3"
+      },
+      "root_python": {
+        "exists": true,
+        "files": 11,
+        "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+      },
+      "saves": {
+        "exists": false,
+        "files": 0,
+        "sha256": "absent"
+      },
+      "templates": {
+        "exists": true,
+        "files": 19,
+        "sha256": "2dffe0ca8746b63cf64fd1062a7f259ba2bb85a2fc54f7a2cd2bd2564ffee4ef"
+      },
+      "tests/saves": {
+        "exists": true,
+        "files": 3,
+        "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+      },
+      "villages": {
+        "exists": true,
+        "files": 31,
+        "sha256": "92429a07402766d8183b16fb32178b5c51f1e555df69d3cb46085a7d977f96ea"
+      }
+    },
+    "pre_combined_sha256": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "pre_run": {
+      "config": {
+        "exists": true,
+        "files": 12,
+        "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+      },
+      "mods": {
+        "exists": true,
+        "files": 2,
+        "sha256": "81b3c6e1f426e8813d96028b9035a853c1fbff8716256e84e956d8826f136ba3"
+      },
+      "root_python": {
+        "exists": true,
+        "files": 11,
+        "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+      },
+      "saves": {
+        "exists": false,
+        "files": 0,
+        "sha256": "absent"
+      },
+      "templates": {
+        "exists": true,
+        "files": 19,
+        "sha256": "2dffe0ca8746b63cf64fd1062a7f259ba2bb85a2fc54f7a2cd2bd2564ffee4ef"
+      },
+      "tests/saves": {
+        "exists": true,
+        "files": 3,
+        "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+      },
+      "villages": {
+        "exists": true,
+        "files": 31,
+        "sha256": "92429a07402766d8183b16fb32178b5c51f1e555df69d3cb46085a7d977f96ea"
+      }
+    },
+    "protected_fixtures": {
+      "identical": true,
+      "paths": [
+        "tests/fixtures/godot-compatibility-boot",
+        "tests/fixtures/godot-building-placement",
+        "tests/fixtures/godot-item-purchase",
+        "tests/fixtures/godot-building-move",
+        "tests/fixtures/godot-building-sell",
+        "tests/fixtures/godot-building-store",
+        "tests/fixtures/godot-building-upgrade",
+        "tests/fixtures/godot-building-construction",
+        "tests/fixtures/godot-building-collect",
+        "tests/fixtures/godot-building-expand",
+        "tests/fixtures/godot-building-xp",
+        "tests/fixtures/godot-unit-queues"
+      ],
+      "post_run": {
+        "godot-building-collect": {
+          "exists": true,
+          "files": 12,
+          "sha256": "c2ebf3b0778a994e97310b5247809fda57b940cb04b1d1215db787dd81009fa8"
+        },
+        "godot-building-construction": {
+          "exists": true,
+          "files": 12,
+          "sha256": "8efdebcf8e5b91251a48f17d840380da8cd48ea33a922656c67acb115d3c3751"
+        },
+        "godot-building-expand": {
+          "exists": true,
+          "files": 12,
+          "sha256": "08829b34c70979ffd8e887e98bb77d5d6b53774817b393f6388795ff5eb98d19"
+        },
+        "godot-building-move": {
+          "exists": true,
+          "files": 12,
+          "sha256": "b3c477a7947fbe409330f03a8658cdca707a2631b52d1d4c5127f440619799c1"
+        },
+        "godot-building-placement": {
+          "exists": true,
+          "files": 12,
+          "sha256": "546a5f00e5e45319ffd17f5ee67201dd2b72cb21de833a3e35e8a9a98d60c5a8"
+        },
+        "godot-building-sell": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fa85af3fb12ef8b9298203a64632b6d7b31c1ed48f8d1ba716151f25ec7ab1c4"
+        },
+        "godot-building-store": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d4dff84132353a60e3a005c42d067185772ec8d6a2548ffdc5aa4779a2055194"
+        },
+        "godot-building-upgrade": {
+          "exists": true,
+          "files": 12,
+          "sha256": "398675ad94928dd75f7fbcd9f62e082d73ee973d3c973f5bbdf44a083a9c0521"
+        },
+        "godot-building-xp": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fd7d9f43e05a4b858fb5aa2589094fe19c9e1ec0340adedb2645e15ad9ef3b50"
+        },
+        "godot-compatibility-boot": {
+          "exists": true,
+          "files": 31,
+          "sha256": "4d389707e0f18676fb23b3a2a8a47031b4e233366e4066437f8bad6854e15234"
+        },
+        "godot-item-purchase": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d05e5b92b26a1222774bb32e76a42417c692e65ee1b87abdb8a2f4e6cd84e813"
+        },
+        "godot-unit-queues": {
+          "exists": true,
+          "files": 17,
+          "sha256": "7f506cb0863a4eea2d33a23ffa792277875adb89665177646b1a186a65f6c551"
+        }
+      },
+      "pre_run": {
+        "godot-building-collect": {
+          "exists": true,
+          "files": 12,
+          "sha256": "c2ebf3b0778a994e97310b5247809fda57b940cb04b1d1215db787dd81009fa8"
+        },
+        "godot-building-construction": {
+          "exists": true,
+          "files": 12,
+          "sha256": "8efdebcf8e5b91251a48f17d840380da8cd48ea33a922656c67acb115d3c3751"
+        },
+        "godot-building-expand": {
+          "exists": true,
+          "files": 12,
+          "sha256": "08829b34c70979ffd8e887e98bb77d5d6b53774817b393f6388795ff5eb98d19"
+        },
+        "godot-building-move": {
+          "exists": true,
+          "files": 12,
+          "sha256": "b3c477a7947fbe409330f03a8658cdca707a2631b52d1d4c5127f440619799c1"
+        },
+        "godot-building-placement": {
+          "exists": true,
+          "files": 12,
+          "sha256": "546a5f00e5e45319ffd17f5ee67201dd2b72cb21de833a3e35e8a9a98d60c5a8"
+        },
+        "godot-building-sell": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fa85af3fb12ef8b9298203a64632b6d7b31c1ed48f8d1ba716151f25ec7ab1c4"
+        },
+        "godot-building-store": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d4dff84132353a60e3a005c42d067185772ec8d6a2548ffdc5aa4779a2055194"
+        },
+        "godot-building-upgrade": {
+          "exists": true,
+          "files": 12,
+          "sha256": "398675ad94928dd75f7fbcd9f62e082d73ee973d3c973f5bbdf44a083a9c0521"
+        },
+        "godot-building-xp": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fd7d9f43e05a4b858fb5aa2589094fe19c9e1ec0340adedb2645e15ad9ef3b50"
+        },
+        "godot-compatibility-boot": {
+          "exists": true,
+          "files": 31,
+          "sha256": "4d389707e0f18676fb23b3a2a8a47031b4e233366e4066437f8bad6854e15234"
+        },
+        "godot-item-purchase": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d05e5b92b26a1222774bb32e76a42417c692e65ee1b87abdb8a2f4e6cd84e813"
+        },
+        "godot-unit-queues": {
+          "exists": true,
+          "files": 17,
+          "sha256": "7f506cb0863a4eea2d33a23ffa792277875adb89665177646b1a186a65f6c551"
+        }
+      }
+    },
+    "working_tree_saves_unchanged": true
+  },
+  "corpus": {
+    "login_preserved_seed": true,
+    "pid": "00000000-0000-4000-8000-000000000001",
+    "seed": {
+      "file_sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+      "path": "tests/saves/fresh-player.json",
+      "saves_group_sha256_before_server_start": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6"
+    },
+    "seeded_as": "saves/<pid>.save.json in the disposable copy",
+    "startup_preserved_seed": true
+  },
+  "executed_at_utc": "2026-10-01T03:33:54+00:00",
+  "exit_code": 0,
+  "grant": {
+    "alias_rule": "THE CLAMP IS AN ALIAS, REPORTED NOT HIDDEN. `max(0, collection - 1)` clamps BELOW the requested index, so EVERY collection id <= 1 \u2014 id 0 and every negative id \u2014 resolves to index 0 and therefore to the SAME committed prize as id 1 (Draggy Collection, unit 1085 Metal Draggy). In particular COLLECTION ID 0 AND COLLECTION ID 1 RESOLVE TO THE SAME PRIZE, and this contract never presents id 0 as a distinct collection. The alias is a recorded legacy-contract fact, NOT permission to widen the route: the grant contents stay content-derived, because the aliased ids all select a genuine committed row rather than manufacturing one",
+    "bought_flag": "args[1] is read into `bought` and used in ONE printed line only (command.py:520-523): truthy prints 'Bought <name>' and falsy prints 'Completed <name>'. Nothing is written, returned, or persisted, so the derivation sends 0 \u2014 the COMPLETED wording \u2014 and the choice is recorded as DERIVED, never observed: no executed-legacy evidence establishes which wording a real client produced. The flag is therefore irrelevant to every post-execution proof on this route",
+    "committed_table": "config/main.json -> collections (10 entries)",
+    "derivation": "the granted id and quantity were DERIVED from the committed collections table by get_collection_prize(collection_id) -> json.loads(collections[max(0, collection_id - 1)]['prize']); nothing about the grant came from the request, and the endpoint's post-execution proof compares the persisted storage against THAT committed bag rather than against any client-supplied expectation",
+    "derived_from_committed_content": true,
+    "four_building_collections": [
+      4,
+      7,
+      8,
+      9
+    ],
+    "grant_pointer": "/maps/0/store/1085",
+    "index_base": "one-based, derived-provisional",
+    "index_rejected_alternative": "zero-based",
+    "index_rule": "THE COLLECTION ID SPACE IS 1-BASED AND THE LOOKUP IS POSITIONAL. get_collection_prize (get_game_config.py:170-175) computes `index = max(0, collection - 1)`, bounds-checks `index < len(collections)` against the loaded configuration's `collections` LIST, and returns `json.loads(collections[index]['prize'])`. So the id a client names is one greater than the array position it selects. The 1-based reading is DERIVED-PROVISIONAL and is corroborated by the stored content rather than merely plausible: config/main.json stores ten rows whose own native `id` column runs '1'..'10' over the ten ARRAY POSITIONS 0..9, so `collection - 1` maps that native id onto exactly its own position. Nothing here is observed from the Flash client",
+    "no_eligibility_check": "NO ELIGIBILITY CHECK IS PERFORMED BY THE LEGACY SERVER AND NONE IS IMPLEMENTED HERE. get_collection_prize clamps the index and bounds-checks it against the committed table, and complete_collection (command.py:504-523) never looks at the caller's collection state: the only read of privateState['collections'] in the whole legacy source is the append-if-absent test at command.py:517, and the committed `item_ids` requirement list is read by NO branch at all. So a caller may name ANY of the ten committed collections and receives whatever that collection genuinely grants. Adding a check would invent a rule the legacy server does not have (design D2): the recorded absence of a check is a property of the legacy contract, not permission to invent one, and authoritative validation belongs to a later server-authoritative milestone",
+    "six_unit_collections": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      10
+    ]
+  },
+  "harvester": "harvester is NOT A COMMITTED CONTENT FIELD AT ALL. The string occurs exactly FIVE times in the stored configuration and every one of them is a flag key inside a committed `properties` blob, never a field of its own: unit 1001 Worker I, 1039 Worker II, 1040 Worker III, 1041 Worker IV, and 1125 Orc Worker. All five record `collect` 0, so the 'harvester' set is disjoint from any positive collect amount \u2014 and it is also disjoint from the legacy source, which contains zero occurrences of the string. This corrects the committed investigation's framing of harvester as a committed item field carrying a positive value on five units: it is a properties flag on five units, with no value at all",
+  "intent": {
+    "collection_id_rule": "the collection id is the completion's ONLY meaningful argument (command.py:505); no prize, item id, quantity, price, or resource delta is accepted, and the extra keys a client might add are ignored",
+    "collection_id_sent": 1,
+    "commands_per_batch": 1,
+    "derived": {
+      "args": [
+        1,
+        0
+      ],
+      "bought_flag": 0,
+      "bought_note": "args[1] is read into `bought` and used in ONE printed line only (command.py:520-523): truthy prints 'Bought <name>' and falsy prints 'Completed <name>'. Nothing is written, returned, or persisted, so the derivation sends 0 \u2014 the COMPLETED wording \u2014 and the choice is recorded as DERIVED, never observed: no executed-legacy evidence establishes which wording a real client produced. The flag is therefore irrelevant to every post-execution proof on this route",
+      "command": "complete_collection",
+      "resources_changed": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "envelope_keys": [
+      "accessToken",
+      "commands",
+      "first_number",
+      "publishActions",
+      "tries",
+      "ts"
+    ],
+    "resource_vector": "unknown, xp, gold, wood, oil, steel, cash, mana",
+    "status": "established: the branch's exact argument list, the COMMITTED prize it grants, the append-if-absent ledger rule, the ABSENCE of any eligibility check, and the resulting states of this executed transaction. DERIVED and never observed from the Flash client: that a real client sends exactly this batch, that the `bought` flag is 0, and that the derived vector is neutral. The claim is about what the legacy server does with a collection id, NEVER about what a Flash client sent, and no cost, income, cap, or experience award is claimed",
+    "vector_is_neutral": true,
+    "vector_rule": "NO completion price is claimed or implemented (design D5): a completion's price would be a CLIENT-SENT delta, because do_command applies the request's per-command vector before the branch (command.py:40; engine.py:251-271) as max(current + delta, 0). The derived vector is NEUTRAL and the endpoint requires every stored resource to be UNCHANGED"
+  },
+  "interpreter": {
+    "executable": "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+    "requirement": "CPython 3.9.x (pinned baseline for this change)",
+    "version": "3.9.13 (tags/v3.9.13:6de2ca5, May 17 2022, 16:36:42) [MSC v.1929 64 bit (AMD64)]"
+  },
+  "invocation": "python -B apps/compat-api/capture_collection_fixture.py",
+  "probes": [
+    {
+      "changed_top_level_map_keys": [
+        "store",
+        "xp"
+      ],
+      "commands": [
+        "complete_collection([1, 0]) with a CLIENT-SENT vector [0, 500, 0, 0, 0, 0, 0, 0]"
+      ],
+      "established": "the branch writes ONLY map['store'] and (when absent) the private state's collection ledger (command.py:504-523): the experience move is entirely client-sent, because apply_resources runs BEFORE the branch (command.py:40; engine.py:251-271) and applies the 8-slot vector verbatim per resource as max(current + delta, 0)",
+      "executed_in_this_capture": true,
+      "grant_note": "maps[0]['store'] grew from {'1085': 1} to {'1085': 2}, so the committed bag was granted a SECOND time from the same already-completed collection",
+      "leaf_differences": [
+        "/maps/0/store/1085",
+        "/maps/0/xp"
+      ],
+      "ledger_after": [
+        1
+      ],
+      "ledger_before": [
+        1
+      ],
+      "ledger_note": "privateState['collections'] stayed [1]: the append is if-absent (command.py:517), so the LEDGER is idempotent while the GRANT is not",
+      "other_resources": "gold 2000, wood 2000, oil 2000, steel 2000, playerInfo.cash 5 and privateState.mana 0 all unchanged",
+      "probe": 1,
+      "question": "what does a collection completion actually write, and does a client-sent resource vector really move a balance through it?",
+      "resources_after": {
+        "cash": 5,
+        "gold": 2000,
+        "mana": 0,
+        "oil": 2000,
+        "steel": 2000,
+        "wood": 2000,
+        "xp": 504
+      },
+      "resources_before": {
+        "cash": 5,
+        "gold": 2000,
+        "mana": 0,
+        "oil": 2000,
+        "steel": 2000,
+        "wood": 2000,
+        "xp": 4
+      },
+      "response": "{\"result\":\"success\"}",
+      "store_after": {
+        "1085": 2
+      },
+      "store_before": {
+        "1085": 1
+      },
+      "why_it_matters": "two claims in this contract would otherwise be tautologies. (a) The derived NEUTRAL vector: a completion carrying a non-zero slot moves a balance through this very branch, so requiring that EVERY stored resource be unchanged after execution distinguishes a correct completion from a resource-minting exploit wearing its clothes (design D1/D5). (b) The append-if-absent rule: the ledger staying at [1] while the prize was granted AGAIN is the executed proof that the ledger is idempotent and the grant is not, which is exactly what the endpoint's second proof half has to reproduce",
+      "xp_after": 504,
+      "xp_before": 4
+    },
+    {
+      "changed_top_level_map_keys": [
+        "store",
+        "xp"
+      ],
+      "commands": [
+        "complete_collection([10, 0]) \u2014 collection 10 'Animal Collection', whose committed item_ids are [61, 62, 63, 64, 65] and whose committed prize is unit 1056 Elephant rider; the corpus places NONE of those five items"
+      ],
+      "established": "NO eligibility check exists. The committed `item_ids` requirement list is read by NO branch in the legacy source (zero quoted \"item_ids\" occurrences across the ten legacy root modules), and the completion branch never looks at the caller's collection state: the only read of privateState['collections'] is the append-if-absent test at command.py:517",
+      "executed_in_this_capture": true,
+      "grant_note": "maps[0]['store'] gained '1056': 1, on top of the already-granted '1085': 2",
+      "leaf_differences": [
+        "/maps/0/store/1056",
+        "/maps/0/xp",
+        "/privateState/collections"
+      ],
+      "ledger_after": [
+        1,
+        10
+      ],
+      "ledger_before": [
+        1
+      ],
+      "ledger_note": "privateState['collections'] grew from [1] to [1, 10]",
+      "probe": 2,
+      "question": "does the legacy server check that a collection's items were actually collected before granting its prize?",
+      "resources_after": {
+        "cash": 5,
+        "gold": 2000,
+        "mana": 0,
+        "oil": 2000,
+        "steel": 2000,
+        "wood": 2000,
+        "xp": 1004
+      },
+      "resources_before": {
+        "cash": 5,
+        "gold": 2000,
+        "mana": 0,
+        "oil": 2000,
+        "steel": 2000,
+        "wood": 2000,
+        "xp": 504
+      },
+      "response": "{\"result\":\"success\"}",
+      "store_after": {
+        "1056": 1,
+        "1085": 2
+      },
+      "store_before": {
+        "1085": 2
+      },
+      "why_it_matters": "it is the executed evidence for design D2's authority gap. A caller may name ANY of the ten committed collections and receive whatever that collection genuinely grants. This contract RECORDS that gap and implements no check, because adding one would invent a rule the legacy server does not have; authoritative validation belongs to a later server-authoritative milestone. The probe also shows the grant's contents stay content-derived even when eligibility is unchecked: the client chose WHICH collection, never WHAT it received",
+      "xp_after": 1004,
+      "xp_before": 504
+    }
+  ],
+  "purpose": "Executed request/before/response/after fixtures for a legacy complete_collection on the committed corpus's empty storage and empty collection ledger; the executed-legacy parity oracle for the Compatibility API v0 collection endpoint and the project's FIRST content-derived, server-authoritative unit acquisition.",
+  "recorded_steps": {
+    "bought_units_after": [],
+    "bought_units_before": [],
+    "cap_interpreted": false,
+    "cap_note": "NO cap is interpreted: max_collects is 0 on all 429 units, so the cap building-collect refuses has NO unit analogue and no threshold exists to read",
+    "clamp_exercised": false,
+    "clamp_note": "legacy's max(current + delta, 0) only bites when a delta would drive a balance below zero; the derived vector is the NEUTRAL all-zero vector, so no balance moves at all and the clamp is never exercised by this fixture. That the vector really is client-sent and really would move a balance through this very branch is established by probe 1 above",
+    "count": 2,
+    "dead_heroes_after": {},
+    "eligibility_checked": false,
+    "eligibility_note": "NO eligibility check runs, before or after execution: the committed `item_ids` requirement list is read by no branch at all, so a caller may name ANY of the ten committed collections. Recorded, not fixed (design D2); probe 2 is the executed evidence",
+    "grant_writes": [
+      "engine.apply_resources applies the derived NEUTRAL vector on the single command with max(..., 0) per resource, BEFORE the branch (command.py:40; engine.py:251-271)",
+      "get_collection_prize reads the committed collections table positionally and json.loads the selected row's `prize` (get_game_config.py:170-175)",
+      "engine.add_store_item creates map['store'][str(item_id)] with the committed quantity when the key is absent and increments it when present (engine.py:70-75) \u2014 nothing else",
+      "complete_collection appends the collection id to privateState['collections'] ONLY when it is absent (command.py:517-518) \u2014 nothing else"
+    ],
+    "income_derived": false,
+    "income_note": "NO income and NO payout are derived: no committed unit records a positive `collect` (0 of 429), `max_collects` is 0 on every unit, and no collect field has a legacy consumer (design D5)",
+    "ledger_after": [
+      1
+    ],
+    "ledger_before": [],
+    "map_key_set_unchanged": true,
+    "other_map_fields_unchanged": true,
+    "other_rows_unchanged": true,
+    "placement_count_after": 40,
+    "placement_count_before": 40,
+    "player_info_unchanged": true,
+    "private_state_unchanged_except_ledger": true,
+    "resource_delta": {
+      "cash": 0,
+      "gold": 0,
+      "mana": 0,
+      "oil": 0,
+      "steel": 0,
+      "wood": 0,
+      "xp": 0
+    },
+    "resources_after": {
+      "cash": 5,
+      "gold": 2000,
+      "mana": 0,
+      "oil": 2000,
+      "steel": 2000,
+      "wood": 2000,
+      "xp": 4
+    },
+    "resources_before": {
+      "cash": 5,
+      "gold": 2000,
+      "mana": 0,
+      "oil": 2000,
+      "steel": 2000,
+      "wood": 2000,
+      "xp": 4
+    },
+    "response_body": "{\"result\": \"success\"}",
+    "steps": [
+      {
+        "method": "POST",
+        "name": "login_post",
+        "path": "/",
+        "response_bytes": 207,
+        "response_sha256": "2de230237d9f4055670576b9485897dbc06581889ca90527504cbdbd4933ec01",
+        "save_after_sha256": "4d8dc20cffa36a9b3c0c4443eec87400b7ec221ffae08f08d99b6d0b543edc23",
+        "save_before_sha256": "4d8dc20cffa36a9b3c0c4443eec87400b7ec221ffae08f08d99b6d0b543edc23",
+        "save_unchanged_by_call": true,
+        "status": 302,
+        "target": "/"
+      },
+      {
+        "method": "POST",
+        "name": "command_complete_collection",
+        "path": "/dynamic/menvswomen/srvsexwars/command.php",
+        "response_bytes": 21,
+        "response_sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87",
+        "save_after_sha256": "27bf93d0104b3d64a97e4085a5673dffa1b4bc867b187f9e8b2d0e159d76650d",
+        "save_before_sha256": "4d8dc20cffa36a9b3c0c4443eec87400b7ec221ffae08f08d99b6d0b543edc23",
+        "save_unchanged_by_call": false,
+        "status": 200,
+        "target": "/dynamic/menvswomen/srvsexwars/command.php"
+      }
+    ],
+    "store_after": {
+      "1085": 1
+    },
+    "store_before": {},
+    "unit_note": "NO unit is placed, garrisoned, or spawned on the map by this transaction: the committed prize went into map['store'] and the placement count is unchanged. The stored-item placement step was deliberately NOT chained (design D6)",
+    "unit_placed": false,
+    "xp_awarded": false,
+    "xp_note": "NO experience is awarded: `collect_xp` is never read and the only command writing a placed row's attr['xp'] takes a client-sent amount, which this line refuses (design D5). The corpus's xp is unchanged at 4"
+  },
+  "refusals": [
+    {
+      "implemented": false,
+      "refusal": "unit_income",
+      "rule": "NO UNIT INCOME AND NO COLLECTION PAYOUT ARE DERIVED. The `collect` command is field-agnostic: the whole branch looks the row up, stamps item[3] with the wall clock, prints a name, and writes NOTHING else (command.py:136-144). Measured over the ten legacy root modules, `collect_type`, `collect_xp`, `max_collects`, `max_elem_vol`, and `harvester` have ZERO occurrences and the single quoted \"collect\" is the BRANCH NAME at command.py:136, never a field read \u2014 so all five committed collect fields have zero legacy consumers, the fourth and fifth such fields in this project after unit_capacity (M8 line 2), training_time (M8 line 4), and the level curve's unread reward fields (M7's XP line). On top of that the content leaves nothing to derive: 0 of 429 committed units record a positive `collect` (every one of them records 0), against 51 of the 470 committed buildings. This contract therefore computes NO income, NO payout, and NO collection reward for a unit (design D5)"
+    },
+    {
+      "implemented": false,
+      "refusal": "cap_semantics",
+      "rule": "NO CAP SEMANTICS ARE INTERPRETED. `max_collects` is 0 on ALL 429 committed units, so there is NO committed unit cap to interpret at all: the cap the delivered building-collect line deliberately REFUSED (a non-zero committed cap, because nothing in the repository says whether it limits one collection, a daily total, or a lifetime output) has NO UNIT ANALOGUE. On buildings the field takes exactly three values (0 on 459, 25 on 9, 100 on 2) and is still read by no branch. The recorded ABSENCE is stated as an absence and never read as permission to set a threshold (design D5)"
+    },
+    {
+      "implemented": false,
+      "refusal": "experience_award",
+      "rule": "NO EXPERIENCE IS AWARDED, GRANTED, OR COMPUTED. `collect_xp` is never read: it is non-zero on 427 of the 429 committed units (0 on 2, 1 on 37, 2 on 159, 3 on 211, 4 on 8, 5 on 12), and the only command that writes a placed row's attr['xp'] is `add_xp_unit` (command.py:322-343), which creates nothing and takes its amount from a CLIENT ARGUMENT \u2014 already refused by the delivered godot-unit-production requirement. A collection completion does not reopen that refusal: this contract awards nothing, and the committed corpus carries attr['xp'] on 0 of its 40 placed rows (design D5)"
+    }
+  ],
+  "schema": "godot-unit-collection/legacy-capture-v1",
+  "server": {
+    "command": [
+      "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+      "-B",
+      "server.py"
+    ],
+    "command_recorder_env": "SOCIALWARS_COMMAND_RECORD_DIR stripped from child",
+    "cwd": "<disposable copy under the system temp root>",
+    "host": "127.0.0.1",
+    "output_logs": "server.stdout.log / server.stderr.log inside the disposable copy (removed with the copy; not committed)",
+    "port": 5055,
+    "port_free_after_stop": true,
+    "port_free_before_start": true,
+    "readiness": "TCP connect loop on 127.0.0.1:5055 (no extra HTTP request)",
+    "stopped_by": "taskkill /T /F <pid>, wait, then port-free re-check"
+  },
+  "target": {
+    "collection_id": 1,
+    "collection_name": "Draggy Collection",
+    "committed_prize": {
+      "1085": 1
+    },
+    "committed_prize_item_name": "Metal Draggy",
+    "committed_prize_item_type": "u",
+    "fabricated_state": false,
+    "ledger_before": [],
+    "store_before": {},
+    "target_rule": "the committed fresh-player corpus records maps[0]['store'] == {} and privateState['collections'] == [], so the committed grant is an observable write into an EMPTY storage and an EMPTY ledger - with NO fabricated player state, which is what makes this the FIRST content-derived, server-authoritative unit acquisition in the project. Collection id 1 is chosen because its committed prize is unit 1085 Metal Draggy; the other five unit prizes (1062, 1096, 1073, 1010, 1056) are equally exercisable against the same corpus"
+  },
+  "time_dependent_fields": {
+    "documented_normalization": "collection parity applies NO clock normalization at all: the granted id and quantity are compared by value against the COMMITTED bag, the ledger is compared entry by entry, and every stored resource is compared by value (exactly unchanged, because the derived vector is neutral). There is no instant in this transaction whose value is not derivable",
+    "leaves": [
+      "/captured_at_utc in steps/login_post/request.json",
+      "/captured_at_utc in steps/login_post/response.meta.json",
+      "/captured_at_utc in steps/command_complete_collection/request.json",
+      "/captured_at_utc in steps/command_complete_collection/response.meta.json",
+      "/executed_at_utc in capture-manifest.json",
+      "/headers/Date in steps/login_post/response.meta.json",
+      "/headers/Date in steps/command_complete_collection/response.meta.json",
+      "the envelope ts inside the command step's request.json /form/data (and therefore that whole field's string, because the digest covers the payload), since ts is the current time"
+    ],
+    "rule": "the recorded STATE and the recorded RESPONSE carry NO time-dependent value at all: complete_collection writes only the storage and the collection ledger, and neither touches a clock. The only wall-clock values in this fixture are record metadata and the envelope `ts`, listed below, so a leaf-level diff of two consecutive runs must differ at exactly these paths and nowhere else",
+    "stable_by_derivation": "the granted id and quantity, the appended ledger id, the placement count, and all seven stored resources are byte-stable because the derivation is fixed: collection 1's committed prize is {1085: 1} into an EMPTY storage, so the grant writes exactly that entry, and the ledger is empty, so exactly one id is appended",
+    "stable_state_leaves": [
+      "steps/command_complete_collection/before.json is byte-stable",
+      "steps/command_complete_collection/after.json is byte-stable",
+      "the login step's before.json and after.json are both byte-stable and identical to each other"
+    ],
+    "state_leaves": []
+  },
+  "transaction": {
+    "changed_leaves": [
+      "/maps/0/store/1085",
+      "/privateState/collections"
+    ],
+    "collection_id": 1,
+    "command": "complete_collection",
+    "grant_pointer": "/maps/0/store/1085",
+    "granted": {
+      "1085": 1
+    },
+    "ledger_after": [
+      1
+    ],
+    "ledger_appended": true,
+    "ledger_before": [],
+    "ledger_pointer": "/privateState/collections",
+    "store_after": {
+      "1085": 1
+    },
+    "store_before": {}
+  }
+}

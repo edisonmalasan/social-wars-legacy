@@ -1161,6 +1161,244 @@ static func _queue_error(envelope: Dictionary) -> QueueResult:
 	return queue_failure(code, message)
 
 
+## Result of `complete_collection_town()`: the legacy result plus the
+## **content-derived** grant and the projected prize (unit-collection design
+## D1/D8) — the granted item id and quantity, the committed prize the service
+## derived them from, the index resolution with its **alias**, the player's
+## storage and collection ledger before and after execution, whether the ledger
+## grew, the current `resources`, and the three recorded refusals — or a
+## structured failure with no partial payload.
+##
+## **The grant is authoritative and content-derived**: the service looked the
+## prize up in the committed `collections` table, so the typed result's
+## `item_id` and `quantity` are what the *content* grants, never what a client
+## asked for. A client-supplied `prize`, `item_id`, or `quantity` is ignored
+## server-side exactly as a client-supplied amount or price is elsewhere.
+##
+## **No stored resource is expected to move**: a completion is dispatched with a
+## derived **neutral** vector, so the service's post-execution proof requires
+## every stored resource to be **unchanged**, which is what forecloses a client
+## minting or burning a balance through this path.
+class CollectionResult:
+	extends RefCounted
+	var ok := false
+	var protocol := ""
+	var game_version := ""
+	## Wall-clock seconds the legacy server stamped (a time-dependent field, so
+	## tests assert positivity, never a fixed value).
+	var server_time := 0
+	## The legacy result string ("success"); "" on failure.
+	var result := ""
+	## The collection id the intent named — echoed exactly as sent, including an
+	## **aliased** id, which is never rewritten to the id it resolves to.
+	var collection_id := -1
+	## The item id the committed prize granted, as the **committed string form**
+	## (`map["store"]` is keyed by strings).  "" on failure.
+	var item_id := ""
+	## The committed quantity granted, verbatim.
+	var quantity := -1
+	## The committed collection's own name, and its own native `id` column.
+	var collection_name := ""
+	var collection_id_column := ""
+	## The committed prize bag the grant was derived from: `{item id: quantity}`.
+	var prize := {}
+	## The index resolution: the one-based rule's requested index, the resolved
+	## index, whether the legacy clamp moved it, and the id an aliased id
+	## resolves to (`-1` when the id was not clamped).
+	var requested_index := -1
+	var index := -1
+	var clamped := false
+	var aliased := false
+	var alias_of := -1
+	## The player's storage and collection ledger as read BEFORE execution and
+	## re-read AFTER it.
+	var store_before := {}
+	var store_after := {}
+	var ledger_before: Array = []
+	var ledger_after: Array = []
+	## Whether the ledger grew by exactly one appended id. `false` is a real
+	## legacy outcome, not an error: the append is IF-ABSENT, so completing an
+	## already-completed collection grants the prize again while the ledger
+	## stands still.
+	var ledger_appended := false
+	## The three recorded refusals, as `{refusal, implemented, rule}`.
+	var refusals: Array = []
+	## The recorded eligibility gap: always `checked: false`.
+	var eligibility_checked := false
+	var resources: Resources = null
+	var error_code := ""
+	var error_message := ""
+
+
+## Structured failure for the completion intent (never a partial payload).
+static func collection_failure(code: String, message: String) -> CollectionResult:
+	var result := CollectionResult.new()
+	result.ok = false
+	result.error_code = code
+	result.error_message = message
+	return result
+
+
+## Parses a v0 collection envelope — success or structured error — into the typed
+## result, fail-closed in both directions (spec "A structured failure carries no
+## partial payload").  The rules mirror `parse_queue()`: the envelope must be a
+## JSON object reporting `ok: true`, the protocol must be the v0 one, the legacy
+## result string must be `success`, `collection_id` must be an integer, the
+## `grant` block must carry an item id and a non-negative quantity, the `prize`
+## block must carry the committed bag and its own name and `id` column, the
+## `index` block must carry the one-based base and the resolved index, the two
+## ledgers must be arrays, and `resources` must be the seven non-negative integers
+## every other response carries.
+##
+## The response is the AUTHORITATIVE record of what the service did: the client
+## applies `grant`, `store_after`, and `resources` **verbatim** and discards its
+## own expectations even where the two disagree, so a wrong client-side
+## derivation cannot be silently compounded.
+static func parse_collection(payload: Variant) -> CollectionResult:
+	if not (payload is Dictionary):
+		return collection_failure("bad_response",
+			"response is not a JSON object")
+	var envelope: Dictionary = payload
+	if envelope.get("ok") != true:
+		return _collection_error(envelope)
+	if str(envelope.get("protocol", "")) != PROTOCOL:
+		return collection_failure("protocol_mismatch",
+			"expected protocol %s, got %s" % [PROTOCOL,
+				str(envelope.get("protocol"))])
+	if str(envelope.get("result", "")) != "success":
+		return collection_failure("bad_response",
+			"collection response did not report the legacy success result")
+	var id: Variant = _parse_int(envelope.get("collection_id"))
+	if id == null or int(id) < 0:
+		return collection_failure("bad_response",
+			"the collection response carries no non-negative collection_id")
+	var grant: Variant = envelope.get("grant")
+	if not (grant is Dictionary):
+		return collection_failure("bad_response",
+			"the collection response carries no grant object")
+	var grant_body: Dictionary = grant
+	if str(grant_body.get("command", "")) != "complete_collection":
+		return collection_failure("bad_response",
+			"the collection response names command %r, not complete_collection"
+				% str(grant_body.get("command", "")))
+	var item_id: Variant = grant_body.get("item_id")
+	if not (item_id is String) or str(item_id).is_empty():
+		return collection_failure("bad_response",
+			"the collection response carries no granted item id")
+	var quantity: Variant = _parse_int(grant_body.get("quantity"))
+	if quantity == null or int(quantity) < 0:
+		return collection_failure("bad_response",
+			"the collection response carries no non-negative granted quantity")
+	var prize: Variant = envelope.get("prize")
+	if not (prize is Dictionary):
+		return collection_failure("bad_response",
+			"the collection response carries no prize object")
+	var prize_body: Dictionary = prize
+	var bag: Variant = prize_body.get("bag")
+	if not (bag is Dictionary) or (bag as Dictionary).is_empty():
+		return collection_failure("bad_response",
+			"the collection response carries no committed prize bag")
+	var entries: Variant = prize_body.get("entries")
+	if not (entries is Array) or (entries as Array).is_empty():
+		return collection_failure("bad_response",
+			"the collection response carries no committed prize entries")
+	var index_block: Variant = envelope.get("index")
+	if not (index_block is Dictionary):
+		return collection_failure("bad_response",
+			"the collection response carries no index object")
+	var index_body: Dictionary = index_block
+	if str(index_body.get("base", "")) != "one-based":
+		return collection_failure("bad_response",
+			"the collection response reports index base %r, not one-based"
+				% str(index_body.get("base", "")))
+	var requested: Variant = _parse_int(index_body.get("requested"))
+	var resolved: Variant = _parse_int(index_body.get("resolved"))
+	if requested == null or resolved == null:
+		return collection_failure("bad_response",
+			"the collection response carries no readable index resolution")
+	var alias_of: Variant = _parse_int(index_body.get("alias_of"))
+	if index_body.get("clamped") != true and index_body.get("clamped") != false:
+		return collection_failure("bad_response",
+			"the collection response carries no boolean clamped statement")
+	if index_body.get("aliased") != true and index_body.get("aliased") != false:
+		return collection_failure("bad_response",
+			"the collection response carries no boolean aliased statement")
+	var store_before: Variant = envelope.get("store_before")
+	var store_after: Variant = envelope.get("store_after")
+	if not (store_before is Dictionary) or not (store_after is Dictionary):
+		return collection_failure("bad_response",
+			"the collection response carries no storage object on one side")
+	var ledger_before: Variant = envelope.get("ledger_before")
+	var ledger_after: Variant = envelope.get("ledger_after")
+	if not (ledger_before is Array) or not (ledger_after is Array):
+		return collection_failure("bad_response",
+			"the collection response carries no collection ledger on one side")
+	if envelope.get("ledger_appended") != true \
+			and envelope.get("ledger_appended") != false:
+		return collection_failure("bad_response",
+			"the collection response carries no boolean ledger_appended statement")
+	var resources_raw: Variant = envelope.get("resources")
+	if not (resources_raw is Dictionary):
+		return collection_failure("bad_response",
+			"collection response carries no resources object")
+	var resources := _parse_resources(resources_raw)
+	if resources == null:
+		return collection_failure("bad_response",
+			"collection resources are not seven non-negative integers")
+	var eligibility: Variant = envelope.get("eligibility")
+	if not (eligibility is Dictionary):
+		return collection_failure("bad_response",
+			"the collection response carries no eligibility object")
+	if (eligibility as Dictionary).get("checked") != false:
+		return collection_failure("bad_response",
+			"the collection response claims an eligibility check the legacy "
+				+ "server never performs")
+	var result := CollectionResult.new()
+	result.ok = true
+	result.protocol = PROTOCOL
+	result.game_version = str(envelope.get("game_version", ""))
+	result.server_time = _parse_epoch(envelope.get("server_time"))
+	if result.server_time < 0:
+		return collection_failure("bad_response", "server_time is not a number")
+	result.result = "success"
+	result.collection_id = int(id)
+	result.item_id = str(item_id)
+	result.quantity = int(quantity)
+	result.collection_name = str(prize_body.get("name", ""))
+	result.collection_id_column = str(prize_body.get("id_column", ""))
+	result.prize = (bag as Dictionary).duplicate(true)
+	result.requested_index = int(requested)
+	result.index = int(resolved)
+	result.clamped = bool(index_body.get("clamped", false))
+	result.aliased = bool(index_body.get("aliased", false))
+	result.alias_of = int(alias_of) if alias_of != null else -1
+	result.store_before = (store_before as Dictionary).duplicate(true)
+	result.store_after = (store_after as Dictionary).duplicate(true)
+	result.ledger_before = (ledger_before as Array).duplicate(true)
+	result.ledger_after = (ledger_after as Array).duplicate(true)
+	result.ledger_appended = bool(envelope.get("ledger_appended", false))
+	result.refusals = (envelope.get("refusals", []) as Array).duplicate(true)
+	result.eligibility_checked = false
+	result.resources = resources
+	return result
+
+
+## Structured error fields of a failed collection envelope (code + message) —
+## the same one envelope rule the other eleven commands use, so a code the service
+## named (`missing_collection_id`, `invalid_collection_id`,
+## `unknown_collection_id`, `missing_user_id`, `invalid_user_id`,
+## `unknown_user_id`, `internal_error`, …) reaches the client unchanged.
+static func _collection_error(envelope: Dictionary) -> CollectionResult:
+	var code := "bad_response"
+	var message := "response reported failure without a structured error"
+	var error: Variant = envelope.get("error")
+	if error is Dictionary:
+		var typed: Dictionary = error
+		code = str(typed.get("code", code))
+		message = str(typed.get("message", message))
+	return collection_failure(code, message)
+
+
 ## Parses any v0 session envelope — success or structured error — into the
 ## typed result. Shared by `FakeApi` (which synthesizes the envelope from the
 ## committed fixtures) and `LegacyV0Api` (which decodes the HTTP body).

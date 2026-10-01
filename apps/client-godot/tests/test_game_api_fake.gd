@@ -398,6 +398,7 @@ func run_scenario() -> void:
 	await _check_expand(api, user_id)
 	await _check_level(api, user_id)
 	await _check_queue(api, user_id)
+	await _check_collection(api, user_id)
 
 	info("fake implementation resolved %d save(s) with no server and no socket"
 		% save_list.saves.size())
@@ -2605,6 +2606,358 @@ func _check_level_top(api: Variant, user_id: String) -> void:
 ## The committed executed-legacy queue fixture the double reproduces, asserted
 ## against the double's own in-memory state first — a push, then the three-key
 ## teardown, then every stored balance unchanged.
+## The executed-legacy collection fixture's before-state (which again equals the
+## fresh-player corpus: an EMPTY storage and an EMPTY collection ledger) and its
+## after-state — the real legacy server's record of the one executed
+## `complete_collection`, which wrote collection 1's committed prize (unit
+## `1085`, quantity `1`) into the empty storage, appended **exactly one** id to
+## the empty ledger, and moved **no** stored resource. Read (never written) so a
+## malformed capture cannot leave the double running on an inconsistent oracle.
+const FIXTURE_COLLECTION_BEFORE := \
+	"tests/fixtures/godot-unit-collection/steps/command_complete_collection/before.json"
+const FIXTURE_COLLECTION_AFTER := \
+	"tests/fixtures/godot-unit-collection/steps/command_complete_collection/after.json"
+## The committed collection id the double validates against, its committed name,
+## and the committed prize it grants.
+const COLLECTION_ID := 1
+const COLLECTION_NAME := "Draggy Collection"
+const COLLECTION_PRIZE_ID := "1085"
+const COLLECTION_PRIZE_QUANTITY := 1
+## A building-granting committed collection (4 — Defense Collection, building
+## `164`) and the last one (10 — Animal Collection, unit `1056`).
+const COLLECTION_BUILDING_ID := 4
+const COLLECTION_BUILDING_PRIZE := "164"
+const COLLECTION_LAST_ID := 10
+const COLLECTION_LAST_PRIZE := "1056"
+## An id the committed ten-row table does not resolve.
+const COLLECTION_UNKNOWN_ID := 11
+## The seven stored resource values the committed corpus records, which a
+## completion must leave unchanged.
+const COLLECTION_CORPUS_RESOURCES := {
+	"xp": 4, "gold": 2000, "wood": 2000, "oil": 2000, "steel": 2000,
+	"cash": 5, "mana": 0,
+}
+
+## One collection-completion intent under the same contract on both
+## implementations: the save identity and a collection id, and NOTHING else.
+##
+## Covered here: the **typed shape**; the **content-derived grant** — the granted
+## id and quantity equal the **committed** bag, compared against the executed
+## fixture's after-state and never against a client expectation; the
+## **one-based index and its alias** (id 0 and a negative id resolve to the same
+## prize, with ``aliased: true`` and ``alias_of: 1``); the **append-if-absent
+## ledger** (completing an already-completed collection grants the prize **again**
+## while the ledger stands still — a real legacy behaviour, not an error); a
+## **building-granting** and the **last** committed collection; an
+## **unresolvable** id; **every fail-closed code** in the endpoint's own order;
+## and that a **refused** intent leaves the storage, the ledger, and every stored
+## resource untouched — all with no process, no server, and no socket.
+func _check_collection(api: Variant, user_id: String) -> void:
+	var before_doc := _read_fixture_object(FIXTURE_COLLECTION_BEFORE)
+	var after_doc := _read_fixture_object(FIXTURE_COLLECTION_AFTER)
+	if before_doc.is_empty() or after_doc.is_empty():
+		return
+	var before_map: Dictionary = before_doc["maps"][0]
+	var after_map: Dictionary = after_doc["maps"][0]
+	# The committed corpus state the executed fixture began from.
+	check_eq(before_map["store"], {},
+		"the collection fixture's before state records an EMPTY storage")
+	check_eq(before_doc["privateState"]["collections"], [],
+		"the collection fixture's before state records an EMPTY collection ledger")
+	# The executed transaction's own facts, normalised to integers because the
+	# pinned engine's JSON parser widens every committed number to a float.
+	check_eq(_normalize(after_map["store"]),
+		{COLLECTION_PRIZE_ID: COLLECTION_PRIZE_QUANTITY},
+		"the executed completion wrote the committed prize of collection 1 into "
+			+ "the empty storage")
+	check_eq(_normalize(after_doc["privateState"]["collections"]), [COLLECTION_ID],
+		"the executed completion appended EXACTLY ONE id to the empty ledger")
+	for key in ["xp", "gold", "wood", "oil", "steel", "level", "expansions",
+			"items"]:
+		check_eq(after_map[key], before_map[key],
+			"the executed collection transaction left map.%s byte-identical" % key)
+	check_eq(after_map["items"], before_map["items"],
+		"the executed collection transaction wrote NO placement: the unit went "
+			+ "into storage, never onto the map")
+	check_eq((after_map["items"] as Dictionary).size(),
+		(before_map["items"] as Dictionary).size(),
+		"the placement count stayed at 40 across the collection transaction")
+	check_eq(after_doc["playerInfo"], before_doc["playerInfo"],
+		"the executed collection transaction left the player info byte-identical")
+	for name in ["xp", "gold", "wood", "oil", "steel", "cash", "mana"]:
+		check_eq(_document_resource(after_doc, name),
+			COLLECTION_CORPUS_RESOURCES.get(name, -99),
+			"the executed completion left the %s balance unchanged" % name)
+
+	var requests_before: int = api.collection_requests
+	# --- the unit-granting completion, against the committed empty storage.
+	var granted: Variant = await api.complete_collection_town(user_id,
+		COLLECTION_ID)
+	check(granted is BootData.CollectionResult,
+		"complete_collection_town returns the typed result")
+	_check_typed_collection(granted, "the unit-granting completion")
+	if granted is BootData.CollectionResult and granted.ok:
+		var typed: BootData.CollectionResult = granted
+		check_eq(typed.collection_id, COLLECTION_ID,
+			"the echoed collection id is the one the client named")
+		check_eq(typed.item_id, COLLECTION_PRIZE_ID,
+			"the granted item id is the COMMITTED prize's, never the client's")
+		check_eq(typed.quantity, COLLECTION_PRIZE_QUANTITY,
+			"the granted quantity is the COMMITTED quantity")
+		check_eq(typed.collection_name, COLLECTION_NAME,
+			"the committed collection's own name is reported verbatim")
+		check_eq(typed.collection_id_column, "1",
+			"the committed native id column is reported verbatim")
+		check_eq(typed.prize, {COLLECTION_PRIZE_ID: COLLECTION_PRIZE_QUANTITY},
+			"the projected prize is the committed bag")
+		check_eq(typed.store_before, {},
+			"the response's before storage is the corpus's empty one")
+		check_eq(typed.store_after, _normalize(after_map["store"]),
+			"the response's after storage equals the executed fixture's")
+		check_eq(typed.ledger_before, [],
+			"the response's before ledger is the corpus's empty one")
+		check_eq(typed.ledger_after, [COLLECTION_ID],
+			"the response's after ledger is the executed fixture's")
+		check_eq(bool(typed.ledger_appended), true,
+			"the ledger grew by exactly one appended id")
+		# The index: one-based, derived-provisional, and not clamped for id 1.
+		check_eq(typed.index, 0, "id 1 resolves to index 0")
+		check_eq(typed.requested_index, 0, "id 1 requests index 0")
+		check_eq(bool(typed.clamped), false, "id 1 is NOT clamped")
+		check_eq(bool(typed.aliased), false, "id 1 is not an alias")
+		check_eq(typed.alias_of, -1, "id 1 names no alias target")
+		# The recorded gaps and refusals travel with every success.
+		check_eq(bool(typed.eligibility_checked), false,
+			"the service states that it checked no eligibility")
+		check_eq((typed.refusals as Array).size(), 3,
+			"the response carries the three recorded refusals")
+		for entry: Dictionary in typed.refusals:
+			check_eq(bool(entry.get("implemented", true)), false,
+				"the %s refusal is reported as NOT implemented"
+					% str(entry.get("refusal", "?")))
+		# The value-level half of the endpoint's proof: a completion moves NO
+		# resource, so every stored balance is the value it started from.
+		for name: String in ["xp", "gold", "wood", "oil", "steel", "cash",
+				"mana"]:
+			check_eq(_typed_collection_resource(typed, name),
+				COLLECTION_CORPUS_RESOURCES.get(name, -99),
+				"the %s balance is UNCHANGED by the completion (the endpoint's "
+					% name + "value-level proof)")
+	# --- the ALIAS: id 0 and a negative id resolve to the same committed prize.
+	var zero: Variant = await api.complete_collection_town(user_id, 0)
+	if zero is BootData.CollectionResult and zero.ok:
+		check_eq(zero.item_id, COLLECTION_PRIZE_ID,
+			"collection id 0 resolves to the SAME committed prize as id 1")
+		check_eq(bool(zero.clamped), true, "id 0 IS clamped by the legacy max(0, …)")
+		check_eq(bool(zero.aliased), true, "id 0 is reported as an alias")
+		check_eq(zero.alias_of, COLLECTION_ID,
+			"id 0 is reported as resolving to collection id 1")
+		check_eq(zero.collection_id, 0,
+			"an aliased id is echoed exactly as sent, never rewritten")
+		check_eq(int(zero.quantity), int(zero.quantity),
+			"an aliased completion still grants the committed quantity")
+	var negative: Variant = await api.complete_collection_town(user_id, -5)
+	if negative is BootData.CollectionResult and negative.ok:
+		check_eq(negative.item_id, COLLECTION_PRIZE_ID,
+			"a negative collection id also resolves to id 1's committed prize")
+		check_eq(bool(negative.aliased), true,
+			"a negative id is reported as an alias, not as a distinct collection")
+	# --- the append-if-absent ledger: the prize is granted AGAIN while the
+	# ledger stands still. This is the executed legacy behaviour, and a naive
+	# "grew by exactly one" proof would reject it.
+	var again: Variant = await api.complete_collection_town(user_id, COLLECTION_ID)
+	if again is BootData.CollectionResult and again.ok:
+		var before_repeat: Array = again.ledger_before as Array
+		var after_repeat: Array = again.ledger_after as Array
+		check(before_repeat.has(COLLECTION_ID),
+			"the second completion's before ledger already held the id")
+		check_eq(bool(again.ledger_appended), false,
+			"completing an ALREADY completed collection appends nothing")
+		check_eq(after_repeat, before_repeat,
+			"the ledger is idempotent across a repeat completion")
+		check_eq(int(again.store_after.get(COLLECTION_PRIZE_ID, 0)),
+			int(again.store_before.get(COLLECTION_PRIZE_ID, 0)) + 1,
+			"the grant is NOT idempotent: the committed prize was stored AGAIN")
+	# --- the building-granting committed collection, and the last one.
+	var building: Variant = await api.complete_collection_town(user_id,
+		COLLECTION_BUILDING_ID)
+	if building is BootData.CollectionResult and building.ok:
+		check_eq(building.item_id, COLLECTION_BUILDING_PRIZE,
+			"collection 4 grants its committed BUILDING prize, reported "
+				+ "distinctly from a unit prize")
+		check_eq(building.collection_name, "Defense Collection",
+			"collection 4's committed name is reported verbatim")
+		check_eq(int(building.index), 3, "collection 4 resolves to index 3")
+	var last: Variant = await api.complete_collection_town(user_id,
+		COLLECTION_LAST_ID)
+	if last is BootData.CollectionResult and last.ok:
+		check_eq(last.item_id, COLLECTION_LAST_PRIZE,
+			"collection 10 grants its committed unit prize")
+		check_eq(int(last.index), 9, "collection 10 resolves to index 9")
+		check_eq(bool(last.clamped), false,
+			"collection 10 is NOT clamped: it is the last table position")
+	# --- an id the committed table does not resolve.
+	var unknown: Variant = await api.complete_collection_town(user_id,
+		COLLECTION_UNKNOWN_ID)
+	_check_collection_failure(unknown, "unknown_collection_id",
+		"an id outside the committed table")
+	check(unknown is BootData.CollectionResult and not unknown.ok
+		and unknown.item_id == "" and (unknown.prize as Dictionary).is_empty()
+		and (unknown.store_after as Dictionary).is_empty(),
+		"an unresolvable completion carries NO partial grant payload")
+	# --- every fail-closed code, in the endpoint's own order.
+	_check_collection_failure(
+		await api.complete_collection_town("", COLLECTION_ID), "missing_user_id",
+		"an empty save id")
+	_check_collection_failure(
+		await api.complete_collection_town("no-such-save-000", COLLECTION_ID),
+		"unknown_user_id", "an unknown save id")
+	# --- a refused intent leaves the double's state untouched.
+	# FOUR grants of unit 1085 in total: the recorded one, id 0's alias, the
+	# negative id's alias, and the repeat completion - each granted in full,
+	# because the grant is NOT idempotent even though the ledger is.
+	check_eq(_double_collection_store(api), {
+		COLLECTION_PRIZE_ID: 4, COLLECTION_BUILDING_PRIZE: 1,
+		COLLECTION_LAST_PRIZE: 1,
+	}, "every refused completion changed no stored item")
+	check_eq(_double_collection_ledger(api), [
+		COLLECTION_ID, 0, -5, COLLECTION_BUILDING_ID, COLLECTION_LAST_ID,
+	], "every refused completion appended no ledger id")
+	for name: String in ["xp", "gold", "wood", "oil", "steel", "cash", "mana"]:
+		check_eq(_double_collection_resource(api, name),
+			COLLECTION_CORPUS_RESOURCES.get(name, -99),
+			"the %s balance is unchanged by every completion" % name)
+	# --- the wire contract: the facade's operation carries ONLY the save
+	# identity and a collection id, so there is no channel through which a client
+	# could dictate a prize, an item id, a quantity, or a price.
+	check_eq(api.collection_requests, requests_before + 9,
+		"the facade counted every completion intent it issued: the unit grant, "
+			+ "the two aliases, the repeat, the building and the last collection, "
+			+ "and three refusals")
+	check(_collection_argument_count(api) == 2,
+		"the completion operation takes EXACTLY the save identity and a "
+			+ "collection id: there is no parameter through which a client could "
+			+ "send a prize")
+	info("collection double granted the committed unit prize, the building prize, "
+		+ "and the aliased and repeat cases with no server and no socket")
+
+
+## One typed collection result's own shape: the grant, the prize, the index
+## resolution, both ledgers, and the seven resources — with **no** payout, cap,
+## income, or experience field anywhere on the typed class.
+func _check_typed_collection(result: Variant, label: String) -> void:
+	if not (result is BootData.CollectionResult):
+		check(false, "%s collection result is typed" % label)
+		return
+	var typed: BootData.CollectionResult = result
+	check_eq(typed.protocol, BootData.PROTOCOL, "%s protocol is compat-v0" % label)
+	check_eq(typed.result, "success", "%s carries the legacy success result" % label)
+	check(typed.server_time > 0,
+		"%s server_time is a positive integer (time-dependent field)" % label)
+	for field: String in ["income", "payout", "cap", "experience", "xp", "reward"]:
+		check(not ("_%s" % field) in typed,
+			"%s carries NO %s field at all: the legacy server has no such rule"
+				% [label, field])
+
+
+## One structured refusal, with its code named and no partial payload.
+func _check_collection_failure(result: Variant, code: String, label: String) -> void:
+	if not (result is BootData.CollectionResult):
+		check(false, "%s collection result is typed" % label)
+		return
+	var typed: BootData.CollectionResult = result
+	check(not typed.ok, "%s is refused" % label)
+	check_eq(typed.error_code, code, "%s names the service's own code" % label)
+	check(not typed.error_message.is_empty(), "%s carries a message" % label)
+	check_eq(typed.item_id, "",
+		"%s carries NO granted item id: a refusal grants nothing" % label)
+	check_eq(typed.quantity, -1, "%s carries no quantity" % label)
+	check((typed.prize as Dictionary).is_empty(), "%s carries no prize" % label)
+	check((typed.store_before as Dictionary).is_empty(),
+		"%s carries no before storage" % label)
+	check((typed.ledger_before as Array).is_empty(),
+		"%s carries no before ledger" % label)
+	check(typed.resources == null, "%s carries no resources" % label)
+
+
+## One stored resource value read straight out of a captured save document.
+func _document_resource(document: Dictionary, name: String) -> int:
+	var first_map: Dictionary = document["maps"][0] as Dictionary
+	match name:
+		"cash":
+			return int((document["playerInfo"] as Dictionary).get("cash", 0))
+		"mana":
+			return int((document["privateState"] as Dictionary).get("mana", 0))
+		_:
+			return int(first_map.get(name, 0))
+
+
+## The double's own in-memory storage, read from the LIVE implementation
+## instance — its observable in-process state, never a transport payload.
+func _double_collection_store(api: Variant) -> Variant:
+	var double: Variant = api._impl
+	if double == null or not (double is FakeApi):
+		return "unreachable"
+	return _normalize(((double as FakeApi)._collection_state["store"])
+		as Dictionary)
+
+
+## The double's own in-memory collection ledger, likewise.
+func _double_collection_ledger(api: Variant) -> Variant:
+	var double: Variant = api._impl
+	if double == null or not (double is FakeApi):
+		return "unreachable"
+	return _normalize(((double as FakeApi)._collection_state["ledger"])
+		as Array)
+
+
+## The double's own in-memory balance for one stored resource.
+func _double_collection_resource(api: Variant, name: String) -> int:
+	var double: Variant = api._impl
+	if double == null or not (double is FakeApi):
+		return -99
+	return int(((double as FakeApi)._collection_state)[name])
+
+
+## One stored resource value on the typed result.
+func _typed_collection_resource(typed: BootData.CollectionResult,
+		name: String) -> int:
+	if typed.resources == null:
+		return -99
+	match name:
+		"xp":
+			return typed.resources.xp
+		"gold":
+			return typed.resources.gold
+		"wood":
+			return typed.resources.wood
+		"oil":
+			return typed.resources.oil
+		"steel":
+			return typed.resources.steel
+		"cash":
+			return typed.resources.cash
+		"mana":
+			return typed.resources.mana
+		_:
+			return -99
+
+
+## How many arguments the facade's completion operation declares, read from the
+## implementation's own method list — the structural form of "there is no
+## parameter through which a client could send a prize".
+func _collection_argument_count(api: Variant) -> int:
+	for entry: Variant in api.get_method_list():
+		if not (entry is Dictionary):
+			continue
+		if str((entry as Dictionary).get("name", "")) != "complete_collection_town":
+			continue
+		var arguments: Variant = (entry as Dictionary).get("args", [])
+		if arguments is Array:
+			return (arguments as Array).size()
+	return -1
+
+
 func _check_queue(api: Variant, user_id: String) -> void:
 	var push_before := _read_fixture_object(FIXTURE_QUEUE_PUSH_BEFORE)
 	var push_after := _read_fixture_object(FIXTURE_QUEUE_PUSH_AFTER)
