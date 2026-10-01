@@ -52,7 +52,7 @@ It is a progress ledger, not the source of truth for specified behavior.
 - **Last verified commit:** `cc77b90` — the Apply-tree tip the final-state battery executed on for `building-xp` (the following commit `d04766d` recorded the documentation and integration review; Apply PR #200 merged as `4fffe05`); prior: `7163311` for `building-resources` (PR #195 merged as `1eb3d57`), `2a3516f` for `building-expand` (PR #190 merged as `974bd15`), `8121e37` for `building-collect` (PR #185 merged as `fa88a99`), `fabbb58` for `building-construction`, `8d15315` for `building-upgrade`, `120b343` for `building-store`, `77abfd0` for `building-sell`, `7c4390b` for `building-move`, `b341904` for `building-purchase`, `742f594` for `building-placement`, then `3f3406c` the archive-stage tree the independent M6 verification batteries executed on
 - **Last updated:** 2026-10-01 (M8 line 3 archive PR recorded)
 
-### Resume point (updated after M8 line 4, orchestrator)
+### Resume point (updated after M8 line 5's investigation, orchestrator)
 
 **Delivered and archived, M8 lines 1-4:**
 
@@ -61,65 +61,50 @@ It is a progress ledger, not the source of truth for specified behavior.
 | `unit definitions` | `2026-10-01-unit-definitions` | #204 `cf13a5b`, #205 `72f87a3`, #206 `43b8ed4`, #207 `5e43bc0` |
 | `unit instances` | `2026-10-01-unit-instances` | #208 `235b4d2` (investigation), #209 `0710038` (**squash, disclosed**), #210 `02dbfa6`, #211 `84f7af9`, #212 `435db4e` |
 | `queues` | `2026-10-01-unit-queues` | #213 `bbf4669` (investigation), #214 `4b6a1eb`, #215 `69d49be`, #216 `a55fe41`, #217 `1420e2c` |
-| `production` | `2026-10-01-unit-production` | #219 `58caf86` (investigation), #220 `c442b3b`, #221 `eaa6f37`, #222 `65af7ee` |
+| `production` | `2026-10-01-unit-production` | #219 `58caf86` (investigation), #220 `c442b3b`, #221 `eaa6f37`, #222 `65af7ee`, #223 `61f400a` |
+
+**Committed investigations:** `docs/legacy-unit-instances.md`, `docs/legacy-production-queues.md`,
+`docs/legacy-unit-production.md`, and **`docs/legacy-unit-collection.md`** (M8 line 5, PR #224,
+merged `4cfc3fd`).
 
 **Baselines in the final state (re-run by the orchestrator):** `verify.ps1` exit 0;
 `verify-boot.ps1` exit 0 with **31 hermetic suites and 14 live phases**, guard digest
 `6978b959...ff348` identical pre/post; compat **`Ran 1257 tests ... OK`** unchanged; content
 validator `valid`, 21 schemas; hash manifest 3,258 entries; `openspec validate --all --strict`
-**53/53** with the change active, **52** after the archive. Report digests:
-`f997eb2d...66d5`, `A02EEDC8...57BBA0`, `807477db...92090`, `E56A470B...33CD6`.
+**52/52** after the last archive. Report digests: `f997eb2d...66d5`, `A02EEDC8...57BBA0`,
+`807477db...92090`, `E56A470B...33CD6`.
 
-**Next objective:** propose M8 line 5, **`collection`**, on the committed contract in
-**`docs/legacy-unit-collection.md`** (the collection investigation, committed on the branch that
-carries it). It is **materially different from `production`**: it is the first M8 line with a
-**server-derived, content-backed grant**, and therefore the first with a genuinely capturable unit
-transaction.
-  * **The headline: a collection prize CAN be a unit, and it is content-derived.**
-    `complete_collection` calls `get_collection_prize(collection_id)`, which reads the committed
-    `collections` table positionally and returns the committed prize bag, and the branch grants it
-    into `map['store']`. **Six of the ten committed collections grant a UNIT** (1085 Metal Draggy,
-    1062 MegaBot, 1096 F-117, 1073 Erradicator, 1010 APC, 1056 Elephant rider) and four grant a
-    building. The client sends a *collection id*, never *what it receives*. **This corrects and
-    extends** the `production` line's acquisition picture: `buy_offer_pack` and
-    `buy_stored_item_cash` really are unvalidated client-sent lists, but they are not the only
-    route - this one derives its grant from committed content, and the production investigation
-    did not find it.
-  * **It is capturable against the corpus.** The store is empty and `collections` is empty, so a
-    completion **writes** the committed prize: the project's **first content-derived,
-    server-authoritative unit acquisition**, captured without fabricating a player state. With
-    `place_stored_item` that is a two-step committed path by which a unit enters a town.
-  * **Two authority gaps to state, not smooth over**: nothing checks the collection was
-    *earned* (a client may name any of the ten), and the 1-based index makes **id 0 and id 1
-    alias**.
-  * **`collect` is field-agnostic**: it re-stamps slot 3 and does nothing else. All of
-    `collect`, `collect_type`, `collect_xp`, `max_collects`, `max_elem_vol`, and `harvester` have
-    **zero** legacy reads - the fourth and fifth such committed fields in this project.
-  * **No unit carries income at all**: 0 of 429 have a positive `collect`, the five `harvester`
-    units are on a disjoint set, `max_collects` is 0 on every unit, and `collect_xp` is never
-    read with the only writer client-sent - so a collection must not reintroduce an XP award.
-  * **`unit_collections_completed` grants nothing** (it only appends an id), and the 20
-    `unit_collection_categories` rows are read by no branch. Two "collection" concepts must not
-    be conflated.
+**Next objective:** propose M8 line 5, **`collection`**, on `docs/legacy-unit-collection.md`.
+It is the first M8 line with a **server-derived, content-backed grant**, so the change should
+include **an executed-legacy fixture**: `complete_collection` granting a committed **unit**
+prize into the corpus's empty store — the project's **first content-derived,
+server-authoritative unit acquisition** — captured without fabricating a player state. The
+endpoint's post-execution proof should assert that the granted id and quantity match the
+**content-derived** prize bag exactly and that the private state's collection ledger moves by
+exactly one appended id, in the family's established proof style.
 
-**Discipline carried forward, now with four data points rather than two:**
-* **Measure every figure before asserting it.** Nine of my own investigation figures across
-these four lines were asserted rather than measured, or miscounted, and every one was found by
-someone else measuring it independently.
-* **Verify a worker's factual claim before accepting it — and reject it when wrong.** Two
-workers found real errors of mine; the third reported 2 occurrences where there were 3 and had
-pinned the wrong number, so the root reverted it. A wrong "correction" is as damaging as a wrong
-original.
-* **Prefer a public accessor** over reaching into another module's private state (the registry's
-`_domains`).
-* **Prefer a boundary assertion over a repository-wide absence** in a delivered suite, or it rots
-on the next line — which is exactly what happened once.
-* **Test a guard rather than trusting it.** The production suite's anti-invention guard was
-verified by injecting a helper and watching it fail.
+**The finding that changes the picture:** the `production` line recorded that no committed unit
+is obtainable, because `buy_offer_pack` and `buy_stored_item_cash` are unvalidated client-sent
+lists. That is still true of *those* routes, but **not** of the whole server:
+`complete_collection` derives its grant from the committed `collections` table, and **six of
+the ten collections grant a unit**. Two authority gaps must be carried, not smoothed over:
+**nothing checks a collection was earned**, and the **1-based index makes id 0 and id 1 alias**.
+
+**Also recorded for this line:** `collect` is **field-agnostic** (it re-stamps slot 3 and reads
+no collect field); `collect`, `collect_type`, `collect_xp`, `max_collects`, `max_elem_vol`, and
+`harvester` all have **zero** legacy reads; **no unit carries a positive `collect`**; and
+`unit_collections_completed` grants nothing.
+
+**Discipline carried forward, with five data points now:** *measure every figure before
+asserting it* — eleven of my own investigation figures across these lines were asserted rather
+than measured or were miscounted, and every one was found by someone else measuring it; *verify a
+worker's claim and reject it when wrong* — two workers found real errors of mine and one
+reported 2 occurrences where there were 3 and had pinned the wrong number; *prefer a public
+accessor* over a private-state reach; *prefer a boundary assertion over a repository-wide
+absence*, which rotted once; and *test a guard rather than trusting it*.
 
 **Known-flaky guard:** `verify-boot.ps1` can fail on a `^ERROR:` line that is only an engine
 shutdown RID-leak warning; re-run before treating it as a regression.
-
 ### Process disclosure (recorded 2026-10-01, orchestrator)
 
 **PR #209, the `unit-instances` proposal, was squash-merged as `0710038` instead of with a
