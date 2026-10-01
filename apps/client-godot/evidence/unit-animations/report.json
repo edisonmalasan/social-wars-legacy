@@ -1,0 +1,1047 @@
+{
+  "schema": "unit-animations-report-v1",
+  "generated_by": "apps/client-godot/tests/test_unit_animations.gd --report=<path>",
+  "determinism": {
+    "byte_identical_across_reruns": true,
+    "reason": "no timestamp, no absolute path, no wall clock, no request, and no network: every table is derived from the delivered module, the verified content registry, the committed converted package bytes, and the measurements this run performed"
+  },
+  "linkage": {
+    "fields": [
+      {
+        "name": "labels",
+        "source": "the recorded labels[] of the root timeline and of every committed sprite, in recorded order",
+        "source_kind": "asset-parse",
+        "verbatim": true,
+        "note": "each entry carries its recorded name, frame, and anchor, plus the recorded key set and the timeline it came from. NO duration, loop, transition, or state is derived from any of them"
+      },
+      {
+        "name": "label_frame_positions",
+        "source": "each label entry's OWN recorded frame value, inside that entry",
+        "source_kind": "asset-parse",
+        "verbatim": true,
+        "note": "a recorded position, never a range: no start, end, length, or elapsed frame is computed from it, and the recorded rate is never multiplied by it"
+      },
+      {
+        "name": "sprite_frame_counts",
+        "source": "each committed sprite's OWN recorded frame_count",
+        "source_kind": "asset-parse",
+        "verbatim": true,
+        "note": "reported per sprite in recorded order with its recorded label count. No loop count and no duration is computed from a frame count, and no two sprites' counts are added together"
+      },
+      {
+        "name": "root_frame_count",
+        "source": "the asset root's OWN recorded frame_count, alongside the root main timeline's own recorded frame_count",
+        "source_kind": "asset-parse",
+        "verbatim": true,
+        "note": "OPAQUE and reported twice, as the package records it twice. Never defaulted to 1 when unreadable: an unreadable asset reports null here, never a nominal single frame"
+      },
+      {
+        "name": "frame_rate",
+        "source": "the asset root's OWN recorded frame_rate",
+        "source_kind": "asset-parse",
+        "verbatim": true,
+        "note": "REPORTED, NEVER APPLIED. It is never multiplied by a frame count to produce a duration or a frame time, because M4's recorded conversion limit is no playback semantics"
+      }
+    ],
+    "field_names": [
+      "labels",
+      "label_frame_positions",
+      "sprite_frame_counts",
+      "root_frame_count",
+      "frame_rate"
+    ],
+    "field_count": 5,
+    "label_keys": [
+      "anchor",
+      "frame",
+      "name"
+    ],
+    "no_derivation": "NO VALUE IN THIS PROJECTION IS DERIVED FROM ANOTHER. A duration is never computed from a frame count and a rate, a frame time is never computed from a rate, a loop count is never computed from a label, a next state is never computed from a label position, and no intermediate or elapsed frame is computed between two recorded positions. The suite proves it four ways: each reported field names its own recorded source and no two fields share one, a definition carrying absurd animation-adjacent numbers leaves every linkage field untouched, the same package projected twice differs in nothing, and this module's whole function inventory is compared against a pinned list (design D1/D3)",
+    "asset_refusal": "AN ASSET THAT IS ABSENT, UNREADABLE, LABEL-LESS, OR CARRYING A MALFORMED LABEL ENTRY IS REPORTED AS UNRESOLVABLE WITH ITS RECORDED STATE INTACT, AND IS NEVER DEFAULTED TO AN EMPTY, NOMINAL, OR SINGLE-FRAME ANIMATION. labels is empty and label_count is 0 beside a named reason, while the recorded label count, the recorded root frame counts, the recorded rate, and the per-sprite frame counts are still reported, so a caller can never read a refusal as a one-frame animation (design D1)",
+    "rate_reported_not_applied": {
+      "recorded_rate": 30.0,
+      "applied": false,
+      "applied_to": "",
+      "rule": "the recorded rate is reported exactly as recorded and is never multiplied by a frame count to produce a duration or a frame time"
+    },
+    "labels": [
+      {
+        "name": "QUIETO",
+        "frame": 1.0,
+        "anchor": false,
+        "source": "sprite:63",
+        "recorded_keys": [
+          "anchor",
+          "frame",
+          "name"
+        ]
+      },
+      {
+        "name": "ANDAR",
+        "frame": 6.0,
+        "anchor": false,
+        "source": "sprite:63",
+        "recorded_keys": [
+          "anchor",
+          "frame",
+          "name"
+        ]
+      },
+      {
+        "name": "ATAQUE",
+        "frame": 11.0,
+        "anchor": false,
+        "source": "sprite:63",
+        "recorded_keys": [
+          "anchor",
+          "frame",
+          "name"
+        ]
+      },
+      {
+        "name": "MUERTE",
+        "frame": 16.0,
+        "anchor": false,
+        "source": "sprite:63",
+        "recorded_keys": [
+          "anchor",
+          "frame",
+          "name"
+        ]
+      },
+      {
+        "name": "PICAR",
+        "frame": 21.0,
+        "anchor": false,
+        "source": "sprite:63",
+        "recorded_keys": [
+          "anchor",
+          "frame",
+          "name"
+        ]
+      }
+    ],
+    "label_count": 5,
+    "label_order": [
+      "sprite:63",
+      "sprite:63",
+      "sprite:63",
+      "sprite:63",
+      "sprite:63"
+    ],
+    "labelled_sprite_id": 63.0,
+    "labelled_sprite_ids": [
+      63.0
+    ],
+    "labelled_sprite_frame_count": 29.0,
+    "root_frame_count": 1.0,
+    "main_timeline_frame_count": 1.0,
+    "frame_rate": 30.0,
+    "sprite_frame_counts": [
+      {
+        "sprite_id": 19.0,
+        "frame_count": 20.0,
+        "label_count": 0,
+        "placement_count": 5,
+        "remove_count": 0
+      },
+      {
+        "sprite_id": 28.0,
+        "frame_count": 20.0,
+        "label_count": 0,
+        "placement_count": 5,
+        "remove_count": 0
+      },
+      {
+        "sprite_id": 37.0,
+        "frame_count": 20.0,
+        "label_count": 0,
+        "placement_count": 5,
+        "remove_count": 0
+      },
+      {
+        "sprite_id": 46.0,
+        "frame_count": 20.0,
+        "label_count": 0,
+        "placement_count": 5,
+        "remove_count": 0
+      },
+      {
+        "sprite_id": 55.0,
+        "frame_count": 20.0,
+        "label_count": 0,
+        "placement_count": 5,
+        "remove_count": 0
+      },
+      {
+        "sprite_id": 62.0,
+        "frame_count": 7.0,
+        "label_count": 0,
+        "placement_count": 3,
+        "remove_count": 0
+      },
+      {
+        "sprite_id": 63.0,
+        "frame_count": 29.0,
+        "label_count": 5,
+        "placement_count": 11,
+        "remove_count": 7
+      }
+    ],
+    "sprite_count": 7,
+    "sprite_placement_counts": [
+      5,
+      5,
+      5,
+      5,
+      5,
+      3,
+      11
+    ],
+    "sprite_remove_counts": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      7
+    ],
+    "root_placement_count": 1,
+    "root_remove_count": 0,
+    "package_legacy_id": "10033_wild_elephant",
+    "package_kind": "converted_unit",
+    "package_source_file": "assets/sprites/10033_wild_elephant.swf",
+    "package_relative_path": "assets/converted/units/10033_wild_elephant/package.json",
+    "asset_named_by_content": true,
+    "content_sprite_reference": "10033_wild_elephant",
+    "readout": "recorded labels QUIETO@1.0 ANDAR@6.0 ATAQUE@11.0 MUERTE@16.0 PICAR@21.0 — verbatim names and recorded frame positions, with no duration, loop, transition, or order derived from them | per-sprite recorded frame counts 19.0:20.0/0 labels 28.0:20.0/0 labels 37.0:20.0/0 labels 46.0:20.0/0 labels 55.0:20.0/0 labels 62.0:7.0/0 labels 63.0:29.0/5 labels — reported as recorded, never multiplied by the rate and never added together | recorded frame_rate 30.0 — REPORTED, NEVER APPLIED: no duration and no frame time is computed from it | no frame duration, no loop count, no state machine, no transition, no priority, no interrupt, no playback order, no per-state timing, no animation trigger, and no event-to-state mapping: no legacy branch selects an animation | max_frame: 2.0 — recorded as CONTENT ONLY, never used as a duration, a loop, a transition, or a state count, because no legacy branch reads it | img_name: 10033_wild_elephant — recorded as CONTENT ONLY, never used as a duration, a loop, a transition, or a state count, because no legacy branch reads it | attack: 10.0 — recorded as CONTENT ONLY, never used as a duration, a loop, a transition, or a state count, because no legacy branch reads it | attack_interval: 25.0 — recorded as CONTENT ONLY, never used as a duration, a loop, a transition, or a state count, because no legacy branch reads it | attack_range: 1.0 — recorded as CONTENT ONLY, never used as a duration, a loop, a transition, or a state count, because no legacy branch reads it | velocity: 4.0 — recorded as CONTENT ONLY, never used as a duration, a loop, a transition, or a state count, because no legacy branch reads it"
+  },
+  "refusal": {
+    "measured": {
+      "refusals": 8,
+      "ambiguous": 1,
+      "invalid_definition": true
+    },
+    "reasons": [
+      "asset_absent",
+      "asset_unreadable",
+      "no_labels",
+      "malformed_label",
+      "no_sprite_reference",
+      "ambiguous_sprite_reference",
+      "invalid_definition"
+    ],
+    "recorded_state_intact": true,
+    "nominal_animation_never_defaulted": true,
+    "single_frame_never_defaulted": true
+  },
+  "animation_fields": {
+    "fields": [
+      "max_frame",
+      "img_name",
+      "attack",
+      "attack_interval",
+      "attack_range",
+      "velocity"
+    ],
+    "flag": "animal",
+    "reported_as_content_only": true,
+    "used_as_a_rule": false,
+    "consumer_count": 0,
+    "consumer_count_per_field": {
+      "max_frame": 0,
+      "img_name": 0,
+      "attack": 0,
+      "attack_interval": 0,
+      "attack_range": 0,
+      "velocity": 0,
+      "animal": 0
+    },
+    "searched_modules": [
+      "command.py",
+      "engine.py",
+      "sessions.py",
+      "server.py",
+      "constants.py",
+      "get_game_config.py",
+      "version.py"
+    ],
+    "units_file": "packages/game-content/normalized/units.json",
+    "buildings_file": "packages/game-content/normalized/buildings.json",
+    "unit_count": 429,
+    "building_count": 470,
+    "distinct_unit_values": {
+      "max_frame": 2,
+      "img_name": 401,
+      "attack": 131,
+      "attack_interval": 12,
+      "attack_range": 14,
+      "velocity": 11
+    },
+    "rule": "THE COMMITTED max_frame, img_name, attack, attack_interval, attack_range, AND velocity ARE CONTENT, NEVER RULES, AND SO IS THE animal properties FLAG. All SEVEN have ZERO legacy consumers: measured as occurrences of each string across command.py, engine.py, sessions.py, server.py, constants.py, get_game_config.py, and version.py, each is ZERO, in every one of the seven modules. So NO duration, NO loop, NO transition, NO priority, NO trigger, and NO state selection is derived from any of them, and this module provides no helper that would (design D2)",
+    "coverage": "All SIX fields are present on ALL 429 committed units and take exactly TWO, 401, 131, 12, 14, and 11 distinct values respectively. max_frame is the near-constant: 5 on 427 of the 429 units and 2 on exactly two of them - legacy ids 923 and 933 - while the 470 committed buildings take only 1 (on 24 of them) and 2 (on 446). A field that reads 5 on 427 of 429 unit definitions and is read by nothing is not a per-unit animation setting, and the next section shows it is not the asset's frame count either. The animal properties flag is carried by exactly 2 of the 429 committed units and set on both of them, and by none of the 470 committed buildings (design D2)",
+    "encoding": "the committed normalized package writes max_frame as a JSON NUMBER - the raw entry reads max_frame: 2 - unlike the properties flags, which are committed as STRINGS. Reading it as a string would invent an encoding the source does not carry",
+    "zero_consumer_ordinal": 7,
+    "zero_consumer_precedents": [
+      {
+        "field": "unit_capacity",
+        "line": "M8 line 2 (unit instances)",
+        "fact": "carried by every one of the 429 committed units and non-zero on only 5 of them (4 on Truck and Zodiac, 6 on Ship, Truck 3, and Truck II), with zero occurrences across the legacy modules; push_unit appends to a garrison unconditionally, so no capacity rule is enforced"
+      },
+      {
+        "field": "reward_type / reward_amount",
+        "line": "M7's XP line",
+        "fact": "committed on every one of the 100 level entries and read by no legacy branch, so no level reward is paid"
+      },
+      {
+        "field": "collect / collect_type / collect_xp / max_collects",
+        "line": "M8 line 5 (unit collection)",
+        "fact": "the committed unit-collection income fields; no collect field is ever read and max_collects is zero on every unit, so no unit income, cap, or payout is derived"
+      },
+      {
+        "field": "training_time",
+        "line": "M8 line 4 (unit production)",
+        "fact": "carried by every one of the 899 committed items with a positive value on only 130 of the 470 buildings, and read by no legacy branch, so no production duration is derived from it"
+      },
+      {
+        "field": "harvester (properties flag)",
+        "line": "M8 line 5 (unit collection)",
+        "fact": "a properties flag key on 5 units (Worker I-IV and Orc Worker), every one of them with collect 0, so the flag names no income the content does not also carry"
+      },
+      {
+        "field": "velocity / attack_range / ft_flying / ft_ground",
+        "line": "M8 line 6 (unit movement)",
+        "fact": "the committed movement fields: velocity is positive on all 429 committed units and read by nothing, so no travel time, path, or terrain rule is derived from it. attack_range is listed here because it belongs to THIS line's inventory as an animation-adjacent statistic"
+      }
+    ],
+    "max_frame_distribution": {
+      "units": {
+        "2": 2,
+        "5": 427
+      },
+      "buildings": {
+        "1": 24,
+        "2": 446
+      },
+      "unit_exceptions": [
+        "923",
+        "933"
+      ],
+      "unit_modal_value": 5,
+      "unit_modal_count": 427
+    },
+    "duration_computed": false,
+    "loop_computed": false,
+    "transition_computed": false,
+    "priority_computed": false,
+    "trigger_computed": false,
+    "state_selected": false,
+    "distribution_measured": {
+      "units": {
+        "max_frame": {
+          "2": 2,
+          "5": 427
+        },
+        "animation_fields_present": 2574,
+        "definitions": 429,
+        "flag_set": 2
+      },
+      "buildings": {
+        "max_frame": {
+          "2": 446,
+          "1": 24
+        },
+        "animation_fields_present": 2820,
+        "definitions": 470,
+        "flag_set": 0
+      },
+      "distinct_unit_values": {
+        "max_frame": 2,
+        "img_name": 401,
+        "attack": 131,
+        "attack_interval": 12,
+        "attack_range": 14,
+        "velocity": 11
+      },
+      "max_frame_encoding": "NUMBER on all 429 committed units and a STRING on none of them, unlike the string-encoded properties flags"
+    }
+  },
+  "animation_fields_measured": {
+    "units_total": 429,
+    "buildings_total": 470,
+    "units_flag": 2,
+    "buildings_flag": 0,
+    "units_max_frame": {
+      "2": 2,
+      "5": 427
+    },
+    "buildings_max_frame": {
+      "2": 446,
+      "1": 24
+    },
+    "distinct": {
+      "max_frame": 2,
+      "img_name": 401,
+      "attack": 131,
+      "attack_interval": 12,
+      "attack_range": 14,
+      "velocity": 11
+    },
+    "distribution": {
+      "units": {
+        "max_frame": {
+          "2": 2,
+          "5": 427
+        },
+        "animation_fields_present": 2574,
+        "definitions": 429,
+        "flag_set": 2
+      },
+      "buildings": {
+        "max_frame": {
+          "2": 446,
+          "1": 24
+        },
+        "animation_fields_present": 2820,
+        "definitions": 470,
+        "flag_set": 0
+      },
+      "distinct_unit_values": {
+        "max_frame": 2,
+        "img_name": 401,
+        "attack": 131,
+        "attack_interval": 12,
+        "attack_range": 14,
+        "velocity": 11
+      },
+      "max_frame_encoding": "NUMBER on all 429 committed units and a STRING on none of them, unlike the string-encoded properties flags"
+    },
+    "units_max_frame_typed": 429,
+    "units_fields_present": 2574,
+    "units_exceptions": [
+      "923",
+      "933"
+    ]
+  },
+  "max_frame": {
+    "unit_legacy_id": "933",
+    "unit_name": "Wild Elephant",
+    "package": "assets/converted/units/10033_wild_elephant/package.json",
+    "content_sprite_reference": "10033_wild_elephant",
+    "package_legacy_id": "10033_wild_elephant",
+    "same_unit": true,
+    "same_unit_evidence": "the committed definition's img_name equals the converted package's own legacy_id, so the two numbers describe the SAME unit",
+    "committed_max_frame": 2,
+    "parsed_root_frame_count": 1,
+    "labelled_sprite_id": 63,
+    "labelled_sprite_frame_count": 29,
+    "agreement": "NONE: 2 against 1 against 29",
+    "max_frame_is_the_asset_frame_count": false,
+    "adopted_as_frame_count": false,
+    "adopted_as_duration": false,
+    "adopted_as_loop_bound": false,
+    "adopted_as_state_count": false,
+    "adopted_anywhere": false,
+    "max_frame_role": "content-only",
+    "data_points": 1,
+    "converted_unit_packages": 1,
+    "converted_building_packages": 1,
+    "what_max_frame_means": "NOT CLAIMED. The measurement is ONE data point over ONE committed converted unit package, which is sufficient to REFUSE adopting max_frame as a frame count and insufficient to explain it. No claim is made about what it means and no distribution over the corpus is measurable from one package",
+    "rule": "THE COMMITTED max_frame IS NOT THE PARSED FRAME COUNT OF THE ANIMATION ASSET ITS OWN COMMITTED img_name NAMES. For the one committed converted unit package the committed max_frame is 2, the parsed root frame_count is 1, and the sprite that actually holds the five recorded labels has 29 frames - and the content names EXACTLY the asset that package parsed, so the numbers describe the same unit and DISAGREE. Therefore max_frame is ADOPTED NOWHERE in this client: not as a frame count, not as a duration, not as a loop bound, and not as a state count. It is reported as CONTENT ONLY, and WHAT IT MEANS IS NOT CLAIMED, because the measurement is ONE data point over ONE committed converted package (design D2)",
+    "unit_distribution": {
+      "2": 2,
+      "5": 427
+    },
+    "building_distribution": {
+      "1": 24,
+      "2": 446
+    },
+    "generalises": false,
+    "ordinal": 7
+  },
+  "max_frame_measured": {
+    "committed_max_frame": 2.0,
+    "parsed_root_frame_count": 1.0,
+    "labelled_sprite_frame_count": 29.0,
+    "package_content_ref_max_frame": 2.0,
+    "content_img_name": "10033_wild_elephant",
+    "package_legacy_id": "10033_wild_elephant"
+  },
+  "commands": {
+    "implemented": false,
+    "selected_by_server": false,
+    "named_branch_count": 63,
+    "named_branches": [
+      "buy",
+      "complete_tutorial",
+      "set_goals",
+      "complete_goal",
+      "level_up",
+      "set_quest_var",
+      "move",
+      "collect",
+      "sell",
+      "kill",
+      "kill_iid",
+      "batch_remove",
+      "orient",
+      "expand",
+      "store_item",
+      "place_stored_item",
+      "sell_stored_item",
+      "store_add_items",
+      "next_research_step",
+      "research_buy_step_cash",
+      "next_research_item",
+      "reset_research_item",
+      "flash_debug",
+      "add_xp_unit",
+      "weekly_reward",
+      "push_unit",
+      "pop_unit",
+      "activate",
+      "collect_mission",
+      "win_daily_bonus",
+      "trade_resource",
+      "buy_stored_item_cash",
+      "unit_collections_completed",
+      "add_inventory_item",
+      "remove_inventory_item",
+      "complete_collection",
+      "add_click",
+      "activate_item_click",
+      "buy_si_help",
+      "finish_si",
+      "darts_reset",
+      "darts_new_free",
+      "darts_shoot_balloon",
+      "buy_premium_account",
+      "resurrect_hero",
+      "set_resource_allies",
+      "buy_mana_new",
+      "buy_magic",
+      "use_magic",
+      "push_queue_unit",
+      "push_queue_unit2",
+      "pop_queue_unit",
+      "buy_offer_pack",
+      "buy_powerups",
+      "soulmixer_speedup",
+      "admin_set_quest_rank",
+      "end_quest",
+      "end_attack",
+      "rt_open_graph_unit",
+      "first_time_marketplace",
+      "fast_forward",
+      "ping",
+      "set_variables"
+    ],
+    "vocabulary": [
+      "anim",
+      "move",
+      "orient",
+      "attack"
+    ],
+    "vocabulary_with_no_match": [
+      "frame",
+      "play",
+      "loop",
+      "state",
+      "clip",
+      "sprite",
+      "idle",
+      "walk",
+      "death"
+    ],
+    "matches": [
+      {
+        "command": "move",
+        "matched_vocabulary": "move",
+        "whole_token": true,
+        "inside_another_word": false,
+        "is_animation_command": false,
+        "why_not": "the type-agnostic coordinate write, already delivered as godot-building-move and referenced by godot-unit-movement: it writes a row's two coordinate slots from client arguments, checks nothing beyond the row's existence, and starts no animation"
+      },
+      {
+        "command": "orient",
+        "matched_vocabulary": "orient",
+        "whole_token": true,
+        "inside_another_word": false,
+        "is_animation_command": false,
+        "why_not": "a plain client-supplied write of row slot 4: the only orientation writer in the committed source, with no rotation rule and no animation behind it"
+      },
+      {
+        "command": "end_attack",
+        "matched_vocabulary": "attack",
+        "whole_token": true,
+        "inside_another_word": false,
+        "is_animation_command": false,
+        "why_not": "COMBAT TERMINATION, not animation: the branch closes an attack. It consults no animation field, because the committed attack, attack_interval, and attack_range are read by NO legacy branch at all - there is no committed attack rule for it to end"
+      },
+      {
+        "command": "batch_remove",
+        "matched_vocabulary": "move",
+        "whole_token": false,
+        "inside_another_word": true,
+        "is_animation_command": false,
+        "why_not": "a pure SUBSTRING ARTIFACT: it contains the letters of move inside re-MOVE. It removes map rows and moves nothing, and treating it as a movement or animation command would be exactly the invention this line refuses"
+      },
+      {
+        "command": "remove_inventory_item",
+        "matched_vocabulary": "move",
+        "whole_token": false,
+        "inside_another_word": true,
+        "is_animation_command": false,
+        "why_not": "the same re-MOVE substring artifact: it removes an inventory item, moves no row, and animates nothing"
+      }
+    ],
+    "match_count": 5,
+    "whole_token_matches": [
+      "move",
+      "orient",
+      "end_attack"
+    ],
+    "whole_token_matches_recorded": [
+      "move",
+      "orient",
+      "end_attack"
+    ],
+    "substring_artifacts": [
+      "batch_remove",
+      "remove_inventory_item"
+    ],
+    "substring_artifacts_recorded": [
+      "batch_remove",
+      "remove_inventory_item"
+    ],
+    "animation_command_count": 0,
+    "animation_command_count_measured": 0,
+    "no_animation_command": "NO LEGACY COMMAND BRANCH STARTS, STOPS, ADVANCES, LOOPS, OR SELECTS AN ANIMATION, AND THE COUNT OF ANIMATION COMMANDS IS ZERO. Of the dispatcher's 63 named branches, exactly FIVE carry any animation vocabulary: move and orient (whole-token, and both belong to the delivered movement line), end_attack (combat termination), and batch_remove and remove_inventory_item (pure substring artifacts that contain the letters of move inside re-MOVE). The stems frame, play, loop, state, clip, sprite, idle, walk, and death match NO branch at all. Nothing in the seven legacy root modules animates anything, so no state machine, transition, priority, interrupt, playback order, per-state timing, animation trigger, or mapping from any legacy command to any recorded state is derived here (design D2/D4)"
+  },
+  "commands_measured": {},
+  "refusals": [
+    {
+      "family": "frame_duration",
+      "refused": true,
+      "reason": "the recorded rate is a parse fact with no committed playback rule behind it, and M4's recorded conversion limit is no playback semantics, so multiplying a frame count by a rate would invent a duration the legacy contract never had"
+    },
+    {
+      "family": "frame_time",
+      "refused": true,
+      "reason": "the same absence as frame_duration: no committed field is read by any legacy branch, so no per-frame time exists to report"
+    },
+    {
+      "family": "loop_count",
+      "refused": true,
+      "reason": "nothing recorded says whether or how often a state repeats, and no legacy branch advances a timeline, so a loop count would be invented"
+    },
+    {
+      "family": "state_machine",
+      "refused": true,
+      "reason": "five recorded labels carry recorded positions and no recorded transition between them; no legacy branch selects one, so a state machine would have no committed rule to reproduce"
+    },
+    {
+      "family": "transition",
+      "refused": true,
+      "reason": "no committed source records a transition, an order of succession, or a condition; the label positions are positions, not edges"
+    },
+    {
+      "family": "priority",
+      "refused": true,
+      "reason": "nothing ranks the five recorded labels, and nothing arbitrates between them"
+    },
+    {
+      "family": "interrupt",
+      "refused": true,
+      "reason": "no legacy branch stops, replaces, or preempts a running animation, because no legacy branch starts one"
+    },
+    {
+      "family": "playback_order",
+      "refused": true,
+      "reason": "the recorded label positions are reported exactly as recorded and no order is computed between them, beyond the recorded list order of the asset itself"
+    },
+    {
+      "family": "per_state_timing",
+      "refused": true,
+      "reason": "no per-state duration exists in the committed content, the committed asset, or the legacy source"
+    },
+    {
+      "family": "animation_trigger",
+      "refused": true,
+      "reason": "no legacy command, event, or condition selects an animation, so there is no trigger to bind one to"
+    },
+    {
+      "family": "event_state_mapping",
+      "refused": true,
+      "reason": "with zero animation commands there is no legacy command to map, and mapping one to a recorded label would invent the mapping the contract refuses"
+    },
+    {
+      "family": "playback",
+      "refused": true,
+      "reason": "no animation is played, animated, or rendered anywhere in this line: the converted package establishes asset and timeline LINKAGE only, never playback correctness"
+    }
+  ],
+  "refusal_statement": "NOTHING PLAYABLE IS IMPLEMENTED. From the recorded max_frame, the recorded frame counts, the recorded frame rate, and the five recorded labels this line derives NO frame duration, NO loop count, NO state machine, NO transition rule, NO priority, NO interrupt, NO playback order, NO per-state timing, NO animation trigger, and NO event-to-state mapping from any legacy command to any recorded state. Every one of those is a recorded refusal with its reason attached, and the suite asserts the ABSENCE of the helpers that would implement them (design D3)",
+  "absent_helpers": [
+    {
+      "helper": "frame_duration",
+      "absent_because": "the recorded frame_rate is a parse fact with no playback rule behind it, so a duration computed from it and a frame count would invent timing the legacy contract never had"
+    },
+    {
+      "helper": "frame_time",
+      "absent_because": "no committed field is read by any legacy branch, so there is no committed per-frame time to report"
+    },
+    {
+      "helper": "loop_count",
+      "absent_because": "nothing recorded says whether or how often a state repeats, and no legacy branch advances a timeline"
+    },
+    {
+      "helper": "state_machine",
+      "absent_because": "five recorded labels carry no recorded transition between them and no legacy branch selects one, so a state machine would have no committed rule to reproduce"
+    },
+    {
+      "helper": "next_state",
+      "absent_because": "no committed source records a transition, a condition, or a succession order; the recorded label positions are positions, not edges"
+    },
+    {
+      "helper": "state_priority",
+      "absent_because": "nothing ranks the five recorded labels and nothing arbitrates between them"
+    },
+    {
+      "helper": "interrupt",
+      "absent_because": "no legacy branch stops, replaces, or preempts a running animation, because no legacy branch starts one"
+    },
+    {
+      "helper": "playback_order",
+      "absent_because": "no order is computed between the recorded label positions beyond the asset's own recorded list order"
+    },
+    {
+      "helper": "per_state_timing",
+      "absent_because": "no per-state duration exists in the committed content, the committed asset, or the legacy source"
+    },
+    {
+      "helper": "animation_trigger",
+      "absent_because": "no legacy command, event, or condition selects an animation, so there is no trigger to bind one to"
+    },
+    {
+      "helper": "event_state_mapping",
+      "absent_because": "with zero animation commands there is no legacy command to map to a recorded label"
+    },
+    {
+      "helper": "play",
+      "absent_because": "no animation is played, animated, or rendered anywhere in this line; the converted package establishes LINKAGE only"
+    },
+    {
+      "helper": "animate",
+      "absent_because": "the same absence as play, stated as the verb a caller would reach for"
+    },
+    {
+      "helper": "current_frame",
+      "absent_because": "no clock, no elapsed time, and no timeline advance exists to read a current frame from"
+    },
+    {
+      "helper": "advance_frame",
+      "absent_because": "no legacy branch advances a timeline and no playback runs here, so nothing would advance a frame"
+    }
+  ],
+  "m4_limit": "M4's RECORDED LIMIT IS RESTATED, NEVER WIDENED. The committed unit conversion produces a per-sprite timeline inventory with shape and bitmap linkage, NO TESSELLATION and NO PLAYBACK SEMANTICS, and records its labels NAMES-ONLY with their positions. That is exactly what this projection reports, and exactly as far as it goes",
+  "ownership": "ANIMATION READING AND ANIMATION REFUSALS ARE OWNED HERE AND NOWHERE ELSE. The delivered godot-unit-movement capability records an absent helper named animate_move and defers animation to a later line; this line is that line, so the deferral is discharged here rather than left open. godot-unit-definitions keeps ownership of the static field model and its asset-RESOLUTION status, and this capability owns the asset-TIMELINE reading, so the two cannot drift (design D6)",
+  "animation_implemented": false,
+  "no_endpoint": {
+    "added": false,
+    "animation_implemented": false,
+    "selected_by_server": false,
+    "request_issued": false,
+    "route": "none: unit animation is committed content read through the content registry plus the committed converted asset on disk, so there is no server-selected state, no intent to send, and nothing to authorise",
+    "persistence_changed": false,
+    "compat_suite": "unchanged: no route, response field, error code, or persistence behaviour is added, so its test count does not move",
+    "network_used": false,
+    "note": "UNIT ANIMATION IS CONTENT, NOT A SERVER OPERATION. The labels, their frame positions, the per-sprite frame counts, and the recorded rate are all read from the committed content package and the committed converted asset already on disk, and the committed animation fields are read by no legacy branch at all - there is therefore no server-selected state, no intent to send, no route to add, and nothing to authorise: NO compatibility API endpoint is added, NO client intent is issued, and NO persistence behaviour changes, which is why the compatibility test suite stays green UNCHANGED. This is the same conclusion M8 lines 1, 2, 4, and 6 reached (design D4)"
+  },
+  "fixture": {
+    "captured": false,
+    "reason": "NO EXECUTED-LEGACY ANIMATION FIXTURE WAS CAPTURED, AND THE REASON IS THE STRONGER ONE: there is NO ANIMATION BEHAVIOUR FOR THE LEGACY SERVER TO HAVE, not merely a corpus that could not exercise it. Of the dispatcher's 63 named branches the count of animation commands is ZERO, so there is no request, no state mutation, and no response to record: a fixture here would have to fabricate the behaviour it claims to observe. This is a STRONGER statement than a corpus limitation and it is deliberately recorded as the reason, with the corpus's own absence of any unit row kept as a SECOND and independent fact (design D4)",
+    "reason_kind": "no animation behaviour exists in the legacy server to capture, which is stronger than a corpus limitation",
+    "corpus_distinction": "the committed corpus also holds no unit row (40 rows, 11 distinct ids, every one of committed type 'b'), which is a SECOND and independent reason, deliberately kept separate from the first",
+    "animation_commands_available": 0,
+    "fabricated_state": false
+  },
+  "coverage": {
+    "converted_units_dir": "assets/converted/units",
+    "converted_buildings_dir": "assets/converted/buildings",
+    "unit_packages": [
+      "10033_wild_elephant"
+    ],
+    "unit_package_count": 1,
+    "building_package_count": 1,
+    "unit_packages_recorded": [
+      "10033_wild_elephant"
+    ],
+    "unit_package_count_recorded": 1,
+    "covered_unit_legacy_id": "933",
+    "covered_unit_sprite_reference": "10033_wild_elephant",
+    "ambiguous_reference_units": [
+      "1001",
+      "1007",
+      "1008",
+      "1014",
+      "1034"
+    ],
+    "ambiguous_reference_count": 5,
+    "statement": "THE PROJECTION'S COVERAGE IS EXACTLY ONE UNIT, AND IT IS RECORDED RATHER THAN ASSUMED. Exactly ONE converted unit package is committed - 10033_wild_elephant - and exactly ONE converted building package, so no distribution over the 429 committed units is measurable at all and NO claim is made for any unit other than the Wild Elephant. The refusals generalise to all units as a statement about the LEGACY SOURCE, not about the assets; the linkage evidence does not (design D5)",
+    "reconverted": false,
+    "manufacture_note": "NO COVERAGE IS MANUFACTURED. No conversion or extraction output is regenerated to cover another unit, the committed conversion package and the registry manifests stay byte-identical, and the projection's one-package coverage is recorded as exactly that (design D5)"
+  },
+  "coverage_measured": {
+    "unit_packages": 1,
+    "building_packages": 1,
+    "covered_units": [
+      "933"
+    ],
+    "ambiguous_units": [
+      "1001",
+      "1007",
+      "1008",
+      "1014",
+      "1034"
+    ]
+  },
+  "refusal_measured": {
+    "refusals": 12,
+    "absent": 15
+  },
+  "non_claims": [
+    "no Flash, Ruffle, ActionScript, or browser executed, and no network was used at all",
+    "NO FRAME DURATION, LOOP COUNT, STATE MACHINE, TRANSITION, PRIORITY, INTERRUPT, PLAYBACK ORDER, PER-STATE TIMING, ANIMATION TRIGGER, OR EVENT-TO-STATE MAPPING IS IMPLEMENTED: each is a recorded refusal with its reason attached, not an omission",
+    "THE COMMITTED ANIMATION FIELDS ARE READ BY NO LEGACY BRANCH and are reported as CONTENT ONLY: max_frame, img_name, attack, attack_interval, attack_range, velocity, and the animal flag each have zero occurrences across the seven legacy modules",
+    "max_frame IS NOT ADOPTED AS A FRAME COUNT, A DURATION, A LOOP BOUND, OR A STATE COUNT, and WHAT IT MEANS IS NOT CLAIMED: the measurement is one data point over one committed converted package",
+    "NO LEGACY BRANCH SELECTS AN ANIMATION: the count of animation commands among the dispatcher's 63 named branches is ZERO",
+    "NO ANIMATION IS PLAYED, ANIMATED, OR RENDERED, and the converted unit package establishes asset and timeline LINKAGE ONLY, never playback correctness, animation correctness, or visual fidelity",
+    "NO CLAIM IS MADE FOR ANY UNIT OTHER THAN THE ONE COMMITTED CONVERTED PACKAGE, which is the only coverage measured: exactly one converted unit package is committed, so no distribution over the corpus is measurable at all",
+    "NO EXECUTED-LEGACY FIXTURE WAS CAPTURED, and the reason is the ABSENCE OF ANIMATION BEHAVIOUR in the legacy server rather than only a corpus limitation",
+    "NO PIXEL PARITY IS CLAIMED, and the recorded M6 tile-geometry gap is unchanged and never assumed",
+    "no windowed capture is claimed: nothing is animated and nothing new is rendered",
+    "NO ENDPOINT AND NO CLIENT INTENT: unit animation is committed content read through the content registry plus the committed converted asset on disk, so the compatibility suite stays green unchanged",
+    "the label NAMES are reported verbatim in their committed Portuguese form and are NOT translated into an English state vocabulary here: no state is selected by anything, so a translation would name a rule that does not exist",
+    "MUERTE IS RECORDED AS A STATE THE DELIVERED godot-unit-production CAPABILITY ALREADY FOUND UNREACHABLE: no legacy command produces a unit and none kills one",
+    "a reader who wanted a state machine, a duration, or a trigger out of the reported linkage must bring evidence the legacy contract does not contain"
+  ],
+  "provenance": {
+    "established": [
+      {
+        "fact": "the dispatcher has 63 named branches and the count of animation commands among them is ZERO; the only branches carrying any animation vocabulary are move, orient, end_attack, batch_remove, and remove_inventory_item",
+        "evidence": "command.py's own if/elif chain, measured by the suite, which compares the measured name set against NAMED_BRANCHES and the measured matches against ANIMATION_VOCABULARY_MATCHES"
+      },
+      {
+        "fact": "max_frame, img_name, attack, attack_interval, attack_range, velocity, and the animal flag each have ZERO occurrences across the seven legacy root modules",
+        "evidence": "a quoted-string search per field over command.py, engine.py, sessions.py, server.py, constants.py, get_game_config.py, and version.py, which the suite repeats for all seven names"
+      },
+      {
+        "fact": "all six committed animation fields are present on all 429 committed units and take 2, 401, 131, 12, 14, and 11 distinct values respectively",
+        "evidence": "the committed normalized content package, measured by the suite through the verified registry"
+      },
+      {
+        "fact": "the committed max_frame is 5 on 427 of the 429 units and 2 on exactly two of them - legacy ids 923 and 933 - while the 470 committed buildings take only 1 (on 24) and 2 (on 446)",
+        "evidence": "the same measured content package, over both the units and the buildings domains"
+      },
+      {
+        "fact": "the committed package encodes max_frame as a JSON NUMBER, unlike the properties flags, which are committed as STRINGS",
+        "evidence": "the measured variant type of every unit's max_frame entry as the registry hands it over"
+      },
+      {
+        "fact": "the one committed converted unit package records a root frame_count of 1, a frame_rate of 30.0, seven sprites - five at 20 frames and one at 7, all with no labels - and one sprite, id 63, at 29 frames carrying five labels",
+        "evidence": "assets/converted/units/10033_wild_elephant/package.json, read as committed JSON and measured by the suite"
+      },
+      {
+        "fact": "that sprite's five labels are QUIETO at frame 1, ANDAR at 6, ATAQUE at 11, MUERTE at 16, and PICAR at 21, each with anchor false and the recorded key set anchor/frame/name",
+        "evidence": "the same committed package, reported verbatim in recorded order by the projection"
+      },
+      {
+        "fact": "for that same unit the committed max_frame is 2, the parsed root frame_count is 1, and the labelled sprite has 29 frames, and the committed img_name equals the package's own legacy_id",
+        "evidence": "the committed package's own content_ref against its own parse, compared in this same run by the suite"
+      },
+      {
+        "fact": "exactly one converted unit package and exactly one converted building package are committed",
+        "evidence": "a read-only directory enumeration of assets/converted/units and assets/converted/buildings"
+      },
+      {
+        "fact": "M4's recorded conversion limit for a unit is a per-sprite timeline inventory with shape and bitmap linkage, no tessellation, no playback semantics, and labels recorded names-only",
+        "evidence": "tools/asset-registry/README.md's recorded limit, restated here and implemented not at all"
+      }
+    ],
+    "derived": [
+      {
+        "fact": "the line's deliverable is an asset-linkage projection plus auditable refusals rather than an animation mechanism",
+        "evidence": "derived (design D1): with zero animation commands, no server-selected state, and one committed package, a mechanism would be invented, while five recorded labels are exactly the material a later line would reach for to build a state machine with nothing to anchor it on"
+      },
+      {
+        "fact": "the committed max_frame is NOT the asset's frame count",
+        "evidence": "derived from THREE ESTABLISHED measurements: the committed value 2, the parsed root frame_count 1, and the labelled sprite's 29 frames, over a package the content names exactly. ONE data point: sufficient to REFUSE adoption, insufficient to say what max_frame is, and NOT a measurement of any other unit"
+      },
+      {
+        "fact": "max_frame is the seventh zero-consumer committed field in this project",
+        "evidence": "derived from the six ESTABLISHED precedents in ZERO_CONSUMER_PRECEDENTS plus the measured zero-consumer figure for max_frame itself; the ordinal is recorded because the precedence is what makes the refusal a rule"
+      },
+      {
+        "fact": "the recorded labels are the unit's animation STATES",
+        "evidence": "derived and WEAK: the conversion records label names and positions ONLY, and reading a name into an English state word would be an interpreter's addition rather than the asset's. The committed names are therefore reported verbatim and NO translation is delivered, because nothing selects a state for a translation to name"
+      },
+      {
+        "fact": "no endpoint is warranted while no server-selected animation exists",
+        "evidence": "derived (design D4): there is no intent to send and nothing to authorise, so the compatibility test suite stays green unchanged, exactly as M8 lines 1, 2, 4, and 6 concluded"
+      },
+      {
+        "fact": "a comma-joined committed img_name names no single asset and is refused rather than split",
+        "evidence": "derived from an ESTABLISHED content fact: 5 of the 429 committed units carry a comma-joined reference, and the delivered godot-unit-definitions capability already refuses to split or interpret that field. Splitting it here would invent a single asset the content does not name"
+      }
+    ]
+  },
+  "projection_measured": {
+    "labels": 5,
+    "sprites": 7,
+    "resolved": 1,
+    "package_legacy_id": "10033_wild_elephant",
+    "asset_named_by_content": true,
+    "frame_rate": 30.0,
+    "root_frame_count": 1
+  },
+  "legacy_measured": {
+    "modules": 7,
+    "zero_consumer_names": [
+      "max_frame",
+      "img_name",
+      "attack",
+      "attack_interval",
+      "attack_range",
+      "velocity",
+      "animal"
+    ],
+    "named_branches": [
+      "buy",
+      "complete_tutorial",
+      "set_goals",
+      "complete_goal",
+      "level_up",
+      "set_quest_var",
+      "move",
+      "collect",
+      "sell",
+      "kill",
+      "kill_iid",
+      "batch_remove",
+      "orient",
+      "expand",
+      "store_item",
+      "place_stored_item",
+      "sell_stored_item",
+      "store_add_items",
+      "next_research_step",
+      "research_buy_step_cash",
+      "next_research_item",
+      "reset_research_item",
+      "flash_debug",
+      "add_xp_unit",
+      "weekly_reward",
+      "push_unit",
+      "pop_unit",
+      "activate",
+      "collect_mission",
+      "win_daily_bonus",
+      "trade_resource",
+      "buy_stored_item_cash",
+      "unit_collections_completed",
+      "add_inventory_item",
+      "remove_inventory_item",
+      "complete_collection",
+      "add_click",
+      "activate_item_click",
+      "buy_si_help",
+      "finish_si",
+      "darts_reset",
+      "darts_new_free",
+      "darts_shoot_balloon",
+      "buy_premium_account",
+      "resurrect_hero",
+      "set_resource_allies",
+      "buy_mana_new",
+      "buy_magic",
+      "use_magic",
+      "push_queue_unit",
+      "push_queue_unit2",
+      "pop_queue_unit",
+      "buy_offer_pack",
+      "buy_powerups",
+      "soulmixer_speedup",
+      "admin_set_quest_rank",
+      "end_quest",
+      "end_attack",
+      "rt_open_graph_unit",
+      "first_time_marketplace",
+      "fast_forward",
+      "ping",
+      "set_variables"
+    ],
+    "vocabulary_matches": [
+      "move",
+      "batch_remove",
+      "remove_inventory_item",
+      "orient",
+      "end_attack"
+    ],
+    "whole_token": [
+      "end_attack",
+      "move",
+      "orient"
+    ],
+    "substring": [
+      "batch_remove",
+      "remove_inventory_item"
+    ],
+    "no_match": [
+      "frame",
+      "play",
+      "loop",
+      "state",
+      "clip",
+      "sprite",
+      "idle",
+      "walk",
+      "death"
+    ]
+  },
+  "committed_package": {
+    "relative_path": "assets/converted/units/10033_wild_elephant/package.json",
+    "sha256": "1234668907fec19fed8182a5f9970c93b6a10ed985b59062f63a8c06f3b2c270",
+    "source_file": "assets/sprites/10033_wild_elephant.swf",
+    "content_ref_legacy_id": "933",
+    "content_ref_max_frame": 2.0,
+    "top_level_keys": [
+      "bitmaps",
+      "content_ref",
+      "content_version",
+      "frame_count",
+      "frame_height",
+      "frame_rate",
+      "frame_width",
+      "kind",
+      "legacy_id",
+      "main",
+      "shapes",
+      "source_file",
+      "source_layer",
+      "sprites",
+      "symbols"
+    ]
+  },
+  "inputs": {
+    "content_package": {
+      "manifest": "packages/game-content/manifest.json",
+      "outputs_verified": 22,
+      "bytes_verified": 1905917,
+      "fingerprint": "",
+      "units_json_sha256": "6a7121cdefddf4835ac90c408c98da762b7ccd7de866aea749368beffdad36e0",
+      "buildings_json_sha256": "13ac38e95312af44819a5e8e7af4d7efa306afe879415da872e66914721b2f4d"
+    }
+  }
+}
