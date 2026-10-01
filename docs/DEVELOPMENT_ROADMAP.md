@@ -52,7 +52,7 @@ It is a progress ledger, not the source of truth for specified behavior.
 - **Last verified commit:** `cc77b90` — the Apply-tree tip the final-state battery executed on for `building-xp` (the following commit `d04766d` recorded the documentation and integration review; Apply PR #200 merged as `4fffe05`); prior: `7163311` for `building-resources` (PR #195 merged as `1eb3d57`), `2a3516f` for `building-expand` (PR #190 merged as `974bd15`), `8121e37` for `building-collect` (PR #185 merged as `fa88a99`), `fabbb58` for `building-construction`, `8d15315` for `building-upgrade`, `120b343` for `building-store`, `77abfd0` for `building-sell`, `7c4390b` for `building-move`, `b341904` for `building-purchase`, `742f594` for `building-placement`, then `3f3406c` the archive-stage tree the independent M6 verification batteries executed on
 - **Last updated:** 2026-10-01 (M8 line 3 archive PR recorded)
 
-### Resume point (updated after M8 line 5, orchestrator)
+### Resume point (updated after M8 line 6's investigation, orchestrator)
 
 **Delivered and archived, M8 lines 1-5:**
 
@@ -62,42 +62,69 @@ It is a progress ledger, not the source of truth for specified behavior.
 | `unit instances` | `2026-10-01-unit-instances` | #208 `235b4d2` (inv), #209 `0710038` (**squash, disclosed**), #210 `02dbfa6`, #211 `84f7af9`, #212 `435db4e` |
 | `queues` | `2026-10-01-unit-queues` | #213 `bbf4669` (inv), #214 `4b6a1eb`, #215 `69d49be`, #216 `a55fe41`, #217 `1420e2c` |
 | `production` | `2026-10-01-unit-production` | #219 `58caf86` (inv), #220 `c442b3b`, #221 `eaa6f37`, #222 `65af7ee`, #223 `61f400a` |
-| `collection` | `2026-10-01-unit-collection` | #224 `4cfc3fd` (inv), #225 `52e16b0`, #226 `22fdc2c`, #227 `20215fd` |
+| `collection` | `2026-10-01-unit-collection` | #224 `4cfc3fd` (inv), #225 `52e16b0`, #226 `22fdc2c`, #227 `20215fd`, #228 `c10de94` |
 
-**Committed investigations:** `docs/legacy-unit-instances.md`, `docs/legacy-production-queues.md`,
-`docs/legacy-unit-production.md`, `docs/legacy-unit-collection.md`.
+**Committed investigations (six):** `docs/legacy-unit-instances.md`,
+`docs/legacy-production-queues.md`, `docs/legacy-unit-production.md`,
+`docs/legacy-unit-collection.md`, **`docs/legacy-unit-movement.md`** (PR #229, merged
+`5cd47a1`).
 
 **Baselines in the final state (re-run by the orchestrator):** `verify.ps1` exit 0;
 `verify-boot.ps1` exit 0 on two consecutive final-state runs with **32 hermetic suites and 15
 live phases**, guard digest `6978b959...ff348` identical pre/post; compat **`Ran 1352 tests
-... OK`** (grown from 1257 by +95); content validator `valid`, 21 schemas; hash manifest 3,258
-entries; `openspec validate --all --strict` **54/54** with the change active, **53** after the
-archive. Report digests: `f997eb2d...66d5`, `A02EEDC8...57BBA0`, `807477db...92090`,
-`E56A470B...33CD6`, `81EFAD48...64C`.
+... OK`**; content validator `valid`, 21 schemas; hash manifest 3,258 entries;
+`openspec validate --all --strict` **53/53** after the last archive (54 with a change active).
+Report digests: `f997eb2d...66d5`, `A02EEDC8...57BBA0`, `807477db...92090`, `E56A470B...33CD6`,
+`81EFAD48...64C`.
 
-**Next objective:** propose M8 line 6, **`movement`**, investigation-first, with
-`docs/legacy-unit-movement.md` committed before the proposal. See the "Next eligible
-objective" line above for the questions it must answer.
+**Next objective:** propose M8 line 6, **`movement`**, on
+`docs/legacy-unit-movement.md`. Its shape is a **placement projection plus an explicit
+refusal**, for the reasons the investigation established:
 
-**The two findings that most shape the remaining lines:**
+- **The legacy server has no movement rule.** `move` rewrites the row's two coordinate slots
+  to client-supplied values and does nothing else — no type, occupancy, bounds, terrain, or
+  speed check, with `frame` and `string` read but unused. **`move` is type-agnostic**, so it
+  moves a unit exactly as it moves a building, and **the command already ships** as M7's
+  `building-move`. There is therefore **no new server behaviour** to add.
+- **`velocity` is positive on all 429 committed unit definitions and read by nothing** — the
+  **sixth** zero-consumer committed field. Together with `max_elem_vol`, `width`, `height`,
+  `elevation`, `attack_range`, `ft_flying`, and `ft_ground`, that is **eight** movement-adjacent
+  fields with zero legacy consumers. This is the field a later line would reach for to build a
+  travel-time model, so the refusal is the deliverable.
+- **`fast_forward`** shifts every row's slot-3 instant **and** `attr["ts"]` backwards by a
+  **client-supplied** number of seconds. It has no observable effect because nothing evaluates
+  elapsed time, and it is the **client-writable instant a client-side readiness check would
+  trust** — the invented rule `godot-unit-production` already refuses.
+- **No endpoint and no fixture**, because there is no movement behaviour to capture and the
+  corpus has no unit row.
 
-1. **The legacy server has no production, no completion, and no elapsed-time rule.**
-   `training_time` has zero legacy consumers, so there is no committed duration to use even if
-   a later line wanted one.
-2. **The legacy server has exactly one content-derived unit acquisition, and it works:**
-   `complete_collection` grants a committed prize into `map["store"]`, and six of the ten
-   committed collections grant a **unit**. The next step on that path — `place_stored_item`
-   placing the granted unit onto the map — is **deliberately not delivered** and is now the
-   nearest undelivered step on a fully committed path.
+**After movement**, M8 continues **animations → basic behaviors**, then assess the exit
+criterion **"Core unit gameplay works"**. Both remaining lines are likely refusals or thin
+projections on the established pattern: of five delivered lines, **three were refusals**
+(`unit instances`, `production`, and partly `collection`), and the two with real mechanisms
+(`queues` push/pop, `collection` grant) were exactly the two the committed corpus could
+exercise.
 
-**Discipline carried forward, with six data points now:** *measure every figure before
-asserting it* — twelve of my own investigation figures across these lines were asserted rather
-than measured or miscounted, and every one was found by someone else measuring it; *verify a
-worker's claim and reject it when wrong*; *prefer a public accessor* over a private-state
-reach; *prefer a boundary assertion over a repository-wide absence*; and *test a guard rather
-than trusting it*. Two process errors are recorded above — a squash merge and one direct
-push to `main` — both from chaining git operations into a block whose prerequisite step was
-not written out; branch, commit, and push are now run as separate verified steps.
+**Carried follow-ups, nearest first:**
+
+1. **The stored-item round trip** — `place_stored_item` placing the committed unit that
+   `godot-unit-collection` granted into `map["store"]`. This is the nearest undelivered step on
+   a fully content-derived path, and the collection line deliberately stopped there.
+2. **`verify-boot.ps1`'s `^ERROR:` guard** is broad enough to fail on a benign engine shutdown
+   RID-leak warning; narrow it to `SCRIPT ERROR` or a fatal-error allowlist.
+3. The friend-assist cluster, construction speedups, the upgrade row's seeded `{"nc": 0}`, the
+   premium upgrade path, the legacy level gate and daily-upgrade limit, cap semantics for a
+   non-zero `max_collects`, **the expansion tile-to-cell geometry** (new evidence, not a
+   derivation), and the internal `TownState.Resources.coins` alias.
+
+**Discipline carried forward, with six data points:** *measure every figure before asserting
+it* — twelve of my own investigation figures were asserted rather than measured or miscounted,
+and every one was found by someone else measuring it; *verify a worker's claim and reject it
+when wrong*; *prefer a public accessor* over a private-state reach; *prefer a boundary
+assertion over a repository-wide absence*; and *test a guard rather than trusting it*. **Two
+process errors are disclosed above** — a squash merge (#209) and one direct push to `main`
+(`41fc708`) — both from chaining git operations into a block whose prerequisite step was not
+written out. Branch, commit, and push are now run as separate verified steps.
 
 **Known-flaky guard:** `verify-boot.ps1` can fail on a `^ERROR:` line that is only an engine
 shutdown RID-leak warning; re-run before treating it as a regression.
