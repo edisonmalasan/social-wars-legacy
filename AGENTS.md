@@ -1043,6 +1043,80 @@ the suite exits 0 — one occurrence was seen, two reruns passed clean, and narr
 the guard is a recorded follow-up. No Flash, Ruffle, ActionScript, or browser
 executes in any of these commands, and every network call is loopback.
 
+
+Verified unit-movement commands (milestone M8 line 6; Godot 4.7.2.stable, Windows x64;
+`python` denotes the pinned interpreter, never the PATH alias). This is the **first M8
+line with no Compatibility API endpoint and no executed-legacy fixture**, and both are the
+deliverable rather than a gap, scoped by the committed investigation
+`docs/legacy-unit-movement.md`:
+
+```bash
+godot --headless --path apps/client-godot --script res://tests/test_unit_movement.gd
+godot --headless --path apps/client-godot --script res://tests/test_unit_movement.gd -- --report
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-10-01): the hermetic unit-movement suite (observed
+**245 checks**, 246 with `--report`; the 33rd hermetic suite) over a typed read-only
+placement projection reporting the committed cell, orientation, `width`, `height`,
+`elevation`, and `velocity` **verbatim** with nothing derived from another, failing
+**closed** with the recorded coordinate slots travelling untouched beside the refusal;
+`verify.ps1` exit 0; `verify-boot.ps1` exit 0 with **33 hermetic suites and 15 live phases**
+and **no new live phase**; the **unchanged** compat suite (observed `Ran 1352 tests … OK`,
+exit 0, because this line adds no endpoint and touches `apps/compat-api/**` not at all); the
+content validator (exit 0, `result: valid`, 21 schemas); and the preservation manifest
+(3,258 entries, exit 0). `git status` showed no content-package, fixture, save, config,
+village, conversion-package, or legacy-source byte changed. The evidence is the
+deterministic `unit-movement-report-v1` report under
+`apps/client-godot/evidence/unit-movement/` (digest `785B0482…9165E`, byte-identical across
+three consecutive runs). **The line implements nothing and that is its finding:** the legacy
+server has **no movement rule**, and the one command that moves a row — `move` — is
+**type-agnostic**, rewrites the two coordinate slots from client arguments with **no** type,
+occupancy, bounds, terrain, or speed check and with `frame` and `string` read but **unused**,
+and **already ships** as M7's `building-move`. Across the seven legacy modules there are only
+**five** writes to a row's slots 0–2 and exactly **two** branches write coordinates; `orient`
+is a plain slot write; and `pop_unit` is the only other coordinate writer, releasing a
+garrison row at client-supplied coordinates with the item id overwritten. **`velocity` is the
+sixth committed content field with no legacy consumer** and the sharpest instance in the
+project — positive on **all 429** committed units and on 145 of 470 buildings and read by
+nothing. `fast_forward` makes the row instant **client-writable**, subtracting a
+client-supplied number of seconds from every row's instant, every row's queue start instant,
+and eleven further map, private-state, research, and quest instants; it has no observable
+effect precisely because nothing evaluates elapsed time, and it is named because it is the
+instant a client-side readiness check would trust. The **anti-invention guard is structural
+and was tested rather than trusted**: injecting one deliberately invented
+`static func travel_time(from_cell, to_cell, velocity)` produced **two independent failures**
+and restoring the file returned the suite to its 224-check passing state and exit 0. **Two defects were found
+and corrected during the line:** the investigation's own slot-0–2 write count was **six**
+until `engine.py:62` was measured as `if item[0] == item_id:` — a **comparison** inside
+`pop_unit`'s garrison scan, not an assignment — making the count **five** and leaving the
+two-coordinate-writer conclusion unchanged (`docs/legacy-unit-movement.md` carries the
+correction); and the suite's own measurement reported `ft_flying` as set on **137** units
+where the content says **135**, because the normalized package stores the `properties` flags
+as **strings** and a non-empty String is truthy in GDScript, so `int(value or 0)` collapsed
+the committed `"0"` to `true` and `int(true)` is 1 — verified by probe that `int("0")` is 0,
+so **135** is correct, and the flags are now read through one named helper with the encoding
+recorded in the report. Claim limits: **no velocity-based travel time, path, terrain or
+elevation interaction, occupancy, bounds, readiness, or interpolation is implemented** — the
+eighteen recorded `ABSENT_HELPERS` entries are the contract, not omissions; **the committed
+movement fields are read by no legacy branch** and are reported as content only; **no
+unit-specific movement command exists and none was invented**; **no unit is placed or moved**
+and the corpus holds no unit row; **no executed-legacy fixture was captured** because there
+is **no unit-specific movement behaviour to capture**, which is stronger than the corpus's
+missing unit row and is recorded as a second and independent reason, while the type-agnostic
+move command already has its own executed-legacy fixture under `godot-building-move`; **no
+animation is implemented** and M4's converted unit package establishes asset and timeline
+**linkage** only, never playback correctness; **no pixel parity is claimed**, the M6
+tile-geometry gap remains a recorded gap, and **no windowed capture is claimed** because
+nothing is rendered; the placement **view** is owned here while `godot-unit-instances` keeps
+ownership of the row, so the two cannot drift; and `animations` and `basic behaviors` remain
+undelivered. No Flash, Ruffle, ActionScript, or browser executes in any of these commands,
+and no network is used at all.
+
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 

@@ -2543,3 +2543,126 @@ drove one completion with its content-derived two-part proof.
 - The committed collections' `item_ids` completion requirements are unchecked by the server.
 - `production`, `movement`, `animations`, and `basic behaviors` remain undelivered. No windowed
   capture and no pixel-parity oracle.
+
+## Unit movement (M8 line 6)
+
+The legacy server has **no movement rule**, and the one command that moves a row **already ships**.
+Scoped by `docs/legacy-unit-movement.md`.
+
+### The finding
+
+`move` rewrites the row's two coordinate slots from client arguments and does nothing else:
+
+- **no** type check, **no** occupancy check, **no** bounds check, **no** terrain check, **no** speed
+- `frame` and `string` are read and **unused** — already recorded by the delivered `building-move`
+
+**`move` is type-agnostic**, so it rewrites a unit row exactly as it rewrites a building's, and the
+command **ships as M7's `godot-building-move`**. Across the seven legacy modules there are only
+**five** writes to a row's slots 0–2, and exactly **two** branches write coordinates: `move`, and
+`pop_unit` releasing a garrison row at client-supplied coordinates with the item id overwritten.
+`orient` is a plain client-supplied slot write. There is therefore **no new server behaviour** for
+this line to add.
+
+**`velocity` is the sharpest zero-consumer field in the project** — positive on **all 429**
+committed unit definitions and on 145 of 470 buildings, and **read by no legacy branch**. That is
+the **sixth** committed content field with no legacy consumer, after `unit_capacity`,
+`training_time`, the level curve's reward fields, and the `collect` family. `elevation`,
+`width`, and `height` additionally **cannot** yield terrain-aware movement: the legacy SWF's tile
+geometry was never extracted, the recorded M6 evidence gap.
+
+`fast_forward` subtracts a **client-supplied** `seconds` from every row's recorded instant, from
+every row's queue start instant, and from **eleven** further map, private-state, research, and
+quest instants. It has **no observable effect** — precisely because nothing evaluates elapsed time —
+and it is named because it is the **client-writable instant** a client-side readiness check would
+trust.
+
+### What the module delivers
+
+`scripts/units/unit_movement.gd` is a typed, read-only **placement projection**. It reports the
+committed cell coordinates, orientation, `width`, `height`, `elevation`, and `velocity` **verbatim**
+and **derives nothing** from any of them, and it fails **closed**: a row whose coordinates are
+absent or malformed is reported unresolvable with its **recorded slots travelling untouched** beside
+the refusal, so a caller can never read a defaulted origin as a resolved cell.
+
+Alongside it the module records the **movement-command inventory** — `move`, `orient`, `pop_unit`,
+and `fast_forward`, each with what it *checks* and what it does **not** — and **eighteen** named
+absent helpers, each with the reason it is absent.
+
+**The placement view has one owner.** `godot-unit-instances` keeps ownership of the row and
+**delegates** the placement reading here, so the two cannot drift.
+
+### The guard is tested, not trusted
+
+The anti-invention guard is **structural**: the module's whole function inventory is compared
+against a pinned list. Injecting one deliberately invented
+
+```gdscript
+static func travel_time(from_cell: Variant, to_cell: Variant, velocity: Variant) -> float:
+	return Vector2(float(from_cell[0]), float(from_cell[1])).distance_to(
+		Vector2(float(to_cell[0]), float(to_cell[1]))) / maxf(1.0, float(velocity))
+```
+
+produced **two independent failures** — the pinned-inventory check and the per-helper absence check
+— and restoring the file returned the suite to its passing state and **exit 0**.
+
+### Two implementation defects this line found and corrected
+
+**The investigation's own write count.** It first recorded **six** writes to a row's slots 0–2,
+counting `engine.py:62` as `item[0] = ...`. That line is in fact `if item[0] == item_id:` — a
+**comparison** inside `pop_unit`'s garrison scan. Measured with a pattern that excludes `==`, the
+count is **five**. The conclusion was unaffected and independently re-measured: exactly **two**
+branches write coordinates. `docs/legacy-unit-movement.md` carries the correction.
+
+**A GDScript truthiness trap in the suite's own measurement.** The normalized package stores the
+`properties` flags as **strings** (`"1"` / `"0"`) and leaves most **absent**, so a flag read as
+`int(props.get("ft_flying", 0) or 0) > 0` counts a non-empty String as truthy, collapses the
+committed `"0"` to `true`, and `int(true)` is 1. That reported `ft_flying` as set on **137** units
+where the content says **135** — ids 1357 and 1369 are the two the package marks `"0"`. Verified
+by probe that `int("0")` is 0, so **135** is correct; the flags are now read through one named
+helper that converts each representation explicitly, and the encoding is recorded in the report.
+
+### Verification (commands actually executed)
+
+```bash
+godot --headless --path apps/client-godot --script res://tests/test_unit_movement.gd
+godot --headless --path apps/client-godot --script res://tests/test_unit_movement.gd -- --report
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Observed 2026-10-01: `test_unit_movement` **245 checks** (246 with `--report`), the 33rd hermetic
+suite; `verify.ps1` exit 0; `verify-boot.ps1` exit 0 with **33 hermetic suites and 15 live phases**
+and **no new live phase**, because this line adds no server operation; the compat suite
+**unchanged** at `Ran 1352 tests ... OK`; the content validator `result: valid` across 21 schemas;
+and the preservation manifest 3,258 entries. The evidence is the deterministic
+`unit-movement-report-v1` report at `evidence/unit-movement/report.json`, digest
+`785B0482…9165E`, byte-identical across three consecutive runs.
+
+*One flake worth recording:* the first `verify-boot.ps1` run reported the compat discovery exiting 1
+while the suite itself reported `OK`; the suite passed standalone (`Ran 1352 tests ... OK`, exit 0)
+and the battery passed on rerun. Consistent with the recorded guard-narrowing follow-up, and no
+`apps/compat-api/**` byte changed.
+
+### Unit movement claim limits
+
+- **No velocity-based travel time, path, terrain or elevation interaction, occupancy, bounds,
+  readiness, or interpolation is implemented.** Each is a recorded refusal with its reason, not an
+  omission — the eighteen `ABSENT_HELPERS` entries are the contract.
+- **The committed movement fields are read by no legacy branch** and are reported as content only.
+- **No unit-specific movement command exists in the legacy source and none was invented.** Exactly
+  two branches write coordinates, and the one that moves an existing row is type-agnostic, already
+  delivered, and checks nothing.
+- **No unit is placed or moved**, and the committed corpus holds no unit row (40 placements, 11
+  distinct ids, every committed `type` `b`).
+- **No executed-legacy fixture was captured**, because there is **no unit-specific movement
+  behaviour to capture** — a stronger statement than the corpus's missing unit row, which is
+  recorded as a second and independent reason. The type-agnostic move command already has its own
+  executed-legacy fixture under `godot-building-move`.
+- **No animation or playback is implemented.** M4's converted unit package establishes asset and
+  timeline **linkage** only, never playback correctness or gameplay behaviour.
+- **No pixel parity is claimed**, and the M6 tile-geometry gap remains a recorded gap. **No windowed
+  capture is claimed**: nothing is rendered and no unit exists to render.
+- `animations` and `basic behaviors` remain undelivered.

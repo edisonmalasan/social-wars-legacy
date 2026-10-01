@@ -46,17 +46,23 @@ There is therefore **no new server behaviour** for a unit-movement line to add.
 ### The complete set of coordinate writes
 
 Across `command.py`, `engine.py`, `sessions.py`, `server.py`, `constants.py`,
-`get_game_config.py`, and `version.py`, there are only **six** writes to a row's slots 0, 1, or 2:
+`get_game_config.py`, and `version.py`, there are only **five** writes to a row's slots 0, 1, or 2:
 
 | Where | What |
 | --- | --- |
 | `command.py:132-133` (`move`) | `item[1] = x`, `item[2] = y` — the **only** branch that moves an existing row between cells |
 | `command.py:403-405` (`pop_unit`) | `unit[0] = item_id`, `unit[1] = x`, `unit[2] = y` — a **garrison** row being placed from the map, at **client-supplied** coordinates and with the item id **overwritten** |
-| `engine.py:62` (`pop_unit` helper) | `item[0] = ...` — pops the garrison match, no coordinates |
 
 So exactly two branches write coordinates, and the second only does so when a row leaves a
 garrison. `orient` (`item[4] = int(orientation)`) is the only rotation command, and is likewise a
 plain client-supplied slot write.
+
+*Corrected after the Apply stage.* This table first listed a sixth write at `engine.py:62` as
+`item[0] = ...`. That line is in fact **`if item[0] == item_id:`** — a **comparison** inside
+`engine.pop_unit`'s garrison scan, not an assignment. Measured with an assignment pattern that
+excludes `==`, the count is **five**. The investigation's **conclusion is unaffected and
+independently re-measured**: exactly **two** branches write coordinates (`move` and
+`pop_unit`), and `orient` is the only writer of slot 4.
 
 ## 2. Eight more committed movement-adjacent fields have zero legacy consumers
 
@@ -157,7 +163,7 @@ movement rule exists.
 
 **Established from committed source:** the whole `move` branch and its five arguments, including
 `frame` and `string` read-but-unused; that `move` performs no type, occupancy, bounds, terrain, or
-speed check; the complete six-write set for a row's slots 0–2 and which branches perform them;
+speed check; the complete **five**-write set for a row's slots 0–2 and which branches perform them;
 `orient`'s single slot write; `fast_forward`'s client-supplied time shift over every row's slot 3
 and `attr["ts"]`; the **zero** legacy reads of `velocity`, `max_elem_vol`, `width`, `height`,
 `elevation`, `attack_range`, `ft_flying`, and `ft_ground`; `velocity` being positive on all 429
