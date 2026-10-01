@@ -94,11 +94,11 @@ guard never touched the committed evidence
 - **M7 progress delivered by this change:** the **eleventh and final** M7 deliver line, level progression, is closed — completing the milestone. Executed-legacy fixture committed (`tests/fixtures/godot-building-xp/`, capture exit 0 three times with a byte-identical rerun apart from the documented time-dependent fields, and the recorded probe establishing level movement); the `/v0/level_up` endpoint with the derived target, the ignored client-supplied level, the two 409 refusals, and the two-part proof including that **no** resource moved (compat suite `Ran 1109 tests ... OK`, including `test_level_envelope`, `test_level_endpoint`, and `test_level_parity`); typed `level_up_town()` on both GameApi implementations; client flow `tests/test_town_xp.gd` **767 checks**; battery integration — **27 hermetic suites and 13 live phases**; and evidence `apps/client-godot/evidence/building-xp/` (capture plus `xp-report-v1`, digest `f64a5bec…52a0`, byte-identical across runs, carrying the derived interpretation with its rejected alternative quoted). **All ten previously delivered lines remain delivered and archived.** Commands, purposes, provenance, and claim limits recorded in `AGENTS.md`, `apps/client-godot/README.md`, `apps/compat-api/README.md`, and the updated `docs/legacy-xp-basics.md`
 - **Current objective:** This orchestration run completed the M7 milestone. It recorded the XP-basics investigation (PR #198), reconciled the `building-resources` archive bookkeeping (#197 / `1970325`), proposed `building-xp` (PR #199), and completed the full lifecycle (Propose → Apply → implement → test/verify → Sync → Archive → roadmap ledger update → **M7 exit assessment**) for the eleventh and final bounded M7 objective. Prior stages in this run: the `building-resources` lifecycle (#193–#197), the expand lifecycle (#188–#193), `building-collect` (#184–#187), the collect-income investigation (PR #183), the `building-construction` lifecycle (#178–#182), `building-upgrade` (#174–#177), `building-store` (#169–#172), `building-sell` (#165–#168), `building-move` (#161–#164), `building-purchase` (#157–#160), `building-placement` (#153–#156), `town-vertical-slice` (#149–#152), `content-validator` (#144–#148)
 - **Last completed change:** `unit-collection` — archived as `2026-10-01-unit-collection`; proposal PR #225 (`52e16b0`), Apply PR #226 (`22fdc2c`), spec-sync PR #227 (`20215fd`). Previous: `unit-production` — `2026-10-01-unit-production` (#219–#223, archive `61f400a`); `unit-queues` — `2026-10-01-unit-queues` (#213–#217, `1420e2c`); `unit-instances` — `2026-10-01-unit-instances` (#208–#212, `435db4e`); `unit-definitions` — `2026-10-01-unit-definitions` (#204–#207, `5e43bc0`); `building-xp` — `2026-09-30-building-xp` (#199–#202, `fb999618`); `building-resources` (#193–#197); `building-expand` (#189–#192); `building-collect` (#184–#187); `building-construction` (#178–#182); `building-upgrade` (#174–#177); `building-store` (#169–#172); `building-sell` (#165–#168); `building-move` (#161–#164); `building-purchase` (#157–#160); `building-placement` (#153–#156); `town-vertical-slice` (#149–#152); `content-validator` (#144–#148)
-- **Next eligible objective:** **M8 line 6, `movement`** — the next bounded line, with its investigation committed as **`docs/legacy-unit-movement.md`** (PR #229, merged `5cd47a1`). **The finding is that the legacy server has NO movement rule**, and the one move command is already delivered: `move` rewrites the row's two coordinate slots to client-supplied values and does nothing else — **no type check, no occupancy check, no bounds check, no terrain check, and no speed**, with `frame` and `string` read but unused (already recorded by the delivered `godot-building-move`). **`move` is type-agnostic**, so it would rewrite a unit row exactly as it rewrites a building's, and the command itself ships as M7's `building-move` — so **there is no new server behaviour for a unit-movement line to add**. Across the seven legacy modules there are only **five** writes to a row's slots 0–2 (**corrected during the Apply stage**: `engine.py:62` is `if item[0] == item_id:`, a **comparison** inside `pop_unit`'s garrison scan, not an assignment; the two-coordinate-writer conclusion is unchanged and independently re-measured), and exactly two branches write coordinates (`move`, and `pop_unit` releasing a garrison row at client-supplied coordinates with the item id overwritten). **Eight more committed movement-adjacent fields have zero legacy consumers** — `velocity`, `max_elem_vol`, `width`, `height`, `elevation`, `attack_range`, `ft_flying`, `ft_ground` — and **`velocity` is the sharpest instance in the project: positive on all 429 committed unit definitions, read by nothing.** That is the **sixth** zero-consumer committed field, after `unit_capacity`, `training_time`, the level curve's reward fields, and the `collect` family. `elevation` and `width`/`height` additionally cannot yield terrain-aware movement, because the legacy SWF's tile geometry was never extracted — the M6 evidence gap. **`fast_forward` is the only time-manipulating command** and shifts every row's slot-3 instant **and** `attr["ts"]` backwards by a **client-supplied** number of seconds; it has no observable effect precisely because nothing evaluates elapsed time, and it is named because it is the **client-writable instant a client-side readiness check would trust** — the invented rule `godot-unit-production` refuses. So the deliverable is a **placement projection plus an explicit refusal**: cell, orientation, and committed footprint and `velocity` reported as **content only**, the movement-command inventory, the `fast_forward` recording, and **no** velocity, path, terrain, occupancy, or travel-time semantics — with **no endpoint and no fixture**, since there is no behaviour to capture. The M8 order continues **animations → basic behaviors**, then assess the exit criterion **"Core unit gameplay works"**. **New carried follow-up:** the **stored-item round trip** (`place_stored_item`) is the nearest undelivered step on the fully content-derived path that `godot-unit-collection` opened. **Carried follow-up:** `verify-boot.ps1`'s `^ERROR:` guard is broad enough to fail on a benign engine shutdown RID-leak warning; narrow it to `SCRIPT ERROR` or a fatal-error allowlist
+- **Next eligible objective:** **M8 line 7, `animations`** — its investigation is committed as **`docs/legacy-unit-animations.md`** (PR #237, merged `ff77e8f`), so the line's shape is settled: an **asset-timeline linkage projection plus an explicit refusal**. The legacy server has **no animation rule and no animation command**, and reads **none** of the six animation-adjacent committed fields (`max_frame`, `img_name`, `attack`, `attack_interval`, `attack_range`, `velocity`, plus the `animal` flag), with `max_frame` the **seventh** zero-consumer committed field and a near-constant at `5` on 427 of 429 units. The states live in the asset: sprite 63 of the one converted unit package carries 29 frames and five named labels, which establishes linkage only. A measured contradiction settles the scope: committed `max_frame` is **2** while the parsed root frame count is **1** and the labelled sprite has **29**, so `max_frame` is **not** the asset's frame count and adopting it as one would be wrong. No endpoint, no fixture, and a structural anti-invention guard tested by injection. M8's order then continues **`basic behaviors`**, then the exit criterion “Core unit gameplay works” is assessed
 - **Last OpenSpec validation:** PASS — `building-xp` archive stage (2026-09-30): after the move `openspec list` reports "No active changes found." and `openspec validate --all --strict` reports 48 passed / 0 failed, and at Sync (before the move) 49/49; change strict validation passed at Propose and at the integration review. This completes the sync of all eleven M7 lines' specs. The archive ran with `--skip-specs` because the Sync stage had already applied the deltas — without it, archive correctly aborts with "already exists" and changes no files. This is not the unavailable dedicated verification workflow
 - **Last implementation verification:** Integration review over `building-xp`, followed by the same battery re-run in the final state by the root — orchestrator-run, not an independent agent (fallback noted under Blocking issues). Actually executed by the root: `openspec validate building-xp --strict` exit 0; `verify.ps1` PASS exit 0; `verify-boot.ps1` PASS exit 0 (**27 hermetic suites** including `test_town_xp` 767 checks, **13 live phases** including `level-up-live` green, guard digest `6978b959…ff348` pre=post, port released, no working-tree `saves/`); `hash_manifest.py verify` exit 0 (3,258 entries); compat discovery `Ran 1109 tests ... OK`. The root independently re-read the committed `xp-report-v1` (provenance split, `zero-based` rejected alternative, the corpus contradiction quoted, and `reward.paid: false` / `reward.displayed: false`) and **corrected an error the Apply stage surfaced in my own investigation record** — the `Conqueror` saturation level was a zero-based position in a curve whose index base is one-based, so it is one-based level **45**, not 49. The requirement-to-evidence map, the two honest consequences of the corpus already being at its derived level, the accepted worker deviations, and the residual gaps are recorded in the tasks.md integration-review record. Prior: the ten earlier M7 integration reviews, and the `town-vertical-slice` independent verification (2026-09-28) VERDICT FAIL on exactly C1, discharged by the ledger commit in PR #152
 - **Last verified commit:** `cc77b90` — the Apply-tree tip the final-state battery executed on for `building-xp` (the following commit `d04766d` recorded the documentation and integration review; Apply PR #200 merged as `4fffe05`); prior: `7163311` for `building-resources` (PR #195 merged as `1eb3d57`), `2a3516f` for `building-expand` (PR #190 merged as `974bd15`), `8121e37` for `building-collect` (PR #185 merged as `fa88a99`), `fabbb58` for `building-construction`, `8d15315` for `building-upgrade`, `120b343` for `building-store`, `77abfd0` for `building-sell`, `7c4390b` for `building-move`, `b341904` for `building-purchase`, `742f594` for `building-placement`, then `3f3406c` the archive-stage tree the independent M6 verification batteries executed on
-- **Last updated:** 2026-10-01 (M8 line 3 archive PR recorded)
+- **Last updated:** 2026-10-01 (M8 line 7 animations investigation recorded; the animations proposal is next)
 
 ### Resume point (updated after M8 line 6's investigation, orchestrator)
 
@@ -129,25 +129,55 @@ three runs). **The anti-invention guard was tested rather than trusted** on this
 `travel_time` produced two independent failures and the restore returned the suite to a passing
 state with the report digest unchanged.
 
-**Next objective:** investigate, then propose, M8 line 7, **`animations`**. The
-investigation comes first and must **not** infer animation semantics from M4's converted unit
-package: that package establishes asset and timeline **linkage** only, never playback correctness
-or gameplay behaviour. What must be established from the committed legacy source is whether any
-legacy command, committed field, or configuration entry governs unit animation at all. The
-established pattern makes the likely answer a refusal — six committed content fields have already
-been found with **zero** legacy consumers, and `velocity` is the sharpest — but the *animation*
-line must measure its own fields rather than assume. If no animation rule exists, the deliverable
-is a **linkage projection plus an explicit refusal** of frame timing, looping, state machines, and
-playback order, with no endpoint and no fixture, exactly as `movement` was. M8's order then
-continues **`basic behaviors`**, after which the exit criterion **"Core unit gameplay works"** is
-assessed. **Carried follow-ups, nearest first:** (1) the **stored-item round trip**
-(`place_stored_item`) is the nearest undelivered step on the fully content-derived path
-`godot-unit-collection` opened; (2) `verify-boot.ps1`'s `^ERROR:` guard is broad enough to fail on a
-benign engine-shutdown RID-leak warning — and, recorded this line, on the compat unittest
-discovery exiting 1 while the suite itself reported `OK`, which passed standalone (`Ran 1352 tests
-... OK`, exit 0) and on rerun; narrow it to `SCRIPT ERROR` or a fatal-error allowlist.
+**Next objective:** propose M8 line 7, **`animations`**, on the now-committed investigation
+**`docs/legacy-unit-animations.md`** (PR #237, merged `ff77e8f`). Its shape is an **asset-timeline
+linkage projection plus an explicit refusal**, for the reasons the investigation established:
+
+- **The legacy server has no animation rule and no animation command.** Of the 63 named
+  `command.py` branches, five contain animation vocabulary as a *substring* and every one is an
+  artifact: `move` and `orient` are the movement line's commands, `batch_remove` and
+  `remove_inventory_item` contain the letters of "move" inside "re—–move",
+  and `end_attack` is combat termination.
+- **Six animation-adjacent committed fields, all with ZERO legacy reads** across the seven
+  modules: `max_frame` (on all 429 units, **2** distinct values), `img_name` (401), `attack`
+  (131), `attack_interval` (12), `attack_range` (14), and `velocity` (11), plus the `animal`
+  `properties` flag. **`max_frame` is the seventh zero-consumer committed field in the project**
+  and is a near-constant: **`5` on 427 of the 429** units, `2` on exactly ids **923** and **933**,
+  `1`/`2` on all 470 buildings. Its committed encoding is a JSON *number*, unlike the
+  `properties` flags, which are *strings*.
+- **The animation states live in the asset, not the content or the server.** The one committed
+  converted unit package parsed `10033_wild_elephant.swf` and recorded **sprite 63 with 29 frames
+  and five named states** — `QUIETO` at frame 1, `ANDAR` at 6, `ATAQUE` at 11, `MUERTE` at 16,
+  `PICAR` at 21. That establishes the *labels and frame positions* and nothing more: M4's own
+  recorded limit is **no tessellation, no playback semantics, labels names-only**, so there is no
+  recorded loop, state machine, transition, priority, interrupt, per-state duration, or mapping
+  from any server event to any state. `MUERTE` is a state the delivered `production` line already
+  found unreachable, since no legacy command produces or kills a unit.
+- **A measured contradiction shaped the scope.** For that same unit the committed `max_frame` is
+  **2** while the parsed root `frame_count` is **1** and the sprite holding the five labels has
+  **29** frames, and `img_name` equals the converted package's `legacy_id` — so the two
+  describe the same unit and **disagree**. `max_frame` is therefore **not** the asset's frame
+  count, and adopting it as one would be **wrong**. This is **one data point**, recorded as
+  derived-provisional: enough to **refuse** adopting `max_frame` as a frame count, not enough to
+  claim what it means, and not a measurement of any other unit — only **one** converted unit
+  package and **one** building package are committed, so no distribution is measurable.
+- So the deliverable is a **linkage projection** reporting the labels, frame positions, per-sprite
+  frame counts, and recorded frame rate **verbatim**, plus the explicit refusals of frame duration,
+  loop count, state machine, transitions, priority, interrupts, playback order, per-state timing,
+  animation triggers, and any event-to-state mapping — with **no endpoint and no fixture**,
+  because there is no animation behaviour for the legacy server to have. As with `movement`, the
+  **anti-invention guard should be structural and then tested by injection** rather than trusted.
+
+**Carried follow-ups, nearest first:** (1) the **stored-item round trip** (`place_stored_item`) is
+the nearest undelivered step on the fully content-derived path `godot-unit-collection` opened;
+(2) `verify-boot.ps1`'s `^ERROR:` guard is broad enough to fail on a benign engine-shutdown
+RID-leak warning — and, recorded on the `movement` line, on the compat unittest discovery exiting
+1 while the suite itself reported `OK`, which passed standalone (`Ran 1352 tests ... OK`, exit 0)
+and on rerun; narrow it to `SCRIPT ERROR` or a fatal-error allowlist.
 
 **Process disclosures (both preserved):** the `unit instances` Apply PR #209 was
+**squash-merged** as `0710038`, and `41fc708` was pushed **directly to `main`**, bypassing the
+branch-and-PR workflow. Neither is rewritten.**Process disclosures (both preserved):** the `unit instances` Apply PR #209 was
 **squash-merged** as `0710038`, and `41fc708` was pushed **directly to `main`**, bypassing the
 branch-and-PR workflow. Neither is rewritten.
 **After movement**, M8 continues **animations → basic behaviors**, then assess the exit
