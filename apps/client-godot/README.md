@@ -2362,3 +2362,89 @@ desynchronize the double and the suite.
 nondeterministic engine-shutdown RID-leak warning can fail the battery even though the suite
 exits 0. Observed once on `test_town_xp`; two reruns passed clean. **Re-run before treating
 such a failure as a regression.**
+
+---
+
+## Unit production (M8 line 4)
+
+A **refusal made a capability**, not a mechanism — because the committed investigation
+`docs/legacy-unit-production.md` established that **the legacy server cannot produce a unit at
+all**.
+
+### The finding
+
+**All five branches that can place a row on the map take the item id from the client.**
+
+| Branch | Where the `item_id` comes from |
+| --- | --- |
+| `buy` | **client `args[1]`** |
+| `place_stored_item` | **client `args[1]`** |
+| `weekly_reward` | **client `args[1]`** |
+| `pop_unit` | client `args[2]` — **and it overwrites the garrison row's item with it** (`unit[0] = item_id`) |
+| `resurrect_hero` | **client `args[1]`** |
+
+Not one derives an id from a completed queue, from a duration, or from committed production
+content.
+
+**`training_time` has zero legacy consumers.** The only matches of the substring are the
+*distinct* field `sm_training_time` inside `soulmixer_speedup` — **three occurrences on two
+lines**, all in that one branch. This is the **third** committed content field with no legacy
+consumer, after `unit_capacity` (M8 line 2) and the level curve's `reward_type`/`reward_amount`
+(M7's XP line). The precedent, established twice: **record the field, refuse to invent a rule.**
+
+**The acquisition routes are unvalidated client-sent item lists.** `buy_offer_pack` reads
+`package_id` — and then never uses it — `json.loads` a client-sent array, and stores every id
+with **no lookup into the committed `offer_packs` table**. So the committed `offer_packs` and
+`darts_items` tables are read by no **command branch** and **no acquisition is derived from
+either**. (`darts_items` *is* walked at module level by `get_game_config.py`'s `make_dynamic` to
+rewrite each entry's `start_date` — a content-freshness concern, not an acquisition path.)
+
+`add_xp_unit` **creates nothing**: it adds a **client-sent** `attr["xp"]` to a placed row, with a
+client-sent level used only in a print.
+
+### What the module delivers
+
+`scripts/units/production_flow.gd` is a pure module that projects that a queue exists and records
+its start instant **while stating the server cannot say whether it is ready**, and exposes **no**
+`is_complete`, `remaining`, `progress`, duration, or award helper at all. It records:
+
+- the **row-entry inventory** with each id's source and classification, and the finding that no
+  path derives a unit from a queue;
+- the **`training_time` refusal** — reportable as content only, with the zero-consumer fact;
+- the **`add_xp_unit` refusal** — a recorded `attr["xp"]` is readable as content, never awarded;
+- the **acquisition finding** — recorded, with no mechanism and no request.
+
+### The guard is tested, not trusted
+
+The suite **asserts the absence** of any readiness, duration, or award helper, and re-derives
+the recorded legacy facts from the source rather than trusting prose. Injecting a single
+`static func is_complete` into the module makes the suite **fail with four independent
+failures**; restoring it passes. A later line that adds a readiness helper therefore **fails the
+delivered suite** rather than quietly reintroducing an invented rule.
+
+### Verification (commands actually executed)
+
+```bash
+godot --headless --path apps/client-godot --script res://tests/test_unit_production.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+```
+
+Observed 2026-10-01: `test_unit_production` **568 checks** (581 with `--report`), the 31st
+hermetic suite; compat **unchanged** at `Ran 1257 tests ... OK` — this line adds **no endpoint**;
+`verify-boot.ps1` exit 0 with **31 hermetic suites and 14 live phases**, guard digest identical
+pre/post.
+
+### Unit production claim limits
+
+- **No production mechanism, completion, or readiness is implemented**, because the legacy server
+  has none to reproduce.
+- **No unit is created, trained, or placed**, and **no acquisition is implemented or claimed**.
+- **No duration is derived** from the committed `training_time`.
+- **No experience is awarded** from the recorded `attr["xp"]`.
+- **No executed-legacy fixture** — and the reason is stronger than a corpus limitation: there is
+  **no production behaviour to capture**.
+- Death and resurrection are unreachable from the delivered client and unimplemented.
+- `collection`, `movement`, `animations`, and `basic behaviors` remain undelivered.
+- No windowed capture, no production endpoint, and no pixel-parity oracle.
