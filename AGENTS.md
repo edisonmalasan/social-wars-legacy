@@ -974,6 +974,75 @@ the delivered client and unimplemented; `collection`, `movement`, `animations`, 
 oracle. No Flash, Ruffle, ActionScript, or browser executes in any of these
 commands, and **no network is used at all**.
 
+Verified unit-collection commands (milestone M8 line 5; Godot 4.7.2.stable, Windows x64;
+`python` denotes the pinned interpreter, never the PATH alias). M8's first
+**content-derived, server-authoritative** grant and its first genuinely capturable
+unit transaction, scoped by the committed investigation
+`docs/legacy-unit-collection.md`:
+
+```bash
+python -B apps/compat-api/capture_collection_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_unit_collection.gd
+godot --headless --path apps/client-godot --script res://tests/test_unit_production.gd
+godot --headless --path apps/client-godot --script res://tests/test_unit_queues.gd
+godot --headless --path apps/client-godot --script res://tests/test_project_scope.gd
+godot --headless --path apps/client-godot --script res://tests/test_game_api_fake.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-10-01): the executed-legacy fixture capture
+(exit 0, containment identical, re-runnable) recording one `complete_collection`
+against collection 1 (Draggy Collection) whose committed prize is exactly
+`{"1085": 1}` — the corpus's **empty** store became exactly `{"1085": 1}` and the
+collection ledger went `[]` to `[1]`, so the grant matches the **committed bag
+exactly**, the ledger grew by **exactly one appended id**, and **no player state
+was fabricated**; this is the **project's first content-derived,
+server-authoritative unit acquisition**; the hermetic unit-collection suite
+(observed **1793 checks**, 1805 with `--report`; the 32nd hermetic suite); the
+sibling unit suites (**568**, **411**), the scope suite (**1526**, was 1475), and
+the fake GameApi (**1322**, was 1205); both batteries in the final state (each
+exit `0`; `verify-boot.ps1` now runs **32 hermetic suites and 15 live phases**, and
+`collection-live` drove one completion with its content-derived two-part proof and
+mutated the disposable corpus; guard digest identical pre/post, `6978b959…ff348`);
+the **grown** compat suite (observed **`Ran 1352 tests ... OK`**, exit `0` — up
+from 1257 by **+95**); the content validator (exit `0`, `result: valid`, 21
+schemas); and the preservation manifest (3,258 entries, exit `0`). `git status`
+showed no legacy, config, save, content-package, or prior-fixture byte changed.
+The evidence is the deterministic `unit-collection-report-v1` report under
+`apps/client-godot/evidence/unit-collection/` (digest `81EFAD48…64C`,
+byte-identical across three runs). **This COMPLETED, rather than amended, the
+`production` line's acquisition finding**: `buy_offer_pack` and
+`buy_stored_item_cash` remain unvalidated client-sent item lists, but they are not
+the only route, and `godot-unit-production` now names this as the **sole
+content-derived** path — without that delta a delivered spec would assert
+something false at exactly the moment this line disproved it. Two authority gaps
+are recorded as requirements rather than smoothed over: **nothing verifies a
+collection was earned**, and the **one-based index makes ids 0 and 1 alias** (the
+one-based reading is derived-provisional, corroborated by the committed `id`
+column running `1..10` against `legacy_id` `0..9`, with the rejected zero-based
+alternative retained). **One imprecision of mine was corrected** after the worker
+found it: `harvester` is **not** a top-level committed field but a `properties` flag
+key on **5** units (Worker I–IV, Orc Worker), **every one with `collect` 0**; the
+zero-consumer finding is unchanged but the list is no longer read as six top-level
+fields. Claim limits: **no unit income, payout, cap semantics, or experience
+award** — 0 of 429 units carry a positive `collect`, no collect field is ever read,
+`max_collects` is 0 on every unit, and `collect_xp`'s only writer is client-sent;
+**no collection eligibility is checked**; **ids 0 and 1 alias**; **the stored-item
+placement step is not delivered**, so the fixture evidences the grant into storage
+and **not** a unit placed on the map, leaving that round trip a carried follow-up;
+the committed collections' `item_ids` requirements are unchecked by the server;
+`production`, `movement`, `animations`, and `basic behaviors` remain undelivered;
+no windowed capture and no pixel-parity oracle. **Known-flaky guard:**
+`verify-boot.ps1` treats any `^ERROR:` line as a script error, so a
+nondeterministic engine-shutdown RID-leak warning can fail the battery even though
+the suite exits 0 — one occurrence was seen, two reruns passed clean, and narrowing
+the guard is a recorded follow-up. No Flash, Ruffle, ActionScript, or browser
+executes in any of these commands, and every network call is loopback.
+
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 

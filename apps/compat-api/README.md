@@ -742,6 +742,84 @@ service source from `def v0_level_up()` to the closing `app.config` line, so a r
 inserted between them broke their dedent. Keep new routes out of that span, or narrow those two
 tests' source slice.
 
+## `POST /v0/collection`
+
+M8 line 5, and the **first endpoint whose payload is entirely content-derived**. The
+client sends only a player identifier and a collection id; the service looks up what
+that collection grants in the committed `collections` table.
+
+### What it does
+
+`complete_collection_town(collection_id)` builds the single-command batch envelope with a
+**neutral** resource vector, dispatches through the unchanged `command()` dispatcher, and
+derives the grant from `collection_envelope.py`'s shared one-based clamped index
+resolution. Any client-supplied **prize**, **item id**, or **quantity** is **ignored** — there
+is no key for the service to trust.
+
+The post-execution proof asserts **two things**: the granted id and quantity equal the
+**committed** prize bag exactly, **and** the collection ledger grew by **exactly one appended
+id**. Comparing against the committed bag rather than the request is what makes this the
+project's first *content-derived* proof — the earlier family forms compare against a derived
+delta or against a claimed no-move.
+
+### Six of the ten committed collections grant a unit
+
+| `collection_id` | Name | Committed prize |
+| --- | --- | --- |
+| 1 | Draggy Collection | **unit 1085 Metal Draggy** |
+| 2 | Transformer Collection | **unit 1062 MegaBot** |
+| 3 | Plane Collection | **unit 1096 F-117** |
+| 4 | Defense Collection | building 164 |
+| 5 | Gun Collection | **unit 1073 Erradicator** |
+| 6 | Tank Collection | **unit 1010 APC** |
+| 7 | Launcher Collection | building 45 |
+| 8 | Soldier Awards Collection | building 136 |
+| 9 | Relaxing Time Collection | building 106 |
+| 10 | Animal Collection | **unit 1056 Elephant rider** |
+
+### The executed-legacy fixture — the project's first content-derived unit acquisition
+
+`tests/fixtures/godot-unit-collection/` captures one `complete_collection` against
+collection 1, whose committed prize is exactly `{"1085": 1}`. Read from the committed bytes:
+
+| Step | `maps[0]["store"]` | `privateState["collections"]` |
+| --- | --- | --- |
+| login | `{}` | `[]` |
+| **complete_collection** | **`{"1085": 1}`** | **`[1]`** |
+
+The grant equals the **committed bag exactly**, the ledger grew by **exactly one appended id**,
+and **no player state was fabricated**. The manifest records that the grant is content-derived and
+that the **stored-item placement step was not chained**, because that round trip is a separate
+follow-up.
+
+### Two recorded authority gaps
+
+- **Eligibility is not checked.** No legacy branch verifies the collection was earned, so a caller
+  may name any of the ten. The endpoint **records** this and implements **no** check — adding one
+  would invent a rule the server does not have. Server-authoritative validation belongs to M13.
+- **Ids 0 and 1 alias.** `get_collection_prize` does `index = max(0, collection - 1)`, so id 0
+  clamps to index 0 and resolves to the *same* prize as id 1. The one-based reading is
+  **derived-provisional** (corroborated by the committed `id` column running `1..10` against
+  `legacy_id` `0..9`, with the rejected zero-based alternative retained), and the response reports
+  the alias rather than presenting the two ids as distinct.
+
+### What it deliberately does not do
+
+- **No unit income, payout, cap semantics, or experience award.** No committed unit carries a
+  positive `collect`, no collect field is read by the legacy service, `max_collects` is 0 on every
+  unit, and `collect_xp`'s only writer takes a client-sent amount.
+- **No stored-item placement.** The grant lands in `map["store"]` and stops there.
+- **No unit is created or placed on the map** by this endpoint.
+
+### Refusals
+
+| Code | HTTP | Meaning |
+| --- | --- | --- |
+| `missing_collection_id` | 409 | the request carries no collection id |
+| `invalid_collection_id` | 409 | the id is not an integer the one-based index can resolve |
+| `unresolvable_collection` | 409 | the id resolves outside the committed table |
+| `internal_error` | 500 | unhandled server failure |
+
 ## Commands actually executed
 
 All run from the repository root on Windows x64 with the pinned interpreter

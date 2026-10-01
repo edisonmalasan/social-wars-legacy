@@ -2448,3 +2448,98 @@ pre/post.
 - Death and resurrection are unreachable from the delivered client and unimplemented.
 - `collection`, `movement`, `animations`, and `basic behaviors` remain undelivered.
 - No windowed capture, no production endpoint, and no pixel-parity oracle.
+
+---
+
+## Unit collection (M8 line 5)
+
+The first M8 line with a **server-derived, content-backed grant** — and therefore the first with a
+genuinely capturable unit transaction. Scoped by `docs/legacy-unit-collection.md`.
+
+### The project's first content-derived, server-authoritative unit acquisition
+
+`complete_collection` takes a collection id, calls `get_collection_prize`, and grants the
+**committed** prize bag into `map["store"]`:
+
+```python
+def get_collection_prize(collection: int):
+    index = max(0, collection - 1)
+    collections = __game_config["collections"]
+    if index < len(collections):
+        return json.loads(collections[index]["prize"])
+    return None
+```
+
+**Six of the ten committed collections grant a unit:**
+
+| `collection_id` | Name | Committed prize |
+| --- | --- | --- |
+| 1 | Draggy Collection | **unit 1085 Metal Draggy** |
+| 2 | Transformer Collection | **unit 1062 MegaBot** |
+| 3 | Plane Collection | **unit 1096 F-117** |
+| 4 | Defense Collection | building 164 |
+| 5 | Gun Collection | **unit 1073 Erradicator** |
+| 6 | Tank Collection | **unit 1010 APC** |
+| 7 | Launcher Collection | building 45 |
+| 8 | Soldier Awards Collection | building 136 |
+| 9 | Relaxing Time Collection | building 106 |
+| 10 | Animal Collection | **unit 1056 Elephant rider** |
+
+**The client sends a collection id, never what it receives.** Read from the captured fixture bytes:
+collection 1's committed prize is exactly `{"1085": 1}`, the corpus's empty store became exactly
+`{"1085": 1}`, and the ledger went `[]` → `[1]` — the grant matching the **committed bag exactly**,
+the ledger growing by **exactly one appended id**, and **no player state fabricated**.
+
+### What this corrected
+
+The `production` line recorded that `buy_offer_pack` and `buy_stored_item_cash` are unvalidated
+client-sent item lists, which reads as *no committed unit is obtainable*. That is true of **those
+routes** and false of the server — so `godot-unit-production` now **completes** that finding with
+this as the **sole content-derived** route, rather than amending it.
+
+### Two authority gaps, recorded not smoothed over
+
+- **Nothing verifies a collection was earned** — a caller may name any of the ten.
+- **The one-based index makes ids 0 and 1 alias** (`max(0, collection - 1)`), and
+  `collection_prize.gd` reports that rather than presenting them as distinct. The one-based reading
+  is **derived-provisional**, corroborated by the committed `id` column running `1..10` against
+  `legacy_id` `0..9`, with the rejected zero-based alternative retained.
+
+### Three refusals
+
+| | Why |
+| --- | --- |
+| No unit income | **0 of 429** units carry a positive `collect`; `collect`, `collect_type`, `collect_xp`, `max_collects`, `max_elem_vol` all have **zero** legacy reads |
+| No cap semantics | `max_collects` is **0 on every unit** — the cap `building-collect` refused has **no unit analogue** |
+| No experience award | `collect_xp` is never read and its only writer is **client-sent**, which `unit-production` already refuses |
+
+(`harvester` is **not** a top-level committed field — it is a `properties` flag key on 5 Worker
+units, all with `collect` 0 — and it is likewise never read.)
+
+### Verification (commands actually executed)
+
+```bash
+python -B apps/compat-api/capture_collection_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_unit_collection.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+```
+
+Observed 2026-10-01: `test_unit_collection` **1793 checks** (1805 with `--report`), the 32nd
+hermetic suite; compat **grown** to `Ran 1352 tests ... OK` (from 1257, **+95**);
+`verify-boot.ps1` exit 0 with **32 hermetic suites and 15 live phases**, and `collection-live`
+drove one completion with its content-derived two-part proof.
+
+### Unit collection claim limits
+
+- **No unit income, payout, cap semantics, or experience award** is implemented.
+- **No collection eligibility is checked** — a caller may name any committed collection. A
+  server-authority gap for M13.
+- **Collection ids 0 and 1 alias**, and the projection reports it.
+- **The stored-item placement step is not delivered.** The fixture evidences the grant **into
+  storage**, not a unit placed on the map — that round trip remains a carried follow-up, and it is
+  now the nearest undelivered step on a fully content-derived path.
+- The committed collections' `item_ids` completion requirements are unchecked by the server.
+- `production`, `movement`, `animations`, and `basic behaviors` remain undelivered. No windowed
+  capture and no pixel-parity oracle.
