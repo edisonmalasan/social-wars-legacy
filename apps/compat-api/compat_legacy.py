@@ -776,6 +776,57 @@ class LegacyBoot:
             )
         return store
 
+    # --- collection content and ledger (godot-unit-collection) -----------
+    # The two accessors below read the loaded legacy configuration's
+    # ``collections`` table and the loaded save's own collection ledger, exactly
+    # as ``expansion_price`` reads the positional price schedule and
+    # ``map_expansions`` reads the owned-expansions ledger.  Neither is ever read
+    # from a client: the table fixes what a completion GRANTS and the ledger is
+    # only the post-execution proof's own before-snapshot.
+
+    def collection_table(self) -> Optional[Any]:
+        """The loaded configuration's ``collections`` list, verbatim, or ``None``.
+
+        This is the table ``get_collection_prize`` indexes positionally
+        (``get_game_config.py:170-175``).  It is returned **by reference** on
+        purpose, unlike every save accessor here: it is immutable loaded content
+        that no branch writes, and :func:`collection_envelope.project_prize`
+        copies out of it rather than mutating it.  ``None`` means the loaded
+        configuration carries no ``collections`` list at all, which the endpoint
+        turns into ``internal_error`` — failing closed rather than granting
+        against a table it could not read.
+        """
+        table = self._config.get_game_config().get("collections")
+        if not isinstance(table, list):
+            return None
+        return table
+
+    def private_collections(self, user_id: str) -> List[Any]:
+        """``save["privateState"]["collections"]`` — the completed-collection ledger.
+
+        Legacy ``command.complete_collection`` appends the collection id **only
+        when it is absent** (``command.py:517-518``), so the accessor returns a
+        **copy**: the endpoint reads the pre-execution ledger for the second
+        proof half and the legacy dispatcher mutates this very list in place, so
+        a list returned by reference would alias the live ledger and report the
+        after-state as the before-state — the same aliasing
+        :meth:`map_expansions` exists to prevent.
+
+        A save with no ``collections`` list is a state this service cannot reason
+        about, so it raises ``LegacyBootError("invalid_save_state")`` rather than
+        inventing an empty ledger.  Entries are **never** rewritten, normalized,
+        reordered, or deduplicated here: the committed corpus's ledger is empty
+        and real ledgers carry numbers, not text, exactly as the branch appended
+        them.
+        """
+        ledger = (self.save_document(user_id).get("privateState") or {}).get("collections")
+        if not isinstance(ledger, list):
+            raise LegacyBootError(
+                "invalid_save_state",
+                "save for user id %r has no privateState['collections'] list" % user_id,
+            )
+        return list(ledger)
+
     def execute_commands(self, user_id: str, envelope: Dict[str, object]) -> None:
         """Run the unchanged legacy ``command()`` batch dispatcher (D2).
 

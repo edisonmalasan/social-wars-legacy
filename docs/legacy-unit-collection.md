@@ -121,10 +121,15 @@ measurement across `command.py`, `engine.py`, `constants.py`, and `get_game_conf
 | `collect_xp` | **0** |
 | `max_collects` | **0** |
 | `max_elem_vol` | **0** |
-| `harvester` | **0** |
+| `harvester` | **0** — and note this is **not** a top-level committed field: it is a
+|   | `properties` flag key, present on **5** units (Worker I, Worker II, Worker III,
+|   | Worker IV, Orc Worker), **every one of them with `collect` 0** |
 
-So **all five committed collect fields have zero legacy consumers** — the same shape as
-`unit_capacity`, `training_time`, and the level curve's reward fields. That is why the delivered
+So **every one of those committed collect fields has zero legacy consumers** — the same shape
+as `unit_capacity`, `training_time`, and the level curve's reward fields. (`harvester` is the
+one imprecise entry in that list: it is a `properties` flag key rather than a top-level field,
+which does not change the zero-consumer finding but is recorded here so the list is not read
+as six top-level fields.) That is why the delivered
 `building-collect` capability **derived** its payout from committed content and recorded it as
 derived-provisional: the server has none to reproduce, and the client's `resources_changed`
 vector is the untrusted path.

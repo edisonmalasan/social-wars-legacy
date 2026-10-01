@@ -489,6 +489,43 @@ Surface (loopback only, port :5056):
     persists the batch; every other failure below also returns before the
     dispatcher runs, so the corpus is untouched on every error path.
 
+``POST /v0/collection`` with JSON ``{"user_id", "collection_id"}``
+    ``{protocol, ok, game_version, server_time, result, collection_id, grant,
+    prize, index, eligibility, store_before, store_after, ledger_before,
+    ledger_after, ledger_appended, refusals, resources}`` — the **twelfth**
+    state-mutating surface, specified by the ``godot-unit-collection``
+    capability, and the **first whose payload is entirely content-derived**.
+    One call carries **exactly one** legacy ``complete_collection`` command and
+    the request carries **only** a save identity and a collection id: no prize,
+    no item id, no quantity, no price, and no resource delta is accepted, and
+    every such key (``prize``, ``item_id``, ``quantity``, ``item``, ``cost``,
+    ``price``, ``resources_changed``, ``vector``, …) is **ignored** (design D1).
+    The service looks the grant up in the loaded configuration's committed
+    ``collections`` table through ``get_collection_prize``
+    (``get_game_config.py:170-175``) and grants **exactly** what that collection
+    grants.
+
+    **The two-part post-execution proof is content-derived**, which is what makes
+    it non-tautological: the granted id **and** quantity are compared with the
+    **committed** prize bag and no other stored key may move, while the private
+    state's collection ledger must match the derived one — **exactly one appended
+    id** when the id was absent, or nothing appended when it was already there
+    (``command.py:517-518`` is an append-if-absent, so the ledger is idempotent
+    while the grant is not).  Every stored resource is **unchanged** as well,
+    because the derived vector is neutral (design D1/D5).
+
+    **The index is one-based and derived-provisional** (design D3): the id selects
+    the table positionally through ``max(0, collection_id - 1)``, and the
+    response reports the resolved index, whether the clamp moved it, and the id an
+    aliased id resolves to — **collection id 0 and collection id 1 resolve to the
+    same committed prize**, as does every negative id.
+
+    **No eligibility check is performed and none is added** (design D2): the
+    committed ``item_ids`` requirement list is read by no branch at all, so a
+    caller may name **any** of the ten committed collections.  What a caller
+    cannot do is choose the contents.  **No unit income, no cap semantics, and no
+    experience** are derived either (design D5) — see ``collection_envelope``.
+
     After execution the endpoint proves the post-state in **two** ways
     (design D4) and fails closed with ``internal_error`` on any other outcome:
     the recorded ``attr`` bag matches the **derived** result for the action —
@@ -653,6 +690,21 @@ code                     HTTP  when
 ``invalid_attr``         500  the addressed row carries no object attribute bag,
                                 or a ``nu`` that is not a non-negative integer —
                                 a server-side shape failure, never client input
+``missing_collection_id`` 400 ``/v0/collection`` body carries no ``collection_id``
+``invalid_collection_id`` 400 ``collection_id`` present but not a strict integer
+                                (``bool``, float, and string all excluded — legacy
+                                would raise out of ``collection - 1`` or index the
+                                table with a fractional index)
+``unknown_collection_id`` 409 ``/v0/collection``: the one-based index
+                                ``max(0, collection_id - 1)`` lands outside the
+                                committed 10-entry ``collections`` table.
+                                ``get_collection_prize`` returns ``None`` there
+                                and the branch's next statement raises
+                                ``TypeError``, so this is refused **before** the
+                                dispatcher runs.  A **negative** or zero id is
+                                NOT this code: the clamp resolves it to index 0,
+                                so it is answered with the id-1 grant and
+                                ``index.aliased: true``
 ``invalid_reason``       400  derived reason is not a string (server-side
                                 derivation failure; never client input)
 ``invalid_coordinates``  400  ``x``/``y`` missing, not integers, or outside ``0..99``
@@ -672,7 +724,8 @@ session and bootstrap endpoints never persist — this module never calls
 byte-identical. ``POST /v0/place``, ``POST /v0/purchase``,
 ``POST /v0/move``, ``POST /v0/sell``, ``POST /v0/store``,
 ``POST /v0/upgrade``, ``POST /v0/construction``, ``POST /v0/collect``,
-``POST /v0/expand``, ``POST /v0/level_up``, and ``POST /v0/queue``
+``POST /v0/expand``, ``POST /v0/level_up``, ``POST /v0/queue``, and
+``POST /v0/collection``
 execute the unchanged legacy ``command()`` dispatcher, which
 persists through legacy ``save_session`` into the **service corpus's**
 ``saves/`` and nowhere else; the service never opens a working-tree file for
@@ -688,6 +741,7 @@ from flask import Flask, Response, jsonify, request
 
 import compat_legacy
 import collect_envelope
+import collection_envelope
 import construction_envelope
 import expand_envelope
 import level_envelope
@@ -738,6 +792,9 @@ ERROR_XP_BELOW_THRESHOLD = "xp_below_threshold"
 ERROR_MISSING_MAP_KEY = "missing_map_key"
 ERROR_INVALID_MAP_KEY = "invalid_map_key"
 ERROR_UNKNOWN_MAP_KEY = "unknown_map_key"
+ERROR_MISSING_COLLECTION_ID = "missing_collection_id"
+ERROR_INVALID_COLLECTION_ID = "invalid_collection_id"
+ERROR_UNKNOWN_COLLECTION_ID = "unknown_collection_id"
 ERROR_INVALID_ATTR = "invalid_attr"
 ERROR_BAD_REQUEST = "bad_request"
 ERROR_NOT_FOUND = "not_found"
@@ -2852,6 +2909,253 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
                 previous=previous_row,
                 row=updated_row,
                 queue=queue_envelope.project_queue(after_attr),
+                resources=resources_after,
+            ),
+            200,
+        )
+
+    @app.post("/v0/collection")
+    def v0_collection() -> Tuple[Dict[str, Any], int]:
+        """Execute one collection completion through the unchanged legacy path.
+
+        One call carries **exactly one** legacy ``complete_collection`` command
+        (``command.py:504-523``), and the request body carries **only** a save
+        identity and a collection id.  **No prize, item id, quantity, price, or
+        resource delta is accepted** (design D1): the grant is looked up in the
+        loaded configuration's committed ``collections`` table through
+        ``get_collection_prize`` (``get_game_config.py:170-175``), so the server
+        decides what a caller receives and a client-supplied expectation can
+        never become the endpoint's own proof.  Any such key is ignored — the
+        same intent-only discipline the collect, expand, and level-up routes use
+        for amounts and prices.
+
+        **The core decision, D1 — the grant is content-derived.**  This is the
+        first route whose payload is *fully* committed, and that is what makes
+        its post-execution proof non-tautological: the proof compares the
+        persisted storage against the **committed** prize bag, not against
+        anything the client sent.
+
+        Validation is structural fail-closed, and every failure below returns
+        **before** the legacy dispatcher runs, so the corpus is byte-identical on
+        every error path: a JSON object body, a resolvable save, a **strict
+        integer** collection id, and an id the committed table resolves.  The
+        resolvability check is load-bearing rather than defensive — for an
+        out-of-range id ``get_collection_prize`` returns ``None`` and the
+        branch's very next statement (``for key in prize``) raises ``TypeError``,
+        so reporting success would claim a grant that never happened.
+
+        **The one-based index and its alias (design D3).**  The id selects the
+        table positionally through ``max(0, collection - 1)``.  The clamp is
+        reported rather than absorbed: **collection id 0 and collection id 1
+        resolve to the same committed prize**, as does every negative id.  The
+        response carries the resolved index, whether the clamp moved it, and the
+        id an aliased id resolves to, so no caller can present an aliased id as a
+        distinct collection.
+
+        **Design D2 — no eligibility check, and none added.**  Nothing in the
+        legacy source verifies that a collection was earned: the committed
+        ``item_ids`` requirement list is read by no branch at all, and the
+        ledger is read only to decide whether to append.  So a caller may name
+        **any** of the ten committed collections, and this route adds no check —
+        that would invent a rule the legacy server does not have, and
+        authoritative validation belongs to a later server-authoritative
+        milestone.  What a caller *cannot* do is choose the contents.
+
+        **Design D1/D5 — a neutral vector and a two-part proof.**  A completion
+        has no committed price, and any cost would be a **client-sent** delta
+        because ``do_command`` applies the request's vector before the branch
+        (``command.py:40``, ``engine.py:251-271``), so the derived vector is
+        neutral.  The proof then has two value-level halves against the
+        **committed** bag: part one, the granted id **and quantity** equal the
+        committed prize exactly and no other stored key moved; part two, the
+        collection ledger matches the derived one — **exactly one appended id**
+        when the id was absent, or **nothing appended** when it was already there
+        (``command.py:517-518`` is an append-if-absent, so the ledger is
+        idempotent while the grant is not).  Either half failing is a reported
+        failure, not a success.
+
+        **Design D5 — no unit income, no cap semantics, no experience.**  The
+        ``collect`` command is field-agnostic (it re-stamps slot 3 and does
+        nothing else), no collect field has a legacy consumer, 0 of 429 units
+        record a positive ``collect``, and ``max_collects`` is 0 on every unit —
+        so nothing here pays out, caps, or awards experience.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404,
+                ERROR_UNKNOWN_USER_ID,
+                "no save exists for user_id %r" % user_id,
+            )
+
+        if "collection_id" not in payload:
+            return error_response(
+                400, ERROR_MISSING_COLLECTION_ID, "collection_id is required"
+            )
+        collection_id = payload["collection_id"]
+        if not collection_envelope.is_strict_int(collection_id):
+            return error_response(
+                400,
+                ERROR_INVALID_COLLECTION_ID,
+                "collection_id must be an integer",
+            )
+
+        # The committed table, and the read-only projection of the named id.  The
+        # projection is the ONLY source of the grant: no prize key is read from
+        # the request, so a client-supplied prize/item/quantity cannot win.
+        table = boot.collection_table()
+        if table is None:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the loaded legacy configuration carries no collections table",
+            )
+        try:
+            projected = collection_envelope.project_prize(table, collection_id)
+        except collection_envelope.EnvelopeError as failure:
+            # A content-side shape failure (the table is not a list), never a
+            # client value.
+            return error_response(500, ERROR_INTERNAL, failure.code)
+        if not bool(projected.get("ok", False)):
+            code = str(projected.get("reason", ""))
+            if code == collection_envelope.REASON_INVALID_COLLECTION_ID:
+                return error_response(
+                    400, ERROR_INVALID_COLLECTION_ID, str(projected.get("error", ""))
+                )
+            if code == collection_envelope.REASON_INVALID_PRIZE:
+                return error_response(
+                    500, ERROR_INTERNAL, str(projected.get("error", ""))
+                )
+            return error_response(
+                409,
+                ERROR_UNKNOWN_COLLECTION_ID,
+                str(projected.get("error", "")),
+            )
+
+        # The pre-execution storage and ledger.  Both accessors return copies, so
+        # the legacy dispatcher's in-place writes cannot reach them.
+        try:
+            store_before = dict(boot.map_store(user_id))
+            ledger_before = boot.private_collections(user_id)
+            resources_before = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        # Derive the legacy envelope (design D1/D5): the command, the collection
+        # id, the print-only `bought` flag, and the neutral resource vector are
+        # the module's, never the client's.
+        try:
+            envelope_payload = collection_envelope.build_envelope(
+                collection_id=collection_id
+            )
+        except collection_envelope.EnvelopeError as failure:
+            if failure.code in ("invalid_vector", "invalid_timestamp"):
+                return error_response(500, ERROR_INTERNAL, failure.code)
+            return error_response(400, failure.code, str(failure))
+
+        # Execute the unchanged legacy command dispatcher in-process.  It
+        # persists via legacy save_session into this corpus only; the legacy HTTP
+        # route returns {"result": "success"} whenever command() returns without
+        # raising, so reaching here IS the legacy result — which is precisely why
+        # it is NOT taken as proof that the right item was granted.
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        # Prove the post-state (design D1).  Both halves are value comparisons
+        # against the COMMITTED bag; either half failing is a reported failure.
+        try:
+            store_after = dict(boot.map_store(user_id))
+            ledger_after = boot.private_collections(user_id)
+            resources_after = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        divergence = collection_envelope.expected_grant(
+            store_before,
+            store_after,
+            projected["prize"],
+            collection_id=collection_id,
+            before_ledger=ledger_before,
+            after_ledger=ledger_after,
+        )
+        if divergence is not None:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the completion did not carry the committed grant: %s" % divergence,
+            )
+        try:
+            derived_ledger = collection_envelope.expected_ledger(
+                ledger_before, collection_id
+            )
+        except collection_envelope.EnvelopeError as failure:
+            return error_response(500, ERROR_INTERNAL, failure.code)
+        for name in sorted(resources_after):
+            if resources_after[name] != resources_before[name]:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "resource %s is %r after execution, not the pre-execution %r: "
+                    "a completion moves no resource, so the derived neutral "
+                    "vector requires every stored resource to be unchanged"
+                    % (name, resources_after[name], resources_before[name]),
+                )
+        return (
+            envelope(
+                boot,
+                result="success",
+                collection_id=int(collection_id),
+                grant={
+                    "command": collection_envelope.COMPLETE_COMMAND,
+                    "item_id": str(projected["entries"][0]["item_id"]),
+                    "quantity": int(projected["entries"][0]["quantity"]),
+                    "item_count": int(projected["item_count"]),
+                    "quantity_total": int(projected["quantity_total"]),
+                    "derived_from": "the committed collections table: the "
+                        "service looks up what the named collection grants and "
+                        "accepts no prize, item id, or quantity from the client",
+                },
+                prize={
+                    "name": str(projected["name"]),
+                    "id_column": str(projected["id_column"]),
+                    "bag": dict(projected["prize"]),
+                    "entries": [dict(entry) for entry in projected["entries"]],
+                },
+                index={
+                    "base": "one-based",
+                    "derivation_status": "derived-provisional",
+                    "rejected_alternative": "zero-based",
+                    "rule": collection_envelope.INDEX_RULE,
+                    "alias_rule": collection_envelope.ALIAS_RULE,
+                    "requested": int(projected["requested_index"]),
+                    "resolved": int(projected["index"]),
+                    "clamped": bool(projected["clamped"]),
+                    "aliased": bool(projected["aliased"]),
+                    "alias_of": (
+                        int(projected["alias_of"])
+                        if projected["alias_of"] is not None
+                        else None
+                    ),
+                },
+                eligibility={
+                    "checked": False,
+                    "rule": collection_envelope.NO_ELIGIBILITY_CHECK,
+                },
+                store_before=store_before,
+                store_after=store_after,
+                ledger_before=list(ledger_before),
+                ledger_after=list(ledger_after),
+                ledger_appended=bool(derived_ledger["appended"]),
+                refusals=[dict(entry) for entry in collection_envelope.REFUSALS],
                 resources=resources_after,
             ),
             200,

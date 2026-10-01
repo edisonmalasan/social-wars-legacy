@@ -9,9 +9,10 @@ extends Node
 ## store intent, `upgrade_building()` for one upgrade intent,
 ## `build_construction()` for one construction intent,
 ## `collect_income()` for one collection intent, `expand_town()` for one
-## expansion intent, `level_up_town()` for one level-up intent, and
+## expansion intent, `level_up_town()` for one level-up intent,
 ## `push_queue_unit_town()` / `pop_queue_unit_town()` for one production-queue
-## intent each, receiving typed results
+## intent each, and `complete_collection_town()` for one collection-completion
+## intent, receiving typed results
 ## (`scripts/gameapi/boot_data.gd`); raw transport dictionaries never reach
 ## presentation code, and no other script references a transport.
 ##
@@ -31,7 +32,8 @@ extends Node
 ##               (collection), and `tests/fixtures/godot-building-expand/`
 ##               (expansion), `tests/fixtures/godot-building-xp/`
 ##               (level), and `tests/fixtures/godot-unit-queues/`
-##               (queue); no process, no server, no socket.
+##               (queue), and `tests/fixtures/godot-unit-collection/`
+##               (collection completion); no process, no server, no socket.
 ##   legacy_v0 - JSON over loopback HTTP to Compatibility API v0 through the
 ##               built-in HTTP request client; endpoint from the project
 ##               setting `gameapi/endpoint` (default: loopback 127.0.0.1 on
@@ -132,6 +134,12 @@ var level_up_requests := 0
 ## `placement_requests`). Monotonic for the same reason: `configure()` swaps the
 ## implementation without hiding history.
 var queue_requests := 0
+## Number of collection-completion intents this process has issued (unit-collection
+## flow contract: exactly one per confirm, zero for every local refusal — the
+## collection suite snapshots this counter exactly like `placement_requests`).
+## Monotonic for the same reason: `configure()` swaps the implementation
+## without hiding history.
+var collection_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -402,6 +410,32 @@ func pop_queue_unit_town(user_id: String,
 	queue_requests += 1
 	var result: BootData.QueueResult = await _impl.pop_queue_unit_town(
 		user_id, map_key)
+	return result
+
+
+## One collection-completion intent (the save identity and a collection id, and
+## NOTHING else) from the selected implementation. The contract carries NO prize,
+## NO item id, NO quantity, NO price, and NO resource deltas: the service looks
+## the grant up in the committed `collections` table and executes the unchanged
+## legacy `complete_collection` branch with a NEUTRAL vector (unit-collection
+## design D1/D5) — so a client-supplied prize/item/quantity key is ignored
+## exactly as a client-supplied amount or price is ignored elsewhere, and the
+## typed result's `item_id`, `quantity`, `prize`, `store_after`, and `resources`
+## are authoritative (design D8). The response carries the storage and the
+## collection ledger as read BEFORE execution and re-read AFTER it, plus the
+## index resolution with its **alias**, so presentation code never appends an id,
+## never grants an item, and never applies its own arithmetic — the response
+## wins even where the two disagree.
+##
+## **No eligibility is checked** and none is invented (design D2): the legacy
+## server verifies nothing about whether a collection was earned, so a caller may
+## name any of the ten committed collections. What a caller cannot do is choose
+## the contents.
+func complete_collection_town(user_id: String,
+		collection_id: int) -> BootData.CollectionResult:
+	collection_requests += 1
+	var result: BootData.CollectionResult = await _impl.complete_collection_town(
+		user_id, collection_id)
 	return result
 
 

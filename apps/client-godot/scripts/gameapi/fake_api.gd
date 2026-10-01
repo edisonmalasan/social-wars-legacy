@@ -246,6 +246,28 @@ const QUEUE_POP_BEFORE_FIXTURE := \
 ## are byte-identical. Read (never written) and validated the same way.
 const QUEUE_POP_AFTER_FIXTURE := \
 	"tests/fixtures/godot-unit-queues/steps/command_pop_queue_unit/after.json"
+## The executed-legacy collection fixture's before-state: the committed
+## fresh-player corpus, whose `maps[0]["store"]` is `{}` and whose
+## `privateState["collections"]` is `[]`. Read (never written) as the double's
+## starting save for the completion intent.
+const COLLECTION_BEFORE_FIXTURE := \
+	"tests/fixtures/godot-unit-collection/steps/command_complete_collection/before.json"
+## The same fixture's after-state — the real legacy server's record of the one
+## executed `complete_collection`: collection 1's committed prize written into the
+## empty storage, **exactly one** id appended to the empty ledger, and **no**
+## stored resource moved. Read (never written) and validated against the
+## before-state, so a capture that is not this transaction cannot leave the
+## double running on an inconsistent oracle.
+const COLLECTION_AFTER_FIXTURE := \
+	"tests/fixtures/godot-unit-collection/steps/command_complete_collection/after.json"
+## The committed collection id and prize the double validates the executed
+## fixture against: id 1 "Draggy Collection" grants unit `1085` with quantity
+## `1`. These are the **committed content's** values, and they are duplicated
+## here (rather than imported) so this module keeps no dependency on the units
+## model — the double validates committed BYTES, and the projection that reads
+## them is `collection_prize.gd`'s job.
+const COLLECTION_FIXTURE_ID := 1
+const COLLECTION_EXPECTED_PRIZE := {"1085": 1}
 
 ## Anchor grid extent the v0 endpoint validates against (anchors 0..99;
 ## footprints may extend past the edge — design D5). Must match
@@ -501,6 +523,16 @@ var _queue_state: Dictionary = {}
 var _queue_pid := ""
 var _queue_loaded := false
 var _queue_error := ""
+# Mutable in-memory collection state (unit-collection design D8): one save, whose
+# storage gains the committed prize and whose collection ledger gains at most one
+# id per successful completion inside this process. Never written anywhere. The
+# `table` entry carries the committed collections table the captured config
+# payload holds, so the grant is derived from the same content the live service
+# reads rather than from a second copy of it.
+var _collection_state: Dictionary = {}
+var _collection_pid := ""
+var _collection_loaded := false
+var _collection_error := ""
 ## The start instant the committed executed push stamped, read out of that
 ## capture before any expectation is built. It is the only authority for the
 ## value the branch stamps: the double never reads a clock (design D8).
@@ -2490,6 +2522,386 @@ func _queue_normalize(value: Variant) -> Variant:
 		var bag := {}
 		for key: Variant in (value as Dictionary).keys():
 			bag[key] = _queue_normalize((value as Dictionary)[key])
+		return bag
+	return value
+
+
+## One collection-completion intent under the **same** contract the live
+## implementation sends: the save identity and a collection id, and nothing else.
+##
+## The double is deterministic and in-memory: it reads the committed
+## executed-legacy collection fixture's before-state (whose ``maps[0]["store"]``
+## is ``{}`` and whose ``privateState["collections"]`` is ``[]``), derives the
+## prize from the **committed** ``collections`` table carried by the captured
+## ``config.json`` payload — the same payload the placement and purchase doubles
+## already index — and grants **exactly** that bag, appending exactly one
+## ledger id when it is absent.  It never reads a wall clock and never writes a
+## file, so every run is byte-identical.
+##
+## The refusals mirror the endpoint's own, in the endpoint's order (design D1/D2):
+## the save-identity codes first, then ``invalid_collection_id`` for anything
+## that is not a strict integer, then ``unknown_collection_id`` for an id the
+## committed table does not resolve.  A **negative** or zero id is NOT refused:
+## the legacy clamp resolves it to index 0, so it is answered with collection
+## 1's grant and ``aliased: true``, exactly as the service answers it.
+func complete_collection_town(user_id: String,
+		collection_id: int) -> BootData.CollectionResult:
+	if user_id.strip_edges() == "":
+		return _collection_failure("missing_user_id",
+			"user_id must be a non-empty string")
+	if not _ensure_collection_loaded():
+		return _collection_failure("fixture_unreadable", _collection_error)
+	if user_id != _collection_pid:
+		return _collection_failure("unknown_user_id",
+			"no save exists for user_id '%s'" % user_id)
+	var projection := _collection_prize(collection_id)
+	if not bool(projection.get("resolved", false)):
+		var code := str(projection.get("reason", ""))
+		if code == "invalid_collection_id":
+			return _collection_failure(code, str(projection.get("error", "")))
+		return _collection_failure("unknown_collection_id",
+			str(projection.get("error", "")))
+	var before_store: Dictionary = (_collection_state["store"] as Dictionary) \
+		.duplicate(true)
+	var before_ledger: Array = (_collection_state["ledger"] as Array) \
+		.duplicate(true)
+	var bag: Dictionary = projection["prize"]
+	var after_store: Dictionary = before_store.duplicate(true)
+	for key: Variant in bag.keys():
+		var id_text := str(key)
+		var quantity := int(bag[key])
+		after_store[id_text] = int(after_store.get(id_text, 0)) + quantity
+	var after_ledger: Array = before_ledger.duplicate(true)
+	var appended := not after_ledger.has(collection_id)
+	if appended:
+		after_ledger.append(collection_id)
+	_collection_state["store"] = after_store
+	_collection_state["ledger"] = after_ledger
+	var entries: Array = []
+	for key: Variant in _collection_sorted_keys(bag):
+		entries.append({"item_id": str(key), "quantity": int(bag[key])})
+	var first: Dictionary = entries[0]
+	# The same envelope shape the service returns; the shared parser yields the
+	# typed result (identical shapes by construction, design D8).
+	return BootData.parse_collection({
+		"protocol": BootData.PROTOCOL,
+		"ok": true,
+		"game_version": str(_save_list_doc.get("game_version", "")),
+		# Time-dependent field: the fake reports the fixture capture's legacy
+		# server timestamp instead of "now" (never the wall clock).
+		"server_time": _fixture_server_time(),
+		"result": "success",
+		"collection_id": collection_id,
+		"grant": {
+			"command": "complete_collection",
+			"item_id": str(first["item_id"]),
+			"quantity": int(first["quantity"]),
+			"item_count": entries.size(),
+			"quantity_total": _collection_total(bag),
+			"derived_from": "the committed collections table: the service looks "
+				+ "up what the named collection grants and accepts no prize, item "
+				+ "id, or quantity from the client",
+		},
+		"prize": {
+			"name": str(projection["name"]),
+			"id_column": str(projection["id_column"]),
+			"bag": bag.duplicate(true),
+			"entries": entries,
+		},
+		"index": {
+			"base": "one-based",
+			"derivation_status": "derived-provisional",
+			"rejected_alternative": "zero-based",
+			"rule": "index = max(0, collection - 1) over the committed table",
+			"alias_rule": "collection id 0 and collection id 1 resolve to the "
+				+ "same committed prize, as does every negative id",
+			"requested": int(projection["requested_index"]),
+			"resolved": int(projection["index"]),
+			"clamped": bool(projection["clamped"]),
+			"aliased": bool(projection["aliased"]),
+			"alias_of": (int(projection["alias_of"])
+				if int(projection["alias_of"]) >= 0 else null),
+		},
+		"eligibility": {
+			"checked": false,
+			"rule": "NO ELIGIBILITY CHECK: the legacy server verifies nothing "
+				+ "about whether a collection was earned, and the committed "
+				+ "item_ids requirement list is read by no branch at all",
+		},
+		"store_before": before_store,
+		"store_after": after_store,
+		"ledger_before": before_ledger,
+		"ledger_after": after_ledger,
+		"ledger_appended": appended,
+		"refusals": [
+			{"refusal": "unit_income", "implemented": false,
+				"rule": "no committed unit records a positive collect"},
+			{"refusal": "cap_semantics", "implemented": false,
+				"rule": "max_collects is 0 on every committed unit"},
+			{"refusal": "experience_award", "implemented": false,
+				"rule": "collect_xp is never read and the only writer takes a "
+					+ "client-sent amount"},
+		],
+		"resources": _collection_resources(),
+	})
+
+
+## Structured failure in the service's error envelope shape, parsed by the same
+## shared parser the live implementation uses.
+func _collection_failure(code: String, message: String) -> BootData.CollectionResult:
+	return BootData.parse_collection({
+		"protocol": BootData.PROTOCOL,
+		"ok": false,
+		"error": {"code": code, "message": message},
+	})
+
+
+## The double's own committed-prize projection: the one-based index with the
+## legacy clamp, the committed row's name and native id column, and the committed
+## prize bag — derived from the SAME table the live service reads, so the two
+## implementations cannot disagree about what a collection grants.
+func _collection_prize(collection_id: Variant) -> Dictionary:
+	var table: Array = _collection_state["table"] as Array
+	var unknown := func(id: int) -> Dictionary:
+		var index := maxi(0, id - 1)
+		return {
+			"resolved": false,
+			"reason": "unknown_collection_id",
+			"error": "collection_id %d resolves to index %d, outside the "
+				% [id, index] + "%d-entry committed collections table" % table.size(),
+			"collection_id": id,
+			"requested_index": id - 1,
+			"index": index,
+			"clamped": index != id - 1,
+			"aliased": index != id - 1,
+			"alias_of": 1 if index != id - 1 else -1,
+			"name": "",
+			"id_column": "",
+			"prize": {},
+		}
+	if typeof(collection_id) != TYPE_INT or typeof(collection_id) == TYPE_BOOL:
+		return {
+			"resolved": false,
+			"reason": "invalid_collection_id",
+			"error": "collection_id must be an integer",
+			"collection_id": collection_id,
+			"requested_index": -1,
+			"index": -1,
+			"clamped": false,
+			"aliased": false,
+			"alias_of": -1,
+			"name": "",
+			"id_column": "",
+			"prize": {},
+		}
+	var index := maxi(0, int(collection_id) - 1)
+	if index >= table.size():
+		return unknown.call(int(collection_id))
+	var row: Dictionary = table[index]
+	# The captured config keeps `prize` exactly as the legacy server reads it —
+	# a JSON-encoded STRING — so it is decoded here the same way
+	# `get_collection_prize` decodes it.  An already-parsed object is accepted
+	# too, so the double runs against either representation.
+	var decoded: Variant = row.get("prize", null)
+	if decoded is String:
+		var parser := JSON.new()
+		decoded = parser.data if parser.parse(str(decoded)) == OK else null
+	if not (decoded is Dictionary):
+		return unknown.call(int(collection_id))
+	var bag := {}
+	for key: Variant in (decoded as Dictionary).keys():
+		bag[str(key)] = int((decoded as Dictionary)[key])
+	return {
+		"resolved": not bag.is_empty(),
+		"reason": "" if not bag.is_empty() else "unknown_collection_id",
+		"error": "" if not bag.is_empty() else ("collection %d grants nothing"
+			% int(collection_id)),
+		"collection_id": int(collection_id),
+		"requested_index": int(collection_id) - 1,
+		"index": index,
+		"clamped": index != int(collection_id) - 1,
+		"aliased": index != int(collection_id) - 1,
+		"alias_of": 1 if index != int(collection_id) - 1 else -1,
+		"name": str(row.get("name", "")),
+		"id_column": str(row.get("id", "")),
+		"prize": bag,
+	}
+
+
+## The committed prize bag's keys in a deterministic numeric order, so the
+## double's response bytes never depend on a dictionary's iteration order.
+func _collection_sorted_keys(bag: Dictionary) -> Array:
+	var keys: Array = bag.keys()
+	keys.sort_custom(func(a: Variant, b: Variant) -> bool:
+		return int(a) < int(b))
+	return keys
+
+
+## The bag's total committed quantity.
+func _collection_total(bag: Dictionary) -> int:
+	var total := 0
+	for key: Variant in bag.keys():
+		total += int(bag[key])
+	return total
+
+
+## The seven stored resource values of the in-memory collection state, reported
+## verbatim as the response's authoritative `resources`. A completion moves none
+## of them, so these are the same values the intent started from — the strongest
+## form of the "nothing moved" proof the endpoint requires (design D5).
+func _collection_resources() -> Dictionary:
+	var resources := {}
+	for key: String in RESOURCE_KEYS:
+		resources[key] = int(_collection_state[key])
+	return resources
+
+
+## Loads the committed collection fixture's before-state and the committed
+## `collections` table into mutable process state (once). Structural failures are
+## named with the offending field; every other double's error state is untouched
+## (independent sinks).
+##
+## The table comes from the **captured config payload** the double already reads
+## for placement and purchase — not from a separate file and not from the
+## repository working tree — so the double runs on exactly the content the
+## executed fixture was captured against.
+func _ensure_collection_loaded() -> bool:
+	if _collection_loaded:
+		return _collection_error == ""
+	_collection_loaded = true
+	# The committed collections table is read out of the SAME captured
+	# config payload the placement and purchase doubles already index, so
+	# the base fixtures must be loaded first — independently of them, so
+	# this double's failure cannot hide behind another's.
+	if not _ensure_loaded():
+		_collection_error = _load_error
+		return false
+	var sink := {"error": ""}
+	var before := _read_json_into(COLLECTION_BEFORE_FIXTURE, sink)
+	if str(sink["error"]) != "":
+		_collection_error = str(sink["error"])
+		return false
+	var after_sink := {"error": ""}
+	# The after-state is read (never written) so a malformed capture cannot leave
+	# the double running on an inconsistent oracle.
+	var after := _read_json_into(COLLECTION_AFTER_FIXTURE, after_sink)
+	if str(after_sink["error"]) != "":
+		_collection_error = str(after_sink["error"])
+		return false
+	var table: Variant = _config_payload.get("collections")
+	if not (table is Array) or (table as Array).is_empty():
+		_collection_error = ("the captured config carries no collections table: "
+			+ GAME_CONFIG_FIXTURE)
+		return false
+	var store: Variant = (before.get("maps", []) as Array)[0].get("store", null)
+	if not (store is Dictionary):
+		_collection_error = ("the collection fixture before state carries no "
+			+ "maps[0].store object")
+		return false
+	var ledger: Variant = (before.get("privateState", {}) as Dictionary).get(
+		"collections", null)
+	if not (ledger is Array):
+		_collection_error = ("the collection fixture before state carries no "
+			+ "privateState['collections'] list")
+		return false
+	var info: Variant = before.get("playerInfo")
+	var priv: Variant = before.get("privateState")
+	if not (info is Dictionary) or not (priv is Dictionary):
+		_collection_error = "the collection fixture before state lacks playerInfo"
+		return false
+	var pid: Variant = (info as Dictionary).get("pid")
+	var cash: Variant = (info as Dictionary).get("cash")
+	var mana: Variant = (priv as Dictionary).get("mana")
+	if not (pid is String) or cash == null or mana == null \
+			or int(cash) < 0 or int(mana) < 0:
+		_collection_error = "the collection fixture before state lacks save fields"
+		return false
+	var first_map: Dictionary = (before.get("maps", []) as Array)[0] as Dictionary
+	var resources := {}
+	for name: String in ["xp", "gold", "wood", "oil", "steel"]:
+		var value: Variant = first_map.get(name)
+		if value == null or int(value) < 0:
+			_collection_error = "the collection fixture before state lacks map %s" \
+				% name
+			return false
+		resources[name] = int(value)
+	resources["cash"] = int(cash)
+	resources["mana"] = int(mana)
+	if not _validate_collection_after(after, store, ledger, resources):
+		return false
+	resources["store"] = (store as Dictionary).duplicate(true)
+	resources["ledger"] = (ledger as Array).duplicate(true)
+	resources["table"] = (table as Array).duplicate(true)
+	_collection_state = resources
+	_collection_pid = str(pid)
+	return true
+
+
+## Validates the executed fixture against the double's own starting state: the
+## recorded completion wrote **exactly** the committed prize of collection 1 into
+## the empty storage and appended **exactly one** id to the empty ledger, and
+## **no stored resource moved**. A capture that is not this transaction fails
+## closed here rather than producing a differently-behaving double.
+func _validate_collection_after(after: Dictionary, store: Variant, ledger: Variant,
+		resources: Dictionary) -> bool:
+	var first_map: Variant = (after.get("maps", []) as Array)[0]
+	if not (first_map is Dictionary):
+		_collection_error = "the collection fixture after state carries no first map"
+		return false
+	var after_store: Variant = (first_map as Dictionary).get("store", null)
+	var after_ledger: Variant = (after.get("privateState", {}) as Dictionary).get(
+		"collections", null)
+	if not (after_store is Dictionary) or not (after_ledger is Array):
+		_collection_error = ("the collection fixture after state carries no store "
+			+ "or ledger")
+		return false
+	var expected_store: Dictionary = (store as Dictionary).duplicate(true)
+	for key: Variant in COLLECTION_EXPECTED_PRIZE.keys():
+		expected_store[str(key)] = int(COLLECTION_EXPECTED_PRIZE[key])
+	if _collection_normalize(after_store) != expected_store:
+		_collection_error = ("the executed completion wrote %r, not the committed "
+			% [after_store] + "prize %r" % expected_store)
+		return false
+	if _collection_normalize(after_ledger) != [COLLECTION_FIXTURE_ID]:
+		_collection_error = ("the executed completion left the collection ledger "
+			+ "%r, not [%d]" % [after_ledger, COLLECTION_FIXTURE_ID])
+		return false
+	for name: String in RESOURCE_KEYS:
+		if _collection_resource_of(after, name) != int(resources[name]):
+			_collection_error = ("the executed completion moved the %s balance, "
+				% name + "which no collection completion does")
+			return false
+	return true
+
+
+## One stored resource of a captured save, as an integer.
+func _collection_resource_of(document: Dictionary, name: String) -> int:
+	var first_map: Dictionary = (document.get("maps", []) as Array)[0] as Dictionary
+	match name:
+		"cash":
+			return int((document.get("playerInfo", {}) as Dictionary).get("cash", 0))
+		"mana":
+			return int((document.get("privateState", {}) as Dictionary).get(
+				"mana", 0))
+		_:
+			return int(first_map.get(name, 0))
+
+
+## The pinned engine's JSON parser widens every committed number to a float, so
+## both sides of a fixture comparison are normalised to integers first.
+func _collection_normalize(value: Variant) -> Variant:
+	if value is float:
+		var number := float(value)
+		return int(number) if number == floor(number) else number
+	if value is Array:
+		var list: Array = []
+		for entry: Variant in value as Array:
+			list.append(_collection_normalize(entry))
+		return list
+	if value is Dictionary:
+		var bag := {}
+		for key: Variant in (value as Dictionary).keys():
+			bag[key] = _collection_normalize((value as Dictionary)[key])
 		return bag
 	return value
 

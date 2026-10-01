@@ -33,7 +33,12 @@
        the five row-entry branches with each item id's source named and
        re-derived from the committed dispatcher, the training-time and
        add_xp_unit refusals, and the acquisition finding, with no endpoint, no
-       request, no production mechanism, and no live phase)
+       request, no production mechanism, and no live phase), and the
+        unit-collection suite (the committed collection prize with the one-based
+        index and its id-0/id-1 alias, the acquisition inventory with exactly one
+        content-derived route, both recorded authority gaps, the three refusals,
+        and the committed executed-legacy grant into the corpus's empty storage,
+        also with no request issued and no committed-corpus mutation)
        (the loop passes the dead endpoint to every suite: the session and
        game-clock suites use it for their failure phase, the placement,
        purchase, move, sell, store, upgrade, construction, collect, and
@@ -41,7 +46,7 @@
        that ignore user args are unaffected)
     6. boot-scene unreachable-endpoint failure scenario, run with no service
        at all
-    7. fourteen live phases against the real Compatibility API: the main-scene
+    7. fifteen live phases against the real Compatibility API: the main-scene
        boot (success, compared with the committed fixture save), the legacy-v0
        GameApi suite, the structured API-error boot scenario, the
        placement phase (one intent through the v0 placement endpoint with
@@ -83,6 +88,12 @@
        post-state (the addressed row's bag carries exactly the derived count and
        the stamped instant, then the three-key teardown removed nu, ts, and ui
        together) and that EVERY stored resource is unchanged, with the
+       disposable corpus save asserted mutated), and the collection phase
+       (one completion through the v0 collection endpoint against the corpus's
+       own empty storage and empty collection ledger, whose response must prove
+       the content-derived TWO-part post-state (the granted id and quantity
+       equal the COMMITTED prize bag, and the ledger grew by exactly one
+       appended id) and that EVERY stored resource is unchanged, with the
        disposable corpus save asserted mutated)
     8. Compatibility API guard baseline, post-run, must equal the pre-run
        digests
@@ -343,7 +354,7 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_collection")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a
@@ -552,6 +563,23 @@ try {
                 "--", "--scenario=live-queue",
                 "--gameapi-endpoint=$endpoint"
             )
+        },
+        @{
+            # The collection phase drives ONE completion through the real v0
+            # endpoint against the corpus's own EMPTY storage and EMPTY
+            # collection ledger, so the unchanged legacy dispatcher writes the
+            # COMMITTED prize of collection 1 into the storage and appends
+            # exactly one id to the ledger. --expect-save-mutation holds
+            # because the grant is a real write.
+            Name = "collection-live"
+            Assertions = "collection live phase"
+            ExpectSaveMutation = $true
+            Arguments = @(
+                "--headless", "--path", $projectRel,
+                "--script", "res://tests/test_unit_collection.gd",
+                "--", "--scenario=live-collection",
+                "--gameapi-endpoint=$endpoint"
+            )
         }
     )
 
@@ -563,9 +591,10 @@ try {
         )
         if ($phase.ContainsKey("ExpectSaveMutation")) {
             # placement-live, purchase-live, move-live, sell-live, store-live,
-            # upgrade-live, construction-live, collect-live, expand-live, and
-            # queue-live: the harness snapshots the disposable corpus saves
-            # before the Godot run and fails unless one changed after.
+            # upgrade-live, construction-live, collect-live, expand-live,
+            # queue-live, and collection-live: the harness snapshots the
+            # disposable corpus saves before the Godot run and fails unless one
+            # changed after.
             $phaseArgs += "--expect-save-mutation"
         }
         $phaseArgs += @("--", $GodotExe) + $phase.Arguments
@@ -808,6 +837,21 @@ try {
         "queue live phase drove a push and a pop through the v0 endpoint against the committed Command Center, with its two-part post-state proof"
     Report-Result ($queueOut -match "(?m)^PASS corpus save mutated by the live placement") `
         "queue live phase mutated the disposable corpus save"
+
+    # The collection live phase must show a typed success through the real
+    # endpoint — including its TWO-part CONTENT-DERIVED value-level post-state
+    # proof (the granted id and quantity equal the COMMITTED prize bag, the
+    # ledger grew by exactly one appended id, AND every stored resource is
+    # unchanged, which is what makes the neutral-vector claim non-tautological)
+    # — and the harness must have observed the corpus save change.
+    $collectionOut = ""
+    if ($phaseLogs.ContainsKey("collection-live")) { $collectionOut = $phaseLogs["collection-live"] }
+    Report-Result ($collectionOut -match "\[test\] PASS script=res://tests/test_unit_collection\.gd") `
+        "collection live phase asserts its scenario"
+    Report-Result ($collectionOut -match '\[test\] live-collection applied collection_id=1 item_id=1085 quantity=1 ledger_appended=true resources_unchanged=true') `
+        "collection live phase drove one completion through the v0 endpoint, with its content-derived two-part post-state proof"
+    Report-Result ($collectionOut -match "(?m)^PASS corpus save mutated by the live placement") `
+        "collection live phase mutated the disposable corpus save"
 
     # --- 8. guard baseline, post-run ---------------------------------------
 

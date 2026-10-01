@@ -32,6 +32,7 @@ const COLLECT_PATH := "/v0/collect"
 const EXPAND_PATH := "/v0/expand"
 const LEVEL_UP_PATH := "/v0/level_up"
 const QUEUE_PATH := "/v0/queue"
+const COLLECTION_PATH := "/v0/collection"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -421,7 +422,40 @@ func pop_queue_unit_town(user_id: String,
 	return BootData.parse_queue(outcome.get("payload"))
 
 
-## One HTTP round trip. Success returns `{ok: true, payload: Dictionary}`;
+## One collection-completion intent over loopback HTTP: the client sends the
+## save identity and a collection id and NOTHING else — no prize, item id,
+## quantity, price, or resource deltas. Any `prize` / `item_id` / `quantity` /
+## `item` / `grant` / `cost` / `price` / `resources_changed` / `vector` key the
+## service receives alongside the identity is **ignored** server-side, exactly as
+## the collect and expand endpoints ignore client-supplied amounts and prices
+## (unit-collection design D1): the service looks the grant up in the committed
+## `collections` table and executes the unchanged legacy `complete_collection`
+## branch with a NEUTRAL vector (design D5), so the typed result's `item_id`,
+## `quantity`, `prize`, `store_after`, and `resources` are authoritative
+## (design D8).
+##
+## The response's second post-execution proof half requires every stored resource
+## to be **unchanged**, because a completion moves none. The id-0/id-1 **alias**
+## is reported on every answer rather than hidden: an aliased id is echoed
+## exactly as sent, together with `clamped`, `aliased`, and `alias_of`.
+##
+## Structured service errors pass through with their original codes — notably
+## `missing_collection_id`, `invalid_collection_id`, `unknown_collection_id`,
+## and the shared `missing_user_id` / `invalid_user_id` / `unknown_user_id` /
+## `internal_error` family — all of which the client surfaces instead of
+## granting anything; transport failures keep the boot failure rules, never a
+## partial payload.
+func complete_collection_town(user_id: String,
+		collection_id: int) -> BootData.CollectionResult:
+	var outcome := await _call("POST", COLLECTION_PATH, JSON.stringify({
+		"user_id": user_id,
+		"collection_id": collection_id,
+	}))
+	if not outcome.get("ok", false):
+		return BootData.collection_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return BootData.parse_collection(outcome.get("payload"))
 ## every failure returns `{ok: false, code, message}` with the failure named.
 func _call(method: String, path: String, body: String) -> Dictionary:
 	var url := resolved_endpoint() + path

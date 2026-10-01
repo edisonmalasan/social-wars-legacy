@@ -42,8 +42,9 @@ which a unit enters a town**, captured **without fabricating a player state**.
 
 Two further facts shape the line. **`collect` is field-agnostic**: the whole command re-stamps the
 row's slot-3 timestamp and does nothing else, and `collect`, `collect_type`, `collect_xp`,
-`max_collects`, `max_elem_vol`, and `harvester` all have **zero** legacy reads — the fourth and
-fifth such committed fields in this project. And **no unit carries income at all**: 0 of 429 have a
+`max_collects`, and `max_elem_vol` all have **zero** legacy reads — the fourth and fifth such
+committed fields in this project — and `harvester`, which is **not** a top-level field but a
+`properties` flag key on 5 Worker units all carrying `collect` 0, is likewise never read. And **no unit carries income at all**: 0 of 429 have a
 positive `collect`, the five `harvester` units are on a disjoint set, and `max_collects` is 0 on
 every unit, so the cap semantics `building-collect` deliberately refused have **no unit analogue**.
 

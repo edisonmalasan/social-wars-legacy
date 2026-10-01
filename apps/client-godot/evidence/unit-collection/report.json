@@ -1,0 +1,719 @@
+{
+	"absent_helpers": [
+		{
+			"absent_because": "the legacy `collect` command re-stamps the row's slot-3 instant and writes nothing else, so it reads no collect field; and 0 of the 429 committed units record a positive `collect`, so there is nothing to derive from the content either",
+			"helper": "income"
+		},
+		{
+			"absent_because": "a collection completion has no committed price and no committed income, so any payout would be a figure this repository cannot source",
+			"helper": "payout"
+		},
+		{
+			"absent_because": "the committed prize IS the grant, and it is already reported verbatim by the projection; a second 'reward' shape would be a second answer",
+			"helper": "reward"
+		},
+		{
+			"absent_because": "`max_collects` is 0 on all 429 committed units, so the cap building-collect refuses has no unit analogue and inventing one would fabricate a threshold",
+			"helper": "collection_cap"
+		},
+		{
+			"absent_because": "no legacy branch bounds a collection, a grant, or a ledger, and a recorded absence is not permission to add one",
+			"helper": "limit"
+		},
+		{
+			"absent_because": "no committed unit cap exists, so there is no committed threshold to read; the delivered building-collect ladder belongs to that capability",
+			"helper": "threshold"
+		},
+		{
+			"absent_because": "`collect_xp` is never read and the only command writing a placed row's attr['xp'] takes a client-sent amount, already refused by the godot-unit-production requirement",
+			"helper": "experience_award"
+		},
+		{
+			"absent_because": "the same absence as experience_award: a collection must not reopen a refusal an earlier capability established",
+			"helper": "grant_xp"
+		},
+		{
+			"absent_because": "the legacy server verifies NOTHING about whether a collection was earned, and adding a check would invent a rule it does not have (design D2)",
+			"helper": "eligible"
+		},
+		{
+			"absent_because": "the same absence as eligible; the gap is RECORDED in AUTHORITY_GAPS instead",
+			"helper": "check_eligibility"
+		},
+		{
+			"absent_because": "the stored-item round trip is a SEPARATE carried follow-up, so this line records the grant and places nothing (design D6)",
+			"helper": "place_stored_item"
+		}
+	],
+	"acquisition": {
+		"classification_counts": {
+			"already-existing": 1,
+			"client-supplied": 4,
+			"content-derived": 1
+		},
+		"classifications": [
+			"content-derived",
+			"client-supplied",
+			"already-existing"
+		],
+		"client_supplied_routes": [
+			"store_add_items",
+			"win_daily_bonus",
+			"buy_stored_item_cash",
+			"buy_offer_pack"
+		],
+		"content_derived_route_count": 1,
+		"content_derived_routes": [
+			"complete_collection"
+		],
+		"count": 6,
+		"lines": [
+			229,
+			263,
+			460,
+			479,
+			513,
+			716
+		],
+		"no_derivation": "EXACTLY ONE ACQUISITION ROUTE IS CONTENT-DERIVED AND IT IS complete_collection. Of the six branches that can put an id into the storage, FOUR take the id straight from a client argument and one moves an id off a row the player already placed; only complete_collection stores ids that come out of committed content, because its grant is `json.loads(collections[max(0, collection - 1)]['prize'])`. So a committed unit IS obtainable, and only through this one route. That COMPLETES the delivered godot-unit-production acquisition finding rather than amending it: the two client-supplied unit sources it recorded remain unusable, and the content-derived route it did not find is named here (design D4)",
+		"not_an_acquisition_route": "`unit_collections_completed` only APPENDS an id to privateState['unitCollectionsCompleted'] and grants NOTHING, so it is a unit COLLECTION TRACKER, a different concept from the `collections` table this line completes, and it is not an acquisition route. The committed unit_collection_categories table (20 rows) is read by no branch either, and `collect_mission` writes idCurrentMission and a timestamp and is unrelated to items",
+		"request_issued": false,
+		"routes": [
+			{
+				"branch": "store_item",
+				"call": "add_store_item",
+				"classification": "already-existing",
+				"implemented": false,
+				"input": "an existing row popped off the map",
+				"note": "the id is read off a row the player already placed, so it is already-owned rather than granted",
+				"site": "command.py:229"
+			},
+			{
+				"branch": "store_add_items",
+				"call": "add_store_item",
+				"classification": "client-supplied",
+				"implemented": false,
+				"input": "client args[0], a list of ids",
+				"note": "no content check; each id is stored and recorded in boughtUnits",
+				"site": "command.py:263"
+			},
+			{
+				"branch": "win_daily_bonus",
+				"call": "add_store_item",
+				"classification": "client-supplied",
+				"implemented": false,
+				"input": "client args[0], inside a committed daily schedule",
+				"note": "the schedule fixes WHEN the branch may run; the id it stores is the client's, and the committed weekday table carries no per-day item",
+				"site": "command.py:460"
+			},
+			{
+				"branch": "buy_stored_item_cash",
+				"call": "add_store_item",
+				"classification": "client-supplied",
+				"implemented": false,
+				"input": "client args[0], one id",
+				"note": "one of the two plausible unit sources, and a single client-sent id stored with no check at all",
+				"site": "command.py:479"
+			},
+			{
+				"branch": "complete_collection",
+				"call": "add_store_item",
+				"classification": "content-derived",
+				"implemented": true,
+				"input": "committed content: the collection's own `prize` bag",
+				"note": "THE ONLY content-derived route: the branch stores every entry of `json.loads(collections[max(0, collection - 1)]['prize'])`, so the server decides what the caller receives. This line implements this route and no other",
+				"site": "command.py:513"
+			},
+			{
+				"branch": "buy_offer_pack",
+				"call": "add_store_item",
+				"classification": "client-supplied",
+				"implemented": false,
+				"input": "client args[1], a JSON array of ids",
+				"note": "the second plausible unit source: json.loads of a client-sent array, with every id in it stored and NO lookup into the committed offer_packs table",
+				"site": "command.py:716"
+			}
+		]
+	},
+	"acquisition_measured": {
+		"branches": [
+			"store_item",
+			"store_add_items",
+			"win_daily_bonus",
+			"buy_stored_item_cash",
+			"complete_collection",
+			"buy_offer_pack"
+		],
+		"completion_branch_end": 524,
+		"completion_branch_start": 504,
+		"lines": [
+			"command.py:229",
+			"command.py:263",
+			"command.py:460",
+			"command.py:479",
+			"command.py:513",
+			"command.py:716"
+		],
+		"note": "the six add_store_item call sites, their line numbers, and the branch each belongs to are RE-DERIVED from the committed dispatcher by the suite in the same run, so the route table cannot drift from the source and a seventh would be reported as an unrecorded gap rather than ignored"
+	},
+	"alias": {
+		"negative_ids_alias_too": true,
+		"note": "the clamp is reported rather than absorbed: id 0 and every negative id resolve to the same committed prize as id 1, and id 1 itself is NOT clamped because 1 - 1 is already its own index",
+		"one_aliased": false,
+		"one_clamped": false,
+		"rule": "THE CLAMP IS AN ALIAS, REPORTED NOT HIDDEN. `max(0, collection - 1)` clamps BELOW the requested index, so EVERY collection id below 1 - id 0 and every negative id - resolves to index 0 and therefore to the SAME committed prize as id 1. In particular COLLECTION ID 0 AND COLLECTION ID 1 RESOLVE TO THE SAME PRIZE, and this projection never presents id 0 as a distinct collection. Collection id 1 is the boundary and is NOT clamped, because 1 - 1 is already the index its own committed row sits at. The alias is a recorded legacy-contract fact, NOT permission to widen the route: the grant contents stay content-derived, because an aliased id selects a genuine committed row rather than manufacturing one",
+		"zero_alias_of": 1,
+		"zero_aliased": true,
+		"zero_and_one_same_prize": true,
+		"zero_clamped": true
+	},
+	"authority_gaps": [
+		{
+			"fixed": false,
+			"gap": "no_eligibility_check",
+			"rule": "NO COLLECTION ELIGIBILITY IS CHECKED, BY THE LEGACY SERVER OR BY THIS CLIENT. The committed lookup clamps the index and bounds-checks it against the committed table, and the completion branch never looks at the caller's collection state: the only read of privateState['collections'] in the whole legacy source is the append-if-absent test, and the committed `item_ids` requirement list is read by NO branch at all. A caller may therefore name ANY of the ten committed collections and receives whatever that collection genuinely grants. Adding a check would invent a rule the legacy server does not have (design D2) — the same refusal this project applied to unit_capacity, training_time, and the level curve's reward fields — and authoritative validation belongs to a later server-authoritative milestone. What a caller CANNOT do is choose the contents"
+		},
+		{
+			"fixed": false,
+			"gap": "index_alias",
+			"rule": "THE INDEX ALIAS IS A SECOND AUTHORITY GAP, REPORTED NOT HIDDEN. The legacy lookup's `max(0, collection - 1)` clamp means COLLECTION ID 0 AND COLLECTION ID 1 RESOLVE TO THE SAME PRIZE, as does every negative id. The grant CONTENTS stay content-derived even through the alias, because a clamped id selects a genuine committed row rather than manufacturing one; what the alias adds is a second spelling for a collection the caller did not name. The projection reports `clamped`, `aliased`, and `alias_of` on every answer so no caller can present id 0 as a distinct collection"
+		}
+	],
+	"collection_table": {
+		"building_granting": 4,
+		"building_granting_measured": 4,
+		"classification_vocabulary": [
+			"unit",
+			"building",
+			"unclassified"
+		],
+		"distinct_prize_ids": 10,
+		"entries": 10,
+		"file": "packages/game-content/normalized/collections.json",
+		"measurement_note": "the classification is a RESOLUTION against the verified units/buildings domains and the committed `type` field, measured by the suite in the same run, never asserted from prose and never inferred from an id range",
+		"unit_granting": 6,
+		"unit_granting_measured": 6
+	},
+	"committed_collections": [
+		{
+			"aliased": false,
+			"clamped": false,
+			"classification": "unit",
+			"collection_id": 1,
+			"id_column": "1",
+			"index": 0,
+			"item_id": "1085",
+			"item_name": "Metal Draggy",
+			"name": "Draggy Collection",
+			"quantity": 1,
+			"requested_index": 0
+		},
+		{
+			"aliased": false,
+			"clamped": false,
+			"classification": "unit",
+			"collection_id": 2,
+			"id_column": "2",
+			"index": 1,
+			"item_id": "1062",
+			"item_name": "MegaBot",
+			"name": "Transformer Collection",
+			"quantity": 1,
+			"requested_index": 1
+		},
+		{
+			"aliased": false,
+			"clamped": false,
+			"classification": "unit",
+			"collection_id": 3,
+			"id_column": "3",
+			"index": 2,
+			"item_id": "1096",
+			"item_name": "F-117",
+			"name": "Plane Collection",
+			"quantity": 1,
+			"requested_index": 2
+		},
+		{
+			"aliased": false,
+			"clamped": false,
+			"classification": "building",
+			"collection_id": 4,
+			"id_column": "4",
+			"index": 3,
+			"item_id": "164",
+			"item_name": "Laser Turret",
+			"name": "Defense Collection",
+			"quantity": 1,
+			"requested_index": 3
+		},
+		{
+			"aliased": false,
+			"clamped": false,
+			"classification": "unit",
+			"collection_id": 5,
+			"id_column": "5",
+			"index": 4,
+			"item_id": "1073",
+			"item_name": "Erradicator",
+			"name": "Gun Collection",
+			"quantity": 1,
+			"requested_index": 4
+		},
+		{
+			"aliased": false,
+			"clamped": false,
+			"classification": "unit",
+			"collection_id": 6,
+			"id_column": "6",
+			"index": 5,
+			"item_id": "1010",
+			"item_name": "APC",
+			"name": "Tank Collection",
+			"quantity": 1,
+			"requested_index": 5
+		},
+		{
+			"aliased": false,
+			"clamped": false,
+			"classification": "building",
+			"collection_id": 7,
+			"id_column": "7",
+			"index": 6,
+			"item_id": "45",
+			"item_name": "Dual-Rocket Turret",
+			"name": "Launcher Collection",
+			"quantity": 1,
+			"requested_index": 6
+		},
+		{
+			"aliased": false,
+			"clamped": false,
+			"classification": "building",
+			"collection_id": 8,
+			"id_column": "8",
+			"index": 7,
+			"item_id": "136",
+			"item_name": "General Sculpture",
+			"name": "Soldier Awards Collection",
+			"quantity": 1,
+			"requested_index": 7
+		},
+		{
+			"aliased": false,
+			"clamped": false,
+			"classification": "building",
+			"collection_id": 9,
+			"id_column": "9",
+			"index": 8,
+			"item_id": "106",
+			"item_name": "Fountain",
+			"name": "Relaxing Time Collection",
+			"quantity": 1,
+			"requested_index": 8
+		},
+		{
+			"aliased": false,
+			"clamped": false,
+			"classification": "unit",
+			"collection_id": 10,
+			"id_column": "10",
+			"index": 9,
+			"item_id": "1056",
+			"item_name": "Elephant rider",
+			"name": "Animal Collection",
+			"quantity": 1,
+			"requested_index": 9
+		}
+	],
+	"content": {
+		"buildings_file": "packages/game-content/normalized/buildings.json",
+		"collections_file": "packages/game-content/normalized/collections.json",
+		"enumeration": "ContentRegistry.legacy_ids(domain) and ContentRegistry.get_entry(domain, id), the registry's own public accessors over the index it built during its verified load, so every count in this report crosses the same byte-count and digest gate as every other read",
+		"manifest_bytes_verified": 1905917,
+		"manifest_outputs_verified": 22,
+		"package_files": 67,
+		"package_sha256": "dba0a98b25c6fafdb7b752436d2f70fcfc8641ef5f977166aa2002a3f4b44ea0",
+		"units_file": "packages/game-content/normalized/units.json"
+	},
+	"corpus": {
+		"bought_units": [],
+		"claim": "the committed fresh-player corpus records an EMPTY storage and an EMPTY collection ledger, places 40 rows across 11 distinct item ids every one of committed type 'b' with 40 empty attribute bags, and contains NO unit row â€” so a completion's grant is a real, observable, content-derived mutation with NO fabricated player state",
+		"distinct_item_ids": [
+			22,
+			23,
+			26,
+			905,
+			907,
+			908,
+			909,
+			928,
+			929,
+			930,
+			931
+		],
+		"experience_rows": [],
+		"ledger": [],
+		"map_index": 0,
+		"map_level": 1,
+		"non_empty_attr_bags": [],
+		"resources": {
+			"cash": 5,
+			"gold": 2000,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2000,
+			"xp": 4
+		},
+		"rows": 40,
+		"save": "tests/saves/fresh-player.json",
+		"save_bytes": 15628,
+		"save_sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+		"store": {},
+		"unit_rows": []
+	},
+	"determinism": {
+		"byte_identical_across_reruns": true,
+		"reason": "no timestamp, no absolute path, no wall clock, no request, and no saved state: every table is derived from the two modules' own constants, the same run's legacy measurement, the verified registry, and the committed corpus and fixture bytes, and every derived set is sorted before it is written",
+		"serialization": "JSON.stringify(report, tab, sort_keys=true) plus one trailing newline; every number written is an integer - the pinned engine's integral floats are normalised on the way in, which changes no value - so no float formatting varies between runs",
+		"time_dependent_fields": "there are NONE in this line's evidence: the recorded completion writes only the storage and the collection ledger, and neither touches a clock, so the executed fixture's manifest records no time-dependent state leaf at all"
+	},
+	"eligibility": {
+		"alias_gap": "THE INDEX ALIAS IS A SECOND AUTHORITY GAP, REPORTED NOT HIDDEN. The legacy lookup's `max(0, collection - 1)` clamp means COLLECTION ID 0 AND COLLECTION ID 1 RESOLVE TO THE SAME PRIZE, as does every negative id. The grant CONTENTS stay content-derived even through the alias, because a clamped id selects a genuine committed row rather than manufacturing one; what the alias adds is a second spelling for a collection the caller did not name. The projection reports `clamped`, `aliased`, and `alias_of` on every answer so no caller can present id 0 as a distinct collection",
+		"caller_may_choose_the_grant": false,
+		"caller_may_name_any_committed_collection": true,
+		"checked": false,
+		"implemented_check": false,
+		"item_ids_read_by_any_branch": false,
+		"note": "what is recorded here is a property of the legacy contract, not a defect this line fixes: authoritative validation belongs to a later server-authoritative milestone",
+		"rule": "NO COLLECTION ELIGIBILITY IS CHECKED, BY THE LEGACY SERVER OR BY THIS CLIENT. The committed lookup clamps the index and bounds-checks it against the committed table, and the completion branch never looks at the caller's collection state: the only read of privateState['collections'] in the whole legacy source is the append-if-absent test, and the committed `item_ids` requirement list is read by NO branch at all. A caller may therefore name ANY of the ten committed collections and receives whatever that collection genuinely grants. Adding a check would invent a rule the legacy server does not have (design D2) — the same refusal this project applied to unit_capacity, training_time, and the level curve's reward fields — and authoritative validation belongs to a later server-authoritative milestone. What a caller CANNOT do is choose the contents"
+	},
+	"fixture": {
+		"directory": "tests/fixtures/godot-unit-collection",
+		"grant_derived_from_committed_content": true,
+		"grants_into_storage_only": true,
+		"note": "the executed-legacy fixture records a committed grant into the corpus's EMPTY storage and exactly ONE appended ledger id, with no placement written and no resource moved. The stored-item placement step is a SEPARATE carried follow-up, so the fixture evidences a grant into storage and NOT a unit placed on the map",
+		"step": "steps/command_complete_collection",
+		"stored_item_placement_chained": false,
+		"unit_placed": false
+	},
+	"generated_by": "apps/client-godot/tests/test_unit_collection.gd --report=<path>",
+	"harvester": "harvester is NOT A COMMITTED CONTENT FIELD AT ALL. The string occurs exactly FIVE times in the stored configuration and every one of them is a flag key inside a committed `properties` blob, never a field of its own: unit 1001 Worker I, 1039 Worker II, 1040 Worker III, 1041 Worker IV, and 1125 Orc Worker. All five record `collect` 0, so the 'harvester' set is disjoint from any positive collect amount — and it is also disjoint from the legacy source, which contains ZERO occurrences of the string outside the committed configuration itself. This CORRECTS the committed investigation's framing of harvester as a committed item field carrying a positive value on five units",
+	"index_resolution": {
+		"alias_boundary": 1,
+		"alias_rule": "THE CLAMP IS AN ALIAS, REPORTED NOT HIDDEN. `max(0, collection - 1)` clamps BELOW the requested index, so EVERY collection id below 1 - id 0 and every negative id - resolves to index 0 and therefore to the SAME committed prize as id 1. In particular COLLECTION ID 0 AND COLLECTION ID 1 RESOLVE TO THE SAME PRIZE, and this projection never presents id 0 as a distinct collection. Collection id 1 is the boundary and is NOT clamped, because 1 - 1 is already the index its own committed row sits at. The alias is a recorded legacy-contract fact, NOT permission to widen the route: the grant contents stay content-derived, because an aliased id selects a genuine committed row rather than manufacturing one",
+		"base": "one-based",
+		"clamp_expression": "max(0, collection - 1)",
+		"derivation_status": "derived-provisional",
+		"first_collection_id": 1,
+		"last_collection_id": 10,
+		"negative_ids_alias_too": true,
+		"rejected_alternative": "zero-based",
+		"rejected_alternative_note": "REJECTED: a 0-BASED id space, in which the id would BE the array position. It is rejected because it leaves the committed table unreachable: under 0-based indexing the largest namable id would select the second-to-last row and the last committed collection (id '10' / Animal Collection, the only one granting a mounted unit) would need id 10 to reach. The retained alternative is kept visible so a later reader can re-derive the choice rather than inherit it",
+		"rule": "THE COLLECTION ID SPACE IS 1-BASED AND THE LOOKUP IS POSITIONAL. The legacy lookup computes `index = max(0, collection - 1)` against the loaded configuration's `collections` LIST and returns `json.loads(collections[index]['prize'])`, so the id a client names is one greater than the array position it selects. The 1-based reading is DERIVED-PROVISIONAL and is corroborated by the stored content rather than merely plausible: the committed table carries its own native `id` column running \"1\"..\"10\" over the ten ARRAY POSITIONS 0..9, so `collection - 1` maps that native id onto exactly its own position. Nothing here is observed from the Flash client",
+		"zero_and_one_alias": true
+	},
+	"intent": {
+		"command": "complete_collection",
+		"grant_derived_from": "the committed collections table, through the service's own lookup — never from the request",
+		"grant_is_content_derived": true,
+		"ignored_keys": [
+			"prize",
+			"item_id",
+			"quantity",
+			"item",
+			"grant",
+			"cost",
+			"price",
+			"cashPrice",
+			"resources_changed",
+			"vector",
+			"resources"
+		],
+		"keys": [
+			"user_id",
+			"collection_id"
+		],
+		"note": "THE COMPLETION INTENT CARRIES ONLY AN IDENTIFIER. The request is {user_id, collection_id} and nothing else: no prize, item id, quantity, price, or resource delta is accepted, and every such key is IGNORED by the service. The grant is looked up in the committed collections table, so the server decides what the caller receives and a client-supplied expectation can never become the post-execution proof (design D1)",
+		"proof": "THE POST-EXECUTION PROOF IS CONTENT-DERIVED, which is what makes it non-tautological. The granted id AND quantity are compared with the COMMITTED prize bag and no other stored key may move, while the collection ledger must match the derived one — exactly one appended id when the id was absent, or NOTHING appended when it was already there, because the legacy append is IF-ABSENT. Every stored resource is unchanged as well, because the derived vector is neutral. Either half failing is a reported failure, not a success",
+		"stored_item_follow_up": "THE STORED-ITEM PLACEMENT STEP IS NOT DELIVERED HERE. complete_collection -> map['store'] -> place_stored_item is a two-step, fully committed, server-derived path by which a unit enters a town, and this line records and delivers ONLY the first step. The round trip is a SEPARATE carried follow-up, so the executed-legacy fixture evidences a committed GRANT INTO STORAGE and NOT a unit placed on the map: the placement count is unchanged at 40 and no map row is written (design D6). Nothing in this repository places a granted unit",
+		"stored_item_placement_delivered": false
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed",
+		"NO UNIT INCOME, COLLECTION PAYOUT, CAP SEMANTICS, OR EXPERIENCE AWARD IS IMPLEMENTED: the legacy server reads no collect field, 0 of 429 units record a positive collect, max_collects is 0 on every unit, and collect_xp is never read",
+		"NO COLLECTION ELIGIBILITY IS CHECKED, and a caller may name ANY of the ten committed collections: the committed item_ids requirement list is read by no branch at all, so the gap is recorded rather than fixed",
+		"COLLECTION IDS 0 AND 1 ALIAS, as does every negative id: the legacy clamp resolves them all to the same committed prize, and the projection reports that rather than presenting id 0 as distinct",
+		"NO CLIENT-SUPPLIED ACQUISITION ROUTE IS IMPLEMENTED and no request is issued for any of them: complete_collection is the sole content-derived route and the only one this line delivers",
+		"THE STORED-ITEM PLACEMENT STEP IS NOT DELIVERED, so the fixture evidences a grant into storage and NOT a unit placed on the map",
+		"NO UNIT IS PLACED OR GARRISONED by this change: the placement count is unchanged and no map row is written",
+		"no windowed capture is claimed: nothing is rendered and no unit is drawn",
+		"no pixel-parity oracle against the legacy client exists",
+		"the one-based index is derived-provisional and the zero-based alternative is retained; the corpus confirms the one-based reading empirically, and the prize is the committed content, NEVER what the Flash client displayed"
+	],
+	"provenance": {
+		"derived": [
+			{
+				"evidence": "derived-provisional (design D3), corroborated by the committed content rather than merely plausible: the table's own native id column runs \"1\"..\"10\" over the ten array positions 0..9, and the zero-based reading would leave the last collection unreachable; the rejected alternative is retained in REJECTED_ALTERNATIVE",
+				"fact": "the index space is one-based"
+			},
+			{
+				"evidence": "derived (design D4): the inventory classifies all six storage routes and names this one, which COMPLETES the godot-unit-production acquisition finding instead of amending it",
+				"fact": "complete_collection is the project's only content-derived unit acquisition route"
+			},
+			{
+				"evidence": "derived (design D6): the fixture stops at the grant so this line's scope is one transaction, and the residual is recorded rather than quietly delivered",
+				"fact": "the stored-item round trip belongs to a later line rather than to this one"
+			},
+			{
+				"evidence": "derived: no authentic legacy collection panel has been captured, so the wording is the delivered provisional convention, never a claim about what the legacy client displayed",
+				"fact": "the readout's labels and the composition of its lines"
+			}
+		],
+		"established": [
+			{
+				"evidence": "command.py:504-523 against engine.py:70-75 and get_game_config.py:170-175; the executed-legacy fixture records one such transaction",
+				"fact": "the completion branch grants the committed prize into map['store'] through add_store_item and appends the collection id to privateState['collections'] when it is absent"
+			},
+			{
+				"evidence": "the committed normalized content package, measured by the suite through the verified registry; the executed fixture confirms collection 1's unit 1085 empirically",
+				"fact": "the ten committed collections, their committed names, their committed prizes, and that SIX grant a unit while FOUR grant a building, with ten distinct item ids between them"
+			},
+			{
+				"evidence": "get_game_config.py:170-175; the suite computes the expression independently over ids -9999..99",
+				"fact": "the one-based index with the legacy clamp: `max(0, collection - 1)` against a positional list, so id 0 and every negative id resolve to index 0 and therefore to id 1's prize"
+			},
+			{
+				"evidence": "a search for the quoted token over the ten legacy root modules, plus command.py:517-518; executed-legacy probe 2 completed collection 10 with none of its five items present",
+				"fact": "no eligibility check exists: the committed `item_ids` requirement list is read by NO branch, and the ledger is read only by the append-if-absent test"
+			},
+			{
+				"evidence": "command.py:136-144; a substring search over the ten legacy root modules, which the suite repeats",
+				"fact": "the `collect` command re-stamps the row's slot-3 instant and writes nothing else, and collect_type, collect_xp, max_collects, max_elem_vol, and harvester have zero occurrences in the legacy source"
+			},
+			{
+				"evidence": "the committed normalized content package, measured by the suite through the verified registry",
+				"fact": "0 of 429 committed units record a positive `collect` (against 51 of 470 buildings), and max_collects is 0 on all 429 units"
+			},
+			{
+				"evidence": "command.py:322-343 against the committed content distribution, both measured by the suite",
+				"fact": "collect_xp is non-zero on 427 of 429 units and is never read; the only command writing a placed row's attr['xp'] takes a client-sent amount"
+			},
+			{
+				"evidence": "the suite re-measures the five occurrences and resolves each carrying item against the verified registry; this CORRECTS the committed investigation's '5 harvester units' framing",
+				"fact": "the string `harvester` is not a committed item field at all: it occurs five times in the stored configuration, every one a flag key inside a committed properties blob, on units 1001, 1039, 1040, 1041, and 1125, all of which record collect 0"
+			},
+			{
+				"evidence": "command.py:229, 263, 460, 479, 513, 716; the suite re-derives the call sites and their enclosing branches",
+				"fact": "exactly one of the six storage-filling branches is content-derived, and it is complete_collection"
+			},
+			{
+				"evidence": "command.py:482-489 against engine.py:91-94",
+				"fact": "unit_collections_completed only appends an id and grants nothing; unit_collection_categories is read by no branch"
+			},
+			{
+				"evidence": "tests/saves/fresh-player.json, measured by the suite and by the executed-legacy capture",
+				"fact": "the committed corpus records an empty storage and an empty collection ledger, places 40 rows across 11 distinct ids all of committed type 'b', and carries 40 empty attribute bags"
+			}
+		]
+	},
+	"refusals": {
+		"award_helper_exists": false,
+		"cap_helper_exists": false,
+		"cap_interpreted": false,
+		"collect_fields": [
+			{
+				"buildings_carried": 470,
+				"buildings_of": 470,
+				"buildings_positive": 51,
+				"field": "collect",
+				"legacy_reads": 0,
+				"note": "the only quoted \"collect\" in the legacy source is the BRANCH NAME; there is no [\"collect\"] subscript and no .get(\"collect\") anywhere",
+				"units_carried": 429,
+				"units_of": 429,
+				"units_positive": 0
+			},
+			{
+				"buildings_carried": 470,
+				"buildings_of": 470,
+				"buildings_positive": 0,
+				"field": "collect_type",
+				"legacy_reads": 0,
+				"note": "the ONE committed collect field that is not a number: it reads as a resource letter (`g` on 427 of the 429 units and 425 of the 470 buildings, with w/o/s/c on the rest), so it is measured by how many entries CARRY it rather than by a positive count. That it looks exactly like a rule and has no consumer at all is the point",
+				"units_carried": 429,
+				"units_of": 429,
+				"units_positive": 0
+			},
+			{
+				"buildings_carried": 470,
+				"buildings_of": 470,
+				"buildings_positive": 53,
+				"field": "collect_xp",
+				"legacy_reads": 0,
+				"note": "carried by every committed item and non-zero on 427 units and 53 buildings, and never read by any branch",
+				"units_carried": 429,
+				"units_of": 429,
+				"units_positive": 427
+			},
+			{
+				"buildings_carried": 470,
+				"buildings_of": 470,
+				"buildings_positive": 11,
+				"field": "max_collects",
+				"legacy_reads": 0,
+				"note": "0 on every unit and on 459 of the 470 buildings (25 on 9, 100 on 2); the non-zero building values are the caps building-collect refuses to interpret",
+				"units_carried": 429,
+				"units_of": 429,
+				"units_positive": 0
+			},
+			{
+				"buildings_carried": 470,
+				"buildings_of": 470,
+				"buildings_positive": 39,
+				"field": "max_elem_vol",
+				"legacy_reads": 0,
+				"units_carried": 429,
+				"units_of": 429,
+				"units_positive": 5
+			}
+		],
+		"experience_awarded": false,
+		"harvester": "harvester is NOT A COMMITTED CONTENT FIELD AT ALL. The string occurs exactly FIVE times in the stored configuration and every one of them is a flag key inside a committed `properties` blob, never a field of its own: unit 1001 Worker I, 1039 Worker II, 1040 Worker III, 1041 Worker IV, and 1125 Orc Worker. All five record `collect` 0, so the 'harvester' set is disjoint from any positive collect amount — and it is also disjoint from the legacy source, which contains ZERO occurrences of the string outside the committed configuration itself. This CORRECTS the committed investigation's framing of harvester as a committed item field carrying a positive value on five units",
+		"harvester_is_a_committed_field": false,
+		"income_derived": false,
+		"payout_helper_exists": false,
+		"refusals": [
+			{
+				"implemented": false,
+				"refusal": "unit_income",
+				"rule": "NO UNIT INCOME AND NO COLLECTION PAYOUT ARE DERIVED. The legacy `collect` command is field-agnostic: the whole branch looks the row up, stamps item[3] with the wall clock, prints a name, and writes NOTHING else — it never reads the item's collect, collect_type, collect_xp, max_collects, max_elem_vol, or harvester. Measured across the ten legacy root modules, collect_type, collect_xp, max_collects, max_elem_vol, and harvester have ZERO occurrences and the single quoted \"collect\" is the BRANCH NAME, never a field read — so all five committed collect fields have zero legacy consumers. On the content side there is nothing to derive either: 0 of 429 committed units record a positive `collect` (every one of them records 0), against 51 of the 470 committed buildings. So this contract computes NO income, NO payout, and NO collection reward for a unit, and provides no payout helper of any kind"
+			},
+			{
+				"implemented": false,
+				"refusal": "cap_semantics",
+				"rule": "NO UNIT COLLECTION CAP IS INTERPRETED. `max_collects` is 0 on ALL 429 committed units, so there is NO committed unit cap to interpret at all: the cap the delivered building-collect line deliberately REFUSED — a non-zero committed cap, because nothing in the repository says whether it limits one collection, a daily total, or a building's lifetime output — has NO UNIT ANALOGUE. On buildings the field takes exactly three values (0 on 459, 25 on 9, 100 on 2) and is read by no branch either. The recorded ABSENCE is stated as an absence and never read as permission to set a threshold (design D5)"
+			},
+			{
+				"implemented": false,
+				"refusal": "experience_award",
+				"rule": "NO EXPERIENCE IS AWARDED, GRANTED, OR COMPUTED. `collect_xp` is never read: it is non-zero on 427 of the 429 committed units (0 on 2, 1 on 37, 2 on 159, 3 on 211, 4 on 8, 5 on 12), and the only command that writes a placed row's attr['xp'] is `add_xp_unit`, which creates nothing and takes its amount from a CLIENT ARGUMENT — already refused by the delivered godot-unit-production requirement. A collection completion does not reopen that refusal, and the committed corpus carries attr['xp'] on 0 of its 40 placed rows (design D5)"
+			}
+		],
+		"zero_consumer_precedents": [
+			{
+				"fact": "committed on 5 of the 429 units and read by no legacy branch, so no capacity rule is enforced",
+				"field": "unit_capacity",
+				"line": "M8 line 2 (unit instances)"
+			},
+			{
+				"fact": "committed on every one of the 100 level entries and read by no legacy branch, so no level reward is paid",
+				"field": "reward_type / reward_amount",
+				"line": "M7's XP line"
+			},
+			{
+				"fact": "carried by every one of the 899 committed items and read by no legacy branch, so no production duration is derived from it",
+				"field": "training_time",
+				"line": "M8 line 4 (unit production)"
+			}
+		]
+	},
+	"refusals_measured": {
+		"collect_field_occurrences": {
+			"collect_type": 0,
+			"collect_xp": 0,
+			"harvester": 0,
+			"max_collects": 0,
+			"max_elem_vol": 0
+		},
+		"collect_subscript_occurrences": 0,
+		"coverage": {
+			"buildings": {
+				"collect": {
+					"carrying_key": 470,
+					"of": 470,
+					"positive": 51
+				},
+				"collect_type": {
+					"carrying_key": 470,
+					"of": 470,
+					"positive": 0
+				},
+				"collect_xp": {
+					"carrying_key": 470,
+					"of": 470,
+					"positive": 53
+				},
+				"max_collects": {
+					"carrying_key": 470,
+					"of": 470,
+					"positive": 11
+				},
+				"max_elem_vol": {
+					"carrying_key": 470,
+					"of": 470,
+					"positive": 39
+				}
+			},
+			"units": {
+				"collect": {
+					"carrying_key": 429,
+					"of": 429,
+					"positive": 0
+				},
+				"collect_type": {
+					"carrying_key": 429,
+					"of": 429,
+					"positive": 0
+				},
+				"collect_xp": {
+					"carrying_key": 429,
+					"of": 429,
+					"positive": 427
+				},
+				"max_collects": {
+					"carrying_key": 429,
+					"of": 429,
+					"positive": 0
+				},
+				"max_elem_vol": {
+					"carrying_key": 429,
+					"of": 429,
+					"positive": 5
+				}
+			}
+		},
+		"item_ids_reads": 0,
+		"note": "the five committed collect fields' legacy occurrence counts are MEASURED over the ten named legacy root modules and are all zero, while the single quoted \"collect\" is the branch name at command.py:136 and there is NO [\"collect\"] subscript anywhere; the committed coverage is measured from the verified registry, so neither figure is promised from prose",
+		"quoted_collect_occurrences": 1
+	},
+	"schema": "unit-collection-report-v1",
+	"scope": {
+		"completes": "the godot-unit-production acquisition finding, rather than amending it",
+		"corpus": "the committed fresh-player corpus records maps[0]['store'] == {} and privateState['collections'] == [], so a completion WRITES the committed prize and APPENDS the id — a real, observable, content-derived mutation with NO fabricated player state. It places 40 rows across 11 distinct item ids, every one of committed type 'b', so it contains NO unit row, and all 40 attribute bags are empty",
+		"delivered": [
+			"the committed-prize projection with the one-based index and its alias",
+			"the acquisition-path inventory with each route classified",
+			"both authority gaps, recorded as contract facts",
+			"three refusals, each with its recorded reason",
+			"the guarded completion intent and its content-derived proof"
+		],
+		"first_of_its_kind": "the project's FIRST content-derived, server-authoritative unit acquisition",
+		"not_delivered": [
+			"any unit income, collection payout, cap semantics, or experience award",
+			"any collection eligibility check",
+			"any client-supplied acquisition route",
+			"the stored-item placement step, so no unit is placed or garrisoned",
+			"no production, movement, animation, or behaviour — each is a later M8 line or a later milestone"
+		]
+	},
+	"unresolvable": {
+		"collection_id": 11,
+		"error": "collection_id 11 resolves to index 10, outside the 10-entry committed collections table",
+		"prize": {},
+		"reason": "unknown_collection_id",
+		"recorded_value_intact": true,
+		"resolved": false,
+		"substitutes_nothing": true
+	}
+}
