@@ -34,59 +34,63 @@ This section is maintained by the root Codex orchestrator.
 
 It is a progress ledger, not the source of truth for specified behavior.
 
-- **Current milestone:** **M8 — Units — in progress.** M7 — Construction and Economy — is **complete with its exit assessed MET**; all eleven of its deliver lines are delivered and archived. M6 — Town Vertical Slice — remains delivered with its exit assessed MET; M0–M5 deliver lists are complete with their exits assessed MET. **M8's deliver list is `unit definitions`, `unit instances`, `queues`, `production`, `collection`, `movement`, `animations`, `basic behaviors`, and its exit criterion is "Core unit gameplay works"** — **six of eight lines are delivered and archived** (`unit definitions`, `unit instances`, `queues`, `production`, `collection`, `movement`); the seventh, **`animations`, is the next bounded line**
-- **Roadmap cursor:** **M8 — Units**, line 7 of 8. Lines 1–6 are delivered and
-archived. **Line 6 (`movement`) delivered a placement projection plus an explicit refusal, because
-the legacy server has no movement rule and the one move command already ships as M7's
-`building-move`.** `move` rewrites the row's two coordinate slots from client arguments with no
-type, occupancy, bounds, terrain, or speed check and with `frame` and `string` read but unused, and
-it is **type-agnostic**, so a unit row moves exactly as a building row does. There are only **five**
-writes to a row's slots 0–2 and exactly **two** coordinate writers (`move`, and `pop_unit`
-releasing a garrison row at client-supplied coordinates with the item id overwritten). **`velocity`
-is the sixth committed content field with no legacy consumer** and the sharpest in the project
-— positive on **all 429** committed units and 145 of 470 buildings, and read by nothing.
-`fast_forward` makes the row instant **client-writable** by subtracting a client-supplied number of
-seconds from every row's instant, every row's queue start instant, and **eleven** further map,
-private-state, research, and quest instants; it has no observable effect precisely because nothing
-evaluates elapsed time, and it is named because it is the instant a client-side readiness check
-would trust. Delivered: the typed read-only placement projection reporting cell, orientation,
-`width`, `height`, `elevation`, and `velocity` **verbatim** with nothing derived from another and
-failing **closed** with the recorded coordinate slots travelling untouched beside the refusal; the
-movement-command inventory; **eighteen** named absent helpers each with its reason; and the
-placement **view** explicitly delegated from `godot-unit-instances` so the row and its placement
-each have one owner. **No endpoint, no compat change, and no fixture** — with no server-derived
-movement there is no intent to authorise, and with no unit-specific movement behaviour there is
-nothing to capture; both are the deliverable rather than a gap. **Two defects were found and
-corrected during the line**, both recorded on the evidence: the investigation's own
-slot-0–2 write count was six until `engine.py:62` was measured as a comparison rather than an
-assignment (`docs/legacy-unit-movement.md` carries the correction), and the suite's own `ft_flying`
-measurement was **137** where the content says **135**, because the normalized package stores the
-`properties` flags as **strings** and a non-empty String is truthy in GDScript, so
-`int(value or 0)` collapsed the committed `"0"` to `true` and `int(true)` is 1 — verified by
-probe that `int("0")` is 0, so **135** is correct, and the flags are now read through one named
-helper with the encoding recorded in the report and the figure **asserted** so it cannot drift
-again
-- **Active OpenSpec change:** None — M8 line 6, `movement`, was archived as
-`2026-10-01-unit-movement` (Apply PR #233 merged as `da664a1`, spec-sync PR #234 merged as
-`ce29107`, archive PR #235 merged as `018e030`). Its evidence basis was the committed
-investigation `docs/legacy-unit-movement.md` (PR #229, merged `5cd47a1`)
+- **Current milestone:** **M8 — Units — in progress.** M7 — Construction and Economy — is **complete with its exit assessed MET**; all eleven of its deliver lines are delivered and archived. M6 — Town Vertical Slice — remains delivered with its exit assessed MET; M0–M5 deliver lists are complete with their exits assessed MET. **M8's deliver list is `unit definitions`, `unit instances`, `queues`, `production`, `collection`, `movement`, `animations`, `basic behaviors`, and its exit criterion is "Core unit gameplay works"** — **seven of eight lines are delivered and archived** (`unit definitions`, `unit instances`, `queues`, `production`, `collection`, `movement`, `animations`); the eighth and final line, **`basic behaviors`**, is next
+- **Roadmap cursor:** **M8 — Units**, line 8 of 8, the **final** line. Lines 1–7
+are delivered and archived. **Line 7 (`animations`) delivered an asset-timeline linkage projection plus
+an explicit refusal**, and its investigation was the one scoped by an instruction **not** to infer
+animation semantics from M4's converted unit package — a caution that proved **load-bearing**,
+because the most tempting reading of the evidence is wrong and the package itself refutes it. The
+legacy server has **no animation rule and no animation command**: of the 63 named branches, five
+contain animation vocabulary as a substring and every one is an artifact — three as whole-`_`-token
+matches (`move`, `orient`, `end_attack`) and two as pure substring artifacts (`batch_remove` and
+`remove_inventory_item` contain the letters of "move" inside "remove"). **Six animation-adjacent
+committed fields have zero legacy consumers** (`max_frame`, `img_name`, `attack`, `attack_interval`,
+`attack_range`, `velocity`, plus the `animal` flag), making `max_frame` the **seventh** zero-consumer
+committed field in this project, and a near-constant at `5` on 427 of 429 units, `2` on ids 923 and
+933, and over the buildings `2` on 446 / `1` on 24. The states exist **in the asset**: sprite 63 of
+the one committed converted package carries 29 frames and five named labels (`QUIETO`@1, `ANDAR`@6,
+`ATAQUE`@11, `MUERTE`@16, `PICAR`@21), which establishes **linkage only**. **The measured
+contradiction settled the scope:** committed `max_frame` is **2** while the parsed root frame count is
+**1** and the labelled sprite has **29**, and `img_name` equals that package's `legacy_id`, so all
+three describe the same unit and **disagree** — `max_frame` is **not** the asset's frame count, and
+adopting it as one would be **wrong**. Recorded as **one** data point and derived-provisional: enough
+to refuse adopting it, not enough to claim what it means. The refusal is enforced **structurally** —
+the suite asserts **no code identifier is named after the committed field**, which forced the accessor
+to be named `non_equivalence_record()`. Delivered: the typed read-only linkage projection reporting
+the labels, frame positions, per-sprite frame counts, and recorded rate **verbatim**, with **zero**
+multiplication or division lines in the module so the no-derivation claim is mechanically true;
+failing **closed** on an absent, unreadable, or label-less asset; the field inventory with measured
+zero-consumer counts; the non-equivalence record; the command inventory with a **negative** measurement
+that `frame`/`play`/`loop`/`state`/`clip`/`sprite`/`idle`/`walk`/`death` match no branch at all; and
+the explicit refusals of every playback rule. **No endpoint, no fixture** — there is **no animation
+behaviour for the legacy server to have**. The **five label names are reported verbatim in Portuguese
+and deliberately NOT translated**, because nothing selects a state for a translation to name.
+- **Active OpenSpec change:** None — M8 line 7, `animations`, was archived as
+`2026-10-02-unit-animations` (proposal PR #239 merged as `e6f2f9c`, Apply PR #240 merged as
+`28e77df`, spec-sync PR #241 merged as `5bfdadd`, archive PR #242 merged as `4915948`). Its evidence
+basis was the committed investigation `docs/legacy-unit-animations.md` (PR #237, merged `ff77e8f`)
 - **Lifecycle stage:** ARCHIVED
-- **Change status:** Closed — `unit-movement` archived as
-`2026-10-01-unit-movement`. Artifacts: `proposal.md`, `design.md` decisions D1–D7, `tasks.md`
-12 tasks (all ticked) plus the integration-review record carrying the
-requirement-to-evidence map, the two corrections, the guard-injection result, and the verification
-actually run; capability deltas `godot-unit-movement` **ADDED** (7 requirements),
-`godot-unit-instances` **MODIFIED** (it delegates the placement view), `godot-unit-queues`
-**MODIFIED** (the client-writable instant that makes its readiness refusal a refusal),
-`godot-building-move` **MODIFIED** (a move is not a movement), and `godot-compatibility-boot`
-**MODIFIED** (movement is committed content, not a GameApi operation). `openspec validate
---all --strict` PASS at Propose and at the integration review; **55/55** after the spec sync;
-**54/54** after the archive with no active change. **The compat suite is unchanged at `Ran 1352
-tests ... OK`**, because this line adds no endpoint and touches `apps/compat-api/**` not at all.
-**The anti-invention guard was tested rather than trusted**: injecting one invented `static func
-travel_time(from_cell, to_cell, velocity)` produced **two independent failures**, and restoring the
-file returned the suite to a passing state with the evidence report's digest unchanged, so the
-guard never touched the committed evidence
+- **Change status:** Closed — `unit-animations` archived as
+`2026-10-02-unit-animations`. Artifacts: `proposal.md`, `design.md` decisions D1–D7, `tasks.md` 15
+tasks (all ticked) plus the integration-review record; capability deltas `godot-unit-animations`
+**ADDED** (7 requirements), `godot-unit-definitions` **MODIFIED** (it keeps whether a sprite reference
+*resolves* and delegates the *timeline* reading here), `godot-unit-movement` **MODIFIED** (its
+`animate_move` absence is completed by naming this capability the single owner of the animation
+refusals), and `godot-compatibility-boot` **MODIFIED** (animation is committed asset linkage, not a
+GameApi operation). `openspec validate --all --strict` PASS at Propose and at the integration review;
+**56/56** after the spec sync. **The compat suite is unchanged at `Ran 1352 tests ... OK`**, because
+this line adds no endpoint and touches `apps/compat-api/**` not at all. **Three corrections the
+implementation made** — sprite 63 records **11** placements and 7 removes, not the 5 my brief stated
+(39 placements across all seven sprites); buildings `max_frame` splits `2` on **446** / `1` on **24**,
+which the investigation left as only "1 or 2"; and the `animal` flag is set on exactly **2 of 429**
+units and **0 of 470** buildings, recorded nowhere in the investigation. **Two defects in my own prior
+work were found while verifying**: the scope test listed two movement paths **twice** in `ALLOWED`
+because I appended without checking whether an interrupted worker had already added them, and the
+permissive allow-list did not catch it, so it would have shipped silently — both duplicates removed,
+and the four `scenes/*.tscn` duplicates left alone because `ALLOWED` and `EXPECTED_SCENES` check them
+separately; and `AGENTS.md` recorded the collection suite at **1793** checks where the unmodified suite
+measures **1845** (1857 with `--report`) — corrected in place. **The anti-invention guard was tested
+rather than trusted**: an injected `frame_duration` helper produced **two independent failures**.
 - **M7 exit assessment: MET** — exit criterion "Core town-building gameplay loop works" is satisfied by committed evidence across all eleven delivered lines, each with its own executed-legacy fixture, endpoint, typed operation, client flow, hermetic suite, live battery phase, and captured evidence: a player can **place** a building from the catalogue, **purchase** one with cash, **move** it, **sell** it, **store** it, **upgrade** it, watch its **construction** start and finish, **collect** its income, **expand** the town, **read** every resource the save carries, and **advance** a level on the committed curve — with every state-mutating step executed by the unchanged legacy command path behind a typed, intent-only contract, and every response applied from the server's own numbers rather than the client's arithmetic. The loop's **legibility** is committed too: `apps/client-godot/evidence/town/` renders the real town with all ten readout rows sourced (the resources line corrected the primary-currency row from a field nothing produces to `gold`, which made the currency visible for the first time), and eleven further evidence directories carry windowed captures plus deterministic reports, each byte-identical across reruns. The families' post-state proofs together are the milestone's central safety result: a value **moved by exactly** a derived delta (collect), **moved by exactly** a derived debit (expand), and proven **not to move at all** (level up), so a client-sent vector cannot mint or burn through any delivered surface. Final-state verification: `verify.ps1` exit 0; `verify-boot.ps1` exit 0 with **27 hermetic suites and 13 live phases** and guard digest `6978b959…ff348` pre=post; compat **`Ran 1109 tests ... OK`**; hash manifest 3,258 entries; `openspec validate --all --strict` 48/48 exit 0 after the final archive. **Residual gaps named by the delivered specs, none blocking the criterion:** no Flash, Ruffle, ActionScript, or browser executed anywhere and **no pixel-parity oracle** against the legacy client exists; parity everywhere rests on **one recorded transaction against the fresh-player corpus** plus recorded probes, never on progressed players (whose saves remain unavailable); the HUD's labels and layout are the delivered provisional convention; the **expansion tile-to-cell geometry is a known evidence gap**, so no terrain, grid, buildable-cell, or placement-bound growth is claimed — the expansion line delivers the unlock ledger only; no level reward is paid, unit XP and tutorial progression are out of scope because the corpus cannot exercise them, and the level curve's index base is derived-provisional from one corpus data point with its rejected alternative retained; collect's payout amounts and expand's price index are derived from committed content and never observed from the Flash client; and every stored rule's server-authoritative validation remains Server v1 (M13) work
 - **M6 exit assessment: MET** — exit criterion "A player can launch and view a real legacy town without Flash" is satisfied by committed evidence: `apps/client-godot/evidence/town/town-player.png` (windowed run, boot → `town=rendered placements=40`, 1400×600, 741,893 bytes) shows the fresh save's real town, and `town-slice.png` (1400×600, 1,226,928 bytes) together with `report.json` (`town-report-v1`, committed blob sha256 `1540D11A…676AF`, `bootstrap_requests` 1) records the inputs and their digests, the derived-provisional projection constants, counts by chosen visual source (player save: 40 objects = 31 thumbnails + 9 markers; slice: 576 objects including the authentic House I and Wild Elephant sprites), the observed HUD values, selection and camera state, and five explicit non-claims. Remaining gaps named by the `godot-town-rendering` spec: projection provenance (the legacy SWF's numeric iso constants were never extracted; the constants derived from save coordinate extents, content footprints, sprite scales, and documented iso-engine identifiers remain provisional); authentic HUD/selection visuals (values and hit behavior are authoritative, but presentation uses the modern UI foundation rather than legacy Flash art); unit presence in the live save (the fresh save contains no unit placements, so authentic unit rendering is proven via the slice scene); and the systems deferred to later phases (placement/movement/disposal, buildings, economy — M7 and beyond). No pixel-parity oracle against the legacy client exists, and no Flash, Ruffle, ActionScript, or browser executed
 - **M4 exit assessment: MET** — exit criterion "at least one authentic building and unit render correctly in Godot" is satisfied by committed evidence: `apps/client-godot/evidence/first-render/first-render.png` (448×224, sha256 `da15d192…bae5`, visually verified: House I tent + elephant with crisp alpha on the neutral background) and `apps/client-godot/evidence/first-render/report.json` (`pass=true`, `failures=[]`, oracle error (0,0) both entities, max_abs 1/1/1/0, entity coverage 1.0, input package digests recorded). Claim limits in `apps/client-godot/README.md`: authentic source-bitmap fidelity at authentic bounds/placement within documented tolerances — explicitly not live-Flash pixel parity (Flash execution is forbidden and no reference renders exist).
@@ -98,11 +102,11 @@ guard never touched the committed evidence
 - **Last OpenSpec validation:** PASS — `building-xp` archive stage (2026-09-30): after the move `openspec list` reports "No active changes found." and `openspec validate --all --strict` reports 48 passed / 0 failed, and at Sync (before the move) 49/49; change strict validation passed at Propose and at the integration review. This completes the sync of all eleven M7 lines' specs. The archive ran with `--skip-specs` because the Sync stage had already applied the deltas — without it, archive correctly aborts with "already exists" and changes no files. This is not the unavailable dedicated verification workflow
 - **Last implementation verification:** Integration review over `building-xp`, followed by the same battery re-run in the final state by the root — orchestrator-run, not an independent agent (fallback noted under Blocking issues). Actually executed by the root: `openspec validate building-xp --strict` exit 0; `verify.ps1` PASS exit 0; `verify-boot.ps1` PASS exit 0 (**27 hermetic suites** including `test_town_xp` 767 checks, **13 live phases** including `level-up-live` green, guard digest `6978b959…ff348` pre=post, port released, no working-tree `saves/`); `hash_manifest.py verify` exit 0 (3,258 entries); compat discovery `Ran 1109 tests ... OK`. The root independently re-read the committed `xp-report-v1` (provenance split, `zero-based` rejected alternative, the corpus contradiction quoted, and `reward.paid: false` / `reward.displayed: false`) and **corrected an error the Apply stage surfaced in my own investigation record** — the `Conqueror` saturation level was a zero-based position in a curve whose index base is one-based, so it is one-based level **45**, not 49. The requirement-to-evidence map, the two honest consequences of the corpus already being at its derived level, the accepted worker deviations, and the residual gaps are recorded in the tasks.md integration-review record. Prior: the ten earlier M7 integration reviews, and the `town-vertical-slice` independent verification (2026-09-28) VERDICT FAIL on exactly C1, discharged by the ledger commit in PR #152
 - **Last verified commit:** `cc77b90` — the Apply-tree tip the final-state battery executed on for `building-xp` (the following commit `d04766d` recorded the documentation and integration review; Apply PR #200 merged as `4fffe05`); prior: `7163311` for `building-resources` (PR #195 merged as `1eb3d57`), `2a3516f` for `building-expand` (PR #190 merged as `974bd15`), `8121e37` for `building-collect` (PR #185 merged as `fa88a99`), `fabbb58` for `building-construction`, `8d15315` for `building-upgrade`, `120b343` for `building-store`, `77abfd0` for `building-sell`, `7c4390b` for `building-move`, `b341904` for `building-purchase`, `742f594` for `building-placement`, then `3f3406c` the archive-stage tree the independent M6 verification batteries executed on
-- **Last updated:** 2026-10-01 (M8 line 7 animations investigation recorded; the animations proposal is next)
+- **Last updated:** 2026-10-02 (M8 line 7 archive recorded; the basic behaviors investigation is next)
 
-### Resume point (updated after M8 line 6's investigation, orchestrator)
+### Resume point (updated after M8 line 7's archive, orchestrator)
 
-**Delivered and archived, M8 lines 1-6:**
+**Delivered and archived, M8 lines 1-7:**
 
 | Line | Archive | PRs and merges |
 | --- | --- | --- |
@@ -112,11 +116,12 @@ guard never touched the committed evidence
 | `production` | `2026-10-01-unit-production` | #219 `58caf86` (inv), #220 `c442b3b`, #221 `eaa6f37`, #222 `65af7ee`, #223 `61f400a` |
 | `collection` | `2026-10-01-unit-collection` | #224 `4cfc3fd` (inv), #225 `52e16b0`, #226 `22fdc2c`, #227 `20215fd`, #228 `c10de94` |
 | `movement` | `2026-10-01-unit-movement` | #229 `5cd47a1` (inv), #231 `a958bef` (ledger reconcile), #232 `e5dc176`, #233 `da664a1`, #234 `ce29107`, #235 `018e030` |
+| `animations` | `2026-10-02-unit-animations` | #237 `ff77e8f` (inv), #238 `3ccbf03` (cursor), #239 `e6f2f9c`, #240 `28e77df`, #241 `5bfdadd`, #242 `4915948` |
 
-**Committed investigations (six):** `docs/legacy-unit-instances.md`,
+**Committed investigations (seven):** `docs/legacy-unit-instances.md`,
 `docs/legacy-production-queues.md`, `docs/legacy-unit-production.md`,
-`docs/legacy-unit-collection.md`, **`docs/legacy-unit-movement.md`** (PR #229, merged
-`5cd47a1`).
+`docs/legacy-unit-collection.md`, `docs/legacy-unit-movement.md` (PR #229, merged
+`5cd47a1`), and **`docs/legacy-unit-animations.md`** (PR #237, merged `ff77e8f`).
 
 **Baselines in the final state (re-run by the orchestrator):** `verify.ps1` exit 0;
 `verify-boot.ps1` exit 0 with **33 hermetic suites and 15 live phases** and no new live phase,
@@ -129,44 +134,31 @@ three runs). **The anti-invention guard was tested rather than trusted** on this
 `travel_time` produced two independent failures and the restore returned the suite to a passing
 state with the report digest unchanged.
 
-**Next objective:** propose M8 line 7, **`animations`**, on the now-committed investigation
-**`docs/legacy-unit-animations.md`** (PR #237, merged `ff77e8f`). Its shape is an **asset-timeline
-linkage projection plus an explicit refusal**, for the reasons the investigation established:
+**Next objective:** investigate, then propose, M8 line 8, **`basic behaviors`** — the
+**final** M8 line, after which the exit criterion **"Core unit gameplay works"** is assessed. The
+investigation comes first, and it must measure its own fields rather than assume the refusal pattern
+repeats: seven committed content fields have already been found with **zero** legacy consumers, and
+while the last three lines (`production`, `movement`, `animations`) all resolved to a projection plus
+refusals, `basic behaviors` names the broadest surface of the three and is the one most likely to
+contain a real mechanism. The questions it must answer from the committed source are whether **any**
+legacy branch reads a behavioural field, whether `attack` / `defense` / `life` / `best_against` /
+`attack_interval` / `attack_range` have consumers, what `properties.healer`, `properties.animal`,
+`properties.resurrectable`, `properties.seeStealthUnits`, and `properties.waterborne` actually gate if
+anything does, and whether the `end_attack` command and the `xp`-awarding surface imply any real
+behaviour. If a mechanism exists, the line delivers it; if not, it is a projection plus refusals with
+no endpoint and no fixture, exactly as `movement` and `animations` were. Either way the anti-invention
+guard should be **structural and then tested by injection**, not merely asserted.
 
-- **The legacy server has no animation rule and no animation command.** Of the 63 named
-  `command.py` branches, five contain animation vocabulary as a *substring* and every one is an
-  artifact: `move` and `orient` are the movement line's commands, `batch_remove` and
-  `remove_inventory_item` contain the letters of "move" inside "re—–move",
-  and `end_attack` is combat termination.
-- **Six animation-adjacent committed fields, all with ZERO legacy reads** across the seven
-  modules: `max_frame` (on all 429 units, **2** distinct values), `img_name` (401), `attack`
-  (131), `attack_interval` (12), `attack_range` (14), and `velocity` (11), plus the `animal`
-  `properties` flag. **`max_frame` is the seventh zero-consumer committed field in the project**
-  and is a near-constant: **`5` on 427 of the 429** units, `2` on exactly ids **923** and **933**,
-  `1`/`2` on all 470 buildings. Its committed encoding is a JSON *number*, unlike the
-  `properties` flags, which are *strings*.
-- **The animation states live in the asset, not the content or the server.** The one committed
-  converted unit package parsed `10033_wild_elephant.swf` and recorded **sprite 63 with 29 frames
-  and five named states** — `QUIETO` at frame 1, `ANDAR` at 6, `ATAQUE` at 11, `MUERTE` at 16,
-  `PICAR` at 21. That establishes the *labels and frame positions* and nothing more: M4's own
-  recorded limit is **no tessellation, no playback semantics, labels names-only**, so there is no
-  recorded loop, state machine, transition, priority, interrupt, per-state duration, or mapping
-  from any server event to any state. `MUERTE` is a state the delivered `production` line already
-  found unreachable, since no legacy command produces or kills a unit.
-- **A measured contradiction shaped the scope.** For that same unit the committed `max_frame` is
-  **2** while the parsed root `frame_count` is **1** and the sprite holding the five labels has
-  **29** frames, and `img_name` equals the converted package's `legacy_id` — so the two
-  describe the same unit and **disagree**. `max_frame` is therefore **not** the asset's frame
-  count, and adopting it as one would be **wrong**. This is **one data point**, recorded as
-  derived-provisional: enough to **refuse** adopting `max_frame` as a frame count, not enough to
-  claim what it means, and not a measurement of any other unit — only **one** converted unit
-  package and **one** building package are committed, so no distribution is measurable.
-- So the deliverable is a **linkage projection** reporting the labels, frame positions, per-sprite
-  frame counts, and recorded frame rate **verbatim**, plus the explicit refusals of frame duration,
-  loop count, state machine, transitions, priority, interrupts, playback order, per-state timing,
-  animation triggers, and any event-to-state mapping — with **no endpoint and no fixture**,
-  because there is no animation behaviour for the legacy server to have. As with `movement`, the
-  **anti-invention guard should be structural and then tested by injection** rather than trusted.
+**Carried follow-ups, nearest first:** (1) the **stored-item round trip** (`place_stored_item`) is the
+nearest undelivered step on the fully content-derived path `godot-unit-collection` opened; (2)
+`verify-boot.ps1`'s `^ERROR:` guard is broad enough to fail on a benign engine-shutdown RID-leak
+warning — and, recorded on the `movement` line, on the compat unittest discovery exiting 1 while the
+suite itself reported `OK`, which passed standalone (`Ran 1352 tests ... OK`, exit 0) and on rerun;
+narrow it to `SCRIPT ERROR` or a fatal-error allowlist.
+
+**Process disclosures (both preserved):** the `unit instances` Apply PR #209 was **squash-merged** as
+`0710038`, and `41fc708` was pushed **directly to `main`**, bypassing the branch-and-PR workflow.
+Neither is rewritten.
 
 **Carried follow-ups, nearest first:** (1) the **stored-item round trip** (`place_stored_item`) is
 the nearest undelivered step on the fully content-derived path `godot-unit-collection` opened;
