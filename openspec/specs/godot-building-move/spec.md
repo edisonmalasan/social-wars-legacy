@@ -104,6 +104,15 @@ The change SHALL commit a windowed capture of a completed move together with a d
 - **WHEN** the report step is rerun against the same inputs
 - **THEN** it reproduces its committed bytes exactly
 
+#### Scenario: A move is not a movement
+
+- **WHEN** a move is executed and this capability's claim limits are read
+- **THEN** they record that the move command is **type-agnostic**, so a unit row moves exactly as a building row does, and that the committed `velocity`, `width`, `height`, and `elevation` fields are **read by no legacy branch** — a move therefore travels no distance, consumes no time, and obeys no speed, which the `godot-unit-movement` capability records in full
+
+#### Scenario: The unread fields are not adopted here either
+
+- **WHEN** this capability's surface is inspected for a travel time
+- **THEN** none is computed, and the committed fields are neither interpreted as a speed nor used to derive a path, so the delivered move capability does not pre-empt the movement capability's refusal
 ### Requirement: Containment and preservation
 
 All execution SHALL stay on loopback under the pinned CPython 3.9.13 with the existing locked dependencies and no new packages; legacy sources, configs, saves, villages, committed fixtures, conversion packages, registry manifests, and the committed M4, M6, placement, and purchase evidence SHALL remain byte-identical across the change (SHA-256 guards plus the hash manifest); move execution SHALL never write a working-tree save; and both verification batteries SHALL exit 0 in the final state.
