@@ -31,7 +31,11 @@ extends "res://tests/test_base.gd"
 ## authority gaps — its suite, and the `unit-collection` evidence report), and
 ## the unit-movement work (the `scripts/units/unit_movement.gd` placement
 ## projection with the movement-command inventory and the content-only refusals,
-## its suite, and the `unit-movement` evidence report):
+## its suite, and the `unit-movement` evidence report), and the unit-animations
+## work (the `scripts/units/unit_animations.gd` asset-timeline linkage
+## projection with the recorded label positions, the `max_frame`
+## non-equivalence, the animation-command inventory, and the playback refusals,
+## its suite, and the `unit-animations` evidence report):
 ## no other game system, no scene beyond the allow-list, no script outside
 ## the allow-list, no Flash-related runtime, no legacy protocol token
 ## anywhere, and no transport reference outside the legacy-v0
@@ -103,6 +107,7 @@ const ALLOWED := [
 	"scripts/units/collection_prize.gd",
 	"scripts/units/collection_flow.gd",
 	"scripts/units/unit_movement.gd",
+	"scripts/units/unit_animations.gd",
 	"scripts/verification.gd",
 	"tests/test_asset_ids.gd",
 	"tests/test_audio_manager.gd",
@@ -142,7 +147,7 @@ const ALLOWED := [
 	"tests/test_unit_production.gd",
 	"tests/test_unit_collection.gd",
 	"tests/test_unit_movement.gd",
-	"tests/test_unit_movement.gd",
+	"tests/test_unit_animations.gd",
 	"evidence/boot/boot-report.json",
 	"evidence/building-move/building-move.png",
 	"evidence/building-move/report.json",
@@ -177,7 +182,7 @@ const ALLOWED := [
 	"evidence/unit-production/report.json",
 	"evidence/unit-collection/report.json",
 	"evidence/unit-movement/report.json",
-	"evidence/unit-movement/report.json",
+	"evidence/unit-animations/report.json",
 ]
 
 ## The exact scene set the project may declare (set equality below).

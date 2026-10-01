@@ -2666,3 +2666,147 @@ and the battery passed on rerun. Consistent with the recorded guard-narrowing fo
 - **No pixel parity is claimed**, and the M6 tile-geometry gap remains a recorded gap. **No windowed
   capture is claimed**: nothing is rendered and no unit exists to render.
 - `animations` and `basic behaviors` remain undelivered.
+
+## Unit animation (M8 line 7)
+
+The legacy server has **no animation rule and no animation command**. Scoped by
+`docs/legacy-unit-animations.md`, which was itself scoped by an instruction **not** to infer
+animation semantics from M4's converted unit package. That caution proved load-bearing: the single
+most tempting reading of the evidence is **wrong**, and the package itself refutes it.
+
+### The finding
+
+Of the **63** named `command.py` branches, five contain animation vocabulary as a *substring*, and
+every one is an artifact:
+
+| Branch | Class | Why it is not an animation command |
+| --- | --- | --- |
+| `move`, `orient` | whole `_`-token | already owned by `godot-unit-movement` |
+| `end_attack` | whole `_`-token | combat termination |
+| `batch_remove`, `remove_inventory_item` | pure substring | contain the letters of "move" inside "re**move**" |
+
+**No branch starts, stops, advances, loops, or selects an animation**, and **six animation-adjacent
+committed fields have zero legacy consumers** across the seven modules: `max_frame`, `img_name`,
+`attack`, `attack_interval`, `attack_range`, and `velocity`, plus the `animal` `properties` flag.
+**`max_frame` is the seventh zero-consumer committed field in this project**, and it is a
+near-constant: **`5` on 427 of the 429** units, `2` on exactly ids **923** and **933**, and over the
+470 buildings `2` on **446** and `1` on **24**.
+
+### The states exist, in the asset rather than in the content or the server
+
+The one committed converted unit package parsed `10033_wild_elephant.swf` and recorded **sprite 63
+with 29 frames and five named labels**:
+
+| Label | Frame |
+| --- | --- |
+| `QUIETO` | 1 |
+| `ANDAR` | 6 |
+| `ATAQUE` | 11 |
+| `MUERTE` | 16 |
+| `PICAR` | 21 |
+
+**Established:** the labels and their frame positions. **Not established:** any playback — M4's own
+recorded limit is *no tessellation, no playback semantics, labels names-only*, so there is no
+recorded loop, state machine, transition, priority, interrupt, per-state duration, or mapping from
+any server event to any state. `MUERTE` is a state the delivered `production` line already found
+**unreachable**, since no legacy command produces a unit and none kills one.
+
+**The label names are reported verbatim in Portuguese and are deliberately NOT translated** into
+English state words: nothing selects a state, so there is nothing for a translation to name, and a
+translation would import a state model the evidence does not support. A later line wanting those
+readings must re-derive them.
+
+### The measured contradiction that settled the scope
+
+| Quantity | Value | What it is |
+| --- | --- | --- |
+| committed `max_frame` | **2** | a per-unit **content** field on the definition |
+| parsed root `frame_count` | **1** | a static parse of that asset's root timeline |
+| parsed sprite 63 `frame_count` | **29** | the timeline that actually holds the five labels |
+
+The content's `img_name` equals the converted package's `legacy_id`, so all three describe the same
+unit and **disagree**. **`max_frame` is therefore not the asset's frame count**, and a line that
+adopted it as one would be wrong.
+
+That is **one data point**, recorded as derived-provisional: enough to **refuse adopting** `max_frame`,
+not enough to claim what it means, and not a measurement of any other unit — only **one** converted
+unit package and **one** building package are committed, so no distribution is measurable.
+
+The refusal is enforced *structurally*: the suite asserts that **no code identifier in the module is
+named after the committed field**, which is what forced the public accessor to be named
+`non_equivalence_record()` rather than after the field it reports on.
+
+### What the module delivers
+
+`scripts/units/unit_animations.gd` is a typed, read-only **linkage** projection. It reports the
+recorded labels, each label's recorded frame position, the per-sprite recorded frame counts, and the
+recorded frame rate **verbatim**, deriving **nothing** from them — the module's code contains **zero**
+multiplication or division lines, so the no-derivation claim is mechanically true rather than
+asserted. It fails **closed**: an asset that is absent, unreadable, or **label-less** is reported
+unresolvable with its recorded state intact, never defaulted to an empty, nominal, or single-frame
+animation.
+
+**The reading has one owner.** `godot-unit-definitions` keeps ownership of whether the committed
+sprite reference *resolves*, and this capability owns what the asset's recorded timeline *contains*.
+
+### The guard is tested, not trusted
+
+The anti-invention guard is **structural**: the module's whole function inventory is compared against
+a pinned list. Injecting one deliberately invented
+
+```gdscript
+static func frame_duration(frame_count: Variant, rate: Variant) -> float:
+	return float(frame_count) / float(rate)
+```
+
+produced **two independent failures** — the per-helper absence check and the pinned-inventory check —
+and restoring the file from a byte-identical copy returned the suite to its passing state.
+
+### Verification (commands actually executed)
+
+```bash
+godot --headless --path apps/client-godot --script res://tests/test_unit_animations.gd
+godot --headless --path apps/client-godot --script res://tests/test_unit_animations.gd -- --report
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Observed 2026-10-02: `test_unit_animations` **628 checks** (629 with `--report`), the 34th hermetic
+suite; `verify.ps1` exit 0; `verify-boot.ps1` exit 0 with **34 hermetic suites and 15 live phases** and
+**no new live phase**; the compat suite **unchanged** at `Ran 1352 tests ... OK`; the content validator
+`result: valid` across 21 schemas; the preservation manifest 3,258 entries; and
+`openspec validate --all --strict` green. The evidence is the deterministic
+`unit-animations-report-v1` report at `evidence/unit-animations/report.json`, digest
+`f06784cb…d8556`, 46,703 bytes, byte-identical across three consecutive runs.
+
+**Two corrections made to prior records while this line was verified:**
+
+- `test_project_scope.gd` listed `tests/test_unit_movement.gd` and
+  `evidence/unit-movement/report.json` **twice** in `ALLOWED` — a defect introduced on the movement
+  line, which the permissive allow-list did not catch, so it would have shipped silently. Both
+  duplicates are removed. (The four `scenes/*.tscn` duplicates are **intentional**: `ALLOWED` lists
+  them and `EXPECTED_SCENES` checks them separately.)
+- `AGENTS.md` recorded the collection suite at **1793 checks**, measured on the unmodified suite at
+  **1845** (1857 with `--report`). The recorded figure was stale and is now corrected in place.
+
+### Unit animation claim limits
+
+- **No frame duration, loop count, state machine, transition, priority, interrupt, playback order,
+  per-state timing, animation trigger, or event-to-state mapping is implemented.** The recorded
+  `ABSENT_HELPERS` are the contract, not omissions.
+- **The committed animation fields are read by no legacy branch** and are reported as content only.
+- **`max_frame` is adopted nowhere** as a frame count, duration, or loop bound, and **what it means is
+  not claimed** — the measurement is one data point.
+- **No legacy branch selects an animation**, and none was invented.
+- **No animation is played, animated, or rendered.** The converted unit package establishes asset and
+  timeline **linkage** only, never playback correctness.
+- **No claim is made for any unit other than the one committed converted package** — coverage is
+  **1 of 429**, with every other path exercised over crafted in-memory packages. Closing this needs a
+  new conversion, not a derivation.
+- **No executed-legacy fixture was captured**, because there is **no animation behaviour for the
+  legacy server to have** — a stronger statement than any corpus limitation.
+- **No pixel parity is claimed** and **no windowed capture is claimed**, because nothing is rendered.
+- `basic behaviors` remains undelivered.

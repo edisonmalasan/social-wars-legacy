@@ -1002,7 +1002,7 @@ collection ledger went `[]` to `[1]`, so the grant matches the **committed bag
 exactly**, the ledger grew by **exactly one appended id**, and **no player state
 was fabricated**; this is the **project's first content-derived,
 server-authoritative unit acquisition**; the hermetic unit-collection suite
-(observed **1793 checks**, 1805 with `--report`; the 32nd hermetic suite); the
+(observed **1845 checks**, 1857 with `--report`; the 32nd hermetic suite — **corrected 2026-10-02**: the earlier recorded 1793/1805 was stale, measured on the unmodified suite at 1845/1857); the
 sibling unit suites (**568**, **411**), the scope suite (**1526**, was 1475), and
 the fake GameApi (**1322**, was 1205); both batteries in the final state (each
 exit `0`; `verify-boot.ps1` now runs **32 hermetic suites and 15 live phases**, and
@@ -1116,6 +1116,77 @@ nothing is rendered; the placement **view** is owned here while `godot-unit-inst
 ownership of the row, so the two cannot drift; and `animations` and `basic behaviors` remain
 undelivered. No Flash, Ruffle, ActionScript, or browser executes in any of these commands,
 and no network is used at all.
+
+
+Verified unit-animations commands (milestone M8 line 7; Godot 4.7.2.stable, Windows x64;
+`python` denotes the pinned interpreter, never the PATH alias). The line is scoped by the
+committed investigation `docs/legacy-unit-animations.md` (PR #237, merged `ff77e8f`), which was
+itself scoped by an explicit instruction **not** to infer animation semantics from M4's converted
+unit package — a caution that proved load-bearing, because the single most tempting reading of the
+evidence is **wrong** and the package itself refutes it:
+
+```bash
+godot --headless --path apps/client-godot --script res://tests/test_unit_animations.gd
+godot --headless --path apps/client-godot --script res://tests/test_unit_animations.gd -- --report
+godot --headless --path apps/client-godot --script res://tests/test_unit_movement.gd
+godot --headless --path apps/client-godot --script res://tests/test_unit_definitions.gd
+godot --headless --path apps/client-godot --script res://tests/test_project_scope.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-10-02): the hermetic unit-animations suite (observed **628
+checks**, 629 with `--report`; the 34th hermetic suite) over a typed read-only asset-timeline
+**linkage** projection reporting the recorded labels, each label's recorded frame position, the
+per-sprite recorded frame counts, and the recorded frame rate **verbatim**, failing **closed** when
+an asset is absent, unreadable, or label-less rather than defaulting it to an empty, nominal, or
+single-frame animation; `verify.ps1` exit 0; `verify-boot.ps1` exit 0 with **34 hermetic suites and
+15 live phases** and **no new live phase**; the **unchanged** compat suite (observed `Ran 1352 tests
+... OK`, exit 0, because this line adds no endpoint and touches `apps/compat-api/**` not at all);
+the content validator (exit 0, `result: valid`, 21 schemas); and the preservation manifest (3,258
+entries, exit 0). `git status` showed no content-package, conversion-package, registry-manifest,
+fixture, save, config, village, or legacy-source byte changed. The evidence is the deterministic
+`unit-animations-report-v1` report under `apps/client-godot/evidence/unit-animations/` (digest
+`f06784cb…d8556`, 46,703 bytes, byte-identical across three consecutive runs). **The line implements
+nothing and that is its finding:** the legacy server has **no animation rule and no animation
+command** — of the 63 named `command.py` branches, five contain animation vocabulary as a substring
+and every one is an artifact, with `move` and `orient` being whole-`_`-token matches already owned by
+`godot-unit-movement` and `batch_remove` and `remove_inventory_item` pure substring artifacts, while
+`end_attack` is combat termination; and **six animation-adjacent committed fields have zero legacy
+consumers** across the seven modules (`max_frame`, `img_name`, `attack`, `attack_interval`,
+`attack_range`, `velocity`, plus the `animal` flag). **`max_frame` is the seventh zero-consumer
+committed field in this project** and is a near-constant: `5` on **427** of the 429 units, `2` on
+exactly ids **923** and **933**, and over the 470 buildings `2` on **446** and `1` on **24**. **A
+measured contradiction settled the scope:** for the one committed converted unit package the content's
+own `img_name` equals the package's `legacy_id`, so both describe the same unit, yet committed
+`max_frame` is **2** while the parsed root `frame_count` is **1** and the labelled sprite 63 has
+**29** — so `max_frame` is **not** the asset's frame count, and a line that adopted it as one would
+be **wrong**. That is recorded as **one** data point and derived-provisional: enough to **refuse
+adopting** `max_frame`, not enough to claim what it means, and not a measurement of any other unit,
+since only **one** converted unit package and **one** building package are committed. The
+**anti-invention guard is structural and was tested rather than trusted**: injecting one invented
+`static func frame_duration(frame_count, rate)` produced **two independent failures**, and restoring
+the file from a byte-identical copy returned the suite to its passing state. Claim limits: **no
+frame duration, loop count, state machine, transition, priority, interrupt, playback order,
+per-state timing, animation trigger, or event-to-state mapping is implemented** — the recorded
+`ABSENT_HELPERS` are the contract, not omissions, and the module's code contains **zero**
+multiplication or division lines, so the no-derivation claim is mechanically true; **the committed
+animation fields are read by no legacy branch** and are reported as content only; **`max_frame` is
+adopted nowhere** as a frame count, duration, or loop bound, which forced the public accessor to be
+named `non_equivalence_record()` rather than after the field, because the suite asserts no code
+identifier is named after it; **no legacy branch selects an animation**; **no animation is played,
+animated, or rendered**, and the converted unit package establishes asset and timeline **linkage**
+only, never playback correctness; **the five label names are reported verbatim in Portuguese and
+are deliberately NOT translated** into English state words, because nothing selects a state for a
+translation to name — a later line wanting those readings must re-derive them; **no claim is made
+for any unit other than the one committed converted package**, which is coverage of **1 of 429**,
+with every other path exercised over crafted in-memory packages; **no executed-legacy fixture was
+captured**, because there is **no animation behaviour for the legacy server to have**; **no pixel
+parity is claimed**; and **no windowed capture is claimed**, because nothing is rendered. No Flash,
+Ruffle, ActionScript, or browser executes in any of these commands, and **no network is used**.
 
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
