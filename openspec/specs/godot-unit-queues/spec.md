@@ -66,6 +66,15 @@ line MAY introduce completion only as its own deliverable, with its own evidence
 - **WHEN** the absence of any queue-derived unit creation is examined
 - **THEN** the `godot-unit-production` inventory names every legacy branch that can place a row with its item id's source, and no inventoried branch derives an id from a completed queue, a duration, or committed production content, so the absence rests on the recorded entry paths rather than on a search that found no completion command
 
+#### Scenario: The row instant is client-writable, which is why readiness stays refused
+
+- **WHEN** this requirement's refusal of elapsed-time evaluation is read
+- **THEN** it records that a legacy command shifts every row's recorded instant **and** its queue start instant backwards by a **client-supplied** number of seconds, so the instant is **client-writable**, and a readiness rule derived from it would trust a value the client can rewrite — the concrete reason this is a refusal rather than an omission
+
+#### Scenario: The instant is reported as an opaque value
+
+- **WHEN** a row's instant is projected
+- **THEN** it is treated as an opaque recorded value with no elapsed, remaining, or readiness computation, and the `godot-unit-movement` capability records the same fact for the placement view
 ### Requirement: The three queue commands and their recorded lack of validation
 
 The client SHALL record the three legacy queue commands' exact effects — a push that

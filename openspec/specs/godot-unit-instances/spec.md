@@ -13,7 +13,11 @@ around.
 The client SHALL expose a player-owned **unit instance** as a typed, read-only
 `UnitInstance` that **wraps** one legacy map row together with its resolved
 `UnitDefinition`, and SHALL be a **distinct type** from the static definition rather than
-an extension of it. An instance SHALL carry the row's own fields verbatim — item id, cell
+An instance SHALL read the row's own identity and state verbatim — item id, row instant,
+player team, and its `attr` bag — and SHALL **delegate the placement view** (cell
+coordinates, orientation, and committed footprint and `velocity`) to the
+`godot-unit-movement` capability, so the instance owns the row while the movement capability
+owns the placement reading of it. An instance
 coordinates, row instant, orientation, and player team — and its `attr` bag, and SHALL
 read its identity from its resolved definition rather than restating the definition's
 fields. A row whose committed item `type` is not a unit SHALL be **rejected**, never
@@ -35,6 +39,15 @@ definition.
 - **WHEN** an instance is inspected for a field that could hold player state
 - **THEN** the definition it holds still has none, and the instance's own player state lives on the instance, never on the definition
 
+#### Scenario: The placement view has one owner
+
+- **WHEN** a unit instance's placement is read
+- **THEN** the cell, orientation, and committed footprint come from the `godot-unit-movement` capability's projection rather than a second implementation here, so the row's owner and the placement's owner cannot drift apart
+
+#### Scenario: The instance still owns the row
+
+- **WHEN** a unit instance is inspected
+- **THEN** its item id, row instant, player team, garrison, and `attr` bag remain read here, so delegating the placement view did not move ownership of the row
 ### Requirement: A garrisoned unit is a row nested in a row
 
 The client SHALL treat a placed row's fifth slot as a **list of nested rows**, not a list
