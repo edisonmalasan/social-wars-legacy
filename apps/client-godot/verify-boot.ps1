@@ -26,7 +26,14 @@
        no request, and no mutation), and the unit-queues suite (the typed
        read-only production-queue projection and its recorded contracts, with
        the committed executed-legacy push and pop fixture and the two-part
-       post-state proof, also with no endpoint, no request, and no mutation)
+       post-state proof, also with no endpoint, no request, and no mutation),
+       and the unit-production suite (the explicit REFUSAL made a capability:
+       a readiness projection that reports a queue's presence and start
+       instant while stating the legacy server cannot say whether it is ready,
+       the five row-entry branches with each item id's source named and
+       re-derived from the committed dispatcher, the training-time and
+       add_xp_unit refusals, and the acquisition finding, with no endpoint, no
+       request, no production mechanism, and no live phase)
        (the loop passes the dead endpoint to every suite: the session and
        game-clock suites use it for their failure phase, the placement,
        purchase, move, sell, store, upgrade, construction, collect, and
@@ -336,7 +343,7 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a

@@ -16,18 +16,29 @@ the queues line's recorded "no completion exists"**, and it is stated three inde
 - **`training_time` has zero legacy consumers.** The only three substring matches across
   `command.py`, `engine.py`, `sessions.py`, `server.py`, `constants.py`, and
   `get_game_config.py` are `sm_training_time` inside `soulmixer_speedup` — a **different
-  field**, on the soul-mixer path. So a building's committed `training_time` — on **130 of 470**
-  buildings, including the Command Center's `5` — is read by **nothing**. This is the **third**
+  field**, on the soul-mixer path (three occurrences, all inside that branch). So a
+  building's committed `training_time` is read by **nothing**. *(Corrected coverage reading,
+  measured after the Apply stage: the key is carried by **every** item — 470 of 470
+  buildings and 429 of 429 units — taking only the values `0` and `5`; **130** buildings carry
+  the positive value `5` and **0** units do. So "130 of 470 / 0 of 429" is the
+  **positive-value** reading, not key presence.)* This is the **third**
   committed content field in this project with no legacy consumer, after `unit_capacity`
   (M8 line 2) and the level curve's `reward_type`/`reward_amount` (M7's XP line). The precedent
   is established twice: record the field, refuse to invent a rule from it.
 - **The acquisition routes are unvalidated client-sent item lists.** `buy_offer_pack` reads
   `package_id` and then **never uses it**, `json.loads` a client-sent array, and stores every
   id in it with **no lookup into the committed `offer_packs` table**; `buy_stored_item_cash` is
-  the same shape with one client-sent id. So the committed `offer_packs` (44 packs, 109 unit
-  references) and `darts_items` (27 entries, 44 unit references) tables are read by **no**
-  legacy branch — they describe a content-derived acquisition system this server does not
-  implement, which is later-milestone work.
+  the same shape with one client-sent id. So the committed `offer_packs` and `darts_items`
+  tables are read by **no** legacy **command branch** — they describe a content-derived
+  acquisition system this server does not implement, which is later-milestone work.
+  *(Two corrections applied after the Apply stage, both measured rather than asserted: the
+  reference counts are **distinct** ids, not occurrences — 609 occurrences across `offer_packs`
+  resolve to **109 distinct units and 42 distinct buildings**, and 213 across `darts_items` to
+  44 distinct units and 24 buildings, so a units-only count silently drops buildings. And
+  "read by no legacy module" would be **false**: `get_game_config.py`'s `make_dynamic` /
+  `update_darts` do walk the darts table to rewrite each entry's `start_date`, so the precise
+  claim is branch-level — no command branch reads either table, so no acquisition is derived
+  from either. `offer_packs` genuinely is read by no legacy module.)*
 
 And `add_xp_unit` **creates nothing**: it adds a **client-sent** `attr["xp"]` to a placed row,
 with an optional client-sent level used only in a print. A production-shaped field therefore
