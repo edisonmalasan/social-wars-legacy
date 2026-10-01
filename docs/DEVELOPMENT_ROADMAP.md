@@ -124,6 +124,26 @@ without explicit authorization. The squash stands on the permanent record, this 
 accompanies it, and **every subsequent PR used a merge commit** — #210 (`02dbfa6`) and #211
 (`84f7af9`) are both proper merge commits.
 
+
+### Process disclosure (second entry, recorded 2026-10-01, orchestrator)
+
+**One commit was pushed directly to `main`, bypassing the branch-and-PR workflow.**
+It was `docs: refresh the roadmap resume point for M8 line 5` (`41fc708`), a
+documentation-only resume-point refresh, and it was the result of chaining a
+`git push origin main` into the same command block that had just committed it — the branch
+step was omitted by oversight rather than chosen.
+
+**Impact:** the content is correct and was verified before pushing, and no code, spec, fixture,
+or legacy byte was involved. But it is a **workflow violation** — every repository-mutating
+stage is supposed to reach `main` through a remote branch and a merge-commit PR, so this one
+commit has no PR and no merge commit.
+
+**Disposition:** recorded here rather than papered over, and no force-push or history rewrite
+was attempted. Every subsequent stage follows the workflow. This is the **second** process
+error of this kind in this run — the first was the squash-merge recorded above — and both
+were the same root cause: chaining a git operation into a command block where the
+prerequisite step was not written out. The discipline that follows is to run branch, commit,
+and push as **separate, explicitly verified** steps rather than one chained block.
 ## Stage A — Preserve the Current Implementation
 
 ```text
