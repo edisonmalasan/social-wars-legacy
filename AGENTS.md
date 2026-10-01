@@ -909,6 +909,71 @@ observed once on `test_town_xp`; two consecutive reruns passed clean. **Re-run
 before treating such a failure as a regression.** Narrowing the guard to
 `SCRIPT ERROR` or a fatal-error allowlist is a recorded follow-up.
 
+Verified unit-production commands (milestone M8 line 4; Godot 4.7.2.stable, Windows x64;
+`python` denotes the pinned interpreter, never the PATH alias). This is a **refusal
+made a capability** rather than a mechanism, scoped by the committed
+investigation `docs/legacy-unit-production.md`:
+
+```bash
+godot --headless --path apps/client-godot --script res://tests/test_unit_production.gd
+godot --headless --path apps/client-godot --script res://tests/test_unit_queues.gd
+godot --headless --path apps/client-godot --script res://tests/test_unit_instances.gd
+godot --headless --path apps/client-godot --script res://tests/test_unit_definitions.gd
+godot --headless --path apps/client-godot --script res://tests/test_project_scope.gd
+godot --headless --path apps/client-godot --script res://tests/test_scene_build.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-10-01): the hermetic unit-production suite
+(observed **568 checks**, 581 with `--report`; the 31st hermetic suite) over a pure
+`production_flow.gd` that projects a queue's presence and start instant **while
+stating the server cannot say whether it is ready**, the row-entry inventory with
+each item id's source and classification, and the `training_time` and
+`add_xp_unit` refusals; the sibling unit suites (**411**, **437**, **213**), the
+scope suite (**1475**, was 1441), and the scene build (**36**); both batteries in
+the final state (each exit `0`; `verify-boot.ps1` now runs **31 hermetic suites and
+14 live phases**, guard digest identical pre/post, `6978b959…ff348`); the
+**unchanged** compat suite (observed `Ran 1257 tests … OK`, exit `0`, because this
+line adds **no endpoint** and touches `apps/compat-api/**` not at all); the content
+validator (exit `0`, `result: valid`, 21 schemas); and the preservation manifest
+(3,258 entries, exit `0`). `git status` showed no legacy, config, save,
+content-package, or fixture byte changed. The evidence is the deterministic
+`unit-production-report-v1` report under
+`apps/client-godot/evidence/unit-production/` (digest `E56A470B…33CD6`,
+byte-identical across reruns). **The finding is that the legacy server cannot
+produce a unit at all**: exactly **five** branches can place a row on the map and
+**all five take the item id from the client** — four directly, and `pop_unit` after
+it has already **overwritten** the garrison row's item with the client's value.
+**`training_time` has zero legacy consumers** (the only matches are the distinct
+`sm_training_time`), making it the **third** committed content field with no legacy
+consumer after `unit_capacity` and the level curve's unread reward fields, where the
+established precedent is to record the field and refuse to invent a rule. The
+acquisition routes are **unvalidated client-sent item lists** (`buy_offer_pack`
+reads `package_id` and never uses it), so the committed `offer_packs` and
+`darts_items` tables are read by no **command branch**. **The suite ASSERTS THE
+ABSENCE of any readiness, duration, or award helper, and that guard was tested
+rather than trusted**: injecting one `static func is_complete` makes the suite fail
+with four independent failures, verified by injection and restore. **Five errors of
+mine were corrected after independent measurement**, and **one worker claim was
+REJECTED** — it reported 2 occurrences of `training_time` where there are **3**,
+having counted distinct *lines* rather than occurrences, and had pinned that wrong
+number; the measurement now counts occurrences per line and the occurrence count
+and distinct-line count are recorded and asserted separately (566 → 568 checks).
+Claim limits: **no production mechanism, completion, or readiness is implemented**;
+**no unit is created, trained, or placed**; **no acquisition is implemented or
+claimed**; **no duration is derived** from the committed training time; **no
+experience is awarded** from the recorded `attr["xp"]`; **no executed-legacy
+fixture, because there is no production behaviour to capture** — a stronger
+statement than a corpus limitation; death and resurrection are unreachable from
+the delivered client and unimplemented; `collection`, `movement`, `animations`, and
+`basic behaviors` remain undelivered; no windowed capture and no pixel-parity
+oracle. No Flash, Ruffle, ActionScript, or browser executes in any of these
+commands, and **no network is used at all**.
+
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 
