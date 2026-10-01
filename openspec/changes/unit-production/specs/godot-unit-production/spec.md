@@ -142,7 +142,8 @@ the explicit non-claims, byte-identical across reruns. The non-claims SHALL stat
 Ruffle, ActionScript, or browser executed; **no production mechanism, completion, or readiness
 is implemented**; **no unit is created, trained, or placed**; **no duration is derived from the
 committed training time**; **no experience is awarded**; **no acquisition is implemented or
-claimed**, and the committed acquisition tables are read by no legacy branch; **no executed-legacy
+claimed**, and the committed acquisition tables are read by no legacy **command branch**, so no
+acquisition is derived from either; **no executed-legacy
 fixture was captured, because no production behaviour exists to capture** rather than because
 the corpus lacked state; death and resurrection are unreachable and unimplemented; and no
 windowed capture is claimed.

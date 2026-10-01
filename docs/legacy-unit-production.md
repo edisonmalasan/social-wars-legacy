@@ -27,13 +27,15 @@ all**, established from three independent directions:
 | `buy` | **client `args[1]`** | places any id at any cell; no store check, no producer check |
 | `place_stored_item` | **client `args[1]`** | removes the id from `map["store"]`, then places it |
 | `weekly_reward` | **client `args[1]`** | a reward — an item *or* resources |
-| `pop_unit` | client `args[2]`, but the **row already exists** | moves a garrison row back onto the map |
+| `pop_unit` | client `args[2]` — **and it overwrites the row's item with it** (`unit[0] = item_id`) | moves a garrison row back onto the map |
 | `resurrect_hero` | **client `args[1]`** | decrements the dead-unit count, then places |
 
 `command.py`'s only `map_add_item` / `map_add_item_from_item` call sites are these five.
-**Four of the five take the item id straight from the client**, and the fifth moves a row that
-was already there. **Not one** derives an id from a completed queue, from `training_time`, or
-from any committed production rule.
+**All five take the item id from the client** — four directly, and `pop_unit` after it has
+already **overwritten** the garrison row's item with the client's value, so even the one
+"already-existing" path places a client-supplied id. **Not one** derives an id from a
+completed queue, from `training_time`, or from any committed production rule. *(The
+`pop_unit` sharpening was found by the Apply stage and makes the finding stronger.)*
 
 ### 1b. No completion command exists, and nothing evaluates elapsed time
 
@@ -47,8 +49,15 @@ completion command nor a readiness rule to reproduce.
 **`training_time` has no legacy consumer.** The only three substring matches across
 `command.py`, `engine.py`, `sessions.py`, `server.py`, `constants.py`, and `get_game_config.py`
 are `sm_training_time` inside `soulmixer_speedup` — a **different field**, on the soul-mixer
-path. So a building's committed `training_time` — on **130 of 470** buildings, including the
-Command Center's `5` — is read by **nothing**.
+path (three occurrences, all within `command.py`'s soul-mixer span). So a building's
+committed `training_time` is read by **nothing**.
+
+*Corrected coverage reading.* The key is carried by **every** item in both domains —
+**470 of 470** buildings and **429 of 429** units — and the whole domain takes exactly two
+values, `0` and `5`. **130** buildings carry the positive value `5`; **0** units do. So the
+often-quoted "130 of 470 buildings / 0 of 429 units" is the **positive-value** reading, not
+key presence: the field is universal, and only its value is sparse. (Correction made after
+the Apply stage, which measured both readings separately so neither can be conflated.)
 
 **This is the third committed content field in this project with no legacy consumer**, after
 `unit_capacity` (M8 line 2) and the level curve's `reward_type`/`reward_amount` (M7's XP
@@ -87,11 +96,23 @@ one client-sent `item_id`, stored with no check. This is exactly the pattern the
 observed from the Flash client" — and it is why that line refused to claim anything about
 resource-priced storage purchases.
 
-**Consequence: the committed `offer_packs` content (44 packs, 109 unit references) and the
-committed `darts_items` content (27 entries, 44 unit references) are never read by any legacy
-branch.** They describe a content-derived acquisition system the legacy server does not
-implement. The offer and darts systems are later milestones, and enforcing their content is
-their work, not this line's.
+**Consequence: the committed `offer_packs` and `darts_items` content is never read by any
+dispatcher branch, so no acquisition is derived from it.** The offer and darts systems are
+later milestones, and enforcing their content is their work, not this line's.
+
+*Two corrections made after the Apply stage.*
+
+1. **A units-only reference count silently dropped buildings.** "109 unit references" was a
+   **distinct-unit** count. Measured: `offer_packs` holds **609** item-id occurrences
+   resolving to **109 distinct units and 42 distinct buildings**; `darts_items` holds **213**
+   resolving to **44 distinct units and 24 distinct buildings**.
+2. **`darts_items` IS read at module level, so "read by no legacy branch" is too strong as
+   written.** `get_game_config.py`'s `make_dynamic` / `update_darts` walk the table and
+   rewrite each entry's `start_date` (7 occurrences, in the config loader rather than any
+   command branch). `offer_packs` genuinely is read by **no** legacy module. The precise
+   statement is therefore **branch-level**: no **command branch** reads either table, so
+   **no acquisition is derived from either** — and the darts date rewriting is a
+   content-freshness concern belonging to the content-census record, not an acquisition path.
 
 ## 3. What `add_xp_unit` actually does — and why it is not production
 
@@ -120,10 +141,14 @@ implemented here.
 
 ## 4. `sell` with a kill reason is a death path, and it is unreachable
 
-`sell` calls `push_dead_unit(save["privateState"], item)` when `reason == "KILL"` and prints
-`Remove {name} (Resurrectable)` when it returns `True`. The delivered `building-sell` line
-already established that the combat `KILL` reason is **never reached**, because no reason is
-accepted from the client. So no unit death, and no resurrection, is exercisable.
+`sell` takes `reason = args[1]` — **positionally, so the legacy server does accept a
+client-supplied reason** — and calls `push_dead_unit(save["privateState"], item)` when it
+equals `"KILL"`, printing `Remove {name} (Resurrectable)` when that returns `True`. What is
+unreachable is **the delivered client**: the `building-sell` surface *derives* its own
+reason and ignores a client-supplied one, which is why the legacy combat reason is never
+exercised. *(Corrected: this record first said "no reason is accepted from the client", which
+is wrong about the legacy server and right only about the delivered client.)* So no unit
+death, and no resurrection, is implemented here.
 
 ## 5. What the corpus can exercise
 

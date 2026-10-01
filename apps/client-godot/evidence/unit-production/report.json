@@ -1,0 +1,817 @@
+{
+	"acquisition": {
+		"client_supplied_routes": [
+			"store_add_items",
+			"win_daily_bonus",
+			"buy_stored_item_cash",
+			"buy_offer_pack"
+		],
+		"implemented": false,
+		"note": "NO ACQUISITION IS IMPLEMENTED OR CLAIMED. The two plausible unit sources are unvalidated client-sent item lists, so the committed offer_packs and darts_items tables describe a content-derived acquisition system this server does not implement; enforcing them is a LATER milestone's work, and this line issues no acquisition request and creates no intent to authorise (design D1/D5). A client-supplied item id, package id, or item list is recorded as client-supplied and is never treated as authorising",
+		"package_id": "command.py:711 reads package_id = args[0] and NEVER USES IT: the branch goes straight on to json.loads(args[1]) and stores every id in the resulting client-sent array. There is no lookup into the committed offer_packs table, so a client may name any ids at all and the server stores them",
+		"request_issued": false,
+		"route_count": 6,
+		"route_lines": [
+			229,
+			263,
+			460,
+			479,
+			513,
+			716
+		],
+		"routes": [
+			{
+				"branch": "store_item",
+				"input": "an existing row popped off the map",
+				"note": "the id is read off a row the player already placed",
+				"site": "command.py:229",
+				"trusted": true
+			},
+			{
+				"branch": "store_add_items",
+				"input": "client args[0], a list of ids",
+				"note": "no content check; each id is stored and recorded in boughtUnits (command.py:262-264)",
+				"site": "command.py:263",
+				"trusted": false
+			},
+			{
+				"branch": "win_daily_bonus",
+				"input": "client args[0], inside a committed daily schedule",
+				"note": "the schedule fixes WHEN the branch may run, while the id it stores is the client's; the committed weekday table carries no per-day item",
+				"site": "command.py:460",
+				"trusted": false
+			},
+			{
+				"branch": "buy_stored_item_cash",
+				"input": "client args[0], one id",
+				"note": "one of the two plausible unit sources, and it is a single client-sent id stored with no check at all",
+				"site": "command.py:479",
+				"trusted": false
+			},
+			{
+				"branch": "complete_collection",
+				"input": "committed content, the collection's own prize",
+				"note": "the one storage route whose id comes from committed content",
+				"site": "command.py:513",
+				"trusted": true
+			},
+			{
+				"branch": "buy_offer_pack",
+				"input": "client args[1], a JSON array of ids",
+				"note": "the second plausible unit source: json.loads of a client-sent array, with every id in it stored and NO lookup into the committed offer_packs table",
+				"site": "command.py:716",
+				"trusted": false
+			}
+		],
+		"tables": [
+			{
+				"distinct_building_references": 7,
+				"distinct_unit_references": 109,
+				"entries": 44,
+				"file": "packages/game-content/normalized/offer_packs.json",
+				"legacy_module_reads": [],
+				"note": "read by NO legacy module at all: the string occurs in none of the six modules the training-time claim is measured over. Its references are measured and separated, because '109 unit references' is the DISTINCT unit-id count: the 44 packs make 574 item references in total, 564 of them units and 10 buildings, resolving to 109 distinct unit ids and 7 distinct building ids",
+				"read_by_dispatcher_branch": false,
+				"table": "offer_packs",
+				"total_item_references": 574
+			},
+			{
+				"distinct_building_references": 0,
+				"distinct_unit_references": 44,
+				"entries": 27,
+				"file": "packages/game-content/normalized/darts_items.json",
+				"legacy_module_reads": [
+					"get_game_config.py:215-246 (make_dynamic / update_darts)"
+				],
+				"note": "read by exactly ONE legacy module, and for its DATES only: update_darts walks the table to rebuild each entry's rolling start_date and shifts the week. Its items and extra_item are touched only inside a debug print that runs at debug level >= 1, and the normal path runs at 0, so no acquisition is derived from the table. The measured correction against the committed investigation: the table is NOT unread, it is unread BY NO DISPATCHER BRANCH for acquisition. Its 189 references are all units, resolving to 44 distinct unit ids",
+				"read_by_dispatcher_branch": false,
+				"table": "darts_items",
+				"total_item_references": 189
+			}
+		]
+	},
+	"acquisition_measured": {
+		"branches": [
+			"store_item",
+			"store_add_items",
+			"win_daily_bonus",
+			"buy_stored_item_cash",
+			"complete_collection",
+			"buy_offer_pack"
+		],
+		"darts_items": {
+			"distinct_building_references": 0,
+			"distinct_unit_references": 44,
+			"domain": "darts_items",
+			"of": 27,
+			"total_item_references": 189,
+			"unit_occurrences": 189,
+			"unresolved_references": []
+		},
+		"lines": [
+			229,
+			263,
+			460,
+			479,
+			513,
+			716
+		],
+		"note": "the six add_store_item call sites and the branch each belongs to are RE-DERIVED from the committed dispatcher by the suite in the same run, so the route table cannot drift from the source and a seventh would be an unrecorded gap. The two committed tables' entry counts, total references, and DISTINCT unit-id counts are measured from the verified registry alongside them, and both figures are reported so the distinct count can never be read as an occurrence count",
+		"offer_packs": {
+			"distinct_building_references": 7,
+			"distinct_unit_references": 109,
+			"domain": "offer_packs",
+			"of": 44,
+			"total_item_references": 574,
+			"unit_occurrences": 564,
+			"unresolved_references": []
+		}
+	},
+	"content": {
+		"buildings": {
+			"absent_key": 0,
+			"carrying_key": 470,
+			"distinct_values": 2,
+			"domain": "buildings",
+			"field": "training_time",
+			"maximum": 5,
+			"minimum": 5,
+			"of": 470,
+			"positive": 130,
+			"values": [
+				"0",
+				"5"
+			]
+		},
+		"buildings_file": "packages/game-content/normalized/buildings.json",
+		"coverage_note": "the coverage above is measured by the suite from the verified registry rather than trusted from prose, and it is recorded as CONTENT and applied as NO rule: no legacy branch reads training_time (design D3)",
+		"duration_field": "training_time",
+		"enumeration": "ContentRegistry.legacy_ids(domain), the registry's own public accessor over the index it built during its verified load, so every count in this report crosses the same byte-count and digest gate as every other read",
+		"manifest_bytes_verified": 1905917,
+		"manifest_outputs_verified": 22,
+		"package_files": 67,
+		"package_sha256": "dba0a98b25c6fafdb7b752436d2f70fcfc8641ef5f977166aa2002a3f4b44ea0",
+		"sibling_buildings": {
+			"absent_key": 470,
+			"carrying_key": 0,
+			"distinct_values": 0,
+			"domain": "buildings",
+			"field": "sm_training_time",
+			"maximum": 0,
+			"minimum": 0,
+			"of": 470,
+			"positive": 0,
+			"values": []
+		},
+		"sibling_field": "sm_training_time",
+		"sibling_units": {
+			"absent_key": 129,
+			"carrying_key": 300,
+			"distinct_values": 84,
+			"domain": "units",
+			"field": "sm_training_time",
+			"maximum": 480000,
+			"minimum": 4000,
+			"of": 429,
+			"positive": 300,
+			"values": [
+				"10000",
+				"100000",
+				"12000",
+				"120000",
+				"124000",
+				"126000",
+				"130000",
+				"14000",
+				"140000",
+				"150000",
+				"16000",
+				"160000",
+				"162000",
+				"164000",
+				"170000",
+				"174000",
+				"18000",
+				"180000",
+				"184000",
+				"190000",
+				"194000",
+				"20000",
+				"200000",
+				"204000",
+				"210000",
+				"214000",
+				"22000",
+				"220000",
+				"224000",
+				"230000",
+				"24000",
+				"240000",
+				"250000",
+				"26000",
+				"260000",
+				"270000",
+				"28000",
+				"280000",
+				"284000",
+				"290000",
+				"30000",
+				"300000",
+				"310000",
+				"320000",
+				"330000",
+				"34000",
+				"340000",
+				"350000",
+				"36000",
+				"360000",
+				"370000",
+				"38000",
+				"380000",
+				"390000",
+				"4000",
+				"40000",
+				"400000",
+				"410000",
+				"42000",
+				"420000",
+				"430000",
+				"44000",
+				"440000",
+				"450000",
+				"46000",
+				"460000",
+				"470000",
+				"480000",
+				"50000",
+				"52000",
+				"54000",
+				"56000",
+				"6000",
+				"60000",
+				"62000",
+				"64000",
+				"66000",
+				"70000",
+				"72000",
+				"74000",
+				"8000",
+				"80000",
+				"84000",
+				"90000"
+			]
+		},
+		"units": {
+			"absent_key": 0,
+			"carrying_key": 429,
+			"distinct_values": 1,
+			"domain": "units",
+			"field": "training_time",
+			"maximum": 0,
+			"minimum": 0,
+			"of": 429,
+			"positive": 0,
+			"values": [
+				"0"
+			]
+		},
+		"units_file": "packages/game-content/normalized/units.json"
+	},
+	"corpus": {
+		"bought_units": [],
+		"claim": "the committed corpus carries NO unit row, NO storage, and an empty inventory, and every one of its 40 attribute bags is empty, so no production behaviour is exercisable in it — and the reason no fixture was captured is that there is no production behaviour to capture at all, not that the corpus lacked the state",
+		"distinct_item_ids": [
+			22,
+			23,
+			26,
+			905,
+			907,
+			908,
+			909,
+			928,
+			929,
+			930,
+			931
+		],
+		"experience_rows": [],
+		"fixture_captured": false,
+		"fixture_note": "NO executed-legacy fixture was captured, and the reason is the stronger one: there is NO production behaviour to capture, not merely a corpus that could not exercise it. A fixture here would have to fabricate the state it claims to observe",
+		"inventory": {},
+		"map_index": 0,
+		"map_level": 1,
+		"rows": 40,
+		"save": "tests/saves/fresh-player.json",
+		"save_bytes": 15628,
+		"save_sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+		"store": {},
+		"target": {
+			"item_id": 26,
+			"item_name": "Command Center",
+			"map_key": "1",
+			"training_time": 5
+		},
+		"unit_rows": []
+	},
+	"death_and_resurrection": {
+		"delivered_surface": "the building-sell surface derives its own reason and ignores a client-supplied one, so the dead-hero pool is unreachable through it",
+		"implemented": false,
+		"kill_branch": "the separate kill branch (command.py:169-181) deletes the row and never touches the dead-hero counter",
+		"kill_reason_source": "command.py:151 reads reason = args[1], and command.py:159 pushes a dead hero only when that argument is exactly 'KILL'",
+		"rule": "DEATH AND RESURRECTION ARE RECORDED AND UNIMPLEMENTED. sell (command.py:149-168) reads reason = args[1] and calls push_dead_unit only when that argument is exactly 'KILL' (command.py:159), while the separate kill branch (command.py:169-181) deletes the row and never touches the counter. The delivered building-sell surface DERIVES its own reason and ignores a client-supplied one, so the dead-hero pool is unreachable through it. NO death, NO resurrection, and NO unit is created from a queue here: the resurrect_hero entry above is recorded as a row placement and nothing more",
+		"unit_created": false
+	},
+	"determinism": {
+		"byte_identical_across_reruns": true,
+		"reason": "no timestamp, no absolute path, no wall clock, no request, and no saved state: every table is derived from the contract's own constants, the same run's legacy measurement, the verified registry, and the committed corpus bytes, and every derived set is sorted before it is written",
+		"serialization": "JSON.stringify(report, tab, sort_keys=true) plus one trailing newline; every number written is an integer - the pinned engine's integral floats are normalised on the way in, which changes no value - so no float formatting varies between runs",
+		"time_dependent_fields": "there are NONE in this line's evidence: no instant is read from a clock, and the one instant the readout renders is a fixed literal the suite passes in"
+	},
+	"experience": {
+		"amount_source": "client args[1] (xp_gain): the branch SETS attr['xp'] to it when the key is absent and otherwise ADDS it to the value already there (command.py:335-338)",
+		"attr_key": "xp",
+		"attr_slot": 6,
+		"award_implemented": false,
+		"command": "add_xp_unit",
+		"corpus_finding": "the committed fresh-player corpus places 40 rows across 11 distinct item ids, every one of committed type 'b': it contains NO unit row, NO storage, and an empty inventory, and every one of its 40 attribute bags is empty",
+		"corpus_note": "the committed corpus carries attr['xp'] on 0 of its 40 placed rows, which is asserted by the suite as a measurement and is a fact about the corpus, not evidence that an award exists: with no trusted award on the server, a recorded value would have to come from a client amount",
+		"creates_anything": false,
+		"level_source": "client args[2] (optional level): used ONLY inside a printed line (command.py:340-341) and written nowhere",
+		"rule": "NO EXPERIENCE IS AWARDED FROM A CLIENT AMOUNT. add_xp_unit (command.py:322-343) is the ONLY command that writes a placed row's attr['xp'] and it CREATES NOTHING: the amount is client-sent, and the optional level is client-sent and used only in a print. So a recorded attr['xp'] is READ AND REPORTED AS CONTENT, verbatim and never coerced, and NO experience is awarded, granted, or computed from it here or anywhere else in this repository (design D5). This is the third untrusted client-delta pattern in this area, alongside the queue vector and trade_resource",
+		"site": "command.py:322-343"
+	},
+	"generated_by": "apps/client-godot/tests/test_unit_production.gd --report=<path>",
+	"no_endpoint": {
+		"added": false,
+		"client_supplied_keys_not_authority": [
+			"an item id (command.py:55, 245, 353, 633)",
+			"a package id (command.py:711, read and never used)",
+			"an item list (command.py:714, json.loads of a client array)"
+		],
+		"facade_operations_checked": [
+			"complete_queue_unit_town",
+			"produce_unit_town",
+			"train_unit_town",
+			"collect_unit_town",
+			"award_xp_town",
+			"acquire_unit_town",
+			"buy_unit_town",
+			"production_town"
+		],
+		"later_capability": "enforcing the committed offer_packs and darts_items content is a LATER milestone's work: this line records the routes and enforces nothing",
+		"route": "none: there is no intent to send and nothing to authorise, so no compatibility operation is added and the compatibility test suite stays green UNCHANGED (design D6)",
+		"routes_checked": [
+			"/v0/production",
+			"/v0/produce",
+			"/v0/complete",
+			"/v0/train",
+			"/v0/acquire",
+			"/v0/award"
+		]
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed",
+		"NO PRODUCTION MECHANISM, COMPLETION, OR READINESS IS IMPLEMENTED, BECAUSE THE LEGACY SERVER HAS NONE TO REPRODUCE: the absence is a recorded contract, not a missing feature, and a later line that introduces completion must bring its own evidence",
+		"NO UNIT IS CREATED, TRAINED, OR PLACED: nothing here materialises a unit from a queue, and the corpus contains no unit row at all",
+		"NO DURATION IS DERIVED FROM THE COMMITTED TRAINING TIME: the field has zero legacy consumers and is reported as content only, and NO duration semantics are added for the soul-mixer sibling field either",
+		"NO EXPERIENCE IS AWARDED: the only command writing a recorded experience takes its amount from a client argument, and the committed corpus carries the field on 0 of its 40 placed rows",
+		"NO ACQUISITION IS IMPLEMENTED OR CLAIMED: both plausible unit sources are unvalidated client-sent item lists, the committed offer_packs and darts_items tables are read by no dispatcher branch for an acquisition, and enforcing them belongs to a later milestone",
+		"NO EXECUTED-LEGACY FIXTURE WAS CAPTURED, and the reason is the stronger one: there is NO production behaviour to capture, not merely a corpus that could not exercise it",
+		"DEATH AND RESURRECTION ARE UNREACHABLE THROUGH THE DELIVERED SURFACE AND UNIMPLEMENTED here, and no death, reward, or scheduling rule is claimed",
+		"no windowed capture is claimed: nothing is rendered and no unit exists to render",
+		"no pixel-parity oracle exists",
+		"the production-shaped field and its plausible-looking committed duration are reported, not applied: a reader who wanted a production rule out of them must bring evidence the legacy contract does not contain"
+	],
+	"provenance": {
+		"derived": [
+			{
+				"evidence": "derived (design D1): with no completion command, no elapsed-time evaluation, and no committed production rule, any mechanism would be invented, while the corpus's production-shaped field plus its plausible duration is a known trap the two prior lines each refused ad hoc",
+				"fact": "the line's deliverable is a refusal plus an auditable inventory rather than a mechanism"
+			},
+			{
+				"evidence": "derived (design D2): the inventory is what makes the godot-unit-queues absence auditable rather than asserted, so it had to arrive with the refusal it supports. Its scope is closed over the committed legacy source, and a later acquisition line extends it explicitly",
+				"fact": "the row-entry inventory belongs to this line rather than to a later acquisition line"
+			},
+			{
+				"evidence": "derived (design D6): there is no intent to send and nothing to authorise, so the compatibility test suite stays green unchanged, exactly as M8 lines 1 and 2 concluded",
+				"fact": "no endpoint is warranted while no server-derived production exists"
+			},
+			{
+				"evidence": "derived: no authentic legacy production panel has been captured, so the wording is the delivered provisional convention, never a claim about what the legacy client displayed",
+				"fact": "the readout's labels and the composition of its lines"
+			}
+		],
+		"established": [
+			{
+				"evidence": "command.py:55, 245, 353, 408, 633 against engine.pop_unit; the suite re-derives the sites, their enclosing branch names, and the count out of the committed dispatcher and fails on any sixth",
+				"fact": "command.py's only row-placing call sites are five branches — buy (55), place_stored_item (245), weekly_reward (353), pop_unit (408), and resurrect_hero (633) — and four of the five take the item id straight from a client argument while the fifth moves a row that already existed in a building's garrison"
+			},
+			{
+				"evidence": "the same five call sites: each is a map write whose id arrives as an argument or off an existing row, and none reads a queue, a clock, or content",
+				"fact": "no row-entry branch derives an item id from a completed queue, from a duration, or from committed production content"
+			},
+			{
+				"evidence": "command.py's own if/elif chain; the suite measures both the branch count and the complete_* names",
+				"fact": "the dispatcher has 63 named branches and its complete_* family is exactly complete_collection, complete_goal, and complete_tutorial, so no command completes a queue and none materialises a unit from one"
+			},
+			{
+				"evidence": "a substring search over command.py, engine.py, sessions.py, server.py, constants.py, and get_game_config.py, which the suite repeats and compares against the recorded count and line numbers",
+				"fact": "training_time has ZERO legacy consumers: the only three lines in the six named modules containing the string are command.py:735 and command.py:737, and both are the distinct field sm_training_time inside the soul-mixer speedup branch"
+			},
+			{
+				"evidence": "the committed normalized content package, measured by the suite through the verified registry",
+				"fact": "training_time is carried by every one of the 899 committed items, takes exactly two values, and reads as a POSITIVE duration on 130 of the 470 buildings and on 0 of the 429 units; the Command Center (id 26) records 5"
+			},
+			{
+				"evidence": "command.py:322-343",
+				"fact": "add_xp_unit is the only command writing a placed row's attr['xp']; it creates nothing, takes the amount from args[1], and uses an optional client-sent args[2] only in a printed line"
+			},
+			{
+				"evidence": "command.py:229, 263, 460, 479, 513, 716; the suite measures the six call sites and their enclosing branches",
+				"fact": "six branches call add_store_item, and two of them are the plausible unit sources: buy_offer_pack reads package_id and never uses it before json.loads of a client-sent array with no lookup into the committed table, and buy_stored_item_cash takes one client-sent id"
+			},
+			{
+				"evidence": "a search for both table names over the legacy root modules; get_game_config.py:215-246 against command.py, which contains neither name",
+				"fact": "offer_packs is read by no legacy module, and darts_items is read only by get_game_config.make_dynamic, which walks it to rebuild rolling start dates; its item fields are touched only inside a debug print that never runs at the normal debug level"
+			},
+			{
+				"evidence": "command.py:149-168 and 169-181; the delivered building-sell surface derives its own reason and ignores a client-supplied one",
+				"fact": "sell reads its reason from a positional argument and pushes a dead hero only on exactly 'KILL', while the kill branch deletes the row without touching the counter"
+			},
+			{
+				"evidence": "tests/saves/fresh-player.json, measured by the suite",
+				"fact": "the committed corpus places 40 rows across 11 distinct item ids, all of committed type 'b', with an empty storage, an empty inventory, 40 empty attribute bags, and no attr['xp'] anywhere"
+			}
+		]
+	},
+	"readiness_projection": {
+		"completion_available": false,
+		"delegated_to": "res://scripts/units/queue_flow.gd (never re-derived), so a surface, the suite, and this report cannot disagree about a queue by a key",
+		"duration_computed": false,
+		"readiness_reason": "the legacy server CANNOT SAY whether this queue is ready: no command completes a queue, nothing evaluates a queue's elapsed time, and no committed production rule derives a unit from one",
+		"readiness_test_exists": false,
+		"readiness_value": "unknown-and-uncomputable",
+		"readout": "queue: count 2, started at 1700000000 | readiness: unknown-and-uncomputable — the legacy server CANNOT SAY whether this queue is ready: no command completes a queue, nothing evaluates a queue's elapsed time, and no committed production rule derives a unit from one | no completion, no duration, no progress: the legacy server has none of those rules to reproduce | no unit is produced: all 5 row-entry branches are inventoried and 0 of them derive an id from a queue, a duration, or committed content",
+		"reports": [
+			"whether a queue is present",
+			"the committed count",
+			"the recorded start instant, verbatim"
+		]
+	},
+	"refusal": {
+		"absent_helpers": [
+			{
+				"absent_because": "no legacy command completes a queue and no command materialises a unit from one, so there is no server-side completion to reproduce",
+				"helper": "is_complete"
+			},
+			{
+				"absent_because": "the same absence: nothing in the legacy source can answer 'is this queue ready?', so a client-side answer would be invented",
+				"helper": "is_ready"
+			},
+			{
+				"absent_because": "no legacy branch evaluates a queue's elapsed time: every occurrence of attr['ts'] is a write or a deletion, and the only reader is the soul-mixer speedup, which is not a general queue path",
+				"helper": "remaining"
+			},
+			{
+				"absent_because": "a ratio needs a duration, and NO branch reads training_time or sm_training_time, so there is no committed denominator",
+				"helper": "progress"
+			},
+			{
+				"absent_because": "the start instant is reported verbatim and nothing derives an instant from it",
+				"helper": "ready_at"
+			},
+			{
+				"absent_because": "completion is a server-authoritative decision and this milestone delivers none; it belongs to a later line with its own evidence",
+				"helper": "complete"
+			},
+			{
+				"absent_because": "no row-entry branch derives an id from a queue, a duration, or committed production content, so there is nothing to produce",
+				"helper": "produce_unit"
+			},
+			{
+				"absent_because": "the legacy source places a row in exactly five branches, every one of them inventoried above, and none of them is a completion",
+				"helper": "spawn_unit"
+			},
+			{
+				"absent_because": "no legacy command trains a unit; the queue's three keys are written and deleted and never evaluated",
+				"helper": "train_unit"
+			},
+			{
+				"absent_because": "the committed training time has zero legacy consumers, so deriving a duration from it would invent the rule this line refuses",
+				"helper": "duration"
+			},
+			{
+				"absent_because": "the only command writing a recorded experience takes its amount from a client argument, so no trusted award exists to reproduce",
+				"helper": "award_experience"
+			},
+			{
+				"absent_because": "both plausible unit sources are unvalidated client-sent item lists, so there is no acquisition to reproduce and the committed tables belong to a later milestone",
+				"helper": "acquire_unit"
+			}
+		],
+		"inventory_proof": "the delivered module's whole function inventory is asserted against a pinned list by the suite, so a readiness, remaining-time, progress, duration, completion, production, award, or acquisition helper fails the run wherever it is added",
+		"mechanism_implemented": false,
+		"production_possible": false,
+		"reason": "the legacy server has NO production mechanism to reproduce: no command completes a queue, nothing evaluates a queue's elapsed time, and no committed production rule derives a unit from one. This is a RECORDED PROPERTY of the legacy contract, not a missing feature"
+	},
+	"row_entry_inventory": {
+		"classification_counts": {
+			"already-existing": 1,
+			"client-supplied": 4,
+			"derived-from-committed-content": 0
+		},
+		"classifications": [
+			"client-supplied",
+			"already-existing",
+			"derived-from-committed-content"
+		],
+		"count": 5,
+		"derived_branches": [],
+		"derived_count": 0,
+		"dispatcher": {
+			"complete_family": [
+				"complete_collection",
+				"complete_goal",
+				"complete_tutorial"
+			],
+			"named_branches": 63,
+			"source": "command.py"
+		},
+		"entries": [
+			{
+				"branch": "buy",
+				"call": "map_add_item",
+				"classification": "client-supplied",
+				"effect": "places any id at any cell and records it in boughtUnits when playerID is 1",
+				"item_id_argument_index": 1,
+				"item_id_source": "client args[1], verbatim",
+				"note": "no store check, no producer check, no content lookup: the branch is a map write plus a print (command.py:42-58)",
+				"site": "command.py:55"
+			},
+			{
+				"branch": "place_stored_item",
+				"call": "map_add_item",
+				"classification": "client-supplied",
+				"effect": "removes the id from map['store'] (command.py:244), places it, and records it in boughtUnits",
+				"item_id_argument_index": 1,
+				"item_id_source": "client args[1], verbatim",
+				"note": "the id is not checked against the storage it was taken from",
+				"site": "command.py:245"
+			},
+			{
+				"branch": "weekly_reward",
+				"call": "map_add_item",
+				"classification": "client-supplied",
+				"effect": "a reward: an item when the request carries more than four arguments, resources otherwise",
+				"item_id_argument_index": 1,
+				"item_id_source": "client args[1], verbatim",
+				"note": "the branch also advances the committed Monday-bonus schedule (command.py:360-363), but the PLACED id is the client's, not the schedule's: the schedule fixes how often the branch may run, never what it places",
+				"site": "command.py:353"
+			},
+			{
+				"branch": "pop_unit",
+				"call": "map_add_item_from_item",
+				"classification": "already-existing",
+				"effect": "pops a matching row out of a building's fifth slot (engine.pop_unit), overwrites its item, cell, and team, and places it back on the map",
+				"item_id_argument_index": 2,
+				"item_id_source": "client args[2], written onto a row that ALREADY EXISTED in a building's garrison",
+				"note": "even this path is not a derivation: the row exists because it was placed or garrisoned earlier, and command.py:403 overwrites the popped row's committed item with the client-sent id",
+				"site": "command.py:408"
+			},
+			{
+				"branch": "resurrect_hero",
+				"call": "map_add_item",
+				"classification": "client-supplied",
+				"effect": "decrements privateState['deadHeroes'][item_id] (engine.resurrect_hero) and then places the id",
+				"item_id_argument_index": 1,
+				"item_id_source": "client args[1], verbatim",
+				"note": "the dead-hero counter is keyed by the SAME client-sent id, so the branch cannot place an id the counter does not hold while still never deriving one: it is a decrement plus a map write",
+				"site": "command.py:633"
+			}
+		],
+		"lines": [
+			55,
+			245,
+			353,
+			408,
+			633
+		],
+		"measured_branches": [
+			"buy",
+			"place_stored_item",
+			"weekly_reward",
+			"pop_unit",
+			"resurrect_hero"
+		],
+		"measured_lines": [
+			55,
+			245,
+			353,
+			408,
+			633
+		],
+		"measurement_note": "the call sites, their line numbers, and the branch each belongs to are RE-DERIVED from the committed dispatcher by the suite in the same run, so this table cannot drift from the source: a sixth row-placing call site would be reported as an unrecorded gap rather than ignored",
+		"no_derivation": "NO ROW-ENTRY BRANCH DERIVES A UNIT. The five branches above are the whole set of legacy call sites that place a row on the map, FOUR of them take the item id straight from a client argument, and the fifth (pop_unit) moves a row that already existed in a building's garrison. None of them reads a completed queue, a duration, a producer, or any committed production content to decide what to place, so the DERIVED set is EMPTY and a derived entry would be an invented rule (design D2). The recorded absence of a derivation is a closed measurement: the suite re-derives the call sites and their enclosing branches out of the committed dispatcher and fails on any sixth site"
+	},
+	"schema": "unit-production-report-v1",
+	"training_time": {
+		"consumer_count": 0,
+		"coverage": "training_time is a key on EVERY committed item: all 470 buildings and all 429 units carry it, and it takes exactly two values — 0 on 340 of the 470 buildings and on all 429 units, and 5 on the remaining 130 buildings, including the Command Center (id 26), which also records min_level 1 and group_type COMMAND_CENTER. So a POSITIVE duration exists on 130 of the 470 committed buildings and on 0 of the 429 committed units. The coverage is reported for reference ONLY: no legacy branch reads the field, so no rule may be derived from it (design D3)",
+		"distribution_measured": {
+			"buildings": {
+				"absent_key": 0,
+				"carrying_key": 470,
+				"distinct_values": 2,
+				"domain": "buildings",
+				"field": "training_time",
+				"maximum": 5,
+				"minimum": 5,
+				"of": 470,
+				"positive": 130,
+				"values": [
+					"0",
+					"5"
+				]
+			},
+			"sibling_buildings": {
+				"absent_key": 470,
+				"carrying_key": 0,
+				"distinct_values": 0,
+				"domain": "buildings",
+				"field": "sm_training_time",
+				"maximum": 0,
+				"minimum": 0,
+				"of": 470,
+				"positive": 0,
+				"values": []
+			},
+			"sibling_units": {
+				"absent_key": 129,
+				"carrying_key": 300,
+				"distinct_values": 84,
+				"domain": "units",
+				"field": "sm_training_time",
+				"maximum": 480000,
+				"minimum": 4000,
+				"of": 429,
+				"positive": 300,
+				"values": [
+					"10000",
+					"100000",
+					"12000",
+					"120000",
+					"124000",
+					"126000",
+					"130000",
+					"14000",
+					"140000",
+					"150000",
+					"16000",
+					"160000",
+					"162000",
+					"164000",
+					"170000",
+					"174000",
+					"18000",
+					"180000",
+					"184000",
+					"190000",
+					"194000",
+					"20000",
+					"200000",
+					"204000",
+					"210000",
+					"214000",
+					"22000",
+					"220000",
+					"224000",
+					"230000",
+					"24000",
+					"240000",
+					"250000",
+					"26000",
+					"260000",
+					"270000",
+					"28000",
+					"280000",
+					"284000",
+					"290000",
+					"30000",
+					"300000",
+					"310000",
+					"320000",
+					"330000",
+					"34000",
+					"340000",
+					"350000",
+					"36000",
+					"360000",
+					"370000",
+					"38000",
+					"380000",
+					"390000",
+					"4000",
+					"40000",
+					"400000",
+					"410000",
+					"42000",
+					"420000",
+					"430000",
+					"44000",
+					"440000",
+					"450000",
+					"46000",
+					"460000",
+					"470000",
+					"480000",
+					"50000",
+					"52000",
+					"54000",
+					"56000",
+					"6000",
+					"60000",
+					"62000",
+					"64000",
+					"66000",
+					"70000",
+					"72000",
+					"74000",
+					"8000",
+					"80000",
+					"84000",
+					"90000"
+				]
+			},
+			"units": {
+				"absent_key": 0,
+				"carrying_key": 429,
+				"distinct_values": 1,
+				"domain": "units",
+				"field": "training_time",
+				"maximum": 0,
+				"minimum": 0,
+				"of": 429,
+				"positive": 0,
+				"values": [
+					"0"
+				]
+			}
+		},
+		"duration_computed": false,
+		"field": "training_time",
+		"implemented_as_duration": false,
+		"rule": "NO PRODUCTION DURATION IS DERIVED FROM training_time. The field has ZERO legacy consumers: the only three occurrences of the string across command.py, engine.py, sessions.py, server.py, constants.py, and get_game_config.py are command.py:735 and command.py:737, and both are the DISTINCT field sm_training_time inside the soul-mixer speedup branch - a different field, on a different path. So NO production time, NO remaining time, and NO progress ratio is computed from a building's committed training_time, and this module provides no duration helper of any kind (design D3/D4)",
+		"searched_modules": [
+			"command.py",
+			"engine.py",
+			"sessions.py",
+			"server.py",
+			"constants.py",
+			"get_game_config.py"
+		],
+		"sibling_field": "sm_training_time",
+		"sibling_note": "sm_training_time is the soul-mixer branch's OWN field, present on 300 of the 429 committed units and on 0 of the 470 buildings, and the one legacy reader of it (command.py:735) reads it off the QUEUED UNIT to print a cost it never charges. It is recorded as that path's recorded contract and is NOT treated as a general production duration here: NO production or timing semantics are derived from it either (design D3)",
+		"soulmixer_span": [
+			727,
+			745
+		],
+		"substring_match_distinct_line_count": 2,
+		"substring_match_field": "sm_training_time",
+		"substring_match_lines": [
+			"command.py:735",
+			"command.py:737"
+		],
+		"substring_match_occurrence_count": 3,
+		"zero_consumer_precedents": [
+			{
+				"fact": "committed on 5 of the 429 units and on non-zero on a small minority, with zero occurrences across the legacy modules; push_unit appends to a garrison unconditionally, so no capacity rule is enforced",
+				"field": "unit_capacity",
+				"line": "M8 line 2 (unit instances)"
+			},
+			{
+				"fact": "committed on every one of the 100 level entries and read by no legacy branch, so no level reward is paid",
+				"field": "reward_type / reward_amount",
+				"line": "M7's XP line"
+			},
+			{
+				"fact": "carried by every one of the 899 committed items with a positive value on only 130 of the 470 buildings, and read by no legacy branch, so no production duration is derived from it",
+				"field": "training_time",
+				"line": "this line (unit production)"
+			}
+		]
+	},
+	"training_time_measured": {
+		"modules_searched": [
+			"command.py",
+			"engine.py",
+			"sessions.py",
+			"server.py",
+			"constants.py",
+			"get_game_config.py"
+		],
+		"note": "the measured matches are the two lines the contract records, and every one of them is the DISTINCT field sm_training_time inside the soul-mixer branch, so NO line in any of the six modules reads the committed training time itself: the zero-consumer claim is a measurement, not a promise",
+		"substring_matches": [
+			"command.py:735",
+			"command.py:737"
+		]
+	}
+}

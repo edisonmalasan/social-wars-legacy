@@ -23,7 +23,9 @@ extends "res://tests/test_base.gd"
 ## work (the two `scripts/units/` instance modules, its suite, and the
 ## `unit-instances` evidence report), and the unit-queues work (the two
 ## `scripts/units/` queue modules, its suite, and the `unit-queues` evidence
-## report):
+## report), and the unit-production work (the
+## `scripts/units/production_flow.gd` refusal-and-inventory module, its suite,
+## and the `unit-production` evidence report):
 ## no other game system, no scene beyond the allow-list, no script outside
 ## the allow-list, no Flash-related runtime, no legacy protocol token
 ## anywhere, and no transport reference outside the legacy-v0
@@ -91,6 +93,7 @@ const ALLOWED := [
 	"scripts/units/unit_instance_projection.gd",
 	"scripts/units/unit_queue.gd",
 	"scripts/units/queue_flow.gd",
+	"scripts/units/production_flow.gd",
 	"scripts/verification.gd",
 	"tests/test_asset_ids.gd",
 	"tests/test_audio_manager.gd",
@@ -127,6 +130,7 @@ const ALLOWED := [
 	"tests/test_unit_definitions.gd",
 	"tests/test_unit_instances.gd",
 	"tests/test_unit_queues.gd",
+	"tests/test_unit_production.gd",
 	"evidence/boot/boot-report.json",
 	"evidence/building-move/building-move.png",
 	"evidence/building-move/report.json",
@@ -158,6 +162,7 @@ const ALLOWED := [
 	"evidence/unit-definitions/report.json",
 	"evidence/unit-instances/report.json",
 	"evidence/unit-queues/report.json",
+	"evidence/unit-production/report.json",
 ]
 
 ## The exact scene set the project may declare (set equality below).
