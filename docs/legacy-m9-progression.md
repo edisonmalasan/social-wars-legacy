@@ -274,3 +274,83 @@ preserved material.
 
 **Nothing in this record is inferred from a converted asset package**, the caution that made M8 line 7
 scoped correctly — no rendering, animation, or combat semantics are claimed anywhere above.
+
+---
+
+## 11. Research, measured in full: the counters are write-only
+
+This section was added after a follow-up probe, because the finding is sharper
+than section 2 states and it decides the line's whole shape.
+
+**Every occurrence of the three counters across the seven modules:**
+
+| Counter | Sites | All writes? |
+| --- | --- | --- |
+| `researchStepNumber` | 3 | **yes** — `command.py:271` `+= 1`, `288` `= 0`, `297` `= 0` |
+| `researchItemNumber` | 2 | **yes** — `command.py:287` `+= 1`, `296` `= 0` |
+| `timeStampDoResearch` | 5 | 4 writes in the branches, plus **one read** at `command.py:923` |
+
+**The single read is itself a write.** `command.py:922-928` is inside `fast_forward`:
+
+```python
+# research timers
+research_timers = privateState["timeStampDoResearch"]
+num_research_timers = len(research_timers)
+i = 0
+while i < num_research_timers:
+    research_timers[i] = max(0, research_timers[i] - seconds)
+    i += 1
+```
+
+`fast_forward` subtracts a **client-supplied** `seconds` from every research stamp, clamped at zero.
+
+**Therefore: the research state surface is four branches plus one `fast_forward` decrement, and not one
+of them reads a counter to decide anything.** There is no completion test, no readiness test, no
+remaining-time computation, no unlock gate, and no cost check. The counters are pure bookkeeping with no
+consumer — the same shape as `velocity`, which M8 line 6 found is positive on all 429 units and read by
+nothing, and the same shape as `training_time`, which M8 line 4 refused to derive from.
+
+**This decides M9 line 1's shape:** the deliverable is the counter mechanics themselves, and *every*
+derivation must be refused, because there is nothing to derive from — not a refusal line like M8's, because
+the counters genuinely mutate and the corpus genuinely exercises all four branches, but a line whose
+entire content surface is "four commands, three integers, two tracks."
+
+### `fast_forward` makes the research stamp client-writable
+
+M8 line 6 recorded that `fast_forward` makes a row's instant client-writable and named it "the instant a
+client-side readiness check would trust." **The research stamp is the same case, and it is worse in one
+specific way: there is no readiness check anywhere, so the trusted-by-nothing instant is the *only*
+elapsed-time input the research system has.** It has no observable effect for the same reason
+`fast_forward` has none elsewhere — nothing evaluates it — and recording that is part of the line.
+
+## 12. Research has almost no committed content, and the two tracks are resolvable
+
+Measured across every normalized package and `config/main.json`:
+
+- **No normalized package contains a research section.** `research` appears in exactly **one** normalized
+  file, `buildings.json`, and there only inside a single `name` value: **`legacy_id` 256, `name`
+  "Research Lab"**. It is a building, and it is not what the counters track.
+- **`config/main.json` has no key whose name contains `research`** — zero of the 20 top-level content
+  keys, and no nested key either.
+- **There is therefore no committed cost, no committed step count, no committed unlock requirement, and no
+  committed reward for research.** Nothing exists to derive a schedule from, which independently confirms
+  section 2's refusal and strengthens it: a research price is not merely unsourced, it is **absent from
+  the content entirely**.
+- **The two tracks are named by committed content, though** — as building ids in
+  `constants.py:299-300`: `ID_BUILDING_ROBOTIC_CENTER = 86` and `ID_BUILDING_AREA_51 = 139`. The branch
+  comments read `0: TYPE_AREA_51 , 1: TYPE_ROBOTIC`, so track 0 is Area 51 (building 139) and track 1 is
+  Robotic Center (building 86). The names `TYPE_AREA_51` and `TYPE_ROBOTIC` appear **only inside those four
+  comments** and are defined nowhere, so the track-to-building link rests on the comment's own word order
+  plus the two committed id constants — **established enough to report the mapping, not to derive any
+  behaviour from it.**
+
+## 13. What this means for the M9 line order
+
+Research is the correct first M9 line, and the measurement sharpens the reasons rather than changing them.
+It is a **closed four-branch set** over a **three-integer, two-track** state vector; it is **fully
+exercisable** by the committed corpus, which holds all three counters at `[0, 0]`; it has the clearest
+authority story in M9, since the counters advance on the client's word and the one price-taking branch
+**charges nothing**; and it needs **no content package**, because none exists.
+
+Quests remains the largest surface and the natural second line, with its content side already normalized at
+**91** entries of a uniform ten-field shape.
