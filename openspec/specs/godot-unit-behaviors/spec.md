@@ -50,7 +50,9 @@ Archive **refuses a renamed heading**, so the heading MUST NOT be corrected. The
 `map_lose_item` **engine helper** (`engine.py:215-228`), which calls `push_dead_unit`, so a unit lost
 in a quest is pushed onto the ledger through the same helper. `map_lose_item` is **not** a dispatcher
 branch, so the named-branch count and the door count stay distinguishable, and this door is reached
-from the **quest** path rather than the death path. The recorded facts SHALL include that **`map_lose_item` reaches the ledger through `push_dead_unit`**
+from the **quest** path rather than the death path. The `godot-quests` capability delivers one of
+that helper's two callers and names it here, so the ledger owner and the quest owner cannot
+describe the same reach differently. The recorded facts SHALL include that **`map_lose_item` reaches the ledger through `push_dead_unit`**
 and is counted as a door, that **`kill` deletes the row and never
 touches the ledger**, that **`sell` reaches the ledger only when its reason is the combat reason and
 through the `push_dead_unit` engine helper**, that `push_dead_unit` is an **engine helper rather than a
@@ -94,6 +96,13 @@ client-supplied coordinates**.
 - **THEN** it still reads "three-door" while its body records four, and the body states that the label is
   superseded and that the heading MUST NOT be renamed, because a MODIFIED delta resolves its header
   against the existing requirement name and Archive refuses a renamed heading
+
+#### Scenario: The quest path's caller is named by both capabilities
+- **WHEN** this requirement records where the fourth door is reached from
+- **THEN** it records that the quest path is reached through `map_lose_item`, and names `godot-quests`
+  as the capability that delivers one of that helper's two callers, so the ledger owner and the quest
+  owner cannot describe the same reach differently
+
 ### Requirement: A revival is a server-derived intent, and the client-supplied syringe is ignored
 
 The compatibility service SHALL expose a revival operation accepting **only** a player identifier and
