@@ -1,0 +1,868 @@
+{
+	"branch_count": 6,
+	"branch_count_rule": "the dispatcher has 63 named branches and exactly SIX of them touch quest state; the suite re-derives each one's inclusive line range out of command.py and fails the run on a drift, and a seventh quest-ish branch would fail it too",
+	"branch_record_fields": [
+		"branch_count",
+		"branches",
+		"content_fields",
+		"content_fields_read",
+		"content_fields_unread",
+		"content_note",
+		"fast_forward",
+		"ledger_door",
+		"migration",
+		"no_op_command",
+		"non_derivation",
+		"quest_var_alias_key",
+		"quest_var_comment_keys",
+		"quest_var_comment_note",
+		"quest_var_ignored_key",
+		"refusal_count",
+		"refusals",
+		"refused_destruction",
+		"reward_field_absent",
+		"wrap_bound",
+		"wrap_note",
+		"wrap_target",
+		"writer_count",
+		"writer_fast_forward",
+		"writers",
+		"zero_consumer_fields"
+	],
+	"branches": [
+		{
+			"action": "set_goal",
+			"args": [
+				"goal index",
+				"json progress pair"
+			],
+			"command": "set_goals",
+			"delegates_to": "engine.py:96-100 (engine.set_goals)",
+			"effect": "the addressed goal's entry is REPLACED by the progress pair, and the goals list is grown ON DEMAND with None padding",
+			"grows_list_on_demand": true,
+			"mutates": true,
+			"reads": [
+				"args[0]",
+				"args[1]",
+				"json.loads",
+				"the committed title"
+			],
+			"source": "command.py:68-74",
+			"upper_bound": null,
+			"validation": "none: no bounds check, no clamp, no membership test, no exception guard, and no existence check. A goal index of 500 appends 350 entries from one client-sent identifier, and that absence is reproduced, not closed",
+			"writes": [
+				"privateState[goals][goal_index]"
+			]
+		},
+		{
+			"action": "complete_goal",
+			"args": [
+				"goal index"
+			],
+			"command": "complete_goal",
+			"delegates_to": null,
+			"effect": "NOTHING AT ALL: the branch resolves the committed title, prints it, and returns. There is no completion flag, no ledger, and no reward",
+			"grows_list_on_demand": false,
+			"mutates": false,
+			"reads": [
+				"args[0]",
+				"the committed title"
+			],
+			"source": "command.py:76-79",
+			"upper_bound": null,
+			"validation": "none: no bounds check, no clamp, no membership test, and no existence check. get_attribute_from_goal_id calls int(id) on the client value with no guard, so a non-numeric goal id RAISES rather than refusing - a legacy crash path, recorded, not reproduced",
+			"writes": []
+		},
+		{
+			"action": "set_quest_var",
+			"args": [
+				"key",
+				"value"
+			],
+			"command": "set_quest_var",
+			"delegates_to": null,
+			"effect": "ANY client-supplied key is persisted into the quest-variable map, which is SELF-HEALED from the corpus's recorded None to an empty dict first (command.py:113-114); the key `id` ALSO overwrites the current mission identifier (command.py:110-111)",
+			"grows_list_on_demand": false,
+			"mutates": true,
+			"reads": [
+				"args[0]",
+				"args[1]",
+				"map[currentQuestVars]"
+			],
+			"source": "command.py:87-117",
+			"upper_bound": null,
+			"validation": "NONE beyond the ONE key the branch itself ignores: idSimpleChapter. There is no membership test against the eight keys the branch's own comment enumerates, so an invented key is accepted and persisted",
+			"writes": [
+				"map[currentQuestVars][key]",
+				"map[idCurrentMission] (the `id` alias only)"
+			]
+		},
+		{
+			"action": "collect_mission",
+			"args": [
+				"mission identifier"
+			],
+			"command": "collect_mission",
+			"delegates_to": null,
+			"effect": "the current mission identifier is written as a STRING (command.py:438) where the committed corpus records an INTEGER 0; the last-chapter instant is stamped with the wall clock; and the quest-variable map is CLEARED to an empty dict (command.py:440)",
+			"grows_list_on_demand": false,
+			"mutates": true,
+			"reads": [
+				"args[0]"
+			],
+			"source": "command.py:430-442",
+			"upper_bound": null,
+			"validation": "the ONLY guard is `if next_mission > 99: next_mission = 1` - a WRAP, not a rejection. No bounds check, no clamp, no membership test, and no existence check otherwise",
+			"writes": [
+				"map[idCurrentMission]",
+				"map[timestampLastChapter]",
+				"map[currentQuestVars]"
+			]
+		},
+		{
+			"action": "set_quest_rank",
+			"args": [
+				"rank index",
+				"difficulty"
+			],
+			"command": "admin_set_quest_rank",
+			"delegates_to": null,
+			"effect": "the addressed rank's difficulty is written under the STRINGIFIED index, and nothing else. Both values are client-sent in legacy; the service derives the difficulty",
+			"grows_list_on_demand": false,
+			"mutates": true,
+			"reads": [
+				"args[0]",
+				"args[1]"
+			],
+			"source": "command.py:745-750",
+			"upper_bound": null,
+			"validation": "none: no bounds check, no clamp, no membership test, and no existence check on either side of the assignment",
+			"writes": [
+				"privateState[questsRank][str(index)]"
+			]
+		},
+		{
+			"action": "end_quest",
+			"args": [
+				"json blob"
+			],
+			"command": "end_quest",
+			"delegates_to": "engine.map_lose_item (engine.py:215-228) in LEGACY ONLY",
+			"destruction": "REFUSED",
+			"difficulty_clamp": "max(1, min(3, ...)) at command.py:782",
+			"effect": "the quest-time map gains one entry under the STRINGIFIED quest id. The client-computed destruction count is NOT reproduced: the service derives the blob with an EMPTY unit list, so no placed row is touched",
+			"grows_list_on_demand": false,
+			"mutates": true,
+			"reads": [
+				"args[0]",
+				"json.loads",
+				"win",
+				"duration",
+				"units",
+				"map",
+				"difficulty",
+				"voluntary_end",
+				"quest_id"
+			],
+			"source": "command.py:752-806",
+			"upper_bound": null,
+			"validation": "only `if not quest_id: return` (command.py:798-800), and that check runs AFTER the destruction loop. `difficulty` is the ONLY clamped value in the branch: max(1, min(3, ...))",
+			"writes": [
+				"map[questTimes][str(quest_id)]",
+				"and, in LEGACY ONLY, placed rows via map_lose_item - REFUSED here"
+			]
+		}
+	],
+	"content": {
+		"distinct_shapes": 1,
+		"empty_hints": 91,
+		"entries": 91,
+		"field_count": 10,
+		"fields": [
+			{
+				"field": "id",
+				"quoted_occurrences": 8,
+				"used": true,
+				"where": [
+					"command.py",
+					"get_game_config.py"
+				]
+			},
+			{
+				"field": "title",
+				"note": "both occurrences are `print` statements; the title is resolved only to be narrated",
+				"quoted_occurrences": 2,
+				"used": true,
+				"where": [
+					"command.py"
+				]
+			},
+			{
+				"field": "hint",
+				"quoted_occurrences": 0,
+				"used": false,
+				"where": []
+			},
+			{
+				"field": "description",
+				"quoted_occurrences": 0,
+				"used": false,
+				"where": []
+			},
+			{
+				"field": "reward",
+				"note": "UNIFORMLY 10 on all 91 committed entries and read by NOTHING, so it carries no information even if it were read",
+				"quoted_occurrences": 0,
+				"used": false,
+				"where": []
+			},
+			{
+				"field": "kind",
+				"quoted_occurrences": 0,
+				"used": false,
+				"where": []
+			},
+			{
+				"field": "legacy_id",
+				"quoted_occurrences": 0,
+				"used": false,
+				"where": []
+			},
+			{
+				"field": "source_file",
+				"quoted_occurrences": 0,
+				"used": false,
+				"where": []
+			},
+			{
+				"field": "source_layer",
+				"quoted_occurrences": 0,
+				"used": false,
+				"where": []
+			},
+			{
+				"field": "content_version",
+				"quoted_occurrences": 0,
+				"used": false,
+				"where": []
+			}
+		],
+		"fields_read": [
+			"id",
+			"title"
+		],
+		"fields_unread": [
+			"legacy_id",
+			"kind",
+			"source_file",
+			"source_layer",
+			"content_version",
+			"hint",
+			"description",
+			"reward"
+		],
+		"goal_index_source": "get_game_config.py:142-150",
+		"id_max": 91,
+		"id_min": 1,
+		"non_empty_descriptions": 91,
+		"note": "REPORTED AND NEVER USED. The committed quest content is read by the legacy server for exactly two things: an identifier lookup (get_game_config.py:142 and 144-146) and a title to print (command.py:74 and 79). Nothing else. So the committed content is used ONLY to resolve an identifier and read its title, and NO reward, cost, requirement, schedule, or completion rule is derived from it. `hint` and `description` exist to be DISPLAYED BY THE FLASH CLIENT and are read by no server branch; MEASURED, every one of the 91 committed `hint` values is EMPTY and every `description` is non-empty (design D6)",
+		"paid_amount_constant": 0,
+		"reward_field": "reward",
+		"reward_field_absent": "NO DELIVERED CODE IDENTIFIER OR COMPUTATION IS NAMED AFTER THE REWARD FIELD. The field is committed on all 91 entries as the UNIFORM value 10 and read by NOTHING, so a later reader cannot mistake a reported constant for a derived payout. The paid amount this contract reports is named without the committed field's own name, and the suite asserts this over the module's declarations and its whole function inventory (design D6)",
+		"reward_values": [
+			10
+		]
+	},
+	"corpus": {
+		"claim": "the committed corpus holds every quest field at its initial value — 151 goal entries all None, an empty rank map, an unlocked index of 0, a recorded NULL quest-variable map, an empty quest-time map, an INTEGER mission 0, and a last-chapter instant of 0 — which is why this line records NO absent fixture",
+		"goals_length": 151,
+		"goals_null_entries": 151,
+		"quest_content_rows": 0,
+		"resources": {
+			"cash": 5,
+			"gold": 2000,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2000,
+			"xp": 4
+		},
+		"rows": 40,
+		"save": "tests/saves/fresh-player.json",
+		"save_bytes": 15628,
+		"save_sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+		"store": {}
+	},
+	"determinism": {
+		"byte_identical_across_reruns": true,
+		"reason": "no timestamp, no absolute path, no wall clock, no request, and no saved state: every table is derived from the model's own constants and from the committed bytes measured in the same run, and every derived set is sorted before it is written",
+		"serialization": "JSON.stringify(report, tab, sort_keys=true) plus one trailing newline; every number written is an integer - the pinned engine's integral floats are normalised on the way in, which changes no value - so no float formatting varies between runs",
+		"time_dependent_fields": "the ONLY time-dependent values in this line's evidence are the two wall-clock stamps the committed fixture fixed — the last-chapter instant and the quest-time entry — and the fake double stamps those same recorded values rather than reading a clock"
+	},
+	"fast_forward": {
+		"clamped": true,
+		"command": "fast_forward",
+		"contract": "RECORDED AND IMPLEMENTED NOT AT ALL. Quest state has SEVEN writers: the six branches and fast_forward, which is NOT a quest branch. fast_forward (command.py:905) subtracts a CLIENT-SUPPLIED number of seconds (`seconds = args[0]`, command.py:906) from every questTimes entry (command.py:942-944) and from timestampLastChapter (command.py:911), both clamped at zero. That makes quest timing CLIENT-WRITABLE, and for the same reason the research instant is: NO legacy branch reads a quest instant to decide anything. NO fast-forward operation is delivered by the client facade, by either GameApi implementation, by this flow, or by any route, and no elapsed-time, remaining-time, readiness, or completion behaviour is derived from any quest instant anywhere in this repository (design D9)",
+		"formula": "quest_times[key] = max(0, quest_times[key] - seconds)",
+		"is_a_quest_branch": false,
+		"last_chapter_source": "command.py:911",
+		"offered": false,
+		"quest_times_source": "command.py:942-944",
+		"seconds_source": "args[0], CLIENT-SUPPLIED (command.py:906)"
+	},
+	"fixture": {
+		"branches": 6,
+		"destruction_captured": false,
+		"directory": "tests/fixtures/godot-quests",
+		"executed_legacy": true,
+		"fixture_scope": "the six recorded quest-state transitions against the fresh-player corpus: no progressed save, no other command, no reward, no completion, and no quest-timing semantics",
+		"manifest": "tests/fixtures/godot-quests/capture-manifest.json",
+		"no_absent_fixture": true,
+		"no_op_step_byte_identical": true,
+		"probe_note": "probe 1 grew the goals list by exactly 350 entries from ONE client-sent identifier of 500 and stored the DERIVED progress pair; probe 2 showed the one ignored key changing nothing while probe 2b showed an INVENTED key accepted; probe 3 showed the out-of-range mission WRAPPING to the string \"1\" where the corpus records an integer 0; probe 4 showed the LEGACY server really DESTROYING one placed row while the delivered step destroyed none, which is the executed evidence for the divergence; probe 5 showed fast_forward subtracting the CLIENT-supplied 60 seconds from every quest time and from the last-chapter instant",
+		"probes": 5,
+		"reward_captured": false,
+		"steps": [
+			{
+				"action": "set_goal",
+				"addressing": 2,
+				"leaves": [
+					"/privateState/goals"
+				],
+				"name": "command_set_goals",
+				"written": [
+					"goals"
+				]
+			},
+			{
+				"action": "complete_goal",
+				"addressing": 2,
+				"leaves": [],
+				"name": "command_complete_goal",
+				"written": []
+			},
+			{
+				"action": "set_quest_var",
+				"addressing": "spawned",
+				"leaves": [
+					"/maps/0/currentQuestVars"
+				],
+				"name": "command_set_quest_var",
+				"written": [
+					"currentQuestVars"
+				]
+			},
+			{
+				"action": "collect_mission",
+				"addressing": 5,
+				"leaves": [
+					"/maps/0/currentQuestVars",
+					"/maps/0/idCurrentMission",
+					"/maps/0/timestampLastChapter"
+				],
+				"name": "command_collect_mission",
+				"written": [
+					"currentQuestVars",
+					"idCurrentMission",
+					"timestampLastChapter"
+				]
+			},
+			{
+				"action": "set_quest_rank",
+				"addressing": 3,
+				"leaves": [
+					"/privateState/questsRank"
+				],
+				"name": "command_admin_set_quest_rank",
+				"written": [
+					"questsRank"
+				]
+			},
+			{
+				"action": "end_quest",
+				"addressing": "{\"difficulty\":1,\"duration\":0,\"map\":0,\"quest_id\":7,\"units\":[],\"voluntary_end\":true,\"win\":true}",
+				"leaves": [
+					"/maps/0/questTimes"
+				],
+				"name": "command_end_quest",
+				"written": [
+					"questTimes"
+				]
+			}
+		]
+	},
+	"generated_by": "apps/client-godot/tests/test_quests.gd --report=<path>",
+	"intents": {
+		"action_vocabulary": [
+			"set_goal",
+			"complete_goal",
+			"set_quest_var",
+			"collect_mission",
+			"set_quest_rank",
+			"end_quest"
+		],
+		"addressing_keys": {
+			"collect_mission": "mission",
+			"complete_goal": "goal_index",
+			"end_quest": "quest_id",
+			"set_goal": "goal_index",
+			"set_quest_rank": "quest_index",
+			"set_quest_var": "key"
+		},
+		"addressing_kinds": {
+			"collect_mission": "mission identifier",
+			"complete_goal": "goal index",
+			"end_quest": "quest identifier",
+			"set_goal": "goal index",
+			"set_quest_rank": "rank index",
+			"set_quest_var": "quest-variable key"
+		},
+		"difficulty": 1,
+		"end_quest_units": [],
+		"fast_forward_offered": false,
+		"fixed_keys": [
+			"user_id",
+			"action"
+		],
+		"ignored_keys": [
+			"progress",
+			"visited",
+			"currentStep",
+			"value",
+			"difficulty",
+			"win",
+			"duration",
+			"map",
+			"units",
+			"lost",
+			"voluntary_end",
+			"reward",
+			"price",
+			"cost",
+			"resources_changed",
+			"vector",
+			"seconds",
+			"fast_forward",
+			"complete",
+			"completed",
+			"unlocked_quest_index",
+			"unlockedQuestIndex"
+		],
+		"key_count": 3,
+		"note": "the client sends EXACTLY the player identifier, a closed action, and the branch's own addressing under THAT ACTION'S OWN wire key (goal_index, key, mission, quest_index, or quest_id), so the body is three keys wide whatever the action. No progress pair, no value, no difficulty, no win/loss outcome, and no unit list is expressible, so the service derives every one of them itself and ignores any such key a client attaches alongside (design D2)",
+		"path": "/v0/quests",
+		"per_action_bodies": {
+			"collect_mission": {
+				"example_value": 0,
+				"kind": "mission identifier",
+				"wire_key": "mission",
+				"wire_type": "integer"
+			},
+			"complete_goal": {
+				"example_value": 0,
+				"kind": "goal index",
+				"wire_key": "goal_index",
+				"wire_type": "integer"
+			},
+			"end_quest": {
+				"example_value": 0,
+				"kind": "quest identifier",
+				"wire_key": "quest_id",
+				"wire_type": "integer"
+			},
+			"set_goal": {
+				"example_value": 0,
+				"kind": "goal index",
+				"wire_key": "goal_index",
+				"wire_type": "integer"
+			},
+			"set_quest_rank": {
+				"example_value": 0,
+				"kind": "rank index",
+				"wire_key": "quest_index",
+				"wire_type": "integer"
+			},
+			"set_quest_var": {
+				"example_value": "aNonEmptyKey",
+				"kind": "quest-variable key",
+				"wire_key": "key",
+				"wire_type": "string"
+			}
+		},
+		"progress_pair": [
+			0,
+			0
+		],
+		"quest_var_value": true,
+		"reward_derived_from_content": false,
+		"reward_paid": 0,
+		"unknown_action_key": "addressing",
+		"unlocked_index_written": false,
+		"vector": "NEUTRAL: a quest price would be a client-sent delta, because the legacy dispatcher applies the request's per-command vector BEFORE the branch (command.py:40, engine.py:251-271) as max(current + delta, 0)"
+	},
+	"ledger_door": {
+		"callers": [
+			"command.py:796 (end_quest)",
+			"command.py:872 (end_attack)"
+		],
+		"calls_helper_at": "engine.py:223 (push_dead_unit)",
+		"door": "map_lose_item",
+		"is_a_dispatcher_branch": false,
+		"modern_behaviour": "the quest-side caller is REFUSED here: the derived end_quest blob carries an empty unit list, so map_lose_item is never reached through this endpoint and no dead-hero ledger entry is written by a quest action",
+		"source": "engine.py:215-228",
+		"status": "the quest path's reach into the dead-hero ledger is recorded, REFUSED, and asserted byte-identical on the whole placed-row set"
+	},
+	"measured_legacy": {
+		"branch_ranges": {
+			"admin_set_quest_rank": [
+				745,
+				750
+			],
+			"collect_mission": [
+				430,
+				442
+			],
+			"complete_goal": [
+				76,
+				79
+			],
+			"end_quest": [
+				752,
+				806
+			],
+			"set_goals": [
+				68,
+				74
+			],
+			"set_quest_var": [
+				87,
+				117
+			]
+		},
+		"counting_rule": "quoted occurrences are counted so a comment or a recorded non-claim can never be mistaken for code, and the OCCURRENCE count and the DISTINCT-LINE count are recorded separately because they differ for exactly one key: timestampLastChapter is read and written on ONE line",
+		"ignored_key_line": 91,
+		"key_distinct_lines": {
+			"currentQuestVars": 5,
+			"goals": 3,
+			"idCurrentMission": 2,
+			"questTimes": 6,
+			"questsRank": 1,
+			"timestampLastChapter": 2,
+			"unlockedQuestIndex": 0
+		},
+		"key_occurrences": {
+			"currentQuestVars": 5,
+			"goals": 3,
+			"idCurrentMission": 2,
+			"questTimes": 6,
+			"questsRank": 1,
+			"timestampLastChapter": 3,
+			"unlockedQuestIndex": 0
+		},
+		"migration_lines": [
+			39,
+			40,
+			41,
+			43
+		],
+		"set_goals_helper_line": [
+			96
+		]
+	},
+	"migration": {
+		"effect": "if the map carries no questTimes it is set to None, and if it is then not a dict it is coerced to {} and the 'quest fix' is printed",
+		"field": "questTimes",
+		"is_gameplay": false,
+		"kind": "save-migration",
+		"note": "RECORDED AS A MIGRATION PATH, NOT AS QUEST BEHAVIOUR. version.py runs once per save load and repairs the quest-time map's SHAPE. It resolves no goal, advances no chapter, awards nothing, and reads no quest content, so counting it as a seventh quest behaviour would overstate what the migration does",
+		"where": "version.py:38-44"
+	},
+	"no_op_branch": {
+		"command": "complete_goal",
+		"reason": "NO COMPLETION STATE EXISTS, AND THE SUITE ASSERTS THE ABSENCE STRUCTURALLY. complete_goal writes NOTHING AT ALL (command.py:76-79): it resolves the committed title, prints it, and returns. So there is no completion flag, no completion ledger, no completion accessor, and no reward for finishing a goal - a goal 'completes' by being narrated in a print statement. The service executes the real branch and its post-execution proof requires the WHOLE quest state to be byte-identical, and this module's whole function inventory is pinned, so a mark_goal_complete or is_goal_complete helper fails the run wherever it is added (design D3)",
+		"writes_nothing_at_all": true
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed",
+		"NO QUEST REWARD IS PAID AND NO STORED RESOURCE MOVES, because the committed reward field has ZERO legacy consumers and is UNIFORMLY 10 on all 91 entries; the endpoint's post-execution proof compares the COMPLETE stored resource set, which is what makes the claim non-tautological",
+		"THE `end_quest` DESTRUCTION COUNT IS REFUSED and every placed row is left byte-identical; the legacy server DOES destroy rows on this command, so the difference is a DIVERGENCE and NOT parity, and authoritative combat belongs to Server v1 / M13",
+		"NO COMPLETION STATE EXISTS, because `complete_goal` writes NOTHING AT ALL; the branch is delivered as a no-op and its whole-state identity is proved",
+		"NO BOUND IS ADDED to the on-demand goals list, so a client-supplied identifier can still grow it without limit, and that is a Server v1 / M13 gap",
+		"NO MEMBERSHIP TEST is added to the quest-variable writer: an invented key is accepted, as legacy does, and only the one key the legacy branch itself ignores is refused",
+		"THE UNLOCKED-QUEST INDEX is reported and NEVER written, because it has zero legacy consumers",
+		"NO FAST-FORWARD OPERATION IS DELIVERED, though its write of quest state is recorded as the seventh writer",
+		"NO ELAPSED-TIME, remaining-chapter, readiness, or cooldown rule is derived from any quest instant, because no legacy branch reads one",
+		"THE COMMITTED QUEST CONTENT IS REPORTED AND NEVER USED: only the identifier and the title are read, and no code identifier or computation is named after the reward field",
+		"NO CLAIM IS MADE ABOUT WHAT THE LEGACY CLIENT DISPLAYED: no authentic quest panel has been captured, and the readout's wording is the delivered provisional convention",
+		"the fixture covers all SIX branches against the fresh-player corpus and nothing else: no reward, no completion, no destruction, and no quest-timing semantics is evidenced, and no fixture is absent",
+		"no compatibility route beyond the six guarded intents this line delivers exists for a quest, and the service adds no server-authoritative validation of bounds, membership, price, or reward - that belongs to Server v1 / M13",
+		"no pixel-parity oracle exists",
+		"no windowed capture is claimed: nothing is rendered, and the committed corpus places no quest content",
+		"the committed capture runs the fake GameApi implementation for the client-side evidence, a deterministic test double rather than a parity oracle; the executed-legacy parity rests on the committed fixture and the live phase"
+	],
+	"non_derivation": [
+		{
+			"absent_because": "complete_goal writes NOTHING AT ALL, so there is no completion for a flag to record (design D3)",
+			"helper": "mark_goal_complete"
+		},
+		{
+			"absent_because": "nothing anywhere reads the goals list to decide anything, so no completion test exists to reproduce (design D3)",
+			"helper": "is_goal_complete"
+		},
+		{
+			"absent_because": "the committed reward field has ZERO legacy consumers and is UNIFORMLY 10 on all 91 entries, so any amount computed here would fabricate an economy from a constant (design D6)",
+			"helper": "quest_reward"
+		},
+		{
+			"absent_because": "no committed quest cost exists, and a price would be a client-sent resource delta because do_command applies the vector before the branch",
+			"helper": "quest_price"
+		},
+		{
+			"absent_because": "the stored progress pair is never read by any legacy module and there is no committed total to divide by",
+			"helper": "quest_progress_ratio"
+		},
+		{
+			"absent_because": "no legacy branch reads a quest instant, so there is no elapsed-time rule and no committed duration to subtract (design D9)",
+			"helper": "quest_remaining_time"
+		},
+		{
+			"absent_because": "the chapter instant is reported verbatim and nothing derives a decision from it",
+			"helper": "quest_ready"
+		},
+		{
+			"absent_because": "the quest-time map's seventh writer subtracts a CLIENT-SUPPLIED number of seconds and is recorded, not delivered: no action and no route derives it (design D9)",
+			"helper": "fast_forward"
+		}
+	],
+	"package_files": 67,
+	"package_sha256": "dba0a98b25c6fafdb7b752436d2f70fcfc8641ef5f977166aa2002a3f4b44ea0",
+	"provenance": {
+		"derived": [
+			{
+				"evidence": "derived (design D2): the same intent-only discipline the research, queue, collection, and revival endpoints apply, chosen because every legacy branch takes its outcome from the client",
+				"fact": "the intent body is three keys wide for EVERY action: a player identifier, a closed action, and the addressing under one fixed key"
+			},
+			{
+				"evidence": "derived (design D2/D6): the committed reward field is a uniform constant with zero consumers, so no amount is derivable, and a client-sent one would be client-trusted",
+				"fact": "the service derives the progress pair, the quest-variable value, the rank difficulty, and the whole end_quest blob"
+			},
+			{
+				"evidence": "derived (design D4): Python would otherwise write goals[-1], aliasing the last entry, so the alias is refused structurally while the legacy absence of an upper bound is reproduced",
+				"fact": "a negative goal index is refused while a large one is accepted"
+			},
+			{
+				"evidence": "derived: no authentic legacy quest panel has been captured, so the wording is the delivered provisional convention, never a claim about what the legacy client displayed",
+				"fact": "the readout's labels and the composition of its lines"
+			}
+		],
+		"established": [
+			{
+				"evidence": "command.py:68-74, 76-79, 87-117, 430-442, 745-750, 752-806; tests/saves/fresh-player.json",
+				"fact": "the quest state is three private-state keys and four map keys, reported verbatim with nothing derived from another"
+			},
+			{
+				"evidence": "command.py:76-79, and the committed fixture's recorded step whose before and after states are byte-identical",
+				"fact": "complete_goal writes NOTHING AT ALL: it resolves the committed title, prints it, and returns"
+			},
+			{
+				"evidence": "engine.py:96-100, and probe 1 of the committed capture, which grew the list from 151 to 501 entries",
+				"fact": "the goals list grows ON DEMAND with no upper bound"
+			},
+			{
+				"evidence": "command.py:87-117, and probes 2 and 2b of the committed capture: the ignored key changed nothing and an invented key was accepted",
+				"fact": "set_quest_var accepts ANY key, and the one key it ignores is idSimpleChapter"
+			},
+			{
+				"evidence": "command.py:430-442, and probe 3 of the committed capture",
+				"fact": "collect_mission stringifies the mission identifier, wraps above 99, stamps the last-chapter instant, and clears the quest-variable map"
+			},
+			{
+				"evidence": "the measured content inventory, taken over the seven legacy modules and packages/game-content/normalized/quests.json in the same run",
+				"fact": "only the identifier and the title are read; the reward field has ZERO consumers and is uniformly 10 on all 91 entries"
+			},
+			{
+				"evidence": "the seven legacy modules, counted as quoted occurrences",
+				"fact": "unlockedQuestIndex has zero legacy sites"
+			},
+			{
+				"evidence": "command.py:911 and 942-944, and probe 5 of the committed capture",
+				"fact": "fast_forward subtracts a client-supplied number of seconds from every quest time and from the last-chapter instant"
+			},
+			{
+				"evidence": "probe 4 of the committed capture: one placed row was destroyed against the live legacy server",
+				"fact": "the legacy server DOES destroy placed rows on end_quest, and this repository's endpoint does NOT"
+			}
+		]
+	},
+	"quest_model": {
+		"field_count": 7,
+		"fields": [
+			"goals",
+			"questsRank",
+			"currentQuestVars",
+			"questTimes",
+			"idCurrentMission",
+			"timestampLastChapter",
+			"unlockedQuestIndex"
+		],
+		"map_keys": [
+			"currentQuestVars",
+			"questTimes",
+			"idCurrentMission",
+			"timestampLastChapter"
+		],
+		"null_rule": "a recorded NULL currentQuestVars is a legitimate committed state and is reported as a recorded null, flagged by its own predicate and its own named marker, and NEVER presented as an empty map (design D8)",
+		"private_keys": [
+			"goals",
+			"questsRank",
+			"unlockedQuestIndex"
+		],
+		"read_only": "the view holds copies of the committed values and declares no setter, no mutating method, and no writable public field; every reader returns a committed value or a fresh copy",
+		"reasons": [
+			"absent_quest_state",
+			"non_object_state",
+			"non_list_goals",
+			"non_integer_unlocked_index",
+			"non_integer_or_string_mission",
+			"non_integer_last_chapter",
+			"non_object_quest_var_map"
+		],
+		"recorded_null_marker": "recorded_null_quest_vars",
+		"unresolvable_rule": "a state that is absent, is not an object, carries a goals list that is not a list, a rank map that is not an object, a non-integer unlocked index, a mission that is neither an integer nor a string, or a non-integer last-chapter instant is reported UNRESOLVABLE with its recorded state intact, and is never defaulted to an empty quest presented as a resolved one",
+		"verbatim_rule": "each of the seven fields is reported exactly as the save holds it - no scaling, rounding, defaulting, or clamping - and a malformed value fails closed with the field and the value named. An integral float is the documented transport tolerance; a numeric string is refused"
+	},
+	"quest_var_keys": {
+		"alias_key": "id",
+		"comment_keys": [
+			"id",
+			"spawned",
+			"ended",
+			"visited",
+			"activators",
+			"boss",
+			"treasure",
+			"killed"
+		],
+		"enforced": false,
+		"ignored_key": "idSimpleChapter",
+		"note": "RECORDED AS CONTENT AND NEVER ENFORCED, SO THE ACCEPTED SET IS UNBOUNDED. The legacy branch's own comment (command.py:97-106) enumerates these eight keys, and there is NO membership test anywhere in it. Inventing a closed set of eight would reject keys the legacy server happily stored, which would make this client STRICTER than legacy in the unexamined direction (design D5)"
+	},
+	"refusal_count": 6,
+	"refusals": [
+		{
+			"implemented": false,
+			"reason": "NO QUEST REWARD IS PAID AND NONE EXISTS. MEASURED as QUOTED occurrences across the seven legacy modules, only two committed quest fields are read by anything: `id` (8 occurrences: command.py 2, get_game_config.py 6) and `title` (2 occurrences, both `print` statements). `reward` has ZERO, and it is committed on all 91 entries UNIFORMLY the value 10 - so it carries no information even if it were read. A line that derived a payout from a uniform 10 would fabricate a uniform payout that is not a payout at all, and NO delivered code identifier or computation is named after the reward field, which is what makes the 'reported, never used' claim mechanical rather than editorial (design D6)",
+			"refusal": "no_reward"
+		},
+		{
+			"implemented": false,
+			"reason": "NO STORED RESOURCE MOVES ON ANY QUEST ACTION. do_command applies the request's per-command resource vector BEFORE dispatch (command.py:40; engine.py:251-271) as max(current + delta, 0) per resource, so any price a client attached would be a client-trusted mint or burn. The derived vector is therefore NEUTRAL and every action's post-execution proof requires that EVERY stored resource - all seven of them, compared over the complete set rather than a selected subset - be UNCHANGED (design D6)",
+			"refusal": "no_resource_move"
+		},
+		{
+			"implemented": false,
+			"reason": "NO COMPLETION STATE EXISTS, AND THE SUITE ASSERTS THE ABSENCE STRUCTURALLY. complete_goal writes NOTHING AT ALL (command.py:76-79): it resolves the committed title, prints it, and returns. So there is no completion flag, no completion ledger, no completion accessor, and no reward for finishing a goal - a goal 'completes' by being narrated in a print statement. The service executes the real branch and its post-execution proof requires the WHOLE quest state to be byte-identical, and this module's whole function inventory is pinned, so a mark_goal_complete or is_goal_complete helper fails the run wherever it is added (design D3)",
+			"refusal": "no_completion"
+		},
+		{
+			"implemented": false,
+			"reason": "NO BOUND IS ADDED TO THE ON-DEMAND GOALS LIST. engine.set_goals grows the list on demand (engine.py:98-99): `while goal >= len(goals): goals.append(None)`. There is no upper bound, so a client-sent goal index of 500 appends 350 entries from ONE identifier, and that absence is reproduced rather than closed - a bound the legacy server does not have would make this client stricter in the unexamined direction, which is a parity break in the opposite sense from the one this line refuses. The recorded absence is a Server v1 / M13 gap, NOT permission to invent a limit (design D4)",
+			"refusal": "no_bounds"
+		},
+		{
+			"implemented": false,
+			"reason": "NO MEMBERSHIP TEST IS ADDED TO THE QUEST-VARIABLE WRITER. The legacy branch accepts ANY client-invented key (command.py:116) against the eight keys its own comment enumerates (command.py:97-106), so inventing a closed set of eight would reject keys the legacy server happily persisted. The eight are recorded as CONTENT, what the client sends is accepted, and exactly ONE key is refused - idSimpleChapter - because that is the one key the legacy branch ITSELF ignores (command.py:91-95), which is a recorded behaviour rather than an absence (design D5)",
+			"refusal": "no_membership"
+		},
+		{
+			"implemented": false,
+			"reason": "NO ELAPSED-TIME BEHAVIOUR IS DERIVED FROM ANY QUEST INSTANT. No legacy branch reads timestampLastChapter or any questTimes entry to decide anything: the quest-time map's six sites are the branch write at command.py:802, the fast_forward write at command.py:942-944, and four save-migration lines at version.py:39-43. So there is no chapter duration, no remaining chapter time, no cooldown, and no readiness rule to reproduce, and this projection computes none of them (design D9)",
+			"refusal": "no_elapsed"
+		}
+	],
+	"refused_destruction": {
+		"command": "end_quest",
+		"implemented": false,
+		"legacy_behaviour": "destroys placed rows via map_lose_item (command.py:796) using the CLIENT-COMPUTED count max(0, unit[2] - unit[3]) (command.py:792)",
+		"modern_behaviour": "destroys nothing: the derived blob carries an EMPTY LIST of units, so the destruction loop iterates zero times, map_lose_item is never reached, and every placed row is left byte-identical over the COMPLETE items mapping",
+		"reason": "THE DESTRUCTION COUNT IS REFUSED, AND THE DIFFERENCE FROM THE LEGACY SERVER IS A DIVERGENCE, NOT PARITY. Reproducing a client-dictated destruction is exactly the anti-pattern AGENTS.md names as Bad, so this line derives the end_quest blob server-side with an EMPTY unit list and proves the refusal over the whole placed-row set. This is the single place in this repository where the modern service deliberately does NOT reproduce legacy behaviour, and it is recorded here rather than left for a reader to infer (design D2)",
+		"refusal": "destruction_count",
+		"status": "DIVERGENCE, NOT PARITY"
+	},
+	"schema": "quests-report-v1",
+	"wrap": {
+		"bound": 99,
+		"note": "A WRAP, NOT A REJECTION. The branch's only guard is `if next_mission > 99: next_mission = 1` (command.py:432-436), and the source's own comment admits uncertainty past chapter 99",
+		"rejection": false,
+		"target": 1
+	},
+	"writer_count": 7,
+	"writers": [
+		{
+			"client_writable": false,
+			"fields_written": [
+				"goals"
+			],
+			"kind": "dispatcher-branch",
+			"source": "command.py:68-74 delegating to engine.py:96-100",
+			"writer": "command:set_goals"
+		},
+		{
+			"client_writable": false,
+			"fields_written": [],
+			"kind": "dispatcher-branch",
+			"note": "this branch WRITES NOTHING AT ALL - recorded so the writer inventory is complete rather than flattering",
+			"source": "command.py:76-79",
+			"writer": "command:complete_goal"
+		},
+		{
+			"client_writable": false,
+			"fields_written": [
+				"currentQuestVars",
+				"idCurrentMission"
+			],
+			"kind": "dispatcher-branch",
+			"source": "command.py:87-117",
+			"writer": "command:set_quest_var"
+		},
+		{
+			"client_writable": false,
+			"fields_written": [
+				"idCurrentMission",
+				"timestampLastChapter",
+				"currentQuestVars"
+			],
+			"kind": "dispatcher-branch",
+			"source": "command.py:430-442",
+			"writer": "command:collect_mission"
+		},
+		{
+			"client_writable": false,
+			"fields_written": [
+				"questsRank"
+			],
+			"kind": "dispatcher-branch",
+			"source": "command.py:745-750",
+			"writer": "command:admin_set_quest_rank"
+		},
+		{
+			"client_writable": false,
+			"fields_written": [
+				"questTimes"
+			],
+			"kind": "dispatcher-branch",
+			"source": "command.py:752-806 (write at 802)",
+			"writer": "command:end_quest"
+		},
+		{
+			"client_writable": true,
+			"fields_written": [
+				"questTimes",
+				"timestampLastChapter"
+			],
+			"kind": "engine-side decrement inside a dispatcher branch",
+			"source": "command.py:942-944 (questTimes) and command.py:911 (timestampLastChapter)",
+			"writer": "command:fast_forward"
+		}
+	]
+}

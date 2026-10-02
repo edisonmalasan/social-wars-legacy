@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-10-02T18:35:57+00:00",
+  "form": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "data": "faff4c5dc90d24a55a2fc933e869b10bac0f123e70d516d7d14a85e8971e45db;{\"accessToken\":\"\",\"commands\":[[0,\"set_goals\",[2,\"[0,0]\"],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1790966157}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "command.php form (USERID, user_key, language, data) with the derived <64-hex>;<json> envelope carrying exactly one command: set_goals addressed by goal index 2. That addressing is the ONE value a client may name; every other value is the module's DERIVED constant \u2014 the progress pair, the quest-variable marker, the rank difficulty, and (for end_quest) the whole server-side blob \u2014 and the resources_changed is the NEUTRAL vector because a quest price would be a CLIENT-SENT delta (do_command applies it before the branch) and no committed quest field records one: `reward` has ZERO legacy consumers and is UNIFORMLY 10 on all 91 entries. The branch's recorded effect is ESTABLISHED; the request's exact shape is DERIVED and never observed from the Flash client. For end_quest the derived blob carries `units: []`, which IS the refusal of the client-computed destruction count (design D2): the destruction loop iterates zero times and no placed row moves. user_key is redacted in this record; accessToken is the crafted empty placeholder, never a token value.",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}

@@ -13,7 +13,8 @@ extends Node
 ## `push_queue_unit_town()` / `pop_queue_unit_town()` for one production-queue
 ## intent each, `complete_collection_town()` for one collection-completion
 ## intent, `resurrect_hero_town()` for one dead-hero revival intent, and
-## `advance_research_town()` for one research-track intent, receiving typed results
+## `advance_research_town()` for one research-track intent, and
+## `advance_quest_town()` for one quest intent, receiving typed results
 ## (`scripts/gameapi/boot_data.gd`); raw transport dictionaries never reach
 ## presentation code, and no other script references a transport.
 ##
@@ -51,6 +52,7 @@ extends Node
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
 const ResearchFlow = preload("res://scripts/units/research_flow.gd")
+const QuestFlow = preload("res://scripts/units/quest_flow.gd")
 const FakeApi = preload("res://scripts/gameapi/fake_api.gd")
 const LegacyV0Api = preload("res://scripts/gameapi/legacy_v0_api.gd")
 
@@ -154,6 +156,11 @@ var behavior_requests := 0
 ## snapshots this counter exactly like `placement_requests`). Monotonic for the
 ## same reason: `configure()` swaps the implementation without hiding history.
 var research_requests := 0
+## Number of quest intents this process has issued (quest flow contract: exactly
+## one per confirm, zero for every local refusal — the quest suite snapshots this
+## counter exactly like `placement_requests`). Monotonic for the same reason:
+## `configure()` swaps the implementation without hiding history.
+var quest_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -506,6 +513,44 @@ func advance_research_town(user_id: String, action: String,
 	research_requests += 1
 	var result: ResearchFlow.ResearchResult = await _impl.advance_research_town(
 		user_id, action, track)
+	return result
+
+
+## One quest intent (the save identity, a **closed action**, and the branch's own
+## **addressing** - and NOTHING else) from the selected implementation. The
+## contract carries NO progress pair, NO quest-variable value, NO difficulty, NO
+## win/loss outcome, and NO unit list: the service derives every value it writes,
+## derives the whole `end_quest` blob, and executes the unchanged legacy branch
+## with a NEUTRAL vector (quest design D2/D6) - so a client-supplied `progress`,
+## `value`, `difficulty`, `win`, `units`, `lost`, `reward`, `price`, or
+## `resources_changed` key is ignored exactly as a client-supplied amount or price
+## is ignored elsewhere, and the typed result's `derived`, `quest_state`,
+## `quests`, and `resources` are authoritative.
+##
+## The response's second post-execution proof half requires **every** stored
+## resource to be **unchanged**, because a quest action moves none.
+##
+## **No completion, no elapsed time, and no reward** are reported (design D1/D6):
+## `complete_goal` writes nothing at all, no legacy branch reads a quest instant,
+## and the committed `reward` field has zero consumers and is uniformly 10 - so
+## `reward_paid` is the derived `0`, `reward_derived_from_content` is `false`,
+## `fast_forward_offered` is `false` (the seventh writer of quest state is recorded
+## and delivered not at all, design D9), and `unlocked_quest_index_written` is
+## `false` (that field has zero legacy consumers, design D7).
+##
+## **The `end_quest` destruction count is REFUSED** and reported as a
+## **DIVERGENCE**, not as parity (design D2): the derived blob carries an empty
+## unit list, no placed row is destroyed, and `destruction` states both the refusal
+## and the byte-identical whole-row-set proof. The legacy server DOES destroy
+## rows on that command.
+##
+## The client applies `quest_state` and `resources` **verbatim**, so a wrong
+## client-side expectation can never be silently compounded.
+func advance_quest_town(user_id: String, action: String,
+		addressing: Variant) -> QuestFlow.QuestResult:
+	quest_requests += 1
+	var result: QuestFlow.QuestResult = await _impl.advance_quest_town(
+		user_id, action, addressing)
 	return result
 
 

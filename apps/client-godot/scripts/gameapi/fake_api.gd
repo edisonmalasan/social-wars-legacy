@@ -109,6 +109,7 @@ const Paths = preload("res://scripts/package_paths.gd")
 const UnitBehaviors = preload("res://scripts/units/unit_behaviors.gd")
 const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
 const ResearchFlow = preload("res://scripts/units/research_flow.gd")
+const QuestFlow = preload("res://scripts/units/quest_flow.gd")
 
 const SAVE_LIST_FIXTURE := \
 	"tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json"
@@ -293,6 +294,25 @@ const COLLECTION_EXPECTED_PRIZE := {"1085": 1}
 ## the shared branch record instead of replaying the recording (design D1/D8).
 const RESEARCH_BEFORE_FIXTURE := \
 	"tests/fixtures/godot-research/steps/command_next_research_step_track_0/before.json"
+
+## The ONLY fixture the quest double reads, for the same reason: the recorded set
+## is six steps of ONE transaction and every step after the first starts from the
+## previous step's after-state - so the double derives each step's effect from the
+## shared branch record instead of replaying the recording (quest design D1/D2).
+const QUEST_BEFORE_FIXTURE := \
+	"tests/fixtures/godot-quests/steps/command_set_goals/before.json"
+## The recorded after-state of that same first step, read for the two wall-clock
+## stamps the double must reproduce deterministically: the step branch never
+## stamps a clock here, so the double reuses the instant the capture recorded.
+const QUEST_AFTER_FIXTURE := \
+	"tests/fixtures/godot-quests/steps/command_set_goals/after.json"
+## The recorded after-state of the chapter step, whose stamped instant the double
+## reuses for the same reason.
+const QUEST_CHAPTER_FIXTURE := \
+	"tests/fixtures/godot-quests/steps/command_collect_mission/after.json"
+## The recorded after-state of the end-quest step, for the same reason.
+const QUEST_TIME_FIXTURE := \
+	"tests/fixtures/godot-quests/steps/command_end_quest/after.json"
 
 ## Anchor grid extent the v0 endpoint validates against (anchors 0..99;
 ## footprints may extend past the edge — design D5). Must match
@@ -580,6 +600,16 @@ var _research_error := ""
 ## capture before any expectation is built. It is the only authority for the value
 ## the step branch stamps: the double never reads a clock (design D8).
 var _research_stamp := 0
+
+# The quest double's mutable process state: the seven committed quest fields, the
+# seven balances it reports unchanged, and the two recorded wall-clock stamps.
+# Never written anywhere.
+var _quest_state: Dictionary = {}
+var _quest_pid := ""
+var _quest_loaded := false
+var _quest_error := ""
+var _quest_chapter_stamp := 0
+var _quest_time_stamp := 0
 ## The start instant the committed executed push stamped, read out of that
 ## capture before any expectation is built. It is the only authority for the
 ## value the branch stamps: the double never reads a clock (design D8).
@@ -5155,6 +5185,473 @@ func _research_recorded_stamp() -> int:
 	if not (entries is Array) or (entries as Array).is_empty():
 		return 0
 	var number: Variant = BootData._parse_int((entries as Array)[0])
+	if number == null or int(number) <= 0:
+		return 0
+	return int(number)
+
+# --- quest double (godot-quests design D1/D2) ------------------------------
+
+
+## One quest intent under the **same** contract the live implementation sends: the
+## save identity, a CLOSED action, and the branch's own addressing under one fixed
+## key — nothing else. No progress pair, no value, no difficulty, no outcome, and
+## no unit list is accepted or expressible.
+##
+## The double is deterministic and in-memory: it reads the recorded fixture's
+## FIRST before-state (the committed fresh-player corpus, whose quest state is at
+## its initial value throughout) and derives each branch's effect from
+## `QuestFlow.BRANCHES` — the same record the service applies — stamping the two
+## wall-clock fields with the **recorded** instants the capture left behind rather
+## than reading a clock, so every offline run is byte-identical. The recording is
+## six steps of ONE transaction and every step after the first starts from the
+## previous step's after-state, so the double derives each step rather than
+## replaying the file; the executed parity against legacy is owned exclusively by
+## the compat fixture-replay tests and this double is never a parity oracle.
+##
+## **No stored resource moves** (design D6): the derived vector is neutral, so the
+## seven balances are the same values the intent started from. The double also
+## moves **nothing else** — no placement, no storage, no dead-hero ledger, because
+## the `end_quest` destruction count is REFUSED and the derived blob's unit list is
+## empty (design D2).
+##
+## The refusals mirror the endpoint's own, in the endpoint's order: the
+## save-identity codes first, then ``invalid_action`` for anything outside the
+## closed six-action set, then the per-action addressing code, and
+## ``unresolvable_quest_state`` for a state the projection cannot read.
+func advance_quest_town(user_id: String, action: String,
+		addressing: Variant) -> QuestFlow.QuestResult:
+	if user_id.strip_edges() == "":
+		return QuestFlow.result_failure("missing_user_id",
+			"user_id must be a non-empty string")
+	if not _ensure_quest_loaded():
+		return QuestFlow.result_failure("fixture_unreadable", _quest_error)
+	if user_id != _quest_pid:
+		return QuestFlow.result_failure("unknown_user_id",
+			"no save exists for user_id '%s'" % user_id)
+	if not QuestFlow.is_action(action):
+		return QuestFlow.result_failure("invalid_action",
+			"action must be one of %s" % ", ".join(
+				PackedStringArray(QuestFlow.ACTIONS)))
+	var reason := QuestFlow.addressing_reason(action, addressing)
+	if reason != "":
+		return QuestFlow.result_failure(reason,
+			"the %s is not addressable: got %s" % [
+				str((QuestFlow.ACTION_ADDRESSING as Dictionary)[str(action)]),
+				addressing])
+	if str(action) == QuestFlow.ACTION_SET_QUEST_VAR \
+			and str(addressing) == QuestFlow.QUEST_VAR_IGNORED_KEY:
+		return QuestFlow.result_failure("ignored_quest_var_key",
+			("the legacy set_quest_var branch explicitly IGNORES %s "
+				% QuestFlow.QUEST_VAR_IGNORED_KEY)
+			+ "(command.py:91-95), so it is refused rather than persisted")
+	var before := _quest_fields()
+	var effect := _quest_effect(before, str(action), addressing)
+	if not bool(effect.get("ok", false)):
+		return QuestFlow.result_failure(
+			str(effect.get("code", "internal_error")), str(effect.get("error", "")))
+	_quest_state["fields"] = (effect["fields"] as Dictionary).duplicate(true)
+	var after := _quest_fields()
+	# The same envelope shape the service returns; the shared parser yields the
+	# typed result (identical shapes by construction, design D2).
+	return QuestFlow.parse_result({
+		"protocol": BootData.PROTOCOL,
+		"ok": true,
+		"game_version": str(_save_list_doc.get("game_version", "")),
+		# Time-dependent field: the fake reports the fixture capture's legacy
+		# server timestamp instead of "now" (never the wall clock).
+		"server_time": _fixture_server_time(),
+		"result": "success",
+		"action": str(action),
+		"addressing": addressing,
+		"addressing_kind": str((QuestFlow.ACTION_ADDRESSING as Dictionary)[
+			str(action)]),
+		"command": str(effect["command"]),
+		"derived": {
+			"written": (effect["written"] as Array).duplicate(),
+			"untouched": (effect["untouched"] as Array).duplicate(),
+			"mutates": bool(effect["mutates"]),
+			"stamps_instant": bool(effect["stamps_instant"]),
+			"stamps_chapter": bool(effect["stamps_chapter"]),
+			"progress_pair": (QuestFlow.DERIVED_PROGRESS as Array).duplicate(),
+			"quest_var_value": QuestFlow.DERIVED_QUEST_VALUE,
+			"difficulty": QuestFlow.DERIVED_DIFFICULTY,
+			"wrapped_mission": (effect["wrapped_mission"] as Variant),
+		},
+		"previous": _quest_block(before),
+		"quests": _quest_block(after),
+		"quest_state": after.duplicate(true),
+		"branches": (QuestFlow.BRANCHES as Array).duplicate(true),
+		"branch_count": QuestFlow.BRANCH_COUNT,
+		"writers": (QuestFlow.WRITERS as Array).duplicate(true),
+		"writer_count": QuestFlow.WRITER_COUNT,
+		"fast_forward_offered": false,
+		"reward_paid": QuestFlow.REWARD_PAID,
+		"reward_derived_from_content": false,
+		"unlocked_quest_index": after[QuestFlow.KEY_UNLOCKED_INDEX],
+		"unlocked_quest_index_written": false,
+		"destruction": {
+			"status": "REFUSED",
+			"legacy_status": "DIVERGENCE, NOT PARITY",
+			"client_supplied_units_ignored": true,
+			"derived_units": 0,
+			"placed_rows_before": QuestFlow.CORPUS_PLACEMENTS,
+			"placed_rows_after": QuestFlow.CORPUS_PLACEMENTS,
+			"placed_rows_byte_identical": true,
+			"ledger_door": QuestFlow.LEDGER_DOOR.duplicate(true),
+			"note": str((QuestFlow.REFUSED_DESTRUCTION as Dictionary)["reason"]),
+		},
+		# The blob belongs to the end_quest branch alone; the service sends None
+		# for every other action and the typed parser refuses a blob on one.
+		"end_quest_blob": _quest_blob(str(action), addressing)
+			if str(action) == QuestFlow.ACTION_END_QUEST else null,
+		"ignored_client_keys": (QuestFlow.INTENT_IGNORED_KEYS as Array).duplicate(),
+		"persisted_client_values": [],
+		"refusals": _quest_refusal_records(),
+		"refused_destruction": QuestFlow.REFUSED_DESTRUCTION.duplicate(true),
+		"migration": QuestFlow.MIGRATION.duplicate(true),
+		"content_note": QuestFlow.CONTENT_RECORD_NOTE,
+		"resources": _quest_resources(),
+	})
+
+
+## The recorded legacy effect of one quest branch — DERIVED from
+## `QuestFlow.BRANCHES` and the double's own before-state, never read from a
+## response. Returns ``{ok, error, code, command, fields, written, untouched,
+## mutates, stamps_instant, stamps_chapter, wrapped_mission}``.
+##
+## The two wall-clock fields take a **recorded** instant the double reads out of
+## the committed capture rather than a clock, so every offline run is
+## byte-identical. The derived record also names every field the branch does
+## **NOT** write, so nothing else in the state can be touched by construction, and
+## the two TYPE facts are reproduced exactly: the mission identifier is written as
+## a **string** (design D8) and the quest-variable map is self-healed from the
+## corpus's recorded null.
+func _quest_effect(before: Dictionary, action: String,
+		addressing: Variant) -> Dictionary:
+	var index := QuestFlow._action_index(action)
+	if index < 0:
+		return {
+			"ok": false,
+			"code": "internal_error",
+			"error": "the quest double cannot apply a branch record for action "
+				+ "'%s': it is outside the closed six-action set" % action,
+		}
+	var record: Dictionary = (QuestFlow.BRANCHES as Array)[index]
+	var fields := (before as Dictionary).duplicate(true)
+	var written: Array = []
+	var stamps_instant := false
+	var stamps_chapter := false
+	var mutates := true
+	var wrapped: Variant = null
+	match str(record["command"]):
+		QuestFlow.SET_GOALS_COMMAND:
+			var goal_index := int(addressing)
+			while goal_index >= (fields[QuestFlow.KEY_GOALS] as Array).size():
+				(fields[QuestFlow.KEY_GOALS] as Array).append(null)
+			(fields[QuestFlow.KEY_GOALS] as Array)[goal_index] = \
+				(QuestFlow.DERIVED_PROGRESS as Array).duplicate()
+			written = [QuestFlow.KEY_GOALS]
+		QuestFlow.COMPLETE_GOAL_COMMAND:
+			# NOTHING AT ALL: the branch resolves the title, prints it, returns.
+			mutates = false
+		QuestFlow.SET_QUEST_VAR_COMMAND:
+			var name := str(addressing)
+			if fields[QuestFlow.KEY_QUEST_VARS] == null:
+				fields[QuestFlow.KEY_QUEST_VARS] = {}
+			var variables: Dictionary = fields[QuestFlow.KEY_QUEST_VARS]
+			variables[name] = QuestFlow.DERIVED_QUEST_VALUE
+			written = [QuestFlow.KEY_QUEST_VARS]
+			if name == QuestFlow.QUEST_VAR_ALIAS_KEY:
+				fields[QuestFlow.KEY_MISSION] = QuestFlow.DERIVED_QUEST_VALUE
+				written = [QuestFlow.KEY_QUEST_VARS, QuestFlow.KEY_MISSION]
+		QuestFlow.COLLECT_MISSION_COMMAND:
+			wrapped = QuestFlow.wrap_mission(addressing)
+			fields[QuestFlow.KEY_MISSION] = str(wrapped)
+			fields[QuestFlow.KEY_LAST_CHAPTER] = _quest_chapter_stamp
+			stamps_chapter = true
+			fields[QuestFlow.KEY_QUEST_VARS] = {}
+			written = [QuestFlow.KEY_MISSION, QuestFlow.KEY_LAST_CHAPTER,
+				QuestFlow.KEY_QUEST_VARS]
+		QuestFlow.ADMIN_SET_QUEST_RANK_COMMAND:
+			var ranks: Dictionary = fields[QuestFlow.KEY_RANKS]
+			ranks[str(addressing)] = QuestFlow.DERIVED_DIFFICULTY
+			written = [QuestFlow.KEY_RANKS]
+		QuestFlow.END_QUEST_COMMAND:
+			var times: Dictionary = fields[QuestFlow.KEY_QUEST_TIMES]
+			times[str(addressing)] = _quest_time_stamp
+			written = [QuestFlow.KEY_QUEST_TIMES]
+			stamps_instant = true
+		_:
+			return {
+				"ok": false,
+				"code": "internal_error",
+				"error": "the quest double cannot apply the branch record for "
+					+ "'%s': a seventh branch reached it and this contract "
+					% str(record["command"]) + "refuses to guess",
+			}
+	var expected: Array = (record["writes"] as Array).map(
+		func(entry: Variant) -> String: return str(entry))
+	# Every field the double ACTUALLY wrote must be named in the record's own
+	# `writes`, so a changed effect fails closed here instead of making the double
+	# write something the service would not.  The converse is deliberately not
+	# asserted: two of the six branches name a field they write only
+	# CONDITIONALLY (`idCurrentMission` for the `id` alias) or only in LEGACY
+	# (the refused `map_lose_item` reach), so a record may name more than one
+	# execution writes.
+	for key: String in written as Array:
+		var named := false
+		for entry: String in expected:
+			if _quest_field_for(entry) == key:
+				named = true
+				break
+		if not named:
+			return {
+				"ok": false,
+				"code": "internal_error",
+				"error": "the quest double wrote %s, which the branch record for "
+					% key + "'%s' does not name" % str(record["command"]),
+			}
+	var untouched: Array = []
+	for key: String in QuestFlow.QUEST_FIELDS:
+		if not (written as Array).has(key):
+			untouched.append(key)
+	return {
+		"ok": true,
+		"error": "",
+		"code": "",
+		"command": str(record["command"]),
+		"fields": fields,
+		"written": written,
+		"untouched": untouched,
+		"mutates": mutates,
+		"stamps_instant": stamps_instant,
+		"stamps_chapter": stamps_chapter,
+		"wrapped_mission": wrapped,
+	}
+
+
+## One branch record's `writes` entry as the committed FIELD name it refers to,
+## so the double can cross-check its derivation without duplicating the table.
+func _quest_field_for(entry: String) -> String:
+	if entry.begins_with("privateState[goals]"):
+		return QuestFlow.KEY_GOALS
+	if entry.begins_with("privateState[questsRank]"):
+		return QuestFlow.KEY_RANKS
+	if entry.begins_with("map[currentQuestVars]"):
+		return QuestFlow.KEY_QUEST_VARS
+	if entry.begins_with("map[questTimes]"):
+		return QuestFlow.KEY_QUEST_TIMES
+	if entry.begins_with("map[idCurrentMission]"):
+		return QuestFlow.KEY_MISSION
+	if entry.begins_with("map[timestampLastChapter]"):
+		return QuestFlow.KEY_LAST_CHAPTER
+	if entry.begins_with("privateState[unlockedQuestIndex]"):
+		return QuestFlow.KEY_UNLOCKED_INDEX
+	return entry
+
+
+## The server-derived `end_quest` blob, or an empty record for every other action —
+## matching the endpoint, which reports ``None`` there.
+func _quest_blob(action: String, addressing: Variant) -> Dictionary:
+	if action != QuestFlow.ACTION_END_QUEST:
+		return {}
+	return {
+		"difficulty": QuestFlow.DERIVED_DIFFICULTY,
+		"duration": QuestFlow.DERIVED_DURATION,
+		"map": QuestFlow.DERIVED_MAP,
+		"quest_id": int(addressing),
+		# The refusal, in the exact shape the endpoint sends it: an EMPTY list,
+		# so the legacy destruction loop iterates zero times (design D2).
+		"units": [],
+		"voluntary_end": QuestFlow.DERIVED_VOLUNTARY_END,
+		"win": QuestFlow.DERIVED_WIN,
+	}
+
+
+## The refusal records, in the endpoint's own shape.
+func _quest_refusal_records() -> Array:
+	var out: Array = []
+	for record: Variant in QuestFlow.REFUSALS:
+		out.append({
+			"refusal": str((record as Dictionary)["refusal"]),
+			"implemented": bool((record as Dictionary)["implemented"]),
+		})
+	return out
+
+
+## The double's own quest fields, as a fresh copy so a caller cannot mutate them.
+func _quest_fields() -> Dictionary:
+	return (_quest_state["fields"] as Dictionary).duplicate(true)
+
+
+## The service's `quests` projection for one state: all seven fields verbatim, the
+## recorded null flagged, and an **empty** ``derived`` block, which is the
+## machine-readable form of "nothing is computed from these fields".
+func _quest_block(fields: Dictionary) -> Dictionary:
+	var block := fields.duplicate(true)
+	block["resolvable"] = true
+	block["reason"] = ""
+	block["error"] = ""
+	block["goals_null_entries"] = 0
+	for entry: Variant in (fields[QuestFlow.KEY_GOALS] as Array):
+		if entry == null:
+			block["goals_null_entries"] = int(block["goals_null_entries"]) + 1
+	block["quest_vars_is_null"] = fields[QuestFlow.KEY_QUEST_VARS] == null
+	block["mission_is_string"] = fields[QuestFlow.KEY_MISSION] is String
+	block["verbatim"] = true
+	block["derived"] = {}
+	block["quest_field_names"] = (QuestFlow.QUEST_FIELDS as Array).duplicate()
+	block["reward_paid"] = QuestFlow.REWARD_PAID
+	block["completion_state"] = null
+	block["unlocked_quest_index_written"] = false
+	return block
+
+
+## The seven stored resource values of the in-memory quest state, reported
+## verbatim as the response's authoritative ``resources``. A quest action moves
+## none of them, so these are the values the intent started from — the strongest
+## form of the "nothing moved" proof the endpoint requires (design D6).
+func _quest_resources() -> Dictionary:
+	var resources := {}
+	for key: String in RESOURCE_KEYS:
+		resources[key] = int(_quest_state[key])
+	return resources
+
+
+## Loads the quest fixture's first before-state into mutable process state
+## (once), validating the seven committed quest fields and the seven balances.
+## Structural failures are named with the offending field; every other double's
+## error state is untouched (independent sinks).
+func _ensure_quest_loaded() -> bool:
+	if _quest_loaded:
+		return _quest_error == ""
+	_quest_loaded = true
+	# The boot fixtures must be loaded first: the double's response reports the
+	# captured `game_version` and `server_time` from them, so without this the
+	# double would answer with an empty version and a ZERO server time whenever
+	# it is reached before any boot read.  Done independently of the other
+	# doubles, so this double's failure cannot hide behind another's.
+	if not _ensure_loaded():
+		_quest_error = _load_error
+		return false
+	var sink := {"error": ""}
+	var before := _read_json_into(QUEST_BEFORE_FIXTURE, sink)
+	if str(sink["error"]) != "":
+		_quest_error = str(sink["error"])
+		return false
+	var maps: Variant = before.get("maps")
+	if not (maps is Array) or (maps as Array).is_empty():
+		_quest_error = "the quest fixture before state carries no maps array"
+		return false
+	var first_map: Variant = (maps as Array)[0]
+	if not (first_map is Dictionary):
+		_quest_error = "the quest fixture before state's first map is not an object"
+		return false
+	var rows: Variant = (first_map as Dictionary).get("items")
+	if not (rows is Dictionary) or (rows as Dictionary).is_empty():
+		_quest_error = "the quest fixture before state carries no placement map"
+		return false
+	var info: Variant = before.get("playerInfo")
+	var priv: Variant = before.get("privateState")
+	if not (info is Dictionary) or not (priv is Dictionary):
+		_quest_error = "the quest fixture before state lacks playerInfo/privateState"
+		return false
+	var pid: Variant = (info as Dictionary).get("pid")
+	var cash: Variant = (info as Dictionary).get("cash")
+	var mana: Variant = (priv as Dictionary).get("mana")
+	if not (pid is String) or cash == null or mana == null \
+			or int(cash) < 0 or int(mana) < 0:
+		_quest_error = "the quest fixture before state lacks save fields"
+		return false
+	var resources := {}
+	for name: String in ["xp", "gold", "wood", "oil", "steel"]:
+		var value: Variant = (first_map as Dictionary).get(name)
+		if value == null or int(value) < 0:
+			_quest_error = "the quest fixture before state lacks map %s" % name
+			return false
+		resources[name] = int(value)
+	resources["cash"] = int(cash)
+	resources["mana"] = int(mana)
+	var fields := {
+		QuestFlow.KEY_GOALS: ((priv as Dictionary).get(QuestFlow.KEY_GOALS)
+			as Array).duplicate(true),
+		QuestFlow.KEY_RANKS: ((priv as Dictionary).get(QuestFlow.KEY_RANKS)
+			as Dictionary).duplicate(true),
+		QuestFlow.KEY_QUEST_VARS: _quest_copied_var(first_map),
+		QuestFlow.KEY_QUEST_TIMES: ((first_map as Dictionary).get(
+			QuestFlow.KEY_QUEST_TIMES) as Dictionary).duplicate(true),
+		QuestFlow.KEY_MISSION: (first_map as Dictionary).get(QuestFlow.KEY_MISSION),
+		QuestFlow.KEY_LAST_CHAPTER: int((first_map as Dictionary).get(
+			QuestFlow.KEY_LAST_CHAPTER)),
+		QuestFlow.KEY_UNLOCKED_INDEX: int((priv as Dictionary).get(
+			QuestFlow.KEY_UNLOCKED_INDEX)),
+	}
+	# The committed corpus holds every quest field at its initial value, and the
+	# double validates that rather than trusting this sentence: a capture that is
+	# not the recorded transaction fails closed here.
+	if (fields[QuestFlow.KEY_GOALS] as Array).size() \
+			!= QuestFlow.CORPUS_GOALS_LENGTH:
+		_quest_error = "the quest fixture before state's goals list holds %d " \
+			% (fields[QuestFlow.KEY_GOALS] as Array).size() \
+			+ "entries, not the committed %d" % QuestFlow.CORPUS_GOALS_LENGTH
+		return false
+	for entry: Variant in fields[QuestFlow.KEY_GOALS] as Array:
+		if entry != null:
+			_quest_error = ("the quest fixture before state's goals list holds a "
+				+ "non-null entry: the committed corpus is ALL None")
+			return false
+	if fields[QuestFlow.KEY_QUEST_VARS] != null:
+		_quest_error = ("the quest fixture before state's quest-variable map is "
+			+ "not the committed recorded null")
+		return false
+	if fields[QuestFlow.KEY_MISSION] != QuestFlow.CORPUS_MISSION:
+		_quest_error = ("the quest fixture before state's mission is %s, not the "
+			% fields[QuestFlow.KEY_MISSION] + "committed integer %s" \
+			% QuestFlow.CORPUS_MISSION)
+		return false
+	# The recorded wall-clock stamps the executed capture left behind, read out of
+	# its own steps so the double never reads a clock (design D2/D8).
+	_quest_chapter_stamp = _quest_recorded_stamp(QUEST_CHAPTER_FIXTURE,
+		QuestFlow.KEY_LAST_CHAPTER)
+	_quest_time_stamp = _quest_recorded_stamp(QUEST_TIME_FIXTURE,
+		QuestFlow.KEY_LAST_CHAPTER)
+	if _quest_chapter_stamp <= 0 or _quest_time_stamp <= 0:
+		_quest_error = ("the quest fixture recorded no positive wall-clock stamp "
+			+ "for the chapter or the quest time, so the double could not be "
+			+ "deterministic")
+		return false
+	# The placement map is read and never written: a quest action moves no
+	# placement row, so the double holds no copy of one at all.
+	var state := resources
+	state["fields"] = fields
+	_quest_state = state
+	_quest_pid = str(pid)
+	return true
+
+
+## The quest-variable map as a fresh copy, or `null` preserved as `null` — the
+## committed corpus records this field as a recorded null and two branches
+## self-heal it to a dict, which is a real shape fact rather than a defect.
+func _quest_copied_var(first_map: Dictionary) -> Variant:
+	var value: Variant = first_map.get(QuestFlow.KEY_QUEST_VARS)
+	if value == null:
+		return null
+	return (value as Dictionary).duplicate(true)
+
+
+## The wall-clock instant the committed executed capture recorded for one step,
+## read out of that step's recorded after-state.  `0` means the capture recorded
+## none, which the two stamping branches never do.
+func _quest_recorded_stamp(fixture: String, field: String) -> int:
+	var sink := {"error": ""}
+	var after := _read_json_into(fixture, sink)
+	if str(sink["error"]) != "":
+		return 0
+	var maps: Variant = after.get("maps")
+	if not (maps is Array) or (maps as Array).is_empty():
+		return 0
+	var value: Variant = (maps as Array)[0].get(field)
+	var number: Variant = BootData._parse_int(value)
 	if number == null or int(number) <= 0:
 		return 0
 	return int(number)

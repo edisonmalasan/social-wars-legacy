@@ -396,7 +396,7 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a
@@ -671,6 +671,33 @@ try {
                 "--headless", "--path", $projectRel,
                 "--script", "res://tests/test_research.gd",
                 "--", "--scenario=live-research",
+                "--gameapi-endpoint=$endpoint"
+            )
+        },
+        @{
+            # The quests phase drives ALL SIX quest branches through the real v0
+            # endpoint against the committed corpus's OWN quest state (goals 151
+            # entries all None, ranks {}, questTimes {}, and a recorded NULL
+            # quest-variable map), so the unchanged legacy dispatcher executes
+            # every quest branch with NO fabricated player state.
+            # --expect-save-mutation holds because five of the six branches write:
+            # the progress branch writes the derived pair, the chapter branch
+            # stringifies the mission and clears the map, the rank branch writes
+            # the derived difficulty, and end_quest writes its quest-time entry.
+            # The sixth writes NOTHING AT ALL and its step is asserted to have
+            # moved no field, while the REFUSED destruction count is proved to
+            # have left all 40 placed rows byte-identical.
+            #
+            # No COMPAT_SEED_* seam is needed and none is used: this line's state
+            # is present in the committed corpus as committed, and manufacturing
+            # it would be refused.
+            Name = "quests-live"
+            Assertions = "quests live phase"
+            ExpectSaveMutation = $true
+            Arguments = @(
+                "--headless", "--path", $projectRel,
+                "--script", "res://tests/test_quests.gd",
+                "--", "--scenario=live-quests",
                 "--gameapi-endpoint=$endpoint"
             )
         }
@@ -1005,6 +1032,28 @@ try {
         "research live phase proved both named refusals with the endpoint's own codes and no partial payload"
     Report-Result ($researchOut -match "(?m)^PASS corpus save mutated by the live placement") `
         "research live phase mutated the disposable corpus save"
+
+    # The quests live phase must show a typed success for each of the SIX quest
+    # branches through the real endpoint — including the no-op branch's
+    # whole-state identity, the chapter branch's STRINGIFIED identifier and
+    # cleared map, the wrap of an out-of-range identifier, the derived rank
+    # difficulty, the REFUSED destruction count with every placed row
+    # byte-identical, AND every stored resource unchanged — plus its three named
+    # refusals carrying the endpoint's own codes with no partial payload — and
+    # the harness must have observed the corpus save change.
+    $questsOut = ""
+    if ($phaseLogs.ContainsKey("quests-live")) {
+        $questsOut = $phaseLogs["quests-live"]
+    }
+    Report-Result ($questsOut -match "\[test\] PASS script=res://tests/test_quests\.gd") `
+        "quests live phase asserts its scenario"
+    Report-Result ($questsOut -match '\[test\] live-quests applied progress_pair=\[0, 0\] no_op_wrote=0 quest_var=self_healed mission="5" then wrapped "1" difficulty=1 quest_time_written=true rows_byte_identical=true reward_paid=0 resources_unchanged=true') `
+        "quests live phase drove all six branches through the v0 endpoint, with the refused destruction proved byte-identical over the whole placed-row set and its value-level post-state proof"
+    Report-Result ($questsOut -match "refused=ignored_quest_var_key,invalid_quest_index,invalid_action" `
+            -and $questsOut -match "missing_key_refusals=structurally_unreachable") `
+        "quests live phase proved its three named refusals with the endpoint's own codes and no partial payload, and recorded that the five missing-key refusals are structurally unreachable through the typed client"
+    Report-Result ($questsOut -match "(?m)^PASS corpus save mutated by the live placement") `
+        "quests live phase mutated the disposable corpus save"
 
     # --- 8. guard baseline, post-run ---------------------------------------
 
