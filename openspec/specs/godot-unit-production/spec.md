@@ -153,7 +153,11 @@ committed training time**; **no experience is awarded**; **no acquisition is imp
 claimed**, and the committed acquisition tables are read by no legacy **command branch**, so no
 acquisition is derived from either; **no executed-legacy
 fixture was captured, because no production behaviour exists to capture** rather than because
-the corpus lacked state; death and resurrection are unreachable and unimplemented; and no
+**the server's death and resurrection mechanism is recorded by the
+`godot-unit-behaviors` capability rather than denied here** — this line's claim that death and
+resurrection are unreachable **and unimplemented** stays **true of the delivered client**, which
+sends no death intent and revives nothing, but it left the server behaviour unstated, and the
+server does implement both halves of a resurrectable-unit counter; and no
 windowed capture is claimed.
 
 #### Scenario: Commit the report
@@ -170,3 +174,16 @@ windowed capture is claimed.
 
 - **WHEN** this capability's documentation is read
 - **THEN** it states that neither a windowed capture nor an executed-legacy fixture is claimed, and distinguishes "no mechanism exists" from "the corpus could not exercise it"
+
+#### Scenario: The server's death mechanism is recorded, not denied
+- **WHEN** this requirement's non-claim about death and resurrection is read
+- **THEN** it states that the claim is **scoped to the delivered client**, which sends no death
+  intent and revives nothing, and it **points to `godot-unit-behaviors`** for the server behaviour
+  it previously left unstated — so a reader consulting this capability alone cannot conclude
+  the server has no death model at all, which would be false
+
+#### Scenario: The delivered client's inaccessibility is unchanged
+- **WHEN** the delivered client's capabilities are inspected
+- **THEN** it still exposes no death and no revival operation, so the claim that death and
+  resurrection are unreachable **from the delivered client** is unaffected by the record of the
+  server-side mechanism
