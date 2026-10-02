@@ -33,9 +33,8 @@ The repository SHALL provide a Compatibility API v0 service that serves modern J
   client-supplied cost, duration, count, or readiness key is ignored, and the post-execution
   proof asserts that every stored resource is unchanged while the row's attribute bag
   carries exactly the recorded queue effect
-
 ### Requirement: GameApi abstraction
-The Godot client SHALL depend on a `GameApi` autoload for every server interaction, exposing typed `list_sessions()`, `get_bootstrap()`, `place_building()`, `purchase_item()`, `move_building()`, `sell_building()`, `store_building()`, `upgrade_building()`, `build_construction()`, `collect_income()`, `expand_town()`, and `level_up_town()`, `push_queue_unit_town(map_key)` and `pop_queue_unit_town(map_key)` and `complete_collection_town(collection_id)` operations, with the two queue operations sending **only a map key** and no cost, duration, readiness, count, or outcome, and the collection operation sending **only a collection id** with its grant derived entirely from committed content, with the level-up operation deriving its target level from the player's stored experience and the committed level schedule rather than accepting a client-supplied level outcome projecting every resource through one canonical mapping that names each resource exactly as the legacy server names it — the primary currency as `gold` and never `coins`, and the experience counter grouped with the player's summary — with two interchangeable implementations — and unit **definitions**, which are read from the committed content package through the content registry and are therefore **not** a GameApi operation, as is unit **movement**, whose placement, footprint, and velocity are committed content read through that same registry and whose only legacy command is already delivered by `godot-building-move`, so a unit move needs no server round trip, no compatibility surface, and no client intent: no server round trip, no compatibility surface, and no client-supplied or server-supplied unit content — `LegacyV0Api`, speaking JSON over loopback HTTP to Compatibility API v0, and `FakeApi`, serving committed fixture data and applying the documented in-memory operation semantics with no process, server, or socket — and no boot or presentation code SHALL reference `command.php`, AMF, FlashVars, legacy form encoding, legacy URLs, or legacy command names., as is unit **animation**, whose labels, frame positions, and recorded frame counts are committed asset linkage read from the committed converted package rather than from the registry, and which no legacy branch ever selects, and `resurrect_hero_town()`, whose revived item id and map key the server derives from its own ledger and from the addressed cell, discarding any client-supplied syringe count exactly as a client-sent prize is discarded by `complete_collection_town(collection_id)`
+The Godot client SHALL depend on a `GameApi` autoload for every server interaction, exposing typed `list_sessions()`, `get_bootstrap()`, `place_building()`, `purchase_item()`, `move_building()`, `sell_building()`, `store_building()`, `upgrade_building()`, `build_construction()`, `collect_income()`, `expand_town()`, and `level_up_town()`, `push_queue_unit_town(map_key)` and `pop_queue_unit_town(map_key)` and `complete_collection_town(collection_id)` operations, with the two queue operations sending **only a map key** and no cost, duration, readiness, count, or outcome, and the collection operation sending **only a collection id** with its grant derived entirely from committed content, with the level-up operation deriving its target level from the player's stored experience and the committed level schedule rather than accepting a client-supplied level outcome projecting every resource through one canonical mapping that names each resource exactly as the legacy server names it — the primary currency as `gold` and never `coins`, and the experience counter grouped with the player's summary — with two interchangeable implementations — and unit **definitions**, which are read from the committed content package through the content registry and are therefore **not** a GameApi operation, as is unit **movement**, whose placement, footprint, and velocity are committed content read through that same registry and whose only legacy command is already delivered by `godot-building-move`, so a unit move needs no server round trip, no compatibility surface, and no client intent: no server round trip, no compatibility surface, and no client-supplied or server-supplied unit content — `LegacyV0Api`, speaking JSON over loopback HTTP to Compatibility API v0, and `FakeApi`, serving committed fixture data and applying the documented in-memory operation semantics with no process, server, or socket — and no boot or presentation code SHALL reference `command.php`, AMF, FlashVars, legacy form encoding, legacy URLs, or legacy command names., as is unit **animation**, whose labels, frame positions, and recorded frame counts are committed asset linkage read from the committed converted package rather than from the registry, and which no legacy branch ever selects, and `resurrect_hero_town()`, whose revived item id and map key the server derives from its own ledger and from the addressed cell, discarding any client-supplied syringe count exactly as a client-sent prize is discarded by `complete_collection_town(collection_id)`, and the four research operations, whose step counter, item counter, and research instant the server derives itself and which discard any client-supplied counter, timestamp, or cash value, exactly as a client-sent prize is discarded by `complete_collection_town(collection_id)`
 
 #### Scenario: Boot offline with the fake implementation
 - **WHEN** headless tests run with the fake implementation selected
@@ -120,6 +119,11 @@ The Godot client SHALL depend on a `GameApi` autoload for every server interacti
   key, and the resulting ledger state from its own state, and no client-supplied outcome, price,
   or quantity is trusted
 
+#### Scenario: The research intent derives every counter it moves
+- **WHEN** the client advances or resets a research track
+- **THEN** it sends only a player identifier and a track, the service derives every counter value and
+  research instant from its own state, and no client-supplied counter, timestamp, or cash value is
+  trusted or charged
 ### Requirement: Boot scene
 The project SHALL provide a boot scene as the main scene that initializes the session, requests bootstrap, and displays engine version, connection state, and a player summary derived from the response; an unreachable endpoint or a structured API error SHALL surface as an explicit error state naming the failure, never as a blank screen or a partial success.
 
@@ -134,7 +138,6 @@ The project SHALL provide a boot scene as the main scene that initializes the se
 #### Scenario: Fail visibly on API error
 - **WHEN** the service returns a structured error
 - **THEN** the boot scene displays that error rather than an empty or guessed summary
-
 ### Requirement: Windowed boot-to-town transition
 After the boot scene reaches its ready state with successfully validated typed bootstrap data, a windowed run SHALL hand that already-validated state to the town scene and replace the boot view with the town view — without issuing a second bootstrap request (the legacy bootstrap mutates `last_logged_in`, so exactly one request per launch is part of the contract) and without the raw transport payload reaching presentation code; a handoff that cannot build a valid town state SHALL surface an explicit error naming the failure in place of the view, never a blank window and never a partially rendered town; and a headless run SHALL never enter the town scene, keeping the existing headless marker, summary, error-state, and exit-code contract byte-for-byte unchanged.
 
@@ -149,7 +152,6 @@ After the boot scene reaches its ready state with successfully validated typed b
 #### Scenario: Fail explicitly instead of a blank window
 - **WHEN** the handed state cannot build a valid town state at transition time
 - **THEN** an explicit error naming the failure replaces the view, and no partial town is shown
-
 ### Requirement: Legacy parity fixtures
 Before the Compatibility API behavior is implemented, the repository SHALL capture golden fixtures by executing the real legacy endpoints — request, before-state, response, and after-state — inside a disposable copy under the pinned interpreter, commit them under a documented path together with a field-stability record, and the Compatibility API tests SHALL reproduce those responses with no server running for all stable fields, with every time-dependent field documented and normalized.
 
@@ -160,7 +162,6 @@ Before the Compatibility API behavior is implemented, the repository SHALL captu
 #### Scenario: Replay parity offline
 - **WHEN** the Compatibility API parity tests run with no network
 - **THEN** its session and bootstrap outputs equal the captured legacy responses field-by-field except the documented time-dependent fields, which match their documented normalization
-
 ### Requirement: Containment and preservation
 All execution SHALL stay on loopback with no Flash, Ruffle, ActionScript, browser, or external network; Python SHALL run under the pinned CPython 3.9.13 with the existing locked dependencies and no new packages; legacy sources, configs, saves, conversion packages, preservation manifests, and the committed M4 first-render evidence SHALL remain byte-identical across the change (SHA-256 guards), and the M4 verification SHALL remain green in the final state.
 
@@ -171,7 +172,6 @@ All execution SHALL stay on loopback with no Flash, Ruffle, ActionScript, browse
 #### Scenario: Keep M4 green
 - **WHEN** the first-render verification command runs in the final state
 - **THEN** it exits 0 and the committed `first-render.png` and `report.json` remain byte-identical to their recorded digests
-
 ### Requirement: Documented commands and assessment record
 `AGENTS.md` and the application READMEs SHALL document the exact commands actually executed (fixture capture, Compatibility API tests, boot verification, first-render verification), the loopback port, the evidence paths, and the limits of the v0 claim — read-only bootstrap parity for the fresh-save corpus, not gameplay parity, not authentication security, not progressed-player coverage — and the roadmap Project Status ledger SHALL record the M5 progress this change delivers.
 
