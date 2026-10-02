@@ -632,6 +632,115 @@ class IntentOnlyInputTests(unittest.TestCase):
         self.assertEqual(resources_now(), baseline["resources"])
         del first
 
+    #: Response keys that legitimately differ between two otherwise identical
+    #: requests.  Named rather than skipped, and asserted to be the *only*
+    #: such keys, so a new volatile key cannot silently join them.
+    VOLATILE_KEYS = ("server_time",)
+
+    #: Field names a client might plausibly send instead of a step, each paired
+    #: with a value chosen to be **maximally influential** for that name, so
+    #: honouring any of them is observable in the response and the save.
+    #:
+    #: This list is deliberately far wider than the endpoint's own vocabulary:
+    #: the recorded field's own name, the two no-op and verdict names the
+    #: response itself uses, the legacy dispatcher's command name, the save-level
+    #: record, every client-ladder spelling the other delivered endpoints read,
+    #: and two named resource slots.  A **narrow** three-key test is what the
+    #: first draft used, and it was measured to be insufficient: an injection
+    #: that made the route honour a client-sent ``completed_tutorial`` produced
+    #: exactly **one** failure across the whole 1912-test suite - only
+    #: ``test_a_client_supplied_stored_flag_is_ignored`` caught it, because the
+    #: other two tests sent unrelated names.  This sweep is the fix.
+    HONOURED_IF_READ = (
+        ("completed_tutorial", 1),
+        ("completed", True),
+        ("outcome", "success"),
+        ("result", "success"),
+        ("flag", 1),
+        ("flag_before", 1),
+        ("flag_after", 1),
+        ("stored", 1),
+        ("gate_satisfied", False),
+        ("no_op_reason", "none"),
+        ("dispatched", True),
+        ("changed", [FLAG_LEAF]),
+        ("complete_tutorial", True),
+        ("playerInfo", {"completed_tutorial": 1}),
+        ("resources_changed", list(T.MINTING_LADDER)),
+        ("resources", list(T.MINTING_LADDER)),
+        ("vector", list(T.MINTING_LADDER)),
+        ("neutral_vector", list(T.MINTING_LADDER)),
+        ("xp", 500),
+        ("gold", 999999),
+    )
+
+    @staticmethod
+    def _stable(body: Dict[str, Any]) -> Dict[str, Any]:
+        """The response minus the named volatile keys, for equality comparison."""
+        return {
+            key: value
+            for key, value in body.items()
+            if key not in IntentOnlyInputTests.VOLATILE_KEYS
+        }
+
+    def test_no_client_supplied_field_is_ever_read(self) -> None:
+        """Both steps, twenty field names, and the **whole** response compared.
+
+        Comparing the entire payload is what makes this a sweep rather than a
+        spot check: an honoured field has to move ``flag_before``,
+        ``gate_satisfied``, ``dispatched``, ``changed``, ``resources``, or
+        ``no_op_reason``, and the equality assertion fails whichever it moves.
+        Each candidate is sent from a freshly reset corpus so the comparison is
+        against an identical starting state, and the persisted flag and every
+        stored resource are compared too, so a field that is read but written
+        back identically is still caught.
+        """
+        for step in (15, 24):
+            pristine()
+            baseline_body = tutorial_now(intent(step)).get_json()
+            baseline_flag = flag_now()
+            baseline_resources = copy.deepcopy(resources_now())
+            for key, value in self.HONOURED_IF_READ:
+                pristine()
+                body = tutorial_now(
+                    {"user_id": PID, "step": step, key: value}
+                ).get_json()
+                self.assertEqual(
+                    self._stable(body),
+                    self._stable(baseline_body),
+                    "step %r with a client-sent %r changed the response"
+                    % (step, key),
+                )
+                self.assertEqual(
+                    flag_now(),
+                    baseline_flag,
+                    "step %r with a client-sent %r moved the recorded flag"
+                    % (step, key),
+                )
+                self.assertEqual(
+                    resources_now(),
+                    baseline_resources,
+                    "step %r with a client-sent %r moved a stored resource"
+                    % (step, key),
+                )
+
+    def test_the_volatile_key_list_is_exactly_the_one_that_varies(self) -> None:
+        """So ``_stable`` cannot silently grow to hide a real difference."""
+        pristine()
+        first = tutorial_now(intent(15)).get_json()
+        pristine()
+        second = tutorial_now(intent(15)).get_json()
+        differing = {
+            key
+            for key in set(first) | set(second)
+            if first.get(key) != second.get(key)
+        }
+        self.assertTrue(
+            set(self.VOLATILE_KEYS).issubset(differing | set(self.VOLATILE_KEYS))
+        )
+        self.assertEqual(differing - set(self.VOLATILE_KEYS), set())
+        self.assertEqual(set(first), set(second))
+
 
 class FailClosedTests(unittest.TestCase):
     """Structurally unresolvable inputs, each with a documented code."""
