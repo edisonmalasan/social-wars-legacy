@@ -35,7 +35,11 @@ extends "res://tests/test_base.gd"
 ## work (the `scripts/units/unit_animations.gd` asset-timeline linkage
 ## projection with the recorded label positions, the `max_frame`
 ## non-equivalence, the animation-command inventory, and the playback refusals,
-## its suite, and the `unit-animations` evidence report):
+## its suite, and the `unit-animations` evidence report), and the unit-behaviors
+## work (the `scripts/units/unit_behaviors.gd` dead-hero ledger projection with
+## its two-door increment gates and the three-door command inventory, the
+## `scripts/units/behavior_flow.gd` revival intent that carries only an
+## identifier and a cell, its suite, and the `unit-behaviors` evidence report):
 ## no other game system, no scene beyond the allow-list, no script outside
 ## the allow-list, no Flash-related runtime, no legacy protocol token
 ## anywhere, and no transport reference outside the legacy-v0
@@ -108,6 +112,8 @@ const ALLOWED := [
 	"scripts/units/collection_flow.gd",
 	"scripts/units/unit_movement.gd",
 	"scripts/units/unit_animations.gd",
+	"scripts/units/unit_behaviors.gd",
+	"scripts/units/behavior_flow.gd",
 	"scripts/verification.gd",
 	"tests/test_asset_ids.gd",
 	"tests/test_audio_manager.gd",
@@ -148,6 +154,7 @@ const ALLOWED := [
 	"tests/test_unit_collection.gd",
 	"tests/test_unit_movement.gd",
 	"tests/test_unit_animations.gd",
+	"tests/test_unit_behaviors.gd",
 	"evidence/boot/boot-report.json",
 	"evidence/building-move/building-move.png",
 	"evidence/building-move/report.json",
@@ -183,6 +190,7 @@ const ALLOWED := [
 	"evidence/unit-collection/report.json",
 	"evidence/unit-movement/report.json",
 	"evidence/unit-animations/report.json",
+	"evidence/unit-behaviors/report.json",
 ]
 
 ## The exact scene set the project may declare (set equality below).

@@ -489,6 +489,52 @@ Surface (loopback only, port :5056):
     persists the batch; every other failure below also returns before the
     dispatcher runs, so the corpus is untouched on every error path.
 
+``POST /v0/resurrect`` with JSON ``{"user_id", "x", "y"}``
+    ``{protocol, ok, game_version, server_time, result, map_key, item_id,
+    count_before, count_after, removed, cell, occupant_item_id,
+    committed_resurrectable, committed_syringes, gates, ledger_before,
+    ledger_after, placement_before, placement_after, syringe, resolution,
+    clicks_to_build, refusals, no_third_gate, resources}`` — the **thirteenth**
+    state-mutating surface, specified by the ``godot-unit-behaviors``
+    capability, and the **first M8 surface whose mechanism reaches private
+    state**.  One call carries **exactly one** legacy ``resurrect_hero`` command
+    (``command.py:625-635``) and the request carries **only** a save identity and
+    a cell: no map key, no item id, no syringe count, no price, and no resource
+    delta is accepted, and every such key (``map_key``, ``index``, ``item_id``,
+    ``used_syringe``, ``syringe``, ``cost``, ``price``, ``resources_changed``,
+    ``vector``, …) is **ignored** (design D2).  The service derives the **map
+    key** by resolving the addressed cell against the save's own placement rows
+    and the **item id** from the player's own recorded
+    ``privateState["deadHeroes"]`` ledger.
+
+    **The three doors and the two gates** are named on the response rather than
+    asserted silently: ``gates`` carries both of ``push_dead_unit``'s
+    conditions — the row on **player team 1** (``engine.py:151``) and the
+    committed ``resurrectable > 0`` (``engine.py:159,162``) — and **no third** is
+    evaluated.  ``kill`` never reaches the ledger, ``sell`` reaches it only
+    behind the ``KILL`` guard and only through the ``push_dead_unit`` **engine
+    helper**, and ``resurrect_hero`` decrements with the **delete-at-zero** rule
+    (``engine.py:178-179``).
+
+    **The refused targets resolve BEFORE the dispatcher runs**, so the corpus is
+    byte-identical on every one of them: an addressed cell that names no
+    placement row (``unresolvable_cell``) or more than one (``ambiguous_cell``),
+    a ledger that records nothing to revive
+    (``unresolvable_ledger_entry``) or more than one entry (``ambiguous_ledger``),
+    and a resolved entry whose committed ``resurrectable`` is not greater than
+    zero (``not_resurrectable``).  Each returns a **named code with an empty
+    payload** — never a partial one.
+
+    **The two-part post-execution proof** (design D3/D5): the ledger entry is
+    **gone** after a revival that reached zero, compared against the derived
+    decrement; the addressed key's row now records the **derived** item id at the
+    **addressed** cell; and **every** stored resource is **unchanged**, comparing
+    the **full** resource set.  That last half is what makes the **no syringe
+    cost** claim non-tautological: ``used_syringe`` is read from ``args[4]`` and
+    **discarded** (``command.py:630``) while the committed ``syringes`` field has
+    **zero** legacy consumers, so a cost could only ever arrive smuggled through
+    the request's own vector, which legacy applies **before** the branch.
+
 ``POST /v0/collection`` with JSON ``{"user_id", "collection_id"}``
     ``{protocol, ok, game_version, server_time, result, collection_id, grant,
     prize, index, eligibility, store_before, store_after, ledger_before,
@@ -707,6 +753,32 @@ code                     HTTP  when
                                 ``index.aliased: true``
 ``invalid_reason``       400  derived reason is not a string (server-side
                                 derivation failure; never client input)
+``missing_cell``         400  ``/v0/resurrect`` body carries no ``x`` or no ``y``
+``invalid_cell``         400  ``/v0/resurrect`` ``x``/``y`` present but not strict
+                                integers (``bool``, float, and string all
+                                excluded), or outside the shared ``0..99`` anchor
+                                range — a structural refusal on a shape legacy
+                                never validated, not a gameplay claim
+``unresolvable_cell``    409  ``/v0/resurrect``: no placement row records the
+                                addressed cell, so it resolves to no revival
+                                target.  Refused **before** the dispatcher runs,
+                                so the corpus is unchanged
+``ambiguous_cell``       409  ``/v0/resurrect``: more than one placement row
+                                records the addressed cell and the legacy
+                                contract records no tie-break, so none is invented
+``unresolvable_ledger_entry`` 409 ``/v0/resurrect``: the player's
+                                ``privateState["deadHeroes"]`` is empty, so the
+                                addressed cell resolves to no recorded ledger
+                                entry.  **This is what the committed corpus itself
+                                produces.**
+``ambiguous_ledger``     409  ``/v0/resurrect``: the ledger holds more than one
+                                entry and no committed rule chooses between them
+``not_resurrectable``    409  ``/v0/resurrect``: the resolved ledger entry's
+                                committed ``properties`` carry no
+                                ``resurrectable`` flag, or one that is not greater
+                                than zero — ``push_dead_unit`` would have refused
+                                it at ``engine.py:159-162``, so it could never have
+                                entered the ledger through the legacy increment
 ``invalid_coordinates``  400  ``x``/``y`` missing, not integers, or outside ``0..99``
 ``invalid_orientation``  400  ``orientation`` present but not an integer
 ``costs_not_cash``       400  ``/v0/purchase`` item's config price is not a cash
@@ -724,8 +796,8 @@ session and bootstrap endpoints never persist — this module never calls
 byte-identical. ``POST /v0/place``, ``POST /v0/purchase``,
 ``POST /v0/move``, ``POST /v0/sell``, ``POST /v0/store``,
 ``POST /v0/upgrade``, ``POST /v0/construction``, ``POST /v0/collect``,
-``POST /v0/expand``, ``POST /v0/level_up``, ``POST /v0/queue``, and
-``POST /v0/collection``
+``POST /v0/expand``, ``POST /v0/level_up``, ``POST /v0/queue``,
+``POST /v0/collection``, and ``POST /v0/resurrect``
 execute the unchanged legacy ``command()`` dispatcher, which
 persists through legacy ``save_session`` into the **service corpus's**
 ``saves/`` and nowhere else; the service never opens a working-tree file for
@@ -735,11 +807,13 @@ lives here so both the start command and the tests read one constant).
 
 from __future__ import annotations
 
+import os
 from typing import Any, Dict, Optional, Tuple
 
 from flask import Flask, Response, jsonify, request
 
 import compat_legacy
+import behavior_envelope
 import collect_envelope
 import collection_envelope
 import construction_envelope
@@ -796,6 +870,13 @@ ERROR_MISSING_COLLECTION_ID = "missing_collection_id"
 ERROR_INVALID_COLLECTION_ID = "invalid_collection_id"
 ERROR_UNKNOWN_COLLECTION_ID = "unknown_collection_id"
 ERROR_INVALID_ATTR = "invalid_attr"
+ERROR_MISSING_CELL = "missing_cell"
+ERROR_INVALID_CELL = "invalid_cell"
+ERROR_UNRESOLVABLE_CELL = "unresolvable_cell"
+ERROR_AMBIGUOUS_CELL = "ambiguous_cell"
+ERROR_UNRESOLVABLE_LEDGER_ENTRY = "unresolvable_ledger_entry"
+ERROR_AMBIGUOUS_LEDGER = "ambiguous_ledger"
+ERROR_NOT_RESURRECTABLE = "not_resurrectable"
 ERROR_BAD_REQUEST = "bad_request"
 ERROR_NOT_FOUND = "not_found"
 ERROR_METHOD_NOT_ALLOWED = "method_not_allowed"
@@ -863,9 +944,107 @@ def _legacy_boot_error(
     return error_response(500, ERROR_INTERNAL, "%s: %s" % (failure.code, failure))
 
 
+def _seed_dead_heroes(boot: compat_legacy.LegacyBoot) -> Dict[str, Any]:
+    """Apply the opt-in dead-hero seed to the running corpus, if one was asked for.
+
+    The committed corpus records ``privateState["deadHeroes"] == {}`` and places
+    no resurrectable row at all, so ``POST /v0/resurrect``'s positive path cannot
+    be exercised against it — and no executed-legacy fixture exists either,
+    because capturing one would require manufacturing a unit row first (the
+    committed investigation's named cause).
+
+    This is the verification seam that lets the live phase drive one real
+    revival: it is **absent by default**, so no normal run, no unittest, and no
+    other live phase is affected, and a malformed value is a named refusal
+    rather than a silent no-op so a typo can never make a seeding claim quietly
+    false.  It writes the **in-memory** save of the running corpus only — the
+    corpus the live-phase harness builds under the system temp root and removes
+    on stop — and never a committed save.  The derivation and the format live in
+    :mod:`behavior_envelope`; only the trigger lives here.
+    """
+    raw = os.environ.get(behavior_envelope.SEED_ENVIRONMENT)
+    if raw is None:
+        return {"seeded": False, "reason": "not requested", "error": ""}
+    result: Dict[str, Any] = {
+        "seeded": False,
+        "reason": "",
+        "error": "",
+        "user_id": "",
+        "after": None,
+    }
+    user_ids = boot.known_user_ids()
+    if not user_ids:
+        result["reason"] = "no save"
+        result["error"] = "the running corpus holds no save to seed"
+        return result
+    user_id = str(user_ids[0])
+    seeded = behavior_envelope.seed_ledger_from_environment(
+        boot.save_document(user_id), raw
+    )
+    result["seeded"] = bool(seeded.get("seeded", False))
+    result["reason"] = str(seeded.get("reason", ""))
+    result["error"] = str(seeded.get("error", ""))
+    result["user_id"] = user_id
+    result["after"] = seeded.get("after")
+    return result
+
+
+def _committed_item(
+    boot: compat_legacy.LegacyBoot, item_id: int
+) -> Optional[Dict[str, Any]]:
+    """One item id's committed configuration row, verbatim, or ``None``.
+
+    Read from the **loaded legacy configuration** rather than the committed
+    normalized package: ``push_dead_unit`` reads the **raw configuration
+    string** through ``get_attribute_from_item_id`` and then ``json.loads`` it
+    (``engine.py:154-162``), so the endpoint evaluates the gate against exactly
+    the bytes the legacy helper would have read — its ``properties`` is a raw
+    JSON **string** here.  The committed normalized package stores the same
+    values as an **object**, which is the R2 coercion boundary M8 line 1
+    recorded: the two agree on *values*, never on *representation*.
+
+    The row is located by its own native ``id`` column, exactly as
+    ``get_item_from_id`` does (``get_game_config.py:119-125``).  Item ids are
+    unique across the loaded items — measured over the whole committed set, 0
+    duplicates — so there is nothing to disambiguate, and a last-match scan
+    reproduces the id-to-position index's own last-wins behaviour.  ``None``
+    means the loaded configuration holds no such item, which the legacy gate
+    treats exactly like an absent flag.
+    """
+    config = boot.config()
+    items = config.get("items")
+    if not isinstance(items, list):
+        return None
+    found: Optional[Dict[str, Any]] = None
+    for row in items:
+        if not isinstance(row, dict):
+            continue
+        try:
+            if int(row.get("id")) != int(item_id):
+                continue
+        except (TypeError, ValueError):
+            continue
+        found = row
+    return dict(found) if found is not None else None
+
+
 def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
     """Build the v0 Flask app over an already-initialized legacy boot state."""
     boot = legacy if legacy is not None else compat_legacy.current()
+    # Applied once, before the first request, so the opt-in seeded ledger is
+    # visible to ``POST /v0/resurrect`` exactly as a persisted one would be.
+    app_seed = _seed_dead_heroes(boot)
+    if str(app_seed.get("reason", "")) != "not requested":
+        print(
+            "compat-api: dead-hero seed %s for %s: seeded=%s after=%r%s"
+            % (
+                behavior_envelope.SEED_ENVIRONMENT,
+                app_seed.get("user_id", "") or "(no save)",
+                app_seed.get("seeded"),
+                app_seed.get("after"),
+                (" error=%s" % app_seed["error"]) if app_seed.get("error") else "",
+            )
+        )
 
     app = Flask(__name__, static_folder=None)
 
@@ -3156,6 +3335,313 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
                 ledger_after=list(ledger_after),
                 ledger_appended=bool(derived_ledger["appended"]),
                 refusals=[dict(entry) for entry in collection_envelope.REFUSALS],
+                resources=resources_after,
+            ),
+            200,
+        )
+
+    @app.post("/v0/resurrect")
+    def v0_resurrect() -> Tuple[Dict[str, Any], int]:
+        """Execute one revival intent through the unchanged legacy path.
+
+        One call carries **exactly one** legacy ``resurrect_hero`` command
+        (``command.py:625-635``), and the request body carries **only** a save
+        identity and a cell.  **No map key, item id, syringe count, price, or
+        resource delta is accepted** (design D2): the service derives the map
+        key from the addressed cell's own placement row and the item id from the
+        player's own recorded ledger, so a client-supplied expectation can never
+        become the endpoint's own proof.  Every such key is ignored, exactly as a
+        client amount or price is ignored on the collect, expand, level-up, and
+        collection routes.
+
+        **Design D1/D2 — a mechanism, and a derived target.**  This is the first
+        M8 surface whose transaction is both server-derived and state-mutating
+        since ``collection``, and the first committed field in this project
+        whose legacy consumer is a mutation of private state.  The cell chooses
+        *where* the revival lands and the ledger chooses *what* is revived;
+        both readings are recorded, and the rejected alternative is retained in
+        ``projection.rejected_resolution``.
+
+        **Both gates are evaluated here and only these two**: the dying row's
+        player team (``engine.py:151``) and the committed
+        ``resurrectable > 0`` (``engine.py:159,162``).  No third is invented —
+        the delta's "derive no further eligibility" made structural.  The gate
+        is applied to the *ledger entry's* item rather than to a row, because
+        the revived row is not on the map; that is the recorded consequence of
+        deriving the item id from the ledger, and it is why the response reports
+        the resolved entry's own committed flag beside it.
+
+        **Design D3 — no syringe cost, and a neutral vector.**  ``used_syringe``
+        is read from ``args[4]`` and **discarded** (``command.py:630``), and the
+        committed ``syringes`` field it would be paid in has zero legacy
+        consumers, so the derivation sends a literal ``0`` and the response
+        never echoes the discarded argument.  Because legacy applies the
+        request's own vector *before* the branch (``command.py:40``), the only
+        honest vector is neutral and the proof's second half proves that **every**
+        stored resource is unchanged.
+
+        **Design D5 — the revived placement is not validated.**  The legacy
+        branch re-places the row through ``engine.map_add_item`` with no
+        occupancy, bounds, type, or terrain check, and this route reproduces
+        that absence rather than filling it.  The one bounds notion present
+        (``0..99``) is the shared anchor range the other delivered routes already
+        apply for structural safety, and it is recorded as such rather than as a
+        gameplay claim.
+
+        The two-part post-execution proof fails closed with ``internal_error``
+        on any other outcome: the ledger entry is **gone** after a revival that
+        reached zero, the addressed key's row now records the **derived** item
+        id, and **every** stored resource is **unchanged**.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404,
+                ERROR_UNKNOWN_USER_ID,
+                "no save exists for user_id %r" % user_id,
+            )
+
+        # The request carries a cell and NOTHING else.  An absent coordinate is
+        # a 400 with its own code so a missing key is never confused with a
+        # present-but-unusable one.
+        for axis in ("x", "y"):
+            if axis not in payload:
+                return error_response(
+                    400, ERROR_MISSING_CELL, "%s is required" % axis
+                )
+        cell_x = payload["x"]
+        cell_y = payload["y"]
+
+        # The pre-execution snapshots.  ``map_items`` returns the live dict and
+        # ``save_document`` the live save, so BOTH are deep-copied here: the
+        # legacy dispatcher's writes are in place, and a before-snapshot that
+        # aliased them would report the after-state as the before-state.
+        try:
+            items_before = {
+                str(key): list(value)  # type: ignore[call-overload]
+                for key, value in boot.map_items(user_id).items()
+            }
+            save_before = boot.save_document(user_id)
+            private_before = save_before.get("privateState")
+            ledger_before = (
+                None
+                if not isinstance(private_before, dict)
+                else private_before.get(behavior_envelope.LEDGER_KEY)
+            )
+            ledger_snapshot = (
+                None if ledger_before is None else dict(ledger_before)
+            )
+            resources_before = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        # The derivation (design D1/D2).  Everything below — the cell
+        # resolution, the ledger resolution, both gates, and the delete-at-zero
+        # decrement — lives in behavior_envelope, so the endpoint, the offline
+        # tests, and the report all compare against ONE derivation.
+        projection = behavior_envelope.project_resurrection(
+            items_before, ledger_before, cell_x, cell_y,
+            lambda item_id: _committed_item(boot, item_id),
+        )
+        target = projection["projection"]  # type: ignore[index]
+        if not bool(target.get("ok", False)):
+            reason = str(target.get("reason", ""))  # type: ignore[union-attr]
+            messages = {
+                behavior_envelope.REASON_INVALID_CELL: (400, ERROR_MISSING_CELL
+                    if "x" not in payload or "y" not in payload
+                    else ERROR_INVALID_CELL),
+                behavior_envelope.REASON_UNRESOLVABLE_CELL: (
+                    409, ERROR_UNRESOLVABLE_CELL),
+                behavior_envelope.REASON_AMBIGUOUS_CELL: (409, ERROR_AMBIGUOUS_CELL),
+                behavior_envelope.REASON_UNRESOLVABLE_LEDGER_ENTRY: (
+                    409, ERROR_UNRESOLVABLE_LEDGER_ENTRY),
+                behavior_envelope.REASON_AMBIGUOUS_LEDGER: (
+                    409, ERROR_AMBIGUOUS_LEDGER),
+                behavior_envelope.REASON_NOT_RESURRECTABLE: (
+                    409, ERROR_NOT_RESURRECTABLE),
+                behavior_envelope.REASON_INVALID_LEDGER: (500, ERROR_INTERNAL),
+                behavior_envelope.REASON_INVALID_ITEM_ID: (500, ERROR_INTERNAL),
+            }
+            status, code = messages.get(reason, (500, ERROR_INTERNAL))
+            return error_response(
+                status,
+                code,
+                "%s (%s)" % (str(target.get("error", "")), reason),  # type: ignore[union-attr]
+            )
+
+        map_key = int(target["map_key"])  # type: ignore[index,arg-type]
+        item_id = int(target["item_id"])  # type: ignore[index,arg-type]
+
+        try:
+            envelope_payload = behavior_envelope.build_envelope(
+                map_key, item_id, cell_x, cell_y
+            )
+        except behavior_envelope.EnvelopeError as failure:
+            if failure.code in ("invalid_vector", "invalid_timestamp"):
+                return error_response(500, ERROR_INTERNAL, failure.code)
+            return error_response(400, failure.code, str(failure))
+
+        # Execute the unchanged legacy command dispatcher in-process.  It
+        # persists via legacy save_session into THIS corpus only; the legacy HTTP
+        # route answers {"result": "success"} whenever command() returns without
+        # raising, so reaching here IS the legacy result — which is precisely why
+        # it is NOT taken as proof that the right unit was revived.
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        # Prove the post-state (design D3/D5).  Three halves, all value
+        # comparisons against the derivation; any of them failing is a reported
+        # failure, not a success.
+        try:
+            items_after_raw = boot.map_items(user_id)
+            save_after = boot.save_document(user_id)
+            private_after = save_after.get("privateState")
+            ledger_after = (
+                None
+                if not isinstance(private_after, dict)
+                else private_after.get(behavior_envelope.LEDGER_KEY)
+            )
+            resources_after = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        divergence = behavior_envelope.ledger_divergence(
+            ledger_snapshot, ledger_after, item_id
+        )
+        if divergence is not None:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the revival did not carry the derived decrement: %s" % divergence,
+            )
+        derived_ledger = behavior_envelope.expected_ledger(
+            ledger_snapshot, item_id
+        )
+        if int(derived_ledger["count_after"]) != int(  # type: ignore[index]
+            projection["count_after"]  # type: ignore[index]
+        ):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the derived decrement disagrees with the projected one: %r vs %r"
+                % (derived_ledger["count_after"], projection["count_after"]),  # type: ignore[index]
+            )
+        placement_after = items_after_raw.get(str(map_key))
+        if not isinstance(placement_after, list) or len(placement_after) != (
+            behavior_envelope.MAP_ROW_SLOTS
+        ):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "map key %d holds no committed row after the revival" % map_key,
+            )
+        if placement_after[behavior_envelope.SLOT_ITEM_ID] != item_id:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "map key %d records item %r after the revival, not the derived %d"
+                % (
+                    map_key,
+                    placement_after[behavior_envelope.SLOT_ITEM_ID],
+                    item_id,
+                ),
+            )
+        if placement_after[behavior_envelope.SLOT_CELL_X] != cell_x or (
+            placement_after[behavior_envelope.SLOT_CELL_Y] != cell_y
+        ):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "map key %d records cell %r after the revival, not the addressed "
+                "(%r, %r)"
+                % (
+                    map_key,
+                    (
+                        placement_after[behavior_envelope.SLOT_CELL_X],
+                        placement_after[behavior_envelope.SLOT_CELL_Y],
+                    ),
+                    cell_x,
+                    cell_y,
+                ),
+            )
+        for name in behavior_envelope.RESOURCE_NAMES:
+            if name not in resources_before or name not in resources_after:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "stored resource %s is missing from one side of the proof: "
+                    "the comparison covers the FULL resource set, never a subset"
+                    % name,
+                )
+            if resources_after[name] != resources_before[name]:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "resource %s is %r after execution, not the pre-execution "
+                    "%r: a revival moves no resource — no syringe cost is "
+                    "charged and no resource is converted"
+                    % (name, resources_after[name], resources_before[name]),
+                )
+        return (
+            envelope(
+                boot,
+                result="success",
+                map_key=map_key,
+                item_id=item_id,
+                count_before=int(projection["count_before"]),  # type: ignore[index]
+                count_after=int(derived_ledger["count_after"]),  # type: ignore[index]
+                removed=bool(derived_ledger["removed"]),  # type: ignore[index]
+                cell=[int(cell_x), int(cell_y)],
+                occupant_item_id=target.get("occupant_item_id"),
+                committed_resurrectable=target.get("committed_resurrectable"),
+                committed_syringes=target.get("committed_syringes"),
+                gates=behavior_envelope.gates(),
+                ledger_before=(
+                    []
+                    if ledger_snapshot is None
+                    else [
+                        {"item_id": key, "count": ledger_snapshot[key]}
+                        for key in sorted(ledger_snapshot, key=lambda t: int(t))
+                    ]
+                ),
+                ledger_after=(
+                    []
+                    if ledger_after is None
+                    else [
+                        {"item_id": str(key), "count": ledger_after[key]}
+                        for key in sorted(ledger_after, key=lambda t: int(t))
+                    ]
+                ),
+                placement_before=list(items_before[str(map_key)]),
+                placement_after=list(placement_after),
+                syringe={
+                    "charged": 0,
+                    "discarded_argument": behavior_envelope.DERIVED_USED_SYRINGE,
+                    "echoed": False,
+                    "committed_syringes_reported_as_content_only": target.get(
+                        "committed_syringes"
+                    ),
+                    "note": behavior_envelope.SYRINGE_DISCARD_NOTE,
+                    "rule": behavior_envelope.NO_SYRINGE_COST,
+                },
+                resolution={
+                    "rule": behavior_envelope.RESOLUTION_RULE,
+                    "rejected_alternative": behavior_envelope.REJECTED_RESOLUTION,
+                    "derivation_status": "derived",
+                    "pairing": behavior_envelope.DERIVED_PAIRING,
+                },
+                clicks_to_build=behavior_envelope.CLICKS_TO_BUILD_BOUNDARY,
+                refusals=behavior_envelope.refusals(),
+                no_third_gate=behavior_envelope.NO_THIRD_GATE,
                 resources=resources_after,
             ),
             200,

@@ -6,7 +6,8 @@ extends Node
 ## either implementation", "Upgrade through either implementation", and
 ## "Construction through either implementation", "Collect through either
 ## implementation", "Expand through either implementation", "Level up
-## through either implementation", and "Queue through either implementation").
+## through either implementation", "Queue through either implementation", and
+## "Resurrect through either implementation").
 ##
 ## This is the ONLY project file allowed to name the compat endpoint or to
 ## use the built-in HTTP request/enumeration types; the scope test restricts
@@ -16,6 +17,7 @@ extends Node
 ## address of the v0 service (design D3/D9).
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
+const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
 
 ## Loopback default: the v0 service binds 127.0.0.1 only (design D3).
 const DEFAULT_ENDPOINT := "http://127.0.0.1:5056"
@@ -33,6 +35,7 @@ const EXPAND_PATH := "/v0/expand"
 const LEVEL_UP_PATH := "/v0/level_up"
 const QUEUE_PATH := "/v0/queue"
 const COLLECTION_PATH := "/v0/collection"
+const RESURRECT_PATH := "/v0/resurrect"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -456,6 +459,56 @@ func complete_collection_town(user_id: String,
 			str(outcome.get("code", "bad_response")),
 			str(outcome.get("message", "")))
 	return BootData.parse_collection(outcome.get("payload"))
+
+
+## One revival intent over loopback HTTP: the client sends ONLY the save identity
+## and the addressed **cell** — no map key, no revived item id, no syringe
+## count, no price, and no resource deltas.  Any `item_id` / `map_key` /
+## `index` / `used_syringe` / `syringes` / `price` / `cost` /
+## `resources_changed` / `vector` key the service receives alongside the
+## identity is **ignored** server-side, exactly as the collect, expand, level-up,
+## and collection routes ignore client-supplied amounts and prices (unit-behaviors
+## design D2): the service derives the map key from the addressed cell's own
+## placement row and the revived item id from the player's own recorded ledger,
+## then executes the unchanged legacy `resurrect_hero` branch with a **NEUTRAL**
+## vector (design D3), so the typed result's `map_key`, `item_id`, both ledgers,
+## both placements, and `resources` are authoritative (design D8).
+##
+## **No syringe cost is charged and no resource moves**: `used_syringe` is bound
+## from `args[4]` and DISCARDED, and the committed `syringes` field it would be
+## paid in has zero legacy consumers.  The response's second post-execution proof
+## half requires every stored resource to be **unchanged**, which is what makes
+## that claim non-tautological.
+##
+## **No combat is resolved** and the revived placement is **not validated**:
+## none of the seven committed combat fields has a legacy consumer, and the
+## legacy branch re-places the row with no occupancy, bounds, type, or terrain
+## check (design D5).  Both absences travel on the typed result, never as an
+## implied rule.
+##
+## Structured service errors pass through with their original codes — notably
+## `unresolvable_cell` for a cell no placement row records, `ambiguous_cell`
+## for one more than one row records, `unresolvable_ledger_entry` for a player
+## whose ledger is empty, `ambiguous_ledger` for a ledger holding more than one
+## entry, `not_resurrectable` for a resolved entry whose committed
+## `resurrectable` is absent or not greater than zero, and the shared
+## `missing_user_id` / `invalid_user_id` / `unknown_user_id` / `internal_error`
+## family — all of which the client surfaces instead of reviving anything;
+## transport failures keep the boot failure rules, never a partial payload.
+func resurrect_hero_town(user_id: String, x: int,
+		y: int) -> BehaviorFlow.ResurrectResult:
+	var outcome := await _call("POST", RESURRECT_PATH, JSON.stringify({
+		"user_id": user_id,
+		"x": x,
+		"y": y,
+	}))
+	if not outcome.get("ok", false):
+		return BehaviorFlow.resurrect_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return BehaviorFlow.parse_resurrect(outcome.get("payload"))
+
+
 ## every failure returns `{ok: false, code, message}` with the failure named.
 func _call(method: String, path: String, body: String) -> Dictionary:
 	var url := resolved_endpoint() + path
