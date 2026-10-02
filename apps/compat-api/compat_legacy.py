@@ -220,6 +220,41 @@ class LegacyBoot:
             raise LegacyBootError("unknown_user_id", "no save for user id %r" % user_id)
         return self._player.get_player_info(user_id)
 
+    # --- tutorial completion flag (godot-tutorial) ------------------------
+    def completed_tutorial(self, user_id: str) -> Optional[Any]:
+        """``save["playerInfo"]["completed_tutorial"]`` - the recorded flag, or ``None``.
+
+        Read from the **stored** save, not through :meth:`player_info`: this
+        accessor exists for the endpoint's pre-execution comparison, and
+        ``player_info`` runs the legacy in-memory ``get_player_info`` whose side
+        effects would make the "before" reading unreliable.
+
+        The flag is the entire legacy tutorial surface.  It is written exactly
+        once, at ``command.py:65``, and read by **nothing** in any of the eleven
+        root modules - the tenth committed field in this project with no legacy
+        consumer, and the second write-only progression counter family after
+        line 1's research counters.  It reaches the client only because
+        ``get_player_info.py:15`` includes the whole ``playerInfo`` dict
+        wholesale, by dict inclusion and not by any server-side naming of it.
+
+        The value is returned **verbatim** - a recorded ``1`` stays the integer
+        ``1`` - and is deliberately **not** folded to a boolean here, so the
+        endpoint can report what the save actually stores.
+
+        ``None`` means the flag could not be read as a stored value: the record
+        is absent or not a mapping, or it carries no such key.  It is a graceful
+        refusal, never an exception, and the caller turns it into a fail-closed
+        answer rather than defaulting to "not complete", which would present an
+        unreadable state as a decided one.
+        """
+        save = self.save_document(user_id)
+        record = save.get("playerInfo")
+        if not isinstance(record, dict):
+            return None
+        if "completed_tutorial" not in record:
+            return None
+        return record["completed_tutorial"]
+
     # --- gameplay execution (design D2/D6; godot-building-placement) ------
     def has_item(self, item_id: int) -> bool:
         """Whether the loaded legacy config resolves this item id."""

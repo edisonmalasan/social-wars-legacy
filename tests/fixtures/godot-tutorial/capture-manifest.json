@@ -1,0 +1,373 @@
+{
+  "absences": {
+    "committed_content_occurrences": 0,
+    "committed_tutorial_content": {
+      "config_main_occurrences": 0,
+      "config_main_paths": [],
+      "normalized_package_occurrences": 0,
+      "total": 0
+    },
+    "flag_reaches_client_via": "get_player_info.py:15 includes the whole playerInfo dict wholesale, by dict inclusion and not by any server-side naming of the field",
+    "flag_readers_in_legacy": 0,
+    "flag_writer_lines": [
+      "command.py:65"
+    ],
+    "gate_bounds_added": false,
+    "legacy_raising_shapes": [
+      "string_step",
+      "missing_step",
+      "null_step"
+    ],
+    "legacy_raising_shapes_reproduced": false,
+    "no_reward_paid": true,
+    "no_step_persisted": true,
+    "raising_shapes_divergence": "the three input shapes legacy answers with an unhandled HTTP 500 are REFUSED here with named codes, an empty payload, and no state change. This is the line's one deliberate divergence, confined to failure handling: for every step legacy ACCEPTS the state transition is identical",
+    "stored_step_introduced": false
+  },
+  "executed_at_utc": "2026-10-02T22:58:48+00:00",
+  "fixture": "godot-tutorial",
+  "gate": {
+    "command": "complete_tutorial",
+    "exact_arm": 15,
+    "expression": "tutorial_step >= 25 or tutorial_step == 15",
+    "has_lower_bound": false,
+    "has_type_check": false,
+    "has_upper_bound": false,
+    "hole_high": 24,
+    "hole_low": 16,
+    "hole_size": 9,
+    "hole_steps": [
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24
+    ],
+    "lower_arm": 25,
+    "raising_shapes": [
+      "string_step",
+      "missing_step",
+      "null_step"
+    ],
+    "raising_status": 500,
+    "replay_boundary_steps": [
+      14,
+      15,
+      24,
+      25,
+      26,
+      -1
+    ],
+    "replay_oracle_is_executed_legacy": false
+  },
+  "interpreter": "3.9.13",
+  "known_limits": [
+    "no mid-tutorial save exists and none can be represented: the step is a local and is never persisted, so the corpus records 0 (the new-player template) or 1 and nothing in between",
+    "no reward is paid and no stored resource moves in the parity transaction, because zero committed tutorial content exists",
+    "no gate bound is added: legacy has neither an upper nor a lower bound and no type check, and a bound it does not have would be an invented rule (Server v1 / M13)",
+    "no pixel parity and no windowed capture: nothing is rendered here",
+    "the request's exact shape is DERIVED; its effect is ESTABLISHED. No Flash client was executed and none exists to execute",
+    "the boundary arithmetic is pinned by the committed replay-harness test against a STUB oracle; this capture adds the executed-legacy fixture beside it rather than claiming that coverage as new"
+  ],
+  "legacy": {
+    "dynamic_root": "/dynamic/menvswomen/srvsexwars",
+    "game_version": "Basesec_1.5.4.swf",
+    "host": "127.0.0.1",
+    "language": "en",
+    "port": 5055
+  },
+  "parity": {
+    "minting_transaction_recorded_not_reproduced": "the minting transaction is recorded as a step and is the anchor for the endpoint's second proof half. The endpoint REFUSES to reproduce it: its derived vector is neutral by construction, so it cannot express the ladder at all",
+    "neutralization": "the parity transaction compares by VALUE with NO clock normalization: the derived flag, the unchanged placement count, the byte-identical placements, the byte-identical store, the byte-identical privateState, every other playerInfo field, and all seven stored resources. The ONLY wall-clock field, the request's envelope ts, is recorded but not compared, because it is the current time at capture",
+    "parity_covers": "ONE parity transaction against the fresh-player corpus, which is the only save with completed_tutorial 0 outside the new-player template village. No progressed-player save exists with the flag at any other value, and none can: the step is never persisted, so a mid-tutorial save is unrepresentable"
+  },
+  "probes": [
+    {
+      "changed_leaves": 7,
+      "commands": [
+        "complete_tutorial([24]) with the CLIENT-SENT vector [101, 3, 7, 11, 13, 17, 19, 23]"
+      ],
+      "established": "24 is the UPPER EDGE of the nine-value hole (16..24 inclusive), so the branch declines: it prints nothing about completion and leaves playerInfo.completed_tutorial alone. The same ladder still moves all seven stored resources, because apply_resources runs BEFORE the branch (command.py:40; engine.py:251-271)",
+      "executed_in_this_capture": true,
+      "flag_after": 1,
+      "flag_before": 1,
+      "gate_satisfied": false,
+      "probe": 1,
+      "question": "does the client-sent resource ladder move balances because the tutorial COMPLETED, or because the client sent it?",
+      "resources_moved": 7,
+      "response": "{\"result\":\"success\"}",
+      "step": 24,
+      "step_in_gate_hole": true,
+      "why_it_matters": "this separates the two effects the recorded steps show together. Without it, the minting round's eight changed leaves could be read as 'completing the tutorial mints resources'. With it, the ladder moves resources on a DECLINING step, so the movement belongs to the client-sent vector and the flag flip belongs to the gate -- which is exactly the separation the endpoint's two-part proof asserts"
+    }
+  ],
+  "rounds": [
+    {
+      "outcomes": [
+        {
+          "changed_leaf_count": 1,
+          "changed_leaves": [
+            "/playerInfo/completed_tutorial"
+          ],
+          "flag_after": 1,
+          "flag_before": 0,
+          "flag_moved": true,
+          "resources_after": {
+            "cash": 5,
+            "gold": 2000,
+            "mana": 0,
+            "oil": 2000,
+            "steel": 2000,
+            "wood": 2000,
+            "xp": 4
+          },
+          "resources_before": {
+            "cash": 5,
+            "gold": 2000,
+            "mana": 0,
+            "oil": 2000,
+            "steel": 2000,
+            "wood": 2000,
+            "xp": 4
+          },
+          "resources_moved": [],
+          "resources_moved_count": 0
+        },
+        {
+          "changed_leaf_count": 0,
+          "changed_leaves": [],
+          "flag_after": 1,
+          "flag_before": 1,
+          "flag_moved": false,
+          "resources_after": {
+            "cash": 5,
+            "gold": 2000,
+            "mana": 0,
+            "oil": 2000,
+            "steel": 2000,
+            "wood": 2000,
+            "xp": 4
+          },
+          "resources_before": {
+            "cash": 5,
+            "gold": 2000,
+            "mana": 0,
+            "oil": 2000,
+            "steel": 2000,
+            "wood": 2000,
+            "xp": 4
+          },
+          "resources_moved": [],
+          "resources_moved_count": 0
+        }
+      ],
+      "probe": null,
+      "purpose": "the parity transaction: the derived NEUTRAL vector moves nothing and the gate flips the flag 0 -> 1",
+      "round": "neutral",
+      "seed_save_sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+      "steps": [
+        {
+          "name": "command_tutorial_15",
+          "step": 15,
+          "vector": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "command_tutorial_15_again",
+          "step": 15,
+          "vector": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "outcomes": [
+        {
+          "changed_leaf_count": 8,
+          "changed_leaves": [
+            "/maps/0/gold",
+            "/maps/0/oil",
+            "/maps/0/steel",
+            "/maps/0/wood",
+            "/maps/0/xp",
+            "/playerInfo/cash",
+            "/playerInfo/completed_tutorial",
+            "/privateState/mana"
+          ],
+          "flag_after": 1,
+          "flag_before": 0,
+          "flag_moved": true,
+          "resources_after": {
+            "cash": 24,
+            "gold": 2007,
+            "mana": 23,
+            "oil": 2013,
+            "steel": 2017,
+            "wood": 2011,
+            "xp": 7
+          },
+          "resources_before": {
+            "cash": 5,
+            "gold": 2000,
+            "mana": 0,
+            "oil": 2000,
+            "steel": 2000,
+            "wood": 2000,
+            "xp": 4
+          },
+          "resources_moved": [
+            "cash",
+            "gold",
+            "mana",
+            "oil",
+            "steel",
+            "wood",
+            "xp"
+          ],
+          "resources_moved_count": 7
+        }
+      ],
+      "probe": {
+        "changed_leaves": 7,
+        "commands": [
+          "complete_tutorial([24]) with the CLIENT-SENT vector [101, 3, 7, 11, 13, 17, 19, 23]"
+        ],
+        "established": "24 is the UPPER EDGE of the nine-value hole (16..24 inclusive), so the branch declines: it prints nothing about completion and leaves playerInfo.completed_tutorial alone. The same ladder still moves all seven stored resources, because apply_resources runs BEFORE the branch (command.py:40; engine.py:251-271)",
+        "executed_in_this_capture": true,
+        "flag_after": 1,
+        "flag_before": 1,
+        "gate_satisfied": false,
+        "observed": {
+          "changed_leaf_count": 7,
+          "changed_leaves": [
+            "/maps/0/gold",
+            "/maps/0/oil",
+            "/maps/0/steel",
+            "/maps/0/wood",
+            "/maps/0/xp",
+            "/playerInfo/cash",
+            "/privateState/mana"
+          ],
+          "flag_after": 1,
+          "flag_before": 1,
+          "flag_moved": false,
+          "resources_after": {
+            "cash": 43,
+            "gold": 2014,
+            "mana": 46,
+            "oil": 2026,
+            "steel": 2034,
+            "wood": 2022,
+            "xp": 10
+          },
+          "resources_before": {
+            "cash": 24,
+            "gold": 2007,
+            "mana": 23,
+            "oil": 2013,
+            "steel": 2017,
+            "wood": 2011,
+            "xp": 7
+          },
+          "resources_moved": [
+            "cash",
+            "gold",
+            "mana",
+            "oil",
+            "steel",
+            "wood",
+            "xp"
+          ],
+          "resources_moved_count": 7
+        },
+        "probe": 1,
+        "question": "does the client-sent resource ladder move balances because the tutorial COMPLETED, or because the client sent it?",
+        "resources_moved": 7,
+        "response": "{\"result\":\"success\"}",
+        "step": 24,
+        "step_in_gate_hole": true,
+        "why_it_matters": "this separates the two effects the recorded steps show together. Without it, the minting round's eight changed leaves could be read as 'completing the tutorial mints resources'. With it, the ladder moves resources on a DECLINING step, so the movement belongs to the client-sent vector and the flag flip belongs to the gate -- which is exactly the separation the endpoint's two-part proof asserts"
+      },
+      "purpose": "the proof anchor: ONE request moves all seven stored resources AND the flag, so the endpoint's 'nothing moved' proof is not a tautology",
+      "round": "minting",
+      "seed_save_sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+      "steps": [
+        {
+          "name": "command_tutorial_15_minting",
+          "step": 15,
+          "vector": [
+            101,
+            3,
+            7,
+            11,
+            13,
+            17,
+            19,
+            23
+          ]
+        }
+      ]
+    }
+  ],
+  "schema": "tutorial-fixture-v1",
+  "target": {
+    "fabricated_state": false,
+    "flag_after": 1,
+    "flag_before": 0,
+    "flag_key": "completed_tutorial",
+    "flag_record": "playerInfo",
+    "minting_vector": [
+      101,
+      3,
+      7,
+      11,
+      13,
+      17,
+      19,
+      23
+    ],
+    "neutral_vector": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "placements": 40,
+    "resources_before": {
+      "cash": 5,
+      "gold": 2000,
+      "mana": 0,
+      "oil": 2000,
+      "steel": 2000,
+      "wood": 2000,
+      "xp": 4
+    },
+    "target_rule": "the tutorial completion flag, playerInfo.completed_tutorial, on the committed fresh-player corpus: the seed records 0, and the gate 'tutorial_step >= 25 or tutorial_step == 15' completes on 15. The step is CLIENT INTENT and the completion is DERIVED SERVER-SIDE by applying that gate (design D2). The vector is NEUTRAL: no committed tutorial reward of any kind exists, so the only derivable vector moves nothing (design D4)",
+    "the_map_has_no_such_key": true
+  },
+  "why_two_rounds": "playerInfo.completed_tutorial is 0 in the seed and 1 after any completing step, so the 0 -> 1 transition is exercisable exactly ONCE per disposable copy. Two rounds are therefore required, not stylistic: folding both into one server would silently record a 1 -> 1 rewrite instead of the transition the fixture is about"
+}

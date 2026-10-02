@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-10-02T22:58:46+00:00",
+  "form": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "data": "bbb6a3027713ffcf975024b371d7911ee496f49ee1e854bf5a881f9213fed200;{\"accessToken\":\"\",\"commands\":[[0,\"complete_tutorial\",[15],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1790981926}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "the SAME request a second time, recorded to establish that the write is IDEMPOTENT: the branch assigns 1 over 1, so the save is byte-identical and ZERO leaves change. This is the executed counterpart of the endpoint's already-complete refusal -- legacy answers success and changes nothing rather than erroring",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}

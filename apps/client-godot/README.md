@@ -3154,3 +3154,157 @@ windowed capture**, because nothing is rendered.
 
 **A third recorded flaky surface:** `verify.ps1` returned **-1** on one of two runs and **0** with
 `PASS all checks succeeded` on the second, because its windowed-capture step is display-sensitive.
+
+---
+
+## Tutorial progression (M9 line 3)
+
+M9's third line, and the first **not** to be a refusal line. The contract is committed in
+`docs/legacy-m9-tutorial.md` (PR #264, merged `2dbf715`), and the field it delivers has **zero legacy
+readers** — which is exactly why the previous two M8 lines' investigation instructions to "measure your own
+fields rather than assume the refusal pattern repeats" were load-bearing here.
+
+### The finding: one branch, one write, one stored field, and **three** reachable verdicts
+
+`command.py:60-66` is the entire tutorial system:
+
+```python
+if command == "complete_tutorial":
+    tutorial_step = args[0]                                              # :61  a LOCAL
+    print("Tutorial step", tutorial_step)                                 # :62  a log line
+    if tutorial_step >= 25 or tutorial_step == 15:                        # :63  the gate
+        save["playerInfo"]["completed_tutorial"] = 1                      # :65  the write
+```
+
+Measured across the eleven legacy root modules: `completed_tutorial` occurs **once**, on **one** line, and
+that line is the **write** — **zero** readers, making it the **tenth** committed field in this project with no
+legacy consumer (after `unit_capacity`, the level curve's unread reward fields, `training_time`, `velocity`,
+`max_frame`, `resurrectable`'s siblings, `unlockedQuestIndex`, and the quest `reward`). `tutorial_step` occurs
+**4** times over **3** lines; `complete_tutorial` occurs **once**.
+
+The gate has **no lower bound, no upper bound, and no type check**. It completes at
+`15, 25, 26, 100, 1000000, 1000000000` and declines at `-1000000000, -5, -1, 0, 1, 14, 16..24` — so the
+**hole is exactly `16..24`**, nine steps wide, between the two arms. `tutorial_step` is a **local** and is
+**never persisted**, so there is **no stored step** and therefore nothing to resume from.
+
+### Three verdicts, and the ORDER they are reachable in
+
+The endpoint checks the **flag before the gate**, so once a tutorial completes, every later step answers
+`already_completed` and `gate_declined` is unreachable for the rest of that save's life. The committed corpus
+starts at the seed value, so the hole step must go **first**. The `tutorial-live` phase is written in exactly
+that order and says so in its own comment, because any other order would silently prove only the third verdict
+while reading as full coverage.
+
+- `gate_declined` — a hole step. **200**, `{"result": "success"}`, nothing written. Not an error: legacy
+  answers success and changes nothing.
+- *(dispatch)* — a completing step. Exactly **one** changed leaf, `/playerInfo/completed_tutorial`, and
+  **no** stored resource moves.
+- `already_completed` — **200**, nothing written.
+
+Both no-ops answer **200 rather than an error**, and that was a deliberate decision: legacy answers
+`{"result": "success"}` and changes nothing in both, so an error would be a divergence the evidence does not
+support.
+
+### The ONE divergence, confined to failure handling
+
+Legacy answers an unhandled **HTTP 500** for a string, missing, or null step. Those three shapes get **named
+refusal codes** here (HTTP 400, empty payload) and the legacy 500 is **not reproduced** — a crash is not a
+behaviour. Coercing a malformed step to `0` so it merely declines was rejected for the same reason. Legacy
+*state transitions* for accepted steps are reproduced exactly; only failure handling diverges, and the
+committed save state is identical either way.
+
+**Float steps are measured, not reproduced.** Legacy **completes** on `15.0`; this client refuses a float
+step in `evaluate()` *and* the endpoint refuses it in `validate_step()`. That is recorded as
+`LEGACY_ACCEPTS_FLOAT_STEP := true` — a divergence stated, not hidden.
+
+### The deliberate strictness asymmetry
+
+`_strict_int()` governs the **outgoing** step (accepts only `int`; refuses bool and float, matching the
+endpoint's `validate_step`). `_integer()` governs every **incoming** value and accepts integral floats,
+because Godot decodes every JSON number as a `float` — without that, the client could not read its own
+save. Both are in the pinned `STATIC_FUNCTIONS` inventory.
+
+Gate-record comparison uses `_gate_field_equal()` and **never `str()`**: the service's `25` arrives as `25.0`
+and the manifest's `hole_low` as `16.0`, so a textual comparison would fail on values that are equal. Bools
+compare by identity, never as `0`/`1`.
+
+### `/v0/tutorial` route placement is load-bearing, and pinned
+
+The route is declared **FIRST**, ahead of every other route. Every delivered suite slices
+`def vN_x():` up to the next `@app.<method>(...)` decorator and `textwrap.dedent` is a no-op on such a
+slice, so a route inserted at indent 4 after a body at indent 8 raises `IndentationError` inside the
+*previous* route's slice. The only slot no slice reaches is ahead of the first route. `test_tutorial_endpoint.py`
+pins this with a dedicated `RoutePlacementTests` class, and the placement guard was **proven by injection**:
+moving the route produced **3 independent failures** with exit 1 while the file still compiled, and restoring
+it byte-identically (SHA-256 `D75BF31C…D6D0`) returned the suite to green.
+
+### Two disposable rounds, because the flag is not reusable
+
+The flag is `0` in the seed and `1` after any completing step, so step records live under
+`steps/<round>/<name>` — the one layout deviation in this project's fixtures. Round 1 (`neutral`) is the
+**parity** transaction; round 2 (`minting`) is the **anchor**: one legacy request with the client ladder
+`[101, 3, 7, 11, 13, 17, 19, 23]` — read out of the committed `request.json` by the suite rather than
+restated from memory — moved all seven stored resources **plus** the flag, 8 leaves. The endpoint's
+`validate_vector`/`build_envelope` **refuse** that ladder, which is what makes its "no stored resource moved"
+proof half **non-tautological**.
+
+### The only progressed evidence is the villages
+
+`config/main.json` and `packages/game-content/normalized/*.json` contain **zero** occurrences of `tutorial`
+— no step list, no count, no gate definition, no tutorial text. The **eight committed village saves** are the
+only progressed evidence for the field: seven record `1`, and one — `initial.json`, the seed, whose `pid` is
+absent — records `0`. Both states are therefore observable in committed data. *(The fixture README originally
+asserted "31 village saves, 30 recording `1`"; that was an assertion rather than a measurement, is wrong on
+both counts, and is corrected there with the measurement recorded — this suite asserts 8 / 7 / 1.)*
+
+The flag reaches the client only because `get_player_info.py:15` includes the **whole** `playerInfo` dict
+wholesale; the endpoint names no field, which is why the projection reads the record rather than a selected key.
+
+### The offline double mutates its in-memory flag
+
+A dispatch flips the double's own flag (monotonically), so `already_completed` is **reachable offline** and
+its no-op-ness is **demonstrated** rather than asserted.
+
+### Verification actually run (2026-10-03)
+
+```bash
+python -B apps/compat-api/capture_tutorial_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_tutorial.gd
+godot --headless --path apps/client-godot --script res://tests/test_tutorial.gd -- --report=<repo>/apps/client-godot/evidence/tutorial/report.json
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+openspec validate tutorial --strict
+```
+
+- fixture capture: exit **0**, containment **UNCHANGED**, on **five** consecutive runs; the committed fixture
+  is 2 rounds / 3 recorded steps / 1 executed probe, and its re-runnability was verified by diffing two runs
+  field by field — only `executed_at_utc`, `captured_at_utc`, the `Date` header, and the signed `form.data`
+  (which embeds a wall-clock `ts`) differ. The **40** executed-legacy probe transactions are the
+  *investigation's*, recorded in `docs/legacy-m9-tutorial.md`, not this fixture's.
+- the hermetic suite: **639 checks** (642 with `--report`) — the **38th** hermetic suite
+- `verify.ps1` exit **0**; `verify-boot.ps1` exit **0** with **38 hermetic suites and 19 live phases**, guard
+  digest `6978b959…ff348` identical pre/post
+- **264** log files inspected with **zero** `[test] FAIL`, `^ERROR:`, or `SCRIPT ERROR` lines
+- compat suite **`Ran 1912 tests ... OK`**, exit 0
+- content validator exit **0**, `result: valid`, 21 schemas; preservation manifest **3,258 entries**, exit 0
+- evidence: `evidence/tutorial/report.json`, `tutorial-report-v1`, digest **`05f7b12d…c38b`**, 10,634 bytes,
+  byte-identical across **three** consecutive runs
+
+**The anti-invention guard is structural and was tested rather than trusted.** Injecting one invented
+`static func tutorial_total_steps() -> int` produced **3 independent failures** and exit 1; restoring the file
+from a byte-identical copy (SHA-256 `9ea3ff1b…0d6`) returned the suite to its 637-check passing state.
+
+### Claim limits
+
+**No stored step** and **no un-complete path** — `tutorial_step` is a local, so nothing resumes · **no reward**
+is paid and **no progress display, step count, ratio, or remaining time** is implemented · **no gate bounds,
+no membership test, and no exception guard** are added, the legacy branch having none, so a client can still
+send a negative or enormous step; that is a recorded **Server v1 / M13** gap · **no pixel parity** and **no
+windowed capture**, because nothing is rendered · **the float-step and raising-shape divergences are recorded,
+not reproduced** · **the offline double is not the endpoint** — it exists so the no-op verdicts are
+demonstrable without a service · **parity covers three recorded transactions against the fresh-player corpus
+only**, and no progressed-player save exists beyond the eight villages · the tutorial is **not rendered as
+tutorial**, only as a readout and a confirm line.

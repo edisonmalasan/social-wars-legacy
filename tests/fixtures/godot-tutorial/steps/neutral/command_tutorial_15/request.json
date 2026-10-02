@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-10-02T22:58:46+00:00",
+  "form": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "data": "bbb6a3027713ffcf975024b371d7911ee496f49ee1e854bf5a881f9213fed200;{\"accessToken\":\"\",\"commands\":[[0,\"complete_tutorial\",[15],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1790981926}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "THE RECORDED TRANSACTION. command.php form (USERID, user_key, language, data) with the derived <64-hex>;<json> envelope carrying exactly one command: a complete_tutorial whose single argument is the CLIENT'S STEP, sent as INTENT and never as an outcome. Completion is DERIVED SERVER-SIDE by applying the committed gate 'tutorial_step >= 25 or tutorial_step == 15' to that step (design D2). The resources_changed is the NEUTRAL VECTOR [0, 0, 0, 0, 0, 0, 0, 0] because no committed tutorial reward of any kind exists (design D4). What is ESTABLISHED: the branch writes playerInfo.completed_tutorial = 1 and nothing else, and the 8-slot vector is applied verbatim before it under the max(..., 0) clamp. What is DERIVED: that the Flash client ever sends this shape, or counts steps this way. user_key is redacted in this record; accessToken is the crafted empty placeholder, never a token.",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}

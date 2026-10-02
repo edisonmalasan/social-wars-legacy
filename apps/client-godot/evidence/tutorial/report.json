@@ -1,0 +1,392 @@
+{
+  "schema": "tutorial-report-v1",
+  "generated_by": "apps/client-godot/tests/test_tutorial.gd --report=<path>",
+  "determinism": {
+    "reads_wall_clock": false,
+    "writes_absolute_paths": false,
+    "note": "every table below is generated from the delivered module, from this run's own measurement of the committed legacy source, or from committed corpus / capture bytes"
+  },
+  "gate": {
+    "expression": "tutorial_step >= 25 or tutorial_step == 15",
+    "legacy_line": "command.py:63",
+    "lower_arm": 25,
+    "exact_arm": 15,
+    "hole_low": 16,
+    "hole_high": 24,
+    "hole_steps": [
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24
+    ],
+    "has_upper_bound": false,
+    "has_lower_bound": false,
+    "has_type_check": false,
+    "probe_rows": [
+      {
+        "step": -1,
+        "legacy": false,
+        "mirror": false,
+        "arm": "none",
+        "in_hole": false
+      },
+      {
+        "step": 0,
+        "legacy": false,
+        "mirror": false,
+        "arm": "none",
+        "in_hole": false
+      },
+      {
+        "step": 14,
+        "legacy": false,
+        "mirror": false,
+        "arm": "none",
+        "in_hole": false
+      },
+      {
+        "step": 15,
+        "legacy": true,
+        "mirror": true,
+        "arm": "exact_arm",
+        "in_hole": false
+      },
+      {
+        "step": 16,
+        "legacy": false,
+        "mirror": false,
+        "arm": "none",
+        "in_hole": true
+      },
+      {
+        "step": 24,
+        "legacy": false,
+        "mirror": false,
+        "arm": "none",
+        "in_hole": true
+      },
+      {
+        "step": 25,
+        "legacy": true,
+        "mirror": true,
+        "arm": "lower_arm",
+        "in_hole": false
+      },
+      {
+        "step": 26,
+        "legacy": true,
+        "mirror": true,
+        "arm": "lower_arm",
+        "in_hole": false
+      }
+    ],
+    "record": {
+      "command": "complete_tutorial",
+      "expression": "tutorial_step >= 25 or tutorial_step == 15",
+      "lower_arm": 25,
+      "exact_arm": 15,
+      "hole_low": 16,
+      "hole_high": 24,
+      "hole_size": 9,
+      "hole_steps": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
+      ],
+      "has_upper_bound": false,
+      "has_lower_bound": false,
+      "has_type_check": false,
+      "raising_shapes": [
+        "string_step",
+        "missing_step",
+        "null_step"
+      ],
+      "raising_status": 500,
+      "replay_boundary_steps": [
+        14,
+        15,
+        24,
+        25,
+        26,
+        -1
+      ],
+      "replay_oracle_is_executed_legacy": false
+    }
+  },
+  "field": {
+    "record": "playerInfo",
+    "key": "completed_tutorial",
+    "writer_line": "command.py:65",
+    "reader_count": 0,
+    "occurrences": 1,
+    "lines": 1,
+    "ordinal_among_zero_consumer_fields": 10,
+    "reaches_client_via": "\"playerInfo\": session(USERID)[\"playerInfo\"],"
+  },
+  "committed_state": {
+    "corpus_flag": 0,
+    "corpus_placements": 40,
+    "map_carries_the_flag": false,
+    "village_saves": {
+      "count": 8,
+      "completed": 7,
+      "seeded": 1,
+      "names": [
+        "AcidCaos.json",
+        "General_Mike_30.json",
+        "General_Mike_31.json",
+        "Kiriakos.json",
+        "Nerri.json",
+        "Neutral.json",
+        "Scarlet.json",
+        "initial.json"
+      ]
+    },
+    "committed_content_occurrences": 0
+  },
+  "capture": {
+    "rounds": 2,
+    "recorded_steps": 3,
+    "probes": 1,
+    "outcomes": [
+      {
+        "changed_leaf_count": 1.0,
+        "changed_leaves": [
+          "/playerInfo/completed_tutorial"
+        ],
+        "flag_after": 1.0,
+        "flag_before": 0.0,
+        "flag_moved": true,
+        "resources_after": {
+          "cash": 5.0,
+          "gold": 2000.0,
+          "mana": 0.0,
+          "oil": 2000.0,
+          "steel": 2000.0,
+          "wood": 2000.0,
+          "xp": 4.0
+        },
+        "resources_before": {
+          "cash": 5.0,
+          "gold": 2000.0,
+          "mana": 0.0,
+          "oil": 2000.0,
+          "steel": 2000.0,
+          "wood": 2000.0,
+          "xp": 4.0
+        },
+        "resources_moved": [],
+        "resources_moved_count": 0.0
+      },
+      {
+        "changed_leaf_count": 0.0,
+        "changed_leaves": [],
+        "flag_after": 1.0,
+        "flag_before": 1.0,
+        "flag_moved": false,
+        "resources_after": {
+          "cash": 5.0,
+          "gold": 2000.0,
+          "mana": 0.0,
+          "oil": 2000.0,
+          "steel": 2000.0,
+          "wood": 2000.0,
+          "xp": 4.0
+        },
+        "resources_before": {
+          "cash": 5.0,
+          "gold": 2000.0,
+          "mana": 0.0,
+          "oil": 2000.0,
+          "steel": 2000.0,
+          "wood": 2000.0,
+          "xp": 4.0
+        },
+        "resources_moved": [],
+        "resources_moved_count": 0.0
+      },
+      {
+        "changed_leaf_count": 8.0,
+        "changed_leaves": [
+          "/maps/0/gold",
+          "/maps/0/oil",
+          "/maps/0/steel",
+          "/maps/0/wood",
+          "/maps/0/xp",
+          "/playerInfo/cash",
+          "/playerInfo/completed_tutorial",
+          "/privateState/mana"
+        ],
+        "flag_after": 1.0,
+        "flag_before": 0.0,
+        "flag_moved": true,
+        "resources_after": {
+          "cash": 24.0,
+          "gold": 2007.0,
+          "mana": 23.0,
+          "oil": 2013.0,
+          "steel": 2017.0,
+          "wood": 2011.0,
+          "xp": 7.0
+        },
+        "resources_before": {
+          "cash": 5.0,
+          "gold": 2000.0,
+          "mana": 0.0,
+          "oil": 2000.0,
+          "steel": 2000.0,
+          "wood": 2000.0,
+          "xp": 4.0
+        },
+        "resources_moved": [
+          "cash",
+          "gold",
+          "mana",
+          "oil",
+          "steel",
+          "wood",
+          "xp"
+        ],
+        "resources_moved_count": 7.0
+      }
+    ],
+    "raising_shapes": [
+      "string_step",
+      "missing_step",
+      "null_step"
+    ],
+    "raising_status": 500,
+    "raising_reproduced": true,
+    "ladder": [
+      101,
+      3,
+      7,
+      11,
+      13,
+      17,
+      19,
+      23
+    ],
+    "ladder_refused_as": "invalid_vector",
+    "ladder_moved": 7
+  },
+  "derived_vector": {
+    "vector": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "slots": 8,
+    "derived_by": "the service, never the client"
+  },
+  "divergence": {
+    "scope": "failure handling only",
+    "legacy_behaviour": "a string, a missing, and a null step each RAISE in the legacy branch and escape as HTTP 500",
+    "this_contract": "each is REFUSED with a named code, an empty payload, and no state change",
+    "why": "a crash is not a behaviour. Every step legacy ACCEPTS has its state transition reproduced exactly",
+    "legacy_accepts_float_step": true,
+    "float_handling": "the mirror answers false where legacy completes; recorded, never smoothed, and the resulting save state is identical either way"
+  },
+  "legacy_measurement": {
+    "modules_found": 10,
+    "step_local_line": "tutorial_step = args[0]",
+    "step_print_line": "print(\"Tutorial step\", tutorial_step, \"reached.\")",
+    "gate_line": "if tutorial_step >= 25 or tutorial_step == 15:",
+    "write_line": "save[\"playerInfo\"][\"completed_tutorial\"] = 1",
+    "player_info_line": "\"playerInfo\": session(USERID)[\"playerInfo\"],",
+    "flag_occurrences": 1,
+    "flag_lines": 1,
+    "flag_writers": 1,
+    "flag_readers": 0,
+    "step_occurrences": 4,
+    "step_lines": 3,
+    "command_occurrences": 1,
+    "command_line": "command.py:60",
+    "branch_write_leaves": 1,
+    "branch_return_count": 1,
+    "branch_writes_map": false,
+    "tutorial_content_occurrences": 0,
+    "tutorial_content_files": 23
+  },
+  "absences": {
+    "helpers": [
+      "tutorial_step_count",
+      "tutorial_total_steps",
+      "tutorial_progress_ratio",
+      "tutorial_remaining_steps",
+      "tutorial_remaining_time",
+      "tutorial_reward",
+      "tutorial_reward_for",
+      "tutorial_reward_amount",
+      "mark_tutorial_complete",
+      "tutorial_unlocked",
+      "tutorial_bounds",
+      "clamp_tutorial_step",
+      "fast_forward",
+      "intent_body",
+      "tutorial_vector",
+      "tutorial_price"
+    ],
+    "refusal_reasons": [
+      "absent_player_info",
+      "non_object_player_info",
+      "absent_completed_tutorial",
+      "unreadable_completed_tutorial"
+    ],
+    "non_claims": [
+      "no step, ratio, remaining time, total step count, or completion state is derived, because the save persists no step and no legacy branch reads the flag: every one of those figures would be fabricated",
+      "no reward is paid, shown, or read, and none is committed: paying one would invent an economy",
+      "no bound is added to the gate, so a client may still report any integer; the legacy gate has none and authoritative validation belongs to Server v1 / M13",
+      "the flag is read from the save-level playerInfo and never from maps[0]: the legacy branch writes playerInfo and the map carries no such key",
+      "the three shapes legacy raises on are RECORDED and deliberately NOT reproduced: a crash is not a behaviour, so each gets a named refusal instead. Every accepted step's state transition IS reproduced exactly",
+      "a float step is refused where legacy completes; the measured legacy fact is recorded as LEGACY_ACCEPTS_FLOAT_STEP and the resulting save state is identical either way",
+      "the gate's boundary steps are ESTABLISHED from committed source while only step 15 has an executed oracle, so replay_oracle_is_executed_legacy is false",
+      "parity covers two recorded transactions and one probe against the fresh-player corpus only: no progressed player and no other command",
+      "no un-complete path exists: the legacy branch writes 1 and nothing ever writes it back to 0",
+      "no pixel-parity oracle against the legacy client exists",
+      "the committed capture runs the fake GameApi implementation, a deterministic test double rather than a parity oracle"
+    ],
+    "static_functions": [
+      "gate_satisfied",
+      "gate_verdict",
+      "gate_hole_steps",
+      "gate_record",
+      "is_step",
+      "completed_flag",
+      "project",
+      "evaluate",
+      "offers_completion",
+      "readout_text",
+      "confirm_text",
+      "step_label",
+      "record",
+      "result_failure",
+      "parse_result",
+      "_integer",
+      "_strict_int",
+      "_type_name",
+      "_result_error",
+      "_parse_flag_pair",
+      "_gate_field_equal",
+      "_number_text",
+      "_bool_text",
+      "_verdict_text"
+    ]
+  }
+}

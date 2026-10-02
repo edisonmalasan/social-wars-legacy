@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-10-02T22:58:48+00:00",
+  "form": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "data": "fa39b399f4cdb8a05860443f040b0ac197f886486a03cd49d696a9425f1fbe97;{\"accessToken\":\"\",\"commands\":[[0,\"complete_tutorial\",[15],[101,3,7,11,13,17,19,23]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1790981928}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "the PROOF ANCHOR, and the transaction the endpoint REFUSES to reproduce. The step and the completing gate are exactly as in the neutral round; only the CLIENT-SENT ladder differs: [101, 3, 7, 11, 13, 17, 19, 23]. Legacy adds each slot to the stored balance as max(current + delta, 0), so this single request moves all seven stored resources alongside the flag -- eight changed leaves. Slot 0's 101 is the vector's 'unknown', which apply_resources reads and DISCARDS (engine.py:253), so it must NOT appear among the changed leaves; that absence is asserted, not assumed. This is the evidence that makes the endpoint's post-execution proof non-tautological (design D4): without it, 'no stored resource moved' would be vacuously true of a command that provably can move all seven",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}
