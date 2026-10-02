@@ -396,7 +396,7 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a
@@ -650,6 +650,27 @@ try {
                 "--headless", "--path", $projectRel,
                 "--script", "res://tests/test_unit_behaviors.gd",
                 "--", "--scenario=live-behavior",
+                "--gameapi-endpoint=$endpoint"
+            )
+        },
+        @{
+            # The research phase drives one FULL step -> cash -> item -> reset
+            # cycle through the real v0 endpoint against the committed corpus's
+            # OWN research counters (all three at [0, 0]), so the unchanged
+            # legacy dispatcher executes four branches over one track.
+            # --expect-save-mutation holds because the step branch writes the
+            # track's step counter and research instant.
+            #
+            # No COMPAT_SEED_* seam is needed and none is used: unlike
+            # behavior-live, this line's state is present in the committed corpus
+            # as committed, and manufacturing it would be refused.
+            Name = "research-live"
+            Assertions = "research live phase"
+            ExpectSaveMutation = $true
+            Arguments = @(
+                "--headless", "--path", $projectRel,
+                "--script", "res://tests/test_research.gd",
+                "--", "--scenario=live-research",
                 "--gameapi-endpoint=$endpoint"
             )
         }
@@ -962,6 +983,28 @@ try {
         "behavior live phase proved both named refusals with the endpoint's own codes and no partial payload"
     Report-Result ($behaviorOut -match "(?m)^PASS corpus save mutated by the live placement") `
         "behavior live phase mutated the disposable corpus save"
+
+    # The research live phase must show a typed success for each of the four
+    # research branches through the real endpoint — including its value-level
+    # post-state proof (the derived step counter, the cash branch's
+    # instant-only zeroing with NO consumed cash, the item branch's PAIRED
+    # step-and-instant reset, the reset branch's three-counter zeroing, AND every
+    # stored resource unchanged, which is what makes the no-price claim
+    # non-tautological) and its two named refusals carrying the endpoint's own
+    # codes with no partial payload — and the harness must have observed the
+    # corpus save change.
+    $researchOut = ""
+    if ($phaseLogs.ContainsKey("research-live")) {
+        $researchOut = $phaseLogs["research-live"]
+    }
+    Report-Result ($researchOut -match "\[test\] PASS script=res://tests/test_research\.gd") `
+        "research live phase asserts its scenario"
+    Report-Result ($researchOut -match '\[test\] live-research applied step=1 cash=0 item=1 paired_reset=true reset=0 resources_unchanged=true') `
+        "research live phase drove the full step -> cash -> item -> reset cycle through the v0 endpoint, with its value-level post-state proof"
+    Report-Result ($researchOut -match "refused=invalid_track,invalid_action") `
+        "research live phase proved both named refusals with the endpoint's own codes and no partial payload"
+    Report-Result ($researchOut -match "(?m)^PASS corpus save mutated by the live placement") `
+        "research live phase mutated the disposable corpus save"
 
     # --- 8. guard baseline, post-run ---------------------------------------
 

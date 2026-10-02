@@ -18,6 +18,7 @@ extends Node
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
+const ResearchFlow = preload("res://scripts/units/research_flow.gd")
 
 ## Loopback default: the v0 service binds 127.0.0.1 only (design D3).
 const DEFAULT_ENDPOINT := "http://127.0.0.1:5056"
@@ -36,6 +37,7 @@ const LEVEL_UP_PATH := "/v0/level_up"
 const QUEUE_PATH := "/v0/queue"
 const COLLECTION_PATH := "/v0/collection"
 const RESURRECT_PATH := "/v0/resurrect"
+const RESEARCH_PATH := "/v0/research"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -507,6 +509,46 @@ func resurrect_hero_town(user_id: String, x: int,
 			str(outcome.get("code", "bad_response")),
 			str(outcome.get("message", "")))
 	return BehaviorFlow.parse_resurrect(outcome.get("payload"))
+
+
+## One research-track intent over loopback HTTP: the client sends the save
+## identity, a CLOSED action, and the research track, and NOTHING else — no
+## counter value, no research instant, and no cash amount. Any `step` / `item` /
+## `timestamp` / `instant` / `cash` / `price` / `cost` / `step_count` / `reward` /
+## `remaining` / `ready` / `duration` / `resources_changed` / `vector` /
+## `seconds` / `fast_forward` key the service receives alongside the identity is
+## **ignored** server-side, exactly as the collect, expand, level-up, collection,
+## and revival routes ignore client-supplied amounts and prices (research design
+## D2): the service derives every counter, derives the cash branch's own
+## argument, and executes the unchanged legacy branch with a NEUTRAL vector
+## (design D3).
+##
+## The response's second post-execution proof half requires **every** stored
+## resource to be **unchanged**, because a research action moves none. That is
+## what makes the no-price claim non-tautological.
+##
+## **No readiness and no completion** are reported, and no price either: the
+## typed parser refuses a response that claims any of them, and `fast_forward` is
+## offered by **no** action and **no** route (design D7).
+##
+## Structured service errors pass through with their original codes — notably
+## `missing_track`, `invalid_track`, and `unresolvable_research_state`, and the
+## shared `missing_user_id` / `invalid_user_id` / `unknown_user_id` /
+## `internal_error` family — all of which the client surfaces instead of
+## advancing anything; transport failures keep the boot failure rules, never a
+## partial payload.
+func advance_research_town(user_id: String, action: String,
+		track: int) -> ResearchFlow.ResearchResult:
+	var outcome := await _call("POST", RESEARCH_PATH, JSON.stringify({
+		"user_id": user_id,
+		"action": action,
+		"track": track,
+	}))
+	if not outcome.get("ok", false):
+		return ResearchFlow.result_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return ResearchFlow.parse_result(outcome.get("payload"))
 
 
 ## every failure returns `{ok: false, code, message}` with the failure named.

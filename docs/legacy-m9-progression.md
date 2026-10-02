@@ -327,11 +327,15 @@ elapsed-time input the research system has.** It has no observable effect for th
 
 Measured across every normalized package and `config/main.json`:
 
-- **No normalized package contains a research section.** `research` appears in exactly **one** normalized
-  file, `buildings.json`, and there only inside a single `name` value: **`legacy_id` 256, `name`
-  "Research Lab"**. It is a building, and it is not what the counters track.
-- **`config/main.json` has no key whose name contains `research`** — zero of the 20 top-level content
-  keys, and no nested key either.
+- **No normalized package contains a research section.** `research` appears in **two** normalized files —
+  `buildings.json` (**1** occurrence) and `images.json` (**6**, from three popup-asset rows) — and every
+  occurrence is an **asset name** or a building's **display name**: **`legacy_id` "256", `name`
+  "Research Lab"**, plus `popupResearchCenter_buildingProcess{,_2,_3}.swf`. None of them is a schedule,
+  price, gate, or reward.
+- **`config/main.json` has no top-level key whose name contains `research`** — but it does have **three**
+  nested ones, all in the `/images` asset namespace
+  (`/images/popupResearchCenter_buildingProcess{,_2,_3}.swf`), and exactly **one** string value
+  (`/items/244/name = "Research Lab"`).
 - **There is therefore no committed cost, no committed step count, no committed unlock requirement, and no
   committed reward for research.** Nothing exists to derive a schedule from, which independently confirms
   section 2's refusal and strengthens it: a research price is not merely unsourced, it is **absent from
@@ -354,3 +358,58 @@ authority story in M9, since the counters advance on the client's word and the o
 
 Quests remains the largest surface and the natural second line, with its content side already normalized at
 **91** entries of a uniform ten-field shape.
+
+---
+
+## Corrections after the research Apply stage (2026-10-02)
+
+**Three figures in section 12 were asserted rather than measured, and all three overstated the absence of
+committed research content.** The Apply stage measured them and the orchestrator re-measured each
+independently before accepting the correction. Recorded rather than quietly applied:
+
+1. **`research` appears in TWO normalized files, not one.** The record said "exactly **one** normalized
+   file, `buildings.json`". Measured across the whole package: **`buildings.json` 1 occurrence** and
+   **`images.json` 6**, totalling **7**. The `images.json` occurrences are **three** rows —
+   `popupResearchCenter_buildingProcess.swf`, `_2.swf`, `_3.swf` — each contributing the word **twice**
+   (once in `legacy_id`, once in `path`), so 3 rows → 6 occurrences.
+2. **`config/main.json` DOES have keys containing `research`** — exactly **three**, all under `/images`:
+   `/images/popupResearchCenter_buildingProcess.swf`, `..._2.swf`, `..._3.swf`. The record's claim of
+   "**no** key containing `research` at any depth" is **false**. What is true is narrower: **no
+   top-level** content key contains it, and the three hits are **asset-name keys in the `/images`
+   namespace**, not content sections. The file also has exactly **one string *value*** containing it:
+   `/items/244/name = "Research Lab"`.
+3. **The building's `legacy_id` is the STRING `"256"`, not the integer `256`.** An integer comparison
+   finds no such row at all; **every** `legacy_id` in `buildings.json` is a string.
+
+### What survives, and why the conclusion is unchanged
+
+The corrections **narrow** an overstatement rather than overturn a finding. All three hits are **asset
+names or a display name**, never an economy:
+
+- the three `/images` keys name **SWF popups**, not costs, step counts, unlocks, or rewards;
+- `images.json`'s three rows are the same popup assets, referenced not defined;
+- `/items/244/name` is a **display string**.
+
+**There is still no committed research cost, step count, unlock requirement, or reward**, and the
+no-price / no-schedule refusal stands unchanged — now on a **correctly measured** basis rather than an
+overstated one. That distinction matters for how the refusal is read: the record previously said the words
+were *absent from the content entirely*, which overstated the case; the accurate statement is that
+**research appears in the content only as asset names and one building's display name, and never as a
+schedule, price, gate, or reward.**
+
+### Everything else in section 12 measured correct
+
+Re-verified independently by the orchestrator:
+
+- the four branch line ranges `268–274`, `276–282`, `284–291`, `293–300`, each confirmed by content and
+  not by line number alone;
+- `TYPE_AREA_51` and `TYPE_ROBOTIC` appear **4** times each, all in `command.py`, all on comment lines
+  `269`, `278`, `285`, `294`, and **0** times in the other six modules;
+- `researchStepNumber` **3** sites (`271`, `288`, `297`), `researchItemNumber` **2** (`287`, `296`),
+  `timeStampDoResearch` **5** (`272`, `280`, `289`, `298`, `923`) — **all** in `command.py` and only in
+  `command.py`;
+- `fast_forward` reads `seconds = args[0]` at `906`, reads the vector at `923`, and writes it at `927`;
+- `map_lose_item` is `engine.py:215-228` with `push_dead_unit` called at **223** (not at the function's
+  first line), and its only two callers are `command.py:796` inside **`end_quest`** and `command.py:872`
+  inside **`end_attack`** — so the fourth dead-hero door is reached from **two** branches, not one, which
+  strengthens rather than weakens the correction made to `godot-unit-behaviors`.

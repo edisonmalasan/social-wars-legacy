@@ -38,8 +38,12 @@ extends "res://tests/test_base.gd"
 ## its suite, and the `unit-animations` evidence report), and the unit-behaviors
 ## work (the `scripts/units/unit_behaviors.gd` dead-hero ledger projection with
 ## its two-door increment gates and the three-door command inventory, the
-## `scripts/units/behavior_flow.gd` revival intent that carries only an
-## identifier and a cell, its suite, and the `unit-behaviors` evidence report):
+## the `scripts/units/behavior_flow.gd` revival intent that carries only an
+## identifier and a cell, its suite, and the `unit-behaviors` evidence report),
+## and the research work (the `scripts/units/research_flow.gd` two-track counter
+## projection with the four recorded branch effects, the `fast_forward` fourth
+## writer, and the absent-price/readiness/bounds/reward refusals, its suite, and
+## the `research` evidence report):
 ## no other game system, no scene beyond the allow-list, no script outside
 ## the allow-list, no Flash-related runtime, no legacy protocol token
 ## anywhere, and no transport reference outside the legacy-v0
@@ -114,6 +118,7 @@ const ALLOWED := [
 	"scripts/units/unit_animations.gd",
 	"scripts/units/unit_behaviors.gd",
 	"scripts/units/behavior_flow.gd",
+	"scripts/units/research_flow.gd",
 	"scripts/verification.gd",
 	"tests/test_asset_ids.gd",
 	"tests/test_audio_manager.gd",
@@ -155,6 +160,7 @@ const ALLOWED := [
 	"tests/test_unit_movement.gd",
 	"tests/test_unit_animations.gd",
 	"tests/test_unit_behaviors.gd",
+	"tests/test_research.gd",
 	"evidence/boot/boot-report.json",
 	"evidence/building-move/building-move.png",
 	"evidence/building-move/report.json",
@@ -191,6 +197,7 @@ const ALLOWED := [
 	"evidence/unit-movement/report.json",
 	"evidence/unit-animations/report.json",
 	"evidence/unit-behaviors/report.json",
+	"evidence/research/report.json",
 ]
 
 ## The exact scene set the project may declare (set equality below).
