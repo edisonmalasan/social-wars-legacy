@@ -3043,3 +3043,114 @@ one; `config/main.json` **does** have **three** nested keys containing it, all i
 namespace, so "no key at any depth" is **false** — though no *top-level* key contains it; and the
 building's `legacy_id` is the **string** `"256"`, since every `legacy_id` in `buildings.json` is a string.
 **The conclusion is unchanged**, but the refusal now rests on a correctly measured basis.
+## Quest progression (M9 line 2)
+
+**M9 — Progression's second deliver line** and its **largest surface**: six undelivered branches, on the
+committed contract in `docs/legacy-m9-quests.md` (PR #258).
+
+## Only TWO committed quest fields are read by anything
+
+Measured as **quoted** occurrences across the seven legacy modules, so comments cannot contribute:
+
+| Committed field | Quoted legacy occurrences |
+| --- | --- |
+| `id` | **8** |
+| `title` | **2** — the two `print` statements |
+| **`reward`** | **0** |
+| `hint`, `description`, `kind`, `legacy_id`, `source_file`, `source_layer`, `content_version` | **0** each |
+
+`reward` is committed on all **91** entries and is **uniformly the value `10`** — so it carries **no
+information even if it were read**. **There is therefore no quest reward, cost, or price to derive**, and
+none is.
+
+## `complete_goal` mutates nothing
+
+The executed fixture proves it: the captured transaction changed **no** `privateState` key and **no**
+`maps[0]` key. A goal "completes" by being narrated in a `print` statement, so a line that wrote a
+completion flag, ledger, or reward would invent a mechanic that does not exist.
+
+## The divergence is **measured**, not asserted
+
+Probe 4 sends `end_quest` with `units = [[26, 0, 1, 0]]`, so the legacy branch's **client-computed**
+`lost = max(0, unit[2] - unit[3])` is **1**:
+
+- the **legacy server destroyed a placed row, 40 → 39**;
+- the modern endpoint derives `units: []`, destroys nothing, and leaves **all 40 rows byte-identical**.
+
+Recorded as a **divergence**, not as parity. Reproducing a client-dictated destruction count would be
+exactly the anti-pattern `AGENTS.md` names as "Bad". The manifest also records separately that the
+*captured transaction's* rows were byte-identical, because that step carried no lossy tuple — the worker
+distinguished the two rather than letting the probe stand in for the transaction.
+
+## Three probes establish the refusals with executed evidence
+
+- `set_goals([500, "[0,0]"])` grew the list from **151 to 501** — **350** entries appended from one
+  client-sent id, **no upper bound** — so the endpoint **reproduces** the unbounded growth rather than
+  closing it.
+- `set_quest_var(["idSimpleChapter", 5])` wrote **nothing** (the branch returns at `command.py:95` before
+  any write) while an invented key **was** accepted — so exactly **one** key is refused, and it is the one
+  the legacy branch itself ignores.
+- `collect_mission([150])` **wrapped to `1`** at bound `99`, stored as a **`str`** against a corpus
+  recording an **integer** `0`.
+
+## Five cross-layer defects the hermetic suite **structurally could not catch**
+
+This is the most important verification finding of the line. The offline suite builds its own response
+envelope, so **1223 hermetic checks passed while the live phase failed five separate times**. Each was
+found only by `quests-live`:
+
+1. the transport sent every action's addressing under a fixed `addressing` key while the service reads the
+   **per-action** key;
+2. `project_quests()` never emitted the `resolvable` flag the typed parser requires, so **all six** live
+   responses were refused `bad_response`;
+3. the parser demanded `end_quest_blob` unconditionally while the service sends `null` for the other five;
+4. `int()` on a recorded null goal is a **nonexistent constructor** in Godot 4;
+5. **Godot decodes every JSON number as a `float`**, so `[0,0]` arrives as `[0.0,0.0]`.
+
+New guards were added for the class: the request's third key is asserted equal to
+`ACTION_ADDRESSING_KEY[action]`, the transport must call `wire_key()` and must contain no hardcoded
+`"addressing":`, and the suite **asserts the double builds no body at all**, recording *why* it could not
+catch any of the five.
+
+## Verification actually run (2026-10-03)
+
+```bash
+python -B apps/compat-api/capture_quest_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_quests.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+```
+
+- fixture capture: exit **0**, six branch transactions plus login and **five** probes
+- the hermetic suite: **1223 checks** (1238 with `--report`) — the **37th** hermetic suite
+- `verify.ps1` exit **0**; `verify-boot.ps1` exit **0** with **37 hermetic suites and 18 live phases**,
+  guard digest `6978b959…ff348` identical pre/post
+- **484** log files inspected with **zero** `[test] FAIL`, `^ERROR:`, or `SCRIPT ERROR` lines
+- compat suite **grown** to **`Ran 1751 tests ... OK`** — up from 1572 by **+179**
+- evidence: `evidence/quests/report.json`, `quests-report-v1`, digest **`412dd271…6019`**, byte-identical
+  across **three** runs
+
+**Two anti-invention guards, both tested by injection rather than trusted.** Injecting `quest_reward`
+produced **4 independent failures** and exit 1; injecting `mark_goal_complete` produced **4 independent
+failures** and exit 1; restoring the byte-identical file (SHA-256 `631a564d…fa12`) returned the suite to exit
+**0** with **1223 checks**.
+
+### Claim limits
+
+**No quest reward is paid** and **no stored resource moves**, and the uniform `10` is recorded as **not** a
+payout · **the `end_quest` destruction count is refused** as a divergence, not parity · **no bound is added**
+to the on-demand goals list and **no membership test** to the quest-variable writer, both absences being
+Server v1 / M13 gaps deliberately not filled · **no completion state exists** · `unlockedQuestIndex` is
+reported and **never written**, having **zero** legacy sites — the ninth such field in this project ·
+**no fast-forward operation is delivered**, though `command.py:942-944` and `911` are recorded as
+quest-state writers making quest timing client-writable, and `version.py:38-44` as a **migration** rather
+than gameplay · the committed content is **reported and never used**, with no delivered identifier named
+after the reward field · parity covers **six** transactions and five probes against the fresh-player corpus
+only · the five **missing-key** refusals are **structurally unreachable through the typed client** and the
+live phase proves this rather than asserting it · the hermetic suite **cannot** detect envelope or wire
+drift by construction, so `quests-live` is the only guard for that class · **no pixel parity** and **no
+windowed capture**, because nothing is rendered.
+
+**A third recorded flaky surface:** `verify.ps1` returned **-1** on one of two runs and **0** with
+`PASS all checks succeeded` on the second, because its windowed-capture step is display-sensitive.

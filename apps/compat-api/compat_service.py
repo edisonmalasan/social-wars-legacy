@@ -807,6 +807,7 @@ lives here so both the start command and the tests read one constant).
 
 from __future__ import annotations
 
+import copy
 import os
 from typing import Any, Dict, Optional, Tuple
 
@@ -827,6 +828,7 @@ import sell_envelope
 import store_envelope
 import upgrade_envelope
 import research_envelope
+import quest_envelope
 
 PROTOCOL = "compat-v0"
 HOST = "127.0.0.1"
@@ -881,6 +883,18 @@ ERROR_NOT_RESURRECTABLE = "not_resurrectable"
 ERROR_MISSING_TRACK = "missing_track"
 ERROR_INVALID_TRACK = "invalid_track"
 ERROR_UNRESOLVABLE_RESEARCH_STATE = "unresolvable_research_state"
+ERROR_MISSING_GOAL_INDEX = "missing_goal_index"
+ERROR_INVALID_GOAL_INDEX = "invalid_goal_index"
+ERROR_MISSING_QUEST_VAR_KEY = "missing_key"
+ERROR_INVALID_QUEST_VAR_KEY = "invalid_key"
+ERROR_IGNORED_QUEST_VAR_KEY = "ignored_quest_var_key"
+ERROR_MISSING_MISSION = "missing_mission"
+ERROR_INVALID_MISSION = "invalid_mission"
+ERROR_MISSING_QUEST_INDEX = "missing_quest_index"
+ERROR_INVALID_QUEST_INDEX = "invalid_quest_index"
+ERROR_MISSING_QUEST_ID = "missing_quest_id"
+ERROR_INVALID_QUEST_ID = "invalid_quest_id"
+ERROR_UNRESOLVABLE_QUEST_STATE = "unresolvable_quest_state"
 ERROR_BAD_REQUEST = "bad_request"
 ERROR_NOT_FOUND = "not_found"
 ERROR_METHOD_NOT_ALLOWED = "method_not_allowed"
@@ -3646,6 +3660,359 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
                 clicks_to_build=behavior_envelope.CLICKS_TO_BUILD_BOUNDARY,
                 refusals=behavior_envelope.refusals(),
                 no_third_gate=behavior_envelope.NO_THIRD_GATE,
+                resources=resources_after,
+            ),
+            200,
+        )
+
+    @app.post("/v0/quests")
+    def v0_quests() -> Tuple[Dict[str, Any], int]:
+        """Execute one quest intent through the unchanged legacy path.
+
+        One call carries **exactly one** of the six legacy quest branches
+        (``command.py:68-74``, ``76-79``, ``87-117``, ``430-442``, ``745-750``,
+        ``752-806``), chosen by the **closed** action vocabulary.
+
+        **The client sends a player identifier and the branch's own addressing,
+        and nothing else.**  The addressing is the branch's own subject — a goal
+        index, a quest-variable key, a mission identifier, a rank index, or a
+        quest identifier — and every other value is
+        :mod:`quest_envelope`'s ``DERIVED_*`` constant: the progress pair, the
+        quest-variable value, the rank difficulty, and the whole ``end_quest``
+        blob.  Any ``progress``, ``value``, ``difficulty``, ``win``,
+        ``voluntary_end``, ``duration``, ``map``, ``units``, ``lost``,
+        ``reward``, ``price``, ``cost``, ``resources_changed``, ``vector``,
+        ``seconds``, or ``fast_forward`` key a client attaches is **ignored**, so
+        a request carrying every one of them changes nothing and the response
+        echoes no ignored value.
+
+        **Design D2 — the destruction count is REFUSED and the difference from
+        the legacy server is a DIVERGENCE, not parity.**  The legacy branch
+        destroys placed rows through ``map_lose_item`` (``command.py:796``) using
+        a count the **client** computed, ``max(0, unit[2] - unit[3])``
+        (``command.py:792``).  This route derives the blob server-side with
+        ``units`` as an **empty list**, so the destruction loop
+        (``command.py:790``) iterates zero times, ``map_lose_item`` is never
+        reached, and every placed row is left **byte-identical** — proved over
+        the **complete** ``items`` mapping, not a selected subset.  The response
+        reports that as a divergence rather than as parity.
+
+        **Design D3 — ``complete_goal`` is delivered as a no-op on purpose.**  It
+        mutates nothing (it resolves the committed title, prints it, and
+        returns), so the route executes the real branch and its post-execution
+        proof requires the **whole** quest state to be byte-identical.  No
+        completion flag, ledger, or reward exists.
+
+        **Design D4/D5 — no bound and no membership rule is added.**
+        ``set_goals`` grows the goals list on demand with **no upper bound**, so
+        the endpoint reproduces that growth rather than closing it; the one
+        structural refusal is a **negative** goal index, because Python would
+        otherwise write ``goals[-1]``.  ``set_quest_var`` accepts **any**
+        key — an invented one is persisted, as legacy does — and refuses exactly
+        the one key the branch itself ignores, ``idSimpleChapter``.
+
+        **Design D6 — a neutral vector and a two-part proof.**  No quest price
+        exists: the committed ``reward`` field has **zero** legacy consumers and
+        is **uniformly the value 10** on all 91 entries, so the derived vector is
+        neutral.  The proof's first half requires the persisted quest state to
+        match the **derived** result for the action — every field it writes, every
+        field it does not, and the two wall-clock fields compared by **shape** and
+        **direction** — plus every placed row byte-identical.  The second half
+        requires **every** stored resource to be **unchanged**.
+
+        **Design D7 — ``unlockedQuestIndex`` is reported and never written.**  It
+        has **zero** legacy sites, so no action here touches it and the proof
+        fails closed if one ever does.
+
+        **Design D9 — no fast-forward operation is delivered.**  ``fast_forward``
+        subtracts a **client-supplied** number of seconds from every quest time
+        and from the last-chapter instant; it is recorded in
+        ``quest_envelope.FAST_FORWARD_CONTRACT`` and exposed by **no** action and
+        **no** route.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404,
+                ERROR_UNKNOWN_USER_ID,
+                "no save exists for user_id %r" % user_id,
+            )
+
+        if "action" not in payload:
+            return error_response(400, ERROR_MISSING_ACTION, "action is required")
+        action = payload["action"]
+        if not quest_envelope.is_action(action):
+            return error_response(
+                400,
+                ERROR_INVALID_ACTION,
+                "action must be one of %s"
+                % ", ".join(sorted(quest_envelope.ACTIONS)),
+            )
+
+        # --- the ONE value a client may name: the branch's own addressing ----
+        addressing_key = quest_envelope.ACTION_ADDRESSING_KEY[str(action)]
+        missing_code = ERROR_MISSING_ACTION
+        invalid_code = ERROR_INVALID_ACTION
+        if str(action) == quest_envelope.ACTION_SET_GOAL \
+                or str(action) == quest_envelope.ACTION_COMPLETE_GOAL:
+            missing_code = ERROR_MISSING_GOAL_INDEX
+            invalid_code = ERROR_INVALID_GOAL_INDEX
+        elif str(action) == quest_envelope.ACTION_SET_QUEST_VAR:
+            missing_code = ERROR_MISSING_QUEST_VAR_KEY
+            invalid_code = ERROR_INVALID_QUEST_VAR_KEY
+        elif str(action) == quest_envelope.ACTION_COLLECT_MISSION:
+            missing_code = ERROR_MISSING_MISSION
+            invalid_code = ERROR_INVALID_MISSION
+        elif str(action) == quest_envelope.ACTION_SET_QUEST_RANK:
+            missing_code = ERROR_MISSING_QUEST_INDEX
+            invalid_code = ERROR_INVALID_QUEST_INDEX
+        else:
+            missing_code = ERROR_MISSING_QUEST_ID
+            invalid_code = ERROR_INVALID_QUEST_ID
+        if addressing_key not in payload:
+            return error_response(
+                400,
+                missing_code,
+                "%s is required for a %s (%s)"
+                % (addressing_key, action,
+                   quest_envelope.ACTION_ADDRESSING[str(action)]),
+            )
+        addressing = payload[addressing_key]
+        if str(action) == quest_envelope.ACTION_SET_QUEST_VAR:
+            if str(addressing) == quest_envelope.QUEST_VAR_IGNORED_KEY:
+                return error_response(
+                    409,
+                    ERROR_IGNORED_QUEST_VAR_KEY,
+                    "the legacy set_quest_var branch explicitly IGNORES %r "
+                    "(command.py:91-95), so it is refused rather than persisted: "
+                    "the game's own comment explains the key is dropped to let a "
+                    "player reach chapter 99"
+                    % quest_envelope.QUEST_VAR_IGNORED_KEY,
+                )
+            if not quest_envelope.is_quest_var_key(addressing):
+                return error_response(
+                    400, invalid_code, "key must be a non-empty string, got %r"
+                    % (addressing,),
+                )
+        elif str(action) in (
+            quest_envelope.ACTION_SET_GOAL,
+            quest_envelope.ACTION_COMPLETE_GOAL,
+        ):
+            if not quest_envelope.is_goal_index(addressing):
+                return error_response(
+                    400,
+                    invalid_code,
+                    "goal_index must be a non-negative integer, got %r; the goals "
+                    "list grows on demand with NO upper bound, so a large index is "
+                    "accepted, but a negative one would alias goals[-1] in Python "
+                    "and that is refused structurally"
+                    % (addressing,),
+                )
+        elif str(action) == quest_envelope.ACTION_COLLECT_MISSION:
+            if not quest_envelope.is_mission(addressing):
+                return error_response(
+                    400, invalid_code,
+                    "mission must be an integer, got %r" % (addressing,),
+                )
+        elif str(action) == quest_envelope.ACTION_SET_QUEST_RANK:
+            if not quest_envelope.is_quest_rank_index(addressing):
+                return error_response(
+                    400, invalid_code,
+                    "quest_index must be an integer, got %r" % (addressing,),
+                )
+        else:
+            if not quest_envelope.is_quest_id(addressing):
+                return error_response(
+                    400, invalid_code,
+                    "quest_id must be an integer, got %r" % (addressing,),
+                )
+
+        # Both pre-execution reads happen **before** dispatch.  The snapshots are
+        # deep-enough COPIES, because the legacy branches mutate these very
+        # containers in place: a by-reference snapshot would alias the live state
+        # and report the after-state as the before-state.
+        try:
+            before_state = quest_envelope.snapshot_state(boot.save_document(user_id))
+            items_before = copy.deepcopy(boot.map_items(user_id))
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        except quest_envelope.EnvelopeError as failure:
+            # A server-side state failure, never a client value: the endpoint
+            # must be able to address its own state, so an unresolvable quest
+            # state fails closed instead of being defaulted to zeros.
+            return error_response(409, ERROR_UNRESOLVABLE_QUEST_STATE, str(failure))
+        try:
+            resources_before = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        # The derived post-execution state, computed BEFORE dispatch against the
+        # copied snapshot, so the derivation cannot be influenced by what
+        # execution writes.
+        try:
+            derived = quest_envelope.derived_quest(before_state, action, addressing)
+        except quest_envelope.EnvelopeError as failure:
+            if failure.code == quest_envelope.REASON_INVALID_ACTION:
+                return error_response(400, ERROR_INVALID_ACTION, str(failure))
+            if failure.code == quest_envelope.REASON_IGNORED_KEY:
+                return error_response(409, ERROR_IGNORED_QUEST_VAR_KEY, str(failure))
+            if failure.code in (
+                quest_envelope.REASON_INVALID_GOAL_INDEX,
+                quest_envelope.REASON_INVALID_KEY,
+                quest_envelope.REASON_INVALID_MISSION,
+                quest_envelope.REASON_INVALID_QUEST_INDEX,
+                quest_envelope.REASON_INVALID_QUEST_ID,
+            ):
+                return error_response(400, invalid_code, str(failure))
+            return error_response(409, ERROR_UNRESOLVABLE_QUEST_STATE, str(failure))
+
+        # Derive the legacy envelope (design D2/D6): the command, its argument
+        # list, and the neutral resource vector are the module's, never the
+        # client's.
+        try:
+            envelope_payload = quest_envelope.build_envelope(
+                action=action, addressing=addressing
+            )
+        except quest_envelope.EnvelopeError as failure:
+            if failure.code in (
+                quest_envelope.REASON_INVALID_VECTOR,
+                quest_envelope.REASON_INVALID_TIMESTAMP,
+                quest_envelope.REASON_INVALID_PAYLOAD,
+            ):
+                return error_response(500, ERROR_INTERNAL, failure.code)
+            return error_response(400, failure.code, str(failure))
+
+        # Execute the unchanged legacy command dispatcher in-process.  It persists
+        # via legacy save_session into this corpus only; the legacy HTTP route
+        # returns {"result": "success"} whenever command() returns without
+        # raising, so reaching here IS the legacy result -- which is precisely
+        # why it is NOT taken as proof that the right fields were written and
+        # that nothing else moved.
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        # Prove the post-state (design D2/D3/D4/D6).  Part one: the persisted quest
+        # state matches the DERIVED result for the action, with every untouched
+        # field compared by value and the two wall-clock fields compared by shape
+        # and direction; plus EVERY placed row byte-identical, which is what
+        # proves the refused destruction count stayed refused.  Part two: every
+        # stored resource is unchanged, which is the neutral vector's own
+        # guarantee and what forecloses a smuggled vector.  Either half failing is
+        # a reported failure, not a success.
+        try:
+            after_state = quest_envelope.snapshot_state(boot.save_document(user_id))
+            items_after = boot.map_items(user_id)
+            resources_after = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        except quest_envelope.EnvelopeError as failure:
+            return error_response(500, ERROR_INTERNAL, str(failure))
+        divergence = quest_envelope.expected_state(
+            before_state, str(action), addressing, after_state
+        )
+        if divergence is not None:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the persisted quest state does not carry the derived result for a "
+                "%s: %s" % (derived["action"], divergence),
+            )
+        if items_after != items_before:
+            changed = sorted(
+                set(str(key) for key in items_before) | set(str(key) for key in items_after)
+            )
+            moved = [
+                key for key in changed
+                if items_before.get(key) != items_after.get(key)
+            ]
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "placed rows changed under a %s (map keys %s): no quest branch "
+                "destroys a placed row, and the client-computed destruction count "
+                "is refused by contract (design D2)"
+                % (derived["command"], moved),
+            )
+        for name in sorted(resources_after):
+            if resources_after[name] != resources_before[name]:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "resource %s is %r after execution, not the pre-execution "
+                    "%r: a quest action moves no resource, so the derived neutral "
+                    "vector requires every stored resource to be unchanged"
+                    % (name, resources_after[name], resources_before[name]),
+                )
+        return (
+            envelope(
+                boot,
+                result="success",
+                action=str(action),
+                addressing=derived["addressing"],
+                addressing_kind=derived["addressing_kind"],
+                command=derived["command"],
+                derived={
+                    "written": derived["written"],
+                    "untouched": derived["untouched"],
+                    "mutates": derived["mutates"],
+                    "stamps_instant": derived["stamps_instant"],
+                    "stamps_chapter": derived["stamps_chapter"],
+                    "progress_pair": list(quest_envelope.DERIVED_PROGRESS),
+                    "quest_var_value": quest_envelope.DERIVED_QUEST_VALUE,
+                    "difficulty": quest_envelope.DERIVED_DIFFICULTY,
+                    "wrapped_mission": (
+                        quest_envelope.wrap_mission(addressing)
+                        if str(action) == quest_envelope.ACTION_COLLECT_MISSION
+                        else None
+                    ),
+                },
+                previous=quest_envelope.project_quests(before_state),
+                quests=quest_envelope.project_quests(after_state),
+                quest_state=quest_envelope.copy_state(after_state),
+                branches=[dict(record) for record in quest_envelope.BRANCHES],
+                branch_count=quest_envelope.BRANCH_COUNT,
+                writers=[dict(record) for record in quest_envelope.WRITERS],
+                writer_count=quest_envelope.WRITER_COUNT,
+                fast_forward_offered=False,
+                reward_paid=0,
+                reward_derived_from_content=False,
+                unlocked_quest_index=after_state[quest_envelope.KEY_UNLOCKED_INDEX],
+                unlocked_quest_index_written=False,
+                destruction={
+                    "status": "REFUSED",
+                    "legacy_status": "DIVERGENCE, NOT PARITY",
+                    "client_supplied_units_ignored": True,
+                    "derived_units": 0,
+                    "placed_rows_before": len(items_before),
+                    "placed_rows_after": len(items_after),
+                    "placed_rows_byte_identical": True,
+                    "ledger_door": quest_envelope.LEDGER_DOOR,
+                    "note": quest_envelope.END_QUEST_REFUSAL,
+                },
+                end_quest_blob=(
+                    quest_envelope.end_quest_blob(addressing)
+                    if str(action) == quest_envelope.ACTION_END_QUEST
+                    else None
+                ),
+                ignored_client_keys=list(quest_envelope.IGNORED_CLIENT_KEYS),
+                persisted_client_values=list(quest_envelope.PERSISTED_CLIENT_VALUES),
+                refusals=[
+                    {"refusal": record["refusal"], "implemented": record["implemented"]}
+                    for record in quest_envelope.REFUSALS
+                ],
+                refused_destruction=dict(quest_envelope.REFUSED_DESTRUCTION),
+                migration=dict(quest_envelope.MIGRATION),
+                content_note=quest_envelope.CONTENT_RECORD_NOTE,
                 resources=resources_after,
             ),
             200,

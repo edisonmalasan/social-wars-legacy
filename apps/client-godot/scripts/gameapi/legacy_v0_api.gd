@@ -19,6 +19,7 @@ extends Node
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
 const ResearchFlow = preload("res://scripts/units/research_flow.gd")
+const QuestFlow = preload("res://scripts/units/quest_flow.gd")
 
 ## Loopback default: the v0 service binds 127.0.0.1 only (design D3).
 const DEFAULT_ENDPOINT := "http://127.0.0.1:5056"
@@ -38,6 +39,7 @@ const QUEUE_PATH := "/v0/queue"
 const COLLECTION_PATH := "/v0/collection"
 const RESURRECT_PATH := "/v0/resurrect"
 const RESEARCH_PATH := "/v0/research"
+const QUEST_PATH := "/v0/quests"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -549,6 +551,67 @@ func advance_research_town(user_id: String, action: String,
 			str(outcome.get("code", "bad_response")),
 			str(outcome.get("message", "")))
 	return ResearchFlow.parse_result(outcome.get("payload"))
+
+
+## One quest intent over loopback HTTP: the client sends the save identity, a
+## CLOSED action, and the branch's own addressing under that action's **own**
+## wire key (`goal_index`, `key`, `mission`, `quest_index`, or `quest_id` —
+## `QuestFlow.ACTION_ADDRESSING_KEY`, read through `QuestFlow.wire_key()`) — and
+## NOTHING else. The typed layer carries the addressing **positionally**; the wire
+## key is the per-action spelling the service reads, so a body is always exactly
+## THREE keys and no fourth value is even expressible. No progress pair, no value, no
+## difficulty, no win/loss outcome, and no unit list can be sent, so there is no
+## channel through which a client could dictate an outcome (quest design D2). Any
+## `progress` / `value` / `difficulty` / `win` / `units` / `lost` / `reward` /
+## `price` / `resources_changed` / `vector` / `seconds` / `fast_forward` key the
+## service receives alongside the identity is **ignored** server-side, exactly as
+## the collect, expand, level-up, collection, revival, and research routes ignore
+## client-supplied amounts and prices.
+##
+## The response's second post-execution proof half requires **every** stored
+## resource to be **unchanged**, because a quest action moves none. That is what
+## makes the no-reward claim non-tautological: the committed `reward` field has
+## ZERO legacy consumers and is **uniformly 10** on all 91 entries, so paying it
+## would fabricate an economy from a constant (design D6).
+##
+## **No completion and no elapsed time** are reported, and no reward either: the
+## typed parser refuses a response that claims any of them, `fast_forward` is
+## offered by **no** action and **no** route (design D9), and
+## `unlocked_quest_index_written` is `false` because that field has zero legacy
+## consumers (design D7).
+##
+## **The `end_quest` destruction count is REFUSED and reported as a DIVERGENCE,
+## not as parity** (design D2): the service derives the blob server-side with an
+## empty unit list, so no placed row is destroyed and the response proves every
+## row byte-identical over the complete `items` mapping. The legacy server DOES
+## destroy rows on that command — see probe 4 of the committed capture — and
+## authoritative combat belongs to Server v1 / M13.
+##
+## Structured service errors pass through with their original codes — notably
+## `missing_goal_index`, `invalid_goal_index`, `missing_key`, `invalid_key`,
+## `ignored_quest_var_key`, `missing_mission`, `invalid_mission`,
+## `missing_quest_index`, `invalid_quest_index`, `missing_quest_id`,
+## `invalid_quest_id`, and `unresolvable_quest_state`, and the shared
+## `missing_user_id` / `invalid_user_id` / `unknown_user_id` / `internal_error`
+## family — all of which the client surfaces instead of advancing anything;
+## transport failures keep the boot failure rules, never a partial payload.
+func advance_quest_town(user_id: String, action: String,
+		addressing: Variant) -> QuestFlow.QuestResult:
+	var body := {
+		"user_id": user_id,
+		"action": action,
+	}
+	# The per-action wire key IS the addressing, and `wire_key()` is the ONE place
+	# it is decided, so the body cannot drift from the key the service reads. An
+	# action outside the closed table still yields exactly three keys, and the
+	# service answers `invalid_action` before it looks at the addressing.
+	body[QuestFlow.wire_key(action)] = addressing
+	var outcome := await _call("POST", QUEST_PATH, JSON.stringify(body))
+	if not outcome.get("ok", false):
+		return QuestFlow.result_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return QuestFlow.parse_result(outcome.get("payload"))
 
 
 ## every failure returns `{ok: false, code, message}` with the failure named.
