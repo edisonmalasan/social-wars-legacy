@@ -110,6 +110,14 @@ The change SHALL commit a windowed capture of a completed construction sequence 
 - **WHEN** the report step is rerun against the same inputs
 - **THEN** it reproduces its committed bytes exactly
 
+
+#### Scenario: The construction-click counter's committed source is named
+- **WHEN** the deliberately unconsumed construction-click counter is read
+- **THEN** it names `clicks_to_build` as the committed field whose **single** legacy consumer
+  seeds it at placement, records that the field has exactly **one** legacy read and is
+  therefore **not** a zero-consumer field, and states that `godot-unit-behaviors` references that
+  relationship while **reimplementing nothing**, so the counter keeps exactly one owner
+
 ### Requirement: Containment and preservation
 
 All execution SHALL stay on loopback under the pinned CPython 3.9.13 with the existing locked dependencies and no new packages; legacy sources, configs, saves, villages, committed fixtures, conversion packages, registry manifests, and the committed M4, M6, and every delivered gameplay slice's evidence SHALL remain byte-identical across the change (SHA-256 guards plus the hash manifest); construction execution SHALL never write a working-tree save; and both verification batteries SHALL exit 0 in the final state.
