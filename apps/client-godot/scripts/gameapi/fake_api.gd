@@ -90,9 +90,24 @@ extends Node
 ## executed legacy is owned exclusively by
 ## the compat fixture-replay tests; this double exists so the client flow can
 ## be tested hermetically and is NEVER itself a parity oracle.
+##
+## `resurrect_hero_town()` starts from the **committed corpus save** rather than
+## a `before.json` fixture, which makes it the only double that does: this line
+## has NO executed-legacy fixture by construction, because `resurrectable` is a
+## UNIT-ONLY committed flag, the corpus places only buildings, and its ledger is
+## present and `{}` (design D4).  It applies the legacy decrement with the
+## **delete-at-zero** rule, re-places the row at the derived key and cell with
+## **no** occupancy, bounds, type, or terrain check, and moves **no** resource —
+## `used_syringe` is bound from `args[4]` and DISCARDED, so the revival is free
+## (design D3/D5).  It is therefore another double with a deliberately NEUTRAL
+## vector — the file numbers only the three most recent ones, so no ordinal is
+## claimed here — and its in-memory ledger seed is **documented and throwaway**
+## rather than a committed write.
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const Paths = preload("res://scripts/package_paths.gd")
+const UnitBehaviors = preload("res://scripts/units/unit_behaviors.gd")
+const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
 
 const SAVE_LIST_FIXTURE := \
 	"tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json"
@@ -533,6 +548,17 @@ var _collection_state: Dictionary = {}
 var _collection_pid := ""
 var _collection_loaded := false
 var _collection_error := ""
+# Mutable in-memory dead-hero state (unit-behaviors design D8): one save, whose
+# placement row at the addressed cell is REPLACED by the derived revived item id
+# and whose ledger loses exactly one entry per successful revival under the
+# delete-at-zero rule — and whose seven balances never move, because a revival
+# moves no resource. Never written anywhere. This is the ONLY double that starts
+# from the committed corpus save rather than a `before.json` fixture, because
+# this line has NO executed-legacy fixture by construction (design D4).
+var _behavior_state: Dictionary = {}
+var _behavior_pid := ""
+var _behavior_loaded := false
+var _behavior_error := ""
 ## The start instant the committed executed push stamped, read out of that
 ## capture before any expectation is built. It is the only authority for the
 ## value the branch stamps: the double never reads a clock (design D8).
@@ -4375,3 +4401,359 @@ func _read_json_into(relative: String, sink: Dictionary) -> Dictionary:
 		return {}
 	var typed: Dictionary = parser.data
 	return typed
+
+
+# --- dead-hero resurrection double (unit-behaviors design D8) ----------------
+
+## The committed corpus save this double starts from: the **same** committed
+## bytes every other double's `before.json` fixture carries (they compare
+## byte-identical to it).  It is read, never written.
+##
+## This is the ONLY double that reads the committed corpus save directly rather
+## than a fixture under `tests/fixtures/`, and the reason is the line's own
+## named cause (design D4): `resurrectable` is a UNIT-ONLY committed flag and
+## the corpus places only buildings, so **no executed-legacy resurrection fixture
+## exists** and none was fabricated.  The double therefore has nothing executed
+## to reproduce, and it is NEVER a parity oracle — parity against executed legacy
+## is owned exclusively by the compat fixture-replay tests.
+const BEHAVIOR_CORPUS_SAVE := "tests/saves/fresh-player.json"
+
+## The in-memory ledger the double starts from, mirroring the live phase's
+## opt-in `COMPAT_SEED_DEAD_HEROES` seed so the two implementations can be
+## compared against each other.  It is a **documented, in-memory** seed of the
+## THROWAWAY state the live phase seeds its disposable corpus copy with, never a
+## write to any committed save, and it exists because the committed corpus's own
+## ledger is present and `{}`.
+const BEHAVIOR_SEED := {"1001": 1}
+
+## The committed item id the seed names, and the corpus cell the double's own
+## positive path addresses.  Both are read out of the committed bytes at run
+## time rather than trusted from this sentence.
+const BEHAVIOR_SEED_ITEM_ID := 1001
+
+## The ledger the double's projection reports when the state is unresolvable:
+## never a substituted entry.
+const BEHAVIOR_UNRESOLVABLE := "unresolvable_ledger"
+
+
+## One revival intent under the **same** contract the live implementation sends:
+## the save identity and a cell, and nothing else.
+##
+## The double is deterministic and in-memory: it reads the committed corpus
+## save, resolves the addressed cell against that save's own placement rows,
+## derives the revived item id from its **own in-memory ledger**, applies the
+## legacy decrement with the **delete-at-zero** rule, and re-places the row at
+## the derived key and cell with no occupancy, bounds, type, or terrain check —
+## the recorded absence, not an omitted one.  It never reads a wall clock: the
+## re-placed row's timestamp is the boot fixture's recorded epoch, exactly as
+## every other double stamps its own writes.
+##
+## Both gates are evaluated in the helper's own order and **no third**: the row
+## that stands at the addressed cell must be on player team 1, and the resolved
+## ledger entry's own committed `resurrectable` must be greater than zero.  The
+## gate is applied to the LEDGER ENTRY's item rather than to the row, because
+## the revived row is not on the map — which is why the response reports the
+## resolved entry's committed flag beside it.
+func resurrect_hero_town(user_id: String, x: int,
+		y: int) -> BehaviorFlow.ResurrectResult:
+	if user_id.strip_edges() == "":
+		return BehaviorFlow.resurrect_failure("missing_user_id",
+			"user_id must be a non-empty string")
+	if not _ensure_behavior_loaded():
+		return BehaviorFlow.resurrect_failure("fixture_unreadable",
+			_behavior_error)
+	if user_id != _behavior_pid:
+		return BehaviorFlow.resurrect_failure("unknown_user_id",
+			"no save exists for user_id '%s'" % user_id)
+	var target: Dictionary = _behavior_resolve(x, y)
+	if not bool(target.get("ok", false)):
+		return BehaviorFlow.resurrect_failure(str(target.get("reason", "")),
+			str(target.get("error", "")))
+	var map_key := int(target["map_key"])
+	var item_id := int(target["item_id"])
+	var ledger_before: Dictionary = (_behavior_state["ledger"] as Dictionary) \
+		.duplicate(true)
+	var derived: Dictionary = UnitBehaviors.expected_ledger(ledger_before, item_id)
+	if not bool(derived.get("resolvable", false)):
+		return BehaviorFlow.resurrect_failure("invalid_ledger",
+			str(derived.get("error", "")))
+	var ledger_after: Dictionary = (derived["entries"] as Dictionary) \
+		.duplicate(true)
+	var rows: Dictionary = (_behavior_state["rows"] as Dictionary).duplicate(true)
+	var placement_before: Array = (rows[str(map_key)] as Array).duplicate(true)
+	var placement_after: Array = _behavior_replacement(placement_before, item_id)
+	rows[str(map_key)] = placement_after
+	# Nothing else moves: no balance, no storage, no ledger beyond the derived
+	# decrement, and no other row.  A revival moves no resource (design D3).
+	_behavior_state["rows"] = rows
+	_behavior_state["ledger"] = ledger_after
+	# The same envelope shape the service returns; the shared parser yields the
+	# typed result (identical shapes by construction, design D8).
+	return BehaviorFlow.parse_resurrect({
+		"protocol": BootData.PROTOCOL,
+		"ok": true,
+		"game_version": str(_save_list_doc.get("game_version", "")),
+		# Time-dependent field: the fake reports the fixture capture's legacy
+		# server timestamp instead of "now" (never the wall clock).
+		"server_time": _fixture_server_time(),
+		"result": "success",
+		"map_key": map_key,
+		"item_id": item_id,
+		"count_before": int(derived["count_before"]),
+		"count_after": int(derived["count_after"]),
+		"removed": bool(derived["removed"]),
+		"cell": [int(x), int(y)],
+		"occupant_item_id": int(placement_before[0]),
+		"committed_resurrectable": int(target["committed_resurrectable"]),
+		"committed_syringes": int(target["committed_syringes"]),
+		"gates": UnitBehaviors.gates(),
+		"ledger_before": _behavior_ledger_entries(ledger_before),
+		"ledger_after": _behavior_ledger_entries(ledger_after),
+		"placement_before": placement_before,
+		"placement_after": placement_after,
+		"syringe": {
+			"charged": 0,
+			"discarded_argument": 0,
+			"echoed": false,
+			"committed_syringes_reported_as_content_only":
+				int(target["committed_syringes"]),
+			"note": UnitBehaviors.SYRINGE_DISCARD_NOTE,
+			"rule": UnitBehaviors.NO_SYRINGE_COST,
+		},
+		"resolution": {
+			"rule": "the cell chooses WHERE the revival lands and the ledger "
+				+ "chooses WHAT is revived; neither is ever taken from the "
+				+ "client",
+			"derivation_status": "derived",
+		},
+		"clicks_to_build": UnitBehaviors.CLICKS_TO_BUILD_BOUNDARY,
+		"refusals": (UnitBehaviors.REFUSALS as Array).duplicate(true),
+		"no_third_gate": UnitBehaviors.NO_THIRD_GATE,
+		"resources": _behavior_resources(),
+	})
+
+
+## The double's own cell resolution and both gates, in the helper's order.  Zero
+## rows at the addressed cell is a refusal and more than one is a refusal rather
+## than an invented tie-break; an unresolvable or absent ledger is a refusal; and
+## a resolved entry whose committed `resurrectable` is absent or not greater than
+## zero is a refusal.
+func _behavior_resolve(x: int, y: int) -> Dictionary:
+	var out := {
+		"ok": false,
+		"reason": "",
+		"error": "",
+		"map_key": -1,
+		"item_id": -1,
+		"committed_resurrectable": 0,
+		"committed_syringes": 0,
+	}
+	if x < 0 or y < 0 or x >= GRID_EXTENT or y >= GRID_EXTENT:
+		out["reason"] = "invalid_cell"
+		out["error"] = ("the addressed cell (%d, %d) is outside the 0..%d town "
+			% [x, y, GRID_EXTENT - 1] + "grid")
+		return out
+	var rows: Dictionary = _behavior_state["rows"]
+	var matches: Array = []
+	for key: Variant in rows.keys():
+		var row: Variant = rows[key]
+		if not (row is Array) or (row as Array).size() != 8:
+			continue
+		if int((row as Array)[1]) == x and int((row as Array)[2]) == y:
+			matches.append(str(key))
+	matches.sort_custom(func(one: Variant, two: Variant) -> bool:
+		return int(one) < int(two))
+	if matches.is_empty():
+		out["reason"] = "unresolvable_cell"
+		out["error"] = ("no placement row records the cell (%d, %d), so the "
+			% [x, y] + "addressed cell resolves to no revival target")
+		return out
+	if matches.size() > 1:
+		out["reason"] = "ambiguous_cell"
+		out["error"] = ("%d placement rows record the cell (%d, %d) and the "
+			% [matches.size(), x, y]
+			+ "legacy contract records no tie-break between them")
+		return out
+	var map_key := int(matches[0])
+	var occupant: Array = rows[str(map_key)]
+	# Gate one, in the helper's own order: the row that stands there must be on
+	# player team 1 (`engine.py:151`).
+	if not UnitBehaviors.passes_team_gate(int(occupant[7])):
+		out["reason"] = "not_resurrectable"
+		out["error"] = ("map key %d stands on player team %d, not %d: gate one "
+			% [map_key, int(occupant[7]), UnitBehaviors.PLAYER_TEAM]
+			+ "refuses it (engine.py:151)")
+		return out
+	var projection: Dictionary = UnitBehaviors.project_ledger(
+		_behavior_state["ledger"])
+	if not bool(projection.get("ok", false)):
+		out["reason"] = "invalid_ledger"
+		out["error"] = str(projection.get("error", ""))
+		return out
+	var entries: Dictionary = UnitBehaviors.ledger_entries(
+		_behavior_state["ledger"])
+	if entries.is_empty():
+		out["reason"] = "unresolvable_ledger_entry"
+		out["error"] = ("the player's deadHeroes ledger is EMPTY, so the cell "
+			+ "(%d, %d) resolves to nothing to revive" % [x, y])
+		return out
+	if entries.size() > 1:
+		out["reason"] = "ambiguous_ledger"
+		out["error"] = ("the ledger holds %d entries and the legacy contract "
+			% entries.size()
+			+ "records no rule for choosing between them from a cell")
+		return out
+	var item_id := int(entries.keys()[0])
+	var committed: Dictionary = _behavior_item(item_id)
+	var flag: Variant = UnitBehaviors.committed_resurrectable(
+		committed.get(UnitBehaviors.PROPERTIES_FIELD))
+	if not UnitBehaviors.passes_resurrectable_gate(flag):
+		out["reason"] = "not_resurrectable"
+		out["error"] = ("the resolved ledger entry names item id %d, whose "
+			% item_id
+			+ "committed resurrectable is absent or not greater than zero: "
+			+ "gate two refuses it (engine.py:159,162)")
+		return out
+	out["ok"] = true
+	out["map_key"] = map_key
+	out["item_id"] = item_id
+	out["committed_resurrectable"] = int(flag)
+	out["committed_syringes"] = int(committed.get("syringes", 0))
+	return out
+
+
+## The re-placed row, reproducing `engine.map_add_item`'s own construction
+## (`engine.py:8-31`) with **no** occupancy, bounds, type, or terrain check —
+## the recorded absence, not an omitted one.  The revived unit's committed
+## `clicks_to_build` is 0, so the `{"nc": 0}` counter is **not** seeded, and its
+## `friend_assistable` is absent, so `si` is not either; the attribute bag stays
+## empty, which is a measurement rather than an assumption.
+func _behavior_replacement(before: Array, item_id: int) -> Array:
+	return [
+		item_id,
+		int(before[1]),
+		int(before[2]),
+		# Deterministic: the boot fixture's recorded epoch, never the clock.
+		_fixture_server_time(),
+		int(before[4]),
+		(before[5] as Array).duplicate(true),
+		{},
+		UnitBehaviors.PLAYER_TEAM,
+	]
+
+
+## The projected ledger as the response's `[{item_id, count}]` entries, sorted
+## by item id so the bytes never depend on a dictionary's iteration order.
+func _behavior_ledger_entries(ledger: Dictionary) -> Array:
+	var out: Array = []
+	var keys: Array = ledger.keys()
+	keys.sort_custom(func(one: Variant, two: Variant) -> bool:
+		return int(one) < int(two))
+	for key: Variant in keys:
+		out.append({"item_id": str(key), "count": int(ledger[key])})
+	return out
+
+
+## One committed item id's raw configuration row, read out of the SAME captured
+## config payload the placement and purchase doubles already index — so the
+## double reads `properties` in exactly the representation `push_dead_unit`
+## reads it in (a raw JSON **string**), and the two implementations cannot
+## disagree about a gate.
+func _behavior_item(item_id: int) -> Dictionary:
+	var items: Variant = _config_payload.get("items")
+	if not (items is Array):
+		return {}
+	for row: Variant in items as Array:
+		if not (row is Dictionary):
+			continue
+		var candidate: Dictionary = row
+		if str(_id_text(candidate.get("id"))) != str(item_id):
+			continue
+		return candidate.duplicate(true)
+	return {}
+
+
+## One committed item id as the text the committed row records it by: the
+## captured configuration carries `id` as a STRING, so a numeric form is
+## normalised rather than compared against a float.
+func _id_text(value: Variant) -> String:
+	if value is String:
+		return str(value).strip_edges()
+	var parsed: Variant = BootData._parse_int(value)
+	if parsed == null:
+		return str(value)
+	return str(int(parsed))
+
+
+## The seven stored resource values of the in-memory behaviour state, reported
+## verbatim as the response's authoritative `resources`.  A revival moves none of
+## them, so these are the values the intent started from — the strongest form of
+## the "nothing moved" proof the endpoint requires (design D3).
+func _behavior_resources() -> Dictionary:
+	var resources := {}
+	for key: String in RESOURCE_KEYS:
+		resources[key] = int(_behavior_state[key])
+	return resources
+
+
+## Loads the committed corpus save into mutable process state (once), applying
+## the documented in-memory ledger seed.  Structural failures are named with the
+## offending field; every other double's error state is untouched (independent
+## sinks).
+func _ensure_behavior_loaded() -> bool:
+	if _behavior_loaded:
+		return _behavior_error == ""
+	_behavior_loaded = true
+	# The captured config payload must be loaded first because gate two reads
+	# the committed `properties` out of it — independently of the other
+	# doubles, so this double's failure cannot hide behind another's.
+	if not _ensure_loaded():
+		_behavior_error = _load_error
+		return false
+	var sink := {"error": ""}
+	var before := _read_json_into(BEHAVIOR_CORPUS_SAVE, sink)
+	if str(sink["error"]) != "":
+		_behavior_error = str(sink["error"])
+		return false
+	var maps: Variant = before.get("maps")
+	if not (maps is Array) or (maps as Array).is_empty():
+		_behavior_error = "the committed corpus save carries no first map"
+		return false
+	var first_map: Variant = (maps as Array)[0]
+	if not (first_map is Dictionary):
+		_behavior_error = "the committed corpus save's first map is not an object"
+		return false
+	var rows: Variant = (first_map as Dictionary).get("items")
+	if not (rows is Dictionary) or (rows as Dictionary).is_empty():
+		_behavior_error = "the committed corpus save carries no placement map"
+		return false
+	var info: Variant = before.get("playerInfo")
+	var priv: Variant = before.get("privateState")
+	if not (info is Dictionary) or not (priv is Dictionary):
+		_behavior_error = "the committed corpus save lacks playerInfo/privateState"
+		return false
+	var pid: Variant = (info as Dictionary).get("pid")
+	var cash: Variant = (info as Dictionary).get("cash")
+	var mana: Variant = (priv as Dictionary).get("mana")
+	if not (pid is String) or cash == null or mana == null \
+			or int(cash) < 0 or int(mana) < 0:
+		_behavior_error = "the committed corpus save lacks save fields"
+		return false
+	var resources := {}
+	for name: String in ["xp", "gold", "wood", "oil", "steel"]:
+		var value: Variant = (first_map as Dictionary).get(name)
+		if value == null or int(value) < 0:
+			_behavior_error = "the committed corpus save lacks map %s" % name
+			return false
+		resources[name] = int(value)
+	resources["cash"] = int(cash)
+	resources["mana"] = int(mana)
+	var state := resources
+	state["rows"] = (rows as Dictionary).duplicate(true)
+	# The committed corpus ledger is present and `{}`; the double's documented
+	# in-memory seed replaces it for the duration of this process only, and no
+	# committed byte is written.
+	state["ledger"] = BEHAVIOR_SEED.duplicate(true)
+	_behavior_state = state
+	_behavior_pid = str(pid)
+	return true

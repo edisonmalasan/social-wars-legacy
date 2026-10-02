@@ -1002,7 +1002,7 @@ collection ledger went `[]` to `[1]`, so the grant matches the **committed bag
 exactly**, the ledger grew by **exactly one appended id**, and **no player state
 was fabricated**; this is the **project's first content-derived,
 server-authoritative unit acquisition**; the hermetic unit-collection suite
-(observed **1845 checks**, 1857 with `--report`; the 32nd hermetic suite — **corrected 2026-10-02**: the earlier recorded 1793/1805 was stale, measured on the unmodified suite at 1845/1857); the
+(observed **1884 checks**, 1896 with `--report`, on a 93-file client source tree; the 32nd hermetic suite — **re-measured 2026-10-02**: the earlier recorded 1793/1805 was stale, and a 1845/1857 reading was itself already stale within a day. **This suite's count is NOT a fixed number**: it walks `CLIENT_SCAN_ROOTS` (`res://scripts` and `res://tests`) and asserts per walked source, so **every delivered line that adds a client source raises it**. Re-measure before quoting it); the
 sibling unit suites (**568**, **411**), the scope suite (**1526**, was 1475), and
 the fake GameApi (**1322**, was 1205); both batteries in the final state (each
 exit `0`; `verify-boot.ps1` now runs **32 hermetic suites and 15 live phases**, and
@@ -1187,6 +1187,103 @@ with every other path exercised over crafted in-memory packages; **no executed-l
 captured**, because there is **no animation behaviour for the legacy server to have**; **no pixel
 parity is claimed**; and **no windowed capture is claimed**, because nothing is rendered. No Flash,
 Ruffle, ActionScript, or browser executes in any of these commands, and **no network is used**.
+
+
+Verified unit-behaviors commands (milestone M8 line 8, the **final** M8 deliver line; Godot
+4.7.2.stable, Windows x64; `python` denotes the pinned interpreter, never the PATH alias). **This
+is the first M8 line that is NOT a refusal**: the investigation it is scoped by
+(`docs/legacy-unit-behaviors.md`, PR #244, merged `2e98d55`) was explicitly instructed to measure
+its own fields rather than assume the refusal pattern repeats, and that caution was decisive —
+
+```bash
+godot --headless --path apps/client-godot --script res://tests/test_unit_behaviors.gd
+godot --headless --path apps/client-godot --script res://tests/test_unit_behaviors.gd -- --report
+godot --headless --path apps/client-godot --script res://tests/test_unit_animations.gd
+godot --headless --path apps/client-godot --script res://tests/test_unit_movement.gd
+godot --headless --path apps/client-godot --script res://tests/test_unit_production.gd
+godot --headless --path apps/client-godot --script res://tests/test_project_scope.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-10-02): the hermetic unit-behaviors suite (observed **573
+checks**, 587 with `--report`; the 35th hermetic suite) over a typed read-only dead-hero ledger
+projection reporting the recorded counts, the increment and decrement shapes, the **delete-at-zero**
+rule, and **both** legacy gates — the row on **player team 1** and the committed
+**`resurrectable > 0`** — verbatim, deriving no third gate, and failing **closed** on an absent
+ledger, a non-object ledger, a non-string key, or a non-integer count; `verify.ps1` exit 0;
+`verify-boot.ps1` exit 0 with **35 hermetic suites and 16 live phases**; the **grown** compat suite
+(observed **`Ran 1444 tests ... OK`**, exit 0 — up from 1352 by **+92**, because this line adds a
+state-mutating endpoint, the first M8 line since `collection` to do so); the content validator (exit
+0, `result: valid`, 21 schemas); and the preservation manifest (3,258 entries, exit 0). `git status`
+showed no content-package, save, config, village, conversion-package, registry-manifest, fixture,
+or legacy-source byte changed. The evidence is the deterministic `unit-behaviors-report-v1` report
+under `apps/client-godot/evidence/unit-behaviors/` (digest `0FE80C47…8F59`, 39,979 bytes,
+byte-identical across three consecutive runs).
+
+**The finding: of twenty-three behavioural committed fields, twenty-one have ZERO legacy consumers**
+across the seven modules (`attack` 131 distinct, `defense` 1, `life` 150, `min_level` 21,
+`syringes` 6, and every behavioural `properties` flag) — but **two** do not, and one is the **first
+committed field in this project whose legacy consumer is a MUTATION of private state rather than a
+read**: **`resurrectable`**, **carried by 426 of 429 units** and **0 of 470 buildings** (the key is
+**absent entirely** on ids 923, 933, and 1176 rather than set to zero), with exactly **two** reads at
+`engine.py:159,162`. **The eighth zero-consumer candidate is not one.** The second is
+**`clicks_to_build`**, one read at `engine.py:26` seeding `attr["nc"] = 0`, whose consumer is owned
+by `godot-building-construction` and is **referenced, not reimplemented**, here. The mechanism is
+`privateState["deadHeroes"]`, a **string-keyed count per item id**, reached by **three** of the 63
+dispatcher branches: **`kill`** deletes the row and **never** touches the ledger; **`sell`** calls the
+`push_dead_unit` **engine helper** (not a branch) **only** behind the combat-reason guard; and
+**`resurrect_hero`** decrements and **deletes the key at zero**, then re-places the row at
+**client-supplied** `index`/`x`/`y`. **`used_syringe` is read from `args[4]` and discarded** while the
+committed `syringes` field is its obvious counterpart with **zero** consumers, so **no syringe cost
+is ever charged** — and the endpoint's **two-part post-execution proof** includes that **every
+stored resource is unchanged**, which is what makes that claim non-tautological. The **anti-invention
+guard is structural and was tested rather than trusted**: injecting one invented `static func
+syringe_cost(syringes)` produced **five independent failures**, and restoring the file from a
+byte-identical copy returned the suite to its passing state.
+
+**Five figures in the investigation record were asserted rather than measured, and all five were
+corrected by the Apply stage and independently re-verified**: the zero-consumer count was
+**twenty-one**, not twenty (the prose said "twenty of twenty-two" while naming twenty-one), and the
+behavioural total is **twenty-three**; the source lines were each **off by one** (`push_dead_unit` is
+`engine.py:149-170`, `resurrect_hero` is `172-181`, and `del deadHeroes[itemstr]` is at **179**
+behind the guard at **178**); `resurrectable` is **carried** by 426 units with the key **absent** on
+923/933/1176 rather than set to zero; **`clicks_to_build` takes two distinct values** over the units
+(both `0`) rather than three; and **`collect_type` takes two** over the units (`g` 427, `w` 2), the
+five-value spread being the *buildings'* only. **None changes the conclusion**, and
+`docs/legacy-unit-behaviors.md` carries a corrections section rather than quiet edits.
+
+**Three bugs in the new suite were found and fixed by measurement, not by luck**: `_code_only()` was
+passed a *path* instead of the body, making the syringe-cost, `nc`, and clicks scans **vacuously
+true**; it then desynchronised on an apostrophe inside a double-quoted string, fixed with a proper
+two-state lexer; and the live scenario's `addressed.size() != 3` guard silently aborted after 7
+checks, which is why the first two live attempts showed no save mutation.
+
+**One deviation was flagged and approved**: `scripts/gameapi/game_api.gd` was edited although it was
+not in the worker's ownership list, because all 15 existing live phases drive through the `GameApi`
+autoload facade and the `behavior-live` phase would otherwise have had to instantiate `LegacyV0Api`
+directly, diverging from the established pattern. The change is three additive pieces in the exact
+shape of the 15 existing forwarders, and `test_game_api_fake.gd` (1322 checks) still passes.
+
+Claim limits: **no executed-legacy fixture**, and the reason is **specific** rather than the refusal
+lines' "no behaviour exists" — `resurrectable` is **unit-only**, the committed corpus places
+**only buildings** and **no unit row**, and its ledger is present and `{}`; manufacturing a unit row
+is refused, as `godot-unit-instances` refused. Unlike the refusal lines, the cause is the **absence of
+a resurrectable row**, not the absence of behaviour. **No combat is resolved** — `attack`,
+`defense`, `life`, `attack_interval`, `attack_range`, `best_against`, and `best_against_mult` are
+content with zero consumers. **No syringe cost** and **no resource movement**. **No occupancy,
+bounds, type, or terrain validation** is added to the revived placement, reproducing the legacy
+branch's absence and recording it as a Server v1 / M13 gap. The **death/resurrection pairing is
+derived**, not asserted by the source. The committed corpus is **not** all team 1 — keys 1–20 are
+team 1 and **21–40 are team 3** — which gate one alone does not need but which any future claim must
+respect. **No pixel parity** and **no windowed capture**. This **completes** the delivered
+`godot-unit-production` record: its claim that death and resurrection are unimplemented stays **true
+of the delivered client**, but the server behaviour it left unstated is now recorded. No Flash,
+Ruffle, ActionScript, or browser executes in any of these commands, and every network call is
+loopback.
 
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):

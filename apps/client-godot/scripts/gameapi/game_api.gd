@@ -11,8 +11,9 @@ extends Node
 ## `collect_income()` for one collection intent, `expand_town()` for one
 ## expansion intent, `level_up_town()` for one level-up intent,
 ## `push_queue_unit_town()` / `pop_queue_unit_town()` for one production-queue
-## intent each, and `complete_collection_town()` for one collection-completion
-## intent, receiving typed results
+## intent each, `complete_collection_town()` for one collection-completion
+## intent, and `resurrect_hero_town()` for one dead-hero revival intent,
+## receiving typed results
 ## (`scripts/gameapi/boot_data.gd`); raw transport dictionaries never reach
 ## presentation code, and no other script references a transport.
 ##
@@ -48,6 +49,7 @@ extends Node
 ## ever names an endpoint (the scope test enforces that).
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
+const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
 const FakeApi = preload("res://scripts/gameapi/fake_api.gd")
 const LegacyV0Api = preload("res://scripts/gameapi/legacy_v0_api.gd")
 
@@ -140,6 +142,12 @@ var queue_requests := 0
 ## Monotonic for the same reason: `configure()` swaps the implementation
 ## without hiding history.
 var collection_requests := 0
+## Number of revival intents this process has issued (unit-behaviors flow
+## contract: exactly one per confirm, zero for every local refusal — the
+## behavior suite snapshots this counter exactly like `placement_requests`).
+## Monotonic for the same reason: `configure()` swaps the implementation without
+## hiding history.
+var behavior_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -436,6 +444,31 @@ func complete_collection_town(user_id: String,
 	collection_requests += 1
 	var result: BootData.CollectionResult = await _impl.complete_collection_town(
 		user_id, collection_id)
+	return result
+
+
+## One revival intent (the save identity and the addressed **cell**, and NOTHING
+## else) from the selected implementation.  The contract carries NO map key, NO
+## revived item id, NO syringe count, NO price, and NO resource deltas: the
+## service derives the map key from the addressed cell's own placement row and
+## the revived item id from the player's own recorded `deadHeroes` ledger, then
+## executes the unchanged legacy `resurrect_hero` branch with a NEUTRAL vector
+## (unit-behaviors design D2/D3) — so a client-supplied item id, key, or
+## syringe count is ignored exactly as a client-supplied amount or price is
+## ignored elsewhere, and the typed result's `map_key`, `item_id`, both ledgers,
+## both placements, and `resources` are authoritative (design D8).  The response
+##'s second post-execution proof half requires every stored resource to be
+## **unchanged**, because a revival moves none.
+##
+## **No combat is resolved** and the revived placement is **not validated**: the
+## committed combat fields have zero legacy consumers and the legacy branch
+## re-places the row with no occupancy, bounds, type, or terrain check
+## (design D5).  Both absences travel on the typed result.
+func resurrect_hero_town(user_id: String, x: int,
+		y: int) -> BehaviorFlow.ResurrectResult:
+	behavior_requests += 1
+	var result: BehaviorFlow.ResurrectResult = await _impl.resurrect_hero_town(
+		user_id, x, y)
 	return result
 
 

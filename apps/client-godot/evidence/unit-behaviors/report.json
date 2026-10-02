@@ -1,0 +1,984 @@
+{
+	"boundary": {
+		"client_sources_scanned": 93,
+		"needles": [
+			"syringe_cost",
+			"charge_revive",
+			"resolve_damage",
+			"apply_attack",
+			"hit_chance",
+			"is_occupied",
+			"revive_count_cap",
+			"revive_cooldown",
+			"terrain_at",
+			"is_type_allowed"
+		],
+		"other_endpoint_exists": false,
+		"resurrection_path": "/v0/resurrect"
+	},
+	"corpus": {
+		"cause": "A CORPUS LIMITATION WITH A NAMED CAUSE, not the absence of behaviour: `resurrectable` is unit-only, the corpus places only buildings, and its ledger is present and empty",
+		"fixture_not_captured": "NO EXECUTED-LEGACY BEHAVIOUR FIXTURE WAS CAPTURED, AND THE REASON IS A CORPUS LIMITATION WITH A NAMED CAUSE - NOT, as on the three refusal lines before this one, the absence of behaviour. resurrectable is a UNIT-ONLY committed flag (positive on 426 of 429 units, on 0 of 470 buildings), the committed corpus places ONLY buildings across 40 rows and 40 distinct cells, so 0 of its placed rows are resurrectable and it places NO unit row at all, and its privateState['deadHeroes'] is present and {}. Capturing one would require MANUFACTURING A UNIT ROW first, which the delivered godot-unit-instances capability already refused and recorded as the right call. No unit row was manufactured in the committed corpus or in any delivered fixture directory (design D4)",
+		"measurement": {
+			"distinct_cells": 40,
+			"distinct_item_ids": 11,
+			"ledger": {},
+			"ledger_present": true,
+			"pid": "00000000-0000-4000-8000-000000000001",
+			"resources": {
+				"cash": 5,
+				"gold": 2000,
+				"mana": 0,
+				"oil": 2000,
+				"steel": 2000,
+				"wood": 2000,
+				"xp": 4
+			},
+			"resurrectable_rows": 0,
+			"rows": 40,
+			"target_cell": [
+				51,
+				41
+			],
+			"target_item_id": 26,
+			"target_map_key": 1,
+			"unit_rows": 0,
+			"unresolved_rows": 0
+		},
+		"unit_row_manufactured": false
+	},
+	"determinism": {
+		"byte_identical_across_reruns": true,
+		"reason": "no timestamp, no absolute path, no wall clock, no request, and no saved state: every table is derived from the two delivered modules' own constants, this same run's legacy and content measurements, and the committed corpus bytes, and every derived set is sorted before it is written",
+		"serialization": "JSON.stringify(report, tab, sort_keys=true) plus one trailing newline; every number written is an integer - the pinned engine's integral floats are normalised on the way in, which changes no value",
+		"time_dependent_fields": "NONE in this line's hermetic evidence: the ledger projection, the inventory, and the refusals touch no clock, and the offline double stamps its re-placed row with the boot fixture's recorded epoch rather than the wall clock"
+	},
+	"fields": {
+		"behavioural_field_count": 23,
+		"behavioural_field_count_recorded": 22,
+		"building_count": 470,
+		"clicks_to_build": {
+			"boundary": "clicks_to_build is REFERENCED AND NOT REIMPLEMENTED. Its single legacy read is engine.py:26, inside map_add_item, where a positive value seeds attr['nc'] = 0 on a freshly placed team-1 row (engine.py:27-29). That counter is the construction-click counter already reported and deliberately not consumed by the delivered godot-building-construction capability, which owns it. This line records the relationship and reimplements nothing: the re-placement is executed by the UNCHANGED legacy map_add_item. Note also that the committed clicks_to_build is 0 on ALL 429 unit definitions, so a revived UNIT never seeds the counter at all - a measurement, not an assumption",
+			"building_values": {
+				"0": 172,
+				"1": 298
+			},
+			"correction": "CORRECTION, MEASURED AGAINST THE COMMITTED INVESTIGATION: that record reports clicks_to_build as '429 of 429 units, 3 distinct'. Measured over the committed content package the field takes TWO distinct values in total (0 and 1) and only ONE of them over the units, which is 0 on all 429. The buildings take 0 on 172 and 1 on 298; the 299th row carrying 1 is the single committed SPECIAL (id 925, committed type 'l', Expandable Land), which is neither a unit nor a building. The recorded 3 is retained beside the measured 2 so a later reader can re-derive the choice",
+			"distinct_over_content": 2,
+			"distinct_recorded": 3,
+			"legacy_reads": 1,
+			"unit_values": {
+				"0": 429
+			}
+		},
+		"combat_field_count": 7,
+		"combat_fields": [
+			"attack",
+			"defense",
+			"life",
+			"attack_interval",
+			"attack_range",
+			"best_against",
+			"best_against_mult"
+		],
+		"consumed_behavioural_fields": [
+			{
+				"buildings_of": 470,
+				"buildings_positive": 0,
+				"field": "resurrectable",
+				"kind": "properties flag",
+				"legacy_reads": 2,
+				"note": "the FIRST committed field in this project whose legacy consumer is a MUTATION OF PRIVATE STATE rather than a read, and the reason this line delivers a mechanism rather than a refusal",
+				"source": "engine.py:159,162 (push_dead_unit)",
+				"units_of": 429,
+				"units_positive": 426
+			},
+			{
+				"building_values": {
+					"0": 172,
+					"1": 298
+				},
+				"field": "clicks_to_build",
+				"kind": "top-level item field",
+				"legacy_reads": 1,
+				"note": "seeds attr['nc'] = 0 on a fresh team-1 placement when positive; that counter is owned by godot-building-construction and is referenced here, never reimplemented",
+				"source": "engine.py:26 (map_add_item)",
+				"unit_values": {
+					"0": 429
+				},
+				"units_distinct": 1,
+				"units_distinct_recorded": 3
+			}
+		],
+		"raw_properties": "BOTH LEGACY READS GO THROUGH get_attribute_from_item_id(...) THEN json.loads(properties), so the server reads the RAW configuration STRING while the committed normalized package stores properties as an OBJECT (engine.py:154-162). That is the R2 coercion boundary M8 line 1 recorded: the legacy reads are not against the committed normalized bytes, and the two agree on VALUES, never on representation",
+		"resurrectable": {
+			"buildings_of": 470,
+			"buildings_positive": 0,
+			"note": "resurrectable is a UNIT-ONLY committed flag: it is positive on 426 of the 429 committed unit definitions and on 0 of the 470 committed building definitions, and it is carried by none of them, so it never appears on a building at all. That is why the committed corpus - which places only buildings - holds no resurrectable row, and why a one-shot executed-legacy fixture is impossible here without first manufacturing a unit row",
+			"unit_only": true,
+			"unit_value": "1",
+			"units_absent": 3,
+			"units_absent_ids": [
+				"923",
+				"933",
+				"1176"
+			],
+			"units_of": 429,
+			"units_positive": 426
+		},
+		"searched_modules": [
+			"command.py",
+			"engine.py",
+			"sessions.py",
+			"server.py",
+			"constants.py",
+			"get_game_config.py",
+			"version.py"
+		],
+		"syringes": {
+			"building_values": {
+				"0": 470
+			},
+			"content_only": true,
+			"legacy_reads": 0,
+			"unit_distinct": 6,
+			"unit_values": {
+				"0": 2,
+				"1": 120,
+				"2": 48,
+				"3": 256,
+				"4": 1,
+				"5": 2
+			}
+		},
+		"unit_count": 429,
+		"unit_property_flag_count": 15,
+		"unit_property_flags": [
+			{
+				"flag": "animal",
+				"positive": 2
+			},
+			{
+				"flag": "bulldozable",
+				"positive": 424
+			},
+			{
+				"flag": "fireman",
+				"positive": 1
+			},
+			{
+				"flag": "ft_armored",
+				"positive": 157
+			},
+			{
+				"flag": "ft_building",
+				"positive": 2
+			},
+			{
+				"flag": "ft_flying",
+				"positive": 135
+			},
+			{
+				"flag": "ft_ground",
+				"positive": 134
+			},
+			{
+				"flag": "harvester",
+				"positive": 5
+			},
+			{
+				"flag": "healer",
+				"positive": 3
+			},
+			{
+				"flag": "human",
+				"positive": 126
+			},
+			{
+				"flag": "mechanic",
+				"positive": 301
+			},
+			{
+				"flag": "resurrectable",
+				"positive": 426
+			},
+			{
+				"flag": "seeStealthUnits",
+				"positive": 427
+			},
+			{
+				"flag": "waterborne",
+				"positive": 2
+			},
+			{
+				"flag": "worker",
+				"positive": 5
+			}
+		],
+		"zero_consumer_count": 21,
+		"zero_consumer_count_recorded": 20,
+		"zero_consumer_fields": [
+			{
+				"field": "attack",
+				"legacy_reads": 0,
+				"unit_distinct": 131
+			},
+			{
+				"field": "attack_interval",
+				"legacy_reads": 0,
+				"unit_distinct": 12
+			},
+			{
+				"field": "attack_range",
+				"legacy_reads": 0,
+				"unit_distinct": 14
+			},
+			{
+				"field": "best_against",
+				"legacy_reads": 0,
+				"unit_distinct": 5
+			},
+			{
+				"field": "best_against_mult",
+				"legacy_reads": 0,
+				"unit_distinct": 5
+			},
+			{
+				"field": "defense",
+				"legacy_reads": 0,
+				"unit_distinct": 1
+			},
+			{
+				"field": "life",
+				"legacy_reads": 0,
+				"unit_distinct": 150
+			},
+			{
+				"field": "velocity",
+				"legacy_reads": 0,
+				"unit_distinct": 11
+			},
+			{
+				"field": "collect_type",
+				"legacy_reads": 0,
+				"unit_distinct": 2
+			},
+			{
+				"field": "collect_xp",
+				"legacy_reads": 0,
+				"unit_distinct": 6
+			},
+			{
+				"field": "max_collects",
+				"legacy_reads": 0,
+				"unit_distinct": 1
+			},
+			{
+				"field": "syringes",
+				"legacy_reads": 0,
+				"unit_distinct": 6
+			},
+			{
+				"field": "volume",
+				"legacy_reads": 0,
+				"unit_distinct": 3
+			},
+			{
+				"field": "training_time",
+				"legacy_reads": 0,
+				"unit_distinct": 1
+			},
+			{
+				"field": "unit_capacity",
+				"legacy_reads": 0,
+				"unit_distinct": 3
+			},
+			{
+				"field": "expiration",
+				"legacy_reads": 0,
+				"unit_distinct": 1
+			},
+			{
+				"field": "population",
+				"legacy_reads": 0,
+				"unit_distinct": 5
+			},
+			{
+				"field": "min_level",
+				"legacy_reads": 0,
+				"unit_distinct": 21
+			},
+			{
+				"field": "activation",
+				"legacy_reads": 0,
+				"unit_distinct": 1
+			},
+			{
+				"field": "gift_level",
+				"legacy_reads": 0,
+				"unit_distinct": 8
+			},
+			{
+				"field": "build_time",
+				"legacy_reads": 0,
+				"unit_distinct": 2
+			}
+		]
+	},
+	"fields_measured": {
+		"buildings": 470,
+		"buildings_distinct": {
+			"activation": 7,
+			"attack": 16,
+			"attack_interval": 5,
+			"attack_range": 12,
+			"best_against": 5,
+			"best_against_mult": 2,
+			"build_time": 18,
+			"collect_type": 5,
+			"collect_xp": 15,
+			"defense": 2,
+			"expiration": 1,
+			"gift_level": 11,
+			"life": 44,
+			"max_collects": 3,
+			"min_level": 47,
+			"population": 12,
+			"syringes": 1,
+			"training_time": 2,
+			"unit_capacity": 7,
+			"velocity": 3,
+			"volume": 1
+		},
+		"buildings_resurrectable_carried": 0,
+		"buildings_resurrectable_positive": 0,
+		"clicks_to_build": {
+			"0": 429
+		},
+		"clicks_to_build_buildings": {
+			"0": 172,
+			"1": 298
+		},
+		"flags": {
+			"animal": 2,
+			"bulldozable": 424,
+			"fireman": 1,
+			"ft_armored": 157,
+			"ft_building": 2,
+			"ft_flying": 135,
+			"ft_ground": 134,
+			"harvester": 5,
+			"healer": 3,
+			"human": 126,
+			"mechanic": 301,
+			"resurrectable": 426,
+			"seeStealthUnits": 427,
+			"waterborne": 2,
+			"worker": 5
+		},
+		"resurrectable": {
+			"absent_ids": [
+				"923",
+				"933",
+				"1176"
+			]
+		},
+		"syringes": {
+			"0": 2,
+			"1": 120,
+			"2": 48,
+			"3": 256,
+			"4": 1,
+			"5": 2
+		},
+		"syringes_buildings": {
+			"0": 470
+		},
+		"units": 429,
+		"units_distinct": {
+			"activation": 1,
+			"attack": 131,
+			"attack_interval": 12,
+			"attack_range": 14,
+			"best_against": 5,
+			"best_against_mult": 5,
+			"build_time": 2,
+			"collect_type": 2,
+			"collect_xp": 6,
+			"defense": 1,
+			"expiration": 1,
+			"gift_level": 8,
+			"life": 150,
+			"max_collects": 1,
+			"min_level": 21,
+			"population": 5,
+			"syringes": 6,
+			"training_time": 1,
+			"unit_capacity": 3,
+			"velocity": 11,
+			"volume": 3
+		},
+		"units_resurrectable_carried": 426,
+		"units_resurrectable_positive": 426
+	},
+	"gates": {
+		"committed_string_zero": 0,
+		"count": 2,
+		"gates": [
+			{
+				"checks": "the dying row's slot 7 (player) equals 1",
+				"committed": true,
+				"gate": "player_team_one",
+				"note": "push_dead_unit returns False when item[7] != 1, so a row on another team never enters the ledger no matter how resurrectable its committed properties say it is",
+				"source": "engine.py:151 (push_dead_unit)"
+			},
+			{
+				"checks": "the committed properties object carries resurrectable AND int(resurrectable) > 0",
+				"committed": true,
+				"gate": "resurrectable_positive",
+				"note": "push_dead_unit returns False when the flag is ABSENT (engine.py:159-160) and when it is present but not greater than zero (engine.py:162), so an absent flag is a REFUSAL, never a zero",
+				"source": "engine.py:159,162 (push_dead_unit)"
+			}
+		],
+		"no_third_gate": "EXACTLY TWO GATES EXIST AND NO THIRD IS INVENTED. push_dead_unit (engine.py:149-170) performs two checks and no more: the row's player team (engine.py:151) and the committed resurrectable flag (engine.py:159,162). Everything else a reader might expect is absent from the helper: no level check, no cost check, no capacity check, no cooldown, no per-type check, and no check that the row is a unit rather than a building. Adding any of them here would make this client STRICTER than the legacy server, which is a parity break in the opposite direction from the usual risk (design D1)",
+		"raw_string_read": 1,
+		"resurrectable_gate_absent": false,
+		"resurrectable_gate_positive": true,
+		"resurrectable_gate_zero": false,
+		"team_gate": true
+	},
+	"generated_by": "apps/client-godot/tests/test_unit_behaviors.gd --report=<path>",
+	"intent": {
+		"command": "resurrect_hero",
+		"identical_typed_shapes": true,
+		"ignored_keys": [
+			"item_id",
+			"map_key",
+			"index",
+			"used_syringe",
+			"syringe",
+			"syringes",
+			"price",
+			"cost",
+			"charge",
+			"resources_changed",
+			"vector",
+			"resources",
+			"reason",
+			"resurrect_hero"
+		],
+		"item_id_is": "server-derived from the player's own recorded deadHeroes ledger, because the revived row is not on the map and the ledger is the only place a dead unit's identity survives",
+		"keys": [
+			"user_id",
+			"x",
+			"y"
+		],
+		"map_key_is": "server-derived from the addressed cell's own placement row (every row records its committed (x, y) in slots 1 and 2)",
+		"note": "THE REVIVAL INTENT CARRIES ONLY AN IDENTIFIER AND A CELL. The request is {user_id, x, y} and nothing else: no map key, no item id, no syringe count, no price, and no resource delta is accepted, and every such key is IGNORED by the service. The map key is derived by resolving the addressed cell against the save's own placement rows and the revived item id from the player's own recorded ledger, so a client-supplied expectation can never become the post-execution proof (design D2)",
+		"path": "/v0/resurrect",
+		"proof": "THE POST-EXECUTION PROOF HAS TWO HALVES AND BOTH ARE CONTENT-INDEPENDENT. Half one: the revived ledger entry is GONE after a revival that reached zero, because engine.resurrect_hero DELETES the key at zero and never stores a zero. Half two: EVERY stored resource is unchanged — the FULL set of seven, never a selected subset — because the derived vector is neutral. Either half failing is a reported failure, not a success (design D3)",
+		"used_syringe_is": "DISCARDED: bound from args[4] and never read again in the branch"
+	},
+	"inventory": {
+		"branches_that_bypass_ledger": [
+			"kill"
+		],
+		"command_inventory": [
+			{
+				"command": "kill",
+				"effect": "looks the row up, deletes it, and prints; it NEVER touches privateState['deadHeroes'], so a combat kill records no death in the ledger",
+				"kind": "dispatcher-branch",
+				"mutates_also": "map['items']: the addressed row is deleted",
+				"reaches_ledger": false,
+				"source": "command.py:169-181"
+			},
+			{
+				"closed_in_practice": "the delivered godot-building-sell capability derives its own sell reason and accepts none from the client, so the KILL guard is closed in practice while remaining open in the source. That recorded claim is CORRECT AND UNCHANGED: this guard is the ONLY door into the dead-hero ledger",
+				"command": "sell",
+				"effect": "calls push_dead_unit ONLY when the reason is the combat reason, which increments deadHeroes[str(item_id)] by one, creating the key at 1, subject to BOTH gates",
+				"guard": "reason == 'KILL'",
+				"kind": "dispatcher-branch",
+				"mutates_also": "map['items']: the addressed row is deleted",
+				"reaches_ledger": true,
+				"source": "command.py:149-167",
+				"through": "push_dead_unit (engine helper, engine.py:149-170)"
+			},
+			{
+				"command": "resurrect_hero",
+				"discarded_argument": "args[4], used_syringe, is READ and DISCARDED",
+				"effect": "decrements deadHeroes[str(item_id)] and DELETES the key when the count reaches zero",
+				"kind": "dispatcher-branch",
+				"mutates_also": "map['items']: map_add_item re-places the row at CLIENT-SUPPLIED index/x/y with no occupancy, bounds, type, or terrain check (engine.py:8-31)",
+				"reaches_ledger": true,
+				"source": "command.py:625-635",
+				"through": "resurrect_hero (engine helper, engine.py:172-181)"
+			}
+		],
+		"engine_helpers": [
+			{
+				"effect": "the increment, behind both gates",
+				"helper": "push_dead_unit",
+				"is_dispatcher_branch": false,
+				"source": "engine.py:149-170"
+			},
+			{
+				"effect": "the decrement, deleting the key at zero",
+				"helper": "resurrect_hero",
+				"is_dispatcher_branch": false,
+				"source": "engine.py:172-181"
+			}
+		],
+		"inventory_commands": [
+			"kill",
+			"sell",
+			"resurrect_hero"
+		],
+		"kill_reaches_ledger": false,
+		"ledger_reaching_command_count": 2,
+		"ledger_reaching_commands": [
+			"sell",
+			"resurrect_hero"
+		],
+		"named_branch_count": 63,
+		"push_dead_unit_is_a_branch": false,
+		"resurrect_hero_discarded_argument": "args[4] (used_syringe)",
+		"sell_guard": "reason == 'KILL'"
+	},
+	"inventory_measured": {
+		"clicks_to_build_reads": [
+			"engine.py:26"
+		],
+		"modules": 7,
+		"named_branch_count": 63,
+		"named_branches": [
+			"buy",
+			"complete_tutorial",
+			"set_goals",
+			"complete_goal",
+			"level_up",
+			"set_quest_var",
+			"move",
+			"collect",
+			"sell",
+			"kill",
+			"kill_iid",
+			"batch_remove",
+			"orient",
+			"expand",
+			"store_item",
+			"place_stored_item",
+			"sell_stored_item",
+			"store_add_items",
+			"next_research_step",
+			"research_buy_step_cash",
+			"next_research_item",
+			"reset_research_item",
+			"flash_debug",
+			"add_xp_unit",
+			"weekly_reward",
+			"push_unit",
+			"pop_unit",
+			"activate",
+			"collect_mission",
+			"win_daily_bonus",
+			"trade_resource",
+			"buy_stored_item_cash",
+			"unit_collections_completed",
+			"add_inventory_item",
+			"remove_inventory_item",
+			"complete_collection",
+			"add_click",
+			"activate_item_click",
+			"buy_si_help",
+			"finish_si",
+			"darts_reset",
+			"darts_new_free",
+			"darts_shoot_balloon",
+			"buy_premium_account",
+			"resurrect_hero",
+			"set_resource_allies",
+			"buy_mana_new",
+			"buy_magic",
+			"use_magic",
+			"push_queue_unit",
+			"push_queue_unit2",
+			"pop_queue_unit",
+			"buy_offer_pack",
+			"buy_powerups",
+			"soulmixer_speedup",
+			"admin_set_quest_rank",
+			"end_quest",
+			"end_attack",
+			"rt_open_graph_unit",
+			"first_time_marketplace",
+			"fast_forward",
+			"ping",
+			"set_variables"
+		],
+		"note": "every legacy figure is re-derived from the committed source in this same run, so the inventory cannot drift from the dispatcher and a 64th branch would be an unrecorded gap",
+		"resurrectable_bare_note": "the BARE substring count exceeds the quoted READ count because command.py binds a LOCAL VARIABLE named `resurrectable` at lines 158, 160, and 164. A local is not a field read, so the recorded two-read figure is the quoted measurement; both are reported so a reader can re-derive the choice",
+		"resurrectable_bare_occurrences": 5,
+		"resurrectable_quoted_read_count": 2,
+		"resurrectable_reads": [
+			"engine.py:159",
+			"engine.py:162"
+		]
+	},
+	"ledger": {
+		"decrement_shape": "num_heroes = deadHeroes[itemstr] - 1; if num_heroes <= 0 the key is DELETED, else deadHeroes[itemstr] -= 1 (engine.py:177-181). An item id the ledger does not hold is a SILENT NO-OP: the helper returns before touching anything (engine.py:175-176)",
+		"delete_at_zero": "REACHING ZERO DELETES THE KEY; IT NEVER STORES A ZERO. engine.resurrect_hero computes num_heroes = count - 1 and, when that is not greater than zero, executes `del deadHeroes[itemstr]` (engine.py:178-179). A ledger holding key: 0 is a state the legacy helpers cannot produce, so a post-execution proof that finds one is a failure, not a zero (design D1)",
+		"gate_count": 2,
+		"gates": [
+			{
+				"checks": "the dying row's slot 7 (player) equals 1",
+				"committed": true,
+				"gate": "player_team_one",
+				"note": "push_dead_unit returns False when item[7] != 1, so a row on another team never enters the ledger no matter how resurrectable its committed properties say it is",
+				"source": "engine.py:151 (push_dead_unit)"
+			},
+			{
+				"checks": "the committed properties object carries resurrectable AND int(resurrectable) > 0",
+				"committed": true,
+				"gate": "resurrectable_positive",
+				"note": "push_dead_unit returns False when the flag is ABSENT (engine.py:159-160) and when it is present but not greater than zero (engine.py:162), so an absent flag is a REFUSAL, never a zero",
+				"source": "engine.py:159,162 (push_dead_unit)"
+			}
+		],
+		"increment_shape": "deadHeroes[str(item_id)] += 1 when the key is already present, and deadHeroes[str(item_id)] = 1 when it is absent — the key is CREATED AT 1, never at 0 and never pre-seeded (engine.py:164-167)",
+		"ledger_key": "deadHeroes",
+		"no_third_gate": "EXACTLY TWO GATES EXIST AND NO THIRD IS INVENTED. push_dead_unit (engine.py:149-170) performs two checks and no more: the row's player team (engine.py:151) and the committed resurrectable flag (engine.py:159,162). Everything else a reader might expect is absent from the helper: no level check, no cost check, no capacity check, no cooldown, no per-type check, and no check that the row is a unit rather than a building. Adding any of them here would make this client STRICTER than the legacy server, which is a parity break in the opposite direction from the usual risk (design D1)",
+		"private_state_key": "privateState",
+		"projection": {
+			"entries": [
+				{
+					"count": 2,
+					"item_id": "1001"
+				},
+				{
+					"count": 1,
+					"item_id": "1085"
+				}
+			],
+			"entry_count": 2,
+			"error": "",
+			"ok": true,
+			"reason": "",
+			"recorded_keys": [
+				"1001",
+				"1085"
+			],
+			"recorded_present": true,
+			"recorded_type": "Dictionary",
+			"resolvable": true,
+			"total": 3
+		},
+		"refusal_recorded": 3,
+		"shape": "A STRING-KEYED COUNT PER ITEM ID. push_dead_unit writes deadHeroes[str(item[0])] and creates the key at 1 when it is absent; resurrect_hero reads str(item), so both halves of the shape are load-bearing and an integer-keyed reading is a different shape, not a tolerated one"
+	},
+	"ledger_projections": {
+		"absent": {
+			"entries": [],
+			"entry_count": 0,
+			"error": "privateState['deadHeroes'] is ABSENT (null): a save that never held the key receives an empty ledger from the version.py migration, never from gameplay, so this is reported UNRESOLVABLE rather than presented as an empty ledger that was resolved",
+			"ok": false,
+			"reason": "ledger_absent",
+			"recorded_keys": [],
+			"recorded_present": false,
+			"recorded_type": "null",
+			"resolvable": false,
+			"total": 0
+		},
+		"empty": {
+			"entries": [],
+			"entry_count": 0,
+			"error": "",
+			"ok": true,
+			"reason": "",
+			"recorded_keys": [],
+			"recorded_present": true,
+			"recorded_type": "Dictionary",
+			"resolvable": true,
+			"total": 0
+		},
+		"non_integer_count": {
+			"entries": [],
+			"entry_count": 0,
+			"error": "the ledger count for item id 1001 is 1 (String), not an integer; the legacy helpers add and subtract it directly, so a non-integer is unreadable rather than coercible",
+			"ok": false,
+			"reason": "ledger_count_not_integer",
+			"recorded_keys": [
+				"1001"
+			],
+			"recorded_present": true,
+			"recorded_type": "Dictionary",
+			"resolvable": false,
+			"total": 0
+		},
+		"non_string_key": {
+			"entries": [],
+			"entry_count": 0,
+			"error": "the ledger key 1001 is int, not the text of an item id: the ledger is a STRING-keyed count per item id",
+			"ok": false,
+			"reason": "ledger_key_not_text",
+			"recorded_keys": [],
+			"recorded_present": true,
+			"recorded_type": "Dictionary",
+			"resolvable": false,
+			"total": 0
+		},
+		"not_an_object": {
+			"entries": [],
+			"entry_count": 0,
+			"error": "privateState['deadHeroes'] is Array, not a JSON object, so it is not a string-keyed count per item id",
+			"ok": false,
+			"reason": "ledger_not_object",
+			"recorded_keys": [],
+			"recorded_present": true,
+			"recorded_type": "Array",
+			"resolvable": false,
+			"total": 0
+		},
+		"populated": {
+			"entries": [
+				{
+					"count": 2,
+					"item_id": "1001"
+				},
+				{
+					"count": 1,
+					"item_id": "1085"
+				}
+			],
+			"entry_count": 2,
+			"error": "",
+			"ok": true,
+			"reason": "",
+			"recorded_keys": [
+				"1001",
+				"1085"
+			],
+			"recorded_present": true,
+			"recorded_type": "Dictionary",
+			"resolvable": true,
+			"total": 3
+		},
+		"unresolvable_is_never_empty": [
+			false,
+			false,
+			false,
+			false
+		]
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed, and no network was used in the hermetic suite",
+		"NO SYRINGE COST IS CHARGED AND NO STORED RESOURCE MOVES: `used_syringe` is read from args[4] and DISCARDED, and the committed `syringes` field has zero legacy consumers",
+		"NO COMBAT IS RESOLVED: attack, defense, life, attack_interval, attack_range, best_against, and best_against_mult each have zero legacy consumers and are content, never rules",
+		"NO OCCUPANCY, BOUNDS, TYPE, OR TERRAIN VALIDATION IS ADDED to the revived placement, which reproduces the legacy branch's recorded absence rather than filling it",
+		"THE DEATH/RESURRECTION PAIRING IS DERIVED: the two legacy helpers are complementary and share the ledger, but nothing in the source asserts that they are a pair",
+		"`clicks_to_build` IS REFERENCED AND NOT REIMPLEMENTED: its consumer is the construction-click counter owned by godot-building-construction",
+		"NO EXECUTED-LEGACY BEHAVIOUR FIXTURE WAS CAPTURED, and the reason is the corpus holding no resurrectable row - a corpus limitation with a named cause, NOT the refusal lines' absence of behaviour",
+		"NO UNIT ROW WAS MANUFACTURED in the committed corpus or in any delivered fixture directory",
+		"NO UNIT IS REVIVED AGAINST THE COMMITTED CORPUS: its ledger is present and empty and 0 of its 40 placed rows are resurrectable",
+		"THE ZERO-CONSUMER FIELD COUNT IS 21, NOT THE 20 the committed investigation states: that record names twenty-one fields and every one of them measures zero, so the behavioural total is 23, not 22",
+		"`clicks_to_build` TAKES TWO DISTINCT VALUES OVER THE COMMITTED CONTENT, NOT the three the committed investigation states",
+		"no pixel parity is claimed, and the recorded M6 tile-geometry gap is unchanged and never assumed",
+		"no windowed capture is claimed: nothing is rendered and no revived unit is drawn",
+		"NO COVERAGE IS MANUFACTURED: the content package, the committed saves, and the delivered fixture directories stay byte-identical"
+	],
+	"provenance": {
+		"derived": [
+			{
+				"evidence": "derived (design D1): with a real two-sided counter gated on committed content, delivering a refusal would leave a server mutation unimplemented while the committed flag sits on 426 of 429 unit definitions looking like dead content",
+				"fact": "the line's deliverable is a mechanism rather than a refusal"
+			},
+			{
+				"evidence": "derived from an ESTABLISHED count: that record says \"twenty of twenty-two\" and then NAMES twenty-one fields, and every one of the twenty-one measures zero. The named list is countable and the prose is not, so the count follows the list",
+				"fact": "the zero-consumer field count is 21, not the 20 the committed investigation states"
+			},
+			{
+				"evidence": "derived from THREE ESTABLISHED measurements: 0 on all 429 units, {0: 172, 1: 298} over the 470 buildings, and the single committed special (id 925) as the 299th row with 1. The recorded 3 is retained in CLICKS_TO_BUILD_CORRECTION",
+				"fact": "clicks_to_build takes two distinct values over the content, not the three the committed investigation states"
+			},
+			{
+				"evidence": "derived and WEAK: the two functions are complementary and the ledger is shared, but no comment and no dispatch path asserts the pairing, and nothing checks that the revived row is the unit that died",
+				"fact": "sell(KILL) and resurrect_hero are intended as a death/resurrection pair"
+			},
+			{
+				"evidence": "derived (design D2/D5): the legacy branch takes index, item_id, x, and y all from the client, which is the untrusted pattern godot-building-move and godot-building-collect already record; the compatibility service therefore derives the key and the item id server-side and the client sends only a cell",
+				"fact": "the revived placement's cell/key resolution is a server concern"
+			}
+		],
+		"established": [
+			{
+				"evidence": "engine.py:163-181, re-measured by the suite",
+				"fact": "privateState['deadHeroes'] is a string-keyed count per item id, written as deadHeroes[str(item[0])] and read as str(item)"
+			},
+			{
+				"evidence": "engine.py:149-170 against the dispatcher's own 63 branches, both re-derived by the suite",
+				"fact": "push_dead_unit is an ENGINE HELPER and not a dispatcher branch, and it performs exactly two checks"
+			},
+			{
+				"evidence": "the same two lines, and the suite compares GATES against them by name",
+				"fact": "the two gates are the row's player team (engine.py:151) and the committed resurrectable flag being greater than zero (engine.py:159,162)"
+			},
+			{
+				"evidence": "command.py:169-181, whose whole body is the lookup, the delete, and the print",
+				"fact": "kill deletes the row and never touches the ledger"
+			},
+			{
+				"evidence": "command.py:158-160 against the recorded reason codes",
+				"fact": "sell reaches the ledger only behind reason == 'KILL' and only through the engine helper"
+			},
+			{
+				"evidence": "command.py:625-635 against engine.py:172-181 and engine.py:8-31",
+				"fact": "resurrect_hero decrements the ledger, DELETES the key at zero, re-places the row at client-supplied index/x/y, and DISCARDS args[4]"
+			},
+			{
+				"evidence": "a quoted-token search per field over command.py, engine.py, sessions.py, server.py, constants.py, get_game_config.py, and version.py, which the suite repeats",
+				"fact": "the zero-consumer count is 21 and every one of them measures zero occurrences across the seven legacy root modules"
+			},
+			{
+				"evidence": "the committed normalized content package, measured by the suite through the verified registry",
+				"fact": "resurrectable is positive on 426 of the 429 committed units, carried by 426 of them, and on 0 of the 470 committed buildings"
+			},
+			{
+				"evidence": "the same measured content package",
+				"fact": "syringes takes 6 distinct values over the units and 0 is the only value over the buildings"
+			},
+			{
+				"evidence": "the same measured content package, over both the units and the buildings domains",
+				"fact": "clicks_to_build is 0 on all 429 committed units and takes exactly two distinct values over the content"
+			},
+			{
+				"evidence": "tests/saves/fresh-player.json, measured by the suite and resolved against the verified registry",
+				"fact": "the committed corpus records deadHeroes == {}, places 40 rows across 40 distinct cells, and every one of them is a committed building"
+			}
+		]
+	},
+	"readout": "1001: 2 | 1085: 1 | reaching zero DELETES the key, never stores a zero | two gates and no third: player team 1, and committed resurrectable greater than zero | kill never reaches this ledger; sell reaches it only behind the KILL reason | no syringe cost and no resource moves; no combat is resolved; the revived placement is not validated",
+	"refusals": {
+		"absent_helpers": [
+			{
+				"absent_because": "`syringes` has zero legacy consumers, so the legacy server charges nothing; a cost computed from it would invent an economy the repository does not contain",
+				"helper": "syringe_cost"
+			},
+			{
+				"absent_because": "the same absence as syringe_cost, stated as the verb a caller would reach for",
+				"helper": "charge_revive"
+			},
+			{
+				"absent_because": "none of the seven committed combat fields has a legacy consumer, so there is no committed damage rule to resolve",
+				"helper": "resolve_damage"
+			},
+			{
+				"absent_because": "the same absence as resolve_damage: `attack` and `attack_interval` are content with zero consumers",
+				"helper": "apply_attack"
+			},
+			{
+				"absent_because": "`defense` is a constant 1 on all 429 committed units and is read by no branch, so there is nothing to apply",
+				"helper": "defend"
+			},
+			{
+				"absent_because": "no committed field records a probability and no branch draws a random number",
+				"helper": "hit_chance"
+			},
+			{
+				"absent_because": "the legacy resurrect_hero branch re-places the row with no occupancy check, so a stricter client would be a parity break in the opposite direction",
+				"helper": "is_occupied"
+			},
+			{
+				"absent_because": "the same absence as is_occupied, for the cell bounds the branch never checks",
+				"helper": "in_bounds"
+			},
+			{
+				"absent_because": "the same absence as is_occupied, for the terrain the branch never reads",
+				"helper": "terrain_at"
+			},
+			{
+				"absent_because": "the branch checks no item type: it re-places whatever item id the caller named",
+				"helper": "is_type_allowed"
+			},
+			{
+				"absent_because": "the engine sets no bound on the ledger, and a recorded absence is not permission to add one",
+				"helper": "revive_count_cap"
+			},
+			{
+				"absent_because": "no legacy branch reads a clock for a revival, so there is no committed cooldown to reproduce",
+				"helper": "revive_cooldown"
+			}
+		],
+		"clicks_to_build_reimplemented": false,
+		"combat_resolved": false,
+		"fixture_not_captured": "NO EXECUTED-LEGACY BEHAVIOUR FIXTURE WAS CAPTURED, AND THE REASON IS A CORPUS LIMITATION WITH A NAMED CAUSE - NOT, as on the three refusal lines before this one, the absence of behaviour. resurrectable is a UNIT-ONLY committed flag (positive on 426 of 429 units, on 0 of 470 buildings), the committed corpus places ONLY buildings across 40 rows and 40 distinct cells, so 0 of its placed rows are resurrectable and it places NO unit row at all, and its privateState['deadHeroes'] is present and {}. Capturing one would require MANUFACTURING A UNIT ROW first, which the delivered godot-unit-instances capability already refused and recorded as the right call. No unit row was manufactured in the committed corpus or in any delivered fixture directory (design D4)",
+		"ledger_migration": "privateState['deadHeroes'] is initialised to None and then coerced to {} by version.py:26-30 ('Applied hospital fix'). That is a SAVE MIGRATION, not behaviour: no branch ever creates the key, so a save that never held it receives an empty ledger from the migration rather than from gameplay. Recorded, never treated as a rule",
+		"no_third_gate": "EXACTLY TWO GATES EXIST AND NO THIRD IS INVENTED. push_dead_unit (engine.py:149-170) performs two checks and no more: the row's player team (engine.py:151) and the committed resurrectable flag (engine.py:159,162). Everything else a reader might expect is absent from the helper: no level check, no cost check, no capacity check, no cooldown, no per-type check, and no check that the row is a unit rather than a building. Adding any of them here would make this client STRICTER than the legacy server, which is a parity break in the opposite direction from the usual risk (design D1)",
+		"pairing": "THE DEATH/RESURRECTION PAIRING IS DERIVED, NOT ASSERTED. push_dead_unit and resurrect_hero are complementary and share privateState['deadHeroes'], but no comment and no dispatch path asserts that they are a pair: the legacy author's own comment on the increment says only 'Tries to push item to deadHeroes if it is ressurectable and on player team' (engine.py:150). Nothing in this client asserts the pairing as a server guarantee either",
+		"placement_validated": false,
+		"refusals": [
+			{
+				"implemented": false,
+				"refusal": "syringe_cost",
+				"rule": "NO SYRINGE COST IS CHARGED AND NO STORED RESOURCE MOVES. `used_syringe` is bound from args[4] (command.py:630) and is NEVER READ AGAIN anywhere in the branch, so it is DISCARDED, and the committed `syringes` field it would be paid in has ZERO occurrences across the seven legacy modules, so the legacy server charges nothing. Charging one would invent an economy the repository does not contain. The no-cost claim is proved by the endpoint's 'every stored resource is unchanged' half, which compares the FULL resource set rather than a subset"
+			},
+			{
+				"implemented": false,
+				"refusal": "combat_resolution",
+				"rule": "NO COMBAT IS RESOLVED OF ANY KIND. attack, defense, life, attack_interval, attack_range, best_against, and best_against_mult each have ZERO legacy consumers, so the committed numbers are CONTENT and never rules: this contract computes no damage, no attack outcome, no defence application, no hit chance, and no life or interval arithmetic, and a reader who wanted a combat model out of them must bring evidence the legacy contract does not contain. The ledger's own two-sided counter is the WHOLE death model the server has"
+			},
+			{
+				"implemented": false,
+				"refusal": "placement_validation",
+				"rule": "NO OCCUPANCY, BOUNDS, TYPE, OR TERRAIN VALIDATION IS ADDED TO THE REVIVED PLACEMENT. The legacy branch re-places the row through engine.map_add_item (engine.py:8-31) with no such check, and this client reproduces that absence rather than filling it: inventing an occupancy check here would make this client STRICTER than the legacy server. The gap is recorded as a Server v1 / M13 requirement, exactly as godot-building-move, godot-building-place, and godot-building-upgrade already do"
+			}
+		],
+		"resource_moved": false,
+		"syringe_charge": 0,
+		"syringe_discard_note": "args[4] is bound to the local `used_syringe` (command.py:630) and is NEVER READ AGAIN anywhere in the branch, so the value is inert and is DISCARDED. The committed counterpart is the item's own `syringes` field, which is carried by all 429 committed units and all 470 committed buildings, takes 6 distinct values over the units, and has ZERO occurrences across the seven legacy modules. The response NEVER ECHOES the discarded argument",
+		"syringe_discarded": true
+	},
+	"schema": "unit-behaviors-report-v1",
+	"scope": {
+		"delivered": [
+			"a typed resurrection intent carrying only an identifier and a cell",
+			"the typed result with the server-derived map key and item id, both gates, both ledgers, and both placements",
+			"the ledger projection delegated to unit_behaviors.gd, never re-derived",
+			"the two-part post-execution proof the endpoint requires"
+		],
+		"first_of_its_kind": "the FIRST M8 line whose transaction is both server-derived and state-mutating since godot-unit-collection, and the first committed field in this project whose legacy consumer is a MUTATION OF PRIVATE STATE rather than a read",
+		"intent": [
+			"user_id",
+			"x",
+			"y"
+		],
+		"not_delivered": [
+			"any syringe cost or resource movement",
+			"any combat resolution: no damage, outcome, defence, hit, or life arithmetic",
+			"any occupancy, bounds, type, or terrain check on the revived placement",
+			"a reimplementation of clicks_to_build, whose counter is owned by godot-building-construction",
+			"no executed-legacy fixture: the committed corpus holds no resurrectable row and manufacturing one is refused"
+		]
+	},
+	"zero_consumer_occurrences": {
+		"activation": 0,
+		"attack": 0,
+		"attack_interval": 0,
+		"attack_range": 0,
+		"best_against": 0,
+		"best_against_mult": 0,
+		"build_time": 0,
+		"collect_type": 0,
+		"collect_xp": 0,
+		"defense": 0,
+		"expiration": 0,
+		"gift_level": 0,
+		"life": 0,
+		"max_collects": 0,
+		"min_level": 0,
+		"population": 0,
+		"syringes": 0,
+		"training_time": 0,
+		"unit_capacity": 0,
+		"velocity": 0,
+		"volume": 0
+	}
+}

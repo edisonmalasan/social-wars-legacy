@@ -5,19 +5,20 @@ legacy contract before implementation.
 
 ## Summary
 
-**This line is not a refusal, and that is the finding.** Of twenty-two behavioural
-committed fields, twenty have **zero** legacy consumers, exactly as the last three
+**This line is not a refusal, and that is the finding.** Of twenty-three behavioural
+committed fields, **twenty-one** have **zero** legacy consumers, exactly as the last three
 lines found. But **two do not**, and one of them is the **first committed field in this
 project whose legacy consumer is a mutation of private state rather than a read**:
 
 | Field | Present | Distinct | Legacy reads |
 | --- | --- | --- | --- |
-| **`resurrectable`** (`properties` flag) | **426 of 429 units**, **0 of 470 buildings** | — | **2** — `engine.py:159,162` |
-| **`clicks_to_build`** | 429 of 429 units | 3 | **1** — `engine.py:26` |
+| **`resurrectable`** (`properties` flag) | **carried by 426 of 429 units** and **0 of 470 buildings** | — | **2** — `engine.py:159,162` |
+| **`clicks_to_build`** | 429 of 429 units | **2** (both `0`) | **1** — `engine.py:26` |
 
 Everything else measured zero across the seven legacy modules: `attack` (131 distinct),
 `attack_interval` (12), `attack_range` (14), `best_against` (5), `best_against_mult` (5),
-`defense` (1), `life` (150), `velocity` (11), `collect_type`, `collect_xp`, `max_collects`,
+`defense` (1), `life` (150), `velocity` (11), `collect_type` (**2** over the units — `g` 427,
+`w` 2; the five-value spread is the *buildings'*), `collect_xp`, `max_collects`,
 `syringes` (6), `volume` (3), `training_time`, `unit_capacity`, `expiration`, `population`,
 `min_level` (21), `activation`, `gift_level` (8), `build_time`, and every behavioural
 `properties` flag (`animal` on 2, `bulldozable` on 424, `fireman` on 1, `ft_armored` on 157,
@@ -47,7 +48,7 @@ map_delete_item(map, item_index)
 ```
 
 `push_dead_unit` is an **engine helper, not a branch** (consistent with the committed command
-catalog's note). It (`engine.py:149-171`) returns `False` unless the row is on **player team 1**
+catalog's note). It (`engine.py:149-170`) returns `False` unless the row is on **player team 1**
 (`item[7] == 1`) and its `properties` carry `resurrectable > 0`; otherwise it increments
 `deadHeroes[str(item_id)]`, creating the key at `1`.
 
@@ -63,8 +64,9 @@ resurrect_hero(save["privateState"], item_id)
 map_add_item(map, index, item_id, x, y)
 ```
 
-`resurrect_hero` (`engine.py:172-182`) decrements `deadHeroes[str(item)]` and **deletes the key
-when the count reaches zero**. The row is then re-placed at **client-supplied** `index`, `x`, and
+`resurrect_hero` (`engine.py:172-181`) decrements `deadHeroes[str(item)]` and **deletes the key
+when the count reaches zero** -- `del deadHeroes[itemstr]` at `engine.py:179`, behind the
+`if num_heroes <= 0:` guard at 178. The row is then re-placed at **client-supplied** `index`, `x`, and
 `y`, with **no** occupancy, bounds, type, or terrain check — the same untrusted pattern the delivered
 `godot-building-move` capability already records.
 
@@ -105,9 +107,11 @@ legacy reads agree on *values*, not on *representation*.
 
 **Established** (measured, repeatable):
 
-- the presence and distinct-value counts of all twenty-two behavioural fields, and the **zero**
-  legacy-consumer count for each of the twenty;
-- `resurrectable`'s **two** reads and its distribution — **426 of 429 units**, **0 of 470 buildings**;
+- the presence and distinct-value counts of all twenty-three behavioural fields, and the **zero**
+  legacy-consumer count for each of the **twenty-one** that have none;
+- `resurrectable`'s **two** reads and its distribution — **carried by 426 of 429 units** with the
+  key **absent entirely** on ids **923**, **933**, and **1176** rather than set to zero, and every
+  present value the string `"1"`; **0 of 470 buildings** carry the key;
 - `clicks_to_build`'s **one** read and its seeding of `attr["nc"] = 0`;
 - the three branch bodies verbatim, and that `push_dead_unit` is an engine helper while `kill` and
   `resurrect_hero` are **dispatcher branches** (63 named branches, both present);
@@ -182,3 +186,29 @@ PY
 - **No** Flash, Ruffle, ActionScript, or browser executed, and no ActionScript was decompiled; the M4
   conversion and inspection are read as committed outputs, not re-run.
 - The **no-pixel-parity** and **M6 tile-geometry** gaps are unchanged.
+
+## Corrections after the Apply stage (2026-10-02)
+
+Five figures in this record were **asserted rather than measured**, and the Apply stage measured
+them. Each was independently re-verified before being corrected here, and each correction is
+recorded rather than quietly applied:
+
+1. **The zero-consumer count was twenty-one, not twenty.** The prose said "twenty of twenty-two"
+   while naming **twenty-one** fields. Measured: all twenty-one measure **zero** quoted occurrences
+   across the seven modules, and the behavioural total is **twenty-three**.
+2. **The source lines were each off by one.** `push_dead_unit` is `engine.py:149-170` (line 171 is
+   blank), `resurrect_hero` is `engine.py:172-181` (182 blank), and `del deadHeroes[itemstr]` is at
+   **line 179**, behind the `if num_heroes <= 0:` guard at **178**.
+3. **`resurrectable` is *carried* by 426 of 429 units, and the key is *absent entirely*** on ids
+   **923**, **933**, and **1176** rather than set to zero. Every present value is the string `"1"`,
+   and **0 of 470 buildings** carry the key. The "426" figure was right; the absent-versus-zero
+   distinction was not stated and now is.
+4. **`clicks_to_build` takes two distinct values over the units** (both `0`), not three. Over the
+   470 buildings it is `{0: 172, 1: 298}`.
+5. **`collect_type` takes two distinct values over the units** (`g` 427, `w` 2). The five-value
+   `w`/`o`/`s`/`c`/`g` spread belongs to the **buildings** only, which is what the already-delivered
+   `collection_flow.gd` describes.
+
+None of these changes the conclusion. The mechanism, both gates, the delete-at-zero rule, the three
+doors, the `used_syringe` discard, and the corpus's inability to exercise any of it are all
+unchanged and all independently re-measured.

@@ -58,8 +58,19 @@
        and its zero animation commands, the recorded playback refusals, and the
        structural anti-invention guard over duration, loop, state machine,
        transition, priority, interrupt, timing, trigger, and playback helpers,
-       also with no endpoint, no request, and no mutation), and no live phase,
-       because this line adds no server operation),
+       also with no endpoint, no request, and no mutation), and the
+       unit-behaviors suite (the typed read-only dead-hero ledger projection
+       with both legacy increment gates named and exactly two of them, the
+       delete-at-zero rule, the fail-closed absent/non-object/non-string-key/
+       non-integer-count paths, the three-door command inventory recording that
+       `kill` never reaches the ledger and `sell` reaches it only behind the KILL
+       guard and only through the `push_dead_unit` engine helper, all 21
+       zero-consumer behavioural fields with their MEASURED occurrence counts
+       and measured committed distributions, the offline double's delete-at-zero
+       decrement and unvalidated re-placement, and the structural
+       anti-invention guard over syringe-cost, damage, attack, defence, hit,
+       occupancy, and charge helpers, also with no request over the network and
+       no committed-corpus mutation),
        (the loop passes the dead endpoint to every suite: the session and
        game-clock suites use it for their failure phase, the placement,
        purchase, move, sell, store, upgrade, construction, collect, and
@@ -67,7 +78,7 @@
        that ignore user args are unaffected)
     6. boot-scene unreachable-endpoint failure scenario, run with no service
        at all
-    7. fifteen live phases against the real Compatibility API: the main-scene
+    7. sixteen live phases against the real Compatibility API: the main-scene
        boot (success, compared with the committed fixture save), the legacy-v0
        GameApi suite, the structured API-error boot scenario, the
        placement phase (one intent through the v0 placement endpoint with
@@ -115,7 +126,17 @@
        the content-derived TWO-part post-state (the granted id and quantity
        equal the COMMITTED prize bag, and the ledger grew by exactly one
        appended id) and that EVERY stored resource is unchanged, with the
-       disposable corpus save asserted mutated)
+       disposable corpus save asserted mutated), and the behavior phase
+       (one revival through the v0 resurrect endpoint against a disposable
+       corpus SEEDED with one resurrectable ledger entry through the service's
+       documented opt-in COMPAT_SEED_DEAD_HEROES seam — set for this phase only,
+       and a throwaway copy rather than a committed corpus — whose response must
+       prove the TWO-part post-state (the revived ledger entry is GONE under the
+       delete-at-zero rule, the addressed key's row now records the
+       server-derived item id, AND every stored resource is unchanged, which is
+       what makes the no-syringe-cost claim non-tautological) and whose two
+       named refusals must each carry the endpoint's own code with no partial
+       payload, with the disposable corpus save asserted mutated)
     8. Compatibility API guard baseline, post-run, must equal the pre-run
        digests
     9. teardown assertions: loopback port released, no working-tree saves/
@@ -375,7 +396,7 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_collection", "test_unit_movement", "test_unit_animations")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a
@@ -601,6 +622,36 @@ try {
                 "--", "--scenario=live-collection",
                 "--gameapi-endpoint=$endpoint"
             )
+        },
+        @{
+            # The behavior phase drives ONE revival through the real v0 endpoint.
+            #
+            # The committed corpus holds NO resurrectable row and an EMPTY
+            # ledger, so the endpoint's positive path cannot run against it —
+            # and manufacturing a unit row in preserved material is refused.
+            # Instead the disposable CORPUS COPY this phase's own harness builds
+            # under the system temp root is SEEDED with one resurrectable ledger
+            # entry through the service's documented, opt-in
+            # COMPAT_SEED_DEAD_HEROES seam, which the service reads once at
+            # start-up. The seed is set for THIS phase only and cleared
+            # immediately afterwards, so no other phase and no normal run is
+            # affected, and the committed corpus and every delivered fixture
+            # directory stay byte-identical — which is exactly what the
+            # no-manufactured-coverage boundary requires.
+            #
+            # --expect-save-mutation holds because the revival is a real write:
+            # the unchanged legacy dispatcher deletes the ledger entry and
+            # re-places the row through engine.map_add_item.
+            Name = "behavior-live"
+            Assertions = "behavior live phase"
+            ExpectSaveMutation = $true
+            SeedEnvironment = @{ "COMPAT_SEED_DEAD_HEROES" = "1001=1" }
+            Arguments = @(
+                "--headless", "--path", $projectRel,
+                "--script", "res://tests/test_unit_behaviors.gd",
+                "--", "--scenario=live-behavior",
+                "--gameapi-endpoint=$endpoint"
+            )
         }
     )
 
@@ -613,13 +664,30 @@ try {
         if ($phase.ContainsKey("ExpectSaveMutation")) {
             # placement-live, purchase-live, move-live, sell-live, store-live,
             # upgrade-live, construction-live, collect-live, expand-live,
-            # queue-live, and collection-live: the harness snapshots the
-            # disposable corpus saves before the Godot run and fails unless one
-            # changed after.
+            # queue-live, collection-live, and behavior-live: the harness
+            # snapshots the disposable corpus saves before the Godot run and
+            # fails unless one changed after.
             $phaseArgs += "--expect-save-mutation"
         }
         $phaseArgs += @("--", $GodotExe) + $phase.Arguments
-        $run = Invoke-Python -Arguments $phaseArgs -TimeoutSeconds 900 -Name $phase.Name
+        # The seed is set for THIS phase only and cleared immediately after the
+        # wrapped command returns, so the disposable corpus the harness builds
+        # is seeded while no other phase and no post-run check is affected.
+        $seededNames = @()
+        if ($phase.ContainsKey("SeedEnvironment")) {
+            foreach ($seedEntry in $phase.SeedEnvironment.GetEnumerator()) {
+                [Environment]::SetEnvironmentVariable(
+                    $seedEntry.Key, $seedEntry.Value, "Process")
+                $seededNames += $seedEntry.Key
+            }
+        }
+        try {
+            $run = Invoke-Python -Arguments $phaseArgs -TimeoutSeconds 900 -Name $phase.Name
+        } finally {
+            foreach ($seededName in $seededNames) {
+                [Environment]::SetEnvironmentVariable($seededName, $null, "Process")
+            }
+        }
         $phaseLogs[$phase.Name] = $run.Combined
         Report-Result ($run.ExitCode -eq 0) `
             "$($phase.Assertions): live phase exits 0 (got $($run.ExitCode))"
@@ -873,6 +941,27 @@ try {
         "collection live phase drove one completion through the v0 endpoint, with its content-derived two-part post-state proof"
     Report-Result ($collectionOut -match "(?m)^PASS corpus save mutated by the live placement") `
         "collection live phase mutated the disposable corpus save"
+
+    # The behavior live phase must show a typed success through the real
+    # endpoint — including its TWO-part value-level post-state proof (the
+    # revived ledger entry is GONE under the delete-at-zero rule, the addressed
+    # key's row now records the SERVER-DERIVED item id, AND every stored
+    # resource is unchanged, which is what makes the no-syringe-cost claim
+    # non-tautological) and its two named refusals carrying the endpoint's own
+    # codes with no partial payload — and the harness must have observed the
+    # corpus save change.
+    $behaviorOut = ""
+    if ($phaseLogs.ContainsKey("behavior-live")) {
+        $behaviorOut = $phaseLogs["behavior-live"]
+    }
+    Report-Result ($behaviorOut -match "\[test\] PASS script=res://tests/test_unit_behaviors\.gd") `
+        "behavior live phase asserts its scenario"
+    Report-Result ($behaviorOut -match '\[test\] live-behavior applied item_id=\d+ map_key=\d+ cell=\(\d+, \d+\) ledger_removed=true resources_unchanged=true') `
+        "behavior live phase drove one revival through the v0 endpoint, with its two-part post-state proof"
+    Report-Result ($behaviorOut -match "refused=unresolvable_ledger_entry,unresolvable_cell") `
+        "behavior live phase proved both named refusals with the endpoint's own codes and no partial payload"
+    Report-Result ($behaviorOut -match "(?m)^PASS corpus save mutated by the live placement") `
+        "behavior live phase mutated the disposable corpus save"
 
     # --- 8. guard baseline, post-run ---------------------------------------
 
