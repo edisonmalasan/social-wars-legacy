@@ -12,8 +12,8 @@ extends Node
 ## expansion intent, `level_up_town()` for one level-up intent,
 ## `push_queue_unit_town()` / `pop_queue_unit_town()` for one production-queue
 ## intent each, `complete_collection_town()` for one collection-completion
-## intent, and `resurrect_hero_town()` for one dead-hero revival intent,
-## receiving typed results
+## intent, `resurrect_hero_town()` for one dead-hero revival intent, and
+## `advance_research_town()` for one research-track intent, receiving typed results
 ## (`scripts/gameapi/boot_data.gd`); raw transport dictionaries never reach
 ## presentation code, and no other script references a transport.
 ##
@@ -50,6 +50,7 @@ extends Node
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
+const ResearchFlow = preload("res://scripts/units/research_flow.gd")
 const FakeApi = preload("res://scripts/gameapi/fake_api.gd")
 const LegacyV0Api = preload("res://scripts/gameapi/legacy_v0_api.gd")
 
@@ -148,6 +149,11 @@ var collection_requests := 0
 ## Monotonic for the same reason: `configure()` swaps the implementation without
 ## hiding history.
 var behavior_requests := 0
+## Number of research intents this process has issued (research flow contract:
+## exactly one per confirm, zero for every local refusal — the research suite
+## snapshots this counter exactly like `placement_requests`). Monotonic for the
+## same reason: `configure()` swaps the implementation without hiding history.
+var research_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -469,6 +475,37 @@ func resurrect_hero_town(user_id: String, x: int,
 	behavior_requests += 1
 	var result: BehaviorFlow.ResurrectResult = await _impl.resurrect_hero_town(
 		user_id, x, y)
+	return result
+
+
+## One research-track intent (the save identity, a **closed action**, and the
+## research **track** — and NOTHING else) from the selected implementation. The
+## contract carries NO counter value, NO research instant, and NO cash amount:
+## the service derives every counter itself, derives the cash branch's own
+## argument, and executes the unchanged legacy branch with a NEUTRAL vector
+## (research design D2/D3) — so a client-supplied step, item, timestamp, or cash
+## key is ignored exactly as a client-supplied amount or price is ignored
+## elsewhere, and the typed result's `derived`, `vector_before`,
+## `vector_after`, `research`, and `resources` are authoritative.
+##
+## The response's second post-execution proof half requires **every** stored
+## resource to be **unchanged**, because a research action moves none.
+##
+## **No readiness and no completion** are reported (design D1): all three
+## counters are write-only in the legacy source, so there is no rule to derive,
+## and the response's projection carries an explicitly empty `derived` block.
+## **No price is reported** — `cash_charged` is the derived `0`, the cash
+## branch's own argument is discarded by the legacy code, and
+## `fast_forward_offered` is `false`: the research instant's fourth writer is
+## recorded and delivered not at all (design D7).
+##
+## The client applies `vector_after` and `resources` **verbatim**, so a wrong
+## client-side expectation can never be silently compounded.
+func advance_research_town(user_id: String, action: String,
+		track: int) -> ResearchFlow.ResearchResult:
+	research_requests += 1
+	var result: ResearchFlow.ResearchResult = await _impl.advance_research_town(
+		user_id, action, track)
 	return result
 
 

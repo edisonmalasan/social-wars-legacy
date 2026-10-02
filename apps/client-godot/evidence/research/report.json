@@ -1,0 +1,765 @@
+{
+	"branch_count": 4,
+	"branch_count_rule": "the dispatcher has 63 named branches and exactly FOUR of them touch a research counter (command.py:268-300); the suite re-derives each one's inclusive line range and fails the run on a drift",
+	"branches": [
+		{
+			"action": "next_step",
+			"args": [
+				"track index"
+			],
+			"argument_order": "track",
+			"charges": false,
+			"command": "next_research_step",
+			"counters_written": [
+				"researchStepNumber",
+				"timeStampDoResearch"
+			],
+			"effect": "the step counter is INCREMENTED and the research instant is stamped with time_now; the item counter is untouched",
+			"paired_reset": false,
+			"reads_a_price": false,
+			"source": "command.py:268-274",
+			"stamps_instant": true,
+			"validation": "none: no bounds check, no clamp, no membership test, no exception guard, and no existence check"
+		},
+		{
+			"action": "buy_step_cash",
+			"args": [
+				"cash",
+				"track index"
+			],
+			"argument_order": "cash-then-track",
+			"charges": false,
+			"command": "research_buy_step_cash",
+			"counters_written": [
+				"timeStampDoResearch"
+			],
+			"effect": "the research instant is ZEROED and nothing else is written; the step and item counters are untouched",
+			"paired_reset": false,
+			"price_note": "the branch reads args[0] as `cash` (command.py:277) and NEVER uses it: it prints 'Buy research step for …' and moves no balance. This is the same shape as M8 line 8's discarded `used_syringe`, and it is what makes the no-price claim provable rather than merely asserted",
+			"reads_a_price": true,
+			"source": "command.py:276-282",
+			"stamps_instant": false,
+			"validation": "none: no bounds check, no clamp, no membership test, no exception guard, and no existence check — and no cost validation either, because the only cost-token match is the branch's own parameter name"
+		},
+		{
+			"action": "next_item",
+			"args": [
+				"track index"
+			],
+			"argument_order": "track",
+			"charges": false,
+			"command": "next_research_item",
+			"counters_written": [
+				"researchItemNumber",
+				"researchStepNumber",
+				"timeStampDoResearch"
+			],
+			"effect": "the item counter is INCREMENTED and the step counter AND the research instant are RESET TOGETHER, in this one branch (command.py:288-289)",
+			"paired_reset": true,
+			"paired_reset_note": "the step reset and the instant reset happen TOGETHER at command.py:288 and command.py:289, in the same branch; no other branch resets the step counter, and no committed branch ever resets the instant alone",
+			"reads_a_price": false,
+			"source": "command.py:284-291",
+			"stamps_instant": false,
+			"validation": "none: no bounds check, no clamp, no membership test, no exception guard, and no existence check"
+		},
+		{
+			"action": "reset_item",
+			"args": [
+				"track index"
+			],
+			"argument_order": "track",
+			"charges": false,
+			"command": "reset_research_item",
+			"counters_written": [
+				"researchItemNumber",
+				"researchStepNumber",
+				"timeStampDoResearch"
+			],
+			"effect": "all THREE counters are set to 0 for the addressed track and nothing else is written",
+			"paired_reset": false,
+			"reads_a_price": false,
+			"source": "command.py:293-300",
+			"stamps_instant": false,
+			"validation": "none: no bounds check, no clamp, no membership test, no exception guard, and no existence check"
+		}
+	],
+	"content_absence": "NO COMMITTED RESEARCH CONTENT IS INVENTED. MEASURED over all 22 normalized files and config/main.json: (1) NO normalized package carries a research SECTION — no file has a top-level key of any research kind, and all 22 are top-level arrays of domain rows; (2) the string 'research' appears in exactly TWO normalized files, not one: buildings.json, ONCE, inside the `name` of legacy_id \"256\" (\"Research Lab\"), and images.json, in exactly THREE rows whose `legacy_id`/`path` are popupResearchCenter_buildingProcess.swf and its _2 and _3 variants — six occurrences in total, all asset references; (3) config/main.json has ZERO top-level content keys naming research and ZERO nested content-section keys, but it does have THREE keys containing the word, all of them under /images (the asset namespace whose keys are asset paths by construction), and exactly ONE string value containing it, /items/244/name = \"Research Lab\". MEASURED CORRECTION: the M9 investigation and this line's proposal both state that 'research' appears in exactly ONE normalized file and only inside one `name`, and that config/main.json has NO key containing 'research' at any depth. BOTH FIGURES ARE WRONG — it is two files and it is three image keys plus one value — and both are corrected here rather than shipped. The CONCLUSION is unchanged and is what matters: there is no committed research cost, step count, unlock requirement, or reward to derive a schedule from, so none is invented and no price, step count, requirement, or reward is computed anywhere in this repository (design D4)",
+	"corpus": {
+		"claim": "the committed corpus holds every research counter at its initial value [0, 0] on both tracks, and no placed row carries a research counter anywhere. That is why this line is the first M9 line with a real executed-legacy fixture, and it is a fact about the corpus, not evidence that research can be obtained, finished, or shown to be ready",
+		"resources": {
+			"cash": 5,
+			"gold": 2000,
+			"mana": 0,
+			"oil": 2000,
+			"steel": 2000,
+			"wood": 2000,
+			"xp": 4
+		},
+		"rows": 40,
+		"rows_carrying_a_research_counter": 0,
+		"save": "tests/saves/fresh-player.json",
+		"save_bytes": 15628,
+		"save_sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+		"store": {},
+		"vector": {}
+	},
+	"counter_model": {
+		"counter_meanings": {
+			"researchItemNumber": "the ITEM counter: incremented by next_research_item and zeroed by reset_research_item",
+			"researchStepNumber": "the STEP counter: incremented by next_research_step and reset (with the instant, together) by next_research_item",
+			"timeStampDoResearch": "the RESEARCH INSTANT: stamped by next_research_step, zeroed by the cash, item, and reset branches, and decremented by the recorded fast_forward writer"
+		},
+		"counters": [
+			"researchStepNumber",
+			"researchItemNumber",
+			"timeStampDoResearch"
+		],
+		"read_only": "the view holds copies of the committed values and declares no setter, no mutating method, and no writable public field; every reader returns a committed value or a fresh copy",
+		"reasons": [
+			"absent_research_state",
+			"non_object_private_state",
+			"non_list_counter",
+			"wrong_track_count",
+			"non_integer_counter",
+			"negative_counter"
+		],
+		"track_count": 2,
+		"unresolvable_rule": "a state that is absent, is not an object, carries a counter that is not a list, holds the wrong number of entries, or holds a non-integer or negative value is reported UNRESOLVABLE with its recorded state intact, and is never defaulted to a zero vector presented as a resolved one",
+		"verbatim_rule": "each counter is reported exactly as the save holds it - no scaling, rounding, defaulting, or clamping - and a malformed value fails closed with the counter and the element named. An integral float is the documented transport tolerance; a numeric string is refused"
+	},
+	"determinism": {
+		"byte_identical_across_reruns": true,
+		"reason": "no timestamp, no absolute path, no wall clock, no request, and no saved state: every table is derived from the model's own constants and from the committed bytes measured in the same run, and every derived set is sorted before it is written",
+		"serialization": "JSON.stringify(report, tab, sort_keys=true) plus one trailing newline; every number written is an integer - the pinned engine's integral floats are normalised on the way in, which changes no value - so no float formatting varies between runs",
+		"time_dependent_fields": "the ONLY time-dependent value in this line's evidence is the research instant the legacy step branch stamped, which the fixture fixed at one run; the fake double stamps that same committed value rather than reading a clock"
+	},
+	"fast_forward": {
+		"clamped": true,
+		"command": "fast_forward",
+		"contract": "RECORDED AND IMPLEMENTED NOT AT ALL. The research instant has FIVE writers (command.py:272, 280, 289, 298, and 927), and the FIFTH is not a research branch at all: fast_forward (command.py:905) reads the instant at command.py:923 and subtracts a CLIENT-SUPPLIED number of seconds from every track's entry at command.py:927, clamped at zero. That makes the research instant client-writable in exactly the way M8 line 6 found a row's instant client-writable, and it is named here because it is the ONLY elapsed-time input the research system has — an instant trusted by nothing, in a system where nothing reads it. NO fast-forward operation is delivered by the client facade, by either GameApi implementation, by this flow, or by any route, and no elapsed-time, remaining-time, readiness, or completion behaviour is derived from the instant anywhere in this repository (design D7)",
+		"formula": "research_timers[i] = max(0, research_timers[i] - seconds)",
+		"is_a_research_branch": false,
+		"offered": false,
+		"read_line": "command.py:923",
+		"seconds_source": "args[0], CLIENT-SUPPLIED (command.py:906)",
+		"source": "command.py:905-946, research lines 922-928",
+		"write_line": "command.py:927"
+	},
+	"fixture": {
+		"combinations": 8,
+		"completion_captured": false,
+		"directory": "tests/fixtures/godot-research",
+		"executed_legacy": true,
+		"fixture_scope": "the four counter transitions over two tracks against the fresh-player corpus: no progressed save, no other command, and nothing about a finished or ready step",
+		"manifest": "tests/fixtures/godot-research/capture-manifest.json",
+		"note": "all FOUR branches were captured on BOTH tracks - eight branch-track combinations - and the eight steps round-trip the vector back to the committed seed byte-for-byte. No completion and no readiness were captured, because the legacy server has neither: every one of the ten counter sites is a write and the instant's single read is itself a fast_forward write",
+		"probe_note": "probe 1 hands the cash branch a price of 250 and proves playerInfo.cash does not move, while a client-sent resource vector does - which is what makes the endpoint's everything-unchanged proof non-tautological; probes 2 and 3 prove the recorded fast_forward writer subtracts a client-supplied number of seconds and clamps at zero",
+		"probes": 3,
+		"readiness_captured": false,
+		"round_trip_to_seed": true,
+		"steps": [
+			{
+				"action": "next_step",
+				"command": "next_research_step",
+				"leaves": [
+					"/privateState/researchStepNumber/0",
+					"/privateState/timeStampDoResearch/0"
+				],
+				"name": "command_next_research_step_track_0",
+				"track": 0,
+				"vector_after": {
+					"researchItemNumber": [
+						0,
+						0
+					],
+					"researchStepNumber": [
+						1,
+						0
+					],
+					"timeStampDoResearch": [
+						1790946686,
+						0
+					]
+				},
+				"vector_before": {
+					"researchItemNumber": [
+						0,
+						0
+					],
+					"researchStepNumber": [
+						0,
+						0
+					],
+					"timeStampDoResearch": [
+						0,
+						0
+					]
+				}
+			},
+			{
+				"action": "next_step",
+				"command": "next_research_step",
+				"leaves": [
+					"/privateState/researchStepNumber/1",
+					"/privateState/timeStampDoResearch/1"
+				],
+				"name": "command_next_research_step_track_1",
+				"track": 1,
+				"vector_after": {
+					"researchItemNumber": [
+						0,
+						0
+					],
+					"researchStepNumber": [
+						1,
+						1
+					],
+					"timeStampDoResearch": [
+						1790946686,
+						1790946686
+					]
+				},
+				"vector_before": {
+					"researchItemNumber": [
+						0,
+						0
+					],
+					"researchStepNumber": [
+						1,
+						0
+					],
+					"timeStampDoResearch": [
+						1790946686,
+						0
+					]
+				}
+			},
+			{
+				"action": "buy_step_cash",
+				"command": "research_buy_step_cash",
+				"leaves": [
+					"/privateState/timeStampDoResearch/0"
+				],
+				"name": "command_research_buy_step_cash_track_0",
+				"track": 0,
+				"vector_after": {
+					"researchItemNumber": [
+						0,
+						0
+					],
+					"researchStepNumber": [
+						1,
+						1
+					],
+					"timeStampDoResearch": [
+						0,
+						1790946686
+					]
+				},
+				"vector_before": {
+					"researchItemNumber": [
+						0,
+						0
+					],
+					"researchStepNumber": [
+						1,
+						1
+					],
+					"timeStampDoResearch": [
+						1790946686,
+						1790946686
+					]
+				}
+			},
+			{
+				"action": "buy_step_cash",
+				"command": "research_buy_step_cash",
+				"leaves": [
+					"/privateState/timeStampDoResearch/1"
+				],
+				"name": "command_research_buy_step_cash_track_1",
+				"track": 1,
+				"vector_after": {
+					"researchItemNumber": [
+						0,
+						0
+					],
+					"researchStepNumber": [
+						1,
+						1
+					],
+					"timeStampDoResearch": [
+						0,
+						0
+					]
+				},
+				"vector_before": {
+					"researchItemNumber": [
+						0,
+						0
+					],
+					"researchStepNumber": [
+						1,
+						1
+					],
+					"timeStampDoResearch": [
+						0,
+						1790946686
+					]
+				}
+			},
+			{
+				"action": "next_item",
+				"command": "next_research_item",
+				"leaves": [
+					"/privateState/researchItemNumber/0",
+					"/privateState/researchStepNumber/0"
+				],
+				"name": "command_next_research_item_track_0",
+				"track": 0,
+				"vector_after": {
+					"researchItemNumber": [
+						1,
+						0
+					],
+					"researchStepNumber": [
+						0,
+						1
+					],
+					"timeStampDoResearch": [
+						0,
+						0
+					]
+				},
+				"vector_before": {
+					"researchItemNumber": [
+						0,
+						0
+					],
+					"researchStepNumber": [
+						1,
+						1
+					],
+					"timeStampDoResearch": [
+						0,
+						0
+					]
+				}
+			},
+			{
+				"action": "next_item",
+				"command": "next_research_item",
+				"leaves": [
+					"/privateState/researchItemNumber/1",
+					"/privateState/researchStepNumber/1"
+				],
+				"name": "command_next_research_item_track_1",
+				"track": 1,
+				"vector_after": {
+					"researchItemNumber": [
+						1,
+						1
+					],
+					"researchStepNumber": [
+						0,
+						0
+					],
+					"timeStampDoResearch": [
+						0,
+						0
+					]
+				},
+				"vector_before": {
+					"researchItemNumber": [
+						1,
+						0
+					],
+					"researchStepNumber": [
+						0,
+						1
+					],
+					"timeStampDoResearch": [
+						0,
+						0
+					]
+				}
+			},
+			{
+				"action": "reset_item",
+				"command": "reset_research_item",
+				"leaves": [
+					"/privateState/researchItemNumber/0"
+				],
+				"name": "command_reset_research_item_track_0",
+				"track": 0,
+				"vector_after": {
+					"researchItemNumber": [
+						0,
+						1
+					],
+					"researchStepNumber": [
+						0,
+						0
+					],
+					"timeStampDoResearch": [
+						0,
+						0
+					]
+				},
+				"vector_before": {
+					"researchItemNumber": [
+						1,
+						1
+					],
+					"researchStepNumber": [
+						0,
+						0
+					],
+					"timeStampDoResearch": [
+						0,
+						0
+					]
+				}
+			},
+			{
+				"action": "reset_item",
+				"command": "reset_research_item",
+				"leaves": [
+					"/privateState/researchItemNumber/1"
+				],
+				"name": "command_reset_research_item_track_1",
+				"track": 1,
+				"vector_after": {
+					"researchItemNumber": [
+						0,
+						0
+					],
+					"researchStepNumber": [
+						0,
+						0
+					],
+					"timeStampDoResearch": [
+						0,
+						0
+					]
+				},
+				"vector_before": {
+					"researchItemNumber": [
+						0,
+						1
+					],
+					"researchStepNumber": [
+						0,
+						0
+					],
+					"timeStampDoResearch": [
+						0,
+						0
+					]
+				}
+			}
+		]
+	},
+	"generated_by": "apps/client-godot/tests/test_research.gd --report=<path>",
+	"instant_writer_count": 5,
+	"instant_writers": [
+		{
+			"client_writable": false,
+			"effect": "instant = time_now",
+			"kind": "dispatcher-branch",
+			"source": "command.py:272",
+			"writer": "command:next_research_step"
+		},
+		{
+			"client_writable": false,
+			"effect": "instant = 0",
+			"kind": "dispatcher-branch",
+			"source": "command.py:280",
+			"writer": "command:research_buy_step_cash"
+		},
+		{
+			"client_writable": false,
+			"effect": "instant = 0 (together with the step counter's reset)",
+			"kind": "dispatcher-branch",
+			"source": "command.py:289",
+			"writer": "command:next_research_item"
+		},
+		{
+			"client_writable": false,
+			"effect": "instant = 0",
+			"kind": "dispatcher-branch",
+			"source": "command.py:298",
+			"writer": "command:reset_research_item"
+		},
+		{
+			"client_writable": true,
+			"effect": "for every track: instant = max(0, instant - seconds), where `seconds` is the CLIENT-SUPPLIED args[0] (command.py:906)",
+			"kind": "engine-side decrement inside a dispatcher branch",
+			"source": "command.py:923 (read), command.py:927 (write)",
+			"writer": "command:fast_forward"
+		}
+	],
+	"intents": {
+		"action_vocabulary": [
+			"next_step",
+			"buy_step_cash",
+			"next_item",
+			"reset_item"
+		],
+		"cash_rule": "research_buy_step_cash is handed a SERVER-DERIVED cash value of 0 and the branch discards it anyway (command.py:277), so no research price is claimed in either direction (design D3)",
+		"fast_forward_offered": false,
+		"ignored_keys": [
+			"step",
+			"item",
+			"timestamp",
+			"instant",
+			"cash",
+			"price",
+			"cost",
+			"step_count",
+			"reward",
+			"remaining",
+			"ready",
+			"duration",
+			"resources_changed",
+			"vector",
+			"seconds",
+			"fast_forward",
+			"type",
+			"unlock",
+			"requirement"
+		],
+		"keys": [
+			"user_id",
+			"action",
+			"track"
+		],
+		"note": "the client sends EXACTLY the player identifier, a closed action, and a track. No counter value, no research instant, and no cash amount is expressible, so the service derives every one of them itself and ignores any such key a client attaches alongside (design D2)",
+		"path": "/v0/research",
+		"track_count": 2,
+		"vector": "NEUTRAL: a research price would be a client-sent delta, because the legacy dispatcher applies the request's per-command vector BEFORE the branch (command.py:40, engine.py:251-271) as max(current + delta, 0)"
+	},
+	"ledger_door_correction": {
+		"calls_helper_at": "engine.py:223 (push_dead_unit)",
+		"doors": 4,
+		"fourth_door": "map_lose_item",
+		"heading_note": "the superseded 'three-door' word is retained in the requirement heading because a MODIFIED delta resolves its header against the existing requirement name and Archive REFUSES a renamed heading",
+		"is_a_dispatcher_branch": false,
+		"reached_from": "the QUEST path (command.py:796 inside end_quest, and command.py:872 inside end_attack), not the death path",
+		"source": "engine.py:215-228",
+		"superseded": "godot-unit-behaviors records THREE doors; the M9 investigation measured four and this suite re-measures it. Its named-BRANCH count stays three, which is what keeps the two counts distinguishable"
+	},
+	"measured_content": {
+		"config_keys_containing_research": [
+			"/images/popupResearchCenter_buildingProcess.swf",
+			"/images/popupResearchCenter_buildingProcess_2.swf",
+			"/images/popupResearchCenter_buildingProcess_3.swf"
+		],
+		"config_string_values_containing_research": [
+			"/items/244/name"
+		],
+		"config_top_level_keys": 20,
+		"corrections": "the M9 investigation and this line's proposal both state that 'research' appears in exactly ONE normalized file and only inside one `name`, and that config/main.json has NO key containing 'research' at any depth. Both figures are WRONG - two files, and three /images keys plus one value - and the conclusion is unchanged: no committed research cost, step count, unlock requirement, or reward exists, so none is invented (design D4)",
+		"normalized_files": 22,
+		"normalized_files_containing_research": {
+			"buildings.json": 1,
+			"images.json": 6
+		},
+		"research_center_popup_assets": [
+			"popupResearchCenter_buildingProcess.swf",
+			"popupResearchCenter_buildingProcess_2.swf",
+			"popupResearchCenter_buildingProcess_3.swf"
+		],
+		"research_lab_building": {
+			"domain": "buildings",
+			"legacy_id": "256",
+			"name": "Research Lab"
+		},
+		"research_sections": 0
+	},
+	"measured_legacy": {
+		"branch_ranges": {
+			"next_research_item": [
+				284,
+				291
+			],
+			"next_research_step": [
+				268,
+				274
+			],
+			"research_buy_step_cash": [
+				276,
+				282
+			],
+			"reset_research_item": [
+				293,
+				300
+			]
+		},
+		"instant_lines": [
+			272,
+			280,
+			289,
+			298,
+			923
+		],
+		"instant_sites": 5,
+		"item_sites": 2,
+		"modules_touched": {
+			"researchItemNumber": "command.py",
+			"researchStepNumber": "command.py",
+			"timeStampDoResearch": "command.py"
+		},
+		"step_sites": 3,
+		"track_comment_lines": [],
+		"write_only_rule": "every occurrence of all three counters is a write in command.py, and the instant's single read is itself a write inside fast_forward: nothing anywhere reads a research counter to decide anything"
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed",
+		"NO RESEARCH PRICE IS CHARGED AND NO STORED RESOURCE MOVES, because none is committed and the one price-taking branch reads a cash value and discards it; the endpoint's post-execution proof compares the COMPLETE stored resource set, which is what makes the claim non-tautological",
+		"NO COMPLETION, READINESS, REMAINING-TIME, OR UNLOCK SEMANTICS ARE IMPLEMENTED, because the counters are read by nothing: they are write-only in the legacy source",
+		"NO COUNTER BOUND, MEMBERSHIP RULE, OR CLAMP IS ADDED, the legacy branches having none; the recorded absence is a property of the contract, not permission",
+		"NO REWARD IS PAID, and none exists: there is no committed reward for research anywhere, not even a zero-valued one",
+		"NO COMMITTED RESEARCH CONTENT IS INVENTED, none existing: this is a MEASURED absence, and it corrected two figures of the M9 investigation that had it wrong",
+		"the track-to-building mapping is REPORTED and NEVER USED: the track constants are undefined in the server, no code identifier is named after either of them, and nothing is derived from the mapping",
+		"NO FAST-FORWARD OPERATION IS DELIVERED, though its write of the research instant is recorded as the fourth writer",
+		"THE COUNTERS HAVE NO IN-GAME CONSUMER: nothing in the legacy server reads one to decide anything, so the delivered feature is observable ONLY as these counter transitions and nothing more",
+		"the fixture covers FOUR branches over BOTH tracks and nothing else: no readiness, no completion, and no reward is evidenced, and the item branch's instant half is a recorded no-op transition because exactly eight steps leave no room for a priming step",
+		"no compatibility route beyond the four guarded intents this line delivers exists for a research track, and the service adds no server-authoritative validation of bounds, membership, or price - that belongs to Server v1 / M13",
+		"no pixel-parity oracle exists",
+		"no windowed capture is claimed: nothing is rendered, and the committed corpus places neither research building",
+		"the committed capture runs the fake GameApi implementation for the client-side evidence, a deterministic test double rather than a parity oracle; the executed-legacy parity rests on the committed fixture and the live phase"
+	],
+	"non_derivation": [
+		{
+			"absent_because": "no legacy branch reads a research counter to decide whether a step or an item finished, so there is no server-side completion to reproduce",
+			"helper": "is_research_complete"
+		},
+		{
+			"absent_because": "the research instant is reported verbatim and nothing derives a decision from it: the legacy server evaluates no research elapsed time at all",
+			"helper": "research_ready"
+		},
+		{
+			"absent_because": "there is no committed research duration field anywhere in the content, so there is no committed denominator to divide by",
+			"helper": "research_duration"
+		},
+		{
+			"absent_because": "no committed research cost exists and the one price-taking branch charges nothing, so any price computed here would invent an economy",
+			"helper": "research_price"
+		},
+		{
+			"absent_because": "no committed unlock requirement exists, and the track-to-building mapping supports no derivation because the track constants are undefined in the server (design D5)",
+			"helper": "unlock_research"
+		},
+		{
+			"absent_because": "no committed step count exists, so a total could only be invented",
+			"helper": "research_step_count"
+		},
+		{
+			"absent_because": "no committed reward for research exists, not even a zero-valued one",
+			"helper": "research_reward"
+		},
+		{
+			"absent_because": "the research instant's fifth writer subtracts a CLIENT-SUPPLIED number of seconds and is recorded, not delivered: no action and no route derives it (design D7)",
+			"helper": "fast_forward"
+		}
+	],
+	"package_files": 67,
+	"package_sha256": "dba0a98b25c6fafdb7b752436d2f70fcfc8641ef5f977166aa2002a3f4b44ea0",
+	"provenance": {
+		"derived": [
+			{
+				"evidence": "derived (design D1): the service's own derivation fails closed on the same shapes with `unresolvable_research_state`, so the client mirrors it rather than defaulting a zero vector",
+				"fact": "the projection refuses an absent, non-object, non-list, wrong-length, non-integer, or negative state and reports it with its recorded state intact"
+			},
+			{
+				"evidence": "derived (design D2): the same intent-only discipline the queue, collection, and revival endpoints apply, chosen because every legacy branch takes its outcome from the client",
+				"fact": "the intent is three keys wide: a player identifier, a closed action, and a track"
+			},
+			{
+				"evidence": "derived: no authentic legacy research panel has been captured, so the wording is the delivered provisional convention, never a claim about what the legacy client displayed",
+				"fact": "the readout's labels and the composition of its lines"
+			}
+		],
+		"established": [
+			{
+				"evidence": "command.py:271-298; tests/saves/fresh-player.json, where all three hold [0, 0]",
+				"fact": "the research state is three two-entry counters in the player's private state: researchStepNumber, researchItemNumber, and timeStampDoResearch"
+			},
+			{
+				"evidence": "command.py:268-274, 276-282, 284-291, 293-300; the committed executed fixture in tests/fixtures/godot-research/",
+				"fact": "four dispatcher branches advance them, over two tracks, with the recorded per-branch effects and line ranges"
+			},
+			{
+				"evidence": "command.py:288 and command.py:289, adjacent lines in one branch",
+				"fact": "the item branch resets the step counter AND the research instant together, and no other branch resets the step counter"
+			},
+			{
+				"evidence": "command.py:276-282; probe 1 of the committed fixture, executed against the real legacy server",
+				"fact": "research_buy_step_cash reads a client-supplied cash value and discards it: playerInfo.cash does not move even when the branch is handed 250"
+			},
+			{
+				"evidence": "the seven legacy modules, measured per line; command.py:923 and 927",
+				"fact": "the three counters are WRITE-ONLY: three step sites, two item sites, all writes, and the instant's single read is itself a write inside fast_forward"
+			},
+			{
+				"evidence": "probes 2 and 3 of the committed fixture, executed against the real legacy server",
+				"fact": "the research instant has five writers and the fifth subtracts a client-supplied number of seconds, clamped at zero"
+			},
+			{
+				"evidence": "the measured content findings below, taken over all 22 normalized files and config/main.json",
+				"fact": "there is no committed research cost, step count, unlock requirement, or reward"
+			},
+			{
+				"evidence": "constants.py:299-300",
+				"fact": "the two tracks resolve to committed building ids 139 and 86"
+			}
+		]
+	},
+	"refusal_count": 4,
+	"refusals": [
+		{
+			"implemented": false,
+			"reason": "NO RESEARCH PRICE IS CHARGED AND NO STORED RESOURCE MOVES. No committed content records a research cost, a step count, an unlock requirement, or a reward, and the one price-taking branch charges nothing: research_buy_step_cash reads a client-supplied cash value and discards it (command.py:277), printing 'Buy research step for …' and moving no balance. Because do_command applies the request's per-command vector BEFORE dispatch (command.py:40, engine.py:251-271), any price a client attached would be a client-trusted mint or burn, so the derived vector is NEUTRAL and every action's post-execution proof requires that EVERY stored resource be UNCHANGED (design D3). Deriving a price from any committed field would invent an economy the content does not contain",
+			"refusal": "no_price"
+		},
+		{
+			"implemented": false,
+			"reason": "NO COMPLETION, READINESS, REMAINING-TIME, OR UNLOCK SEMANTICS ARE IMPLEMENTED, because the legacy server has NONE to reproduce. The three research counters are WRITE-ONLY: every occurrence of researchStepNumber and researchItemNumber in the seven legacy modules is a WRITE (3 sites and 2 sites respectively, all writes), and the single read of timeStampDoResearch outside its own branches is command.py:923 inside fast_forward — and that read is itself a write. So NOTHING anywhere reads a research counter to decide anything: there is no server-side completion test, no readiness test, no remaining-time computation, no unlock gate, and no cost check. This projection computes NO readiness, NO remaining time, NO progress ratio, NO completion fraction, and NO derived step count (design D1). The absence is a recorded property of the legacy contract, not a missing feature; a later line may introduce any of them only as its own deliverable, with its own evidence",
+			"refusal": "no_readiness"
+		},
+		{
+			"implemented": false,
+			"reason": "NO COUNTER BOUND, MEMBERSHIP RULE, OR CLAMP IS ADDED. A guard audit of all four branches finds no bounds check, no numeric clamp, no membership test, no exception guard, and no existence check: a client naming a track outside the vector would raise IndexError in legacy, and a client naming a large track number would let the counter grow without limit. Both are legacy behaviours, and reproducing them means NOT inventing validation (design D6). The recorded absence is NOT permission to invent a bound: the only structural checks are that the track is an integer the two-entry vector addresses and that the vector itself is well-formed, because a client that cannot address its own state is not delivering behaviour. An authoritative limit belongs to Server v1 / M13",
+			"refusal": "no_bounds"
+		},
+		{
+			"implemented": false,
+			"reason": "NO REWARD IS PAID, AND NONE EXISTS. There is no committed reward for research anywhere in the content — not even a zero-valued one — so there is nothing to derive one from and none is invented (design D4). This is the same shape as the committed level curve's unread reward_type/reward_amount fields and the quests table's unread reward: a recorded field with no consumer is a fact, and reading one as a promise would be an invention",
+			"refusal": "no_reward"
+		}
+	],
+	"schema": "research-report-v1",
+	"tracking_note": "REPORTED AND NEVER USED. The two track names exist ONLY inside the four branch comments and are DEFINED NOWHERE in the legacy server: zero definitions and zero non-comment uses across command.py, engine.py, sessions.py, server.py, constants.py, get_game_config.py, and version.py. Their mapping to the committed building identifiers rests on the comment's own word order plus the four print statements' display list [\"Area 51\", \"Robotic Center\"][_type]. That is enough to REPORT the mapping and is not enough to DERIVE anything from it, so no counter value, unlock, requirement, or cost is computed from a track's name or building id (design D5). No code identifier in this repository is named after either track constant, which is what makes the 'never used' claim mechanical rather than editorial",
+	"tracking_rule": "the mapping is REPORTED and asserted never to be used: no code identifier in this repository is named after either track constant, and the suite asserts that over the delivered module's declarations (design D5)",
+	"tracks": [
+		{
+			"building_constant": "constants.py:300 ID_BUILDING_AREA_51 = 139",
+			"building_id": 139,
+			"defined_in_server": false,
+			"display_name": "Area 51",
+			"name": "TYPE_AREA_51",
+			"track": 0,
+			"where_named": "only inside the four branch comments (command.py:269, 278, 285, 294)"
+		},
+		{
+			"building_constant": "constants.py:299 ID_BUILDING_ROBOTIC_CENTER = 86",
+			"building_id": 86,
+			"defined_in_server": false,
+			"display_name": "Robotic Center",
+			"name": "TYPE_ROBOTIC",
+			"track": 1,
+			"where_named": "only inside the four branch comments (command.py:269, 278, 285, 294)"
+		}
+	]
+}

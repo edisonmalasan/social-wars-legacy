@@ -108,6 +108,7 @@ const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const Paths = preload("res://scripts/package_paths.gd")
 const UnitBehaviors = preload("res://scripts/units/unit_behaviors.gd")
 const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
+const ResearchFlow = preload("res://scripts/units/research_flow.gd")
 
 const SAVE_LIST_FIXTURE := \
 	"tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json"
@@ -283,6 +284,15 @@ const COLLECTION_AFTER_FIXTURE := \
 ## them is `collection_prize.gd`'s job.
 const COLLECTION_FIXTURE_ID := 1
 const COLLECTION_EXPECTED_PRIZE := {"1085": 1}
+
+## The research fixture's FIRST recorded step's before-state: the committed
+## fresh-player corpus, whose three research counters are each `[0, 0]`. It is
+## the ONLY fixture the research double reads, because the recorded set is eight
+## steps of ONE transaction and every step after the first starts from the
+## previous step's after-state — so the double derives each step's effect from
+## the shared branch record instead of replaying the recording (design D1/D8).
+const RESEARCH_BEFORE_FIXTURE := \
+	"tests/fixtures/godot-research/steps/command_next_research_step_track_0/before.json"
 
 ## Anchor grid extent the v0 endpoint validates against (anchors 0..99;
 ## footprints may extend past the edge — design D5). Must match
@@ -559,6 +569,17 @@ var _behavior_state: Dictionary = {}
 var _behavior_pid := ""
 var _behavior_loaded := false
 var _behavior_error := ""
+# The research double's mutable process state: the three committed two-entry
+# counters, the seven balances it reports unchanged, and the recorded stamp. Never
+# written anywhere.
+var _research_state: Dictionary = {}
+var _research_pid := ""
+var _research_loaded := false
+var _research_error := ""
+## The research instant the committed executed capture recorded, read out of that
+## capture before any expectation is built. It is the only authority for the value
+## the step branch stamps: the double never reads a clock (design D8).
+var _research_stamp := 0
 ## The start instant the committed executed push stamped, read out of that
 ## capture before any expectation is built. It is the only authority for the
 ## value the branch stamps: the double never reads a clock (design D8).
@@ -4757,3 +4778,383 @@ func _ensure_behavior_loaded() -> bool:
 	_behavior_state = state
 	_behavior_pid = str(pid)
 	return true
+
+
+# --- research double (godot-research design D8) ------------------------------
+
+
+## One research-track intent under the **same** contract the live implementation
+## sends: the save identity, a CLOSED action, and the research track — nothing
+## else.  No counter value, no research instant, and no cash amount is accepted
+## or expressible.
+##
+## The double is deterministic and in-memory: it reads the recorded fixture's
+## FIRST before-state (the committed fresh-player corpus, whose three counters
+## are each `[0, 0]`), derives each branch's effect from
+## `ResearchFlow.BRANCHES` — the same record the service applies — and stamps
+## the research instant with a **fixture** value rather than a wall clock, so
+## every run is byte-identical.  The recording is eight steps of ONE transaction
+## and every step after the first starts from the previous step's after-state,
+## so the double derives each step rather than replaying the file; the executed
+## parity against legacy is owned exclusively by the compat fixture-replay tests
+## and this double is never a parity oracle.
+##
+## **No stored resource moves** (design D3): the derived vector is neutral, so
+## the seven balances are the same values the intent started from.  The double
+## also moves **nothing else** — no placement, no storage, no ledger.
+##
+## The refusals mirror the endpoint's own, in the endpoint's order: the
+## save-identity codes first, then ``invalid_action`` for anything outside the
+## closed four-action set, then ``invalid_track`` for a track the two-entry
+## vector cannot address, and ``unresolvable_research_state`` for a state whose
+## counters are absent, not lists, the wrong length, non-integer, or negative.
+func advance_research_town(user_id: String, action: String,
+		track: int) -> ResearchFlow.ResearchResult:
+	if user_id.strip_edges() == "":
+		return ResearchFlow.result_failure("missing_user_id",
+			"user_id must be a non-empty string")
+	if not _ensure_research_loaded():
+		return ResearchFlow.result_failure("fixture_unreadable",
+			_research_error)
+	if user_id != _research_pid:
+		return ResearchFlow.result_failure("unknown_user_id",
+			"no save exists for user_id '%s'" % user_id)
+	if not ResearchFlow.is_action(action):
+		return ResearchFlow.result_failure("invalid_action",
+			"action must be one of %s" % ", ".join(
+				PackedStringArray(ResearchFlow.ACTIONS)))
+	if not ResearchFlow.is_track(track):
+		return ResearchFlow.result_failure("invalid_track",
+			"track must be an integer in 0..%d, got %d"
+				% [ResearchFlow.TRACK_COUNT - 1, track])
+	var before: Dictionary = _research_counters()
+	var effect := _research_effect(before, action, track)
+	if not bool(effect.get("ok", false)):
+		return ResearchFlow.result_failure(
+			str(effect.get("code", "internal_error")), str(effect.get("error", "")))
+	var after: Dictionary = (before as Dictionary).duplicate(true)
+	for key: String in (effect["written"] as Array):
+		after[key] = (effect["counters"] as Dictionary)[key]
+	_research_state["counters"] = after
+	# The same envelope shape the service returns; the shared parser yields the
+	# typed result (identical shapes by construction, design D8).
+	return ResearchFlow.parse_result({
+		"protocol": BootData.PROTOCOL,
+		"ok": true,
+		"game_version": str(_save_list_doc.get("game_version", "")),
+		# Time-dependent field: the fake reports the fixture capture's legacy
+		# server timestamp instead of "now" (never the wall clock).
+		"server_time": _fixture_server_time(),
+		"result": "success",
+		"action": action,
+		"track": int(track),
+		"command": str(effect["command"]),
+		"derived": {
+			"step": int((effect["counters"] as Dictionary)[ResearchFlow.KEY_STEP][
+				int(track)]),
+			"item": int((effect["counters"] as Dictionary)[ResearchFlow.KEY_ITEM][
+				int(track)]),
+			# The step branch stamps the wall clock, so its value is NOT
+			# derivable and the typed result carries a null there exactly as the
+			# service does.
+			"instant": (null if bool(effect["stamps_instant"])
+				else int((effect["counters"] as Dictionary)[
+					ResearchFlow.KEY_INSTANT][int(track)])),
+			"stamps_instant": bool(effect["stamps_instant"]),
+			"paired_reset": bool(effect["paired_reset"]),
+			"written": (effect["written"] as Array).duplicate(),
+			"untouched_counters": (effect["untouched"] as Array).duplicate(),
+		},
+		"previous": _research_block(before),
+		"counters": _research_counters_block(after),
+		"research": _research_block(after),
+		"tracks": _research_track_ids(),
+		"tracks_source": (ResearchFlow.TRACKS as Array).duplicate(true),
+		"cash_charged": 0,
+		"cash_argument_ignored": true,
+		"price_computed": false,
+		"fast_forward_offered": false,
+		"resources": _research_resources(),
+	})
+
+
+## The recorded legacy effect of one research branch on one track — DERIVED from
+## `ResearchFlow.BRANCHES` and the double's own before-state, never read from a
+## response.  Returns ``{ok, error, code, command, counters, written,
+## untouched, stamps_instant, paired_reset}``.
+##
+## The step and item values are exact; the INSTANT is a **fixture** value because
+## the branch stamps the wall clock and the double never reads one (design D8),
+## which keeps every run byte-identical.  The derived record also names every
+## counter the branch does **NOT** write, so nothing else in the vector can be
+## touched by construction.
+func _research_effect(before: Dictionary, action: String,
+		track: int) -> Dictionary:
+	var index := int(track)
+	var record: Dictionary = ResearchFlow.BRANCHES[_research_branch_index(action)]
+	var written: Array = (record["counters_written"] as Array).duplicate()
+	var step := int((before[ResearchFlow.KEY_STEP] as Array)[index])
+	var item := int((before[ResearchFlow.KEY_ITEM] as Array)[index])
+	var instant := int((before[ResearchFlow.KEY_INSTANT] as Array)[index])
+	var stamps_instant := bool(record["stamps_instant"])
+	var expected: Array = []
+	# The effect is keyed on the recorded COMMAND, not on the action name, and
+	# every write is cross-checked against the record's own `counters_written` —
+	# so a fifth branch or a changed effect fails closed here instead of making
+	# the double write something the service would not.
+	match str(record["command"]):
+		ResearchFlow.STEP_COMMAND:
+			step = step + 1
+			expected = [ResearchFlow.KEY_STEP, ResearchFlow.KEY_INSTANT]
+		ResearchFlow.CASH_COMMAND:
+			instant = 0
+			expected = [ResearchFlow.KEY_INSTANT]
+		ResearchFlow.ITEM_COMMAND:
+			item = item + 1
+			step = 0
+			instant = 0
+			expected = [ResearchFlow.KEY_ITEM, ResearchFlow.KEY_STEP,
+				ResearchFlow.KEY_INSTANT]
+		ResearchFlow.RESET_COMMAND:
+			step = 0
+			item = 0
+			instant = 0
+			expected = [ResearchFlow.KEY_ITEM, ResearchFlow.KEY_STEP,
+				ResearchFlow.KEY_INSTANT]
+		_:
+			return {
+				"ok": false,
+				"code": "internal_error",
+				"error": "the research double cannot apply the branch record for "
+					% ("action '%s': a fifth branch reached it and this contract "
+						% action + "refuses to guess"),
+			}
+	if expected != written:
+		return {
+			"ok": false,
+			"code": "internal_error",
+			"error": "the research double wrote %r, which the branch record for "
+				% written + "'%s' does not" % str(record["command"]),
+		}
+	if stamps_instant:
+		instant = _research_stamp_value()
+	var counters: Dictionary = {
+		ResearchFlow.KEY_STEP: (before[ResearchFlow.KEY_STEP] as Array).duplicate(),
+		ResearchFlow.KEY_ITEM: (before[ResearchFlow.KEY_ITEM] as Array).duplicate(),
+		ResearchFlow.KEY_INSTANT: (before[ResearchFlow.KEY_INSTANT] as Array)
+			.duplicate(),
+	}
+	(counters[ResearchFlow.KEY_STEP] as Array)[index] = step
+	(counters[ResearchFlow.KEY_ITEM] as Array)[index] = item
+	(counters[ResearchFlow.KEY_INSTANT] as Array)[index] = instant
+	var untouched: Array = []
+	for key: String in ResearchFlow.COUNTERS:
+		if not written.has(key):
+			untouched.append(key)
+	return {
+		"ok": true,
+		"error": "",
+		"code": "",
+		"command": str(record["command"]),
+		"counters": counters,
+		"written": written,
+		"untouched": untouched,
+		"stamps_instant": stamps_instant,
+		"paired_reset": bool(record["paired_reset"]),
+	}
+
+
+## The index of one closed action inside the recorded branch table, or -1.
+func _research_branch_index(action: String) -> int:
+	var index := 0
+	for record: Variant in ResearchFlow.BRANCHES:
+		if str((record as Dictionary)["action"]) == action:
+			return index
+		index += 1
+	return -1
+
+
+## The instant a research stamp takes in the double.  The legacy branch stamps
+## ``timestamp_now()``, which the double deliberately never reads: it reuses the
+## instant the committed executed capture recorded, so an offline run is
+## deterministic and byte-identical.  No elapsed-time rule is computed from it
+## either way — the legacy server has none (design D1/D7).
+func _research_stamp_value() -> int:
+	return int(_research_state.get("stamp", 0))
+
+
+## The double's own counters, as a fresh copy so a caller cannot mutate them.
+func _research_counters() -> Dictionary:
+	var out: Dictionary = {}
+	for key: String in ResearchFlow.COUNTERS:
+		out[key] = ((_research_state["counters"] as Dictionary)[key] as Array) \
+			.duplicate()
+	return out
+
+
+## The three committed counter vectors, in the shape the response carries them.
+func _research_counters_block(counters: Dictionary) -> Dictionary:
+	var out: Dictionary = {"counters": {}}
+	for key: String in ResearchFlow.COUNTERS:
+		(out["counters"] as Dictionary)[key] = (counters[key] as Array).duplicate()
+	return out
+
+
+## The service's `research` projection for one vector: both tracks verbatim and
+## an **empty** ``derived`` block, which is the machine-readable form of "nothing
+## is computed from these counters".
+func _research_block(counters: Dictionary) -> Dictionary:
+	var rows: Array = []
+	for index in range(ResearchFlow.TRACK_COUNT):
+		rows.append({
+			"track": index,
+			"step": int((counters[ResearchFlow.KEY_STEP] as Array)[index]),
+			"item": int((counters[ResearchFlow.KEY_ITEM] as Array)[index]),
+			"instant": int((counters[ResearchFlow.KEY_INSTANT] as Array)[index]),
+		})
+	return {
+		"track_count": ResearchFlow.TRACK_COUNT,
+		"counters": _research_counters_block(counters)["counters"],
+		"tracks": rows,
+		"verbatim": true,
+		"derived": {},
+		"tracks_source": (ResearchFlow.TRACKS as Array).duplicate(true),
+		"tracking_note": ResearchFlow.TRACK_RECORD_NOTE,
+	}
+
+
+## Both committed track indices, in committed order.
+func _research_track_ids() -> Array:
+	var out: Array = []
+	for record: Variant in ResearchFlow.TRACKS:
+		out.append(int((record as Dictionary)["track"]))
+	return out
+
+
+## The seven stored resource values of the in-memory research state, reported
+## verbatim as the response's authoritative ``resources``.  A research action
+## moves none of them, so these are the same values the intent started from —
+## the strongest form of the "nothing moved" proof the endpoint requires
+## (design D3).
+func _research_resources() -> Dictionary:
+	var resources := {}
+	for key: String in RESOURCE_KEYS:
+		resources[key] = int(_research_state[key])
+	return resources
+
+
+## Loads the research fixture's first before-state into mutable process state
+## (once), validating the committed research vector and the seven balances.
+## Structural failures are named with the offending field; every other double's
+## error state is untouched (independent sinks).
+func _ensure_research_loaded() -> bool:
+	if _research_loaded:
+		return _research_error == ""
+	_research_loaded = true
+	# The boot fixtures must be loaded first: the double's response reports the
+	# captured `game_version` and `server_time` from them, so without this the
+	# double would answer with an empty version and a ZERO server time whenever
+	# it is reached before any boot read.  Done independently of the other
+	# doubles, so this double's failure cannot hide behind another's.
+	if not _ensure_loaded():
+		_research_error = _load_error
+		return false
+	var sink := {"error": ""}
+	var before := _read_json_into(RESEARCH_BEFORE_FIXTURE, sink)
+	if str(sink["error"]) != "":
+		_research_error = str(sink["error"])
+		return false
+	var maps: Variant = before.get("maps")
+	if not (maps is Array) or (maps as Array).is_empty():
+		_research_error = "the research fixture before state carries no maps array"
+		return false
+	var first_map: Variant = (maps as Array)[0]
+	if not (first_map is Dictionary):
+		_research_error = ("the research fixture before state's first map is not "
+			+ "an object")
+		return false
+	var items: Variant = (first_map as Dictionary).get("items")
+	if not (items is Dictionary) or (items as Dictionary).is_empty():
+		_research_error = "the research fixture before state carries no placement map"
+		return false
+	var info: Variant = before.get("playerInfo")
+	var priv: Variant = before.get("privateState")
+	if not (info is Dictionary) or not (priv is Dictionary):
+		_research_error = ("the research fixture before state lacks "
+			+ "playerInfo/privateState")
+		return false
+	var pid: Variant = (info as Dictionary).get("pid")
+	var cash: Variant = (info as Dictionary).get("cash")
+	var mana: Variant = (priv as Dictionary).get("mana")
+	if not (pid is String) or cash == null or mana == null \
+			or int(cash) < 0 or int(mana) < 0:
+		_research_error = "the research fixture before state lacks save fields"
+		return false
+	var resources := {}
+	for name: String in ["xp", "gold", "wood", "oil", "steel"]:
+		var value: Variant = (first_map as Dictionary).get(name)
+		if value == null or int(value) < 0:
+			_research_error = "the research fixture before state lacks map %s" % name
+			return false
+		resources[name] = int(value)
+	resources["cash"] = int(cash)
+	resources["mana"] = int(mana)
+	var counters := {}
+	for key: String in ResearchFlow.COUNTERS:
+		var entries: Variant = (priv as Dictionary).get(key)
+		if not (entries is Array) or (entries as Array).size() \
+				!= ResearchFlow.TRACK_COUNT:
+			_research_error = ("the research fixture before state's %s is not a "
+				% key + "%d-entry vector") % ResearchFlow.TRACK_COUNT
+			return false
+		var row: Array = []
+		for entry: Variant in entries as Array:
+			var number: Variant = BootData._parse_int(entry)
+			if number == null or int(number) < 0:
+				_research_error = ("the research fixture before state's %s holds a "
+					% key + "non-integer or negative entry")
+				return false
+			row.append(int(number))
+		counters[key] = row
+	# The committed corpus holds every research counter at its initial value, and
+	# the double validates that rather than trusting this sentence: a capture that
+	# is not the recorded transaction fails closed here.
+	for key: String in ResearchFlow.COUNTERS:
+		if (counters[key] as Array) != (ResearchFlow.CORPUS_VECTOR[key] as Array):
+			_research_error = ("the research fixture before state's %s is %r, not "
+				% [key, counters[key]] + "the committed %r"
+				% (ResearchFlow.CORPUS_VECTOR[key]))
+			return false
+		# The placement map is read and never written: a research action moves no
+		# placement row, so the double holds no copy of one at all.
+	# The recorded wall-clock stamp the executed capture left behind, read from
+	# its manifest so the double never reads a clock.
+	_research_stamp = _research_recorded_stamp()
+	var state := resources
+	state["counters"] = counters
+	state["stamp"] = _research_stamp
+	_research_state = state
+	_research_pid = str(pid)
+	return true
+
+
+## The research instant the committed executed capture recorded, read out of the
+## recorded step's after-state — never pinned as a literal, so a re-capture moves
+## the double with it.  `0` means the capture recorded none, which the branch
+## always does for the step track.
+func _research_recorded_stamp() -> int:
+	var sink := {"error": ""}
+	var after := _read_json_into(
+		RESEARCH_BEFORE_FIXTURE.replace("/before.json", "/after.json"), sink)
+	if str(sink["error"]) != "":
+		return 0
+	var priv: Variant = after.get("privateState")
+	if not (priv is Dictionary):
+		return 0
+	var entries: Variant = (priv as Dictionary).get(ResearchFlow.KEY_INSTANT)
+	if not (entries is Array) or (entries as Array).is_empty():
+		return 0
+	var number: Variant = BootData._parse_int((entries as Array)[0])
+	if number == null or int(number) <= 0:
+		return 0
+	return int(number)

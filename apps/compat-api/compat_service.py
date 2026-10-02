@@ -826,6 +826,7 @@ import queue_envelope
 import sell_envelope
 import store_envelope
 import upgrade_envelope
+import research_envelope
 
 PROTOCOL = "compat-v0"
 HOST = "127.0.0.1"
@@ -877,6 +878,9 @@ ERROR_AMBIGUOUS_CELL = "ambiguous_cell"
 ERROR_UNRESOLVABLE_LEDGER_ENTRY = "unresolvable_ledger_entry"
 ERROR_AMBIGUOUS_LEDGER = "ambiguous_ledger"
 ERROR_NOT_RESURRECTABLE = "not_resurrectable"
+ERROR_MISSING_TRACK = "missing_track"
+ERROR_INVALID_TRACK = "invalid_track"
+ERROR_UNRESOLVABLE_RESEARCH_STATE = "unresolvable_research_state"
 ERROR_BAD_REQUEST = "bad_request"
 ERROR_NOT_FOUND = "not_found"
 ERROR_METHOD_NOT_ALLOWED = "method_not_allowed"
@@ -3642,6 +3646,245 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
                 clicks_to_build=behavior_envelope.CLICKS_TO_BUILD_BOUNDARY,
                 refusals=behavior_envelope.refusals(),
                 no_third_gate=behavior_envelope.NO_THIRD_GATE,
+                resources=resources_after,
+            ),
+            200,
+        )
+
+    @app.post("/v0/research")
+    def v0_research() -> Tuple[Dict[str, Any], int]:
+        """Execute one research intent through the unchanged legacy path.
+
+        One call carries **exactly one** of the four legacy research commands
+        (``command.py:268-300``), chosen by the **closed** action vocabulary
+        (design D2): ``next_step`` derives ``next_research_step``,
+        ``buy_step_cash`` derives ``research_buy_step_cash``, ``next_item``
+        derives ``next_research_item``, and ``reset_item`` derives
+        ``reset_research_item``.
+
+        **Design D2 — the client sends a player identifier and a track, and
+        nothing else.**  No counter value, no research instant, and no cash
+        amount is accepted: the extra keys are **ignored**, so a request
+        carrying ``step: 999``, ``timestamp: 1``, or ``cash: 2500`` changes
+        nothing.  The cash branch's own argument is the module's
+        :data:`research_envelope.DERIVED_CASH` (**0**), server-derived, which
+        the branch then **discards** anyway.  Every counter and every instant in
+        the response is therefore the service's own derivation, and the response
+        echoes **no** ignored client value.
+
+        Validation is structural fail-closed, and every failure below returns
+        **before** the legacy dispatcher runs, so the corpus is byte-identical on
+        every error path: a JSON object body, a resolvable save, an **action**
+        inside the closed set, a **track** that is an integer the two-entry
+        vector addresses, and a research vector that resolves (all three
+        counters present, lists of length 2, all integers, none negative).
+
+        **Design D6 — no bounds, membership rule, or clamp is added.**  The four
+        legacy branches validate **nothing**: no bounds check, no numeric clamp,
+        no membership test, no exception guard, and no existence check.  A track
+        outside the vector would raise ``IndexError`` in legacy and a large track
+        number would let a counter grow without limit; both are recorded as
+        Server v1 / M13 gaps and neither is reproduced.  The only structural
+        check here is that the route can address its own state.
+
+        **Design D3 — a neutral vector and a two-part proof.**  A research action
+        has no committed price (``research_buy_step_cash`` reads a cash value
+        and charges nothing), and any price would be a **client-sent** delta
+        because ``do_command`` applies the request's vector before the branch
+        (``command.py:40``, ``engine.py:251-271``), so the derived vector is
+        neutral.  The proof's first half requires the persisted vector to match
+        the **derived** result for the action — the exact counters, the item
+        branch's **paired** step-and-instant reset, the cash branch's
+        instant-only zeroing, the unaddressed track byte-identical, and the
+        stamped instant compared by **shape** and **direction** rather than by
+        value.  The second half requires **every** stored resource to be
+        **unchanged**, which is what forecloses a client minting or burning a
+        balance through this path.
+
+        **Design D1 — no readiness, completion, remaining time, or unlock.**  All
+        three counters are **write-only** in the legacy source, so there is no
+        server-side rule to reproduce: this route computes none of them, and the
+        response's projection carries an explicitly **empty** ``derived`` block
+        as the machine-readable form of that absence.
+
+        **Design D7 — no fast-forward operation is delivered.**  The research
+        instant has five writers and the fifth is ``fast_forward``, which
+        subtracts a **client-supplied** number of seconds from every track.  It
+        is recorded in ``research_envelope.FAST_FORWARD_CONTRACT`` and exposed by
+        **no** action and **no** route.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404,
+                ERROR_UNKNOWN_USER_ID,
+                "no save exists for user_id %r" % user_id,
+            )
+
+        if "action" not in payload:
+            return error_response(400, ERROR_MISSING_ACTION, "action is required")
+        action = payload["action"]
+        if not research_envelope.is_action(action):
+            return error_response(
+                400,
+                ERROR_INVALID_ACTION,
+                "action must be one of %s"
+                % ", ".join(sorted(research_envelope.ACTIONS)),
+            )
+
+        if "track" not in payload:
+            return error_response(400, ERROR_MISSING_TRACK, "track is required")
+        track = payload["track"]
+        if not research_envelope.is_track(track):
+            return error_response(
+                400,
+                ERROR_INVALID_TRACK,
+                "track must be an integer in 0..%d, got %r"
+                % (research_envelope.TRACK_COUNT - 1, track),
+            )
+
+        # Both pre-execution reads happen **before** dispatch.  The snapshot is a
+        # deep-enough COPY (research_envelope.copy_vector rebuilds each list),
+        # because the legacy dispatcher mutates these very lists in place: a
+        # by-reference snapshot would alias the live state and report the
+        # after-state as the before-state.
+        try:
+            save_document = boot.save_document(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        try:
+            before_vector = research_envelope.snapshot_counters(save_document)
+        except research_envelope.EnvelopeError as failure:
+            # A server-side state failure, never a client value: the endpoint
+            # must be able to address its own state, so an unresolvable vector
+            # fails closed instead of being defaulted to zeros.
+            return error_response(409, ERROR_UNRESOLVABLE_RESEARCH_STATE,
+                                  str(failure))
+        try:
+            resources_before = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        # The derived post-execution vector, computed BEFORE dispatch against the
+        # copied snapshot, so the derivation cannot be influenced by what
+        # execution writes.
+        try:
+            derived = research_envelope.derived_research(
+                before_vector, track, action
+            )
+        except research_envelope.EnvelopeError as failure:
+            if failure.code == research_envelope.REASON_INVALID_ACTION:
+                return error_response(400, failure.code, str(failure))
+            if failure.code == research_envelope.REASON_INVALID_TRACK:
+                return error_response(400, ERROR_INVALID_TRACK, str(failure))
+            return error_response(409, ERROR_UNRESOLVABLE_RESEARCH_STATE,
+                                  str(failure))
+
+        # Derive the legacy envelope (design D2/D3): the command, its argument
+        # list, and the neutral resource vector are the module's, never the
+        # client's.
+        try:
+            envelope_payload = research_envelope.build_envelope(
+                track=track, action=action
+            )
+        except research_envelope.EnvelopeError as failure:
+            if failure.code in (
+                research_envelope.REASON_INVALID_VECTOR,
+                research_envelope.REASON_INVALID_TIMESTAMP,
+                research_envelope.REASON_INVALID_CASH,
+            ):
+                return error_response(500, ERROR_INTERNAL, failure.code)
+            return error_response(400, failure.code, str(failure))
+
+        # Execute the unchanged legacy command dispatcher in-process.  It persists
+        # via legacy save_session into this corpus only; the legacy HTTP route
+        # returns {"result": "success"} whenever command() returns without
+        # raising, so reaching here IS the legacy result -- which is precisely
+        # why it is NOT taken as proof that the right counters were written and
+        # that nothing else moved.
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        # Prove the post-state (design D3).  Part one: the persisted vector matches
+        # the DERIVED result for the action, with the unaddressed track and every
+        # counter the branch does not own compared by value.  Part two: every
+        # stored resource is unchanged, which is the neutral vector's own
+        # guarantee and what forecloses a smuggled vector.  Either half failing is
+        # a reported failure, not a success.
+        try:
+            after_vector = research_envelope.snapshot_counters(
+                boot.save_document(user_id)
+            )
+            resources_after = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        except research_envelope.EnvelopeError as failure:
+            return error_response(500, ERROR_INTERNAL, str(failure))
+        divergence = research_envelope.expected_state(
+            before_vector, action, track, after_vector
+        )
+        if divergence is not None:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the persisted research vector does not carry the derived result "
+                "for a %s on track %d: %s"
+                % (derived["action"], derived["track"], divergence),
+            )
+        for name in sorted(resources_after):
+            if resources_after[name] != resources_before[name]:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "resource %s is %r after execution, not the pre-execution "
+                    "%r: a research action moves no resource, so the derived "
+                    "neutral vector requires every stored resource to be "
+                    "unchanged" % (name, resources_after[name],
+                                    resources_before[name]),
+                )
+        return (
+            envelope(
+                boot,
+                result="success",
+                action=action,
+                track=derived["track"],
+                previous=research_envelope.project_research(before_vector),
+                research=research_envelope.project_research(after_vector),
+                command=derived["command"],
+                derived={
+                    # The step and item values are always derivable; only the
+                    # INSTANT is not, because the step branch stamps the wall
+                    # clock (command.py:272), so that one field is reported as
+                    # null and the typed shape says so.
+                    "step": derived["step"],
+                    "item": derived["item"],
+                    "instant": None if derived["stamps_instant"]
+                    else derived["instant"],
+                    "stamps_instant": derived["stamps_instant"],
+                    "paired_reset": derived["paired_reset"],
+                    "written": derived["written"],
+                    "untouched_counters": derived["untouched_counters"],
+                },
+                counters=after_vector,
+                tracks=[record["track"] for record in research_envelope.TRACKS],
+                tracks_source=[
+                    {key: value for key, value in record.items()}
+                    for record in research_envelope.TRACKS
+                ],
+                cash_charged=0,
+                cash_argument_ignored=True,
+                price_computed=False,
+                fast_forward_offered=False,
                 resources=resources_after,
             ),
             200,

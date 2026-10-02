@@ -1285,6 +1285,94 @@ of the delivered client**, but the server behaviour it left unstated is now reco
 Ruffle, ActionScript, or browser executes in any of these commands, and every network call is
 loopback.
 
+Verified unit-research commands (milestone M9 line 1; Godot 4.7.2.stable, Windows x64;
+`python` denotes the pinned interpreter, never the PATH alias). M9's deliver list is `XP`, `levels`,
+`quests`, `research`, `collections`, and `tutorial/progression`, and its exit criterion is "Primary
+long-term progression systems work." This is its **first** line, and the first M9 deliver line at all.
+The contract is committed in `docs/legacy-m9-progression.md` (PR #250, merged `f74647c`), extended by the
+research measurements in PR #252 (merged `3d44159`):
+
+```bash
+python -B apps/compat-api/capture_research_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_research.gd
+godot --headless --path apps/client-godot --script res://tests/test_research.gd -- --report
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-10-02): the executed-legacy fixture capture (exit 0, **re-runnable
+across three runs**, containment identical) recording **eight** branch-track transactions against the
+committed corpus's real `[0, 0]` research vector — `login_post` plus `next_research_step`,
+`research_buy_step_cash`, `next_research_item`, and `reset_research_item`, each on **both** tracks — with
+transitions such as `next_research_step` track 0 `[[0,0],[0,0],[0,0]] -> [[1,0],[0,0],[<instant>]]` and
+`next_research_item` track 0 `[[1,1],[0,0],[0,0]] -> [[0,1],[1,0],[0,0]]`, the latter showing the **paired**
+step-and-instant reset; the hermetic research suite (observed **1024 checks**, 1038 with `--report`; the
+**36th** hermetic suite) over a typed read-only projection of both tracks and all three counters reported
+**verbatim**, failing **closed** on five malformed shapes; the **grown** compat suite (observed
+**`Ran 1572 tests ... OK`**, exit 0 — up from 1444 by **+128**); both batteries in the final state (each
+exit `0`; `verify-boot.ps1` runs **36 hermetic suites and 17 live phases**, and **221** log files
+inspected with **zero** `^ERROR:` or `SCRIPT ERROR` lines); the content validator (exit `0`, `result:
+valid`, 21 schemas); and the preservation manifest (3,258 entries, exit `0`). Evidence is the
+deterministic `research-report-v1` report under `apps/client-godot/evidence/research/` (digest
+**`e62f2666…c86`**, 32,607 bytes, byte-identical across **four** runs).
+
+**The finding: the three research counters are WRITE-ONLY.** `researchStepNumber` has **3** sites and
+`researchItemNumber` **2**, every one a write, and `timeStampDoResearch` has **5** — the four branch
+writes plus **one read at `command.py:923` that is itself a write**, because it sits inside
+`fast_forward` and subtracts a **client-supplied** number of seconds, clamped at zero (`seconds = args[0]`
+at `command.py:906`). **Nothing anywhere reads a research counter to decide anything**: a guard audit of
+all four branches finds **no** bounds check, numeric clamp, membership test, exception guard, or existence
+check. `fast_forward` is therefore recorded as a **fourth writer** and makes the research instant
+**client-writable** — and since no readiness check exists, an instant trusted by nothing is the only
+elapsed-time input the research system has. `research_buy_step_cash` reads a **client-supplied cash value
+and discards it**, structurally identical to M8 line 8's `used_syringe`, and **no research price is
+charged** — proved non-tautologically by every action's post-execution check that the **complete** stored
+resource set is unchanged. **No committed research content exists to derive a schedule from:** `research`
+appears in the content **only** as asset names and one building's display name. **The anti-invention
+guard is structural and was tested rather than trusted**: injecting one invented `static func
+research_price(track, step)` produced **four independent failures** against a pinned whole
+static-function inventory, and restoring the file from a byte-identical copy returned the suite to its
+1024-check passing state and exit 0.
+
+**Three figures in the committed investigation were asserted rather than measured, and all three
+overstated the absence of committed research content; they were corrected by the Apply stage after
+independent re-verification**, and `docs/legacy-m9-progression.md` carries a corrections section rather
+than quiet edits: `research` appears in **two** normalized files (`buildings.json` **1**, `images.json`
+**6** from three popup-asset rows), not one; `config/main.json` **does** have **three** nested keys
+containing it, all in the `/images` asset namespace, so "no key at any depth" is **false**, though no
+top-level key contains it; and the building's `legacy_id` is the **string** `"256"`, not an integer, since
+every `legacy_id` in `buildings.json` is a string. **The conclusion is unchanged** — every hit is an asset
+name or a display name, so there is still **no committed research cost, step count, unlock requirement, or
+reward** — but the refusal now rests on a **correctly measured** basis rather than an overstated one.
+
+**One measurement strengthened the cross-milestone correction rather than weakening it:** `map_lose_item`
+is `engine.py:215-228` with `push_dead_unit` called at **223**, and its only **two** callers are
+`command.py:796` inside **`end_quest`** and `command.py:872` inside **`end_attack`**. So the dead-hero
+ledger has **four** doors, not the three `godot-unit-behaviors` claimed, and the fourth is reached from
+**two** branches — the quest path and the attack path — not one.
+
+Claim limits: the delivered feature means **these counter transitions and nothing more**, because the
+counters have **no in-game consumer**; **no price is charged and no stored resource moves**; **no
+completion, readiness, remaining-time, or unlock semantics** are implemented; **no counter bound,
+membership rule, or clamp** is added, the legacy branches having none, so a client could still send track
+`7` or `999` and that is a recorded **Server v1 / M13** gap; **no reward** is paid; **no committed
+research content is invented**, none existing; the **track-to-building mapping is reported and never
+used** — `TYPE_AREA_51` and `TYPE_ROBOTIC` appear **4** times each in `command.py`, **0** in the other six
+modules, on comment lines `269`, `278`, `285`, `294` and are defined nowhere, so the suite asserts **no
+delivered code identifier is named after either**, which makes the "never used" claim mechanical; **no
+fast-forward operation is delivered**; fixture parity covers **eight** transactions against the
+fresh-player corpus only, and the item branch's instant half is a recorded **0→0** transition because the
+recorded capture order had already zeroed both instants, with the pairing established instead by
+`command.py:288-289`; the track-to-building mapping is **derived-provisional** from the comment's word
+order and the four `print` display lists; **no pixel parity** and **no windowed capture** are claimed,
+because nothing is rendered and the corpus places neither research building. **Known-flaky guard:** as on
+every prior line, `verify-boot.ps1` treats any `^ERROR:` as a script error, so an engine-shutdown RID leak
+or a transient Windows module-load crash can fail it on an untouched phase; narrow it to `SCRIPT ERROR` or
+a fatal-error allowlist. No Flash, Ruffle, ActionScript, or browser executes in any of these commands, and
+every network call is loopback.
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 

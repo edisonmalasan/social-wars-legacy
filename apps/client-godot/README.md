@@ -2809,9 +2809,9 @@ suite; `verify.ps1` exit 0; `verify-boot.ps1` exit 0 with **34 hermetic suites a
 - **No executed-legacy fixture was captured**, because there is **no animation behaviour for the
   legacy server to have** — a stronger statement than any corpus limitation.
 - **No pixel parity is claimed** and **no windowed capture is claimed**, because nothing is rendered.
-- **No executed-legacy fixture was captured for `basic behaviors` either** (M8 line 8, the
-  milestone's final line, delivered in the next section) — see "Unit behaviors" for the specific
-  cause, which is unlike this line's: a corpus limitation, not an absence of behaviour.
+- **No executed-legacy fixture was captured for `basic behaviors`** (M8 line 8, the
+  milestone's final line) — see "Unit behaviors" for the specific cause, which is unlike
+  this line's: a corpus limitation, not an absence of behaviour.
 
 ## Unit behaviors (M8 line 8)
 
@@ -2928,3 +2928,118 @@ live module and cannot drift from the code they document.
 With this line, **M8 is complete**: eight deliver lines, of which three carried real mechanisms
 (`queues`, `collection`, `behaviors`) and five delivered projections plus refusals — in every case
 because the committed content or the committed corpus had nothing more to reproduce.
+## Unit research (M9 line 1)
+
+**M9 — Progression's first deliver line**, on the committed contract in
+`docs/legacy-m9-progression.md` (PR #250) extended by PR #252. This line is the first M9 work of any
+kind, and it is **not** a refusal line: the counters genuinely mutate and the committed corpus genuinely
+exercises them.
+
+### The contract
+
+Four dispatcher branches over two tracks (`0: TYPE_AREA_51`, `1: TYPE_ROBOTIC`):
+
+| Branch | `command.py` | step | item | instant |
+| --- | --- | --- | --- | --- |
+| `next_research_step(_type)` | 268–274 | `+= 1` | — | `= time_now` |
+| `research_buy_step_cash(cash, _type)` | 276–282 | — | — | `= 0` |
+| `next_research_item(_type)` | 284–291 | `= 0` | `+= 1` | `= 0` |
+| `reset_research_item(_type)` | 293–300 | `= 0` | `= 0` | `= 0` |
+
+### The finding: the three counters are **write-only**
+
+`researchStepNumber` has **3** sites and `researchItemNumber` **2**, every one a write.
+`timeStampDoResearch` has **5** — the four branch writes plus **one read at `command.py:923` that is
+itself a write**, because it sits inside `fast_forward` and subtracts a **client-supplied** number of
+seconds, clamped at zero (`seconds = args[0]` at `command.py:906`).
+
+**Nothing anywhere reads a research counter to decide anything.** A guard audit of all four branches finds
+**no** bounds check, numeric clamp, membership test, exception guard, or existence check. `fast_forward`
+is therefore recorded as a **fourth writer**, and it makes the research instant **client-writable** —
+and because no readiness check exists anywhere, an instant trusted by nothing is the only elapsed-time
+input the research system has. It is **recorded, never delivered**.
+
+`research_buy_step_cash` reads a **client-supplied cash value and discards it** — structurally identical
+to M8 line 8's `used_syringe` — so **no research price is charged**.
+
+### What it delivers
+
+- **`scripts/units/research_flow.gd`** — a typed, read-only projection of **both** tracks and **all three**
+  counters, reported **verbatim** with no value derived from another, and **failing closed** on an absent
+  vector, a non-list, a wrong length, a non-integer element, and a negative element.
+- **The four branch effects recorded as data**, including that the item branch resets the step counter
+  **and** the research instant **together**, and that the cash branch charges nothing.
+- **The track inventory** reporting the committed building ids `ID_BUILDING_AREA_51 = 139` and
+  `ID_BUILDING_ROBOTIC_CENTER = 86` — and the suite asserts **no delivered code identifier is named after
+  `TYPE_AREA_51` or `TYPE_ROBOTIC`**, so the "reported, never used" claim is *mechanical* rather than a
+  promise.
+- **`POST /v0/research`** — **intent-only**: the client sends a player identifier and a track and nothing
+  else; the service derives every counter value and every research instant itself and discards any
+  client-supplied counter, timestamp, or cash value.
+- **Executed-legacy fixtures** — eight branch-track transactions, because the corpus holds every counter
+  at `[0, 0]`.
+
+### Verification actually run (2026-10-02)
+
+```bash
+python -B apps/compat-api/capture_research_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_research.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+```
+
+- fixture capture: exit **0**, **re-runnable across three runs**, eight branch-track steps recorded
+- the hermetic suite: **1024 checks** (1038 with `--report`) — the **36th** hermetic suite
+- `verify.ps1` exit **0**; `verify-boot.ps1` exit **0** with **36 hermetic suites and 17 live phases**,
+  and **221** log files inspected with **zero** `^ERROR:`/`SCRIPT ERROR` lines
+- compat suite **grew** to **`Ran 1572 tests ... OK`** — up from 1444 by **+128**
+- evidence: `evidence/research/report.json`, `research-report-v1`, digest **`e62f2666…c86`**, byte-identical
+  across **four** runs
+
+The report is written by the suite itself via `--report=<path>`, so its tables derive from the live module
+and cannot drift from the code they document.
+
+### The anti-invention guard was tested, not trusted
+
+Injecting one invented `static func research_price(track, step)` produced **four independent failures**
+against a pinned whole static-function inventory — the suite exits **1** with `failures=4`. Restoring the
+file from a byte-identical copy (identical SHA-256) returned it to exit **0** with **1024 checks**. A guard
+that is only asserted is not evidence.
+
+### A cross-milestone correction
+
+`godot-unit-behaviors` claimed **three** doors into the dead-hero ledger. Measurement makes it **four**:
+`map_lose_item` (`engine.py:215-228`) calls `push_dead_unit` at line **223**, and its only **two** callers
+are `command.py:796` inside **`end_quest`** and `command.py:872` inside **`end_attack`**. So the fourth door
+is reached from **two** branches — the quest path and the attack path — which **strengthens** the
+correction rather than weakening it.
+
+**One tool constraint was measured rather than worked around:** a MODIFIED delta resolves its header
+against the existing requirement name and Archive **refuses a renamed heading**, so that requirement's
+"three-door" heading is retained as a documented **superseded label** with the four-door correction in
+its body. No archived change uses `RENAMED Requirements` and the CLI does not document the form.
+
+### Claim limits
+
+The delivered feature means **these counter transitions and nothing more**, because the counters have
+**no in-game consumer**. **No price is charged** and **no stored resource moves** — proved by every
+action's post-execution check that the **complete** stored resource set is unchanged. **No completion,
+readiness, remaining-time, or unlock semantics.** **No counter bound, membership rule, or clamp** is
+added; a client could still send track `7` or `999`, and that is a recorded **Server v1 / M13** gap.
+**No reward** is paid. **No committed research content is invented**, because none exists to invent from:
+`research` appears in the content **only** as asset names and one building's display name, never as a
+schedule, price, gate, or reward. **No fast-forward operation is delivered.** Fixture parity covers
+**eight** transactions against the fresh-player corpus only, and the item branch's instant half is a
+recorded **0→0** transition because the capture order had already zeroed both instants — the pairing is
+established instead by `command.py:288-289`. **No pixel parity** and **no windowed capture**, because
+nothing is rendered and the corpus places neither research building.
+
+**Corrections to the committed investigation.** Three figures were asserted rather than measured and
+**overstated** the absence of committed research content; all three were corrected after independent
+re-verification, and the record carries a corrections section rather than quiet edits. `research` appears
+in **two** normalized files (`buildings.json` **1**, `images.json` **6** from three popup-asset rows), not
+one; `config/main.json` **does** have **three** nested keys containing it, all in the `/images` asset
+namespace, so "no key at any depth" is **false** — though no *top-level* key contains it; and the
+building's `legacy_id` is the **string** `"256"`, since every `legacy_id` in `buildings.json` is a string.
+**The conclusion is unchanged**, but the refusal now rests on a correctly measured basis.

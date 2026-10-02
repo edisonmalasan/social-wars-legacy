@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-10-02T13:11:26+00:00",
+  "form": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "data": "278cb0f558400de81ec77223141d97c635c022f4b5fc76a761357164a1ee957d;{\"accessToken\":\"\",\"commands\":[[0,\"next_research_step\",[1],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1790946686}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "command.php form (USERID, user_key, language, data) with the derived <64-hex>;<json> envelope carrying exactly one command: [[0, \"next_research_step\", [1], [0, 0, 0, 0, 0, 0, 0, 0]]] against research track 1. The track index is the legacy `_type` the branch reads from args[0] and nothing else; no counter value, no research instant, and no cash amount is sent, and the resources_changed is the NEUTRAL vector because a research price would be a CLIENT-SENT delta (do_command applies it before the branch) and no research price is committed at all. The branch's recorded effect is ESTABLISHED; the request's exact shape is DERIVED and never observed from the Flash client. user_key is redacted in this record; accessToken is the crafted empty placeholder, never a token value.",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}
