@@ -110,6 +110,7 @@ const UnitBehaviors = preload("res://scripts/units/unit_behaviors.gd")
 const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
 const ResearchFlow = preload("res://scripts/units/research_flow.gd")
 const QuestFlow = preload("res://scripts/units/quest_flow.gd")
+const TutorialFlow = preload("res://scripts/progression/tutorial_flow.gd")
 
 const SAVE_LIST_FIXTURE := \
 	"tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json"
@@ -313,6 +314,29 @@ const QUEST_CHAPTER_FIXTURE := \
 ## The recorded after-state of the end-quest step, for the same reason.
 const QUEST_TIME_FIXTURE := \
 	"tests/fixtures/godot-quests/steps/command_end_quest/after.json"
+
+## The tutorial double's four fixtures. It reads the **neutral** round only,
+## because the neutral round is the parity transaction: the derived NEUTRAL vector
+## moves nothing and the committed gate flips the flag `0 -> 1` (tutorial design
+## D1/D2). The minting round is read as the **anchor** for the endpoint's second
+## proof half and is deliberately never reproduced, so its presence here is a
+## pinned path the suite asserts rather than a state this double replays.
+const TUTORIAL_BEFORE_FIXTURE := \
+	"tests/fixtures/godot-tutorial/steps/neutral/command_tutorial_15/before.json"
+## The recorded after-state of the completing step: the same save with
+## `playerInfo.completed_tutorial` at the committed post-value.
+const TUTORIAL_AFTER_FIXTURE := \
+	"tests/fixtures/godot-tutorial/steps/neutral/command_tutorial_15/after.json"
+## The recorded after-state of the **repeat** step, which the gate declines
+## because the flag is already at the post-value: byte-identical to the
+## completing step's after-state, which is what makes the no-op provable.
+const TUTORIAL_REPEAT_AFTER_FIXTURE := \
+	"tests/fixtures/godot-tutorial/steps/neutral/command_tutorial_15_again/after.json"
+## The minting round's recorded after-state, read (never written) only to prove
+## the committed capture really did move all seven balances -- so the double's own
+## "nothing moved" answer is checked against an oracle rather than asserted.
+const TUTORIAL_MINTING_AFTER_FIXTURE := \
+	"tests/fixtures/godot-tutorial/steps/minting/command_tutorial_15_minting/after.json"
 
 ## Anchor grid extent the v0 endpoint validates against (anchors 0..99;
 ## footprints may extend past the edge — design D5). Must match
@@ -610,6 +634,15 @@ var _quest_loaded := false
 var _quest_error := ""
 var _quest_chapter_stamp := 0
 var _quest_time_stamp := 0
+
+# The tutorial double's mutable process state: the ONE committed flag, the seven
+# balances it reports unchanged, and the recorded minting-round balances it reads
+# as the anchor for its own "nothing moved" answer. Never written anywhere: a
+# tutorial completion moves a flag and no balance.
+var _tutorial_state: Dictionary = {}
+var _tutorial_pid := ""
+var _tutorial_loaded := false
+var _tutorial_error := ""
 ## The start instant the committed executed push stamped, read out of that
 ## capture before any expectation is built. It is the only authority for the
 ## value the branch stamps: the double never reads a clock (design D8).
@@ -5655,3 +5688,343 @@ func _quest_recorded_stamp(fixture: String, field: String) -> int:
 	if number == null or int(number) <= 0:
 		return 0
 	return int(number)
+
+
+# ---------------------------------------------------------------------------
+# The tutorial double (OpenSpec `tutorial`, M9 line 3)
+# ---------------------------------------------------------------------------
+
+
+## One tutorial **step** intent from the committed executed-legacy fixture, for
+## the offline hermetic runs.
+##
+## The step is **intent** and nothing else. This double takes exactly TWO
+## parameters — the save identity and the step — so there is no channel through
+## which a caller could send a completion flag, a reward, a price, or a resource
+## vector: the gate is derived from the committed expression, the command is
+## derived from the single legacy branch (`command.py:60-66`), and the NEUTRAL
+## vector is the endpoint's, never a client's (tutorial design D2/D5).
+##
+## The double answers with the committed **neutral** round of
+## `tests/fixtures/godot-tutorial/`, read into process state once:
+##   * the first step whose gate fires moves the flag `0 -> 1` and nothing else —
+##     the changed list is exactly the single flag leaf;
+##   * a second step at the same value answers `already_completed` and changes
+##     nothing, byte-identical to the completing step's recorded after-state,
+##     which is what makes the no-op provable rather than asserted;
+##   * any step the committed gate declines answers `gate_declined` and changes
+##     nothing.
+##
+## **Both no-ops answer a typed success, never an error.** The legacy server
+## answers `{"result": "success"}` and changes nothing in both, so reporting
+## either as a failure would be a divergence with no evidence behind it.
+##
+## The refusals mirror the endpoint's, in the endpoint's order: the save-identity
+## codes first, then `invalid_step` for anything the committed gate cannot
+## compare, then `unresolvable_tutorial_state` for a save this projection cannot
+## read.
+##
+## **The gate the double answers is not an echo of the client module**: it is
+## compared against the committed capture manifest's own `gate` block at load
+## time, so a drift between the two fails the double instead of being reflected
+## in it. **The minting round is read as an ANCHOR and never reproduced**: the
+## endpoint's second proof half requires every stored resource to be unchanged,
+## and that claim is only meaningful because the committed capture really did move
+## all seven — so the double loads that ladder and refuses to answer if the
+## neutral round's unchanged balances are not a real subset of the transaction.
+func complete_tutorial_town(user_id: String, step: int) -> TutorialFlow.TutorialResult:
+	if user_id.strip_edges() == "":
+		return TutorialFlow.result_failure("missing_user_id",
+			"user_id must be a non-empty string")
+	if not _ensure_tutorial_loaded():
+		return TutorialFlow.result_failure("fixture_unreadable", _tutorial_error)
+	if user_id != _tutorial_pid:
+		return TutorialFlow.result_failure("unknown_user_id",
+			"no save exists for user_id '%s'" % user_id)
+	if not TutorialFlow.is_step(step):
+		return TutorialFlow.result_failure("invalid_step",
+			("step must be an integer the committed gate can compare; got %s"
+				% typeof(step)) + " (see gate %s)" % TutorialFlow.GATE_EXPRESSION)
+	if not bool((_tutorial_state["flag"] as Dictionary).get("ok", false)):
+		return TutorialFlow.result_failure("unresolvable_tutorial_state",
+			("the fixture save records no readable %s.%s"
+				% [TutorialFlow.PLAYER_INFO_RECORD, TutorialFlow.FLAG_KEY])
+				+ " (found %s)" % str((_tutorial_state["flag"] as Dictionary)
+					.get("reason", "")))
+	var effect := _tutorial_effect(int(step))
+	# The double DOES move its in-memory flag on a dispatch, because that is the
+	# whole transaction: the legacy branch writes the save, so a second request
+	# really does see the flag at its post-value and answers `already_completed`.
+	# Without this the repeat branch would be unreachable offline and its
+	# no-op-ness would be asserted rather than demonstrated. It is also
+	# **monotonic** — nothing ever writes the flag back, which is why there is no
+	# un-complete path to model.
+	if bool((effect["block"] as Dictionary).get("dispatched", false)):
+		(_tutorial_state["flag"] as Dictionary)["stored"] = \
+			TutorialFlow.COMMITTED_FLAG_AFTER
+		(_tutorial_state["flag"] as Dictionary)["completed"] = true
+	return TutorialFlow.parse_result({
+		"protocol": BootData.PROTOCOL,
+		"ok": true,
+		"game_version": str(_save_list_doc.get("game_version", "")),
+		# Time-dependent field: the fake reports the fixture capture's legacy
+		# server timestamp instead of "now" (never the wall clock).
+		"server_time": _fixture_server_time(),
+		"result": "success",
+		"tutorial": effect["block"],
+		"gate": TutorialFlow.gate_record(),
+		"changed": (effect["changed"] as Array).duplicate(),
+		"resources": _tutorial_resources(),
+		"anchor": (_tutorial_state["anchor"] as Dictionary).duplicate(true),
+		"refusals": _tutorial_refusal_records(),
+		"no_reward_paid": true,
+		"stored_step_introduced": false,
+	})
+
+
+## The recorded legacy effect of one tutorial step — DERIVED from the committed
+## gate and this double's own flag, never read from a response. Returns
+## ``{block, changed}``.
+##
+## The three outcomes are the committed ones, in the endpoint's order: the flag
+## already at the post-value answers `already_completed`, a step the gate declines
+## answers `gate_declined`, and only a step the gate fires dispatches the write.
+## Nothing else can move, because the only leaf the legacy branch writes is the
+## flag — so the changed list is empty for both no-ops **by construction** rather
+## than by assertion.
+func _tutorial_effect(step: int) -> Dictionary:
+	var stored := int((_tutorial_state["flag"] as Dictionary)["stored"])
+	var verdict := TutorialFlow.gate_verdict(step)
+	var no_op := ""
+	if stored == TutorialFlow.COMMITTED_FLAG_AFTER:
+		no_op = "already_completed"
+	elif verdict == TutorialFlow.ARM_NONE:
+		no_op = "gate_declined"
+	var dispatched := no_op == ""
+	var flag_after := stored
+	if dispatched:
+		flag_after = TutorialFlow.COMMITTED_FLAG_AFTER
+	var block := {
+		"command": TutorialFlow.COMPLETE_TUTORIAL_COMMAND,
+		"step": step,
+		"step_kind": "integer",
+		"record": TutorialFlow.PLAYER_INFO_RECORD,
+		"key": TutorialFlow.FLAG_KEY,
+		"flag_before": stored,
+		"flag_after": flag_after,
+		"flag_moved": dispatched,
+		"gate_satisfied": verdict != TutorialFlow.ARM_NONE,
+		"gate_arm": verdict,
+		"in_gate_hole": TutorialFlow.gate_hole_steps().has(step),
+		"already_completed": stored == TutorialFlow.COMMITTED_FLAG_AFTER,
+		"no_op_reason": no_op,
+		"dispatched": dispatched,
+		"resolvable": true,
+		"completed": flag_after == TutorialFlow.COMMITTED_FLAG_AFTER,
+		"stored": flag_after,
+	}
+	var changed: Array = []
+	if dispatched:
+		changed = ["/%s/%s" % [TutorialFlow.PLAYER_INFO_RECORD,
+			TutorialFlow.FLAG_KEY]]
+	return {"block": block, "changed": changed}
+
+
+## The service's `tutorial` block for the committed post-state, as the response's
+## authoritative value. Reported **verbatim** from the fixture, never recomputed.
+func _tutorial_post_block() -> Dictionary:
+	var stored := int((_tutorial_state["flag"] as Dictionary)["stored"])
+	return {
+		"record": TutorialFlow.PLAYER_INFO_RECORD,
+		"key": TutorialFlow.FLAG_KEY,
+		"stored": stored,
+		"completed": stored == TutorialFlow.COMMITTED_FLAG_AFTER,
+		"resolvable": true,
+	}
+
+
+## The seven stored resource values of the in-memory tutorial state, reported
+## verbatim as the response's authoritative `resources`. A tutorial completion
+## moves none of them, so these are the values the intent started from — the
+## strongest form of the "nothing moved" proof the endpoint requires (design D5).
+func _tutorial_resources() -> Dictionary:
+	var resources := {}
+	for key: String in RESOURCE_KEYS:
+		resources[key] = int(_tutorial_state[key])
+	return resources
+
+
+## The refusals this double can answer, as records, so a report can enumerate the
+## closed set instead of restating it.
+func _tutorial_refusal_records() -> Array:
+	return [
+		{"code": "missing_user_id", "when": "the identity is empty"},
+		{"code": "unknown_user_id", "when": "the identity is not the fixture's"},
+		{"code": "invalid_step", "when": "the committed gate cannot compare the "
+			+ "step. Legacy RAISES on a string, a missing, and a null step and "
+			+ "escapes as HTTP %d; this line REFUSES those three instead, which "
+			% TutorialFlow.RAISING_STATUS
+			+ "is its one deliberate divergence and is confined to failure "
+			+ "handling"},
+		{"code": "unresolvable_tutorial_state", "when": "the save records no "
+			+ "readable %s.%s" % [TutorialFlow.PLAYER_INFO_RECORD,
+				TutorialFlow.FLAG_KEY]},
+	]
+
+
+## Loads the tutorial fixture's neutral round into mutable process state (once),
+## and validates it against the committed capture manifest.
+func _ensure_tutorial_loaded() -> bool:
+	if _tutorial_loaded:
+		return _tutorial_error == ""
+	_tutorial_loaded = true
+	# The boot fixtures must be loaded first: the double's response reports the
+	# captured `game_version` and `server_time` from them, so without this the
+	# double would answer with an empty version and a ZERO server time whenever it
+	# is reached before any boot read.  Done independently of the other doubles,
+	# so this double's failure cannot hide behind another's.
+	if not _ensure_loaded():
+		_tutorial_error = _load_error
+		return false
+	# The capture manifest is the double's ORACLE: its `gate` block is compared
+	# field by field against the client's committed mirror, so the two cannot
+	# drift apart silently and the double's answer is never an echo.
+	var manifest_sink := {"error": ""}
+	var manifest := _read_json_into(TutorialFlow.CAPTURE_MANIFEST, manifest_sink)
+	if str(manifest_sink["error"]) != "":
+		_tutorial_error = str(manifest_sink["error"])
+		return false
+	var committed_gate: Variant = manifest.get("gate")
+	if not (committed_gate is Dictionary):
+		_tutorial_error = "the tutorial capture manifest carries no gate block"
+		return false
+	var mirror := TutorialFlow.gate_record()
+	for field: String in mirror.keys():
+		# Compared through the module's own helper, never with `str()`: this engine
+		# decodes every JSON number as a float, so the manifest's integer 25 arrives
+		# as 25.0 and a text comparison would refuse the genuine capture.
+		if not TutorialFlow._gate_field_equal(
+				(committed_gate as Dictionary).get(field), mirror.get(field)):
+			_tutorial_error = ("the capture manifest's gate.%s is '%s', which "
+				% [field, str((committed_gate as Dictionary).get(field, ""))]
+				+ "contradicts the committed mirror this double answers with")
+			return false
+	var before_sink := {"error": ""}
+	var before := _read_json_into(TUTORIAL_BEFORE_FIXTURE, before_sink)
+	if str(before_sink["error"]) != "":
+		_tutorial_error = str(before_sink["error"])
+		return false
+	var after_sink := {"error": ""}
+	var after := _read_json_into(TUTORIAL_AFTER_FIXTURE, after_sink)
+	if str(after_sink["error"]) != "":
+		_tutorial_error = str(after_sink["error"])
+		return false
+	var repeat_sink := {"error": ""}
+	var repeated := _read_json_into(TUTORIAL_REPEAT_AFTER_FIXTURE, repeat_sink)
+	if str(repeat_sink["error"]) != "":
+		_tutorial_error = str(repeat_sink["error"])
+		return false
+	var resources: Variant = _tutorial_balances(before)
+	if resources == null:
+		_tutorial_error = "the tutorial fixture before state lacks the seven " \
+			+ "stored resources"
+		return false
+	var flag := TutorialFlow.project(before)
+	if not bool(flag.get("ok", false)):
+		_tutorial_error = ("the tutorial fixture before state is unresolvable: "
+			+ str(flag.get("reason", "")))
+		return false
+	if int(flag["stored"]) != TutorialFlow.COMMITTED_FLAG_BEFORE:
+		_tutorial_error = ("the tutorial fixture before state records %s = %d, "
+			% [TutorialFlow.FLAG_KEY, int(flag["stored"])]
+			+ "not the committed seed %d" % TutorialFlow.COMMITTED_FLAG_BEFORE)
+		return false
+	# The completing step's recorded after-state must be the SAME save with the
+	# flag at the committed post-value, and must differ in nothing else. Compared
+	# key by key rather than by digest so the failure names the key that drifted.
+	var recorded_after := TutorialFlow.project(after)
+	if not bool(recorded_after.get("ok", false)) \
+			or int(recorded_after["stored"]) != TutorialFlow.COMMITTED_FLAG_AFTER:
+		_tutorial_error = ("the tutorial fixture after state records %s = %s, "
+			% [TutorialFlow.FLAG_KEY, str((recorded_after as Dictionary)
+				.get("stored", ""))]
+			+ "not the committed post-value %d"
+			% TutorialFlow.COMMITTED_FLAG_AFTER)
+		return false
+	if _tutorial_balances(after) != resources:
+		_tutorial_error = ("the tutorial fixture after state moves a stored "
+			+ "balance, which the committed transaction does not do")
+		return false
+	# The repeat step answers nothing at all: its recorded after-state is the
+	# completing step's own, so the no-op is proved by the capture rather than
+	# asserted here.
+	if repeated.get("playerInfo") != after.get("playerInfo"):
+		_tutorial_error = ("the tutorial fixture's repeat step changed something, "
+			+ "but the committed capture records it as a no-op")
+		return false
+	if _tutorial_balances(repeated) != resources:
+		_tutorial_error = "the tutorial fixture's repeat step moved a balance"
+		return false
+	# The ANCHOR: the minting round really did move all seven. Read, never
+	# reproduced — it exists so the double's "nothing moved" answer is checked
+	# against an oracle rather than asserted, and so a caller can see the ladder
+	# the NEUTRAL vector refuses.
+	var minted_sink := {"error": ""}
+	var minted := _read_json_into(TUTORIAL_MINTING_AFTER_FIXTURE, minted_sink)
+	if str(minted_sink["error"]) != "":
+		_tutorial_error = str(minted_sink["error"])
+		return false
+	var minted_balances: Variant = _tutorial_balances(minted)
+	if minted_balances == null:
+		_tutorial_error = "the tutorial fixture's minting round lacks balances"
+		return false
+	var ladder: Array = []
+	for key: String in RESOURCE_KEYS:
+		if int(minted_balances[key]) != int(resources[key]):
+			ladder.append(key)
+	if ladder.size() != RESOURCE_KEYS.size():
+		_tutorial_error = ("the tutorial capture's minting round moved %d of %d "
+			% [ladder.size(), RESOURCE_KEYS.size()]
+			+ "balances, so the NEUTRAL vector's unchanged answer would be "
+			+ "vacuous")
+		return false
+	var state: Dictionary = (resources as Dictionary).duplicate(true)
+	state["flag"] = flag
+	state["anchor"] = {
+		"role": "the committed capture's client-sent ladder, read as the ANCHOR "
+			+ "and deliberately never reproduced",
+		"moved": ladder,
+		"moved_count": ladder.size(),
+		"minted_balances": minted_balances,
+		"neutral_vector": (TutorialFlow.NEUTRAL_VECTOR as Array).duplicate(),
+	}
+	_tutorial_state = state
+	_tutorial_pid = str((before.get("playerInfo") as Dictionary).get("pid", ""))
+	return true
+
+
+## The seven stored balances of one recorded save, or `null` when the document
+## does not carry all seven as non-negative integers.
+func _tutorial_balances(save: Dictionary) -> Variant:
+	var maps: Variant = save.get("maps")
+	if not (maps is Array) or (maps as Array).is_empty():
+		return null
+	var first: Variant = (maps as Array)[0]
+	var info: Variant = save.get("playerInfo")
+	var priv: Variant = save.get("privateState")
+	if not (first is Dictionary) or not (info is Dictionary) \
+			or not (priv is Dictionary):
+		return null
+	var balances := {}
+	for key: String in ["xp", "gold", "wood", "oil", "steel"]:
+		var value: Variant = (first as Dictionary).get(key)
+		if value == null or int(value) < 0:
+			return null
+		balances[key] = int(value)
+	var cash: Variant = (info as Dictionary).get("cash")
+	var mana: Variant = (priv as Dictionary).get("mana")
+	if cash == null or mana == null or int(cash) < 0 or int(mana) < 0:
+		return null
+	balances["cash"] = int(cash)
+	balances["mana"] = int(mana)
+	return balances

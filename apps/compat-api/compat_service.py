@@ -829,6 +829,7 @@ import store_envelope
 import upgrade_envelope
 import research_envelope
 import quest_envelope
+import tutorial_envelope
 
 PROTOCOL = "compat-v0"
 HOST = "127.0.0.1"
@@ -895,6 +896,10 @@ ERROR_INVALID_QUEST_INDEX = "invalid_quest_index"
 ERROR_MISSING_QUEST_ID = "missing_quest_id"
 ERROR_INVALID_QUEST_ID = "invalid_quest_id"
 ERROR_UNRESOLVABLE_QUEST_STATE = "unresolvable_quest_state"
+ERROR_MISSING_STEP = "missing_step"
+ERROR_INVALID_STEP = "invalid_step"
+ERROR_NULL_STEP = "null_step"
+ERROR_UNRESOLVABLE_TUTORIAL_STATE = "unresolvable_tutorial_state"
 ERROR_BAD_REQUEST = "bad_request"
 ERROR_NOT_FOUND = "not_found"
 ERROR_METHOD_NOT_ALLOWED = "method_not_allowed"
@@ -1065,6 +1070,272 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
         )
 
     app = Flask(__name__, static_folder=None)
+
+    # ``/v0/tutorial`` is declared FIRST, before every other route, and that
+    # order is load-bearing rather than incidental.  The delivered structural
+    # guards slice this module's source from ``def vN_x():`` up to the next
+    # ``@app.<method>(...)`` decorator (the level suite uses the corpus
+    # constant, because ``/v0/level_up`` was the last route when it was
+    # written) and require each slice to parse as exactly one function.  A new
+    # route declared between two existing ones would therefore land inside the
+    # preceding route's slice and break a delivered guard, so the only slot no
+    # slice reaches is ahead of the first route.  See the tutorial suite's
+    # route-placement test, which pins this.
+
+    @app.post("/v0/tutorial")
+    def v0_tutorial() -> Tuple[Dict[str, Any], int]:
+        """Report a tutorial step; completion is derived here, never sent.
+
+        M9 line 3 (``tutorial/progression``).  The legacy surface is one branch
+        with one write (``command.py:60-66``)::
+
+            elif cmd == "complete_tutorial":
+                tutorial_step = args[0]                       # a LOCAL
+                print("Tutorial step", tutorial_step, "reached.")
+                if tutorial_step >= 25 or tutorial_step == 15:
+                    print("Tutorial COMPLETED!")
+                    save["playerInfo"]["completed_tutorial"] = 1
+                    return
+
+        **Design D1 - the gate is a disjunction with a NINE-VALUE HOLE.**
+        Completion follows ``tutorial_step >= 25 or tutorial_step == 15`` over the
+        **client's** step, so steps 16 through 24 inclusive do not complete, and
+        there is no upper bound, no lower bound, and no type check.  Both arms, the
+        hole, and all three absences are recorded in
+        :func:`tutorial_envelope.gate_record` and reported verbatim below.
+
+        **Design D2 - the step is INTENT; the outcome is derived here.**  The
+        request carries a step and nothing else.  No client-supplied completion
+        outcome, stored flag, or resource vector is read, because no code path
+        below consults one.  The step is not bounded either: closing a bound the
+        legacy server does not have would be an invented rule, and authoritative
+        validation belongs to Server v1 (M13).
+
+        **Design D3 - no stored step, so no progress is derived.**  ``tutorial_step``
+        is a local that is never persisted, so a mid-tutorial position is
+        unrepresentable in the save shape.  Nothing here derives a step, ratio, or
+        remaining time, and no un-complete path exists.
+
+        **Design D4 - the derived vector is NEUTRAL.**  ``apply_resources`` runs
+        BEFORE the branch (``command.py:40``; ``engine.py:251-271``), so the
+        client-sent 8-slot vector is applied on this command like any other.  The
+        vector below is :func:`tutorial_envelope.neutral_vector`, which
+        :func:`tutorial_envelope.validate_vector` makes the only expressible one.
+
+        **The one deliberate divergence.**  Three input shapes - a string step, a
+        missing step, and a ``null`` step - raise inside the legacy branch and
+        escape as an unhandled **HTTP 500**.  They are refused here with named
+        codes, an empty payload, and no state change.  The divergence is confined
+        to the response: for every step legacy ACCEPTS, the state transition below
+        is identical.
+
+        **Design D5 - the post-state proof is the flag AND the absence of
+        resource movement.**  A captured executed-legacy transaction moved **all
+        seven** stored resources alongside the flag on this very command (step
+        15 with the client ladder ``[101, 3, 7, 11, 13, 17, 19, 23]``), so
+        proving that **every** stored resource is unchanged is what forecloses a
+        resource-minting exploit wearing a tutorial's clothes - and it is
+        non-tautological because the capture anchors it.  Either half failing is a
+        reported failure, not a success.
+
+        **The two no-op cases answer 200, not an error.**  Legacy answers
+        ``{"result": "success"}`` and changes nothing both when the gate declines
+        and when the flag is already ``1`` (the executed repeat recorded zero
+        changed leaves).  Refusing either would be a divergence with no evidence
+        behind it, so both are reported faithfully with ``changed: []``.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404,
+                ERROR_UNKNOWN_USER_ID,
+                "no save exists for user_id %r" % user_id,
+            )
+
+        # --- the step, validated before anything is read or dispatched -------
+        try:
+            step = tutorial_envelope.require_step(payload)
+        except tutorial_envelope.EnvelopeError as failure:
+            if failure.code in ("invalid_payload",):
+                return error_response(400, ERROR_INVALID_PAYLOAD, str(failure))
+            # missing_step / null_step / invalid_step are the three shapes legacy
+            # answers with an unhandled 500.  Each gets a named code, an empty
+            # payload, and no state change.
+            return error_response(400, failure.code, str(failure))
+
+        # --- the recorded flag first, and validated before anything else is read --
+        # The flag is read and checked BEFORE the resources: a save whose
+        # ``playerInfo`` is not a mapping makes ``compat_legacy.resources`` raise
+        # a raw ``TypeError`` (a pre-existing adapter gap shared by every
+        # delivered endpoint, recorded as a follow-up rather than widened here),
+        # so reading the resources first would let an unrelated TypeError escape
+        # ahead of the fail-closed answer this route owes for that state.
+        try:
+            flag_before = boot.completed_tutorial(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if flag_before is None:
+            # The flag is absent or unreadable.  Never coerced to "not complete":
+            # defaulting would present an unreadable state as a decided one, and
+            # the legacy server would have written the key regardless.
+            return error_response(
+                500,
+                ERROR_UNRESOLVABLE_TUTORIAL_STATE,
+                "this save records no %s.%s this service can read"
+                % (
+                    tutorial_envelope.PLAYER_INFO_RECORD,
+                    tutorial_envelope.FLAG_KEY,
+                ),
+            )
+        try:
+            resources_before = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        projection_before = tutorial_envelope.project_tutorial_state(
+            {tutorial_envelope.FLAG_KEY: flag_before}
+        )
+        gate_satisfied = tutorial_envelope.gate_satisfied(step)
+        gate_arm = tutorial_envelope.gate_verdict(step)
+        already_completed = bool(flag_before)
+
+        # --- the two no-op cases, answered without dispatching --------------
+        if not gate_satisfied or already_completed:
+            return (
+                envelope(
+                    boot,
+                    result="success",
+                    tutorial={
+                        "command": tutorial_envelope.COMPLETE_TUTORIAL_COMMAND,
+                        "step": step,
+                        "step_kind": tutorial_envelope.step_kind(step),
+                        "gate_satisfied": gate_satisfied,
+                        "gate_arm": gate_arm,
+                        "record": tutorial_envelope.PLAYER_INFO_RECORD,
+                        "key": tutorial_envelope.FLAG_KEY,
+                        "flag_before": flag_before,
+                        "flag_after": flag_before,
+                        "flag_moved": False,
+                        "already_completed": already_completed,
+                        "in_gate_hole": step in tutorial_envelope.gate_hole_steps(),
+                        "resolvable": projection_before["resolvable"],
+                        "completed": already_completed,
+                        "stored": flag_before,
+                        "dispatched": False,
+                        "no_op_reason": (
+                            "already_completed"
+                            if already_completed
+                            else "gate_declined"
+                        ),
+                    },
+                    gate=tutorial_envelope.gate_record(),
+                    resources=resources_before,
+                    changed=[],
+                ),
+                200,
+            )
+
+        # --- derive the envelope: the command, the client's step, and the
+        # NEUTRAL vector are the module's, never the client's.
+        try:
+            envelope_payload = tutorial_envelope.build_envelope(step=step)
+        except tutorial_envelope.EnvelopeError as failure:
+            if failure.code in ("invalid_vector", "invalid_timestamp"):
+                return error_response(500, ERROR_INTERNAL, failure.code)
+            return error_response(400, failure.code, str(failure))
+
+        # Execute the unchanged legacy command dispatcher in-process.  The legacy
+        # HTTP route returns {"result": "success"} whenever command() returns
+        # without raising, so reaching here IS the legacy result - which is
+        # precisely why it is NOT taken as proof that the flag was written and
+        # that nothing else moved.
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        # --- prove the post-state (design D5) ------------------------------
+        try:
+            flag_after = boot.completed_tutorial(user_id)
+            resources_after = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        if flag_after is None:
+            return error_response(
+                500,
+                ERROR_UNRESOLVABLE_TUTORIAL_STATE,
+                "%s.%s became unreadable during execution"
+                % (tutorial_envelope.PLAYER_INFO_RECORD, tutorial_envelope.FLAG_KEY),
+            )
+        # Part one: the gate fired, so the branch must have written the flag.
+        if flag_after != tutorial_envelope.COMMITTED_FLAG_AFTER:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "%s.%s is %r after execution, not the committed %r the gate "
+                "derives for step %d"
+                % (
+                    tutorial_envelope.PLAYER_INFO_RECORD,
+                    tutorial_envelope.FLAG_KEY,
+                    flag_after,
+                    tutorial_envelope.COMMITTED_FLAG_AFTER,
+                    step,
+                ),
+            )
+        # Part two: EVERY stored resource unchanged.  This is the half that
+        # forecloses a smuggled vector, and it is anchored by the captured
+        # minting transaction rather than being vacuously true.
+        for name in sorted(resources_after):
+            if resources_after[name] != resources_before[name]:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "resource %s is %r after execution, not the pre-execution %r: "
+                    "a tutorial step moves no resource, so the derived neutral "
+                    "vector requires every stored resource to be unchanged"
+                    % (name, resources_after[name], resources_before[name]),
+                )
+        return (
+            envelope(
+                boot,
+                result="success",
+                tutorial={
+                    "command": tutorial_envelope.COMPLETE_TUTORIAL_COMMAND,
+                    "step": step,
+                    "step_kind": tutorial_envelope.step_kind(step),
+                    "gate_satisfied": True,
+                    "gate_arm": gate_arm,
+                    "record": tutorial_envelope.PLAYER_INFO_RECORD,
+                    "key": tutorial_envelope.FLAG_KEY,
+                    "flag_before": flag_before,
+                    "flag_after": flag_after,
+                    "flag_moved": flag_before != flag_after,
+                    "already_completed": already_completed,
+                    "in_gate_hole": step in tutorial_envelope.gate_hole_steps(),
+                    "resolvable": True,
+                    "completed": True,
+                    "stored": flag_after,
+                    "dispatched": True,
+                    "no_op_reason": None,
+                },
+                gate=tutorial_envelope.gate_record(),
+                resources=resources_after,
+                changed=[
+                    "/%s/%s" % (tutorial_envelope.PLAYER_INFO_RECORD,
+                                tutorial_envelope.FLAG_KEY)
+                ],
+            ),
+            200,
+        )
+
 
     @app.get("/v0/session")
     def v0_session() -> Response:
@@ -4541,6 +4812,5 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
             ),
             200,
         )
-
     app.config["COMPAT_LEGACY_CORPUS"] = str(boot.corpus)
     return app

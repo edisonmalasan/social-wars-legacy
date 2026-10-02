@@ -70,7 +70,33 @@
        decrement and unvalidated re-placement, and the structural
        anti-invention guard over syringe-cost, damage, attack, defence, hit,
        occupancy, and charge helpers, also with no request over the network and
-       no committed-corpus mutation),
+       no committed-corpus mutation), and the research suite (the typed
+       read-only projection of both research tracks and all three counters
+       reported verbatim, the re-derived command inventory showing the three
+       counters are WRITE-ONLY and that `fast_forward` makes the research
+       instant client-writable, the price-discarding refusal with its
+       non-tautological no-resource-moved proof, the recorded five refusals, and
+       the structural anti-invention guard over price, readiness, completion,
+       remaining-time, unlock, and reward helpers, also with no endpoint, no
+       request, and no mutation), and the quests suite (the typed read-only
+       projection of both quest state records, the re-derived six-branch
+       inventory with the completion branch's total absence of mutation, the
+       three reproduced legacy type and shape quirks, the REFUSED
+       client-dictated destruction count recorded as a divergence rather than
+       parity, the unbounded goals growth reproduced rather than closed, and the
+       transport guard over per-action addressing keys -- five cross-layer
+       defects this suite structurally could not catch and that only the live
+       phase guards, also with no endpoint, no request, and no mutation), and
+       the tutorial suite (the typed read-only projection of the save-level
+       completed_tutorial flag with its two-sided gate mirror, the offline
+       evaluation of all three verdicts over the offline double, the deliberate
+       strict-int/integer asymmetry between the outgoing step and every incoming
+       value, the numeric-tolerant gate-record comparison, the structural
+       anti-invention guard over step-count, ratio, remaining, reward, bound,
+       un-complete and request-body helpers, the recorded absences, the eight
+       committed village saves as the only progressed evidence for the field,
+       and the two-round committed executed-legacy capture with its minting
+       anchor, also with no endpoint, no request, and no mutation),
        (the loop passes the dead endpoint to every suite: the session and
        game-clock suites use it for their failure phase, the placement,
        purchase, move, sell, store, upgrade, construction, collect, and
@@ -78,7 +104,7 @@
        that ignore user args are unaffected)
     6. boot-scene unreachable-endpoint failure scenario, run with no service
        at all
-    7. sixteen live phases against the real Compatibility API: the main-scene
+    7. nineteen live phases against the real Compatibility API: the main-scene
        boot (success, compared with the committed fixture save), the legacy-v0
        GameApi suite, the structured API-error boot scenario, the
        placement phase (one intent through the v0 placement endpoint with
@@ -136,7 +162,27 @@
        server-derived item id, AND every stored resource is unchanged, which is
        what makes the no-syringe-cost claim non-tautological) and whose two
        named refusals must each carry the endpoint's own code with no partial
-       payload, with the disposable corpus save asserted mutated)
+       payload, with the disposable corpus save asserted mutated), and the
+        research phase (the full step -> cash -> item -> reset cycle on BOTH
+        tracks through the v0 research endpoint, whose response must prove the
+        two-part post-state -- the derived counter transition AND that EVERY
+        stored resource is unchanged -- and whose two named refusals must carry
+        the endpoint's own codes with no partial payload, with the disposable
+        corpus save asserted mutated), and the quests phase (all SIX quest
+        branches through the v0 quest endpoint, including the no-op branch's
+        whole-state identity, the STRINGIFIED mission identifier and its wrap,
+        the derived rank difficulty, the REFUSED destruction count with every
+        placed row byte-identical, AND every stored resource unchanged, plus its
+        three named refusals, with the disposable corpus save asserted mutated),
+        and the tutorial phase (all THREE verdicts through the v0 tutorial
+        endpoint, sent in the only order that reaches all three because the flag
+        is checked before the gate -- the declined hole step FIRST -- whose
+        response must prove the derived 0 -> 1 transition with exactly one
+        changed leaf, both no-op verdicts writing nothing, the same 40 rows
+        throughout, and EVERY stored resource unchanged across all three, plus
+        its two reachable named refusals carrying the endpoint's own codes and
+        a record that the third is structurally unreachable from this typed
+        surface, with the disposable corpus save asserted mutated)
     8. Compatibility API guard baseline, post-run, must equal the pre-run
        digests
     9. teardown assertions: loopback port released, no working-tree saves/
@@ -396,7 +442,7 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests", "test_tutorial")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a
@@ -698,6 +744,36 @@ try {
                 "--headless", "--path", $projectRel,
                 "--script", "res://tests/test_quests.gd",
                 "--", "--scenario=live-quests",
+                "--gameapi-endpoint=$endpoint"
+            )
+        },
+        @{
+            # The tutorial phase drives all THREE verdicts over the real v0
+            # endpoint, and the ORDER is load-bearing rather than incidental.
+            # The endpoint checks the flag BEFORE the gate, so once a tutorial
+            # completes every later step answers already_completed and the
+            # gate_declined verdict is unreachable for the rest of that save's
+            # life. The committed corpus starts at the seed value, so the hole
+            # step goes FIRST -- otherwise this phase would silently prove only
+            # the third verdict while reading as full coverage.
+            #
+            # The phase asserts each typed response AND its post-state: the
+            # derived 0 -> 1 transition with exactly one changed leaf, both
+            # no-op verdicts changing nothing at all, the flag genuinely moving
+            # in the SAVE between requests, the same 40 rows throughout, and
+            # every stored resource unchanged across all three -- which is
+            # non-tautological only because the committed capture's minting
+            # anchor round really did move all seven.
+            #
+            # No COMPAT_SEED_* seam is needed and none is used: the flag is
+            # present in the committed corpus as committed, at its seed value.
+            Name = "tutorial-live"
+            Assertions = "tutorial live phase"
+            ExpectSaveMutation = $true
+            Arguments = @(
+                "--headless", "--path", $projectRel,
+                "--script", "res://tests/test_tutorial.gd",
+                "--", "--scenario=live-tutorial",
                 "--gameapi-endpoint=$endpoint"
             )
         }
@@ -1054,6 +1130,26 @@ try {
         "quests live phase proved its three named refusals with the endpoint's own codes and no partial payload, and recorded that the five missing-key refusals are structurally unreachable through the typed client"
     Report-Result ($questsOut -match "(?m)^PASS corpus save mutated by the live placement") `
         "quests live phase mutated the disposable corpus save"
+
+    # The tutorial live phase must reach ALL THREE verdicts through the real
+    # endpoint — which is only possible in the order it uses, because the flag is
+    # checked before the gate — and prove its value-level post-state: the derived
+    # 0 -> 1 transition with exactly one changed leaf, both no-ops writing
+    # nothing, the same 40 rows throughout, and every stored resource unchanged
+    # across all three, plus its three named refusals carrying the endpoint's own
+    # codes.
+    $tutorialOut = ""
+    if ($phaseLogs.ContainsKey("tutorial-live")) {
+        $tutorialOut = $phaseLogs["tutorial-live"]
+    }
+    Report-Result ($tutorialOut -match "\[test\] PASS script=res://tests/test_tutorial\.gd") `
+        "tutorial live phase asserts its scenario"
+    Report-Result ($tutorialOut -match 'declined=no_op_wrote=0 hole_step=16 arm=none then completed=0->1 changed=1 leaf_flag=true then repeated=no_op_wrote=0 rows=40 resources_unchanged=3') `
+        "tutorial live phase drove all three verdicts through the v0 endpoint, with its value-level post-state proof and the same 40 rows throughout"
+    Report-Result ($tutorialOut -match "refused=missing_user_id,unknown_user_id invalid_step=structurally_unreachable") `
+        "tutorial live phase proved its two reachable refusals with the endpoint's own codes and recorded that the third is unreachable from this typed surface"
+    Report-Result ($tutorialOut -match "(?m)^PASS corpus save mutated by the live placement") `
+        "tutorial live phase mutated the disposable corpus save"
 
     # --- 8. guard baseline, post-run ---------------------------------------
 

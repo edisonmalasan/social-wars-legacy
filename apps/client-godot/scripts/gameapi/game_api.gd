@@ -13,10 +13,11 @@ extends Node
 ## `push_queue_unit_town()` / `pop_queue_unit_town()` for one production-queue
 ## intent each, `complete_collection_town()` for one collection-completion
 ## intent, `resurrect_hero_town()` for one dead-hero revival intent, and
-## `advance_research_town()` for one research-track intent, and
-## `advance_quest_town()` for one quest intent, receiving typed results
-## (`scripts/gameapi/boot_data.gd`); raw transport dictionaries never reach
-## presentation code, and no other script references a transport.
+## `advance_research_town()` for one research-track intent,
+## `advance_quest_town()` for one quest intent, and
+## `complete_tutorial_town()` for one tutorial-step intent, receiving typed
+## results (`scripts/gameapi/boot_data.gd`); raw transport dictionaries never
+## reach presentation code, and no other script references a transport.
 ##
 ## Implementations, selected by the project setting `gameapi/implementation`
 ## (default `fake` so tests are hermetic):
@@ -53,6 +54,7 @@ const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
 const ResearchFlow = preload("res://scripts/units/research_flow.gd")
 const QuestFlow = preload("res://scripts/units/quest_flow.gd")
+const TutorialFlow = preload("res://scripts/progression/tutorial_flow.gd")
 const FakeApi = preload("res://scripts/gameapi/fake_api.gd")
 const LegacyV0Api = preload("res://scripts/gameapi/legacy_v0_api.gd")
 
@@ -161,6 +163,11 @@ var research_requests := 0
 ## counter exactly like `placement_requests`). Monotonic for the same reason:
 ## `configure()` swaps the implementation without hiding history.
 var quest_requests := 0
+## Number of tutorial intents this process has issued (tutorial flow contract:
+## exactly one per confirm, zero for every local refusal — the tutorial suite
+## snapshots this counter exactly like `placement_requests`). Monotonic for the
+## same reason: `configure()` swaps the implementation without hiding history.
+var tutorial_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -551,6 +558,52 @@ func advance_quest_town(user_id: String, action: String,
 	quest_requests += 1
 	var result: QuestFlow.QuestResult = await _impl.advance_quest_town(
 		user_id, action, addressing)
+	return result
+
+
+## One tutorial **step** intent (the save identity and the client-sent step, and
+## NOTHING else) from the selected implementation.
+##
+## The contract carries **no** completion flag, **no** reward, **no** resource
+## vector, **no** price, and **no** outcome: the service derives the gate from the
+## committed expression, derives the `complete_tutorial` command, and executes the
+## unchanged legacy branch (`command.py:60-66`) with a NEUTRAL vector
+## (tutorial design D2/D4/D5) — so a client-supplied flag, vector, amount, or
+## price is ignored exactly as a client-supplied amount or price is ignored
+## elsewhere, and the typed result's `tutorial`, `gate`, `changed`, and
+## `resources` are **authoritative** (design D8).
+##
+## The step is **intent**: the legacy server owns the gate, so a client that
+## guesses the thresholds wrong is refused by the service rather than believed.
+## The response's post-execution proof is two-part — the changed-leaf list must be
+## exactly the single flag leaf for a dispatched completion and **empty** for
+## either no-op, and **every stored resource must be unchanged**, because a
+## tutorial completion moves none.
+##
+## **No step, ratio, remaining time, or total step count is reported** (design
+## D1): the legacy `tutorial_step` is a branch-local and is never persisted, so
+## the save carries no progress position and deriving one would fabricate it.
+## **No reward is reported**, and none is committed. **No bounds are reported**:
+## the legacy gate has no upper bound, no lower bound, and no type check
+## (design D7), and adding one would be an invented rule — authoritative
+## validation belongs to Server v1 / M13.
+##
+## The **deliberate divergence** is confined to failure handling: `"15"`, a
+## missing argument, and `null` each raise in the legacy server and escape as
+## HTTP 500, and this line answers each with a named refusal instead. A crash is
+## not a behaviour. Every accepted step's **state transition** is reproduced
+## exactly.
+##
+## Structured service errors pass through with their original codes — notably
+## `invalid_step`, `missing_step`, `null_step`, and
+## `unresolvable_tutorial_state`, plus `missing_user_id`, `invalid_user_id`,
+## `unknown_user_id`, `invalid_payload`, and `internal_error`; transport failures
+## keep the boot failure rules, never a partial payload.
+func complete_tutorial_town(user_id: String,
+		step: int) -> TutorialFlow.TutorialResult:
+	tutorial_requests += 1
+	var result: TutorialFlow.TutorialResult = await _impl.complete_tutorial_town(
+		user_id, step)
 	return result
 
 

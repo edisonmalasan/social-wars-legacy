@@ -1,0 +1,17 @@
+{
+  "body_bytes": 207,
+  "body_sha256": "2de230237d9f4055670576b9485897dbc06581889ca90527504cbdbd4933ec01",
+  "captured_at_utc": "2026-10-02T22:58:46+00:00",
+  "headers": {
+    "Connection": "close",
+    "Content-Length": "207",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 02 Oct 2026 22:58:46 GMT",
+    "Location": "/play.html",
+    "Server": "Werkzeug/2.2.3 Python/3.9.13",
+    "Set-Cookie": "<redacted>",
+    "Vary": "Cookie"
+  },
+  "reason": "FOUND",
+  "status": 302
+}

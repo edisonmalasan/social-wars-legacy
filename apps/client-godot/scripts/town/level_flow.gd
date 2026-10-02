@@ -80,9 +80,18 @@ extends RefCounted
 ## `neighbors` / `inventory_qte` requirements received (design D7).
 ##
 ## **Unit experience** (`add_xp_unit`, which writes `attr["xp"]` on an item row)
-## and **tutorial progression** (`complete_tutorial`) are out of scope: the
-## committed corpus carries no unit placements and no row carrying
-## `attr["xp"]`, so the path cannot be exercised (design D7). The **disagreement
+## is out of scope: the committed corpus carries no unit placements and no row
+## carrying `attr["xp"]`, so the path cannot be exercised (design D7).
+##
+## **Tutorial progression is NO LONGER out of scope** — an earlier revision of
+## this module said it was, and that was true only while the line was undelivered.
+## `complete_tutorial` is delivered by the `tutorial` line (M9 line 3) in
+## `scripts/progression/tutorial_flow.gd`, against the **same** committed
+## fresh-player corpus, because that branch writes a save-level flag and needs no
+## unit row: the corpus records `playerInfo.completed_tutorial = 0`, so the
+## `0 -> 1` transition is exercisable exactly once per disposable copy. Nothing
+## about the level contract changes, and `level_flow.gd` still derives no tutorial
+## figure. The **disagreement
 ## is reported and never reconciled**: the recorded level is unverified against
 ## the curve, so no helper here writes it, prefers one value, or normalises the
 ## save (design D2). Server-authoritative validation beyond the service's own
@@ -834,10 +843,13 @@ const NON_CLAIMS := [
 	"no level reward is paid and none is displayed, because no legacy branch "
 		+ "reads the committed reward fields: paying one would invent an "
 		+ "economy",
-	"unit experience (add_xp_unit) and tutorial progression (complete_tutorial) "
-		+ "are out of scope because the committed corpus cannot exercise them: "
-		+ "0 of the 40 placed rows carry attr[\"xp\"] and the fresh save has no "
-		+ "unit placements",
+	"unit experience (add_xp_unit) is out of scope because the committed corpus "
+		+ "cannot exercise it: 0 of the 40 placed rows carry attr[\"xp\"] and the "
+		+ "fresh save has no unit placements. Tutorial progression is NOT out of "
+		+ "scope: the `tutorial` line delivers it in "
+		+ "scripts/progression/tutorial_flow.gd, against this same corpus, because "
+		+ "complete_tutorial writes the save-level playerInfo.completed_tutorial "
+		+ "flag and needs no unit row",
 	"the committed exp_required thresholds are preserved verbatim: nothing is "
 		+ "rebalanced, smoothed, or interpolated",
 	"the recorded-versus-derived disagreement is REPORTED and deliberately "

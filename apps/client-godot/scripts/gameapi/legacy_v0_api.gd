@@ -20,6 +20,7 @@ const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
 const ResearchFlow = preload("res://scripts/units/research_flow.gd")
 const QuestFlow = preload("res://scripts/units/quest_flow.gd")
+const TutorialFlow = preload("res://scripts/progression/tutorial_flow.gd")
 
 ## Loopback default: the v0 service binds 127.0.0.1 only (design D3).
 const DEFAULT_ENDPOINT := "http://127.0.0.1:5056"
@@ -40,6 +41,7 @@ const COLLECTION_PATH := "/v0/collection"
 const RESURRECT_PATH := "/v0/resurrect"
 const RESEARCH_PATH := "/v0/research"
 const QUEST_PATH := "/v0/quests"
+const TUTORIAL_PATH := "/v0/tutorial"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -612,6 +614,59 @@ func advance_quest_town(user_id: String, action: String,
 			str(outcome.get("code", "bad_response")),
 			str(outcome.get("message", "")))
 	return QuestFlow.parse_result(outcome.get("payload"))
+
+
+## One tutorial **step** intent over loopback HTTP: the client sends the save
+## identity and the client-sent step, and NOTHING else — exactly TWO keys. No
+## completion flag, no reward, no vector, no price, and no outcome can be sent, so
+## there is no channel through which a client could dictate a result: the service
+## derives the gate from the committed expression, derives the
+## `complete_tutorial` command, and executes the unchanged legacy branch with a
+## NEUTRAL vector (tutorial design D2/D5).
+##
+## The step is **intent**. The legacy server owns the gate, so a client that
+## guesses the thresholds wrong is refused by the service rather than believed.
+##
+## Any `completed_tutorial` / `flag` / `resources` / `vector` / `price` /
+## `reward` / `result` / `gate` key the service receives alongside the identity
+## is **ignored** server-side, exactly as the collect, expand, level-up, and
+## research routes ignore client-supplied amounts and prices.
+##
+## The response's post-execution proof is two-part: the changed-leaf list must be
+## exactly the single flag leaf for a dispatched completion and **empty** for
+## either no-op, and **every stored resource must be unchanged**, because a
+## tutorial completion moves none.
+##
+## **No step, ratio, remaining time, or total step count is reported** (design
+## D1): the legacy `tutorial_step` is a branch-local and is never persisted, so
+## the save carries no progress position and the typed parser **refuses** a
+## response claiming one. **No reward** is reported and none is committed
+## (design D6). **No bounds** are reported: the legacy gate has none, and adding
+## one would be an invented rule (design D7, Server v1 / M13).
+##
+## **The deliberate divergence is confined to failure handling**: `"15"`, a
+## missing argument, and `null` each raise in the legacy server and escape as
+## HTTP 500, and this line answers each with a named refusal instead. A crash is
+## not a behaviour. Every accepted step's state transition is reproduced exactly.
+##
+## Structured service errors pass through with their original codes — notably
+## `invalid_step`, `missing_step`, `null_step`, and
+## `unresolvable_tutorial_state`, and the shared `missing_user_id` /
+## `invalid_user_id` / `unknown_user_id` / `invalid_payload` /
+## `internal_error` family — all of which the client surfaces instead of
+## completing anything; transport failures keep the boot failure rules, never a
+## partial payload.
+func complete_tutorial_town(user_id: String,
+		step: int) -> TutorialFlow.TutorialResult:
+	var outcome := await _call("POST", TUTORIAL_PATH, JSON.stringify({
+		"user_id": user_id,
+		"step": step,
+	}))
+	if not outcome.get("ok", false):
+		return TutorialFlow.result_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return TutorialFlow.parse_result(outcome.get("payload"))
 
 
 ## every failure returns `{ok: false, code, message}` with the failure named.
