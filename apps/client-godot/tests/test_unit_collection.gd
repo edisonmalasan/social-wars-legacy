@@ -160,14 +160,37 @@ const FORBIDDEN_HELPERS := [
 ## scans every source file for their literal forms; the strings are matched
 ## against the modules' **declarations only**, so the recorded contract text may
 ## still name them.
+##
+## The storage command token was REMOVED from this list and is no longer scanned
+## tree-wide, because it is no longer absent. `godot-stored-item-placement`
+## delivered the storage-to-map round trip: the committed corpus's storage is
+## exactly where that collection line's grant lands, and the grant was always the
+## missing second half. See `STORAGE_ROUND_TRIP_OWNERSHIP` below for the claim
+## that REPLACED the absence, and `STORAGE_ROUND_TRIP_SUITE` for the tree-wide
+## owner of the now-true absence claim.
 const BEHAVIOUR_NEEDLES := [
 	"collection_in" + "come", "collection_pay" + "out",
 	"collection_re" + "ward", "collection_" + "cap",
 	"collection_thresh" + "old", "collection_lim" + "it",
 	"collection_award", "collection_eligib", "is_collection_el" + "igible",
 	"check_collection_el" + "igibility", "unit_collection_in" + "come",
-	"unit_collection_pay" + "out", "place_sto" + "red_item",
+	"unit_collection_pay" + "out",
 ]
+## The storage command token this line used to require to be absent tree-wide,
+## assembled from fragments so the project-scope suite cannot be tripped by this
+## file's own constant.
+const STORAGE_ROUND_TRIP_TOKEN := "place_sto" + "red_item"
+## The suite that OWNS the storage round trip, and therefore the tree-wide
+## ownership claim over the token. This line does not duplicate that list: two
+## suites scanning the same tree for the same token with two hand-maintained
+## owner lists is exactly the drift this project records against, and the owner
+## suite already asserts both that only its files name the token and that each
+## named owner is a real source.
+const STORAGE_ROUND_TRIP_SUITE := "res://tests/test_stored_item_placement.gd"
+const STORAGE_ROUND_TRIP_MODULE := "res://scripts/units/stored_item_flow.gd"
+## Recorded here so the report and this line's evidence name the line that owns
+## the round trip rather than leaving the reader to find it.
+const STORAGE_ROUND_TRIP_OWNERSHIP := "godot-stored-item-placement"
 ## The same needles scanned over the WHOLE client source tree, which is the
 ## structural form of "no client source derives an income, a cap, a threshold,
 ## an experience award, or an eligibility check".
@@ -1235,6 +1258,35 @@ func _check_boundary() -> void:
 			check(not code.contains(needle),
 				"%s declares no '%s' helper: the legacy server has no such rule"
 					% [source, needle])
+	# The token this line used to require to be absent everywhere is DELIVERED
+	# now (`godot-stored-item-placement`), so the tree-wide absence is FALSE and
+	# asserting it would assert something untrue at exactly the moment the line
+	# that made it untrue landed. It is replaced by a claim that is both true and
+	# this line's own: the two modules THIS line delivers still declare no storage
+	# command, because a collection grant must not grow a placement -- and the
+	# round trip itself is owned elsewhere, recorded here rather than assumed.
+	var sources := _client_sources()
+	for source: String in [DELIVERED_PRIZE_SCRIPT, DELIVERED_FLOW_SCRIPT]:
+		var code := _code_only(FileAccess.get_file_as_string(source))
+		check(not code.contains(STORAGE_ROUND_TRIP_TOKEN),
+			"%s declares no storage command: the collection grant does not "
+			% source + "place, the owned round trip does")
+	check(FileAccess.file_exists(STORAGE_ROUND_TRIP_SUITE),
+		"the suite that owns the storage round trip exists")
+	check(FileAccess.file_exists(STORAGE_ROUND_TRIP_MODULE),
+		"the module that owns the storage round trip exists")
+	check_eq(STORAGE_ROUND_TRIP_OWNERSHIP, "godot-stored-item-placement",
+		"this line names the deliver line that owns the storage round trip")
+	# And the owning suite really does carry the tree-wide ownership claim that
+	# replaced the absence, so the removal above is not a silent hole: it is a
+	# hand-off, and this asserts the hand-off's recipient and that it asserts it.
+	var owner_code := _code_only(
+		FileAccess.get_file_as_string(STORAGE_ROUND_TRIP_SUITE))
+	check(owner_code.contains("STORAGE_OWNERS"),
+		"the owning suite carries the storage-ownership list that replaced the "
+		+ "tree-wide absence this line deleted")
+	var sources_count := sources.size()
+	check(sources_count > 0, "the client source tree is walkable")
 	# The delivered modules name no node, a clock, a request, or a transport.
 	for source: String in [DELIVERED_PRIZE_SCRIPT, DELIVERED_FLOW_SCRIPT]:
 		var body := FileAccess.get_file_as_string(source)

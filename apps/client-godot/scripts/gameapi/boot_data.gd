@@ -1399,7 +1399,354 @@ static func _collection_error(envelope: Dictionary) -> CollectionResult:
 	return collection_failure(code, message)
 
 
-## Parses any v0 session envelope — success or structured error — into the
+## The typed result of ONE stored-item placement intent.
+##
+## Every server-owned value on this record comes from the **response**, never
+## from a client-side recomputation (stored-item-placement design D3): the map
+## slot, the row instant, the garrison, the player team, and the attribute bag
+## are all derived by the service, and a wrong client-side derivation must not
+## be able to compound silently.
+class StoredPlacementResult:
+	extends RefCounted
+	var ok := false
+	var protocol := ""
+	## Wall-clock seconds the legacy server stamped into row slot 3 (a
+	## time-dependent field, so tests assert positivity, never a fixed value).
+	var server_time := 0
+	## The legacy result string ("success"); "" on failure.
+	var result := ""
+	## The stored item id the intent named, echoed exactly as sent.
+	var item_id := -1
+	## The **derived** map slot: the smallest positive integer absent from the
+	## map's placements. The client never sends one.
+	var map_key := -1
+	var x := -1
+	var y := -1
+	var orientation := 0
+	## The placed row, all eight slots, verbatim from the response.
+	var row: Array = []
+	## The four server-owned slots, read out of `row` for convenience.
+	var garrison: Array = []
+	var attr: Dictionary = {}
+	var player := 1
+	## For each key the bag carries, the committed field it came from. Empty for
+	## a unit, which is always `{}`.
+	var attr_derived_from: Array = []
+	## The named rule that produced the slot, echoed from the response.
+	var slot_rule := ""
+	## The two-part post-execution proof, reported by the service.
+	var consumed := 1
+	var count_before := 0
+	var count_after := 0
+	## The ledger before and after, and whether it gained the id. `false` is a
+	## real outcome, not an error: `bought_unit_add` is append-if-absent.
+	var ledger_before: Array = []
+	var ledger_after: Array = []
+	var ledger_gained := false
+	## Whether the service reported a credit. Always `false` and asserted so:
+	## placing a stored item is free.
+	var credited := false
+	## Whether the service reported the geometry gap rather than a bound. Always
+	## `false`: bounds are recorded, not refused.
+	var bounds_refused := false
+	var cell_occupancy_refused := false
+	## The recorded geometry note, echoed so the flow can show why an
+	## out-of-range cell was accepted.
+	var geometry_note := ""
+	## The named refusal the service applied, when one did.
+	var refusal := ""
+	var resources: Resources = null
+	var error_code := ""
+	var error_message := ""
+
+
+## Structured failure for the placement intent (never a partial payload).
+static func stored_placement_failure(code: String,
+		message: String) -> StoredPlacementResult:
+	var result := StoredPlacementResult.new()
+	result.ok = false
+	result.error_code = code
+	result.error_message = message
+	return result
+
+
+## Parses a v0 stored-placement envelope - success or structured error - into
+## the typed result, fail-closed in BOTH directions (spec "A structured failure
+## carries no partial payload").
+##
+## The rules mirror `parse_collection()`: the envelope must be a JSON object
+## reporting `ok: true`, the protocol must be the v0 one, the legacy result
+## string must be `success`, `placement` must carry an integer item id, a
+## non-negative map key, and integer coordinates, `row` must carry an eight-slot
+## row with an object bag and a list garrison, both ledgers must be arrays, and
+## `resources` must be the seven non-negative integers every response carries.
+##
+## The response is the AUTHORITATIVE record: the flow applies `map_key`, `row`,
+## `attr`, `player`, and `resources` **verbatim** and discards its own
+## expectations even where the two disagree.
+static func parse_stored_placement(payload: Variant) -> StoredPlacementResult:
+	if not (payload is Dictionary):
+		return stored_placement_failure("bad_response",
+			"response is not a JSON object")
+	var envelope: Dictionary = payload
+	if envelope.get("ok") != true:
+		return _stored_placement_error(envelope)
+	if str(envelope.get("protocol", "")) != PROTOCOL:
+		return stored_placement_failure("protocol_mismatch",
+			"expected protocol %s, got %s" % [PROTOCOL,
+				str(envelope.get("protocol"))])
+	if str(envelope.get("result", "")) != "success":
+		return stored_placement_failure("bad_response",
+			"placement response did not report the legacy success result")
+	var placement: Variant = envelope.get("placement")
+	var row_block: Variant = envelope.get("row")
+	if not (placement is Dictionary) or not (row_block is Dictionary):
+		return stored_placement_failure("bad_response",
+			"placement response carries no placement or row object")
+	var typed_placement: Dictionary = placement
+	var typed_row: Dictionary = row_block
+	var result := StoredPlacementResult.new()
+	result.ok = true
+	result.protocol = PROTOCOL
+	result.result = "success"
+	var item_id: Variant = _parse_int(typed_placement.get("item_id"))
+	var map_key: Variant = _parse_int(typed_placement.get("map_key"))
+	var cell_x: Variant = _parse_int(typed_placement.get("x"))
+	var cell_y: Variant = _parse_int(typed_placement.get("y"))
+	var orientation: Variant = _parse_int(typed_placement.get("orientation"))
+	if item_id == null or int(item_id) < 0:
+		return stored_placement_failure("bad_response",
+			"placement response carries no integer item_id")
+	if map_key == null or int(map_key) < 0:
+		return stored_placement_failure("bad_response",
+			"placement response carries no non-negative derived map_key")
+	if cell_x == null or cell_y == null or orientation == null:
+		return stored_placement_failure("bad_response",
+			"placement response carries no integer cell or orientation")
+	result.item_id = int(item_id)
+	result.map_key = int(map_key)
+	result.x = int(cell_x)
+	result.y = int(cell_y)
+	result.orientation = int(orientation)
+	result.slot_rule = str(typed_placement.get("slot_rule", ""))
+	var slots: Variant = typed_row.get("slots")
+	if not (slots is Array) or (slots as Array).size() != 8:
+		return stored_placement_failure("bad_response",
+			"placement response's row is not an eight-slot row")
+	result.row = slots
+	var attr: Variant = typed_row.get("attr")
+	var garrison: Variant = typed_row.get("store")
+	if not (attr is Dictionary) or not (garrison is Array):
+		return stored_placement_failure("bad_response",
+			"placement response's row carries no object bag or list garrison")
+	# The JSON transport widens legacy ints to floats, so the bag and garrison
+	# are canonicalized for the same reason every other row is.
+	result.attr = _canonicalize(attr) as Dictionary
+	result.garrison = _canonicalize(garrison) as Array
+	var player: Variant = _parse_int(typed_row.get("player"))
+	if player == null:
+		return stored_placement_failure("bad_response",
+			"placement response's row carries no integer player team")
+	result.player = int(player)
+	var derived: Variant = typed_row.get("attr_derived_from")
+	if derived is Array:
+		result.attr_derived_from = derived
+	var quantity: Variant = envelope.get("quantity")
+	if quantity is Dictionary:
+		var consumed: Variant = _parse_int((quantity as Dictionary).get("consumed"))
+		var before: Variant = _parse_int((quantity as Dictionary).get("count_before"))
+		var after: Variant = _parse_int((quantity as Dictionary).get("count_after"))
+		if consumed == null or before == null or after == null:
+			return stored_placement_failure("bad_response",
+				"placement response carries an unreadable quantity block")
+		result.consumed = int(consumed)
+		result.count_before = int(before)
+		result.count_after = int(after)
+	var ledger_before: Variant = envelope.get("ledger_before")
+	var ledger_after: Variant = envelope.get("ledger_after")
+	if not (ledger_before is Array) or not (ledger_after is Array):
+		return stored_placement_failure("bad_response",
+			"placement response carries unreadable ledgers")
+	result.ledger_before = ledger_before
+	result.ledger_after = ledger_after
+	result.ledger_gained = result.ledger_after.size() > result.ledger_before.size() \
+		and result.ledger_after.has(result.item_id)
+	var geometry: Variant = envelope.get("geometry")
+	if geometry is Dictionary:
+		result.bounds_refused = bool((geometry as Dictionary).get("bounds_refused", false))
+		result.cell_occupancy_refused = bool(
+			(geometry as Dictionary).get("cell_occupancy_refused", false))
+		result.geometry_note = str((geometry as Dictionary).get("note", ""))
+	result.server_time = _parse_epoch(envelope.get("server_time"))
+	if result.server_time < 0:
+		return stored_placement_failure("bad_response",
+			"server_time is not a number")
+	var resources_raw: Variant = envelope.get("resources")
+	if not (resources_raw is Dictionary):
+		return stored_placement_failure("bad_response",
+			"placement response carries no resources object")
+	result.resources = _parse_resources(resources_raw)
+	if result.resources == null:
+		return stored_placement_failure("bad_response",
+			"placement resources are not seven non-negative integers")
+	return result
+
+
+## The typed result of ONE stored-item sale intent.
+##
+## `credited` is read from the response and never assumed, and the flow presents
+## the sale as crediting nothing because the legacy branch's entire effect is one
+## store key disappearing (stored-item-placement design D5).
+class StoredSaleResult:
+	extends RefCounted
+	var ok := false
+	var protocol := ""
+	var server_time := 0
+	var result := ""
+	var item_id := -1
+	## Always `false` on a correct service: a sale credits nothing.
+	var credited := false
+	var refund := 0
+	var consumed := 1
+	var count_before := 0
+	var count_after := 0
+	## Whether the ledger was left untouched, which a sale always does.
+	var ledger_untouched := false
+	var ledger_before: Array = []
+	var ledger_after: Array = []
+	var storage_before: Dictionary = {}
+	var storage_after: Dictionary = {}
+	var quantity_rule := ""
+	var resources: Resources = null
+	var refusal := ""
+	var error_code := ""
+	var error_message := ""
+
+
+## Structured failure for the sale intent (never a partial payload).
+static func stored_sale_failure(code: String, message: String) -> StoredSaleResult:
+	var result := StoredSaleResult.new()
+	result.ok = false
+	result.error_code = code
+	result.error_message = message
+	return result
+
+
+## Parses a v0 stored-sale envelope - success or structured error - into the
+## typed result, fail-closed in both directions.
+##
+## The rules mirror `parse_stored_placement()`: the envelope must report
+## `ok: true`, the v0 protocol, and the legacy success result; `sale` must carry
+## an integer item id; both ledgers must be arrays; both storage views must be
+## mappings; and `resources` must be the seven non-negative integers.
+static func parse_stored_sell(payload: Variant) -> StoredSaleResult:
+	if not (payload is Dictionary):
+		return stored_sale_failure("bad_response", "response is not a JSON object")
+	var envelope: Dictionary = payload
+	if envelope.get("ok") != true:
+		return _stored_sale_error(envelope)
+	if str(envelope.get("protocol", "")) != PROTOCOL:
+		return stored_sale_failure("protocol_mismatch",
+			"expected protocol %s, got %s" % [PROTOCOL,
+				str(envelope.get("protocol"))])
+	if str(envelope.get("result", "")) != "success":
+		return stored_sale_failure("bad_response",
+			"sale response did not report the legacy success result")
+	var sale: Variant = envelope.get("sale")
+	if not (sale is Dictionary):
+		return stored_sale_failure("bad_response",
+			"sale response carries no sale object")
+	var typed_sale: Dictionary = sale
+	var item_id: Variant = _parse_int(typed_sale.get("item_id"))
+	if item_id == null or int(item_id) < 0:
+		return stored_sale_failure("bad_response",
+			"sale response carries no integer item_id")
+	var result := StoredSaleResult.new()
+	result.ok = true
+	result.protocol = PROTOCOL
+	result.result = "success"
+	result.item_id = int(item_id)
+	result.credited = bool(typed_sale.get("credited", false))
+	var refund: Variant = typed_sale.get("refund")
+	var refund_int: Variant = _parse_int(refund)
+	result.refund = 0 if refund_int == null else int(refund_int)
+	result.quantity_rule = str(typed_sale.get("quantity_rule", ""))
+	var quantity: Variant = envelope.get("quantity")
+	if quantity is Dictionary:
+		var consumed: Variant = _parse_int((quantity as Dictionary).get("consumed"))
+		var before: Variant = _parse_int((quantity as Dictionary).get("count_before"))
+		var after: Variant = _parse_int((quantity as Dictionary).get("count_after"))
+		if consumed == null or before == null or after == null:
+			return stored_sale_failure("bad_response",
+				"sale response carries an unreadable quantity block")
+		result.consumed = int(consumed)
+		result.count_before = int(before)
+		result.count_after = int(after)
+	var ledger_before: Variant = envelope.get("ledger_before")
+	var ledger_after: Variant = envelope.get("ledger_after")
+	if not (ledger_before is Array) or not (ledger_after is Array):
+		return stored_sale_failure("bad_response",
+			"sale response carries unreadable ledgers")
+	result.ledger_before = ledger_before
+	result.ledger_after = ledger_after
+	result.ledger_untouched = JSON.stringify(ledger_before) == JSON.stringify(ledger_after)
+	var storage_before: Variant = envelope.get("storage_before")
+	var storage_after: Variant = envelope.get("storage_after")
+	if not (storage_before is Dictionary) or not (storage_after is Dictionary):
+		return stored_sale_failure("bad_response",
+			"sale response carries unreadable storage views")
+	result.storage_before = _canonicalize(storage_before) as Dictionary
+	result.storage_after = _canonicalize(storage_after) as Dictionary
+	result.server_time = _parse_epoch(envelope.get("server_time"))
+	if result.server_time < 0:
+		return stored_sale_failure("bad_response", "server_time is not a number")
+	var sale_resources_raw: Variant = envelope.get("resources")
+	if not (sale_resources_raw is Dictionary):
+		return stored_sale_failure("bad_response",
+			"sale response carries no resources object")
+	result.resources = _parse_resources(sale_resources_raw)
+	if result.resources == null:
+		return stored_sale_failure("bad_response",
+			"sale resources are not seven non-negative integers")
+	return result
+
+
+## The named refusal a structured storage error carries, read once so both
+## parsers agree on where it lives.
+static func _stored_refusal(envelope: Dictionary) -> String:
+	var error: Variant = envelope.get("error")
+	if error is Dictionary:
+		return str((error as Dictionary).get("code", ""))
+	return ""
+
+
+static func _stored_placement_error(envelope: Dictionary) -> StoredPlacementResult:
+	var code := "bad_response"
+	var message := "response reported failure without a structured error"
+	var error: Variant = envelope.get("error")
+	if error is Dictionary:
+		var typed: Dictionary = error
+		code = str(typed.get("code", code))
+		message = str(typed.get("message", message))
+	var result := stored_placement_failure(code, message)
+	result.refusal = _stored_refusal(envelope)
+	return result
+
+
+static func _stored_sale_error(envelope: Dictionary) -> StoredSaleResult:
+	var code := "bad_response"
+	var message := "response reported failure without a structured error"
+	var error: Variant = envelope.get("error")
+	if error is Dictionary:
+		var typed: Dictionary = error
+		code = str(typed.get("code", code))
+		message = str(typed.get("message", message))
+	var result := stored_sale_failure(code, message)
+	result.refusal = _stored_refusal(envelope)
+	return result
+
+
+## Parses any v0 session envelope - success or structured error - into the
 ## typed result. Shared by `FakeApi` (which synthesizes the envelope from the
 ## committed fixtures) and `LegacyV0Api` (which decodes the HTTP body).
 static func parse_save_list(payload: Variant) -> SaveListResult:

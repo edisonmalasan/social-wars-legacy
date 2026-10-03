@@ -1,0 +1,1158 @@
+{
+  "captured": {
+    "closes_unit_collection_followup": true,
+    "note": "A place_stored_item WAS captured, and this is the round trip the delivered unit-collection line recorded as a carried follow-up: complete_collection -> map['store'] -> place_stored_item -> a map row. The placement count grows 40 -> 41 across the recorded placement, unit 1085 appears on the map, and the id is written into boughtUnits",
+    "stored_item_placement": true
+  },
+  "cell_occupancy_gap": "CELL OCCUPANCY IS NOT CHECKED EITHER: no branch reads any neighbouring row and no committed content records a footprint-aware derivation, so a placement may overlap an existing row's cells. The 2x2 General Sculpture prize (136) and the 3x3 Fountain prize (106) need footprint-aware cell derivation, which is blocked on the same M6 gap; this line ships on the 1x1 Metal Draggy prize and records the rest",
+  "changed_leaf_correction": {
+    "cause": "the committed investigation seeded with store_add_items, which calls bought_unit_add in the SAME batch (command.py:264), so its ledger already held the id and the placement's own append-if-absent (command.py:246; engine.py:86-89) left the ledger alone. Seeding with the CONTENT-DERIVED complete_collection instead -- which appends to privateState['collections'] and never to boughtUnits -- makes that third write observable. The number is therefore THREE for the whole document and TWO at map scope, and no conclusion of the investigation changes",
+    "measured": [
+      "/maps/0/items/41",
+      "/maps/0/store/1085",
+      "/privateState/boughtUnits"
+    ],
+    "measured_map_scoped": [
+      "/maps/0/items/41",
+      "/maps/0/store/1085"
+    ],
+    "task_text_predicted": "exactly two leaves, the new row and the store key"
+  },
+  "cleanup": {
+    "disposable_removed_before_manifest_write": true,
+    "server_stopped_within_run": true
+  },
+  "containment": {
+    "disposable_copy_removed": true,
+    "fixture_output": "tests/fixtures/godot-stored-item-placement",
+    "identical": true,
+    "loopback_only": true,
+    "method": "SHA-256 snapshot of every read working-tree group before the run and after the server stopped; equal or the run fails before writing fixtures. The sixteen already committed fixture directories are digest-pinned for the same reason.",
+    "no_flash_browser_external_network": true,
+    "only_working_tree_writes": "fixture files under --out",
+    "post_combined_sha256": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "post_run": {
+      "config": {
+        "exists": true,
+        "files": 12,
+        "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+      },
+      "mods": {
+        "exists": true,
+        "files": 2,
+        "sha256": "81b3c6e1f426e8813d96028b9035a853c1fbff8716256e84e956d8826f136ba3"
+      },
+      "root_python": {
+        "exists": true,
+        "files": 11,
+        "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+      },
+      "saves": {
+        "exists": false,
+        "files": 0,
+        "sha256": "absent"
+      },
+      "templates": {
+        "exists": true,
+        "files": 19,
+        "sha256": "2dffe0ca8746b63cf64fd1062a7f259ba2bb85a2fc54f7a2cd2bd2564ffee4ef"
+      },
+      "tests/saves": {
+        "exists": true,
+        "files": 3,
+        "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+      },
+      "villages": {
+        "exists": true,
+        "files": 31,
+        "sha256": "92429a07402766d8183b16fb32178b5c51f1e555df69d3cb46085a7d977f96ea"
+      }
+    },
+    "pre_combined_sha256": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "pre_run": {
+      "config": {
+        "exists": true,
+        "files": 12,
+        "sha256": "5df37cf10585332c4702196e28c0dbbd55c731e816199eba5c1b06488d5ff5cc"
+      },
+      "mods": {
+        "exists": true,
+        "files": 2,
+        "sha256": "81b3c6e1f426e8813d96028b9035a853c1fbff8716256e84e956d8826f136ba3"
+      },
+      "root_python": {
+        "exists": true,
+        "files": 11,
+        "sha256": "05bd403409a52c6f5927b9c3afd3f910b2e3818f1e3299d0701eee92b38e9e40"
+      },
+      "saves": {
+        "exists": false,
+        "files": 0,
+        "sha256": "absent"
+      },
+      "templates": {
+        "exists": true,
+        "files": 19,
+        "sha256": "2dffe0ca8746b63cf64fd1062a7f259ba2bb85a2fc54f7a2cd2bd2564ffee4ef"
+      },
+      "tests/saves": {
+        "exists": true,
+        "files": 3,
+        "sha256": "a528533419993e919fcbf4cc5ae652e02e0c992d4c75f514a54918a0b8da6302"
+      },
+      "villages": {
+        "exists": true,
+        "files": 31,
+        "sha256": "92429a07402766d8183b16fb32178b5c51f1e555df69d3cb46085a7d977f96ea"
+      }
+    },
+    "protected_fixtures": {
+      "identical": true,
+      "paths": [
+        "tests/fixtures/godot-compatibility-boot",
+        "tests/fixtures/godot-building-placement",
+        "tests/fixtures/godot-item-purchase",
+        "tests/fixtures/godot-building-move",
+        "tests/fixtures/godot-building-sell",
+        "tests/fixtures/godot-building-store",
+        "tests/fixtures/godot-building-upgrade",
+        "tests/fixtures/godot-building-construction",
+        "tests/fixtures/godot-building-collect",
+        "tests/fixtures/godot-building-expand",
+        "tests/fixtures/godot-building-xp",
+        "tests/fixtures/godot-unit-queues",
+        "tests/fixtures/godot-unit-collection",
+        "tests/fixtures/godot-research",
+        "tests/fixtures/godot-quests",
+        "tests/fixtures/godot-tutorial"
+      ],
+      "post_run": {
+        "godot-building-collect": {
+          "exists": true,
+          "files": 12,
+          "sha256": "c2ebf3b0778a994e97310b5247809fda57b940cb04b1d1215db787dd81009fa8"
+        },
+        "godot-building-construction": {
+          "exists": true,
+          "files": 12,
+          "sha256": "8efdebcf8e5b91251a48f17d840380da8cd48ea33a922656c67acb115d3c3751"
+        },
+        "godot-building-expand": {
+          "exists": true,
+          "files": 12,
+          "sha256": "08829b34c70979ffd8e887e98bb77d5d6b53774817b393f6388795ff5eb98d19"
+        },
+        "godot-building-move": {
+          "exists": true,
+          "files": 12,
+          "sha256": "b3c477a7947fbe409330f03a8658cdca707a2631b52d1d4c5127f440619799c1"
+        },
+        "godot-building-placement": {
+          "exists": true,
+          "files": 12,
+          "sha256": "546a5f00e5e45319ffd17f5ee67201dd2b72cb21de833a3e35e8a9a98d60c5a8"
+        },
+        "godot-building-sell": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fa85af3fb12ef8b9298203a64632b6d7b31c1ed48f8d1ba716151f25ec7ab1c4"
+        },
+        "godot-building-store": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d4dff84132353a60e3a005c42d067185772ec8d6a2548ffdc5aa4779a2055194"
+        },
+        "godot-building-upgrade": {
+          "exists": true,
+          "files": 12,
+          "sha256": "398675ad94928dd75f7fbcd9f62e082d73ee973d3c973f5bbdf44a083a9c0521"
+        },
+        "godot-building-xp": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fd7d9f43e05a4b858fb5aa2589094fe19c9e1ec0340adedb2645e15ad9ef3b50"
+        },
+        "godot-compatibility-boot": {
+          "exists": true,
+          "files": 31,
+          "sha256": "4d389707e0f18676fb23b3a2a8a47031b4e233366e4066437f8bad6854e15234"
+        },
+        "godot-item-purchase": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d05e5b92b26a1222774bb32e76a42417c692e65ee1b87abdb8a2f4e6cd84e813"
+        },
+        "godot-quests": {
+          "exists": true,
+          "files": 36,
+          "sha256": "612529681b94555e688c8a34720535c44381b8ac4c1f1eb094776a6eff3efdf3"
+        },
+        "godot-research": {
+          "exists": true,
+          "files": 46,
+          "sha256": "692543932171c0233abd6a2e154a4b50bfd34e6e0391c9c2baddb66ccc8684d2"
+        },
+        "godot-tutorial": {
+          "exists": true,
+          "files": 27,
+          "sha256": "6242e7ee455ce92ab6f72a768ecd264eaeb17288044f5172d6a2a1dc6dd95712"
+        },
+        "godot-unit-collection": {
+          "exists": true,
+          "files": 12,
+          "sha256": "b78f97495cba8f99118007bdf3e4b6aa44f8f89de03909385cf24740bc416036"
+        },
+        "godot-unit-queues": {
+          "exists": true,
+          "files": 17,
+          "sha256": "7f506cb0863a4eea2d33a23ffa792277875adb89665177646b1a186a65f6c551"
+        }
+      },
+      "pre_run": {
+        "godot-building-collect": {
+          "exists": true,
+          "files": 12,
+          "sha256": "c2ebf3b0778a994e97310b5247809fda57b940cb04b1d1215db787dd81009fa8"
+        },
+        "godot-building-construction": {
+          "exists": true,
+          "files": 12,
+          "sha256": "8efdebcf8e5b91251a48f17d840380da8cd48ea33a922656c67acb115d3c3751"
+        },
+        "godot-building-expand": {
+          "exists": true,
+          "files": 12,
+          "sha256": "08829b34c70979ffd8e887e98bb77d5d6b53774817b393f6388795ff5eb98d19"
+        },
+        "godot-building-move": {
+          "exists": true,
+          "files": 12,
+          "sha256": "b3c477a7947fbe409330f03a8658cdca707a2631b52d1d4c5127f440619799c1"
+        },
+        "godot-building-placement": {
+          "exists": true,
+          "files": 12,
+          "sha256": "546a5f00e5e45319ffd17f5ee67201dd2b72cb21de833a3e35e8a9a98d60c5a8"
+        },
+        "godot-building-sell": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fa85af3fb12ef8b9298203a64632b6d7b31c1ed48f8d1ba716151f25ec7ab1c4"
+        },
+        "godot-building-store": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d4dff84132353a60e3a005c42d067185772ec8d6a2548ffdc5aa4779a2055194"
+        },
+        "godot-building-upgrade": {
+          "exists": true,
+          "files": 12,
+          "sha256": "398675ad94928dd75f7fbcd9f62e082d73ee973d3c973f5bbdf44a083a9c0521"
+        },
+        "godot-building-xp": {
+          "exists": true,
+          "files": 12,
+          "sha256": "fd7d9f43e05a4b858fb5aa2589094fe19c9e1ec0340adedb2645e15ad9ef3b50"
+        },
+        "godot-compatibility-boot": {
+          "exists": true,
+          "files": 31,
+          "sha256": "4d389707e0f18676fb23b3a2a8a47031b4e233366e4066437f8bad6854e15234"
+        },
+        "godot-item-purchase": {
+          "exists": true,
+          "files": 12,
+          "sha256": "d05e5b92b26a1222774bb32e76a42417c692e65ee1b87abdb8a2f4e6cd84e813"
+        },
+        "godot-quests": {
+          "exists": true,
+          "files": 36,
+          "sha256": "612529681b94555e688c8a34720535c44381b8ac4c1f1eb094776a6eff3efdf3"
+        },
+        "godot-research": {
+          "exists": true,
+          "files": 46,
+          "sha256": "692543932171c0233abd6a2e154a4b50bfd34e6e0391c9c2baddb66ccc8684d2"
+        },
+        "godot-tutorial": {
+          "exists": true,
+          "files": 27,
+          "sha256": "6242e7ee455ce92ab6f72a768ecd264eaeb17288044f5172d6a2a1dc6dd95712"
+        },
+        "godot-unit-collection": {
+          "exists": true,
+          "files": 12,
+          "sha256": "b78f97495cba8f99118007bdf3e4b6aa44f8f89de03909385cf24740bc416036"
+        },
+        "godot-unit-queues": {
+          "exists": true,
+          "files": 17,
+          "sha256": "7f506cb0863a4eea2d33a23ffa792277875adb89665177646b1a186a65f6c551"
+        }
+      }
+    },
+    "working_tree_saves_unchanged": true
+  },
+  "corpus": {
+    "login_preserved_seed": true,
+    "pid": "00000000-0000-4000-8000-000000000001",
+    "seed": {
+      "file_sha256": "25df5b5a665b5eb07a88af1ea8179f0416fa0078cfaac8dd4b8749a3762643f5",
+      "path": "tests/saves/fresh-player.json",
+      "saves_group_sha256_before_server_start": "c19bc80649512e3fdcb167da0158d14047c582cec740c62b6636456914d039b6"
+    },
+    "seeded_as": "saves/<pid>.save.json in the disposable copy",
+    "startup_preserved_seed": true
+  },
+  "executed_at_utc": "2026-10-03T21:59:08+00:00",
+  "exit_code": 0,
+  "geometry_gap": "GRID BOUNDS AND CELL OCCUPANCY ARE RECORDED, NOT REFUSED. place_stored_item [43, 1085, 250, -3, ...] stored (250, -3) verbatim and `item_index` 999999 became a map key (probe 2 #8 and #10). That is the ALREADY-RECORDED M6 tile-to-cell geometry gap: bounds and occupancy are client-side rules with no server-authoritative validation anywhere in the legacy source. Closing it needs new EVIDENCE, not a derivation, and inventing a 0..99 bound here would fabricate a rule the oracle does not have. `slot_occupied` is not a contradiction of this: it destroys an EXISTING row and is invisible to any count-based check, which is a different and more serious failure than an out-of-range coordinate that damages nothing. building-move, building-sell and building-store all made the same call for the same reason. NO BOUNDS HELPER EXISTS IN THIS MODULE, and the suites assert that absence mechanically",
+  "interpreter": {
+    "executable": "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+    "requirement": "CPython 3.9.x (pinned baseline for this change)",
+    "version": "3.9.13 (tags/v3.9.13:6de2ca5, May 17 2022, 16:36:42) [MSC v.1929 64 bit (AMD64)]"
+  },
+  "invocation": "python -B apps/compat-api/capture_stored_placement_fixture.py",
+  "no_capacity_rule": "NO CAPACITY, EXPIRY, VALUE, OR PRICE RULE EXISTS. The committed save records storage as plain {item id: count} integers with no limit, no expiry, and no ownership rule anywhere in the committed configuration, and the legacy server has no capacity check on this path. Storage is NOT a purchase inventory and no entry carries a refund",
+  "no_stock_rule": "`store_add_items` (command.py:258-266) is OUT OF SCOPE: it is an unvalidated client-sent item id list that grants into storage, which `godot-unit-production` already recorded as an acquisition anti-pattern. It is used in the fixture's PROBES only as a seeding device and is delivered not at all, so the fixture's own precondition is established by the content-derived `complete_collection` instead",
+  "placement": {
+    "attr": [],
+    "attr_derived_from": [],
+    "attr_rule": "attr is a PURE FUNCTION of two committed item fields and never a client input: `si` (an empty friend-assist list) when properties.friend_assistable > 0, and `nc` (a build-click counter seeded at zero) when clicks_to_build > 0. The port is exact -- `map_add_item` reads properties through get_attribute_from_item_id and then json.loads it, tests TRUTHINESS of the raw string first (so an empty properties blob yields no `si`), and only then tests int() > 0 on each value. NO DERIVATION FUNCTION IN THIS MODULE ACCEPTS AN `attr`, A `player`, OR A `price` PARAMETER: derive_attr, expected_row, divergence_place and build_place_envelope all take the two committed FIELDS and derive the bag, so even the post-execution proof cannot be handed a bag and satisfied with it. The only two permitted exceptions are read-only comparisons -- attr_derived_from, the named INVERSE, which reports on a bag rather than producing one, and expected_storage_after's single quantity argument, whose default is this module's own QUANTITY constant and never a client value -- so 'the client cannot dictate the row's bag, its team, or any price' is MECHANICAL rather than a promise",
+    "cell": [
+      58,
+      47
+    ],
+    "changed_leaves": [
+      "/maps/0/items/41",
+      "/maps/0/store/1085",
+      "/privateState/boughtUnits"
+    ],
+    "changed_map_leaves": [
+      "/maps/0/items/41",
+      "/maps/0/store/1085"
+    ],
+    "command": "place_stored_item",
+    "derivation": "the row is server-owned in FIVE of its eight slots: item_id, x and y come from the client's cell intent, orientation is a verbatim passthrough, and the instant is the SERVER clock (int(time.time()), engine.py:13-14), the garrison is ALWAYS an empty list (engine.py:11-12), the attribute bag is derived from committed content, and the player team is ALWAYS 1 because place_stored_item never passes the client-sent playerID on (command.py:238 reads it, command.py:245 does not pass it)",
+    "dismissed_arguments": [
+      {
+        "index": 4,
+        "line": 238,
+        "name": "playerID",
+        "note": "read and never passed to map_add_item, so the committed team is always 1 whatever a client sends -- the same read-but-unused shape as M7's move `frame`/`string` and M8's `used_syringe`",
+        "would_be": "the row's player team (slot 7)"
+      },
+      {
+        "index": 6,
+        "line": 240,
+        "name": "unknown_autoactivable_bool",
+        "note": "read and never used",
+        "would_be": "unknown; it writes nothing"
+      },
+      {
+        "index": 7,
+        "line": 241,
+        "name": "unknown_imgIndex",
+        "note": "read and never used",
+        "would_be": "unknown; the legacy source's own comment says 'one of these might be timestamp', and the committed row's slot 3 is the SERVER clock (engine.py:13-14), so a client-sent value there is discarded"
+      }
+    ],
+    "intent_ignored_keys": [
+      "attr",
+      "attribute",
+      "autoactivable",
+      "bought",
+      "cost",
+      "costs",
+      "count",
+      "img_index",
+      "index",
+      "item_index",
+      "map_key",
+      "orientation_flag",
+      "placement",
+      "player",
+      "playerID",
+      "player_id",
+      "price",
+      "quantity",
+      "reason",
+      "refund",
+      "resources_changed",
+      "row",
+      "slot",
+      "team",
+      "timestamp",
+      "value",
+      "vector"
+    ],
+    "intent_keys": [
+      "user_id",
+      "item_id",
+      "x",
+      "y",
+      "orientation"
+    ],
+    "intent_note": "THE PLACEMENT INTENT CARRIES A PLAYER, A STORED ITEM ID, AND A TARGET CELL. It never carries a map slot, a row, an attribute bag, a player team, a stored count, or a price -- every one of those is derived from committed content on the server. The SALE INTENT CARRIES A PLAYER AND A STORED ITEM ID and nothing else: no price, no refund, no quantity",
+    "item_id": 1085,
+    "ledger_after": [
+      1085
+    ],
+    "ledger_before": [],
+    "ledger_rule": "`boughtUnits` COUNTS DISTINCT IDS, NEVER UNITS HELD. `bought_unit_add` (engine.py:86-89) is append-if-absent, measured twice: re-storing an id the ledger already held left its length unchanged, and two placements of one stored id produced TWO rows, TWO stock decrements, and ONE ledger entry",
+    "map_key": 41,
+    "orientation": 0,
+    "placements_after": 41,
+    "placements_before": 40,
+    "player": 1,
+    "row": [
+      1085,
+      58,
+      47,
+      1791064747,
+      0,
+      [],
+      {},
+      1
+    ],
+    "row_pointer": "/maps/0/items/41",
+    "row_slots": 8,
+    "slot_inverse_rule": "slot_occupied() is the named INVERSE of next_free_slot(): it reports whether one named slot is already present. resolve_slot() calls the derivation and then its own inverse, and REFUSES `slot_occupied` when the two disagree. That disagreement is unreachable through an honest corpus -- it is precisely why the guard is a second line of defence rather than the first -- and the suite exercises it against an in-memory corpus whose key view and occupancy view have been made to conflict",
+    "slot_rule": "the map slot is DERIVED SERVER-SIDE as the smallest positive integer absent from the map's placements -- placement_envelope.next_free_slot, reused unchanged rather than re-implemented -- so a client cannot name a slot, cannot overwrite one, and cannot dictate the row. The committed fresh corpus places keys 1..40, so the first derived slot is 41",
+    "store_after": {},
+    "store_before": {
+      "1085": 1
+    },
+    "vector_rule": "NEUTRAL by necessity: this branch charges nothing, and a client-sent delta would move a balance because engine.apply_resources runs BEFORE the branch (command.py:40; engine.py:251-271)"
+  },
+  "probe_setup": {
+    "batches": [
+      {
+        "changed_leaves": [
+          "/maps/0/store/1085"
+        ],
+        "item_id": 1085,
+        "note": "two `store_add_items` batches seed the two probes that need an item in storage. That branch is an UNVALIDATED client-sent item list (command.py:258-266) and is deliberately deferred by this change's design, so it is used for PROBE PREPARATION only and never in a recorded transaction. Probe 2's seed id 1055 is not a collection prize",
+        "response_sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87",
+        "store_after": {
+          "1085": 1
+        },
+        "store_before": {}
+      },
+      {
+        "changed_leaves": [
+          "/maps/0/store/1085"
+        ],
+        "ledger_after": [
+          1085,
+          1071
+        ],
+        "ledger_before": [
+          1085,
+          1071
+        ],
+        "map_key_set_changed": false,
+        "placement_count_after": 42,
+        "placement_count_before": 42,
+        "player_info_unchanged": true,
+        "resources_after": {
+          "cash": 5,
+          "gold": 2000,
+          "mana": 0,
+          "oil": 2000,
+          "steel": 2000,
+          "wood": 2000,
+          "xp": 4
+        },
+        "resources_before": {
+          "cash": 5,
+          "gold": 2000,
+          "mana": 0,
+          "oil": 2000,
+          "steel": 2000,
+          "wood": 2000,
+          "xp": 4
+        },
+        "sent_args": [
+          [
+            1085
+          ]
+        ],
+        "sent_command": "store_add_items",
+        "sent_vector": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "store_after": {
+          "1085": 1
+        },
+        "store_before": {}
+      },
+      {
+        "changed_leaves": [
+          "/maps/0/store/1055",
+          "/privateState/boughtUnits"
+        ],
+        "item_id": 1055,
+        "note": "two `store_add_items` batches seed the two probes that need an item in storage. That branch is an UNVALIDATED client-sent item list (command.py:258-266) and is deliberately deferred by this change's design, so it is used for PROBE PREPARATION only and never in a recorded transaction. Probe 2's seed id 1055 is not a collection prize",
+        "response_sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87",
+        "store_after": {
+          "1055": 1
+        },
+        "store_before": {}
+      },
+      {
+        "changed_leaves": [
+          "/maps/0/store/1055",
+          "/privateState/boughtUnits"
+        ],
+        "ledger_after": [
+          1085,
+          1071,
+          999999,
+          1055
+        ],
+        "ledger_before": [
+          1085,
+          1071,
+          999999
+        ],
+        "map_key_set_changed": false,
+        "placement_count_after": 44,
+        "placement_count_before": 44,
+        "player_info_unchanged": true,
+        "resources_after": {
+          "cash": 5,
+          "gold": 2000,
+          "mana": 0,
+          "oil": 2000,
+          "steel": 2000,
+          "wood": 2000,
+          "xp": 4
+        },
+        "resources_before": {
+          "cash": 5,
+          "gold": 2000,
+          "mana": 0,
+          "oil": 2000,
+          "steel": 2000,
+          "wood": 2000,
+          "xp": 4
+        },
+        "sent_args": [
+          [
+            1055
+          ]
+        ],
+        "sent_command": "store_add_items",
+        "sent_vector": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "store_after": {
+          "1055": 1
+        },
+        "store_before": {}
+      }
+    ],
+    "note": "two `store_add_items` batches seed the two probes that need an item in storage. That branch is an UNVALIDATED client-sent item list (command.py:258-266) and is deliberately deferred by this change's design, so it is used for PROBE PREPARATION only and never in a recorded transaction. Probe 2's seed id 1055 is not a collection prize"
+  },
+  "probes": [
+    {
+      "changed_leaves": [
+        "/maps/0/items/42",
+        "/privateState/boughtUnits"
+      ],
+      "classification": "divergence",
+      "commands": [
+        "place_stored_item([42, 1071, 60, 47, 1, 0, 0, 0]) with an EMPTY store"
+      ],
+      "established": "`remove_store_item`'s conditional (`if itemstr in map['store']`, engine.py:78-79) makes an absent item a SILENT NO-OP, and the branch then places the row and appends the id to boughtUnits anyway (command.py:244-246)",
+      "executed_in_this_capture": true,
+      "ledger_after": [
+        1085,
+        1071
+      ],
+      "ledger_before": [
+        1085
+      ],
+      "map_key_set_changed": true,
+      "modern_refusal": "not_in_storage",
+      "modern_rule": "the endpoint refuses not_in_storage with 409 and changes nothing, because a modern client must never be able to place a unit it does not own. Item 1071 is a real committed placeable unit, so 'never stored' and 'unknown id' are two DISTINCT refusals, not one check under two spellings",
+      "parity": false,
+      "placement_count_after": 42,
+      "placement_count_before": 41,
+      "player_info_unchanged": true,
+      "probe": 1,
+      "question": "what does the legacy server do when the client places a committed unit it never acquired?",
+      "resources_after": {
+        "cash": 5,
+        "gold": 2000,
+        "mana": 0,
+        "oil": 2000,
+        "steel": 2000,
+        "wood": 2000,
+        "xp": 4
+      },
+      "resources_before": {
+        "cash": 5,
+        "gold": 2000,
+        "mana": 0,
+        "oil": 2000,
+        "steel": 2000,
+        "wood": 2000,
+        "xp": 4
+      },
+      "response": "{\"result\":\"success\"}\n",
+      "response_sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87",
+      "sent_args": [
+        42,
+        1071,
+        60,
+        47,
+        1,
+        0,
+        0,
+        0
+      ],
+      "sent_command": "place_stored_item",
+      "sent_vector": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "store_after": {},
+      "store_before": {},
+      "why_it_matters": "it is the executed evidence for the not_in_storage refusal. Without it the refusal could be vacuously true, because the committed corpus can never place an item that is also absent from storage"
+    },
+    {
+      "changed_leaves": [
+        "/maps/0/items/1/0",
+        "/maps/0/items/1/1",
+        "/maps/0/items/1/2",
+        "/maps/0/items/1/3",
+        "/maps/0/store/1055"
+      ],
+      "classification": "divergence",
+      "commands": [
+        "store_add_items([[1055]])",
+        "place_stored_item([1, 1055, 61, 47, 1, 0, 0, 0]) -- index 1 holds the Command Center"
+      ],
+      "established": "`map['items'][str(index)] = [...]` is a plain ASSIGNMENT with no occupancy test (engine.py:31): the existing row is DESTROYED, the row COUNT does not change, and the server answers success with no resource movement. This is the most serious of the four vectors and the one a two-part post-state proof must be built to catch, because a count-based check cannot see it",
+      "executed_in_this_capture": true,
+      "ledger_after": [
+        1085,
+        1071,
+        999999,
+        1055
+      ],
+      "ledger_before": [
+        1085,
+        1071,
+        999999,
+        1055
+      ],
+      "map_key_set_changed": false,
+      "modern_refusal": "slot_occupied",
+      "modern_rule": "the endpoint never accepts a slot at all -- it derives the smallest absent positive integer -- and the named inverse `slot_occupied` is a 409 guard against the derived slot itself colliding. The typed client cannot reach that guard on an honest save, which is why the endpoint suite exercises it against an injected key-view conflict",
+      "parity": false,
+      "placement_count_after": 44,
+      "placement_count_before": 44,
+      "player_info_unchanged": true,
+      "probe": 2,
+      "question": "what does the legacy server do when the client names a map key an existing row already holds?",
+      "resources_after": {
+        "cash": 5,
+        "gold": 2000,
+        "mana": 0,
+        "oil": 2000,
+        "steel": 2000,
+        "wood": 2000,
+        "xp": 4
+      },
+      "resources_before": {
+        "cash": 5,
+        "gold": 2000,
+        "mana": 0,
+        "oil": 2000,
+        "steel": 2000,
+        "wood": 2000,
+        "xp": 4
+      },
+      "response": "{\"result\":\"success\"}\n",
+      "response_sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87",
+      "sent_args": [
+        1,
+        1055,
+        61,
+        47,
+        1,
+        0,
+        0,
+        0
+      ],
+      "sent_command": "place_stored_item",
+      "sent_vector": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "store_after": {},
+      "store_before": {
+        "1055": 1
+      },
+      "why_it_matters": "it is the executed evidence that a placement proof must compare VALUES and not counts: this probe changes five leaves and zero of them is a key-set change"
+    },
+    {
+      "changed_leaves": [
+        "/maps/0/items/47",
+        "/privateState/boughtUnits"
+      ],
+      "classification": "divergence",
+      "commands": [
+        "place_stored_item([47, 999999, 66, 47, 1, 0, 0, 0])"
+      ],
+      "established": "id 999999 is in no normalized table and in no config section; `get_attribute_from_item_id` returns nothing for it, so the row is placed with an EMPTY attribute bag and the id is appended to boughtUnits as a purchased unit",
+      "executed_in_this_capture": true,
+      "ledger_after": [
+        1085,
+        1071,
+        999999
+      ],
+      "ledger_before": [
+        1085,
+        1071
+      ],
+      "map_key_set_changed": true,
+      "modern_refusal": "unknown_item_id",
+      "modern_rule": "the endpoint resolves the id against the loaded committed configuration first and refuses unknown_item_id with 409, because a row for an unresolvable id would be derived from no committed content at all. This is a DIFFERENT refusal from item_not_placeable, which fires on a row that resolves but carries neither derived field; the split is measured unreachable from the other on the committed content (0 of 778 loaded rows and 0 of 900 normalized items fail the second)",
+      "parity": false,
+      "placement_count_after": 44,
+      "placement_count_before": 43,
+      "player_info_unchanged": true,
+      "probe": 3,
+      "question": "what does the legacy server do when the client names an id that resolves to no committed definition anywhere?",
+      "resources_after": {
+        "cash": 5,
+        "gold": 2000,
+        "mana": 0,
+        "oil": 2000,
+        "steel": 2000,
+        "wood": 2000,
+        "xp": 4
+      },
+      "resources_before": {
+        "cash": 5,
+        "gold": 2000,
+        "mana": 0,
+        "oil": 2000,
+        "steel": 2000,
+        "wood": 2000,
+        "xp": 4
+      },
+      "response": "{\"result\":\"success\"}\n",
+      "response_sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87",
+      "sent_args": [
+        47,
+        999999,
+        66,
+        47,
+        1,
+        0,
+        0,
+        0
+      ],
+      "sent_command": "place_stored_item",
+      "sent_vector": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "store_after": {},
+      "store_before": {},
+      "why_it_matters": "it is the executed evidence for the content-resolution refusal, and it shows the legacy server happily manufactures a row for an id no table has ever heard of"
+    },
+    {
+      "changed_leaves": [
+        "/maps/0/items/43",
+        "/maps/0/store/1085"
+      ],
+      "classification": "divergence",
+      "commands": [
+        "store_add_items([[1085]])",
+        "place_stored_item([43, 1085, 250, -3, 1, 0, 0, 0])"
+      ],
+      "established": "cell (250, -3) is stored VERBATIM on the row, outside the derived 0..99 grid on both axes, and the server answers success. There is no bounds check and no cell-occupancy check anywhere on this path",
+      "executed_in_this_capture": true,
+      "ledger_after": [
+        1085,
+        1071
+      ],
+      "ledger_before": [
+        1085,
+        1071
+      ],
+      "map_key_set_changed": true,
+      "modern_refusal": null,
+      "modern_rule": "RECORDED, NOT REFUSED. Refusing it would fabricate a bound the oracle does not have: tile-to-cell geometry is the already-recorded M6 gap and needs new evidence, not a derivation. The endpoint therefore stores the cell verbatim and reports `geometry.bounds_refused == false` in every success response, which makes the gap mechanical rather than an oversight. Authoritative bounds validation belongs to Server v1 / M13",
+      "parity": false,
+      "placement_count_after": 43,
+      "placement_count_before": 42,
+      "player_info_unchanged": true,
+      "probe": 4,
+      "question": "does the legacy server validate the target cell against any grid?",
+      "resources_after": {
+        "cash": 5,
+        "gold": 2000,
+        "mana": 0,
+        "oil": 2000,
+        "steel": 2000,
+        "wood": 2000,
+        "xp": 4
+      },
+      "resources_before": {
+        "cash": 5,
+        "gold": 2000,
+        "mana": 0,
+        "oil": 2000,
+        "steel": 2000,
+        "wood": 2000,
+        "xp": 4
+      },
+      "response": "{\"result\":\"success\"}\n",
+      "response_sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87",
+      "sent_args": [
+        43,
+        1085,
+        250,
+        -3,
+        1,
+        0,
+        0,
+        0
+      ],
+      "sent_command": "place_stored_item",
+      "sent_vector": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "store_after": {},
+      "store_before": {
+        "1085": 1
+      },
+      "why_it_matters": "it is the fourth recorded probe and the only one the endpoint does NOT refuse, so recording it is what keeps the refusal list honest: three deliberate divergences and one recorded gap"
+    }
+  ],
+  "purpose": "Executed request/before/response/after fixtures for a legacy place_stored_item and a legacy sell_stored_item on the committed corpus, both seeded by the CONTENT-DERIVED complete_collection branch; the executed-legacy parity oracle for the Compatibility API v0 place_stored and sell_stored endpoints and the FIRST executed evidence that a unit acquired from committed content reaches the map.",
+  "recorded_steps": {
+    "clamp_exercised": false,
+    "clamp_note": "legacy's max(current + delta, 0) only bites when a delta would drive a balance below zero; BOTH derived vectors are the NEUTRAL all-zero vector, so no balance moves at all and the clamp is never exercised by this fixture. That the vector really is client-sent is established by the delivered godot-unit-collection probe 1, which moved 500 experience through the very same branch",
+    "collections_after": [
+      1,
+      2
+    ],
+    "collections_before": [],
+    "count": 5,
+    "ledger_after": [
+      1085
+    ],
+    "ledger_before": [],
+    "map_key_set_grew_by_one": true,
+    "other_map_fields_unchanged": true,
+    "other_rows_unchanged": true,
+    "placement_count_after": 41,
+    "placement_count_before": 40,
+    "player_info_unchanged": true,
+    "private_state_unchanged_except_ledgers": true,
+    "resource_delta": {
+      "cash": 0,
+      "gold": 0,
+      "mana": 0,
+      "oil": 0,
+      "steel": 0,
+      "wood": 0,
+      "xp": 0
+    },
+    "resources_after": {
+      "cash": 5,
+      "gold": 2000,
+      "mana": 0,
+      "oil": 2000,
+      "steel": 2000,
+      "wood": 2000,
+      "xp": 4
+    },
+    "resources_before": {
+      "cash": 5,
+      "gold": 2000,
+      "mana": 0,
+      "oil": 2000,
+      "steel": 2000,
+      "wood": 2000,
+      "xp": 4
+    },
+    "response_body": "{\"result\": \"success\"}",
+    "steps": [
+      {
+        "method": "POST",
+        "name": "login_post",
+        "path": "/",
+        "response_bytes": 207,
+        "response_sha256": "2de230237d9f4055670576b9485897dbc06581889ca90527504cbdbd4933ec01",
+        "save_after_sha256": "4d8dc20cffa36a9b3c0c4443eec87400b7ec221ffae08f08d99b6d0b543edc23",
+        "save_before_sha256": "4d8dc20cffa36a9b3c0c4443eec87400b7ec221ffae08f08d99b6d0b543edc23",
+        "save_unchanged_by_call": true,
+        "status": 302,
+        "target": "/"
+      },
+      {
+        "method": "POST",
+        "name": "command_complete_collection",
+        "path": "/dynamic/menvswomen/srvsexwars/command.php",
+        "response_bytes": 21,
+        "response_sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87",
+        "save_after_sha256": "27bf93d0104b3d64a97e4085a5673dffa1b4bc867b187f9e8b2d0e159d76650d",
+        "save_before_sha256": "4d8dc20cffa36a9b3c0c4443eec87400b7ec221ffae08f08d99b6d0b543edc23",
+        "save_unchanged_by_call": false,
+        "status": 200,
+        "target": "/dynamic/menvswomen/srvsexwars/command.php"
+      },
+      {
+        "method": "POST",
+        "name": "command_place_stored_item",
+        "path": "/dynamic/menvswomen/srvsexwars/command.php",
+        "response_bytes": 21,
+        "response_sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87",
+        "save_after_sha256": "c9fdd79396cc5a0f7a2fc89ea6535b77a3a522bb74b3f9864d2b622b67e5da9d",
+        "save_before_sha256": "27bf93d0104b3d64a97e4085a5673dffa1b4bc867b187f9e8b2d0e159d76650d",
+        "save_unchanged_by_call": false,
+        "status": 200,
+        "target": "/dynamic/menvswomen/srvsexwars/command.php"
+      },
+      {
+        "method": "POST",
+        "name": "command_complete_collection_2",
+        "path": "/dynamic/menvswomen/srvsexwars/command.php",
+        "response_bytes": 21,
+        "response_sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87",
+        "save_after_sha256": "b52b946c804d98c8d86d74af9e7ff71702b0eadf31f1b4e55e576ee858ac5b0f",
+        "save_before_sha256": "c9fdd79396cc5a0f7a2fc89ea6535b77a3a522bb74b3f9864d2b622b67e5da9d",
+        "save_unchanged_by_call": false,
+        "status": 200,
+        "target": "/dynamic/menvswomen/srvsexwars/command.php"
+      },
+      {
+        "method": "POST",
+        "name": "command_sell_stored_item",
+        "path": "/dynamic/menvswomen/srvsexwars/command.php",
+        "response_bytes": 21,
+        "response_sha256": "dde248c3f460b9df4a74448b6049932f4805e54893c11529664cc7073a558b87",
+        "save_after_sha256": "3a60b9476af0cd680004e31730da657485cc68945aca030e96d941924e4ad541",
+        "save_before_sha256": "b52b946c804d98c8d86d74af9e7ff71702b0eadf31f1b4e55e576ee858ac5b0f",
+        "save_unchanged_by_call": false,
+        "status": 200,
+        "target": "/dynamic/menvswomen/srvsexwars/command.php"
+      }
+    ],
+    "store_after": {},
+    "store_before": {}
+  },
+  "refusals": [
+    {
+      "divergence": true,
+      "implemented": true,
+      "legacy": "places the row anyway and answers success (probe 1 #5: item 1071 was never stored, rows 41 -> 42, the store UNCHANGED, boughtUnits grew, {\"result\": \"success\"})",
+      "refusal": "not_in_storage",
+      "status": 409,
+      "why": "duplicates an unacquired unit onto the map and records it as bought. `remove_store_item`'s `if itemstr in map[\"store\"]` conditional (engine.py:78) makes an absent item a silent no-op, and that conditional is the whole cause"
+    },
+    {
+      "divergence": true,
+      "implemented": true,
+      "legacy": "overwrites the existing row and answers success (probe 1 #6: index 1's Command Center [26,51,41,0,0,[],{},1] was replaced, FIVE leaves rewritten, row count unchanged)",
+      "refusal": "slot_occupied",
+      "status": 409,
+      "why": "destroys a placed building invisibly. `map_add_item` assigns with no occupancy test (engine.py:31)"
+    },
+    {
+      "divergence": true,
+      "implemented": true,
+      "legacy": "places the row with an empty attr, appends the id to boughtUnits, and answers success (probe 1 #14: 999999 is in no normalized table and in no config section)",
+      "refusal": "unknown_item_id",
+      "status": 409,
+      "why": "a row nothing can render, price, or resolve. `get_item_from_id` returns None and `get_attribute_from_item_id` therefore yields nothing for either derived field"
+    },
+    {
+      "divergence": true,
+      "implemented": true,
+      "legacy": "n/a -- unreached: 0 of 778 loaded rows and 0 of 900 normalized items lack BOTH committed fields",
+      "refusal": "item_not_placeable",
+      "status": 409,
+      "why": "the row exists but carries neither `properties` nor `clicks_to_build`, so `get_attribute_from_item_id` yields nothing for either and the placement would write a row derived from no committed content at all. Unreachable through the committed corpus, so it is exercised only against an in-memory row -- the same precedent `no_build_time` set on the construction line"
+    }
+  ],
+  "sale": {
+    "changed_leaves": [
+      "/maps/0/store/1062"
+    ],
+    "command": "sell_stored_item",
+    "credited": false,
+    "intent_ignored_keys": [
+      "attr",
+      "cash",
+      "cost",
+      "costs",
+      "count",
+      "gold",
+      "index",
+      "item_index",
+      "map_key",
+      "orientation",
+      "player",
+      "player_id",
+      "price",
+      "quantity",
+      "reason",
+      "refund",
+      "resources_changed",
+      "row",
+      "slot",
+      "team",
+      "value",
+      "vector",
+      "x",
+      "y"
+    ],
+    "intent_keys": [
+      "user_id",
+      "item_id"
+    ],
+    "item_id": 1062,
+    "ledger_after": [
+      1085
+    ],
+    "ledger_before": [
+      1085
+    ],
+    "no_refund_note": "SELLING CREDITS NOTHING. `sell_stored_item` (command.py:250-256) reads one argument, calls `remove_store_item`, and prints -- no `map[\"gold\"]`, no `apply_resources`, no return value. Measured over two executed sales: EXACTLY ONE changed leaf, the store key, with no row added, no boughtUnits entry written or removed, and no resource credited. A sale is therefore a pure storage decrement, and the client must present it as crediting nothing",
+    "placements_after": 41,
+    "placements_before": 41,
+    "quantity_consumed": 1,
+    "quantity_rule": "ONE OPERATION CONSUMES EXACTLY ONE UNIT OF STOCK. `remove_store_item(map, item)` is called without its third argument (engine.py:77), so legacy's default quantity is exactly 1, and NEITHER contract carries a quantity: a client cannot place or sell two copies, and cannot guess a parameter the branch would ignore",
+    "refund": null,
+    "store_after": {},
+    "store_before": {
+      "1062": 1
+    },
+    "vector_rule": "NEUTRAL by necessity: a sale credits NOTHING, so every stored resource must be unchanged after execution"
+  },
+  "schema": "godot-stored-item-placement/legacy-capture-v1",
+  "server": {
+    "command": [
+      "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+      "-B",
+      "server.py"
+    ],
+    "command_recorder_env": "SOCIALWARS_COMMAND_RECORD_DIR stripped from child",
+    "cwd": "<disposable copy under the system temp root>",
+    "host": "127.0.0.1",
+    "output_logs": "server.stdout.log / server.stderr.log inside the disposable copy (removed with the copy; not committed)",
+    "port": 5055,
+    "port_free_after_stop": true,
+    "port_free_before_start": true,
+    "readiness": "TCP connect loop on 127.0.0.1:5055 (no extra HTTP request)",
+    "stopped_by": "taskkill /T /F <pid>, wait, then port-free re-check"
+  },
+  "target": {
+    "collections_before": [],
+    "fabricated_state": false,
+    "ledger_before": [],
+    "placement_count_before": 40,
+    "seed_collection": {
+      "collection_id": 1,
+      "index_rule": "THE COLLECTION ID SPACE IS 1-BASED AND THE LOOKUP IS POSITIONAL. get_collection_prize (get_game_config.py:170-175) computes `index = max(0, collection - 1)`, bounds-checks `index < len(collections)` against the loaded configuration's `collections` LIST, and returns `json.loads(collections[index]['prize'])`. So the id a client names is one greater than the array position it selects. The 1-based reading is DERIVED-PROVISIONAL and is corroborated by the stored content rather than merely plausible: config/main.json stores ten rows whose own native `id` column runs '1'..'10' over the ten ARRAY POSITIONS 0..9, so `collection - 1` maps that native id onto exactly its own position. Nothing here is observed from the Flash client",
+      "name": "Draggy Collection",
+      "prize": {
+        "1085": 1
+      }
+    },
+    "seed_prize_item_name": "Metal Draggy",
+    "seed_prize_item_type": "u",
+    "seed_route": "complete_collection (content-derived); store_add_items is used for probe preparation only",
+    "sell_collection": {
+      "collection_id": 2,
+      "index_rule": "THE COLLECTION ID SPACE IS 1-BASED AND THE LOOKUP IS POSITIONAL. get_collection_prize (get_game_config.py:170-175) computes `index = max(0, collection - 1)`, bounds-checks `index < len(collections)` against the loaded configuration's `collections` LIST, and returns `json.loads(collections[index]['prize'])`. So the id a client names is one greater than the array position it selects. The 1-based reading is DERIVED-PROVISIONAL and is corroborated by the stored content rather than merely plausible: config/main.json stores ten rows whose own native `id` column runs '1'..'10' over the ten ARRAY POSITIONS 0..9, so `collection - 1` maps that native id onto exactly its own position. Nothing here is observed from the Flash client",
+      "name": "Transformer Collection",
+      "prize": {
+        "1062": 1
+      }
+    },
+    "sell_prize_item_name": "MegaBot",
+    "sell_prize_item_type": "u",
+    "store_before": {},
+    "target_rule": "the committed fresh-player corpus records maps[0]['store'] == {} and privateState['boughtUnits'] == [], so a placement fixture has nothing to place unless the seed route is chosen deliberately. Collection 1 is chosen because its committed prize is exactly {'1085': 1} (unit 1085 Metal Draggy) and collection 2 because its committed prize is exactly {'1062': 1} (unit 1062 MegaBot): both seeds are therefore CONTENT-DERIVED, no client-sent item id list appears in any recorded transaction, and no player state is fabricated"
+  },
+  "time_dependent_fields": {
+    "documented_normalization": "stored-placement parity applies NO clock normalization: the row is compared slot by slot with slot 3 EXCLUDED, and that exclusion is asserted to be the ONLY excluded slot. Every other slot, the storage key, the ledger entry by entry, and every stored resource by value are compared with no normalization at all. The instant itself is checked to be a positive wall-clock reading and is otherwise never compared",
+    "leaves": [
+      "/executed_at_utc in capture-manifest.json",
+      "/captured_at_utc in every steps/*/request.json",
+      "/captured_at_utc in every steps/*/response.meta.json",
+      "/headers/Date in every steps/*/response.meta.json",
+      "/placement/row/3 in capture-manifest.json, which echoes the recorded row",
+      "the envelope ts inside each RECORDED command step's request.json /form/data (and therefore that whole field's string, because the digest covers the payload), since ts is the current time",
+      "every save_after_sha256 / save_before_sha256 whose document is listed in state_leaf_documents -- that is, the command_place_stored_item step's save_after_sha256 and both digests of the command_complete_collection_2 and command_sell_stored_item steps, whose documents carry the placed row"
+    ],
+    "probe_batches_are_stable": "the four probe batches and the two store_add_items preparation batches pin ts to 1700000000 instead of the current time, so their recorded bytes carry no wall clock. The probe records are also never written as step documents, so no probe save appears in this fixture at all; the probe facts are recorded inside the manifest",
+    "rule": "the recorded STATE carries exactly ONE time-dependent value and it is the placed row's slot 3: int(time.time()) taken inside engine.map_add_item (engine.py:5-6 via engine.py:13-14). Every other state leaf is byte-stable. The SALE carries no time-dependent value of its own -- it writes one storage key and touches no clock -- but its before/after documents still CONTAIN the placed row, so they move with it",
+    "stable_by_derivation": "the derived slot, the cell, the orientation, the empty garrison, the team, the attribute bag, the appended ledger id, the placement count, and all seven stored resources are byte-stable because each is either a fixed constant or a pure function of committed content",
+    "stable_state_leaves": [
+      "every other leaf of all five recorded save documents; a leaf-level diff of two consecutive runs differs at exactly /maps/0/items/41/3 in each of the five documents listed above and nowhere else",
+      "the login step's before.json and after.json are both byte-stable and identical to each other",
+      "steps/command_complete_collection/after.json is byte-stable: it precedes the placement, so no placed row exists in it",
+      "the seeded save's own instant values are the SEED file's, copied verbatim and never rewritten by these branches",
+      "every response.body is the 21-byte legacy success string"
+    ],
+    "state_leaf": "/maps/0/items/41/3",
+    "state_leaf_documents": [
+      "steps/command_place_stored_item/after.json",
+      "steps/command_complete_collection_2/before.json",
+      "steps/command_complete_collection_2/after.json",
+      "steps/command_sell_stored_item/before.json",
+      "steps/command_sell_stored_item/after.json"
+    ]
+  }
+}

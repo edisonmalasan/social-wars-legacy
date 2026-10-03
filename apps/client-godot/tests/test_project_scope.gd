@@ -125,6 +125,7 @@ const ALLOWED := [
 	"scripts/units/research_flow.gd",
 	"scripts/units/quest_flow.gd",
 	"scripts/progression/tutorial_flow.gd",
+	"scripts/units/stored_item_flow.gd",
 	"scripts/verification.gd",
 	"tests/test_asset_ids.gd",
 	"tests/test_audio_manager.gd",
@@ -169,6 +170,7 @@ const ALLOWED := [
 	"tests/test_research.gd",
 	"tests/test_quests.gd",
 	"tests/test_tutorial.gd",
+	"tests/test_stored_item_placement.gd",
 	"evidence/boot/boot-report.json",
 	"evidence/building-move/building-move.png",
 	"evidence/building-move/report.json",
@@ -208,6 +210,7 @@ const ALLOWED := [
 	"evidence/research/report.json",
 	"evidence/quests/report.json",
 	"evidence/tutorial/report.json",
+	"evidence/stored-placement/report.json",
 ]
 
 ## The exact scene set the project may declare (set equality below).

@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-10-03T21:59:07+00:00",
+  "form": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "data": "9a681561dbd7dd248a3b2a5275ab48ef962cf5561cf091bd5d80febc6a31d238;{\"accessToken\":\"\",\"commands\":[[0,\"complete_collection\",[2,0],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1791064747}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "The second content-derived seed, collection 2 whose committed prize is exactly {\"1062\": 1} (unit 1062 MegaBot). It exists so the sale below disposes of an id the ledger has never seen and the placement has never placed, which is what makes the sale step's 'the ledger is untouched' half observable rather than trivially true for an id that was already placed.",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}

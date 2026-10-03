@@ -168,6 +168,14 @@ var quest_requests := 0
 ## snapshots this counter exactly like `placement_requests`). Monotonic for the
 ## same reason: `configure()` swaps the implementation without hiding history.
 var tutorial_requests := 0
+## Number of stored-item **placement** intents this process has issued. One per
+## confirm on a stored item; zero for every local refusal. Monotonic for the same
+## reason as the counters above: `configure()` swaps the implementation without
+## hiding history.
+var stored_placement_requests := 0
+## Number of stored-item **sale** intents this process has issued. One per
+## confirm; zero for every local refusal.
+var stored_sale_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -604,6 +612,61 @@ func complete_tutorial_town(user_id: String,
 	tutorial_requests += 1
 	var result: TutorialFlow.TutorialResult = await _impl.complete_tutorial_town(
 		user_id, step)
+	return result
+
+
+## One stored-item placement intent (the save identity, the stored **item id**,
+## and the target **cell** -- and NOTHING else) from the selected
+## implementation.  The contract carries NO map slot, NO row, NO attribute bag,
+## NO player team, NO stored count, NO quantity, and NO price (stored-item
+## placement design D2/D3): the service derives the map slot as the smallest
+## positive absent integer, the row's instant from the server clock, the garrison
+## as an always-empty list, the team as always `1`, and the attribute bag as the
+## service's pure function of two committed fields -- so a client-supplied slot,
+## bag, team, count, or price is ignored exactly as a client-supplied amount is
+## ignored on the collect, expand, level-up, collection, and revival routes, and
+## the typed result's `map_key`, `row`, `attr`, `player`, and `resources` are
+## authoritative (design D8).
+##
+## The post-execution proof has two halves and **no resource moved** is one of
+## them: all 24 executed probe transactions in the committed investigation left
+## every stored resource byte-identical, because the branch reads the client's
+## vector nowhere and `apply_resources` runs BEFORE it.
+##
+## **Bounds and cell occupancy are NOT refused** and that is deliberate
+## (design D4): `place_stored_item [43, 1085, 250, -3, ...]` stored `(250, -3)`
+## verbatim.  That is the already-recorded M6 tile-to-cell geometry gap, which
+## needs new EVIDENCE rather than a derivation, so the typed result carries
+## `bounds_refused`/`cell_occupancy_refused` as `false` plus the recorded note.
+## What IS refused, each a recorded divergence from an oracle that answers
+## `{"result": "success"}` in all four cases, is `not_in_storage`,
+## `slot_occupied` (which would otherwise silently REPLACE an existing row while
+## the row count stayed unchanged), `unknown_item_id`, and
+## `item_not_placeable`.
+func place_stored_item_town(user_id: String, item_id: int, x: int,
+		y: int) -> BootData.StoredPlacementResult:
+	stored_placement_requests += 1
+	var result: BootData.StoredPlacementResult = await _impl.place_stored_item_town(
+		user_id, item_id, x, y)
+	return result
+
+
+## One stored-item sale intent (the save identity and the stored **item id** --
+## and NOTHING else) from the selected implementation.  The contract carries NO
+## price, NO refund, NO quantity, and NO return value: the legacy branch reads
+## `args[0]`, calls `remove_store_item`, and prints (design D5).  Its entire
+## effect is one store key disappearing, so the typed result's `credited` is
+## read from the response and asserted `false`, and the post-execution proof
+## requires **every stored resource to be unchanged** -- which is what makes
+## "a sale credits nothing" non-tautological rather than a comment.
+##
+## The ledger is left alone by a sale and the placement set is unchanged, and
+## both are reported so the readout can say so honestly.
+func sell_stored_item_town(user_id: String,
+		item_id: int) -> BootData.StoredSaleResult:
+	stored_sale_requests += 1
+	var result: BootData.StoredSaleResult = await _impl.sell_stored_item_town(
+		user_id, item_id)
 	return result
 
 

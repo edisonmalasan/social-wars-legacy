@@ -111,6 +111,7 @@ const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
 const ResearchFlow = preload("res://scripts/units/research_flow.gd")
 const QuestFlow = preload("res://scripts/units/quest_flow.gd")
 const TutorialFlow = preload("res://scripts/progression/tutorial_flow.gd")
+const StoredItemFlow = preload("res://scripts/units/stored_item_flow.gd")
 
 const SAVE_LIST_FIXTURE := \
 	"tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json"
@@ -278,6 +279,22 @@ const COLLECTION_BEFORE_FIXTURE := \
 ## double running on an inconsistent oracle.
 const COLLECTION_AFTER_FIXTURE := \
 	"tests/fixtures/godot-unit-collection/steps/command_complete_collection/after.json"
+
+## The captured corpus for the storage round trip (stored-item-placement design
+## D1). The capture CHAINED `complete_collection(1)` to seed storage, because it
+## is the only content-derived route that can put an id into `maps[0]["store"]`,
+## so this before-state already carries the committed prize `{"1085": 1}` and an
+## empty ledger against 40 placements -- keys 1..40, so the first derived slot
+## is 41.
+const STORED_PLACE_BEFORE_FIXTURE := \
+	"tests/fixtures/godot-stored-item-placement/steps/command_place_stored_item/before.json"
+## The same capture's after-state -- the real legacy server's record of the one
+## executed placement: unit `1085` at map key 41 and cell (58, 47), the storage
+## entry removed, the id appended to the ledger, **no** stored resource moved,
+## and the row's slot-3 instant a wall-clock reading the double reuses as its
+## epoch rather than reading the clock itself.
+const STORED_PLACE_AFTER_FIXTURE := \
+	"tests/fixtures/godot-stored-item-placement/steps/command_place_stored_item/after.json"
 ## The committed collection id and prize the double validates the executed
 ## fixture against: id 1 "Draggy Collection" grants unit `1085` with quantity
 ## `1`. These are the **committed content's** values, and they are duplicated
@@ -602,6 +619,18 @@ var _collection_state: Dictionary = {}
 var _collection_pid := ""
 var _collection_loaded := false
 var _collection_error := ""
+# Mutable in-memory storage state (stored-item-placement design D8): one save,
+# whose `maps[0]["store"]` loses exactly one unit of stock per successful
+# placement or sale, whose placements gain exactly one derived row per placement,
+# and whose purchase ledger gains at most one id per placement — and whose seven
+# balances NEVER move, because placing a stored item is free and a sale credits
+# nothing. `placed_key`/`placed_item_id` record what the executed capture placed,
+# so the double can answer "is this the captured transaction?" without guessing.
+var _stored_state: Dictionary = {}
+var _stored_pid := ""
+var _stored_loaded := false
+var _stored_error := ""
+var _stored_epoch_value := 0
 # Mutable in-memory dead-hero state (unit-behaviors design D8): one save, whose
 # placement row at the addressed cell is REPLACED by the derived revived item id
 # and whose ledger loses exactly one entry per successful revival under the
@@ -6028,3 +6057,368 @@ func _tutorial_balances(save: Dictionary) -> Variant:
 	balances["cash"] = int(cash)
 	balances["mana"] = int(mana)
 	return balances
+# --- stored-item placement double (stored-item-placement design D8) --------
+
+## One stored-item placement intent in the double. The double is the SERVICE's
+## stand-in, not the client's: it is the authority on its own storage, its own
+## map slots, and its own committed content, so this is where the four refusals
+## and the slot derivation live. `stored_item_flow.gd` mirrors the derivation
+## and deliberately does NOT re-implement the refusals.
+func place_stored_item_town(user_id: String, item_id: int, x: int,
+		y: int) -> BootData.StoredPlacementResult:
+	if user_id.strip_edges() == "":
+		return _stored_placement_failure("missing_user_id",
+			"user_id must be a non-empty string")
+	if not _ensure_stored_loaded():
+		return _stored_placement_failure("fixture_unreadable", _stored_error)
+	if user_id != _stored_pid:
+		return _stored_placement_failure("unknown_user_id",
+			"no save exists for user_id '%s'" % user_id)
+	# The refusal ORDER matches the service exactly (compat_service.py:1562,
+	# :1570, :1596): the two committed-content refusals come BEFORE the stock
+	# check, because a row cannot be derived at all from an id the content does
+	# not define -- so the honest complaint about the item precedes the honest
+	# complaint about its stock.
+	var committed: Variant = _config_items.get(str(item_id))
+	if not (committed is Dictionary):
+		return _stored_placement_failure("unknown_item_id",
+			("item %d resolves to no committed definition, so nothing about a "
+			% item_id)
+			+ "row for it can be derived; the legacy server places one anyway "
+			+ "with an empty attribute bag")
+	var row_def: Dictionary = committed
+	var derived := StoredItemFlow.derive_attr(row_def.get("clicks_to_build"),
+		row_def.get("properties"))
+	if not bool(derived["ok"]):
+		return _stored_placement_failure(str(derived["code"]),
+			str(derived["error"]))
+	if not _stored_placeable(row_def):
+		return _stored_placement_failure("item_not_placeable",
+			("committed item %d carries neither properties nor clicks_to_build, "
+			% item_id)
+			+ "so the legacy derivation would write no attribute bag at all")
+	var store: Dictionary = _stored_state["store"] as Dictionary
+	var stock := StoredItemFlow.stored_count(store, item_id)
+	if stock < 1:
+		return _stored_placement_failure("not_in_storage",
+			("item %d is not in storage; `remove_store_item`'s `if itemstr in "
+			% item_id)
+			+ "map[\"store\"]` conditional (engine.py:78) makes an absent item a "
+			+ "silent no-op, and the legacy server places the row anyway")
+	var items: Dictionary = _stored_state["items"] as Dictionary
+	var slot := _stored_next_free_slot(items)
+	if _stored_slot_occupied(items, slot):
+		return _stored_placement_failure("slot_occupied",
+			"derived map slot %d already names a row" % slot)
+	var before_store := store.duplicate(true)
+	var before_ledger: Array = (_stored_state["ledger"] as Array).duplicate(true)
+	var attr: Dictionary = (derived["attr"] as Dictionary).duplicate(true)
+	var row := [item_id, x, y, _stored_epoch(), StoredItemFlow.DERIVED_ORIENTATION,
+		[], attr, StoredItemFlow.DERIVED_PLAYER]
+	var after_store := before_store.duplicate(true)
+	var key := str(item_id)
+	var remaining := int(after_store.get(key, 0)) - StoredItemFlow.QUANTITY
+	if remaining > 0:
+		after_store[key] = remaining
+	else:
+		after_store.erase(key)
+	var after_ledger: Array = before_ledger.duplicate(true)
+	if not after_ledger.has(item_id):
+		after_ledger.append(item_id)
+	var after_items := items.duplicate(true)
+	after_items[str(slot)] = row
+	_stored_state["store"] = after_store
+	_stored_state["ledger"] = after_ledger
+	_stored_state["items"] = after_items
+	return BootData.parse_stored_placement({
+		"protocol": BootData.PROTOCOL,
+		"ok": true,
+		"game_version": str(_save_list_doc.get("game_version", "")),
+		# Time-dependent field: the fake reports the fixture capture's legacy
+		# server timestamp instead of "now" (never the wall clock).
+		"server_time": _fixture_server_time(),
+		"result": "success",
+		"placement": {
+			"command": StoredItemFlow.PLACE_COMMAND,
+			"item_id": item_id,
+			"x": x,
+			"y": y,
+			"orientation": StoredItemFlow.DERIVED_ORIENTATION,
+			"map_key": slot,
+			"derived_from": "the server derives the map slot as the smallest "
+				+ "positive integer absent from the map's placements and accepts "
+				+ "no slot, row, attribute bag, player team, count or price from "
+				+ "the client",
+			"slot_rule": StoredItemFlow.SLOT_RULE,
+			"row_derivation": StoredItemFlow.ROW_DERIVATION,
+		},
+		"row": {
+			"slots": row.duplicate(true),
+			"item_id": row[StoredItemFlow.ROW_SLOT_ITEM],
+			"x": row[StoredItemFlow.ROW_SLOT_X],
+			"y": row[StoredItemFlow.ROW_SLOT_Y],
+			"timestamp": int(row[StoredItemFlow.ROW_SLOT_TIMESTAMP]),
+			"orientation": row[StoredItemFlow.ROW_SLOT_ORIENTATION],
+			"store": [],
+			"attr": attr.duplicate(true),
+			"player": StoredItemFlow.DERIVED_PLAYER,
+			"attr_rule": StoredItemFlow.ATTR_RULE,
+			"attr_derived_from": derived["fields"],
+			"timestamp_note": StoredItemFlow.TIMESTAMP_NOTE,
+		},
+		"quantity": {
+			"consumed": StoredItemFlow.QUANTITY,
+			"count_before": stock,
+			"count_after": stock - StoredItemFlow.QUANTITY,
+			"rule": StoredItemFlow.QUANTITY_RULE,
+		},
+		"storage_before": before_store,
+		"storage_after": after_store,
+		"storage": StoredItemFlow.project_storage(after_store, after_ledger),
+		"ledger_before": before_ledger,
+		"ledger_after": after_ledger,
+		"ledger_rule": StoredItemFlow.LEDGER_RULE,
+		"refused": {"dismissed_arguments": []},
+		"refusals": [],
+		"geometry": {
+			"bounds_refused": false,
+			"cell_occupancy_refused": false,
+			"note": StoredItemFlow.GEOMETRY_GAP,
+			"occupancy_note": StoredItemFlow.CELL_OCCUPANCY_GAP,
+		},
+		"resources": _stored_resources(),
+	})
+
+
+## One stored-item sale intent in the double. The legacy branch's entire effect
+## is one store key disappearing: no price, no refund, no quantity argument, and
+## no return value, so `credited` is a recorded `false` and the post-execution
+## proof requires every stored resource to be unchanged.
+func sell_stored_item_town(user_id: String,
+		item_id: int) -> BootData.StoredSaleResult:
+	if user_id.strip_edges() == "":
+		return _stored_sale_failure("missing_user_id",
+			"user_id must be a non-empty string")
+	if not _ensure_stored_loaded():
+		return _stored_sale_failure("fixture_unreadable", _stored_error)
+	if user_id != _stored_pid:
+		return _stored_sale_failure("unknown_user_id",
+			"no save exists for user_id '%s'" % user_id)
+	var store: Dictionary = _stored_state["store"] as Dictionary
+	var stock := StoredItemFlow.stored_count(store, item_id)
+	if stock < 1:
+		return _stored_sale_failure("not_in_storage",
+			"item %d is not in storage" % item_id)
+	var before_store := store.duplicate(true)
+	var before_ledger: Array = (_stored_state["ledger"] as Array).duplicate(true)
+	var after_store := before_store.duplicate(true)
+	var key := str(item_id)
+	var remaining := int(after_store.get(key, 0)) - StoredItemFlow.QUANTITY
+	if remaining > 0:
+		after_store[key] = remaining
+	else:
+		after_store.erase(key)
+	_stored_state["store"] = after_store
+	return BootData.parse_stored_sell({
+		"protocol": BootData.PROTOCOL,
+		"ok": true,
+		"game_version": str(_save_list_doc.get("game_version", "")),
+		"server_time": _fixture_server_time(),
+		"result": "success",
+		"sale": {
+			"command": StoredItemFlow.SELL_COMMAND,
+			"item_id": item_id,
+			"credited": false,
+			"refund": null,
+			"note": StoredItemFlow.NO_REFUND_NOTE,
+			"quantity_rule": StoredItemFlow.QUANTITY_RULE,
+		},
+		"quantity": {
+			"consumed": StoredItemFlow.QUANTITY,
+			"count_before": stock,
+			"count_after": stock - StoredItemFlow.QUANTITY,
+		},
+		"storage_before": before_store,
+		"storage_after": after_store,
+		"storage": StoredItemFlow.project_storage(after_store, before_ledger),
+		"ledger_before": before_ledger,
+		"ledger_after": before_ledger.duplicate(true),
+		"ledger_rule": StoredItemFlow.LEDGER_RULE,
+		"resources": _stored_resources(),
+	})
+
+
+func _stored_placement_failure(code: String,
+		message: String) -> BootData.StoredPlacementResult:
+	return BootData.parse_stored_placement({
+		"protocol": BootData.PROTOCOL,
+		"ok": false,
+		"error": {"code": code, "message": message},
+	})
+
+
+func _stored_sale_failure(code: String,
+		message: String) -> BootData.StoredSaleResult:
+	return BootData.parse_stored_sell({
+		"protocol": BootData.PROTOCOL,
+		"ok": false,
+		"error": {"code": code, "message": message},
+	})
+
+
+## The SERVICE's placeability predicate, deliberately NOT mirrored into
+## `stored_item_flow.gd`: a client-side copy would second-guess it and could
+## disagree. 0 of 900 committed items fail this, so the refusal is unreachable
+## through the committed corpus and is exercised only against an in-memory row.
+func _stored_placeable(row_def: Dictionary) -> bool:
+	var properties: Variant = row_def.get("properties")
+	if properties is Dictionary and not (properties as Dictionary).is_empty():
+		return true
+	if properties is String and str(properties).strip_edges() != "":
+		return true
+	return bool(row_def.get("clicks_to_build"))
+
+
+## The slot derivation the service owns: the smallest POSITIVE integer absent
+## from the map's placements. Legacy map keys are `str(index)`, so a key that
+## does not parse as an integer cannot collide with a numeric slot string.
+func _stored_next_free_slot(items: Dictionary) -> int:
+	var used := {}
+	for key: Variant in items:
+		var text := str(key)
+		if text.is_valid_int():
+			used[int(text)] = true
+	var candidate := 1
+	while used.has(candidate):
+		candidate += 1
+	return candidate
+
+
+## The named inverse of the derivation, so the second line of defence is
+## reachable rather than dead code.
+func _stored_slot_occupied(items: Dictionary, slot: int) -> bool:
+	return items.has(str(slot))
+
+
+## The recorded capture's row instant, never the wall clock: the fixture is the
+## oracle, so the double is deterministic by construction.
+func _stored_epoch() -> int:
+	return _stored_epoch_value
+
+
+## The seven stored resources, unchanged: placing and selling both move none.
+func _stored_resources() -> Dictionary:
+	var out := {}
+	for key: String in RESOURCE_KEYS:
+		out[key] = int(_stored_state[key])
+	return out
+
+
+func _ensure_stored_loaded() -> bool:
+	if _stored_loaded:
+		return _stored_error == ""
+	_stored_loaded = true
+	# The committed items table is read out of the SAME captured config payload
+	# the other doubles index, so the base fixtures must be loaded first --
+	# independently of them, so this double's failure cannot hide behind
+	# another's.
+	if not _ensure_loaded():
+		_stored_error = _load_error
+		return false
+	var sink := {"error": ""}
+	var before := _read_json_into(STORED_PLACE_BEFORE_FIXTURE, sink)
+	if str(sink["error"]) != "":
+		_stored_error = str(sink["error"])
+		return false
+	# The after-state is read (never written) so a malformed capture cannot leave
+	# the double running on an inconsistent oracle.
+	var after_sink := {"error": ""}
+	var after := _read_json_into(STORED_PLACE_AFTER_FIXTURE, after_sink)
+	if str(after_sink["error"]) != "":
+		_stored_error = str(after_sink["error"])
+		return false
+	return _init_stored_state(before, after)
+
+
+## Validates both fixture documents and builds the in-memory storage state.
+## Every consumed field is checked, so a malformed fixture fails closed instead
+## of crashing the double.
+func _init_stored_state(before: Dictionary, after: Dictionary) -> bool:
+	var before_map: Variant = _first_map(before, "before")
+	if before_map == null:
+		_stored_error = "stored-placement fixture before state carries no map"
+		return false
+	var after_map: Variant = _first_map(after, "after")
+	if after_map == null:
+		_stored_error = "stored-placement fixture after state carries no map"
+		return false
+	var items: Variant = (before_map as Dictionary).get("items")
+	var store: Variant = (before_map as Dictionary).get("store")
+	if not (items is Dictionary) or not (store is Dictionary):
+		_stored_error = "stored-placement fixture before state lacks items/store"
+		return false
+	var info: Variant = before.get("playerInfo")
+	var priv: Variant = before.get("privateState")
+	if not (info is Dictionary) or not (priv is Dictionary):
+		_stored_error = (
+			"stored-placement fixture before state lacks playerInfo/privateState")
+		return false
+	for key in ["xp", "gold", "wood", "oil", "steel"]:
+		var value: Variant = (before_map as Dictionary).get(key)
+		if not (value is int or value is float):
+			_stored_error = "stored-placement fixture before state lacks map %s" % key
+			return false
+	var pid: Variant = (info as Dictionary).get("pid")
+	var cash: Variant = (info as Dictionary).get("cash")
+	var mana: Variant = (priv as Dictionary).get("mana")
+	var energy: Variant = (priv as Dictionary).get("energy")
+	var ledger: Variant = (priv as Dictionary).get("boughtUnits")
+	if not (pid is String) or not (cash is int or cash is float) \
+			or not (mana is int or mana is float) \
+			or not (energy is int or energy is float) or not (ledger is Array):
+		_stored_error = "stored-placement fixture before state lacks save fields"
+		return false
+	# The after-state must add exactly one entry -- the capture's placement --
+	# and its recorded wall-clock instant becomes the double's epoch, so the
+	# double never reads the wall clock.
+	var after_items: Variant = (after_map as Dictionary).get("items")
+	if not (after_items is Dictionary):
+		_stored_error = "stored-placement fixture after state carries no items map"
+		return false
+	var added: Array = []
+	for key: Variant in (after_items as Dictionary):
+		if not (items as Dictionary).has(str(key)):
+			added.append(str(key))
+	if added.size() != 1:
+		_stored_error = ("stored-placement fixture after state must add exactly "
+			+ "one entry, found %d") % added.size()
+		return false
+	var entry: Variant = (after_items as Dictionary).get(added[0])
+	if not (entry is Array) or (entry as Array).size() != 8:
+		_stored_error = (
+			"stored-placement fixture after entry is not the eight-field array")
+		return false
+	var stamp: Variant = (entry as Array)[3]
+	if not (stamp is int or stamp is float) or int(stamp) < 0 \
+			or float(stamp) != floor(float(stamp)):
+		_stored_error = (
+			"stored-placement fixture entry timestamp is not a non-negative integer")
+		return false
+	_stored_state = {
+		"items": (items as Dictionary).duplicate(true),
+		"store": (store as Dictionary).duplicate(true),
+		"ledger": (ledger as Array).duplicate(true),
+		"xp": int((before_map as Dictionary).get("xp")),
+		"gold": int((before_map as Dictionary).get("gold")),
+		"wood": int((before_map as Dictionary).get("wood")),
+		"oil": int((before_map as Dictionary).get("oil")),
+		"steel": int((before_map as Dictionary).get("steel")),
+		"cash": int(cash),
+		"mana": int(mana),
+		"energy": int(energy),
+		"placed_key": added[0],
+		"placed_item_id": int((entry as Array)[0]),
+	}
+	_stored_pid = pid
+	_stored_epoch_value = int(stamp)
+	return true

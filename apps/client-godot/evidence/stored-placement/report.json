@@ -1,0 +1,307 @@
+{
+  "version": "stored-placement-report-v1",
+  "flow_module": "res://scripts/units/stored_item_flow.gd",
+  "content_files": [
+    "buildings",
+    "units",
+    "specials"
+  ],
+  "content_error": "",
+  "row_slots": [
+    {
+      "slot": 0,
+      "name": "item_id",
+      "server_owned": false
+    },
+    {
+      "slot": 1,
+      "name": "x",
+      "server_owned": false
+    },
+    {
+      "slot": 2,
+      "name": "y",
+      "server_owned": false
+    },
+    {
+      "slot": 3,
+      "name": "timestamp",
+      "server_owned": true
+    },
+    {
+      "slot": 4,
+      "name": "orientation",
+      "server_owned": false
+    },
+    {
+      "slot": 5,
+      "name": "store",
+      "server_owned": true
+    },
+    {
+      "slot": 6,
+      "name": "attr",
+      "server_owned": true
+    },
+    {
+      "slot": 7,
+      "name": "player",
+      "server_owned": true
+    }
+  ],
+  "attr_mirror": {
+    "items": 900,
+    "bag_empty": 601,
+    "bag_clicks": 273,
+    "bag_both": 26,
+    "not_placeable": 0,
+    "units_with_clicks": 0,
+    "units_with_assist": 0,
+    "buildings_with_clicks": 298,
+    "buildings_with_assist": 26,
+    "attrs": {
+      "si": "si",
+      "nc": "nc",
+      "source": {
+        "si": "properties.friend_assistable",
+        "nc": "clicks_to_build"
+      },
+      "rule": "attr is a PURE FUNCTION of two committed item fields and never a client input: `si` (an empty friend-assist list) when properties.friend_assistable > 0, and `nc` (a build-click counter seeded at zero) when clicks_to_build > 0. Legacy reads properties through get_attribute_from_item_id and then json.loads it, tests TRUTHINESS of the raw string first (so an empty properties blob yields no `si`), and only then tests int() > 0 on each value. NO DELIVERED HELPER IN THIS MODULE ACCEPTS AN `attr`, A `player`, OR A `price` PARAMETER -- FORBIDDEN_PARAMETERS names each one and the suite parses the declarations to prove none exists -- so 'the client cannot dictate the row's bag, its team, or any price' is MECHANICAL rather than a promise. The only permitted exception is attr_derived_from(), the named INVERSE, which REPORTS on a bag rather than producing one"
+    }
+  },
+  "storage_projection": {
+    "captured": {
+      "ok": true,
+      "code": "",
+      "distinct_ids": 1,
+      "total_units": 1,
+      "entries": {
+        "1085": 1
+      }
+    },
+    "absent_store_code": "store_absent",
+    "absent_ledger_is_absent": true,
+    "codes": [
+      "count_not_integer",
+      "ledger_not_list",
+      "store_absent",
+      "store_not_object"
+    ]
+  },
+  "intents": {
+    "place_keys": [
+      "user_id",
+      "item_id",
+      "x",
+      "y",
+      "orientation"
+    ],
+    "sell_keys": [
+      "user_id",
+      "item_id"
+    ],
+    "dismissed_keys": [
+      "item_index",
+      "map_key",
+      "index",
+      "row",
+      "slots",
+      "attr",
+      "attributes",
+      "player",
+      "playerID",
+      "team",
+      "quantity",
+      "count",
+      "price",
+      "cost",
+      "refund",
+      "cash",
+      "resources",
+      "vector",
+      "timestamp",
+      "store",
+      "autoactivable",
+      "imgIndex"
+    ],
+    "forbidden_parameters": [
+      "attr",
+      "player",
+      "item_index",
+      "timestamp",
+      "quantity",
+      "price",
+      "refund"
+    ]
+  },
+  "refusals": [
+    {
+      "refusal": "not_in_storage",
+      "status": 409,
+      "divergence": true,
+      "legacy": "places the row anyway and answers success, duplicating an unacquired item",
+      "why": "`remove_store_item`'s `if itemstr in map[\"store\"]` conditional (engine.py:78) makes an absent item a silent no-op, so the branch proceeds to place regardless"
+    },
+    {
+      "refusal": "slot_occupied",
+      "status": 409,
+      "divergence": true,
+      "legacy": "silently REPLACES the existing row while the row count stays unchanged",
+      "why": "`map_add_item` is a bare assignment (`map[\"items\"][str(index)] = [...]`, engine.py:31) with no occupancy test, so the destruction is invisible to any count-based check"
+    },
+    {
+      "refusal": "unknown_item_id",
+      "status": 409,
+      "divergence": true,
+      "legacy": "places a row with an empty attribute bag and appends the id to the ledger",
+      "why": "`get_attribute_from_item_id` yields nothing for an absent id, so the row would be built from no committed content at all"
+    },
+    {
+      "refusal": "item_not_placeable",
+      "status": 409,
+      "divergence": true,
+      "legacy": "the same placement, reached through the same branch",
+      "why": "a row carrying neither `properties` nor `clicks_to_build` yields `None` from `get_attribute_from_item_id` for both, so `map_add_item`'s `player == 1` block writes nothing at all -- a DISTINCT refusal from a wholly unknown id, and measured over the committed content to be unreachable (0 of 900 normalized items fail it), so it is exercised only against an in-memory row"
+    }
+  ],
+  "geometry": {
+    "note": "GRID BOUNDS AND CELL OCCUPANCY ARE RECORDED, NOT REFUSED. `place_stored_item [43, 1085, 250, -3, ...]` stored `(250, -3)` verbatim and an `item_index` of `999999` became a map key. That is the ALREADY-RECORDED M6 tile-to-cell geometry gap: bounds and occupancy are client-side rules with no server-authoritative validation anywhere in the legacy source. Closing it needs new EVIDENCE, not a derivation, and inventing a bound would fabricate a rule the oracle does not have. `slot_occupied` is not a contradiction -- it destroys an EXISTING row and is invisible to any count-based check. building-move, building-sell, and building-store all made the same call for the same reason.",
+    "occupancy_note": "NO BRANCH READS ANY NEIGHBOURING ROW, so a placement may overlap an existing row's cells. The committed content records no footprint-aware derivation, so the 2x2 General Sculpture prize and the 3x3 Fountain prize cannot be given a correct cell by this line either. The delivered line ships on the 1x1 Metal Draggy prize, which needs no footprint, and records the rest.",
+    "bounds_refused": false,
+    "cell_occupancy_refused": false
+  },
+  "rules": {
+    "slot": "the map slot is DERIVED SERVER-SIDE as the smallest positive integer absent from the map's placements -- placement_envelope.next_free_slot, reused unchanged rather than re-implemented -- so a client cannot name a slot, cannot overwrite one, and cannot dictate the row. The committed fresh corpus places keys 1..40, so the first derived slot is 41",
+    "row": "the row is server-owned in FIVE of its eight slots: item_id, x and y come from the client's cell intent, orientation is a verbatim passthrough, and the instant is the SERVER clock (int(time.time()), engine.py:13-14), the garrison is ALWAYS an empty list (engine.py:11-12), the attribute bag is derived from committed content, and the player team is ALWAYS 1 because place_stored_item never passes the client-sent playerID on (command.py:238 reads it, command.py:245 does not pass it)",
+    "attr": "attr is a PURE FUNCTION of two committed item fields and never a client input: `si` (an empty friend-assist list) when properties.friend_assistable > 0, and `nc` (a build-click counter seeded at zero) when clicks_to_build > 0. Legacy reads properties through get_attribute_from_item_id and then json.loads it, tests TRUTHINESS of the raw string first (so an empty properties blob yields no `si`), and only then tests int() > 0 on each value. NO DELIVERED HELPER IN THIS MODULE ACCEPTS AN `attr`, A `player`, OR A `price` PARAMETER -- FORBIDDEN_PARAMETERS names each one and the suite parses the declarations to prove none exists -- so 'the client cannot dictate the row's bag, its team, or any price' is MECHANICAL rather than a promise. The only permitted exception is attr_derived_from(), the named INVERSE, which REPORTS on a bag rather than producing one",
+    "timestamp": "the placed row's slot 3 is a WALL-CLOCK reading (int(time.time()), engine.py:13-14), so a fixture's after.json is NOT byte-stable across reruns and the capture's documented time-dependent field list gains this entry",
+    "quantity": "ONE OPERATION CONSUMES EXACTLY ONE UNIT OF STOCK. `remove_store_item` defaults `quantity=1` and `place_stored_item` / `sell_stored_item` pass no other value, so there is no argument a client could send to place or sell more than one at a time.",
+    "ledger": "`privateState.boughtUnits` COUNTS DISTINCT ITEM IDS, NEVER UNITS HELD. `bought_unit_add` appends only when the id is absent (engine.py:86-89), so one id added twice leaves one entry. A sale does not touch the ledger at all: the branch writes only the store key.",
+    "no_price": "NO PRICE EXISTS AND NONE MOVES. All 24 executed probe transactions in the committed investigation left every stored resource byte-identical, and the branch reads the client's vector nowhere -- worse, `apply_resources` runs BEFORE the dispatcher (command.py:40), so a client-sent delta could mint resources through this very branch. The service therefore derives a NEUTRAL eight-slot vector and its post-execution proof asserts every stored resource is unchanged.",
+    "no_refund": "A SALE CREDITS NOTHING. The legacy branch (`command.py:250-256`) reads `args[0]`, calls `remove_store_item`, and prints: no price, no refund, no quantity, no return value. Its entire effect is one store key disappearing, and no placement is added or removed. The committed configuration records no sale value, so paying one would invent an economy the oracle does not have.",
+    "no_storage_rule": "NO CAPACITY, EXPIRY, VALUE, OR PRICE RULE EXISTS. The committed save records storage as plain {item id: count} integers with no limit, no expiry, and no ownership rule, and the legacy server has no capacity check on this path. Storage is NOT a purchase inventory and no entry carries a refund.",
+    "store_not_purchase": "Storage is NOT a purchase inventory, and no entry carries a refund."
+  },
+  "resources": [
+    "xp",
+    "gold",
+    "wood",
+    "oil",
+    "steel",
+    "cash",
+    "mana"
+  ],
+  "committed_content": {
+    "items": 900,
+    "note": "MEASURED over the committed normalized package: 0 of 429 units record a positive clicks_to_build and 0 of 429 carry a friend_assistable flag at all, against 298 of 470 and 26 of 470 buildings. So `attr` is ALWAYS {} for a unit and is content-shaped only for buildings -- which is exactly why the six unit collection prizes all place with an empty bag and the four BUILDING prizes all seed {\"nc\": 0}"
+  },
+  "absent_helpers": [
+    {
+      "helper": "bounds",
+      "absent_because": "the already-recorded M6 tile-to-cell geometry gap: the legacy server validates no coordinate range, and closing the gap needs new evidence rather than a derivation"
+    },
+    {
+      "helper": "in_bounds",
+      "absent_because": "the same absence as bounds; the gap is RECORDED in GEOMETRY_GAP instead of being closed by an invented range"
+    },
+    {
+      "helper": "cell_is_free",
+      "absent_because": "no branch reads any neighbouring row and no committed content records a footprint, so occupancy cannot be evaluated at all"
+    },
+    {
+      "helper": "footprint",
+      "absent_because": "the 2x2 and 3x3 collection prizes need footprint-aware cell derivation, which is blocked on the same M6 gap; this line ships on a 1x1 prize"
+    },
+    {
+      "helper": "price",
+      "absent_because": "no price exists and none moves; paying one would invent an economy"
+    },
+    {
+      "helper": "cost",
+      "absent_because": "the same absence as price: the branch reads no price argument"
+    },
+    {
+      "helper": "refund",
+      "absent_because": "a sale's entire effect is one store key disappearing"
+    },
+    {
+      "helper": "capacity",
+      "absent_because": "the committed save records plain {item id: count} integers with no limit and the legacy server has no capacity check"
+    },
+    {
+      "helper": "expiry",
+      "absent_because": "no committed field records a lifetime and no branch reads one"
+    },
+    {
+      "helper": "value",
+      "absent_because": "storage is not a purchase inventory and the configuration records no per-entry value"
+    },
+    {
+      "helper": "is_placeable",
+      "absent_because": "`is_placeable` is the SERVICE's refusal predicate on a committed definition; a client-side copy would second-guess it and could disagree, so the client never re-implements the refusal"
+    },
+    {
+      "helper": "next_free_slot",
+      "absent_because": "the slot is derived by the service with the reused rule; deriving it client-side would make `slot_occupied` unreachable and duplicate the authority"
+    }
+  ],
+  "fixture": {
+    "pid": "00000000-0000-4000-8000-000000000001",
+    "captured_item": 1085,
+    "captured_item_name": "Metal Draggy",
+    "captured_cell": [
+      58,
+      47
+    ],
+    "captured_slot": 41,
+    "committed_placements": 40,
+    "seed_collection": 1,
+    "placement_row": [
+      1085,
+      58,
+      47,
+      1791020315,
+      0,
+      [],
+      {},
+      1
+    ],
+    "placement_server_time_is_positive": true,
+    "placement_count": [
+      1,
+      0
+    ],
+    "placement_ledger": [
+      [],
+      [
+        1085
+      ]
+    ],
+    "sale_count": [
+      1,
+      0
+    ],
+    "sale_storage": [
+      {
+        "1085": 1
+      },
+      {}
+    ],
+    "sale_credited": false,
+    "sale_refund": 0
+  },
+  "methods": [
+    "_committed_int",
+    "_decode_properties",
+    "_ledger_gained",
+    "attr_derived_from",
+    "bag_is_derivable",
+    "derive_attr",
+    "evaluate_place",
+    "evaluate_sell",
+    "project_storage",
+    "readout_sell",
+    "readout_text",
+    "stored_count"
+  ]
+}
