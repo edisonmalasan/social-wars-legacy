@@ -826,6 +826,7 @@ import purchase_envelope
 import queue_envelope
 import sell_envelope
 import store_envelope
+import stored_placement_envelope
 import upgrade_envelope
 import research_envelope
 import quest_envelope
@@ -881,6 +882,25 @@ ERROR_AMBIGUOUS_CELL = "ambiguous_cell"
 ERROR_UNRESOLVABLE_LEDGER_ENTRY = "unresolvable_ledger_entry"
 ERROR_AMBIGUOUS_LEDGER = "ambiguous_ledger"
 ERROR_NOT_RESURRECTABLE = "not_resurrectable"
+# --- stored-item placement (godot-stored-item-placement) ---------------------
+# The three NEW refusal codes. `unknown_item_id`, `invalid_item_id`,
+# `invalid_coordinates` and `invalid_orientation` are the shared constants above
+# and are reused unchanged rather than duplicated.
+#
+# All three are DELIBERATE DIVERGENCES: the legacy server answers
+# {"result": "success"} in every one of these cases, because
+# `remove_store_item`'s `if itemstr in map["store"]` conditional (engine.py:78)
+# makes an absent item a silent no-op and `map_add_item` assigns over an
+# existing key with no occupancy test (engine.py:31).  Each is recorded as an
+# executed probe in the fixture manifest, never as parity.
+ERROR_NOT_IN_STORAGE = "not_in_storage"
+ERROR_SLOT_OCCUPIED = "slot_occupied"
+ERROR_ITEM_NOT_PLACEABLE = "item_not_placeable"
+# The storage itself could not be read: absent, not a mapping, holding a
+# non-integer count, or paired with a non-list `boughtUnits`.  A save-side
+# precondition rather than a client mistake, so it is reported rather than
+# defaulted, invented, or silently treated as empty.
+ERROR_UNRESOLVABLE_STORAGE = "unresolvable_storage"
 ERROR_MISSING_TRACK = "missing_track"
 ERROR_INVALID_TRACK = "invalid_track"
 ERROR_UNRESOLVABLE_RESEARCH_STATE = "unresolvable_research_state"
@@ -1051,6 +1071,109 @@ def _committed_item(
     return dict(found) if found is not None else None
 
 
+# ------------------------------------------------------------------
+# stored-item placement (godot-stored-item-placement)
+#
+# These three helpers are at MODULE scope on purpose.  Inside `create_app`
+# they could only live in the gap between the first route's `def` and the
+# next route decorator -- and that gap is inside the first route's own
+# marker-bounded source slice, which the delivered structural guards
+# require to contain exactly one function.  Module scope is outside every
+# slice and is the convention `_committed_item` and `_seed_dead_heroes`
+# above already use, so each helper takes `boot` as its first parameter.
+# The reasoning is recorded once above the first route decorator and
+# pinned from both sides by the tutorial suite's `RoutePlacementTests` and
+# this line's own.
+# ------------------------------------------------------------------
+def _stored_placement_state(
+    boot: compat_legacy.LegacyBoot, user_id: str
+) -> Tuple[Dict[str, Any], Dict[str, Any], Any, List[Any], Dict[str, int]]:
+    """The pre/post-execution storage state both routes read.
+
+    ``map_store`` and ``map_items`` return **live references** into the
+    in-memory save the legacy dispatcher mutates in place, so both are copied
+    here for the before/after comparison -- exactly what the collection route
+    does with ``map_store``.  The ledger is read straight off the save document
+    and copied for the same reason: ``bought_unit_add`` appends to the very list
+    ``expected_ledger`` must compare against.
+
+    The placements are ALSO returned as the accessor's own view, un-copied, and
+    that view -- not the copy -- is what the slot derivation reads.  With an
+    honest save the two are indistinguishable.  The distinction exists because
+    ``slot_occupied`` is the slot rule's named inverse and can only ever fire
+    when the key view and the occupancy view disagree; reading the copy would
+    guarantee they agree and make the guard dead code.
+    """
+    document = boot.save_document(user_id)
+    private = document.get("privateState")
+    ledger = private.get("boughtUnits") if isinstance(private, dict) else None
+    items = boot.map_items(user_id)
+    return (
+        dict(boot.map_store(user_id)),
+        dict(items),
+        items,
+        list(ledger) if isinstance(ledger, list) else None,  # type: ignore[arg-type]
+        boot.resources(user_id),
+    )
+
+def _stored_item_row(
+    boot: compat_legacy.LegacyBoot, item_id: int
+) -> Tuple[Optional[Dict[str, Any]], Any, Any]:
+    """The committed row for ``item_id`` plus its two derived bag fields.
+
+    Read from the **loaded legacy configuration** -- the same ``items`` list
+    ``get_item_from_id`` indexes (``get_game_config.py:117-125``) -- so
+    ``properties`` is a raw JSON-encoded STRING here and the derivation must
+    read that representation.  ``compat_legacy`` exposes no ``items`` table
+    accessor and is deliberately not modified by this line, so the route
+    reads it through the public ``config()`` payload exactly as
+    ``collection_table()`` reads ``collections`` internally.
+    """
+    table = boot.config().get("items")
+    row = stored_placement_envelope.committed_item(table, item_id)
+    if row is None:
+        return None, None, None
+    return (
+        row,
+        row.get(stored_placement_envelope.CLICK_TO_BUILD_FIELD),
+        row.get(stored_placement_envelope.PROPERTIES_FIELD),
+    )
+
+
+def _stored_placement_refusal(
+    failure: stored_placement_envelope.EnvelopeError
+) -> Tuple[Dict[str, Any], int]:
+    """Map a derivation refusal onto its structured code and status.
+
+    The four gameplay refusals are ``409``: the request was well formed and
+    the answer is about the player's state, not about the request's shape.
+    The structural ones are ``400``.  A content-side shape failure -- a
+    committed field the derivation cannot read the way legacy's ``int()``
+    reads it -- is the service's ``500``, never the client's ``400``.
+    """
+    code = failure.code
+    if code == stored_placement_envelope.REASON_NOT_IN_STORAGE:
+        return error_response(409, ERROR_NOT_IN_STORAGE, str(failure))
+    if code == stored_placement_envelope.REASON_SLOT_OCCUPIED:
+        return error_response(409, ERROR_SLOT_OCCUPIED, str(failure))
+    if code == stored_placement_envelope.REASON_UNKNOWN_ITEM_ID:
+        return error_response(409, ERROR_UNKNOWN_ITEM_ID, str(failure))
+    if code == stored_placement_envelope.REASON_ITEM_NOT_PLACEABLE:
+        return error_response(409, ERROR_ITEM_NOT_PLACEABLE, str(failure))
+    if code == stored_placement_envelope.REASON_UNRESOLVABLE_STORAGE:
+        return error_response(409, ERROR_UNRESOLVABLE_STORAGE, str(failure))
+    if code in (
+        stored_placement_envelope.REASON_INVALID_ITEM_ID,
+        stored_placement_envelope.REASON_INVALID_COORDINATES,
+        stored_placement_envelope.REASON_INVALID_ORIENTATION,
+    ):
+        return error_response(400, code, str(failure))
+    if code in ("item_properties_invalid", "item_field_invalid"):
+        # The committed content, not the request.
+        return error_response(500, ERROR_INTERNAL, code)
+    return error_response(400, code, str(failure))
+
+
 def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
     """Build the v0 Flask app over an already-initialized legacy boot state."""
     boot = legacy if legacy is not None else compat_legacy.current()
@@ -1071,16 +1194,18 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
 
     app = Flask(__name__, static_folder=None)
 
-    # ``/v0/tutorial`` is declared FIRST, before every other route, and that
-    # order is load-bearing rather than incidental.  The delivered structural
-    # guards slice this module's source from ``def vN_x():`` up to the next
-    # ``@app.<method>(...)`` decorator (the level suite uses the corpus
-    # constant, because ``/v0/level_up`` was the last route when it was
-    # written) and require each slice to parse as exactly one function.  A new
-    # route declared between two existing ones would therefore land inside the
-    # preceding route's slice and break a delivered guard, so the only slot no
-    # slice reaches is ahead of the first route.  See the tutorial suite's
-    # route-placement test, which pins this.
+    # ``/v0/tutorial`` is declared FIRST and that order is load-bearing, not
+    # incidental: the delivered structural guards slice this module's source
+    # from each ``def v0_x():`` up to a chosen end marker -- usually the next
+    # route decorator, but the level suite uses the corpus constant and the
+    # expand suite names the first error handler -- and require one function per
+    # slice.  A new route declared between two existing ones lands inside the
+    # preceding route's marker-bounded slice and breaks a delivered guard, so
+    # only two slots are free: ahead of the first route, and after the first
+    # route's body with no decorator between.  The tutorial suite's
+    # route-placement test pins this slot; the two stored-placement routes below
+    # take the other one, with their three helpers hoisted to module scope above
+    # ``create_app`` because a helper inside that gap would sit in this slice.
 
     @app.post("/v0/tutorial")
     def v0_tutorial() -> Tuple[Dict[str, Any], int]:
@@ -1335,7 +1460,416 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
             ),
             200,
         )
+    @app.post("/v0/place_stored")
+    def v0_place_stored() -> Tuple[Dict[str, Any], int]:
+        """Execute one storage placement intent through the unchanged legacy path.
 
+        One call carries **exactly one** legacy ``place_stored_item`` command
+        (``command.py:233-248``), and the request body carries **only** a save
+        identity, a stored item id, and a target cell.  **No map slot, row,
+        attribute bag, player team, stored count, or price is accepted** (design
+        D2/D3): the slot is derived by the reused ``next_free_slot``, the row's
+        instant comes from the server clock (``engine.py:13-14``), the garrison is
+        always an empty list, the team is always ``1``, and the attribute bag is
+        :func:`derive_attr`'s pure function of two committed fields.  Every such
+        key a client sends is ignored -- the same intent-only discipline the
+        collect, expand, level-up, collection and revival routes use for amounts
+        and prices.
+
+        **No price exists and none moves (design D5).**  All 24 executed probe
+        transactions left every stored resource byte-identical, and the branch
+        reads the client's vector nowhere; worse, ``apply_resources`` runs BEFORE
+        the branch (``command.py:40``), so a client-sent delta would let any
+        caller mint resources through this very branch.  The derived vector is
+        therefore neutral and the proof asserts every stored resource is
+        unchanged.
+
+        **Design D3 -- the row is server-owned in five of its eight slots.**
+        ``place_stored_item`` reads ``args[4] playerID`` and never passes it on
+        (``command.py:238`` reads it, ``command.py:245`` does not), so the team is
+        always ``1`` whatever a client sends -- executed probe evidence, recorded
+        in the fixture report rather than asserted from the source.
+
+        **The four refusals are deliberate DIVERGENCES (design D4).**  The legacy
+        server answers success in every case: an item that was never stored is
+        placed anyway, an occupied index is silently overwritten with the row
+        COUNT unchanged, and an unknown id is placed with an empty bag.  Each is
+        refused here with a named code and no state change, and each is recorded
+        in the fixture manifest as an executed probe rather than as parity.
+
+        **Bounds are deliberately NOT refused.**  ``place_stored_item [43, 1085,
+        250, -3, ...]`` stored ``(250, -3)`` verbatim: that is the already
+        recorded M6 tile-to-cell geometry gap, it needs new evidence rather than
+        a derivation, and inventing a bound would fabricate a rule the oracle does
+        not have.  ``slot_occupied`` is not a contradiction -- it destroys an
+        EXISTING row and is invisible to any count-based check.
+
+        Validation is structural fail-closed and every failure returns **before**
+        the dispatcher runs, so the corpus is byte-identical on every error path.
+
+        **The slot is derived from the accessor's own view, not from a copy.**
+        ``_stored_placement_state`` returns the placements twice -- copied for the
+        before/after proof, and un-copied for this derivation -- because
+        ``slot_occupied`` is the slot rule's named inverse and can only fire when
+        the key view and the occupancy view disagree.  Deriving from the copy
+        would guarantee they agree and make the guard unreachable.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404, ERROR_UNKNOWN_USER_ID, "no save exists for user_id %r" % user_id
+            )
+
+        if "item_id" not in payload:
+            return error_response(
+                400, ERROR_MISSING_ITEM_ID, "item_id is required"
+            )
+        if "x" not in payload or "y" not in payload:
+            return error_response(
+                400, ERROR_INVALID_COORDINATES, "x and y are both required"
+            )
+        item_id = payload["item_id"]
+        try:
+            item_id = stored_placement_envelope.validate_item_id(item_id)
+            cell = stored_placement_envelope.validate_coordinates(
+                payload["x"], payload["y"]
+            )
+            # Absent means the derived default, not a client value.
+            orientation = stored_placement_envelope.validate_orientation(
+                payload.get("orientation", stored_placement_envelope.DERIVED_ORIENTATION)
+            )
+        except stored_placement_envelope.EnvelopeError as failure:
+            return _stored_placement_refusal(failure)
+
+        try:
+            store_before, items_before, items_view, ledger_before, resources_before = (
+                _stored_placement_state(boot, user_id)
+            )
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        # The committed definition.  A missing row and a row that carries neither
+        # derived field are TWO distinct refusals, split on the record's own
+        # wording, not one spelling of one check.
+        row, clicks_to_build, properties = _stored_item_row(boot, item_id)
+        if row is None:
+            return error_response(
+                409,
+                ERROR_UNKNOWN_ITEM_ID,
+                "item %d resolves to no committed definition, so nothing about a "
+                "row for it can be derived; the legacy server places one anyway "
+                "with an empty attribute bag" % item_id,
+            )
+        if not stored_placement_envelope.is_placeable(row):
+            return error_response(
+                409,
+                ERROR_ITEM_NOT_PLACEABLE,
+                "item %d carries neither `properties` nor `clicks_to_build`, so "
+                "`get_attribute_from_item_id` yields nothing for either derived "
+                "field and the row would be derived from no committed content"
+                % item_id,
+            )
+        try:
+            derived_attr = stored_placement_envelope.derive_attr(
+                clicks_to_build, properties
+            )
+        except stored_placement_envelope.EnvelopeError as failure:
+            return error_response(500, ERROR_INTERNAL, failure.code)
+
+        # The four refusals, resolved BEFORE the dispatcher runs.
+        projection = stored_placement_envelope.project_storage(
+            store_before, ledger_before
+        )
+        if not bool(projection.get("ok", False)):
+            return error_response(
+                409, ERROR_UNRESOLVABLE_STORAGE, str(projection.get("error", ""))
+            )
+        try:
+            stored_count = stored_placement_envelope.store_count(store_before, item_id)
+            if stored_count < 1:
+                return error_response(
+                    409,
+                    ERROR_NOT_IN_STORAGE,
+                    "item %d is not in storage; `remove_store_item`'s "
+                    "`if itemstr in map[\"store\"]` conditional (engine.py:78) "
+                    "makes an absent item a silent no-op, and the legacy server "
+                    "then places the row anyway" % item_id,
+                )
+            slot = stored_placement_envelope.resolve_slot(items_view)
+        except stored_placement_envelope.EnvelopeError as failure:
+            return _stored_placement_refusal(failure)
+
+        # Derive the legacy envelope.  The slot is derived HERE, never accepted.
+        try:
+            envelope_payload = stored_placement_envelope.build_place_envelope(
+                item_id=item_id, x=cell[0], y=cell[1], items=items_view,
+                orientation=orientation,
+            )
+        except stored_placement_envelope.EnvelopeError as failure:
+            return _stored_placement_refusal(failure)
+
+        # Execute the unchanged legacy dispatcher in-process.  Reaching here IS
+        # the legacy result -- which is precisely why it is not taken as proof
+        # that the right row was placed at the right slot.
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500, ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        try:
+            store_after, items_after, _items_view, ledger_after, resources_after = (
+                _stored_placement_state(boot, user_id)
+            )
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        row_after = items_after.get(str(slot))
+        try:
+            divergence = stored_placement_envelope.divergence_place(
+                store_before, store_after, ledger_before, ledger_after,
+                row_after, item_id, cell[0], cell[1], orientation,
+                clicks_to_build, properties,
+            )
+        except stored_placement_envelope.EnvelopeError as failure:
+            return error_response(500, ERROR_INTERNAL, failure.code)
+        if divergence is not None:
+            return error_response(
+                500, ERROR_INTERNAL,
+                "the placement did not carry the derived row: %s" % divergence,
+            )
+        for name in sorted(resources_after):
+            if resources_after[name] != resources_before[name]:
+                return error_response(
+                    500, ERROR_INTERNAL,
+                    "resource %s is %r after execution, not the pre-execution %r: "
+                    "placing a stored item moves no resource, so the derived "
+                    "neutral vector requires every stored resource to be unchanged"
+                    % (name, resources_after[name], resources_before[name]),
+                )
+        return (
+            envelope(
+                boot,
+                result="success",
+                placement={
+                    "command": stored_placement_envelope.PLACE_COMMAND,
+                    "item_id": item_id,
+                    "x": cell[0],
+                    "y": cell[1],
+                    "orientation": orientation,
+                    "map_key": slot,
+                    "derived_from": "the server derives the map slot as the "
+                        "smallest positive integer absent from the map's "
+                        "placements and accepts no slot, row, attribute bag, "
+                        "player team, count or price from the client",
+                    "slot_rule": stored_placement_envelope.SLOT_RULE,
+                    "row_derivation": stored_placement_envelope.ROW_DERIVATION,
+                },
+                row={
+                    "slots": list(row_after or []),
+                    "item_id": row_after[stored_placement_envelope.ROW_SLOT_ITEM],
+                    "x": row_after[stored_placement_envelope.ROW_SLOT_X],
+                    "y": row_after[stored_placement_envelope.ROW_SLOT_Y],
+                    "timestamp": row_after[stored_placement_envelope.ROW_SLOT_TIMESTAMP],
+                    "orientation": row_after[stored_placement_envelope.ROW_SLOT_ORIENTATION],
+                    "store": list(row_after[stored_placement_envelope.ROW_SLOT_STORE]),
+                    "attr": dict(row_after[stored_placement_envelope.ROW_SLOT_ATTR]),
+                    "player": row_after[stored_placement_envelope.ROW_SLOT_PLAYER],
+                    "attr_rule": stored_placement_envelope.ATTR_RULE,
+                    "attr_derived_from": stored_placement_envelope.attr_derived_from(
+                        row_after[stored_placement_envelope.ROW_SLOT_ATTR]
+                    ),
+                    "timestamp_note": stored_placement_envelope.TIMESTAMP_NOTE,
+                },
+                quantity={
+                    "consumed": stored_placement_envelope.QUANTITY,
+                    "count_before": stored_count,
+                    "count_after": stored_count - stored_placement_envelope.QUANTITY,
+                    "rule": stored_placement_envelope.QUANTITY_RULE,
+                },
+                storage_before=store_before,
+                storage_after=store_after,
+                storage=projection,
+                ledger_before=ledger_before,
+                ledger_after=ledger_after,
+                ledger_rule=stored_placement_envelope.LEDGER_RULE,
+                refused={
+                    "dismissed_arguments": [
+                        dict(entry)
+                        for entry in stored_placement_envelope.DISMISSED_ARGUMENTS
+                    ],
+                },
+                refusals=[dict(entry) for entry in stored_placement_envelope.REFUSALS],
+                geometry={
+                    "bounds_refused": False,
+                    "cell_occupancy_refused": False,
+                    "note": stored_placement_envelope.GEOMETRY_GAP,
+                    "occupancy_note": stored_placement_envelope.CELL_OCCUPANCY_GAP,
+                },
+                resources=resources_after,
+            ),
+            200,
+        )
+
+    @app.post("/v0/sell_stored")
+    def v0_sell_stored() -> Tuple[Dict[str, Any], int]:
+        """Execute one stored-item sale through the unchanged legacy path.
+
+        One call carries **exactly one** legacy ``sell_stored_item`` command
+        (``command.py:250-256``), and the request body carries **only** a save
+        identity and a stored item id.  The branch reads ``args[0]``, calls
+        ``remove_store_item``, and prints: **no price, no refund, no quantity, no
+        return value.**  So the route accepts none of them -- a client-sent price
+        is ignored exactly as a client-sent amount is on the collect and
+        level-up routes, and a client-sent refund cannot become the endpoint's own
+        proof.
+
+        **A sale credits NOTHING (design D5).**  Measured over two executed sales:
+        exactly ONE changed leaf, the store key, with no placement added, no
+        ``boughtUnits`` entry written or removed, and no resource credited.  The
+        proof asserts all four of those, because asserting only the decrement
+        would leave a sale that also paid out looking correct.
+
+        **A sale of nothing is refused.**  ``remove_store_item``'s conditional
+        (``engine.py:78``) makes selling an absent item a silent no-op that the
+        legacy server answers with success -- indistinguishable from a real sale,
+        which is exactly why it is refused rather than reported.
+
+        **No row is touched.**  A sale adds no placement, removes none, and
+        changes none; the proof compares the whole placement mapping before and
+        after rather than only its count, so a sale that quietly rewrote a row
+        would be caught even with the count unchanged.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404, ERROR_UNKNOWN_USER_ID, "no save exists for user_id %r" % user_id
+            )
+
+        if "item_id" not in payload:
+            return error_response(
+                400, ERROR_MISSING_ITEM_ID, "item_id is required"
+            )
+        item_id = payload["item_id"]
+        try:
+            item_id = stored_placement_envelope.validate_item_id(item_id)
+        except stored_placement_envelope.EnvelopeError as failure:
+            return _stored_placement_refusal(failure)
+
+        try:
+            store_before, items_before, _items_view, ledger_before, resources_before = (
+                _stored_placement_state(boot, user_id)
+            )
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        projection = stored_placement_envelope.project_storage(
+            store_before, ledger_before
+        )
+        if not bool(projection.get("ok", False)):
+            return error_response(
+                409, ERROR_UNRESOLVABLE_STORAGE, str(projection.get("error", ""))
+            )
+        try:
+            stored_count = stored_placement_envelope.store_count(store_before, item_id)
+            if stored_count < 1:
+                return error_response(
+                    409,
+                    ERROR_NOT_IN_STORAGE,
+                    "item %d is not in storage; selling it is a silent no-op whose "
+                    "success response is indistinguishable from a real sale"
+                    % item_id,
+                )
+        except stored_placement_envelope.EnvelopeError as failure:
+            return _stored_placement_refusal(failure)
+
+        try:
+            envelope_payload = stored_placement_envelope.build_sell_envelope(
+                item_id=item_id
+            )
+        except stored_placement_envelope.EnvelopeError as failure:
+            return _stored_placement_refusal(failure)
+
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500, ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        try:
+            store_after, items_after, _items_view, ledger_after, resources_after = (
+                _stored_placement_state(boot, user_id)
+            )
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        try:
+            divergence = stored_placement_envelope.divergence_sell(
+                store_before, store_after, ledger_before, ledger_after,
+                item_id, items_before, items_after,
+            )
+        except stored_placement_envelope.EnvelopeError as failure:
+            return error_response(500, ERROR_INTERNAL, failure.code)
+        if divergence is not None:
+            return error_response(
+                500, ERROR_INTERNAL,
+                "the sale did not carry the derived storage decrement: %s"
+                % divergence,
+            )
+        for name in sorted(resources_after):
+            if resources_after[name] != resources_before[name]:
+                return error_response(
+                    500, ERROR_INTERNAL,
+                    "resource %s is %r after execution, not the pre-execution %r: "
+                    "selling a stored item credits NOTHING -- the legacy branch "
+                    "writes only the store key -- so every stored resource must "
+                    "be unchanged"
+                    % (name, resources_after[name], resources_before[name]),
+                )
+        return (
+            envelope(
+                boot,
+                result="success",
+                sale={
+                    "command": stored_placement_envelope.SELL_COMMAND,
+                    "item_id": item_id,
+                    "credited": False,
+                    "refund": None,
+                    "note": stored_placement_envelope.NO_REFUND_NOTE,
+                    "quantity_rule": stored_placement_envelope.QUANTITY_RULE,
+                },
+                quantity={
+                    "consumed": stored_placement_envelope.QUANTITY,
+                    "count_before": stored_count,
+                    "count_after": stored_count - stored_placement_envelope.QUANTITY,
+                },
+                storage_before=store_before,
+                storage_after=store_after,
+                storage=projection,
+                ledger_before=ledger_before,
+                ledger_after=ledger_after,
+                ledger_rule=stored_placement_envelope.LEDGER_RULE,
+                placements={
+                    "before": len(items_before),
+                    "after": len(items_after),
+                    "untouched": items_before == items_after,
+                    "rule": "a sale adds, removes and rewrites no placement",
+                },
+                refusals=[dict(entry) for entry in stored_placement_envelope.REFUSALS],
+                resources=resources_after,
+            ),
+            200,
+        )
 
     @app.get("/v0/session")
     def v0_session() -> Response:
@@ -4812,5 +5346,7 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
             ),
             200,
         )
+
+
     app.config["COMPAT_LEGACY_CORPUS"] = str(boot.corpus)
     return app

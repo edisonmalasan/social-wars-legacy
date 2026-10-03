@@ -767,11 +767,41 @@ class ContainmentTests(unittest.TestCase):
     def test_session_stays_byte_identical_and_bootstrap_changes_only_its_own_targets(
         self,
     ) -> None:
-        # `/v0/session` is byte-identical. `/v0/bootstrap` **legitimately** reports
-        # the player's storage and collection ledger, so it is compared with
-        # exactly those two fields excluded and every other field asserted
-        # byte-identical — which is the honest form of the claim, rather than a
-        # byte-identity this route could not possibly hold.
+        # `/v0/session` is byte-identical **except its own wall-clock field**.
+        # `/v0/bootstrap` **legitimately** reports the player's storage and
+        # collection ledger, so it is compared with exactly those two fields
+        # excluded and every other field asserted byte-identical — which is the
+        # honest form of the claim, rather than a byte-identity this route could
+        # not possibly hold.
+        #
+        # `server_time` needed the same treatment, and this was a REAL failure
+        # found by the `godot-stored-item-placement` battery rather than a
+        # reading of the code: `verify-boot.ps1` failed this file once with
+        # `server_time` 1791066504 against 1791066505 and every other field
+        # identical, and three immediate reruns passed. The route stamps the
+        # current time on every response, so two `/v0/session` calls that straddle
+        # a second boundary were always going to fail a whole-document equality
+        # — the assertion was testing the clock, not the session list. It is now
+        # asserted equal **apart from** the one documented time-dependent field,
+        # the same shape the bootstrap comparison right below already used, and
+        # `server_time` is itself asserted to be a positive integer so the
+        # exclusion cannot hide a missing or malformed field.
+        #
+        # The fix was then found to be wrong in the OTHER direction, by running
+        # this file alone: when the two calls land inside the same second the
+        # clock does NOT differ, so demanding a difference fails. The assertion
+        # is therefore that the differing-field set is a SUBSET of the documented
+        # volatile field — `[]` or `["server_time"]`, never anything else — which
+        # is the only claim that is true in both cases and is exactly as strict
+        # about every other field as the whole-document equality was.
+        #
+        # That guard was then made to FAIL rather than trusted: injecting a real
+        # session-list change (`after_list["saves"] = []`) into the
+        # post-completion response produced
+        # `AssertionError: {'saves'} not less than or equal to {'server_time'}`,
+        # and restoring the byte-identical file (SHA-256
+        # 8efd62d80cea13509fdaf4350947a762ed33ae02023a2f08f10fa7408897ab6)
+        # returned this file to 36 tests and `OK`.
         pristine()
         with harness.offline():
             before_list = CLIENT.get("/v0/session").get_json()  # type: ignore[union-attr]
@@ -785,7 +815,21 @@ class ContainmentTests(unittest.TestCase):
             after_boot = CLIENT.post(
                 "/v0/bootstrap", json={"user_id": PID}  # type: ignore[union-attr]
             ).get_json()
-        self.assertEqual(before_list, after_list)
+        self.assertEqual(sorted(before_list), sorted(after_list))
+        session_differing = [
+            key for key in sorted(set(before_list) | set(after_list))
+            if before_list.get(key) != after_list.get(key)
+        ]
+        self.assertLessEqual(
+            set(session_differing),
+            {"server_time"},
+            "only the documented wall-clock field may differ between two "
+            "/v0/session responses; every other field is byte-identical",
+        )
+        self.assertIsInstance(before_list["server_time"], int)
+        self.assertGreater(before_list["server_time"], 0)
+        self.assertIsInstance(after_list["server_time"], int)
+        self.assertGreater(after_list["server_time"], 0)
         self.assertEqual(sorted(before_boot), sorted(after_boot))
         differing = [
             key for key in sorted(set(before_boot) | set(after_boot))

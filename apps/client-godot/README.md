@@ -296,16 +296,19 @@ powershell -File apps/client-godot/verify-boot.ps1
 ```
 
 It runs, in order: guard baseline → Compatibility API unittest discovery +
-loopback smoke → the seventeen headless Godot suites → the
-unreachable-endpoint scenario against a port with nothing listening → four
-live phases → guard baseline again → `evidence/boot/boot-report.json`. Each
+loopback smoke → the headless Godot suites (one per delivered line; the count
+and the list live in `verify-boot.ps1`, and each line's own section below records
+what *it* added) → the unreachable-endpoint scenario against a port with nothing
+listening → the live phases (one per state-mutating deliver line, each against
+the real Compatibility API) → guard baseline again →
+`evidence/boot/boot-report.json`. Each
 live phase is wrapped
 by `compat_live_phase.py`, which starts `apps/compat-api/run.py`, waits for
 `GET /v0/session`, runs exactly one Godot command, stops the service with
 `CTRL_BREAK`, and asserts the service exited 0, the disposable corpus was
 removed, no new `socialwars-compat-*` directory is left in temp, no
-working-tree `saves/` exists, and the port is released. The fourth live
-phase (`placement-live`) additionally passes
+working-tree `saves/` exists, and the port is released. Every
+save-mutating phase additionally passes
 `--expect-save-mutation`: the wrapper snapshots every file under the
 running corpus's `saves/` after readiness and fails unless at least one
 changed after the Godot run — proof that a live `POST /v0/place` persisted
@@ -930,9 +933,10 @@ and purchase request counts (exactly one each), and the fake-capture pointer.
   progressed players;
 - insufficient cash reproduces legacy clamping, not rejection, and the client
   refuses such a purchase without sending anything;
-- storage is display-only here: nothing places from or sells out of storage
-  (`place_stored_item` / `sell_stored_item` are the later *store* and *sell*
-  deliver lines);
+- storage is display-only *here*: this line moves an item **into** storage and
+  nothing more. Placing from and selling out of storage are the separate
+  `godot-stored-item-placement` deliver line, which is **delivered** — see
+  "Stored-item placement" below;
 - no pixel-parity oracle against the legacy client exists, and the shop layout,
   entry labels, and readout are documented placeholders (no captured legacy
   shop layout exists);
@@ -1317,9 +1321,13 @@ one each), and the fake-capture pointer.
   configuration records neither and the legacy server has no capacity check;
 - the bought-units list is deliberately not written by the legacy branch, and
   this line does not change that;
-- this line only moves a building *into* storage, so stored items are **not yet
-  playable**: `place_stored_item` (storage to map) and `sell_stored_item` remain
-  open legacy commands;
+- this line only moves a building *into* storage, so at the time of this line
+  stored items were **not yet playable**: `place_stored_item` (storage to map)
+  and `sell_stored_item` were open legacy commands. Both are **now delivered** by
+  `godot-stored-item-placement` (see "Stored-item placement" below), and that
+  line's `godot-building-store` carve-out is the only thing this bullet still
+  constrains: nothing here renders a storage row as placeable, and nothing here
+  was changed to make it so;
 - parity covers one recorded transaction against the fresh-player corpus, not
   progressed players;
 - storability and addressability are client-side rules only; the endpoint
@@ -2537,9 +2545,12 @@ drove one completion with its content-derived two-part proof.
 - **No collection eligibility is checked** — a caller may name any committed collection. A
   server-authority gap for M13.
 - **Collection ids 0 and 1 alias**, and the projection reports it.
-- **The stored-item placement step is not delivered.** The fixture evidences the grant **into
-  storage**, not a unit placed on the map — that round trip remains a carried follow-up, and it is
-  now the nearest undelivered step on a fully content-derived path.
+- **The stored-item placement step was not delivered by this line** — and is now delivered separately.
+  This fixture still evidences the grant **into storage**, not a unit placed on the map; the second half
+  is `godot-stored-item-placement` (see "Stored-item placement" below), which captures and delivers
+  exactly that round trip. This bullet is retained rather than deleted because the *evidence* stays
+  here: nothing in this fixture was regenerated to fold the placement in, and its own README records
+  that it is the first half only.
 - The committed collections' `item_ids` completion requirements are unchecked by the server.
 - `production`, `movement`, `animations`, and `basic behaviors` remain undelivered. No windowed
   capture and no pixel-parity oracle.
@@ -3308,3 +3319,214 @@ not reproduced** · **the offline double is not the endpoint** — it exists so 
 demonstrable without a service · **parity covers three recorded transactions against the fresh-player corpus
 only**, and no progressed-player save exists beyond the eight villages · the tutorial is **not rendered as
 tutorial**, only as a readout and a confirm line.
+
+## Stored-item placement (`godot-stored-item-placement`)
+
+M9's fourth deliver line, and the **first working round trip** in the M8/M9
+sequence — every prior line after M7 either recorded a refusal or moved only
+counters. The contract is committed in `docs/legacy-stored-unit-placement.md`
+(PR #271, merged `6bb7a46`) and the approved artifacts are
+`openspec/changes/2026-10-03-stored-item-placement/`.
+
+### The finding: `place_stored_item` is **not** a refusal line
+
+The investigation was told to measure rather than assume, and the assumption
+would have been wrong. `place_stored_item` and `sell_stored_item` are two
+`command.py` branches (`command.py:233-256`) that **place a row on the map** and
+**remove a storage entry**, both **unguarded**, both **type-agnostic** (no
+building/unit distinction), and both charging **nothing**. **24 executed probe
+transactions** established the contract rather than one recorded transaction
+guessing at it.
+
+Legacy argument shapes, confirmed at `command.py:233-248`:
+
+| slot | meaning | source |
+| --- | --- | --- |
+| `args[0]` | `item_index` — **client-sent**, and the map key it becomes | 233 |
+| `args[1]` | `item_id` — client-sent | 234 |
+| `args[2]`, `args[3]` | `x`, `y` — client-sent, stored verbatim | 235–236 |
+| `args[4]` | `playerID` | 238 |
+| `args[5]` | `orientation` | 239, passed at 245 |
+| `args[6]` | `unknown_autoactivable_bool` | 240 |
+| `args[7]` | `unknown_imgIndex` | 241 |
+
+*"appears on exactly one line"* is true only **branch-scoped** for `playerID`
+and `orientation` (whole-file: `args[4]`×7, `args[5]`×4, `args[6]`×4,
+`args[7]`×2) and **globally unique** only for `unknown_autoactivable_bool` and
+`unknown_imgIndex`. The suite asserts **both** scopes separately, because the
+first draft of the suite asserted the stronger one and it was false.
+
+### Five of eight row slots are server-derived, and three are not
+
+`engine.map_add_item` (`engine.py:31`) is a bare assignment, and the storage
+removal at `engine.py:78` is conditional on the count reaching zero. So a placed
+row's slots 0, 1, 2 come from the client while **3 (server clock), 4
+(orientation), 5 (garrison), 6 (attr), and 7 (team)** are derived — and the
+attribute bag is derived from **committed content**, which makes this the
+project's second content-derived, server-authoritative write.
+
+### The capture seeds itself through committed content
+
+The committed corpus's `maps[0]["store"]` is `{}`, so there is nothing to place.
+The only content-derived seeding route is `complete_collection(1)`, whose prize
+is **exactly** `{"1085": 1}` — so the recorded transaction chain is
+`login_post` → `complete_collection(1)` → `place_stored_item` →
+`complete_collection(1)` → `sell_stored_item`, with **no fabricated player state
+and no client-sent item list anywhere**.
+
+Verified fixture facts: the placement changed exactly **3** top-level paths
+(`maps[0].items.41`, `maps[0].store.1085`, `privateState.boughtUnits`) = 8
+leaves, with the placement count 40 → 41; the sale changed exactly **1** leaf
+(`maps[0].store.1062` **removed**) and **no** refund; `login_post` changed **0**
+leaves; and **all seven stored resources are byte-identical in all five steps**,
+which is what makes every "charges nothing" claim non-tautological.
+
+### Four unguarded behaviours: three refused, one recorded
+
+The endpoints refuse `unknown_item_id`, `item_not_placeable`, and
+`not_in_storage`, in that **order** (pinned to `compat_service.py:1562`, `:1570`,
+`:1596`). The **fourth** unguarded behaviour — accepting an out-of-grid cell — is
+the **already-recorded M6 tile-to-cell geometry gap**, so it is *recorded and
+reported* rather than refused: inventing a bound would fabricate a rule the
+oracle does not have, and closing the gap needs new **evidence**, not a
+derivation. `slot_occupied` is not a contradiction of this — it destroys an
+**existing** row and is invisible to any count-based check.
+
+### The seam in `test_unit_collection.gd` had to be amended, not deleted
+
+That suite's `_check_boundary()` asserted `place_stored_item` was absent from
+**every** client source. That claim became **false** the moment this line landed,
+and asserting it would assert something untrue at exactly the moment it stopped
+being true. The whole-tree absence was replaced by an **ownership claim** — and
+because two suites scanning the same tree for the same token with two
+hand-maintained owner lists is drift waiting to happen, the *owner* list lives
+only here (`STORAGE_OWNERS`) while the collection suite asserts the hand-off's
+**recipient exists and asserts it**. `BEHAVIOUR_NEEDLES` lost the token; the two
+collection modules are now asserted to declare **no** storage command, which is
+the absence that is still this line's own.
+
+### Four defects the hermetic suite structurally could not catch
+
+The offline suite builds its own envelope, so **544 hermetic checks passed while
+the live phase failed four separate times**. All four were found only by
+`stored-placement-live`:
+
+- the bootstrap payload is keyed `map` (singular) — it is the legacy
+  `get_player_info()` body verbatim — while the recorded **fixture** documents are
+  keyed `maps[0]`. Reading one with the other's accessor returns `{}` silently,
+  so the pre-seed storage check passed **for the wrong reason** and the
+  post-seed one failed. Both accessors are now separately named;
+- `CollectionResult` has **no** `count_after`, so a whole-function abort left
+  steps D and the refusals never executed;
+- the service's and the client's copies of the recorded geometry and quantity
+  notes are **deliberately not identical** (the service cites source lines and
+  probe numbers; the client's copy is the readout string). The suite had asserted
+  byte-equality and claimed "verbatim" — a claim **stronger than anything true**,
+  which failed honestly. It is now a **clause** check over the identifying text,
+  which is what the client actually depends on;
+- the sale's ledger append is **if-absent**, so a repeat completion grants the
+  prize again while the collection ledger **stands still** — the opposite of what
+  the first draft asserted, and the fact that makes step D possible at all.
+
+### The by-name guard was weaker than it looked, and was found by injection
+
+Injecting `static func refund_for(item_id: int) -> int` tripped the
+whole-inventory pin and **nothing else**, because the by-name guard matched only
+the exact name `refund`. That is the same helper wearing a disguise, so a
+substring check was added — and the finding is recorded in the suite rather than
+quietly fixed, because the whole-inventory pin is the real gate and the
+by-name guard is the belt.
+
+### Verification actually run (2026-10-03/04)
+
+```bash
+python -B apps/compat-api/capture_stored_placement_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_stored_item_placement.gd
+godot --headless --path apps/client-godot --script res://tests/test_stored_item_placement.gd -- --report=<repo>/apps/client-godot/evidence/stored-placement/report.json
+godot --headless --path apps/client-godot --script res://tests/test_unit_collection.gd
+godot --headless --path apps/client-godot --script res://tests/test_project_scope.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+openspec validate --all --strict
+```
+
+- fixture capture: exit **0** on **four** consecutive runs, containment **UNCHANGED**
+  (`18e5e55b…a724`). Re-runnability was **measured**, not assumed: every byte is
+  reproducible except `captured_at_utc`, `executed_at_utc`, the `Date` header,
+  and the signed envelope `ts` (which drags its own digest and the save digests of
+  the documents containing the placed row with it). Normalizing exactly those
+  four kinds made the whole directory byte-identical; not normalizing them made
+  every file carrying one differ. The full list is pinned in the manifest under
+  `time_dependent_fields.leaves`.
+- compat suite **`Ran 2130 tests ... OK`**, exit 0 — **+216** over the 1,914
+  baseline, because this line adds two state-mutating routes, the envelope
+  module, and three test modules.
+- the hermetic suite: **544 checks** — the **39th** hermetic suite
+- `verify.ps1` exit **0**; `verify-boot.ps1` exit **0** with **39 hermetic suites
+  and 20 live phases**, guard digest `6978b959…ff348` identical pre/post
+- `test_unit_collection.gd` **1,894** (the amended boundary), `test_project_scope.gd`
+  **1,781**, `test_game_api_fake.gd` **1,322**, `test_unit_production.gd` **568**,
+  `test_unit_animations.gd` **628**, `test_unit_behaviors.gd` **573**,
+  `test_research.gd` **1,024**, `test_quests.gd` **1,223**, `test_tutorial.gd`
+  **639**, `test_scene_build.gd` **36**, `test_content_registry.gd` **87**
+- content validator exit **0**, `result: valid`, 21 schemas; preservation manifest
+  **3,258 entries**, exit 0; `openspec validate --all --strict` **60 passed / 0 failed**
+- evidence: `evidence/stored-placement/report.json`, `stored-placement-report-v1`,
+  digest **`c5bea9dd…8d18`**, 13,618 bytes, byte-identical across **four**
+  consecutive runs. **No windowed capture is committed, because this line renders
+  nothing** — the four M7 buildings' PNGs are the only windowed evidence in the
+  tree and this line adds none.
+
+**Two anti-invention guards, both proven by injection.** Injecting
+`static func cell_is_free(from_cell: int, to_cell: int) -> bool` produced **3
+independent failures** and exit 1; injecting `static func refund_for(item_id: int)
+-> int` produced **2** after the substring guard was added and **1** before it;
+restoring the byte-identical module (SHA-256 `0b437e5d…0edbd`) returned the suite
+to its 544-check passing state and exit 0 both times.
+
+### One pre-existing flake was found by this battery and fixed
+
+`verify-boot.ps1` failed its compat step once with
+`test_collection_endpoint.ContainmentTests.test_session_stays_byte_identical…`
+reporting `server_time` **1791066504** against **1791066505** and every other
+field identical; three immediate reruns passed. `/v0/session` stamps the current
+time on every response, so two calls that straddle a second boundary were always
+going to fail a whole-document equality — the assertion was **testing the clock,
+not the session list**. The fix was then found to be wrong in the **other**
+direction, by running that file alone: when both calls land inside one second the
+clock does *not* differ, so demanding a difference fails. The assertion is
+therefore that the differing-field set is a **subset** of the documented volatile
+field — `[]` or `["server_time"]`, never anything else — which is the only claim
+true in both cases and exactly as strict about every other field as the
+whole-document equality was. That guard was made to fail rather than trusted:
+injecting a real session-list change (`after_list["saves"] = []`) produced
+`AssertionError: {'saves'} not less than or equal to {'server_time'}`, and
+restoring the byte-identical file (SHA-256 `8efd62d8…7ab6`) returned it to 36
+tests and `OK`.
+
+### Claim limits
+
+**The round trip only** — storage to map and storage to gone, with no
+intermediate step · **no price in either direction**: a placement is free and a
+sale credits nothing, because the legacy refund travels in **client-sent deltas**
+this contract refuses · **no capacity, expiry, value, or price rule** — the
+committed configuration records none and the legacy server has none · **no bounds
+and no occupancy check** — the M6 geometry gap is recorded and reported, never
+refused · **no refund is claimed** and none is paid · **`store_add_items` is out
+of scope** — it is an unvalidated client-sent grant and is probe-only here ·
+**placement is type-agnostic**, exactly as the legacy branch is, so a building
+prize is placed through the same route · **four of the ten committed collection
+prizes are buildings**, and because occupancy is unchecked this line cannot give
+any 2×2 or 3×3 prize a correct cell; it ships on the 1×1 Metal Draggy prize and
+records the rest · **nothing is rendered**: there is no windowed capture and no
+pixel-parity oracle, and storage remains a readout · **no unit is moved, trained,
+or animated**, and `production`, `movement`, `animations`, and `basic behaviors`
+remain undelivered · **parity covers five recorded transactions against the
+fresh-player corpus only**, and no progressed-player save exists · the
+**committed capture's two stored resources** are the fake's fixture, so
+real-execution parity rests on the fixture-replay tests and the live phase ·
+No Flash, Ruffle, ActionScript, or browser executes in any of these commands, and
+every network call is loopback.

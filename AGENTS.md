@@ -1471,6 +1471,125 @@ untouched phase. `verify.ps1` additionally returned **-1** on one of two runs an
 `PASS all checks succeeded` on the second, because its windowed-capture step is display-sensitive — a third
 recorded flaky surface. Re-run before treating any of the three as a regression. No Flash, Ruffle,
 ActionScript, or browser executes in any of these commands, and every network call is loopback.
+Verified stored-item-placement commands (M9's first post-assessment line; Godot 4.7.2.stable,
+Windows x64; `python` denotes the pinned interpreter, never the PATH alias). This is the **first
+working round trip** in the M8/M9 sequence rather than a refusal line, and the contract is committed
+in `docs/legacy-stored-unit-placement.md` (PR #271, merged `6bb7a46`):
+
+```bash
+python -B apps/compat-api/capture_stored_placement_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_stored_item_placement.gd
+godot --headless --path apps/client-godot --script res://tests/test_stored_item_placement.gd -- --report=<repo>/apps/client-godot/evidence/stored-placement/report.json
+godot --headless --path apps/client-godot --script res://tests/test_unit_collection.gd
+godot --headless --path apps/client-godot --script res://tests/test_project_scope.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+openspec validate --all --strict
+```
+
+Purposes and observed results (2026-10-03/04): the executed-legacy fixture capture (exit 0 on **four**
+consecutive runs, containment **UNCHANGED** at `18e5e55b…a724`, five steps chained
+`login_post` → `complete_collection(1)` → `place_stored_item` → `complete_collection(1)` →
+`sell_stored_item`, seeded through committed content because the corpus's own `maps[0]["store"]` is
+`{}`; the placement changed exactly **3** top-level paths = 8 leaves with the count 40 → 41, the sale
+changed exactly **1** leaf — a **removed** storage key — and **no refund**, `login_post` changed **0**
+leaves, and **all seven stored resources are byte-identical in all five steps**); the hermetic
+stored-item-placement suite (observed **544 checks**, the **39th** hermetic suite); the
+**amended** collection suite (observed **1,894**); `test_project_scope.gd` (**1,781**),
+`test_game_api_fake.gd` (**1,322**), `test_unit_production.gd` (**568**),
+`test_unit_animations.gd` (**628**), `test_unit_behaviors.gd` (**573**), `test_research.gd` (**1,024**),
+`test_quests.gd` (**1,223**), `test_tutorial.gd` (**639**), `test_content_registry.gd` (**87**), and
+`test_scene_build.gd` (**36**); both batteries in the final state (each exit `0`;
+`verify-boot.ps1` now runs **39 hermetic suites and 20 live phases**, guard digest
+`6978b959…ff348` identical pre/post, and **574** log files inspected with **zero** `[test] FAIL`,
+`^ERROR:`, or `SCRIPT ERROR` lines); the **grown** compat suite (observed **`Ran 2130 tests ... OK`**,
+exit `0` — **+216** over the 1,914 baseline, because this line adds two state-mutating routes, the
+envelope module, and three test modules); the content validator (exit `0`, `result: valid`, 21
+schemas); the preservation manifest (3,258 entries, exit `0`); and `openspec validate --all --strict`
+**60 passed / 0 failed**. Evidence is the deterministic `stored-placement-report-v1` report under
+`apps/client-godot/evidence/stored-placement/` (digest **`c5bea9dd…8d18`**, 13,618 bytes, byte-identical
+across **four** runs). The compatibility service listens on `127.0.0.1:5056` only, and every network call
+in these commands is loopback.
+
+**The finding: `place_stored_item` is NOT a refusal line.** **24 executed probe transactions**
+established that the two branches at `command.py:233-256` are **type-agnostic** (no building/unit
+distinction), **charge nothing**, and are **server-derived in five of eight row slots** — the instant,
+the orientation, the garrison list, the player team, and an `attr` bag that is a **pure function of
+committed content**. Four unguarded behaviours were confirmed by execution and **three are refused**
+(`unknown_item_id`, `item_not_placeable`, `not_in_storage`, in that pinned order, to
+`compat_service.py:1562`, `:1570`, `:1596`); the **fourth**, an out-of-grid cell, is the
+**already-recorded M6 geometry gap** and is therefore *recorded and reported, never refused*, because
+inventing a bound would fabricate a rule the oracle does not have. `store_add_items` is **out of
+scope**: it is an unvalidated client-sent grant and is probe-only. Four of the ten committed collection
+prizes are **buildings**, which corrects the assessment's framing and is why the scope is written
+against the **prize**, not the word "unit".
+
+**Two corrections the Apply stage made to its own prior claims, recorded rather than quietly fixed.**
+(1) *"each appears on exactly one line"* is true only **branch-scoped** for `playerID` and
+`orientation` — whole-file `args[4]`×7, `args[5]`×4, `args[6]`×4, `args[7]`×2 — and **globally
+unique** only for `unknown_autoactivable_bool` and `unknown_imgIndex`; the suite now asserts **both**
+scopes. (2) The service's `resources()` returns `xp, gold, wood, oil, steel, cash, mana` — **seven**,
+**not** the M7 readout's set, which also surfaces the never-written `privateState.energy` — so every
+no-resource-moved proof compares the seven.
+
+**Two anti-invention guards, both proven by injection rather than trusted:** injecting
+`static func cell_is_free(from_cell: int, to_cell: int) -> bool` into the delivered flow module
+produced **3 independent failures** and exit 1, and `static func refund_for(item_id: int) -> int`
+produced **1** — which is how the by-name guard was found to match only the exact name and miss a
+suffixed helper wearing the same disguise, so a substring check was added and the same injection then
+produced **2**; restoring the byte-identical module (SHA-256 `0b437e5d…0edbd`, re-measured after
+restore) returned the suite to its 544-check passing state and exit 0 both times. The whole-inventory
+pin is the real gate; the by-name guard is the belt.
+
+**A cross-suite boundary was amended, not deleted.** `test_unit_collection.gd::_check_boundary()`
+asserted that the placement token was absent from **every** client source; that claim became **false**
+the moment this line landed and was **measured failing with 4 failures** before being touched. The
+whole-tree absence was replaced by an **ownership claim**, and — because two suites scanning one tree
+for one token with two hand-maintained owner lists is drift waiting to happen — the owner list lives
+**only** in this line's suite while the collection suite asserts that the hand-off's **recipient exists
+and asserts it**.
+
+**Four cross-layer defects the hermetic suite structurally could not catch**, all found by
+`stored-placement-live`: the bootstrap payload is keyed `map` while the recorded fixture documents are
+keyed `maps[0]`, so one storage assertion had been **passing for the wrong reason**;
+`CollectionResult` has no `count_after`, so a bad field aborted the function before the sale and both
+refusals ever ran; the service's and the client's copies of the recorded geometry and quantity notes
+are deliberately **not** identical, so the suite had been asserting byte-equality and claiming
+"verbatim" — **stronger than anything true** — and now asserts the identifying **clauses** instead; and
+the sale's ledger append is **if-absent**, so a repeat completion grants the prize again while the
+collection ledger **stands still**, the opposite of what the first draft asserted and the fact that
+makes the sale reachable at all.
+
+**A sixth recorded flaky surface was found by this battery and FIXED rather than re-run.**
+`verify-boot.ps1` failed `test_collection_endpoint.ContainmentTests` once on `server_time`
+**1791066504** against **1791066505** with every other field identical, while three immediate reruns
+passed; `/v0/session` stamps the current time on every response, so a whole-document equality across
+two calls was always going to fail when they straddled a second. The first fix was then found wrong in
+the **other** direction by running that file alone, because when both calls land inside one second the
+clock does *not* differ — so the assertion is now that the differing-field set is a **subset** of the
+documented volatile field, the only claim true in both cases and exactly as strict about every other
+field as before. That guard was made to fail rather than trusted: injecting a real session-list change
+produced `AssertionError: {'saves'} not less than or equal to {'server_time'}`, and restoring the
+byte-identical file (`8efd62d8…7ab6`) returned it to 36 tests and `OK`. **This is the first recorded
+flaky surface in this project that was closed rather than re-run.** The other five remain as recorded
+above.
+
+Claim limits: **the round trip only** — storage to map and storage to gone, with no intermediate step;
+**no price in either direction**, because the legacy refund travels in **client-sent deltas** this
+contract refuses; **no capacity, expiry, value, or price rule**; **no bounds and no occupancy check** —
+the M6 geometry gap is recorded, never refused; **no refund is claimed or paid**; `store_add_items` is
+out of scope; **placement is type-agnostic**, exactly as the legacy branch is, so a building prize is
+placed through the same route, and because occupancy is unchecked this line cannot give any 2×2 or 3×3
+prize a correct cell — it ships on the 1×1 Metal Draggy prize and records the rest; **nothing is
+rendered**, so there is **no windowed capture** and **no pixel-parity oracle**, and storage remains a
+readout; **no unit is moved, trained, or animated**; **parity covers five recorded transactions against
+the fresh-player corpus only**, and no progressed-player save exists; the **committed capture runs the
+fake** implementation, so real-execution parity rests on the fixture-replay tests and the live phase.
+No Flash, Ruffle, ActionScript, or browser executes in any of these commands, and every network call is
+loopback.
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 

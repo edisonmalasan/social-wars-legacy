@@ -669,6 +669,55 @@ func complete_tutorial_town(user_id: String,
 	return TutorialFlow.parse_result(outcome.get("payload"))
 
 
+const STORED_PLACE_PATH := "/v0/place_stored"
+const STORED_SELL_PATH := "/v0/sell_stored"
+
+
+## One stored-item placement intent over loopback HTTP: the client sends ONLY the
+## save identity, the stored item id, and the target cell -- no map slot, no row,
+## no attribute bag, no player team, no stored count, no quantity, and no price.
+## Any `map_key`/`index`/`item_index`/`attr`/`player`/`team`/`quantity`/`price`/
+## `cost`/`resources` key this body carries is DISCARDED, exactly as a
+## client-supplied amount is discarded on the collect, expand, level-up,
+## collection, and revival routes: the server derives the map slot, the row
+## instant, the garrison, the team, and the attribute bag (design D2/D3).
+##
+## **No price moves and none is sent**, because all 24 executed probe
+## transactions left every stored resource byte-identical and the branch reads
+## the client's vector nowhere.
+func place_stored_item_town(user_id: String, item_id: int, x: int,
+		y: int) -> BootData.StoredPlacementResult:
+	var outcome := await _call("POST", STORED_PLACE_PATH, JSON.stringify({
+		"user_id": user_id,
+		"item_id": item_id,
+		"x": x,
+		"y": y,
+	}))
+	if not outcome.get("ok", false):
+		return BootData.stored_placement_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return BootData.parse_stored_placement(outcome.get("payload"))
+
+
+## One stored-item sale intent over loopback HTTP: the client sends ONLY the save
+## identity and the stored item id. No price, no refund, no quantity, no return
+## value is sent or accepted -- the legacy branch's entire effect is one store
+## key disappearing (design D5), so a client-sent refund is ignored exactly as a
+## client-sent price is ignored elsewhere.
+func sell_stored_item_town(user_id: String,
+		item_id: int) -> BootData.StoredSaleResult:
+	var outcome := await _call("POST", STORED_SELL_PATH, JSON.stringify({
+		"user_id": user_id,
+		"item_id": item_id,
+	}))
+	if not outcome.get("ok", false):
+		return BootData.stored_sale_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return BootData.parse_stored_sell(outcome.get("payload"))
+
+
 ## every failure returns `{ok: false, code, message}` with the failure named.
 func _call(method: String, path: String, body: String) -> Dictionary:
 	var url := resolved_endpoint() + path

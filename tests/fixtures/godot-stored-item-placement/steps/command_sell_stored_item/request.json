@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-10-03T21:59:07+00:00",
+  "form": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "data": "b830987247bb12e2a383bce6df5bf03f893d1730be695579a82b38d01b0f1ab7;{\"accessToken\":\"\",\"commands\":[[0,\"sell_stored_item\",[1062],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1791064747}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "command.php form carrying exactly one command: [[0,\"sell_stored_item\",[1062],[0,0,0,0,0,0,0,0]]] -- ONE argument and nothing else. The branch reads args[0] and calls remove_store_item with its default quantity=1 (command.py:250-255), so there is no quantity, no price, and no refund to send. The executed result changes EXACTLY ONE leaf, the storage key, because remove_store_item DELETES the key when the remaining quantity is not positive (engine.py:80-83): no row is added, no boughtUnits entry is written or removed, and NO resource is credited. The vector is NEUTRAL, and a 'sale' that credited anything would be a client-sent delta applied before the branch.",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}

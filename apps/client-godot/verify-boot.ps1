@@ -97,6 +97,16 @@
        committed village saves as the only progressed evidence for the field,
        and the two-round committed executed-legacy capture with its minting
        anchor, also with no endpoint, no request, and no mutation),
+       and the stored-item-placement suite (the pure projection and mirror of
+       the storage-to-map round trip: the eight row slots read verbatim, the
+       content-derived attribute bag, the storage projection, the intent keys
+       and the dismissed keys, the four refusals and the two recorded geometry
+       gaps, the offline double driven through the committed five-step capture
+       with its value-level no-resource-moved proofs, the re-derived dispatcher
+       branch and engine helpers, the structural anti-invention guard, the
+       tree-wide storage-ownership claim that REPLACED the collection suite's
+       now-false whole-tree absence, and the report writer -- also with no
+       endpoint, no request, and no mutation),
        (the loop passes the dead endpoint to every suite: the session and
        game-clock suites use it for their failure phase, the placement,
        purchase, move, sell, store, upgrade, construction, collect, and
@@ -104,7 +114,7 @@
        that ignore user args are unaffected)
     6. boot-scene unreachable-endpoint failure scenario, run with no service
        at all
-    7. nineteen live phases against the real Compatibility API: the main-scene
+    7. twenty live phases against the real Compatibility API: the main-scene
        boot (success, compared with the committed fixture save), the legacy-v0
        GameApi suite, the structured API-error boot scenario, the
        placement phase (one intent through the v0 placement endpoint with
@@ -182,7 +192,17 @@
         throughout, and EVERY stored resource unchanged across all three, plus
         its two reachable named refusals carrying the endpoint's own codes and
         a record that the third is structurally unreachable from this typed
-        surface, with the disposable corpus save asserted mutated)
+        surface, with the disposable corpus save asserted mutated), and the
+        stored-placement phase (the FIRST working round trip in this battery,
+        driven as seed -> place -> reseed -> sale through the v0 endpoints,
+        whose responses must prove the committed prize landed in the corpus's
+        empty storage, that the map slot was DERIVED server-side from the
+        corpus's own placements (the client never sent one), that the
+        attribute bag is EMPTY because the committed prize is a unit, that the
+        sale credits NOTHING, and that EVERY stored resource is unchanged
+        across all four steps -- plus both reachable named refusals carrying
+        the endpoint's own codes with no partial payload, with the disposable
+        corpus save asserted mutated)
     8. Compatibility API guard baseline, post-run, must equal the pre-run
        digests
     9. teardown assertions: loopback port released, no working-tree saves/
@@ -442,7 +462,7 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests", "test_tutorial")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests", "test_tutorial", "test_stored_item_placement")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a
@@ -774,6 +794,45 @@ try {
                 "--headless", "--path", $projectRel,
                 "--script", "res://tests/test_tutorial.gd",
                 "--", "--scenario=live-tutorial",
+                "--gameapi-endpoint=$endpoint"
+            )
+        },
+        @{
+            # The stored-placement phase drives the FIRST working round trip of
+            # the M8/M9 sequence over the real v0 endpoint, in FOUR steps, and the
+            # order is load-bearing rather than incidental:
+            #
+            #   A  complete_collection(1)   seeds storage with the COMMITTED
+            #                                prize {1085: 1} -- the only
+            #                                content-derived route there is,
+            #                                because the committed corpus's own
+            #                                storage is EMPTY
+            #   B  place_stored_item(1085) the unchanged legacy dispatcher places
+            #                                one row under a SERVER-DERIVED map
+            #                                slot and consumes the unit
+            #   C  complete_collection(1)   the ledger is NOT idempotent, so the
+            #                                SAME completion grants the unit back;
+            #                                without this step step D has nothing
+            #                                to sell
+            #   D  sell_stored_item(1085)   the dispatcher removes the storage
+            #                                entry and credits NOTHING
+            #
+            # --expect-save-mutation holds four times over: every step is a real
+            # write, and the phase asserts each typed response, its post-state,
+            # and that all seven stored resources are UNCHANGED across every
+            # step -- which is what makes this line's free-placement and
+            # no-refund claims non-tautological.
+            #
+            # No COMPAT_SEED_* seam is needed and none is used: the storage,
+            # the ledger, and the placements are all present in the committed
+            # corpus, and manufacturing any of them would be refused.
+            Name = "stored-placement-live"
+            Assertions = "stored-placement live phase"
+            ExpectSaveMutation = $true
+            Arguments = @(
+                "--headless", "--path", $projectRel,
+                "--script", "res://tests/test_stored_item_placement.gd",
+                "--", "--scenario=live-stored-placement",
                 "--gameapi-endpoint=$endpoint"
             )
         }
@@ -1150,6 +1209,23 @@ try {
         "tutorial live phase proved its two reachable refusals with the endpoint's own codes and recorded that the third is unreachable from this typed surface"
     Report-Result ($tutorialOut -match "(?m)^PASS corpus save mutated by the live placement") `
         "tutorial live phase mutated the disposable corpus save"
+
+    # The stored-placement live phase is the first WORKING ROUND TRIP in this
+    # battery, so its assertions are about a transaction that must SUCCEED, not
+    # about a refusal: the committed prize seeded into storage, a server-DERIVED
+    # map slot (the client never sent one), an empty content-derived attribute
+    # bag, a sale that credits nothing, both resources-unchanged proofs, and both
+    # reachable refusals carrying the endpoint's own codes.
+    $storedOut = ""
+    if ($phaseLogs.ContainsKey("stored-placement-live")) {
+        $storedOut = $phaseLogs["stored-placement-live"]
+    }
+    Report-Result ($storedOut -match "\[test\] PASS script=res://tests/test_stored_item_placement\.gd") `
+        "stored-placement live phase asserts its scenario"
+    Report-Result ($storedOut -match '\[test\] live-stored-placement seeded=1 placed_key=\d+ cell=58,47 sold=1085 refund=0 resources_unchanged=true refused=unknown_item_id,not_in_storage') `
+        "stored-placement live phase drove seed -> place -> reseed -> sell through the v0 endpoint, with a server-derived map slot, a content-derived bag, no refund, and both reachable refusals"
+    Report-Result ($storedOut -match "(?m)^PASS corpus save mutated by the live placement") `
+        "stored-placement live phase mutated the disposable corpus save"
 
     # --- 8. guard baseline, post-run ---------------------------------------
 

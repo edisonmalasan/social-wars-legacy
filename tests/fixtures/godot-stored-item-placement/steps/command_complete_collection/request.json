@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-10-03T21:59:07+00:00",
+  "form": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "data": "0ae596f2fa89b7f34d7c0569aa198f9201f803b40e95e9c9ce48b5d04977d6e0;{\"accessToken\":\"\",\"commands\":[[0,\"complete_collection\",[1,0],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1791064747}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "command.php form (USERID, user_key, language, data) with the derived <64-hex>;<json> envelope carrying exactly one command: [[0,\"complete_collection\",[1,0],[0,0,0,0,0,0,0,0]]]. This is the CONTENT-DERIVED SEED of the whole line: the client names WHICH collection and the server looks up WHAT it grants in the committed `collections` table (get_collection_prize: index = max(0, collection - 1), then json.loads(collections[index]['prize'])), so no item id, quantity, or price is sent and the resource vector is NEUTRAL because a completion's price would be a client-sent delta (apply_resources runs before the branch). The grant writes map['store'] and privateState['collections'] and NOTHING ELSE -- in particular NOT privateState['boughtUnits'], which is why the placement below performs that write itself. user_key is redacted; accessToken is the crafted empty placeholder.",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}

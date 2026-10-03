@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-10-03T21:59:07+00:00",
+  "form": {
+    "USERID": "00000000-0000-4000-8000-000000000001",
+    "data": "e071deb2c69ded2686ef6e16bc6f85f628847b7a9a31b45423070240f9fbb248;{\"accessToken\":\"\",\"commands\":[[0,\"place_stored_item\",[41,1085,58,47,1,0,0,0],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1791064747}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "command.php form carrying exactly one command: [[0,\"place_stored_item\",[41,1085,58,47,1,0,0,0],[0,0,0,0,0,0,0,0]]] -- the DERIVED map slot (the smallest positive integer absent from maps[0]['items']), the committed prize id, the derived cell, the server's own team, the orientation, and the two placeholders the branch reads and discards. NOTHING about the row is accepted from the client except item id, cell and orientation: the instant is the server clock (engine.timestamp_now), the garrison slot is always [] (engine.py:11-12), the team is always 1 (command.py:238 reads args[4] and command.py:245 never passes it on), and the attribute bag is derived from the item's committed clicks_to_build and properties.friend_assistable (engine.py:15-29) -- for a unit both are empty, so the bag is {}. The vector is NEUTRAL: this branch charges nothing, and a client-sent delta would move a balance because apply_resources runs BEFORE the branch (command.py:40).",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}
