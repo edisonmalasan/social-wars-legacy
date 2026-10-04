@@ -2112,8 +2112,12 @@ godot --headless --path apps/client-godot res://scenes/town.tscn -- --xp-report=
 - **no level reward is paid and none displayed** — `reward_type` and `reward_amount` are
   committed on every entry and consumed by no legacy branch, so paying one would invent an
   economy;
-- **unit XP and tutorial progression are out of scope** because the corpus cannot exercise
-  them (0 of 40 placed rows carry `attr["xp"]`; no unit placements exist);
+- **unit XP and tutorial progression were out of scope for M7, and the reason recorded for
+  unit XP was false as a general claim** — the fresh-player corpus carries `attr["xp"]` on 0 of
+  40 placed rows and holds no unit row at all, which are facts about *that* corpus, while 171
+  of 12,954 placed rows across 5 of the 31 committed save documents carry it — every one of them
+  a committed unit row — so the branch was always exercisable; it is now owned by
+  `godot-unit-experience`, and the tutorial by `godot-tutorial`;
 - the committed thresholds are **preserved verbatim**; nothing is rebalanced;
 - the disagreement reporting deliberately **does not reconcile** — it surfaces the conflict;
 - a **successful live level-up is unproven** (unreachable from the committed corpus); parity

@@ -2,8 +2,9 @@
 
 ## Why
 
-Five delivered locations tell the reader that unit experience is out of scope **"because the
-corpus cannot exercise it"**. That reason is false. The legacy branch does mutate: `add_xp_unit`
+Seven delivered locations tell the reader that unit experience is out of scope **"because the
+corpus cannot exercise it"** — five enumerated by the investigation and two more that only Apply
+found. That reason is false. The legacy branch does mutate: `add_xp_unit`
 (`command.py:322-343`) writes `attr["xp"]` on a placed row, and **22 executed-legacy
 transactions** against an authentic committed village save — recorded in
 `docs/legacy-unit-xp.md` and committed nowhere in a fixture — establish how. The field is not
@@ -28,10 +29,12 @@ behaviour with no committed fixture.
   (`production_flow.gd::experience()`): the recorded value is reported verbatim *and* its kind is
   reported, so a bag poisoned by the legacy server's own string write (`{"xp": "5"}`, proven
   reachable) is **visible** rather than read as an integer.
-- **Five corrected stale statements** in `level_flow.gd` (two doc comments and the user-facing
-  note string) and in `AGENTS.md` / `apps/client-godot/README.md`, each reframed from *"the
-  corpus cannot exercise it"* to *"no trusted award exists"*, with the corpus figure retained and
-  labelled as a corpus fact, the repository-wide figure added, and a pointer to this capability.
+- **Seven corrected stale statements** in `level_flow.gd` (its first doc line, two doc comments and
+  the user-facing note string), in `town.gd`, and in `AGENTS.md` / `apps/client-godot/README.md`,
+  each reframed from *"the corpus cannot exercise it"* to *"no trusted award exists"*, with the
+  corpus figure retained and labelled as a corpus fact, the repository-wide figure added, and a
+  pointer to this capability. A tree scan pinned to zero expected hits keeps a new one from
+  appearing — the count grew from five to seven during Apply, which is the argument for the scan.
 - **One wording-precision fix** where a hermetic assertion message says "NOT ONE **committed**
   row" while its scope is the 40-row fresh corpus — the assertion is true, the phrasing is
   broader than its scope.
