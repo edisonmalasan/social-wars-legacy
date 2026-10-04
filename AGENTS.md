@@ -1765,6 +1765,129 @@ passes, full suite `Ran 2187 tests … OK`). A measurement scoped the defect cla
 this was the **only** instance in the repository; every prior fixture verifies by
 **sha256**, which is line-ending invariant. No Flash, Ruffle, ActionScript, or
 browser executes in any of these commands, and every network call is loopback.
+
+Verified mission-vocabulary commands (milestone M10 line 1; Godot 4.7.2.stable,
+Windows x64; `python` denotes the pinned interpreter, never the PATH alias). This
+is **M10's first deliver line**, and the first since M9 that is neither a refusal
+nor a transaction: the contract is committed in `docs/legacy-m10-missions.md`
+(PR #283, merged `e4fc5e2`), which measured that mission *state* is already
+delivered by `godot-quests` (`collect_mission`, `command.py:430-442`, the only
+mission-mutating command in the server) and that the **only undelivered surface
+is vocabulary**:
+
+```bash
+godot --headless --path apps/client-godot --script res://tests/test_mission_vocabulary.gd
+godot --headless --path apps/client-godot --script res://tests/test_mission_vocabulary.gd -- --report=<repo>/apps/client-godot/evidence/mission-vocabulary/report.json
+godot --headless --path apps/client-godot --script res://tests/test_project_scope.gd
+godot --headless --path apps/client-godot --script res://tests/test_content_registry.gd
+godot --headless --path apps/client-godot --script res://tests/test_game_api_fake.gd
+godot --headless --path apps/client-godot --script res://tests/test_scene_build.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+openspec validate --all --strict
+```
+
+Purposes and observed results (2026-10-05): the hermetic mission-vocabulary
+suite (observed **208 checks**, **211** with `--report`; the **41st** hermetic
+suite) over a typed read-only `Entry`/`Vocabulary` projection of the **64**
+committed `MISSION_*` declarations at `constants.py:984-1047`; the scope suite
+(**1,832**, was 1,798); the **unchanged** sibling suites (content registry
+**87**, fake GameApi **1,322**, scene build **36**, quests **1,223**, tutorial
+**639** — all PASS, all unchanged, because this line adds **no endpoint** and
+**no registry entry** and touches `apps/compat-api/**` not at all);
+`verify.ps1` (exit `0`, `PASS all checks succeeded`); `verify-boot.ps1` (exit `0`, `PASS all checks succeeded`; **41** hermetic suites (was 40), **20** live phases (unchanged), guard digest `6978b959…ff348` **identical before and after**, and **682** log files inspected carrying zero `[test] FAIL`, `^ERROR:`, or `SCRIPT ERROR` lines); the **unchanged**
+compat suite (`Ran 2187 tests in 63.502s` then `OK`, exit `0` — unchanged at the 2,187 baseline); the content validator (exit `0`, `result: valid` — 22 outputs, 21 schemas, 604 references); the
+preservation manifest (3,258 entries, 758423699 bytes, exit `0`); and `openspec validate --all --strict`
+(**62 passed, 0 failed** (62 items)). Evidence is the deterministic `mission-vocabulary-report-v1`
+report under `apps/client-godot/evidence/mission-vocabulary/` (digest
+**`1aeee8d2…b6f4b`**, **13,850** bytes in LF form, byte-identical across
+**four** consecutive runs). `git status` showed no content-package, fixture,
+save, config, village, conversion-package, registry-manifest, or legacy-source
+byte changed.
+
+**The finding is that the vocabulary exists and nothing ever read it.** A first
+classifier reported three consumers at `constants.py:997`, `:998`, and `:1012`,
+and **all three are substring artifacts** — `MISSION_DESTROYED` prefixes
+`MISSION_DESTROYED_SUBCATFUNC` and `MISSION_DESTROYED_ID`, and
+`MISSION_COMPLETE_QUEST` prefixes `MISSION_COMPLETE_QUEST_IN_MAP`. The suite
+re-measures the absence **every run** across the **ten** other legacy modules and
+requires **zero** `MISSION_` occurrences, so the claim is a measurement rather
+than an inherited assertion, and it fails if an artifact is ever miscounted as a
+consumer. The vocabulary is nevertheless **why this line precedes the combat
+lines**: it is the only surviving statement of what they must resolve, and it
+resolves none of it, naming `MISSION_ATTACK_PLAYER` (37), `MISSION_ATTACK_FRIEND`
+(38), `MISSION_ASSAULTS_WON` (46), `MISSION_KILLED_ENEMY` (67),
+`MISSION_DEFEAT_ALL_TROLLS` (30), `MISSION_SACRIFICE_UNIT` (63), and others.
+
+**Design D1 was a decision, not an omission: the vocabulary is NOT normalized
+into the content package.** Every `packages/game-content/normalized/globals.json`
+entry records `source_file: "config/main.json"`, because that package describes
+content the server *serves*; this vocabulary is dead source in a module the
+server never serves. Verified before deciding: **no** legacy `constants.py`
+vocabulary (e.g. `CAT_ENERGY` / `TOKEN_ENERGY` / `COST_ENERGY`) is normalized
+today either. Normalization is recorded as a deferred alternative. Because D1
+leaves a duplicated table, **design D2** makes the suite prove byte-faithfulness
+instead: it re-derives the declarations from `constants.py` **as bytes** and
+requires name, value, and declared line to match for all **64** entries plus
+entry-count and gap-set equality in both directions — stronger than a
+normalization pass for the failure mode that matters, a mistranscribed value.
+
+**All three structural guards were proven by injection rather than trusted, and
+all eight injections were detected**, each followed by a byte-identical restore:
+an invented dispatch helper `resolve_type` (**5** failures); a helper named after
+a mission type `mission_killed_enemy` (**5**); a suffixed absent helper
+`damage_for`, caught by the **substring** check (**5**); a mission-state
+reference `"timestampLastChapter"` (**4**); a colliding mistranscribed value
+(**3**); a clean mistranscribed value (**3**); a mistranscribed name (**2**); and
+a removed entry (**3**).
+
+**Three defects in this line's own work were found and fixed by measurement, not
+by luck.** (1) The projection **silently dropped entries**: the ordering pass
+scanned `range(first, last)` using the *last entry in file order* as its upper
+bound, so mistranscribing one value above the committed range shrank the
+projection from **64** entries to **63** and surfaced as an entry-count mismatch
+rather than as the value mismatch it was. The min/max fix was then **refused by
+the suite's own guard**, because it added exactly two comparisons over a
+committed value; the final fix sorts the value keys, keeping the "no comparison
+of one committed value against another" claim literally true and making the
+projection independent of storage order, with a regression check. (2) The by-name
+guard was **case-sensitive**, so `mission_killed_enemy` would have slipped past
+it; it was strengthened only after measuring that the module is clean
+case-insensitively and that a lower-cased probe is caught by a folded comparison
+but not by the exact-case one. (3) A **deliberate refusal test failed the
+battery**: `JSON.parse_string` emits an engine `ERROR:` line for malformed input
+and `verify-boot.ps1` treats any `^ERROR:` as a script error, so a document that
+does not begin with `{` is now refused *before* the parser is invoked, with the
+identical verdict and no engine error — coverage kept rather than dropped.
+
+Claim limits: **the vocabulary only** — **64** committed names, values, and
+provenance lines, with **nothing derived**; **zero consumers is a statement about
+the preserved server** and says nothing about what the Flash client did with
+these names, and no mission type is dispatched, triggered, resolved, or
+displayed; **no combat, damage, death, mission completion, or reward** is
+implemented, and this line deliberately starts none; the numbering gaps
+`[9, 10, 20, 57]` are **reported and never closed**, with nothing synthesised to
+fill one; the two overlapping declarations (`destroyed_family` 15/16/17,
+`complete_quest_pair` 31/47) are reported **`resolved: false`** with no preferred
+member and **no grouping rule**, which would be an invention; the three committed
+globals (`NUM_ACTIVE_MISSIONS` 5, `PERMISSION_PACK_UNITS` `[10, 20, 30, 40]`,
+`PERMISSION_COSTS` `{10, 20, 30, 40}`) are read **through the existing
+normalized registry** and never transcribed here, and **no cap, limit, or price
+is derived** — `NUM_ACTIVE_MISSIONS` is specifically **not** turned into an
+active-mission bound; **mission state is owned by `godot-quests`**, so this
+capability may not reference a mission-state field anywhere except the one
+literal declaring it foreign, and the suite verifies the owner really does
+project all **five** fields, making the boundary a hand-off and not an orphan;
+the cost of D1 is a duplicated table, which the byte-faithfulness guard pays for;
+the declaration count and gap set are **re-derived every run**, so a legacy edit
+fails the suite rather than silently contradicting it; **no windowed capture and
+no pixel-parity oracle** are claimed, because nothing is rendered. No Flash,
+Ruffle, ActionScript, or browser executes in any of these commands, and **no
+network is used at all**.
+
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 
