@@ -1476,6 +1476,87 @@ untouched phase. `verify.ps1` additionally returned **-1** on one of two runs an
 `PASS all checks succeeded` on the second, because its windowed-capture step is display-sensitive — a third
 recorded flaky surface. Re-run before treating any of the three as a regression. No Flash, Ruffle,
 ActionScript, or browser executes in any of these commands, and every network call is loopback.
+Verified unit-tutorial commands (milestone M9 line 3; Godot 4.7.2.stable, Windows
+x64; `python` denotes the pinned interpreter, never the PATH alias). M9's deliver
+list is `XP`, `levels`, `quests`, `research`, `collections`, and
+`tutorial/progression`; this is its **third** line and the first **not** to be a
+refusal line. The contract is committed in `docs/legacy-m9-tutorial.md`
+(PR #264, merged `2dbf715`):
+
+```bash
+python -B apps/compat-api/capture_tutorial_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_tutorial.gd
+godot --headless --path apps/client-godot --script res://tests/test_tutorial.gd -- --report=<repo>/apps/client-godot/evidence/tutorial/report.json
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-10-03): the fixture capture (exit **0**,
+containment **UNCHANGED**, re-runnable across **five** consecutive runs,
+recording two transactions against a disposable corpus over loopback); the compat
+suite (observed **`Ran 1914 tests ... OK`**, exit `0` — **1912** at Apply, plus
+**+2** from the recorded follow-up PR #268); the hermetic tutorial suite
+(observed **639 checks**, 642 with `--report`; the **38th** hermetic suite, and
+**re-measured 2026-10-05 at 639, exit 0**); both batteries in the final state
+(each exit `0`; the second embeds the `tutorial-live` phase, and at delivery ran
+**38 hermetic suites and 19 live phases** with guard digest `6978b959…ff348`
+identical pre/post and **264** log files carrying zero `[test] FAIL`, `^ERROR:`,
+or `SCRIPT ERROR` lines); the content validator (exit `0`, `result: valid`, 21
+schemas); and the preservation manifest (3,258 entries, exit `0`). Evidence is
+the deterministic `tutorial-report-v1` report under
+`apps/client-godot/evidence/tutorial/` (digest **`05f7b12d…c38b`**, **10,634**
+bytes in LF form — **re-verified 2026-10-05** against the committed Git blob,
+which is byte-identical, so the figure holds on an LF or a CRLF checkout; the
+CRLF working tree shows 11,026 bytes for the same content). On merged `main`
+today `verify-boot.ps1` registers **40 hermetic suites and 20 live phases**, and
+`test_tutorial.gd` is among them.
+
+**The finding: one branch, one write, one stored field, and three reachable
+verdicts.** `command.py:60-66` is the entire tutorial system:
+
+```python
+if command == "complete_tutorial":
+    tutorial_step = args[0]                                 # :61  a LOCAL
+    print("Tutorial step", tutorial_step)                    # :62  a log line
+    if tutorial_step >= 25 or tutorial_step == 15:           # :63  the gate
+        save["playerInfo"]["completed_tutorial"] = 1         # :65  the write
+```
+
+`completed_tutorial` occurs **once** across the eleven legacy root modules, and
+that line is the **write**, making it the **tenth** committed field in this
+project with no legacy consumer. `tutorial_step` occurs **4** times over **3**
+lines and is a **local** that is **never persisted**, so there is **no stored
+step** and therefore nothing to resume from. The gate has **no lower bound, no
+upper bound, and no type check**: it completes at `15, 25, 26, 100, 1000000,
+1000000000` and declines at `-1000000000, -5, -1, 0, 1, 14, 16..24`, so the
+**hole is exactly `16..24`**, nine steps wide, between the two arms. The endpoint
+checks the **flag before the gate**, so once a tutorial completes it stays
+complete regardless of the step sent.
+
+This line is the clearest case for the standing instruction to *measure your own
+fields rather than assume the refusal pattern repeats*: the field was assumed to
+be dead by the two preceding M8 lines and is not.
+
+Claim limits: **no total step count is derived** — none is committed, so a
+`total_steps()` helper would invent one (and injecting one was **proven** to fail
+three independent checks); **the stored flag has zero readers**, so the delivered
+gate is a faithful reproduction of an inert one and does not gate any client
+option; **the step is client-supplied and unvalidated**, and the `16..24` hole is
+**recorded, not reproduced as a client affordance**; **the three verdicts and
+their order are derived from the branch**, not observed from the Flash client;
+raising-shape divergences between the service and the client are **recorded
+rather than reproduced**; parity covers **two** recorded transactions against the
+fresh-player corpus only, with no progressed-player save available; **no pixel
+parity** and **no windowed capture**, because nothing is rendered. **A fourth
+recorded flaky surface** was added by this line: a GDScript `%`-binding slip in
+the live phase's marker line made the suite unparseable and `verify-boot.ps1`
+failed while every hermetic suite passed — caught by reading the log files, which
+is why `SCRIPT ERROR` and not only `^ERROR:` must be grepped. No Flash, Ruffle,
+ActionScript, or browser executes in any of these commands, and every network
+call is loopback.
 Verified stored-item-placement commands (M9's first post-assessment line; Godot 4.7.2.stable,
 Windows x64; `python` denotes the pinned interpreter, never the PATH alias). This is the **first
 working round trip** in the M8/M9 sequence rather than a refusal line, and the contract is committed
@@ -1595,6 +1676,95 @@ the fresh-player corpus only**, and no progressed-player save exists; the **comm
 fake** implementation, so real-execution parity rests on the fixture-replay tests and the live phase.
 No Flash, Ruffle, ActionScript, or browser executes in any of these commands, and every network call is
 loopback.
+Verified unit-experience commands (M9's second post-assessment line; Godot
+4.7.2.stable, Windows x64; `python` denotes the pinned interpreter, never the
+PATH alias). This is the **eleventh and final** M9 line, and the only one whose
+deliverable is **two branches that disagree with each other**. The contract is
+committed in `docs/legacy-unit-xp.md` (PR #276, merged `79d13ac`):
+
+```bash
+python -B apps/compat-api/capture_unit_xp_fixture.py
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_unit_experience.gd
+godot --headless --path apps/client-godot --script res://tests/test_unit_experience.gd -- --report=<repo>/apps/client-godot/evidence/unit-experience/report.json
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-10-04): the executed-legacy fixture capture
+(exit **0**, **12 transactions, 12 disposables, 12 servers**, containment digest
+`18e5e55b…a724` identical before and after, no working-tree `saves/`, all **17**
+prior fixtures untouched, re-runnable); the compat suite (observed **`Ran 2187
+tests … OK`**, exit `0`, against the 2,130 baseline — **+57**); the hermetic
+unit-experience suite (observed **2,432 checks**, **2,430** without `--report`,
+exit `0`; the **40th** hermetic suite — **re-measured 2026-10-05 at 2,430**, exit
+`0`); both batteries in the final state (each exit `0`, `PASS all checks
+succeeded`; `verify-boot.ps1` ran **40 hermetic suites and 20 live phases** with
+guard digest `6978b959…ff348` identical pre/post and **636 log files inspected
+with zero** `ERROR:` / `SCRIPT ERROR` / `[test] FAIL`; **no new live phase**, since
+the line adds no endpoint); the content validator (exit `0`, `result: valid`, 22
+files / 21 schemas / 604 references); the preservation manifest (3,258 entries,
+exit `0`); and `openspec validate --all --strict` (**61 passed / 0 failed** at
+Apply, **62 / 0** after Sync, the new capability being a new spec item).
+`test_project_scope.gd` needed an amendment and was re-run to **1,798 checks**
+after a stray build artifact was **deleted, not worked around**. Evidence is the
+deterministic `unit-experience-report-v1` report under
+`apps/client-godot/evidence/unit-experience/` (digest
+**`d83282ac…a7ef4`**, **38,465** bytes in LF form — **re-verified 2026-10-05**
+against the committed Git blob, byte-identical; byte-identical across three
+consecutive runs at delivery, and the CRLF working tree shows 39,726 bytes for the
+same content). Committed evidence lives under
+`tests/fixtures/godot-unit-experience/` (79 files, 1,465 KB).
+
+**The finding: the two arms disagree, and that asymmetry is the deliverable.**
+`add_xp_unit` at `command.py:334-340` assigns `attr["xp"] = xp_gain` when the key
+is **absent** and increments with `+=` when it is **present**. The amount is
+`args[1]`, **entirely client-supplied**, with **no validation whatsoever — not
+even `int()`**. So one request can poison a save (`{"xp": "5"}` is persisted on
+the assign arm) while the increment arm **raises** on the same string (HTTP 500,
+zero leaves changed). A projection that folded `bool` into `int` would be right
+by accident and wrong by reason, which is why the delivered model records
+`recorded_kind`. **Boolean is narrower than it first looks:** on the increment arm
+a client-sent `true` is worth exactly **+1** and the row moved **23 → 24**, an
+`int`, so no `True` is persisted there; a stored `True` is reachable only on the
+assign arm (**derived from the branch, not executed**), and `True + 5` is `6`.
+Exactly one leaf moves on success: `/maps/0/items/<key>/6/xp`. The
+third-argument level rule was established as **display-only** by execution —
+`[772,5]` and `[772,5,9]` give an identical `attr_after`, leaf set, and
+whole-state sha256, with only the printed lines differing — and is **recorded, not
+implemented**. All seven stored resources were byte-identical across all twelve
+transactions, **non-tautologically**, since the printed lines differ between arms.
+
+**A false delivered claim was found and corrected rather than inherited.** The
+prior record asserted unit XP was unreachable because the corpus carries
+`attr["xp"]` on **0 of 40** placed rows and contains no unit row. That is true of
+`tests/saves/fresh-player.json` and **false of the repository**: **171 of 12,954**
+placed rows across **5 of the 31** committed save documents carry it, every one a
+committed unit row. Separately, `units[].xp` was **refuted** as the award source by
+three recomputed measurements, and the pid must be read from `playerInfo.pid`,
+never from a filename stem (**3 of 8** village saves disagree; `initial.json` has
+`null`).
+
+Claim limits: **no XP award is paid and no stored resource moves**; **no award
+schedule is derived**, because the amount is client-supplied and unvalidated —
+this is the refusal the whole line exists to preserve; **no readiness, threshold,
+unit level, or schedule** is implemented; the third-argument rule is **recorded,
+not implemented**; **the client's role in the round trip is undelivered** and the
+fixture **does not license a route**; parity covers **one recorded transaction per
+case against a single village corpus**, with no progressed-player save available;
+coverage is **1 of 429** committed units; **no pixel parity** and **no windowed
+capture**, because nothing is rendered. **This line also found the second
+byte-count guard defect in this project** (PR #280): the fixture integrity test
+compared `stat().st_size` against a recorded byte count, which passes on an LF
+checkout and fails on a CRLF one. It was **fixed, not re-run** — the guard now
+counts LF-normalized bytes — and was proven by injection in three directions and
+re-proven on a **fresh CRLF checkout of `main`** (pristine blob fails, fixed file
+passes, full suite `Ran 2187 tests … OK`). A measurement scoped the defect class:
+this was the **only** instance in the repository; every prior fixture verifies by
+**sha256**, which is line-ending invariant. No Flash, Ruffle, ActionScript, or
+browser executes in any of these commands, and every network call is loopback.
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 
