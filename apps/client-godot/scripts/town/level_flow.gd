@@ -53,9 +53,17 @@ extends RefCounted
 ##   * **zero** references to the `levels` schedule exist anywhere in the legacy
 ##     server (`command.py`, `engine.py`, `sessions.py`, `server.py`,
 ##     `constants.py`) — the curve is content the client owns entirely;
-##   * **0 of the 40** placed corpus rows carry `attr["xp"]`, and the fresh save
-##     carries no unit placements, so the unit-experience path cannot be
-##     exercised;
+##   * **0 of the 40** placed rows of the committed fresh-player corpus carry
+##     `attr["xp"]`, and that corpus places no unit row — **which is a fact
+##     about that one document, not the reason anything is undelivered and not
+##     a repository-wide figure**: measured across all **31** committed save
+##     documents the field is on **171 of 12,954** placed rows in **5 of 31**,
+##     and `docs/legacy-unit-xp.md` records the branch executed **22** times.
+##     What is NOT delivered is an award, because **no trusted award exists**:
+##     the field's only writer takes a **client-supplied** amount with no
+##     validation of any kind, and the field has **zero legacy readers**. The
+##     `godot-unit-experience` capability records that, and reports a recorded
+##     value verbatim beside its kind;
 ##   * the committed curve: **100** entries, `exp_required` **strictly
 ##     increasing** with no duplicates and no non-positive gap, first thresholds
 ##     `0, 40, 60, 100, 200, 350, 550, 800`, final `2016089205`; `name` is a
@@ -80,8 +88,17 @@ extends RefCounted
 ## `neighbors` / `inventory_qte` requirements received (design D7).
 ##
 ## **Unit experience** (`add_xp_unit`, which writes `attr["xp"]` on an item row)
-## is out of scope: the committed corpus carries no unit placements and no row
-## carrying `attr["xp"]`, so the path cannot be exercised (design D7).
+## is **NOT reproduced as an award**, and the reason is **not** corpus coverage:
+## the field's only writer takes a **client-supplied** amount with no validation
+## of any kind — not even an `int()` — and the field is written twice and read
+## **zero** times, so **no trusted award exists** for this module to reproduce
+## (design D7). The corpus figure stays a **corpus fact** and is labelled as
+## one: the committed fresh-player corpus carries `attr["xp"]` on **0 of its 40**
+## placed rows and places no unit row, while the repository's committed evidence
+## carries it on **171 of 12,954** placed rows across **5 of 31** save documents
+## and the branch has been executed **22** times. Reading a recorded value
+## verbatim, beside its **kind**, is delivered by the `godot-unit-experience`
+## capability; awarding one is refused here and everywhere else.
 ##
 ## **Tutorial progression is NO LONGER out of scope** — an earlier revision of
 ## this module said it was, and that was true only while the line was undelivered.
@@ -843,10 +860,24 @@ const NON_CLAIMS := [
 	"no level reward is paid and none is displayed, because no legacy branch "
 		+ "reads the committed reward fields: paying one would invent an "
 		+ "economy",
-	"unit experience (add_xp_unit) is out of scope because the committed corpus "
-		+ "cannot exercise it: 0 of the 40 placed rows carry attr[\"xp\"] and the "
-		+ "fresh save has no unit placements. Tutorial progression is NOT out of "
-		+ "scope: the `tutorial` line delivers it in "
+	# Composite note, and BOTH halves are corrected because a corrected half
+	# must never leave a stale one beside it. The unit-XP half now states the
+	# REAL reason (no trusted award exists: the only writer takes a
+	# client-supplied amount and the field has zero legacy readers) and keeps
+	# the corpus figure only as a labelled CORPUS FACT; the tutorial half keeps
+	# stating the truth, which is that tutorial progression is DELIVERED.
+	"unit experience (add_xp_unit) is NOT awarded here and no award is "
+		+ "reproduced, because NO TRUSTED AWARD EXISTS: the field's only writer "
+		+ "takes a client-supplied amount with no validation of any kind, and the "
+		+ "field has zero legacy readers. The corpus figure is a CORPUS FACT, not "
+		+ "the reason and not evidence of an award: 0 of the 40 placed rows in "
+		+ "the committed fresh-player corpus carry attr[\"xp\"] and that corpus "
+		+ "places no unit row, while the repository's committed evidence carries "
+		+ "the field on 171 of 12,954 placed rows across 5 of the 31 committed "
+		+ "save documents and the branch has been executed 22 times. A recorded "
+		+ "value is read verbatim beside its kind by the godot-unit-experience "
+		+ "capability. Tutorial progression is NOT out of scope: the `tutorial` "
+		+ "line delivers it in "
 		+ "scripts/progression/tutorial_flow.gd, against this same corpus, because "
 		+ "complete_tutorial writes the save-level playerInfo.completed_tutorial "
 		+ "flag and needs no unit row",

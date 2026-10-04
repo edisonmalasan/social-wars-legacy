@@ -62,16 +62,29 @@ extends RefCounted
 ## invent a rule from it. `committed_training_time()` exists to report the
 ## value **as content**, verbatim, and computes nothing from it.
 ##
-## ## No experience is awarded from a client amount (D5)
+## ## No experience is awarded from a client amount, and the recorded value's
+## ## KIND is reported beside it (D5)
 ##
 ## `add_xp_unit` is the only command writing a placed row's `attr["xp"]`: it
 ## **creates nothing**, adds a **client-sent** amount, and uses an optional
 ## client-sent level only in a printed line. So `experience()` reports a
-## recorded value **as content, verbatim, never awarded**, and the committed
-## corpus carries the field on **0 of 40** rows. This supersedes the softer
-## `godot-building-xp` note that unit experience was out of scope because the
-## corpus could not exercise it: the sharper truth is that **nothing on the
-## server awards it from a trusted value**.
+## recorded value **as content, verbatim, never awarded**, beside a
+## `recorded_kind` naming what that value **is**, and the committed corpus
+## carries the field on **0 of 40** rows. This supersedes the softer
+## `godot-building-xp` note that placed unit experience out of scope on corpus
+## grounds: the sharper truth is that **nothing on the server awards it from a
+## trusted value**.
+##
+## ## Why the KIND is reported at all: the two ARMS differ (D1/D2)
+##
+## The assign arm (`=` at command.py:336) persists whatever it is given, so the
+## legacy server can be made to write a **string** into a committed save — while
+## the increment arm (`+=` at command.py:338) **raises** on one. That asymmetry
+## is a durability defect in the legacy server, and it is **recorded** here and
+## **never reproduced**: no delivered code path writes, coerces, or repairs the
+## field. Reporting the kind is what makes a poisoned bag distinguishable from
+## an integer one instead of being read as a number, and it is why the
+## vocabulary is closed rather than free text.
 ##
 ## ## The acquisition routes are UNVALIDATED client-sent lists (D1/D5)
 ##
@@ -328,6 +341,90 @@ const CORPUS_FINDING := ("the committed fresh-player corpus places 40 rows "
 	+ "across 11 distinct item ids, every one of committed type 'b': it "
 	+ "contains NO unit row, NO storage, and an empty inventory, and every one "
 	+ "of its 40 attribute bags is empty")
+
+## ## The recorded value's KIND, over a CLOSED vocabulary (D2)
+##
+## Six members and no seventh. `absent` is the **named absence** of the key and
+## is never a substituted zero; the next five classify what is recorded under
+## it; `other` is the honest landing place for anything a future save carries,
+## and it exists so a new kind is never silently reported as a number.
+##
+## `bool` is a member **in its own right** rather than folded into `int`, and
+## the reason is stated at the precision the evidence actually reaches. The
+## **executed** fact is narrower than "the server stores a boolean": the
+## committed capture sent `true` on the **increment** arm, where the branch does
+## arithmetic on the gain, and a row recorded at `23` became **`24`** — an
+## `int`. No `True` is persisted on that arm, and this module does not claim it
+## is. A stored `True` is reachable on the **assign** arm instead, which writes
+## the gain with no arithmetic (`attr["xp"] = xp_gain`), so a client-sent `true`
+## would land there verbatim — that half is **derived from the branch, not
+## executed by this line**. It matters because `True + 5` is `6` in Python: such
+## a row would read as an integer by accident. A projection that folded `bool`
+## into `int` would therefore be right by accident and wrong by reason.
+const KIND_ABSENT := "absent"
+const KIND_INT := "int"
+const KIND_FLOAT := "float"
+const KIND_STRING := "string"
+const KIND_BOOL := "bool"
+const KIND_OTHER := "other"
+const RECORDED_KINDS := [KIND_ABSENT, KIND_INT, KIND_FLOAT, KIND_STRING,
+	KIND_BOOL, KIND_OTHER]
+
+## The single named helper that produces the kind, named here so the report and
+## the suite read the inventory rather than restating it.
+const XP_KIND_HELPER := "recorded_experience_kind"
+
+## The rule the kind is reported under, as the evidence report records it.
+const XP_KIND_RULE := ("THE RECORDED VALUE IS REPORTED VERBATIM AND BESIDE ITS "
+	+ "KIND. experience() returns the value exactly as the bag holds it - never "
+	+ "coerced, rounded, converted, or compared - and `recorded_kind` names what "
+	+ "it IS over a CLOSED vocabulary of six members: absent, int, float, string, "
+	+ "bool, other. The kind is reported so that a bag the legacy server was "
+	+ "made to poison is DISTINGUISHABLE from an integer one rather than being "
+	+ "read as a number; `bool` is separate from `int` because a client-sent "
+	+ "true is worth exactly +1 on the increment arm (EXECUTED: 23 became 24, "
+	+ "an int, so no True is persisted there) while the assign arm writes the "
+	+ "gain with no arithmetic and would store True verbatim (DERIVED from the "
+	+ "branch, not executed), and True + 5 is 6, so such a row would read as an "
+	+ "integer by accident (design D1/D2)")
+
+## The arm asymmetry, recorded as a legacy defect this capability deliberately
+## does NOT reproduce. The assign arm persists whatever it is given; the
+## increment arm raises on a non-numeric amount, so a value written by the first
+## makes every later increment against that row a guaranteed server error.
+const XP_ARM_ASYMMETRY := ("THE TWO ARMS DIFFER IN TYPE BEHAVIOUR, AND THE "
+	+ "DIFFERENCE IS A SAVE-POISONING PATH THAT IS RECORDED, NEVER REPRODUCED. "
+	+ "The ASSIGN arm (attr['xp'] = xp_gain, command.py:336) persists whatever "
+	+ "it is given, so a client-sent STRING can be written into a committed save "
+	+ "({} becomes {'xp': '5'}), while the INCREMENT arm (attr['xp'] += "
+	+ "xp_gain, command.py:338) RAISES on a non-numeric amount and the server "
+	+ "answers a 500 with the save unchanged. Every later increment against a "
+	+ "poisoned row therefore fails. That is a durability defect in the legacy "
+	+ "server, not a capability to reproduce: NO delivered code path writes, "
+	+ "coerces, or repairs this field, which is why `recorded_kind` is reported "
+	+ "at all (design D1/D2)")
+
+## The client-sent level argument, recorded as DISPLAY-ONLY and safely
+## ignorable. It is read into a local, used only inside a printed line, and
+## written nowhere; the executed evidence is that the two-argument and
+## three-argument forms produce identical post-states and identical changed-leaf
+## sets while their printed output differs.
+const XP_LEVEL_DISPLAY_ONLY := ("THE OPTIONAL THIRD ARGUMENT IS DISPLAY-ONLY AND "
+	+ "SAFELY IGNORABLE. add_xp_unit reads it into a local (command.py:325-327) "
+	+ "and uses it ONLY inside the interpolated print at command.py:340-341; it "
+	+ "is written nowhere. Ignorability is established BY MEASUREMENT rather than "
+	+ "by argument: the two-argument and three-argument forms were executed and "
+	+ "produced IDENTICAL post-states and IDENTICAL changed-leaf sets, while "
+	+ "their printed lines differ (+5xp against +5xp BOUGHT LEVEL UP -> 9), so "
+	+ "the argument's absence from the post-state is not evidence of a missing "
+	+ "write. A consumer of this contract SHALL ACCEPT AND IGNORE it rather than "
+	+ "refuse it, because refusing would reject a request the legacy server "
+	+ "accepts whose stored effect is nil. The branch also tests its TRUTHINESS "
+	+ "(if level:), so a zero or absent value takes the other printed line and an "
+	+ "ignoring consumer is unaffected either way. It must never be stored, never "
+	+ "surfaced as a level the row reached, and never used to derive a threshold: "
+	+ "there is no committed per-unit level schedule anywhere in the content "
+	+ "package (design D1/D2/D7)")
 
 # ---------------------------------------------------------------------------
 # Acquisition: recorded, refused, never implemented (design D1/D5)
@@ -854,14 +951,16 @@ static func training_time_note(value: Variant) -> String:
 
 ## A placed row's recorded experience, reported **as content and never
 ## awarded**. Returns
-## `{ok, reason, error, recorded, recorded_is_absent, awarded, award_source,
-##   award_implemented, contract, corpus_note}`.
+## `{ok, reason, error, recorded, recorded_is_absent, recorded_kind, awarded,
+##   award_source, award_implemented, contract, corpus_note}`.
 ##
 ## `recorded` is the value **verbatim** — never coerced to a number, never
 ## rounded — because a client-sent amount is a fact about what a client said,
-## not a quantity this contract may interpret. `awarded` is a constant false
-## carrying the reason beside it, and there is deliberately no function
-## anywhere in this module that adds, grants, or computes an award.
+## not a quantity this contract may interpret. `recorded_kind` names what that
+## value **is** over the closed vocabulary above, so a bag the legacy server was
+## made to poison is distinguishable from an integer one. `awarded` is a
+## constant false carrying the reason beside it, and there is deliberately no
+## function anywhere in this module that adds, grants, or computes an award.
 static func experience(attr: Variant) -> Dictionary:
 	if not (attr is Dictionary):
 		return _experience_reject(
@@ -875,6 +974,7 @@ static func experience(attr: Variant) -> Dictionary:
 		"error": "",
 		"recorded": bag[XP_ATTR_KEY] if carries else null,
 		"recorded_is_absent": not carries,
+		"recorded_kind": recorded_experience_kind(bag),
 		"awarded": false,
 		"award_source": "none: no client amount is ever applied, and the only "
 			+ "legacy command writing this field takes its amount from a "
@@ -883,6 +983,43 @@ static func experience(attr: Variant) -> Dictionary:
 		"contract": XP_CONTRACT,
 		"corpus_note": CORPUS_XP_NOTE,
 	}
+
+
+## The single named classification helper: what the recorded experience **is**,
+## over the closed vocabulary. An absent key is the named absence `absent` and
+## never a substituted zero; anything the vocabulary does not name is `other`
+## rather than a number.
+##
+## It reads the key and runs type tests and nothing else: **no arithmetic, no
+## conversion, no comparison**, and never a numeric interpretation of the value
+## it classifies. `bool` is tested **before** `int` because a boolean can reach
+## this field as an experience value: the **assign** arm writes the gain with no
+## arithmetic, so a client-sent `true` lands there verbatim (**derived** from the
+## branch, not executed), and `True + 5` is `6`. The **executed** boolean
+## evidence is the increment arm, which stored an `int` (`23` became `24`) — it
+## is recorded here so the distinction is not lost, not as support for a stored
+## `True`. A projection that reported a stored boolean as `int` would be right by
+## accident and wrong by reason. A stored `null` is **not** `absent` — the key is
+## present, so it is `other`.
+static func recorded_experience_kind(attr: Dictionary) -> String:
+	if not attr.has(XP_ATTR_KEY):
+		return KIND_ABSENT
+	var value: Variant = attr[XP_ATTR_KEY]
+	if value is bool:
+		return KIND_BOOL
+	if value is int:
+		return KIND_INT
+	if value is float:
+		return KIND_FLOAT
+	if value is String:
+		return KIND_STRING
+	return KIND_OTHER
+
+
+## The closed classification vocabulary as a fresh array, so a report reads this
+## module's own inventory rather than restating it.
+static func recorded_kind_vocabulary() -> Array:
+	return (RECORDED_KINDS as Array).duplicate()
 
 
 ## How the readout renders the experience record: the recorded value, then the
@@ -913,6 +1050,15 @@ static func experience_record() -> Dictionary:
 		"rule": XP_CONTRACT,
 		"corpus_note": CORPUS_XP_NOTE,
 		"corpus_finding": CORPUS_FINDING,
+		"kind_helper": XP_KIND_HELPER,
+		"recorded_kinds": recorded_kind_vocabulary(),
+		"kind_rule": XP_KIND_RULE,
+		"arm_asymmetry": XP_ARM_ASYMMETRY,
+		"level_display_only": XP_LEVEL_DISPLAY_ONLY,
+		"coerced": false,
+		"converted": false,
+		"compared": false,
+		"field_repaired": false,
 	}
 
 
@@ -1053,6 +1199,7 @@ static func _experience_reject(message: String) -> Dictionary:
 			% message,
 		"recorded": null,
 		"recorded_is_absent": true,
+		"recorded_kind": KIND_ABSENT,
 		"awarded": false,
 		"award_source": "none: nothing was read, so nothing could be awarded",
 		"award_implemented": XP_AWARD_IMPLEMENTED,

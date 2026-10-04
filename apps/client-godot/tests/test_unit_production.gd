@@ -109,7 +109,10 @@ const EXPECTED_DARTS_UNIT_IDS := 44
 ## anti-invention guard (design D4): a readiness, remaining-time, progress,
 ## duration, completion, production, experience-award, or acquisition helper
 ## appears here and fails the suite. Every entry is a presence reader, a
-## recorded-contract accessor, a note, or a private helper — nothing else.
+## recorded-contract accessor, a note, or a private helper — nothing else. The
+## two `recorded_*_kind` entries were added by `godot-unit-experience` and are
+## the ONE classification helper design D1 permits beside this projection: they
+## name what a recorded experience IS and award nothing.
 const EXPECTED_MODULE_METHODS := [
 	"_client_routes", "_count_text", "_evaluation_reject",
 	"_experience_reject", "_number_text", "_type_name",
@@ -117,7 +120,8 @@ const EXPECTED_MODULE_METHODS := [
 	"classification_counts", "classification_vocabulary",
 	"committed_training_time", "death_record", "derived_row_entries",
 	"evaluate", "experience", "experience_note", "experience_record",
-	"no_derivation_finding", "readout_text", "row_entry_branch_names",
+	"no_derivation_finding", "readout_text", "recorded_experience_kind",
+	"recorded_kind_vocabulary", "row_entry_branch_names",
 	"row_entry_inventory", "training_time_note", "training_time_record",
 ]
 ## Helpers a production rule would take. The inventory above is the real gate;
@@ -1182,11 +1186,23 @@ func _check_corpus() -> Dictionary:
 			+ "instance and no production target exist")
 	check_eq(types, {"b": EXPECTED_DISTINCT_ITEM_IDS},
 		"every distinct committed id resolves to committed type 'b'")
+	# The message names THIS assertion's own scope. The assertion is over the
+	# committed fresh-player corpus's EXPECTED_ROWS placed rows and nothing
+	# wider, so the message says "all 40 rows of the committed fresh-player
+	# corpus" rather than the broader "NOT ONE committed row" it used to read.
+	# The word "committed" there was true of the rows and false as a
+	# repository-wide claim: the repository's committed evidence carries the
+	# field on 171 of 12,954 placed rows across 5 of 31 save documents. Only
+	# the wording changed - no expected value, threshold, or intent.
 	check_eq(experience_rows, [],
-		"NOT ONE committed row carries attr['xp']: the recorded experience "
-			+ "field is absent from all %d rows, which is a corpus measurement "
-				% EXPECTED_ROWS
-			+ "and never an award")
+		"NOT ONE of the %d rows in THIS committed fresh-player corpus carries "
+			% EXPECTED_ROWS
+			+ "attr['xp']: the field is absent from all of them, which is a "
+			+ "corpus measurement over that one document and never an award "
+			+ "(this is a scope claim about the fresh-player corpus, NOT a "
+			+ "repository-wide one: the `godot-unit-experience` capability "
+			+ "measures 171 of 12,954 placed rows across 5 of the 31 committed "
+			+ "save documents as carrying it)")
 	# No storage and no inventory: the two client-sent routes that could fill
 	# the storage with a unit are the only way a unit could ever be obtained.
 	check_eq(map.get("store", null), {},
