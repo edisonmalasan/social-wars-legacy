@@ -1,0 +1,512 @@
+{
+  "schema": "mission-vocabulary-report-v1",
+  "generated_by": "apps/client-godot/tests/test_mission_vocabulary.gd --report=<path>",
+  "determinism": {
+    "reads_wall_clock": false,
+    "writes_absolute_paths": false,
+    "note": "every table is generated from the delivered module's own constants, from this run's own measurement of the committed legacy source, or from committed content bytes"
+  },
+  "policy": {
+    "policy": "mission-vocabulary-v1",
+    "table_relative": "content/mission_vocabulary.json",
+    "declaration_source": "constants.py",
+    "generated_not_transcribed": true,
+    "drift_guard": "the suite re-derives the declarations from the legacy source as bytes and requires byte equality per entry",
+    "not_in_content_package": "this is dead legacy source vocabulary, not served content; every content-package entry records source_file config/main.json"
+  },
+  "vocabulary": {
+    "entry_count": 64,
+    "lowest": 0,
+    "highest": 67,
+    "gaps": [
+      9,
+      10,
+      20,
+      57
+    ],
+    "gaps_closed": 0,
+    "entry_properties": [
+      "declared_at",
+      "legacy_id",
+      "value"
+    ],
+    "vocabulary_properties": [
+      "entries",
+      "gaps",
+      "highest",
+      "lowest"
+    ],
+    "entries": [
+      {
+        "legacy_id": "MISSION_NONE",
+        "value": 0,
+        "declared_at": "constants.py:984"
+      },
+      {
+        "legacy_id": "MISSION_BUILT_SUBCATFUNC",
+        "value": 1,
+        "declared_at": "constants.py:985"
+      },
+      {
+        "legacy_id": "MISSION_BUILT_ID",
+        "value": 2,
+        "declared_at": "constants.py:986"
+      },
+      {
+        "legacy_id": "MISSION_SUBCATFUNC_COUNT",
+        "value": 3,
+        "declared_at": "constants.py:987"
+      },
+      {
+        "legacy_id": "MISSION_TRAINED_ID",
+        "value": 4,
+        "declared_at": "constants.py:988"
+      },
+      {
+        "legacy_id": "MISSION_CONTAINED_SUBCATFUNC",
+        "value": 5,
+        "declared_at": "constants.py:989"
+      },
+      {
+        "legacy_id": "MISSION_CONTAINED_ID",
+        "value": 6,
+        "declared_at": "constants.py:990"
+      },
+      {
+        "legacy_id": "MISSION_COLLECTED_SUBCATFUNC",
+        "value": 7,
+        "declared_at": "constants.py:991"
+      },
+      {
+        "legacy_id": "MISSION_COLLECTED_ID",
+        "value": 8,
+        "declared_at": "constants.py:992"
+      },
+      {
+        "legacy_id": "MISSION_CAPTURED_SUBCATFUNC",
+        "value": 11,
+        "declared_at": "constants.py:993"
+      },
+      {
+        "legacy_id": "MISSION_CAPTURED_ID",
+        "value": 12,
+        "declared_at": "constants.py:994"
+      },
+      {
+        "legacy_id": "MISSION_KILLED_SUBCATFUNC",
+        "value": 13,
+        "declared_at": "constants.py:995"
+      },
+      {
+        "legacy_id": "MISSION_KILLED_ID",
+        "value": 14,
+        "declared_at": "constants.py:996"
+      },
+      {
+        "legacy_id": "MISSION_DESTROYED_SUBCATFUNC",
+        "value": 15,
+        "declared_at": "constants.py:997"
+      },
+      {
+        "legacy_id": "MISSION_DESTROYED_ID",
+        "value": 16,
+        "declared_at": "constants.py:998"
+      },
+      {
+        "legacy_id": "MISSION_DESTROYED",
+        "value": 17,
+        "declared_at": "constants.py:999"
+      },
+      {
+        "legacy_id": "MISSION_MOVE_UNITS",
+        "value": 18,
+        "declared_at": "constants.py:1000"
+      },
+      {
+        "legacy_id": "MISSION_MARKET_USED",
+        "value": 19,
+        "declared_at": "constants.py:1001"
+      },
+      {
+        "legacy_id": "MISSION_RENAME_EMPIRE",
+        "value": 21,
+        "declared_at": "constants.py:1002"
+      },
+      {
+        "legacy_id": "MISSION_POPULATION",
+        "value": 22,
+        "declared_at": "constants.py:1003"
+      },
+      {
+        "legacy_id": "MISSION_HELP_FRIENDS",
+        "value": 23,
+        "declared_at": "constants.py:1004"
+      },
+      {
+        "legacy_id": "MISSION_EXPAND",
+        "value": 24,
+        "declared_at": "constants.py:1005"
+      },
+      {
+        "legacy_id": "MISSION_SELECT_TIME_SUBCATFUNC",
+        "value": 25,
+        "declared_at": "constants.py:1006"
+      },
+      {
+        "legacy_id": "MISSION_SELECT_TIME_ID",
+        "value": 26,
+        "declared_at": "constants.py:1007"
+      },
+      {
+        "legacy_id": "MISSION_ZOOM",
+        "value": 27,
+        "declared_at": "constants.py:1008"
+      },
+      {
+        "legacy_id": "MISSION_MOVE_SUBCATFUNC_UNIT_NEAR_TOWNHALL",
+        "value": 28,
+        "declared_at": "constants.py:1009"
+      },
+      {
+        "legacy_id": "MISSION_MOVE_SUBCATFUNC_BUILDING",
+        "value": 29,
+        "declared_at": "constants.py:1010"
+      },
+      {
+        "legacy_id": "MISSION_DEFEAT_ALL_TROLLS",
+        "value": 30,
+        "declared_at": "constants.py:1011"
+      },
+      {
+        "legacy_id": "MISSION_COMPLETE_QUEST_IN_MAP",
+        "value": 31,
+        "declared_at": "constants.py:1012"
+      },
+      {
+        "legacy_id": "MISSION_RECRUIT_MARKET_FRIEND",
+        "value": 32,
+        "declared_at": "constants.py:1013"
+      },
+      {
+        "legacy_id": "MISSION_POPUP_OPENED",
+        "value": 33,
+        "declared_at": "constants.py:1014"
+      },
+      {
+        "legacy_id": "MISSION_PLAYER_STATS_MODIFIED",
+        "value": 34,
+        "declared_at": "constants.py:1015"
+      },
+      {
+        "legacy_id": "MISSION_GIFT_SEND",
+        "value": 35,
+        "declared_at": "constants.py:1016"
+      },
+      {
+        "legacy_id": "MISSION_DAILY_BONUS",
+        "value": 36,
+        "declared_at": "constants.py:1017"
+      },
+      {
+        "legacy_id": "MISSION_ATTACK_PLAYER",
+        "value": 37,
+        "declared_at": "constants.py:1018"
+      },
+      {
+        "legacy_id": "MISSION_ATTACK_FRIEND",
+        "value": 38,
+        "declared_at": "constants.py:1019"
+      },
+      {
+        "legacy_id": "MISSION_SET_DEFFENSIVE_STRATEGY",
+        "value": 39,
+        "declared_at": "constants.py:1020"
+      },
+      {
+        "legacy_id": "MISSION_MARKET_TRADE",
+        "value": 40,
+        "declared_at": "constants.py:1021"
+      },
+      {
+        "legacy_id": "MISSION_STORE_SUBCATFUNCS",
+        "value": 41,
+        "declared_at": "constants.py:1022"
+      },
+      {
+        "legacy_id": "MISSION_STORE_ID",
+        "value": 42,
+        "declared_at": "constants.py:1023"
+      },
+      {
+        "legacy_id": "MISSION_COMPLETE_SOCIAL_SUBCAT",
+        "value": 43,
+        "declared_at": "constants.py:1024"
+      },
+      {
+        "legacy_id": "MISSION_COMPLETE_SOCIAL_ID",
+        "value": 44,
+        "declared_at": "constants.py:1025"
+      },
+      {
+        "legacy_id": "MISSION_SPY_PLAYER",
+        "value": 45,
+        "declared_at": "constants.py:1026"
+      },
+      {
+        "legacy_id": "MISSION_ASSAULTS_WON",
+        "value": 46,
+        "declared_at": "constants.py:1027"
+      },
+      {
+        "legacy_id": "MISSION_COMPLETE_QUEST",
+        "value": 47,
+        "declared_at": "constants.py:1028"
+      },
+      {
+        "legacy_id": "MISSION_POP_UNIT_SUBCATFUNC",
+        "value": 48,
+        "declared_at": "constants.py:1029"
+      },
+      {
+        "legacy_id": "MISSION_PUSH_SUBCATFUNC_IN_SUBCATFUNC",
+        "value": 49,
+        "declared_at": "constants.py:1030"
+      },
+      {
+        "legacy_id": "MISSION_OWN_BIG_TILES",
+        "value": 50,
+        "declared_at": "constants.py:1031"
+      },
+      {
+        "legacy_id": "MISSION_PROTECT_WITH_WALLS",
+        "value": 51,
+        "declared_at": "constants.py:1032"
+      },
+      {
+        "legacy_id": "MISSION_LETS_SAIL",
+        "value": 52,
+        "declared_at": "constants.py:1033"
+      },
+      {
+        "legacy_id": "MISSION_REPAIR_BUILDING",
+        "value": 53,
+        "declared_at": "constants.py:1034"
+      },
+      {
+        "legacy_id": "MISSION_ASSIST_NEIGHBOUR_BUILDINGS",
+        "value": 54,
+        "declared_at": "constants.py:1035"
+      },
+      {
+        "legacy_id": "MISSION_TRAIN_IDS_IN_ID",
+        "value": 55,
+        "declared_at": "constants.py:1036"
+      },
+      {
+        "legacy_id": "MISSION_HONOR_POINTS",
+        "value": 56,
+        "declared_at": "constants.py:1037"
+      },
+      {
+        "legacy_id": "MISSION_WIN_ASSAULTS_SAME_LEVEL",
+        "value": 58,
+        "declared_at": "constants.py:1038"
+      },
+      {
+        "legacy_id": "MISSION_WIN_ASSAULTS_MORE_LEVEL",
+        "value": 59,
+        "declared_at": "constants.py:1039"
+      },
+      {
+        "legacy_id": "MISSION_REVENGE_ASAULT",
+        "value": 60,
+        "declared_at": "constants.py:1040"
+      },
+      {
+        "legacy_id": "MISSION_COORDINATED_ATTACK",
+        "value": 61,
+        "declared_at": "constants.py:1041"
+      },
+      {
+        "legacy_id": "MISSION_PLACE_STORED_ITEM",
+        "value": 62,
+        "declared_at": "constants.py:1042"
+      },
+      {
+        "legacy_id": "MISSION_SACRIFICE_UNIT",
+        "value": 63,
+        "declared_at": "constants.py:1043"
+      },
+      {
+        "legacy_id": "MISSION_CONVERT_UNIT",
+        "value": 64,
+        "declared_at": "constants.py:1044"
+      },
+      {
+        "legacy_id": "MISSION_HEAL_UNITS_WITH_HEALING_SPRING",
+        "value": 65,
+        "declared_at": "constants.py:1045"
+      },
+      {
+        "legacy_id": "MISSION_KILL_TOWER_WITH_SCORPION",
+        "value": 66,
+        "declared_at": "constants.py:1046"
+      },
+      {
+        "legacy_id": "MISSION_KILLED_ENEMY",
+        "value": 67,
+        "declared_at": "constants.py:1047"
+      }
+    ]
+  },
+  "byte_faithfulness": {
+    "declarations_extracted": 64,
+    "names_mismatched": 0,
+    "values_mismatched": 0,
+    "provenance_lines_mismatched": 0,
+    "entries_padded": 0,
+    "gaps_re_derived": [
+      9,
+      10,
+      20,
+      57
+    ]
+  },
+  "globals": {
+    "names": [
+      "NUM_ACTIVE_MISSIONS",
+      "PERMISSION_PACK_UNITS",
+      "PERMISSION_COSTS"
+    ],
+    "read_through": "the existing normalized content registry",
+    "duplicated": false,
+    "enforcement": "none recorded: the preserved legacy server reads none of these globals",
+    "committed_values": {
+      "NUM_ACTIVE_MISSIONS": 5,
+      "PERMISSION_PACK_UNITS": [
+        10,
+        20,
+        30,
+        40
+      ],
+      "PERMISSION_COSTS": {
+        "10": 10,
+        "20": 20,
+        "30": 30,
+        "40": 40
+      }
+    }
+  },
+  "overlaps": {
+    "observations": [
+      {
+        "observation": "destroyed_family",
+        "names": [
+          "MISSION_DESTROYED_SUBCATFUNC",
+          "MISSION_DESTROYED_ID",
+          "MISSION_DESTROYED"
+        ],
+        "values": [
+          15,
+          16,
+          17
+        ],
+        "resolved": false,
+        "preferred": ""
+      },
+      {
+        "observation": "complete_quest_pair",
+        "names": [
+          "MISSION_COMPLETE_QUEST_IN_MAP",
+          "MISSION_COMPLETE_QUEST"
+        ],
+        "values": [
+          31,
+          47
+        ],
+        "resolved": false,
+        "preferred": ""
+      }
+    ],
+    "resolved": false,
+    "preferred_member": "",
+    "note": "verified to still hold by the suite; not a classification and not a grouping rule this capability invented"
+  },
+  "zero_consumer": {
+    "finding": {
+      "consumer_sites_outside_declarations": 0,
+      "mission_types_with_a_dispatch": 0,
+      "save_fields_storing_a_mission_type": 0,
+      "response_fields_echoing_a_mission_type": 0,
+      "substring_artifacts_rejected": [
+        "MISSION_DESTROYED is a prefix of MISSION_DESTROYED_SUBCATFUNC and MISSION_DESTROYED_ID",
+        "MISSION_COMPLETE_QUEST is a prefix of MISSION_COMPLETE_QUEST_IN_MAP"
+      ],
+      "statement": "Zero MISSION_* occurrences exist outside constants.py. No branch dispatches on a mission type, no save field stores one, and no response echoes one."
+    },
+    "static_functions": [
+      "table_path",
+      "legacy_source_path",
+      "_read_table_bytes",
+      "_as_exact_integer",
+      "load_vocabulary",
+      "parse_table_text",
+      "mission_globals",
+      "recorded_overlap_observations",
+      "zero_consumer_finding",
+      "foreign_state_identifiers"
+    ],
+    "absent_helpers": [
+      "resolve_type",
+      "dispatch",
+      "dispatch_for",
+      "trigger_for",
+      "is_combat_event",
+      "matches",
+      "category_of",
+      "group_of",
+      "advance",
+      "damage",
+      "complete_mission",
+      "reward_for"
+    ],
+    "arithmetic_record": {
+      "multiply_operators": 0,
+      "divide_operators": 0,
+      "power_operators": 0,
+      "bitwise_operators": 0,
+      "shift_operators": 0,
+      "format_operator_rule": "every `%` in this module is either inside a string literal or the binary string-format operator applied to a string literal; none is modulo over a number",
+      "comparison_of_one_mission_value_against_another": 0,
+      "membership_tests_over_a_committed_value": 1,
+      "membership_tests_note": "the gap scan asks only whether a committed value is present, which is a set difference and not a rule about what a value means",
+      "note": "nothing here computes a duration, a distance, a score, a rank, a category, or an ordering rule from a mission value"
+    },
+    "arithmetic_measured": {
+      "multiply_operators": 0,
+      "divide_operators": 0,
+      "power_operators": 0,
+      "bitwise_operators": 0,
+      "shift_operators": 0
+    },
+    "format_operators_outside_a_string": 0
+  },
+  "ownership": {
+    "mission_state_fields": [
+      "idCurrentMission",
+      "timestampLastChapter",
+      "currentQuestVars",
+      "questTimes",
+      "unlockedQuestIndex"
+    ],
+    "owned_by": "godot-quests",
+    "owner_path": "scripts/units/quest_flow.gd",
+    "duplicated_here": false
+  },
+  "legacy_absence": {
+    "legacy_modules_scanned": 10,
+    "mission_occurrences_outside_declarations": 0,
+    "offending_modules": [],
+    "declarations_in_source": 64
+  }
+}
