@@ -1,0 +1,55 @@
+{
+  "addressed_map_key": "3",
+  "args": [
+    "3",
+    11
+  ],
+  "attr_after": {
+    "xp": 11
+  },
+  "attr_before": {},
+  "changed_leaf_count": 1,
+  "changed_leaves": [
+    {
+      "after": 11,
+      "before": null,
+      "path": "/maps/0/items/3/6/xp",
+      "present_after": true,
+      "present_before": false
+    }
+  ],
+  "expected_status": 200,
+  "name": "building_row_type_agnostic",
+  "note": "The branch is TYPE-AGNOSTIC: it accepts a building row exactly as it accepts a unit row and stores unit experience on it. The same is true of the one writer of this field anywhere in the legacy source. There is no unit type check and no unit-only key space.",
+  "placed_rows": 319,
+  "printed_branch_lines": [
+    "[+] COMMAND: add_xp_unit(['3', 11]) -> Wall I +11xp"
+  ],
+  "resource_neutral": true,
+  "resources_after": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "resources_before": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "response_payload": {
+    "result": "success"
+  },
+  "state_sha256_after": "627f9b81ef6de10a4408cf3b698efef99156ba0597e35e13a50e90576a748970",
+  "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "status": 200,
+  "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b"
+}

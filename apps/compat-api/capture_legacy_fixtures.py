@@ -234,24 +234,39 @@ def copy_tree(src: Path, dst: Path) -> None:
             shutil.copy2(path, target)
 
 
-def build_disposable(tmp_parent: Path) -> Tuple[Path, str, str]:
-    """Create the disposable legacy runtime; returns (root, pid, seed_sha)."""
+def build_disposable(
+    tmp_parent: Path, seed_path: Path = FRESH_PLAYER_SAVE
+) -> Tuple[Path, str, str]:
+    """Create the disposable legacy runtime; returns (root, pid, seed_sha).
+
+    ``seed_path`` selects the corpus the disposable starts from. It defaults
+    to ``FRESH_PLAYER_SAVE`` so every existing caller — all seventeen of them,
+    each passing a single positional argument — keeps seeding the committed
+    fresh-player corpus unchanged.
+
+    The parameter exists because the fresh corpus cannot exercise a placed row
+    carrying ``attr["xp"]`` at all, and one capture needs an authentic
+    *progressed* save instead. Two details follow from the seed no longer being
+    the fresh corpus, and both are why the pid is read from the document rather
+    than derived: ``playerInfo.pid`` is not the filename stem for every
+    committed save, and it is ``null`` for one.
+    """
     disposable = Path(tempfile.mkdtemp(prefix="socialwars-capture-", dir=str(tmp_parent)))
     for name in COPY_ROOT_PY:
         shutil.copy2(REPO_ROOT / name, disposable / name)
     for name in COPY_DIRS:
         copy_tree(REPO_ROOT / name, disposable / name)
-    seed = json.loads(FRESH_PLAYER_SAVE.read_text(encoding="utf-8"))
+    seed = json.loads(seed_path.read_text(encoding="utf-8"))
     try:
         pid = str(seed["playerInfo"]["pid"])
     except (KeyError, TypeError) as error:
-        raise CaptureError(EXIT_ENVIRONMENT, "fresh save has no playerInfo.pid: %s" % error)
+        raise CaptureError(EXIT_ENVIRONMENT, "seed save has no playerInfo.pid: %s" % error)
     if not pid:
-        raise CaptureError(EXIT_ENVIRONMENT, "fresh save pid is empty")
+        raise CaptureError(EXIT_ENVIRONMENT, "seed save pid is empty")
     saves_dir = disposable / "saves"
     saves_dir.mkdir(parents=True, exist_ok=False)
     seed_target = saves_dir / ("%s.save.json" % pid)
-    shutil.copy2(FRESH_PLAYER_SAVE, seed_target)
+    shutil.copy2(seed_path, seed_target)
     return disposable, pid, sha256_file(seed_target)
 
 
@@ -264,11 +279,23 @@ def child_environment() -> Dict[str, str]:
     return env
 
 
-def start_server(disposable: Path) -> Tuple[subprocess.Popen, Path, Path]:
+def start_server(
+    disposable: Path, env_extra: Optional[Dict[str, str]] = None
+) -> Tuple[subprocess.Popen, Path, Path]:
+    """Start ``python -B server.py`` inside ``disposable``.
+
+    ``env_extra`` is layered on top of :func:`child_environment` for the child
+    process only. It exists so a capture that needs an environment setting can
+    ask for it without changing what the other sixteen captures see; the
+    default is ``None``, which is every existing call.
+    """
     stdout_path = disposable / "server.stdout.log"
     stderr_path = disposable / "server.stderr.log"
     stdout_handle = open(stdout_path, "wb")
     stderr_handle = open(stderr_path, "wb")
+    environment = child_environment()
+    if env_extra:
+        environment.update(env_extra)
     creationflags = 0
     if os.name == "nt":
         creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
@@ -276,7 +303,7 @@ def start_server(disposable: Path) -> Tuple[subprocess.Popen, Path, Path]:
         process = subprocess.Popen(
             [sys.executable, "-B", "server.py"],
             cwd=str(disposable),
-            env=child_environment(),
+            env=environment,
             stdout=stdout_handle,
             stderr=stderr_handle,
             stdin=subprocess.DEVNULL,

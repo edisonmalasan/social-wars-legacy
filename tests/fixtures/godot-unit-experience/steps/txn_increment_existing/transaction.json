@@ -1,0 +1,57 @@
+{
+  "addressed_map_key": "772",
+  "args": [
+    "772",
+    5
+  ],
+  "attr_after": {
+    "xp": 28
+  },
+  "attr_before": {
+    "xp": 23
+  },
+  "changed_leaf_count": 1,
+  "changed_leaves": [
+    {
+      "after": 28,
+      "before": 23,
+      "path": "/maps/0/items/772/6/xp",
+      "present_after": true,
+      "present_before": true
+    }
+  ],
+  "expected_status": 200,
+  "name": "increment_existing",
+  "note": "The increment arm: the key already carries the field, so the branch executes attr['xp'] += args[1] and nothing else. Exactly one leaf moves and no stored resource moves.",
+  "placed_rows": 319,
+  "printed_branch_lines": [
+    "[+] COMMAND: add_xp_unit(['772', 5]) -> Soldier +5xp"
+  ],
+  "resource_neutral": true,
+  "resources_after": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "resources_before": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "response_payload": {
+    "result": "success"
+  },
+  "state_sha256_after": "5a2c2083d37599473518165abb76d58fbf216cccaf2b88b2322e458f45bbbb43",
+  "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "status": 200,
+  "unchanged_leaves_sha256_after": "5eec0e03c882d4613f98da9d9ac1a6b0f01b9fbc84347c5a7490e42c72a570b3",
+  "unchanged_leaves_sha256_before": "5eec0e03c882d4613f98da9d9ac1a6b0f01b9fbc84347c5a7490e42c72a570b3"
+}
