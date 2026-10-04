@@ -768,7 +768,19 @@ class ManifestIntegrityTests(unittest.TestCase):
             if not path.is_file():
                 continue
             actual_files += 1
-            actual_bytes += path.stat().st_size
+            # Count the bytes GIT STORES, not the bytes that happen to be on
+            # disk. This path has no .gitattributes entry and the repository
+            # sets core.autocrlf=true, so a working tree may legitimately hold
+            # LF or CRLF for byte-identical committed content: a stash
+            # round-trip elsewhere in this repository re-checked-out all 79
+            # files as CRLF and moved this total by 99,282 bytes with no
+            # content change whatsoever. Measured with st_size, this guard was
+            # therefore a line-ending detector -- it failed on a CRLF checkout
+            # and passed on an LF one, and said nothing at all about the
+            # inventory it exists to protect. Normalizing CRLF to LF makes it
+            # measure exactly the committed blob size, verified to be equal
+            # for all 79 tracked files.
+            actual_bytes += len(path.read_bytes().replace(b"\r\n", b"\n"))
             if path.name in ("before.json", "after.json"):
                 save_documents += 1
 
