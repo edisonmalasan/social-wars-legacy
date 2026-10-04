@@ -1,0 +1,939 @@
+{
+  "batch_shape": {
+    "arguments": "CRAFTED AND CLIENT-SUPPLIED. args[0] is the map key and args[1] is the gain; the branch reads both with no validation of any kind, not even int().",
+    "command": "add_xp_unit",
+    "command_source": "command.py:322-343",
+    "resource_vector": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "ts": 1700000000,
+    "ts_note": "Pinned to a constant, as on the stored-placement capture. The dispatcher parses it and never reads it.",
+    "vector_status": "neutral by construction, every transaction"
+  },
+  "captured_at_utc": "2026-10-04T12:17:41+00:00",
+  "cleanup": {
+    "disposables": 12,
+    "note": "Each disposable is removed by the harness's own finally block; the fixture is staged OUTSIDE the working tree and published only after every check passed, so a failed run writes nothing into the repository."
+  },
+  "containment": {
+    "combined_after": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "combined_before": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "groups": [
+      "config",
+      "mods",
+      "root_python",
+      "saves",
+      "templates",
+      "tests/saves",
+      "villages"
+    ],
+    "identical": true,
+    "protected_fixtures": [
+      "godot-building-collect",
+      "godot-building-construction",
+      "godot-building-expand",
+      "godot-building-move",
+      "godot-building-placement",
+      "godot-building-sell",
+      "godot-building-store",
+      "godot-building-upgrade",
+      "godot-building-xp",
+      "godot-compatibility-boot",
+      "godot-item-purchase",
+      "godot-quests",
+      "godot-research",
+      "godot-stored-item-placement",
+      "godot-tutorial",
+      "godot-unit-collection",
+      "godot-unit-queues"
+    ],
+    "protected_fixtures_unchanged": true,
+    "seed_sha256_after": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd",
+    "seed_sha256_before": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd",
+    "working_tree_saves_absent": true
+  },
+  "derived_provisional": [
+    "That the two- and three-argument forms are INTERCHANGEABLE, because their stored effects were measured equal; the branch source shows a truthiness test feeding only an f-string.",
+    "The choice of villages/AcidCaos.json as the disposable seed."
+  ],
+  "established": [
+    "The two write arms: attr['xp'] += args[1] when the key is present, attr['xp'] = args[1] when it is absent.",
+    "args[0] is the map key, args[1] is the gain, args[2] is optional; none is validated, not even with int().",
+    "An unaddressable map key hits the falsy-item early return, prints an error and RETURNS -- and the server still answers the legacy success result.",
+    "No clamp on a negative gain (unlike engine.apply_resources' max(..., 0)) and no bound on the amount.",
+    "A float gain persists as a float.",
+    "The branch is TYPE-AGNOSTIC: a building row accepts and stores unit experience exactly as a unit row does.",
+    "The two arms are ASYMMETRIC on type: the assign arm persists a string, the increment arm raises TypeError against one.",
+    "True is worth exactly +1, because the branch does arithmetic on the gain.",
+    "The third argument has NIL stored effect: identical post-state, identical resource state and identical changed-leaf set, with a different printed line.",
+    "Under a NEUTRAL vector, exactly one leaf moves on success and no stored resource moves at all."
+  ],
+  "exit_code": 0,
+  "interpreter": "CPython 3.9 (pinned)",
+  "invocation": "python -B apps/compat-api/capture_unit_xp_fixture.py",
+  "login_step": "Performed once per server (twelve times) and recorded once, from the first transaction. Its neutrality is asserted for EVERY transaction, so the elision loses no evidence.",
+  "not_claimed": [
+    "Any award schedule, unit level, threshold, or per-unit experience source. No committed per-unit level schedule exists, and the committed units[].xp field is refuted as the award by three independent measurements.",
+    "That the amounts recorded here are what a player earns. They are what a CLIENT SENT and the server accepted.",
+    "Any resource movement. Every transaction ran under a neutral vector and moved nothing.",
+    "Any server-authoritative validation. None exists: the branch has no range check, no bound, no type check, and no membership test.",
+    "That this fixture implies a route. It does not, and the compat-side guard asserts that no unit-experience route is answered and no award helper exists."
+  ],
+  "purpose": "Executed-legacy evidence for the single add_xp_unit branch (command.py:322-343). It records what the ORACLE does. It does NOT license a modern endpoint: the amount is a client argument with no validation, and the committed per-unit experience field is refuted as its source by three independent measurements (docs/legacy-unit-xp.md).",
+  "recorded_steps": [
+    "txn_increment_existing",
+    "txn_assign_absent_key",
+    "txn_missing_row",
+    "txn_negative_no_clamp",
+    "txn_zero_amount",
+    "txn_unbounded_amount",
+    "txn_float_amount_persisted",
+    "txn_building_row_type_agnostic",
+    "txn_level_argument_ignored",
+    "txn_string_amount_increment_fails",
+    "txn_string_amount_assign_persisted",
+    "txn_bool_amount_increments_as_one",
+    "login_post"
+  ],
+  "schema": "unit-experience-fixture-v1",
+  "seed": {
+    "census": {
+      "pid": "AcidCaos",
+      "placed_rows": 319,
+      "rows_carrying_attr_xp": 36,
+      "state_sha256": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "target_absent_present": false,
+      "target_building_row": [
+        23,
+        47,
+        49,
+        0,
+        0,
+        [],
+        {},
+        1
+      ],
+      "target_empty_bag_row": [
+        1050,
+        39,
+        53,
+        1705746657,
+        0,
+        [],
+        {},
+        1
+      ],
+      "target_existing_row": [
+        1007,
+        42,
+        47,
+        1705688445,
+        0,
+        [],
+        {
+          "xp": 23
+        },
+        1
+      ]
+    },
+    "choice_reason": "Smallest of the five committed save documents carrying attr['xp'] by placed-row count (319, against 569 / 367 / 549 / 576), and it carries 36 rows WITH the key and 283 without it, including 12 unit rows with an empty bag and 271 building rows -- so both arms and both row kinds are exercisable from one authentic committed save. Any other of the five would also have worked; recorded so a rerun reproduces the committed bytes.",
+    "choice_status": "derived-provisional",
+    "path": "villages/AcidCaos.json",
+    "pid_note": "Read from playerInfo.pid in the document, never derived from the filename stem: for three of the eight committed village saves the two disagree, and for initial.json the pid is null, which build_disposable refuses loudly rather than writing a 'None.save.json'.",
+    "pid_read_from_document": "AcidCaos",
+    "sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+  },
+  "server": {
+    "debug": false,
+    "debug_note": "server.py runs app.run(..., debug=False), so a failing request answers the framework's plain error page with no traceback and no absolute path. The capture asserts the body does not leak the disposable path before committing it.",
+    "env_extra": {
+      "PYTHONUNBUFFERED": "1"
+    },
+    "env_extra_note": "Set for THIS capture's child processes only, via a defaulted parameter on start_server. child_environment() is untouched, so no existing capture's log changes. The printed lines below are evidence -- the third argument's display-only nature is visible nowhere else -- and block buffering would lose them when the harness reaps the child.",
+    "host": "127.0.0.1",
+    "one_per_transaction": true,
+    "one_per_transaction_reason": "sessions.load_saves() caches the corpus in a module global at import, so a running server never re-reads the seed file. Restoring the seed between probes on one server leaves the in-memory corpus already mutated and silently produces a different result.",
+    "port": 5055,
+    "process": "python -B server.py inside each disposable",
+    "starts": 12
+  },
+  "third_argument_pair": {
+    "compared": [
+      "increment_existing",
+      "level_argument_ignored"
+    ],
+    "printed_lines_differ": true,
+    "printed_three": [
+      "[+] COMMAND: add_xp_unit(['772', 5, 9]) -> Soldier +5xp BOUGHT LEVEL UP -> 9"
+    ],
+    "printed_two": [
+      "[+] COMMAND: add_xp_unit(['772', 5]) -> Soldier +5xp"
+    ],
+    "same_attr_after": true,
+    "same_changed_leaves": true,
+    "same_state_sha256": true
+  },
+  "time_dependent_fields": {
+    "captured_at_utc": "Same, in this manifest.",
+    "request_captured_at_utc": "Recorded per step and necessarily volatile; it is the only field in this fixture that changes between reruns, which is why 'byte-identical rerun' is claimed for the transaction records, states and manifest body, not for these two fields.",
+    "ts": "Pinned to a constant, so not volatile."
+  },
+  "transactions": [
+    {
+      "addressed_map_key": "772",
+      "args": [
+        "772",
+        5
+      ],
+      "attr_after": {
+        "xp": 28
+      },
+      "attr_before": {
+        "xp": 23
+      },
+      "changed_leaf_count": 1,
+      "changed_leaves": [
+        {
+          "after": 28,
+          "before": 23,
+          "path": "/maps/0/items/772/6/xp",
+          "present_after": true,
+          "present_before": true
+        }
+      ],
+      "expected_status": 200,
+      "name": "increment_existing",
+      "note": "The increment arm: the key already carries the field, so the branch executes attr['xp'] += args[1] and nothing else. Exactly one leaf moves and no stored resource moves.",
+      "placed_rows": 319,
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['772', 5]) -> Soldier +5xp"
+      ],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "5a2c2083d37599473518165abb76d58fbf216cccaf2b88b2322e458f45bbbb43",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "5eec0e03c882d4613f98da9d9ac1a6b0f01b9fbc84347c5a7490e42c72a570b3",
+      "unchanged_leaves_sha256_before": "5eec0e03c882d4613f98da9d9ac1a6b0f01b9fbc84347c5a7490e42c72a570b3"
+    },
+    {
+      "addressed_map_key": "1783",
+      "args": [
+        "1783",
+        7
+      ],
+      "attr_after": {
+        "xp": 7
+      },
+      "attr_before": {},
+      "changed_leaf_count": 1,
+      "changed_leaves": [
+        {
+          "after": 7,
+          "before": null,
+          "path": "/maps/0/items/1783/6/xp",
+          "present_after": true,
+          "present_before": false
+        }
+      ],
+      "expected_status": 200,
+      "name": "assign_absent_key",
+      "note": "The assign arm: the row's bag is empty, so the branch writes attr['xp'] = args[1] and persists it. This is the arm that can persist a non-integer, which is why the delivered projection classifies the recorded value's kind.",
+      "placed_rows": 319,
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['1783', 7]) -> Medic +7xp"
+      ],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "76bfec85cea16ec78d1de1a90655592d0ea6f77e0052d29e84f884a252a2ab55",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b"
+    },
+    {
+      "addressed_map_key": "999999",
+      "args": [
+        "999999",
+        5
+      ],
+      "attr_after": null,
+      "attr_before": null,
+      "changed_leaf_count": 0,
+      "changed_leaves": [],
+      "expected_status": 200,
+      "name": "missing_row",
+      "note": "An unaddressable map key hits map_get_item's falsy branch, prints 'Error: item not found.' and RETURNS -- and the server still answers the legacy success result. A client cannot distinguish this outcome from a real award by the response alone.",
+      "placed_rows": 319,
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['999999', 5]) -> Error: item not found."
+      ],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b"
+    },
+    {
+      "addressed_map_key": "772",
+      "args": [
+        "772",
+        -1000
+      ],
+      "attr_after": {
+        "xp": -977
+      },
+      "attr_before": {
+        "xp": 23
+      },
+      "changed_leaf_count": 1,
+      "changed_leaves": [
+        {
+          "after": -977,
+          "before": 23,
+          "path": "/maps/0/items/772/6/xp",
+          "present_after": true,
+          "present_before": true
+        }
+      ],
+      "expected_status": 200,
+      "name": "negative_no_clamp",
+      "note": "A negative gain is NOT clamped. This is the sharp asymmetry with engine.apply_resources, which applies every vector slot through max(..., 0); this branch does no arithmetic on the gain at all, so a client-sent negative persists a negative accumulator.",
+      "placed_rows": 319,
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['772', -1000]) -> Soldier +-1000xp"
+      ],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "c0caa825c1b290801d5d03c26f06b698db706a81fbf6962f1a9c3953881a6309",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "5eec0e03c882d4613f98da9d9ac1a6b0f01b9fbc84347c5a7490e42c72a570b3",
+      "unchanged_leaves_sha256_before": "5eec0e03c882d4613f98da9d9ac1a6b0f01b9fbc84347c5a7490e42c72a570b3"
+    },
+    {
+      "addressed_map_key": "772",
+      "args": [
+        "772",
+        0
+      ],
+      "attr_after": {
+        "xp": 23
+      },
+      "attr_before": {
+        "xp": 23
+      },
+      "changed_leaf_count": 0,
+      "changed_leaves": [],
+      "expected_status": 200,
+      "name": "zero_amount",
+      "note": "A zero gain leaves the document byte-identical while still answering success and still printing. Recorded so the 'exactly one leaf moved' claim is not read as 'the field always changes'.",
+      "placed_rows": 319,
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['772', 0]) -> Soldier +0xp"
+      ],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b"
+    },
+    {
+      "addressed_map_key": "772",
+      "args": [
+        "772",
+        1000000000000
+      ],
+      "attr_after": {
+        "xp": 1000000000023
+      },
+      "attr_before": {
+        "xp": 23
+      },
+      "changed_leaf_count": 1,
+      "changed_leaves": [
+        {
+          "after": 1000000000023,
+          "before": 23,
+          "path": "/maps/0/items/772/6/xp",
+          "present_after": true,
+          "present_before": true
+        }
+      ],
+      "expected_status": 200,
+      "name": "unbounded_amount",
+      "note": "No bound of any kind on the amount: a client-sent 10**12 persists verbatim. Unusable as an economy, which is one of the three independent reasons this line delivers evidence and not a route.",
+      "placed_rows": 319,
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['772', 1000000000000]) -> Soldier +1000000000000xp"
+      ],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "ba58d100abf7996a232e9190bc96800c9caddd69e2e2356e62280ac60beabbd9",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "5eec0e03c882d4613f98da9d9ac1a6b0f01b9fbc84347c5a7490e42c72a570b3",
+      "unchanged_leaves_sha256_before": "5eec0e03c882d4613f98da9d9ac1a6b0f01b9fbc84347c5a7490e42c72a570b3"
+    },
+    {
+      "addressed_map_key": "772",
+      "args": [
+        "772",
+        2.5
+      ],
+      "attr_after": {
+        "xp": 25.5
+      },
+      "attr_before": {
+        "xp": 23
+      },
+      "changed_leaf_count": 1,
+      "changed_leaves": [
+        {
+          "after": 25.5,
+          "before": 23,
+          "path": "/maps/0/items/772/6/xp",
+          "present_after": true,
+          "present_before": true
+        }
+      ],
+      "expected_status": 200,
+      "name": "float_amount_persisted",
+      "note": "A float gain persists as a float. The delivered projection reports the value verbatim and never rounds it, because rounding would destroy the very fact this records.",
+      "placed_rows": 319,
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['772', 2.5]) -> Soldier +2.5xp"
+      ],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "04d7fb5ff49899e4923025c3518c87e805a3676023f1a0efa3c21d7759d13ee3",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "5eec0e03c882d4613f98da9d9ac1a6b0f01b9fbc84347c5a7490e42c72a570b3",
+      "unchanged_leaves_sha256_before": "5eec0e03c882d4613f98da9d9ac1a6b0f01b9fbc84347c5a7490e42c72a570b3"
+    },
+    {
+      "addressed_map_key": "3",
+      "args": [
+        "3",
+        11
+      ],
+      "attr_after": {
+        "xp": 11
+      },
+      "attr_before": {},
+      "changed_leaf_count": 1,
+      "changed_leaves": [
+        {
+          "after": 11,
+          "before": null,
+          "path": "/maps/0/items/3/6/xp",
+          "present_after": true,
+          "present_before": false
+        }
+      ],
+      "expected_status": 200,
+      "name": "building_row_type_agnostic",
+      "note": "The branch is TYPE-AGNOSTIC: it accepts a building row exactly as it accepts a unit row and stores unit experience on it. The same is true of the one writer of this field anywhere in the legacy source. There is no unit type check and no unit-only key space.",
+      "placed_rows": 319,
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['3', 11]) -> Wall I +11xp"
+      ],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "627f9b81ef6de10a4408cf3b698efef99156ba0597e35e13a50e90576a748970",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b"
+    },
+    {
+      "addressed_map_key": "772",
+      "args": [
+        "772",
+        5,
+        9
+      ],
+      "attr_after": {
+        "xp": 28
+      },
+      "attr_before": {
+        "xp": 23
+      },
+      "changed_leaf_count": 1,
+      "changed_leaves": [
+        {
+          "after": 28,
+          "before": 23,
+          "path": "/maps/0/items/772/6/xp",
+          "present_after": true,
+          "present_before": true
+        }
+      ],
+      "expected_status": 200,
+      "name": "level_argument_ignored",
+      "note": "The third argument, paired with increment_existing which sends the same first two. Post-state, resource state and changed-leaf set are IDENTICAL; only the printed line differs, because the third argument is read into a local, truthiness-tested, and then used only inside an f-string. Its stored effect is nil -- established by this pair, not asserted from reading the branch.",
+      "placed_rows": 319,
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['772', 5, 9]) -> Soldier +5xp BOUGHT LEVEL UP -> 9"
+      ],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "5a2c2083d37599473518165abb76d58fbf216cccaf2b88b2322e458f45bbbb43",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "5eec0e03c882d4613f98da9d9ac1a6b0f01b9fbc84347c5a7490e42c72a570b3",
+      "unchanged_leaves_sha256_before": "5eec0e03c882d4613f98da9d9ac1a6b0f01b9fbc84347c5a7490e42c72a570b3"
+    },
+    {
+      "addressed_map_key": "772",
+      "args": [
+        "772",
+        "5"
+      ],
+      "attr_after": {
+        "xp": 23
+      },
+      "attr_before": {
+        "xp": 23
+      },
+      "changed_leaf_count": 0,
+      "changed_leaves": [],
+      "expected_status": 500,
+      "failure_body_sha256": "ae5163256b944013e27cbef0d2bcd33a6dacbb92463509f91d5f3df782142910",
+      "failure_is_framework_error_page": true,
+      "name": "string_amount_increment_fails",
+      "note": "The increment arm against a string gain: 23 + '5' raises TypeError and the request ends HTTP 500. Nothing is written. The two arms are ASYMMETRIC on type, and this is the half that raises.",
+      "placed_rows": 319,
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['772', '5']) ->"
+      ],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": null,
+      "state_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 500,
+      "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b"
+    },
+    {
+      "addressed_map_key": "1783",
+      "args": [
+        "1783",
+        "5"
+      ],
+      "attr_after": {
+        "xp": "5"
+      },
+      "attr_before": {},
+      "changed_leaf_count": 1,
+      "changed_leaves": [
+        {
+          "after": "5",
+          "before": null,
+          "path": "/maps/0/items/1783/6/xp",
+          "present_after": true,
+          "present_before": false
+        }
+      ],
+      "expected_status": 200,
+      "name": "string_amount_assign_persisted",
+      "note": "The assign arm against the SAME string gain, and it PERSISTS the string. So one request can poison a save: every later increment against that row then raises. This is the reachable state the delivered projection's recorded_kind classification exists to make visible instead of readable as an integer.",
+      "placed_rows": 319,
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['1783', '5']) -> Medic +5xp"
+      ],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "557e1975f89bd94be6d6c10758f013e167c57d852249b6a4bf9fde48a9064d9c",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b"
+    },
+    {
+      "addressed_map_key": "772",
+      "args": [
+        "772",
+        true
+      ],
+      "attr_after": {
+        "xp": 24
+      },
+      "attr_before": {
+        "xp": 23
+      },
+      "changed_leaf_count": 1,
+      "changed_leaves": [
+        {
+          "after": 24,
+          "before": 23,
+          "path": "/maps/0/items/772/6/xp",
+          "present_after": true,
+          "present_before": true
+        }
+      ],
+      "expected_status": 200,
+      "name": "bool_amount_increments_as_one",
+      "note": "A boolean gain is worth exactly +1, because the branch does arithmetic on it. This is why bool is a separate member of the delivered projection's closed classification vocabulary and not folded into int: a projection reporting bool as int would be right by accident and wrong by reason.",
+      "placed_rows": 319,
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['772', True]) -> Soldier +Truexp"
+      ],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "52201f339b8eec5983c647ab42842bfca1e807c224664a49a1bd6397f26c76c9",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "5eec0e03c882d4613f98da9d9ac1a6b0f01b9fbc84347c5a7490e42c72a570b3",
+      "unchanged_leaves_sha256_before": "5eec0e03c882d4613f98da9d9ac1a6b0f01b9fbc84347c5a7490e42c72a570b3"
+    }
+  ],
+  "transcript": [
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "increment_existing",
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['772', 5]) -> Soldier +5xp"
+      ],
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "assign_absent_key",
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['1783', 7]) -> Medic +7xp"
+      ],
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "missing_row",
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['999999', 5]) -> Error: item not found."
+      ],
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "negative_no_clamp",
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['772', -1000]) -> Soldier +-1000xp"
+      ],
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "zero_amount",
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['772', 0]) -> Soldier +0xp"
+      ],
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "unbounded_amount",
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['772', 1000000000000]) -> Soldier +1000000000000xp"
+      ],
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "float_amount_persisted",
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['772', 2.5]) -> Soldier +2.5xp"
+      ],
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "building_row_type_agnostic",
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['3', 11]) -> Wall I +11xp"
+      ],
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "level_argument_ignored",
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['772', 5, 9]) -> Soldier +5xp BOUGHT LEVEL UP -> 9"
+      ],
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "string_amount_increment_fails",
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['772', '5']) ->"
+      ],
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "string_amount_assign_persisted",
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['1783', '5']) -> Medic +5xp"
+      ],
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "bool_amount_increments_as_one",
+      "printed_branch_lines": [
+        "[+] COMMAND: add_xp_unit(['772', True]) -> Soldier +Truexp"
+      ],
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    }
+  ]
+}

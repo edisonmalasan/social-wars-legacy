@@ -1,0 +1,45 @@
+{
+  "addressed_map_key": "999999",
+  "args": [
+    "999999",
+    5
+  ],
+  "attr_after": null,
+  "attr_before": null,
+  "changed_leaf_count": 0,
+  "changed_leaves": [],
+  "expected_status": 200,
+  "name": "missing_row",
+  "note": "An unaddressable map key hits map_get_item's falsy branch, prints 'Error: item not found.' and RETURNS -- and the server still answers the legacy success result. A client cannot distinguish this outcome from a real award by the response alone.",
+  "placed_rows": 319,
+  "printed_branch_lines": [
+    "[+] COMMAND: add_xp_unit(['999999', 5]) -> Error: item not found."
+  ],
+  "resource_neutral": true,
+  "resources_after": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "resources_before": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "response_payload": {
+    "result": "success"
+  },
+  "state_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "status": 200,
+  "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b"
+}

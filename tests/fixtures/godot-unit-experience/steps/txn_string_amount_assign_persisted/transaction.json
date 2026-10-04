@@ -1,0 +1,55 @@
+{
+  "addressed_map_key": "1783",
+  "args": [
+    "1783",
+    "5"
+  ],
+  "attr_after": {
+    "xp": "5"
+  },
+  "attr_before": {},
+  "changed_leaf_count": 1,
+  "changed_leaves": [
+    {
+      "after": "5",
+      "before": null,
+      "path": "/maps/0/items/1783/6/xp",
+      "present_after": true,
+      "present_before": false
+    }
+  ],
+  "expected_status": 200,
+  "name": "string_amount_assign_persisted",
+  "note": "The assign arm against the SAME string gain, and it PERSISTS the string. So one request can poison a save: every later increment against that row then raises. This is the reachable state the delivered projection's recorded_kind classification exists to make visible instead of readable as an integer.",
+  "placed_rows": 319,
+  "printed_branch_lines": [
+    "[+] COMMAND: add_xp_unit(['1783', '5']) -> Medic +5xp"
+  ],
+  "resource_neutral": true,
+  "resources_after": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "resources_before": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "response_payload": {
+    "result": "success"
+  },
+  "state_sha256_after": "557e1975f89bd94be6d6c10758f013e167c57d852249b6a4bf9fde48a9064d9c",
+  "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "status": 200,
+  "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b"
+}

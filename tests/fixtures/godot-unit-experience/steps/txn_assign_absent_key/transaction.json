@@ -1,0 +1,55 @@
+{
+  "addressed_map_key": "1783",
+  "args": [
+    "1783",
+    7
+  ],
+  "attr_after": {
+    "xp": 7
+  },
+  "attr_before": {},
+  "changed_leaf_count": 1,
+  "changed_leaves": [
+    {
+      "after": 7,
+      "before": null,
+      "path": "/maps/0/items/1783/6/xp",
+      "present_after": true,
+      "present_before": false
+    }
+  ],
+  "expected_status": 200,
+  "name": "assign_absent_key",
+  "note": "The assign arm: the row's bag is empty, so the branch writes attr['xp'] = args[1] and persists it. This is the arm that can persist a non-integer, which is why the delivered projection classifies the recorded value's kind.",
+  "placed_rows": 319,
+  "printed_branch_lines": [
+    "[+] COMMAND: add_xp_unit(['1783', 7]) -> Medic +7xp"
+  ],
+  "resource_neutral": true,
+  "resources_after": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "resources_before": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "response_payload": {
+    "result": "success"
+  },
+  "state_sha256_after": "76bfec85cea16ec78d1de1a90655592d0ea6f77e0052d29e84f884a252a2ab55",
+  "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "status": 200,
+  "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b"
+}

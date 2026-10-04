@@ -156,11 +156,19 @@ fail by injection** and the file restored from a byte-identical copy.
 
 ### D6 — Correction is textual and enumerates its own sites
 
-**Decision.** The five stale locations are corrected in place with the corpus figure retained and
-labelled as a corpus fact, plus the `godot-unit-production` and `godot-building-xp` requirement
-deltas. The hermetic suite carries a **tree scan** asserting that no client source states the
-corpus-cannot-exercise reason for unit experience — so the sixth location cannot be added later
-without the suite failing.
+**Decision.** The five stale locations this investigation enumerated are corrected in place with the
+corpus figure retained and labelled as a corpus fact, plus the `godot-unit-production` and
+`godot-building-xp` requirement deltas. The hermetic suite carries a **tree scan** asserting that no
+client source states the corpus-cannot-exercise reason for unit experience — so the sixth location
+cannot be added later without the suite failing.
+
+> **Amended during Apply.** Apply found **two** further locations the investigation missed, making
+> the true count **seven**: `town.gd:329-330` (the identical false sentence, unlisted anywhere in the
+> investigation) and `level_flow.gd:1` (the module's own first doc line). The second is the direct
+> vindication of this decision — three successive readers produced five, six, and six, and the last
+> found a defect in the first line of the file. An enumeration does not converge, so the count in
+> this decision is superseded by the scan's pinned zero and `docs/legacy-unit-xp.md` now records
+> seven. The scan is the deliverable; the enumeration was never the point.
 
 **Rationale.** The supersession of this claim already happened **once** and propagated only as
 far as a code comment: `production_flow.gd:67-74` carries the sharp reason while

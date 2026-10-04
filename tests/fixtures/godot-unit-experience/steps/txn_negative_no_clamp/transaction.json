@@ -1,0 +1,57 @@
+{
+  "addressed_map_key": "772",
+  "args": [
+    "772",
+    -1000
+  ],
+  "attr_after": {
+    "xp": -977
+  },
+  "attr_before": {
+    "xp": 23
+  },
+  "changed_leaf_count": 1,
+  "changed_leaves": [
+    {
+      "after": -977,
+      "before": 23,
+      "path": "/maps/0/items/772/6/xp",
+      "present_after": true,
+      "present_before": true
+    }
+  ],
+  "expected_status": 200,
+  "name": "negative_no_clamp",
+  "note": "A negative gain is NOT clamped. This is the sharp asymmetry with engine.apply_resources, which applies every vector slot through max(..., 0); this branch does no arithmetic on the gain at all, so a client-sent negative persists a negative accumulator.",
+  "placed_rows": 319,
+  "printed_branch_lines": [
+    "[+] COMMAND: add_xp_unit(['772', -1000]) -> Soldier +-1000xp"
+  ],
+  "resource_neutral": true,
+  "resources_after": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "resources_before": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "response_payload": {
+    "result": "success"
+  },
+  "state_sha256_after": "c0caa825c1b290801d5d03c26f06b698db706a81fbf6962f1a9c3953881a6309",
+  "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "status": 200,
+  "unchanged_leaves_sha256_after": "5eec0e03c882d4613f98da9d9ac1a6b0f01b9fbc84347c5a7490e42c72a570b3",
+  "unchanged_leaves_sha256_before": "5eec0e03c882d4613f98da9d9ac1a6b0f01b9fbc84347c5a7490e42c72a570b3"
+}

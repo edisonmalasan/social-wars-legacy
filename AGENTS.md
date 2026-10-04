@@ -701,9 +701,14 @@ for the corpus's `xp 4`. Claim limits: **the level is the one the committed curv
 the stored experience, never one observed from the Flash client**, and the one-based index is
 derived from **one** corpus data point; **no level reward is paid and none displayed**
 (`reward_type` and `reward_amount` are committed on every entry and consumed by no legacy
-branch, so paying one would invent an economy); **unit XP and tutorial progression are out of
-scope** because the corpus cannot exercise them (0 of 40 placed rows carry `attr["xp"]`; no
-unit placements exist); the committed thresholds are **preserved verbatim** with no
+branch, so paying one would invent an economy); **unit XP and tutorial progression were out of
+scope for M7, and the reason recorded for unit XP was false as a general claim** — the
+fresh-player corpus carries `attr["xp"]` on **0 of 40** placed rows and contains no unit row at
+all, which are facts about *that* corpus and not about the branch, while **171 of 12,954**
+placed rows across **5 of the 31** committed save documents carry it — every one of them a
+committed unit row — so the branch was always exercisable and is now owned by
+`godot-unit-experience`; tutorial progression is owned by `godot-tutorial`; the committed
+thresholds are **preserved verbatim** with no
 rebalancing; the stored-versus-derived **disagreement reporting deliberately does not
 reconcile**, surfacing both values instead, because the recorded level is unverified against
 the curve; **a successful live level-up is unproven** — the committed corpus is already at its

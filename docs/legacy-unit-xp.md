@@ -504,10 +504,28 @@ inferred. **Five are false as written and must be corrected** (§8a); **seven ar
 correct and must not be touched** (§8b), one of those seven carrying only a
 wording-precision item.
 
+> **Correction, recorded during Apply.** §8a enumerated **five** stale locations. The
+> delivery found **two more**, so the true count is **seven** — and the two extras are the
+> argument for the guard D6 required:
+>
+> 1. the **sixth**: `apps/client-godot/scripts/town/town.gd:329-330`, which carried the
+>    identical false sentence verbatim and which §8a does not list anywhere;
+> 2. the **seventh**: `apps/client-godot/scripts/town/level_flow.gd:1`, the module's own
+>    first doc line, read *"Unit experience is out of scope because the committed corpus
+>    cannot exercise it."* — the same falsehood in the most prominent position in the file,
+>    which §8a's search missed because it evidently began below the module header.
+>
+> The seventh is the one that matters methodologically. Three different readers produced
+> five, six, and six: an enumeration does not converge, and the last reader to run found a
+> defect in the *first line of the file*. That is why the delivered guard is a **scan** over
+> every client source with a pinned expected hit count of **zero**, and not a checklist.
+> See §11.
+
 ### 8a. False as written — must be corrected
 
 | Location | What it says | Why it is wrong |
 | --- | --- | --- |
+| `apps/client-godot/scripts/town/level_flow.gd:1` (module doc line) | *"Unit experience is out of scope because the committed corpus cannot exercise it."* | **Found by the delivered scan, not by this investigation — see the correction above.** False for the same reason as the two rows below, and in the most prominent position in the file. |
 | `apps/client-godot/scripts/town/level_flow.gd:56-58` (doc comment) | *"`0 of the 40` placed corpus rows carry `attr["xp"]`, and the fresh save carries no unit placements, **so the unit-experience path cannot be exercised**"* | the first two clauses are true; the conclusion is **false**. The path has now been exercised 22 times against an authentic committed village save. |
 | `apps/client-godot/scripts/town/level_flow.gd:82-84` (doc comment) | *"**Unit experience** … **is out of scope**: the committed corpus carries no unit placements and no row carrying `attr["xp"]`, so the path cannot be exercised (design D7)"* | false on both counts: the repository's committed evidence has 171 such rows in 5 of 31 saves, and the path has been executed. |
 | `apps/client-godot/scripts/town/level_flow.gd:846-848` (the note string returned to the view) | *"unit experience (add_xp_unit) is out of scope **because the committed corpus cannot exercise it**: 0 of the 40 placed rows carry `attr[\"xp\"]` and the fresh save has no unit placements"* | false as written, and it is a **user-facing string**, so the falsehood is on the surface. Note it is **composite**: its continuation at `:848-850` already says tutorial progression is *not* out of scope. So this one string holds a **corrected** tutorial half and a **stale** unit-XP half side by side — the clearest single artefact of the unpropagated supersession. |
@@ -557,8 +575,9 @@ award_unit_xp(item_index, xp_gain=client_amount)
 So the honest options are exactly these, and the first is the one the evidence selects:
 
 **Option A — a correction and evidence line (recommended).** Deliver
-1. the **evidence correction**: replace all five stale "out of scope because the corpus
-   cannot exercise it" statements with the measured repository-wide figure and the correct
+1. the **evidence correction**: replace all seven stale "out of scope because the corpus
+   cannot exercise it" statements — five enumerated in §8a plus two this investigation
+   missed, per the correction above — with the measured repository-wide figure and the correct
    reason — *no trusted award exists*, keeping the corpus figure labelled as a corpus fact;
 2. the **executed-legacy fixture** for the branch, captured against a committed village
    save, re-runnable, with containment unchanged — which converts "no fixture exists" from

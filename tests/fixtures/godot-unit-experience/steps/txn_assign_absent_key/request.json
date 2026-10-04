@@ -1,0 +1,25 @@
+{
+  "captured_at_utc": "2026-10-04T12:17:11+00:00",
+  "form": {
+    "USERID": "AcidCaos",
+    "data": "52b9681c4302c7bf4900a2832d1981e2201f1eaae70848ed426b8e05e15de4f0;{\"accessToken\":\"\",\"commands\":[[0,\"add_xp_unit\",[\"1783\",7],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1700000000}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "Exact client request bytes are reconstructed from this record; Host is set explicitly, no User-Agent header is sent. The batch's arguments ARE the crafted, client-supplied values under test -- that is the finding, not an oversight. The resource vector is NEUTRAL. ts is pinned to a constant so this record is byte-stable; legacy parses it and never reads it. user_key is redacted; accessToken is the crafted empty placeholder, never a token value.",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "seed_save": "AcidCaos.json",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}

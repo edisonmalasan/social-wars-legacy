@@ -1,0 +1,49 @@
+{
+  "addressed_map_key": "772",
+  "args": [
+    "772",
+    0
+  ],
+  "attr_after": {
+    "xp": 23
+  },
+  "attr_before": {
+    "xp": 23
+  },
+  "changed_leaf_count": 0,
+  "changed_leaves": [],
+  "expected_status": 200,
+  "name": "zero_amount",
+  "note": "A zero gain leaves the document byte-identical while still answering success and still printing. Recorded so the 'exactly one leaf moved' claim is not read as 'the field always changes'.",
+  "placed_rows": 319,
+  "printed_branch_lines": [
+    "[+] COMMAND: add_xp_unit(['772', 0]) -> Soldier +0xp"
+  ],
+  "resource_neutral": true,
+  "resources_after": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "resources_before": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "response_payload": {
+    "result": "success"
+  },
+  "state_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "status": 200,
+  "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b"
+}

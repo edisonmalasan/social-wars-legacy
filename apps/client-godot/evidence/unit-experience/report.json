@@ -1,0 +1,1261 @@
+{
+	"census": {
+		"fresh_corpus": {
+			"experience_rows": [],
+			"figure_label": "A FACT ABOUT THIS ONE DOCUMENT, and never evidence about the repository and never evidence that an award exists: the same field is present on 171 placed rows across 5 committed save documents",
+			"rows": 40,
+			"rows_with_xp": 0,
+			"save": "tests/saves/fresh-player.json",
+			"store_empty": true
+		},
+		"repository_wide": {
+			"distinct_item_ids": 55,
+			"documents": 31,
+			"documents_with_xp": 5,
+			"documents_with_xp_names": [
+				"AcidCaos.json",
+				"Kiriakos.json",
+				"Nerri.json",
+				"Neutral.json",
+				"Scarlet.json"
+			],
+			"measured_by": "this run, over every committed save document in villages/ and villages/quest/",
+			"per_document": [
+				{
+					"document": "100000001.json",
+					"rows": 381,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000002.json",
+					"rows": 494,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000003.json",
+					"rows": 154,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000004.json",
+					"rows": 348,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000005.json",
+					"rows": 337,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000006.json",
+					"rows": 465,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000007.json",
+					"rows": 310,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000008.json",
+					"rows": 430,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000009.json",
+					"rows": 236,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000010.json",
+					"rows": 276,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000011.json",
+					"rows": 724,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000012.json",
+					"rows": 39,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000013.json",
+					"rows": 293,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000014.json",
+					"rows": 841,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000017.json",
+					"rows": 616,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000018.json",
+					"rows": 773,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000019.json",
+					"rows": 728,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000020.json",
+					"rows": 367,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000021.json",
+					"rows": 253,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000022.json",
+					"rows": 548,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000025.json",
+					"rows": 811,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000026.json",
+					"rows": 219,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "100000049.json",
+					"rows": 19,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "AcidCaos.json",
+					"rows": 319,
+					"rows_with_xp": 36
+				},
+				{
+					"document": "General_Mike_30.json",
+					"rows": 436,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "General_Mike_31.json",
+					"rows": 436,
+					"rows_with_xp": 0
+				},
+				{
+					"document": "Kiriakos.json",
+					"rows": 569,
+					"rows_with_xp": 16
+				},
+				{
+					"document": "Nerri.json",
+					"rows": 367,
+					"rows_with_xp": 46
+				},
+				{
+					"document": "Neutral.json",
+					"rows": 549,
+					"rows_with_xp": 65
+				},
+				{
+					"document": "Scarlet.json",
+					"rows": 576,
+					"rows_with_xp": 8
+				},
+				{
+					"document": "initial.json",
+					"rows": 40,
+					"rows_with_xp": 0
+				}
+			],
+			"recorded_value_kinds": [
+				"int"
+			],
+			"rows": 12954,
+			"rows_with_xp": 171
+		},
+		"split": {
+			"derived": "nothing about the AWARD is derived: the amount reaches the field as a client argument, so no award, threshold, unit level, or schedule is reproduced anywhere in this repository",
+			"established": "the field is on 171 of 12954 placed rows across 31 committed save documents, every recorded value is an integer, and the field is written twice and read zero times",
+			"labelling": "the fresh corpus's 0-of-40 figure is a FACT ABOUT THAT ONE DOCUMENT and is never evidence about the repository nor evidence that an award exists"
+		}
+	},
+	"determinism": {
+		"byte_identical_across_reruns": true,
+		"reason": "no timestamp, no absolute path, no wall clock, no request, and no saved state: every table is derived from production_flow.gd's own constants, this same run's measurements over the committed bytes, and the fixture's own recorded manifest, and every derived list is sorted before it is written",
+		"recorded_input_change": "the `fixture` block is the ONE place whose content depends on whether tests/fixtures/godot-unit-experience is committed. It is written from that manifest and marked absent otherwise, so a change there is a change of INPUT and is recorded rather than hidden",
+		"serialization": "JSON.stringify(report, tab, sort_keys=true) plus one trailing newline; every number written is an integer where the value is integral - the pinned engine's integral floats are normalised on the way in, which changes no value",
+		"time_dependent_fields": "NONE in this line's hermetic evidence: the projection reads a bag, the census reads committed save documents, and the legacy figures are measured out of the committed source"
+	},
+	"fixture": {
+		"changed_leaf_counts": [
+			1,
+			1,
+			0,
+			1,
+			0,
+			1,
+			1,
+			1,
+			1,
+			0,
+			1,
+			1
+		],
+		"directory": "tests/fixtures/godot-unit-experience",
+		"display_only": {
+			"found": true,
+			"leaf_sets_identical": true,
+			"post_states_identical": true,
+			"printed_output_differs": "the recorded contract in production_flow.gd states the printed lines differ (+5xp against +5xp BOUGHT LEVEL UP -> 9); printed output is NOT a recorded state leaf, so this suite reads the difference from the contract rather than inventing a transcript",
+			"same_row_and_amount": true,
+			"three_argument_after": {
+				"xp": 28
+			},
+			"three_argument_count": 1,
+			"three_argument_leaves": [
+				{
+					"after": 28,
+					"before": 23,
+					"path": "/maps/0/items/772/6/xp",
+					"present_after": true,
+					"present_before": true
+				}
+			],
+			"two_argument_after": {
+				"xp": 28
+			},
+			"two_argument_count": 11,
+			"two_argument_leaves": [
+				{
+					"after": 28,
+					"before": 23,
+					"path": "/maps/0/items/772/6/xp",
+					"present_after": true,
+					"present_before": true
+				}
+			]
+		},
+		"manifest": "capture-manifest.json",
+		"manifest_bytes": 33730,
+		"manifest_sha256": "6facc707f5a8f4d58d2956454a6ea45e084a79c8f969becedb0db56909b25b2e",
+		"manifest_top_level_keys": [
+			"batch_shape",
+			"captured_at_utc",
+			"cleanup",
+			"containment",
+			"derived_provisional",
+			"established",
+			"exit_code",
+			"interpreter",
+			"invocation",
+			"login_step",
+			"not_claimed",
+			"purpose",
+			"recorded_steps",
+			"schema",
+			"seed",
+			"server",
+			"third_argument_pair",
+			"time_dependent_fields",
+			"transactions",
+			"transcript"
+		],
+		"not_invented": true,
+		"one_leaf_transactions": 9,
+		"present": true,
+		"read_from": "the committed fixture's own manifest; every field above is COPIED from it and every missing field is listed per transaction in fields_missing",
+		"recorded": {
+			"container_shipped": "python -B apps/compat-api/capture_unit_xp_fixture.py",
+			"containment_identical": true,
+			"containment_post": "",
+			"containment_pre": "",
+			"exit_code": 0,
+			"schema": "unit-experience-fixture-v1",
+			"seed": {
+				"file_sha256": "",
+				"path": "",
+				"pid": "",
+				"seeded_as": ""
+			}
+		},
+		"step_names": [
+			"login_post",
+			"txn_assign_absent_key",
+			"txn_bool_amount_increments_as_one",
+			"txn_building_row_type_agnostic",
+			"txn_float_amount_persisted",
+			"txn_increment_existing",
+			"txn_level_argument_ignored",
+			"txn_missing_row",
+			"txn_negative_no_clamp",
+			"txn_string_amount_assign_persisted",
+			"txn_string_amount_increment_fails",
+			"txn_unbounded_amount",
+			"txn_zero_amount"
+		],
+		"transaction_count": 12,
+		"transactions": [
+			{
+				"args": [
+					"772",
+					5
+				],
+				"attr_after": {
+					"xp": 28
+				},
+				"attr_before": {
+					"xp": 23
+				},
+				"changed_leaves": [
+					{
+						"after": 28,
+						"before": 23,
+						"path": "/maps/0/items/772/6/xp",
+						"present_after": true,
+						"present_before": true
+					}
+				],
+				"fields_missing": [
+					"command",
+					"response",
+					"response_body",
+					"established",
+					"why_it_matters",
+					"probe",
+					"question"
+				],
+				"fields_present": [
+					"addressed_map_key",
+					"args",
+					"attr_after",
+					"attr_before",
+					"changed_leaf_count",
+					"changed_leaves",
+					"expected_status",
+					"name",
+					"note",
+					"placed_rows",
+					"printed_branch_lines",
+					"resource_neutral",
+					"resources_after",
+					"resources_before",
+					"response_payload",
+					"state_sha256_after",
+					"state_sha256_before",
+					"status",
+					"unchanged_leaves_sha256_after",
+					"unchanged_leaves_sha256_before"
+				],
+				"note": "The increment arm: the key already carries the field, so the branch executes attr['xp'] += args[1] and nothing else. Exactly one leaf moves and no stored resource moves.",
+				"status": 200
+			},
+			{
+				"args": [
+					"1783",
+					7
+				],
+				"attr_after": {
+					"xp": 7
+				},
+				"attr_before": {},
+				"changed_leaves": [
+					{
+						"after": 7,
+						"before": null,
+						"path": "/maps/0/items/1783/6/xp",
+						"present_after": true,
+						"present_before": false
+					}
+				],
+				"fields_missing": [
+					"command",
+					"response",
+					"response_body",
+					"established",
+					"why_it_matters",
+					"probe",
+					"question"
+				],
+				"fields_present": [
+					"addressed_map_key",
+					"args",
+					"attr_after",
+					"attr_before",
+					"changed_leaf_count",
+					"changed_leaves",
+					"expected_status",
+					"name",
+					"note",
+					"placed_rows",
+					"printed_branch_lines",
+					"resource_neutral",
+					"resources_after",
+					"resources_before",
+					"response_payload",
+					"state_sha256_after",
+					"state_sha256_before",
+					"status",
+					"unchanged_leaves_sha256_after",
+					"unchanged_leaves_sha256_before"
+				],
+				"note": "The assign arm: the row's bag is empty, so the branch writes attr['xp'] = args[1] and persists it. This is the arm that can persist a non-integer, which is why the delivered projection classifies the recorded value's kind.",
+				"status": 200
+			},
+			{
+				"args": [
+					"999999",
+					5
+				],
+				"attr_after": null,
+				"attr_before": null,
+				"changed_leaves": [],
+				"fields_missing": [
+					"command",
+					"response",
+					"response_body",
+					"established",
+					"why_it_matters",
+					"probe",
+					"question"
+				],
+				"fields_present": [
+					"addressed_map_key",
+					"args",
+					"attr_after",
+					"attr_before",
+					"changed_leaf_count",
+					"changed_leaves",
+					"expected_status",
+					"name",
+					"note",
+					"placed_rows",
+					"printed_branch_lines",
+					"resource_neutral",
+					"resources_after",
+					"resources_before",
+					"response_payload",
+					"state_sha256_after",
+					"state_sha256_before",
+					"status",
+					"unchanged_leaves_sha256_after",
+					"unchanged_leaves_sha256_before"
+				],
+				"note": "An unaddressable map key hits map_get_item's falsy branch, prints 'Error: item not found.' and RETURNS -- and the server still answers the legacy success result. A client cannot distinguish this outcome from a real award by the response alone.",
+				"status": 200
+			},
+			{
+				"args": [
+					"772",
+					-1000
+				],
+				"attr_after": {
+					"xp": -977
+				},
+				"attr_before": {
+					"xp": 23
+				},
+				"changed_leaves": [
+					{
+						"after": -977,
+						"before": 23,
+						"path": "/maps/0/items/772/6/xp",
+						"present_after": true,
+						"present_before": true
+					}
+				],
+				"fields_missing": [
+					"command",
+					"response",
+					"response_body",
+					"established",
+					"why_it_matters",
+					"probe",
+					"question"
+				],
+				"fields_present": [
+					"addressed_map_key",
+					"args",
+					"attr_after",
+					"attr_before",
+					"changed_leaf_count",
+					"changed_leaves",
+					"expected_status",
+					"name",
+					"note",
+					"placed_rows",
+					"printed_branch_lines",
+					"resource_neutral",
+					"resources_after",
+					"resources_before",
+					"response_payload",
+					"state_sha256_after",
+					"state_sha256_before",
+					"status",
+					"unchanged_leaves_sha256_after",
+					"unchanged_leaves_sha256_before"
+				],
+				"note": "A negative gain is NOT clamped. This is the sharp asymmetry with engine.apply_resources, which applies every vector slot through max(..., 0); this branch does no arithmetic on the gain at all, so a client-sent negative persists a negative accumulator.",
+				"status": 200
+			},
+			{
+				"args": [
+					"772",
+					0
+				],
+				"attr_after": {
+					"xp": 23
+				},
+				"attr_before": {
+					"xp": 23
+				},
+				"changed_leaves": [],
+				"fields_missing": [
+					"command",
+					"response",
+					"response_body",
+					"established",
+					"why_it_matters",
+					"probe",
+					"question"
+				],
+				"fields_present": [
+					"addressed_map_key",
+					"args",
+					"attr_after",
+					"attr_before",
+					"changed_leaf_count",
+					"changed_leaves",
+					"expected_status",
+					"name",
+					"note",
+					"placed_rows",
+					"printed_branch_lines",
+					"resource_neutral",
+					"resources_after",
+					"resources_before",
+					"response_payload",
+					"state_sha256_after",
+					"state_sha256_before",
+					"status",
+					"unchanged_leaves_sha256_after",
+					"unchanged_leaves_sha256_before"
+				],
+				"note": "A zero gain leaves the document byte-identical while still answering success and still printing. Recorded so the 'exactly one leaf moved' claim is not read as 'the field always changes'.",
+				"status": 200
+			},
+			{
+				"args": [
+					"772",
+					1000000000000
+				],
+				"attr_after": {
+					"xp": 1000000000023
+				},
+				"attr_before": {
+					"xp": 23
+				},
+				"changed_leaves": [
+					{
+						"after": 1000000000023,
+						"before": 23,
+						"path": "/maps/0/items/772/6/xp",
+						"present_after": true,
+						"present_before": true
+					}
+				],
+				"fields_missing": [
+					"command",
+					"response",
+					"response_body",
+					"established",
+					"why_it_matters",
+					"probe",
+					"question"
+				],
+				"fields_present": [
+					"addressed_map_key",
+					"args",
+					"attr_after",
+					"attr_before",
+					"changed_leaf_count",
+					"changed_leaves",
+					"expected_status",
+					"name",
+					"note",
+					"placed_rows",
+					"printed_branch_lines",
+					"resource_neutral",
+					"resources_after",
+					"resources_before",
+					"response_payload",
+					"state_sha256_after",
+					"state_sha256_before",
+					"status",
+					"unchanged_leaves_sha256_after",
+					"unchanged_leaves_sha256_before"
+				],
+				"note": "No bound of any kind on the amount: a client-sent 10**12 persists verbatim. Unusable as an economy, which is one of the three independent reasons this line delivers evidence and not a route.",
+				"status": 200
+			},
+			{
+				"args": [
+					"772",
+					2.5
+				],
+				"attr_after": {
+					"xp": 25.5
+				},
+				"attr_before": {
+					"xp": 23
+				},
+				"changed_leaves": [
+					{
+						"after": 25.5,
+						"before": 23,
+						"path": "/maps/0/items/772/6/xp",
+						"present_after": true,
+						"present_before": true
+					}
+				],
+				"fields_missing": [
+					"command",
+					"response",
+					"response_body",
+					"established",
+					"why_it_matters",
+					"probe",
+					"question"
+				],
+				"fields_present": [
+					"addressed_map_key",
+					"args",
+					"attr_after",
+					"attr_before",
+					"changed_leaf_count",
+					"changed_leaves",
+					"expected_status",
+					"name",
+					"note",
+					"placed_rows",
+					"printed_branch_lines",
+					"resource_neutral",
+					"resources_after",
+					"resources_before",
+					"response_payload",
+					"state_sha256_after",
+					"state_sha256_before",
+					"status",
+					"unchanged_leaves_sha256_after",
+					"unchanged_leaves_sha256_before"
+				],
+				"note": "A float gain persists as a float. The delivered projection reports the value verbatim and never rounds it, because rounding would destroy the very fact this records.",
+				"status": 200
+			},
+			{
+				"args": [
+					"3",
+					11
+				],
+				"attr_after": {
+					"xp": 11
+				},
+				"attr_before": {},
+				"changed_leaves": [
+					{
+						"after": 11,
+						"before": null,
+						"path": "/maps/0/items/3/6/xp",
+						"present_after": true,
+						"present_before": false
+					}
+				],
+				"fields_missing": [
+					"command",
+					"response",
+					"response_body",
+					"established",
+					"why_it_matters",
+					"probe",
+					"question"
+				],
+				"fields_present": [
+					"addressed_map_key",
+					"args",
+					"attr_after",
+					"attr_before",
+					"changed_leaf_count",
+					"changed_leaves",
+					"expected_status",
+					"name",
+					"note",
+					"placed_rows",
+					"printed_branch_lines",
+					"resource_neutral",
+					"resources_after",
+					"resources_before",
+					"response_payload",
+					"state_sha256_after",
+					"state_sha256_before",
+					"status",
+					"unchanged_leaves_sha256_after",
+					"unchanged_leaves_sha256_before"
+				],
+				"note": "The branch is TYPE-AGNOSTIC: it accepts a building row exactly as it accepts a unit row and stores unit experience on it. The same is true of the one writer of this field anywhere in the legacy source. There is no unit type check and no unit-only key space.",
+				"status": 200
+			},
+			{
+				"args": [
+					"772",
+					5,
+					9
+				],
+				"attr_after": {
+					"xp": 28
+				},
+				"attr_before": {
+					"xp": 23
+				},
+				"changed_leaves": [
+					{
+						"after": 28,
+						"before": 23,
+						"path": "/maps/0/items/772/6/xp",
+						"present_after": true,
+						"present_before": true
+					}
+				],
+				"fields_missing": [
+					"command",
+					"response",
+					"response_body",
+					"established",
+					"why_it_matters",
+					"probe",
+					"question"
+				],
+				"fields_present": [
+					"addressed_map_key",
+					"args",
+					"attr_after",
+					"attr_before",
+					"changed_leaf_count",
+					"changed_leaves",
+					"expected_status",
+					"name",
+					"note",
+					"placed_rows",
+					"printed_branch_lines",
+					"resource_neutral",
+					"resources_after",
+					"resources_before",
+					"response_payload",
+					"state_sha256_after",
+					"state_sha256_before",
+					"status",
+					"unchanged_leaves_sha256_after",
+					"unchanged_leaves_sha256_before"
+				],
+				"note": "The third argument, paired with increment_existing which sends the same first two. Post-state, resource state and changed-leaf set are IDENTICAL; only the printed line differs, because the third argument is read into a local, truthiness-tested, and then used only inside an f-string. Its stored effect is nil -- established by this pair, not asserted from reading the branch.",
+				"status": 200
+			},
+			{
+				"args": [
+					"772",
+					"5"
+				],
+				"attr_after": {
+					"xp": 23
+				},
+				"attr_before": {
+					"xp": 23
+				},
+				"changed_leaves": [],
+				"fields_missing": [
+					"command",
+					"response",
+					"response_body",
+					"established",
+					"why_it_matters",
+					"probe",
+					"question"
+				],
+				"fields_present": [
+					"addressed_map_key",
+					"args",
+					"attr_after",
+					"attr_before",
+					"changed_leaf_count",
+					"changed_leaves",
+					"expected_status",
+					"failure_body_sha256",
+					"failure_is_framework_error_page",
+					"name",
+					"note",
+					"placed_rows",
+					"printed_branch_lines",
+					"resource_neutral",
+					"resources_after",
+					"resources_before",
+					"response_payload",
+					"state_sha256_after",
+					"state_sha256_before",
+					"status",
+					"unchanged_leaves_sha256_after",
+					"unchanged_leaves_sha256_before"
+				],
+				"note": "The increment arm against a string gain: 23 + '5' raises TypeError and the request ends HTTP 500. Nothing is written. The two arms are ASYMMETRIC on type, and this is the half that raises.",
+				"status": 500
+			},
+			{
+				"args": [
+					"1783",
+					"5"
+				],
+				"attr_after": {
+					"xp": "5"
+				},
+				"attr_before": {},
+				"changed_leaves": [
+					{
+						"after": "5",
+						"before": null,
+						"path": "/maps/0/items/1783/6/xp",
+						"present_after": true,
+						"present_before": false
+					}
+				],
+				"fields_missing": [
+					"command",
+					"response",
+					"response_body",
+					"established",
+					"why_it_matters",
+					"probe",
+					"question"
+				],
+				"fields_present": [
+					"addressed_map_key",
+					"args",
+					"attr_after",
+					"attr_before",
+					"changed_leaf_count",
+					"changed_leaves",
+					"expected_status",
+					"name",
+					"note",
+					"placed_rows",
+					"printed_branch_lines",
+					"resource_neutral",
+					"resources_after",
+					"resources_before",
+					"response_payload",
+					"state_sha256_after",
+					"state_sha256_before",
+					"status",
+					"unchanged_leaves_sha256_after",
+					"unchanged_leaves_sha256_before"
+				],
+				"note": "The assign arm against the SAME string gain, and it PERSISTS the string. So one request can poison a save: every later increment against that row then raises. This is the reachable state the delivered projection's recorded_kind classification exists to make visible instead of readable as an integer.",
+				"status": 200
+			},
+			{
+				"args": [
+					"772",
+					true
+				],
+				"attr_after": {
+					"xp": 24
+				},
+				"attr_before": {
+					"xp": 23
+				},
+				"changed_leaves": [
+					{
+						"after": 24,
+						"before": 23,
+						"path": "/maps/0/items/772/6/xp",
+						"present_after": true,
+						"present_before": true
+					}
+				],
+				"fields_missing": [
+					"command",
+					"response",
+					"response_body",
+					"established",
+					"why_it_matters",
+					"probe",
+					"question"
+				],
+				"fields_present": [
+					"addressed_map_key",
+					"args",
+					"attr_after",
+					"attr_before",
+					"changed_leaf_count",
+					"changed_leaves",
+					"expected_status",
+					"name",
+					"note",
+					"placed_rows",
+					"printed_branch_lines",
+					"resource_neutral",
+					"resources_after",
+					"resources_before",
+					"response_payload",
+					"state_sha256_after",
+					"state_sha256_before",
+					"status",
+					"unchanged_leaves_sha256_after",
+					"unchanged_leaves_sha256_before"
+				],
+				"note": "A boolean gain is worth exactly +1, because the branch does arithmetic on it. This is why bool is a separate member of the delivered projection's closed classification vocabulary and not folded into int: a projection reporting bool as int would be right by accident and wrong by reason.",
+				"status": 200
+			}
+		]
+	},
+	"generated_by": "apps/client-godot/tests/test_unit_experience.gd --report=<path>",
+	"guards": {
+		"anti_invention": {
+			"absent_helpers_recorded": 12,
+			"forbidden_helpers": [
+				"award_experience",
+				"grant_experience",
+				"add_experience",
+				"add_xp",
+				"award_xp",
+				"experience_award",
+				"experience_for",
+				"xp_award",
+				"total_experience",
+				"new_experience",
+				"level_up_experience",
+				"experience_threshold",
+				"experience_to_level",
+				"level_from_experience",
+				"xp_schedule",
+				"experience_schedule",
+				"per_unit_level",
+				"unit_level",
+				"award_level",
+				"threshold_for_level"
+			],
+			"injection_note": "the guard counts as PROVEN only because it was made to FAIL by injection and the file restored from a byte-identical copy; see the change's report",
+			"pinned_inventory_size": 26,
+			"whole_static_function_inventory": [
+				"_client_routes",
+				"_count_text",
+				"_evaluation_reject",
+				"_experience_reject",
+				"_number_text",
+				"_type_name",
+				"acquisition_note",
+				"acquisition_record",
+				"acquisition_routes",
+				"classification_counts",
+				"classification_vocabulary",
+				"committed_training_time",
+				"death_record",
+				"derived_row_entries",
+				"evaluate",
+				"experience",
+				"experience_note",
+				"experience_record",
+				"no_derivation_finding",
+				"readout_text",
+				"recorded_experience_kind",
+				"recorded_kind_vocabulary",
+				"row_entry_branch_names",
+				"row_entry_inventory",
+				"training_time_note",
+				"training_time_record"
+			]
+		},
+		"no_arithmetic": {
+			"experience_surface": [
+				"experience",
+				"recorded_experience_kind",
+				"experience_note",
+				"experience_record",
+				"_experience_reject"
+			],
+			"extraction": "each surface function's body is extracted BY NAME from the module's own source and is asserted to be a real body before anything is asserted about it",
+			"numeric_conversions": [
+				"int(",
+				"float(",
+				"round(",
+				"abs(",
+				"min(",
+				"max(",
+				"clamp(",
+				"ceil(",
+				"floor(",
+				"sign(",
+				"snappedf(",
+				"snappedi(",
+				"pow(",
+				"lerp(",
+				"fmod(",
+				"nearest_po2(",
+				"is_equal_approx("
+			],
+			"numeric_operators": [
+				" + ",
+				" - ",
+				" * ",
+				" / ",
+				" ** ",
+				" += ",
+				" -= ",
+				" *= ",
+				" /= "
+			],
+			"percent_operator_excluded_because": "% is GDScript's string-format operator in this module and is never a modulo, so it is recorded as excluded rather than silently dropped"
+		}
+	},
+	"kind_cases": [
+		{
+			"awarded": false,
+			"bag": {
+				"xp": 25.5
+			},
+			"kind": "float",
+			"reported_value": 25.5,
+			"reported_value_type": "float",
+			"witness": "the executed PERSISTED FRACTION"
+		},
+		{
+			"awarded": false,
+			"bag": {
+				"xp": "5"
+			},
+			"kind": "string",
+			"reported_value": "5",
+			"reported_value_type": "string",
+			"witness": "the executed POISONED STRING on the assign arm"
+		},
+		{
+			"awarded": false,
+			"bag": {
+				"xp": true
+			},
+			"kind": "bool",
+			"reported_value": true,
+			"reported_value_type": "bool",
+			"witness": "a STORED True, reachable on the assign arm which writes the gain verbatim - DERIVED from the branch, not executed: the executed boolean took the increment arm and moved a row from 23 to 24, an int, so no True is persisted there"
+		},
+		{
+			"awarded": false,
+			"bag": {
+				"xp": null
+			},
+			"kind": "other",
+			"reported_value": null,
+			"reported_value_type": "null",
+			"witness": "a stored null, which is NOT an absent key"
+		},
+		{
+			"awarded": false,
+			"bag": {
+				"xp": [
+					1
+				]
+			},
+			"kind": "other",
+			"reported_value": [
+				1
+			],
+			"reported_value_type": "array",
+			"witness": "a stored array"
+		},
+		{
+			"awarded": false,
+			"bag": {
+				"xp": {
+					"a": 1
+				}
+			},
+			"kind": "other",
+			"reported_value": {
+				"a": 1
+			},
+			"reported_value_type": "object",
+			"witness": "a stored object"
+		}
+	],
+	"kind_cases_count": 6,
+	"legacy": {
+		"accumulator_bounded": false,
+		"accumulator_clamped": false,
+		"amount_validated": false,
+		"apply_resources": "engine.py:251-271, applied at command.py:40 before the dispatch",
+		"attr_occurrences": 2,
+		"attr_sites": [
+			336,
+			338
+		],
+		"branch": "add_xp_unit",
+		"branch_span": "command.py:322-343",
+		"level_falsy_sites": [
+			340
+		],
+		"note": "the field is written twice and read zero times; the amount is client args[1] with no validation of any kind, not even an int(); the optional third argument is client args[2], used ONLY inside a printed line and written nowhere. Only the PLAYER's experience is clamped, and only by apply_resources",
+		"player_clamp_site": [
+			262
+		],
+		"player_xp_sites_in_command": [
+			314
+		],
+		"reader_sites": [
+			"command.py:338 (the increment reads and writes)"
+		],
+		"readers": 1,
+		"xp_gain_occurrences": 5
+	},
+	"non_claims": [
+		"no Flash, Ruffle, ActionScript, or browser executed",
+		"NO EXPERIENCE IS AWARDED AND NO AWARD IS DERIVABLE: the field's only writer takes a client-supplied amount and the field has zero legacy readers, so there is no trusted award to reproduce",
+		"NO ENDPOINT, ROUTE, ENVELOPE, OR CLIENT INTENT IS ADDED: with no route there is no request to authorise",
+		"NO UNIT LEVEL, THRESHOLD, OR SCHEDULE EXISTS OR IS INTRODUCED: every level-shaped key in the content package is player-level, price-tier, or magic-gate keyed",
+		"THE COMMITTED PER-UNIT EXPERIENCE FIELD IS NOT ADOPTED AS AN AWARD: it has zero legacy consumers and three measurements contradict it",
+		"THE THIRD ARGUMENT IS DISPLAY-ONLY: it is recorded and never stored, never surfaced as a level the row reached, and never used to derive a threshold",
+		"THE CORPUS'S ABSENCE OF THE FIELD REMAINS TRUE OF THAT CORPUS and is a FACT ABOUT THE CORPUS, not evidence about the repository",
+		"NO LEVEL REWARD IS PAID OR INVENTED: reward_type, reward_amount, and level_ranking_reward all have zero legacy consumers",
+		"PARITY COVERS THE FIXTURE'S RECORDED TRANSACTIONS AGAINST ONE PROGRESSED VILLAGE SAVE AND NO FRESH-PLAYER CORPUS TRANSACTION",
+		"NO WINDOWED CAPTURE AND NO PIXEL-PARITY ORACLE IS CLAIMED, because nothing is rendered",
+		"THIS LINE'S HERMETIC SUITE CANNOT DETECT ENVELOPE OR WIRE DRIFT, because it builds no request: there is no endpoint"
+	],
+	"projection": {
+		"contract": {
+			"amount_source": "client args[1] (xp_gain): the branch SETS attr['xp'] to it when the key is absent and otherwise ADDS it to the value already there (command.py:335-338)",
+			"arm_asymmetry": "THE TWO ARMS DIFFER IN TYPE BEHAVIOUR, AND THE DIFFERENCE IS A SAVE-POISONING PATH THAT IS RECORDED, NEVER REPRODUCED. The ASSIGN arm (attr['xp'] = xp_gain, command.py:336) persists whatever it is given, so a client-sent STRING can be written into a committed save ({} becomes {'xp': '5'}), while the INCREMENT arm (attr['xp'] += xp_gain, command.py:338) RAISES on a non-numeric amount and the server answers a 500 with the save unchanged. Every later increment against a poisoned row therefore fails. That is a durability defect in the legacy server, not a capability to reproduce: NO delivered code path writes, coerces, or repairs this field, which is why `recorded_kind` is reported at all (design D1/D2)",
+			"attr_key": "xp",
+			"attr_slot": 6,
+			"award_implemented": false,
+			"coerced": false,
+			"command": "add_xp_unit",
+			"compared": false,
+			"converted": false,
+			"corpus_finding": "the committed fresh-player corpus places 40 rows across 11 distinct item ids, every one of committed type 'b': it contains NO unit row, NO storage, and an empty inventory, and every one of its 40 attribute bags is empty",
+			"corpus_note": "the committed corpus carries attr['xp'] on 0 of its 40 placed rows, which is asserted by the suite as a measurement and is a fact about the corpus, not evidence that an award exists: with no trusted award on the server, a recorded value would have to come from a client amount",
+			"creates_anything": false,
+			"field_repaired": false,
+			"kind_helper": "recorded_experience_kind",
+			"kind_rule": "THE RECORDED VALUE IS REPORTED VERBATIM AND BESIDE ITS KIND. experience() returns the value exactly as the bag holds it - never coerced, rounded, converted, or compared - and `recorded_kind` names what it IS over a CLOSED vocabulary of six members: absent, int, float, string, bool, other. The kind is reported so that a bag the legacy server was made to poison is DISTINGUISHABLE from an integer one rather than being read as a number; `bool` is separate from `int` because a client-sent true is worth exactly +1 on the increment arm (EXECUTED: 23 became 24, an int, so no True is persisted there) while the assign arm writes the gain with no arithmetic and would store True verbatim (DERIVED from the branch, not executed), and True + 5 is 6, so such a row would read as an integer by accident (design D1/D2)",
+			"level_display_only": "THE OPTIONAL THIRD ARGUMENT IS DISPLAY-ONLY AND SAFELY IGNORABLE. add_xp_unit reads it into a local (command.py:325-327) and uses it ONLY inside the interpolated print at command.py:340-341; it is written nowhere. Ignorability is established BY MEASUREMENT rather than by argument: the two-argument and three-argument forms were executed and produced IDENTICAL post-states and IDENTICAL changed-leaf sets, while their printed lines differ (+5xp against +5xp BOUGHT LEVEL UP -> 9), so the argument's absence from the post-state is not evidence of a missing write. A consumer of this contract SHALL ACCEPT AND IGNORE it rather than refuse it, because refusing would reject a request the legacy server accepts whose stored effect is nil. The branch also tests its TRUTHINESS (if level:), so a zero or absent value takes the other printed line and an ignoring consumer is unaffected either way. It must never be stored, never surfaced as a level the row reached, and never used to derive a threshold: there is no committed per-unit level schedule anywhere in the content package (design D1/D2/D7)",
+			"level_source": "client args[2] (optional level): used ONLY inside a printed line (command.py:340-341) and written nowhere",
+			"recorded_kinds": [
+				"absent",
+				"int",
+				"float",
+				"string",
+				"bool",
+				"other"
+			],
+			"rule": "NO EXPERIENCE IS AWARDED FROM A CLIENT AMOUNT. add_xp_unit (command.py:322-343) is the ONLY command that writes a placed row's attr['xp'] and it CREATES NOTHING: the amount is client-sent, and the optional level is client-sent and used only in a print. So a recorded attr['xp'] is READ AND REPORTED AS CONTENT, verbatim and never coerced, and NO experience is awarded, granted, or computed from it here or anywhere else in this repository (design D5). This is the third untrusted client-delta pattern in this area, alongside the queue vector and trade_resource",
+			"site": "command.py:322-343"
+		},
+		"field_set": [
+			"ok",
+			"reason",
+			"error",
+			"recorded",
+			"recorded_is_absent",
+			"recorded_kind",
+			"awarded",
+			"award_source",
+			"award_implemented",
+			"contract",
+			"corpus_note"
+		],
+		"fields_added_by_this_line": [
+			"recorded_kind"
+		],
+		"fields_removed_by_this_line": [],
+		"fields_whose_meaning_changed": [],
+		"note_absent": "experience: absent (no recorded attr['xp'] on this row) and never awarded: client args[1] (xp_gain): the branch SETS attr['xp'] to it when the key is absent and otherwise ADDS it to the value already there (command.py:335-338)",
+		"note_int": "experience: 250 — recorded as CONTENT ONLY and never awarded: client args[1] (xp_gain): the branch SETS attr['xp'] to it when the key is absent and otherwise ADDS it to the value already there (command.py:335-338)",
+		"vocabulary": [
+			"absent",
+			"int",
+			"float",
+			"string",
+			"bool",
+			"other"
+		],
+		"vocabulary_size": 6
+	},
+	"provenance": {
+		"derived_provisional": [
+			"the disposable seed's CHOICE (the fixture's manifest records which committed save it used and why)",
+			"the recommendation that a future consumer ACCEPTS AND IGNORES the display-only third argument rather than refusing it",
+			"the recommendation shape for a client consumer of this contract, which this line implements no part of"
+		],
+		"established": [
+			"the field has exactly two occurrences of attr['xp'] in the committed dispatcher, both inside add_xp_unit (command.py:336 and command.py:338), and both are WRITES",
+			"the field has ZERO readers across all ten legacy root modules: no branch, engine helper, session function, or migration consults a unit's recorded total",
+			"the amount is client args[1] with no validation of any kind, not even an int() call",
+			"the optional third argument is client args[2], falsy-tested and used ONLY inside a printed line, written nowhere",
+			"only the PLAYER's experience is clamped, by apply_resources (engine.py:251-271) at command.py:40, before the dispatch; the row accumulator has no floor and no bound",
+			"the repository-wide census: 171 of 12954 placed rows across 31 committed save documents carry the field, every recorded value an integer",
+			"the fresh corpus's own figure: 0 of 40 placed rows"
+		],
+		"not_established": [
+			"what amount the Flash client actually sent in args[1]",
+			"whether the committed per-unit experience field was the intended per-award value in a client this legacy server never received",
+			"whether a unit level exists anywhere in the original game"
+		]
+	},
+	"reason_scan": {
+		"client_sources_scanned": 102,
+		"constructions": [
+			"cannot exercise",
+			"can not exercise",
+			"could not exercise",
+			"cannot be exercised",
+			"can not be exercised",
+			"could not be exercised"
+		],
+		"corrected_locations": [
+			"apps/client-godot/scripts/town/level_flow.gd (FOUR: the module's own FIRST doc line at :1, the two documented blocks, and the user-facing note string)",
+			"apps/client-godot/scripts/town/town.gd (one documented block at :329-330) - the SIXTH, which the committed investigation's count of five did not record",
+			"the SEVENTH was level_flow.gd:1, and it is the only one of the seven that the delivered TREE SCAN found rather than a reader: the investigation enumerated five, a second reader found a sixth, and the guard found the seventh in the most prominent line in the file. That is the whole argument for a scan over an enumeration",
+			"apps/client-godot/scripts/units/production_flow.gd (the module header, which recorded the supersession by quoting the superseded construction and now records it by reference; NOT one of the seven stale locations - the sharp reason was already there)",
+			"apps/client-godot/tests/test_unit_production.gd (one assertion MESSAGE, widened to name its own 40-row scope; no expected value, threshold, or intent changed)",
+			"AGENTS.md and apps/client-godot/README.md (two prose locations) - NOT this suite's: see task 5.2"
+		],
+		"excluded": "res://tests/test_unit_experience.gd",
+		"excluded_because": "this suite carries the stale sentence as its negative control, so scanning itself would report the control as an offender of the rule the control exists to test",
+		"expected_hits": 0,
+		"hit_count": 0,
+		"hits": [],
+		"roots": [
+			"res://scripts",
+			"res://tests"
+		],
+		"scope_limit": "the scan is scoped to unit experience by a proximity window. The repository also holds NEGATED occurrences of the same constructions about production, animation, movement, and resurrection; none of them is this capability's reason, and the suite proves that scoping by asserting a negated sentence about another topic is not a hit",
+		"targets_the_construction_not_the_figure": "the corrected text LEGITIMATELY keeps the corpus figure and labels it, so the scan hunts the reason construction and the figure is never the needle",
+		"unit_experience_tokens": [
+			"add_xp_unit",
+			"attr['xp']",
+			"attr[\"xp\"]",
+			"unit experience",
+			"unit-experience",
+			"recorded experience",
+			"experience_awarded",
+			"recorded_experience_kind"
+		],
+		"window_characters": 160
+	},
+	"schema": "unit-experience-report-v1"
+}

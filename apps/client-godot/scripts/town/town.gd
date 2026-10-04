@@ -326,9 +326,19 @@ extends Node2D
 ##
 ## **No reward is paid and none is displayed** (design D7): `reward_type` and
 ## `reward_amount` are committed on every curve entry and no legacy branch reads
-## either, so paying one would invent an economy. **Unit experience and tutorial
-## progression are out of scope** because the committed corpus cannot exercise
-## them. The committed `exp_required` thresholds are preserved **verbatim** — no
+## either, so paying one would invent an economy. **Unit experience is not
+## awarded and no award is reproduced**, and the reason is **not** corpus
+## coverage: the field's only writer takes a **client-supplied** amount with no
+## validation of any kind and the field has **zero legacy readers**, so **no
+## trusted award exists** — the `godot-unit-experience` capability records that
+## and reports a recorded value verbatim beside its kind. The corpus figure is
+## kept as a labelled **corpus fact**: 0 of the 40 placed rows in the committed
+## fresh-player corpus carry `attr["xp"]`, against 171 of 12,954 placed rows
+## across 5 of the 31 committed save documents, which is also why this view sends
+## no `add_xp_unit` request of any kind. **Tutorial progression IS delivered**
+## (`scripts/progression/tutorial_flow.gd`): an earlier revision of this comment
+## said it was out of scope, which was true only while the line was undelivered.
+## The committed `exp_required` thresholds are preserved **verbatim** — no
 ## rebalancing, smoothing, or interpolation. The curve's index base is
 ## **one-based and derived-provisional**: the single named conversion lives in
 ## `level_flow.gd` and the **rejected zero-based alternative** is contradicted
