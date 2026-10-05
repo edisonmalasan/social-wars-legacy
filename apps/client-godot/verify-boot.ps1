@@ -462,7 +462,7 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_experience", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests", "test_tutorial", "test_stored_item_placement", "test_mission_vocabulary", "test_combat_actions")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_experience", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests", "test_tutorial", "test_stored_item_placement", "test_mission_vocabulary", "test_combat_actions", "test_damage_magic")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a
@@ -874,6 +874,35 @@ try {
                 "--headless", "--path", $projectRel,
                 "--script", "res://tests/test_combat_actions.gd",
                 "--", "--scenario=live-combat",
+                "--gameapi-endpoint=$endpoint"
+            )
+        }
+        @{
+            # magic-live: M10 line 3 (`damage`).  The delivered surface is the
+            # magics counter, and the phase drives it twice on purpose.
+            #
+            # `tests/saves/fresh-player.json` has `privateState.magics == {}`, so
+            # the FIRST request necessarily takes the absent-identity path, where
+            # both preserved branches write the key at ZERO while the service's
+            # derived transition gives ONE.  That is the seventh divergence, and
+            # the phase asserts the disagreement is REPORTED rather than asserted
+            # away -- `matches_derived` is false here and that is the correct
+            # result.  The SECOND request on the same identity is present at 0, so
+            # `min(50, 0 + 1) == 1` for the preserved branch and the derived
+            # transition alike, and that one DOES agree.  Driving both is what
+            # makes the reported divergence visible next to a clean increment.
+            #
+            # No COMPAT_SEED_* seam is needed and none is used: this line's state
+            # is reachable from the committed corpus with no seeding at all, and
+            # both requests mutate the disposable save so the harness's
+            # save-mutation assertion has something real to see.
+            Name = "magic-live"
+            Assertions = "magic live phase"
+            ExpectSaveMutation = $true
+            Arguments = @(
+                "--headless", "--path", $projectRel,
+                "--script", "res://tests/test_damage_magic.gd",
+                "--", "--scenario=live-magic",
                 "--gameapi-endpoint=$endpoint"
             )
         }

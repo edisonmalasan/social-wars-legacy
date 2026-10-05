@@ -109,6 +109,7 @@ const Paths = preload("res://scripts/package_paths.gd")
 const UnitBehaviors = preload("res://scripts/units/unit_behaviors.gd")
 const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
 const CombatFlow = preload("res://scripts/units/combat_flow.gd")
+const MagicFlow = preload("res://scripts/units/magic_flow.gd")
 const ResearchFlow = preload("res://scripts/units/research_flow.gd")
 const QuestFlow = preload("res://scripts/units/quest_flow.gd")
 const TutorialFlow = preload("res://scripts/progression/tutorial_flow.gd")
@@ -4545,6 +4546,32 @@ const BEHAVIOR_SEED := {"1001": 1}
 ## time rather than trusted from this sentence.
 const BEHAVIOR_SEED_ITEM_ID := 1001
 
+# --- magic-counter double state (godot-damage) --------------------------------
+
+## The same committed corpus save the behaviour double reads, read through an
+## INDEPENDENT sink: this double must not depend on another double's failure state
+## or inherit a ledger it never seeded.
+const MAGIC_CORPUS_SAVE := "tests/saves/fresh-player.json"
+
+## The captured configuration's magic table. Named here so the lookup names no
+## string literal of its own.
+const MAGICS_KEY := "magics"
+
+## **Eight** stored resource slots, not the seven `RESOURCE_KEYS` lists. Six live
+## on the map, `cash` lives on the player info, and `mana`/`energy` live in private
+## state -- and `energy` is stored by no legacy branch at all, which is why the
+## seven-slot accessor omits it while the document keeps it. Comparing a subset
+## would make the no-price claim weaker than the measurement that established it.
+const MAGIC_RESOURCE_KEYS := ["xp", "gold", "wood", "oil", "steel", "cash",
+	"mana", "energy"]
+
+## Mutable process state for the magic double: the eight resource slots plus the
+## ledger under `"ledger"`.
+var _magic_state: Dictionary = {}
+var _magic_pid := ""
+var _magic_error := ""
+var _magic_loaded := false
+
 ## The ledger the double's projection reports when the state is unresolvable:
 ## never a substituted entry.
 const BEHAVIOR_UNRESOLVABLE := "unresolvable_ledger"
@@ -4968,6 +4995,183 @@ func combat_town(user_id: String, action: Variant,
 			"server_time": _fixture_server_time(),
 			"game_version": str(_save_list_doc.get("game_version", "")),
 		}))
+
+
+# --- magic-counter double (godot-damage) --------------------------------------
+
+
+## One magic-counter intent under the **same** contract the live implementation
+## sends: the save identity, a CLOSED action, and the magic identity -- nothing
+## else. No counter value, no delta, no cap, no price, and no damage magnitude is
+## accepted or expressible, because `MagicFlow.build_magic_intent()` assembles
+## exactly `MagicFlow.BODY_KEY_COUNT` keys.
+##
+## The double is deterministic and in-memory. It reads the committed corpus save
+## (`tests/saves/fresh-player.json`, whose `privateState.magics` is `{}`), derives
+## the transition from the shared projection in `magic_flow.gd`, and applies the
+## **recorded legacy arm** to its own ledger rather than the derived transition --
+## because that is what the unchanged dispatcher does, and a double that stored
+## the derived value would report a state the oracle never produced.
+##
+## It is NEVER a parity oracle. Parity against executed legacy is owned
+## exclusively by `apps/compat-api/tests/test_magic_*.py`.
+##
+## ## The first request reproduces the recorded divergence, deliberately
+##
+## With an **absent** key the unchanged branch takes its `else` arm and writes the
+## key at **zero**, while the derived transition reads absent as zero charges and
+## increments it. So the first answer reports `matches_derived` **false**, and
+## that is the expected result rather than a limitation worked around.
+func magic_town(user_id: String, action: Variant,
+		magic_id: Variant) -> MagicFlow.MagicResult:
+	if user_id.strip_edges() == "":
+		return MagicFlow.magic_failure("missing_user_id",
+			"user_id must be a non-empty string")
+	if not _ensure_magic_loaded():
+		return MagicFlow.magic_failure("fixture_unreadable", _magic_error)
+	if user_id != _magic_pid:
+		return MagicFlow.magic_failure("unknown_user_id",
+			"no save exists for user_id '%s'" % user_id)
+	# The identity typing and the closed action both resolve HERE, before the
+	# double reads a single ledger key -- the same order the live service uses,
+	# so a request naming no spell never reaches the player's state in either
+	# implementation.
+	var intent := MagicFlow.build_magic_intent(user_id, action, magic_id)
+	if not bool(intent.get("ok", false)):
+		return MagicFlow.magic_failure(str(intent.get("reason", "")),
+			str(intent.get("error", "")))
+	var ledger: Dictionary = (_magic_state["ledger"] as Dictionary) \
+		.duplicate(true)
+	var projection: Dictionary = MagicFlow.project_magic(
+		ledger, action, magic_id,
+		func(value: int) -> Variant: return _magic_entry(value))
+	if not bool(projection.get("ok", false)):
+		return MagicFlow.magic_failure(str(projection.get("reason", "")),
+			str(projection.get("error", "")))
+
+	# --- the write step: exactly one ledger entry, by the RECORDED arm --------
+	var key := str(projection.get("ledger_key", ""))
+	var recorded := MagicFlow.legacy_recorded_after(action,
+		int(projection.get("counter_before", 0)),
+		bool(projection.get("counter_present", false)),
+		int(projection.get("cap", MagicFlow.COUNTER_CAP)))
+	if not bool(recorded.get("ok", false)):
+		return MagicFlow.magic_failure(str(recorded.get("reason", "")),
+			str(recorded.get("error", "")))
+	# A present key keeps its recorded position; a created key is appended, which
+	# is what `+=` and a bare assignment each do to the document.
+	ledger[key] = int(recorded.get("after", 0))
+	_magic_state["ledger"] = ledger
+	var changed: Array = ["/privateState/magics/%s" % key]
+
+	# Nothing else moves: the branch resolves no resource, so the reported set is
+	# what the intent started from -- the strongest form of the no-price proof.
+	return MagicFlow.parse_magic(MagicFlow.build_magic_response(
+		action, magic_id, projection,
+		{
+			"ledger_after": ledger,
+			"changed": changed,
+			"resources": _magic_resources(),
+			# Deterministic: the boot fixture's recorded epoch, never the clock.
+			"server_time": _fixture_server_time(),
+			"game_version": str(_save_list_doc.get("game_version", "")),
+		}))
+
+
+## One committed magic from the captured configuration, or null.
+##
+## The captured row's `id` is normalised through `_id_text()` rather than
+## compared as a number, because the committed package records every `legacy_id`
+## as a **string** while this fixture's raw capture holds an integer -- and a
+## comparison that happened to work on one form would be a second, unrelated
+## assumption rather than a rule.
+func _magic_entry(magic_id: int) -> Variant:
+	var table: Variant = _config_payload.get(MAGICS_KEY)
+	if not (table is Array):
+		return null
+	for row: Variant in table as Array:
+		if not (row is Dictionary):
+			continue
+		var candidate: Dictionary = row
+		if _id_text(candidate.get("id")) != str(magic_id):
+			continue
+		return candidate.duplicate(true)
+	return null
+
+
+## All **eight** stored resource slots of the in-memory magic state, reported
+## verbatim. Eight rather than seven, because `privateState['energy']` is stored
+## by no legacy branch and so is absent from the seven-slot accessor while present
+## in the document; the no-price proof compares every slot.
+func _magic_resources() -> Dictionary:
+	var out := {}
+	for key: String in MAGIC_RESOURCE_KEYS:
+		out[key] = int(_magic_state[key])
+	return out
+
+
+## Loads the committed corpus save's magic state into mutable process state
+## (once).  An **independent sink** from the behaviour double, so this double's
+## failure cannot hide behind another's -- and a failure in either cannot be
+## mistaken for a clean ledger.
+func _ensure_magic_loaded() -> bool:
+	if _magic_loaded:
+		return _magic_error == ""
+	_magic_loaded = true
+	if not _ensure_loaded():
+		_magic_error = _load_error
+		return false
+	var sink := {"error": ""}
+	var before := _read_json_into(MAGIC_CORPUS_SAVE, sink)
+	if str(sink["error"]) != "":
+		_magic_error = str(sink["error"])
+		return false
+	var maps: Variant = before.get("maps")
+	if not (maps is Array) or (maps as Array).is_empty():
+		_magic_error = "the committed corpus save carries no first map"
+		return false
+	var first_map: Variant = (maps as Array)[0]
+	if not (first_map is Dictionary):
+		_magic_error = "the committed corpus save's first map is not an object"
+		return false
+	var info: Variant = before.get("playerInfo")
+	var priv: Variant = before.get("privateState")
+	if not (info is Dictionary) or not (priv is Dictionary):
+		_magic_error = "the committed corpus save lacks playerInfo/privateState"
+		return false
+	var map_body: Dictionary = first_map
+	var player_body: Dictionary = info
+	var private_body: Dictionary = priv
+	# The ledger must be readable BEFORE anything is seeded from it: an
+	# unreadable ledger is the service's `invalid_ledger` refusal, and defaulting
+	# it here would turn a server-side precondition into a silent create.
+	var ledger_projection := MagicFlow.project_ledger(
+		private_body.get(MagicFlow.LEDGER_KEY))
+	if not bool(ledger_projection.get("ok", false)):
+		_magic_error = str(ledger_projection.get("error", ""))
+		return false
+	var missing: Array = []
+	for key: String in MAGIC_RESOURCE_KEYS:
+		var source: Variant = map_body
+		if key == "cash":
+			source = player_body
+		elif key == "mana" or key == "energy":
+			source = private_body
+		if not source.has(key):
+			missing.append(key)
+			continue
+		_magic_state[key] = int(source[key])
+	if not missing.is_empty():
+		_magic_error = ("the committed corpus save lacks the stored resource "
+			+ str(missing))
+		return false
+	_magic_state["ledger"] = \
+		(private_body[MagicFlow.LEDGER_KEY] as Dictionary).duplicate(true)
+	_magic_pid = str(player_body.get("pid", ""))
+	if _magic_pid == "":
+		_magic_error = "the committed corpus save records no playerInfo pid"
+		return false
+	return true
 
 
 # --- research double (godot-research design D8) ------------------------------
