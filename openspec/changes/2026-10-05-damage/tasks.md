@@ -117,6 +117,21 @@ positive integer on **both** sides, and that the exempt timestamp is never
 injection. This is the **second** recorded flaky surface in this project closed
 rather than re-run.
 
+**The class then appeared a third time**, in `test_research_endpoint.py`, as a
+real battery failure: `server_time` 1791185085 against 1791185086 with every other
+field identical. Line 882 was `assertEqual(before, after)` over two
+`/v0/session` responses — the shape already fixed twice. It was given the same
+subset assertion and proven by injection (`{'saves'} not less than or equal to
+{'server_time'}`), and restoring the byte-identical file returned 38 tests and
+`OK`.
+
+**Rather than patch it a third time, the class was then measured.** There are
+**15** whole-document equalities in the compat suite: **12** assert that the same
+input applied twice is deterministic (no wall clock involved), **2** compare
+*save file hashes* (correct precisely because file bytes never move), and **1**
+was the research assertion. **Zero remain at risk** — a measurement, not an
+assumption about the rest.
+
 ### Three corrections to the committed investigation
 
 Recorded in `docs/legacy-m10-damage.md` §7.1-7.2 rather than by quiet edits, and

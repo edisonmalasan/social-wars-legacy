@@ -3861,6 +3861,31 @@ incrementing ledger. Proven by injection: injecting a real extra field produced 
 failure, and restoring the byte-identical file returned 36 tests and `OK`. This is
 the **second** recorded flaky surface in this project closed rather than re-run.
 
+### The same defect class, in a third file — and then audited rather than patched again
+
+The next full battery run produced a **real** failure in
+`test_research_endpoint.py`:
+`server_time` 1791185085 against 1791185086, every other field identical — line
+882 was `assertEqual(before, after)` over two `/v0/session` responses, the very
+shape already fixed elsewhere. It was given the same subset assertion, and proven
+by injection: a real session-list change produced
+`AssertionError: {'saves'} not less than or equal to {'server_time'}`, and
+restoring the byte-identical file returned 38 tests and `OK`.
+
+So the class was then **measured** rather than patched a third time. Repo-wide
+there are **15** whole-document equalities in the compat suite:
+
+- **12** assert that the *same input applied twice* is deterministic — a
+  different and legitimate claim, over documents with no wall clock in them.
+- **2** are containment assertions over *save file hashes*, where whole-document
+  equality is exactly right because file bytes never move.
+- **1** was the research assertion above, now fixed.
+
+**Zero remain at risk.** That is a measurement of the class, not an assertion
+about it: `test_compat_v0.py:317` compares `harness.save_hashes(CORPUS)` either
+side of two bootstraps, and it is correct precisely *because* it is comparing
+file bytes, which the clock cannot touch.
+
 ### Verification actually run (2026-10-05)
 
 ```bash
