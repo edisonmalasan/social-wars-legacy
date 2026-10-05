@@ -1,6 +1,35 @@
-# Spec Delta
+# godot-rewards
 
-## ADDED Requirements
+## Purpose
+
+Deliver the M10 `rewards` line. Both preserved reward branches are **real
+granting surfaces** rather than closures — each moves private state — but what
+each moves is **one cursor and one instant**, and neither grants anything this
+contract can reproduce: the item is client-sent, and the preserved server charges
+and credits nothing in either branch across both executed arms, so any amount
+would be invention.
+
+The line's finding is that **neither cursor can address the whole of the schedule
+it would address**, for **two different reasons**, which is why a single figure
+would hide half of it. Weekly's derived bound is **5 against 3** rungs, so
+positions **3 and 4** name no rung. Daily's bound is **5 against 5** entries —
+**no exceedance at all** — and the real defect is a one-based vs zero-based
+offset, leaving position **5** unreachable *and* position **0** unreachable.
+
+What the line delivers is therefore the two cursor transitions derived
+server-side from recorded state, each derived bound beside its schedule's
+cardinality and **the difference in both directions**, the stamped instant, the
+committed schedule entries verbatim, and the surrounding undecoded and unread
+surface reported rather than invented: the three schedule type letters, the ten
+of eleven committed reward schedules no preserved branch consumes, the seven
+private-state fields present in every committed save and in no source line, and
+the ranking-reward table's split ownership.
+
+**Nothing is granted, selected, priced, credited, charged, or displayed.** No
+capability name, identifier, or response field in this capability implies a payout
+was paid.
+
+## Requirements
 
 ### Requirement: A reward operation carries only an action and a save id, and the delivered surface is a cursor transition rather than a reward
 
@@ -50,30 +79,22 @@ schedule's cardinality, the positions the cursor reaches, the positions the
 schedule answers, and **the difference in both directions** — rather than
 emitting either the bound or a single derived figure alone.
 
-**RECONCILED at Sync, 2026-10-06.** This requirement originally read "SHALL report
-that the derived bound exceeds the schedule's cardinality and by how much", which
-asserts an exceedance for **both** cursors. That is **false for the daily
-cursor**, and the implementation had to contradict it to stay accurate: the
-daily bound is **5** against a cardinality of **5**, so the exceedance is **0**.
-The two cursors carry **two different defects**, which is exactly why a single
-exceedance figure is the wrong shape to report:
+The two cursors carry **two different defects**, which is why the difference must
+be reported in both directions rather than as one figure:
 
-| | bound | cardinality | `exceeds_cardinality_by` | the actual defect |
-| --- | --- | --- | --- | --- |
-| weekly | 5 | 3 | **2** | the bound exceeds the rungs, so positions **3 and 4** name no rung |
-| daily | 5 | 5 | **0** | **no exceedance** — a one-based vs zero-based offset, leaving position **5** unreachable *and* position **0** unreachable |
+- **weekly** — the derived bound is **5** against a cardinality of **3**, an
+  exceedance of **2**, so positions **3 and 4** name no rung;
+- **daily** — the derived bound is **5** against a cardinality of **5**, so the
+  exceedance is **0** and there is **no exceedance at all**; the defect is a
+  one-based vs zero-based offset, leaving position **5** unreachable *and* position
+  **0** unreachable.
 
-The delivered report already produced the bidirectional difference
-(`reachable_not_answerable: [5]` and `answerable_not_reachable: [0]`), and the
-hermetic suite already stated why: *a report carrying only the exceedance would
-hide that the daily cursor cannot reach position 0 at all*. The requirement, not
-the implementation, was the thing that had to change.
-
-This requirement exists because the mismatch is a **cardinality disagreement
-between two committed pieces of the same feature** and is **reachable from
-committed recorded state**: two committed documents record cursor values whose
-successors fall outside their own schedule. A reader who received only the bound
-would not know that two of its positions name nothing.
+A reader who received only an exceedance figure would not know that the daily
+cursor cannot reach the first position of its own schedule at all. This
+requirement exists because the mismatch is a **cardinality disagreement between
+two committed pieces of the same feature** and is **reachable from committed
+recorded state**: two committed documents record cursor values whose successors
+fall outside their own schedule.
 
 #### Scenario: The cursor successor is derived from the recorded value
 
@@ -85,10 +106,10 @@ would not know that two of its positions name nothing.
 - **WHEN** the weekly bound is derived
 - **THEN** it is the maximum entry length over schedule entries whose value is a list, and it is **not** the schedule's entry count, and the response reports both numbers so the difference is visible
 
-#### Scenario: The unreachable positions are reported, per cursor
+#### Scenario: The unreachable positions are reported, per cursor, in both directions
 
 - **WHEN** a reward operation succeeds
-- **THEN** the response reports the positions the cursor can reach, the positions the schedule can answer, and the difference between them, for each of the two cursors
+- **THEN** the response reports the positions the cursor can reach, the positions the schedule can answer, and the difference between them **in both directions**, for each of the two cursors
 
 #### Scenario: No cursor-to-schedule selection exists
 
@@ -292,6 +313,13 @@ The origin of the save-only fields SHALL be reported as an **inference** from th
 total absence in every source line alongside universal presence in every save, and
 not as a measurement.
 
+The document-presence count SHALL be stated with its **denominator**: the
+committed corpus is walked as **34** `.json` files across the three corpus
+directories, of which **33** carry a `privateState` — the single exclusion being
+the corpus manifest, which is a manifest of the corpus rather than a save — and
+**all 33** carry every one of the seven fields. A presence figure without its
+denominator would leave a reader unable to tell a manifest from a save.
+
 #### Scenario: Unread schedules are reported with their consumer counts
 
 - **WHEN** the reward schedules are reported
@@ -300,7 +328,7 @@ not as a measurement.
 #### Scenario: Save-only fields are reported, and their origin is labelled an inference
 
 - **WHEN** the save-only private-state fields are reported
-- **THEN** each is listed with its measured source-occurrence count and document-presence count, and their origin is labelled as an inference from those two measurements rather than stated as a measurement
+- **THEN** each is listed with its measured source-occurrence count and document-presence count **stated against its denominator**, and their origin is labelled as an inference from those two measurements rather than stated as a measurement
 
 #### Scenario: The ranking-reward table's split ownership is stated
 
