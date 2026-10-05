@@ -1,6 +1,6 @@
 {
 	"boundary": {
-		"client_sources_scanned": 93,
+		"client_sources_scanned": 106,
 		"needles": [
 			"syringe_cost",
 			"charge_revive",
@@ -25,6 +25,111 @@
 			"ledger": {},
 			"ledger_present": true,
 			"pid": "00000000-0000-4000-8000-000000000001",
+			"repository_census": {
+				"correction": "The M8 godot-unit-behaviors record states its cause as the committed corpus places only buildings and no unit row. That is TRUE of tests/saves/fresh-player.json and FALSE of the repository, which places 441 unit rows across 7 documents. The conclusion is UNCHANGED and the absence-of-fixture cause still holds, because the document this line measures and drives is the fresh-player one and it places no unit row",
+				"document_count": 10,
+				"documents": [
+					{
+						"document": "tests/saves/fresh-player-pre-migration.json",
+						"ledger_keys": 0,
+						"ok": true,
+						"placed_rows": 40,
+						"unit_rows": 0,
+						"unit_rows_on_team_one": 0,
+						"unit_rows_resurrectable": 0
+					},
+					{
+						"document": "tests/saves/fresh-player.json",
+						"ledger_keys": 0,
+						"ok": true,
+						"placed_rows": 40,
+						"unit_rows": 0,
+						"unit_rows_on_team_one": 0,
+						"unit_rows_resurrectable": 0
+					},
+					{
+						"document": "villages/AcidCaos.json",
+						"ledger_keys": 0,
+						"ok": true,
+						"placed_rows": 319,
+						"unit_rows": 48,
+						"unit_rows_on_team_one": 48,
+						"unit_rows_resurrectable": 48
+					},
+					{
+						"document": "villages/General_Mike_30.json",
+						"ledger_keys": 0,
+						"ok": true,
+						"placed_rows": 436,
+						"unit_rows": 31,
+						"unit_rows_on_team_one": 31,
+						"unit_rows_resurrectable": 31
+					},
+					{
+						"document": "villages/General_Mike_31.json",
+						"ledger_keys": 0,
+						"ok": true,
+						"placed_rows": 436,
+						"unit_rows": 31,
+						"unit_rows_on_team_one": 31,
+						"unit_rows_resurrectable": 31
+					},
+					{
+						"document": "villages/Kiriakos.json",
+						"ledger_keys": 9,
+						"ok": true,
+						"placed_rows": 569,
+						"unit_rows": 109,
+						"unit_rows_on_team_one": 109,
+						"unit_rows_resurrectable": 109
+					},
+					{
+						"document": "villages/Nerri.json",
+						"ledger_keys": 9,
+						"ok": true,
+						"placed_rows": 367,
+						"unit_rows": 70,
+						"unit_rows_on_team_one": 70,
+						"unit_rows_resurrectable": 70
+					},
+					{
+						"document": "villages/Neutral.json",
+						"ledger_keys": 28,
+						"ok": true,
+						"placed_rows": 549,
+						"unit_rows": 87,
+						"unit_rows_on_team_one": 87,
+						"unit_rows_resurrectable": 87
+					},
+					{
+						"document": "villages/Scarlet.json",
+						"ledger_keys": 2,
+						"ok": true,
+						"placed_rows": 576,
+						"unit_rows": 65,
+						"unit_rows_on_team_one": 65,
+						"unit_rows_resurrectable": 53
+					},
+					{
+						"document": "villages/initial.json",
+						"ledger_keys": 0,
+						"ok": true,
+						"placed_rows": 40,
+						"unit_rows": 0,
+						"unit_rows_on_team_one": 0,
+						"unit_rows_resurrectable": 0
+					}
+				],
+				"documents_with_non_empty_ledger": 4,
+				"documents_with_unit_rows": 7,
+				"fresh_player_unit_rows": 0,
+				"no_unit_row_was_manufactured": false,
+				"placed_rows": 3372,
+				"scope": "every committed save document under villages/ and tests/saves/, measured this run; the fresh-player document is INCLUDED and is named in fresh_player_unit_rows",
+				"unit_rows": 441,
+				"unit_rows_on_team_one": 441,
+				"unit_rows_resurrectable": 429
+			},
 			"resources": {
 				"cash": 5,
 				"gold": 2000,

@@ -1,0 +1,186 @@
+{
+  "changed_leaf_count": 15,
+  "changed_leaves": [
+    {
+      "after": null,
+      "before": 1020,
+      "path": "/maps/0/items/1022/0",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 67,
+      "path": "/maps/0/items/1022/1",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 44,
+      "path": "/maps/0/items/1022/2",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 1705676543,
+      "path": "/maps/0/items/1022/3",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 0,
+      "path": "/maps/0/items/1022/4",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 53,
+      "path": "/maps/0/items/1022/6/xp",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 1,
+      "path": "/maps/0/items/1022/7",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 1020,
+      "path": "/maps/0/items/2425/0",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 41,
+      "path": "/maps/0/items/2425/1",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 40,
+      "path": "/maps/0/items/2425/2",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 1705676537,
+      "path": "/maps/0/items/2425/3",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 0,
+      "path": "/maps/0/items/2425/4",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 109,
+      "path": "/maps/0/items/2425/6/xp",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 1,
+      "path": "/maps/0/items/2425/7",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": 2,
+      "before": null,
+      "path": "/privateState/deadHeroes/1020",
+      "present_after": true,
+      "present_before": false
+    }
+  ],
+  "command": "end_attack",
+  "crafted_args": null,
+  "crafted_units": [
+    [
+      1020,
+      0,
+      3,
+      1
+    ]
+  ],
+  "divergence": "THE CENTRAL DIVERGENCE, MEASURED. The client sent A=3 and B=1, so the oracle computed max(0, 3 - 1) == 2 and destroyed TWO rows, incrementing the ledger twice. This capability destroys EXACTLY ONE row and increments once. Reproducing the subtraction would make this server a pass-through for a client-computed casualty figure, which is the AGENTS.md Bad pattern. The oracle's apparent safety is EXHAUSTION OF MATCHES, not a check: engine.py:218-227 loops `while qty > 0` and returns the moment one pass finds no match, so a client asking for a thousand removes a thousand while any match remains.",
+  "exhaustion_shortfall": 0,
+  "expected_removed_keys": [
+    "2425",
+    "1022"
+  ],
+  "expected_status": 200,
+  "ledger_after": {
+    "1020": 2
+  },
+  "ledger_before": {},
+  "ledger_keys_after": 1,
+  "ledger_keys_before": 0,
+  "ledger_moved": true,
+  "modern_derives_ledger": {
+    "1020": 1
+  },
+  "modern_derives_removed_keys": [
+    "2425"
+  ],
+  "name": "client_dictated_count_two",
+  "note": "This is the transaction that measures the design D1/D2 decision instead of asserting it. It also shows the increment is PER POPPED ROW, not per request: one request, one tuple, two ledger counts.",
+  "parity_with_delivered_endpoint": false,
+  "printed_branch_lines": [
+    "[+] COMMAND: end_attack(['{\"attacker_units\":[[1020,0,3,1]],\"victim\":{\"name\":\"derived\"}}', 0]) -> Lost 2 Soldier II(s)"
+  ],
+  "printed_destruction_counts": [
+    2
+  ],
+  "printed_requested_count": 2,
+  "removed_keys": [
+    "2425",
+    "1022"
+  ],
+  "resource_neutral": true,
+  "resources_after": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "resources_before": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "response_payload": {
+    "result": "success"
+  },
+  "rows_after": 317,
+  "rows_before": 319,
+  "rows_removed": 2,
+  "seed": "destruction",
+  "state_sha256_after": "4c648440a12680036bf5ecfb67dc16e8f4b5e3557c1f2cc1d19cc9da18fe0412",
+  "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "status": 200,
+  "unchanged_leaves_sha256_after": "0e392d01e1ca6e3db7062239f25f8181d1a50efd7ad387a031ca767bb74e9514",
+  "unchanged_leaves_sha256_before": "0e392d01e1ca6e3db7062239f25f8181d1a50efd7ad387a031ca767bb74e9514",
+  "victim_supplied": true
+}

@@ -1,0 +1,14 @@
+{
+  "body_bytes": 265,
+  "body_sha256": "ae5163256b944013e27cbef0d2bcd33a6dacbb92463509f91d5f3df782142910",
+  "captured_at_utc": "2026-10-05T01:03:30+00:00",
+  "headers": {
+    "Connection": "close",
+    "Content-Length": "265",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Mon, 05 Oct 2026 01:03:30 GMT",
+    "Server": "Werkzeug/2.2.3 Python/3.9.13"
+  },
+  "reason": "INTERNAL SERVER ERROR",
+  "status": 500
+}

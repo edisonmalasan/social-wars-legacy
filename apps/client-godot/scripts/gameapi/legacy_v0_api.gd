@@ -18,6 +18,7 @@ extends Node
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
+const CombatFlow = preload("res://scripts/units/combat_flow.gd")
 const ResearchFlow = preload("res://scripts/units/research_flow.gd")
 const QuestFlow = preload("res://scripts/units/quest_flow.gd")
 const TutorialFlow = preload("res://scripts/progression/tutorial_flow.gd")
@@ -42,6 +43,7 @@ const RESURRECT_PATH := "/v0/resurrect"
 const RESEARCH_PATH := "/v0/research"
 const QUEST_PATH := "/v0/quests"
 const TUTORIAL_PATH := "/v0/tutorial"
+const COMBAT_PATH := "/v0/combat"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -716,6 +718,30 @@ func sell_stored_item_town(user_id: String,
 			str(outcome.get("code", "bad_response")),
 			str(outcome.get("message", "")))
 	return BootData.parse_stored_sell(outcome.get("payload"))
+
+
+## One combat-action intent over loopback HTTP. The body is built by
+## `CombatFlow.build_intent()` and is therefore **exactly three keys** -- the save
+## identity, the closed action, and that action's addressing under its own wire
+## key -- so no destruction count, no `sent`/`survived` pair, no resource delta,
+## no honour, and no price is even expressible here (design D1/D2). This function
+## deliberately names none of those: the refusal that a client-dictated count is
+## a *client* attempt happens INSIDE `build_intent`, before any HTTP call, so no
+## refused request ever reaches the service or a save.
+func combat_town(user_id: String, action: Variant,
+		addressing: Variant) -> CombatFlow.CombatResult:
+	var intent := CombatFlow.build_intent(user_id, action, addressing)
+	if not intent.get("ok", false):
+		return CombatFlow.combat_failure(
+			str(intent.get("reason", "bad_intent")),
+			str(intent.get("error", "")))
+	var outcome := await _call("POST", COMBAT_PATH,
+		JSON.stringify(intent.get("body")))
+	if not outcome.get("ok", false):
+		return CombatFlow.combat_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return CombatFlow.parse_combat(outcome.get("payload"))
 
 
 ## every failure returns `{ok: false, code, message}` with the failure named.

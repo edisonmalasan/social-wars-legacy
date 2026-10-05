@@ -52,6 +52,7 @@ extends Node
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
+const CombatFlow = preload("res://scripts/units/combat_flow.gd")
 const ResearchFlow = preload("res://scripts/units/research_flow.gd")
 const QuestFlow = preload("res://scripts/units/quest_flow.gd")
 const TutorialFlow = preload("res://scripts/progression/tutorial_flow.gd")
@@ -176,6 +177,12 @@ var stored_placement_requests := 0
 ## Number of stored-item **sale** intents this process has issued. One per
 ## confirm; zero for every local refusal.
 var stored_sale_requests := 0
+## Number of combat-action intents this process has issued. One per intent; zero
+## for every local refusal -- and note the counting boundary: a request refused
+## for a client-dictated destruction count or an unknown action is refused by
+## `CombatFlow.build_intent()` BEFORE this counter moves, because the refusal
+## is about what the client tried to send.
+var combat_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -667,6 +674,24 @@ func sell_stored_item_town(user_id: String,
 	stored_sale_requests += 1
 	var result: BootData.StoredSaleResult = await _impl.sell_stored_item_town(
 		user_id, item_id)
+	return result
+
+
+## One combat-action intent (the save identity, a closed `action`, and that
+## action's addressing) from the selected implementation. The addressing is the
+## LOST UNIT'S **IDENTITY** for `resolve`, the map key for `kill`, and the item id
+## for `kill_iid` -- never a count.
+##
+## The destruction count is derived server-side and is always 0 or 1 (design D1).
+## A client that sends one is refused by `CombatFlow.build_intent()` before the
+## transport is touched, and the refusal is a NAMED one, separate from the
+## server-side eligibility check: "you may not dictate this" and "there is
+## nothing to destroy" are different answers (design D2).
+func combat_town(user_id: String, action: Variant,
+		addressing: Variant) -> CombatFlow.CombatResult:
+	combat_requests += 1
+	var result: CombatFlow.CombatResult = await _impl.combat_town(
+		user_id, action, addressing)
 	return result
 
 

@@ -62,7 +62,7 @@ rather than a selected subset of it.
 ### Requirement: The request's read-and-discarded fields are recorded, and no combat outcome is derived from any of them
 
 The capability SHALL record the combat request's full field inventory, which is
-**eleven** keys read from the client payload, and SHALL record that **seven** of
+**twelve** keys read from the client payload, and SHALL record that **nine** of
 them reach nothing at all — the victim's unit list, the victim's resources, the
 attacker record, the attacker's won resources, honour, duration, and the town-hall
 gold — while the win flag and the victim's name reach only printed output. The
@@ -77,7 +77,7 @@ would express those rules have **zero** legacy consumers.
 #### Scenario: The discarded fields are recorded and re-derived
 
 - **WHEN** the combat request's field inventory is produced
-- **THEN** all eleven keys are listed, the seven that reach nothing are named individually, and the inventory is re-measured from the preserved source on every run rather than transcribed
+- **THEN** all twelve keys are listed, the nine that reach nothing are named individually, and the inventory is re-measured from the preserved source on every run rather than transcribed
 
 #### Scenario: No combat outcome is derived from a recorded field
 

@@ -2920,17 +2920,21 @@ live module and cannot drift from the code they document.
 ### Claim limits
 
 - **No executed-legacy fixture**, and the cause is **specific**, not the refusal lines' "no behaviour
-  exists": `resurrectable` is **unit-only**, the committed corpus places **only buildings** and **no
-  unit row**, and its ledger is present and `{}`. Manufacturing a unit row to make one capturable is
-  refused, exactly as `godot-unit-instances` refused. Unlike the refusal lines, the cause is the
-  **absence of a resurrectable row**, not the absence of a mechanism.
+  exists": `resurrectable` is **unit-only**, `tests/saves/fresh-player.json` places **only buildings**
+  and **no unit row**, and its ledger is present and `{}`. Manufacturing a unit row to make one
+  capturable is refused, exactly as `godot-unit-instances` refused. Unlike the refusal lines, the
+  cause is the **absence of a resurrectable row**, not the absence of a mechanism. **The premise
+  is now SCOPED and the scope is measured**: it holds of that one document and not of the
+  repository, which places **441 unit rows across 7 of the 10 committed save documents** \u2014 see `repository_census` in this suite's
+  evidence report and `test_combat_actions.gd`'s identical census. The cause is unchanged.
 - **The death/resurrection pairing is derived.** The two functions are complementary and share the
   ledger, but no comment or dispatch path asserts the pairing, so it is never presented as a server
   guarantee.
 - **The committed corpus is not all team 1.** Keys 1–20 are team 1 and **21–40 are team 3**. Gate one
   alone does not need that fact, but any future claim that scans the corpus must respect it.
 - **No pixel parity is claimed** and **no windowed capture is claimed**: a revived unit needs a unit
-  row, and the corpus has none, so nothing would be rendered that is not already rendered.
+  row, and `tests/saves/fresh-player.json` has none, so nothing would be rendered that is not
+  already rendered.
 - **Five figures in the investigation record were asserted rather than measured** and were corrected
   by the Apply stage after independent re-verification — the zero-consumer count (twenty-one, and a
   total of twenty-three), four source lines (each off by one), `resurrectable` being *carried* by 426
@@ -2939,6 +2943,24 @@ live module and cannot drift from the code they document.
   **two** over the units with the five-value spread belonging to the *buildings*.
   `docs/legacy-unit-behaviors.md` carries a corrections section rather than quiet edits; **none
   changes the conclusion**.
+
+- **A second discrepancy in that record is annotated here, not corrected.** The five
+  combat-field figures it cites — `attack` 131, `defense` 1, `life` 150, `min_level` 21,
+  `syringes` 6 — read **zero** as legacy consumers under **all six** counting rules applied
+  over the seven modules `unit_behaviors.gd` declares as `SEARCHED_MODULES` (whole-file
+  occurrences, whole-file distinct lines, code-only occurrences with comments and string
+  literals stripped, code-only distinct lines, exact identifier tokens, and the
+  quoted-access form), so **none of the five reproduces as a consumer**. `attack` measures
+  `12 / 10 / 5 / 5 / 0 / 0` and all twelve whole-file occurrences sit inside **longer
+  identifiers** — `end_attack`, `attacker`, `attacker_units`, `flash_reload_attack` —
+  never the committed field name as a standalone token; the other four fields have **no**
+  occurrence in any view. No figure was invented to match the prose: each reproduces
+  **exactly** as the count of distinct committed values over the **429** committed unit
+  definitions — 131, 1, 150, 21, 6 — which is the `unit_distinct` column of that suite's own
+  `ZERO_CONSUMER_FIELDS` table, all five present on all 429 rows and all `int`. The record's
+  numbers are correct and its **placement** misleads: it reads as a consumer census and is a
+  content-distribution census. **M8's conclusion stands** and **no figure is silently
+  replaced**; this change's own proposal counted "four of five" and is **off by one**.
 
 With this line, **M8 is complete**: eight deliver lines, of which three carried real mechanisms
 (`queues`, `collection`, `behaviors`) and five delivered projections plus refusals — in every case

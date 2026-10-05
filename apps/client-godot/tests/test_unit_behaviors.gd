@@ -91,6 +91,31 @@ const EXPECTED_DISTINCT_ITEM_IDS := 11
 const EXPECTED_RESURRECTABLE_ROWS := 0
 const EXPECTED_UNIT_ROWS := 0
 
+## The committed placed-row width this line parses; eight slots.
+const CORPUS_ROW_SLOTS := 8
+
+## The REPOSITORY-WIDE census, measured in the same run, which this
+## milestone added because the fresh-player figures above were repeatedly
+## quoted as though they described the repository.
+##
+## The record they were quoted into is `godot-unit-behaviors`, and those
+## figures are TRUE OF `CORPUS_SAVE` and FALSE of the repository:
+## `tests/saves/` and `villages/` together hold committed documents that
+## place hundreds of unit rows, so "the committed corpus places no unit
+## row" was a statement about ONE file. Both sets are now measured and
+## written together, and every figure is re-derived from the committed
+## bytes on every run.
+const REPOSITORY_VILLAGE_DIR := "villages"
+const REPOSITORY_SAVES_DIR := "tests/saves"
+const REPOSITORY_EXCLUDED_SAVE_DOCUMENTS := ["manifest.json"]
+const EXPECTED_REPOSITORY_DOCUMENTS := 10
+const EXPECTED_REPOSITORY_PLACED_ROWS := 3372
+const EXPECTED_REPOSITORY_UNIT_ROWS := 441
+const EXPECTED_REPOSITORY_UNIT_ROWS_ON_TEAM_ONE := 441
+const EXPECTED_REPOSITORY_UNIT_ROWS_RESURRECTABLE := 429
+const EXPECTED_REPOSITORY_DOCUMENTS_WITH_UNIT_ROWS := 7
+const EXPECTED_REPOSITORY_DOCUMENTS_WITH_NON_EMPTY_LEDGER := 4
+
 ## The committed corpus's ledger and its seven balances, measured not asserted.
 const EXPECTED_LEDGER := {}
 const EXPECTED_RESOURCES := {
@@ -158,6 +183,19 @@ const BEHAVIOUR_NEEDLES := [
 ## The same needles scanned over the WHOLE client source tree, which is the
 ## structural form of "no client source derives a syringe cost, damage,
 ## occupancy, or terrain rule".
+##
+## The scan matches an IDENTIFIER TOKEN rather than a bare substring, and
+## that distinction is load-bearing rather than cosmetic. It was MEASURED:
+## `godot-combat-actions` legitimately **carries this line's own
+## `NO_SYRINGE_COST` statement** through a field named `no_syringe_cost`,
+## so the needle `syringe_cost` matched inside a longer, differently-
+## purposed identifier and the guard reported an offender that does not
+## exist -- there is no syringe-cost helper, declaration, or rule anywhere
+## in the client. A substring is not a declaration, which is the same rule
+## this project applies when counting legacy consumers, so the scan now
+## uses this suite's EXISTING word-boundary helper
+## (`_declares_identifier`, already needed for the two-letter `nc` needle)
+## instead of `contains`.
 const CLIENT_SCAN_ROOTS := ["res://scripts", "res://tests"]
 
 ## Tokens a pure module must not carry: a node, a clock, a request, or a
@@ -953,7 +991,163 @@ func _check_corpus() -> Dictionary:
 		"and it holds zero entries, so no revival is possible against it")
 	check_eq(bool(BehaviorFlow.offers_revival(projection)), false,
 		"so the client offers NO revival action against the committed corpus")
+	measured["repository_census"] = _repository_census()
 	return measured
+
+
+## Every committed save document under `villages/` and `tests/saves/`,
+## measured this run. The fresh-player document is INCLUDED in the totals
+## and is named, so a reader can subtract one figure from another without
+## guessing which document a total includes.
+func _repository_census() -> Dictionary:
+	var documents: Array = []
+	var skipped := 0
+	var placed := 0
+	var unit_rows := 0
+	var team_one := 0
+	var resurrectable := 0
+	var with_units := 0
+	var with_ledger := 0
+	var fresh_player_unit_rows := -1
+	for relative: String in _committed_save_documents():
+		var record: Dictionary = _census_save(relative)
+		if not bool(record.get("ok", false)):
+			skipped += 1
+			continue
+		documents.append(record)
+		placed += int(record.get("placed_rows", 0))
+		var row_units := int(record.get("unit_rows", 0))
+		unit_rows += row_units
+		team_one += int(record.get("unit_rows_on_team_one", 0))
+		resurrectable += int(record.get("unit_rows_resurrectable", 0))
+		if row_units > 0:
+			with_units += 1
+		if int(record.get("ledger_keys", 0)) > 0:
+			with_ledger += 1
+		if str(record.get("document", "")) == CORPUS_SAVE:
+			fresh_player_unit_rows = row_units
+
+	check_eq(documents.size(), EXPECTED_REPOSITORY_DOCUMENTS,
+		"the repository holds %d committed save documents, enumerated this "
+			% EXPECTED_REPOSITORY_DOCUMENTS + "run rather than assumed")
+	check_eq(skipped, 0, "and every one of them parsed as a save")
+	check_eq(placed, EXPECTED_REPOSITORY_PLACED_ROWS,
+		"across %d placed rows in total" % EXPECTED_REPOSITORY_PLACED_ROWS)
+	check_eq(unit_rows, EXPECTED_REPOSITORY_UNIT_ROWS,
+		"of which %d carry a committed UNIT id, so this line's %d is TRUE OF "
+			% [EXPECTED_REPOSITORY_UNIT_ROWS, EXPECTED_UNIT_ROWS]
+			+ "THAT ONE DOCUMENT and FALSE of the repository")
+	check_eq(fresh_player_unit_rows, EXPECTED_UNIT_ROWS,
+		"the fresh-player document is among them and still places no unit row,"
+			+ "which is what this line's named cause rests on")
+	check_eq(team_one, EXPECTED_REPOSITORY_UNIT_ROWS_ON_TEAM_ONE,
+		"every one of those %d unit rows is on player team one, so the team "
+			% EXPECTED_REPOSITORY_UNIT_ROWS_ON_TEAM_ONE
+			+ " asymmetry stays unreachable against committed bytes")
+	check_eq(resurrectable, EXPECTED_REPOSITORY_UNIT_ROWS_RESURRECTABLE,
+		"and %d of them have a positive committed resurrectable, so BOTH ledger "
+			% EXPECTED_REPOSITORY_UNIT_ROWS_RESURRECTABLE
+			+ " gates hold SOMEWHERE in the repository")
+	check(resurrectable < unit_rows,
+		"so the two gates genuinely disagree: %d rows are revivable and %d are "
+			% [resurrectable, unit_rows - resurrectable] + "not")
+	check_eq(with_units, EXPECTED_REPOSITORY_DOCUMENTS_WITH_UNIT_ROWS,
+		"%d documents place at least one unit row, so unit-row material EXISTS "
+			% EXPECTED_REPOSITORY_DOCUMENTS_WITH_UNIT_ROWS
+			+ " in committed bytes and its absence was never repository-wide")
+	check_eq(with_ledger, EXPECTED_REPOSITORY_DOCUMENTS_WITH_NON_EMPTY_LEDGER,
+		"and %d carry a non-empty deadHeroes ledger"
+			% EXPECTED_REPOSITORY_DOCUMENTS_WITH_NON_EMPTY_LEDGER)
+	return {
+		"scope": "every committed save document under villages/ and tests/saves/, "
+			+ "measured this run; the fresh-player document is INCLUDED and is "
+			+ "named in fresh_player_unit_rows",
+		"documents": documents,
+		"document_count": documents.size(),
+		"placed_rows": placed,
+		"unit_rows": unit_rows,
+		"unit_rows_on_team_one": team_one,
+		"unit_rows_resurrectable": resurrectable,
+		"documents_with_unit_rows": with_units,
+		"documents_with_non_empty_ledger": with_ledger,
+		"fresh_player_unit_rows": fresh_player_unit_rows,
+		"correction": "The M8 godot-unit-behaviors record states its cause as "
+			+ "the committed corpus places only buildings and no unit row. "
+			+ "That is TRUE of tests/saves/fresh-player.json and FALSE of the "
+			+ "repository, which places %d unit rows across %d documents. The "
+			% [EXPECTED_REPOSITORY_UNIT_ROWS,
+				EXPECTED_REPOSITORY_DOCUMENTS_WITH_UNIT_ROWS]
+			+ "conclusion is UNCHANGED and the absence-of-fixture cause still "
+			+ "holds, because the document this line measures and drives is the "
+			+ "fresh-player one and it places no unit row",
+		"no_unit_row_was_manufactured": false,
+	}
+
+
+## Every committed save document, repository-relative and sorted.
+func _committed_save_documents() -> Array:
+	var out: Array = []
+	for directory: String in [REPOSITORY_VILLAGE_DIR, REPOSITORY_SAVES_DIR]:
+		var absolute := Paths.repo_root().path_join(directory)
+		for name: String in DirAccess.get_files_at(absolute):
+			if not name.ends_with(".json"):
+				continue
+			if REPOSITORY_EXCLUDED_SAVE_DOCUMENTS.has(name):
+				continue
+			var relative := directory + "/" + name
+			# `get_files_at` is non-recursive, so a document of another shape
+			# fails to census rather than being silently counted.
+			if JSON.parse_string(FileAccess.get_file_as_string(
+					Paths.repo_root().path_join(relative))) == null:
+				continue
+			out.append(relative)
+	out.sort()
+	return out
+
+
+## One committed save document's placement and ledger figures.
+func _census_save(relative: String) -> Dictionary:
+	var out := {
+		"ok": false, "document": relative, "placed_rows": 0, "unit_rows": 0,
+		"unit_rows_on_team_one": 0, "unit_rows_resurrectable": 0,
+		"ledger_keys": 0,
+	}
+	var document: Variant = JSON.parse_string(FileAccess.get_file_as_string(
+		Paths.repo_root().path_join(relative)))
+	if not (document is Dictionary):
+		return out
+	var maps: Variant = (document as Dictionary).get("maps")
+	if not (maps is Array) or (maps as Array).is_empty():
+		return out
+	var items: Variant = ((maps as Array)[0] as Dictionary).get("items")
+	if not (items is Dictionary):
+		return out
+	var priv: Variant = (document as Dictionary).get("privateState")
+	var ledger: Variant = (priv as Dictionary).get(UnitBehaviors.LEDGER_KEY) \
+			if priv is Dictionary else null
+	out["ledger_keys"] = (ledger as Dictionary).size() \
+			if ledger is Dictionary else 0
+	for key: Variant in (items as Dictionary).keys():
+		var row: Variant = (items as Dictionary)[key]
+		if not (row is Array) \
+				or (row as Array).size() != CORPUS_ROW_SLOTS:
+			continue
+		out["placed_rows"] = int(out["placed_rows"]) + 1
+		var item_id := str(int((row as Array)[0]))
+		if _domain_of(item_id) != "units":
+			continue
+		out["unit_rows"] = int(out["unit_rows"]) + 1
+		if UnitBehaviors.passes_team_gate((row as Array)[7]):
+			out["unit_rows_on_team_one"] \
+				= int(out["unit_rows_on_team_one"]) + 1
+		var flag: Variant = UnitBehaviors.committed_resurrectable(
+			_registry_entry("units", item_id).get(
+				UnitBehaviors.PROPERTIES_FIELD))
+		if UnitBehaviors.passes_resurrectable_gate(flag):
+			out["unit_rows_resurrectable"] \
+				= int(out["unit_rows_resurrectable"]) + 1
+	out["ok"] = true
+	return out
 
 
 # ---------------------------------------------------------------------------
@@ -1561,11 +1755,33 @@ func _check_boundary() -> void:
 	for path: String in sources:
 		var code := _code_only(path)
 		for needle: String in BEHAVIOUR_NEEDLES:
-			if code.contains(needle):
+			if _declares_identifier(code, needle):
 				offenders.append("%s declares %s" % [path, needle])
 	check_eq(offenders, [],
-		"no client source declares a syringe-cost, damage, attack, hit, "
+		"no client source DECLARES a syringe-cost, damage, attack, hit, "
 			+ "occupancy, cooldown, terrain, or type-check helper")
+	# The identifier rule is a real gate and not a stricter-looking
+	# tautology. The tree really does hold a source carrying the needle as a
+	# substring of a longer identifier, so the distinction is exercised, and a
+	# synthetic declaration of the same name is caught.
+	var carrier := ""
+	for path: String in sources:
+		if _code_only(path).contains("no_syringe" + "_cost"):
+			carrier = path
+			break
+	check(carrier != "",
+		"the client tree really does hold a source carrying `no_syringe_cost`,"
+			+ " so the substring-versus-identifier distinction is exercised")
+	if carrier != "":
+		check(not _declares_identifier(_code_only(carrier),
+				"syringe_" + "cost"),
+			"and the needle inside that longer identifier is NOT a declaration")
+	check(_declares_identifier("static func syringe_" + "cost(n) -> int:",
+			"syringe_" + "cost"),
+		"while a real declaration of the same name IS caught")
+	check(not _declares_identifier("static func other_name(n) -> int:",
+			"syringe_" + "cost"),
+		"and an unrelated declaration is not")
 	# The one legitimate mention is the RECORDED absence list, which lives in
 	# the delivered modules' constants and is therefore matched out of the
 	# declarations by `_code_only` only for code, not for recorded strings —

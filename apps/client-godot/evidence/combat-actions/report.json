@@ -1,0 +1,1034 @@
+{
+	"absences": {
+		"absent_helpers": [
+			{
+				"absent_because": "none of the committed combat fields has a legacy consumer, so there is no committed damage rule to resolve",
+				"helper": "resolve_damage"
+			},
+			{
+				"absent_because": "the same absence as resolve_damage, stated as the noun a caller would reach for",
+				"helper": "damage_for"
+			},
+			{
+				"absent_because": "`attack` and `attack_interval` are content with zero consumers, so there is no outcome to apply",
+				"helper": "apply_attack"
+			},
+			{
+				"absent_because": "`defense` is a constant 1 on all 429 committed units and is read by no branch",
+				"helper": "defend"
+			},
+			{
+				"absent_because": "no committed field records a probability and no branch draws a random number",
+				"helper": "hit_chance"
+			},
+			{
+				"absent_because": "no combat-adjacent duration has a legacy consumer; `max(0, unit[2] - unit[3])` is a subtraction of two unnamed client numbers, not a duration",
+				"helper": "resolve_duratio"
+			},
+			{
+				"absent_because": "the same absence as resolve_duratio",
+				"helper": "duration_for"
+			},
+			{
+				"absent_because": "the committed blob key `honor` is read and DISCARDED (command.py:846-847) and the committed honor schedule has zero legacy consumers",
+				"helper": "honor_for"
+			},
+			{
+				"absent_because": "no committed field records a combat reward and the branch writes no resource field at all",
+				"helper": "reward_for"
+			},
+			{
+				"absent_because": "mission vocabulary remains owned by godot-mission-vocabulary, which measured zero consumers; this line references no MISSION_ field",
+				"helper": "complete_mission"
+			},
+			{
+				"absent_because": "the only count this operation derives is the constant one, so a helper named for a lost count is exactly where an untrusted subtraction would reappear",
+				"helper": "lost_count"
+			},
+			{
+				"absent_because": "the action vocabulary is a closed constant of three names, so no classification is needed",
+				"helper": "resolve_type"
+			},
+			{
+				"absent_because": "map_lose_item tests only the item id and the team's truthiness (engine.py:221), so a stricter client would be a parity break in the opposite direction",
+				"helper": "is_occupied"
+			},
+			{
+				"absent_because": "the same absence as is_occupied, for the cell bounds the row-removal helper never checks",
+				"helper": "in_bounds"
+			},
+			{
+				"absent_because": "the same absence as is_occupied, for the terrain the row-removal helper never reads",
+				"helper": "terrain_at"
+			}
+		],
+		"arithmetic_measured": {
+			"bitwise_operators": 0,
+			"divide_operators": 0,
+			"modulo_operators": 0,
+			"multiply_operators": 0,
+			"power_operators": 0,
+			"shift_operators": 0
+		},
+		"arithmetic_record": {
+			"additive_operand_rule": "every identifier on a line carrying a binary + or - must be in ADDITIVE_OPERANDS, and every published operand must be measured; the comparison runs in BOTH directions, so a new sum over a committed value introduces an identifier and fails it",
+			"additive_operands": [
+				"ACTIONS",
+				"BootData",
+				"COMBAT_BRANCH",
+				"GATE_COUNT",
+				"LEGACY_SOURCE_RELATIVE",
+				"PROTOCOL",
+				"REFUSAL_COUNT",
+				"UnitBehaviors",
+				"_type_name",
+				"action",
+				"addressing_body",
+				"append",
+				"block_end",
+				"body",
+				"call_line",
+				"compile",
+				"declared",
+				"field",
+				"for_start",
+				"gate",
+				"get",
+				"header",
+				"index",
+				"int",
+				"item_id",
+				"items",
+				"join",
+				"key",
+				"labels",
+				"lines",
+				"name",
+				"out",
+				"parsed",
+				"range",
+				"region",
+				"site",
+				"size",
+				"span",
+				"start",
+				"str",
+				"wire_key",
+				"word"
+			],
+			"binary_additive_lines": 31,
+			"bitwise_operators": 0,
+			"committed_combat_field_hits_on_additive_lines": 0,
+			"divide_operators": 0,
+			"modulo_operators": 0,
+			"multiply_operators": 0,
+			"note": "nothing here computes a damage figure, a duration, a ratio, a probability, an honour amount, a reward, or a mission completion from any committed value. The ONE destruction is a constant, not a sum",
+			"power_operators": 0,
+			"shift_operators": 0,
+			"superseded_additive_token_rule": "the earlier rule required every additive line to name one of twelve bookkeeping tokens. It was falsified by measurement: 20 of the 31 binary additive lines name none of them, because the module's additions are over strings, arrays, and path fragments rather than over line indices. The list is retained as SUPERSEDED_ADDITIVE_TOKENS and gates nothing"
+		},
+		"format_operators_outside_a_string": 0,
+		"no_combat": "NO COMBAT IS RESOLVED OF ANY KIND. attack, defense, life, attack_interval, attack_range, best_against, best_against_mult, and velocity each measure ZERO legacy consumers across the seven legacy root modules, so the committed numbers are CONTENT and never rules. This contract computes no damage, no attack outcome, no defence application, no hit chance, and no life or interval arithmetic. No mission is dispatched, resolved, or completed either: the mission vocabulary remains owned by the godot-mission-vocabulary capability and nothing here references a mission field",
+		"no_cost_or_reward": "NO HONOUR, REWARD, OR RESOURCE MOVEMENT OF ANY KIND. The committed blob keys are `honor` (US spelling, command.py:846-847), `resources`, `resources_victim`, and `townhall_gold`; each is read from the client blob and DISCARDED, the committed honor schedule has zero legacy consumers, and the branch writes no resource field at all. The derived resource vector is therefore the neutral all-zero one and the endpoint's post-execution proof requires EVERY stored resource to be unchanged, which is what forecloses a vector smuggled through the request",
+		"no_placement_validation": "NO OCCUPANCY, BOUNDS, TYPE, OR TERRAIN VALIDATION IS ADDED. map_lose_item tests only the item id and the team's truthiness (engine.py:221) and inventory selection adds no check of its own, so this contract reproduces that absence rather than filling it. Inventing a check here would make this client STRICTER than the legacy server. The gap is recorded as a Server v1 / M13 requirement, exactly as godot-building-move, godot-building-collect, and godot-stored-item-placement already do",
+		"non_claims": [
+			"no Flash, Ruffle, ActionScript, or browser executed, and no network was used in the hermetic suite",
+			"NO CLIENT-DICTATED DESTRUCTION COUNT IS REPRODUCED IN EITHER DIRECTION: the legacy server subtracts two client numbers; this operation destroys exactly one server-derived row and the difference is a DIVERGENCE, never parity",
+			"THE LEGACY BRANCH'S PRINTED LOSS COUNT IS NOT TREATED AS AN OUTCOME COUNT. It is printed before the row-removal call it appears to describe and is not conditional on it, so an identity with zero matching rows still printed it. It is evidence of what a client requested and of nothing else",
+			"NO DAMAGE, HEALTH, DEFENCE, HIT CHANCE, OR LIFE ARITHMETIC IS DELIVERED OR CLAIMED. attack, defense, life, attack_interval, attack_range, best_against, best_against_mult, and velocity each measure zero legacy consumers, so the committed numbers are content and never rules",
+			"NO MISSION IS DISPATCHED, RESOLVED, OR COMPLETED, and the mission vocabulary remains owned by godot-mission-vocabulary. No MISSION_ field is referenced anywhere in this line's delivered code",
+			"NO HONOUR OR REWARD IS PAID AND NO STORED RESOURCE MOVES: the committed blob keys `honor` (US spelling), `resources`, resources_victim, and townhall_gold are read and discarded; the derived vector is neutral and the proof requires every stored resource unchanged",
+			"NO SYRINGE COST IS CHARGED, because the committed syringes field has zero legacy consumers",
+			"NO OCCUPANCY, BOUNDS, TYPE, OR TERRAIN VALIDATION IS ADDED. That absence is reproduced, not filled, and is recorded as a Server v1 / M13 gap",
+			"THE TEAM ASYMMETRY between map_lose_item's truthy-team acceptance and push_dead_unit's team-one requirement is RECORDED AS A CODE FACT AND NOT EXERCISED, because no committed unit row is on a team other than one. It is not refused, which would invent a bound the oracle does not have",
+			"THE ITEM-KEYED KILL IS DELIVERED AS A PROVEN NO-OP, not as a refusal, and no replacement meaning is invented for it. Its intent is unknown",
+			"PARITY COVERS THE RECORDED TRANSACTIONS AGAINST THE COMMITTED VILLAGE DOCUMENTS ONLY, and no progressed-player save exists for this line beyond those two committed documents",
+			"NO WINDOWED CAPTURE AND NO PIXEL-PARITY ORACLE ARE CLAIMED, because nothing is rendered by this line"
+		],
+		"static_functions": [
+			"_validation_order_field_agrees",
+			"combat_failure",
+			"legacy_source_path",
+			"_read_source_bytes",
+			"_strip_string_literals",
+			"_indent_of",
+			"_branch_span",
+			"_row_removal_region",
+			"derive_field_inventory",
+			"is_action",
+			"is_item_id",
+			"is_map_key",
+			"_addressing_is_well_typed",
+			"_addressing_reason",
+			"wire_key",
+			"actions",
+			"branches",
+			"validation_order",
+			"refusals",
+			"corrections",
+			"team_asymmetry",
+			"select_eligible_rows",
+			"address_row",
+			"project_ledger",
+			"committed_resurrectable",
+			"expected_ledger_increment",
+			"refused_client_keys",
+			"project_combat",
+			"build_intent",
+			"build_response",
+			"intent_record",
+			"scope_record",
+			"readout_text",
+			"parse_combat",
+			"_whole_number",
+			"_type_name",
+			"_optional_int",
+			"_combat_error"
+		]
+	},
+	"capability": {
+		"action_command": {
+			"kill": "kill",
+			"kill_iid": "kill_iid",
+			"resolve": "end_attack"
+		},
+		"actions": [
+			"resolve",
+			"kill",
+			"kill_iid"
+		],
+		"addressing": {
+			"kill": "the map key of the placed row to remove",
+			"kill_iid": "the committed item id the legacy branch only prints",
+			"resolve": "the committed item id of the unit that was lost"
+		},
+		"addressing_key": {
+			"kill": "map_key",
+			"kill_iid": "item_id",
+			"resolve": "item_id"
+		},
+		"branches": [
+			{
+				"action": "resolve",
+				"addressing_key": "item_id",
+				"command": "end_attack",
+				"destroys_rows": true,
+				"kind": "dispatcher-branch",
+				"note": "the sole mutation path in the whole branch; the client payload's destruction count is refused rather than reproduced",
+				"reaches_ledger": true,
+				"source": "command.py:808-885",
+				"through": "map_lose_item (engine helper, engine.py:215-228) -> push_dead_unit (engine helper, engine.py:149-170)"
+			},
+			{
+				"action": "kill",
+				"addressing_key": "map_key",
+				"command": "kill",
+				"destroys_rows": true,
+				"kind": "dispatcher-branch",
+				"note": "deletes the addressed row and NEVER touches privateState['deadHeroes']; the branch holds no push_dead_unit call, so the ledger's non-participation is a property of the branch rather than an observation of one request",
+				"reaches_ledger": false,
+				"source": "command.py:169-181",
+				"through": null
+			},
+			{
+				"action": "kill_iid",
+				"addressing_key": "item_id",
+				"command": "kill_iid",
+				"destroys_rows": false,
+				"kind": "dispatcher-branch",
+				"note": "WRITES NOTHING: the branch binds two locals from args, every assignment target is a bare Name, and its only call is one print, so it is delivered as a proven no-op rather than refused",
+				"reaches_ledger": false,
+				"source": "command.py:183-187",
+				"through": null
+			}
+		],
+		"intent": {
+			"action_command": {
+				"kill": "kill",
+				"kill_iid": "kill_iid",
+				"resolve": "end_attack"
+			},
+			"actions": [
+				"resolve",
+				"kill",
+				"kill_iid"
+			],
+			"addressing": {
+				"kill": "the map key of the placed row to remove",
+				"kill_iid": "the committed item id the legacy branch only prints",
+				"resolve": "the committed item id of the unit that was lost"
+			},
+			"addressing_key": {
+				"kill": "map_key",
+				"kill_iid": "item_id",
+				"resolve": "item_id"
+			},
+			"body_keys": 3,
+			"destruction_count": "ALWAYS 0 or 1, derived server-side; never a client number",
+			"destruction_count_keys": [
+				"lost",
+				"losses",
+				"destroyed",
+				"destroyed_count",
+				"units_lost",
+				"quantity",
+				"qty",
+				"count"
+			],
+			"identical_typed_shapes": true,
+			"note": "THE REQUEST CARRIES AN IDENTITY AND NOTHING ELSE. The body is exactly three keys -- the save identity, a closed action, and the addressing under that action's own wire key -- so no destruction count, no sent/survived pair, no resource delta, no honour, and no price is even expressible (design D1/D2)",
+			"path": "/v0/combat",
+			"proof": [
+				{
+					"checks": "the placement key set differs by exactly the derived key and EVERY other row is byte-identical",
+					"half": "placement_set_and_every_other_row",
+					"why": "a count comparison would pass while the wrong row was removed, so this half is a value comparison against the whole map rather than about the removal"
+				},
+				{
+					"checks": "entries keep their recorded insertion order, a created key is appended (engine.py:164-167), and the derived entry matches by value",
+					"half": "ledger_key_order_and_every_entry_by_value",
+					"why": "comparing against the shared display projection's SORTED keys would reject every ledger whose recorded order is not already sorted"
+				},
+				{
+					"checks": "all seven stored resources are compared, never a subset",
+					"half": "every_stored_resource_unchanged",
+					"why": "legacy applies the request's own vector BEFORE the branch (command.py:40), so this half is what forecloses a delta smuggled through the request"
+				},
+				{
+					"checks": "the row count is checked against the derived destruction LAST",
+					"half": "row_count_stated_as_a_count_last",
+					"why": "every other half is a value comparison, so this one can never be the only thing that passed"
+				}
+			],
+			"refused_client_keys": [],
+			"sent_survived_keys": [
+				"sent",
+				"survived"
+			]
+		},
+		"provenance": {
+			"capability": "godot-combat-actions",
+			"combat_branch": "end_attack (command.py:808-885)",
+			"interpretation": "Every field inventory, fate, corpus figure, and ordering step is RE-DERIVED from the committed legacy source on every verification run. Nothing is transcribed, so a legacy edit fails the guard instead of silently contradicting the record",
+			"kill_branch": "kill (command.py:169-181)",
+			"kill_iid_branch": "kill_iid (command.py:183-187)",
+			"ledger_helper": "push_dead_unit (engine.py:149-170)",
+			"ledger_owner": "godot-unit-behaviors (unit_behaviors.gd), delegated whole",
+			"legacy_source": "command.py",
+			"milestone": "M10 line 2",
+			"mission_vocabulary_owner": "godot-mission-vocabulary",
+			"row_removal_helper": "map_lose_item (engine.py:215-228)"
+		},
+		"scope": {
+			"absent_helpers": [
+				{
+					"absent_because": "none of the committed combat fields has a legacy consumer, so there is no committed damage rule to resolve",
+					"helper": "resolve_damage"
+				},
+				{
+					"absent_because": "the same absence as resolve_damage, stated as the noun a caller would reach for",
+					"helper": "damage_for"
+				},
+				{
+					"absent_because": "`attack` and `attack_interval` are content with zero consumers, so there is no outcome to apply",
+					"helper": "apply_attack"
+				},
+				{
+					"absent_because": "`defense` is a constant 1 on all 429 committed units and is read by no branch",
+					"helper": "defend"
+				},
+				{
+					"absent_because": "no committed field records a probability and no branch draws a random number",
+					"helper": "hit_chance"
+				},
+				{
+					"absent_because": "no combat-adjacent duration has a legacy consumer; `max(0, unit[2] - unit[3])` is a subtraction of two unnamed client numbers, not a duration",
+					"helper": "resolve_duratio"
+				},
+				{
+					"absent_because": "the same absence as resolve_duratio",
+					"helper": "duration_for"
+				},
+				{
+					"absent_because": "the committed blob key `honor` is read and DISCARDED (command.py:846-847) and the committed honor schedule has zero legacy consumers",
+					"helper": "honor_for"
+				},
+				{
+					"absent_because": "no committed field records a combat reward and the branch writes no resource field at all",
+					"helper": "reward_for"
+				},
+				{
+					"absent_because": "mission vocabulary remains owned by godot-mission-vocabulary, which measured zero consumers; this line references no MISSION_ field",
+					"helper": "complete_mission"
+				},
+				{
+					"absent_because": "the only count this operation derives is the constant one, so a helper named for a lost count is exactly where an untrusted subtraction would reappear",
+					"helper": "lost_count"
+				},
+				{
+					"absent_because": "the action vocabulary is a closed constant of three names, so no classification is needed",
+					"helper": "resolve_type"
+				},
+				{
+					"absent_because": "map_lose_item tests only the item id and the team's truthiness (engine.py:221), so a stricter client would be a parity break in the opposite direction",
+					"helper": "is_occupied"
+				},
+				{
+					"absent_because": "the same absence as is_occupied, for the cell bounds the row-removal helper never checks",
+					"helper": "in_bounds"
+				},
+				{
+					"absent_because": "the same absence as is_occupied, for the terrain the row-removal helper never reads",
+					"helper": "terrain_at"
+				}
+			],
+			"arithmetic": {
+				"additive_operand_rule": "every identifier on a line carrying a binary + or - must be in ADDITIVE_OPERANDS, and every published operand must be measured; the comparison runs in BOTH directions, so a new sum over a committed value introduces an identifier and fails it",
+				"additive_operands": [
+					"ACTIONS",
+					"BootData",
+					"COMBAT_BRANCH",
+					"GATE_COUNT",
+					"LEGACY_SOURCE_RELATIVE",
+					"PROTOCOL",
+					"REFUSAL_COUNT",
+					"UnitBehaviors",
+					"_type_name",
+					"action",
+					"addressing_body",
+					"append",
+					"block_end",
+					"body",
+					"call_line",
+					"compile",
+					"declared",
+					"field",
+					"for_start",
+					"gate",
+					"get",
+					"header",
+					"index",
+					"int",
+					"item_id",
+					"items",
+					"join",
+					"key",
+					"labels",
+					"lines",
+					"name",
+					"out",
+					"parsed",
+					"range",
+					"region",
+					"site",
+					"size",
+					"span",
+					"start",
+					"str",
+					"wire_key",
+					"word"
+				],
+				"binary_additive_lines": 31,
+				"bitwise_operators": 0,
+				"committed_combat_field_hits_on_additive_lines": 0,
+				"divide_operators": 0,
+				"modulo_operators": 0,
+				"multiply_operators": 0,
+				"note": "nothing here computes a damage figure, a duration, a ratio, a probability, an honour amount, a reward, or a mission completion from any committed value. The ONE destruction is a constant, not a sum",
+				"power_operators": 0,
+				"shift_operators": 0,
+				"superseded_additive_token_rule": "the earlier rule required every additive line to name one of twelve bookkeeping tokens. It was falsified by measurement: 20 of the 31 binary additive lines name none of them, because the module's additions are over strings, arrays, and path fragments rather than over line indices. The list is retained as SUPERSEDED_ADDITIVE_TOKENS and gates nothing"
+			},
+			"delegated": [
+				"project_ledger, committed_resurrectable, the increment, and both gates all live in unit_behaviors.gd"
+			],
+			"delivered": [
+				"a typed combat intent carrying only a save identity, a closed action, and that action's own addressing",
+				"the server-derived destruction: the eligible rows, the addressed row, and a count of exactly one",
+				"the field inventory RE-DERIVED from command.py bytes, with each key's fate measured rather than transcribed",
+				"the four-part post-execution proof the endpoint requires",
+				"the two kill contracts, delivered differently: kill deletes a row and never touches the ledger; kill_iid is a proven no-op"
+			],
+			"not_delivered": [
+				"any client-dictated destruction count, in either direction",
+				"any combat resolution: no damage, outcome, defence, hit chance, or life arithmetic",
+				"any honour, reward, or resource movement, and no syringe cost",
+				"any occupancy, bounds, type, or terrain check on a removed or reinstated row",
+				"any mission dispatch, resolution, or completion: the mission vocabulary remains owned by godot-mission-vocabulary",
+				"a reimplementation of the ledger projection or either increment gate, which are delegated whole to unit_behaviors.gd"
+			]
+		}
+	},
+	"committed_content": {
+		"combat_field_support": {
+			"attack": {
+				"encoding": "numeric",
+				"units_with_a_committed_value": 429
+			},
+			"attack_interval": {
+				"encoding": "numeric",
+				"units_with_a_committed_value": 429
+			},
+			"attack_range": {
+				"encoding": "numeric",
+				"units_with_a_committed_value": 429
+			},
+			"best_against": {
+				"encoding": "categorical",
+				"units_with_a_committed_value": 427
+			},
+			"best_against_mult": {
+				"encoding": "numeric",
+				"units_with_a_committed_value": 429
+			},
+			"defense": {
+				"encoding": "numeric",
+				"units_with_a_committed_value": 429
+			},
+			"life": {
+				"encoding": "numeric",
+				"units_with_a_committed_value": 429
+			}
+		},
+		"resurrectable_flag": {
+			"carrying_a_positive_value": 426,
+			"carrying_a_zero_value": 0,
+			"definitions": 429,
+			"key_absent_entirely": 3,
+			"note": "the ledger gate reads this flag; the distribution is reported, and no rule is derived from it beyond the gate the committed engine already evaluates",
+			"unreadable": 0
+		}
+	},
+	"corpus": {
+		"correction": {
+			"does_not_reproduce": [
+				"'11 documents' measures 10: 8 under villages/ and 2 under tests/saves/. tests/saves/manifest.json is a manifest, not a save, and the villages/quest/ directory holds 23 quest documents of a different shape. The committed investigation's own table lists exactly ten rows",
+				"'five village saves carry a non-empty deadHeroes ledger' measures FOUR, and the committed record's own enumeration names exactly four",
+				"Neutral.json's ledger holds 28 keys, not the recorded 29. This change's design D8 and proposal already state 28, so the investigation's table row is the outlier"
+			],
+			"measured_documents": 10,
+			"measured_documents_with_non_empty_ledger": 4,
+			"measured_documents_with_unit_rows": 7,
+			"measured_neutral_ledger_keys": 28,
+			"measured_placed_rows": 3372,
+			"measured_unit_rows": 441,
+			"measured_unit_rows_on_team_one": 441,
+			"measured_unit_rows_resurrectable": 429,
+			"note": "Every per-document row figure and the placed-row total reproduce exactly; only the three derived prose figures above do not",
+			"recorded_documents": 11,
+			"recorded_documents_with_non_empty_ledger": 5,
+			"recorded_neutral_ledger_keys": 29
+		},
+		"document_count": 10,
+		"documents": [
+			{
+				"document": "tests/saves/fresh-player-pre-migration.json",
+				"ledger_keys": 0,
+				"ok": true,
+				"placed_rows": 40,
+				"unit_rows": 0,
+				"unit_rows_on_team_one": 0,
+				"unit_rows_resurrectable": 0
+			},
+			{
+				"document": "tests/saves/fresh-player.json",
+				"ledger_keys": 0,
+				"ok": true,
+				"placed_rows": 40,
+				"unit_rows": 0,
+				"unit_rows_on_team_one": 0,
+				"unit_rows_resurrectable": 0
+			},
+			{
+				"document": "villages/AcidCaos.json",
+				"ledger_keys": 0,
+				"ok": true,
+				"placed_rows": 319,
+				"unit_rows": 48,
+				"unit_rows_on_team_one": 48,
+				"unit_rows_resurrectable": 48
+			},
+			{
+				"document": "villages/General_Mike_30.json",
+				"ledger_keys": 0,
+				"ok": true,
+				"placed_rows": 436,
+				"unit_rows": 31,
+				"unit_rows_on_team_one": 31,
+				"unit_rows_resurrectable": 31
+			},
+			{
+				"document": "villages/General_Mike_31.json",
+				"ledger_keys": 0,
+				"ok": true,
+				"placed_rows": 436,
+				"unit_rows": 31,
+				"unit_rows_on_team_one": 31,
+				"unit_rows_resurrectable": 31
+			},
+			{
+				"document": "villages/Kiriakos.json",
+				"ledger_keys": 9,
+				"ok": true,
+				"placed_rows": 569,
+				"unit_rows": 109,
+				"unit_rows_on_team_one": 109,
+				"unit_rows_resurrectable": 109
+			},
+			{
+				"document": "villages/Nerri.json",
+				"ledger_keys": 9,
+				"ok": true,
+				"placed_rows": 367,
+				"unit_rows": 70,
+				"unit_rows_on_team_one": 70,
+				"unit_rows_resurrectable": 70
+			},
+			{
+				"document": "villages/Neutral.json",
+				"ledger_keys": 28,
+				"ok": true,
+				"placed_rows": 549,
+				"unit_rows": 87,
+				"unit_rows_on_team_one": 87,
+				"unit_rows_resurrectable": 87
+			},
+			{
+				"document": "villages/Scarlet.json",
+				"ledger_keys": 2,
+				"ok": true,
+				"placed_rows": 576,
+				"unit_rows": 65,
+				"unit_rows_on_team_one": 65,
+				"unit_rows_resurrectable": 53
+			},
+			{
+				"document": "villages/initial.json",
+				"ledger_keys": 0,
+				"ok": true,
+				"placed_rows": 40,
+				"unit_rows": 0,
+				"unit_rows_on_team_one": 0,
+				"unit_rows_resurrectable": 0
+			}
+		],
+		"documents_with_non_empty_ledger": 4,
+		"documents_with_unit_rows": 7,
+		"measured_this_run": true,
+		"neutral_ledger_keys": 28,
+		"placed_rows": 3372,
+		"unit_rows": 441,
+		"unit_rows_on_team_one": 441,
+		"unit_rows_resurrectable": 429
+	},
+	"destruction": {
+		"count": "ALWAYS 0 or 1, derived server-side; never a client number",
+		"destruction_count_keys": [
+			"lost",
+			"losses",
+			"destroyed",
+			"destroyed_count",
+			"units_lost",
+			"quantity",
+			"qty",
+			"count"
+		],
+		"order": "the save's own recorded map-key (insertion) order, which is the order `for index in map_items` walks and therefore the order map_lose_item pops; NOT numeric key order and NOT the key-sorted order of a captured snapshot, and the committed corpus distinguishes all three",
+		"printed_count_is_request": "THE BRANCH'S PRINTED COUNT REPORTS WHAT THE CLIENT ASKED FOR, NOT WHAT IT DESTROYED. The print at command.py:871 precedes the row-removal call at :872 and is not conditional on it, so `Lost N` is printed from the client-supplied subtraction whether or not a single row matched. MEASURED: item id 923 -- a committed unit id with zero placed rows -- printed `Lost 1` and destroyed nothing. Reading that log as an outcome count would reinstate the untrusted subtraction, which is why the count is refused and the one server-derived destruction is proved against the persisted state instead",
+		"recorded_order_precedence": {
+			"document": "villages/AcidCaos.json",
+			"item_id": 1020,
+			"note": "three orders, three answers, so the choice is observable rather than decorative",
+			"numeric_min": "897",
+			"recorded_first": "2425",
+			"snapshot_sorted_first": "1022"
+		},
+		"refused_client_keys": [],
+		"refused_count_note": "The legacy branch's apparent safety against over-deletion is EXHAUSTION OF MATCHES, NOT A CHECK: map_lose_item loops `while qty > 0` and returns the moment one pass finds no match (engine.py:218-227). Mistaking exhaustion for a bound is how an untrusted count survives review, so no loop count is derived here and no clamp is applied",
+		"rule": "A CLIENT-DICTATED DESTRUCTION COUNT IS REFUSED, NEVER REPRODUCED. The legacy branch derives its destruction count as max(0, unit[2] - unit[3]) (command.py:868) on two numbers the CLIENT supplies, and the committed source labels them only 'A' and 'B' with the comment 'number of loses is A - B' -- nothing establishes what they mean. This operation therefore destroys exactly ONE row, derived from its own recorded state. Reproducing the subtraction would make this server a pass-through for a client-computed casualty figure, which is the AGENTS.md Bad pattern and the identical anti-pattern the godot-quests line refused in end_quest. The difference is recorded as a DIVERGENCE, never as parity",
+		"sent_survived_keys": [
+			"sent",
+			"survived"
+		]
+	},
+	"determinism": {
+		"note": "every table is generated from the delivered module's own constants, from this run's own measurement of the committed legacy source, or from committed bytes. The committed fixture MANIFEST is deliberately not read, because it carries a capture timestamp; the parity evidence lives in the Python replay suite and this report carries a path pointer to it",
+		"reads_the_fixture_manifest": false,
+		"reads_wall_clock": false,
+		"writes_absolute_paths": false
+	},
+	"divergence": {
+		"legacy_status": "the legacy server can destroy an ARBITRARY number of rows from one request",
+		"modern_status": "this operation destroys AT MOST ONE, derived server-side",
+		"reason": "A CLIENT-DICTATED DESTRUCTION COUNT IS REFUSED, NEVER REPRODUCED. The legacy branch derives its destruction count as max(0, unit[2] - unit[3]) (command.py:868) on two numbers the CLIENT supplies, and the committed source labels them only 'A' and 'B' with the comment 'number of loses is A - B' -- nothing establishes what they mean. This operation therefore destroys exactly ONE row, derived from its own recorded state. Reproducing the subtraction would make this server a pass-through for a client-computed casualty figure, which is the AGENTS.md Bad pattern and the identical anti-pattern the godot-quests line refused in end_quest. The difference is recorded as a DIVERGENCE, never as parity",
+		"recorded_not_narrowed": "The divergence is recorded rather than narrowed, because narrowing it would require a combat rule the preserved source does not contain. The executed legacy capture measures the real difference against a committed village document and the fixture records it as a divergence field, so it cannot be reported as parity by omission",
+		"status": "DIVERGENCE, NOT PARITY",
+		"unobserved_request_shape": "Whether the real Flash client ever sent a MULTI-UNIT loss in one payload is never observed: the client was never executed. If it did, this operation under-delivers against it, and that is recorded as a claim limit rather than resolved"
+	},
+	"evidence": {
+		"fixture": "tests/fixtures/godot-combat-actions",
+		"note": "the recorded fixture is replayed by the Python suite, not by this one, because its response bodies are the LEGACY {result: success} shape and cannot seed a typed parser",
+		"parity_suite": "apps/compat-api/tests/test_combat_parity.py"
+	},
+	"field_inventory": {
+		"branch_span": [
+			808,
+			885
+		],
+		"correction": {
+			"fates": "discarded = zero post-block references, quote-stripped; mutation_path = a reference inside the row-removal loop region located by SEARCHING for the map_lose_item( call; print_only = the complement. The three-way partition is asserted, so a key fitting none of them fails the derivation",
+			"key_absent_from_the_recorded_table": "voluntary_end",
+			"measured_discarded_count": 9,
+			"measured_read_key_count": 12,
+			"note": "The committed investigation docs/legacy-m10-combat.md and the combat-actions spec deltas both state eleven read keys and seven discarded; the investigation's own table then lists eight discarded rows, and the proposal names eight keys while saying seven. Measured from the branch there are TWELVE read keys and NINE that reach nothing: voluntary_end (command.py:839-840) is absent from both the prose and the table. The conclusion is unchanged -- the keys the record names do reach nothing, which is the finding this capability was chartered to record. Only the counts are corrected, and every count here is re-derived on every verification run",
+			"omitted_in_both": "voluntary_end (command.py:839-840)",
+			"recorded_discarded_count": 7,
+			"recorded_discarded_count_in_the_own_table": 8,
+			"recorded_read_key_count": 11
+		},
+		"derived_this_run": true,
+		"discarded": [
+			"voluntary_end",
+			"attacker",
+			"resources",
+			"honor",
+			"duration",
+			"townhall_gold",
+			"different_island",
+			"victim_units",
+			"resources_victim"
+		],
+		"fates": [
+			"discarded",
+			"print_only",
+			"mutation_path"
+		],
+		"key_count": 12,
+		"keys": [
+			{
+				"fate": "discarded",
+				"inside_row_removal_region": false,
+				"key": "voluntary_end",
+				"post_test_distinct_lines": 0,
+				"post_test_site_count": 0,
+				"post_test_sites": [],
+				"tested_at": "command.py:839"
+			},
+			{
+				"fate": "print_only",
+				"inside_row_removal_region": false,
+				"key": "victim",
+				"post_test_distinct_lines": 2,
+				"post_test_site_count": 2,
+				"post_test_sites": [
+					"command.py:874",
+					"command.py:875"
+				],
+				"tested_at": "command.py:841"
+			},
+			{
+				"fate": "discarded",
+				"inside_row_removal_region": false,
+				"key": "attacker",
+				"post_test_distinct_lines": 0,
+				"post_test_site_count": 0,
+				"post_test_sites": [],
+				"tested_at": "command.py:843"
+			},
+			{
+				"fate": "discarded",
+				"inside_row_removal_region": false,
+				"key": "resources",
+				"post_test_distinct_lines": 0,
+				"post_test_site_count": 0,
+				"post_test_sites": [],
+				"tested_at": "command.py:845"
+			},
+			{
+				"fate": "discarded",
+				"inside_row_removal_region": false,
+				"key": "honor",
+				"post_test_distinct_lines": 0,
+				"post_test_site_count": 0,
+				"post_test_sites": [],
+				"tested_at": "command.py:847"
+			},
+			{
+				"fate": "discarded",
+				"inside_row_removal_region": false,
+				"key": "duration",
+				"post_test_distinct_lines": 0,
+				"post_test_site_count": 0,
+				"post_test_sites": [],
+				"tested_at": "command.py:849"
+			},
+			{
+				"fate": "discarded",
+				"inside_row_removal_region": false,
+				"key": "townhall_gold",
+				"post_test_distinct_lines": 0,
+				"post_test_site_count": 0,
+				"post_test_sites": [],
+				"tested_at": "command.py:851"
+			},
+			{
+				"fate": "print_only",
+				"inside_row_removal_region": false,
+				"key": "win",
+				"post_test_distinct_lines": 2,
+				"post_test_site_count": 2,
+				"post_test_sites": [
+					"command.py:876",
+					"command.py:881"
+				],
+				"tested_at": "command.py:853"
+			},
+			{
+				"fate": "discarded",
+				"inside_row_removal_region": false,
+				"key": "different_island",
+				"post_test_distinct_lines": 0,
+				"post_test_site_count": 0,
+				"post_test_sites": [],
+				"tested_at": "command.py:855"
+			},
+			{
+				"fate": "discarded",
+				"inside_row_removal_region": false,
+				"key": "victim_units",
+				"post_test_distinct_lines": 0,
+				"post_test_site_count": 0,
+				"post_test_sites": [],
+				"tested_at": "command.py:857"
+			},
+			{
+				"fate": "mutation_path",
+				"inside_row_removal_region": true,
+				"key": "attacker_units",
+				"post_test_distinct_lines": 1,
+				"post_test_site_count": 1,
+				"post_test_sites": [
+					"command.py:866"
+				],
+				"tested_at": "command.py:859"
+			},
+			{
+				"fate": "discarded",
+				"inside_row_removal_region": false,
+				"key": "resources_victim",
+				"post_test_distinct_lines": 0,
+				"post_test_site_count": 0,
+				"post_test_sites": [],
+				"tested_at": "command.py:861"
+			}
+		],
+		"mutation_path": [
+			"attacker_units"
+		],
+		"partition": true,
+		"print_only": [
+			"victim",
+			"win"
+		],
+		"row_removal_region": [
+			866,
+			873
+		],
+		"second_extraction": {
+			"agrees_on_discarded": true,
+			"agrees_on_key_names": true,
+			"agrees_on_mutation_path": true,
+			"agrees_on_print_only": true,
+			"branch_span": [
+				808,
+				885
+			],
+			"independent": true,
+			"row_removal_region": [
+				866,
+				873
+			]
+		}
+	},
+	"generated_by": "apps/client-godot/tests/test_combat_actions.gd --report=<path>",
+	"ledger": {
+		"gate_count": 2,
+		"gates": [
+			{
+				"checks": "the dying row's slot 7 (player) equals 1",
+				"committed": true,
+				"gate": "player_team_one",
+				"note": "push_dead_unit returns False when item[7] != 1, so a row on another team never enters the ledger no matter how resurrectable its committed properties say it is",
+				"source": "engine.py:151 (push_dead_unit)"
+			},
+			{
+				"checks": "the committed properties object carries resurrectable AND int(resurrectable) > 0",
+				"committed": true,
+				"gate": "resurrectable_positive",
+				"note": "push_dead_unit returns False when the flag is ABSENT (engine.py:159-160) and when it is present but not greater than zero (engine.py:162), so an absent flag is a REFUSAL, never a zero",
+				"source": "engine.py:159,162 (push_dead_unit)"
+			}
+		],
+		"kill_contract": {
+			"command": "kill",
+			"deletes_addressed_row": true,
+			"ledger_references": 0,
+			"missing_row_behaviour": "map_get_item's falsy branch prints 'Error: item not found.' and RETURNS, and the server still answers the legacy success result, so a client cannot distinguish this outcome from a real deletion by the response alone. This endpoint REFUSES it instead, which is a recorded divergence and not parity",
+			"note": "the ledger's non-participation is asserted as a property of the branch, not inferred from one request that happened not to change it: the branch contains no reference to privateState['deadHeroes'] and no call to push_dead_unit at all",
+			"reaches_ledger": false,
+			"source": "command.py:169-181"
+		},
+		"kill_iid_contract": {
+			"body": "print(\"Killed\", str(get_name_from_item_id(item_id)))",
+			"command": "kill_iid",
+			"delivered": "as a proven no-op",
+			"local_bindings": [
+				"item_id",
+				"reason_str"
+			],
+			"mutates": [],
+			"not_delivered": "as a refusal",
+			"reaches_ledger": false,
+			"resources_move": false,
+			"source": "command.py:183-187",
+			"statement_writes_save_state": false,
+			"why": "the branch WRITES NOTHING -- every assignment target in its body is a bare Name and its only call is one print -- which is a stronger statement than any single observed request showing nothing changed. Refusing a command that does nothing would misrepresent the preserved server as having a rule to violate. Its INTENT is unknown: nothing observes whether a real client sent it, or what it was meant to do"
+		},
+		"no_syringe_cost": "NO SYRINGE COST IS CHARGED AND NO STORED RESOURCE MOVES. `used_syringe` is bound from args[4] (command.py:630) and is NEVER READ AGAIN anywhere in the branch, so it is DISCARDED, and the committed `syringes` field it would be paid in has ZERO occurrences across the seven legacy modules, so the legacy server charges nothing. Charging one would invent an economy the repository does not contain. The no-cost claim is proved by the endpoint's 'every stored resource is unchanged' half, which compares the FULL resource set rather than a subset",
+		"no_third_gate": "EXACTLY TWO GATES EXIST AND NO THIRD IS INVENTED. push_dead_unit (engine.py:149-170) performs two checks and no more: the row's player team (engine.py:151) and the committed resurrectable flag (engine.py:159,162). Everything else a reader might expect is absent from the helper: no level check, no cost check, no capacity check, no cooldown, no per-type check, and no check that the row is a unit rather than a building. Adding any of them here would make this client STRICTER than the legacy server, which is a parity break in the opposite direction from the usual risk (design D1)",
+		"owner": "godot-unit-behaviors (unit_behaviors.gd), delegated whole",
+		"team_asymmetry": {
+			"committed_unit_rows": 441,
+			"committed_unit_rows_on_team_one": 441,
+			"consequence": "a non-team-one unit row would be DESTROYED and would never ENTER THE LEDGER",
+			"exercised": false,
+			"exercised_note": "unreachable from the committed corpus: every one of the 441 committed unit rows across the committed save documents is on player team one, which is the value push_dead_unit requires",
+			"ledger_helper": {
+				"accepts": "PLAYER TEAM 1 ONLY (`if item[7] != 1: return False`, engine.py:151)",
+				"helper": "push_dead_unit",
+				"is_dispatcher_branch": false,
+				"source": "engine.py:149-170"
+			},
+			"refused": false,
+			"refused_note": "refusing it would invent a bound the oracle does not have, which is the same reasoning that leaves the M6 tile-geometry gap recorded rather than closed",
+			"row_removal_helper": {
+				"accepts": "ANY TRUTHY recorded team (`map_items[index][7]`, engine.py:221)",
+				"helper": "map_lose_item",
+				"is_dispatcher_branch": false,
+				"source": "engine.py:215-228"
+			},
+			"status": "RECORDED, NOT EXERCISED, NOT REFUSED"
+		}
+	},
+	"ordering": {
+		"destruction_step": 9,
+		"proof_halves": [
+			{
+				"checks": "the placement key set differs by exactly the derived key and EVERY other row is byte-identical",
+				"half": "placement_set_and_every_other_row",
+				"why": "a count comparison would pass while the wrong row was removed, so this half is a value comparison against the whole map rather than about the removal"
+			},
+			{
+				"checks": "entries keep their recorded insertion order, a created key is appended (engine.py:164-167), and the derived entry matches by value",
+				"half": "ledger_key_order_and_every_entry_by_value",
+				"why": "comparing against the shared display projection's SORTED keys would reject every ledger whose recorded order is not already sorted"
+			},
+			{
+				"checks": "all seven stored resources are compared, never a subset",
+				"half": "every_stored_resource_unchanged",
+				"why": "legacy applies the request's own vector BEFORE the branch (command.py:40), so this half is what forecloses a delta smuggled through the request"
+			},
+			{
+				"checks": "the row count is checked against the derived destruction LAST",
+				"half": "row_count_stated_as_a_count_last",
+				"why": "every other half is a value comparison, so this one can never be the only thing that passed"
+			}
+		],
+		"rule": "EVERY VALIDATION COMPLETES BEFORE ANY ROW IS REMOVED (design D3). The legacy branch's two unguarded absent-value dereferences sit on OPPOSITE SIDES of its write loop: omitting attacker_units raises at command.py:866 before the loop body runs, while omitting victim raises at command.py:874 after map_lose_item already ran. Both answer HTTP 500 -- and the PERSISTED save is byte-identical in both cases, because command.py dispatches the whole batch first and calls save_session only afterwards (command.py:30,32), so an exception anywhere in the batch discards every mutation it made. MEASURED, including a two-command batch whose first command was valid: the branch printed its destruction and the persisted state did not move. The failure mode is therefore a DISCARDED save rather than a partially applied one, and the persistence boundary is the BATCH, not the command. Reproducing that ordering inside this endpoint is still refused: every check resolves before dispatch so a refusal can never leave a half-applied state, whatever a future persistence change does",
+		"steps": [
+			{
+				"check": "action_is_in_the_closed_vocabulary",
+				"resolves": "before dispatch",
+				"step": 1
+			},
+			{
+				"check": "no_client_dictated_destruction_key",
+				"code": "client_dictated_destruction",
+				"resolves": "before dispatch",
+				"step": 2
+			},
+			{
+				"check": "addressing_present_and_well_typed",
+				"resolves": "before dispatch",
+				"step": 3
+			},
+			{
+				"check": "eligible_row_resolves",
+				"code": "no_eligible_row",
+				"resolves": "before dispatch",
+				"step": 4
+			},
+			{
+				"check": "addressed_row_resolves",
+				"code": "unaddressable_row",
+				"resolves": "before dispatch",
+				"step": 5
+			},
+			{
+				"check": "ledger_readable",
+				"code": "invalid_ledger",
+				"resolves": "before dispatch",
+				"step": 6
+			},
+			{
+				"check": "destruction_set_derived",
+				"resolves": "before dispatch",
+				"step": 7
+			},
+			{
+				"check": "derivation_ready_to_execute",
+				"resolves": "before dispatch",
+				"step": 8
+			},
+			{
+				"check": "destruction",
+				"resolves": "THE WRITE STEP",
+				"step": 9
+			},
+			{
+				"check": "post_execution_proof",
+				"resolves": "after dispatch",
+				"step": 10
+			}
+		]
+	},
+	"refusals": [
+		{
+			"implemented": true,
+			"note": "The legacy branch's apparent safety against over-deletion is EXHAUSTION OF MATCHES, NOT A CHECK: map_lose_item loops `while qty > 0` and returns the moment one pass finds no match (engine.py:218-227). Mistaking exhaustion for a bound is how an untrusted count survives review, so no loop count is derived here and no clamp is applied",
+			"refusal": "client_dictated_destruction",
+			"rule": "A CLIENT-DICTATED DESTRUCTION COUNT IS REFUSED, NEVER REPRODUCED. The legacy branch derives its destruction count as max(0, unit[2] - unit[3]) (command.py:868) on two numbers the CLIENT supplies, and the committed source labels them only 'A' and 'B' with the comment 'number of loses is A - B' -- nothing establishes what they mean. This operation therefore destroys exactly ONE row, derived from its own recorded state. Reproducing the subtraction would make this server a pass-through for a client-computed casualty figure, which is the AGENTS.md Bad pattern and the identical anti-pattern the godot-quests line refused in end_quest. The difference is recorded as a DIVERGENCE, never as parity"
+		},
+		{
+			"implemented": false,
+			"refusal": "combat_resolution",
+			"rule": "NO COMBAT IS RESOLVED OF ANY KIND. attack, defense, life, attack_interval, attack_range, best_against, best_against_mult, and velocity each measure ZERO legacy consumers across the seven legacy root modules, so the committed numbers are CONTENT and never rules. This contract computes no damage, no attack outcome, no defence application, no hit chance, and no life or interval arithmetic. No mission is dispatched, resolved, or completed either: the mission vocabulary remains owned by the godot-mission-vocabulary capability and nothing here references a mission field"
+		},
+		{
+			"implemented": false,
+			"refusal": "no_cost_or_reward",
+			"rule": "NO HONOUR, REWARD, OR RESOURCE MOVEMENT OF ANY KIND. The committed blob keys are `honor` (US spelling, command.py:846-847), `resources`, `resources_victim`, and `townhall_gold`; each is read from the client blob and DISCARDED, the committed honor schedule has zero legacy consumers, and the branch writes no resource field at all. The derived resource vector is therefore the neutral all-zero one and the endpoint's post-execution proof requires EVERY stored resource to be unchanged, which is what forecloses a vector smuggled through the request"
+		},
+		{
+			"implemented": false,
+			"refusal": "syringe_cost",
+			"rule": "NO SYRINGE COST IS CHARGED AND NO STORED RESOURCE MOVES. `used_syringe` is bound from args[4] (command.py:630) and is NEVER READ AGAIN anywhere in the branch, so it is DISCARDED, and the committed `syringes` field it would be paid in has ZERO occurrences across the seven legacy modules, so the legacy server charges nothing. Charging one would invent an economy the repository does not contain. The no-cost claim is proved by the endpoint's 'every stored resource is unchanged' half, which compares the FULL resource set rather than a subset"
+		},
+		{
+			"implemented": false,
+			"refusal": "placement_validation",
+			"rule": "NO OCCUPANCY, BOUNDS, TYPE, OR TERRAIN VALIDATION IS ADDED. map_lose_item tests only the item id and the team's truthiness (engine.py:221) and inventory selection adds no check of its own, so this contract reproduces that absence rather than filling it. Inventing a check here would make this client STRICTER than the legacy server. The gap is recorded as a Server v1 / M13 requirement, exactly as godot-building-move, godot-building-collect, and godot-stored-item-placement already do"
+		}
+	],
+	"schema": "combat-actions-report-v1"
+}

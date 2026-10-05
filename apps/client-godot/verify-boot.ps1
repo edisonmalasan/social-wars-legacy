@@ -462,7 +462,7 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_experience", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests", "test_tutorial", "test_stored_item_placement", "test_mission_vocabulary")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_experience", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests", "test_tutorial", "test_stored_item_placement", "test_mission_vocabulary", "test_combat_actions")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a
@@ -838,6 +838,44 @@ try {
                 "--", "--scenario=live-stored-placement",
                 "--gameapi-endpoint=$endpoint"
             )
+        },
+        @{
+            # The combat phase drives ONE `kill` through the real v0 endpoint
+            # against the committed corpus's OWN placed row (item 26 at map key
+            # 1), so the unchanged legacy dispatcher deletes exactly that one row
+            # through the same map_lose_item helper end_attack uses. No
+            # COMPAT_SEED_* seam is needed and none is used: the row is present
+            # in the committed corpus as committed, and manufacturing one would
+            # be refused.
+            #
+            # --expect-save-mutation holds because the deletion is a real write,
+            # and the phase asserts the typed response, that the removed row is
+            # exactly the addressed key, that all seven stored resources are
+            # UNCHANGED, and that the dead-hero ledger did NOT move -- `kill`
+            # never touches it, unlike push_dead_unit.
+            #
+            # The `resolve` ELIGIBILITY REFUSAL is proved HERE against the real
+            # endpoint, with its own named code rather than the client-dictated
+            # one, and the after-snapshot then proves it moved nothing. The
+            # client-dictated-count refusal cannot be expressed through the
+            # delivered transport at all, so it is asserted against the shared
+            # module instead -- and the phase states that rather than implying
+            # the endpoint refused it.
+            #
+            # The `resolve` POSITIVE path is deliberately NOT driven here: the
+            # committed corpus places only buildings, the phase asserts that
+            # (zero unit rows) rather than working around it, and the positive
+            # destruction-plus-ledger round trip is exercised hermetically over
+            # the committed village documents, which do carry unit rows.
+            Name = "combat-live"
+            Assertions = "combat live phase"
+            ExpectSaveMutation = $true
+            Arguments = @(
+                "--headless", "--path", $projectRel,
+                "--script", "res://tests/test_combat_actions.gd",
+                "--", "--scenario=live-combat",
+                "--gameapi-endpoint=$endpoint"
+            )
         }
     )
 
@@ -850,7 +888,8 @@ try {
         if ($phase.ContainsKey("ExpectSaveMutation")) {
             # placement-live, purchase-live, move-live, sell-live, store-live,
             # upgrade-live, construction-live, collect-live, expand-live,
-            # queue-live, collection-live, and behavior-live: the harness
+            # queue-live, collection-live, behavior-live, and combat-live: the
+            # harness
             # snapshots the disposable corpus saves before the Godot run and
             # fails unless one changed after.
             $phaseArgs += "--expect-save-mutation"

@@ -1,0 +1,134 @@
+{
+  "changed_leaf_count": 8,
+  "changed_leaves": [
+    {
+      "after": null,
+      "before": 1020,
+      "path": "/maps/0/items/2425/0",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 41,
+      "path": "/maps/0/items/2425/1",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 40,
+      "path": "/maps/0/items/2425/2",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 1705676537,
+      "path": "/maps/0/items/2425/3",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 0,
+      "path": "/maps/0/items/2425/4",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 109,
+      "path": "/maps/0/items/2425/6/xp",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 1,
+      "path": "/maps/0/items/2425/7",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": 1,
+      "before": null,
+      "path": "/privateState/deadHeroes/1020",
+      "present_after": true,
+      "present_before": false
+    }
+  ],
+  "command": "end_attack",
+  "crafted_args": null,
+  "crafted_units": [
+    [
+      1020,
+      0,
+      1,
+      0
+    ]
+  ],
+  "exhaustion_shortfall": 0,
+  "expected_removed_keys": [
+    "2425"
+  ],
+  "expected_status": 200,
+  "ledger_after": {
+    "1020": 1
+  },
+  "ledger_before": {},
+  "ledger_keys_after": 1,
+  "ledger_keys_before": 0,
+  "ledger_moved": true,
+  "modern_derives_ledger": {
+    "1020": 1
+  },
+  "modern_derives_removed_keys": [
+    "2425"
+  ],
+  "name": "resolve_first_by_recorded_order",
+  "note": "The whole selection rule in one transaction. The blob names only an item identity, the helper matches slot 0 == 1020 AND a truthy slot 7, and it pops the FIRST match in the save's own recorded map-key order -- key 2425, not the numeric minimum 897. That difference is the point: an implementation that sorted would remove 897 and still produce a plausible-looking fixture. The ledger key is CREATED at 1 by the committed resurrectable gate.",
+  "parity_with_delivered_endpoint": true,
+  "printed_branch_lines": [
+    "[+] COMMAND: end_attack(['{\"attacker_units\":[[1020,0,1,0]],\"victim\":{\"name\":\"derived\"}}', 0]) -> Lost 1 Soldier II(s)"
+  ],
+  "printed_destruction_counts": [
+    1
+  ],
+  "printed_requested_count": 1,
+  "removed_keys": [
+    "2425"
+  ],
+  "resource_neutral": true,
+  "resources_after": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "resources_before": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "response_payload": {
+    "result": "success"
+  },
+  "rows_after": 318,
+  "rows_before": 319,
+  "rows_removed": 1,
+  "seed": "destruction",
+  "state_sha256_after": "c0039e0bb31623a283a23627673843ce6ae9a1d7e0ad76f4b24010a48774eaad",
+  "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "status": 200,
+  "unchanged_leaves_sha256_after": "311e2f4214435a1d9a754e058d0ad50e29c77668338fe1ccbd0035fad2bffc5b",
+  "unchanged_leaves_sha256_before": "311e2f4214435a1d9a754e058d0ad50e29c77668338fe1ccbd0035fad2bffc5b",
+  "victim_supplied": true
+}

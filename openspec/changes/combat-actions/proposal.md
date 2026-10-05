@@ -13,7 +13,7 @@ on destruction is not a check but the exhaustion of matching rows.
 Delivering it forces a correction the milestone could not defer. M8's
 `godot-unit-behaviors` recorded, as the reason no executed-legacy fixture could be
 captured, that "the committed corpus places only buildings and no unit row, and
-its ledger is present and `{}`". Measured across all eleven committed save
+its ledger is present and `{}`". Measured across all ten committed save
 documents, that is **false of the repository** and true of
 `tests/saves/fresh-player.json` alone: **441** committed unit rows across **7 of
 11** documents, all team 1, **429** of them satisfying the `resurrectable` gate,
@@ -37,9 +37,9 @@ exercises cleanly, and the false premise sits in a merged requirement's SHALL te
   the write reproduces a partially-applied save on a refusal path, so the ordering
   is a requirement, not an implementation detail.
 - **The request shape's discarded fields are reported structurally.** `end_attack`
-  reads **eleven** keys from its client blob and **seven** reach nothing at all
-  (`victim_units`, `resources_victim`, `attacker`, `resources`, `honor`,
-  `duration`, `townhall_gold`, `different_island`), with `win` and
+  reads **twelve** keys from its client blob and **nine** reach nothing at all
+  (`voluntary_end`, `victim_units`, `resources_victim`, `attacker`, `resources`,
+  `honor`, `duration`, `townhall_gold`, `different_island`), with `win` and
   `victim["name"]` reaching only a `print`. The non-claims become a mechanical
   guard rather than prose.
 - **`kill` delivered as row deletion that never touches the ledger**, and
@@ -61,13 +61,20 @@ exercises cleanly, and the false premise sits in a merged requirement's SHALL te
   `apps/client-godot/README.md`, each of which repeated the fresh-player figures
   as though they described the repository. Three further occurrences were checked
   and are correctly scoped to that corpus; they are left alone.
-- **A second discrepancy recorded, not corrected.** Four of five combat-field
+- **A second discrepancy recorded, not corrected.** **All five** combat-field
   figures in the M8 record (`attack` 131, `defense` 1, `life` 150,
   `min_level` 21, `syringes` 6) reproduce under **no** counting rule measured
-  here, which finds exactly zero for all four. M8's *direction* holds and this
-  measurement strengthens it; the *figures* do not reproduce. The record is
-  annotated rather than rewritten, and resolving the discrepancy is left to the
-  line that owns those fields.
+  here, which finds exactly zero for all five across all six rules —
+  whole-file occurrences, whole-file distinct lines, code-only occurrences,
+  code-only distinct lines, exact identifier tokens, and the quoted-access
+  form. (This proposal first wrote "four of five"; that count was itself off by
+  one.) None reproduces as a consumer, but **each reproduces exactly** as the
+  count of distinct committed values over the 429 committed unit definitions,
+  so the record's *numbers* are right and its *placement* — read as a consumer
+  census, in fact a content-distribution census — is what misleads. M8's
+  *direction* holds and this measurement strengthens it. The record is
+  annotated rather than rewritten, no figure is silently replaced, and
+  resolving the discrepancy is left to the line that owns those fields.
 
 ## Capabilities
 
