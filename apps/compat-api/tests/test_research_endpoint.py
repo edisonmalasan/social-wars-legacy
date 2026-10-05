@@ -879,7 +879,36 @@ class SurfaceTests(unittest.TestCase):
             boot = CLIENT.post(  # type: ignore[union-attr]
                 "/v0/bootstrap", json={"user_id": PID}
             ).get_json()
-        self.assertEqual(before, after)
+        # `/v0/session` is compared apart from its own wall-clock field.  The
+        # previous whole-document equality could pass or fail by wall-clock luck,
+        # and this was a **REAL failure** measured by the `godot-damage` battery:
+        # it failed once with `server_time` 1791185085 against 1791185086 and every
+        # other field identical.  `/v0/session` stamps the current time on every
+        # response, so two calls that straddle a second boundary were always going
+        # to fail an equality that was really asserting the clock.
+        #
+        # The claim is that the differing set is a SUBSET of the one documented
+        # volatile field -- `[]` or `["server_time"]`, never anything else -- which
+        # is the only form true whether or not the calls straddle a second, and is
+        # exactly as strict about every other field as the equality was.
+        # `server_time` is asserted a positive integer on **both** sides so the
+        # exemption cannot hide a missing or malformed field.
+        self.assertEqual(sorted(before), sorted(after))
+        session_differing = [
+            key for key in sorted(set(before) | set(after))
+            if before.get(key) != after.get(key)
+        ]
+        self.assertLessEqual(
+            set(session_differing),
+            {"server_time"},
+            "only the documented wall-clock field may differ between two "
+            "/v0/session responses; every other field is byte-identical, so a "
+            "research intent that changed the session list would fail here",
+        )
+        self.assertIsInstance(before["server_time"], int)
+        self.assertGreater(before["server_time"], 0)
+        self.assertIsInstance(after["server_time"], int)
+        self.assertGreater(after["server_time"], 0)
         # And the boot payload still reads the committed balances the intent left.
         resources = boot["player_info"]["map"]
         self.assertEqual(
