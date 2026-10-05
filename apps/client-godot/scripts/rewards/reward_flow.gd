@@ -82,9 +82,12 @@ const PROVENANCE := {
 	"service_half": "apps/compat-api/rewards_envelope.py",
 	"primary_finding": "the two preserved reward branches advance one cursor "
 		+ "and stamp one instant and grant nothing this contract can reproduce, "
-		+ "and BOTH cursors' derived bounds EXCEED the cardinality of the "
-		+ "schedule they would address -- 5 against 3 weekly and 5 against 5 "
-		+ "daily -- so positions the recorded cursors reach name no rung",
+		+ "and NEITHER cursor can address the whole of the schedule it would "
+		+ "address, for TWO DIFFERENT reasons -- weekly: the derived bound 5 "
+		+ "EXCEEDS the 3 rungs, so positions 3 and 4 name no rung; daily: the "
+		+ "bound 5 EQUALS the 5 entries, so there is no exceedance at all and "
+		+ "the defect is a one-based/zero-based offset instead, leaving "
+		+ "position 5 unreachable AND position 0 unreachable",
 	"delivered_surface": "one cursor transition per action, two derived bounds "
 		+ "beside their schedules' cardinalities, the reachability difference "
 		+ "in both directions, the committed schedule entries verbatim, the "

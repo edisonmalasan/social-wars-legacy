@@ -3981,10 +3981,14 @@ is the committed contract (`openspec/changes/2026-10-05-rewards`).
 
 ### The verdict
 
-**Both preserved branches advance one cursor and stamp one instant, and BOTH
-derived bounds EXCEED the cardinality of the schedule they would address** — 5
-against 3 weekly, 5 against 5 daily. Positions the recorded cursors actually
-reach name no rung at all.
+**Both preserved branches advance one cursor and stamp one instant, and NEITHER
+cursor can address the whole of the schedule it would address** — for **two
+different reasons**, which is exactly why reporting only an "exceedance" would
+hide the daily half. Weekly: the derived bound **5 exceeds** the **3** rungs, so
+positions **3 and 4** name no rung at all. Daily: the bound **5 equals** the **5**
+entries, so there is **no exceedance at all** and the defect is a
+one-based/zero-based offset instead — position **5** is unreachable *and* position
+**0** is unreachable.
 
 | | weekly | daily |
 | --- | --- | --- |
