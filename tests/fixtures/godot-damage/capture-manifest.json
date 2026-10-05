@@ -1,0 +1,1630 @@
+{
+  "batch_shape": {
+    "arguments": "CRAFTED AND CLIENT-SUPPLIED. Both branches read exactly one argument and validate nothing: not the type, not the table membership, and not the string form. The captured values 1, 3, 99, '1' and 1.0 are what makes each hazard observable.",
+    "arguments_per_command": 1,
+    "commands": [
+      "buy_magic",
+      "use_magic"
+    ],
+    "operator_source_lines": {
+      "buy_magic": [
+        658
+      ],
+      "use_magic": [
+        670
+      ]
+    },
+    "operators": {
+      "buy_magic": "+=",
+      "use_magic": "="
+    },
+    "resource_vector": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "ts": 1700000000,
+    "ts_note": "Pinned to a constant, as on the stored-placement and unit-experience captures. The dispatcher parses it and never reads it.",
+    "vector_status": "neutral by construction, every transaction"
+  },
+  "cap": {
+    "rejected_derivation": {
+      "applied": "COUNTER_CAP is the literal; no committed magic value is read to obtain it",
+      "candidates": [
+        {
+          "field": "cash",
+          "magic_id": 1,
+          "magic_name": "AirStrike",
+          "value": 50
+        },
+        {
+          "field": "level",
+          "magic_id": 5,
+          "magic_name": "Shortcircuit Inductor",
+          "value": 50
+        }
+      ],
+      "reason": "The preserved source contains no reference to any content when it applies the cap: min(50, ...) is a literal in a min() call. The value 50 occurring among the committed magics values is a coincidence of the value distribution, not its provenance. Recording it as content-derived would invent a derivation, which is the defect class this project's own training_time and unit_capacity findings warn against. The cap is delivered as the hardcoded literal it is, and the suite asserts the literal is used and that no content lookup substitutes for it.",
+      "rejected": "derive the cap from committed magics content"
+    },
+    "source_lines": [
+      658,
+      670
+    ],
+    "status": "literal in the preserved source, never content-derived",
+    "value": 50
+  },
+  "captured_at_utc": "2026-10-05T05:46:15+00:00",
+  "cleanup": {
+    "disposables": 1,
+    "note": "Each disposable is removed by the harness's own finally block; the fixture is staged OUTSIDE the working tree and published only after every check passed, so a failed run writes nothing into the repository."
+  },
+  "containment": {
+    "combined_after": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "combined_before": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "groups": [
+      "config",
+      "mods",
+      "root_python",
+      "saves",
+      "templates",
+      "tests/saves",
+      "villages"
+    ],
+    "identical": true,
+    "protected_fixtures": [
+      "godot-building-collect",
+      "godot-building-construction",
+      "godot-building-expand",
+      "godot-building-move",
+      "godot-building-placement",
+      "godot-building-sell",
+      "godot-building-store",
+      "godot-building-upgrade",
+      "godot-building-xp",
+      "godot-combat-actions",
+      "godot-compatibility-boot",
+      "godot-item-purchase",
+      "godot-quests",
+      "godot-research",
+      "godot-stored-item-placement",
+      "godot-tutorial",
+      "godot-unit-collection",
+      "godot-unit-experience",
+      "godot-unit-queues"
+    ],
+    "protected_fixtures_unchanged": true,
+    "seed_sha256_after": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+    "seed_sha256_before": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+    "working_tree_saves_absent": true
+  },
+  "derived_provisional": [
+    "That villages/Neutral.json is the seed. Recorded so a rerun reproduces the committed bytes; it is the only corpus with a non-empty ledger, so the choice is forced rather than preferred.",
+    "That all twelve steps are ONE interleaved sequence rather than twelve independent transactions. It rests on the committed record's wording ('deliberately interleaved', 'driven against the same disposable corpus') and is independently settled by step 11: use_magic ['1'] leaves key '1' at 50, which is only reachable if step 8's 50 is still there, while on a fresh seed that key holds 2 and the same request would make it 3. The capture asserts every one of the eleven links.",
+    "That a modern capability should increment by one under the cap at all. No committed rule states it; it is the coherent reading of a ledger nobody reads, and it is recorded as a decision rather than a reproduction."
+  ],
+  "divergences": {
+    "asymmetry_chain": {
+      "buy_arm": {
+        "command": "buy_magic",
+        "defect": "+= adds a capped amount rather than assigning a capped value, so the result is not bounded by 50 and the counter grows without limit.",
+        "executed": {
+          "crossed_cap": true,
+          "sequence": [
+            3,
+            7,
+            15,
+            31,
+            63,
+            113
+          ],
+          "start": 2
+        },
+        "operator": "+=",
+        "reason": "Reproducing an unbounded growth as parity would ship a defect as a contract. The service increments by one under the recorded cap instead, and records the difference as a divergence.",
+        "source_expression": "magics[str(magic_id)] += min(50, magics[str(magic_id)] + 1)",
+        "source_lines": [
+          658
+        ],
+        "verdict": "REFUSED, never reproduced"
+      },
+      "cap_uniformity": {
+        "above_cap": "A recorded counter already above the cap is refused with counter_above_cap rather than reduced. The legacy server reduces it, and refusing is the only option that neither reproduces that decrease nor answers success for an operation that did nothing.",
+        "legacy": "The two branches disagree about the cap, so there is no recorded rule for how a cap applies across actions: one is unbounded past 50 and the other clamps down to it.",
+        "service": "The service applies the recorded cap uniformly to both actions and records that the uniformity is a decision rather than a reproduction.",
+        "verdict": "recorded divergence, not parity"
+      },
+      "parity_claimed": false,
+      "recorded_values": [
+        3,
+        7,
+        15,
+        31,
+        63,
+        113,
+        50,
+        50
+      ],
+      "use_arm": {
+        "command": "use_magic",
+        "defect": "= assigns an absolute value, so min(50, x + 1) is a clamp that can reduce a counter already above 50.",
+        "executed": {
+          "after": 50,
+          "before": 113,
+          "charges_destroyed": 63
+        },
+        "operator": "=",
+        "reason": "This is the sharpest measurement in the line: a command whose recorded message claims a spell was used deleted 63 player-owned charges. The service never reduces a counter, and records the difference as a divergence.",
+        "recorded_message": "Used magic spell",
+        "source_expression": "magics[str(magic_id)] = min(50, magics[str(magic_id)] + 1)",
+        "source_lines": [
+          670
+        ],
+        "verdict": "REFUSED, never reproduced"
+      }
+    },
+    "count": 9,
+    "parity_claimed_for": [
+      "use_1_from_two",
+      "use_1_at_the_cap_unchanged",
+      "use_string_id_resolves_the_same_key"
+    ],
+    "recorded_not_narrowed": true,
+    "transactions": [
+      {
+        "command": "buy_magic",
+        "delivered_endpoint_refusal": null,
+        "divergence": "unbounded_growth",
+        "ledger_key": "1",
+        "magic_id_sent": 1,
+        "magic_id_sent_type": "int",
+        "modern_derives_after": null,
+        "name": "buy_1_unbounded_first",
+        "oracle_ledger_after": 7
+      },
+      {
+        "command": "buy_magic",
+        "delivered_endpoint_refusal": null,
+        "divergence": "unbounded_growth",
+        "ledger_key": "1",
+        "magic_id_sent": 1,
+        "magic_id_sent_type": "int",
+        "modern_derives_after": null,
+        "name": "buy_1_unbounded_second",
+        "oracle_ledger_after": 15
+      },
+      {
+        "command": "buy_magic",
+        "delivered_endpoint_refusal": null,
+        "divergence": "unbounded_growth",
+        "ledger_key": "1",
+        "magic_id_sent": 1,
+        "magic_id_sent_type": "int",
+        "modern_derives_after": null,
+        "name": "buy_1_unbounded_third",
+        "oracle_ledger_after": 31
+      },
+      {
+        "command": "buy_magic",
+        "delivered_endpoint_refusal": null,
+        "divergence": "unbounded_growth",
+        "ledger_key": "1",
+        "magic_id_sent": 1,
+        "magic_id_sent_type": "int",
+        "modern_derives_after": null,
+        "name": "buy_1_crossed_the_cap",
+        "oracle_ledger_after": 63
+      },
+      {
+        "command": "buy_magic",
+        "delivered_endpoint_refusal": null,
+        "divergence": "unbounded_growth",
+        "ledger_key": "1",
+        "magic_id_sent": 1,
+        "magic_id_sent_type": "int",
+        "modern_derives_after": null,
+        "name": "buy_1_still_climbing",
+        "oracle_ledger_after": 113
+      },
+      {
+        "command": "use_magic",
+        "delivered_endpoint_refusal": null,
+        "divergence": "use_magic_decreases",
+        "ledger_key": "1",
+        "magic_id_sent": 1,
+        "magic_id_sent_type": "int",
+        "modern_derives_after": null,
+        "name": "use_1_destroys_charges",
+        "oracle_ledger_after": 50
+      },
+      {
+        "command": "use_magic",
+        "delivered_endpoint_refusal": null,
+        "divergence": "absent_key_writes_zero_not_one",
+        "ledger_key": "3",
+        "magic_id_sent": 3,
+        "magic_id_sent_type": "int",
+        "modern_derives_after": 1,
+        "name": "use_absent_id_3_creates_zero",
+        "oracle_ledger_after": 0
+      },
+      {
+        "command": "buy_magic",
+        "delivered_endpoint_refusal": "unknown_magic_id",
+        "divergence": "unvalidated_identity",
+        "ledger_key": "99",
+        "magic_id_sent": 99,
+        "magic_id_sent_type": "int",
+        "modern_derives_after": null,
+        "name": "buy_out_of_table_id_99_accepted",
+        "oracle_ledger_after": 0
+      },
+      {
+        "command": "use_magic",
+        "delivered_endpoint_refusal": "non_canonical_magic_id",
+        "divergence": "non_canonical_identity",
+        "ledger_key": "1.0",
+        "magic_id_sent": 1.0,
+        "magic_id_sent_type": "float",
+        "modern_derives_after": null,
+        "name": "use_float_id_creates_a_distinct_key",
+        "oracle_ledger_after": 0
+      }
+    ],
+    "why_not_narrowed": "Narrowing any of these would require a magic rule the preserved source does not contain. There is no committed amount, no committed cap derivation, and no reader of the ledger, so the only coherent modern contract is a server-derived increment under the recorded literal -- and every difference from the oracle is recorded rather than reproduced."
+  },
+  "established": [
+    "The two branches are FOUR LINES APART and not interchangeable: buy_magic ADDS min(50, x+1) (command.py:658) and use_magic ASSIGNS it (command.py:670). Neither behaves as its name suggests.",
+    "buy_magic is UNBOUNDED: key '1' ran 2 -> 3 -> 7 -> 15 -> 31 -> 63 -> 113 and would keep adding 50 per request, so the literal 50 is not a cap on that arm.",
+    "use_magic can DESTROY charges: 113 owned charges became 50, a loss of 63, on a command whose printed message is 'Used magic spell'. This is the sharpest measurement in the line.",
+    "At the cap the use arm is a no-op (50 -> 50), so 'unchanged' and 'refused' are different outcomes and the capture records which.",
+    "An ABSENT key takes the else arm and is written at ZERO, for BOTH branches (command.py:660, 672) -- so the legacy 'acquire a spell you hold none of' path increments nothing at all.",
+    "The identity is UNVALIDATED: 99 is accepted although it is not one of the ten committed magics.",
+    "The identity is UNTYPED: str(1.0) is '1.0', so a float creates a SECOND, unrelated ledger key, while a STRING '1' resolves to the SAME key. That pair is what proves the hazard is the string form and not the JSON type alone.",
+    "Under a NEUTRAL vector all EIGHT stored resource slots are byte-identical in all twelve steps and mana holds at 15, so no magic branch charges anything and no effect is applied.",
+    "Only the addressed ledger key ever moves: every step's whole-document leaf diff is exactly one path.",
+    "Both branches are absent from get_game_config.py entirely -- the word 'magic' has zero occurrences there -- so the ten committed magics are loaded and never indexed, and there is no code path from a magic id to its content row at all."
+  ],
+  "exit_code": 0,
+  "interpreter": "CPython 3.9 (pinned)",
+  "invocation": "python -B apps/compat-api/capture_magic_fixture.py",
+  "login_step": "Performed once, before the sequence, and recorded once. Its neutrality is asserted: the corpus after the login is compared against the committed seed and must be byte-identical.",
+  "not_claimed": [
+    "Any damage rule, effect, magnitude, or outcome. The committed magics carry mana, level, gold, cash and target and NO damage, multiplier, radius or duration field; the Attack Boost description promises an effect whose magnitude was never committed.",
+    "That the cap is content-derived. It is a bare literal in a min() call at command.py:658 and 670, and the rejected derivation is retained rather than dropped.",
+    "That the modern endpoint reproduces the oracle's counter value. It deliberately does not, and every step records the oracle value, the derived value, and whether they agree.",
+    "Anything about what the real Flash client sent. The client was never executed: every payload here is crafted.",
+    "Any per-magic behaviour. One of the ten committed magics was driven (id 1); the other nine ledger keys were observed but not driven, and no per-magic effect is claimed because none exists to claim.",
+    "Any partial application or atomicity claim about the oracle's persistence boundary. Every recorded step succeeded, so the failure-mode boundary the combat line established was not re-measured here.",
+    "A per-magic price, mana cost, or effect for any of the ten committed magics. The eight-slot comparison is the evidence that none is charged by these two branches."
+  ],
+  "purpose": "Executed-legacy evidence for the magic-counter surface: buy_magic (command.py:652-662) and use_magic (664-674). It records what the ORACLE does, including the five behaviours this capability deliberately does NOT reproduce: unbounded buy growth, a charge-destroying use decrease, an out-of-table identity, a float-keyed identity, and an absent key written at zero.",
+  "recorded_steps": [
+    "txn_use_1_from_two",
+    "txn_buy_1_unbounded_first",
+    "txn_buy_1_unbounded_second",
+    "txn_buy_1_unbounded_third",
+    "txn_buy_1_crossed_the_cap",
+    "txn_buy_1_still_climbing",
+    "txn_use_1_destroys_charges",
+    "txn_use_1_at_the_cap_unchanged",
+    "txn_use_absent_id_3_creates_zero",
+    "txn_buy_out_of_table_id_99_accepted",
+    "txn_use_string_id_resolves_the_same_key",
+    "txn_use_float_id_creates_a_distinct_key",
+    "login_post"
+  ],
+  "schema": "damage-magic-counter-fixture-v1",
+  "seed": {
+    "census": {
+      "committed_magics_is_the_only_non_empty_one": "derived-provisional, recorded so a rerun reproduces the bytes; verified over all ten committed save documents by the committed investigation",
+      "energy": 50,
+      "ledger": {
+        "1": 2,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_keys": 5,
+      "mana": 15,
+      "path": "villages/Neutral.json",
+      "pid_read_from_document": "Neutral",
+      "placed_rows": 549,
+      "resource_slot_count": 8,
+      "resource_slots": [
+        "cash",
+        "energy",
+        "gold",
+        "mana",
+        "oil",
+        "steel",
+        "wood",
+        "xp"
+      ]
+    },
+    "no_ledger_entry_fabricated": "The seed's five keys are reproduced verbatim in every transaction's ledger_before, and every step's before ledger is asserted equal to its predecessor's after ledger. No entry is written into the seed by this capture; the seed's digest is asserted before and after the run.",
+    "path": "villages/Neutral.json",
+    "pid_read_from_document": "Neutral",
+    "sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+    "why_this_one": "It is the only committed corpus whose privateState.magics is non-empty, so the increment arm is observable as a value that moves while the key count does not -- a pair the key-creation branch cannot produce. All ten committed save documents were measured; the other nine record an empty object."
+  },
+  "server": {
+    "debug": false,
+    "debug_note": "server.py runs app.run(..., debug=False). Every recorded step answers HTTP 200, so no framework error page is committed.",
+    "env_extra": {
+      "PYTHONUNBUFFERED": "1"
+    },
+    "env_extra_note": "Set for THIS capture's child processes only, via a defaulted parameter on start_server. child_environment() is untouched, so no existing capture's log changes. The printed lines are the evidence that each branch ran, and block buffering would lose them when the harness reaps the child.",
+    "host": "127.0.0.1",
+    "one_per_transaction_reason_rejected": "One server per TRANSACTION was rejected rather than merely avoided: the committed record states steps 1-8 as one interleaved sequence in which each step's recorded before is the previous step's recorded after (2 -> 3 -> 7 -> 15 -> 31 -> 63 -> 113 -> 50 -> 50), and states steps 9-12 were driven against the same disposable corpus. Those numbers mean nothing unless each step really ran against its predecessor's state, and the capture asserts exactly that for all eleven links.",
+    "one_server_for_the_whole_sequence": true,
+    "one_server_reason": "sessions.load_saves() caches the corpus in a module global at import, so a running server never re-reads the seed file. Restoring the seed between steps on one server leaves the in memory corpus already mutated and silently produces a different result.",
+    "port": 5055,
+    "process": "python -B server.py inside the disposable",
+    "sequence": "All twelve steps are ONE interleaved sequence against ONE disposable, because the committed record states steps 9-12 were driven against the same corpus as 1-8 and step 11's recorded no-change only holds if key '1' still carries the 50 that step 8 left there.",
+    "sequence_linkage_asserted": "every step's whole recorded ledger equals its predecessor's, for all eleven links, plus the key-count ladder [5, 5, 5, 5, 5, 5, 5, 5, 6, 7, 7, 8]",
+    "starts": 1
+  },
+  "time_dependent_fields": {
+    "captured_at_utc": "Same, in this manifest.",
+    "request_captured_at_utc": "Recorded per step and necessarily volatile.  With captured_at_utc and the Werkzeug Date header below, these are the ONLY fields that change between reruns -- measured, not assumed: two consecutive runs were compared file by file with the timestamps elided and exactly the thirteen response.meta.json files differed, each on its Date header alone.  Every transaction record, state document, request record and manifest body is byte-identical across reruns.",
+    "response Date header": "Each step's response.meta.json records the server's own Date header verbatim, so it moves with the wall clock.  capture_combat_fixture records it the same way; nothing redacts it, because redacting a header the oracle sent would be narrowing the record.",
+    "ts": "Pinned to a constant, so not volatile."
+  },
+  "transactions": [
+    {
+      "cap_literal": 50,
+      "cap_source_lines": [
+        658,
+        670
+      ],
+      "changed_leaf_paths": [
+        "/privateState/magics/1"
+      ],
+      "command": "use_magic",
+      "energy_after": 50,
+      "energy_before": 50,
+      "ledger_after": {
+        "1": 3,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_before": {
+        "1": 2,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_key": "1",
+      "ledger_key_created": false,
+      "ledger_key_present_before": true,
+      "ledger_keys_after": 5,
+      "ledger_keys_before": 5,
+      "ledger_recomputed": {
+        "1": 3,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_value_after": 3,
+      "ledger_value_before": 2,
+      "magic_id_sent": 1,
+      "magic_id_sent_type": "int",
+      "magic_id_string_form": "1",
+      "mana_after": 15,
+      "mana_before": 15,
+      "modern_derives_after": 3,
+      "modern_differs_from_oracle": false,
+      "name": "use_1_from_two",
+      "note": "The two arms are driven against the SAME counter key and deliberately interleaved, so the divergence reads as one sequence.",
+      "only_the_addressed_key_moved": true,
+      "operator": "=",
+      "parity_note": "For a value at or below the cap the use_magic assignment and this capability's derived transition are the same number.",
+      "parity_with_delivered_endpoint": true,
+      "placed_rows_after": 549,
+      "placed_rows_before": 549,
+      "printed_branch_lines": [
+        "[+] COMMAND: use_magic([1]) -> Used magic spell"
+      ],
+      "printed_message": "Used magic spell",
+      "printed_message_claims": "a spell was used",
+      "resource_slot_count": 8,
+      "resources_after": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+      "resources_moved": [],
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "a0c23a3a0c9cd918875d276ae42a39eb1ec3b4f66d18334def2714b29667d430",
+      "state_sha256_before": "796900703a5db559b448d1c8b5711de6253e1b59b33107f307fe01024fa11cc0",
+      "status": 200,
+      "stdout_evidence_is_this_request_only": true,
+      "stdout_offset_before": 2180,
+      "step_number": 1,
+      "unchanged_leaves_sha256": "a74579ada0fb7a79817ffd84da5f718eeded193f661704733c7e34e246f86f3a"
+    },
+    {
+      "cap_literal": 50,
+      "cap_source_lines": [
+        658,
+        670
+      ],
+      "changed_leaf_paths": [
+        "/privateState/magics/1"
+      ],
+      "command": "buy_magic",
+      "divergence": "unbounded_growth",
+      "energy_after": 50,
+      "energy_before": 50,
+      "ledger_after": {
+        "1": 7,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_before": {
+        "1": 3,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_key": "1",
+      "ledger_key_created": false,
+      "ledger_key_present_before": true,
+      "ledger_keys_after": 5,
+      "ledger_keys_before": 5,
+      "ledger_recomputed": {
+        "1": 7,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_value_after": 7,
+      "ledger_value_before": 3,
+      "magic_id_sent": 1,
+      "magic_id_sent_type": "int",
+      "magic_id_string_form": "1",
+      "mana_after": 15,
+      "mana_before": 15,
+      "name": "buy_1_unbounded_first",
+      "note": "3 + min(50, 4) = 7: the ADD already exceeds the literal cap.",
+      "only_the_addressed_key_moved": true,
+      "operator": "+=",
+      "parity_with_delivered_endpoint": false,
+      "placed_rows_after": 549,
+      "placed_rows_before": 549,
+      "printed_branch_lines": [
+        "[+] COMMAND: buy_magic([1]) -> Bought magic spell"
+      ],
+      "printed_message": "Bought magic spell",
+      "printed_message_claims": "a spell was bought",
+      "resource_slot_count": 8,
+      "resources_after": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+      "resources_moved": [],
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "db18e4db1bc3c6a27677bbbe7a3bca00dae15fe5c692b3d109cfca0b3c419d9f",
+      "state_sha256_before": "a0c23a3a0c9cd918875d276ae42a39eb1ec3b4f66d18334def2714b29667d430",
+      "status": 200,
+      "stdout_evidence_is_this_request_only": true,
+      "stdout_offset_before": 2279,
+      "step_number": 2,
+      "unchanged_leaves_sha256": "a74579ada0fb7a79817ffd84da5f718eeded193f661704733c7e34e246f86f3a"
+    },
+    {
+      "cap_literal": 50,
+      "cap_source_lines": [
+        658,
+        670
+      ],
+      "changed_leaf_paths": [
+        "/privateState/magics/1"
+      ],
+      "command": "buy_magic",
+      "divergence": "unbounded_growth",
+      "energy_after": 50,
+      "energy_before": 50,
+      "ledger_after": {
+        "1": 15,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_before": {
+        "1": 7,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_key": "1",
+      "ledger_key_created": false,
+      "ledger_key_present_before": true,
+      "ledger_keys_after": 5,
+      "ledger_keys_before": 5,
+      "ledger_recomputed": {
+        "1": 15,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_value_after": 15,
+      "ledger_value_before": 7,
+      "magic_id_sent": 1,
+      "magic_id_sent_type": "int",
+      "magic_id_string_form": "1",
+      "mana_after": 15,
+      "mana_before": 15,
+      "name": "buy_1_unbounded_second",
+      "note": "7 + min(50, 8) = 15.",
+      "only_the_addressed_key_moved": true,
+      "operator": "+=",
+      "parity_with_delivered_endpoint": false,
+      "placed_rows_after": 549,
+      "placed_rows_before": 549,
+      "printed_branch_lines": [
+        "[+] COMMAND: buy_magic([1]) -> Bought magic spell"
+      ],
+      "printed_message": "Bought magic spell",
+      "printed_message_claims": "a spell was bought",
+      "resource_slot_count": 8,
+      "resources_after": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+      "resources_moved": [],
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "67bb21089ae8094652388145ba06ae6d408b3d212607107667e1dcd4c4a77102",
+      "state_sha256_before": "db18e4db1bc3c6a27677bbbe7a3bca00dae15fe5c692b3d109cfca0b3c419d9f",
+      "status": 200,
+      "stdout_evidence_is_this_request_only": true,
+      "stdout_offset_before": 2380,
+      "step_number": 3,
+      "unchanged_leaves_sha256": "a74579ada0fb7a79817ffd84da5f718eeded193f661704733c7e34e246f86f3a"
+    },
+    {
+      "cap_literal": 50,
+      "cap_source_lines": [
+        658,
+        670
+      ],
+      "changed_leaf_paths": [
+        "/privateState/magics/1"
+      ],
+      "command": "buy_magic",
+      "divergence": "unbounded_growth",
+      "energy_after": 50,
+      "energy_before": 50,
+      "ledger_after": {
+        "1": 31,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_before": {
+        "1": 15,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_key": "1",
+      "ledger_key_created": false,
+      "ledger_key_present_before": true,
+      "ledger_keys_after": 5,
+      "ledger_keys_before": 5,
+      "ledger_recomputed": {
+        "1": 31,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_value_after": 31,
+      "ledger_value_before": 15,
+      "magic_id_sent": 1,
+      "magic_id_sent_type": "int",
+      "magic_id_string_form": "1",
+      "mana_after": 15,
+      "mana_before": 15,
+      "name": "buy_1_unbounded_third",
+      "note": "15 + min(50, 16) = 31.",
+      "only_the_addressed_key_moved": true,
+      "operator": "+=",
+      "parity_with_delivered_endpoint": false,
+      "placed_rows_after": 549,
+      "placed_rows_before": 549,
+      "printed_branch_lines": [
+        "[+] COMMAND: buy_magic([1]) -> Bought magic spell"
+      ],
+      "printed_message": "Bought magic spell",
+      "printed_message_claims": "a spell was bought",
+      "resource_slot_count": 8,
+      "resources_after": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+      "resources_moved": [],
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "a8fb4ba6fafacb5b05742ce6515b04455e2fc9d64216baeb291e2d4ba03c311c",
+      "state_sha256_before": "67bb21089ae8094652388145ba06ae6d408b3d212607107667e1dcd4c4a77102",
+      "status": 200,
+      "stdout_evidence_is_this_request_only": true,
+      "stdout_offset_before": 2481,
+      "step_number": 4,
+      "unchanged_leaves_sha256": "a74579ada0fb7a79817ffd84da5f718eeded193f661704733c7e34e246f86f3a"
+    },
+    {
+      "cap_literal": 50,
+      "cap_source_lines": [
+        658,
+        670
+      ],
+      "changed_leaf_paths": [
+        "/privateState/magics/1"
+      ],
+      "command": "buy_magic",
+      "crossed_the_literal_cap": true,
+      "divergence": "unbounded_growth",
+      "energy_after": 50,
+      "energy_before": 50,
+      "ledger_after": {
+        "1": 63,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_before": {
+        "1": 31,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_key": "1",
+      "ledger_key_created": false,
+      "ledger_key_present_before": true,
+      "ledger_keys_after": 5,
+      "ledger_keys_before": 5,
+      "ledger_recomputed": {
+        "1": 63,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_value_after": 63,
+      "ledger_value_before": 31,
+      "magic_id_sent": 1,
+      "magic_id_sent_type": "int",
+      "magic_id_string_form": "1",
+      "mana_after": 15,
+      "mana_before": 15,
+      "name": "buy_1_crossed_the_cap",
+      "note": "31 + min(50, 32) = 63: the counter CROSSED the literal 50.",
+      "only_the_addressed_key_moved": true,
+      "operator": "+=",
+      "parity_with_delivered_endpoint": false,
+      "placed_rows_after": 549,
+      "placed_rows_before": 549,
+      "printed_branch_lines": [
+        "[+] COMMAND: buy_magic([1]) -> Bought magic spell"
+      ],
+      "printed_message": "Bought magic spell",
+      "printed_message_claims": "a spell was bought",
+      "resource_slot_count": 8,
+      "resources_after": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+      "resources_moved": [],
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "22a05ff396f13e84bfaa54f9a5dbe2180455b7cdec72e62ac753f6fc5e69d4a8",
+      "state_sha256_before": "a8fb4ba6fafacb5b05742ce6515b04455e2fc9d64216baeb291e2d4ba03c311c",
+      "status": 200,
+      "stdout_evidence_is_this_request_only": true,
+      "stdout_offset_before": 2582,
+      "step_number": 5,
+      "unchanged_leaves_sha256": "a74579ada0fb7a79817ffd84da5f718eeded193f661704733c7e34e246f86f3a"
+    },
+    {
+      "cap_literal": 50,
+      "cap_source_lines": [
+        658,
+        670
+      ],
+      "changed_leaf_paths": [
+        "/privateState/magics/1"
+      ],
+      "command": "buy_magic",
+      "divergence": "unbounded_growth",
+      "energy_after": 50,
+      "energy_before": 50,
+      "ledger_after": {
+        "1": 113,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_before": {
+        "1": 63,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_key": "1",
+      "ledger_key_created": false,
+      "ledger_key_present_before": true,
+      "ledger_keys_after": 5,
+      "ledger_keys_before": 5,
+      "ledger_recomputed": {
+        "1": 113,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_value_after": 113,
+      "ledger_value_before": 63,
+      "magic_id_sent": 1,
+      "magic_id_sent_type": "int",
+      "magic_id_string_form": "1",
+      "mana_after": 15,
+      "mana_before": 15,
+      "name": "buy_1_still_climbing",
+      "note": "63 + min(50, 64) = 113: still climbing, and it would keep adding 50 per request, so the 50 is NOT a cap on this arm.",
+      "only_the_addressed_key_moved": true,
+      "operator": "+=",
+      "parity_with_delivered_endpoint": false,
+      "placed_rows_after": 549,
+      "placed_rows_before": 549,
+      "printed_branch_lines": [
+        "[+] COMMAND: buy_magic([1]) -> Bought magic spell"
+      ],
+      "printed_message": "Bought magic spell",
+      "printed_message_claims": "a spell was bought",
+      "resource_slot_count": 8,
+      "resources_after": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+      "resources_moved": [],
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "ffb5244a7b23fc7df347b58fc7ab3198d8d5a6f223a102f95ceda8961b615c15",
+      "state_sha256_before": "22a05ff396f13e84bfaa54f9a5dbe2180455b7cdec72e62ac753f6fc5e69d4a8",
+      "status": 200,
+      "stdout_evidence_is_this_request_only": true,
+      "stdout_offset_before": 2683,
+      "step_number": 6,
+      "unchanged_leaves_sha256": "a74579ada0fb7a79817ffd84da5f718eeded193f661704733c7e34e246f86f3a"
+    },
+    {
+      "cap_literal": 50,
+      "cap_source_lines": [
+        658,
+        670
+      ],
+      "changed_leaf_paths": [
+        "/privateState/magics/1"
+      ],
+      "charges_destroyed": 63,
+      "command": "use_magic",
+      "decreased": true,
+      "divergence": "use_magic_decreases",
+      "energy_after": 50,
+      "energy_before": 50,
+      "ledger_after": {
+        "1": 50,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_before": {
+        "1": 113,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_key": "1",
+      "ledger_key_created": false,
+      "ledger_key_present_before": true,
+      "ledger_keys_after": 5,
+      "ledger_keys_before": 5,
+      "ledger_recomputed": {
+        "1": 50,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_value_after": 50,
+      "ledger_value_before": 113,
+      "magic_id_sent": 1,
+      "magic_id_sent_type": "int",
+      "magic_id_string_form": "1",
+      "mana_after": 15,
+      "mana_before": 15,
+      "message_contradicts_the_effect": "the branch printed 'Used magic spell' while REMOVING 63 charges; the message is a print, not a claim the code checks",
+      "name": "use_1_destroys_charges",
+      "note": "min(50, 114) = 50: an ABSOLUTE clamp, so this REDUCED a counter above the cap. 63 player-owned charges were destroyed by a command whose printed message claims a spell was used. This is the sharpest measurement in the line.",
+      "only_the_addressed_key_moved": true,
+      "operator": "=",
+      "parity_with_delivered_endpoint": false,
+      "placed_rows_after": 549,
+      "placed_rows_before": 549,
+      "printed_branch_lines": [
+        "[+] COMMAND: use_magic([1]) -> Used magic spell"
+      ],
+      "printed_message": "Used magic spell",
+      "printed_message_claims": "a spell was used",
+      "resource_slot_count": 8,
+      "resources_after": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+      "resources_moved": [],
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "2fa853968e27c03f0748ab7cfa02c51b2df717b6eae901ef1bcd04d24824fe6f",
+      "state_sha256_before": "ffb5244a7b23fc7df347b58fc7ab3198d8d5a6f223a102f95ceda8961b615c15",
+      "status": 200,
+      "stdout_evidence_is_this_request_only": true,
+      "stdout_offset_before": 2784,
+      "step_number": 7,
+      "unchanged_leaves_sha256": "a74579ada0fb7a79817ffd84da5f718eeded193f661704733c7e34e246f86f3a"
+    },
+    {
+      "cap_literal": 50,
+      "cap_source_lines": [
+        658,
+        670
+      ],
+      "changed_leaf_paths": [],
+      "command": "use_magic",
+      "energy_after": 50,
+      "energy_before": 50,
+      "ledger_after": {
+        "1": 50,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_before": {
+        "1": 50,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_key": "1",
+      "ledger_key_created": false,
+      "ledger_key_present_before": true,
+      "ledger_keys_after": 5,
+      "ledger_keys_before": 5,
+      "ledger_recomputed": {
+        "1": 50,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_value_after": 50,
+      "ledger_value_before": 50,
+      "magic_id_sent": 1,
+      "magic_id_sent_type": "int",
+      "magic_id_string_form": "1",
+      "mana_after": 15,
+      "mana_before": 15,
+      "modern_derives_after": 50,
+      "modern_differs_from_oracle": false,
+      "name": "use_1_at_the_cap_unchanged",
+      "note": "min(50, 51) = 50: at the cap the use_magic arm is a no-op.",
+      "only_the_addressed_key_moved": true,
+      "operator": "=",
+      "parity_note": "At the cap the assignment and the derived transition are both the cap, with a derived change of zero -- an unchanged success, not a refusal.",
+      "parity_with_delivered_endpoint": true,
+      "placed_rows_after": 549,
+      "placed_rows_before": 549,
+      "printed_branch_lines": [
+        "[+] COMMAND: use_magic([1]) -> Used magic spell"
+      ],
+      "printed_message": "Used magic spell",
+      "printed_message_claims": "a spell was used",
+      "resource_slot_count": 8,
+      "resources_after": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+      "resources_moved": [],
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "2fa853968e27c03f0748ab7cfa02c51b2df717b6eae901ef1bcd04d24824fe6f",
+      "state_sha256_before": "2fa853968e27c03f0748ab7cfa02c51b2df717b6eae901ef1bcd04d24824fe6f",
+      "status": 200,
+      "stdout_evidence_is_this_request_only": true,
+      "stdout_offset_before": 2883,
+      "step_number": 8,
+      "unchanged_leaves_sha256": "2fa853968e27c03f0748ab7cfa02c51b2df717b6eae901ef1bcd04d24824fe6f"
+    },
+    {
+      "cap_literal": 50,
+      "cap_source_lines": [
+        658,
+        670
+      ],
+      "changed_leaf_paths": [
+        "/privateState/magics/3"
+      ],
+      "command": "use_magic",
+      "divergence": "absent_key_writes_zero_not_one",
+      "energy_after": 50,
+      "energy_before": 50,
+      "ledger_after": {
+        "1": 50,
+        "10": 0,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_before": {
+        "1": 50,
+        "10": 0,
+        "2": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_key": "3",
+      "ledger_key_created": true,
+      "ledger_key_present_before": false,
+      "ledger_keys_after": 6,
+      "ledger_keys_before": 5,
+      "ledger_recomputed": {
+        "1": 50,
+        "10": 0,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_value_after": 0,
+      "ledger_value_before": null,
+      "magic_id_sent": 3,
+      "magic_id_sent_type": "int",
+      "magic_id_string_form": "3",
+      "mana_after": 15,
+      "mana_before": 15,
+      "modern_derives_after": 1,
+      "modern_differs_from_oracle": true,
+      "name": "use_absent_id_3_creates_zero",
+      "note": "Key '3' is ABSENT, so the branch takes its else arm and writes it at ZERO. The legacy 'acquire a spell you hold none of' path therefore increments nothing at all.",
+      "only_the_addressed_key_moved": true,
+      "operator": "=",
+      "parity_with_delivered_endpoint": false,
+      "placed_rows_after": 549,
+      "placed_rows_before": 549,
+      "printed_branch_lines": [
+        "[+] COMMAND: use_magic([3]) -> Used magic spell"
+      ],
+      "printed_message": "Used magic spell",
+      "printed_message_claims": "a spell was used",
+      "resource_slot_count": 8,
+      "resources_after": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+      "resources_moved": [],
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "3cfd34f1b5a7970f9ae8dbf69af5372cfa4923f08a2422be6ddf70b27379a64a",
+      "state_sha256_before": "2fa853968e27c03f0748ab7cfa02c51b2df717b6eae901ef1bcd04d24824fe6f",
+      "status": 200,
+      "stdout_evidence_is_this_request_only": true,
+      "stdout_offset_before": 2982,
+      "step_number": 9,
+      "unchanged_leaves_sha256": "2fa853968e27c03f0748ab7cfa02c51b2df717b6eae901ef1bcd04d24824fe6f"
+    },
+    {
+      "cap_literal": 50,
+      "cap_source_lines": [
+        658,
+        670
+      ],
+      "changed_leaf_paths": [
+        "/privateState/magics/99"
+      ],
+      "command": "buy_magic",
+      "delivered_endpoint_refusal": "unknown_magic_id",
+      "divergence": "unvalidated_identity",
+      "energy_after": 50,
+      "energy_before": 50,
+      "identity_outside_the_committed_ten_entry_table": true,
+      "ledger_after": {
+        "1": 50,
+        "10": 0,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "9": 1,
+        "99": 0
+      },
+      "ledger_before": {
+        "1": 50,
+        "10": 0,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "9": 1
+      },
+      "ledger_key": "99",
+      "ledger_key_created": true,
+      "ledger_key_present_before": false,
+      "ledger_keys_after": 7,
+      "ledger_keys_before": 6,
+      "ledger_recomputed": {
+        "1": 50,
+        "10": 0,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "9": 1,
+        "99": 0
+      },
+      "ledger_value_after": 0,
+      "ledger_value_before": null,
+      "magic_id_sent": 99,
+      "magic_id_sent_type": "int",
+      "magic_id_string_form": "99",
+      "mana_after": 15,
+      "mana_before": 15,
+      "name": "buy_out_of_table_id_99_accepted",
+      "note": "99 is NOT one of the ten committed magics and the server accepted it, creating a ledger entry for a spell that does not exist. The else arm is identical in both branches, so buy_magic writes 0 too.",
+      "only_the_addressed_key_moved": true,
+      "operator": "+=",
+      "parity_with_delivered_endpoint": false,
+      "placed_rows_after": 549,
+      "placed_rows_before": 549,
+      "printed_branch_lines": [
+        "[+] COMMAND: buy_magic([99]) -> Bought magic spell"
+      ],
+      "printed_message": "Bought magic spell",
+      "printed_message_claims": "a spell was bought",
+      "resource_slot_count": 8,
+      "resources_after": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+      "resources_moved": [],
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "92ba9153aedf44846b52f1dffb9cad727577fccda6607295bd69097e747e5415",
+      "state_sha256_before": "3cfd34f1b5a7970f9ae8dbf69af5372cfa4923f08a2422be6ddf70b27379a64a",
+      "status": 200,
+      "stdout_evidence_is_this_request_only": true,
+      "stdout_offset_before": 3081,
+      "step_number": 10,
+      "unchanged_leaves_sha256": "3cfd34f1b5a7970f9ae8dbf69af5372cfa4923f08a2422be6ddf70b27379a64a"
+    },
+    {
+      "cap_literal": 50,
+      "cap_source_lines": [
+        658,
+        670
+      ],
+      "changed_leaf_paths": [],
+      "command": "use_magic",
+      "energy_after": 50,
+      "energy_before": 50,
+      "ledger_after": {
+        "1": 50,
+        "10": 0,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "9": 1,
+        "99": 0
+      },
+      "ledger_before": {
+        "1": 50,
+        "10": 0,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "9": 1,
+        "99": 0
+      },
+      "ledger_key": "1",
+      "ledger_key_created": false,
+      "ledger_key_present_before": true,
+      "ledger_keys_after": 7,
+      "ledger_keys_before": 7,
+      "ledger_recomputed": {
+        "1": 50,
+        "10": 0,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "9": 1,
+        "99": 0
+      },
+      "ledger_value_after": 50,
+      "ledger_value_before": 50,
+      "magic_id_sent": "1",
+      "magic_id_sent_type": "str",
+      "magic_id_string_form": "1",
+      "mana_after": 15,
+      "mana_before": 15,
+      "modern_derives_after": 50,
+      "modern_differs_from_oracle": false,
+      "name": "use_string_id_resolves_the_same_key",
+      "note": "A STRING '1' resolves to the SAME key '1', because the branch keys on str(magic_id) and str('1') == str(1). This is the discriminator that proves the float hazard below is about the STRING FORM rather than the JSON type alone.",
+      "only_the_addressed_key_moved": true,
+      "operator": "=",
+      "parity_note": "The oracle and the derived transition agree here; the string form is what differs from an integer request, not the result.",
+      "parity_with_delivered_endpoint": true,
+      "placed_rows_after": 549,
+      "placed_rows_before": 549,
+      "printed_branch_lines": [
+        "[+] COMMAND: use_magic(['1']) -> Used magic spell"
+      ],
+      "printed_message": "Used magic spell",
+      "printed_message_claims": "a spell was used",
+      "resource_slot_count": 8,
+      "resources_after": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+      "resources_moved": [],
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "92ba9153aedf44846b52f1dffb9cad727577fccda6607295bd69097e747e5415",
+      "state_sha256_before": "92ba9153aedf44846b52f1dffb9cad727577fccda6607295bd69097e747e5415",
+      "status": 200,
+      "stdout_evidence_is_this_request_only": true,
+      "stdout_offset_before": 3183,
+      "step_number": 11,
+      "unchanged_leaves_sha256": "92ba9153aedf44846b52f1dffb9cad727577fccda6607295bd69097e747e5415"
+    },
+    {
+      "cap_literal": 50,
+      "cap_source_lines": [
+        658,
+        670
+      ],
+      "changed_leaf_paths": [
+        "/privateState/magics/1.0"
+      ],
+      "command": "use_magic",
+      "delivered_endpoint_refusal": "non_canonical_magic_id",
+      "distinct_key_from": "1",
+      "divergence": "non_canonical_identity",
+      "energy_after": 50,
+      "energy_before": 50,
+      "ledger_after": {
+        "1": 50,
+        "1.0": 0,
+        "10": 0,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "9": 1,
+        "99": 0
+      },
+      "ledger_before": {
+        "1": 50,
+        "10": 0,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "9": 1,
+        "99": 0
+      },
+      "ledger_key": "1.0",
+      "ledger_key_created": true,
+      "ledger_key_present_before": false,
+      "ledger_keys_after": 8,
+      "ledger_keys_before": 7,
+      "ledger_recomputed": {
+        "1": 50,
+        "1.0": 0,
+        "10": 0,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "9": 1,
+        "99": 0
+      },
+      "ledger_value_after": 0,
+      "ledger_value_before": null,
+      "magic_id_sent": 1.0,
+      "magic_id_sent_type": "float",
+      "magic_id_string_form": "1.0",
+      "mana_after": 15,
+      "mana_before": 15,
+      "name": "use_float_id_creates_a_distinct_key",
+      "note": "str(1.0) is '1.0', so a float identity creates a SECOND, unrelated ledger entry '1.0' beside '1'. A client sending 1.0 instead of 1 silently acquires an unrelated spell.",
+      "only_the_addressed_key_moved": true,
+      "operator": "=",
+      "parity_with_delivered_endpoint": false,
+      "placed_rows_after": 549,
+      "placed_rows_before": 549,
+      "printed_branch_lines": [
+        "[+] COMMAND: use_magic([1.0]) -> Used magic spell"
+      ],
+      "printed_message": "Used magic spell",
+      "printed_message_claims": "a spell was used",
+      "resource_slot_count": 8,
+      "resources_after": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+      "resources_moved": [],
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "106d76ed6e9717c9ed8a4c06069db40a0668a6eb79995c8e3e071837b2c208a4",
+      "state_sha256_before": "92ba9153aedf44846b52f1dffb9cad727577fccda6607295bd69097e747e5415",
+      "status": 200,
+      "stdout_evidence_is_this_request_only": true,
+      "stdout_offset_before": 3284,
+      "step_number": 12,
+      "string_form_is_the_hazard": "str(1.0) is '1.0', which is not the committed key '1', so the two requests are two unrelated ledger entries",
+      "unchanged_leaves_sha256": "92ba9153aedf44846b52f1dffb9cad727577fccda6607295bd69097e747e5415"
+    }
+  ],
+  "transcript": [
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "use_1_from_two",
+      "printed_branch_lines": [
+        "[+] COMMAND: use_magic([1]) -> Used magic spell"
+      ],
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+      "step_number": 1
+    },
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "buy_1_unbounded_first",
+      "printed_branch_lines": [
+        "[+] COMMAND: buy_magic([1]) -> Bought magic spell"
+      ],
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+      "step_number": 2
+    },
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "buy_1_unbounded_second",
+      "printed_branch_lines": [
+        "[+] COMMAND: buy_magic([1]) -> Bought magic spell"
+      ],
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+      "step_number": 3
+    },
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "buy_1_unbounded_third",
+      "printed_branch_lines": [
+        "[+] COMMAND: buy_magic([1]) -> Bought magic spell"
+      ],
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+      "step_number": 4
+    },
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "buy_1_crossed_the_cap",
+      "printed_branch_lines": [
+        "[+] COMMAND: buy_magic([1]) -> Bought magic spell"
+      ],
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+      "step_number": 5
+    },
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "buy_1_still_climbing",
+      "printed_branch_lines": [
+        "[+] COMMAND: buy_magic([1]) -> Bought magic spell"
+      ],
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+      "step_number": 6
+    },
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "use_1_destroys_charges",
+      "printed_branch_lines": [
+        "[+] COMMAND: use_magic([1]) -> Used magic spell"
+      ],
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+      "step_number": 7
+    },
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "use_1_at_the_cap_unchanged",
+      "printed_branch_lines": [
+        "[+] COMMAND: use_magic([1]) -> Used magic spell"
+      ],
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+      "step_number": 8
+    },
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "use_absent_id_3_creates_zero",
+      "printed_branch_lines": [
+        "[+] COMMAND: use_magic([3]) -> Used magic spell"
+      ],
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+      "step_number": 9
+    },
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "buy_out_of_table_id_99_accepted",
+      "printed_branch_lines": [
+        "[+] COMMAND: buy_magic([99]) -> Bought magic spell"
+      ],
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+      "step_number": 10
+    },
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "use_string_id_resolves_the_same_key",
+      "printed_branch_lines": [
+        "[+] COMMAND: use_magic(['1']) -> Used magic spell"
+      ],
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+      "step_number": 11
+    },
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "use_float_id_creates_a_distinct_key",
+      "printed_branch_lines": [
+        "[+] COMMAND: use_magic([1.0]) -> Used magic spell"
+      ],
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+      "step_number": 12
+    }
+  ]
+}

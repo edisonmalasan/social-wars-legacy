@@ -1,0 +1,92 @@
+{
+  "cap_literal": 50,
+  "cap_source_lines": [
+    658,
+    670
+  ],
+  "changed_leaf_paths": [],
+  "command": "use_magic",
+  "energy_after": 50,
+  "energy_before": 50,
+  "ledger_after": {
+    "1": 50,
+    "10": 0,
+    "2": 0,
+    "4": 2,
+    "9": 1
+  },
+  "ledger_before": {
+    "1": 50,
+    "10": 0,
+    "2": 0,
+    "4": 2,
+    "9": 1
+  },
+  "ledger_key": "1",
+  "ledger_key_created": false,
+  "ledger_key_present_before": true,
+  "ledger_keys_after": 5,
+  "ledger_keys_before": 5,
+  "ledger_recomputed": {
+    "1": 50,
+    "10": 0,
+    "2": 0,
+    "4": 2,
+    "9": 1
+  },
+  "ledger_value_after": 50,
+  "ledger_value_before": 50,
+  "magic_id_sent": 1,
+  "magic_id_sent_type": "int",
+  "magic_id_string_form": "1",
+  "mana_after": 15,
+  "mana_before": 15,
+  "modern_derives_after": 50,
+  "modern_differs_from_oracle": false,
+  "name": "use_1_at_the_cap_unchanged",
+  "note": "min(50, 51) = 50: at the cap the use_magic arm is a no-op.",
+  "only_the_addressed_key_moved": true,
+  "operator": "=",
+  "parity_note": "At the cap the assignment and the derived transition are both the cap, with a derived change of zero -- an unchanged success, not a refusal.",
+  "parity_with_delivered_endpoint": true,
+  "placed_rows_after": 549,
+  "placed_rows_before": 549,
+  "printed_branch_lines": [
+    "[+] COMMAND: use_magic([1]) -> Used magic spell"
+  ],
+  "printed_message": "Used magic spell",
+  "printed_message_claims": "a spell was used",
+  "resource_slot_count": 8,
+  "resources_after": {
+    "cash": 4,
+    "energy": 50,
+    "gold": 37691,
+    "mana": 15,
+    "oil": 15401,
+    "steel": 14151,
+    "wood": 19705,
+    "xp": 136878
+  },
+  "resources_before": {
+    "cash": 4,
+    "energy": 50,
+    "gold": 37691,
+    "mana": 15,
+    "oil": 15401,
+    "steel": 14151,
+    "wood": 19705,
+    "xp": 136878
+  },
+  "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+  "resources_moved": [],
+  "response_payload": {
+    "result": "success"
+  },
+  "state_sha256_after": "2fa853968e27c03f0748ab7cfa02c51b2df717b6eae901ef1bcd04d24824fe6f",
+  "state_sha256_before": "2fa853968e27c03f0748ab7cfa02c51b2df717b6eae901ef1bcd04d24824fe6f",
+  "status": 200,
+  "stdout_evidence_is_this_request_only": true,
+  "stdout_offset_before": 2883,
+  "step_number": 8,
+  "unchanged_leaves_sha256": "2fa853968e27c03f0748ab7cfa02c51b2df717b6eae901ef1bcd04d24824fe6f"
+}

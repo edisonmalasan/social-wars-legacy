@@ -53,6 +53,7 @@ extends Node
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
 const CombatFlow = preload("res://scripts/units/combat_flow.gd")
+const MagicFlow = preload("res://scripts/units/magic_flow.gd")
 const ResearchFlow = preload("res://scripts/units/research_flow.gd")
 const QuestFlow = preload("res://scripts/units/quest_flow.gd")
 const TutorialFlow = preload("res://scripts/progression/tutorial_flow.gd")
@@ -183,6 +184,12 @@ var stored_sale_requests := 0
 ## `CombatFlow.build_intent()` BEFORE this counter moves, because the refusal
 ## is about what the client tried to send.
 var combat_requests := 0
+## Number of magic-counter intents this process has issued. One per intent; zero
+## for every local refusal -- and note the counting boundary: a request refused
+## for a missing identity or an unknown action is refused by
+## `MagicFlow.build_magic_intent()` BEFORE this counter moves, because the refusal
+## is about what the client tried to send.
+var magic_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -692,6 +699,31 @@ func combat_town(user_id: String, action: Variant,
 	combat_requests += 1
 	var result: CombatFlow.CombatResult = await _impl.combat_town(
 		user_id, action, addressing)
+	return result
+
+
+## One magic-counter intent (the save identity, a closed `action`, and the magic
+## **identity**) from the selected implementation. The identity is a spell id,
+## never a count, a cap, or a map key.
+##
+## The counter transition is derived server-side from the player's own recorded
+## ledger. A client that tries to send a count is refused by
+## `MagicFlow.build_magic_intent()` before the transport is touched, and the
+## refusal is a NAMED one, separate from the endpoint's server-side refusals:
+## "you may not say how many" and "there is nothing to buy" are different answers.
+##
+## ## The recorded divergence is reported, not smoothed
+##
+## The answer carries the value the **unchanged legacy arm writes** *and* the
+## value this service derives, side by side, plus whether they agree. On an absent
+## key and for `buy` they do **not** agree -- that is the divergence this line
+## exists to report, so a caller that sees `matches_derived == false` is seeing a
+## measured difference between the two implementations, not a defect.
+func magic_town(user_id: String, action: Variant,
+		magic_id: Variant) -> MagicFlow.MagicResult:
+	magic_requests += 1
+	var result: MagicFlow.MagicResult = await _impl.magic_town(
+		user_id, action, magic_id)
 	return result
 
 

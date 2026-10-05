@@ -128,6 +128,7 @@ const ALLOWED := [
 	"scripts/units/stored_item_flow.gd",
 	"scripts/missions/mission_vocabulary.gd",
 	"scripts/units/combat_flow.gd",
+	"scripts/units/magic_flow.gd",
 	"scripts/verification.gd",
 	"tests/test_asset_ids.gd",
 	"tests/test_audio_manager.gd",
@@ -176,6 +177,7 @@ const ALLOWED := [
 	"tests/test_stored_item_placement.gd",
 	"tests/test_mission_vocabulary.gd",
 	"tests/test_combat_actions.gd",
+	"tests/test_damage_magic.gd",
 	"evidence/boot/boot-report.json",
 	"evidence/building-move/building-move.png",
 	"evidence/building-move/report.json",
@@ -220,6 +222,7 @@ const ALLOWED := [
 	"content/mission_vocabulary.json",
 	"evidence/mission-vocabulary/report.json",
 	"evidence/combat-actions/report.json",
+	"evidence/damage-magic/report.json",
 ]
 
 ## The exact scene set the project may declare (set equality below).

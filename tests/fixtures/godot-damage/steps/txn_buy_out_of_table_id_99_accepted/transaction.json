@@ -1,0 +1,99 @@
+{
+  "cap_literal": 50,
+  "cap_source_lines": [
+    658,
+    670
+  ],
+  "changed_leaf_paths": [
+    "/privateState/magics/99"
+  ],
+  "command": "buy_magic",
+  "delivered_endpoint_refusal": "unknown_magic_id",
+  "divergence": "unvalidated_identity",
+  "energy_after": 50,
+  "energy_before": 50,
+  "identity_outside_the_committed_ten_entry_table": true,
+  "ledger_after": {
+    "1": 50,
+    "10": 0,
+    "2": 0,
+    "3": 0,
+    "4": 2,
+    "9": 1,
+    "99": 0
+  },
+  "ledger_before": {
+    "1": 50,
+    "10": 0,
+    "2": 0,
+    "3": 0,
+    "4": 2,
+    "9": 1
+  },
+  "ledger_key": "99",
+  "ledger_key_created": true,
+  "ledger_key_present_before": false,
+  "ledger_keys_after": 7,
+  "ledger_keys_before": 6,
+  "ledger_recomputed": {
+    "1": 50,
+    "10": 0,
+    "2": 0,
+    "3": 0,
+    "4": 2,
+    "9": 1,
+    "99": 0
+  },
+  "ledger_value_after": 0,
+  "ledger_value_before": null,
+  "magic_id_sent": 99,
+  "magic_id_sent_type": "int",
+  "magic_id_string_form": "99",
+  "mana_after": 15,
+  "mana_before": 15,
+  "name": "buy_out_of_table_id_99_accepted",
+  "note": "99 is NOT one of the ten committed magics and the server accepted it, creating a ledger entry for a spell that does not exist. The else arm is identical in both branches, so buy_magic writes 0 too.",
+  "only_the_addressed_key_moved": true,
+  "operator": "+=",
+  "parity_with_delivered_endpoint": false,
+  "placed_rows_after": 549,
+  "placed_rows_before": 549,
+  "printed_branch_lines": [
+    "[+] COMMAND: buy_magic([99]) -> Bought magic spell"
+  ],
+  "printed_message": "Bought magic spell",
+  "printed_message_claims": "a spell was bought",
+  "resource_slot_count": 8,
+  "resources_after": {
+    "cash": 4,
+    "energy": 50,
+    "gold": 37691,
+    "mana": 15,
+    "oil": 15401,
+    "steel": 14151,
+    "wood": 19705,
+    "xp": 136878
+  },
+  "resources_before": {
+    "cash": 4,
+    "energy": 50,
+    "gold": 37691,
+    "mana": 15,
+    "oil": 15401,
+    "steel": 14151,
+    "wood": 19705,
+    "xp": 136878
+  },
+  "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+  "resources_moved": [],
+  "response_payload": {
+    "result": "success"
+  },
+  "state_sha256_after": "92ba9153aedf44846b52f1dffb9cad727577fccda6607295bd69097e747e5415",
+  "state_sha256_before": "3cfd34f1b5a7970f9ae8dbf69af5372cfa4923f08a2422be6ddf70b27379a64a",
+  "status": 200,
+  "stdout_evidence_is_this_request_only": true,
+  "stdout_offset_before": 3081,
+  "step_number": 10,
+  "unchanged_leaves_sha256": "3cfd34f1b5a7970f9ae8dbf69af5372cfa4923f08a2422be6ddf70b27379a64a"
+}

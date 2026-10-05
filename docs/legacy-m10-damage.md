@@ -409,6 +409,57 @@ passed on an LF checkout), and the standing remedy applies here too: **a
 counting script must be shown to count what it claims.** The 33/13,034 figure was
 caught only because the corrected run disagreed with it.
 
+### 7.1 Corrections found during implementation
+
+Three further errors were found by the Apply stage and are recorded here rather
+than by quiet edits above. All three were reported by the implementation
+subagent, and all three were **independently re-measured** before being accepted.
+
+**5. §5.5 contradicts itself on the ledger's site count.** It reads
+`command.py 6 sites` and then lists **eight** lines (656, 657, 658, 660, 668,
+669, 670, 672). The eight lines are correct and the "6" is wrong, but the
+sentence as written is self-contradictory. The precise decomposition, which is
+what the delivered module reports, is **four assignment statements, six
+subscript occurrences** (the two assignment lines carry two each), **two
+membership tests** (`if str(magic_id) in magics`), and **two local bindings** of
+the ledger. Collapsing those four shapes into one number is what made the
+sentence ambiguous in the first place.
+
+**6. `config["magics"]` is a `list`, not a `dict`.** Measured: ten rows with
+native `id` values `1..10`. Nothing in this investigation depends on the
+difference — identity validation resolves a row by its native `id` — but the
+delivered `is_committed_magic()` reads the loaded shape rather than assuming a
+mapping, so the distinction is recorded here to keep the two in step.
+
+**7. `get_game_config.py` has zero occurrences of `magic`, case-insensitively.**
+This record asserted the committed magics content had no legacy consumer; that
+holds, and this measurement is the direct confirmation from the module that
+serves content. It was worth stating because it was previously an inference from
+absence in the dispatcher rather than a count in the serving module.
+
+**Correction 4 recurred, and that is the finding worth keeping.** The
+implementation's own branch-count regex measured **62** where the catalog reports
+**63**, for the *same* reason as before: the identifier character class was
+`[A-Za-z_]+`, with **no digits**, and `push_queue_unit2` ends in `2`. I had
+recorded the original error and then made it again a few days later while
+writing the derivation, which is direct evidence that recording a correction is
+not the same as preventing the class. `branch_count_agrees_with_catalog()` now
+guards it mechanically in both the Python envelope and the GDScript projection,
+and both suites re-derive the count on every run.
+
+### 7.2 A measurement of mine that was false outright
+
+While designing the post-execution proof I asserted that the legacy `use` arm and
+the service's derived transition "agree only at a recorded counter of zero."
+**That is false.** Measured over the whole legal domain, they are *literally the
+same formula* `min(cap, x + 1)` and they agree at **every** counter from 0 to 50.
+The entire divergence is about `buy` (which adds that quantity, so the legacy arm
+is unbounded) and about the absent-key `else` arm (both write `0`, while the
+derived transition gives `1`). The endpoint therefore reports `derived_after`,
+`recorded_after` and `legacy_expected_after` side by side and states
+`matches_derived` plainly, rather than asserting equality that would fail on five
+of seven successful steps.
+
 ---
 
 ## 8. What the implementation line must and must not do

@@ -21,6 +21,7 @@ const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
 const CombatFlow = preload("res://scripts/units/combat_flow.gd")
 const ResearchFlow = preload("res://scripts/units/research_flow.gd")
 const QuestFlow = preload("res://scripts/units/quest_flow.gd")
+const MagicFlow = preload("res://scripts/units/magic_flow.gd")
 const TutorialFlow = preload("res://scripts/progression/tutorial_flow.gd")
 
 ## Loopback default: the v0 service binds 127.0.0.1 only (design D3).
@@ -44,6 +45,7 @@ const RESEARCH_PATH := "/v0/research"
 const QUEST_PATH := "/v0/quests"
 const TUTORIAL_PATH := "/v0/tutorial"
 const COMBAT_PATH := "/v0/combat"
+const MAGIC_PATH := "/v0/magic"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -742,6 +744,44 @@ func combat_town(user_id: String, action: Variant,
 			str(outcome.get("code", "bad_response")),
 			str(outcome.get("message", "")))
 	return CombatFlow.parse_combat(outcome.get("payload"))
+
+
+## One magic-counter intent over loopback HTTP. The body is built by
+## `MagicFlow.build_magic_intent()` and is therefore **exactly three keys** -- the
+## save identity, the closed action, and that action's addressing under its own
+## wire key -- so a count, a delta, a resulting value, a cap, a price, and a
+## damage magnitude are not expressible here (design D2). This function
+## deliberately names none of them: the `client_dictated_count` refusal is a
+## refusal of a HAND-BUILT request, and this body cannot be one.
+##
+## The identity is unwrapped through `MagicFlow.wire_magic_identity()` before it
+## travels, because the engine decodes every JSON number as a `float` and the
+## recorded legacy rule is that a magic identity is an **integer** -- so the
+## decode is unwrapped in exactly one named place rather than by widening the
+## canonical rule that exists to close the float hazard.
+##
+## ## The answer reports a divergence, and this function does not hide it
+##
+## The service pins the ledger against what the **unchanged legacy arm writes**,
+## not against the derived transition, because design D3 requires those two to
+## disagree for `buy` and for every absent key. Both values travel side by side
+## and `MagicFlow.parse_magic()` re-derives the recorded arm's own arithmetic
+## rather than trusting either number, so the recorded outcome is a check rather
+## than an echo.
+func magic_town(user_id: String, action: Variant,
+		magic_id: Variant) -> MagicFlow.MagicResult:
+	var intent := MagicFlow.build_magic_intent(user_id, action, magic_id)
+	if not intent.get("ok", false):
+		return MagicFlow.magic_failure(
+			str(intent.get("reason", "bad_intent")),
+			str(intent.get("error", "")))
+	var outcome := await _call("POST", MAGIC_PATH,
+		JSON.stringify(intent.get("body")))
+	if not outcome.get("ok", false):
+		return MagicFlow.magic_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return MagicFlow.parse_magic(outcome.get("payload"))
 
 
 ## every failure returns `{ok: false, code, message}` with the failure named.

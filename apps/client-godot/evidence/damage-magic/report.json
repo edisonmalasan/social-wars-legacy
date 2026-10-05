@@ -1,0 +1,1028 @@
+{
+  "schema": "damage-magic-report-v1",
+  "line": {
+    "milestone": "M10",
+    "index": 3,
+    "capability": "godot-damage"
+  },
+  "investigation": "docs/legacy-m10-damage.md",
+  "primary_finding": "the damage refusal -- no damage is resolved, computed, applied, or stored, and no committed amount exists to derive one from",
+  "delivered_surface": "the privateState magics counter transition, validated against the committed magic table",
+  "branches": [
+    "buy_magic",
+    "use_magic"
+  ],
+  "actions": [
+    "buy",
+    "use"
+  ],
+  "action_command": {
+    "buy": "buy_magic",
+    "use": "use_magic"
+  },
+  "cap": {
+    "value": 50,
+    "source_lines": [
+      658,
+      670
+    ],
+    "a_literal": true,
+    "rejected_derivation": {
+      "rejected": "derive the cap from committed magics content",
+      "candidates": [
+        {
+          "magic_id": 1,
+          "magic_name": "AirStrike",
+          "field": "cash",
+          "value": 50
+        },
+        {
+          "magic_id": 5,
+          "magic_name": "Shortcircuit Inductor",
+          "field": "level",
+          "value": 50
+        }
+      ],
+      "reason": "The preserved source contains no reference to any content when it applies the cap: min(50, ...) is a literal in a min call. The value 50 occurring among the committed magics values is a coincidence of the value distribution, not its provenance. Recording it as content-derived would invent a derivation, which is the defect class this project own training_time and unit_capacity findings warn against. The cap is delivered as the hardcoded literal it is, and the suite asserts the literal is used and that no content lookup substitutes for it.",
+      "applied": "COUNTER_CAP is the literal; no committed magic value is read to obtain it"
+    }
+  },
+  "transition": {
+    "driven_commands": [
+      "use_magic",
+      "buy_magic",
+      "buy_magic",
+      "buy_magic",
+      "buy_magic",
+      "buy_magic",
+      "use_magic",
+      "use_magic"
+    ],
+    "legacy_counter_path": [
+      2,
+      3,
+      7,
+      15,
+      31,
+      63,
+      113,
+      50,
+      50
+    ],
+    "service_counter_path": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "cap": 50,
+    "at_cap_change": 0,
+    "above_cap_reason": "counter_above_cap"
+  },
+  "validation_order": [
+    {
+      "step": 1,
+      "key": "action_in_closed_vocabulary",
+      "reads_player_state": false,
+      "rule": "action must name one of the two recorded branches"
+    },
+    {
+      "step": 2,
+      "key": "no_client_dictated_count",
+      "reads_player_state": false,
+      "rule": "the request carries no count, delta, resulting value, or cap, and no protocol plumbing key"
+    },
+    {
+      "step": 3,
+      "key": "identity_present",
+      "reads_player_state": false,
+      "rule": "the request names a magic identity"
+    },
+    {
+      "step": 4,
+      "key": "identity_well_typed",
+      "reads_player_state": false,
+      "rule": "the identity is an integer and not a bool, and it is not a float, because the string form of 1.0 differs from the string form of 1 and the legacy ledger keys on that string form"
+    },
+    {
+      "step": 5,
+      "key": "identity_in_committed_table",
+      "reads_player_state": false,
+      "rule": "the identity resolves against the committed ten-entry magic table, which the legacy server never checks"
+    },
+    {
+      "step": 6,
+      "key": "ledger_readable",
+      "reads_player_state": true,
+      "rule": "the recorded ledger is a mapping of string keys to non-negative integers; an absent ledger and a non-mapping ledger are reported, never defaulted to an empty one"
+    },
+    {
+      "step": 7,
+      "key": "counter_readable",
+      "reads_player_state": true,
+      "rule": "the addressed counter is a non-negative integer when present"
+    },
+    {
+      "step": 8,
+      "key": "transition_derived",
+      "reads_player_state": true,
+      "rule": "the after value is the smaller of the cap and the before value plus one, for both actions, derived server-side, and is never below the before value; a recorded counter already above the cap is refused rather than reduced, because the obvious formula applied to it returns the very decrease the legacy assigning arm performs"
+    }
+  ],
+  "ordering_rule": {
+    "steps": 8,
+    "write_step": 9,
+    "rule": "Every check resolves before any ledger entry is created or modified, so a refused request provably leaves the whole recorded document byte-identical. The legacy branch performs no validation at all, so there is no recorded ordering to reproduce; this requirement exists so that this service refusals are safe rather than to match an ordering.",
+    "content_before_state": "Step 5 reads committed content and steps 6 to 8 read player state, so a request naming a spell that does not exist never consults the corpus."
+  },
+  "proof_halves": [
+    {
+      "half": "the_recorded_ledger_entry_equals_what_the_unchanged_arm_writes",
+      "checks": "the persisted ledger value for the addressed identity equals the value the unchanged legacy arm's own arithmetic produces, every entry the derivation did not address is byte-identical, and the recorded key order is preserved with a created key appended",
+      "why": "the derived transition is deliberately NOT what executes, so pinning the recorded value is what makes this half a proof; the derived value travels beside it under matches_derived, and the two disagreeing is the recorded divergence rather than a failure",
+      "not_this": "counter_moved_by_exactly_the_derived_delta",
+      "not_this_why": "the derived transition cannot equal the recorded one for buy or for an absent key by construction, so that claim was never true of this route and asserting it would have failed every execution rather than caught a defect"
+    },
+    {
+      "half": "every_stored_resource_unchanged",
+      "checks": "all eight stored resource slots are compared, never a subset",
+      "why": "the legacy dispatcher applies the request own vector BEFORE the branch, so this half is what forecloses a delta smuggled through the request"
+    }
+  ],
+  "divergences": [
+    {
+      "id": "buy_magic_unbounded_growth",
+      "legacy_behaviour": "tampered",
+      "service_behaviour": "counter increments by one under the recorded cap",
+      "classification": "refused, not reproduced",
+      "authority": "server-side derivation (design D2/D3)"
+    },
+    {
+      "id": "use_magic_decreases_counter",
+      "legacy_behaviour": "counter reduced from 113 to 50, destroying 63 charges",
+      "service_behaviour": "counter is never reduced",
+      "classification": "refused, not reproduced",
+      "authority": "server-side derivation (design D3)"
+    },
+    {
+      "id": "cap_applied_uniformly",
+      "legacy_behaviour": "the two branches disagree about the cap",
+      "service_behaviour": "the cap applies to both actions",
+      "classification": "recorded decision, not a reproduction",
+      "authority": "design D3"
+    },
+    {
+      "id": "identity_outside_committed_table_accepted",
+      "legacy_behaviour": "an identity of 99 was accepted and created a ledger entry",
+      "service_behaviour": "refused with unknown_magic_id",
+      "classification": "divergence",
+      "authority": "Server v1 / M13 (design D4)"
+    },
+    {
+      "id": "float_identity_creates_distinct_key",
+      "legacy_behaviour": "an identity of 1.0 created a distinct key",
+      "service_behaviour": "refused rather than coerced to the committed key",
+      "classification": "divergence",
+      "authority": "Server v1 / M13 (design D4)"
+    },
+    {
+      "id": "counter_above_cap_reduced_by_legacy",
+      "legacy_behaviour": "a recorded counter above the cap is accepted and reduced: 113 to 50, destroying 63 charges",
+      "service_behaviour": "refused with counter_above_cap; the recorded state is reported rather than rewritten",
+      "classification": "refused, not reproduced",
+      "authority": "server-side derivation (design D3)",
+      "note": "Found by smoke-testing the derivation, not by review: the obvious formula applied to a before value of 113 returns 50, which is the very decrease this line refuses, wearing this service clothes. Clamping would reproduce the defect and leaving the value unchanged would answer success for an operation that did nothing, so the recorded state is refused."
+    },
+    {
+      "id": "absent_key_writes_zero_not_one",
+      "legacy_behaviour": "an identity with no recorded entry takes the branch's else arm and the ledger gains the key at ZERO: executed, use_magic 3 created '3': 0 and buy_magic 99 created '99': 0",
+      "service_behaviour": "an absent entry is read as zero charges and the transition increments it, so the key is created at ONE",
+      "classification": "divergence",
+      "authority": "server-side derivation (design D2)",
+      "note": "Both arms of the legacy branch write 0 for an unknown key, so the legacy server's own 'acquire a spell you hold none of' path increments nothing at all. Treating the absent entry as zero charges and incrementing it is the coherent reading, and it is recorded here rather than left to be discovered as a mismatch. This is also the path a live phase against tests/saves/fresh-player.json exercises, because that corpus's privateState.magics is {}, so the phase drives a second request on the same identity to show a clean increment with no divergence alongside it."
+    }
+  ],
+  "refused_arms": [
+    {
+      "command": "buy_magic",
+      "operator": "+=",
+      "source_expression": "magics[str(magic_id)] += min(50, magics[str(magic_id)] + 1)",
+      "source_lines": [
+        658
+      ],
+      "defect": "the additive operator adds a capped amount rather than assigning a capped value, so the result is not bounded by 50 and the counter grows without limit",
+      "executed": {
+        "start": 2,
+        "sequence": [
+          3,
+          7,
+          15,
+          31,
+          63,
+          113
+        ],
+        "crossed_cap": true
+      },
+      "verdict": "REFUSED, never reproduced",
+      "reason": "Reproducing an unbounded growth as parity would ship a defect as a contract. This service increments by one under the recorded cap instead, and records the difference as a divergence."
+    },
+    {
+      "command": "use_magic",
+      "operator": "=",
+      "source_expression": "magics[str(magic_id)] = min(50, magics[str(magic_id)] + 1)",
+      "source_lines": [
+        670
+      ],
+      "defect": "the assigning operator assigns an absolute value, so the capped expression is a clamp that can reduce a counter already above the cap",
+      "executed": {
+        "before": 113,
+        "after": 50,
+        "charges_destroyed": 63
+      },
+      "recorded_message": "Used magic spell",
+      "verdict": "REFUSED, never reproduced",
+      "reason": "This is the sharpest measurement in the line: a command whose recorded message claims a spell was used deleted 63 player-owned charges. This service never reduces a counter, and records the difference as a divergence."
+    }
+  ],
+  "cap_uniformity": {
+    "legacy": "The two branches disagree about the cap, so there is no recorded rule for how a cap applies across actions: one is unbounded past the cap and the other clamps down to it.",
+    "service": "The recorded cap applies uniformly to both actions, and that uniformity is a recorded decision rather than a reproduction.",
+    "above_cap": "A recorded counter already above the cap is refused with counter_above_cap rather than reduced. The legacy server reduces it, and refusing is the only option that neither reproduces that decrease nor answers success for an operation that did nothing.",
+    "verdict": "recorded divergence, not parity"
+  },
+  "reported_vocabulary": {
+    "cost_tokens": [
+      {
+        "name": "COST_DAMAGE_SELF",
+        "value": "ds",
+        "declared_at": "constants.py:894"
+      },
+      {
+        "name": "COST_DAMAGE_ENEMY",
+        "value": "de",
+        "declared_at": "constants.py:895"
+      }
+    ],
+    "cost_token_field": "tampered",
+    "reset_instants": [
+      {
+        "name": "tsAttacksReset",
+        "declared_at": "command.py:919",
+        "occurrence_count": 1,
+        "fate": "write_only",
+        "readers": 0,
+        "note": "A client-writable instant inside the fast-forward branch with no reader. Its name implies a daily attack allowance; no such check exists, so no allowance, limit, window, or reset rule is derived from the name."
+      },
+      {
+        "name": "tsSpyingsReset",
+        "declared_at": "command.py:920",
+        "occurrence_count": 1,
+        "fate": "write_only",
+        "readers": 0
+      }
+    ],
+    "no_op_branch": {
+      "command": "buy_mana_new",
+      "declared_at": "command.py:650",
+      "note": "A named dispatcher branch whose entire body is one print, whose own trailing comment says the work was never done. It is reported as a recorded absence and never delivered, because an empty branch maintains no state for a client to be verified against."
+    },
+    "mission_types_owned_elsewhere": [
+      "MISSION_ATTACK_PLAYER",
+      "MISSION_ATTACK_FRIEND",
+      "MISSION_ASSAULTS_WON",
+      "MISSION_KILLED_ENEMY",
+      "MISSION_DEFEAT_ALL_TROLLS",
+      "MISSION_SACRIFICE_UNIT"
+    ],
+    "mission_vocabulary_owner": "scripts/missions/mission_vocabulary.gd",
+    "rule": "Every entry here appears only as reported content. None of it is read to compute a value, gate an operation, or derive a limit. The combat-named mission types are owned by godot-mission-vocabulary and are referenced, not reimplemented."
+  },
+  "reported_token_sites": [
+    {
+      "token": "COST_DAMAGE_SELF",
+      "identifier_sites": 0,
+      "reported_in": "DAMAGE_SELF_TOKEN"
+    },
+    {
+      "token": "COST_DAMAGE_ENEMY",
+      "identifier_sites": 0,
+      "reported_in": "DAMAGE_ENEMY_TOKEN"
+    },
+    {
+      "token": "tsAttacksReset",
+      "identifier_sites": 0,
+      "reported_in": "ATTACK_RESET_FIELD"
+    },
+    {
+      "token": "tsSpyingsReset",
+      "identifier_sites": 0,
+      "reported_in": "SPYING_RESET_FIELD"
+    },
+    {
+      "token": "buy_mana_new",
+      "identifier_sites": 0,
+      "reported_in": "NO_OP_COMMAND"
+    },
+    {
+      "token": "MISSION_",
+      "identifier_sites": 0,
+      "reported_in": "COMBAT_NAMED_TYPES_OWNED_ELSEWHERE",
+      "note": "The two constants holding those six names are deliberately NOT named after the prefix -- they are COMBAT_NAMED_TYPES_OWNED_ELSEWHERE and VOCABULARY_OWNER_PATH -- so the identifier column is zero and the claim is literally true rather than nearly true"
+    }
+  ],
+  "committed_content": {
+    "domain": "magics",
+    "count": 10,
+    "reported_fields": [
+      "mana",
+      "level",
+      "gold",
+      "cash",
+      "target"
+    ],
+    "entries": [
+      {
+        "legacy_id": "1",
+        "name": "AirStrike",
+        "mana": 8,
+        "level": 38,
+        "gold": 30000,
+        "cash": 50,
+        "target": 2,
+        "magnitude_present": false
+      },
+      {
+        "legacy_id": "2",
+        "name": "Medic Case Rain",
+        "mana": 8,
+        "level": 40,
+        "gold": 40000,
+        "cash": 60,
+        "target": 1,
+        "magnitude_present": false
+      },
+      {
+        "legacy_id": "3",
+        "name": "Protection Shield",
+        "mana": 8,
+        "level": 45,
+        "gold": 60000,
+        "cash": 80,
+        "target": 1,
+        "magnitude_present": false
+      },
+      {
+        "legacy_id": "4",
+        "name": "Nuclear Bomb",
+        "mana": 20,
+        "level": 52,
+        "gold": 90000,
+        "cash": 110,
+        "target": 2,
+        "magnitude_present": false
+      },
+      {
+        "legacy_id": "5",
+        "name": "Shortcircuit Inductor",
+        "mana": 10,
+        "level": 50,
+        "gold": 80000,
+        "cash": 100,
+        "target": 2,
+        "magnitude_present": false
+      },
+      {
+        "legacy_id": "6",
+        "name": "Magnetic Trap",
+        "mana": 12,
+        "level": 42,
+        "gold": 50000,
+        "cash": 70,
+        "target": 2,
+        "magnitude_present": false
+      },
+      {
+        "legacy_id": "7",
+        "name": "Mech Summoner",
+        "mana": 16,
+        "level": 48,
+        "gold": 70000,
+        "cash": 90,
+        "target": 0,
+        "magnitude_present": false
+      },
+      {
+        "legacy_id": "8",
+        "name": "Stealth Sneak",
+        "mana": 8,
+        "level": 55,
+        "gold": 100000,
+        "cash": 120,
+        "target": 1,
+        "magnitude_present": false
+      },
+      {
+        "legacy_id": "9",
+        "name": "Alien Abduction",
+        "mana": 15,
+        "level": 35,
+        "gold": 20000,
+        "cash": 40,
+        "target": 2,
+        "magnitude_present": false
+      },
+      {
+        "legacy_id": "10",
+        "name": "Attack Boost",
+        "mana": 10,
+        "level": 35,
+        "gold": 10000,
+        "cash": 30,
+        "target": 1,
+        "magnitude_present": false
+      }
+    ],
+    "fingerprint": "44e5b9edd1eba2910833bb8e2f063175e51c5754e38c35177648e4de779df501",
+    "absent_magnitude": {
+      "magic_id": 10,
+      "magic_name": "Attack Boost",
+      "description": "Your units will increase their attack and life to wreak havoc on enemies!!",
+      "committed_numbers": {
+        "mana": 10,
+        "level": 35,
+        "gold": 10000,
+        "cash": 30,
+        "target": 1
+      },
+      "absent": "no multiplier, factor, magnitude, radius, or duration is committed for the promised attack and life increase",
+      "rule": "No delivered code may synthesize the missing magnitude, and the suite asserts the absence rather than only the presence of the other fields"
+    }
+  },
+  "no_damage": {
+    "verdict": "No damage is resolved, computed, applied, or stored, because the preserved server has no damage rule to reproduce and no committed amount from which to derive one.",
+    "no_consumer_fields": [
+      "attack",
+      "defense",
+      "life",
+      "attack_interval",
+      "attack_range",
+      "best_against",
+      "best_against_mult"
+    ],
+    "counting_rules": [
+      "whole",
+      "distinct_line",
+      "code_only",
+      "code_distinct_line",
+      "token",
+      "quoted"
+    ],
+    "consumer_rules": [
+      "token",
+      "quoted"
+    ],
+    "no_storage_evidence": {
+      "row_slots": 8,
+      "row_length_is_constant": true,
+      "attr_bag_union": [
+        "cp",
+        "nu",
+        "si",
+        "ts",
+        "ui",
+        "xp"
+      ],
+      "private_state_damage_shaped_keys": 0,
+      "rule": "Every placed row in every canonical committed save document is exactly eight slots with one type per slot, the attribute bag union contains no hit point, and no private-state key matches any damage-shaped token. A damage system needs somewhere to keep a remaining hit point and the committed format has nowhere."
+    },
+    "structural_guard": "No delivered code contains a helper capable of computing a damage amount, a hit-point value, attack or defense arithmetic, a multiplier, a mitigation, or a combat outcome, and the hermetic suite asserts that absence by pinning the delivered module whole static inventory, so the guard fails when such a helper is introduced.",
+    "committed_content_has_no_amount": {
+      "field": "",
+      "reason": "The committed magics carry mana, level, gold, cash, and target, and no damage, multiplier, magnitude, radius, or duration field at all."
+    }
+  },
+  "arithmetic_record": {
+    "multiply_operators": 0,
+    "divide_operators": 0,
+    "power_operators": 0,
+    "shift_left_operators": 0,
+    "shift_right_operators": 0,
+    "bitwise_and_operators": 0,
+    "bitwise_or_operators": 0,
+    "bitwise_xor_operators": 0,
+    "format_operators": 2,
+    "format_operator_left_operands": "one string literal, and one string literal continued on the following line; both are the binary format operator and neither is a modulo",
+    "modulo_operators": 0,
+    "arithmetic_over_a_committed_damage_field": 0,
+    "arithmetic_over_a_reported_committed_field": 0,
+    "comparisons_of_one_committed_value_against_another": 0,
+    "the_one_arithmetic": "the counter transition: a before value plus one, bounded by the recorded literal cap"
+  },
+  "guards": {
+    "static_functions": 48,
+    "pinned": 48,
+    "instance_functions": 0,
+    "absent_helpers": 23,
+    "arithmetic": {
+      "multiply_operators": 0,
+      "divide_operators": 0,
+      "power_operators": 0,
+      "shift_left_operators": 0,
+      "shift_right_operators": 0,
+      "bitwise_and_operators": 0,
+      "bitwise_or_operators": 0,
+      "bitwise_xor_operators": 0
+    },
+    "format_operators": 2,
+    "module_sha256": "aef380877f1e0109e44cd0e9283aa2b5771cc3e99719616727f3bad9a5f589b0"
+  },
+  "absent_helpers": [
+    {
+      "helper": "resolve_damage",
+      "absent_because": "no committed damage field has a legacy consumer and there is nowhere to store a hit point, so there is no committed damage rule to resolve"
+    },
+    {
+      "helper": "damage_for",
+      "absent_because": "the same absence, stated as the noun a caller would reach for"
+    },
+    {
+      "helper": "derive_damage",
+      "absent_because": "the same absence again, stated in this module own verb"
+    },
+    {
+      "helper": "magic_damage",
+      "absent_because": "the same absence, stated for the delivered surface"
+    },
+    {
+      "helper": "apply_attack",
+      "absent_because": "the attack and attack-interval fields are content with zero consumers, so there is no outcome to apply"
+    },
+    {
+      "helper": "attack_of",
+      "absent_because": "the committed attack field is read by no branch, so it is content and never a rule"
+    },
+    {
+      "helper": "defend",
+      "absent_because": "the defense field is a constant on every committed unit and is read by no branch"
+    },
+    {
+      "helper": "defense_of",
+      "absent_because": "the same absence as defend"
+    },
+    {
+      "helper": "life_of",
+      "absent_because": "the life field is read by no branch and no row stores a remaining hit point"
+    },
+    {
+      "helper": "hit_points",
+      "absent_because": "the committed row shape has no slot for a hit point and the attribute bag has no key for one"
+    },
+    {
+      "helper": "mitigate",
+      "absent_because": "no committed field records a mitigation and no branch applies one"
+    },
+    {
+      "helper": "multiplier_for",
+      "absent_because": "no committed field records a multiplier, and the one committed description that promises an increased attack and life commits no magnitude at all"
+    },
+    {
+      "helper": "magnitude_for",
+      "absent_because": "the same absence, for the magnitude the committed content never states"
+    },
+    {
+      "helper": "synthesize_magnitude",
+      "absent_because": "the same absence, named as the act the line forbids outright"
+    },
+    {
+      "helper": "hit_chance",
+      "absent_because": "no committed field records a probability and no branch draws a random number"
+    },
+    {
+      "helper": "resolve_combat",
+      "absent_because": "no combat is resolved by the preserved server, so there is no outcome to reproduce"
+    },
+    {
+      "helper": "combat_outcome",
+      "absent_because": "the same absence, stated as the value a caller would want"
+    },
+    {
+      "helper": "cap_from_content",
+      "absent_because": "the cap is a bare literal in the preserved source; deriving it from a committed value would invent a derivation, and the rejected alternative is retained instead"
+    },
+    {
+      "helper": "price_for",
+      "absent_because": "no stored resource slot moved across any measured transaction, so a price would be invented"
+    },
+    {
+      "helper": "honor_for",
+      "absent_because": "no committed field records an honour amount and neither branch writes one"
+    },
+    {
+      "helper": "reward_for",
+      "absent_because": "no committed field records a reward and neither branch writes a resource"
+    },
+    {
+      "helper": "attack_allowance",
+      "absent_because": "the attack-reset instant has one write site and no reader, so no allowance, limit, window, or reset rule exists to reproduce and none may be derived from the name"
+    },
+    {
+      "helper": "complete_mission",
+      "absent_because": "the mission vocabulary remains owned by godot-mission-vocabulary, which measured zero consumers; this line references no mission state"
+    }
+  ],
+  "static_functions": [
+    "magic_failure",
+    "legacy_source_path",
+    "_read_source_bytes",
+    "_code_only",
+    "_strip_line",
+    "_branch_name",
+    "_branch_span",
+    "_count_occurrences",
+    "_count_lines_containing",
+    "_count_tokens",
+    "_count_quoted",
+    "_is_word_character",
+    "_count_field_consumers",
+    "legacy_census_text",
+    "derive_field_inventory",
+    "_counter_operator",
+    "_cap_literal_lines",
+    "branch_count_agrees_with_catalog",
+    "derive_corpus_census",
+    "_record_row",
+    "_kind_name",
+    "is_action",
+    "is_canonical_magic_key",
+    "wire_magic_identity",
+    "ledger_key_for",
+    "refused_client_keys",
+    "project_ledger",
+    "counter_value",
+    "derive_counter_transition",
+    "_is_integer_valued",
+    "is_committed_magic",
+    "project_magic_entry",
+    "_neutral_resource_delta",
+    "project_magic",
+    "result_from_projection",
+    "divergences",
+    "reported_vocabulary",
+    "no_damage_record",
+    "coverage_limit",
+    "owners",
+    "build_magic_intent",
+    "legacy_recorded_after",
+    "build_magic_response",
+    "parse_magic",
+    "_magic_error",
+    "_order_step_agrees",
+    "_wire_resources",
+    "_wire_int"
+  ],
+  "re_derivation": {
+    "branches": [
+      {
+        "name": "buy_magic",
+        "start": 652,
+        "end": 663,
+        "found": true
+      },
+      {
+        "name": "use_magic",
+        "start": 664,
+        "end": 675,
+        "found": true
+      }
+    ],
+    "dispatcher_branches": 63,
+    "cap_literals": [
+      658,
+      670
+    ],
+    "damage_census": {
+      "attack": {
+        "whole": 42,
+        "distinct_line": 38,
+        "code_only": 30,
+        "code_distinct_line": 30,
+        "token": 0,
+        "quoted": 0
+      },
+      "defense": {
+        "whole": 0,
+        "distinct_line": 0,
+        "code_only": 0,
+        "code_distinct_line": 0,
+        "token": 0,
+        "quoted": 0
+      },
+      "life": {
+        "whole": 0,
+        "distinct_line": 0,
+        "code_only": 0,
+        "code_distinct_line": 0,
+        "token": 0,
+        "quoted": 0
+      },
+      "attack_interval": {
+        "whole": 0,
+        "distinct_line": 0,
+        "code_only": 0,
+        "code_distinct_line": 0,
+        "token": 0,
+        "quoted": 0
+      },
+      "attack_range": {
+        "whole": 0,
+        "distinct_line": 0,
+        "code_only": 0,
+        "code_distinct_line": 0,
+        "token": 0,
+        "quoted": 0
+      },
+      "best_against": {
+        "whole": 0,
+        "distinct_line": 0,
+        "code_only": 0,
+        "code_distinct_line": 0,
+        "token": 0,
+        "quoted": 0
+      },
+      "best_against_mult": {
+        "whole": 0,
+        "distinct_line": 0,
+        "code_only": 0,
+        "code_distinct_line": 0,
+        "token": 0,
+        "quoted": 0
+      }
+    },
+    "ledger_write_sites": 4,
+    "ledger_membership_tests": 2,
+    "ledger_local_bindings": 2,
+    "modules": 11
+  },
+  "recorded_damage_census": {
+    "attack": {
+      "whole": 42,
+      "distinct_line": 38,
+      "code_only": 30,
+      "code_distinct_line": 30,
+      "token": 0,
+      "quoted": 0
+    },
+    "defense": {
+      "whole": 0,
+      "distinct_line": 0,
+      "code_only": 0,
+      "code_distinct_line": 0,
+      "token": 0,
+      "quoted": 0
+    },
+    "life": {
+      "whole": 0,
+      "distinct_line": 0,
+      "code_only": 0,
+      "code_distinct_line": 0,
+      "token": 0,
+      "quoted": 0
+    },
+    "attack_interval": {
+      "whole": 0,
+      "distinct_line": 0,
+      "code_only": 0,
+      "code_distinct_line": 0,
+      "token": 0,
+      "quoted": 0
+    },
+    "attack_range": {
+      "whole": 0,
+      "distinct_line": 0,
+      "code_only": 0,
+      "code_distinct_line": 0,
+      "token": 0,
+      "quoted": 0
+    },
+    "best_against": {
+      "whole": 0,
+      "distinct_line": 0,
+      "code_only": 0,
+      "code_distinct_line": 0,
+      "token": 0,
+      "quoted": 0
+    },
+    "best_against_mult": {
+      "whole": 0,
+      "distinct_line": 0,
+      "code_only": 0,
+      "code_distinct_line": 0,
+      "token": 0,
+      "quoted": 0
+    }
+  },
+  "corpus": {
+    "allow_list": [
+      "villages/AcidCaos.json",
+      "villages/General_Mike_30.json",
+      "villages/General_Mike_31.json",
+      "villages/Kiriakos.json",
+      "villages/Nerri.json",
+      "villages/Neutral.json",
+      "villages/Scarlet.json",
+      "villages/initial.json",
+      "tests/saves/fresh-player.json",
+      "tests/saves/fresh-player-pre-migration.json"
+    ],
+    "excluded": [
+      {
+        "excluded": "tests/fixtures",
+        "reason": "fixture step documents are recorded evidence of a transaction, not canonical save documents; walking them is what produced the recorded 33-document figure"
+      },
+      {
+        "excluded": "apps/client-godot/.godot",
+        "reason": "a Godot build cache, which is the second half of the same recorded over-count"
+      },
+      {
+        "excluded": "villages/quest",
+        "reason": "quest documents of a different shape, not placed-row saves"
+      },
+      {
+        "excluded": "tests/saves/manifest.json",
+        "reason": "a manifest of saves, not a save"
+      }
+    ],
+    "census": {
+      "documents": [
+        "villages/AcidCaos.json",
+        "villages/General_Mike_30.json",
+        "villages/General_Mike_31.json",
+        "villages/Kiriakos.json",
+        "villages/Nerri.json",
+        "villages/Neutral.json",
+        "villages/Scarlet.json",
+        "villages/initial.json",
+        "tests/saves/fresh-player.json",
+        "tests/saves/fresh-player-pre-migration.json"
+      ],
+      "document_count": 10,
+      "placed_rows": 3372,
+      "row_lengths": [
+        8
+      ],
+      "attr_bag_union": [
+        "cp",
+        "nu",
+        "si",
+        "ts",
+        "ui",
+        "xp"
+      ],
+      "damage_shaped_keys": 0,
+      "reset_instants": {
+        "tsAttacksReset": 10,
+        "tsSpyingsReset": 10
+      }
+    }
+  },
+  "coverage": {
+    "committed_magics_total": 10,
+    "driven": 1,
+    "driven_legacy_id": "1",
+    "driven_name": "AirStrike",
+    "driven_command_sequence": [
+      "use_magic",
+      "buy_magic",
+      "buy_magic",
+      "buy_magic",
+      "buy_magic",
+      "buy_magic",
+      "use_magic",
+      "use_magic"
+    ],
+    "legacy_counter_path": [
+      2,
+      3,
+      7,
+      15,
+      31,
+      63,
+      113,
+      50,
+      50
+    ],
+    "service_counter_path": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "path_note": "The two paths are the SAME eight commands driven against the SAME committed ledger key, and they are recorded side by side because the difference between them is the whole deliverable. The committed investigation interleaved the arms deliberately so the divergence reads as one sequence; the service path is derived by replaying that same sequence through the delivered transition.",
+    "ledger_keys_observed_in_the_committed_corpus": 5,
+    "observed_but_not_driven": 4,
+    "parity_transactions": 12,
+    "corpora": 1,
+    "per_magic_behaviour_claimed": false,
+    "reason": "The two branches are identity-agnostic, so the transition shape is shared across the ten committed magics, but NO per-magic behaviour is claimed -- and none exists to claim, because no committed field has a legacy consumer. The five ledger keys the committed corpus carries were observed in the ledger and only one of them was driven through the recorded transactions.",
+    "progressed_player_corpora": 0,
+    "progressed_player_note": "No progressed-player save with a different ledger shape is exercised by this line."
+  },
+  "owners": [
+    {
+      "capability": "godot-combat-actions",
+      "path": "scripts/units/combat_flow.gd",
+      "surface": "the attack-resolution branches and the dead-hero ledger"
+    },
+    {
+      "capability": "godot-mission-vocabulary",
+      "path": "scripts/missions/mission_vocabulary.gd",
+      "surface": "every mission-type declaration and the mission-state hand-off"
+    },
+    {
+      "capability": "godot-unit-behaviors",
+      "path": "scripts/units/unit_behaviors.gd",
+      "surface": "the dead-hero ledger gates, the revival gate fields, and the syringe cost refusal"
+    },
+    {
+      "capability": "godot-unit-queues",
+      "path": "scripts/units/queue_flow.gd",
+      "surface": "the training queue keys and their instants"
+    },
+    {
+      "capability": "godot-building-construction",
+      "path": "scripts/town/construction_flow.gd",
+      "surface": "the construction countdown and the click threshold"
+    },
+    {
+      "capability": "godot-unit-instances",
+      "path": "scripts/units/unit_instance_projection.gd",
+      "surface": "the stored-instance attribute bag projection"
+    },
+    {
+      "capability": "godot-unit-experience",
+      "path": "scripts/units/production_flow.gd",
+      "surface": "the recorded unit experience kind and its two branch arms"
+    }
+  ],
+  "non_claims": [
+    "No damage is resolved, computed, applied, or stored, and none is claimed.",
+    "No magic effect is applied to any unit.",
+    "No price is charged and no reward is paid; every one of the eight stored resource slots is unchanged across the measured transactions.",
+    "No combat outcome, mission completion, or honour is computed.",
+    "No attack allowance, limit, window, or reset rule is derived from the attack-reset instant.",
+    "No magnitude is synthesized for the committed entry whose description promises an effect.",
+    "No per-magic behaviour is claimed: one of ten committed magics was driven.",
+    "The cap is the recorded literal, not a derivation from committed content.",
+    "The two refused legacy asymmetries are divergences, never parity.",
+    "No pixel parity is claimed and no windowed capture is claimed; nothing is rendered by this line.",
+    "The ledger has zero readers, so no committed magics field can be consumed.",
+    "no Flash, Ruffle, ActionScript, or browser executed, and no network was used in the hermetic suite"
+  ],
+  "ledger_has_no_readers": {
+    "ledger_write_sites": 4,
+    "counter_subscript_occurrences": 6,
+    "membership_tests": 2,
+    "local_bindings": 2,
+    "read_sites": 0,
+    "migration_sites": 4,
+    "migration_location": "version.py:32-37",
+    "note": "The four shapes are counted separately because collapsing them into one number is ambiguous: four assignment statements, six subscript occurrences because the two assignment lines carry two each, two membership tests of the string form of the identity, and two local bindings of the ledger. The version module coerces a missing or non-mapping ledger to an empty one, which is a migration and not a reader. No statement anywhere reads a ledger value, so there is no code path from the committed magics content to any behaviour.",
+    "consequence": "No committed magics field can be consumed at all: not the reported five, and not the zero-consumer ones."
+  },
+  "no_cost_or_reward": {
+    "price": "none charged",
+    "reward": "none paid",
+    "measured": {
+      "transactions": 12,
+      "resource_slots_compared": 8,
+      "resource_names": [
+        "xp",
+        "gold",
+        "wood",
+        "oil",
+        "steel",
+        "cash",
+        "mana",
+        "energy"
+      ],
+      "slots_that_moved": 0,
+      "mana_before": 15,
+      "mana_after": 15
+    },
+    "rule": "No stored resource is charged and none is paid, measured across twelve executed transactions in which no resource slot moved and the mana value held steady across a use command. Any price would be invented."
+  },
+  "no_magic_effect": {
+    "verdict": "no magic effect is applied to any unit",
+    "reason": "The use command increments a number. Nothing happens to any unit, because the two branches touch no placement row and resolve no combat."
+  }
+}
