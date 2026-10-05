@@ -3972,3 +3972,335 @@ is loopback.
 first combat-line section present. Writing up another line's delivered evidence
 from memory is how a wrong figure reaches a spec, so that gap is left visible for
 the combat line rather than filled on its behalf.
+
+## Rewards (`godot-rewards`, M10 line 4)
+
+The delivered surface is a **cursor transition**, and the finding is an arithmetic
+mismatch that no amount of reading the schedule can resolve. `docs/legacy-m10-rewards.md`
+is the committed contract (`openspec/changes/2026-10-05-rewards`).
+
+### The verdict
+
+**Both preserved branches advance one cursor and stamp one instant, and BOTH
+derived bounds EXCEED the cardinality of the schedule they would address** — 5
+against 3 weekly, 5 against 5 daily. Positions the recorded cursors actually
+reach name no rung at all.
+
+| | weekly | daily |
+| --- | --- | --- |
+| command | `weekly_reward` (`command.py:345-363`) | `win_daily_bonus` (`command.py:444-463`) |
+| cursor | `weeklyRewardIndex` | `bonusNextId` |
+| stamped instant | `timeStampMondayBonus` | `timestampLastBonus` |
+| committed corpus value | 0 | 0 |
+| derived successor | 1 | 1 |
+| derived bound | **5**, from `get_weekly_reward_length` (`get_game_config.py:195-204`) | **5**, a hardcoded literal (`command.py:451-452`) |
+| schedule cardinality | **3** (`MONDAY_BONUS_REWARDS`) | **5** (`DAILY_GOLD_REWARDS`) |
+| reachable but **not** answerable | `[3, 4]` | `[5]` |
+| answerable but **not** reachable | `[]` | `[0]` |
+
+The difference is reported **in both directions**, so the mismatch is visible
+rather than folded into one number, and it is a **set difference over two recorded
+ranges that performs no lookup** — nothing in the delivered code indexes a
+schedule, because this contract never selects an entry.
+
+**The weekly bound is derived; the daily bound is a literal, and the agreement
+between them is a coincidence, not provenance.** `DAILY_GOLD_REWARDS` holds
+exactly five entries, so its count agrees with the literal — but the name occurs
+**zero** times across all eleven legacy modules, so the two numbers cannot be
+reading as one deriving the other. Conversely the weekly bound is derived from the
+schedule's **list-valued entries**, never from its entry count, which is precisely
+why it is 5 and the cardinality is 3.
+
+**The index base is derived-provisional with the alternative retained.** Nothing in
+the preserved source indexes either schedule, so no source fact fixes the base.
+The zero-based reading is the one under which the committed data carries a
+mismatch (`weeklyRewardIndex` is recorded 0..3 and the bound exceeds 3); a
+one-based reading would still leave positions unaddressed, but a *different* set.
+Neither base is used to select anything.
+
+### What is measured rather than assumed
+
+| measurement | value |
+| --- | --- |
+| legacy modules censused | **11**, discovered by listing every top-level `.py` |
+| reward schedules reported | 11 |
+| schedules with a legacy consumer | **1** — `MONDAY_BONUS_REWARDS`, a quoted subscript |
+| committed save files walked / carrying the seven save-only fields | 34 / **33** |
+| weekly cursor distribution across those documents | `{0: 26, 1: 5, 2: 1, 3: 1}` |
+| daily cursor distribution | `{0: 7, 2: 24, 3: 2}` |
+| type-letter decoder searches / positive-control hits | 6 × 0 / 4, 516, 225 |
+| type letters, reported **undecoded** | `g`, `u`, `c` |
+
+`tasks.md` 3.3 calls this a "twelve-module" census; the measured count is **eleven**
+and the suite **discovers** the set rather than transcribing it, so the correction
+is self-evident rather than a note. The save-only fields' origin is recorded as an
+**inference, not a measurement** — total source absence alongside universal save
+presence — and one of them has exactly one whole-file occurrence, inside a longer
+identifier at `auctions.py:176`, which is therefore not a consumer.
+
+**The three type letters are reported verbatim and never decoded.** Reading `g` as
+gold and `c` as cash is the obvious next step and would be an invention: all six
+decoder searches return zero, and the positive controls confirm those searches
+fire abundantly on the same corpus.
+
+### Three divergences, refused or recorded — never reproduced as parity
+
+| divergence | classification |
+| --- | --- |
+| `client_sent_item` | refused, not reproduced |
+| `client_sent_next_id` | refused, not reproduced |
+| `client_sent_argument_count` | refused, not reproduced |
+
+The preserved weekly branch **selects its arm by the client's argument count**
+(`len(args) > 4`), so the same command name places a row with five arguments and
+grants nothing with four. The daily branch advances a **client-supplied** next id
+and only then wraps it, so a client sending a larger id would have had its cursor
+moved *backwards* onto the first position — a divergence observable in the
+preserved **source**, not only in an executed record. Consequently **an executed
+transaction establishes nothing about what was granted**, because the grant was
+whatever the client asked for.
+
+### The four-part grant proof, and why it is not tautological
+
+A grant could land in four distinct places, so every successful action is checked
+against all four:
+
+1. **no map row** — the placed-row count is unchanged and every row byte-identical
+2. **no bought-units entry** — byte-identical, covering the helper's *deduplicating* behaviour
+3. **no storage entry** — byte-identical, covering the helper's *accumulating* behaviour
+4. **no stored resource moved** — the **complete** set the service exposes, compared as a set and **not** as a subset
+
+The allowlist is the whole-document leaf set, and each action's *entire* document
+is checked, so an implementation that quietly appended to one list fails. Part 4 is
+what makes "no price and no reward" non-tautological.
+
+**The request carries two keys and nothing else** — `{user_id, action}` — so a
+grant shape is not merely refused, it is **not expressible**. The envelope declares
+**fifteen** named reasons and all fifteen are wired into the route's status table
+(`compat_service.py:1743-1774`), of which **twelve** resolve in the recorded pre-write
+validation order — nine client-supplied-value or malformed-request refusals plus
+three recorded-state refusals — and **every one precedes both the cursor write
+and the instant stamp**. That ordering is load-bearing: a refusal that ran far
+enough to stamp would leave a wall-clock difference in a document meant to be
+unchanged, forcing the byte-identity assertion to be weakened.
+
+> Counted by constant **reference**, not by literal string. The route spells these
+> as `rewards_envelope.REASON_UNKNOWN_ACTION`, so a literal grep reports **zero**
+> for `unknown_action` and understates the total — the same
+> whole-name-versus-literal census trap this project has hit before, and the reason
+> this records the counting rule alongside the number.
+
+### No eligibility rule, and no schedule selection
+
+Both branches stamp a wall clock, and a write is reproducible parity, so the stamp
+is written. **Nothing else is.** The weekly instant has exactly one live write
+(`command.py:361`) and its only other occurrence is **commented out**; it has **no
+reader**, so there is no window, no cooldown, no weekly period, no reset boundary
+and no already-claimed test to reproduce — and none is invented. Its *name*
+(`timeStampMondayBonus`) invites exactly the rule this contract refuses to write,
+which is why the absence is a recorded requirement rather than an implementation
+detail.
+
+### Two ownership records, one a real orphan
+
+The three foreign save fields are named **only** inside one literal in the
+delivered module, each with the path that owns it, and the suite asserts no
+identifier is named after any of them:
+
+| field | owning path |
+| --- | --- |
+| `boughtUnits` | `scripts/units/unit_instance_projection.gd` |
+| `store` | `scripts/units/stored_item_flow.gd` |
+| `maps[0]["items"]` | `scripts/town/placement_catalog.gd` |
+
+**`maps[0]["items"]` is named by no OpenSpec specification at all.** The spec corpus
+names `boughtUnits` (twice) and `store` (once, as `maps[0]["store"]`), but the row
+container itself appears in **zero** of the 64 spec files. That is a **recorded
+orphan with no owner invented for it** — the owning path above is the code owner
+this line found, not a spec claim.
+
+`level_ranking_reward` stays owned as **normalized content** by
+`economy-schedules-normalization` and `content-validation`; this capability reports
+the table and delivers no gameplay from it, and neither statement implies the other.
+
+### Verification actually run (2026-10-06)
+
+```bash
+# The hermetic rewards suite standalone (observed: 417 checks, PASS, empty stderr)
+godot --headless --path apps/client-godot --script res://tests/test_rewards.gd
+
+# The same suite with the deterministic evidence report (observed: 420 checks,
+# PASS; LF digest 5e22a2cc2cd3449c9270d8cb0431d19a5e818980755e2673265e7e77b6cc411e
+# in LF form, 44,949 bytes, byte-identical across three consecutive runs; the
+# committed CRLF checkout is 46,118 bytes, digest 1822ff26)
+godot --headless --path apps/client-godot --script res://tests/test_rewards.gd -- --report=<repo>/apps/client-godot/evidence/rewards/report.json
+
+# The reward live phase, standalone (observed: 112 checks; harness summary
+# checks_passed 12, save_mutation_checked true, disposable corpus mutated)
+python -B apps/client-godot/compat_live_phase.py --name reward-live --expect-save-mutation -- <godot> --headless --path apps/client-godot --script res://tests/test_rewards.gd -- --scenario=live-reward
+
+# The compatibility suite (observed: Ran 2921 tests ... OK, exit 0)
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+
+# The scope suite, which pins the client file set (observed: 1934 checks, PASS)
+godot --headless --path apps/client-godot --script res://tests/test_project_scope.gd
+
+# Both batteries in the final state, each exit 0; verify-boot.ps1 now runs
+# 44 hermetic suites and 23 live phases, the twenty-third of them reward-live
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+
+# The content validator (exit 0, result: valid, 22 outputs, 21 schemas, 604 refs)
+python -B packages/game-content/tools/validate_content.py
+
+# The preservation manifest (3,258 entries, 758,423,699 bytes, exit 0)
+python -B tools/hash-manifest/hash_manifest.py verify
+
+# The OpenSpec contract (65 passed, 0 failed)
+openspec validate --all --strict
+```
+
+`verify-boot.ps1` now registers **44 hermetic suites** (was 43) and **23 live
+phases** (was 22), with the guard digest `6978b959…ff348` **identical before and
+after** the run and **832** battery log files inspected carrying zero `^ERROR:`,
+`SCRIPT ERROR`, or `[test] FAIL` lines.
+
+`reward-live` drives **both** actions against the committed corpus, which starts at
+cursor `0` for both — so each derived successor is `1`, **no seeding seam is needed
+or used**, and both requests mutate the disposable save. It then drives a
+**client-side** refusal (`invalid_action`, raised before any transport) and proves
+the whole corpus byte-identical across it. **No endpoint-side refusal is expressible
+through the typed client**, so the endpoint's own refusals are covered by
+`apps/compat-api/tests/test_rewards_endpoint.py` and the phase says so rather than
+implying coverage.
+
+### A flaky-surface class, in a place the earlier audit could not reach, CLOSED
+
+`reward-live` failed on its first full-battery run: the whole-document byte-identity
+check across the refused request reported two documents differing in exactly two
+leaves — `playerInfo.last_logged_in` 1791228206 → 1791228207 and the envelope
+`timestamp` 1791228206 → 1791228207 — and in **nothing else**. Both come from one
+legacy `ts_now = timestamp_now()`, taken once per read and written to both places
+(`get_player_info.py:6-7` and `:14`), so **every bootstrap read mutates the payload it
+returns**. `/v0/reward` was never called between the two snapshots.
+
+This is the **same defect class** as the M9 stored-placement `server_time` flake and
+the `player_info.last_logged_in` half the Damage line closed — and it is **not
+intermittent**: four loopback round trips reliably straddle a second. It was
+**fixed, not re-run**, on that line's reasoning: the claim is now that the
+differing-path set is a **subset** of the documented volatile fields, which is true
+whether or not two reads land in the same second. Asserting that the snapshots
+*differ* would have re-introduced the flake on a new phase.
+
+**Why the earlier audit did not find it, and what remains unverified.** The Damage
+line audited all 15 whole-document equalities and concluded "zero remain at risk" —
+correct **for its scope**, which was the compat suite. This instance is in a
+**Godot live phase**, which that audit never walked. Measured over
+`apps/client-godot/tests/`: **sixteen** suites fetch the bootstrap payload's `.raw`,
+and **thirteen** of them fetch it **more than once** (3 to 6 call sites each), so
+taking two reads within a second is common. `test_rewards.gd` is the **only** file
+under `tests/` that mentions `last_logged_in` at all, and the only one that
+subtracts volatility before a whole-document claim.
+
+**Not established, and deliberately not claimed:** whether any of those other
+fifteen suites is **latently** at risk. That depends on whether each compares two
+whole reads or narrows to selected fields first — `test_damage_magic.gd` does
+narrow, via `_live_magic_keys(...)`, which is why it never hit this — and this line
+did not audit the other fifteen. A fetch count cannot answer it, and a fetch count
+is what was measured. It is left as a recorded follow-up rather than closed by
+assertion.
+
+The subset claim is a claim about the **whole** document, so two guards make it
+non-vacuous, and **both were proven by injection** rather than trusted:
+
+- **a real non-volatile mutation between snapshots** (a live weekly request) → the
+  subset check **failed**, and the byte-identity check failed with it;
+- **a misnamed volatile field** (`timestamp` → `timeStampLastChapter`) → the
+  present-check **failed**, because the strip had silently become a no-op. That run
+  is the sharp one: the byte-identity check *passed*, because those two reads
+  happened to land inside one second, so without the present-check the strip could
+  have been emptied and nothing would have noticed.
+
+Both injections were followed by a byte-identical restore, verified by SHA-256
+(`6301474…88b2b`) and by a passing post-restore run.
+
+### Anti-invention guards, all proven by injection
+
+The module's whole **28**-function static inventory, **23** forbidden names, **19**
+forbidden fragments (15 of them guarded by substring, which is how a disguised
+helper wearing a suffixed name was found), and 4 absent helpers are pinned.
+Injections into the delivered flow module, each followed by a byte-identical
+restore: a grant helper, a cursor-to-rung selector, a type-letter decoder, an
+eligibility helper, and a **suffixed** helper — **five failures each**. Four
+perturbation modes against the counted source inputs — `weekly-seed` (seed 1 → 9),
+`daily-literal` (5 → 9), `weekly-modulo` (increment 1 → 2), and `list-test`
+(`list` → `dict`) — all exit non-zero, which is the guard against the
+vacuous-measurement failure mode this project has hit before.
+
+### Nine defects of this line's own, found by measurement
+
+1. The `weekly-seed` perturbation asserted `check_eq(altered, span)` — backwards, so
+   it failed for the opposite reason it was written to prove.
+2. `RESOURCE_NAMES` listed **seven** accessor names while the real route answers
+   **eight** (the seven plus `privateState.energy` from the service's own
+   post-execution snapshot), so every reward response was refused `bad_response`.
+   Three distinct sets had to be separated, **two of which are both eights**.
+3. The reachability sets and the resource values were copied verbatim off the wire,
+   so the engine's float decoding reported `[3.0, 4.0]` where the corpus has `[3, 4]`
+   — fixed by a pinned `_wire_int_set` helper and whole-value resource reading.
+4. `_live_rows` typed `map["items"]` as an `Array`; it is a **Dictionary** keyed by
+   slot (33 of 33 committed documents), so it answered `-1` and the no-row half of
+   the grant proof read as **vacuous against rows that are there**.
+5. A dead, mis-typed loop assigned an `int` to an `Array` variable, raising a
+   `SCRIPT ERROR` that aborted the whole phase. Dead and load-bearing on nothing:
+   removed rather than fixed.
+6. The live phase hardcoded `[]` for the weekly unanswerable set — **wrong**: bound 5,
+   cardinality 3, so positions `[3, 4]` **are** reachable and **not** answerable. Both
+   directions are now recomputed from the answer's own bound and cardinality.
+7. `evidence/rewards/` did not exist, so `FileAccess.open` failed; the writer now
+   creates it recursively and **checks the result**.
+8. A U+2192 arrow in the live `print` broke the battery's stdout capture under
+   `charmap`, producing three failures including a **fabricated 600-second timeout**.
+   The print is now ASCII.
+9. The report-digest check itself was wrong: it recomputed the LF digest by joining
+   raw **bytes** with a string join, producing a well-formed-looking 32-byte hex
+   string that did not match the recorded digest and appeared to be a content
+   change. It was not — the raw bytes hash to the recorded `5e22a2cc…`, and the
+   report is byte-identical to what the previous run produced. Found by measuring the
+   real bytes instead of trusting the recomputation.
+10. The live-phase table in `verify-boot.ps1` claimed the endpoint has **"nine
+    refusals"**. Measured: `rewards_envelope.py` declares **fifteen** `REASON_*`
+    constants and all **fifteen** are wired into the route's status table
+    (`compat_service.py:1743-1774`), of which **twelve** resolve in the recorded
+    pre-write validation order. The count is also a **measurement trap**: a literal
+    string grep reports **zero** for `unknown_action`, because the route spells it
+    `rewards_envelope.REASON_UNKNOWN_ACTION`. The whole-name-versus-literal census
+    defect class, hit again, in a comment, and caught only because the number was
+    checked against the report instead of trusted.
+11. A README sentence written for this line first claimed `test_rewards.gd` was "the
+    only suite that compares the payload whole-document". Measured: **sixteen**
+    suites fetch that payload and **thirteen** fetch it more than once, so fetch
+    counts cannot establish that claim. Narrowed to what is measured — it is the only
+    file under `tests/` mentioning `last_logged_in` and the only one subtracting
+    volatility — and whether the other fifteen are **latently** at risk is recorded
+    as an open follow-up rather than closed by assertion. A sentence corrected
+    before commit is recorded here because the next reader meets the narrow version
+    with no sign that a stronger version was ever written.
+
+### Claim limits
+
+**No reward is granted, priced, credited, or displayed**, and no delivered identifier
+or response field implies that one was. **No schedule entry is ever selected** from a
+cursor value, and **no type letter is mapped** onto a stored resource. **No
+eligibility, cooldown, window, period, or already-claimed rule** is derived from the
+stamped instant. **The schedule census states a fact about the preserved server's
+source only**; this repository makes no claim about what any client did with the
+configuration bytes it was served. **The save-only fields' origin is an inference, not
+a measurement.** **The ranking-reward table is owned as content and undelivered as
+gameplay.** **The index base is derived-provisional** with the one-based
+alternative retained, and neither base selects anything. **An executed transaction is
+not parity for what was granted**, because the grant was client-sent in both
+branches. Parity covers the committed village corpus only, and no progressed-player
+save exists. **Nothing is rendered**: there is no windowed capture and no pixel-parity
+oracle, because no reward display exists to compare. No Flash, Ruffle, ActionScript,
+or browser executes in any of these commands, and every network call is loopback.

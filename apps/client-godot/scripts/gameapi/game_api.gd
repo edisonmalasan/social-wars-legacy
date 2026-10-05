@@ -54,6 +54,7 @@ const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
 const CombatFlow = preload("res://scripts/units/combat_flow.gd")
 const MagicFlow = preload("res://scripts/units/magic_flow.gd")
+const RewardFlow = preload("res://scripts/rewards/reward_flow.gd")
 const ResearchFlow = preload("res://scripts/units/research_flow.gd")
 const QuestFlow = preload("res://scripts/units/quest_flow.gd")
 const TutorialFlow = preload("res://scripts/progression/tutorial_flow.gd")
@@ -190,6 +191,12 @@ var combat_requests := 0
 ## `MagicFlow.build_magic_intent()` BEFORE this counter moves, because the refusal
 ## is about what the client tried to send.
 var magic_requests := 0
+## Number of reward-cursor intents this process has issued. One per intent; zero
+## for every local refusal -- and note the counting boundary: a request refused
+## for a missing identity or an unrecognised action is refused by
+## `RewardFlow.build_reward_intent()` BEFORE this counter moves, because the
+## refusal is about what the client tried to send.
+var reward_requests := 0
 
 ## The active implementation node (FakeApi or LegacyV0Api).
 var _impl: Variant = null
@@ -724,6 +731,38 @@ func magic_town(user_id: String, action: Variant,
 	magic_requests += 1
 	var result: MagicFlow.MagicResult = await _impl.magic_town(
 		user_id, action, magic_id)
+	return result
+
+
+## One reward-cursor intent (the save identity and a closed `action` **only**) from
+## the selected implementation. There is deliberately no third argument: a
+## successor value, a bound, a schedule position, an item id, an amount, and a
+## timestamp are all unexpressible here, which is what keeps the legacy
+## `win_daily_bonus` branch's grant arm unreachable -- it fires only when the
+## derived item is greater than zero, and the derived item is always zero.
+##
+## The cursor transition is derived server-side from the player's own recorded
+## cursor, and the answer re-derives it again on this side: a successor is
+## recomputed from the reported before value and the reported bound, and a
+## disagreement is a **refusal**, not a re-labelled acceptance. So a caller that
+## trusts the returned `cursor_after` is trusting a value two independent
+## derivations agreed on.
+##
+## ## The reachability difference travels with every answer
+##
+## Each answer reports, for **both** cursors, which positions the cursor can
+## reach and which positions name a committed schedule entry -- and the
+## difference in **both directions**. The weekly cursor reaches positions 3 and
+## 4, which name no rung of a three-entry schedule; the daily cursor reaches
+## position 5, which is outside a five-entry schedule, and never reaches
+## position 0. Those are measured facts about the preserved server's own
+## arithmetic, not defects introduced here, and the answer never resolves them
+## into a selection.
+func reward_town(user_id: String, action: Variant) \
+		-> RewardFlow.RewardResult:
+	reward_requests += 1
+	var result: RewardFlow.RewardResult = await _impl.reward_town(
+		user_id, action)
 	return result
 
 
