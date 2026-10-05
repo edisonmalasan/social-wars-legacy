@@ -219,7 +219,7 @@ no such arm and SHALL report the boundary and each arm's recorded effect instead
 
 #### Scenario: The arm boundary is reported, not reproduced
 
-- **WHEN** a weekly reward operation succeeds
+- **WHEN** the weekly operation on `weeklyRewardIndex` succeeds
 - **THEN** the response reports which preserved arm the recorded client behaviour would have taken, what each arm's recorded effect is, and that the operation itself has no arm and places nothing
 
 ### Requirement: Every refusal resolves before any write, including before the instant stamp, so a refused request leaves the recorded document byte-identical
