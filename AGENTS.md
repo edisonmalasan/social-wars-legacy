@@ -1110,8 +1110,9 @@ elevation interaction, occupancy, bounds, readiness, or interpolation is impleme
 eighteen recorded `ABSENT_HELPERS` entries are the contract, not omissions; **the committed
 movement fields are read by no legacy branch** and are reported as content only; **no
 unit-specific movement command exists and none was invented**; **no unit is placed or moved**
-and the corpus holds no unit row; **no executed-legacy fixture was captured** because there
-is **no unit-specific movement behaviour to capture**, which is stronger than the corpus's
+and `tests/saves/fresh-player.json` holds no unit row (40 placements, 11 distinct ids, every
+committed `type` `b`); **no executed-legacy fixture was captured** because there
+is **no unit-specific movement behaviour to capture**, which is stronger than that document's
 missing unit row and is recorded as a second and independent reason, while the type-agnostic
 move command already has its own executed-legacy fixture under `godot-building-move`; **no
 animation is implemented** and M4's converted unit package establishes asset and timeline
@@ -1261,6 +1262,26 @@ behind the guard at **178**); `resurrectable` is **carried** by 426 units with t
 five-value spread being the *buildings'* only. **None changes the conclusion**, and
 `docs/legacy-unit-behaviors.md` carries a corrections section rather than quiet edits.
 
+**A second discrepancy in that same record is annotated here rather than corrected.** The five
+combat-field figures it cites — `attack` 131, `defense` 1, `life` 150, `min_level` 21,
+`syringes` 6 — read **zero** as legacy consumers under **all six** counting rules applied
+over the seven modules `unit_behaviors.gd` declares as `SEARCHED_MODULES`, so **none of the
+five reproduces as a consumer**: whole-file occurrences, whole-file distinct lines,
+code-only occurrences (comments and string literals stripped), code-only distinct lines,
+exact identifier tokens, and the quoted-access form (`"field"` / `'field'`). The measured
+`attack` row is `12 / 10 / 5 / 5 / 0 / 0`, and all twelve of its whole-file occurrences sit
+inside **longer identifiers** — `end_attack`, `attacker`, `attacker_units`,
+`flash_reload_attack` — never the committed field name as a standalone token; the other four
+fields have **no** occurrence at all in any view. The figures were **not** invented to match
+the prose, because each reproduces **exactly** as the count of distinct committed values over
+the **429** committed unit definitions — 131, 1, 150, 21, and 6 — which is the `unit_distinct`
+column of `unit_behaviors.gd`'s own `ZERO_CONSUMER_FIELDS` table, with all five present on
+all 429 rows and all `int`. The record's numbers are therefore correct and its **placement**
+misleads: it reads as a consumer census and is a content-distribution census. **M8's
+conclusion is left intact** — these fields are content with no legacy consumer, which this
+measurement strengthens — and **no figure is silently replaced**. Note that this change's own
+proposal counted "four of five" and is itself **off by one**: it is five of five.
+
 **Three bugs in the new suite were found and fixed by measurement, not by luck**: `_code_only()` was
 passed a *path* instead of the body, making the syringe-cost, `nc`, and clicks scans **vacuously
 true**; it then desynchronised on an apostrophe inside a double-quoted string, fixed with a proper
@@ -1274,10 +1295,14 @@ directly, diverging from the established pattern. The change is three additive p
 shape of the 15 existing forwarders, and `test_game_api_fake.gd` (1322 checks) still passes.
 
 Claim limits: **no executed-legacy fixture**, and the reason is **specific** rather than the refusal
-lines' "no behaviour exists" — `resurrectable` is **unit-only**, the committed corpus places
-**only buildings** and **no unit row**, and its ledger is present and `{}`; manufacturing a unit row
-is refused, as `godot-unit-instances` refused. Unlike the refusal lines, the cause is the **absence of
-a resurrectable row**, not the absence of behaviour. **No combat is resolved** — `attack`,
+lines' "no behaviour exists" — `resurrectable` is **unit-only**, `tests/saves/fresh-player.json` places
+**only buildings** and **no unit row**, and its ledger is present and `{}`; manufacturing a
+unit row is refused, as `godot-unit-instances` refused. Unlike the refusal lines, the cause is the
+**absence of a resurrectable row**, not the absence of behaviour. **That premise is now SCOPED, and the
+scope is measured rather than implied**: it is true of that ONE document and false of the repository, which
+places **441 unit rows across 7 of the 10 committed save documents** (`test_unit_behaviors.gd`'s `repository_census`, and
+`test_combat_actions.gd`'s census, agree). The absence-of-fixture cause is therefore
+unchanged, because the document this line measures and drives is the fresh-player one. **No combat is resolved** — `attack`,
 `defense`, `life`, `attack_interval`, `attack_range`, `best_against`, and `best_against_mult` are
 content with zero consumers. **No syringe cost** and **no resource movement**. **No occupancy,
 bounds, type, or terrain validation** is added to the revived placement, reproducing the legacy
@@ -1476,6 +1501,32 @@ untouched phase. `verify.ps1` additionally returned **-1** on one of two runs an
 `PASS all checks succeeded` on the second, because its windowed-capture step is display-sensitive — a third
 recorded flaky surface. Re-run before treating any of the three as a regression. No Flash, Ruffle,
 ActionScript, or browser executes in any of these commands, and every network call is loopback.
+**A seventh flaky surface, found by this line: the `test_no_server_is_running`
+family can fail transiently.** Roughly 20 pre-existing compat test classes
+assert that ports 5055 and 5056 are free, via
+`compat_test_harness.port_is_free()`. Running
+`python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py"`
+**three times back to back** produced **19, 24, and 2** failures, while
+single runs and later back-to-back runs passed clean (`Ran 2438 tests ... OK`).
+Every failure was one of those port assertions. **Three candidate causes were
+measured and all three DISPROVED**, which is why this is recorded as open
+rather than explained: **TIME_WAIT** does not block the helper's `bind()`
+probe (verified by generating real TIME_WAIT sockets -- a single one and ~120
+on one port both bind fine, and `port_is_free(5056)` returns `True` right now
+with ~300 TIME_WAIT entries present); there is **no stray process** holding the
+port; and **neither port is in a Windows excluded range** (`netsh` reports only
+5357). No compat test binds either port -- `test_compat_v0.py` uses
+`APP.test_client()` in-process and `run.py --help` never binds. **The mechanism
+is not established.** This line did not introduce it (it adds one more instance
+of an existing assertion) but it did increase exposure, by adding a suite that
+binds 5056 in its live phase. **Re-run before treating it as a regression.**
+Note also that `port_is_free` is a *bind* probe, which on Windows cannot
+distinguish "in use" from "cannot bind"; a `connect` probe would answer the
+real question but would raise inside the harness's own `offline()` guard, whose
+`_NoConnectSocket.connect` raises `AssertionError`. **Not changed here** --
+reworking a shared containment assertion across 20 existing suites is a
+separate change, and guessing at the mechanism is how an unearned fix ships.
+
 Verified unit-tutorial commands (milestone M9 line 3; Godot 4.7.2.stable, Windows
 x64; `python` denotes the pinned interpreter, never the PATH alias). M9's deliver
 list is `XP`, `levels`, `quests`, `research`, `collections`, and

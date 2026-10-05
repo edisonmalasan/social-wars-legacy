@@ -535,6 +535,82 @@ Surface (loopback only, port :5056):
     **zero** legacy consumers, so a cost could only ever arrive smuggled through
     the request's own vector, which legacy applies **before** the branch.
 
+``POST /v0/combat`` with JSON ``{"user_id", "action", "item_id"|"map_key"}``
+    ``{protocol, ok, game_version, server_time, result, action, command, branch,
+    addressing, destruction, ledger_before, ledger_after, ledger_written,
+    ledger_gates, gates, no_third_gate, team_asymmetry, kill_contract,
+    kill_iid_contract, ordering_rule, validation_order, field_inventory,
+    correction, divergence, refusals, no_combat, no_cost_or_reward,
+    no_syringe_cost, no_placement_validation, non_claims, provenance,
+    resources, changed}`` — specified by the ``godot-combat-actions``
+    capability.  One call carries **exactly one** legacy command, chosen by the
+    **closed** action vocabulary ``{"resolve", "kill", "kill_iid"}``, and the
+    request carries **only** a save identity, that action, and the one
+    addressing key the action names.  **No destruction count, no
+    ``sent``/``survived`` pair, and no legacy payload key is accepted** (design
+    D2): all three families are refused with ``client_dictated_destruction``
+    **before** dispatch and before the player's state is consulted, so the
+    answer to "you may not say how many" never depends on whether anything was
+    there.
+
+    **The destruction set is server-derived and is ALWAYS ONE** (design D1).
+    The request names the **identity** of the unit that was lost; the service
+    derives the eligible rows -- recorded slot 0 equal to that id **and** recorded
+    slot 7 truthy, exactly the two conditions ``map_lose_item`` tests at
+    ``engine.py:221`` -- takes the **first by the save's own recorded map-key
+    order**, which is the insertion order ``for index in map_items`` walks and
+    therefore the order the helper pops, and removes exactly one.  The legacy
+    count is ``max(0, unit[2] - unit[3])`` on two client numbers
+    (``command.py:868``) that the committed source labels only ``A`` and ``B``;
+    reproducing it would make this server a pass-through for a client-computed
+    casualty figure, and the difference is recorded as a **divergence**, never as
+    parity.  The branch's apparent safety against over-deletion is **exhaustion
+    of matches, not a check** -- ``map_lose_item`` loops ``while qty > 0`` and
+    returns the moment one pass finds no match -- so no loop count is derived and
+    no clamp is applied.
+
+    **Every check resolves before any row is removed** (design D3), which is what
+    the branch does *not* guarantee: its two unguarded absent-value
+    dereferences sit on **opposite sides** of the write loop, and both answer
+    HTTP 500 with the **persisted** save byte-identical, because ``command.py``
+    dispatches the whole batch first and calls ``save_session`` only afterwards
+    (``command.py:30,32``).  Measured, including a two-command batch whose first
+    command was valid: the failure mode is a **discarded** save rather than a
+    partially applied one, and the persistence boundary is the **batch**.
+
+    **The two kill commands are delivered differently** (design D5).  ``kill``
+    deletes the addressed row **by map key** and **never** touches the ledger --
+    structurally, because its branch holds no reference to
+    ``privateState["deadHeroes"]`` and no ``push_dead_unit`` call at all.
+    ``kill_iid`` contains **no write statement at all**: its whole body is one
+    ``print``, so it is delivered as a **proven no-op** rather than refused,
+    because an empty branch is a behaviour the preserved server has.
+
+    **No combat is resolved and nothing is paid.**  ``attack``, ``defense``,
+    ``life``, ``attack_interval``, ``attack_range``, ``best_against``,
+    ``best_against_mult``, and ``velocity`` each measure zero legacy consumers,
+    so the committed numbers are **content** and never rules.  The derived
+    resource vector is the neutral all-zero one and the post-execution proof
+    requires **every** stored resource to be unchanged, which is what forecloses
+    a delta smuggled through the request -- legacy applies the request's own
+    vector **before** the branch (``command.py:40``).
+
+    **The field inventory is re-derived, never transcribed** (design D4):
+    ``field_inventory`` and the refusal list both come from reading
+    ``command.py`` **as bytes** on every call, so a legacy edit fails the guard
+    instead of silently contradicting the record.  Four figures in the committed
+    investigation and in this change's own spec deltas do not reproduce and are
+    carried beside the measured ones under ``correction``, never silently
+    replaced.
+
+    After execution the endpoint proves the post-state in **four** ways and fails
+    closed with ``internal_error`` on any other outcome: the placement key set
+    differs by **exactly** the derived key and **every** other row is
+    byte-identical; the ledger keeps its recorded key order and every entry
+    matches the derived one by value, or is wholly unchanged when both gates
+    declined; **every** stored resource is **unchanged**; and the placed-row
+    count is checked last, so it can never be the only thing that passed.
+
 ``POST /v0/collection`` with JSON ``{"user_id", "collection_id"}``
     ``{protocol, ok, game_version, server_time, result, collection_id, grant,
     prize, index, eligibility, store_before, store_after, ledger_before,
@@ -614,9 +690,11 @@ code                     HTTP  when
                                 ``0`` sentinels, or an unresolvable id) — the
                                 legacy dispatcher never runs, so such a row is
                                 never reduced to a bare sale
-``missing_action``       400  ``/v0/construction`` body carries no ``action``
-``invalid_action``       400  ``action`` present but not a string, or outside
-                                the closed set ``{"start", "click", "finish"}``
+``missing_action``       400  ``/v0/construction`` or ``/v0/combat`` body carries no ``action``
+``invalid_action``       400  ``action`` present but not a string, or outside the
+                                closed set -- ``{"start", "click", "finish"}`` for
+                                ``/v0/construction``,
+                                ``{"resolve", "kill", "kill_iid"}`` for ``/v0/combat``
 ``no_build_time``        400  ``/v0/construction`` with ``action "start"``: the
                                 addressed placement's item has no resolvable
                                 **positive** committed ``build_time`` (absent,
@@ -783,6 +861,24 @@ code                     HTTP  when
 ``invalid_orientation``  400  ``orientation`` present but not an integer
 ``costs_not_cash``       400  ``/v0/purchase`` item's config price is not a cash
                                price (absent, empty, another resource, mixed)
+``client_dictated_destruction`` 400 ``/v0/combat``: the request carries a
+                               destruction count, either ``sent``/``survived``
+                               operand, or any key ``end_attack`` itself reads.
+                               Refused **before** dispatch and before the
+                               player's state is consulted, so the answer does
+                               not depend on whether anything was there
+``no_eligible_row``      409  ``/v0/combat``: no placed row records the addressed
+                               item id on a truthy team, which is exactly the two
+                               conditions ``map_lose_item`` tests.  The legacy
+                               server answers success here and prints a loss
+                               count it never achieved
+``unaddressable_row``    409  ``/v0/combat``: no placement stands at the addressed
+                               map key.  ``map_get_item`` prints and returns
+                               while the server still answers success
+``unresolvable_ledger``  500  ``/v0/combat``: the player's
+                               ``privateState["deadHeroes"]`` could not be read
+                               as a string-keyed count map.  Reported, never
+                               defaulted to empty
 ``bad_request``          400  other malformed requests Flask rejects
 ``not_found``            404  unknown path
 ``method_not_allowed``   405  known path, unsupported method
@@ -797,7 +893,7 @@ byte-identical. ``POST /v0/place``, ``POST /v0/purchase``,
 ``POST /v0/move``, ``POST /v0/sell``, ``POST /v0/store``,
 ``POST /v0/upgrade``, ``POST /v0/construction``, ``POST /v0/collect``,
 ``POST /v0/expand``, ``POST /v0/level_up``, ``POST /v0/queue``,
-``POST /v0/collection``, and ``POST /v0/resurrect``
+``POST /v0/collection``, ``POST /v0/resurrect``, and ``POST /v0/combat``
 execute the unchanged legacy ``command()`` dispatcher, which
 persists through legacy ``save_session`` into the **service corpus's**
 ``saves/`` and nowhere else; the service never opens a working-tree file for
@@ -817,6 +913,7 @@ import compat_legacy
 import behavior_envelope
 import collect_envelope
 import collection_envelope
+import combat_envelope
 import construction_envelope
 import expand_envelope
 import level_envelope
@@ -920,6 +1017,37 @@ ERROR_MISSING_STEP = "missing_step"
 ERROR_INVALID_STEP = "invalid_step"
 ERROR_NULL_STEP = "null_step"
 ERROR_UNRESOLVABLE_TUTORIAL_STATE = "unresolvable_tutorial_state"
+# --- combat actions (godot-combat-actions) ----------------------------------
+# The three NEW refusal codes. `invalid_action`, `missing_item_id`,
+# `invalid_item_id`, `missing_map_key` and `invalid_map_key` are the shared
+# constants above and are reused unchanged rather than duplicated.
+#
+# All three are DELIBERATE DIVERGENCES from the response, and never from the
+# state. The legacy server answers {"result": "success"} in every one of them,
+# because `map_lose_item` returns the moment one pass finds no match
+# (engine.py:226-227) and `map_get_item`'s falsy branch prints and returns
+# (command.py:173-176). Each is recorded as an executed transaction in the
+# fixture manifest, never as parity.
+#
+# `unresolvable_ledger` is the save-side precondition: the ledger could not be
+# read as a string-keyed count map. It is a 500, matching the treatment the
+# resurrection route already gives the SAME shared projection
+# (`behavior_envelope.REASON_INVALID_LEDGER`), and it is reported rather than
+# defaulted, invented, or silently treated as an empty ledger.
+#
+# `client_dictated_destruction` is the OTHER direction: a 400, because it is a
+# request-shape fault and no state is consulted to reach it (design D2).
+#
+# Note what is deliberately ABSENT: there is no `unknown_item_id` refusal on
+# this route, unlike `POST /v0/place_stored`. Adding one would be inventing a
+# rule -- an item id with no committed definition simply has no eligible row,
+# so `resolve` already answers `no_eligible_row` from the player's own state,
+# and `kill_iid` is a proven no-op whose branch only prints, so refusing it
+# would be stricter than the oracle for no reason.
+ERROR_CLIENT_DICTATED_DESTRUCTION = "client_dictated_destruction"
+ERROR_NO_ELIGIBLE_ROW = "no_eligible_row"
+ERROR_UNADDRESSABLE_ROW = "unaddressable_row"
+ERROR_UNRESOLVABLE_LEDGER = "unresolvable_ledger"
 ERROR_BAD_REQUEST = "bad_request"
 ERROR_NOT_FOUND = "not_found"
 ERROR_METHOD_NOT_ALLOWED = "method_not_allowed"
@@ -1172,6 +1300,94 @@ def _stored_placement_refusal(
         # The committed content, not the request.
         return error_response(500, ERROR_INTERNAL, code)
     return error_response(400, code, str(failure))
+
+
+# ------------------------------------------------------------------
+# combat actions (godot-combat-actions)
+#
+# These two helpers are at MODULE scope for the reason the three above are: the
+# only free route slot is between `/v0/tutorial`'s body and the next decorator,
+# and that whole gap sits inside the tutorial route's own marker-bounded source
+# slice, which the delivered structural guards require to parse as exactly one
+# function. A helper written there would break a delivered guard. Module scope
+# is outside every slice, so each helper takes `boot` as its first parameter.
+#
+# They are deliberately thin. Every rule, refusal code, ordering step, and
+# derived figure lives in `combat_envelope`, so this route and its three suites
+# compare against ONE derivation and neither can drift from the other.
+# ------------------------------------------------------------------
+def _combat_snapshot(
+    boot: compat_legacy.LegacyBoot, user_id: str
+) -> Tuple[Dict[str, Any], Any, Optional[Dict[str, Any]], Dict[str, int]]:
+    """The pre-execution state the combat route proves its transition against.
+
+    ``map_items`` returns the **live** placements dict and the legacy dispatcher
+    mutates it in place, so the rows are copied here -- without the copy a
+    before-snapshot would alias the writes and report the after-state as the
+    before-state, which is the exact failure this function exists to prevent.
+
+    The ledger is read off the save document and copied for the same reason:
+    ``push_dead_unit`` writes into the very dict the proof must compare against.
+    ``None`` and a non-mapping ledger are passed through **unaltered** rather
+    than defaulted to ``{}``, because ``combat_envelope.project_ledger`` must be
+    the single component that decides whether a ledger is readable -- a default
+    here would make an unreadable save look like an empty one.
+    """
+    items = boot.map_items(user_id)
+    document = boot.save_document(user_id)
+    private = document.get(combat_envelope.PRIVATE_STATE_KEY)
+    ledger = (
+        private.get(combat_envelope.LEDGER_KEY)
+        if isinstance(private, dict)
+        else None
+    )
+    return (
+        {str(key): list(value) for key, value in items.items()},  # type: ignore[call-overload]
+        document,
+        ledger,
+        boot.resources(user_id),
+    )
+
+
+def _combat_refusal(reason: str, error: str) -> Tuple[Dict[str, Any], int]:
+    """Map one :mod:`combat_envelope` refusal onto its code and status.
+
+    The split follows the request's own two halves rather than a blanket rule:
+
+    * **400** -- the request's *shape*. A closed-vocabulary action, a
+      well-typed addressing, or a client-sent destruction count. No player
+      state is consulted to reach any of them (design D2).
+    * **409** -- the player's *state*. No eligible row, or an unaddressable key.
+      The request was well formed and the answer is about the corpus.
+    * **500** -- the *save*. An unreadable ledger is a server-side precondition,
+      reported rather than defaulted to empty, and it takes the same treatment
+      the resurrection route gives the same shared projection.
+
+    An unmapped reason fails closed as the service's ``500`` rather than
+    falling through to a client ``400``: an unknown refusal is a bug in the
+    mapping, and answering it as the client's fault would report a server fault
+    against a request that did nothing wrong.
+    """
+    status_by_reason = {
+        combat_envelope.REASON_UNKNOWN_ACTION: (400, ERROR_INVALID_ACTION),
+        combat_envelope.REASON_INVALID_ACTION: (400, ERROR_INVALID_ACTION),
+        combat_envelope.REASON_MISSING_ITEM_ID: (400, ERROR_MISSING_ITEM_ID),
+        combat_envelope.REASON_INVALID_ITEM_ID: (400, ERROR_INVALID_ITEM_ID),
+        combat_envelope.REASON_MISSING_MAP_KEY: (400, ERROR_MISSING_MAP_KEY),
+        combat_envelope.REASON_INVALID_MAP_KEY: (400, ERROR_INVALID_MAP_KEY),
+        combat_envelope.REASON_CLIENT_DICTATED_DESTRUCTION: (
+            400, ERROR_CLIENT_DICTATED_DESTRUCTION
+        ),
+        combat_envelope.REASON_NO_ELIGIBLE_ROW: (409, ERROR_NO_ELIGIBLE_ROW),
+        combat_envelope.REASON_UNADDRESSABLE_ROW: (409, ERROR_UNADDRESSABLE_ROW),
+        combat_envelope.REASON_INVALID_LEDGER: (500, ERROR_UNRESOLVABLE_LEDGER),
+        combat_envelope.REASON_INVALID_VECTOR: (500, ERROR_INTERNAL),
+        combat_envelope.REASON_INVALID_TIMESTAMP: (500, ERROR_INTERNAL),
+    }
+    status, code = status_by_reason.get(
+        reason, (500, ERROR_UNRESOLVABLE_LEDGER)
+    )
+    return error_response(status, code, "%s (%s)" % (error, reason))
 
 
 def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
@@ -1460,6 +1676,444 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
             ),
             200,
         )
+
+    @app.post("/v0/combat")
+    def v0_combat() -> Tuple[Dict[str, Any], int]:
+        """Execute one combat intent through the unchanged legacy path.
+
+        M10 line 2 (``combat-actions``).  One call carries **exactly one**
+        legacy command, chosen by a closed ``action`` vocabulary
+        (:data:`combat_envelope.ACTIONS`):
+
+        ==================  ==================  ===========================
+        ``action``          ``command``         addressing key
+        ==================  ==================  ===========================
+        ``resolve``         ``end_attack``      ``item_id``
+        ``kill``            ``kill``            ``map_key``
+        ``kill_iid``        ``kill_iid``        ``item_id``
+        ==================  ==================  ===========================
+
+        **Design D1 -- the request carries an IDENTITY and nothing else.**  For
+        ``resolve`` the request names the committed item id of the unit that was
+        lost, and the service derives the **eligible rows** (recorded slot 0
+        equal to that id **and** recorded slot 7 truthy, exactly as
+        ``engine.map_lose_item`` tests them at ``engine.py:221``), takes the
+        **first by the save's own recorded map-key order** -- the insertion
+        order ``for index in map_items`` walks and therefore the order it pops --
+        and destroys **exactly one**.  The legacy count is
+        ``max(0, unit[2] - unit[3])`` on two client numbers (``command.py:868``)
+        that the committed source labels only ``A`` and ``B``.
+
+        **Design D2 -- that count is REFUSED, and by a NAMED, SEPARATE guard.**
+        Any client key naming a destruction count, either subtraction operand, or
+        any key the branch itself reads is refused here with
+        ``client_dictated_destruction`` **before dispatch**, with an empty payload
+        and no state change.  This is deliberately a different refusal from the
+        D1 eligibility check, and the difference is the whole point of the
+        design: eligibility is a question about the player's recorded rows, while
+        this one is a question about the request's own keys, and a client that
+        sent a count must be able to tell "you may not say how many" apart from
+        "there was nothing to find".
+
+        **Design D3 -- every check resolves before any row is removed.**  The
+        branch's two unguarded absent-value dereferences sit on **opposite sides**
+        of its write loop: omitting ``attacker_units`` raises at
+        ``command.py:866`` *before* the loop body runs, while omitting ``victim``
+        raises at ``command.py:874`` *after* ``map_lose_item`` already ran.  Both
+        answer HTTP 500, and the **persisted** save is byte-identical either way,
+        because ``command.py`` dispatches the whole batch first and calls
+        ``save_session`` only afterwards (``command.py:30,32``) -- measured,
+        including a two-command batch whose first command was valid and printed
+        its destruction while the persisted state did not move.  The failure mode
+        is a **discarded** save rather than a partially applied one, and the
+        persistence boundary is the **batch**.  Reproducing that ordering here is
+        still refused: every check below resolves before dispatch, so a refusal
+        can never leave a half-applied state whatever a future persistence change
+        does.
+
+        **Design D5 -- two kill contracts, delivered differently.**  ``kill``
+        (``command.py:169-181``) deletes the addressed row **by map key** and
+        **never** touches the ledger -- structurally, because the branch holds no
+        reference to ``privateState['deadHeroes']`` and no call to
+        ``push_dead_unit`` at all, which is a property of the source rather than
+        an observation of one request.  ``kill_iid`` (``command.py:183-187``)
+        **writes nothing**: it binds two locals from ``args``, every assignment
+        target in its body is a bare ``Name``, and its only call is one
+        ``print``, so it is delivered as a **proven no-op** rather than refused, because an
+        empty branch is a behaviour the preserved server has and a client can be
+        verified against.
+
+        **Design D7 -- the team asymmetry is recorded, not exercised.**  The two
+        helpers disagree: ``map_lose_item`` accepts any **truthy** recorded team
+        while ``push_dead_unit`` records only team one, so a non-team-one unit row
+        would be destroyed yet never enter the ledger.  All 441 committed unit
+        rows are team one, so the case is unreachable from the committed corpus,
+        and refusing it would invent a bound the oracle does not have.
+
+        **No combat is resolved and nothing is paid.**  ``attack``, ``defense``,
+        ``life``, ``attack_interval``, ``attack_range``, ``best_against``,
+        ``best_against_mult``, and ``velocity`` each measure zero legacy
+        consumers, so the committed numbers are **content** and never rules: no
+        damage, defence, hit chance, mission, honour, or reward is computed.  The
+        derived resource vector is the neutral all-zero one, and the proof below
+        requires **every** stored resource to be unchanged -- which is what
+        forecloses a delta smuggled through the request, since legacy applies the
+        request's own vector *before* the branch (``command.py:40``).
+
+        **Design D4 -- the field inventory is re-derived, never transcribed.**
+        :func:`combat_envelope.derive_field_inventory` reads ``command.py`` as
+        bytes on every call and classifies each key the branch reads.  The
+        refusal list above is built from that derivation rather than from a
+        transcribed table, so a legacy edit fails the guard instead of silently
+        contradicting the record.  Four recorded figures do not reproduce and are
+        carried as ``correction`` beside the measured ones, never silently
+        replaced.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404,
+                ERROR_UNKNOWN_USER_ID,
+                "no save exists for user_id %r" % user_id,
+            )
+
+        # The field inventory is RE-DERIVED from the committed legacy source, once,
+        # and the SAME record is used for the D2 refusal (step 2) and handed to the
+        # projection (step 4).  Deriving it twice would leave two derivations that
+        # could in principle disagree, and "the refused keys and the projected keys
+        # came from one read" is a claim worth being able to make.
+        inventory = combat_envelope.derive_field_inventory()
+        derived_keys = (
+            list(inventory.get("key_names", [])) if bool(inventory.get("ok")) else []
+        )
+
+        # --- step 1: the action names one of the three branches --------------
+        if "action" not in payload:
+            return error_response(400, ERROR_MISSING_ACTION, "action is required")
+        action = payload["action"]
+        if not combat_envelope.is_action(action):
+            return _combat_refusal(
+                combat_envelope.REASON_INVALID_ACTION,
+                "action must be one of %s" % ", ".join(combat_envelope.ACTIONS),
+            )
+
+        # --- step 2: NO client-dictated destruction (design D2) --------------
+        # A separate, NAMED refusal, deliberately reached before the addressing
+        # and long before the player's state is read: the client may not say how
+        # many, and the answer does not depend on whether anything was there.
+        refused_keys = combat_envelope.refused_client_keys(payload, derived_keys)
+        if refused_keys:
+            return _combat_refusal(
+                combat_envelope.REASON_CLIENT_DICTATED_DESTRUCTION,
+                "the request carries client-supplied combat payload keys that the "
+                "legacy branch would read as its own casualty figure: %s"
+                % ", ".join(refused_keys),
+            )
+
+        addressing_key = combat_envelope.ACTION_ADDRESSING_KEY[action]
+        if addressing_key not in payload:
+            return _combat_refusal(
+                combat_envelope.REASON_MISSING_ITEM_ID
+                if addressing_key == "item_id"
+                else combat_envelope.REASON_MISSING_MAP_KEY,
+                "%s is required for action %r" % (addressing_key, action),
+            )
+        addressing = payload[addressing_key]
+
+        # --- steps 3-7: EVERY check resolves here, before any dispatch -------
+        # `project_combat` runs the whole of `combat_envelope.VALIDATION_ORDER`
+        # above the write, which is what makes a refusal leave the recorded
+        # document byte-identical (design D3).
+        try:
+            items_before, _document_before, ledger_before, resources_before = (
+                _combat_snapshot(boot, user_id)
+            )
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        projection = combat_envelope.project_combat(
+            items_before,
+            ledger_before,
+            action,
+            addressing,
+            lambda item_id: _committed_item(boot, item_id),
+            inventory,
+        )
+        if not bool(projection.get("ok", False)):
+            return _combat_refusal(
+                str(projection.get("reason", "")),
+                str(projection.get("error", "")),
+            )
+
+        ledger_snapshot = (
+            None if ledger_before is None else dict(ledger_before)
+        )
+        destruction = int(projection["destruction"])  # type: ignore[arg-type]
+        derived_key = (
+            None
+            if projection.get("eligible") is None
+            else projection["eligible"].get("addressed_key")  # type: ignore[union-attr]
+        )
+
+        # The derived blob carries the resolved identity, so the branch's own
+        # `json.loads` sees a number this server wrote rather than one a client
+        # sent.  The module global is reset in `finally` so no stale value can
+        # reach a later request on the same process.
+        combat_envelope.set_derived_identity(addressing)
+        try:
+            try:
+                envelope_payload = combat_envelope.build_envelope(action, addressing)
+            except combat_envelope.EnvelopeError as failure:
+                return _combat_refusal(failure.code, str(failure))
+
+            # --- step 9: THE WRITE STEP -------------------------------------
+            # Execute the unchanged legacy dispatcher in-process.  It persists via
+            # legacy save_session into THIS corpus only.  The legacy HTTP route
+            # answers {"result": "success"} whenever `command()` returns without
+            # raising, so reaching here IS the legacy result -- which is precisely
+            # why it is NOT taken as proof of anything below.
+            try:
+                boot.execute_commands(user_id, envelope_payload)
+            except Exception as failure:  # legacy raised after validation passed
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "legacy command execution failed: %s" % type(failure).__name__,
+                )
+        finally:
+            combat_envelope.clear_derived_identity()
+
+        # --- step 10: THE POST-EXECUTION PROOF ------------------------------
+        # Four halves, all VALUE comparisons against the derivation.  A count
+        # comparison would pass while the wrong row was removed or a neighbouring
+        # entry changed, so none of these checks a count alone.
+        try:
+            items_after_raw, _document_after, ledger_after, resources_after = (
+                _combat_snapshot(boot, user_id)
+            )
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        changed: list = []
+
+        # (a) The placements.  Exactly the derived key is gone when a row was
+        # destroyed, and EVERY other row is byte-identical -- which is what makes
+        # "one row, and only that row" a claim about the whole map rather than
+        # about the removal.
+        after_keys = set(items_after_raw)
+        expected_keys = set(items_before) - (
+            {derived_key} if derived_key is not None else set()
+        )
+        if after_keys != expected_keys:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the placement set is %d keys after execution against the derived "
+                "%d: the only permitted difference is the derived key %r"
+                % (len(after_keys), len(expected_keys), derived_key),
+            )
+        for key in sorted(items_before):
+            if key == derived_key:
+                continue
+            if items_after_raw[key] != items_before[key]:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "placement %s changed %r -> %r: a combat action destroys the "
+                    "derived row and rewrites nothing else"
+                    % (key, items_before[key], items_after_raw[key]),
+                )
+        if derived_key is not None:
+            changed.append("/maps/0/items/%s" % derived_key)
+
+        # (b) The ledger.  Every surviving entry keeps its recorded value AND its
+        # recorded order, so a comparison against the persisted ledger is a value
+        # comparison rather than a re-ordering; the derived entry is checked by
+        # value in both directions.
+        #
+        # The expected key order is derived from the ledger's OWN recorded order,
+        # NOT from the shared projection's entry dict: `project_ledger` sorts its
+        # keys, because it is a display projection, so comparing against it would
+        # reject every ledger whose recorded order is not already sorted.  What the
+        # legacy helper does to the order is exact and small -- `+=` on a present
+        # key leaves its position alone, and `= 1` on an absent key appends
+        # (`engine.py:164-167`) -- so the expected order is the recorded order,
+        # with the derived key appended when and only when it was created.
+        if ledger_snapshot is None:
+            if ledger_after is not None:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "the ledger appeared at execution time, which no derived "
+                    "transition can produce",
+                )
+        else:
+            if not isinstance(ledger_after, dict):
+                return error_response(
+                    500, ERROR_INTERNAL, "the ledger is %s after execution"
+                    % type(ledger_after).__name__
+                )
+            derived_ledger = projection["ledger_after"]  # type: ignore[index]
+            expected_entries = derived_ledger["entries"]  # type: ignore[index]
+            expected_order = list(ledger_snapshot)
+            if bool(derived_ledger["written"]) and not bool(  # type: ignore[index]
+                derived_ledger["present_before"]  # type: ignore[index]
+            ):
+                expected_order.append(derived_ledger["item_id"])  # type: ignore[index]
+            if list(ledger_after) != expected_order:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "the ledger's key order is %r after execution, not the derived "
+                    "%r: entries keep their recorded insertion order and a created "
+                    "key is appended (engine.py:164-167)"
+                    % (list(ledger_after), expected_order),
+                )
+            for key in expected_entries:
+                expected_value = int(expected_entries[key])  # type: ignore[index]
+                if int(ledger_after.get(key, -1)) != expected_value:
+                    return error_response(
+                        500,
+                        ERROR_INTERNAL,
+                        "ledger[%r] is %r after execution, not the derived %r"
+                        % (key, ledger_after.get(key, "<absent>"), expected_value),
+                    )
+            if bool(derived_ledger["written"]):  # type: ignore[index]
+                changed.append("/privateState/deadHeroes/%s" % derived_ledger["item_id"])  # type: ignore[index]
+            # NOTE: there is deliberately NO third "the ledger moved" check here.
+            # When the gates decline, the derived entry set IS the pre-execution
+            # set value for value, so the order half above already rejects any
+            # added, removed, or re-ordered key and the value half above already
+            # rejects any changed value -- `ledger_after == ledger_snapshot` is
+            # then the only reachable outcome. A guard for it would be
+            # unreachable rather than defensive, so it is not written; see
+            # `test_the_declined_write_need_no_third_ledger_guard`, which measures
+            # both arms rather than trusting the argument.
+
+        # (c) Every stored resource, never a subset.  This is what makes "no
+        # honour, no reward, no syringe cost" non-tautological rather than a
+        # statement about resources nobody looked at.
+        for name in combat_envelope.RESOURCE_NAMES:
+            if name not in resources_before or name not in resources_after:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "stored resource %s is missing from one side of the proof: the "
+                    "comparison covers the FULL resource set, never a subset" % name,
+                )
+            if resources_after[name] != resources_before[name]:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "resource %s is %r after execution, not the pre-execution %r: a "
+                    "combat action moves no resource, so the derived neutral vector "
+                    "requires every stored resource to be unchanged"
+                    % (name, resources_after[name], resources_before[name]),
+                )
+
+        # (d) The row count, stated as a count LAST.  Every half above is a value
+        # comparison, so this one can never be the only thing that passed.
+        rows_after = len(items_after_raw)
+        if rows_after != len(items_before) - destruction:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the corpus holds %d placed rows after execution, not the derived "
+                "%d" % (rows_after, len(items_before) - destruction),
+            )
+
+        eligible = projection.get("eligible") or {}
+        ledger_projection = projection.get("ledger_before") or {}
+        gates_evaluated = (
+            (projection.get("ledger_after") or {}).get("gates") or {}
+        )
+        branch = next(
+            record for record in combat_envelope.BRANCHES
+            if record["action"] == action
+        )
+        return (
+            envelope(
+                boot,
+                result="success",
+                action=action,
+                command=branch["command"],
+                branch=branch,
+                addressing={
+                    "key": addressing_key,
+                    "value": addressing,
+                    "kind": combat_envelope.ACTION_ADDRESSING[action],
+                    "note": "the request names an IDENTITY or a KEY and nothing "
+                            "else; the destruction set is derived from the "
+                            "player's own recorded rows",
+                },
+                destruction={
+                    # ALWAYS ONE, and never a count a client could have chosen.
+                    "count": destruction,
+                    "derived": True,
+                    "derived_key": derived_key,
+                    "derived_row": (
+                        None
+                        if projection.get("addressed_row") is None
+                        else list(projection["addressed_row"])  # type: ignore[arg-type]
+                    ),
+                    "eligible_keys": list(eligible.get("eligible_keys", [])),
+                    "eligible_count": int(eligible.get("eligible_count", 0) or 0),
+                    "order": "the save's own recorded map-key (insertion) order, "
+                             "which is the order `for index in map_items` walks "
+                             "and therefore the order map_lose_item pops",
+                    "refused_count": combat_envelope.CLIENT_DICTATED_REFUSAL,
+                    "refused_count_note": combat_envelope.REFUSED_COUNT_NOTE,
+                    "printed_count_is_request": (
+                        combat_envelope.PRINTED_COUNT_IS_A_REQUEST
+                    ),
+                    "rows_before": len(items_before),
+                    "rows_after": rows_after,
+                },
+                ledger_before=[
+                    {"item_id": entry["item_id"], "count": entry["count"]}
+                    for entry in ledger_projection.get("entries", [])
+                ],
+                ledger_after=[
+                    {"item_id": str(key), "count": ledger_after[key]}
+                    for key in ledger_after
+                ] if isinstance(ledger_after, dict) else None,
+                ledger_written=bool(projection.get("ledger_written", False)),
+                ledger_gates=gates_evaluated,
+                gates=combat_envelope.gates(),
+                no_third_gate=combat_envelope.NO_THIRD_GATE,
+                team_asymmetry=combat_envelope.TEAM_ASYMMETRY,
+                kill_contract=(
+                    combat_envelope.KILL_CONTRACT
+                    if action == combat_envelope.ACTION_KILL
+                    else None
+                ),
+                kill_iid_contract=(
+                    combat_envelope.KILL_IID_CONTRACT
+                    if action == combat_envelope.ACTION_KILL_IID
+                    else None
+                ),
+                ordering_rule=combat_envelope.ORDERING_RULE,
+                validation_order=combat_envelope.validation_order(),
+                field_inventory=inventory,
+                correction=combat_envelope.conflicts(),
+                divergence=combat_envelope.DIVERGENCE_RECORD,
+                refusals=combat_envelope.refusals(),
+                no_combat=combat_envelope.NO_COMBAT,
+                no_cost_or_reward=combat_envelope.NO_COST_OR_REWARD,
+                no_syringe_cost=combat_envelope.NO_SYRINGE_COST,
+                no_placement_validation=combat_envelope.NO_PLACEMENT_VALIDATION,
+                non_claims=combat_envelope.NON_CLAIMS,
+                provenance=combat_envelope.PROVENANCE,
+                resources=resources_after,
+                changed=changed,
+            ),
+            200,
+        )
+
     @app.post("/v0/place_stored")
     def v0_place_stored() -> Tuple[Dict[str, Any], int]:
         """Execute one storage placement intent through the unchanged legacy path.

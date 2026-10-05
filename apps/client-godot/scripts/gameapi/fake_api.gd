@@ -108,6 +108,7 @@ const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const Paths = preload("res://scripts/package_paths.gd")
 const UnitBehaviors = preload("res://scripts/units/unit_behaviors.gd")
 const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
+const CombatFlow = preload("res://scripts/units/combat_flow.gd")
 const ResearchFlow = preload("res://scripts/units/research_flow.gd")
 const QuestFlow = preload("res://scripts/units/quest_flow.gd")
 const TutorialFlow = preload("res://scripts/progression/tutorial_flow.gd")
@@ -4870,6 +4871,103 @@ func _ensure_behavior_loaded() -> bool:
 	_behavior_state = state
 	_behavior_pid = str(pid)
 	return true
+
+
+# --- combat double (godot-combat-actions design D8) ----------------------------
+
+
+## The recorded `response.body` files of the committed combat fixture are the
+## **legacy** `{"result": "success"}` shape, so no captured answer can seed this
+## double —" exactly the recorded absence the stored-placement line also carries.
+## The double is therefore built the way the revival double is: from the
+## committed corpus save, the shared projection in `combat_flow.gd`, and the
+## shared ledger increment in `unit_behaviors.gd`, with no clock and no server.
+##
+## It is NEVER a parity oracle.  Parity against executed legacy is owned
+## exclusively by `apps/compat-api/tests/test_combat_parity.py`.
+##
+## The committed corpus places **zero** unit rows, so a `resolve` against it
+## answers `no_eligible_row` -- which is the honest answer, not a limitation
+## worked around.  A positive `resolve` is unreachable from the committed corpus
+## for the same reason `combat-live` cannot prove one; the hermetic suite proves
+## it over crafted in-memory input instead.
+func combat_town(user_id: String, action: Variant,
+		addressing: Variant) -> CombatFlow.CombatResult:
+	if user_id.strip_edges() == "":
+		return CombatFlow.combat_failure("missing_user_id",
+			"user_id must be a non-empty string")
+	if not _ensure_behavior_loaded():
+		return CombatFlow.combat_failure("fixture_unreadable", _behavior_error)
+	if user_id != _behavior_pid:
+		return CombatFlow.combat_failure("unknown_user_id",
+			"no save exists for user_id '%s'" % user_id)
+	# The design-D2 refusal and the addressing typing both resolve HERE, before
+	# the double reads a single placement row —" the same order the live service
+	# uses, so a request that names a destruction count never even reaches the
+	# player's state in either implementation.
+	var intent := CombatFlow.build_intent(user_id, action, addressing)
+	if not bool(intent.get("ok", false)):
+		return CombatFlow.combat_failure(str(intent.get("reason", "")),
+			str(intent.get("error", "")))
+	var rows: Dictionary = (_behavior_state["rows"] as Dictionary).duplicate(true)
+	var ledger_before: Dictionary = (_behavior_state["ledger"] as Dictionary) \
+		.duplicate(true)
+	var projection: Dictionary = CombatFlow.project_combat(
+		rows, ledger_before, str(action), addressing,
+		func(item_id: int) -> Variant: return _behavior_item(item_id))
+	if not bool(projection.get("ok", false)):
+		return CombatFlow.combat_failure(str(projection.get("reason", "")),
+			str(projection.get("error", "")))
+
+	# --- the write step: exactly one row, and only the derived one ------------
+	# `kill_iid` is a proven no-op, so it carries NO eligible set and NO derived
+	# key at all; the emptiness is the result, not a missing value.
+	var eligible: Dictionary = {}
+	if projection.get("eligible") is Dictionary:
+		eligible = projection.get("eligible")
+	var derived_key := str(eligible.get("addressed_key", ""))
+	var destruction := int(projection.get("destruction", 0))
+	var rows_before := rows.size()
+	var changed: Array = []
+	if destruction == 1:
+		rows.erase(derived_key)
+		changed.append("/maps/0/items/%s" % derived_key)
+	var rows_after := rows.size()
+
+	# --- the ledger, by `engine.push_dead_unit`'s own two arms ---------------
+	var ledger_after: Dictionary = ledger_before.duplicate(true)
+	var derived_ledger: Dictionary = projection.get("ledger_after") as Dictionary
+	if bool(projection.get("ledger_written", false)):
+		var item_text := str(derived_ledger.get("item_id"))
+		if bool(derived_ledger.get("present_before", false)):
+			# `+=` on a present key leaves its recorded position alone.
+			ledger_after[item_text] = int(ledger_after.get(item_text, 0)) \
+				+ int(derived_ledger.get("count_after", 1))
+		else:
+			# `= 1` on an absent key appends (engine.py:164-167).
+			ledger_after[item_text] = 1
+		changed.append("/privateState/deadHeroes/%s" % item_text)
+
+	_behavior_state["rows"] = rows
+	_behavior_state["ledger"] = ledger_after
+
+	# Nothing else moves: the branch resolves no resource and the derived vector
+	# is the neutral all-zero one, so the reported set is what the intent started
+	# from —" the strongest form of the "no honour, no reward, no cost" proof.
+	return CombatFlow.parse_combat(CombatFlow.build_response(
+		action,
+		addressing,
+		projection,
+		{
+			"ledger_after": ledger_after,
+			"rows_before": rows_before,
+			"rows_after": rows_after,
+			"changed": changed,
+			"resources": _behavior_resources(),
+			# Deterministic: the boot fixture's recorded epoch, never the clock.
+			"server_time": _fixture_server_time(),
+			"game_version": str(_save_list_doc.get("game_version", "")),
+		}))
 
 
 # --- research double (godot-research design D8) ------------------------------

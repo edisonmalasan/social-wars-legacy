@@ -1117,12 +1117,42 @@ class RecordedAbsenceTests(unittest.TestCase):
     def test_the_helper_block_defines_only_the_three_documented_helpers(self) -> None:
         text = source()
         start = text.index("def _stored_placement_state(")
-        end = text.index("def create_app(")
+        # Bounded by THIS line's own banner rather than by ``create_app``.
+        # A later line (``godot-combat-actions``) added two more module-scope
+        # helpers above ``create_app`` for exactly the same reason, and extending
+        # this slice to ``create_app`` would silently fold them into an assertion
+        # whose name and subject are the three stored-placement helpers. The
+        # stronger whole-region claim is asserted by the test below instead.
+        end = text.index("# combat actions (godot-combat-actions)")
         block = textwrap.dedent(text[start:end].lstrip("\n"))
         tree = ast.parse(block)
         self.assertEqual(
             [node.name for node in tree.body if isinstance(node, ast.FunctionDef)],
             ["_stored_placement_state", "_stored_item_row", "_stored_placement_refusal"],
+        )
+
+    def test_the_whole_module_scope_helper_region_declares_only_documented_helpers(
+        self,
+    ) -> None:
+        # The version of the assertion above that keeps holding as lines are
+        # added: EVERY module-scope helper above ``create_app`` is one of the
+        # documented ones. Pinning the whole inventory is deliberate -- it makes
+        # "a helper cannot hide inside a route's marker-bounded slice" the ONLY
+        # way to add one, and it fails loudly the moment a helper appears that no
+        # delivered suite claims.
+        text = source()
+        start = text.index("def envelope(")
+        end = text.index("def create_app(")
+        block = textwrap.dedent(text[start:end].lstrip("\n"))
+        tree = ast.parse(block)
+        self.assertEqual(
+            [node.name for node in tree.body if isinstance(node, ast.FunctionDef)],
+            [
+                "envelope", "error_payload", "error_response", "_resolve_user_id",
+                "_legacy_boot_error", "_seed_dead_heroes", "_committed_item",
+                "_stored_placement_state", "_stored_item_row",
+                "_stored_placement_refusal", "_combat_snapshot", "_combat_refusal",
+            ],
         )
 
 
@@ -1173,7 +1203,8 @@ class RoutePlacementTests(unittest.TestCase):
                 offsets.append(cursor)
             cursor += len(line) + 1
         names = (
-            "tutorial", "place_stored", "sell_stored", "session", "bootstrap",
+            "tutorial", "combat", "place_stored", "sell_stored", "session",
+            "bootstrap",
             "place", "purchase", "move", "sell", "store", "upgrade",
             "construction", "collect", "expand", "queue", "collection",
             "resurrect", "quests", "research", "level_up",
@@ -1201,7 +1232,8 @@ class RoutePlacementTests(unittest.TestCase):
                 offsets.append(cursor)
             cursor += len(line) + 1
         names = (
-            "tutorial", "place_stored", "sell_stored", "session", "bootstrap",
+            "tutorial", "combat", "place_stored", "sell_stored", "session",
+            "bootstrap",
             "place", "purchase", "move", "sell", "store", "upgrade",
             "construction", "collect", "expand", "queue", "collection",
             "resurrect", "quests", "research", "level_up",

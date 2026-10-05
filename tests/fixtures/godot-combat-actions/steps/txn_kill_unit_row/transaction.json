@@ -1,0 +1,115 @@
+{
+  "changed_leaf_count": 7,
+  "changed_leaves": [
+    {
+      "after": null,
+      "before": 1076,
+      "path": "/maps/0/items/1639/0",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 66,
+      "path": "/maps/0/items/1639/1",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 28,
+      "path": "/maps/0/items/1639/2",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 1705744977,
+      "path": "/maps/0/items/1639/3",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 0,
+      "path": "/maps/0/items/1639/4",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 297,
+      "path": "/maps/0/items/1639/6/xp",
+      "present_after": false,
+      "present_before": true
+    },
+    {
+      "after": null,
+      "before": 1,
+      "path": "/maps/0/items/1639/7",
+      "present_after": false,
+      "present_before": true
+    }
+  ],
+  "command": "kill",
+  "crafted_args": [
+    1639,
+    0
+  ],
+  "crafted_units": null,
+  "expected_removed_keys": [
+    "1639"
+  ],
+  "expected_status": 200,
+  "ledger_after": {},
+  "ledger_before": {},
+  "ledger_keys_after": 0,
+  "ledger_keys_before": 0,
+  "ledger_moved": false,
+  "modern_derives_ledger": {},
+  "modern_derives_removed_keys": [
+    "1639"
+  ],
+  "name": "kill_unit_row",
+  "note": "kill deletes the addressed row by MAP KEY -- not by item identity -- and NEVER touches the ledger. The seed's ledger is empty, so this transaction cannot by itself prove the non-participation; that claim rests on the branch holding no reference to privateState['deadHeroes'] and no call to push_dead_unit at all, which is a property of the source rather than an observation of one request.",
+  "parity_with_delivered_endpoint": true,
+  "printed_branch_lines": [
+    "[+] COMMAND: kill([1639, 0]) -> Kill Crusader Soldier. Reason: 0"
+  ],
+  "printed_destruction_counts": [],
+  "removed_keys": [
+    "1639"
+  ],
+  "resource_neutral": true,
+  "resources_after": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "resources_before": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "response_payload": {
+    "result": "success"
+  },
+  "rows_after": 318,
+  "rows_before": 319,
+  "rows_removed": 1,
+  "seed": "destruction",
+  "state_sha256_after": "4b7c20dfca6197290f315933750e0eca58e0ac0673db41c50e50ddb71eb0ee4f",
+  "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "status": 200,
+  "unchanged_leaves_sha256_after": "4b7c20dfca6197290f315933750e0eca58e0ac0673db41c50e50ddb71eb0ee4f",
+  "unchanged_leaves_sha256_before": "4b7c20dfca6197290f315933750e0eca58e0ac0673db41c50e50ddb71eb0ee4f",
+  "victim_supplied": true
+}

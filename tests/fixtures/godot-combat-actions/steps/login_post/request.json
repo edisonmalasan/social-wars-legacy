@@ -1,0 +1,22 @@
+{
+  "captured_at_utc": "2026-10-05T01:03:28+00:00",
+  "form": {
+    "GAMEVERSION": "Basesec_1.5.4.swf",
+    "USERID": "AcidCaos"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "Session fidelity only. This step leaves the corpus byte-identical, which the capture asserts for EVERY transaction even though only this one is recorded.",
+  "path": "/",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "seed_save": "AcidCaos.json",
+  "target": "/"
+}

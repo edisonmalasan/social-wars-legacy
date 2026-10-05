@@ -1,0 +1,1791 @@
+{
+  "batch_shape": {
+    "arguments": "CRAFTED AND CLIENT-SUPPLIED. end_attack's args[0] is the client blob, read with json.loads and no validation of any kind; args[1] is bound to the local `unknown` and never read. kill and kill_iid take [subject, reason], and each branch uses its reason only inside a print.",
+    "commands": [
+      "end_attack",
+      "kill",
+      "kill_iid"
+    ],
+    "resource_vector": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "ts": 1700000000,
+    "ts_note": "Pinned to a constant, as on the stored-placement and unit-experience captures. The dispatcher parses it and never reads it.",
+    "vector_status": "neutral by construction, every transaction"
+  },
+  "captured_at_utc": "2026-10-05T01:03:52+00:00",
+  "cleanup": {
+    "disposables": 13,
+    "note": "Each disposable is removed by the harness's own finally block; the fixture is staged OUTSIDE the working tree and published only after every check passed, so a failed run writes nothing into the repository."
+  },
+  "containment": {
+    "combined_after": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "combined_before": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "groups": [
+      "config",
+      "mods",
+      "root_python",
+      "saves",
+      "templates",
+      "tests/saves",
+      "villages"
+    ],
+    "identical": true,
+    "protected_fixtures": [
+      "godot-building-collect",
+      "godot-building-construction",
+      "godot-building-expand",
+      "godot-building-move",
+      "godot-building-placement",
+      "godot-building-sell",
+      "godot-building-store",
+      "godot-building-upgrade",
+      "godot-building-xp",
+      "godot-compatibility-boot",
+      "godot-item-purchase",
+      "godot-quests",
+      "godot-research",
+      "godot-stored-item-placement",
+      "godot-tutorial",
+      "godot-unit-collection",
+      "godot-unit-experience",
+      "godot-unit-queues"
+    ],
+    "protected_fixtures_unchanged": true,
+    "seed_sha256_after": {
+      "destruction": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd",
+      "ledger": "0d9b4e124e6b1046dc9b6a01dee6e6e8f32ff010b3b497f33c294747d5f12cf4"
+    },
+    "seed_sha256_before": {
+      "destruction": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd",
+      "ledger": "0d9b4e124e6b1046dc9b6a01dee6e6e8f32ff010b3b497f33c294747d5f12cf4"
+    },
+    "working_tree_saves_absent": true
+  },
+  "derived_provisional": [
+    "That the recorded map-key order -- rather than a sort -- is the selection order. It rests on `for index in map_items` walking the save's own insertion order plus the committed corpus's out-of-order insertions, and the oracle's removal of 2425 rather than 897 measures it end to end.",
+    "The choice of villages/AcidCaos.json and villages/Neutral.json as the two disposable seeds, recorded so a rerun reproduces the committed bytes.",
+    "That the `reason` argument of kill and kill_iid has no stored effect: each branch uses it only inside an f-string."
+  ],
+  "divergences": {
+    "central": {
+      "compared": [
+        "resolve_first_by_recorded_order",
+        "client_dictated_count_two"
+      ],
+      "modern_derives_rows_removed": 1,
+      "oracle_printed_counts": [
+        [
+          1
+        ],
+        [
+          2
+        ]
+      ],
+      "oracle_rows_removed_one": 1,
+      "oracle_rows_removed_two": 2,
+      "parity_claimed": false,
+      "same_crafted_identity": true
+    },
+    "count": 1,
+    "persistence_boundary": {
+      "after_rows_removed": 0,
+      "after_state_unchanged": true,
+      "all_three_failed_with": 500,
+      "batch_rows_removed": 0,
+      "batch_state_unchanged": true,
+      "before_rows_removed": 0,
+      "before_state_unchanged": true,
+      "compared": [
+        "resolve_absent_attacker_units",
+        "resolve_absent_victim",
+        "resolve_batch_discarded_on_raise"
+      ],
+      "consequence_for_this_capability": "A refused combat request must leave the persisted document byte-identical, which it does; but the reason is the batch boundary rather than a check inside the branch, so a delivered endpoint that dispatched a partial batch would differ. Every check here resolves before dispatch, which makes the refusal indistinguishable from the oracle's by persisted state.",
+      "in_memory_mutation_evidence": "The absent-victim and batch transactions both reach map_lose_item BEFORE their raise, so the in-memory save was mutated; the recorded state does not move because save_session(command.py:32) runs only after the dispatch loop completes, and an exception skips it. The persistence boundary is therefore the BATCH, not the command.",
+      "in_memory_mutation_happened": true,
+      "printed_but_not_persisted": {
+        "resolve_absent_victim": {
+          "persisted_rows_removed": 0,
+          "printed": 1
+        },
+        "resolve_batch_discarded_on_raise": {
+          "persisted_rows_removed": 0,
+          "printed": 1
+        }
+      }
+    },
+    "recorded_not_narrowed": true,
+    "transactions": [
+      {
+        "delivered_endpoint_refusal": null,
+        "divergence": "THE CENTRAL DIVERGENCE, MEASURED. The client sent A=3 and B=1, so the oracle computed max(0, 3 - 1) == 2 and destroyed TWO rows, incrementing the ledger twice. This capability destroys EXACTLY ONE row and increments once. Reproducing the subtraction would make this server a pass-through for a client-computed casualty figure, which is the AGENTS.md Bad pattern. The oracle's apparent safety is EXHAUSTION OF MATCHES, not a check: engine.py:218-227 loops `while qty > 0` and returns the moment one pass finds no match, so a client asking for a thousand removes a thousand while any match remains.",
+        "modern_derives_ledger": {
+          "1020": 1
+        },
+        "modern_derives_rows_removed": 1,
+        "name": "client_dictated_count_two",
+        "oracle_ledger_after": {
+          "1020": 2
+        },
+        "oracle_rows_removed": 2
+      }
+    ],
+    "why_not_narrowed": "Narrowing either would require a combat rule the preserved source does not contain. The client-computed count has no committed meaning, and the ordering difference would require inventing a pre-write validation the legacy branch does not perform."
+  },
+  "established": [
+    "The destruction count is max(0, unit[2] - unit[3]) on two numbers the CLIENT supplies (command.py:868), labelled only 'A' and 'B' in the committed source, with nothing establishing what they mean.",
+    "That count is applied PER POPPED ROW: one request carrying one tuple with A=3, B=1 incremented the ledger twice and removed two rows.",
+    "The oracle's safety against over-deletion is EXHAUSTION OF MATCHES, not a check: engine.py:218-227 loops `while qty > 0` and returns the moment one pass finds no match.",
+    "A row is selected by item id (slot 0) plus a TRUTHY team (slot 7) -- engine.py:221 -- and popped in the save's own RECORDED map-key order, which is not a sort: item 1020's first recorded eligible row is 2425 while its numeric minimum is 897, and the oracle removed 2425.",
+    "The ledger increment is behind EXACTLY TWO committed gates: player team 1 (engine.py:151) and a committed resurrectable flag greater than zero (engine.py:159,162). An absent flag is a refusal, never a zero.",
+    "Both ledger arms are reachable and distinct: a count that moves while the key count does not (4 -> 5, 28 keys), and a key created at 1 (28 -> 29 keys).",
+    "kill deletes a row BY MAP KEY and the branch contains no reference to privateState['deadHeroes'] and no call to push_dead_unit at all.",
+    "kill_iid contains NO WRITE STATEMENT AT ALL -- its entire body is one print -- so nothing can move and no request can change that.",
+    "The branch's two unguarded absent-value dereferences sit on OPPOSITE SIDES of its write loop: an omitted attacker_units raises at command.py:866 before the loop body runs, an omitted victim raises at command.py:874 after map_lose_item already ran -- and the server answers HTTP 500 in both cases.",
+    "The PERSISTED state is byte-identical in both cases anyway, and a two-command batch whose first command is valid shows why: command.py dispatches the whole batch before calling save_session (command.py:30,32), so an exception discards EVERY mutation the batch made. The failure mode is a DISCARDED save rather than a partially applied one, and the persistence boundary is the BATCH.",
+    "A third guard, found by measurement: an EMPTY blob short-circuits at command.py:818's `if not response:` and answers SUCCESS with no change, so the key that raises against a non-empty blob is answered successfully against an empty one.",
+    "Under a NEUTRAL vector, EVERY stored resource is byte-identical in all thirteen transactions, and the only leaves that ever move belong to a destroyed row or to the ledger."
+  ],
+  "exit_code": 0,
+  "interpreter": "CPython 3.9 (pinned)",
+  "invocation": "python -B apps/compat-api/capture_combat_fixture.py",
+  "login_step": "Performed once per server (13 times) and recorded once, from the first transaction. Its neutrality is asserted for EVERY transaction, so the elision loses no evidence.",
+  "not_claimed": [
+    "Any combat rule. Damage, health, defence, hit chance, attack outcome, life and interval arithmetic are NOT resolved or claimed: attack, defense, life, attack_interval, attack_range, best_against, best_against_mult and velocity each measure zero legacy consumers, so the committed numbers are content and never rules.",
+    "Any mission dispatch, resolution, completion, or reward. The mission vocabulary stays owned by godot-mission-vocabulary.",
+    "Any honour, reward, or resource movement. honour, resources, resources_victim and townhall_gold are read and discarded, and every transaction ran under a neutral vector and moved nothing.",
+    "Any occupancy, bounds, type, or terrain validation. map_lose_item tests only the item id and the team's truthiness, and this contract reproduces that absence rather than filling it.",
+    "The team asymmetry between map_lose_item's truthy-team acceptance and push_dead_unit's team-one requirement as something exercised: it is recorded, not exercised and not refused, because every one of the 441 committed unit rows is on team one.",
+    "That the modern endpoint reproduces the oracle's destruction COUNT. It does not, by design, and the manifest records the difference rather than reporting parity by omission.",
+    "Anything about what the real Flash client sent. The client was never executed: every payload here is crafted.",
+    "Any partially applied save. The oracle never persists one: a raise anywhere in a batch skips save_session, so the recorded state is byte-identical on every failing transaction here."
+  ],
+  "order_of_record": {
+    "committed_order_eligible_keys": [
+      "2425",
+      "1022",
+      "898",
+      "3151",
+      "3423",
+      "897",
+      "6627"
+    ],
+    "committed_order_first_three_keys": [
+      "3",
+      "4",
+      "5"
+    ],
+    "committed_order_is_lexicographic": false,
+    "consequence_for_a_replay": "A replay suite must rebuild the disposable corpus from the COMMITTED village document, not from before.json. Resetting from before.json replays against the sorted order, which removes 1022 instead of 2425, and the resulting document still compares equal leaf for leaf -- so the mis-ordering would be invisible to a document diff and would silently invalidate the order claim.",
+    "diff_is_order_insensitive": "The harness's json_diff walks keys rather than positions, so the sorted snapshot compares equal to the unsorted document. That is why this is measured here instead of being assumed harmless.",
+    "first_eligible_committed_order": "2425",
+    "first_eligible_snapshot_order": "1022",
+    "order_of_record": "the COMMITTED VILLAGE DOCUMENT (villages/AcidCaos.json), whose `items` insertion order is what the oracle's in-memory save carried. before.json/after.json are NOT the order of record.",
+    "row_the_oracle_actually_removed": [
+      "2425"
+    ],
+    "snapshot_order_differs_from_committed_order": true,
+    "snapshot_order_eligible_keys": [
+      "1022",
+      "2425",
+      "3151",
+      "3423",
+      "6627",
+      "897",
+      "898"
+    ],
+    "snapshot_order_first_three_keys": [
+      "100",
+      "102",
+      "1022"
+    ],
+    "snapshot_order_is_lexicographic": true,
+    "writer": "capture_legacy_fixtures.py:457 write_json -> json.dump(..., sort_keys=True)",
+    "writer_sorts_keys": true
+  },
+  "purpose": "Executed-legacy evidence for the combat-action surface: end_attack (command.py:808-885), kill (169-181) and kill_iid (183-187). It records what the ORACLE does, including the two behaviours this capability deliberately does NOT reproduce: a client-dictated destruction count, and a partially applied save on an error response.",
+  "recorded_order_discriminator": {
+    "eligible_keys_recorded": [
+      "2425",
+      "1022",
+      "898",
+      "3151",
+      "3423",
+      "897",
+      "6627"
+    ],
+    "first_recorded": "2425",
+    "item_id": 1020,
+    "numeric_min": "897",
+    "recorded_order_discriminates": true,
+    "row_a_sorted_implementation_would_remove": "897",
+    "row_removed_by_the_oracle": [
+      "2425"
+    ]
+  },
+  "recorded_steps": [
+    "txn_resolve_first_by_recorded_order",
+    "txn_resolve_absent_attacker_units",
+    "txn_resolve_empty_payload",
+    "txn_resolve_absent_victim",
+    "txn_resolve_batch_discarded_on_raise",
+    "txn_resolve_empty_attacker_units",
+    "txn_client_dictated_count_two",
+    "txn_resolve_no_eligible_row",
+    "txn_kill_unit_row",
+    "txn_kill_missing_row",
+    "txn_kill_iid_no_op",
+    "txn_ledger_increment_existing",
+    "txn_ledger_key_created",
+    "login_post"
+  ],
+  "schema": "combat-actions-fixture-v1",
+  "seeds": {
+    "destruction": {
+      "census": {
+        "absent_item_id_rows": 0,
+        "kill_absent_key_present": false,
+        "kill_row_item_id": 1076,
+        "ledger_is_empty": true,
+        "ledger_keys": 0,
+        "order_eligible_keys_recorded": [
+          "2425",
+          "1022",
+          "898",
+          "3151",
+          "3423",
+          "897",
+          "6627"
+        ],
+        "order_first_recorded": "2425",
+        "order_item_id": 1020,
+        "order_numeric_min": "897",
+        "order_rows_discriminating": true,
+        "pid": "AcidCaos",
+        "placed_rows": 319,
+        "recorded_map_key_order_is_sorted": false,
+        "state_sha256": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+        "which": "destruction"
+      },
+      "choice_reason": "It is the only committed document whose deadHeroes ledger is empty while carrying eligible unit rows, so both the key-creation branch and the recorded-order selection are observable from nothing. It also contains the only item whose first RECORDED eligible row is not its numeric minimum, which is what makes the order claim testable.",
+      "choice_status": "derived-provisional",
+      "path": "villages/AcidCaos.json",
+      "pid_read_from_document": "AcidCaos",
+      "sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    "ledger": {
+      "census": {
+        "create_item_count_before": "<absent>",
+        "create_item_eligible_keys": 3,
+        "create_item_first_key": "20239",
+        "create_item_id": 1023,
+        "ledger_is_empty": false,
+        "ledger_item_count_before": 4,
+        "ledger_item_eligible_keys": 24,
+        "ledger_item_first_key": "37521",
+        "ledger_item_id": 1034,
+        "ledger_keys": 28,
+        "pid": "Neutral",
+        "placed_rows": 549,
+        "recorded_map_key_order_is_sorted": false,
+        "state_sha256": "796900703a5db559b448d1c8b5711de6253e1b59b33107f307fe01024fa11cc0",
+        "which": "ledger"
+      },
+      "choice_reason": "It carries a 28-key ledger, so the increment branch is observable as a count that moves while the KEY COUNT does not -- a pair the key-creation branch cannot produce. It also holds an item with eligible rows and NO ledger entry, so both ledger arms run from one document.",
+      "choice_status": "derived-provisional",
+      "path": "villages/Neutral.json",
+      "pid_read_from_document": "Neutral",
+      "sha256": "0d9b4e124e6b1046dc9b6a01dee6e6e8f32ff010b3b497f33c294747d5f12cf4"
+    },
+    "pid_note": "Read from playerInfo.pid in the document, never derived from the filename stem: for three of the eight committed village saves the two disagree, and for initial.json the pid is null, which build_disposable refuses loudly rather than writing a 'None.save.json'.",
+    "why_two": "The destruction seed's ledger is EMPTY, so the key-CREATION branch and the first-eligible-row selection are both observable from nothing. The ledger seed's ledger holds 28 keys, so the INCREMENT branch (4 -> 5) is observable instead. Neither document exercises both, so neither is optional."
+  },
+  "server": {
+    "debug": false,
+    "debug_note": "server.py runs app.run(..., debug=False), so a failing request answers the framework's plain error page with no traceback and no absolute path. The capture asserts the body does not leak the disposable path before committing it.",
+    "env_extra": {
+      "PYTHONUNBUFFERED": "1"
+    },
+    "env_extra_note": "Set for THIS capture's child processes only, via a defaulted parameter on start_server. child_environment() is untouched, so no existing capture's log changes. The printed lines are evidence -- the destruction count the oracle computed is visible nowhere else -- and block buffering would lose them when the harness reaps the child.",
+    "host": "127.0.0.1",
+    "one_per_transaction": true,
+    "one_per_transaction_reason": "sessions.load_saves() caches the corpus in a module global at import, so a running server never re-reads the seed file. Restoring the seed between probes on one server leaves the in-memory corpus already mutated and silently produces a different result.",
+    "port": 5055,
+    "process": "python -B server.py inside each disposable",
+    "starts": 13
+  },
+  "time_dependent_fields": {
+    "captured_at_utc": "Same, in this manifest.",
+    "request_captured_at_utc": "Recorded per step and necessarily volatile; it is the only field in this fixture that changes between reruns, which is why 'byte-identical rerun' is claimed for the transaction records, states and manifest body, not for these two fields.",
+    "ts": "Pinned to a constant, so not volatile."
+  },
+  "transactions": [
+    {
+      "changed_leaf_count": 8,
+      "changed_leaves": [
+        {
+          "after": null,
+          "before": 1020,
+          "path": "/maps/0/items/2425/0",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 41,
+          "path": "/maps/0/items/2425/1",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 40,
+          "path": "/maps/0/items/2425/2",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 1705676537,
+          "path": "/maps/0/items/2425/3",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 0,
+          "path": "/maps/0/items/2425/4",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 109,
+          "path": "/maps/0/items/2425/6/xp",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 1,
+          "path": "/maps/0/items/2425/7",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": 1,
+          "before": null,
+          "path": "/privateState/deadHeroes/1020",
+          "present_after": true,
+          "present_before": false
+        }
+      ],
+      "command": "end_attack",
+      "crafted_args": null,
+      "crafted_units": [
+        [
+          1020,
+          0,
+          1,
+          0
+        ]
+      ],
+      "exhaustion_shortfall": 0,
+      "expected_removed_keys": [
+        "2425"
+      ],
+      "expected_status": 200,
+      "ledger_after": {
+        "1020": 1
+      },
+      "ledger_before": {},
+      "ledger_keys_after": 1,
+      "ledger_keys_before": 0,
+      "ledger_moved": true,
+      "modern_derives_ledger": {
+        "1020": 1
+      },
+      "modern_derives_removed_keys": [
+        "2425"
+      ],
+      "name": "resolve_first_by_recorded_order",
+      "note": "The whole selection rule in one transaction. The blob names only an item identity, the helper matches slot 0 == 1020 AND a truthy slot 7, and it pops the FIRST match in the save's own recorded map-key order -- key 2425, not the numeric minimum 897. That difference is the point: an implementation that sorted would remove 897 and still produce a plausible-looking fixture. The ledger key is CREATED at 1 by the committed resurrectable gate.",
+      "parity_with_delivered_endpoint": true,
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{\"attacker_units\":[[1020,0,1,0]],\"victim\":{\"name\":\"derived\"}}', 0]) -> Lost 1 Soldier II(s)"
+      ],
+      "printed_destruction_counts": [
+        1
+      ],
+      "printed_requested_count": 1,
+      "removed_keys": [
+        "2425"
+      ],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "rows_after": 318,
+      "rows_before": 319,
+      "rows_removed": 1,
+      "seed": "destruction",
+      "state_sha256_after": "c0039e0bb31623a283a23627673843ce6ae9a1d7e0ad76f4b24010a48774eaad",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "311e2f4214435a1d9a754e058d0ad50e29c77668338fe1ccbd0035fad2bffc5b",
+      "unchanged_leaves_sha256_before": "311e2f4214435a1d9a754e058d0ad50e29c77668338fe1ccbd0035fad2bffc5b",
+      "victim_supplied": true
+    },
+    {
+      "changed_leaf_count": 0,
+      "changed_leaves": [],
+      "command": "end_attack",
+      "crafted_args": null,
+      "crafted_units": null,
+      "expected_removed_keys": [],
+      "expected_status": 500,
+      "failure_body_sha256": "ae5163256b944013e27cbef0d2bcd33a6dacbb92463509f91d5f3df782142910",
+      "failure_is_framework_error_page": true,
+      "ledger_after": {},
+      "ledger_before": {},
+      "ledger_keys_after": 0,
+      "ledger_keys_before": 0,
+      "ledger_moved": false,
+      "modern_derives_ledger": {},
+      "modern_derives_removed_keys": [],
+      "name": "resolve_absent_attacker_units",
+      "note": "A NON-EMPTY blob with no attacker_units reaches the `for unit in attacker_units` line at command.py:866 with attacker_units still None -- `if \"attacker_units\" in response:` was false, so the local kept its None default -- and iterating None raises TypeError. The response is HTTP 500 and the save is byte-identical, because the raise lands BEFORE map_lose_item is reached. This is the first of the branch's two unguarded absent-value dereferences and the reason the delivered endpoint's refusals are indistinguishable from this one by state.",
+      "parity_with_delivered_endpoint": true,
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{\"win\":true}', 0]) ->"
+      ],
+      "printed_destruction_counts": [],
+      "removed_keys": [],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": null,
+      "rows_after": 319,
+      "rows_before": 319,
+      "rows_removed": 0,
+      "seed": "destruction",
+      "state_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 500,
+      "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "victim_supplied": false
+    },
+    {
+      "changed_leaf_count": 0,
+      "changed_leaves": [],
+      "command": "end_attack",
+      "crafted_args": null,
+      "crafted_units": null,
+      "expected_removed_keys": [],
+      "expected_status": 200,
+      "ledger_after": {},
+      "ledger_before": {},
+      "ledger_keys_after": 0,
+      "ledger_keys_before": 0,
+      "ledger_moved": false,
+      "modern_derives_ledger": {},
+      "modern_derives_removed_keys": [],
+      "name": "resolve_empty_payload",
+      "note": "A THIRD guard, found by measurement rather than by reading the branch: an EMPTY blob short-circuits at command.py:818's `if not response:` before the write loop is ever reached, printing 'Error: Failed to parse command.' and RETURNING -- so the same omitted key that raises when the blob is non-empty is answered with SUCCESS when the blob is empty. Three different responses, three different amounts of damage: empty blob -> success and no change; non-empty blob without attacker_units -> 500 and no change; non-empty blob without victim -> 500 WITH the row destroyed and the ledger incremented.",
+      "parity_with_delivered_endpoint": true,
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{}', 0]) -> Error: Failed to parse command."
+      ],
+      "printed_destruction_counts": [],
+      "removed_keys": [],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "rows_after": 319,
+      "rows_before": 319,
+      "rows_removed": 0,
+      "seed": "destruction",
+      "state_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "victim_supplied": false
+    },
+    {
+      "changed_leaf_count": 0,
+      "changed_leaves": [],
+      "command": "end_attack",
+      "crafted_args": null,
+      "crafted_units": [
+        [
+          1020,
+          0,
+          1,
+          0
+        ]
+      ],
+      "exhaustion_shortfall": 1,
+      "expected_removed_keys": [],
+      "expected_status": 500,
+      "failure_body_sha256": "ae5163256b944013e27cbef0d2bcd33a6dacbb92463509f91d5f3df782142910",
+      "failure_is_framework_error_page": true,
+      "in_memory_destruction_persisted": false,
+      "in_memory_destruction_printed": 1,
+      "in_memory_vs_persisted_disagreement": "The branch printed a destruction of 1 and performed it against the in-memory save, while the persisted save moved 0 rows. Persistence runs after the whole dispatch loop (command.py:30,32), so the exception discarded it.",
+      "ledger_after": {},
+      "ledger_before": {},
+      "ledger_keys_after": 0,
+      "ledger_keys_before": 0,
+      "ledger_moved": false,
+      "modern_derives_ledger": {},
+      "modern_derives_removed_keys": [],
+      "name": "resolve_absent_victim",
+      "note": "The second unguarded absent-value dereference, and the one that sits AFTER the write loop in SOURCE order: the rows are gone from the in-memory save and the ledger has been incremented by the time command.py:874's `if \"name\" in victim` raises TypeError on None. The persisted save is nevertheless BYTE-IDENTICAL, and that is the real finding: command.py dispatches the whole batch first and calls save_session only after the loop (command.py:30,32), so an exception anywhere in the batch skips persistence and discards EVERY mutation the batch made. Recorded here rather than asserted from the source, and paired with resolve_batch_discarded_on_raise, which shows the same discard with a SECOND command that would otherwise have persisted.",
+      "parity_with_delivered_endpoint": true,
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{\"attacker_units\":[[1020,0,1,0]]}', 0]) -> Lost 1 Soldier II(s)"
+      ],
+      "printed_destruction_counts": [
+        1
+      ],
+      "printed_requested_count": 1,
+      "removed_keys": [],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": null,
+      "rows_after": 319,
+      "rows_before": 319,
+      "rows_removed": 0,
+      "seed": "destruction",
+      "state_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 500,
+      "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "victim_supplied": false
+    },
+    {
+      "changed_leaf_count": 0,
+      "changed_leaves": [],
+      "command": "end_attack",
+      "crafted_args": null,
+      "crafted_units": [
+        [
+          1020,
+          0,
+          1,
+          0
+        ]
+      ],
+      "exhaustion_shortfall": 1,
+      "expected_removed_keys": [],
+      "expected_status": 500,
+      "failure_body_sha256": "ae5163256b944013e27cbef0d2bcd33a6dacbb92463509f91d5f3df782142910",
+      "failure_is_framework_error_page": true,
+      "in_memory_destruction_persisted": false,
+      "in_memory_destruction_printed": 1,
+      "in_memory_vs_persisted_disagreement": "The branch printed a destruction of 1 and performed it against the in-memory save, while the persisted save moved 0 rows. Persistence runs after the whole dispatch loop (command.py:30,32), so the exception discarded it.",
+      "ledger_after": {},
+      "ledger_before": {},
+      "ledger_keys_after": 0,
+      "ledger_keys_before": 0,
+      "ledger_moved": false,
+      "modern_derives_ledger": {},
+      "modern_derives_removed_keys": [],
+      "name": "resolve_batch_discarded_on_raise",
+      "note": "A TWO-COMMAND batch whose FIRST command is valid and destroys a row, and whose SECOND raises. The in-memory save is mutated twice over and the client gets HTTP 500 -- yet the persisted save is still byte-identical, because save_session runs only after the dispatch loop completes. This is the sharper statement of the same fact: the failure mode is NOT a partially applied save, it is a DISCARDED one, and it discards the whole batch rather than the failing command alone.",
+      "parity_with_delivered_endpoint": true,
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{\"attacker_units\":[[1020,0,1,0]],\"victim\":{\"name\":\"derived\"}}', 0]) -> Lost 1 Soldier II(s)",
+        "[+] COMMAND: end_attack(['{\"win\":true}', 0]) ->"
+      ],
+      "printed_destruction_counts": [
+        1
+      ],
+      "printed_requested_count": 1,
+      "removed_keys": [],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": null,
+      "rows_after": 319,
+      "rows_before": 319,
+      "rows_removed": 0,
+      "seed": "destruction",
+      "state_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 500,
+      "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "victim_supplied": true
+    },
+    {
+      "changed_leaf_count": 0,
+      "changed_leaves": [],
+      "command": "end_attack",
+      "crafted_args": null,
+      "crafted_units": [],
+      "expected_removed_keys": [],
+      "expected_status": 200,
+      "ledger_after": {},
+      "ledger_before": {},
+      "ledger_keys_after": 0,
+      "ledger_keys_before": 0,
+      "ledger_moved": false,
+      "modern_derives_ledger": {},
+      "modern_derives_removed_keys": [],
+      "name": "resolve_empty_attacker_units",
+      "note": "An EMPTY attacker_units list means the loop body never runs: no row is destroyed and the ledger does not move, while the server still answers success and still prints its final battle line. Recorded so 'a resolve removes a row' is not read as unconditional -- the oracle answers the same success for a request that names nothing.",
+      "parity_with_delivered_endpoint": true,
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{\"attacker_units\":[],\"victim\":{\"name\":\"derived\"}}', 0]) -> Lost battle against derived"
+      ],
+      "printed_destruction_counts": [],
+      "removed_keys": [],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "rows_after": 319,
+      "rows_before": 319,
+      "rows_removed": 0,
+      "seed": "destruction",
+      "state_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "victim_supplied": true
+    },
+    {
+      "changed_leaf_count": 15,
+      "changed_leaves": [
+        {
+          "after": null,
+          "before": 1020,
+          "path": "/maps/0/items/1022/0",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 67,
+          "path": "/maps/0/items/1022/1",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 44,
+          "path": "/maps/0/items/1022/2",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 1705676543,
+          "path": "/maps/0/items/1022/3",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 0,
+          "path": "/maps/0/items/1022/4",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 53,
+          "path": "/maps/0/items/1022/6/xp",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 1,
+          "path": "/maps/0/items/1022/7",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 1020,
+          "path": "/maps/0/items/2425/0",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 41,
+          "path": "/maps/0/items/2425/1",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 40,
+          "path": "/maps/0/items/2425/2",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 1705676537,
+          "path": "/maps/0/items/2425/3",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 0,
+          "path": "/maps/0/items/2425/4",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 109,
+          "path": "/maps/0/items/2425/6/xp",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 1,
+          "path": "/maps/0/items/2425/7",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": 2,
+          "before": null,
+          "path": "/privateState/deadHeroes/1020",
+          "present_after": true,
+          "present_before": false
+        }
+      ],
+      "command": "end_attack",
+      "crafted_args": null,
+      "crafted_units": [
+        [
+          1020,
+          0,
+          3,
+          1
+        ]
+      ],
+      "divergence": "THE CENTRAL DIVERGENCE, MEASURED. The client sent A=3 and B=1, so the oracle computed max(0, 3 - 1) == 2 and destroyed TWO rows, incrementing the ledger twice. This capability destroys EXACTLY ONE row and increments once. Reproducing the subtraction would make this server a pass-through for a client-computed casualty figure, which is the AGENTS.md Bad pattern. The oracle's apparent safety is EXHAUSTION OF MATCHES, not a check: engine.py:218-227 loops `while qty > 0` and returns the moment one pass finds no match, so a client asking for a thousand removes a thousand while any match remains.",
+      "exhaustion_shortfall": 0,
+      "expected_removed_keys": [
+        "2425",
+        "1022"
+      ],
+      "expected_status": 200,
+      "ledger_after": {
+        "1020": 2
+      },
+      "ledger_before": {},
+      "ledger_keys_after": 1,
+      "ledger_keys_before": 0,
+      "ledger_moved": true,
+      "modern_derives_ledger": {
+        "1020": 1
+      },
+      "modern_derives_removed_keys": [
+        "2425"
+      ],
+      "name": "client_dictated_count_two",
+      "note": "This is the transaction that measures the design D1/D2 decision instead of asserting it. It also shows the increment is PER POPPED ROW, not per request: one request, one tuple, two ledger counts.",
+      "parity_with_delivered_endpoint": false,
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{\"attacker_units\":[[1020,0,3,1]],\"victim\":{\"name\":\"derived\"}}', 0]) -> Lost 2 Soldier II(s)"
+      ],
+      "printed_destruction_counts": [
+        2
+      ],
+      "printed_requested_count": 2,
+      "removed_keys": [
+        "2425",
+        "1022"
+      ],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "rows_after": 317,
+      "rows_before": 319,
+      "rows_removed": 2,
+      "seed": "destruction",
+      "state_sha256_after": "4c648440a12680036bf5ecfb67dc16e8f4b5e3557c1f2cc1d19cc9da18fe0412",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "0e392d01e1ca6e3db7062239f25f8181d1a50efd7ad387a031ca767bb74e9514",
+      "unchanged_leaves_sha256_before": "0e392d01e1ca6e3db7062239f25f8181d1a50efd7ad387a031ca767bb74e9514",
+      "victim_supplied": true
+    },
+    {
+      "changed_leaf_count": 0,
+      "changed_leaves": [],
+      "command": "end_attack",
+      "crafted_args": null,
+      "crafted_units": [
+        [
+          923,
+          0,
+          1,
+          0
+        ]
+      ],
+      "delivered_endpoint_refusal": "no_eligible_row",
+      "exhaustion_shortfall": 1,
+      "expected_removed_keys": [],
+      "expected_status": 200,
+      "ledger_after": {},
+      "ledger_before": {},
+      "ledger_keys_after": 0,
+      "ledger_keys_before": 0,
+      "ledger_moved": false,
+      "modern_derives_ledger": {},
+      "modern_derives_removed_keys": [],
+      "name": "resolve_no_eligible_row",
+      "note": "Item 923 is a committed unit legacy_id with no placed row in this document, so map_lose_item finds nothing and RETURNS while the server still answers success -- the exhaustion path, reached from the front instead of from inside a loop. The delivered endpoint refuses it instead of reproducing it, which is a recorded divergence from the response and a parity match from the state.",
+      "parity_with_delivered_endpoint": true,
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{\"attacker_units\":[[923,0,1,0]],\"victim\":{\"name\":\"derived\"}}', 0]) -> Lost 1 Gorilla(s)"
+      ],
+      "printed_destruction_counts": [
+        1
+      ],
+      "printed_requested_count": 1,
+      "removed_keys": [],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "rows_after": 319,
+      "rows_before": 319,
+      "rows_removed": 0,
+      "seed": "destruction",
+      "state_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "victim_supplied": true
+    },
+    {
+      "changed_leaf_count": 7,
+      "changed_leaves": [
+        {
+          "after": null,
+          "before": 1076,
+          "path": "/maps/0/items/1639/0",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 66,
+          "path": "/maps/0/items/1639/1",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 28,
+          "path": "/maps/0/items/1639/2",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 1705744977,
+          "path": "/maps/0/items/1639/3",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 0,
+          "path": "/maps/0/items/1639/4",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 297,
+          "path": "/maps/0/items/1639/6/xp",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 1,
+          "path": "/maps/0/items/1639/7",
+          "present_after": false,
+          "present_before": true
+        }
+      ],
+      "command": "kill",
+      "crafted_args": [
+        1639,
+        0
+      ],
+      "crafted_units": null,
+      "expected_removed_keys": [
+        "1639"
+      ],
+      "expected_status": 200,
+      "ledger_after": {},
+      "ledger_before": {},
+      "ledger_keys_after": 0,
+      "ledger_keys_before": 0,
+      "ledger_moved": false,
+      "modern_derives_ledger": {},
+      "modern_derives_removed_keys": [
+        "1639"
+      ],
+      "name": "kill_unit_row",
+      "note": "kill deletes the addressed row by MAP KEY -- not by item identity -- and NEVER touches the ledger. The seed's ledger is empty, so this transaction cannot by itself prove the non-participation; that claim rests on the branch holding no reference to privateState['deadHeroes'] and no call to push_dead_unit at all, which is a property of the source rather than an observation of one request.",
+      "parity_with_delivered_endpoint": true,
+      "printed_branch_lines": [
+        "[+] COMMAND: kill([1639, 0]) -> Kill Crusader Soldier. Reason: 0"
+      ],
+      "printed_destruction_counts": [],
+      "removed_keys": [
+        "1639"
+      ],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "rows_after": 318,
+      "rows_before": 319,
+      "rows_removed": 1,
+      "seed": "destruction",
+      "state_sha256_after": "4b7c20dfca6197290f315933750e0eca58e0ac0673db41c50e50ddb71eb0ee4f",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "4b7c20dfca6197290f315933750e0eca58e0ac0673db41c50e50ddb71eb0ee4f",
+      "unchanged_leaves_sha256_before": "4b7c20dfca6197290f315933750e0eca58e0ac0673db41c50e50ddb71eb0ee4f",
+      "victim_supplied": true
+    },
+    {
+      "changed_leaf_count": 0,
+      "changed_leaves": [],
+      "command": "kill",
+      "crafted_args": [
+        999999,
+        0
+      ],
+      "crafted_units": null,
+      "delivered_endpoint_refusal": "unaddressable_row",
+      "expected_removed_keys": [],
+      "expected_status": 200,
+      "ledger_after": {},
+      "ledger_before": {},
+      "ledger_keys_after": 0,
+      "ledger_keys_before": 0,
+      "ledger_moved": false,
+      "modern_derives_ledger": {},
+      "modern_derives_removed_keys": [],
+      "name": "kill_missing_row",
+      "note": "An unaddressable map key hits map_get_item's falsy branch, prints 'Error: item not found.' and RETURNS -- and the server still answers the legacy success result. A client cannot distinguish this from a real deletion by the response alone. The delivered endpoint refuses it instead, which is a recorded divergence and not parity.",
+      "parity_with_delivered_endpoint": true,
+      "printed_branch_lines": [
+        "[+] COMMAND: kill([999999, 0]) -> Error: item not found."
+      ],
+      "printed_destruction_counts": [],
+      "removed_keys": [],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "rows_after": 319,
+      "rows_before": 319,
+      "rows_removed": 0,
+      "seed": "destruction",
+      "state_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "victim_supplied": true
+    },
+    {
+      "changed_leaf_count": 0,
+      "changed_leaves": [],
+      "command": "kill_iid",
+      "crafted_args": [
+        1076,
+        0
+      ],
+      "crafted_units": null,
+      "expected_removed_keys": [],
+      "expected_status": 200,
+      "ledger_after": {},
+      "ledger_before": {},
+      "ledger_keys_after": 0,
+      "ledger_keys_before": 0,
+      "ledger_moved": false,
+      "modern_derives_ledger": {},
+      "modern_derives_removed_keys": [],
+      "name": "kill_iid_no_op",
+      "note": "kill_iid's ENTIRE BODY is one print (command.py:183-187): it contains no write statement at all, so nothing can move. That is a stronger statement than any single request showing no change, and it is why this line delivers the command as a proven no-op rather than refusing it. Its INTENT is unknown -- nothing observes whether a real client sent it.",
+      "parity_with_delivered_endpoint": true,
+      "printed_branch_lines": [
+        "[+] COMMAND: kill_iid([1076, 0]) -> Killed Crusader Soldier"
+      ],
+      "printed_destruction_counts": [],
+      "removed_keys": [],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "resources_before": {
+        "cash": 500,
+        "gold": 5898,
+        "mana": 0,
+        "oil": 2750,
+        "steel": 107,
+        "wood": 1176,
+        "xp": 117012
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "rows_after": 319,
+      "rows_before": 319,
+      "rows_removed": 0,
+      "seed": "destruction",
+      "state_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+      "victim_supplied": true
+    },
+    {
+      "changed_leaf_count": 8,
+      "changed_leaves": [
+        {
+          "after": null,
+          "before": 1034,
+          "path": "/maps/0/items/37521/0",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 68,
+          "path": "/maps/0/items/37521/1",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 52,
+          "path": "/maps/0/items/37521/2",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 1673578745,
+          "path": "/maps/0/items/37521/3",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 0,
+          "path": "/maps/0/items/37521/4",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 1286,
+          "path": "/maps/0/items/37521/6/xp",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 1,
+          "path": "/maps/0/items/37521/7",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": 5,
+          "before": 4,
+          "path": "/privateState/deadHeroes/1034",
+          "present_after": true,
+          "present_before": true
+        }
+      ],
+      "command": "end_attack",
+      "crafted_args": null,
+      "crafted_units": [
+        [
+          1034,
+          0,
+          1,
+          0
+        ]
+      ],
+      "exhaustion_shortfall": 0,
+      "expected_removed_keys": [
+        "37521"
+      ],
+      "expected_status": 200,
+      "ledger_after": {
+        "1001": 28,
+        "1008": 3,
+        "1014": 9,
+        "1016": 2,
+        "1030": 9,
+        "1031": 1,
+        "1033": 6,
+        "1034": 5,
+        "1036": 2,
+        "1039": 2,
+        "1042": 1,
+        "1046": 1,
+        "1050": 12,
+        "1051": 5,
+        "1055": 1,
+        "1062": 2,
+        "1063": 7,
+        "1066": 1,
+        "1067": 1,
+        "1070": 1,
+        "1085": 2,
+        "1094": 1,
+        "1101": 1,
+        "1105": 1,
+        "1112": 3,
+        "1121": 1,
+        "1174": 1,
+        "1296": 1
+      },
+      "ledger_before": {
+        "1001": 28,
+        "1008": 3,
+        "1014": 9,
+        "1016": 2,
+        "1030": 9,
+        "1031": 1,
+        "1033": 6,
+        "1034": 4,
+        "1036": 2,
+        "1039": 2,
+        "1042": 1,
+        "1046": 1,
+        "1050": 12,
+        "1051": 5,
+        "1055": 1,
+        "1062": 2,
+        "1063": 7,
+        "1066": 1,
+        "1067": 1,
+        "1070": 1,
+        "1085": 2,
+        "1094": 1,
+        "1101": 1,
+        "1105": 1,
+        "1112": 3,
+        "1121": 1,
+        "1174": 1,
+        "1296": 1
+      },
+      "ledger_keys_after": 28,
+      "ledger_keys_before": 28,
+      "ledger_moved": true,
+      "modern_derives_ledger": {
+        "1034": 5
+      },
+      "modern_derives_removed_keys": [
+        "37521"
+      ],
+      "name": "ledger_increment_existing",
+      "note": "The increment branch, on the only committed document where the ledger key ALREADY EXISTS. Item 1034 reads 4 and becomes 5, while all 28 ledger keys survive -- so the count moved without the key count moving, which is the pair that distinguishes an increment from a creation. 24 eligible rows exist and exactly one is destroyed.",
+      "parity_with_delivered_endpoint": true,
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{\"attacker_units\":[[1034,0,1,0]],\"victim\":{\"name\":\"derived\"}}', 0]) -> Lost 1 UN Allied(s)"
+      ],
+      "printed_destruction_counts": [
+        1
+      ],
+      "printed_requested_count": 1,
+      "removed_keys": [
+        "37521"
+      ],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 4,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "rows_after": 548,
+      "rows_before": 549,
+      "rows_removed": 1,
+      "seed": "ledger",
+      "state_sha256_after": "2bc338db9379e67157af3261d39f66d8867611401e96102643b31063ba8daf94",
+      "state_sha256_before": "796900703a5db559b448d1c8b5711de6253e1b59b33107f307fe01024fa11cc0",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "77768d1a5e59fe7e400f6b5ba5fb5074902d96cdec328dd92c70d1c51be76917",
+      "unchanged_leaves_sha256_before": "77768d1a5e59fe7e400f6b5ba5fb5074902d96cdec328dd92c70d1c51be76917",
+      "victim_supplied": true
+    },
+    {
+      "changed_leaf_count": 8,
+      "changed_leaves": [
+        {
+          "after": null,
+          "before": 1023,
+          "path": "/maps/0/items/20239/0",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 39,
+          "path": "/maps/0/items/20239/1",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 10,
+          "path": "/maps/0/items/20239/2",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 1672321688,
+          "path": "/maps/0/items/20239/3",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 0,
+          "path": "/maps/0/items/20239/4",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 14783,
+          "path": "/maps/0/items/20239/6/xp",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": null,
+          "before": 1,
+          "path": "/maps/0/items/20239/7",
+          "present_after": false,
+          "present_before": true
+        },
+        {
+          "after": 1,
+          "before": null,
+          "path": "/privateState/deadHeroes/1023",
+          "present_after": true,
+          "present_before": false
+        }
+      ],
+      "command": "end_attack",
+      "crafted_args": null,
+      "crafted_units": [
+        [
+          1023,
+          0,
+          1,
+          0
+        ]
+      ],
+      "exhaustion_shortfall": 0,
+      "expected_removed_keys": [
+        "20239"
+      ],
+      "expected_status": 200,
+      "ledger_after": {
+        "1001": 28,
+        "1008": 3,
+        "1014": 9,
+        "1016": 2,
+        "1023": 1,
+        "1030": 9,
+        "1031": 1,
+        "1033": 6,
+        "1034": 4,
+        "1036": 2,
+        "1039": 2,
+        "1042": 1,
+        "1046": 1,
+        "1050": 12,
+        "1051": 5,
+        "1055": 1,
+        "1062": 2,
+        "1063": 7,
+        "1066": 1,
+        "1067": 1,
+        "1070": 1,
+        "1085": 2,
+        "1094": 1,
+        "1101": 1,
+        "1105": 1,
+        "1112": 3,
+        "1121": 1,
+        "1174": 1,
+        "1296": 1
+      },
+      "ledger_before": {
+        "1001": 28,
+        "1008": 3,
+        "1014": 9,
+        "1016": 2,
+        "1030": 9,
+        "1031": 1,
+        "1033": 6,
+        "1034": 4,
+        "1036": 2,
+        "1039": 2,
+        "1042": 1,
+        "1046": 1,
+        "1050": 12,
+        "1051": 5,
+        "1055": 1,
+        "1062": 2,
+        "1063": 7,
+        "1066": 1,
+        "1067": 1,
+        "1070": 1,
+        "1085": 2,
+        "1094": 1,
+        "1101": 1,
+        "1105": 1,
+        "1112": 3,
+        "1121": 1,
+        "1174": 1,
+        "1296": 1
+      },
+      "ledger_keys_after": 29,
+      "ledger_keys_before": 28,
+      "ledger_moved": true,
+      "modern_derives_ledger": {
+        "1023": 1
+      },
+      "modern_derives_removed_keys": [
+        "20239"
+      ],
+      "name": "ledger_key_created",
+      "note": "The creation branch on the SAME document: item 1023 has three eligible rows and no ledger entry, so the key is created at 1 and the key count moves 28 -> 29 with every existing entry preserved, in order, and not deduplicated. Together with ledger_increment_existing this is what makes 'the ledger moved' a value-level claim rather than a key-count coincidence.",
+      "parity_with_delivered_endpoint": true,
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{\"attacker_units\":[[1023,0,1,0]],\"victim\":{\"name\":\"derived\"}}', 0]) -> Lost 1 Bazooka III(s)"
+      ],
+      "printed_destruction_counts": [
+        1
+      ],
+      "printed_requested_count": 1,
+      "removed_keys": [
+        "20239"
+      ],
+      "resource_neutral": true,
+      "resources_after": {
+        "cash": 4,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "response_payload": {
+        "result": "success"
+      },
+      "rows_after": 548,
+      "rows_before": 549,
+      "rows_removed": 1,
+      "seed": "ledger",
+      "state_sha256_after": "6b79e59f5bb64a5e0544cb878611a2ec389b56611925dd85e39337c12d302a94",
+      "state_sha256_before": "796900703a5db559b448d1c8b5711de6253e1b59b33107f307fe01024fa11cc0",
+      "status": 200,
+      "unchanged_leaves_sha256_after": "0a49dd58890d0aef1b5afc29cbc0d4dfcb88a41f9a5cbf0402fd94b7d98c3bd3",
+      "unchanged_leaves_sha256_before": "0a49dd58890d0aef1b5afc29cbc0d4dfcb88a41f9a5cbf0402fd94b7d98c3bd3",
+      "victim_supplied": true
+    }
+  ],
+  "transcript": [
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "resolve_first_by_recorded_order",
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{\"attacker_units\":[[1020,0,1,0]],\"victim\":{\"name\":\"derived\"}}', 0]) -> Lost 1 Soldier II(s)"
+      ],
+      "printed_destruction_counts": [
+        1
+      ],
+      "seed": "destruction",
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "resolve_absent_attacker_units",
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{\"win\":true}', 0]) ->"
+      ],
+      "printed_destruction_counts": [],
+      "seed": "destruction",
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "resolve_empty_payload",
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{}', 0]) -> Error: Failed to parse command."
+      ],
+      "printed_destruction_counts": [],
+      "seed": "destruction",
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "resolve_absent_victim",
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{\"attacker_units\":[[1020,0,1,0]]}', 0]) -> Lost 1 Soldier II(s)"
+      ],
+      "printed_destruction_counts": [
+        1
+      ],
+      "seed": "destruction",
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "resolve_batch_discarded_on_raise",
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{\"attacker_units\":[[1020,0,1,0]],\"victim\":{\"name\":\"derived\"}}', 0]) -> Lost 1 Soldier II(s)",
+        "[+] COMMAND: end_attack(['{\"win\":true}', 0]) ->"
+      ],
+      "printed_destruction_counts": [
+        1
+      ],
+      "seed": "destruction",
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "resolve_empty_attacker_units",
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{\"attacker_units\":[],\"victim\":{\"name\":\"derived\"}}', 0]) -> Lost battle against derived"
+      ],
+      "printed_destruction_counts": [],
+      "seed": "destruction",
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "client_dictated_count_two",
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{\"attacker_units\":[[1020,0,3,1]],\"victim\":{\"name\":\"derived\"}}', 0]) -> Lost 2 Soldier II(s)"
+      ],
+      "printed_destruction_counts": [
+        2
+      ],
+      "seed": "destruction",
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "resolve_no_eligible_row",
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{\"attacker_units\":[[923,0,1,0]],\"victim\":{\"name\":\"derived\"}}', 0]) -> Lost 1 Gorilla(s)"
+      ],
+      "printed_destruction_counts": [
+        1
+      ],
+      "seed": "destruction",
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "kill_unit_row",
+      "printed_branch_lines": [
+        "[+] COMMAND: kill([1639, 0]) -> Kill Crusader Soldier. Reason: 0"
+      ],
+      "printed_destruction_counts": [],
+      "seed": "destruction",
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "kill_missing_row",
+      "printed_branch_lines": [
+        "[+] COMMAND: kill([999999, 0]) -> Error: item not found."
+      ],
+      "printed_destruction_counts": [],
+      "seed": "destruction",
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "AcidCaos",
+      "name": "kill_iid_no_op",
+      "printed_branch_lines": [
+        "[+] COMMAND: kill_iid([1076, 0]) -> Killed Crusader Soldier"
+      ],
+      "printed_destruction_counts": [],
+      "seed": "destruction",
+      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+    },
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "ledger_increment_existing",
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{\"attacker_units\":[[1034,0,1,0]],\"victim\":{\"name\":\"derived\"}}', 0]) -> Lost 1 UN Allied(s)"
+      ],
+      "printed_destruction_counts": [
+        1
+      ],
+      "seed": "ledger",
+      "seed_sha256": "0d9b4e124e6b1046dc9b6a01dee6e6e8f32ff010b3b497f33c294747d5f12cf4"
+    },
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "ledger_key_created",
+      "printed_branch_lines": [
+        "[+] COMMAND: end_attack(['{\"attacker_units\":[[1023,0,1,0]],\"victim\":{\"name\":\"derived\"}}', 0]) -> Lost 1 Bazooka III(s)"
+      ],
+      "printed_destruction_counts": [
+        1
+      ],
+      "seed": "ledger",
+      "seed_sha256": "0d9b4e124e6b1046dc9b6a01dee6e6e8f32ff010b3b497f33c294747d5f12cf4"
+    }
+  ]
+}

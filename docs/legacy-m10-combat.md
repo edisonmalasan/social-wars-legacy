@@ -23,7 +23,7 @@ could be captured:
 rows — and this is the *same* delivered-claim defect M9's `unit-experience` line
 already corrected once, for `attr["xp"]`.
 
-Measured across every committed save document (11 documents, 3,372 placed rows):
+Measured across every committed save document (10 documents, 3,372 placed rows):
 
 | document | rows | unit rows | team-1 unit rows | team-1 **resurrectable** unit rows | `deadHeroes` before |
 | --- | ---: | ---: | ---: | ---: | --- |
@@ -41,7 +41,7 @@ Measured across every committed save document (11 documents, 3,372 placed rows):
 
 Four facts follow, and together they invert the line's shape:
 
-1. **441 committed unit rows** are placed, across **7 of 11** save documents.
+1. **441 committed unit rows** are placed, across **7 of 10** save documents.
 2. **All 441 are on team 1**, which is the value `push_dead_unit` requires
    (`item[7] != 1` returns `False`).
 3. **426 of 429** committed units carry `resurrectable` **inside their
@@ -122,11 +122,13 @@ compares the **string literal** `"KILL"`. The constant is unread.
 `args[0]`; `args[1]` is read into `unknown` and never used. On a parse failure
 the branch's bare `except:` prints and returns (probe **P3c**: save untouched).
 
-Eleven keys are read from the client blob (`command.py:839-862`). **Seven reach
-nothing at all:**
+**Twelve** keys are read from the client blob (`command.py:839-862`), each
+assigned to a local that is first initialised to a neutral value and then
+overwritten only if the key is present. **Nine reach nothing at all:**
 
 | key | fate |
 | --- | --- |
+| `voluntary_end` | read, **discarded** |
 | `victim_units` | read, **discarded** |
 | `resources_victim` | read, **discarded** |
 | `attacker` | read, **discarded** |
@@ -138,6 +140,17 @@ nothing at all:**
 | `win` | reaches a `print` only |
 | `victim` | `victim["name"]` reaches a `print` only |
 | `attacker_units` | **the sole mutation path** |
+
+> **CORRECTED 2026-10-05, after the Apply stage.** This subsection originally
+> read "Eleven keys" and "Seven reach nothing", and its table omitted
+> `voluntary_end` altogether. **All three were wrong.** The delivered hermetic
+> suite re-derives this inventory from `command.py` on every run and measured
+> **twelve** keys — nine discarded, two print-only, one on the mutation path —
+> which is the corrected table above. The cause is the one design D4 names: a
+> transcribed inventory is checkable only by a human reading both sides, and
+> the human reading both sides miscounted **and** dropped a key. The
+> re-derivation guard therefore paid for itself on the first run that
+> exercised it, which is the strongest available evidence for D4.
 
 The branch carries three of its own TODOs: *"Parse more data in the future"*,
 *"Affect victim player save"*, *"Attack logs"*.
@@ -304,13 +317,13 @@ of the 429 units and every one of the 470 buildings** and read by **nothing**.
 1176 — which is exactly what `push_dead_unit`'s third gate tests for — and on
 **all 470** buildings.
 
-### 6.1 Five figures in the M8 record that this measurement cannot reproduce
+### 6.1 Five figures in the M8 record that read zero as legacy consumers
 
 M8 line 8 recorded: "`attack` 131 distinct, `defense` 1, `life` 150,
 `min_level` 21, `syringes` 6". Each was re-measured under every counting rule
 that could plausibly produce it:
 
-| field | M8 recorded | raw | code | lines | units top | units in `properties` | reproduces as |
+| field | M8 recorded | raw | code | lines | units top | units in `properties` | reproduces as a *consumer* |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
 | `resurrectable` | 426 | 5 | 3 | 3 | 0 | **426** | **units-in-`properties`** |
 | `attack` | 131 | 12 | 5 | 5 | 429 | 0 | **nothing measured** |
@@ -319,26 +332,40 @@ that could plausibly produce it:
 | `min_level` | 21 | 0 | 0 | 0 | 429 | 0 | **nothing measured** |
 | `syringes` | 6 | 0 | 0 | 0 | 429 | 0 | **nothing measured** |
 
+**None of the five reproduces as a legacy consumer.** They read zero as a
+consumer under every rule applied here: whole-file occurrences, whole-file
+distinct lines, quote-stripped occurrences, quote-stripped distinct lines,
+exact identifier tokens, and the quoted-access form. The measured `attack` row
+is `12 / 10 / 5 / 5 / 0 / 0`, and all twelve of its whole-file occurrences sit
+inside **longer identifiers** — `end_attack`, `attacker`, `attacker_units`,
+`flash_reload_attack` — never the committed field name as a standalone token;
+the other four have **no** occurrence at all in any view.
+
 **This does not weaken M8's conclusion — it strengthens it.** M8 recorded these
 fields as having zero or near-zero legacy consumption; this measurement finds
-**exactly zero** for four of them, and for `syringes` finds zero against a
+**exactly zero** for all five, and for `syringes` finds zero against a
 committed presence of 429 units and 470 buildings. The **direction** of the
 delivered claim holds.
 
-What does not hold is the **figures**. Four of the five reproduce under no
-counting rule applied here. The most likely explanation — offered as a
-**hypothesis, not a finding** — is that M8 counted matches over a wider corpus
-than the eleven root legacy modules, such as the committed content package or
-the delivered documentation, which would inflate every figure. That was not
-measured, because measuring it is not this line's business and guessing at it
-would be exactly the error being recorded.
-
-**Recorded as a discrepancy, not corrected here.** The delivered M8 record is
-not edited by this investigation; a later line that owns those fields should
-either reproduce the figures under a stated rule or amend them. Carrying an
-unreproducible number forward because "it was already written down" is the same
-failure this project has now caught three times — the `units[].xp` award source,
-the `harvester` field shape, and the corpus claim in §1.
+> **CORRECTED 2026-10-05, after the Apply stage measured it.** This subsection
+> originally concluded that the figures "reproduce under no counting rule
+> applied here" and speculated that M8 had counted over a wider corpus. **That
+> was wrong, and the speculation was the error.** All five reproduce **exactly**
+> as the count of **distinct committed values** over the **429** committed unit
+> definitions — `attack` **131**, `defense` **1**, `life` **150**,
+> `min_level` **21**, `syringes` **6** — all five present on all 429 rows and all
+> `int`. That is the `unit_distinct` column of `unit_behaviors.gd`'s own
+> `ZERO_CONSUMER_FIELDS` table, which the delivered M8 module has always carried
+> beside `legacy_reads: 0`. So the **figures were never wrong** and no
+> discrepancy exists: the record's numbers are correct and its **placement**
+> misleads. Quoted bare as a consumer census ("`attack` 131 distinct"), they read
+> as counts of legacy reads; they are counts of **content values**. The
+> lesson is the one this investigation was written to record, applied to its own
+> text: **a figure is not an error until the rule that produced it is
+> established**, and "I could not reproduce it" is a statement about the rules
+> tried, never about the number. `resurrectable`'s 426 reproduces by a
+> *different* rule — units-in-`properties` — so the two groups needed separate
+> lookups and this measurement gave up after the first.
 
 
 ---
@@ -349,7 +376,7 @@ the `harvester` field shape, and the corpus claim in §1.
   endpoint.** No endpoint response shape is established here; that is the Apply
   stage's work.
 - **The corpus coverage is 2 of 7 usable village documents** for the mutation
-  probes (`AcidCaos`, `Neutral`), and **7 of 11** for the inventory. No
+  probes (`AcidCaos`, `Neutral`), and **7 of 10** for the inventory. No
   progressed-player HTTP capture exists, and none is claimed.
 - **`P2`'s first harness result was lost to stdout interleaving** and the
   reported value in that run was not a behaviour. The table above reports only
@@ -401,7 +428,7 @@ A proposal for this line must settle, explicitly and in writing:
    legacy server as a **divergence**, not parity. Reproducing `end_attack`'s
    would be the `AGENTS.md` "Bad" pattern verbatim.
 2. **The ordering**, per §4.1: validation strictly before any destruction.
-3. **Which of the eleven discarded keys are reported as read-and-unused**, so the
+3. **Which of the twelve read keys are reported as discarded** (nine of them), so the
    non-claims are structural rather than prose.
 4. **Whether `kill_iid` is delivered as a proven no-op** or refused outright.
 5. **How the `godot-unit-behaviors` spec correction is carried** — as a

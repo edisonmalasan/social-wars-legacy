@@ -79,9 +79,16 @@ RESOURCE_SLOTS: Dict[str, Tuple[str, ...]] = {
 NEUTRAL_VECTOR = [0, 0, 0, 0, 0, 0, 0, 0]
 ADD_XP_UNIT_COMMAND = "add_xp_unit"
 
-# This line's own capture. The single build_disposable call site permitted to
-# pass a seed, because this line is the reason the parameter exists.
+# This line's own capture. The build_disposable call sites permitted to pass a
+# seed, because a line is the reason the parameter exists for it. AMENDED by the
+# `combat-actions` line (M10 line 2): its capture seeds two committed village
+# documents because the fresh-player corpus places ZERO unit rows, so the
+# destruction and the ledger paths it records are unreachable against it. The
+# guard is narrowed to a declared set rather than deleted -- a capture may join
+# the set only by naming itself here, which is the review this pin exists to
+# force.
 OWN_CAPTURE_NAME = "capture_unit_xp_fixture.py"
+SEEDED_CAPTURE_NAMES = frozenset({OWN_CAPTURE_NAME, "capture_combat_fixture.py"})
 
 # Identifiers that would mean an award rule had been invented. Matched as
 # SUBSTRINGS on purpose: an earlier by-name guard in this repository matched only
@@ -1106,7 +1113,7 @@ class CaptureHarnessSeamTests(unittest.TestCase):
         other capture has acquired a non-fresh corpus and the corpus assumptions of
         its committed fixture need rechecking. That must be a loud failure.
 
-        This line's own capture is the single deliberate exception and is asserted
+        Each capture in SEEDED_CAPTURE_NAMES is a deliberate exception, asserted
         separately below, so the exception cannot silently widen.
         """
         offenders: List[str] = []
@@ -1114,7 +1121,7 @@ class CaptureHarnessSeamTests(unittest.TestCase):
         for path in sorted(COMPAT_DIR.glob("*.py")):
             body = code_only(path)
             for inner in call_arguments(body, "build_disposable"):
-                if path.name == OWN_CAPTURE_NAME:
+                if path.name in SEEDED_CAPTURE_NAMES:
                     continue
                 pinned += 1
                 if count_top_level_commas(inner) >= 1:
@@ -1125,8 +1132,8 @@ class CaptureHarnessSeamTests(unittest.TestCase):
             offenders,
             [],
             "a build_disposable call site now passes a second argument, so a "
-            "capture other than this one may be seeding from a different corpus: %r"
-            % offenders,
+            "capture other than the declared ones may be seeding from a different "
+            "corpus: %r" % offenders,
         )
         self.assertEqual(
             pinned,
@@ -1135,20 +1142,32 @@ class CaptureHarnessSeamTests(unittest.TestCase):
             "capture must be reviewed before it inherits this property" % pinned,
         )
 
-    def test_this_capture_is_the_only_one_passing_a_seed(self) -> None:
-        """The exception above is exact, not approximate."""
-        own: List[int] = []
-        for path in sorted(COMPAT_DIR.glob("*.py")):
-            if path.name != OWN_CAPTURE_NAME:
-                continue
-            for inner in call_arguments(code_only(path), "build_disposable"):
-                own.append(count_top_level_commas(inner))
-        self.assertEqual(
-            sorted(own),
-            [1],
-            "this capture's own call site changed shape: exactly one call passes a "
-            "second argument (the seed), got argument counts %r" % sorted(own),
+    def test_each_declared_seeded_capture_passes_exactly_one_seed(self) -> None:
+        """The exception set is exact, not approximate, and every member exists.
+
+        Measured by name rather than by hardcoding an argument count per member,
+        so adding a capture to the set cannot quietly give it a different number
+        of seeds -- which would be a third corpus this pin has never reviewed.
+        """
+        found = sorted(
+            path.name for path in COMPAT_DIR.glob("*.py")
+            if path.name in SEEDED_CAPTURE_NAMES
         )
+        self.assertEqual(found, sorted(SEEDED_CAPTURE_NAMES))
+        for name in sorted(SEEDED_CAPTURE_NAMES):
+            path = COMPAT_DIR / name
+            self.assertTrue(path.is_file(), "%s is declared but absent" % name)
+            counts = [
+                count_top_level_commas(inner)
+                for inner in call_arguments(code_only(path), "build_disposable")
+            ]
+            with self.subTest(capture=name):
+                self.assertEqual(
+                    counts,
+                    [1],
+                    "%s's call site changed shape: exactly one call may pass a "
+                    "seed, got argument counts %r" % (name, sorted(counts)),
+                )
 
 
 class CodeOnlyLexTests(unittest.TestCase):

@@ -898,7 +898,7 @@ class RoutePlacementTests(unittest.TestCase):
             "session", "bootstrap", "place", "purchase", "move", "sell",
             "store", "upgrade", "construction", "collect", "expand",
             "queue", "collection", "resurrect", "quests", "research",
-            "level_up",
+            "level_up", "combat", "place_stored", "sell_stored",
         )
         self.assertGreaterEqual(len(markers), 21)
         for name in names:

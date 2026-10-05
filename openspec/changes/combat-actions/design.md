@@ -101,7 +101,7 @@ failure when its first probe run aborted before its cleanup existed.
 
 ### D4 — The request's field inventory is re-derived from `command.py` bytes every run
 
-The eleven read keys and the seven that reach nothing are **re-derived from the
+The twelve read keys and the nine that reach nothing are **re-derived from the
 preserved source on every verification run** and compared for exact identity, so
 a legacy edit fails the suite instead of silently contradicting the record. The
 inventory is not transcribed into a committed table, because a transcribed table

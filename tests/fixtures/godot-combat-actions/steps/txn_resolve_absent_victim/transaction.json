@@ -1,0 +1,70 @@
+{
+  "changed_leaf_count": 0,
+  "changed_leaves": [],
+  "command": "end_attack",
+  "crafted_args": null,
+  "crafted_units": [
+    [
+      1020,
+      0,
+      1,
+      0
+    ]
+  ],
+  "exhaustion_shortfall": 1,
+  "expected_removed_keys": [],
+  "expected_status": 500,
+  "failure_body_sha256": "ae5163256b944013e27cbef0d2bcd33a6dacbb92463509f91d5f3df782142910",
+  "failure_is_framework_error_page": true,
+  "in_memory_destruction_persisted": false,
+  "in_memory_destruction_printed": 1,
+  "in_memory_vs_persisted_disagreement": "The branch printed a destruction of 1 and performed it against the in-memory save, while the persisted save moved 0 rows. Persistence runs after the whole dispatch loop (command.py:30,32), so the exception discarded it.",
+  "ledger_after": {},
+  "ledger_before": {},
+  "ledger_keys_after": 0,
+  "ledger_keys_before": 0,
+  "ledger_moved": false,
+  "modern_derives_ledger": {},
+  "modern_derives_removed_keys": [],
+  "name": "resolve_absent_victim",
+  "note": "The second unguarded absent-value dereference, and the one that sits AFTER the write loop in SOURCE order: the rows are gone from the in-memory save and the ledger has been incremented by the time command.py:874's `if \"name\" in victim` raises TypeError on None. The persisted save is nevertheless BYTE-IDENTICAL, and that is the real finding: command.py dispatches the whole batch first and calls save_session only after the loop (command.py:30,32), so an exception anywhere in the batch skips persistence and discards EVERY mutation the batch made. Recorded here rather than asserted from the source, and paired with resolve_batch_discarded_on_raise, which shows the same discard with a SECOND command that would otherwise have persisted.",
+  "parity_with_delivered_endpoint": true,
+  "printed_branch_lines": [
+    "[+] COMMAND: end_attack(['{\"attacker_units\":[[1020,0,1,0]]}', 0]) -> Lost 1 Soldier II(s)"
+  ],
+  "printed_destruction_counts": [
+    1
+  ],
+  "printed_requested_count": 1,
+  "removed_keys": [],
+  "resource_neutral": true,
+  "resources_after": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "resources_before": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "response_payload": null,
+  "rows_after": 319,
+  "rows_before": 319,
+  "rows_removed": 0,
+  "seed": "destruction",
+  "state_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "status": 500,
+  "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "victim_supplied": false
+}

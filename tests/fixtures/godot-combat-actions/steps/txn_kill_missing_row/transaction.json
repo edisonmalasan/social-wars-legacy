@@ -1,0 +1,60 @@
+{
+  "changed_leaf_count": 0,
+  "changed_leaves": [],
+  "command": "kill",
+  "crafted_args": [
+    999999,
+    0
+  ],
+  "crafted_units": null,
+  "delivered_endpoint_refusal": "unaddressable_row",
+  "expected_removed_keys": [],
+  "expected_status": 200,
+  "ledger_after": {},
+  "ledger_before": {},
+  "ledger_keys_after": 0,
+  "ledger_keys_before": 0,
+  "ledger_moved": false,
+  "modern_derives_ledger": {},
+  "modern_derives_removed_keys": [],
+  "name": "kill_missing_row",
+  "note": "An unaddressable map key hits map_get_item's falsy branch, prints 'Error: item not found.' and RETURNS -- and the server still answers the legacy success result. A client cannot distinguish this from a real deletion by the response alone. The delivered endpoint refuses it instead, which is a recorded divergence and not parity.",
+  "parity_with_delivered_endpoint": true,
+  "printed_branch_lines": [
+    "[+] COMMAND: kill([999999, 0]) -> Error: item not found."
+  ],
+  "printed_destruction_counts": [],
+  "removed_keys": [],
+  "resource_neutral": true,
+  "resources_after": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "resources_before": {
+    "cash": 500,
+    "gold": 5898,
+    "mana": 0,
+    "oil": 2750,
+    "steel": 107,
+    "wood": 1176,
+    "xp": 117012
+  },
+  "response_payload": {
+    "result": "success"
+  },
+  "rows_after": 319,
+  "rows_before": 319,
+  "rows_removed": 0,
+  "seed": "destruction",
+  "state_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "state_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "status": 200,
+  "unchanged_leaves_sha256_after": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "unchanged_leaves_sha256_before": "d74bfac70ddb12417d470e679618affeec321a24d7c69fe97743ff521799af5b",
+  "victim_supplied": true
+}
