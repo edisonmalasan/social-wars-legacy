@@ -1,0 +1,117 @@
+{
+  "args_sent": [
+    0,
+    99
+  ],
+  "argument_count": 2,
+  "arity_selects_the_arm": "not applicable: the daily branch is not arity-selected",
+  "arm": "resources",
+  "backwards_move_cause": "the client sent next id 99, the branch computed 100, and 'if next_id > 5: next_id = 1' overwrote it with 1 -- so a LARGER client value moves the recorded cursor DOWN",
+  "both_cursors": {
+    "bonusNextId": {
+      "after": 1,
+      "before": 4
+    },
+    "weeklyRewardIndex": {
+      "after": 1,
+      "before": 1
+    }
+  },
+  "changed_leaf_count": 2,
+  "changed_leaf_paths": [
+    "/privateState/bonusNextId",
+    "/privateState/timestampLastBonus"
+  ],
+  "command": "win_daily_bonus",
+  "cursor_after": 1,
+  "cursor_before": 4,
+  "cursor_key": "bonusNextId",
+  "cursor_moved_backwards": true,
+  "cursor_recomputed": 1,
+  "delivered_endpoint_refusal": "client_supplied_next_id",
+  "divergence": "client_supplied_next_id",
+  "instant_after_shape": "int",
+  "instant_before": 1791214271,
+  "instant_compared_by": "shape only, never by value: the branch stamps the wall clock",
+  "instant_is_volatile": true,
+  "instant_key": "timestampLastBonus",
+  "leaf_diff": [
+    {
+      "after": 1,
+      "before": 4,
+      "path": "/privateState/bonusNextId",
+      "present_after": true,
+      "present_before": true
+    },
+    {
+      "after": 1791214272,
+      "before": 1791214271,
+      "path": "/privateState/timestampLastBonus",
+      "present_after": true,
+      "present_before": true
+    }
+  ],
+  "message_contradicts_the_absence_of_a_grant": "the branch printed 'Rewarded resources' while its whole-document leaf diff is exactly the cursor and the instant",
+  "modern_derives_after": 5,
+  "modern_differs_from_oracle": true,
+  "moved_backwards": true,
+  "name": "daily_oversized_next_id_moves_the_cursor_backwards",
+  "next_id_sent": 99,
+  "next_id_sent_is_the_recorded_cursor": false,
+  "note": "The client sends a next id of 99. The branch computes 100, sees that it exceeds the hardcoded literal 5, and OVERWRITES it with 1 -- so the recorded cursor moves 4 -> 1, BACKWARDS. This is the sharpest divergence in the line and it is executed rather than argued: the backwards move is visible in the preserved source at command.py:446 and 451-452, and this transaction demonstrates it.",
+  "only_the_cursor_and_instant_moved": true,
+  "parity_with_delivered_endpoint": false,
+  "placed_rows_after": 551,
+  "placed_rows_before": 551,
+  "placed_rows_recorded": 551,
+  "printed_branch_lines": [
+    "[+] COMMAND: win_daily_bonus([0, 99]) -> Rewarded resources"
+  ],
+  "printed_message": "Rewarded resources",
+  "printed_message_claims": "Rewarded resources",
+  "printed_message_item_name_committed": null,
+  "printed_message_names_a_committed_item": null,
+  "printed_message_template": "Rewarded resources",
+  "resource_slot_count": 8,
+  "resources_after": {
+    "cash": 4,
+    "energy": 50,
+    "gold": 37691,
+    "mana": 15,
+    "oil": 15401,
+    "steel": 14151,
+    "wood": 19705,
+    "xp": 136878
+  },
+  "resources_before": {
+    "cash": 4,
+    "energy": 50,
+    "gold": 37691,
+    "mana": 15,
+    "oil": 15401,
+    "steel": 14151,
+    "wood": 19705,
+    "xp": 136878
+  },
+  "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+  "resources_moved": [],
+  "response_payload": {
+    "result": "success"
+  },
+  "state_sha256_after": "4ed88c4037ee04217476622fd13262648df8db6dfcf99223a54e75343afcd6d6",
+  "state_sha256_before": "7a7385176e313a3dc89ee035e4acac9ae283cfdbaadcb8ecbc7379545c71cb01",
+  "status": 200,
+  "stdout_evidence_is_this_request_only": true,
+  "stdout_offset_before": 2756,
+  "step_number": 6,
+  "storage_after": {
+    "1198": 1
+  },
+  "storage_before": {
+    "1198": 1
+  },
+  "storage_byte_identical": true,
+  "unit_list_byte_identical": true,
+  "unit_list_length_after": 136,
+  "unit_list_length_before": 136
+}

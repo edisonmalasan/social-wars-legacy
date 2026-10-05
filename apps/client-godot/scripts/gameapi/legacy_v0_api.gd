@@ -22,6 +22,7 @@ const CombatFlow = preload("res://scripts/units/combat_flow.gd")
 const ResearchFlow = preload("res://scripts/units/research_flow.gd")
 const QuestFlow = preload("res://scripts/units/quest_flow.gd")
 const MagicFlow = preload("res://scripts/units/magic_flow.gd")
+const RewardFlow = preload("res://scripts/rewards/reward_flow.gd")
 const TutorialFlow = preload("res://scripts/progression/tutorial_flow.gd")
 
 ## Loopback default: the v0 service binds 127.0.0.1 only (design D3).
@@ -46,6 +47,7 @@ const QUEST_PATH := "/v0/quests"
 const TUTORIAL_PATH := "/v0/tutorial"
 const COMBAT_PATH := "/v0/combat"
 const MAGIC_PATH := "/v0/magic"
+const REWARD_PATH := "/v0/reward"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -782,6 +784,35 @@ func magic_town(user_id: String, action: Variant,
 			str(outcome.get("code", "bad_response")),
 			str(outcome.get("message", "")))
 	return MagicFlow.parse_magic(outcome.get("payload"))
+
+
+## One reward-cursor intent over loopback HTTP. The body is built by
+## `RewardFlow.build_reward_intent()` and is therefore **exactly two keys** --
+## the save identity and the closed action -- so a successor value, a bound, a
+## schedule position, an item id, an amount, and a timestamp are not expressible
+## here (design D2). That is the whole point of this signature: the legacy
+## `win_daily_bonus` branch's own grant arm is unreachable precisely because the
+## derived item it would carry is **zero**, and a client that could send an item
+## id could reach the arm the contract refuses to reproduce.
+##
+## The answer is read by `RewardFlow.parse_reward()`, which re-derives the
+## successor, both cursors' reachability, the derived argument list, the
+## volatile-field paths, and the granted item's zero-ness from the answer's own
+## reported state -- and refuses a disagreement rather than re-labelling it.
+func reward_town(user_id: String, action: Variant) \
+		-> RewardFlow.RewardResult:
+	var intent := RewardFlow.build_reward_intent(user_id, action)
+	if not intent.get("ok", false):
+		return RewardFlow.reward_failure(
+			str(intent.get("reason", "bad_intent")),
+			str(intent.get("error", "")))
+	var outcome := await _call("POST", REWARD_PATH,
+		JSON.stringify(intent.get("body")))
+	if not outcome.get("ok", false):
+		return RewardFlow.reward_failure(
+			str(outcome.get("code", "bad_response")),
+			str(outcome.get("message", "")))
+	return RewardFlow.parse_reward(outcome.get("payload"))
 
 
 ## every failure returns `{ok: false, code, message}` with the failure named.

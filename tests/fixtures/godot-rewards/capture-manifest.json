@@ -1,0 +1,1244 @@
+{
+  "batch_shape": {
+    "arguments": "CRAFTED AND CLIENT-SUPPLIED. The weekly branch reads zero or five and tests only the COUNT; the daily branch reads an item and a next id and validates neither. The captured values are what makes each divergence observable.",
+    "arguments_per_command": {
+      "weekly_reward": 0,
+      "win_daily_bonus": 2
+    },
+    "commands": [
+      "weekly_reward",
+      "win_daily_bonus"
+    ],
+    "resource_vector": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "ts": 1700000000,
+    "ts_note": "Pinned to a constant, as on the damage and unit-experience captures. The dispatcher parses it and never reads it.",
+    "vector_status": "neutral by construction, every transaction",
+    "weekly_arm_threshold": 4,
+    "weekly_arm_threshold_source": "command.py:346 (len(args) > 4)"
+  },
+  "bounds": {
+    "daily": {
+      "bound": 5,
+      "cardinality": 5,
+      "exceeds_cardinality_by": 0,
+      "rejected_derivation": "REJECTED ALTERNATIVE, RETAINED ON PURPOSE (design D4). DAILY_GOLD_REWARDS holds exactly five entries, so its entry count agrees with the literal at command.py:451, and the two numbers could be read as one deriving the other. THEY ARE NOT. The preserved source contains NO reference to that schedule at all: measured across all eleven top-level legacy modules (auctions.py, bundle.py, command.py, constants.py, engine.py, get_game_config.py, get_player_info.py, legacy_command_recorder.py, server.py, sessions.py, version.py) the name DAILY_GOLD_REWARDS occurs ZERO times. The agreement is therefore a coincidence of the value distribution and NOT provenance, and this contract applies the literal as the literal. This note exists so a later reader who notices that five equals five cannot conclude that a derivation was chosen and then dropped: it never was. The same reasoning runs the other way round for the weekly bound, which IS derived - but from the schedule's LIST-VALUED entries, not from its entry count, and the two numbers differ (5 against 3)",
+      "schedule": "DAILY_GOLD_REWARDS",
+      "source": "command.py:451-452 (a hardcoded literal, `if next_id > 5:`)"
+    },
+    "note": "The weekly bound is derived from the schedule's LIST-VALUED entries and is NOT its entry count, so a bound of 5 sits beside 3 entries. The daily bound is a hardcoded literal whose agreement with an unread schedule's entry count is a coincidence of the value distribution, not its provenance.",
+    "weekly": {
+      "cardinality": 3,
+      "derived_bound": 5,
+      "exceeds_cardinality_by": 2,
+      "schedule": "MONDAY_BONUS_REWARDS",
+      "source": "get_game_config.py:195-204 (get_weekly_reward_length)",
+      "status": "derived from committed content by the delivered envelope, recomputed here and asserted"
+    }
+  },
+  "captured_at_utc": "2026-10-05T15:31:13+00:00",
+  "cleanup": {
+    "disposables": 1,
+    "note": "Each disposable is removed by the harness's own finally block; the fixture is staged OUTSIDE the working tree and published only after every check passed, so a failed run writes nothing into the repository."
+  },
+  "containment": {
+    "combined_after": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "combined_before": "18e5e55ba85473bb6a7aca8ff6a27b05ba7848794649af9391896e6d49b4a724",
+    "groups": [
+      "config",
+      "mods",
+      "root_python",
+      "saves",
+      "templates",
+      "tests/saves",
+      "villages"
+    ],
+    "identical": true,
+    "protected_fixtures": [
+      "godot-building-collect",
+      "godot-building-construction",
+      "godot-building-expand",
+      "godot-building-move",
+      "godot-building-placement",
+      "godot-building-sell",
+      "godot-building-store",
+      "godot-building-upgrade",
+      "godot-building-xp",
+      "godot-combat-actions",
+      "godot-compatibility-boot",
+      "godot-damage",
+      "godot-item-purchase",
+      "godot-quests",
+      "godot-research",
+      "godot-stored-item-placement",
+      "godot-tutorial",
+      "godot-unit-collection",
+      "godot-unit-experience",
+      "godot-unit-queues"
+    ],
+    "protected_fixtures_unchanged": true,
+    "seed_sha256_after": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+    "seed_sha256_before": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+    "working_tree_saves_absent": true
+  },
+  "derived_provisional": [
+    "That villages/Neutral.json is the seed. Recorded so a rerun reproduces the committed bytes; seven committed documents carry a weekly cursor above 0, and this one's successor lands on the unaddressable position 4, so the choice is forced by what the fixture must demonstrate rather than preferred.",
+    "That all seven steps are ONE interleaved sequence rather than seven independent transactions. It is settled independently by the oversized probe: it is the SIXTH step and its recorded before is 4, which is only reachable if the granting daily step before it advanced the recorded cursor from 3, and its recorded after is 1 rather than the successor. The capture asserts all six links over the whole document and over BOTH cursors.",
+    "That a modern capability should derive the successor from the recorded cursor at all. No committed rule states it; it is the coherent reading of a cursor nobody reads, and it is recorded as a decision rather than a reproduction."
+  ],
+  "divergences": {
+    "class_count": 3,
+    "divergence_classes": {
+      "arity_selects_the_arm": "The weekly branch selects between granting and not granting on the client's argument count, so the same command with five arguments places a row and with four does not. The delivered route has NO arm: it always sends the short, non-granting argument list and reports each arm's recorded effect instead.",
+      "client_supplied_item": "Both branches take the granted item from the client, and the weekly branch takes the index, cell, and player team with it. The delivered route accepts none of them and grants nothing.",
+      "client_supplied_next_id": "The daily branch advances a client-sent cursor and then overwrites anything above the literal 5 with 1, so a larger client value moves the recorded cursor backwards. Recorded SEPARATELY from the item divergence because this one is observable in the preserved source rather than only in an executed record. The delivered route derives the successor from the recorded cursor instead."
+    },
+    "parity_claimed_for": [
+      "weekly_short_arm_grants_nothing",
+      "daily_short_arm_grants_nothing",
+      "daily_after_the_backwards_move"
+    ],
+    "recorded_not_narrowed": true,
+    "transaction_count": 4,
+    "transactions": [
+      {
+        "args_sent": [
+          600,
+          1198,
+          58,
+          47,
+          1
+        ],
+        "command": "weekly_reward",
+        "delivered_endpoint_refusal": "client_supplied_item / client_supplied_cell / client_supplied_player / client_supplied_item_index",
+        "divergence": "arity_selects_the_arm",
+        "modern_derives_after": null,
+        "name": "weekly_long_arm_appends_an_absent_unit",
+        "oracle_cursor_after": 0
+      },
+      {
+        "args_sent": [
+          601,
+          1055,
+          58,
+          47,
+          1
+        ],
+        "command": "weekly_reward",
+        "delivered_endpoint_refusal": "client_supplied_item / client_supplied_cell / client_supplied_player / client_supplied_item_index",
+        "divergence": "arity_selects_the_arm",
+        "modern_derives_after": null,
+        "name": "weekly_long_arm_deduplicates_a_present_unit",
+        "oracle_cursor_after": 1
+      },
+      {
+        "args_sent": [
+          1198,
+          3
+        ],
+        "command": "win_daily_bonus",
+        "delivered_endpoint_refusal": "client_supplied_item",
+        "divergence": "client_supplied_item",
+        "modern_derives_after": null,
+        "name": "daily_granting_arm_lands_in_storage",
+        "oracle_cursor_after": 4
+      },
+      {
+        "args_sent": [
+          0,
+          99
+        ],
+        "command": "win_daily_bonus",
+        "delivered_endpoint_refusal": "client_supplied_next_id",
+        "divergence": "client_supplied_next_id",
+        "modern_derives_after": 5,
+        "name": "daily_oversized_next_id_moves_the_cursor_backwards",
+        "oracle_cursor_after": 1
+      }
+    ],
+    "why_not_narrowed": "Reproducing any of these would require deriving what to grant, and nothing in the preserved server derives it. The weekly schedule's only consumer returns an int (its length), the letters 'g' and 'c' are decoded nowhere, and both cursors have zero readers. So the coherent modern contract is a cursor transition with no grant, and every difference from the oracle is recorded rather than reproduced."
+  },
+  "established": [
+    "weekly_reward has TWO ARMS CHOSEN BY THE CLIENT'S ARGUMENT COUNT (command.py:346 tests len(args) > 4), and BOTH arms stamp and advance the cursor whether or not anything was granted.",
+    "The SHORT weekly arm grants NOTHING: its whole-document leaf diff is exactly TWO paths, the cursor and the instant, while it prints 'Won resources'. That is the clean demonstration in this line.",
+    "The LONG weekly arm places a row: 549 -> 550 placed rows, with the client-sent item at the client-sent index, cell, and player team, and every pre-existing row byte-identical.",
+    "The long arm also APPENDED to the unit list, 135 -> 136, because the client-sent item was absent from it, AND the SAME arm with a client-sent item the list already carried left the list at 136 while STILL placing a row (550 -> 551). Both halves of the preserved DEDUPLICATING helper (engine.py:86-89) are therefore executed rather than cited, and the row half and the list half are shown to disagree under one request.",
+    "win_daily_bonus moves the recorded cursor BACKWARDS when the client sends an oversized next id: 4 -> 1. This is observable in the preserved source (command.py:446 computes args[1] + 1 and 451-452 overwrites anything above the literal 5 with 1) and this fixture EXECUTES it rather than arguing it.",
+    "The granting daily arm calls BOTH grant helpers at once: the deduplicating unit-list one and the ACCUMULATING storage one. The seed's storage was empty and became exactly {'1198': 1} while the unit list stood still, so one grant landed in two places by two different rules (engine.py:70-75 and 86-89).",
+    "No arm charges or credits anything: all EIGHT stored resource slots are byte-identical in all seven steps.",
+    "Neither branch DERIVES what to grant. Both take the item id from the client, with no content lookup, no bound, and no eligibility test, and the cursor's only other occurrence is a comment."
+  ],
+  "exit_code": 0,
+  "interpreter": "CPython 3.9 (pinned)",
+  "invocation": "python -B apps/compat-api/capture_rewards_fixture.py",
+  "login_step": "Performed once, before the sequence, and recorded once. Its neutrality is asserted: the corpus after the login is compared against the committed seed and must be byte-identical.",
+  "not_claimed": [
+    "Anything about WHAT WAS GRANTED. The grant is client-sent in both branches: the non-granting arms grant nothing at all, and the granting arms place or store whatever integer the client sent. No committed rule says which item, and the one schedule with a consumer uses it for its LENGTH only. The captured item ids happen to be ones the weekly schedule names, which is what makes the list append observable -- that is NOT evidence the schedule selects them, and the branch never reads it.",
+    "That the daily bound is content-derived. It is a hardcoded literal at command.py:451 in a branch whose only reader of that schedule does not exist, and the rejected derivation is retained rather than dropped.",
+    "That a type letter names a resource. Six independent searches across all eleven preserved modules return zero, so reading 'g' as gold or 'c' as cash would be an invention rather than a reproduction. Nothing here maps a letter onto a slot.",
+    "That the modern endpoint reproduces the oracle's cursor value. It deliberately does not where the two differ, and every step records the oracle value, the derived value, and whether they agree.",
+    "Anything about what the real Flash client sent. The client was never executed: every payload here is crafted, and the weekly arm's arity in particular was chosen by this capture.",
+    "Any eligibility, cooldown, window, or already-claimed rule. The stamped instant has no reader anywhere in the preserved server, so there is nothing to reproduce.",
+    "That the two cursors are read by anything. Each is read only by the expression that overwrites it."
+  ],
+  "purpose": "Executed-legacy evidence for the two reward branches: weekly_reward (command.py:345-363) and win_daily_bonus (444-463). It records what the ORACLE does, including the three behaviours this capability deliberately does NOT reproduce: the client-sent granted item, the client-sent next cursor, and the client-arity-selected arm.",
+  "recorded_steps": [
+    "txn_weekly_short_arm_grants_nothing",
+    "txn_weekly_long_arm_appends_an_absent_unit",
+    "txn_weekly_long_arm_deduplicates_a_present_unit",
+    "txn_daily_short_arm_grants_nothing",
+    "txn_daily_granting_arm_lands_in_storage",
+    "txn_daily_oversized_next_id_moves_the_cursor_backwards",
+    "txn_daily_after_the_backwards_move",
+    "login_post"
+  ],
+  "schema": "rewards-cursor-fixture-v1",
+  "seed": {
+    "census": {
+      "absent_item": 1198,
+      "absent_item_is_absent_from_the_unit_list": true,
+      "daily_cursor": 2,
+      "daily_stamp": 1688653422,
+      "path": "villages/Neutral.json",
+      "pid_read_from_document": "Neutral",
+      "placed_rows": 549,
+      "present_item": 1055,
+      "present_item_is_in_the_unit_list": true,
+      "resource_slot_count": 8,
+      "resource_slots": [
+        "cash",
+        "energy",
+        "gold",
+        "mana",
+        "oil",
+        "steel",
+        "wood",
+        "xp"
+      ],
+      "storage": {},
+      "storage_is_empty_so_the_grant_lands_visibly": true,
+      "unit_list_length": 135,
+      "weekly_cursor": 3,
+      "weekly_schedule_unit_ids": [
+        1055,
+        1033,
+        1046,
+        1063,
+        1198
+      ],
+      "weekly_stamp": 1686569823,
+      "why_this_one": "It is one of only two committed corpora whose weekly cursor is above 1, and at 3 its successor lands on position 4 -- a position the three-entry weekly schedule CANNOT answer. villages/Nerri.json at 2 would land on 3, which the schedule also cannot answer but is the smaller demonstration."
+    },
+    "no_cursor_fabricated": "The seed's two cursors and two instants are reproduced verbatim in every transaction's before state, and every step's before state is asserted equal to its predecessor's after state. Nothing is written into the seed by this capture; its digest is asserted before and after the run.",
+    "path": "villages/Neutral.json",
+    "pid_read_from_document": "Neutral",
+    "sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+    "why_this_one": "It is one of only two committed corpora whose weekly cursor is above 1, and at 3 its successor lands on position 4 -- a position the three-entry weekly schedule CANNOT answer. villages/Nerri.json at 2 would land on 3, which the schedule also cannot answer but is the smaller demonstration."
+  },
+  "server": {
+    "debug": false,
+    "debug_note": "server.py runs app.run(..., debug=False). Every recorded step answers HTTP 200, so no framework error page is committed.",
+    "env_extra": {
+      "PYTHONUNBUFFERED": "1"
+    },
+    "env_extra_note": "Set for THIS capture's child processes only, via a defaulted parameter on start_server. child_environment() is untouched, so no existing capture's log changes. The printed lines are the evidence that each branch ran, and block buffering would lose them when the harness reaps the child.",
+    "host": "127.0.0.1",
+    "one_per_transaction_reason_rejected": "One server per TRANSACTION was rejected rather than merely avoided: the recorded cursors are the point of this fixture, and the oversized next-id probe's recorded before (4) is only reachable if the previous step really advanced the cursor. The capture asserts whole-document linkage for all six links.",
+    "one_server_for_the_whole_sequence": true,
+    "one_server_reason": "sessions.load_saves() caches the corpus in a module global at import, so a running server never re-reads the seed file. Restoring the seed between steps on one server leaves the in memory corpus already mutated and silently produces a different result.",
+    "port": 5055,
+    "process": "python -B server.py inside the disposable",
+    "sequence": "All 7 steps are ONE interleaved sequence against ONE disposable, because the recorded cursors only mean anything if each step ran against its predecessor's recorded state -- and the oversized probe is the link that would break first, since it is the only step whose oracle result is not the recorded value advanced by one.",
+    "sequence_linkage_asserted": "every step's whole recorded state digest equals its predecessor's, for all six links, plus both cursor ladders weekly [4, 0, 1] and daily [3, 4, 1, 2]",
+    "starts": 1
+  },
+  "time_dependent_fields": {
+    "captured_at_utc": "Same, in this manifest.",
+    "instant_stamped_by_the_oracle": "The branch's own instant field moves every step, because the branch stamps the wall clock. That is a STATE difference, not a record difference: it is recorded in each transaction's `instant_before` and `instant_is_volatile`, and the executed value is compared by shape only.",
+    "request_captured_at_utc": "Recorded per step and necessarily volatile, for the ordinary reason that a record says when it was taken.",
+    "response Date header": "Each step's response.meta.json records the server's own Date header verbatim, so it moves with the wall clock. Nothing redacts it, because redacting a header the oracle sent would be narrowing the record.",
+    "state_documents": "THE WHOLE-DOCUMENT STATE FILES ARE NECESSARILY VOLATILE, AND MEASURED AS SUCH. Both preserved branches write the wall clock UNCONDITIONALLY (command.py:361 and command.py:454), so every step's before.json and after.json carries a different instant on every run. This was measured, not assumed: two consecutive runs were compared file by file with the line endings normalised, and 37 of the 48 files differed -- every state document, every request record, every transaction record and this manifest. An earlier draft of this capture claimed the opposite, that only the six response Date headers moved; that claim was copied from a capture whose branch does not stamp a wall clock, and it was false here. CONSEQUENCE FOR VERIFICATION: a test must RECOMPUTE each transaction's state digest from the committed bytes rather than compare it to a fixed constant, which is exactly what this line's parity test does. The capture compensates for the same-second collision by waiting for the wall clock to move past the instant each step is about to overwrite, so the stamp change is observed rather than raced for.",
+    "ts": "Pinned to a constant, so not volatile."
+  },
+  "transactions": [
+    {
+      "args_sent": [],
+      "argument_count": 0,
+      "arity_selects_the_arm": "command.py:346 tests len(args) > 4, so the CLIENT's argument count picks between granting and not granting",
+      "arm": "short",
+      "both_cursors": {
+        "bonusNextId": {
+          "after": 2,
+          "before": 2
+        },
+        "weeklyRewardIndex": {
+          "after": 4,
+          "before": 3
+        }
+      },
+      "changed_leaf_count": 2,
+      "changed_leaf_paths": [
+        "/privateState/timeStampMondayBonus",
+        "/privateState/weeklyRewardIndex"
+      ],
+      "command": "weekly_reward",
+      "cursor_after": 4,
+      "cursor_before": 3,
+      "cursor_key": "weeklyRewardIndex",
+      "cursor_moved_backwards": false,
+      "cursor_recomputed": 4,
+      "instant_after_shape": "int",
+      "instant_before": 1686569823,
+      "instant_compared_by": "shape only, never by value: the branch stamps the wall clock",
+      "instant_is_volatile": true,
+      "instant_key": "timeStampMondayBonus",
+      "leaf_diff": [
+        {
+          "after": 1791214268,
+          "before": 1686569823,
+          "path": "/privateState/timeStampMondayBonus",
+          "present_after": true,
+          "present_before": true
+        },
+        {
+          "after": 4,
+          "before": 3,
+          "path": "/privateState/weeklyRewardIndex",
+          "present_after": true,
+          "present_before": true
+        }
+      ],
+      "message_contradicts_the_absence_of_a_grant": "the branch printed 'Won resources' while its whole-document leaf diff is exactly the cursor and the instant",
+      "modern_derives_after": 4,
+      "modern_differs_from_oracle": false,
+      "name": "weekly_short_arm_grants_nothing",
+      "note": "Zero arguments, so the branch takes its else arm: it prints 'Won resources', stamps the weekly instant, and advances the cursor. The whole-document leaf diff is EXACTLY TWO paths -- the cursor and the stamp -- which is the clean demonstration that a reward was won, a cursor moved, and nothing anywhere else changed.",
+      "note_on_the_gap": "NO CURSOR EVER SELECTS A SCHEDULE ENTRY (design D3/D7). The weekly bound is derived from the schedule's LIST-VALUED entries - the maximum entry length over the entries whose value is a list - and never from its entry count, and the response reports BOTH numbers plus the set difference in both directions so the mismatch is visible rather than hidden inside a number. The delivered code performs no indexing of either schedule by any cursor value: there is no helper that maps a cursor position to a rung, a type letter, or an amount, and the reachability report is a set difference over two ranges that deliberately performs no lookup",
+      "only_the_cursor_and_instant_moved": true,
+      "parity_note": "For the short arm the oracle's transition and this capability's derived transition are the same number, because the branch advances the recorded cursor by the derived bound's own modulo arithmetic and the short arm grants nothing.",
+      "parity_with_delivered_endpoint": true,
+      "placed_rows_after": 549,
+      "placed_rows_before": 549,
+      "placed_rows_recorded": 549,
+      "printed_branch_lines": [
+        "[+] COMMAND: weekly_reward([]) -> Won resources"
+      ],
+      "printed_message": "Won resources",
+      "printed_message_claims": "Won resources",
+      "printed_message_item_name_committed": null,
+      "printed_message_names_a_committed_item": null,
+      "printed_message_template": "Won resources",
+      "resource_slot_count": 8,
+      "resources_after": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+      "resources_moved": [],
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "af1cd85055eed17847294c2c2e8e17054a7dfcad180c7063c0fe35f59065f737",
+      "state_sha256_before": "67244606666148c736804f9f5d54175a60e53fcaf4d06953eb45ae6cf67d2d51",
+      "status": 200,
+      "stdout_evidence_is_this_request_only": true,
+      "stdout_offset_before": 2180,
+      "step_number": 1,
+      "storage_after": {},
+      "storage_before": {},
+      "storage_byte_identical": true,
+      "successor_position": 4,
+      "successor_unaddressable": true,
+      "unit_list_byte_identical": true,
+      "unit_list_length_after": 135,
+      "unit_list_length_before": 135,
+      "weekly_schedule_cardinality": 3
+    },
+    {
+      "args_sent": [
+        600,
+        1198,
+        58,
+        47,
+        1
+      ],
+      "argument_count": 5,
+      "arity_selects_the_arm": "command.py:346 tests len(args) > 4, so the CLIENT's argument count picks between granting and not granting",
+      "arm": "long",
+      "both_cursors": {
+        "bonusNextId": {
+          "after": 2,
+          "before": 2
+        },
+        "weeklyRewardIndex": {
+          "after": 0,
+          "before": 4
+        }
+      },
+      "changed_leaf_count": 9,
+      "changed_leaf_paths": [
+        "/maps/0/items/600/0",
+        "/maps/0/items/600/1",
+        "/maps/0/items/600/2",
+        "/maps/0/items/600/3",
+        "/maps/0/items/600/4",
+        "/maps/0/items/600/7",
+        "/privateState/boughtUnits/135",
+        "/privateState/timeStampMondayBonus",
+        "/privateState/weeklyRewardIndex"
+      ],
+      "command": "weekly_reward",
+      "cursor_after": 0,
+      "cursor_before": 4,
+      "cursor_key": "weeklyRewardIndex",
+      "cursor_moved_backwards": true,
+      "cursor_recomputed": 0,
+      "delivered_endpoint_refusal": "client_supplied_item / client_supplied_cell / client_supplied_player / client_supplied_item_index",
+      "divergence": "arity_selects_the_arm",
+      "grant_is_client_sent": true,
+      "instant_after_shape": "int",
+      "instant_before": 1791214268,
+      "instant_compared_by": "shape only, never by value: the branch stamps the wall clock",
+      "instant_is_volatile": true,
+      "instant_key": "timeStampMondayBonus",
+      "leaf_diff": [
+        {
+          "after": 1198,
+          "before": null,
+          "path": "/maps/0/items/600/0",
+          "present_after": true,
+          "present_before": false
+        },
+        {
+          "after": 58,
+          "before": null,
+          "path": "/maps/0/items/600/1",
+          "present_after": true,
+          "present_before": false
+        },
+        {
+          "after": 47,
+          "before": null,
+          "path": "/maps/0/items/600/2",
+          "present_after": true,
+          "present_before": false
+        },
+        {
+          "after": 1791214269,
+          "before": null,
+          "path": "/maps/0/items/600/3",
+          "present_after": true,
+          "present_before": false
+        },
+        {
+          "after": 0,
+          "before": null,
+          "path": "/maps/0/items/600/4",
+          "present_after": true,
+          "present_before": false
+        },
+        {
+          "after": 1,
+          "before": null,
+          "path": "/maps/0/items/600/7",
+          "present_after": true,
+          "present_before": false
+        },
+        {
+          "after": 1198,
+          "before": null,
+          "path": "/privateState/boughtUnits/135",
+          "present_after": true,
+          "present_before": false
+        },
+        {
+          "after": 1791214269,
+          "before": 1791214268,
+          "path": "/privateState/timeStampMondayBonus",
+          "present_after": true,
+          "present_before": true
+        },
+        {
+          "after": 0,
+          "before": 4,
+          "path": "/privateState/weeklyRewardIndex",
+          "present_after": true,
+          "present_before": true
+        }
+      ],
+      "name": "weekly_long_arm_appends_an_absent_unit",
+      "note": "Five arguments, so the branch takes its granting arm: it places the CLIENT-SENT item at the CLIENT-SENT index, cell, and player team, and records the item through the deduplicating unit-list helper. The client-sent unit id is one the weekly schedule's list-valued rung names and the seed's list does NOT, so the list grows 135 -> 136 and the placed-row count 549 -> 550. This is the THIRD divergence -- the arm is selected by the CLIENT'S ARITY, so one command has two different effects.",
+      "only_the_cursor_and_instant_moved": false,
+      "parity_with_delivered_endpoint": false,
+      "placed_cell_sent": [
+        58,
+        47
+      ],
+      "placed_index_sent": 600,
+      "placed_item_sent": 1198,
+      "placed_player_sent": 1,
+      "placed_rows_after": 550,
+      "placed_rows_before": 549,
+      "placed_rows_recorded": 549,
+      "printed_branch_lines": [
+        "[+] COMMAND: weekly_reward([600, 1198, 58, 47, 1]) -> Won Nebular Knight"
+      ],
+      "printed_message": "Won Nebular Knight",
+      "printed_message_claims": "Won Nebular Knight",
+      "printed_message_item_name_committed": "Nebular Knight",
+      "printed_message_names_a_committed_item": "1198",
+      "printed_message_template": "Won %s",
+      "resource_slot_count": 8,
+      "resources_after": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+      "resources_moved": [],
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "7854f77f8f2ae97d2459ad83a47c20871ee27da02d4132c53d1adbac81cfd1e5",
+      "state_sha256_before": "af1cd85055eed17847294c2c2e8e17054a7dfcad180c7063c0fe35f59065f737",
+      "status": 200,
+      "stdout_evidence_is_this_request_only": true,
+      "stdout_offset_before": 2279,
+      "step_number": 2,
+      "storage_after": {},
+      "storage_before": {},
+      "storage_byte_identical": true,
+      "unit_list_byte_identical": false,
+      "unit_list_length_after": 136,
+      "unit_list_length_before": 135
+    },
+    {
+      "args_sent": [
+        601,
+        1055,
+        58,
+        47,
+        1
+      ],
+      "argument_count": 5,
+      "arity_selects_the_arm": "command.py:346 tests len(args) > 4, so the CLIENT's argument count picks between granting and not granting",
+      "arm": "long",
+      "both_cursors": {
+        "bonusNextId": {
+          "after": 2,
+          "before": 2
+        },
+        "weeklyRewardIndex": {
+          "after": 1,
+          "before": 0
+        }
+      },
+      "changed_leaf_count": 8,
+      "changed_leaf_paths": [
+        "/maps/0/items/601/0",
+        "/maps/0/items/601/1",
+        "/maps/0/items/601/2",
+        "/maps/0/items/601/3",
+        "/maps/0/items/601/4",
+        "/maps/0/items/601/7",
+        "/privateState/timeStampMondayBonus",
+        "/privateState/weeklyRewardIndex"
+      ],
+      "command": "weekly_reward",
+      "cursor_after": 1,
+      "cursor_before": 0,
+      "cursor_key": "weeklyRewardIndex",
+      "cursor_moved_backwards": false,
+      "cursor_recomputed": 1,
+      "delivered_endpoint_refusal": "client_supplied_item / client_supplied_cell / client_supplied_player / client_supplied_item_index",
+      "divergence": "arity_selects_the_arm",
+      "grant_is_client_sent": true,
+      "instant_after_shape": "int",
+      "instant_before": 1791214269,
+      "instant_compared_by": "shape only, never by value: the branch stamps the wall clock",
+      "instant_is_volatile": true,
+      "instant_key": "timeStampMondayBonus",
+      "leaf_diff": [
+        {
+          "after": 1055,
+          "before": null,
+          "path": "/maps/0/items/601/0",
+          "present_after": true,
+          "present_before": false
+        },
+        {
+          "after": 58,
+          "before": null,
+          "path": "/maps/0/items/601/1",
+          "present_after": true,
+          "present_before": false
+        },
+        {
+          "after": 47,
+          "before": null,
+          "path": "/maps/0/items/601/2",
+          "present_after": true,
+          "present_before": false
+        },
+        {
+          "after": 1791214270,
+          "before": null,
+          "path": "/maps/0/items/601/3",
+          "present_after": true,
+          "present_before": false
+        },
+        {
+          "after": 0,
+          "before": null,
+          "path": "/maps/0/items/601/4",
+          "present_after": true,
+          "present_before": false
+        },
+        {
+          "after": 1,
+          "before": null,
+          "path": "/maps/0/items/601/7",
+          "present_after": true,
+          "present_before": false
+        },
+        {
+          "after": 1791214270,
+          "before": 1791214269,
+          "path": "/privateState/timeStampMondayBonus",
+          "present_after": true,
+          "present_before": true
+        },
+        {
+          "after": 1,
+          "before": 0,
+          "path": "/privateState/weeklyRewardIndex",
+          "present_after": true,
+          "present_before": true
+        }
+      ],
+      "name": "weekly_long_arm_deduplicates_a_present_unit",
+      "note": "The same granting arm, the same arity, and the same cell and player team -- only the client-sent item id differs, and it is one the seed's list already carries. The row is STILL placed (550 -> 551) while the unit list stands at 136. The placed-row half of the four-part grant proof and the unit-list half therefore have OPPOSITE outcomes under one request, which is only observable by executing both.",
+      "only_the_cursor_and_instant_moved": false,
+      "parity_with_delivered_endpoint": false,
+      "placed_cell_sent": [
+        58,
+        47
+      ],
+      "placed_index_sent": 601,
+      "placed_item_sent": 1055,
+      "placed_player_sent": 1,
+      "placed_rows_after": 551,
+      "placed_rows_before": 550,
+      "placed_rows_recorded": 550,
+      "printed_branch_lines": [
+        "[+] COMMAND: weekly_reward([601, 1055, 58, 47, 1]) -> Won Mr. Treat"
+      ],
+      "printed_message": "Won Mr. Treat",
+      "printed_message_claims": "Won Mr. Treat",
+      "printed_message_item_name_committed": "Mr. Treat",
+      "printed_message_names_a_committed_item": "1055",
+      "printed_message_template": "Won %s",
+      "resource_slot_count": 8,
+      "resources_after": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+      "resources_moved": [],
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "648d5a7ada51018b380a345f1f59c79caf58d37a5aa35b45b0e517b6ec66ea47",
+      "state_sha256_before": "7854f77f8f2ae97d2459ad83a47c20871ee27da02d4132c53d1adbac81cfd1e5",
+      "status": 200,
+      "stdout_evidence_is_this_request_only": true,
+      "stdout_offset_before": 2403,
+      "step_number": 3,
+      "storage_after": {},
+      "storage_before": {},
+      "storage_byte_identical": true,
+      "unit_list_byte_identical": true,
+      "unit_list_length_after": 136,
+      "unit_list_length_before": 136
+    },
+    {
+      "args_sent": [
+        0,
+        2
+      ],
+      "argument_count": 2,
+      "arity_selects_the_arm": "not applicable: the daily branch is not arity-selected",
+      "arm": "resources",
+      "both_cursors": {
+        "bonusNextId": {
+          "after": 3,
+          "before": 2
+        },
+        "weeklyRewardIndex": {
+          "after": 1,
+          "before": 1
+        }
+      },
+      "changed_leaf_count": 2,
+      "changed_leaf_paths": [
+        "/privateState/bonusNextId",
+        "/privateState/timestampLastBonus"
+      ],
+      "command": "win_daily_bonus",
+      "cursor_after": 3,
+      "cursor_before": 2,
+      "cursor_key": "bonusNextId",
+      "cursor_moved_backwards": false,
+      "cursor_recomputed": 3,
+      "instant_after_shape": "int",
+      "instant_before": 1688653422,
+      "instant_compared_by": "shape only, never by value: the branch stamps the wall clock",
+      "instant_is_volatile": true,
+      "instant_key": "timestampLastBonus",
+      "leaf_diff": [
+        {
+          "after": 3,
+          "before": 2,
+          "path": "/privateState/bonusNextId",
+          "present_after": true,
+          "present_before": true
+        },
+        {
+          "after": 1791214270,
+          "before": 1688653422,
+          "path": "/privateState/timestampLastBonus",
+          "present_after": true,
+          "present_before": true
+        }
+      ],
+      "message_contradicts_the_absence_of_a_grant": "the branch printed 'Rewarded resources' while its whole-document leaf diff is exactly the cursor and the instant",
+      "modern_derives_after": 3,
+      "modern_differs_from_oracle": false,
+      "name": "daily_short_arm_grants_nothing",
+      "next_id_sent": 2,
+      "next_id_sent_is_the_recorded_cursor": true,
+      "note": "The recorded cursor is sent as args[1], so the branch's 'args[1] + 1' advances the RECORDED value and item 0 takes the else arm. 2 -> 3.",
+      "only_the_cursor_and_instant_moved": true,
+      "parity_note": "The delivered route sends the RECORDED cursor as args[1] rather than the recorded successor, so the oracle's 'args[1] + 1' and the derived successor are the same number. What differs is WHERE that number comes from, which is recorded as the next-id divergence.",
+      "parity_with_delivered_endpoint": true,
+      "placed_rows_after": 551,
+      "placed_rows_before": 551,
+      "placed_rows_recorded": 551,
+      "printed_branch_lines": [
+        "[+] COMMAND: win_daily_bonus([0, 2]) -> Rewarded resources"
+      ],
+      "printed_message": "Rewarded resources",
+      "printed_message_claims": "Rewarded resources",
+      "printed_message_item_name_committed": null,
+      "printed_message_names_a_committed_item": null,
+      "printed_message_template": "Rewarded resources",
+      "resource_slot_count": 8,
+      "resources_after": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+      "resources_moved": [],
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "dff5d1ba87be88fe26c3e00078bb3ed71eb895a0baafaf5b1f8a96d540eb9b48",
+      "state_sha256_before": "648d5a7ada51018b380a345f1f59c79caf58d37a5aa35b45b0e517b6ec66ea47",
+      "status": 200,
+      "stdout_evidence_is_this_request_only": true,
+      "stdout_offset_before": 2522,
+      "step_number": 4,
+      "storage_after": {},
+      "storage_before": {},
+      "storage_byte_identical": true,
+      "unit_list_byte_identical": true,
+      "unit_list_length_after": 136,
+      "unit_list_length_before": 136
+    },
+    {
+      "args_sent": [
+        1198,
+        3
+      ],
+      "argument_count": 2,
+      "arity_selects_the_arm": "not applicable: the daily branch is not arity-selected",
+      "arm": "granting",
+      "both_cursors": {
+        "bonusNextId": {
+          "after": 4,
+          "before": 3
+        },
+        "weeklyRewardIndex": {
+          "after": 1,
+          "before": 1
+        }
+      },
+      "changed_leaf_count": 3,
+      "changed_leaf_paths": [
+        "/maps/0/store/1198",
+        "/privateState/bonusNextId",
+        "/privateState/timestampLastBonus"
+      ],
+      "command": "win_daily_bonus",
+      "cursor_after": 4,
+      "cursor_before": 3,
+      "cursor_key": "bonusNextId",
+      "cursor_moved_backwards": false,
+      "cursor_recomputed": 4,
+      "delivered_endpoint_refusal": "client_supplied_item",
+      "divergence": "client_supplied_item",
+      "instant_after_shape": "int",
+      "instant_before": 1791214270,
+      "instant_compared_by": "shape only, never by value: the branch stamps the wall clock",
+      "instant_is_volatile": true,
+      "instant_key": "timestampLastBonus",
+      "leaf_diff": [
+        {
+          "after": 1,
+          "before": null,
+          "path": "/maps/0/store/1198",
+          "present_after": true,
+          "present_before": false
+        },
+        {
+          "after": 4,
+          "before": 3,
+          "path": "/privateState/bonusNextId",
+          "present_after": true,
+          "present_before": true
+        },
+        {
+          "after": 1791214271,
+          "before": 1791214270,
+          "path": "/privateState/timestampLastBonus",
+          "present_after": true,
+          "present_before": true
+        }
+      ],
+      "name": "daily_granting_arm_lands_in_storage",
+      "next_id_sent": 3,
+      "next_id_sent_is_the_recorded_cursor": true,
+      "note": "A positive client-sent item takes the granting arm, which calls BOTH grant helpers: the deduplicating unit-list one and the ACCUMULATING storage one. The storage was empty and becomes exactly one entry for the client-sent id, while the unit list does NOT grow because step 2 already added that id. One grant, two landing places, two different rules -- executed rather than read at engine.py:70-75 and 86-89.",
+      "only_the_cursor_and_instant_moved": false,
+      "parity_with_delivered_endpoint": false,
+      "placed_rows_after": 551,
+      "placed_rows_before": 551,
+      "placed_rows_recorded": 551,
+      "printed_branch_lines": [
+        "[+] COMMAND: win_daily_bonus([1198, 3]) -> Put Nebular Knight in storage"
+      ],
+      "printed_message": "Put Nebular Knight in storage",
+      "printed_message_claims": "Put Nebular Knight in storage",
+      "printed_message_item_name_committed": "Nebular Knight",
+      "printed_message_names_a_committed_item": "1198",
+      "printed_message_template": "Put %s in storage",
+      "resource_slot_count": 8,
+      "resources_after": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+      "resources_moved": [],
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "7a7385176e313a3dc89ee035e4acac9ae283cfdbaadcb8ecbc7379545c71cb01",
+      "state_sha256_before": "dff5d1ba87be88fe26c3e00078bb3ed71eb895a0baafaf5b1f8a96d540eb9b48",
+      "status": 200,
+      "stdout_evidence_is_this_request_only": true,
+      "stdout_offset_before": 2632,
+      "step_number": 5,
+      "storage_after": {
+        "1198": 1
+      },
+      "storage_before": {},
+      "storage_byte_identical": false,
+      "unit_list_byte_identical": true,
+      "unit_list_length_after": 136,
+      "unit_list_length_before": 136
+    },
+    {
+      "args_sent": [
+        0,
+        99
+      ],
+      "argument_count": 2,
+      "arity_selects_the_arm": "not applicable: the daily branch is not arity-selected",
+      "arm": "resources",
+      "backwards_move_cause": "the client sent next id 99, the branch computed 100, and 'if next_id > 5: next_id = 1' overwrote it with 1 -- so a LARGER client value moves the recorded cursor DOWN",
+      "both_cursors": {
+        "bonusNextId": {
+          "after": 1,
+          "before": 4
+        },
+        "weeklyRewardIndex": {
+          "after": 1,
+          "before": 1
+        }
+      },
+      "changed_leaf_count": 2,
+      "changed_leaf_paths": [
+        "/privateState/bonusNextId",
+        "/privateState/timestampLastBonus"
+      ],
+      "command": "win_daily_bonus",
+      "cursor_after": 1,
+      "cursor_before": 4,
+      "cursor_key": "bonusNextId",
+      "cursor_moved_backwards": true,
+      "cursor_recomputed": 1,
+      "delivered_endpoint_refusal": "client_supplied_next_id",
+      "divergence": "client_supplied_next_id",
+      "instant_after_shape": "int",
+      "instant_before": 1791214271,
+      "instant_compared_by": "shape only, never by value: the branch stamps the wall clock",
+      "instant_is_volatile": true,
+      "instant_key": "timestampLastBonus",
+      "leaf_diff": [
+        {
+          "after": 1,
+          "before": 4,
+          "path": "/privateState/bonusNextId",
+          "present_after": true,
+          "present_before": true
+        },
+        {
+          "after": 1791214272,
+          "before": 1791214271,
+          "path": "/privateState/timestampLastBonus",
+          "present_after": true,
+          "present_before": true
+        }
+      ],
+      "message_contradicts_the_absence_of_a_grant": "the branch printed 'Rewarded resources' while its whole-document leaf diff is exactly the cursor and the instant",
+      "modern_derives_after": 5,
+      "modern_differs_from_oracle": true,
+      "moved_backwards": true,
+      "name": "daily_oversized_next_id_moves_the_cursor_backwards",
+      "next_id_sent": 99,
+      "next_id_sent_is_the_recorded_cursor": false,
+      "note": "The client sends a next id of 99. The branch computes 100, sees that it exceeds the hardcoded literal 5, and OVERWRITES it with 1 -- so the recorded cursor moves 4 -> 1, BACKWARDS. This is the sharpest divergence in the line and it is executed rather than argued: the backwards move is visible in the preserved source at command.py:446 and 451-452, and this transaction demonstrates it.",
+      "only_the_cursor_and_instant_moved": true,
+      "parity_with_delivered_endpoint": false,
+      "placed_rows_after": 551,
+      "placed_rows_before": 551,
+      "placed_rows_recorded": 551,
+      "printed_branch_lines": [
+        "[+] COMMAND: win_daily_bonus([0, 99]) -> Rewarded resources"
+      ],
+      "printed_message": "Rewarded resources",
+      "printed_message_claims": "Rewarded resources",
+      "printed_message_item_name_committed": null,
+      "printed_message_names_a_committed_item": null,
+      "printed_message_template": "Rewarded resources",
+      "resource_slot_count": 8,
+      "resources_after": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+      "resources_moved": [],
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "4ed88c4037ee04217476622fd13262648df8db6dfcf99223a54e75343afcd6d6",
+      "state_sha256_before": "7a7385176e313a3dc89ee035e4acac9ae283cfdbaadcb8ecbc7379545c71cb01",
+      "status": 200,
+      "stdout_evidence_is_this_request_only": true,
+      "stdout_offset_before": 2756,
+      "step_number": 6,
+      "storage_after": {
+        "1198": 1
+      },
+      "storage_before": {
+        "1198": 1
+      },
+      "storage_byte_identical": true,
+      "unit_list_byte_identical": true,
+      "unit_list_length_after": 136,
+      "unit_list_length_before": 136
+    },
+    {
+      "args_sent": [
+        0,
+        1
+      ],
+      "argument_count": 2,
+      "arity_selects_the_arm": "not applicable: the daily branch is not arity-selected",
+      "arm": "resources",
+      "both_cursors": {
+        "bonusNextId": {
+          "after": 2,
+          "before": 1
+        },
+        "weeklyRewardIndex": {
+          "after": 1,
+          "before": 1
+        }
+      },
+      "changed_leaf_count": 2,
+      "changed_leaf_paths": [
+        "/privateState/bonusNextId",
+        "/privateState/timestampLastBonus"
+      ],
+      "command": "win_daily_bonus",
+      "cursor_after": 2,
+      "cursor_before": 1,
+      "cursor_key": "bonusNextId",
+      "cursor_moved_backwards": false,
+      "cursor_recomputed": 2,
+      "instant_after_shape": "int",
+      "instant_before": 1791214272,
+      "instant_compared_by": "shape only, never by value: the branch stamps the wall clock",
+      "instant_is_volatile": true,
+      "instant_key": "timestampLastBonus",
+      "leaf_diff": [
+        {
+          "after": 2,
+          "before": 1,
+          "path": "/privateState/bonusNextId",
+          "present_after": true,
+          "present_before": true
+        },
+        {
+          "after": 1791214273,
+          "before": 1791214272,
+          "path": "/privateState/timestampLastBonus",
+          "present_after": true,
+          "present_before": true
+        }
+      ],
+      "message_contradicts_the_absence_of_a_grant": "the branch printed 'Rewarded resources' while its whole-document leaf diff is exactly the cursor and the instant",
+      "modern_derives_after": 2,
+      "modern_differs_from_oracle": false,
+      "name": "daily_after_the_backwards_move",
+      "next_id_sent": 1,
+      "next_id_sent_is_the_recorded_cursor": true,
+      "note": "Driven after the backwards move, so its recorded 'before' is the 1 the previous step wrote. This link is what proves the sequence is one: on a fresh seed the cursor would have been 2 and this step's before would differ.",
+      "only_the_cursor_and_instant_moved": true,
+      "parity_note": "As on step 4: the delivered route feeds the recorded cursor to the branch, so the two transitions agree numerically.",
+      "parity_with_delivered_endpoint": true,
+      "placed_rows_after": 551,
+      "placed_rows_before": 551,
+      "placed_rows_recorded": 551,
+      "printed_branch_lines": [
+        "[+] COMMAND: win_daily_bonus([0, 1]) -> Rewarded resources"
+      ],
+      "printed_message": "Rewarded resources",
+      "printed_message_claims": "Rewarded resources",
+      "printed_message_item_name_committed": null,
+      "printed_message_names_a_committed_item": null,
+      "printed_message_template": "Rewarded resources",
+      "resource_slot_count": 8,
+      "resources_after": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_before": {
+        "cash": 4,
+        "energy": 50,
+        "gold": 37691,
+        "mana": 15,
+        "oil": 15401,
+        "steel": 14151,
+        "wood": 19705,
+        "xp": 136878
+      },
+      "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+      "resources_moved": [],
+      "response_payload": {
+        "result": "success"
+      },
+      "state_sha256_after": "5a8e599ba3ed678391c4dda1dc80b5b3c33ed92bccb08283843600b93e4884ba",
+      "state_sha256_before": "4ed88c4037ee04217476622fd13262648df8db6dfcf99223a54e75343afcd6d6",
+      "status": 200,
+      "stdout_evidence_is_this_request_only": true,
+      "stdout_offset_before": 2867,
+      "step_number": 7,
+      "storage_after": {
+        "1198": 1
+      },
+      "storage_before": {
+        "1198": 1
+      },
+      "storage_byte_identical": true,
+      "unit_list_byte_identical": true,
+      "unit_list_length_after": 136,
+      "unit_list_length_before": 136
+    }
+  ],
+  "transcript": [
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "weekly_short_arm_grants_nothing",
+      "printed_branch_lines": [
+        "[+] COMMAND: weekly_reward([]) -> Won resources"
+      ],
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+      "step_number": 1
+    },
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "weekly_long_arm_appends_an_absent_unit",
+      "printed_branch_lines": [
+        "[+] COMMAND: weekly_reward([600, 1198, 58, 47, 1]) -> Won Nebular Knight"
+      ],
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+      "step_number": 2
+    },
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "weekly_long_arm_deduplicates_a_present_unit",
+      "printed_branch_lines": [
+        "[+] COMMAND: weekly_reward([601, 1055, 58, 47, 1]) -> Won Mr. Treat"
+      ],
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+      "step_number": 3
+    },
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "daily_short_arm_grants_nothing",
+      "printed_branch_lines": [
+        "[+] COMMAND: win_daily_bonus([0, 2]) -> Rewarded resources"
+      ],
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+      "step_number": 4
+    },
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "daily_granting_arm_lands_in_storage",
+      "printed_branch_lines": [
+        "[+] COMMAND: win_daily_bonus([1198, 3]) -> Put Nebular Knight in storage"
+      ],
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+      "step_number": 5
+    },
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "daily_oversized_next_id_moves_the_cursor_backwards",
+      "printed_branch_lines": [
+        "[+] COMMAND: win_daily_bonus([0, 99]) -> Rewarded resources"
+      ],
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+      "step_number": 6
+    },
+    {
+      "disposable_pid_read_from_document": "Neutral",
+      "name": "daily_after_the_backwards_move",
+      "printed_branch_lines": [
+        "[+] COMMAND: win_daily_bonus([0, 1]) -> Rewarded resources"
+      ],
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22",
+      "step_number": 7
+    }
+  ]
+}

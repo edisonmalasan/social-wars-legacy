@@ -1,0 +1,173 @@
+{
+  "args_sent": [
+    600,
+    1198,
+    58,
+    47,
+    1
+  ],
+  "argument_count": 5,
+  "arity_selects_the_arm": "command.py:346 tests len(args) > 4, so the CLIENT's argument count picks between granting and not granting",
+  "arm": "long",
+  "both_cursors": {
+    "bonusNextId": {
+      "after": 2,
+      "before": 2
+    },
+    "weeklyRewardIndex": {
+      "after": 0,
+      "before": 4
+    }
+  },
+  "changed_leaf_count": 9,
+  "changed_leaf_paths": [
+    "/maps/0/items/600/0",
+    "/maps/0/items/600/1",
+    "/maps/0/items/600/2",
+    "/maps/0/items/600/3",
+    "/maps/0/items/600/4",
+    "/maps/0/items/600/7",
+    "/privateState/boughtUnits/135",
+    "/privateState/timeStampMondayBonus",
+    "/privateState/weeklyRewardIndex"
+  ],
+  "command": "weekly_reward",
+  "cursor_after": 0,
+  "cursor_before": 4,
+  "cursor_key": "weeklyRewardIndex",
+  "cursor_moved_backwards": true,
+  "cursor_recomputed": 0,
+  "delivered_endpoint_refusal": "client_supplied_item / client_supplied_cell / client_supplied_player / client_supplied_item_index",
+  "divergence": "arity_selects_the_arm",
+  "grant_is_client_sent": true,
+  "instant_after_shape": "int",
+  "instant_before": 1791214268,
+  "instant_compared_by": "shape only, never by value: the branch stamps the wall clock",
+  "instant_is_volatile": true,
+  "instant_key": "timeStampMondayBonus",
+  "leaf_diff": [
+    {
+      "after": 1198,
+      "before": null,
+      "path": "/maps/0/items/600/0",
+      "present_after": true,
+      "present_before": false
+    },
+    {
+      "after": 58,
+      "before": null,
+      "path": "/maps/0/items/600/1",
+      "present_after": true,
+      "present_before": false
+    },
+    {
+      "after": 47,
+      "before": null,
+      "path": "/maps/0/items/600/2",
+      "present_after": true,
+      "present_before": false
+    },
+    {
+      "after": 1791214269,
+      "before": null,
+      "path": "/maps/0/items/600/3",
+      "present_after": true,
+      "present_before": false
+    },
+    {
+      "after": 0,
+      "before": null,
+      "path": "/maps/0/items/600/4",
+      "present_after": true,
+      "present_before": false
+    },
+    {
+      "after": 1,
+      "before": null,
+      "path": "/maps/0/items/600/7",
+      "present_after": true,
+      "present_before": false
+    },
+    {
+      "after": 1198,
+      "before": null,
+      "path": "/privateState/boughtUnits/135",
+      "present_after": true,
+      "present_before": false
+    },
+    {
+      "after": 1791214269,
+      "before": 1791214268,
+      "path": "/privateState/timeStampMondayBonus",
+      "present_after": true,
+      "present_before": true
+    },
+    {
+      "after": 0,
+      "before": 4,
+      "path": "/privateState/weeklyRewardIndex",
+      "present_after": true,
+      "present_before": true
+    }
+  ],
+  "name": "weekly_long_arm_appends_an_absent_unit",
+  "note": "Five arguments, so the branch takes its granting arm: it places the CLIENT-SENT item at the CLIENT-SENT index, cell, and player team, and records the item through the deduplicating unit-list helper. The client-sent unit id is one the weekly schedule's list-valued rung names and the seed's list does NOT, so the list grows 135 -> 136 and the placed-row count 549 -> 550. This is the THIRD divergence -- the arm is selected by the CLIENT'S ARITY, so one command has two different effects.",
+  "only_the_cursor_and_instant_moved": false,
+  "parity_with_delivered_endpoint": false,
+  "placed_cell_sent": [
+    58,
+    47
+  ],
+  "placed_index_sent": 600,
+  "placed_item_sent": 1198,
+  "placed_player_sent": 1,
+  "placed_rows_after": 550,
+  "placed_rows_before": 549,
+  "placed_rows_recorded": 549,
+  "printed_branch_lines": [
+    "[+] COMMAND: weekly_reward([600, 1198, 58, 47, 1]) -> Won Nebular Knight"
+  ],
+  "printed_message": "Won Nebular Knight",
+  "printed_message_claims": "Won Nebular Knight",
+  "printed_message_item_name_committed": "Nebular Knight",
+  "printed_message_names_a_committed_item": "1198",
+  "printed_message_template": "Won %s",
+  "resource_slot_count": 8,
+  "resources_after": {
+    "cash": 4,
+    "energy": 50,
+    "gold": 37691,
+    "mana": 15,
+    "oil": 15401,
+    "steel": 14151,
+    "wood": 19705,
+    "xp": 136878
+  },
+  "resources_before": {
+    "cash": 4,
+    "energy": 50,
+    "gold": 37691,
+    "mana": 15,
+    "oil": 15401,
+    "steel": 14151,
+    "wood": 19705,
+    "xp": 136878
+  },
+  "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+  "resources_moved": [],
+  "response_payload": {
+    "result": "success"
+  },
+  "state_sha256_after": "7854f77f8f2ae97d2459ad83a47c20871ee27da02d4132c53d1adbac81cfd1e5",
+  "state_sha256_before": "af1cd85055eed17847294c2c2e8e17054a7dfcad180c7063c0fe35f59065f737",
+  "status": 200,
+  "stdout_evidence_is_this_request_only": true,
+  "stdout_offset_before": 2279,
+  "step_number": 2,
+  "storage_after": {},
+  "storage_before": {},
+  "storage_byte_identical": true,
+  "unit_list_byte_identical": false,
+  "unit_list_length_after": 136,
+  "unit_list_length_before": 135
+}

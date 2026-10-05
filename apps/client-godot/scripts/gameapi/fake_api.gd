@@ -110,6 +110,7 @@ const UnitBehaviors = preload("res://scripts/units/unit_behaviors.gd")
 const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
 const CombatFlow = preload("res://scripts/units/combat_flow.gd")
 const MagicFlow = preload("res://scripts/units/magic_flow.gd")
+const RewardFlow = preload("res://scripts/rewards/reward_flow.gd")
 const ResearchFlow = preload("res://scripts/units/research_flow.gd")
 const QuestFlow = preload("res://scripts/units/quest_flow.gd")
 const TutorialFlow = preload("res://scripts/progression/tutorial_flow.gd")
@@ -5170,6 +5171,218 @@ func _ensure_magic_loaded() -> bool:
 	_magic_pid = str(player_body.get("pid", ""))
 	if _magic_pid == "":
 		_magic_error = "the committed corpus save records no playerInfo pid"
+		return false
+	return true
+
+
+# --- reward double (godot-rewards) ---------------------------------------------
+
+# --- reward double state (godot-rewards) --------------------------------------
+
+## The same committed corpus save the magic and behaviour doubles read, read
+## through an **independent sink**: this double must not depend on another
+## double's failure state or inherit a cursor it never seeded.
+const REWARD_CORPUS_SAVE := "tests/saves/fresh-player.json"
+
+## The recorded configuration's namespace for the two committed reward
+## schedules. Named here so the lookup names no string literal of its own.
+const REWARD_GLOBALS_KEY := "globals"
+
+## The **seven** stored resource slots the compatibility service's own
+## `resources()` accessor returns -- `xp, gold, wood, steel, oil, cash, mana` --
+## and NOT the M7 readout's set, which additionally surfaces the never-written
+## `privateState.energy`. Every no-resource-moved proof on the delivered value
+## level compares these seven, so the double reports these seven.
+const REWARD_RESOURCE_KEYS := RewardFlow.RESOURCE_NAMES
+
+## Mutable process state for the reward double: the whole corpus document under
+## `"document"`, so the cursor write and the instant stamp land in the same
+## object `project_save()` projects from and a second request sees them.
+var _reward_state: Dictionary = {}
+var _reward_schedules: Dictionary = {}
+var _reward_pid := ""
+var _reward_error := ""
+var _reward_loaded := false
+
+
+## One reward-cursor intent under the **same** contract the live implementation
+## sends: the save identity and a CLOSED action -- nothing else. No successor
+## value, no bound, no schedule position, no item id, no amount, and no timestamp
+## is accepted or expressible, because `RewardFlow.build_reward_intent()`
+## assembles exactly `RewardFlow.REQUEST_KEYS`.
+##
+## The double is deterministic and in-memory. It reads the committed corpus save
+## (`tests/saves/fresh-player.json`, whose two cursors are both `0`) and the
+## recorded configuration's two schedules, derives the transition through the
+## shared projection in `rewards/reward_flow.gd`, and applies the **derived**
+## successor plus one stamped instant -- which is exactly what the preserved
+## branches do, and exactly the two leaves `ALLOWED_LEAF_PATHS` permits.
+##
+## The stamped instant is written from the recorded boot fixture's epoch, never
+## from the wall clock, so the double's answers are byte-reproducible. That is
+## also why the answer still reports the instant as volatile: the volatility is a
+## property of the **legacy operation**, not of this double.
+##
+## ## No reward is granted here, and the answer proves it rather than asserting it
+##
+## `parse_reward()` receives the complete `changed` list and compares it against
+## the action's two-path allowlist, so a grant landing anywhere else -- the map, a
+## bought-units list, the store, a stored resource -- fails the parse instead of
+## being reported as an absence of evidence.
+##
+## It is NEVER a parity oracle. Parity against executed legacy is owned
+## exclusively by `apps/compat-api/tests/test_reward_*.py` and the captured
+## fixture under `tests/fixtures/godot-rewards/`.
+func reward_town(user_id: String, action: Variant) \
+		-> RewardFlow.RewardResult:
+	if user_id.strip_edges() == "":
+		return RewardFlow.reward_failure("missing_user_id",
+			"user_id must be a non-empty string")
+	if not _ensure_reward_loaded():
+		return RewardFlow.reward_failure("fixture_unreadable", _reward_error)
+	if user_id != _reward_pid:
+		return RewardFlow.reward_failure("unknown_user_id",
+			"no save exists for user_id '%s'" % user_id)
+	# The identity typing and the closed action both resolve HERE, before the
+	# double reads a single cursor key -- the same order the live service uses,
+	# so a request naming no valid action never reaches the player's state in
+	# either implementation.
+	var intent := RewardFlow.build_reward_intent(user_id, action)
+	if not bool(intent.get("ok", false)):
+		return RewardFlow.reward_failure(str(intent.get("reason", "")),
+			str(intent.get("error", "")))
+	var document: Dictionary = (_reward_state["document"] as Dictionary) \
+		.duplicate(true)
+	var projection: Dictionary = RewardFlow.project_save(
+		document, _reward_schedules)
+	if not bool(projection.get("ok", false)):
+		return RewardFlow.reward_failure(str(projection.get("reason", "")),
+			str(projection.get("error", "")))
+
+	# --- the write step: one cursor and one instant, nothing else -------------
+	var typed: RewardFlow.CursorProjection = projection["projection"]
+	var addressed: RewardFlow.Cursor = null
+	for candidate: RewardFlow.Cursor in typed.cursors:
+		if candidate.action == str(action):
+			addressed = candidate
+	if addressed == null:
+		return RewardFlow.reward_failure("unknown_action",
+			"the projection carries no cursor for " + str(action))
+	var private_body: Dictionary = (document[RewardFlow.PRIVATE_STATE_KEY]
+		as Dictionary)
+	private_body[addressed.key] = addressed.successor
+	private_body[addressed.stamp_key] = _fixture_server_time()
+	_reward_state["document"] = document
+	var changed: Array = RewardFlow.ALLOWED_LEAF_PATHS[str(action)]
+
+	# Nothing else moves: neither branch resolves a resource, so the reported set
+	# is what the intent started from -- the strongest form of the no-price proof.
+	return RewardFlow.parse_reward(RewardFlow.build_reward_response(
+		action, projection,
+		{
+			"cursor_after": addressed.successor,
+			"changed": changed,
+			"resources": _reward_resources(document),
+			# Deterministic: the boot fixture's recorded epoch, never the clock.
+			"server_time": _fixture_server_time(),
+			"game_version": str(_save_list_doc.get("game_version", "")),
+		}))
+
+
+## The **eight** stored resource slots, read from the double's own document
+## rather than from a constant, so a missing slot is reported as missing instead
+## of defaulting to zero -- which would make the no-resource-moved proof
+## compare zeros the save never recorded.
+##
+## Eight and not seven: `energy` lives in the private state alongside `mana` and
+## is what the real `/v0/reward` route exposes. The first draft routed only
+## `mana` there and answered seven slots, so the offline double refused the
+## intent with the parser's own `bad_response` while the real endpoint answered
+## it -- the two implementations of one contract disagreeing, found only because
+## the live phase drives both.
+func _reward_resources(document: Dictionary) -> Dictionary:
+	var map_body: Dictionary = {}
+	var maps: Variant = document.get("maps")
+	if maps is Array and not (maps as Array).is_empty() \
+			and (maps as Array)[0] is Dictionary:
+		map_body = (maps as Array)[0]
+	var player_body: Dictionary = {}
+	if document.get("playerInfo") is Dictionary:
+		player_body = document["playerInfo"]
+	var private_body: Dictionary = {}
+	if document.get(RewardFlow.PRIVATE_STATE_KEY) is Dictionary:
+		private_body = document[RewardFlow.PRIVATE_STATE_KEY]
+	var out := {}
+	for key: String in REWARD_RESOURCE_KEYS:
+		var source: Variant = map_body
+		if key == "cash":
+			source = player_body
+		elif key == "mana" or key == "energy":
+			source = private_body
+		out[key] = source.get(key, null)
+	return out
+
+
+## Loads the committed corpus save's reward state and the recorded
+## configuration's two schedules into mutable process state (once). An
+## **independent sink** from the magic and behaviour doubles, so this double's
+## failure cannot hide behind another's -- and a failure in either cannot be
+## mistaken for a clean cursor.
+func _ensure_reward_loaded() -> bool:
+	if _reward_loaded:
+		return _reward_error == ""
+	_reward_loaded = true
+	if not _ensure_loaded():
+		_reward_error = _load_error
+		return false
+	var sink := {"error": ""}
+	var before := _read_json_into(REWARD_CORPUS_SAVE, sink)
+	if str(sink["error"]) != "":
+		_reward_error = str(sink["error"])
+		return false
+	if not (before is Dictionary):
+		_reward_error = "the committed corpus save is not an object"
+		return false
+	var document: Dictionary = before
+	var info: Variant = document.get("playerInfo")
+	var priv: Variant = document.get(RewardFlow.PRIVATE_STATE_KEY)
+	if not (info is Dictionary) or not (priv is Dictionary):
+		_reward_error = "the committed corpus save lacks playerInfo/privateState"
+		return false
+	var private_body: Dictionary = priv
+
+	# Both schedules are read from the RECORDED configuration, not from the
+	# normalized package: this double answers the same bytes the legacy client
+	# was served, and reading a second source would be a second contract.
+	var globals_body: Variant = _config_payload.get(REWARD_GLOBALS_KEY)
+	if not (globals_body is Dictionary):
+		_reward_error = "the recorded configuration carries no globals object"
+		return false
+	var missing_schedules: Array = []
+	for key: String in RewardFlow.ACTION_SCHEDULE_KEY.values():
+		if not (globals_body as Dictionary).has(key):
+			missing_schedules.append(key)
+			continue
+		_reward_schedules[key] = ((globals_body as Dictionary)[key]
+			as Array).duplicate(true)
+	if not missing_schedules.is_empty():
+		_reward_error = ("the recorded configuration lacks the committed "
+			+ "reward schedule " + str(missing_schedules))
+		return false
+
+	# The cursors and the stamped instants must be readable BEFORE anything is
+	# seeded: an absent cursor is the service's `absent_reward_cursor` refusal,
+	# and defaulting it here would turn a server-side precondition into a
+	# silent create.
+	var projection: Dictionary = RewardFlow.project_save(
+		document, _reward_schedules)
+	if not bool(projection.get("ok", false)):
+		_reward_error = str(projection.get("error", ""))
+		return false
+	_reward_state["document"] = document.duplicate(true)
+	_reward_pid = str((info as Dictionary).get("pid", ""))
+	if _reward_pid == "":
+		_reward_error = "the committed corpus save records no playerInfo pid"
 		return false
 	return true
 

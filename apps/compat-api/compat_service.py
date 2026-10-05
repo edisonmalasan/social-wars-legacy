@@ -928,6 +928,7 @@ import stored_placement_envelope
 import upgrade_envelope
 import research_envelope
 import quest_envelope
+import rewards_envelope
 import tutorial_envelope
 
 PROTOCOL = "compat-v0"
@@ -1087,6 +1088,40 @@ ERROR_UNKNOWN_MAGIC_ID = "unknown_magic_id"
 ERROR_UNREADABLE_COUNTER = "unreadable_counter"
 ERROR_COUNTER_ABOVE_CAP = "counter_above_cap"
 ERROR_BAD_REQUEST = "bad_request"
+# --- reward cursors (godot-rewards) ------------------------------------------
+# ELEVEN new refusal codes. `bad_request` above is shared and is reused unchanged
+# rather than duplicated: it is the same "this request is not a well-formed
+# reward request" shape the routes above already report, and the reward module
+# raises it for a body that is not an object and for a caller that reaches for an
+# addressing key neither action has.
+#
+# All ELEVEN are **409**, and that is a DELIBERATE DEVIATION from the shared 400
+# `invalid_payload` / `missing_user_id` / `invalid_user_id` path, which
+# `_resolve_user_id` still owns and which still answers those three first.  The
+# reason is the seven grant-shaped classes: this contract **refuses** a
+# client-supplied item, item index, cell, player, next id, amount, or price by
+# name rather than ignoring it (design D2), and a refusal deserves a code of its
+# own rather than the generic "your payload is malformed".  The remaining four
+# (an unknown action, an absent or unreadable cursor, and an absent instant) sit
+# on the same table because the contract's own validation order resolves them all
+# before dispatch, so they leave the recorded document byte-identical (design D9)
+# exactly as the seven do.
+#
+# Note what is deliberately ABSENT: there is no `insufficient_resources` and no
+# `already_claimed` refusal.  Nothing is charged and nothing is granted, and the
+# stamped instant has no reader anywhere in the preserved server, so a balance
+# test and a claimable test would both be invented rules.
+ERROR_UNKNOWN_REWARD_ACTION = "unknown_reward_action"
+ERROR_ABSENT_REWARD_CURSOR = "absent_reward_cursor"
+ERROR_INVALID_REWARD_CURSOR = "invalid_reward_cursor"
+ERROR_ABSENT_REWARD_INSTANT = "absent_reward_instant"
+ERROR_CLIENT_SUPPLIED_ITEM = "client_supplied_item"
+ERROR_CLIENT_SUPPLIED_ITEM_INDEX = "client_supplied_item_index"
+ERROR_CLIENT_SUPPLIED_CELL = "client_supplied_cell"
+ERROR_CLIENT_SUPPLIED_PLAYER = "client_supplied_player"
+ERROR_CLIENT_SUPPLIED_NEXT_ID = "client_supplied_next_id"
+ERROR_CLIENT_SUPPLIED_AMOUNT = "client_supplied_amount"
+ERROR_CLIENT_SUPPLIED_PRICE = "client_supplied_price"
 ERROR_NOT_FOUND = "not_found"
 ERROR_METHOD_NOT_ALLOWED = "method_not_allowed"
 ERROR_INTERNAL = "internal_error"
@@ -1634,6 +1669,114 @@ def _committed_magic(
     return dict(found) if found is not None else None
 
 
+def _reward_snapshot(
+    boot: compat_legacy.LegacyBoot, user_id: str
+) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    """The pre-execution state the reward route proves its transition against.
+
+    Two halves, and the first is the one this function exists for:
+
+    * the **whole save document, deep-copied**.  The preserved branches write into
+      the very dict this proof must compare against, so a snapshot that aliased it
+      would report the after-state as the before-state and the four-part grant
+      proof would pass vacuously.  It is a **deep** copy rather than the shallow
+      ``dict(...)`` the ledger routes use because the whole point of design D6's
+      allowlist is that a grant could land at *any* path in the document — a placed
+      row, an appended bought unit, a created storage entry, a moved resource — and
+      a shallow copy would share every one of those nested values;
+    * the **eight** stored resource slots, not the seven ``resources()`` returns.
+      ``privateState['energy']`` is recorded by the committed corpus
+      (``villages/Neutral.json`` records ``50``) and no legacy branch ever writes
+      it, so it is absent from that accessor rather than missing from the save.
+      The eight-slot comparison is what makes "every stored resource is unchanged"
+      cover the same set the committed investigation measured, and a slot missing
+      from one side **fails closed** rather than being treated as equal.
+
+    An absent ``energy`` is left **absent** rather than defaulted to zero: a
+    defaulted zero compares equal across both sides and would make "no resource
+    moved" true for a slot nobody read.
+
+    The **eight-slot read is skipped when the save carries no ``privateState``
+    object at all**, and that is a correction rather than a convenience:
+    ``LegacyBoot.resources`` indexes ``save["privateState"]["mana"]`` directly, so
+    reading it first made a save with no private state raise ``KeyError`` out of
+    the route -- which left the envelope's own ``absent_reward_cursor`` refusal
+    **unreachable through this endpoint**, exactly the dead-refusal shape this
+    project has caught itself shipping before.  The caller refuses such a save
+    through :func:`rewards_envelope.resolve_private_state` immediately after this
+    returns, and on every path that reaches the proof the private state is a dict,
+    so the eight-slot comparison is unchanged.  A save that HAS a private state
+    object but is missing an individual slot is a different condition and is not
+    absorbed here; every one of the 33 committed save documents carries all
+    seven accessor slots, so no committed case exists and none is invented.
+    """
+    document = copy.deepcopy(boot.save_document(user_id))
+    private = document.get(rewards_envelope.PRIVATE_STATE_KEY)
+    resources: Dict[str, Any] = {}
+    if isinstance(private, dict):
+        resources = dict(boot.resources(user_id))
+        if "energy" in private:
+            resources["energy"] = private["energy"]
+    return document, resources
+
+
+def _reward_refusal(reason: str, error: str) -> Tuple[Dict[str, Any], int]:
+    """Map one :mod:`rewards_envelope` refusal onto its code and status.
+
+    Every reason this contract defines maps to **409**, and that is a deliberate
+    deviation from the 400 the combat and magic routes give their request-shape
+    refusals: a 400 says "this request is malformed", and every one of these is a
+    *refusal of a request that is well formed* — a client that asked for a grant,
+    a cursor, or a price, and was told no.  ``bad_request`` is the one shared code
+    the routes above already report for a body that is not an object, and it is
+    reused rather than duplicated for exactly that reason.
+
+    Two reasons exist here but are **unreachable from a request**: the derived
+    vector and the timestamp can only fail on a bug in this route, and they map to
+    the internal error rather than to a code a client could have provoked.  The
+    schedule reason is a **500** — the committed content could not supply a
+    schedule — because a content failure reported against the client would blame
+    the wrong party.
+
+    An unmapped reason fails closed as the service's ``500``: an unknown refusal is
+    a bug in this mapping, and answering it as the client's fault would report a
+    server fault against a request that did nothing wrong.
+    """
+    status_by_reason = {
+        rewards_envelope.REASON_BAD_REQUEST: (409, ERROR_BAD_REQUEST),
+        rewards_envelope.REASON_UNKNOWN_ACTION: (409, ERROR_UNKNOWN_REWARD_ACTION),
+        rewards_envelope.REASON_CLIENT_SUPPLIED_ITEM: (
+            409, ERROR_CLIENT_SUPPLIED_ITEM
+        ),
+        rewards_envelope.REASON_CLIENT_SUPPLIED_ITEM_INDEX: (
+            409, ERROR_CLIENT_SUPPLIED_ITEM_INDEX
+        ),
+        rewards_envelope.REASON_CLIENT_SUPPLIED_CELL: (
+            409, ERROR_CLIENT_SUPPLIED_CELL
+        ),
+        rewards_envelope.REASON_CLIENT_SUPPLIED_PLAYER: (
+            409, ERROR_CLIENT_SUPPLIED_PLAYER
+        ),
+        rewards_envelope.REASON_CLIENT_SUPPLIED_NEXT_ID: (
+            409, ERROR_CLIENT_SUPPLIED_NEXT_ID
+        ),
+        rewards_envelope.REASON_CLIENT_SUPPLIED_AMOUNT: (
+            409, ERROR_CLIENT_SUPPLIED_AMOUNT
+        ),
+        rewards_envelope.REASON_CLIENT_SUPPLIED_PRICE: (
+            409, ERROR_CLIENT_SUPPLIED_PRICE
+        ),
+        rewards_envelope.REASON_ABSENT_CURSOR: (409, ERROR_ABSENT_REWARD_CURSOR),
+        rewards_envelope.REASON_INVALID_CURSOR: (409, ERROR_INVALID_REWARD_CURSOR),
+        rewards_envelope.REASON_ABSENT_STAMP: (409, ERROR_ABSENT_REWARD_INSTANT),
+        rewards_envelope.REASON_INVALID_SCHEDULE: (500, ERROR_INTERNAL),
+        rewards_envelope.REASON_INVALID_VECTOR: (500, ERROR_INTERNAL),
+        rewards_envelope.REASON_INVALID_TIMESTAMP: (500, ERROR_INTERNAL),
+    }
+    status, code = status_by_reason.get(reason, (500, ERROR_INTERNAL))
+    return error_response(status, code, "%s (%s)" % (error, reason))
+
+
 def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
     """Build the v0 Flask app over an already-initialized legacy boot state."""
     boot = legacy if legacy is not None else compat_legacy.current()
@@ -1664,8 +1807,8 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
     # only two slots are free: ahead of the first route, and after the first
     # route's body with no decorator between.  The tutorial suite's
     # route-placement test pins this slot; the two stored-placement routes below
-    # take the other one, with their three helpers hoisted to module scope above
-    # ``create_app`` because a helper inside that gap would sit in this slice.
+    # take the other one, hoisting their helpers to module scope above
+    # ``create_app``.  ``/v0/reward`` (godot-rewards) took that slot as well.
 
     @app.post("/v0/tutorial")
     def v0_tutorial() -> Tuple[Dict[str, Any], int]:
@@ -1917,6 +2060,287 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
                     "/%s/%s" % (tutorial_envelope.PLAYER_INFO_RECORD,
                                 tutorial_envelope.FLAG_KEY)
                 ],
+            ),
+            200,
+        )
+
+    @app.post("/v0/reward")
+    def v0_reward() -> Tuple[Dict[str, Any], int]:
+        """Advance one reward cursor.  Nothing is granted, selected, or priced.
+
+        M10 line 1 (``rewards``).  The preserved surface is two branches and
+        nothing else.  ``command.py:345-363``::
+
+            elif cmd == "weekly_reward":
+                if len(args) > 4:                          # the CLIENT's arity
+                    item_index, item_id, x, y, playerID = args[:5]
+                    map_add_item(map, item_index, item_id, x, y, player=playerID)
+                    bought_unit_add(save, item_id)
+                else:
+                    print("Won resources")
+                save["privateState"]["timeStampMondayBonus"] = time_now
+                save["privateState"]["weeklyRewardIndex"] = (
+                    save["privateState"]["weeklyRewardIndex"] + 1
+                ) % get_weekly_reward_length()
+
+        and ``command.py:444-463``::
+
+            elif cmd == "win_daily_bonus":
+                item = args[0]
+                next_id = args[1] + 1
+                if next_id > 5:                            # a HARDCODED literal
+                    next_id = 1
+                privateState["timestampLastBonus"] = time_now
+                privateState["bonusNextId"] = next_id
+                if item > 0:
+                    bought_unit_add(save, item)
+                    add_store_item(map, item)
+
+        **Design D1 - THE DELIVERED SURFACE IS A CURSOR TRANSITION, NOT A REWARD.**
+        Both branches do exactly two writes that this route can reproduce: they
+        advance one cursor and stamp one instant.  Everything else either branch
+        does is a **grant whose only input is a client-sent value** - an item id, a
+        next cursor, a cell, a player - and this contract accepts none of them.
+        So the response reports the cursor's before, after, and change, the derived
+        bounds, and the addressability gap, and no field in it is named after a
+        granted, paid, or awarded reward.
+
+        **Design D2 - a grant-shaped key is REFUSED BY NAME, NOT IGNORED.**
+        The seven classes are each refused with their own code, an empty payload,
+        and no change to the recorded document.  The rejected alternative is
+        recorded at :data:`rewards_envelope.CLIENT_CURSOR_REJECTED_ALTERNATIVE`:
+        ignoring such a key and substituting a derived value would answer
+        ``success`` for an input the operation did not honour, which is the
+        untrusted-client pattern the project names as its anti-pattern.
+
+        **Design D3 - the weekly bound is DERIVED FROM THE SCHEDULE, the daily
+        bound is the PRESERVED LITERAL.**  ``get_weekly_reward_length``
+        (``get_game_config.py:195-204``) seeds ``length = 1`` and takes the
+        maximum over the entries whose ``value`` is a **list**, so the committed
+        schedule derives **5** while holding only **3** entries.  The response
+        reports both numbers side by side and the positions the bound permits that
+        the schedule cannot answer.  The daily bound is the literal ``5`` at
+        ``command.py:451``; the rejected content derivation is retained at
+        :data:`rewards_envelope.DAILY_BOUND_REJECTED_DERIVATION`, because that
+        literal happening to equal an unread schedule's entry count is a
+        coincidence of the value distribution and not its provenance.
+
+        **Design D5 - the next id is NOT REPRODUCED.**  The preserved branch
+        advances a **client-supplied** cursor and then, if it exceeds the bound,
+        **overwrites it with the first position** - so a larger client value moves
+        the recorded cursor *backwards*.  That is source-observable rather than
+        merely executed, it is recorded as its own divergence, and this route
+        derives the successor from the **recorded** cursor instead.  The captured
+        oversized probe in ``tests/fixtures/godot-rewards`` establishes it by
+        execution rather than by argument.
+
+        **The third divergence - there is no arm here.**  The weekly branch picks
+        between granting and not granting on the **client's argument count**, so
+        the same command with five arguments places a row and with four does not.
+        This route has no arm: it always sends the short, non-granting argument
+        list and reports each arm's recorded effect instead of reproducing the
+        choice.
+
+        **Design D9 - EVERY REFUSAL RESOLVES BEFORE THE CURSOR WRITE AND BEFORE
+        THE INSTANT STAMP.**  :func:`rewards_envelope.validate_request` walks the
+        request-shape half of :data:`rewards_envelope.VALIDATION_ORDER`, and
+        :func:`rewards_envelope.derive_reward` walks the recorded-state half; both
+        run above the dispatch, and ``derive_reward`` performs no write at all.
+        The ordering is load-bearing rather than incidental: a refusal that ran
+        far enough to stamp would leave a **wall-clock** difference in a document
+        that is supposed to be unchanged, which would either fail the byte-identity
+        assertion for the wrong reason or force it to be weakened.
+
+        **Design D6 - the FOUR-PART GRANT PROOF, carried as ONE containment
+        check.**  The four places a grant could land are a map row, the
+        bought-units list, the storage, and a stored resource.  Rather than write
+        four hand-maintained checks - each of which names a field this capability
+        does not own, and each of which could miss a fifth landing place - the
+        proof is a **whole-document** leaf allowlist of exactly the two paths this
+        action may change.  Container paths carry size markers, so an added or
+        emptied container is a change even when it has no leaves.  The complete
+        stored resource set is then compared as a **set** and by value, never as a
+        subset, because ``resources()`` exposes seven slots and a save may carry an
+        eighth this contract still proves unchanged.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404,
+                ERROR_UNKNOWN_USER_ID,
+                "no save exists for user_id %r" % user_id,
+            )
+
+        # --- the request shape, refused before anything is read ---------------
+        try:
+            action = rewards_envelope.validate_request(payload)
+        except rewards_envelope.EnvelopeError as failure:
+            return _reward_refusal(failure.code, str(failure))
+
+        # --- the recorded document, snapshotted BEFORE anything is derived -----
+        try:
+            document_before, resources_before = _reward_snapshot(boot, user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        # --- both committed schedules, read from the served configuration -----
+        # Both are read for EVERY action, because the response reports both
+        # schedules' entries in full regardless of which cursor moved.  A missing
+        # schedule is a CONTENT failure and is answered as the server's fault: it
+        # would otherwise be reported against a request that did nothing wrong.
+        try:
+            served_config = boot.config()
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        globals_block = served_config.get(rewards_envelope.GLOBALS_KEY)
+        if not isinstance(globals_block, dict):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the served configuration carries no %r object, so no committed "
+                "schedule can be read"
+                % rewards_envelope.GLOBALS_KEY,
+            )
+        schedules = {}
+        for action_name in rewards_envelope.ACTIONS:
+            schedule_key = rewards_envelope.ACTION_SCHEDULE_KEY[action_name]
+            if schedule_key not in globals_block:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "the served configuration carries no %r schedule, so the %r "
+                    "action's committed bound and entries cannot be reported"
+                    % (schedule_key, action_name),
+                )
+            schedules[action_name] = globals_block[schedule_key]
+
+        # --- the derivation, and the recorded-state refusals with it -----------
+        # `derive_reward` performs no write, so every refusal it raises - an
+        # absent cursor, an absent instant, an unreadable cursor, a schedule that
+        # cannot supply a bound - resolves above the dispatch and therefore above
+        # both the cursor write and the instant stamp (design D9).
+        try:
+            projection = rewards_envelope.derive_reward(
+                document_before,
+                action,
+                schedules[rewards_envelope.ACTION_WEEKLY],
+                schedules[rewards_envelope.ACTION_DAILY],
+            )
+        except rewards_envelope.EnvelopeError as failure:
+            return _reward_refusal(failure.code, str(failure))
+
+        # --- the write step: the UNCHANGED preserved branch --------------------
+        # Execute the legacy dispatcher in-process.  It persists via legacy
+        # save_session into THIS corpus only.  The legacy HTTP route answers
+        # {"result": "success"} whenever `command()` returns without raising, so
+        # reaching here IS the legacy result - which is precisely why it is NOT
+        # taken as proof of anything below.
+        try:
+            envelope_payload = rewards_envelope.build_envelope(
+                action, projection.cursor_before
+            )
+        except rewards_envelope.EnvelopeError as failure:
+            return _reward_refusal(failure.code, str(failure))
+
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        # --- the post-execution proof ------------------------------------------
+        try:
+            document_after, resources_after = _reward_snapshot(boot, user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        # (a) The addressed cursor moved by EXACTLY the derived transition.  The
+        # successor is the recorded value advanced by the branch's own arithmetic,
+        # and the branch was handed that recorded value, so a client could not have
+        # chosen where it landed.
+        try:
+            cursor_after = rewards_envelope.read_cursor(document_after, action)
+        except rewards_envelope.EnvelopeError as failure:
+            return _reward_refusal(failure.code, str(failure))
+        if cursor_after != projection.cursor_after:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "%s.%s is %r after execution, not the derived %r that the "
+                "recorded %r advances to"
+                % (
+                    rewards_envelope.PRIVATE_STATE_KEY,
+                    projection.cursor_key,
+                    cursor_after,
+                    projection.cursor_after,
+                    projection.cursor_before,
+                ),
+            )
+
+        # (b) The FOUR-PART GRANT PROOF, as one whole-document containment check:
+        # every changed path must be one of the two this action may change.
+        changed = rewards_envelope.leaf_diff(document_before, document_after)
+        problem = rewards_envelope.allowed_paths_problem(action, changed)
+        if problem is not None:
+            return error_response(500, ERROR_INTERNAL, problem)
+
+        # (b2) The addressed instant WAS stamped.  Both branches write it
+        # unconditionally (`command.py:361`, `:454`), so its absence from the
+        # changed set is a failure rather than a permitted no-op - and because it
+        # is a wall clock it is reported as volatile and never compared by value.
+        stamp_path = "/%s/%s" % (
+            rewards_envelope.PRIVATE_STATE_KEY,
+            projection.stamp_key,
+        )
+        if stamp_path not in changed:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "%s was not stamped: neither preserved branch leaves it unwritten "
+                "(command.py:361, command.py:454)"
+                % stamp_path.lstrip("/"),
+            )
+
+        # (c) The COMPLETE stored resource set, compared as a set AND by value.
+        # A subset comparison is refused: a slot this contract never read must
+        # fail the proof, not pass it as unchanged.
+        if set(resources_before) != set(resources_after):
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the exposed stored resource set is %r after execution, not the "
+                "recorded %r: a reward operation moves no resource, so every "
+                "exposed slot must be present on both sides"
+                % (
+                    sorted(str(name) for name in resources_after),
+                    sorted(str(name) for name in resources_before),
+                ),
+            )
+        for name in sorted(resources_before):
+            if resources_before[name] != resources_after[name]:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "resource %s is %r after execution, not the recorded %r: "
+                    "neither preserved branch charges or credits anything, so "
+                    "every stored resource must be unchanged"
+                    % (name, resources_after[name], resources_before[name]),
+                )
+
+        return (
+            envelope(
+                boot,
+                result="success",
+                reward=projection.payload(),
+                resources=resources_after,
+                changed=changed,
             ),
             200,
         )

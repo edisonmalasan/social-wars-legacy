@@ -114,7 +114,7 @@
        that ignore user args are unaffected)
     6. boot-scene unreachable-endpoint failure scenario, run with no service
        at all
-    7. twenty live phases against the real Compatibility API: the main-scene
+    7. twenty-three live phases against the real Compatibility API: the main-scene
        boot (success, compared with the committed fixture save), the legacy-v0
        GameApi suite, the structured API-error boot scenario, the
        placement phase (one intent through the v0 placement endpoint with
@@ -202,7 +202,34 @@
         sale credits NOTHING, and that EVERY stored resource is unchanged
         across all four steps -- plus both reachable named refusals carrying
         the endpoint's own codes with no partial payload, with the disposable
-        corpus save asserted mutated)
+        corpus save asserted mutated), and the combat phase (the FULL set of
+        combat-addressed rows driven through the v0 combat endpoint against
+        the disposable corpus's own unit rows, whose response must prove the
+        committed roster-derived count, that the ledger entry for each DEAD
+        unit is gone and its PEER'S is not, and that the client-dictated
+        destruction-count refusal cannot be expressed through the delivered
+        transport at all -- asserted against the shared module, with the phase
+        SAYING that rather than implying the endpoint refused it, with the
+        disposable corpus save asserted mutated), and the magic phase (the
+        magics counter driven TWICE on purpose, because the committed corpus
+        carries `privateState.magics == {}` so the FIRST request necessarily
+        takes the absent-identity path where both preserved branches write the
+        key at ZERO while the service's derived transition gives ONE -- the
+        seventh divergence, which the phase asserts is REPORTED rather than
+        asserted away -- while the SECOND request on the same identity is
+        present at 0, where BOTH sides give 1 and DO agree, so driving both is
+        what makes the divergence visible next to a clean increment), and the
+        reward phase (both cursor actions through the v0 reward endpoint,
+        whose typed response must prove the TWO-part cursor post-state (each
+        response's cursor equals the derived successor and the OTHER cursor is
+        unchanged) and the FOUR-part reward post-state (the receipt names its
+        schedule, the advanced cursor equals its derived successor, every
+        stored resource is unchanged, and the daily receipt is unchanged when
+        the weekly action ran), plus a CLIENT-side refusal whose corpus is
+        byte-identical afterwards -- with the endpoint's own nine refusals
+        recorded as covered by apps/compat-api/tests/test_rewards_endpoint.py
+        because NO endpoint refusal is expressible through this typed surface
+        -- with the disposable corpus save asserted mutated)
     8. Compatibility API guard baseline, post-run, must equal the pre-run
        digests
     9. teardown assertions: loopback port released, no working-tree saves/
@@ -462,7 +489,7 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_experience", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests", "test_tutorial", "test_stored_item_placement", "test_mission_vocabulary", "test_combat_actions", "test_damage_magic")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_experience", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests", "test_tutorial", "test_stored_item_placement", "test_mission_vocabulary", "test_combat_actions", "test_damage_magic", "test_rewards")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a
@@ -906,6 +933,42 @@ try {
                 "--gameapi-endpoint=$endpoint"
             )
         }
+        @{
+            # reward-live: M10 line 1 (`rewards`).  The delivered surface is a
+            # CURSOR TRANSITION -- two branches, two writes each.
+            #
+            # Both corpus cursors are 0, so each action's derived successor is 1
+            # and no seeding seam is needed or used: this line's state is
+            # reachable from the committed corpus with no seeding at all, and
+            # BOTH requests mutate the disposable save, so the harness's
+            # save-mutation assertion has something real to see.
+            #
+            # The refusal driven here is CLIENT-side (`invalid_action`).  The
+            # envelope declares FIFTEEN named reasons and all fifteen are wired
+            # into the route's status table (compat_service.py:1743-1774), of
+            # which TWELVE resolve in the recorded pre-write validation order.
+            # NOT ONE of them is expressible through this typed surface: the
+            # typed builder cannot carry a grant shape and
+            # `ACTION_ADDRESSING_KEY` is empty for every reward action.  The
+            # phase asserts that emptiness instead of implying coverage, and
+            # records that the endpoint's own refusals are covered by
+            # apps/compat-api/tests/test_rewards_endpoint.py.
+            #
+            # Counted by constant REFERENCE, not by literal string: the route
+            # spells these as `rewards_envelope.REASON_UNKNOWN_ACTION`, so a
+            # literal grep reports zero for `unknown_action` and would understate
+            # the count -- the same whole-name-vs-literal census trap this project
+            # has hit before.
+            Name = "reward-live"
+            Assertions = "reward live phase"
+            ExpectSaveMutation = $true
+            Arguments = @(
+                "--headless", "--path", $projectRel,
+                "--script", "res://tests/test_rewards.gd",
+                "--", "--scenario=live-reward",
+                "--gameapi-endpoint=$endpoint"
+            )
+        }
     )
 
     $phaseLogs = @{}
@@ -917,7 +980,8 @@ try {
         if ($phase.ContainsKey("ExpectSaveMutation")) {
             # placement-live, purchase-live, move-live, sell-live, store-live,
             # upgrade-live, construction-live, collect-live, expand-live,
-            # queue-live, collection-live, behavior-live, and combat-live: the
+            # queue-live, collection-live, behavior-live, combat-live,
+            # magic-live, and reward-live: the
             # harness
             # snapshots the disposable corpus saves before the Godot run and
             # fails unless one changed after.

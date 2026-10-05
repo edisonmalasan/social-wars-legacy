@@ -1,0 +1,1169 @@
+{
+  "schema": "rewards-report-v1",
+  "line": {
+    "milestone": "M10",
+    "index": 1,
+    "capability": "godot-rewards"
+  },
+  "investigation": "docs/legacy-m10-rewards.md",
+  "primary_finding": "the two preserved reward branches advance one cursor and stamp one instant and grant nothing this contract can reproduce, and BOTH cursors' derived bounds EXCEED the cardinality of the schedule they would address -- 5 against 3 weekly and 5 against 5 daily -- so positions the recorded cursors reach name no rung",
+  "delivered_surface": "one cursor transition per action, two derived bounds beside their schedules' cardinalities, the reachability difference in both directions, the committed schedule entries verbatim, the eleven reward schedules with their measured consumer counts, the three type letters undecoded, the seven save-only fields with no rule, and the arm boundary",
+  "nothing_delivered": "no reward, no amount, no prize, no price, no cost, no resource movement, no schedule-entry selection, no letter decoding, no eligibility, no cooldown, no window, no period, no already-claimed test, and no cursor-to-rung mapping",
+  "actions": [
+    "weekly",
+    "daily"
+  ],
+  "action_command": {
+    "weekly": "weekly_reward",
+    "daily": "win_daily_bonus"
+  },
+  "action_cursor_key": {
+    "weekly": "weeklyRewardIndex",
+    "daily": "bonusNextId"
+  },
+  "action_stamp_key": {
+    "weekly": "timeStampMondayBonus",
+    "daily": "timestampLastBonus"
+  },
+  "action_schedule_key": {
+    "weekly": "MONDAY_BONUS_REWARDS",
+    "daily": "DAILY_GOLD_REWARDS"
+  },
+  "action_addressing_key": {},
+  "addressing_note": {
+    "recorded_explicitly_rather_than_defaulted": true,
+    "note": "both preserved branches write only whole-player private state -- weeklyRewardIndex with timeStampMondayBonus, bonusNextId with timestampLastBonus -- and neither names a map row, a collection, a track, or any other identity, so NEITHER action carries an addressing key. An empty table cannot be misread as 'look it up somewhere', and the intent builder refuses rather than defaulting"
+  },
+  "request": {
+    "ok": true,
+    "request_keys": [
+      "user_id",
+      "action"
+    ],
+    "body_key_count": 2,
+    "path": "/v0/reward"
+  },
+  "cursors": [
+    {
+      "action": "weekly",
+      "command": "weekly_reward",
+      "key": "weeklyRewardIndex",
+      "stamp_key": "timeStampMondayBonus",
+      "value": 0,
+      "successor": 1,
+      "change": 1,
+      "bound": 5,
+      "bound_is_literal": false,
+      "bound_source": "get_game_config.py:195-204 (get_weekly_reward_length)",
+      "schedule_key": "MONDAY_BONUS_REWARDS",
+      "cardinality": 3,
+      "reachable": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "answerable": [
+        0,
+        1,
+        2
+      ],
+      "reachable_not_answerable": [
+        3,
+        4
+      ],
+      "answerable_not_reachable": [],
+      "selection_performed": false,
+      "stamp_before": 0
+    },
+    {
+      "action": "daily",
+      "command": "win_daily_bonus",
+      "key": "bonusNextId",
+      "stamp_key": "timestampLastBonus",
+      "value": 0,
+      "successor": 1,
+      "change": 1,
+      "bound": 5,
+      "bound_is_literal": true,
+      "bound_source": "command.py:451-452 (a hardcoded literal, `if next_id > 5:`)",
+      "schedule_key": "DAILY_GOLD_REWARDS",
+      "cardinality": 5,
+      "reachable": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "answerable": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "reachable_not_answerable": [
+        5
+      ],
+      "answerable_not_reachable": [
+        0
+      ],
+      "selection_performed": false,
+      "stamp_before": 0
+    }
+  ],
+  "bounds": {
+    "weekly": {
+      "bound": 5,
+      "floor": 1,
+      "source": "get_game_config.py:195-204 (get_weekly_reward_length)",
+      "derived_from": "the maximum entry length over the schedule entries whose value is a list -- never the entry count",
+      "cardinality": 3
+    },
+    "daily": {
+      "bound": 5,
+      "is_literal": true,
+      "source": "command.py:451-452 (a hardcoded literal, `if next_id > 5:`)",
+      "wrap_target": 1,
+      "cardinality": 5,
+      "rejected_alternative": {
+        "alternative": "derive the daily bound from DAILY_GOLD_REWARDS' entry count",
+        "why_it_is_rejected": "that schedule holds exactly five entries, so its count agrees with the literal at command.py:451 and the two numbers could be read as one deriving the other. THEY ARE NOT. Measured across every top-level legacy module the name DAILY_GOLD_REWARDS occurs ZERO times, so the agreement is a coincidence of the value distribution and NOT provenance. This note exists so a later reader who notices that five equals five cannot conclude that a derivation was chosen and then dropped: it never was",
+        "the_same_reasoning_runs_the_other_way_weekly": "the weekly bound IS derived -- but from the schedule's LIST-VALUED entries, not from its entry count, and the two numbers differ (5 against 3)"
+      }
+    }
+  },
+  "index_base": {
+    "chosen": 0,
+    "alternative": 1,
+    "status": {
+      "status": "DERIVED-PROVISIONAL, with the alternative retained",
+      "chosen": 0,
+      "alternative": 1,
+      "why": "the preserved server never indexes either schedule, so nothing in the source fixes the base. What fixes it here is that the zero-based reading is the one under which the committed data carries a MISMATCH: weeklyRewardIndex is recorded at 0..3 across the committed documents and the zero-based reading makes the derived bound (5) exceed the schedule's cardinality (3). A one-based reading would still leave positions unaddressed -- 4 and 5 weekly, 5 daily -- but on a different set, so the reported difference would name positions the recorded cursors do not reach. Both readings are recorded; neither is asserted as fact",
+      "used_for": "the reachability report's set difference only. Neither is used to select a schedule entry, because this contract never selects one (design D3/D7)"
+    }
+  },
+  "re_derivation": {
+    "ok": true,
+    "length_span": "def get_weekly_reward_length() -> int:\n    # This would be better if it was called at the start, instead of being calculated every time\n    rewards = __game_config[\"globals\"][\"MONDAY_BONUS_REWARDS\"]\n    length = 1\n    for reward in rewards:\n        value = reward[\"value\"]\n        if type(value) == list:\n            length = max(length, len(value))\n\n    return length",
+    "weekly_span": "    elif cmd == \"weekly_reward\":\n        if len(args) > 4:\n            item_index = args[0]\n            item_id = args[1]\n            x = args[2]\n            y = args[3]\n            playerID = args[4] # player team\n\n            map_add_item(map, item_index, item_id, x, y, player=playerID)\n            bought_unit_add(save, item_id)\n\n            print(\"Won\", str(get_name_from_item_id(item_id)))\n        else:\n            print(\"Won resources\")\n\n        # Disable Monday bonus until next Monday\n        save[\"privateState\"][\"timeStampMondayBonus\"] = time_now\n        # Advance Monday bonus\n        save[\"privateState\"][\"weeklyRewardIndex\"] = (save[\"privateState\"][\"weeklyRewardIndex\"] + 1) % get_weekly_reward_length()",
+    "daily_span": "    elif cmd == \"win_daily_bonus\":\n        item = args[0]\n        next_id = args[1] + 1\n\n        privateState = save[\"privateState\"]\n\n        # Advance & Reset dailies\n        if next_id > 5:\n            next_id = 1\n\n        privateState[\"timestampLastBonus\"] = time_now\n        privateState[\"bonusNextId\"] = next_id\n\n        # Daily gives an item\n        if item > 0:\n            bought_unit_add(save, item)\n            add_store_item(map, item)\n            print(\"Put\", str(get_name_from_item_id(item)), \"in storage\")\n        else:\n            print(\"Rewarded resources\")",
+    "seed": 1,
+    "list_test": "list",
+    "uses_max": true,
+    "weekly_increment": 1,
+    "weekly_modulo_call": "get_weekly_reward_length",
+    "weekly_arity_test": 4,
+    "daily_increment": 1,
+    "daily_wrap_literal": 5,
+    "daily_wrap_target": 1,
+    "daily_grant_gate": 0,
+    "recomputed_weekly_bound": 5,
+    "weekly_cardinality": 3,
+    "weekly_reachable": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "daily_reachable": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  "schedules": [
+    {
+      "name": "ALLIANCE_DAILY_BONUS_REWARDS",
+      "consumers": 0,
+      "consumed_for": ""
+    },
+    {
+      "name": "DAILY_GOLD_REWARDS",
+      "consumers": 0,
+      "consumed_for": ""
+    },
+    {
+      "name": "MANA_REWARD_PER_LEVEL",
+      "consumers": 0,
+      "consumed_for": ""
+    },
+    {
+      "name": "MONDAY_BONUS_REWARDS",
+      "consumers": 1,
+      "consumed_for": "length only, via get_weekly_reward_length (get_game_config.py:197)"
+    },
+    {
+      "name": "NEWFRIENDS_REWARD_DESCRIPTION",
+      "consumers": 0,
+      "consumed_for": ""
+    },
+    {
+      "name": "NEWFRIENDS_REWARD_ID_UNIT",
+      "consumers": 0,
+      "consumed_for": ""
+    },
+    {
+      "name": "NEWFRIENDS_REWARD_SCALE_UNIT",
+      "consumers": 0,
+      "consumed_for": ""
+    },
+    {
+      "name": "PRIZE_COLLECTIONS_CASH",
+      "consumers": 0,
+      "consumed_for": ""
+    },
+    {
+      "name": "RECRUITMENT_PRIZE",
+      "consumers": 0,
+      "consumed_for": ""
+    },
+    {
+      "name": "REWARDS_CHAPTERS",
+      "consumers": 0,
+      "consumed_for": ""
+    },
+    {
+      "name": "REWARDS_QUESTS",
+      "consumers": 0,
+      "consumed_for": ""
+    }
+  ],
+  "schedule_census": {
+    "ok": true,
+    "module_count": 11,
+    "modules": [
+      "auctions.py",
+      "bundle.py",
+      "command.py",
+      "constants.py",
+      "engine.py",
+      "get_game_config.py",
+      "get_player_info.py",
+      "legacy_command_recorder.py",
+      "server.py",
+      "sessions.py",
+      "version.py"
+    ],
+    "corpus_bytes": 129145,
+    "rows": [
+      {
+        "name": "ALLIANCE_DAILY_BONUS_REWARDS",
+        "consumers": 0,
+        "distinct_lines": 0,
+        "identifier_tokens": 0,
+        "quoted_occurrences": 0
+      },
+      {
+        "name": "DAILY_GOLD_REWARDS",
+        "consumers": 0,
+        "distinct_lines": 0,
+        "identifier_tokens": 0,
+        "quoted_occurrences": 0
+      },
+      {
+        "name": "MANA_REWARD_PER_LEVEL",
+        "consumers": 0,
+        "distinct_lines": 0,
+        "identifier_tokens": 0,
+        "quoted_occurrences": 0
+      },
+      {
+        "name": "MONDAY_BONUS_REWARDS",
+        "consumers": 1,
+        "distinct_lines": 1,
+        "identifier_tokens": 0,
+        "quoted_occurrences": 1
+      },
+      {
+        "name": "NEWFRIENDS_REWARD_DESCRIPTION",
+        "consumers": 0,
+        "distinct_lines": 0,
+        "identifier_tokens": 0,
+        "quoted_occurrences": 0
+      },
+      {
+        "name": "NEWFRIENDS_REWARD_ID_UNIT",
+        "consumers": 0,
+        "distinct_lines": 0,
+        "identifier_tokens": 0,
+        "quoted_occurrences": 0
+      },
+      {
+        "name": "NEWFRIENDS_REWARD_SCALE_UNIT",
+        "consumers": 0,
+        "distinct_lines": 0,
+        "identifier_tokens": 0,
+        "quoted_occurrences": 0
+      },
+      {
+        "name": "PRIZE_COLLECTIONS_CASH",
+        "consumers": 0,
+        "distinct_lines": 0,
+        "identifier_tokens": 0,
+        "quoted_occurrences": 0
+      },
+      {
+        "name": "RECRUITMENT_PRIZE",
+        "consumers": 0,
+        "distinct_lines": 0,
+        "identifier_tokens": 0,
+        "quoted_occurrences": 0
+      },
+      {
+        "name": "REWARDS_CHAPTERS",
+        "consumers": 0,
+        "distinct_lines": 0,
+        "identifier_tokens": 0,
+        "quoted_occurrences": 0
+      },
+      {
+        "name": "REWARDS_QUESTS",
+        "consumers": 0,
+        "distinct_lines": 0,
+        "identifier_tokens": 0,
+        "quoted_occurrences": 0
+      }
+    ],
+    "zero_consumer_names": [
+      "ALLIANCE_DAILY_BONUS_REWARDS",
+      "DAILY_GOLD_REWARDS",
+      "MANA_REWARD_PER_LEVEL",
+      "NEWFRIENDS_REWARD_DESCRIPTION",
+      "NEWFRIENDS_REWARD_ID_UNIT",
+      "NEWFRIENDS_REWARD_SCALE_UNIT",
+      "PRIZE_COLLECTIONS_CASH",
+      "RECRUITMENT_PRIZE",
+      "REWARDS_CHAPTERS",
+      "REWARDS_QUESTS"
+    ],
+    "ranking_reward_consumers": 0,
+    "recorded_task_text_says": "twelve",
+    "measured": 11
+  },
+  "schedule_census_note": {
+    "states_only": "the preserved server's source",
+    "the_whole_configuration_object_is_served": true,
+    "no_claim_about_clients": true,
+    "module_set": "every top-level .py in the repository root, DISCOVERED at run time and never transcribed; the recorded count of eleven is re-measured and asserted on every run"
+  },
+  "committed_weekly_schedule": [
+    {
+      "type": "g",
+      "value": 2500.0
+    },
+    {
+      "type": "u",
+      "value": [
+        1055.0,
+        1033.0,
+        1046.0,
+        1063.0,
+        1198.0
+      ]
+    },
+    {
+      "type": "c",
+      "value": 5.0
+    }
+  ],
+  "committed_daily_schedule": [
+    100.0,
+    250.0,
+    500.0,
+    1000.0,
+    0.0
+  ],
+  "decoder_searches": [
+    {
+      "shape": "single_letter_gold",
+      "search": "a single-letter key 'g' followed by gold or coins",
+      "pattern": "['\"]g['\"]\\s*:\\s*(?:gold|coins)",
+      "hits": 0
+    },
+    {
+      "shape": "single_letter_cash",
+      "search": "a single-letter key 'c' followed by cash",
+      "pattern": "['\"]c['\"]\\s*:\\s*cash",
+      "hits": 0
+    },
+    {
+      "shape": "single_letter_unit",
+      "search": "a single-letter key 'u' followed by unit",
+      "pattern": "['\"]u['\"]\\s*:\\s*unit",
+      "hits": 0
+    },
+    {
+      "shape": "any_single_letter_key",
+      "search": "any single-letter dictionary key at all",
+      "pattern": "['\"][a-zA-Z]['\"]\\s*:",
+      "hits": 0
+    },
+    {
+      "shape": "type_equals_letter",
+      "search": "any branch comparing a type field against a one-letter string",
+      "pattern": "type\\s*==\\s*['\"][a-zA-Z]['\"]",
+      "hits": 0
+    },
+    {
+      "shape": "type_subscript",
+      "search": "any subscript of a reward object by its 'type' key",
+      "pattern": "\\[(?:[^\\]\\[]*)['\"]type['\"](?:[^\\]\\[]*)\\]",
+      "hits": 0
+    }
+  ],
+  "decoder_positive_controls": [
+    {
+      "shape": "two_letter_key",
+      "search": "a two-letter dictionary key",
+      "pattern": "['\"][a-z]{2}['\"]\\s*:",
+      "hits": 4
+    },
+    {
+      "shape": "quoted_subscript",
+      "search": "a subscript by a quoted key",
+      "pattern": "\\[[^\\]\\[]*['\"][A-Za-z_][A-Za-z0-9_]*['\"][^\\]\\[]*\\]",
+      "hits": 516
+    },
+    {
+      "shape": "unquoted_subscript",
+      "search": "an unquoted subscript, a list index rather than a key",
+      "pattern": "\\[[0-9]+\\]",
+      "hits": 225
+    }
+  ],
+  "decoder_note": {
+    "why": "the six zero results are MEASURED, not assumed. These controls run over the same discovered module set with the same machinery, and all match abundantly, so the single-letter shapes are specific rather than silent. A census that reports only zeros and never checks that its own shapes fire has produced the vacuous-census defect three times in this project, so the controls are part of the record",
+    "counts_are_re_derived_every_run": true
+  },
+  "type_letters": [
+    "g",
+    "u",
+    "c"
+  ],
+  "type_letters_undecoded": {
+    "reported_verbatim_and_not_decoded": true,
+    "why": "reading 'g' as gold and 'c' as cash is the obvious next step and would be an INVENTION: no preserved module maps any of these letters onto a stored resource slot, an item category, or a grant shape. The six searches return zero each, and the positive controls confirm the searches themselves fire on the same corpus",
+    "the_nuance_that_strengthens_it": "the same three letters are each declared once in constants.py under resource-flavoured names, every one of those names has exactly ONE occurrence -- the declaration -- and ZERO consumers, they belong to the item costs and item-type vocabularies rather than the reward type field, and NO legacy module iterates costs at all, so nothing bridges them"
+  },
+  "letter_named_declarations": [
+    {
+      "letter": "g",
+      "declared_as": "COST_GOLD",
+      "declared_at": "constants.py:888",
+      "occurrences_total": 1,
+      "declarations": 1,
+      "consumers": 0,
+      "belongs_to": "the item costs vocabulary"
+    },
+    {
+      "letter": "c",
+      "declared_as": "COST_CASH",
+      "declared_at": "constants.py:889",
+      "occurrences_total": 1,
+      "declarations": 1,
+      "consumers": 0,
+      "belongs_to": "the item costs vocabulary"
+    },
+    {
+      "letter": "u",
+      "declared_as": "TYPE_UNIT",
+      "declared_at": "constants.py:857",
+      "occurrences_total": 1,
+      "declarations": 1,
+      "consumers": 0,
+      "belongs_to": "the item type vocabulary"
+    }
+  ],
+  "save_only_fields": [
+    "attacksSent",
+    "attacksPack",
+    "attacksReceived",
+    "bestUnit",
+    "betWin",
+    "spyings",
+    "strategy"
+  ],
+  "save_only_note": {
+    "present_in_every_document": 33,
+    "source_occurrences": 0,
+    "origin": "inference, not a measurement",
+    "why_an_inference": "written by some client this repository does not contain, read by nothing this repository does contain. That is a conclusion drawn from TOTAL source absence alongside UNIVERSAL save presence, and it is not itself a measurement (design D11)",
+    "substring_artifact_recorded": "one field has exactly one whole-file occurrence, inside a longer identifier at auctions.py:176, so it is not a consumer of that field",
+    "measured_correction": "the investigation recorded 39 documents; the committed census is 34 files walked of which 33 carry the fields, the one exclusion being tests/saves/manifest.json. Only the denominator changes"
+  },
+  "save_only_census": {
+    "ok": true,
+    "walked_files": 34,
+    "carrying_private_state": 33,
+    "excluded": [
+      "tests/saves/manifest.json"
+    ],
+    "per_field": {
+      "attacksSent": 33,
+      "attacksPack": 33,
+      "attacksReceived": 33,
+      "bestUnit": 33,
+      "betWin": 33,
+      "spyings": 33,
+      "strategy": 33
+    },
+    "weekly_distribution": [
+      [
+        "0",
+        26
+      ],
+      [
+        "1",
+        5
+      ],
+      [
+        "2",
+        1
+      ],
+      [
+        "3",
+        1
+      ]
+    ],
+    "daily_distribution": [
+      [
+        "0",
+        7
+      ],
+      [
+        "2",
+        24
+      ],
+      [
+        "3",
+        2
+      ]
+    ],
+    "origin_status": "inference, not a measurement",
+    "note": {
+      "present_in_every_document": 33,
+      "source_occurrences": 0,
+      "origin": "inference, not a measurement",
+      "why_an_inference": "written by some client this repository does not contain, read by nothing this repository does contain. That is a conclusion drawn from TOTAL source absence alongside UNIVERSAL save presence, and it is not itself a measurement (design D11)",
+      "substring_artifact_recorded": "one field has exactly one whole-file occurrence, inside a longer identifier at auctions.py:176, so it is not a consumer of that field",
+      "measured_correction": "the investigation recorded 39 documents; the committed census is 34 files walked of which 33 carry the fields, the one exclusion being tests/saves/manifest.json. Only the denominator changes"
+    }
+  },
+  "weekly_cursor_distribution": [
+    [
+      "0",
+      26
+    ],
+    [
+      "1",
+      5
+    ],
+    [
+      "2",
+      1
+    ],
+    [
+      "3",
+      1
+    ]
+  ],
+  "daily_cursor_distribution": [
+    [
+      "0",
+      7
+    ],
+    [
+      "2",
+      24
+    ],
+    [
+      "3",
+      2
+    ]
+  ],
+  "ranking_reward": {
+    "table": "level_ranking_reward",
+    "consumers": 0,
+    "entry_count": 50,
+    "ownership": {
+      "owned_as_normalized_content_by": [
+        "economy-schedules-normalization",
+        "content-validation"
+      ],
+      "delivered_as_gameplay_by_this_line": false,
+      "the_two_statements_do_not_imply_each_other": "content being validated is not content being played"
+    }
+  },
+  "arms": {
+    "weekly": [
+      {
+        "arm": "long",
+        "selected_when": "the client sent five or more arguments",
+        "test": "len(args) > 4",
+        "source": "command.py:346",
+        "grant_shaped": true,
+        "reproduced": false,
+        "printed": "Won <name>",
+        "effect": "the branch reads five client-supplied values -- the map index, the item id, the two cell coordinates and the player team -- places a row, records the item, and prints 'Won <name>'"
+      },
+      {
+        "arm": "short",
+        "selected_when": "the client sent four or fewer arguments",
+        "test": "len(args) <= 4",
+        "source": "command.py:357",
+        "grant_shaped": false,
+        "reproduced": false,
+        "printed": "Won resources",
+        "effect": "the branch grants nothing at all, prints 'Won resources', and falls straight through to the stamp and the cursor advance"
+      }
+    ],
+    "daily": [
+      {
+        "arm": "granting",
+        "selected_when": "the client sent a positive item",
+        "test": "item > 0",
+        "source": "command.py:458",
+        "grant_shaped": true,
+        "reproduced": false,
+        "printed": "Put <name> in storage",
+        "effect": "the branch records the item AND creates a storage entry, by two DIFFERENT rules -- the first deduplicates (it appends only when the id is absent, engine.py:86-89) and the second accumulates (it increments an existing key, engine.py:70-75) -- so one granted id lands in two places"
+      },
+      {
+        "arm": "resources",
+        "selected_when": "the client sent zero or a negative item",
+        "test": "item <= 0",
+        "source": "command.py:462",
+        "grant_shaped": false,
+        "reproduced": false,
+        "printed": "Rewarded resources",
+        "effect": "the branch grants nothing, moves no resource, and prints 'Rewarded resources'"
+      }
+    ],
+    "note": {
+      "the_arm_boundary_is_reported_not_reproduced": true,
+      "why": "both preserved branches select between granting and not granting on a value the CLIENT sent -- the weekly branch on its own ARGUMENT COUNT, so the same command name with different arities has two different effects, and the daily branch on the sign of a client-supplied item id. This contract has NO arm: it always sends the non-granting argument list, always grants nothing, and reports both arms' recorded effects so a reader sees what the arity and the sign would have selected. Reproducing either arm would mean accepting a grant-shaped value from a client, which is exactly what the request contract refuses",
+      "reproducing_either_arm_would_require": "accepting a grant-shaped value from a client"
+    }
+  },
+  "divergences": [
+    {
+      "id": "client_sent_item",
+      "summary": "the granted item id is taken from the client",
+      "where": "command.py:348 (weekly) and command.py:445 (daily)",
+      "reproduced": false,
+      "consequence": "a recorded transaction establishes NOTHING about what was granted, because the grant was whatever the client asked for"
+    },
+    {
+      "id": "client_sent_next_id",
+      "summary": "the next cursor id is taken from the client and then overwritten when it exceeds the bound",
+      "where": "command.py:446 and command.py:451-452",
+      "reproduced": false,
+      "consequence": "the preserved branch advances a CLIENT-SUPPLIED value, so a client that sent a larger id would have had its recorded cursor moved BACKWARDS onto the first position. This divergence is observable in the preserved SOURCE, not only in an executed record, which is what makes it the sharper of the two"
+    },
+    {
+      "id": "client_sent_argument_count",
+      "summary": "the weekly arm is selected by the client's argument count",
+      "where": "command.py:346",
+      "reproduced": false,
+      "consequence": "the same command with five arguments places a row and with four grants nothing, so the preserved command name alone does not determine what it did"
+    }
+  ],
+  "divergences_reported_as_parity": 0,
+  "grant_proof": {
+    "parts": [
+      {
+        "part": 1,
+        "id": "no_map_row",
+        "wire_key": "part_1_no_map_row",
+        "claim": "the placed-row count is unchanged and every existing row is byte-identical",
+        "covered_by": "the whole-document leaf allowlist"
+      },
+      {
+        "part": 2,
+        "id": "no_bought_units_entry",
+        "wire_key": "part_2_no_bought_units_append",
+        "claim": "that list is byte-identical, which also covers the preserved helper's DEDUPLICATING behaviour",
+        "covered_by": "the whole-document leaf allowlist"
+      },
+      {
+        "part": 3,
+        "id": "no_storage_entry",
+        "wire_key": "part_3_no_storage_entry",
+        "claim": "the store is byte-identical, which also covers the preserved helper's ACCUMULATING behaviour",
+        "covered_by": "the whole-document leaf allowlist"
+      },
+      {
+        "part": 4,
+        "id": "no_stored_resource_moved",
+        "wire_key": "part_4_no_stored_resource_moved",
+        "claim": "the COMPLETE stored resource set the service exposes is byte-identical, compared as a set and NOT as a subset",
+        "covered_by": "the complete resource-set equality the route performs"
+      }
+    ],
+    "wire_keys": [
+      "part_1_no_map_row",
+      "part_2_no_bought_units_append",
+      "part_3_no_storage_entry",
+      "part_4_no_stored_resource_moved"
+    ],
+    "part_count": 4,
+    "allowed_leaf_paths": {
+      "weekly": [
+        "/privateState/weeklyRewardIndex",
+        "/privateState/timeStampMondayBonus"
+      ],
+      "daily": [
+        "/privateState/bonusNextId",
+        "/privateState/timestampLastBonus"
+      ]
+    },
+    "no_grant": {
+      "nothing_is_granted": true,
+      "why_non_tautological": "a grant could land in four distinct places and every successful action is checked against all four, so an implementation that quietly placed a row, appended a bought unit, or derived an amount would FAIL the proof rather than pass it as an absence of evidence",
+      "carried_by": "a whole-document leaf allowlist restricted to the two paths this action may change, so a fifth landing place cannot be missed",
+      "complete_resource_set_not_a_subset": true,
+      "the_preserved_server_charges_and_credits_nothing": "measured across both executed arms, so any amount would be invention"
+    }
+  },
+  "proofs": {
+    "ok": true,
+    "parts": [
+      {
+        "part": 1,
+        "id": "no_map_row",
+        "wire_key": "part_1_no_map_row",
+        "claim": "the placed-row count is unchanged and every existing row is byte-identical",
+        "covered_by": "the whole-document leaf allowlist"
+      },
+      {
+        "part": 2,
+        "id": "no_bought_units_entry",
+        "wire_key": "part_2_no_bought_units_append",
+        "claim": "that list is byte-identical, which also covers the preserved helper's DEDUPLICATING behaviour",
+        "covered_by": "the whole-document leaf allowlist"
+      },
+      {
+        "part": 3,
+        "id": "no_storage_entry",
+        "wire_key": "part_3_no_storage_entry",
+        "claim": "the store is byte-identical, which also covers the preserved helper's ACCUMULATING behaviour",
+        "covered_by": "the whole-document leaf allowlist"
+      },
+      {
+        "part": 4,
+        "id": "no_stored_resource_moved",
+        "wire_key": "part_4_no_stored_resource_moved",
+        "claim": "the COMPLETE stored resource set the service exposes is byte-identical, compared as a set and NOT as a subset",
+        "covered_by": "the complete resource-set equality the route performs"
+      }
+    ],
+    "wire_keys": [
+      "part_1_no_map_row",
+      "part_2_no_bought_units_append",
+      "part_3_no_storage_entry",
+      "part_4_no_stored_resource_moved"
+    ],
+    "allowed_leaf_paths": {
+      "weekly": [
+        "/privateState/weeklyRewardIndex",
+        "/privateState/timeStampMondayBonus"
+      ],
+      "daily": [
+        "/privateState/bonusNextId",
+        "/privateState/timestampLastBonus"
+      ]
+    },
+    "part_count": 4
+  },
+  "no_eligibility": {
+    "no_eligibility_cooldown_window_or_period": true,
+    "no_already_claimed_test": true,
+    "why": "both preserved branches stamp a wall-clock instant, and a write is reproducible parity, so the stamp is written. Nothing else is. The weekly instant has exactly ONE live write (command.py:361) and its only other occurrence is COMMENTED OUT; it has NO reader, so there is no window, no cooldown, no weekly period, no reset boundary and no already-claimed test to reproduce, and none is invented. Its NAME invites exactly the rule this contract refuses to write, which is why the absence is a recorded requirement rather than an implementation detail"
+  },
+  "no_cursor_selection": {
+    "no_cursor_selects_a_schedule_entry": true,
+    "the_weekly_bound_is_never_the_entry_count": true,
+    "the_delivered_code_performs_no_indexing": "there is no helper that maps a cursor position to a rung, a type letter, or an amount, and the reachability report is a set difference over two ranges that deliberately performs no lookup",
+    "both_differences_reported": "in BOTH directions, so the mismatch is visible rather than hidden inside one number"
+  },
+  "refusals": {
+    "validation_order": [
+      "bad_request",
+      "unknown_action",
+      "client_supplied_item",
+      "client_supplied_item_index",
+      "client_supplied_cell",
+      "client_supplied_player",
+      "client_supplied_next_id",
+      "client_supplied_amount",
+      "client_supplied_price",
+      "absent_reward_cursor",
+      "invalid_reward_cursor",
+      "absent_reward_instant"
+    ],
+    "write_step": 13,
+    "ordering_rule": {
+      "every_refusal_precedes_the_cursor_write": true,
+      "every_refusal_precedes_the_instant_stamp": true,
+      "why_the_stamp_ordering_is_load_bearing": "a refusal that ran far enough to stamp would leave a WALL-CLOCK difference in a document that is supposed to be unchanged, which would either make the byte-identity assertion fail FOR THE WRONG REASON or force it to be weakened to accommodate that. Keeping the assertion exact is the whole point",
+      "why_the_request_shape_comes_first": "the addressed cursor cannot be named until the action is, so a recorded-state check placed before the action check could not be evaluated and would be vacuous rather than strict",
+      "the_preserved_server_performs_no_validation": "this ordering exists to make the SERVICE's refusals safe, not to match a recorded ordering"
+    },
+    "client_key_refusals": [
+      [
+        "item",
+        "client_supplied_item"
+      ],
+      [
+        "item_index",
+        "client_supplied_item_index"
+      ],
+      [
+        "cell",
+        "client_supplied_cell"
+      ],
+      [
+        "player",
+        "client_supplied_player"
+      ],
+      [
+        "next_id",
+        "client_supplied_next_id"
+      ],
+      [
+        "amount",
+        "client_supplied_amount"
+      ],
+      [
+        "price",
+        "client_supplied_price"
+      ]
+    ],
+    "client_key_aliases": {
+      "x": "client_supplied_cell",
+      "y": "client_supplied_cell"
+    },
+    "refusal_key_map": {
+      "item": "client_supplied_item",
+      "item_index": "client_supplied_item_index",
+      "cell": "client_supplied_cell",
+      "x": "client_supplied_cell",
+      "y": "client_supplied_cell",
+      "player": "client_supplied_player",
+      "next_id": "client_supplied_next_id",
+      "amount": "client_supplied_amount",
+      "price": "client_supplied_price"
+    },
+    "reachability": {
+      "ok": true,
+      "client_reachable": 10,
+      "grant_shapes_reachable_only_against_a_hand_built_request": true,
+      "validation_order": [
+        "bad_request",
+        "unknown_action",
+        "client_supplied_item",
+        "client_supplied_item_index",
+        "client_supplied_cell",
+        "client_supplied_player",
+        "client_supplied_next_id",
+        "client_supplied_amount",
+        "client_supplied_price",
+        "absent_reward_cursor",
+        "invalid_reward_cursor",
+        "absent_reward_instant"
+      ],
+      "write_step": 13,
+      "quests_missing_key_refusals": [
+        {
+          "refusal": "missing_goal",
+          "why_unreachable_there": "its key was a required addressing key, and the quests typed client could not build a request without one",
+          "reachable_here": false,
+          "why_not_here": "this contract has no addressing key at all, so no refusal of that shape exists to be unreachable"
+        },
+        {
+          "refusal": "missing_idSimpleChapter",
+          "why_unreachable_there": "its key was a required addressing key, and the quests typed client could not build a request without one",
+          "reachable_here": false,
+          "why_not_here": "this contract has no addressing key at all, so no refusal of that shape exists to be unreachable"
+        },
+        {
+          "refusal": "missing_currentQuestVars",
+          "why_unreachable_there": "its key was a required addressing key, and the quests typed client could not build a request without one",
+          "reachable_here": false,
+          "why_not_here": "this contract has no addressing key at all, so no refusal of that shape exists to be unreachable"
+        },
+        {
+          "refusal": "missing_idCurrentMission",
+          "why_unreachable_there": "its key was a required addressing key, and the quests typed client could not build a request without one",
+          "reachable_here": false,
+          "why_not_here": "this contract has no addressing key at all, so no refusal of that shape exists to be unreachable"
+        },
+        {
+          "refusal": "missing_goalIndex",
+          "why_unreachable_there": "its key was a required addressing key, and the quests typed client could not build a request without one",
+          "reachable_here": false,
+          "why_not_here": "this contract has no addressing key at all, so no refusal of that shape exists to be unreachable"
+        }
+      ],
+      "quest_shape_unreachable_here": 5
+    }
+  },
+  "resources": {
+    "names": [
+      "xp",
+      "gold",
+      "wood",
+      "oil",
+      "steel",
+      "cash",
+      "mana",
+      "energy"
+    ],
+    "exposed_count": 8,
+    "service_accessor_names": [
+      "xp",
+      "gold",
+      "wood",
+      "oil",
+      "steel",
+      "cash",
+      "mana"
+    ],
+    "legacy_mutation_vector_slots": 8,
+    "two_different_eights": "the mutation vector is eight POSITIONAL slots whose first is `unknown` and which has no room for `energy`; the named stored set is eight NAMES, being the seven the service accessor returns plus `energy` under its own name. Reading one as the other is the error this note prevents"
+  },
+  "volatile_fields": {
+    "private_prefix": "/privateState/",
+    "server_time_field": "server_time",
+    "count": 2
+  },
+  "guards": {
+    "ok": true,
+    "module_bytes": 131240,
+    "module_sha256": "9aa0f3efd697fb723f490f6acfee7dd85fa1acb073042cb4c2a4bee4f00e16a4",
+    "static_function_count": 28,
+    "private_pinned": 8,
+    "instance_functions": 0,
+    "forbidden_names": 23,
+    "forbidden_fragments": 19,
+    "names_guarded_only_by_substring": 15,
+    "absent_helpers": 4
+  },
+  "absent_helpers": [
+    {
+      "capability": "grant",
+      "would": "place a row, append a bought unit, or create a storage entry",
+      "forbidden_because": "NO_REWARD_MOVED"
+    },
+    {
+      "capability": "cursor-to-rung selection",
+      "would": "index a schedule by a cursor value, or map a cursor position onto a rung, a type letter, or an amount",
+      "forbidden_because": "NO_CURSOR_SELECTION"
+    },
+    {
+      "capability": "type-letter decoding",
+      "would": "map a schedule type letter onto a resource slot, a resource name, or a grant shape",
+      "forbidden_because": "TYPE_LETTERS_UNDECODED_NOTE"
+    },
+    {
+      "capability": "eligibility, cooldown, window, or already-claimed test",
+      "would": "compare the stamped instant against the current time, or gate an action on an elapsed interval",
+      "forbidden_because": "NO_ELIGIBILITY"
+    }
+  ],
+  "static_functions": [
+    "reward_failure",
+    "repo_root_py_modules",
+    "legacy_census_text",
+    "is_action",
+    "weekly_bound",
+    "schedule_cardinality",
+    "daily_bound",
+    "weekly_successor",
+    "daily_successor",
+    "reachable_report",
+    "committed_schedule_entries",
+    "project_cursor",
+    "project_save",
+    "refused_client_keys",
+    "build_reward_intent",
+    "build_reward_response",
+    "parse_reward",
+    "_reward_error",
+    "_is_integer_valued",
+    "_wire_int_set",
+    "_wire_int",
+    "_is_encoded_absence",
+    "_is_encoded_presence",
+    "_kind_name",
+    "_is_recorded_zero",
+    "owners",
+    "coverage_limit",
+    "non_claims"
+  ],
+  "static_function_count": 28,
+  "ownership": {
+    "foreign": {
+      "boughtUnits": "scripts/units/unit_instance_projection.gd",
+      "store": "scripts/units/stored_item_flow.gd",
+      "items": "scripts/town/placement_catalog.gd"
+    },
+    "foreign_roles": {
+      "boughtUnits": "the unit-instance row projection reports which units the recorded save lists as bought",
+      "store": "the stored-item-placement projection reads maps[0]['store'] as the row's garrison list",
+      "items": "the building-placement catalog reads the placed rows out of maps[0]['items']"
+    },
+    "owned": {
+      "privateState": "the one field both preserved branches write into",
+      "weeklyRewardIndex": "the weekly cursor",
+      "bonusNextId": "the daily cursor",
+      "timeStampMondayBonus": "the instant the weekly branch stamps",
+      "timestampLastBonus": "the instant the daily branch stamps"
+    },
+    "forbidden_foreign_keys": [
+      "boughtUnits",
+      "bought_unit",
+      "map_items",
+      "map_add_item",
+      "buy_stored"
+    ]
+  },
+  "derivation_record": {
+    "derived": [
+      {
+        "quantity": "the weekly bound",
+        "how": "the maximum entry length over the schedule entries whose value is a list -- never the entry count",
+        "source": "get_game_config.py:195-204 (get_weekly_reward_length)",
+        "why_this_one": "the spec's own requirement demands it, and it transcribes a preserved helper's own rule rather than inventing one",
+        "independently_re_derived_by": "the hermetic suite, on every run"
+      },
+      {
+        "quantity": "the two successor positions",
+        "how": "each branch's own arithmetic, transcribed",
+        "source": "command.py:363 (weekly modulo) and command.py:446,451-452 (daily increment with a wrap)"
+      }
+    ],
+    "reported_but_never_derived": [
+      "every schedule entry, verbatim and in committed order",
+      "both schedule cardinalities, which are counts of committed entries rather than a rule about them",
+      "the reachability sets, which are a set difference over two recorded ranges and deliberately perform no lookup",
+      "the eleven reward schedules' measured consumer counts",
+      "the three type letters, reported undecoded",
+      "the seven save-only fields, reported with no rule",
+      "the ranking-reward table, reported as owned content elsewhere"
+    ],
+    "absent_entirely": [
+      "any amount, prize, payout, or price",
+      "any stored-resource movement, in either direction",
+      "any schedule-entry selection from a cursor value",
+      "any type-letter-to-resource mapping",
+      "any eligibility, cooldown, window, period, or already-claimed test"
+    ],
+    "task_3_1_reading": "read literally, 'deriving nothing from a committed value' is unsatisfiable, because the spec's own second requirement demands the derived weekly bound. The reading implemented here is: the weekly bound is the ONE quantity derived from a committed value -- it transcribes a preserved helper's rule -- and nothing else is derived. No amount, prize, price, letter-to-resource mapping, eligibility, or cursor-to-rung selection exists anywhere here. This reading is recorded rather than silently chosen"
+  },
+  "coverage": {
+    "ok": true,
+    "coverage": {
+      "actions": 2,
+      "branches": 2,
+      "schedules_reported": 11,
+      "schedules_with_no_consumer": 10,
+      "save_only_fields": 7,
+      "committed_save_documents": 33,
+      "committed_save_files_walked": 34,
+      "cursors": 2,
+      "instants": 2,
+      "modules_censused": "discovered at run time; the recorded count is 11",
+      "no_progressed_player_save": "the executed-legacy capture used committed village documents; no claim is made about any other corpus",
+      "nothing_rendered": true,
+      "no_pixel_parity": true,
+      "no_flash": true,
+      "no_network_in_the_hermetic_suite": true
+    },
+    "non_claims": [
+      "no reward is granted, priced, credited, or displayed, and no delivered identifier or response field implies that one was",
+      "no schedule entry is ever selected from a cursor value, and no type letter is mapped onto a stored resource",
+      "no eligibility, cooldown, window, period, or already-claimed rule is derived from the stamped instant",
+      "the schedule census states a fact about the PRESERVED SERVER'S SOURCE only; this repository makes no claim about what any client did with the configuration bytes it was served",
+      "the save-only fields' origin is an INFERENCE from total source absence alongside universal save presence, not a measurement",
+      "the ranking-reward table is owned as normalized content and undelivered as gameplay; neither statement implies the other",
+      "the zero-based schedule index is derived-provisional with the one-based alternative retained, and neither base is used to select an entry",
+      "no executed-legacy transaction is parity for what was GRANTED, because the grant was client-sent in both branches",
+      "nothing is rendered: there is no windowed capture and no pixel-parity oracle, because no reward display exists to compare"
+    ],
+    "divergences": 3,
+    "divergences_as_parity": 0,
+    "arms": 4
+  },
+  "owners": [
+    {
+      "field": "weeklyRewardIndex",
+      "owned_by": "godot-rewards",
+      "kind": "cursor"
+    },
+    {
+      "field": "bonusNextId",
+      "owned_by": "godot-rewards",
+      "kind": "cursor"
+    },
+    {
+      "field": "timeStampMondayBonus",
+      "owned_by": "godot-rewards",
+      "kind": "stamped instant"
+    },
+    {
+      "field": "timestampLastBonus",
+      "owned_by": "godot-rewards",
+      "kind": "stamped instant"
+    },
+    {
+      "field": "privateState",
+      "owned_by": "godot-rewards",
+      "kind": "the one object both branches write into"
+    },
+    {
+      "field": "boughtUnits",
+      "owned_by": "another capability",
+      "named_here_only_as": "a string in FOREIGN_IDENTIFIERS",
+      "asserted_by": "scripts/units/unit_instance_projection.gd",
+      "role": "the unit-instance row projection reports which units the recorded save lists as bought"
+    },
+    {
+      "field": "store",
+      "owned_by": "another capability",
+      "named_here_only_as": "a string in FOREIGN_IDENTIFIERS",
+      "asserted_by": "scripts/units/stored_item_flow.gd",
+      "role": "the stored-item-placement projection reads maps[0]['store'] as the row's garrison list"
+    },
+    {
+      "field": "items",
+      "owned_by": "another capability",
+      "named_here_only_as": "a string in FOREIGN_IDENTIFIERS",
+      "asserted_by": "scripts/town/placement_catalog.gd",
+      "role": "the building-placement catalog reads the placed rows out of maps[0]['items']"
+    },
+    {
+      "field": "level_ranking_reward",
+      "owned_by": "economy-schedules-normalization and content-validation, as normalized content only",
+      "named_here_only_as": "a string in RANKING_REWARD_OWNERSHIP"
+    }
+  ],
+  "non_claims": [
+    "no reward is granted, priced, credited, or displayed, and no delivered identifier or response field implies that one was",
+    "no schedule entry is ever selected from a cursor value, and no type letter is mapped onto a stored resource",
+    "no eligibility, cooldown, window, period, or already-claimed rule is derived from the stamped instant",
+    "the schedule census states a fact about the PRESERVED SERVER'S SOURCE only; this repository makes no claim about what any client did with the configuration bytes it was served",
+    "the save-only fields' origin is an INFERENCE from total source absence alongside universal save presence, not a measurement",
+    "the ranking-reward table is owned as normalized content and undelivered as gameplay; neither statement implies the other",
+    "the zero-based schedule index is derived-provisional with the one-based alternative retained, and neither base is used to select an entry",
+    "no executed-legacy transaction is parity for what was GRANTED, because the grant was client-sent in both branches",
+    "nothing is rendered: there is no windowed capture and no pixel-parity oracle, because no reward display exists to compare"
+  ]
+}
