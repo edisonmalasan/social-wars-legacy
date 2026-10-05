@@ -1,0 +1,98 @@
+{
+  "cap_literal": 50,
+  "cap_source_lines": [
+    658,
+    670
+  ],
+  "changed_leaf_paths": [],
+  "command": "use_magic",
+  "energy_after": 50,
+  "energy_before": 50,
+  "ledger_after": {
+    "1": 50,
+    "10": 0,
+    "2": 0,
+    "3": 0,
+    "4": 2,
+    "9": 1,
+    "99": 0
+  },
+  "ledger_before": {
+    "1": 50,
+    "10": 0,
+    "2": 0,
+    "3": 0,
+    "4": 2,
+    "9": 1,
+    "99": 0
+  },
+  "ledger_key": "1",
+  "ledger_key_created": false,
+  "ledger_key_present_before": true,
+  "ledger_keys_after": 7,
+  "ledger_keys_before": 7,
+  "ledger_recomputed": {
+    "1": 50,
+    "10": 0,
+    "2": 0,
+    "3": 0,
+    "4": 2,
+    "9": 1,
+    "99": 0
+  },
+  "ledger_value_after": 50,
+  "ledger_value_before": 50,
+  "magic_id_sent": "1",
+  "magic_id_sent_type": "str",
+  "magic_id_string_form": "1",
+  "mana_after": 15,
+  "mana_before": 15,
+  "modern_derives_after": 50,
+  "modern_differs_from_oracle": false,
+  "name": "use_string_id_resolves_the_same_key",
+  "note": "A STRING '1' resolves to the SAME key '1', because the branch keys on str(magic_id) and str('1') == str(1). This is the discriminator that proves the float hazard below is about the STRING FORM rather than the JSON type alone.",
+  "only_the_addressed_key_moved": true,
+  "operator": "=",
+  "parity_note": "The oracle and the derived transition agree here; the string form is what differs from an integer request, not the result.",
+  "parity_with_delivered_endpoint": true,
+  "placed_rows_after": 549,
+  "placed_rows_before": 549,
+  "printed_branch_lines": [
+    "[+] COMMAND: use_magic(['1']) -> Used magic spell"
+  ],
+  "printed_message": "Used magic spell",
+  "printed_message_claims": "a spell was used",
+  "resource_slot_count": 8,
+  "resources_after": {
+    "cash": 4,
+    "energy": 50,
+    "gold": 37691,
+    "mana": 15,
+    "oil": 15401,
+    "steel": 14151,
+    "wood": 19705,
+    "xp": 136878
+  },
+  "resources_before": {
+    "cash": 4,
+    "energy": 50,
+    "gold": 37691,
+    "mana": 15,
+    "oil": 15401,
+    "steel": 14151,
+    "wood": 19705,
+    "xp": 136878
+  },
+  "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+  "resources_moved": [],
+  "response_payload": {
+    "result": "success"
+  },
+  "state_sha256_after": "92ba9153aedf44846b52f1dffb9cad727577fccda6607295bd69097e747e5415",
+  "state_sha256_before": "92ba9153aedf44846b52f1dffb9cad727577fccda6607295bd69097e747e5415",
+  "status": 200,
+  "stdout_evidence_is_this_request_only": true,
+  "stdout_offset_before": 3183,
+  "step_number": 11,
+  "unchanged_leaves_sha256": "92ba9153aedf44846b52f1dffb9cad727577fccda6607295bd69097e747e5415"
+}

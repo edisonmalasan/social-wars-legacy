@@ -86,9 +86,19 @@ ADD_XP_UNIT_COMMAND = "add_xp_unit"
 # destruction and the ledger paths it records are unreachable against it. The
 # guard is narrowed to a declared set rather than deleted -- a capture may join
 # the set only by naming itself here, which is the review this pin exists to
-# force.
+# force.  AMENDED a second time by the `damage` line (M10 line 3): its capture
+# seeds villages/Neutral.json because it is the ONLY committed corpus whose
+# privateState.magics is non-empty, and an empty ledger is a ledger the increment
+# arm cannot be observed against -- every key creation would look identical to
+# every increment.  All ten committed save documents were measured and the other
+# nine record an empty object.  Joining the set adds one call site and one
+# exemption, so the pinned count stays at seventeen -- which is precisely why
+# counting alone is a weak pin here and the exact-set assertion below has to be
+# what catches a new capture.
 OWN_CAPTURE_NAME = "capture_unit_xp_fixture.py"
-SEEDED_CAPTURE_NAMES = frozenset({OWN_CAPTURE_NAME, "capture_combat_fixture.py"})
+SEEDED_CAPTURE_NAMES = frozenset(
+    {OWN_CAPTURE_NAME, "capture_combat_fixture.py", "capture_magic_fixture.py"}
+)
 
 # Identifiers that would mean an award rule had been invented. Matched as
 # SUBSTRINGS on purpose: an earlier by-name guard in this repository matched only
@@ -1107,11 +1117,20 @@ class CaptureHarnessSeamTests(unittest.TestCase):
     def test_every_other_build_disposable_call_site_passes_at_most_one_argument(self) -> None:
         """The structural pin (task 1.3).
 
-        Seventeen call sites exist today and all pass a single positional argument.
-        That is why adding a defaulted parameter could not break them. The property
-        decays the moment someone passes a second argument — at which point some
-        other capture has acquired a non-fresh corpus and the corpus assumptions of
-        its committed fixture need rechecking. That must be a loud failure.
+        Seventeen call sites existed when the parameter was added and all of them
+        passed a single positional argument. That is why adding a defaulted
+        parameter could not break them. The property decays the moment someone
+        passes a second argument — at which point some other capture has acquired a
+        non-fresh corpus and the corpus assumptions of its committed fixture need
+        rechecking. That must be a loud failure.
+
+        Seventeen are still pinned, and that is measured rather than asserted by
+        hand: twenty call sites exist and three captures are declared seeded
+        (unit-xp, combat-actions, damage) -- twenty minus three. A seeded capture
+        adds one call site AND one exemption, so joining the set leaves this number
+        exactly where it was. That is a real weakness of counting alone and it is
+        why the number cannot catch a new capture; the separate exact-set assertion
+        below is what does.
 
         Each capture in SEEDED_CAPTURE_NAMES is a deliberate exception, asserted
         separately below, so the exception cannot silently widen.

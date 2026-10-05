@@ -1152,6 +1152,15 @@ class RecordedAbsenceTests(unittest.TestCase):
                 "_legacy_boot_error", "_seed_dead_heroes", "_committed_item",
                 "_stored_placement_state", "_stored_item_row",
                 "_stored_placement_refusal", "_combat_snapshot", "_combat_refusal",
+                # godot-damage (M10 line 3): four more, for the reason spelled
+                # out in the banner above them -- the only decorator-free gap in
+                # the file sits between /v0/combat's body and /v0/place_stored's
+                # decorator, so a fifth route's helpers could not live there
+                # without landing inside the combat route's own marker-bounded
+                # slice.  The comment naming that gap, and the pins that made it
+                # load-bearing, are in test_magic_endpoint.py.
+                "_magic_snapshot", "_legacy_recorded_after", "_magic_refusal",
+                "_committed_magic",
             ],
         )
 

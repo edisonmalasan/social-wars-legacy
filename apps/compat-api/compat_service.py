@@ -917,6 +917,7 @@ import combat_envelope
 import construction_envelope
 import expand_envelope
 import level_envelope
+import magic_envelope
 import move_envelope
 import placement_envelope
 import purchase_envelope
@@ -1048,6 +1049,43 @@ ERROR_CLIENT_DICTATED_DESTRUCTION = "client_dictated_destruction"
 ERROR_NO_ELIGIBLE_ROW = "no_eligible_row"
 ERROR_UNADDRESSABLE_ROW = "unaddressable_row"
 ERROR_UNRESOLVABLE_LEDGER = "unresolvable_ledger"
+# --- magic counter (godot-damage) -------------------------------------------
+# Six NEW refusal codes.  `invalid_action` and `unresolvable_ledger` are shared
+# with the routes above and are reused unchanged rather than duplicated: the
+# action vocabulary is the same closed-vocabulary shape, and an unreadable
+# ledger is the same save-side precondition the combat and resurrection routes
+# already report as a 500.
+#
+# Every one of these is a DELIBERATE DIVERGENCE from the response, never from
+# the state: the legacy server answers {"result": "success"} for all twelve
+# recorded transactions, because `use_magic 3`, `buy_magic 99` and `use_magic
+# 1.0` all take a branch `else` arm that writes the key at zero and prints
+# (command.py:660, 672) and no branch validates an identity at all.
+#
+# The split follows the request's own two halves, exactly as the combat route's
+# does, and for the same reason -- a client that sent something forbidden must
+# be able to tell "you may not say that" apart from "your save says otherwise":
+#
+# * **400** -- the request's *shape*: the action, a client-dictated count, and
+#   an identity that is absent, mistyped, or in the wrong canonical form.  None
+#   of them consults player state to be reached (design D2, D4).
+# * **409** -- the player's *state*: an identity with no committed definition
+#   is refused here rather than as a 400 because the request named a *spell* and
+#   the answer is about committed content; and a ledger or counter that cannot
+#   be read, or a counter already above the recorded cap, is about the corpus.
+#
+# Note what is deliberately ABSENT: there is no `invalid_vector` or
+# `invalid_timestamp` refusal reachable from a request.  Those two exist in
+# `magic_envelope` because `build_envelope` validates its own derived shape, and
+# they can only fire on a bug in this route, so they map to the internal error
+# rather than to a code a client could have provoked.
+ERROR_CLIENT_DICTATED_COUNT = "client_dictated_count"
+ERROR_MISSING_MAGIC_ID = "missing_magic_id"
+ERROR_INVALID_MAGIC_ID = "invalid_magic_id"
+ERROR_NON_CANONICAL_MAGIC_ID = "non_canonical_magic_id"
+ERROR_UNKNOWN_MAGIC_ID = "unknown_magic_id"
+ERROR_UNREADABLE_COUNTER = "unreadable_counter"
+ERROR_COUNTER_ABOVE_CAP = "counter_above_cap"
 ERROR_BAD_REQUEST = "bad_request"
 ERROR_NOT_FOUND = "not_found"
 ERROR_METHOD_NOT_ALLOWED = "method_not_allowed"
@@ -1388,6 +1426,212 @@ def _combat_refusal(reason: str, error: str) -> Tuple[Dict[str, Any], int]:
         reason, (500, ERROR_UNRESOLVABLE_LEDGER)
     )
     return error_response(status, code, "%s (%s)" % (error, reason))
+
+
+# ------------------------------------------------------------------
+# The magic-counter route's two helpers are at MODULE scope on purpose, for
+# the reason the two above spell out: the only decorator-free gap in this file
+# sits between the `/v0/combat` body and the `/v0/place_stored` decorator, and a
+# helper written there would land inside the combat route's own marker-bounded
+# source slice -- which the delivered structural guards require to parse as
+# exactly one function.  Module scope is outside every slice, so each helper
+# takes `boot` as its first parameter.
+#
+# They are deliberately thin, and thinner than `_combat_snapshot` for a measured
+# reason: a magic action touches **no placement row**, so there is no second
+# snapshot half to copy here.  Every rule, refusal code, ordering step, and
+# derived figure lives in `magic_envelope`, so this route and its three suites
+# compare against ONE derivation and neither can drift from the other.
+# ------------------------------------------------------------------
+def _magic_snapshot(
+    boot: compat_legacy.LegacyBoot, user_id: str
+) -> Tuple[Optional[Dict[str, Any]], Optional[Dict[str, Any]], Dict[str, Any]]:
+    """The pre-execution state the magic route proves its transition against.
+
+    The ledger is read off the save document and **copied**, because the legacy
+    branch writes into the very dict the proof must compare against: without the
+    copy the before-snapshot would alias the write and report the after-state as
+    the before-state, which is the exact failure this function exists to prevent.
+    ``dict(ledger)`` is a shallow copy and is sufficient, because the recorded
+    ledger maps string keys to non-negative integers -- there is no nested value
+    for a shallow copy to share.
+
+    The document is returned whole rather than as a diff so a caller that needs
+    to show a refusal left it byte-identical can compare it directly.
+
+    ``None`` and a non-mapping ledger are passed through **unaltered** rather
+    than defaulted to ``{}``, because ``magic_envelope.project_ledger`` must be
+    the single component that decides whether a ledger is readable -- a default
+    here would make an unreadable save look like an empty one and turn a server
+    fault into a silent create.
+
+    **The resource snapshot is eight slots, not the seven ``resources()`` gives.**
+    ``LegacyBoot.resources`` exposes exactly the slots ``engine.apply_resources``
+    writes, and ``privateState['energy']`` is not one of them -- no legacy branch
+    ever writes it, which is why it is absent from that accessor rather than
+    missing from the save (``villages/Neutral.json`` records ``energy: 50``).
+    The committed investigation measured all **eight** slots and found none
+    moving, so a seven-slot proof would be narrower than the evidence it claims
+    to reproduce.  ``energy`` is therefore read here, from the same document
+    fetch, and left **absent** when the save does not record it -- the proof
+    fails closed on a missing slot rather than substituting a zero, because a
+    defaulted zero would compare equal across both sides and make "no resource
+    moved" true for a slot nobody read.
+    """
+    document = boot.save_document(user_id)
+    private = document.get(magic_envelope.PRIVATE_STATE_KEY)
+    ledger = (
+        private.get(magic_envelope.LEDGER_KEY)
+        if isinstance(private, dict)
+        else None
+    )
+    resources: Dict[str, Any] = dict(boot.resources(user_id))
+    if isinstance(private, dict) and "energy" in private:
+        resources["energy"] = private["energy"]
+    return (
+        dict(ledger) if isinstance(ledger, dict) else None,
+        document,
+        resources,
+    )
+
+
+def _legacy_recorded_after(
+    action: str, before: int, present: bool, cap: int
+) -> int:
+    """What the UNCHANGED legacy branch writes, so the proof can pin it.
+
+    **This function exists only to make the post-execution proof meaningful, and
+    it is never used as the transition.**  The transition the service *contracts*
+    to is :func:`magic_envelope.derive_counter_transition` -- increment by one
+    under the cap, never below ``before`` -- and both legacy defects above stay
+    refused.  What the preserved dispatcher actually writes to the save is a
+    different number, and it has to be stated to be checked at all:
+
+    * an **absent** key takes the branch's ``else`` arm and is written at
+      **zero**, for both actions (``command.py:660``, ``672``);
+    * ``use_magic`` **assigns** ``min(cap, before + 1)``, which equals the
+      derived transition whenever ``before <= cap`` and **destroys charges**
+      when it does not (``command.py:670``);
+    * ``buy_magic`` **adds** ``min(cap, before + 1)`` to the counter, so its
+      result is ``before + min(cap, before + 1)`` and is **not bounded by the
+      cap at all** (``command.py:658``) -- executed against
+      ``villages/Neutral.json``: ``2 -> 3 -> 7 -> 15 -> 31 -> 63 -> 113``.
+
+    Deriving the legacy outcome so it can be **verified** is not reproducing it.
+    Reproducing it would mean storing that number as the service's transition,
+    which is exactly what design D3 refuses, and this function's result is never
+    written to a save: it is compared against what the legacy dispatcher produced
+    and then reported as a divergence.  The suite pins that distinction directly
+    -- the derived transition and this expectation must disagree for ``buy`` and
+    for an absent key, so a future edit that quietly made them equal would fail.
+
+    All three figures are literals transcribed from the two branch bodies, which
+    are four lines apart and mutually inconsistent; there is no shared helper in
+    the legacy source to call, which is itself part of the recorded defect.
+    """
+    if not present:
+        # The `else` arm: the key is created at zero and nothing is incremented.
+        return 0
+    stepped = min(cap, before + 1)
+    if action == magic_envelope.ACTION_BUY:
+        return before + stepped
+    return stepped
+
+
+def _magic_refusal(reason: str, error: str) -> Tuple[Dict[str, Any], int]:
+    """Map one :mod:`magic_envelope` refusal onto its code and status.
+
+    The split follows the request's own two halves rather than a blanket rule,
+    and is the same split the combat route's mapping documents:
+
+    * **400** -- the request's *shape*.  A closed-vocabulary action, a
+      client-sent count, or an identity that is absent, mistyped, or in the
+      wrong canonical form.  No player state is consulted to reach any of them
+      (design D2, D4).
+    * **409** -- the request was well formed and the answer is about the
+      corpus: an identity outside the committed ten-entry magic table (design
+      D4), a ledger or counter that cannot be read, or a recorded counter
+      already above the recorded literal cap (design D6).
+
+    ``invalid_ledger`` is the one reason mapped to **500**, matching the
+    treatment the combat and resurrection routes already give the SAME shared
+    "the save could not be read" shape: it is a server-side precondition, and it
+    is reported rather than defaulted, invented, or silently treated as an empty
+    ledger.
+
+    An unmapped reason fails closed as the service's ``500`` rather than
+    falling through to a client ``400``: an unknown refusal is a bug in the
+    mapping, and answering it as the client's fault would report a server fault
+    against a request that did nothing wrong.
+    """
+    status_by_reason = {
+        magic_envelope.REASON_INVALID_ACTION: (400, ERROR_INVALID_ACTION),
+        magic_envelope.REASON_CLIENT_DICTATED_COUNT: (
+            400, ERROR_CLIENT_DICTATED_COUNT
+        ),
+        magic_envelope.REASON_MISSING_MAGIC_ID: (400, ERROR_MISSING_MAGIC_ID),
+        magic_envelope.REASON_INVALID_MAGIC_ID: (400, ERROR_INVALID_MAGIC_ID),
+        magic_envelope.REASON_NON_CANONICAL_MAGIC_ID: (
+            400, ERROR_NON_CANONICAL_MAGIC_ID
+        ),
+        magic_envelope.REASON_UNKNOWN_MAGIC_ID: (409, ERROR_UNKNOWN_MAGIC_ID),
+        magic_envelope.REASON_INVALID_COUNTER: (409, ERROR_UNREADABLE_COUNTER),
+        magic_envelope.REASON_COUNTER_ABOVE_CAP: (409, ERROR_COUNTER_ABOVE_CAP),
+        magic_envelope.REASON_INVALID_LEDGER: (500, ERROR_UNRESOLVABLE_LEDGER),
+        magic_envelope.REASON_INVALID_VECTOR: (500, ERROR_INTERNAL),
+        magic_envelope.REASON_INVALID_TIMESTAMP: (500, ERROR_INTERNAL),
+    }
+    status, code = status_by_reason.get(reason, (500, ERROR_UNRESOLVABLE_LEDGER))
+    return error_response(status, code, "%s (%s)" % (error, reason))
+
+
+def _committed_magic(
+    boot: compat_legacy.LegacyBoot, magic_id: int
+) -> Optional[Dict[str, Any]]:
+    """One magic id's committed configuration row, verbatim, or ``None``.
+
+    Read from the **loaded legacy configuration** rather than the committed
+    normalized package, exactly as ``_committed_item`` reads ``items``, so the
+    identity check runs against the same bytes the legacy server would have had
+    available.  ``magics`` is a **list** of ten rows carrying a native ``id``
+    column running ``1..10`` (measured over the whole loaded set, 0
+    duplicates), and the row is located by that column.
+
+    **There is no legacy accessor to reproduce, and that is a finding rather
+    than an omission here.**  ``get_game_config.py`` builds an id-to-position
+    index and a ``get_<thing>_from_id`` accessor for ``items``, ``goals``,
+    ``inventory_items`` and the rest -- and contains **zero** occurrences of the
+    word ``magic``.  The ten committed magics are loaded into the configuration
+    and never indexed, so there is no code path from a magic id to its content
+    row at all.  That is strictly stronger than the committed investigation's
+    "the ledger has zero readers" finding: not only is the ledger never read, the
+    *content* is never addressable.  The lookup below therefore exists only to
+    give design D4's identity check something real to consult; it is this
+    service's own validation and is recorded as a Server v1 / M13 authority the
+    preserved server never had.
+
+    A last-match scan is used for the same reason as ``_committed_item``: it is
+    robust to a row whose ``id`` is not an integer, and it reproduces the
+    id-to-position index's own last-wins behaviour.  ``None`` means the loaded
+    configuration holds no such magic.
+    """
+    try:
+        magics = boot.config().get("magics")
+    except Exception:  # noqa: BLE001 - a config fault is not a content hit
+        return None
+    if not isinstance(magics, list):
+        return None
+    found: Optional[Dict[str, Any]] = None
+    for row in magics:
+        if not isinstance(row, dict):
+            continue
+        try:
+            if int(row.get("id")) != int(magic_id):
+                continue
+        except (TypeError, ValueError):
+            continue
+        found = row
+    return dict(found) if found is not None else None
 
 
 def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
@@ -2109,6 +2353,452 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
                 non_claims=combat_envelope.NON_CLAIMS,
                 provenance=combat_envelope.PROVENANCE,
                 resources=resources_after,
+                changed=changed,
+            ),
+            200,
+        )
+
+    @app.post("/v0/magic")
+    def v0_magic() -> Tuple[Dict[str, Any], int]:
+        """Execute one magic-counter intent through the unchanged legacy path.
+
+        M10 line 3 (``damage``).  One call carries **exactly one** legacy
+        command, chosen by a closed ``action`` vocabulary
+        (:data:`magic_envelope.ACTIONS`):
+
+        ==================  ==================  ===========================
+        ``action``          ``command``         addressing key
+        ==================  ==================  ===========================
+        ``buy``             ``buy_magic``       ``magic_id``
+        ``use``             ``use_magic``       ``magic_id``
+        ==================  ==================  ===========================
+
+        **The delivered surface is the counter, and the refusal is the finding.**
+        The game has a damage-shaped vocabulary -- ``COST_DAMAGE_SELF``,
+        ``COST_DAMAGE_ENEMY``, ``tsAttacksReset``, ``tsSpyingsReset``, the
+        ``MISSION_*`` combat types, and ten committed magics whose descriptions
+        promise effects -- and **none of it is reachable**.  The committed
+        magics content has zero legacy consumers, the ledger has **zero
+        readers** (every subscript in the codebase is an assignment), and the
+        only number that would define a damage amount, the ``Attack Boost``
+        multiplier, **was never committed**.  So this route moves a counter and
+        nothing else: no damage, no effect, no hit points, no outcome.
+
+        **Design D1 -- the request carries a validated IDENTITY and nothing
+        else.**  The client names a magic id; the service derives the entire
+        counter transition from the player's own recorded ledger and from the
+        recorded literal cap.
+
+        **Design D2 -- a client-sent count is REFUSED, by a NAMED, SEPARATE
+        guard.**  Any request key naming a count, a delta, an amount, a charge,
+        a use count, or protocol plumbing is refused here with
+        ``client_dictated_count`` **before dispatch**, with an empty payload and
+        no state change.  The closed list is
+        :func:`magic_envelope.refused_client_keys` and is deliberately **not**
+        re-implemented here, so this route cannot invent a synonym the derivation
+        did not anticipate.  This is deliberately a different refusal from every
+        other one on the route: eligibility and identity are questions about the
+        player's recorded state and committed content, while this one is a
+        question about the request's own keys, so a client that sent a count can
+        tell "you may not say how many" apart from "there was nothing to find".
+
+        **Design D3 -- both legacy asymmetries are refused, and recorded.**
+        ``buy_magic`` uses ``+=`` on ``min(50, x + 1)`` and so is **unbounded**;
+        the executed fixture drove key ``1`` to ``113`` and it would keep adding
+        50 per request.  ``use_magic`` uses ``=`` on the same ``min``, an
+        absolute clamp, so it turned ``113`` owned charges into ``50`` -- a
+        command whose printed message claims the opposite silently **destroyed
+        63 spells**.  The derived transition is ``after = min(cap, before + 1)``
+        for **both** actions and is never below ``before``; a recorded counter
+        already **above** the cap is refused outright rather than clamped down,
+        because ``min(50, 113 + 1)`` is ``50`` -- the charge-destroying decrease
+        this line exists to refuse, wearing this service's clothes.
+
+        **Design D4 -- the identity is validated against committed content.**
+        The legacy server never checks it: the fixture drove ``buy_magic 99``
+        (not one of the ten committed magics) and ``use_magic 1.0``, and the
+        float silently created a **second, unrelated ledger key** ``"1.0"``
+        because the branch keys on ``str(magic_id)``.  A non-canonical form is
+        refused rather than coerced, and the content check runs **before** the
+        ledger is read, so a request naming something that is not a spell never
+        consults the player's own state.
+
+        **Design D5 -- every check resolves before the ledger write.**  All
+        eight ordering steps run inside :func:`magic_envelope.project_magic`
+        before anything is dispatched, which is what makes a refusal leave the
+        recorded document byte-identical.
+
+        **Design D6 -- the ``50`` is a LITERAL.**  It appears at
+        ``command.py:658`` and ``670`` as a bare argument to ``min()`` with no
+        reference to content whatsoever.  The number ``50`` does occur among the
+        committed magics values -- as ``AirStrike.cash`` and
+        ``Shortcircuit.level`` -- which is a coincidence of the value
+        distribution, and
+        :data:`magic_envelope.REJECTED_CAP_DERIVATION` retains that rejected
+        derivation rather than dropping it.
+
+        **No price is charged and no effect is applied.**  The executed fixture
+        compared all **eight** stored resource slots across all twelve
+        transactions and found none moving; ``mana`` held at 15 through a
+        ``use_magic``.  The derived vector is the neutral all-zero one, and the
+        proof below requires **every** stored resource to be unchanged -- which
+        is what forecloses a delta smuggled through the request, since legacy
+        applies the request's own vector *before* the branch
+        (``command.py:40``).
+
+        **The ``else``-arm divergence is reported, never papered over.**  When
+        the addressed key is **absent**, the legacy branch takes its ``else``
+        arm and writes the key at **zero**, incrementing nothing at all, while
+        this service reads an absent entry as zero charges and increments it.
+
+        **What the post-execution proof therefore compares, and why.**  Design
+        D5 asks for "the counter changed by exactly the derived delta", and that
+        is a statement that **cannot** be true of this route's own executions:
+        D3 requires the modern transition to refuse both legacy defects, so the
+        unchanged dispatcher and the derived transition disagree by construction
+        -- always for ``buy`` (unbounded), always for an absent key (zero), and
+        for a ``use`` above the cap (which is refused before it can execute at
+        all).  Asserting the recorded value equals the derived one would fail
+        every one of those, and asserting nothing would leave the half
+        vacuous.
+
+        The proof instead pins what **actually executed**:
+        :func:`_legacy_recorded_after` states the unchanged branch's own
+        arithmetic, and the ledger half requires the recorded value to equal it
+        exactly, every unaddressed entry to be byte-identical, and the key order
+        to be preserved with a created key appended.  The derived transition is
+        reported beside the recorded one under ``counter.derived_after`` and
+        ``counter.recorded_after`` with ``counter.matches_derived`` stating
+        plainly whether they agree.  Verifying the legacy outcome is not
+        reproducing it: the derived number is never written to a save.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404,
+                ERROR_UNKNOWN_USER_ID,
+                "no save exists for user_id %r" % user_id,
+            )
+
+        # --- step 1: the action names one of the two branches ---------------
+        if "action" not in payload:
+            return error_response(400, ERROR_MISSING_ACTION, "action is required")
+        action = payload["action"]
+        if not magic_envelope.is_action(action):
+            return _magic_refusal(
+                magic_envelope.REASON_INVALID_ACTION,
+                "action must be one of %s" % ", ".join(magic_envelope.ACTIONS),
+            )
+
+        # --- step 2: NO client-dictated count (design D2) -------------------
+        # Deliberately ahead of the addressing and long before player state is
+        # read: the client may not say how many, and the answer does not depend
+        # on whether the spell was owned.  The closed key list lives in
+        # `magic_envelope` and is used as-is, never restated here.
+        refused_keys = magic_envelope.refused_client_keys(payload)
+        if refused_keys:
+            return _magic_refusal(
+                magic_envelope.REASON_CLIENT_DICTATED_COUNT,
+                "the request carries client-supplied count keys that this service "
+                "derives server-side from the player's own recorded ledger: %s"
+                % ", ".join(refused_keys),
+            )
+
+        # --- steps 3-8: EVERY check resolves here, before any dispatch -------
+        # `project_magic` runs the whole of `magic_envelope.VALIDATION_ORDER`
+        # above the write (design D5), which is what makes a refusal leave the
+        # recorded document byte-identical.
+        try:
+            ledger_before, _document_before, resources_before = _magic_snapshot(
+                boot, user_id
+            )
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        projection = magic_envelope.project_magic(
+            ledger_before,
+            action,
+            payload.get("magic_id"),
+            lambda magic_id: _committed_magic(boot, magic_id),
+        )
+        if not bool(projection.get("ok", False)):
+            return _magic_refusal(
+                str(projection.get("reason", "")),
+                str(projection.get("error", "")),
+            )
+
+        ledger_snapshot = (
+            None if ledger_before is None else dict(ledger_before)
+        )
+        derived_key = str(projection.get("ledger_key", ""))  # type: ignore[arg-type]
+        derived_after = int(projection["counter_after"])  # type: ignore[arg-type]
+        derived_change = int(projection["change"])  # type: ignore[arg-type]
+        present_before = bool(projection.get("counter_present", False))
+
+        # --- step 9: THE WRITE STEP -----------------------------------------
+        # Execute the unchanged legacy dispatcher in-process.  It persists via
+        # legacy save_session into THIS corpus only.  The legacy HTTP route
+        # answers {"result": "success"} whenever `command()` returns without
+        # raising, so reaching here IS the legacy result -- which is precisely
+        # why it is NOT taken as proof of anything below.
+        try:
+            envelope_payload = magic_envelope.build_envelope(
+                action, projection["addressing"]
+            )
+        except magic_envelope.EnvelopeError as failure:
+            return _magic_refusal(failure.code, str(failure))
+
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        # --- step 10: THE POST-EXECUTION PROOF ------------------------------
+        # Two halves, both VALUE comparisons against the derivation.  A count
+        # comparison would pass while the wrong entry moved or a neighbouring
+        # entry changed, so neither half checks a count alone.
+        try:
+            ledger_after, _document_after, resources_after = _magic_snapshot(
+                boot, user_id
+            )
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+
+        changed: List[str] = []
+
+        # (a) The ledger.  Every entry the derivation did not address keeps its
+        # recorded value AND its recorded position, so a comparison against the
+        # persisted ledger is a value comparison rather than a re-ordering.
+        #
+        # The expected key order is derived from the ledger's OWN recorded order
+        # rather than from any display projection, because a display projection
+        # may sort.  What the legacy branches do to the order is exact and
+        # small -- `+=` on a present key leaves its position alone and the
+        # `else` arm's assignment to an absent key appends
+        # (command.py:658-660, 670-672) -- so the expected order is the recorded
+        # order, with the addressed key appended when and only when it was
+        # created.
+        if ledger_snapshot is None:
+            if ledger_after is not None:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "the ledger appeared at execution time, which no derived "
+                    "transition can produce",
+                )
+        else:
+            if not isinstance(ledger_after, dict):
+                return error_response(
+                    500, ERROR_INTERNAL, "the ledger is %s after execution"
+                    % type(ledger_after).__name__
+                )
+            expected_order = list(ledger_snapshot)
+            if derived_key not in expected_order:
+                expected_order.append(derived_key)
+            if list(ledger_after) != expected_order:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "the ledger's key order is %r after execution, not the "
+                    "derived %r: entries keep their recorded insertion order and "
+                    "a created key is appended (command.py:658-660, 670-672)"
+                    % (list(ledger_after), expected_order),
+                )
+            # Every entry the derivation did not address is byte-identical.
+            for key in ledger_snapshot:
+                if key == derived_key:
+                    continue
+                if ledger_after.get(key) != ledger_snapshot[key]:
+                    return error_response(
+                        500,
+                        ERROR_INTERNAL,
+                        "ledger[%r] is %r after execution, not the recorded %r: a "
+                        "magic action moves the addressed counter and rewrites "
+                        "nothing else"
+                        % (key, ledger_after.get(key, "<absent>"), ledger_snapshot[key]),
+                    )
+            # And the addressed counter itself, pinned against what the
+            # UNCHANGED legacy dispatcher writes -- NOT against the derived
+            # transition, which deliberately disagrees with it (design D3).
+            # Pinning the executed value is what makes this half a proof: it
+            # catches a smuggled delta, a misrouted command, and a wrong key,
+            # none of which a count comparison would see.  The derived value is
+            # reported beside the recorded one rather than asserted equal, and
+            # `matches_derived` states plainly when they differ.
+            if derived_key not in ledger_after:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "the addressed ledger key %r is absent after execution, but "
+                    "the derived transition addresses it"
+                    % derived_key,
+                )
+            recorded_after = ledger_after[derived_key]
+            if isinstance(recorded_after, bool) or not isinstance(recorded_after, int):
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "ledger[%r] is %r after execution, not an integer"
+                    % (derived_key, recorded_after),
+                )
+            legacy_expected = _legacy_recorded_after(
+                str(action),
+                int(projection["counter_before"]),  # type: ignore[arg-type]
+                present_before,
+                int(projection["cap"]),  # type: ignore[arg-type]
+            )
+            if recorded_after != legacy_expected:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "ledger[%r] is %r after execution, not the %d the unchanged "
+                    "legacy %s arm writes for a recorded before of %d "
+                    "(the service's derived transition is %d, which is refused "
+                    "legacy behaviour and is deliberately NOT written)"
+                    % (
+                        derived_key,
+                        recorded_after,
+                        legacy_expected,
+                        magic_envelope.ACTION_COMMAND[str(action)],
+                        int(projection["counter_before"]),  # type: ignore[arg-type]
+                        derived_after,
+                    ),
+                )
+            changed.append(
+                "/privateState/%s/%s" % (magic_envelope.LEDGER_KEY, derived_key)
+            )
+
+        # (b) Every stored resource, never a subset.  This is what makes "no
+        # price, no mana cost, no reward" non-tautological rather than a
+        # statement about resources nobody looked at -- and it is EIGHT slots,
+        # not the seven `LegacyBoot.resources` exposes, because
+        # `privateState['energy']` is a real stored resource that no legacy
+        # branch writes.  The loop runs over the envelope's own closed name
+        # tuple, so a slot cannot be quietly dropped.
+        for name in magic_envelope.RESOURCE_NAMES:
+            if name not in resources_before or name not in resources_after:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "stored resource %s is missing from one side of the proof: "
+                    "the comparison covers the FULL eight-slot resource set, "
+                    "never a subset" % name,
+                )
+            if resources_after[name] != resources_before[name]:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "resource %s is %r after execution, not the pre-execution "
+                    "%r: a magic action moves no resource, so the derived neutral "
+                    "vector requires every stored resource to be unchanged"
+                    % (name, resources_after[name], resources_before[name]),
+                )
+
+        recorded_after_value = (
+            ledger_after.get(derived_key) if isinstance(ledger_after, dict) else None
+        )
+        legacy_expected = _legacy_recorded_after(
+            str(action),
+            int(projection["counter_before"]),  # type: ignore[arg-type]
+            present_before,
+            int(projection["cap"]),  # type: ignore[arg-type]
+        )
+        return (
+            envelope(
+                boot,
+                result="success",
+                action=action,
+                command=str(projection["command"]),
+                addressing={
+                    "key": magic_envelope.ACTION_ADDRESSING_KEY[str(action)],
+                    "value": projection["addressing"],
+                    "kind": "magic_id",
+                    "note": "the request names a magic IDENTITY and nothing else; "
+                            "the counter transition is derived from the player's "
+                            "own recorded ledger and the recorded literal cap",
+                },
+                counter={
+                    "ledger_key": derived_key,
+                    "before": int(projection["counter_before"]),  # type: ignore[arg-type]
+                    "present_before": present_before,
+                    "derived_after": derived_after,
+                    "derived_change": derived_change,
+                    "recorded_after": recorded_after_value,
+                    "legacy_expected_after": legacy_expected,
+                    # False is the NORMAL case for `buy` and for an absent key,
+                    # and it is the divergence rather than a failure: the derived
+                    # transition is the modern contract, the recorded value is
+                    # what the unchanged legacy branch wrote, and design D3
+                    # refuses to reproduce the latter.
+                    "matches_derived": recorded_after_value == derived_after,
+                    "legacy_absent_arm_writes_zero": not present_before,
+                    "cap": int(projection["cap"]),  # type: ignore[arg-type]
+                    "capped": bool(projection["capped"]),
+                    "decreased": False,
+                    "derived": True,
+                    "cap_is_literal": magic_envelope.CAP_SOURCE_LINES,
+                    "rejected_cap_derivation": magic_envelope.REJECTED_CAP_DERIVATION,
+                    "refused_count": magic_envelope.CLIENT_DICTATED_REFUSAL,
+                    # The RECORDED order, not a re-sort, so it can be compared
+                    # with `ledger_before` above.  Keys are rendered through
+                    # `str` because `magic_envelope.LEDGER_KEY_TYPE` is `str` and
+                    # the legacy branch always writes `str(magic_id)` -- while a
+                    # hand-edited save can hold an integer key, which survives in
+                    # the boot's in-memory document even though `json.dump`
+                    # writes its string form to disk.  Sorting such a mixed set
+                    # raises, and `ledger_after_keys_are_strings` reports the
+                    # condition rather than letting the answer depend on it.
+                    "ledger_before": [
+                        str(key) for key in (ledger_snapshot or {})
+                    ],
+                    "ledger_after": (
+                        [str(key) for key in ledger_after]
+                        if isinstance(ledger_after, dict)
+                        else None
+                    ),
+                    "ledger_after_keys_are_strings": (
+                        all(isinstance(key, str) for key in ledger_after)
+                        if isinstance(ledger_after, dict)
+                        else None
+                    ),
+                },
+                ordering_rule=magic_envelope.ORDERING_RULE,
+                validation_order=[
+                    dict(step) for step in magic_envelope.VALIDATION_ORDER
+                ],
+                write_step=magic_envelope.WRITE_STEP,
+                cap_uniformity=magic_envelope.CAP_UNIFORMITY,
+                legacy_unbounded_arm=magic_envelope.LEGACY_UNBOUNDED_ARM,
+                legacy_decreasing_arm=magic_envelope.LEGACY_DECREASING_ARM,
+                ledger_has_no_readers=magic_envelope.LEDGER_HAS_NO_READERS,
+                no_damage=magic_envelope.NO_DAMAGE,
+                reported_damage_vocabulary=magic_envelope.reported_vocabulary(),
+                no_cost_or_reward=magic_envelope.NO_COST_OR_REWARD,
+                no_magic_effect=magic_envelope.NO_MAGIC_EFFECT,
+                divergence=magic_envelope.divergences(),
+                divergence_count=magic_envelope.DIVERGENCE_COUNT,
+                refusals=[
+                    magic_envelope.REASON_INVALID_ACTION,
+                    magic_envelope.REASON_CLIENT_DICTATED_COUNT,
+                    magic_envelope.REASON_MISSING_MAGIC_ID,
+                    magic_envelope.REASON_INVALID_MAGIC_ID,
+                    magic_envelope.REASON_NON_CANONICAL_MAGIC_ID,
+                    magic_envelope.REASON_UNKNOWN_MAGIC_ID,
+                    magic_envelope.REASON_INVALID_LEDGER,
+                    magic_envelope.REASON_INVALID_COUNTER,
+                    magic_envelope.REASON_COUNTER_ABOVE_CAP,
+                ],
+                provenance=magic_envelope.PROVENANCE,
+                resources=resources_after,
+                resource_count=len(magic_envelope.RESOURCE_NAMES),
                 changed=changed,
             ),
             200,

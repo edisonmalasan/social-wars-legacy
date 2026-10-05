@@ -1,0 +1,92 @@
+{
+  "cap_literal": 50,
+  "cap_source_lines": [
+    658,
+    670
+  ],
+  "changed_leaf_paths": [
+    "/privateState/magics/1"
+  ],
+  "command": "buy_magic",
+  "divergence": "unbounded_growth",
+  "energy_after": 50,
+  "energy_before": 50,
+  "ledger_after": {
+    "1": 15,
+    "10": 0,
+    "2": 0,
+    "4": 2,
+    "9": 1
+  },
+  "ledger_before": {
+    "1": 7,
+    "10": 0,
+    "2": 0,
+    "4": 2,
+    "9": 1
+  },
+  "ledger_key": "1",
+  "ledger_key_created": false,
+  "ledger_key_present_before": true,
+  "ledger_keys_after": 5,
+  "ledger_keys_before": 5,
+  "ledger_recomputed": {
+    "1": 15,
+    "10": 0,
+    "2": 0,
+    "4": 2,
+    "9": 1
+  },
+  "ledger_value_after": 15,
+  "ledger_value_before": 7,
+  "magic_id_sent": 1,
+  "magic_id_sent_type": "int",
+  "magic_id_string_form": "1",
+  "mana_after": 15,
+  "mana_before": 15,
+  "name": "buy_1_unbounded_second",
+  "note": "7 + min(50, 8) = 15.",
+  "only_the_addressed_key_moved": true,
+  "operator": "+=",
+  "parity_with_delivered_endpoint": false,
+  "placed_rows_after": 549,
+  "placed_rows_before": 549,
+  "printed_branch_lines": [
+    "[+] COMMAND: buy_magic([1]) -> Bought magic spell"
+  ],
+  "printed_message": "Bought magic spell",
+  "printed_message_claims": "a spell was bought",
+  "resource_slot_count": 8,
+  "resources_after": {
+    "cash": 4,
+    "energy": 50,
+    "gold": 37691,
+    "mana": 15,
+    "oil": 15401,
+    "steel": 14151,
+    "wood": 19705,
+    "xp": 136878
+  },
+  "resources_before": {
+    "cash": 4,
+    "energy": 50,
+    "gold": 37691,
+    "mana": 15,
+    "oil": 15401,
+    "steel": 14151,
+    "wood": 19705,
+    "xp": 136878
+  },
+  "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+  "resources_moved": [],
+  "response_payload": {
+    "result": "success"
+  },
+  "state_sha256_after": "67bb21089ae8094652388145ba06ae6d408b3d212607107667e1dcd4c4a77102",
+  "state_sha256_before": "db18e4db1bc3c6a27677bbbe7a3bca00dae15fe5c692b3d109cfca0b3c419d9f",
+  "status": 200,
+  "stdout_evidence_is_this_request_only": true,
+  "stdout_offset_before": 2380,
+  "step_number": 3,
+  "unchanged_leaves_sha256": "a74579ada0fb7a79817ffd84da5f718eeded193f661704733c7e34e246f86f3a"
+}
