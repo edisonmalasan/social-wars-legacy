@@ -2602,6 +2602,23 @@ class Task53BoundaryTests(unittest.TestCase):
     the boundary an orphan rather than a hand-off.
     """
 
+    #: The capability that **owns** this line, and therefore the one spec where
+    #: naming a cursor, an instant, or a command is legitimate rather than a
+    #: rival claim.
+    #:
+    #: A first draft wrote the exemption as ``capability == "rewards"``, which is
+    #: **dead code**: the delivered capability directory is ``godot-rewards`` and
+    #: ``openspec/specs/rewards`` does not exist, so the exemption never fired and
+    #: the guard reported the owner's *own* spec as a rival claim.  It surfaced
+    #: only at Sync, because this is the first line whose owner spec was created
+    #: while this guard already existed -- so the guard had never been exercised
+    #: against the file it was written to police.
+    #:
+    #: The exemption is now derived from a checked directory rather than guessed,
+    #: so renaming the capability **fails this test** instead of quietly
+    #: disarming it.
+    OWNING_CAPABILITY = "godot-rewards"
+
     FOREIGN_FIELD_KEYS = ("boughtUnits", "store", "items")
 
     #: Measured, not assumed.  An earlier draft of this table routed
@@ -2808,6 +2825,17 @@ class Task53BoundaryTests(unittest.TestCase):
         )
         role_phrases = ("weekly reward", "daily bonus", "monday bonus",
                         "weekly_reward", "win_daily_bonus")
+        # The exemption is only meaningful against a directory that exists.  An
+        # earlier draft skipped a capability name that no spec directory carries,
+        # so this never fired and the guard would have flagged the owner's own
+        # spec; asserting the directory turns that dead condition into a checked
+        # fact.
+        self.assertTrue(
+            (specs / self.OWNING_CAPABILITY).is_dir(),
+            "the owning capability directory must exist, or this guard's "
+            "exemption is disarmed and it would report the owner's own spec as "
+            "a rival claim",
+        )
         files: List[pathlib.Path] = []
         for spec in sorted(specs.rglob("*.md")):
             files.append(spec)
@@ -2815,7 +2843,7 @@ class Task53BoundaryTests(unittest.TestCase):
         hits: List[str] = []
         for path in files:
             capability = path.relative_to(specs).parts[0]
-            if capability == "rewards":
+            if capability == self.OWNING_CAPABILITY:
                 continue
             text = path.read_text(encoding="utf-8")
             for token in identifiers:
