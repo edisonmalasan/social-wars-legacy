@@ -102,9 +102,9 @@ const CORPUS_DIRECTORIES := ["tests/saves", "villages", "villages/quest"]
 const EXPECTED_WALKED_FILES := 34
 const EXPECTED_DOCUMENTS_CARRYING := 33
 
-## Measured over all 34 walked documents that carry a `privateState`. The
-## distributions sum to 33, which is a second, independent cross-check on the
-## figure above.
+## Measured over the 33 of those 34 walked documents that carry a `privateState`
+## (NOT all 34 -- the 34th is the manifest named above). The distributions sum
+## to 33, which is a second, independent cross-check on the figure above.
 const EXPECTED_WEEKLY_DISTRIBUTION := {"0": 26, "1": 5, "2": 1, "3": 1}
 const EXPECTED_DAILY_DISTRIBUTION := {"0": 7, "2": 24, "3": 2}
 
@@ -1534,11 +1534,36 @@ func _check_ownership_boundary() -> void:
 	# `godot-combat-actions` (M10 line 2) has no README section. Recorded here
 	# rather than backfilled: the instruction is explicit, and a suite that
 	# asserted the section existed would fail on a gap this change must not close.
+	#
+	# MEASURED DEFECT, and the fourth instance of this class in this project (see
+	# section 9). The check was `readme.contains("godot-combat-actions")`, which
+	# reported the section PRESENT while no such section exists: the only
+	# occurrence is this capability's OWN README prose recording the gap, so the
+	# documenting text satisfied the search for the thing it documents. It was
+	# also an `info()` line, so it asserted nothing at all. The comment above
+	# stated the correct intent and the code did the opposite.
+	#
+	# Fixed two ways. The search is for a HEADING carrying the capability name,
+	# not the bare substring, and the gap is asserted still-open rather than
+	# reported -- so a future change that adds the section fails here and forces
+	# this note to be revisited instead of leaving a stale claim behind.
 	var combat_readme := _read_text(Paths.project_dir().path_join(
 		"README.md"))
-	var has_section := combat_readme.contains("godot-combat-actions")
-	info("documentation gap: godot-combat-actions README section present = %s"
-		% str(has_section))
+	var bare_mentions := _count_occurrences(combat_readme,
+		"godot-combat-actions")
+	var heading_lines := 0
+	for line: String in combat_readme.split("\n"):
+		if line.begins_with("#") and line.contains("godot-combat-actions"):
+			heading_lines += 1
+	info("documentation gap: bare mentions = %d, headings = %d"
+		% [bare_mentions, heading_lines])
+	check(bare_mentions > 0,
+		"the gap is RECORDED in prose, so it is visible to a reader (%d mentions)"
+			% bare_mentions)
+	check_eq(heading_lines, 0,
+		"and godot-combat-actions STILL has no README section: this change must "
+		+ "not backfill a gap it was told to leave visible. If this fails, a "
+		+ "later change closed the gap and this note is now stale.")
 
 ## True when `found` is this capability's own spec file.
 func relative_is_own(found: String, own_spec: String) -> bool:

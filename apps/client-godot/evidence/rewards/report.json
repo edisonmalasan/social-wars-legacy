@@ -6,7 +6,7 @@
     "capability": "godot-rewards"
   },
   "investigation": "docs/legacy-m10-rewards.md",
-  "primary_finding": "the two preserved reward branches advance one cursor and stamp one instant and grant nothing this contract can reproduce, and BOTH cursors' derived bounds EXCEED the cardinality of the schedule they would address -- 5 against 3 weekly and 5 against 5 daily -- so positions the recorded cursors reach name no rung",
+  "primary_finding": "the two preserved reward branches advance one cursor and stamp one instant and grant nothing this contract can reproduce, and NEITHER cursor can address the whole of the schedule it would address, for TWO DIFFERENT reasons -- weekly: the derived bound 5 EXCEEDS the 3 rungs, so positions 3 and 4 name no rung; daily: the bound 5 EQUALS the 5 entries, so there is no exceedance at all and the defect is a one-based/zero-based offset instead, leaving position 5 unreachable AND position 0 unreachable",
   "delivered_surface": "one cursor transition per action, two derived bounds beside their schedules' cardinalities, the reachability difference in both directions, the committed schedule entries verbatim, the eleven reward schedules with their measured consumer counts, the three type letters undecoded, the seven save-only fields with no rule, and the arm boundary",
   "nothing_delivered": "no reward, no amount, no prize, no price, no cost, no resource movement, no schedule-entry selection, no letter decoding, no eligibility, no cooldown, no window, no period, no already-claimed test, and no cursor-to-rung mapping",
   "actions": [
@@ -946,8 +946,8 @@
   },
   "guards": {
     "ok": true,
-    "module_bytes": 131240,
-    "module_sha256": "9aa0f3efd697fb723f490f6acfee7dd85fa1acb073042cb4c2a4bee4f00e16a4",
+    "module_bytes": 131450,
+    "module_sha256": "be8306e0b07de0769e0ab0d83ff9776ee0d133e86beaaa9cbe615ff02f444757",
     "static_function_count": 28,
     "private_pinned": 8,
     "instance_functions": 0,
