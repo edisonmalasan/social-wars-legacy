@@ -835,14 +835,91 @@ class ContainmentTests(unittest.TestCase):
             key for key in sorted(set(before_boot) | set(after_boot))
             if before_boot.get(key) != after_boot.get(key)
         ]
-        self.assertEqual(differing, ["player_info"])
+        # `server_time` needed exactly the treatment its `/v0/session` twin
+        # above already received, and this was a **REAL failure** measured by the
+        # `godot-damage` battery rather than inferred: it failed once in four
+        # full-suite runs with `['player_info', 'server_time'] != ['player_info']`
+        # and every other field identical. It is deterministic, not a mystery —
+        # forcing a second boundary between two bootstrap calls makes
+        # `server_time` differ 40 times out of 40, because the route stamps the
+        # current time on **every** response, not only the session route.
+        #
+        # So the previous `assertEqual(differing, ["player_info"])` was testing
+        # the clock, and it could pass or fail by wall-clock luck. The claim is
+        # now that the differing set is a SUBSET of the two documented
+        # time/ledger-dependent fields and that `server_time` is a positive
+        # integer on **both** sides, so the exclusion cannot hide a missing or
+        # malformed field. Every other field stays asserted byte-identical, and
+        # `player_info` remains the required difference: the two completions
+        # below must still move it, or this assertion now fails for the honest
+        # reason.
+        self.assertLessEqual(
+            set(differing),
+            {"player_info", "server_time"},
+            "only the documented player-info and wall-clock fields may differ "
+            "between two /v0/bootstrap responses; every other field is "
+            "byte-identical",
+        )
+        self.assertIn(
+            "player_info",
+            differing,
+            "the two completions must still move player_info; this test is a "
+            "containment guard, not a no-op check",
+        )
+        self.assertIsInstance(before_boot["server_time"], int)
+        self.assertGreater(before_boot["server_time"], 0)
+        self.assertIsInstance(after_boot["server_time"], int)
+        self.assertGreater(after_boot["server_time"], 0)
         before_info = dict(before_boot["player_info"])
         after_info = dict(after_boot["player_info"])
+        # `player_info` carries its OWN wall-clock stamp, `last_logged_in`, so the
+        # per-section comparison needed the same subset discipline as its caller.
+        # This was measured, not predicted: exempting only the top-level
+        # `server_time` fixed one failure and the battery then reported this one,
+        # with `last_logged_in` 1791181939 against 1791181938 and every other
+        # section identical. The two are the same defect at two depths -- a
+        # timestamp is not a state change, and asserting it byte-identical is
+        # asserting the clock.
+        #
+        # The exclusion is narrow and the positive assertion beside it is not:
+        # `completed_tutorial` and the resource sections must still be
+        # byte-identical, and `map`/`privateState` are still compared field by
+        # field below, so a real state change cannot hide behind this exemption.
+        VOLATILE_PLAYER_INFO_FIELDS = {"last_logged_in"}
         for section in sorted(set(before_info) | set(after_info)):
             if section in ("map", "privateState"):
                 continue
+            if section in VOLATILE_PLAYER_INFO_FIELDS:
+                # The exemption is for a *timestamp that moves*, not for an
+                # *absent* field: a corpus that records no such value must not
+                # gain one by being exempted, so presence itself is asserted.
+                for side, info in (("before", before_info),
+                                   ("after", after_info)):
+                    self.assertIn(
+                        section, info,
+                        "%s %r is absent; an exemption may cover a value that "
+                        "moves, never a field that is missing" % (side, section),
+                    )
+                    self.assertIsInstance(info[section], int)
+                    self.assertGreater(
+                        info[section], 0,
+                        "%s %r must be a positive integer, so the exemption "
+                        "cannot hide a malformed value" % (side, section),
+                    )
+                continue
             self.assertEqual(
                 after_info.get(section), before_info.get(section), section
+            )
+        # And the exempt field is asserted to be a timestamp rather than a counter
+        # that could drift for another reason: the post-completion value is never
+        # EARLIER than the pre-completion one, which is true of a clock and false
+        # of an incrementing ledger.
+        if (
+            "last_logged_in" in before_info
+            and "last_logged_in" in after_info
+        ):
+            self.assertGreaterEqual(
+                after_info["last_logged_in"], before_info["last_logged_in"]
             )
         map_differing = sorted(
             key for key in set(before_info["map"]) | set(after_info["map"])
