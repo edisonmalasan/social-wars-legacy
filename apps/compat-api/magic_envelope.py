@@ -802,6 +802,31 @@ DIVERGENCES: Tuple[Dict[str, Any], ...] = (
             "operation that did nothing, so the recorded state is refused."
         ),
     },
+    {
+        "id": "absent_key_writes_zero_not_one",
+        "legacy_behaviour": (
+            "an identity with no recorded entry takes the branch's else arm and "
+            "the ledger gains the key at ZERO: executed, use_magic 3 created '3': "
+            "0 and buy_magic 99 created '99': 0"
+        ),
+        "service_behaviour": (
+            "an absent entry is read as zero charges and the transition "
+            "increments it, so the key is created at ONE"
+        ),
+        "classification": "divergence",
+        "authority": "server-side derivation (design D2)",
+        "note": (
+            "Both arms of the legacy branch write 0 for an unknown key, so the "
+            "legacy server's own 'acquire a spell you hold none of' path "
+            "increments nothing at all. Treating the absent entry as zero "
+            "charges and incrementing it is the coherent reading, and it is "
+            "recorded here rather than left to be discovered as a mismatch. This "
+            "is also the path a live phase against tests/saves/fresh-player.json "
+            "exercises, because that corpus's privateState.magics is {}, so the "
+            "phase drives a second request on the same identity to show a clean "
+            "increment with no divergence alongside it."
+        ),
+    },
 )
 
 DIVERGENCE_COUNT = len(DIVERGENCES)
@@ -1463,6 +1488,12 @@ def project_magic(
         return out
     out["counter_before"] = int(counter["value"])
     out["counter_present"] = bool(counter.get("present", False))
+    # An absent entry is read as zero charges and incremented.  The legacy
+    # branches instead take their `else` arm and write the key at ZERO, so the
+    # legacy "acquire a spell you hold none of" path increments nothing at all.
+    # The fact is surfaced on the response rather than left to be discovered as a
+    # mismatch; see the absent_key_writes_zero_not_one divergence.
+    out["legacy_absent_arm_writes_zero"] = not bool(counter.get("present", False))
 
     # --- step 8: the transition is derived server-side ---------------------
     # `derive_counter_transition` raises rather than returning for a recorded
