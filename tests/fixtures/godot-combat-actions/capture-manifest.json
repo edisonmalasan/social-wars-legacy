@@ -20,7 +20,7 @@
     "ts_note": "Pinned to a constant, as on the stored-placement and unit-experience captures. The dispatcher parses it and never reads it.",
     "vector_status": "neutral by construction, every transaction"
   },
-  "captured_at_utc": "2026-10-05T01:03:52+00:00",
+  "captured_at_utc": "2026-10-05T01:40:28+00:00",
   "cleanup": {
     "disposables": 13,
     "note": "Each disposable is removed by the harness's own finally block; the fixture is staged OUTSIDE the working tree and published only after every check passed, so a failed run writes nothing into the repository."
@@ -60,12 +60,12 @@
     ],
     "protected_fixtures_unchanged": true,
     "seed_sha256_after": {
-      "destruction": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd",
-      "ledger": "0d9b4e124e6b1046dc9b6a01dee6e6e8f32ff010b3b497f33c294747d5f12cf4"
+      "destruction": "c5b4e988e4628eac58b9aa72822882a249a06f75af5a4ff9ce9248cc7f9baaaf",
+      "ledger": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22"
     },
     "seed_sha256_before": {
-      "destruction": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd",
-      "ledger": "0d9b4e124e6b1046dc9b6a01dee6e6e8f32ff010b3b497f33c294747d5f12cf4"
+      "destruction": "c5b4e988e4628eac58b9aa72822882a249a06f75af5a4ff9ce9248cc7f9baaaf",
+      "ledger": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22"
     },
     "working_tree_saves_absent": true
   },
@@ -279,7 +279,7 @@
       "choice_status": "derived-provisional",
       "path": "villages/AcidCaos.json",
       "pid_read_from_document": "AcidCaos",
-      "sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+      "sha256": "c5b4e988e4628eac58b9aa72822882a249a06f75af5a4ff9ce9248cc7f9baaaf"
     },
     "ledger": {
       "census": {
@@ -303,7 +303,7 @@
       "choice_status": "derived-provisional",
       "path": "villages/Neutral.json",
       "pid_read_from_document": "Neutral",
-      "sha256": "0d9b4e124e6b1046dc9b6a01dee6e6e8f32ff010b3b497f33c294747d5f12cf4"
+      "sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22"
     },
     "pid_note": "Read from playerInfo.pid in the document, never derived from the filename stem: for three of the eight committed village saves the two disagree, and for initial.json the pid is null, which build_disposable refuses loudly rather than writing a 'None.save.json'.",
     "why_two": "The destruction seed's ledger is EMPTY, so the key-CREATION branch and the first-eligible-row selection are both observable from nothing. The ledger seed's ledger holds 28 keys, so the INCREMENT branch (4 -> 5) is observable instead. Neither document exercises both, so neither is optional."
@@ -1652,7 +1652,7 @@
         1
       ],
       "seed": "destruction",
-      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+      "seed_sha256": "c5b4e988e4628eac58b9aa72822882a249a06f75af5a4ff9ce9248cc7f9baaaf"
     },
     {
       "disposable_pid_read_from_document": "AcidCaos",
@@ -1662,7 +1662,7 @@
       ],
       "printed_destruction_counts": [],
       "seed": "destruction",
-      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+      "seed_sha256": "c5b4e988e4628eac58b9aa72822882a249a06f75af5a4ff9ce9248cc7f9baaaf"
     },
     {
       "disposable_pid_read_from_document": "AcidCaos",
@@ -1672,7 +1672,7 @@
       ],
       "printed_destruction_counts": [],
       "seed": "destruction",
-      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+      "seed_sha256": "c5b4e988e4628eac58b9aa72822882a249a06f75af5a4ff9ce9248cc7f9baaaf"
     },
     {
       "disposable_pid_read_from_document": "AcidCaos",
@@ -1684,7 +1684,7 @@
         1
       ],
       "seed": "destruction",
-      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+      "seed_sha256": "c5b4e988e4628eac58b9aa72822882a249a06f75af5a4ff9ce9248cc7f9baaaf"
     },
     {
       "disposable_pid_read_from_document": "AcidCaos",
@@ -1697,7 +1697,7 @@
         1
       ],
       "seed": "destruction",
-      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+      "seed_sha256": "c5b4e988e4628eac58b9aa72822882a249a06f75af5a4ff9ce9248cc7f9baaaf"
     },
     {
       "disposable_pid_read_from_document": "AcidCaos",
@@ -1707,7 +1707,7 @@
       ],
       "printed_destruction_counts": [],
       "seed": "destruction",
-      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+      "seed_sha256": "c5b4e988e4628eac58b9aa72822882a249a06f75af5a4ff9ce9248cc7f9baaaf"
     },
     {
       "disposable_pid_read_from_document": "AcidCaos",
@@ -1719,7 +1719,7 @@
         2
       ],
       "seed": "destruction",
-      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+      "seed_sha256": "c5b4e988e4628eac58b9aa72822882a249a06f75af5a4ff9ce9248cc7f9baaaf"
     },
     {
       "disposable_pid_read_from_document": "AcidCaos",
@@ -1731,7 +1731,7 @@
         1
       ],
       "seed": "destruction",
-      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+      "seed_sha256": "c5b4e988e4628eac58b9aa72822882a249a06f75af5a4ff9ce9248cc7f9baaaf"
     },
     {
       "disposable_pid_read_from_document": "AcidCaos",
@@ -1741,7 +1741,7 @@
       ],
       "printed_destruction_counts": [],
       "seed": "destruction",
-      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+      "seed_sha256": "c5b4e988e4628eac58b9aa72822882a249a06f75af5a4ff9ce9248cc7f9baaaf"
     },
     {
       "disposable_pid_read_from_document": "AcidCaos",
@@ -1751,7 +1751,7 @@
       ],
       "printed_destruction_counts": [],
       "seed": "destruction",
-      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+      "seed_sha256": "c5b4e988e4628eac58b9aa72822882a249a06f75af5a4ff9ce9248cc7f9baaaf"
     },
     {
       "disposable_pid_read_from_document": "AcidCaos",
@@ -1761,7 +1761,7 @@
       ],
       "printed_destruction_counts": [],
       "seed": "destruction",
-      "seed_sha256": "870a3c2001dcaccdb0feb743a02c3062c2172ffd011523f5e220be91cd20e9cd"
+      "seed_sha256": "c5b4e988e4628eac58b9aa72822882a249a06f75af5a4ff9ce9248cc7f9baaaf"
     },
     {
       "disposable_pid_read_from_document": "Neutral",
@@ -1773,7 +1773,7 @@
         1
       ],
       "seed": "ledger",
-      "seed_sha256": "0d9b4e124e6b1046dc9b6a01dee6e6e8f32ff010b3b497f33c294747d5f12cf4"
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22"
     },
     {
       "disposable_pid_read_from_document": "Neutral",
@@ -1785,7 +1785,7 @@
         1
       ],
       "seed": "ledger",
-      "seed_sha256": "0d9b4e124e6b1046dc9b6a01dee6e6e8f32ff010b3b497f33c294747d5f12cf4"
+      "seed_sha256": "652cf19874f0b8d45cf35050192f2082ad361baaf7cb8244e8c7145cb213af22"
     }
   ]
 }
