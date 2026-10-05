@@ -1,5 +1,5 @@
 {
-  "captured_at_utc": "2026-10-05T01:03:36+00:00",
+  "captured_at_utc": "2026-10-05T01:39:52+00:00",
   "form": {
     "USERID": "AcidCaos",
     "data": "1ff420b75ad4d5220e5822aac8af55b3838a27409a2128e77f631c4528dcf108;{\"accessToken\":\"\",\"commands\":[[0,\"end_attack\",[\"{\\\"attacker_units\\\":[[1020,0,1,0]],\\\"victim\\\":{\\\"name\\\":\\\"derived\\\"}}\",0],[0,0,0,0,0,0,0,0]],[0,\"end_attack\",[\"{\\\"win\\\":true}\",0],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1700000000}",

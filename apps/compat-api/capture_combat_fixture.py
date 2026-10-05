@@ -110,6 +110,43 @@ from capture_legacy_fixtures import (  # noqa: E402
     write_bytes,
     write_json,
 )
+
+
+def committed_digest(data: bytes) -> str:
+    """SHA-256 over the **committed blob** form of ``data``.
+
+    Every digest recorded by this capture is over text that will be committed
+    and then checked out again, and this repository sets ``core.autocrlf=true``
+    with no ``.gitattributes`` entry for either ``villages/**`` or
+    ``tests/fixtures/**``. A checkout may therefore hold CRLF or LF for
+    byte-identical committed content, so a digest taken over raw working-tree
+    bytes is only valid on the checkout that produced it.
+
+    Normalising CRLF to LF makes the recorded digest mean "these committed
+    bytes", which is the only claim a fixture digest can make. This is the
+    same normalisation PR #280 applied to the unit-xp fixture's byte-count
+    guard, applied here to this line's own digests; the shared
+    ``hashing.sha256_file`` / ``hashing.sha256_bytes`` are left untouched
+    because roughly twenty other compat suites record digests through them.
+
+    Applied only to committed artifacts -- fixture bodies and seed documents.
+    Digests over live server responses stay on raw bytes: those bytes are
+    produced in this process and never round-trip through a checkout.
+    """
+    return sha256_bytes(data.replace(b"\r\n", b"\n"))
+
+
+def seed_target_of(disposable: Path, pid: str) -> Path:
+    """Where ``build_disposable`` copied the seed, rebuilt from its own rule.
+
+    The helper copies to ``<disposable>/saves/<pid>.save.json`` and returns the
+    pid, so the path is derived rather than returned. Recomputing it here is
+    what lets this capture assert the helper's raw-byte digest against the copy
+    it actually made, instead of trusting the returned value.
+    """
+    return disposable / "saves" / ("%s.save.json" % pid)
+
+
 from placement_envelope import (  # noqa: E402
     ENVELOPE_KEYS,
     EnvelopeError,
@@ -1286,7 +1323,10 @@ def protected_fixture_snapshot() -> Dict[str, Dict[str, object]]:
         if path.is_dir():
             for item in sorted(path.rglob("*")):
                 if item.is_file():
-                    entries.append((str(item.relative_to(path)), sha256_file(item)))
+                    entries.append(
+                        (str(item.relative_to(path)),
+                         committed_digest(item.read_bytes())),
+                    )
                     count += 1
         out[name] = {"files": count, "sha256": canonical_digest(entries)}
     return out
@@ -1350,8 +1390,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     pre_combined = snapshot_combined(pre_groups)
     pre_fixtures = protected_fixture_snapshot()
     pre_seed_sha = {
-        "destruction": sha256_file(SEED_DESTRUCTION),
-        "ledger": sha256_file(SEED_LEDGER),
+        "destruction": committed_digest(SEED_DESTRUCTION.read_bytes()),
+        "ledger": committed_digest(SEED_LEDGER.read_bytes()),
     }
 
     staging = Path(tempfile.mkdtemp(prefix="compat-combat-capture-staging-"))
@@ -1395,17 +1435,35 @@ def main(argv: Optional[List[str]] = None) -> int:
             process = None
             stdout_path = None
             try:
-                disposable, pid, seed_sha = build_disposable(
+                disposable, pid, seed_sha_raw = build_disposable(
                     Path(tempfile.gettempdir()), seed_save
                 )
+                # ``build_disposable`` returns a raw working-tree digest and is
+                # shared by eighteen captures, so it is not redefined here. The
+                # guard below needs the committed-blob form, so it is taken
+                # directly from the seed source's own bytes -- which is also the
+                # stricter check: it compares the SOURCE against the recorded
+                # value, while ``seed_sha_raw`` would compare the COPY the
+                # helper made. Both are asserted, and neither substitutes for
+                # the other.
+                seed_sha = committed_digest(seed_save.read_bytes())
                 disposables.append(disposable)
                 saves_dir = disposable / "saves"
                 seed_group = save_group_record(saves_dir)
                 if seed_sha != pre_seed_sha[which]:
                     raise CaptureError(
                         EXIT_ENVIRONMENT,
-                        "%s: the seeded save digest %r differs from the committed "
-                        "seed's %r" % (name, seed_sha, pre_seed_sha[which]),
+                        "%s: the committed seed's digest %r differs from the "
+                        "recorded %r (both digests are over the committed blob "
+                        "form)"
+                        % (name, seed_sha, pre_seed_sha[which]),
+                    )
+                if seed_sha_raw != sha256_file(seed_target_of(disposable, pid)):
+                    raise CaptureError(
+                        EXIT_ENVIRONMENT,
+                        "%s: the helper's verbatim copy digest %r differs from "
+                        "the copy it made at %r -- the seed was not copied "
+                        "verbatim" % (name, seed_sha_raw, pid),
                     )
 
                 process, stdout_path, stderr_path = start_server(
@@ -1501,7 +1559,7 @@ def main(argv: Optional[List[str]] = None) -> int:
                             "cannot be committed verbatim" % name,
                         )
                     facts["response_payload"] = None
-                    facts["failure_body_sha256"] = sha256_bytes(body)
+                    facts["failure_body_sha256"] = committed_digest(body)
                     facts["failure_is_framework_error_page"] = True
 
                 lines = printed_branch_lines(stdout_path, str(entry["command"]))
@@ -1607,7 +1665,7 @@ def main(argv: Optional[List[str]] = None) -> int:
                     "reason": result["reason"],
                     "headers": sanitize_headers(result["response_headers"]),
                     "body_bytes": len(body),
-                    "body_sha256": sha256_bytes(body),
+                    "body_sha256": committed_digest(body),
                     "captured_at_utc": iso_now(),
                 }
                 write_json(step_dir / "request.json", request_record)
@@ -1646,7 +1704,7 @@ def main(argv: Optional[List[str]] = None) -> int:
                         "reason": login_result["reason"],
                         "headers": sanitize_headers(login_result["response_headers"]),
                         "body_bytes": len(login_body),
-                        "body_sha256": sha256_bytes(login_body),
+                        "body_sha256": committed_digest(login_body),
                         "captured_at_utc": iso_now(),
                     }
                     login_dir = staging / "steps" / "login_post"
@@ -2015,8 +2073,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         post_combined = snapshot_combined(post_groups)
         post_fixtures = protected_fixture_snapshot()
         post_seed_sha = {
-            "destruction": sha256_file(SEED_DESTRUCTION),
-            "ledger": sha256_file(SEED_LEDGER),
+            "destruction": committed_digest(SEED_DESTRUCTION.read_bytes()),
+            "ledger": committed_digest(SEED_LEDGER.read_bytes()),
         }
 
         if pre_combined != post_combined:

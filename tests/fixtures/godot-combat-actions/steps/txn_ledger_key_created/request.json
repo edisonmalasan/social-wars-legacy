@@ -1,5 +1,5 @@
 {
-  "captured_at_utc": "2026-10-05T01:03:51+00:00",
+  "captured_at_utc": "2026-10-05T01:40:26+00:00",
   "form": {
     "USERID": "Neutral",
     "data": "c546c3dfa68e6a976211bdccaf13c9df65bcc41b83257dab7018d128ea71cacc;{\"accessToken\":\"\",\"commands\":[[0,\"end_attack\",[\"{\\\"attacker_units\\\":[[1023,0,1,0]],\\\"victim\\\":{\\\"name\\\":\\\"derived\\\"}}\",0],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1700000000}",

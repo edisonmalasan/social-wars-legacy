@@ -250,7 +250,25 @@ def save_path(pid: str) -> Path:
 
 
 def sha256_of(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    """SHA-256 over the **committed blob** form of ``path``.
+
+    Every path this digests is a committed fixture artifact, and the capture
+    records its digest the same way, over LF-normalised bytes. Raw bytes would
+    be a line-ending detector rather than a content guard: this repository
+    sets ``core.autocrlf=true`` with no ``.gitattributes`` entry for
+    ``villages/**`` or ``tests/fixtures/**``, so a checkout may hold CRLF or LF
+    for byte-identical committed content, and a raw-byte digest passes only on
+    the checkout that produced it. Measured on the CRLF tree that motivated
+    this, the recorded 500-body digest is ``ae516325...`` while the raw file
+    hashes to ``772c77ba...`` and its LF form hashes to ``ae516325...``.
+
+    Normalising makes both recorded digest families hold on an LF checkout and
+    a CRLF one alike, and it is what makes the two guards non-tautological:
+    they compare committed content, not the accident of how the tree was
+    checked out. See PR #280 for the same normalisation applied to the unit-xp
+    fixture's byte-count guard.
+    """
+    return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 
 
 def write_save(pid: str, document: Dict[str, Any]) -> None:
