@@ -335,14 +335,57 @@ COUNT_KEYS: Tuple[str, ...] = (
 
 #: The legacy batch envelope's own keys, refused if a client ever sends them.
 #: They are protocol plumbing, not player intent.
+#:
+#: These are the **lower-case canonical forms**. The legacy wire spells two of
+#: them in camelCase; the exact spellings are recorded in
+#: :data:`PROTOCOL_KEY_WIRE_SPELLINGS` so nothing about the legacy request shape
+#: is lost, but the refusal itself is case-insensitive, so the compared tuple
+#: holds only lower case (see :data:`_KEYS_ARE_FOLDED_INVARIANT`).
 PROTOCOL_KEYS: Tuple[str, ...] = (
     "first_number",
-    "publishActions",
+    "publishactions",
     "ts",
     "tries",
-    "accessToken",
+    "accesstoken",
     "commands",
 )
+
+#: The legacy wire spelling of each protocol key, verbatim as the batch envelope
+#: sends it. Recorded rather than discarded: the refusal is case-insensitive, so
+#: the camelCase spelling is what an actual legacy client emits and it is the
+#: spelling the refusal was failing to catch.
+PROTOCOL_KEY_WIRE_SPELLINGS: Dict[str, str] = {
+    "publishactions": "publishActions",
+    "accesstoken": "accessToken",
+}
+
+#: Case-folded views of the two closed key lists, derived **once** rather than
+#: folded at each call site.
+#:
+#: A first draft compared ``key.lower()`` against :data:`PROTOCOL_KEYS` directly,
+#: which silently under-refused: two members of that tuple are camelCase
+#: (``publishActions``, ``accessToken``), so folding the *request* key while
+#: comparing against the *unfolded* tuple meant neither was ever refused --
+#: measured refused set was exactly ``["first_number", "ts", "tries",
+#: "commands"]``, missing both. Folding both sides here removes the class of
+#: defect rather than the instance, and the ``_KEYS_ARE_FOLDED_INVARIANT``
+#: assertion below keeps a future mixed-case member from reintroducing it.
+COUNT_KEYS_FOLDED = frozenset(key.lower() for key in COUNT_KEYS)
+PROTOCOL_KEYS_FOLDED = frozenset(key.lower() for key in PROTOCOL_KEYS)
+
+#: Every member of both tuples must already be lower-case, so the folded views
+#: and the reported views are the same set. Asserted at import time rather than
+#: merely documented, because the defect this guards was invisible at the call
+#: site and was found only by measurement.
+_KEYS_ARE_FOLDED_INVARIANT = not (set(COUNT_KEYS) - COUNT_KEYS_FOLDED) and not (
+    set(PROTOCOL_KEYS) - PROTOCOL_KEYS_FOLDED
+)
+if not _KEYS_ARE_FOLDED_INVARIANT:  # pragma: no cover - import-time guard
+    raise AssertionError(
+        "COUNT_KEYS and PROTOCOL_KEYS must hold lower-case keys only; the "
+        "refusal folds both sides, so a mixed-case member would be reported "
+        "as a protocol key the client may send"
+    )
 
 CLIENT_DICTATED_REFUSAL = {
     "reason": REASON_CLIENT_DICTATED_COUNT,
@@ -590,8 +633,17 @@ COUNTING_RULES: Tuple[str, ...] = (
     "quoted",
 )
 
-#: The rules that can establish a consumer at all.
-CONSUMER_RULES: Tuple[str, ...] = ("code_only", "code_distinct_line", "token", "quoted")
+#: The rules that can establish a consumer at all -- **exactly two**.
+#:
+#: A first draft listed four here while the comment above it said only ``token``
+#: and ``quoted`` can establish one. The two rule sets disagree about what counts
+#: as evidence of a consumer, and a consumer census is the whole point of this
+#: measurement, so the tuple now matches the stricter reading that
+#: ``docs/legacy-m10-damage.md`` states: a consumer requires a token or a quoted
+#: occurrence **under a code-bearing rule**, and a code-only substring count is a
+#: location, not a consumer. Listing the code-only rules here would let a
+#: substring artifact such as ``end_attack`` be read as a consumer of ``attack``.
+CONSUMER_RULES: Tuple[str, ...] = ("token", "quoted")
 
 NO_DAMAGE = {
     "verdict": (
@@ -1168,6 +1220,9 @@ def refused_client_keys(payload: Any) -> List[str]:
 
     Returns them in the request's own key order so the refusal message is
     stable across runs regardless of set iteration order.
+
+    The comparison folds **both** sides (see :data:`PROTOCOL_KEYS_FOLDED`), so a
+    camelCase protocol key is refused exactly as a lower-case count key is.
     """
     if not isinstance(payload, dict):
         return []
@@ -1176,7 +1231,7 @@ def refused_client_keys(payload: Any) -> List[str]:
         if not isinstance(key, str):
             continue
         folded = key.lower()
-        if folded in COUNT_KEYS or folded in PROTOCOL_KEYS:
+        if folded in COUNT_KEYS_FOLDED or folded in PROTOCOL_KEYS_FOLDED:
             refused.append(key)
             continue
         # Any key that *names* a count is refused too, so a client cannot invent
