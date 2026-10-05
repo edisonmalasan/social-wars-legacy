@@ -1,0 +1,25 @@
+{
+  "captured_at_utc": "2026-10-05T15:31:10+00:00",
+  "form": {
+    "USERID": "Neutral",
+    "data": "ffb794f72f7b1c700521c79fa38b772d24a770f6281f35c16dbbcdcc5e35a9f7;{\"accessToken\":\"\",\"commands\":[[0,\"weekly_reward\",[601,1055,58,47,1],[0,0,0,0,0,0,0,0]]],\"first_number\":0,\"publishActions\":[],\"tries\":1,\"ts\":1700000000}",
+    "language": "en",
+    "user_key": "<redacted>"
+  },
+  "headers_sent": {
+    "Accept": "*/*",
+    "Connection": "close",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Cookie": "<redacted>",
+    "Host": "127.0.0.1:5055"
+  },
+  "host": "127.0.0.1",
+  "method": "POST",
+  "note": "Exact client request bytes are reconstructed from this record; Host is set explicitly, no User-Agent header is sent. The batch's argument LIST IS THE CRAFTED, CLIENT-SUPPLIED payload under test -- including the weekly arm's arity, which is what selects between granting and not granting, and the daily arm's next id, which is what the cursor is computed from. The branches validate none of it, which is the finding, not an oversight. The resource vector is NEUTRAL. ts is pinned to a constant so this record is byte-stable; legacy parses it and never reads it. user_key is redacted; accessToken is the crafted empty placeholder, never a token value.",
+  "path": "/dynamic/menvswomen/srvsexwars/command.php",
+  "port": 5055,
+  "query": {},
+  "scheme": "http",
+  "seed_save": "Neutral.json",
+  "target": "/dynamic/menvswomen/srvsexwars/command.php"
+}

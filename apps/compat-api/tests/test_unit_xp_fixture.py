@@ -96,8 +96,19 @@ ADD_XP_UNIT_COMMAND = "add_xp_unit"
 # counting alone is a weak pin here and the exact-set assertion below has to be
 # what catches a new capture.
 OWN_CAPTURE_NAME = "capture_unit_xp_fixture.py"
+# ``capture_rewards_fixture.py`` joined from the ``2026-10-05-rewards`` line: it
+# seeds from a committed village document rather than the fresh-player corpus,
+# because both reward branches need a weekly cursor above 0 and a non-empty unit
+# list to make any of the recorded transitions observable at all. Its own
+# ``test_rewards_parity.py`` asserts this membership, so the exemption cannot be
+# removed from here without failing there.
 SEEDED_CAPTURE_NAMES = frozenset(
-    {OWN_CAPTURE_NAME, "capture_combat_fixture.py", "capture_magic_fixture.py"}
+    {
+        OWN_CAPTURE_NAME,
+        "capture_combat_fixture.py",
+        "capture_magic_fixture.py",
+        "capture_rewards_fixture.py",
+    }
 )
 
 # Identifiers that would mean an award rule had been invented. Matched as
@@ -1125,8 +1136,8 @@ class CaptureHarnessSeamTests(unittest.TestCase):
         rechecking. That must be a loud failure.
 
         Seventeen are still pinned, and that is measured rather than asserted by
-        hand: twenty call sites exist and three captures are declared seeded
-        (unit-xp, combat-actions, damage) -- twenty minus three. A seeded capture
+        hand: twenty-one call sites exist and four captures are declared seeded
+        (unit-xp, combat-actions, magic, rewards) -- twenty-one minus four. A seeded capture
         adds one call site AND one exemption, so joining the set leaves this number
         exactly where it was. That is a real weakness of counting alone and it is
         why the number cannot catch a new capture; the separate exact-set assertion

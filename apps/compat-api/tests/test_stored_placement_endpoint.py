@@ -1161,6 +1161,13 @@ class RecordedAbsenceTests(unittest.TestCase):
                 # load-bearing, are in test_magic_endpoint.py.
                 "_magic_snapshot", "_legacy_recorded_after", "_magic_refusal",
                 "_committed_magic",
+                # godot-rewards (M10 line 1): two more.  This pin is the
+                # hand-off mechanism the comment above describes -- a helper
+                # cannot be added without a delivered suite claiming it -- so
+                # this line extends the inventory rather than weakening it, and
+                # the claim is moved into this suite, which already owns the
+                # whole region.
+                "_reward_snapshot", "_reward_refusal",
             ],
         )
 

@@ -1,0 +1,118 @@
+{
+  "args_sent": [
+    1198,
+    3
+  ],
+  "argument_count": 2,
+  "arity_selects_the_arm": "not applicable: the daily branch is not arity-selected",
+  "arm": "granting",
+  "both_cursors": {
+    "bonusNextId": {
+      "after": 4,
+      "before": 3
+    },
+    "weeklyRewardIndex": {
+      "after": 1,
+      "before": 1
+    }
+  },
+  "changed_leaf_count": 3,
+  "changed_leaf_paths": [
+    "/maps/0/store/1198",
+    "/privateState/bonusNextId",
+    "/privateState/timestampLastBonus"
+  ],
+  "command": "win_daily_bonus",
+  "cursor_after": 4,
+  "cursor_before": 3,
+  "cursor_key": "bonusNextId",
+  "cursor_moved_backwards": false,
+  "cursor_recomputed": 4,
+  "delivered_endpoint_refusal": "client_supplied_item",
+  "divergence": "client_supplied_item",
+  "instant_after_shape": "int",
+  "instant_before": 1791214270,
+  "instant_compared_by": "shape only, never by value: the branch stamps the wall clock",
+  "instant_is_volatile": true,
+  "instant_key": "timestampLastBonus",
+  "leaf_diff": [
+    {
+      "after": 1,
+      "before": null,
+      "path": "/maps/0/store/1198",
+      "present_after": true,
+      "present_before": false
+    },
+    {
+      "after": 4,
+      "before": 3,
+      "path": "/privateState/bonusNextId",
+      "present_after": true,
+      "present_before": true
+    },
+    {
+      "after": 1791214271,
+      "before": 1791214270,
+      "path": "/privateState/timestampLastBonus",
+      "present_after": true,
+      "present_before": true
+    }
+  ],
+  "name": "daily_granting_arm_lands_in_storage",
+  "next_id_sent": 3,
+  "next_id_sent_is_the_recorded_cursor": true,
+  "note": "A positive client-sent item takes the granting arm, which calls BOTH grant helpers: the deduplicating unit-list one and the ACCUMULATING storage one. The storage was empty and becomes exactly one entry for the client-sent id, while the unit list does NOT grow because step 2 already added that id. One grant, two landing places, two different rules -- executed rather than read at engine.py:70-75 and 86-89.",
+  "only_the_cursor_and_instant_moved": false,
+  "parity_with_delivered_endpoint": false,
+  "placed_rows_after": 551,
+  "placed_rows_before": 551,
+  "placed_rows_recorded": 551,
+  "printed_branch_lines": [
+    "[+] COMMAND: win_daily_bonus([1198, 3]) -> Put Nebular Knight in storage"
+  ],
+  "printed_message": "Put Nebular Knight in storage",
+  "printed_message_claims": "Put Nebular Knight in storage",
+  "printed_message_item_name_committed": "Nebular Knight",
+  "printed_message_names_a_committed_item": "1198",
+  "printed_message_template": "Put %s in storage",
+  "resource_slot_count": 8,
+  "resources_after": {
+    "cash": 4,
+    "energy": 50,
+    "gold": 37691,
+    "mana": 15,
+    "oil": 15401,
+    "steel": 14151,
+    "wood": 19705,
+    "xp": 136878
+  },
+  "resources_before": {
+    "cash": 4,
+    "energy": 50,
+    "gold": 37691,
+    "mana": 15,
+    "oil": 15401,
+    "steel": 14151,
+    "wood": 19705,
+    "xp": 136878
+  },
+  "resources_comparison": "all 8 stored resource slots compared; moved: NONE",
+  "resources_moved": [],
+  "response_payload": {
+    "result": "success"
+  },
+  "state_sha256_after": "7a7385176e313a3dc89ee035e4acac9ae283cfdbaadcb8ecbc7379545c71cb01",
+  "state_sha256_before": "dff5d1ba87be88fe26c3e00078bb3ed71eb895a0baafaf5b1f8a96d540eb9b48",
+  "status": 200,
+  "stdout_evidence_is_this_request_only": true,
+  "stdout_offset_before": 2632,
+  "step_number": 5,
+  "storage_after": {
+    "1198": 1
+  },
+  "storage_before": {},
+  "storage_byte_identical": false,
+  "unit_list_byte_identical": true,
+  "unit_list_length_after": 136,
+  "unit_list_length_before": 136
+}
