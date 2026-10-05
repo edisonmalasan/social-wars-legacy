@@ -76,6 +76,15 @@ difference between the two preserved branches **separately** from the difference
 between the service and the preserved server, and SHALL NOT report any of them as
 parity.
 
+A third divergence follows from the same reading and SHALL be recorded with them:
+both preserved branches take their `else` arm for an identity with **no** recorded
+entry and write that entry at **zero**, so the preserved server's own
+"acquire a spell you hold none of" path increments **nothing** at all, while the
+service reads an absent entry as zero charges and increments it. This was found
+by tracing the live path rather than by reading the branches, and it is the
+divergence a live phase against the fresh-player corpus reaches on its **first**
+request, because that corpus's ledger is empty.
+
 #### Scenario: The counter never grows past the cap
 
 - **WHEN** a magic-counter operation is applied repeatedly to one identity
@@ -85,6 +94,19 @@ parity.
 
 - **WHEN** a magic-counter operation is applied to an identity whose counter already stands at the cap
 - **THEN** the counter is unchanged, and it is never reduced below its prior value
+
+#### Scenario: A recorded counter already above the cap is refused, not clamped and not left alone
+
+- **WHEN** a magic-counter operation is applied to an identity whose recorded counter is **already greater** than the cap
+- **THEN** the operation is refused with a named reason, the recorded state is reported rather than rewritten, and no stored resource moves
+
+This is required because the obvious formula is wrong in the dangerous direction:
+`min(cap, before + 1)` applied to a recorded counter of 113 **returns the cap**,
+which is precisely the charge-destroying decrease this requirement exists to
+refuse, wearing the service's own clothes. Clamping would reproduce the defect,
+and leaving the value unchanged would answer success for an operation that did
+nothing, so the recorded state is refused instead and the divergence is
+recorded.
 
 #### Scenario: The two divergences are recorded separately
 
@@ -114,22 +136,39 @@ service's refusals safe rather than to match a recorded ordering.
 ### Requirement: No price is charged, and the two-part post-execution proof makes that non-tautological
 
 The operation SHALL charge **no** resource. Every action SHALL carry a
-two-part post-execution proof: the counter changed by **exactly** the derived
-delta, **and** **every** stored resource is unchanged.
+two-part post-execution proof: the ledger's addressed counter moved by **exactly**
+the amount the unchanged preserved branch writes, **and** **every** stored
+resource is unchanged.
 
-The proof SHALL compare the **complete** stored resource set the service
+The second half SHALL compare the **complete** stored resource set the service
 exposes, which is **eight** slots — the seven on the map plus the eighth stored
 resource that lives in private state and that no branch writes — and SHALL NOT
 compare a subset.
+
+The first half SHALL **not** assert that the ledger equals the service's derived
+transition. That assertion is impossible by construction, because the service is
+required to refuse both preserved asymmetries while the preserved dispatcher is
+left unchanged and therefore still writes its own numbers. The requirement
+therefore pins what **actually executed**: the recorded value equals the
+unchanged branch's own arithmetic, every unaddressed entry is byte-identical and
+keeps its recorded position, and a created key is appended. The derived
+transition SHALL be reported beside the recorded one, with an explicit statement
+of whether they agree. **Verifying the preserved outcome is not reproducing it:**
+the derived number is never written to a save.
 
 The preserved server charges nothing, measured across twelve executed
 transactions in which **no** resource slot moved and the mana value held steady
 across a use command, so any price would be invented.
 
-#### Scenario: The counter moved by exactly the derived delta
+#### Scenario: The counter moved by exactly what the preserved branch writes
 
 - **WHEN** a magic-counter operation succeeds
-- **THEN** the ledger value for the addressed identity equals the server-derived value, differing from its prior value by exactly the derived delta
+- **THEN** the ledger value for the addressed identity equals the unchanged preserved branch's own result for the recorded prior value, every unaddressed entry is byte-identical and in its recorded position, and the response reports the derived value beside the recorded one together with an explicit statement of whether they agree
+
+#### Scenario: The derived and recorded values disagree, and that is reported rather than hidden
+
+- **WHEN** the derived transition deliberately disagrees with the preserved branch — which it does for every `buy` and for every absent identity
+- **THEN** the operation still succeeds, the response states the disagreement plainly, and the disagreement is recorded as a divergence rather than presented as parity
 
 #### Scenario: Every stored resource is unchanged
 

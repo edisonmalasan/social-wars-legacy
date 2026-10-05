@@ -3741,3 +3741,209 @@ edit would fail the suite rather than silently contradict it · **no windowed
 capture and no pixel-parity oracle** are claimed, because nothing is rendered ·
 No Flash, Ruffle, ActionScript, or browser executes in any of these commands, and
 no network is used at all.
+## Damage (`godot-damage`, M10 line 3)
+
+The delivered surface is the **magics counter**, and the refusal is the finding.
+`docs/legacy-m10-damage.md` is the committed contract
+(`openspec/changes/2026-10-05-damage`).
+
+### The verdict
+
+**There is nowhere in a save row to store damage.** Every placed row in all ten
+canonical committed save documents is **exactly 8 slots** with a fixed type per
+slot, the attribute bag's key union is `cp, nu, si, ts, ui, xp`, and **zero**
+damage-shaped keys exist in `privateState`. Seven committed combat fields
+(`attack`, `defense`, `life`, `attack_interval`, `attack_range`,
+`best_against`, `best_against_mult`) have **zero legacy consumers** under all six
+counting rules, and `COST_DAMAGE_SELF` / `COST_DAMAGE_ENEMY` have none either.
+
+So this line is **not** a pure refusal, but what it delivers is not damage: it is
+the one real combat-adjacent surface the preserved server actually writes — the
+`privateState.magics` ledger, moved by `buy_magic` (`command.py:652-663`) and
+`use_magic` (`command.py:664-675`).
+
+### What is measured rather than assumed
+
+| measurement | value |
+| --- | --- |
+| canonical committed save documents | 10 |
+| placed rows walked | 3,372 |
+| slots per row | 8, every row |
+| attribute-bag key union | `cp, nu, si, ts, ui, xp` |
+| damage-shaped `privateState` keys | 0 |
+| `attack` — whole / code-only / token / quoted | 42 / 30 / 0 / 0 |
+| the other six combat fields, every rule | 0 |
+| ledger writes | 4 assignments, 6 subscript occurrences, 2 membership tests |
+| **ledger read sites** | **0** |
+| committed magics rows | 10, native `id` 1..10 |
+| committed magics with a legacy consumer | 0 |
+
+`attack` is the sharpest case: all 42 whole-file occurrences sit inside **longer
+identifiers** — `end_attack`, `attacker`, `attacker_units`,
+`flash_reload_attack` — and never as the committed field name as a standalone
+token. That is why the consumer test is `token` or `quoted` under a code-bearing
+rule and never a code-only substring count.
+
+### Seven divergences, refused or recorded — never reproduced as parity
+
+| divergence | classification |
+| --- | --- |
+| `buy_magic_unbounded_growth` | refused, not reproduced |
+| `use_magic_decreases_counter` | refused, not reproduced |
+| `cap_applied_uniformly` | recorded decision, not a reproduction |
+| `identity_outside_committed_table_accepted` | divergence |
+| `float_identity_creates_distinct_key` | divergence |
+| `counter_above_cap_reduced_by_legacy` | refused, not reproduced |
+| `absent_key_writes_zero_not_one` | divergence |
+
+**The above-cap case is refused, not clamped.** `min(cap, before + 1)` applied to a
+recorded counter of 113 **returns the cap**, which is precisely the
+charge-destroying decrease this line exists to refuse — wearing the service's own
+clothes. Leaving the value unchanged would answer success for an operation that
+did nothing, so `counter_above_cap` is refused before anything executes and the
+recorded state is reported rather than rewritten.
+
+**The `50` cap ships as the recorded literal.** The rejected content-derivation
+is retained in the design (D6) and in both delivered modules:
+`AirStrike.cash = 50` and `Shortcircuit.level = 50` are a coincidence of the
+committed value distribution, not the cap's source.
+
+### The post-execution proof, and the requirement it corrected
+
+The specification originally asked for "the counter changed by exactly the derived
+delta". **That is impossible by construction**, because the service is required to
+refuse both preserved asymmetries while the preserved dispatcher is left unchanged
+and still writes its own numbers. The requirement was corrected rather than
+silently narrowed, and the proof now pins what **actually executed**: the recorded
+value equals the unchanged branch's own arithmetic, every unaddressed entry is
+byte-identical and keeps its recorded position, and a created key is appended. The
+derived transition is reported **beside** the recorded one with an explicit
+`matches_derived` flag — **verifying the preserved outcome is not reproducing it**,
+and the derived number is never written to a save.
+
+The second half compares the **complete eight-slot** stored resource set, never a
+subset, which is what makes "no price, no mana cost, no reward" non-tautological.
+
+### Two defects the implementation found in the delivered envelope
+
+Both were found by the implementation subagent, **reported rather than worked
+around**, and independently re-measured and fixed by the orchestrator. In both
+cases the test suite had **pinned the defect as expected behaviour**, so the
+inversion to the fixed behaviour is what the assertions now assert — which is
+exactly what pinning was for.
+
+1. **`refused_client_keys` folded only one side.** It lower-cased the *request*
+   key and compared it against `PROTOCOL_KEYS`, two members of which are
+   camelCase (`publishActions`, `accessToken`). Measured refused set was exactly
+   `["first_number", "ts", "tries", "commands"]` — both camelCase keys were
+   accepted. Fixed by folding **both** sides and asserting at import time that
+   neither tuple may ever hold a mixed-case member again; the legacy wire
+   spellings are preserved in `PROTOCOL_KEY_WIRE_SPELLINGS`.
+2. **`CONSUMER_RULES` contradicted its own docstring**, naming four rules while the
+   comment above it said only `token` and `quoted` can establish a consumer. The
+   test suite already carried the stricter pair as `ESTABLISHING_RULES`; the
+   module now declares that pair.
+
+### The eighth flaky surface, found by this battery and CLOSED
+
+`test_collection_endpoint.ContainmentTests.test_session_stays_byte_identical_and_bootstrap_changes_only_its_own_targets`
+failed once in four full-suite runs. It was **deterministic**, not a mystery:
+forcing a second boundary between two `/v0/bootstrap` calls makes `server_time`
+differ 40 times out of 40, and a second run surfaced a **nested** instance of the
+same defect — `player_info.last_logged_in`.
+
+The `/v0/session` half of that very test was fixed for exactly this class on the
+stored-item-placement line; the `/v0/bootstrap` half had been missed. It now
+asserts the differing set is a **subset** of the documented time-dependent fields,
+asserts each exempt field is present and a positive integer on **both** sides, and
+asserts the exempt timestamp is never **earlier** — true of a clock, false of an
+incrementing ledger. Proven by injection: injecting a real extra field produced a
+failure, and restoring the byte-identical file returned 36 tests and `OK`. This is
+the **second** recorded flaky surface in this project closed rather than re-run.
+
+### Verification actually run (2026-10-05)
+
+```bash
+# The hermetic damage suite standalone (observed: 618 checks, PASS, empty stderr)
+godot --headless --path apps/client-godot --script res://tests/test_damage_magic.gd
+
+# The same suite with the deterministic evidence report (observed: 621 checks,
+# PASS; digest ec0df2d0f44a913ead4844f6f9f3fccf88b6a20fd1eda06df4f7fbe535904e21
+# in LF form, 36,245 bytes, byte-identical across three consecutive runs; the
+# committed CRLF checkout is 37,273 bytes, digest 5ce9e4ed)
+godot --headless --path apps/client-godot --script res://tests/test_damage_magic.gd -- --report=<repo>/apps/client-godot/evidence/damage-magic/report.json
+
+# The executed-legacy fixture capture (exit 0, containment digest 18e5e55b
+# identical before and after, re-runnable)
+python -B apps/compat-api/capture_magic_fixture.py
+
+# The compatibility suite (observed: Ran 2662 tests ... OK, exit 0)
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+
+# The scope suite, which pins the client file set (observed: 1900 checks, PASS)
+godot --headless --path apps/client-godot --script res://tests/test_project_scope.gd
+
+# Both batteries in the final state, each exit 0; verify-boot.ps1 now runs
+# 43 hermetic suites and 22 live phases, the twenty-second of them magic-live
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+
+# The content validator (exit 0, result: valid, 22 files, 21 schemas, 604 refs)
+python -B packages/game-content/tools/validate_content.py
+
+# The preservation manifest (3,258 entries, 758,423,699 bytes, exit 0)
+python -B tools/hash-manifest/hash_manifest.py verify
+
+# The OpenSpec contract, after the post-execution-proof requirement was corrected
+openspec validate --all --strict    # 64 passed, 0 failed
+```
+
+`verify-boot.ps1` registers **43 hermetic suites** (was 42) and **22 live phases**
+(was 21). `magic-live` drives the endpoint **twice** on purpose:
+`tests/saves/fresh-player.json` has `privateState.magics == {}`, so the first
+request necessarily takes the absent-identity path where the preserved branches
+write the key at **zero** while the service derives **one** — that is the seventh
+divergence, asserted as *reported* rather than asserted away — and the second
+request is present at 0, where `min(50, 0 + 1) == 1` for both and the two values
+**do** agree. No `COMPAT_SEED_*` seam was needed or used.
+
+`test_project_scope` counts **do not** rise for this line's evidence entry, but
+`test_damage_magic`'s counts do walk the client source tree, so re-measure before
+quoting any of them.
+
+### Anti-invention guards, all proven by injection
+
+23 absent helpers and the module's whole 48-function static inventory are pinned.
+Injections into the delivered flow module, each followed by a byte-identical
+restore: `damage_for` (4 failures), a **suffixed** `resolve_damage_for_unit` (4 —
+caught by the substring guard, which is how a disguised helper was found),
+`resolve_magic_target` (3), `damage_from(base, level)` (5, including the
+arithmetic guard), and `unit_hit_points_table` (4, caught by the same substring
+guard). Five perturbation modes against the counted source inputs — rename-branch,
+identifier-class, comment-attack, apostrophe, and ledger-key — all exit non-zero,
+which is the guard against the vacuous-measurement failure mode this project has
+hit before.
+
+### Claim limits
+
+**No damage is resolved, computed, applied, or stored** — no hit points, no
+attack/defence arithmetic, no multiplier, no mitigation, no combat outcome, and
+the committed magics' own descriptions promise effects the commit never
+quantified. **This is the counter only.** **No price, no mana cost, and no reward**
+are charged; all eight stored resource slots are proven unchanged. **The seven
+divergences are refusals or recorded decisions, never parity.** **The cap is a
+recorded literal**, not content-derived. **The ledger has zero readers**, so a
+counter the game never consults is the whole of what moved. **Identity is
+validated against the committed 10-entry table** and a non-integral identity is
+refused rather than coerced. **Parity covers twelve recorded transactions against
+one corpus**, `villages/Neutral.json` — the only committed save with a non-empty
+magics ledger — and no progressed-player save exists. **No windowed capture and no
+pixel-parity oracle** are claimed, because nothing is rendered. No Flash, Ruffle,
+ActionScript, or browser executes in any of these commands, and every network call
+is loopback.
+
+**A recorded documentation gap, not backfilled here:** M10 line 2
+(`godot-combat-actions`) shipped without a README section, so this one is the
+first combat-line section present. Writing up another line's delivered evidence
+from memory is how a wrong figure reaches a spec, so that gap is left visible for
+the combat line rather than filled on its behalf.
