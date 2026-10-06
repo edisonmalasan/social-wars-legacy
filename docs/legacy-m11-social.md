@@ -31,6 +31,7 @@ committed, consistent with prior practice.
 | 4 | Census walk excluded all of `tests/` | 0 documents, 0 rows | Settled denominator is `tests/saves` + `villages`, excluding `tests/saves/manifest.json`. Now reproduces **33 carrying** exactly. |
 | 5 | Loop body left inside `except:` handler | 0 documents inspected after the fix to #4 | Dedent restored. |
 | 6 | Normalized social files assumed to be dicts | `TypeError` sorting dicts against dicts | They are **top-level lists**. |
+| 7 | Write regex matched only the literal `privateState["x"]` subscript form | `magics`/`mana` wrongly reported as *read without a writer* | The branches use an **aliased local** (`magics = privateState["magics"]`) and `engine.py` writes `mana` inside `apply_resources`. Corrected in §6. |
 
 A seventh discrepancy was **reconciled, not a fault**: this investigation first
 counted **13,034** placed rows where prior work records **12,954**. Measurement
@@ -229,9 +230,30 @@ Neither is scored, ranked, or aggregated.
 | `timeStampDartsReset` | 2 | 0 | `darts_reset`, `fast_forward` |
 | `timeStampEndPremium` | 1 | 0 | `buy_premium_account` |
 | `crossPromotionsFinished` | **0** | 0 | — |
-| `magics` | **0** | 2 | — (read only) |
-| `mana` | **0** | 1 | — (read only) |
+| `magics` | **0**\* | 2 | — (\*see correction below) |
+| `mana` | **0**\* | 1 | — (\*see correction below) |
 | `unlockedSkins` | **0** | 0 | — |
+
+> **CORRECTION (2026-10-06, same day, before any proposal).** The table above
+> originally reported `magics` and `mana` as *read without any writer*, and the
+> prose did too. **That was wrong**, and the cause is a seventh instrument fault:
+> the write regex matched only the literal `privateState["magics"]` subscript
+> form, so it missed the **aliased local** the branches actually use —
+> `magics = privateState["magics"]` at `command.py:656` and `:668`, followed by
+> `magics[str(magic_id)] += min(50, ...)` at `:658`/`:670` and
+> `magics[str(magic_id)] = 0` at `:660`/`:672`. `mana` is likewise written at
+> `engine.py:268`, `save["privateState"]["mana"] = max(... + mana, 0)`, inside
+> `apply_resources`.
+>
+> Both fields are therefore **written**, and neither is social state: `magics` is
+> a per-magic-id counter bounded at 50, and `mana` is one of the seven stored
+> resource slots. The only genuinely inert special field is `unlockedSkins`
+> (zero occurrences of any kind), plus `crossPromotionsFinished`.
+>
+> This correction strengthens the §7 classification rather than weakening it, and
+> it is recorded here rather than quietly edited because the superseded claim was
+> published in PR #309. It also narrows §8's open item: `magics`/`mana` is no
+> longer unresolved.
 
 **Darts is the one special system with genuine multi-branch state**: four
 branches (`darts_reset`, `darts_new_free`, `darts_shoot_balloon`, plus
@@ -279,7 +301,9 @@ subject to the verification limits below.
   report six rules each; both were run and both returned zero.
 - **`set_resource_allies`'s building stamp is unexplained.** `item[3] =
   time_now` is reported verbatim; no semantics are derived from it.
-- **`magics`/`mana` read-without-write is unresolved**, not concluded.
+- ~~**`magics`/`mana` read-without-write is unresolved**~~ — **resolved by the
+  §6 correction**: both are written, and neither is social state. The remaining
+  inert special fields are `unlockedSkins` and `crossPromotionsFinished`.
 
 ## 9. Recommended next step
 
