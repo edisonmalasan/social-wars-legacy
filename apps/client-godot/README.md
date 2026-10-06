@@ -4308,3 +4308,122 @@ branches. Parity covers the committed village corpus only, and no progressed-pla
 save exists. **Nothing is rendered**: there is no windowed capture and no pixel-parity
 oracle, because no reward display exists to compare. No Flash, Ruffle, ActionScript,
 or browser executes in any of these commands, and every network call is loopback.
+
+## Darts and premium accounts (`godot-darts`, M11 line 2)
+
+Four read-only modules under `scripts/darts/`, a `/v0/darts` route, and a deterministic evidence report.
+The committed contract is `docs/legacy-m11-darts.md`; its section 0b corrections C3 and C4 are binding.
+
+- `scripts/darts/darts_state.gd` -- the six measured darts fields plus the two fields handed over from
+  `godot-social-state`, each with its recorded storage document, its recorded value, and its document count
+- `scripts/darts/premium_purchase.gd` -- the committed `PREMIUM_ACCOUNTS` duration ladder, its recorded
+  oversized-index clamp, its recorded missing-duration fallback, and the two-arm selection
+- `scripts/darts/week_reset.gd` -- the one server-side time-derived darts mutation, delivered as a pure
+  predicate that returns a verdict and performs no write
+- `scripts/darts/darts_transitions.gd` -- the three recorded transitions with each client-sent input
+  named as client-sent, and each branch's server-written fields derived from recorded state
+
+### The finding: a committed price with zero consumers
+
+`get_premium_days` returns the committed **duration** and never reads the amount recorded beside it
+(`get_game_config.py:181-189`), so **no price is charged** and every one of the seven stored resource slots
+must be byte-identical. This is deliberately **not** the same mechanism as `research_buy_step_cash`, where the
+server *discards* a client-sent price; here it *ignores* a committed one.
+
+"Nothing is charged" is a **refusal, not parity**. `engine.apply_resources` (`engine.py:251-271`) applies a
+**client-sent** vector before the `if cmd ==` chain opens at `command.py:42`, and it unpacks **eight** slots
+(slot 0 read into `unknown` and never written; **seven** real write targets, each `max(current + delta, 0)`),
+so a legacy client could pair a debit with this purchase. The derived neutral vector forecloses that here,
+with no claim about what the Flash client did.
+
+### Two invented rules, refused
+
+The shot list is **unbounded** and the shot index is **never** tested against the committed `darts_items`
+schedule, because `villages/Nerri.json` records shot index `0`, which is absent from the committed `1..27`
+ids -- a membership test would contradict the corpus rather than reproduce the branch. The shot index is
+delivered as client-sent intent with nothing derived and nothing bounded; the response reports
+`shot_list_length_bound: null` and `schedule_membership_tested: false` as **source spellings without
+quotes**, while the JSON response spells them quoted.
+
+The client-dictated **won-shot** outcome is refused too: no delivered route sets `dartsGotExtra` from a
+client value, and the difference from the preserved branch is reported as a **divergence**, never as parity.
+
+### Verification actually run (2026-10-06)
+
+```bash
+godot --headless --path apps/client-godot --script res://tests/test_darts.gd
+godot --headless --path apps/client-godot --script res://tests/test_darts.gd -- --report=<repo>/apps/client-godot/evidence/darts/report.json
+godot --headless --path apps/client-godot --script res://tests/test_social_state.gd
+godot --headless --path apps/client-godot --script res://tests/test_project_scope.gd
+python -B -m unittest discover -s apps/compat-api/tests -p "test_darts_envelope.py" -v
+python -B -m unittest discover -s apps/compat-api/tests -p "test_darts_endpoint.py" -v
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+openspec validate --all --strict
+```
+
+- the hermetic darts suite: **610 checks**, exit 0, the **46th** registered hermetic suite
+- `test_social_state.gd`: **405 checks**, exit 0; `test_project_scope.gd`: **2053 checks** (was 1832), exit 0
+- darts envelope **82 tests**, darts endpoint **73 tests**
+- full compat discovery: **`Ran 3077 tests ... OK`**, exit 0 -- **grown** to +156 over the 2921 baseline,
+  because this line adds a state-mutating route
+- `verify.ps1` exit **0**; `verify-boot.ps1` exit **0** with **46 hermetic suites and 23 live phases**,
+  guard digest `6978b959...ff348` identical pre/post
+- **976** log files inspected with **zero** `[test] FAIL`, `^ERROR:`, or `SCRIPT ERROR` lines
+- `validate_content.py` exit **0**, `result: valid`, 21 schemas; `hash_manifest.py verify` **3,258 entries**,
+  exit 0; `openspec validate --all --strict` **67 passed / 0 failed**
+- evidence: `evidence/darts/report.json`, `darts-report-v1`, digest **`e4859928...2a044`**, 28,484 bytes,
+  byte-identical across **three** runs
+
+### The route placement was a cross-line finding, not an accident
+
+Adding `/v0/darts` broke **eight** guards owned by four earlier delivered lines. Every family slices a route's
+source from its `def` to *some* end marker, two suites reach **forward across every route declared between
+them**, and four suites assert `markers[-1] == '@app.post("/v0/level_up")'`. Two placements were tried and
+rejected before the darts route was declared **second**, immediately after the tutorial route -- the only
+slot no delivered span reaches. The four `markers[-1]` invariants are untouched.
+
+That placement is now a **pinned property**: `test_tutorial_endpoint.RoutePlacementTests` gained `darts` in
+its names tuple and a new test asserting both the route's own single-function slice and its absence from
+both forward-reaching spans. **The guard was proven by injection rather than trusted** -- moving the route
+into the forbidden research-to-level slot produced **four independent detections** (the new test twice, the
+delivered fragile-span test, and 13 research-suite errors), with a byte-identical restore
+(`5926d87b...5c1de`).
+
+The `godot-social-state` hand-off guard was proven the same way: misspelling the foreign owner to
+`godot-dartz` in `social_state.gd` produced **2 independent failures** and a byte-identical restore
+(`b7d28e8b...7c37a`).
+
+**Ten anti-invention injections, ten detected, none missed**, every restore byte-identical, recorded in the
+evidence report under `guard_injections`. One of them, `static func normalize(first, second)` in
+`week_reset.gd`, borrows **no reserved word at all**, so it can only be caught by the whole-inventory pin --
+which is what makes the pin the gate and the reserved-name guard the belt.
+
+### Why there is no `darts-live` phase
+
+A live phase would first have to deliver a client darts transport -- an intent builder, a typed result, a
+`GameApi` facade forwarder, and a fake implementation -- and none of those is in this change's requirements.
+More than that, a client able to fire `darts_shoot_balloon` is precisely the client surface this line exists
+to refuse: the delivered client may project darts state and report transition verdicts, and must not be able
+to claim a won shot or a purchased entitlement. `godot-social-state` set the precedent of a
+state-mutating endpoint with no live phase.
+
+### Claim limits
+
+**No price is charged and no stored resource moves.** **No premium entitlement is granted by the delivered
+client** -- the duration is derived and reported, the server derives it again, and nothing here decides
+whether a player may act on it. **The extend arm has no corpus coverage**, because no committed document
+records a future premium instant, so its coverage is crafted input. **The week reset delivers no mutation
+and no route at all**, because `engine.reset_stuff` writes the instant to **zero** rather than to the server
+clock, and that offset's own comment says it exists because timestamp zero is a Thursday and the reset should
+land on Monday -- reported **as a comment**, with no weekday rule derived. **No shot is ever bounded,
+validated against the schedule, or resolved for a win.** The client-dictated `won_extra` refusal is a
+**divergence** from the preserved branch, not parity. Parity is not claimed for any arm the corpus cannot
+exercise: `tests/saves/fresh-player.json` carries every darts field at its initial value and a zero premium
+instant. **Nothing is rendered**, so there is no windowed capture and no pixel-parity oracle. Absence of a
+token is not absence of a feature -- the Flash client may have held darts and premium UI entirely
+client-side, which this oracle cannot verify. No Flash, Ruffle, ActionScript, or browser executes in any of
+these commands, and every network call is loopback.
