@@ -32,7 +32,7 @@ an occurrence SHALL fail the suite rather than silently contradicting the delive
 claim.
 
 #### Scenario: Review the census provenance
-- **WHEN** a maintainer asks how the thirteen-field zero-consumer group was established
+- **WHEN** a maintainer asks how the twelve-field zero-consumer group was established
 - **THEN** the suite reports that it recomputes the group from the legacy sources on every run
 - **AND** it compares that recomputation against the pinned expectation in both directions
 

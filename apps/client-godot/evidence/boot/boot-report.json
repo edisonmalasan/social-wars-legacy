@@ -1,12 +1,12 @@
 {
     "schema":  "godot-compatibility-boot/verify-boot-v1",
-    "generated_utc":  "2026-10-05T20:17:55Z",
+    "generated_utc":  "2026-10-06T07:49:22Z",
     "environment":  {
                         "engine_executable":  "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
                         "engine_version":  "4.7.2.stable.official.ed1daf0bf",
                         "python_executable":  "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
                         "python_version":  "3.9.13",
-                        "git_commit":  "bade6349eace9312539b6e87b006ca7651484fd3",
+                        "git_commit":  "6763a23b6184eba447ffea605817a8f4328b1b5e",
                         "display_session":  false,
                         "network":  "loopback only (127.0.0.1)"
                     },
@@ -811,6 +811,22 @@
                          "log":  "apps/client-godot/.godot/verify-boot/49-test_rewards.out.txt"
                      },
                      {
+                         "name":  "test_social_state",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_social_state.gd",
+                                         "--",
+                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/50-test_social_state.out.txt"
+                     },
+                     {
                          "name":  "boot-unreachable",
                          "command":  [
                                          "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
@@ -826,7 +842,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/50-boot-unreachable.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/51-boot-unreachable.out.txt"
                      },
                      {
                          "name":  "boot-main-live",
@@ -849,7 +865,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/51-boot-main-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/52-boot-main-live.out.txt"
                      },
                      {
                          "name":  "gameapi-live",
@@ -873,7 +889,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/52-gameapi-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/53-gameapi-live.out.txt"
                      },
                      {
                          "name":  "boot-api-error-live",
@@ -900,7 +916,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/53-boot-api-error-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/54-boot-api-error-live.out.txt"
                      },
                      {
                          "name":  "placement-live",
@@ -926,7 +942,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/54-placement-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/55-placement-live.out.txt"
                      },
                      {
                          "name":  "purchase-live",
@@ -952,7 +968,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/55-purchase-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/56-purchase-live.out.txt"
                      },
                      {
                          "name":  "move-live",
@@ -978,7 +994,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/56-move-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/57-move-live.out.txt"
                      },
                      {
                          "name":  "sell-live",
@@ -1004,7 +1020,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/57-sell-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/58-sell-live.out.txt"
                      },
                      {
                          "name":  "store-live",
@@ -1030,7 +1046,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/58-store-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/59-store-live.out.txt"
                      },
                      {
                          "name":  "upgrade-live",
@@ -1056,7 +1072,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/59-upgrade-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/60-upgrade-live.out.txt"
                      },
                      {
                          "name":  "construction-live",
@@ -1082,7 +1098,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/60-construction-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/61-construction-live.out.txt"
                      },
                      {
                          "name":  "collect-live",
@@ -1108,7 +1124,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/61-collect-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/62-collect-live.out.txt"
                      },
                      {
                          "name":  "expand-live",
@@ -1134,7 +1150,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/62-expand-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/63-expand-live.out.txt"
                      },
                      {
                          "name":  "level-up-live",
@@ -1159,7 +1175,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/63-level-up-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/64-level-up-live.out.txt"
                      },
                      {
                          "name":  "queue-live",
@@ -1185,7 +1201,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/64-queue-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/65-queue-live.out.txt"
                      },
                      {
                          "name":  "collection-live",
@@ -1211,7 +1227,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/65-collection-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/66-collection-live.out.txt"
                      },
                      {
                          "name":  "behavior-live",
@@ -1237,7 +1253,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/66-behavior-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/67-behavior-live.out.txt"
                      },
                      {
                          "name":  "research-live",
@@ -1263,7 +1279,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/67-research-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/68-research-live.out.txt"
                      },
                      {
                          "name":  "quests-live",
@@ -1289,7 +1305,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/68-quests-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/69-quests-live.out.txt"
                      },
                      {
                          "name":  "tutorial-live",
@@ -1315,7 +1331,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/69-tutorial-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/70-tutorial-live.out.txt"
                      },
                      {
                          "name":  "stored-placement-live",
@@ -1341,7 +1357,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/70-stored-placement-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/71-stored-placement-live.out.txt"
                      },
                      {
                          "name":  "combat-live",
@@ -1367,7 +1383,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/71-combat-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/72-combat-live.out.txt"
                      },
                      {
                          "name":  "magic-live",
@@ -1393,7 +1409,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/72-magic-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/73-magic-live.out.txt"
                      },
                      {
                          "name":  "reward-live",
@@ -1419,7 +1435,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/73-reward-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/74-reward-live.out.txt"
                      },
                      {
                          "name":  "guard-post",
@@ -1431,7 +1447,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/74-guard-post.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/75-guard-post.out.txt"
                      }
                  ],
     "assertions":  [
@@ -1825,6 +1841,14 @@
                        },
                        {
                            "name":  "test_rewards reports PASS",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_social_state exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_social_state reports PASS",
                            "ok":  true
                        },
                        {

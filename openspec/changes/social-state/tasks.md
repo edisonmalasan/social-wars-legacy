@@ -10,9 +10,9 @@
 
 ## 2. Census
 
-- [ ] 2.1 Implement the re-derived zero-occurrence census over the declared legacy module list, using whole-identifier tokens with comments and string literals stripped.
-- [ ] 2.2 Pin the expected 13-field zero-occurrence set and require the recomputed set to equal it in **both** directions.
-- [ ] 2.3 Pin `questsRank` outside that group and assert its single reader.
+- [ ] 2.1 Implement the re-derived zero-occurrence census over the declared legacy module list, counting whole-identifier tokens AND quoted subscripts as two separate forms and summing them, so a field reached through a string literal is not scored as absent.
+- [ ] 2.2 Pin the expected **12**-field zero-occurrence set and require the recomputed set to equal it in **both** directions. (The proposal said 13; re-derivation found 12, because `questsRank` is read *and* written. Corrected in Apply.)
+- [ ] 2.3 Pin `questsRank` outside that group and assert **both** its reader and its writer in `admin_set_quest_rank`, not a single reader.
 - [ ] 2.4 Self-check the instrument: prove the token matcher is non-vacuously exercised and refuses substring matches inside longer identifiers.
 
 ## 3. Recorded surfaces
