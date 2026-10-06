@@ -1,0 +1,541 @@
+{
+  "schema": "social-state-report-v1",
+  "capability": "godot-social-state",
+  "kind": "refusal",
+  "delivered": "a typed read-only projection of persisted social state",
+  "not_delivered": [
+    "a friends, visits, scores, or social-rewards feature",
+    "any route, endpoint, or intent for the recorded writer",
+    "any decoded reward, charged coin, or selected worker",
+    "any executed-legacy fixture"
+  ],
+  "fields": [
+    {
+      "name": "friendsHelpedCoveredItem",
+      "store": "privateState",
+      "zero_occurrence": true,
+      "written_by": [],
+      "readers": [],
+      "recorded_value": null,
+      "documents": 33,
+      "note": "uniformly null; the only field whose name promises a friend count"
+    },
+    {
+      "name": "neighborAssists",
+      "store": "privateState",
+      "zero_occurrence": true,
+      "written_by": [],
+      "readers": [],
+      "recorded_value": {},
+      "documents": 33,
+      "note": "committed rewards are owned by social-tables-normalization"
+    },
+    {
+      "name": "receivedAssists",
+      "store": "maps[]",
+      "zero_occurrence": true,
+      "written_by": [],
+      "readers": [],
+      "recorded_value": {},
+      "documents": 33,
+      "note": "a map key, carried and never written"
+    },
+    {
+      "name": "resourceAlliesMarket",
+      "store": "maps[]",
+      "zero_occurrence": false,
+      "written_by": [
+        "set_resource_allies"
+      ],
+      "readers": [],
+      "recorded_value": null,
+      "documents": 33,
+      "note": "written from a client-sent argument; NOT reproduced here"
+    },
+    {
+      "name": "firstTimeAlliance",
+      "store": "privateState",
+      "zero_occurrence": true,
+      "written_by": [],
+      "readers": [],
+      "recorded_value": null,
+      "documents": 33,
+      "note": "uniformly null"
+    },
+    {
+      "name": "helpMap",
+      "store": "privateState",
+      "zero_occurrence": true,
+      "written_by": [],
+      "readers": [],
+      "recorded_value": [],
+      "documents": 33,
+      "note": "uniformly empty"
+    },
+    {
+      "name": "attacksSent",
+      "store": "privateState",
+      "zero_occurrence": true,
+      "written_by": [],
+      "readers": [],
+      "recorded_value": [],
+      "documents": 33,
+      "note": "uniformly empty"
+    },
+    {
+      "name": "attacksReceived",
+      "store": "privateState",
+      "zero_occurrence": true,
+      "written_by": [],
+      "readers": [],
+      "recorded_value": [],
+      "documents": 33,
+      "note": "uniformly empty"
+    },
+    {
+      "name": "attacksPack",
+      "store": "privateState",
+      "zero_occurrence": true,
+      "written_by": [],
+      "readers": [],
+      "recorded_value": 0,
+      "documents": 33,
+      "note": "uniformly zero"
+    },
+    {
+      "name": "spyings",
+      "store": "privateState",
+      "zero_occurrence": true,
+      "written_by": [],
+      "readers": [],
+      "recorded_value": [],
+      "documents": 33,
+      "note": "uniformly empty"
+    },
+    {
+      "name": "spyingsPack",
+      "store": "privateState",
+      "zero_occurrence": true,
+      "written_by": [],
+      "readers": [],
+      "recorded_value": 0,
+      "documents": 33,
+      "note": "uniformly zero"
+    },
+    {
+      "name": "publishedOpenGraphUnit",
+      "store": "privateState",
+      "zero_occurrence": false,
+      "written_by": [
+        "rt_open_graph_unit"
+      ],
+      "readers": [],
+      "recorded_value": [],
+      "documents": 33,
+      "note": "a social-publish list, not a friends list"
+    },
+    {
+      "name": "marketPlaceFirstTime",
+      "store": "privateState",
+      "zero_occurrence": false,
+      "written_by": [
+        "first_time_marketplace"
+      ],
+      "readers": [],
+      "recorded_value": false,
+      "documents": 33,
+      "note": "set True unconditionally by its branch"
+    },
+    {
+      "name": "questsRank",
+      "store": "privateState",
+      "zero_occurrence": false,
+      "written_by": [
+        "admin_set_quest_rank"
+      ],
+      "readers": [
+        "admin_set_quest_rank"
+      ],
+      "recorded_value": 0,
+      "documents": 33,
+      "note": "READ AND WRITTEN by one branch; an identifier-only census miscounted it as zero-occurrence (design D9)"
+    },
+    {
+      "name": "numTradesDone",
+      "store": "maps[]",
+      "zero_occurrence": false,
+      "written_by": [
+        "trade_resource"
+      ],
+      "readers": [],
+      "recorded_value": 0,
+      "documents": 33,
+      "note": "a market trade counter"
+    },
+    {
+      "name": "resourcesTraded",
+      "store": "maps[]",
+      "zero_occurrence": true,
+      "written_by": [],
+      "readers": [],
+      "recorded_value": {},
+      "documents": 33,
+      "note": "uniformly empty"
+    },
+    {
+      "name": "timestampLastTrade",
+      "store": "maps[]",
+      "zero_occurrence": false,
+      "written_by": [
+        "trade_resource",
+        "fast_forward"
+      ],
+      "readers": [],
+      "recorded_value": 0,
+      "documents": 33,
+      "note": "fast_forward subtracts a client-supplied second count from it"
+    },
+    {
+      "name": "timeStampEndPremium",
+      "store": "privateState",
+      "zero_occurrence": false,
+      "written_by": [
+        "buy_premium_account"
+      ],
+      "readers": [],
+      "recorded_value": 0,
+      "documents": 33,
+      "note": "a single instant write"
+    },
+    {
+      "name": "crossPromotionsFinished",
+      "store": "privateState",
+      "zero_occurrence": true,
+      "written_by": [],
+      "readers": [],
+      "recorded_value": [],
+      "documents": 33,
+      "note": "uniformly empty"
+    }
+  ],
+  "census": {
+    "forms:friendsHelpedCoveredItem": {
+      "identifier": 0,
+      "quoted": 0
+    },
+    "forms:neighborAssists": {
+      "identifier": 0,
+      "quoted": 0
+    },
+    "forms:receivedAssists": {
+      "identifier": 0,
+      "quoted": 0
+    },
+    "forms:resourceAlliesMarket": {
+      "identifier": 0,
+      "quoted": 1
+    },
+    "forms:firstTimeAlliance": {
+      "identifier": 0,
+      "quoted": 0
+    },
+    "forms:helpMap": {
+      "identifier": 0,
+      "quoted": 0
+    },
+    "forms:attacksSent": {
+      "identifier": 0,
+      "quoted": 0
+    },
+    "forms:attacksReceived": {
+      "identifier": 0,
+      "quoted": 0
+    },
+    "forms:attacksPack": {
+      "identifier": 0,
+      "quoted": 0
+    },
+    "forms:spyings": {
+      "identifier": 0,
+      "quoted": 0
+    },
+    "forms:spyingsPack": {
+      "identifier": 0,
+      "quoted": 0
+    },
+    "forms:publishedOpenGraphUnit": {
+      "identifier": 0,
+      "quoted": 6
+    },
+    "forms:marketPlaceFirstTime": {
+      "identifier": 0,
+      "quoted": 1
+    },
+    "forms:questsRank": {
+      "identifier": 0,
+      "quoted": 1
+    },
+    "forms:numTradesDone": {
+      "identifier": 0,
+      "quoted": 3
+    },
+    "forms:resourcesTraded": {
+      "identifier": 0,
+      "quoted": 0
+    },
+    "forms:timestampLastTrade": {
+      "identifier": 0,
+      "quoted": 4
+    },
+    "forms:timeStampEndPremium": {
+      "identifier": 0,
+      "quoted": 3
+    },
+    "forms:crossPromotionsFinished": {
+      "identifier": 0,
+      "quoted": 0
+    },
+    "zero_occurrence_recomputed": [
+      "friendsHelpedCoveredItem",
+      "neighborAssists",
+      "receivedAssists",
+      "firstTimeAlliance",
+      "helpMap",
+      "attacksSent",
+      "attacksReceived",
+      "attacksPack",
+      "spyings",
+      "spyingsPack",
+      "resourcesTraded",
+      "crossPromotionsFinished"
+    ],
+    "zero_occurrence_count": 12,
+    "instrument_non_vacuous": true
+  },
+  "corpus": {
+    "documents": 33,
+    "root_count": 2,
+    "uniform:friendsHelpedCoveredItem": {
+      "distinct_values": 1,
+      "documents": 33
+    },
+    "uniform:firstTimeAlliance": {
+      "distinct_values": 1,
+      "documents": 33
+    },
+    "uniform:neighborAssists": {
+      "distinct_values": 1,
+      "documents": 33
+    },
+    "uniform:receivedAssists": {
+      "distinct_values": 1,
+      "documents": 33
+    },
+    "uniform:resourcesTraded": {
+      "distinct_values": 1,
+      "documents": 33
+    },
+    "uniform:helpMap": {
+      "distinct_values": 1,
+      "documents": 33
+    },
+    "uniform:attacksSent": {
+      "distinct_values": 1,
+      "documents": 33
+    },
+    "uniform:attacksReceived": {
+      "distinct_values": 1,
+      "documents": 33
+    },
+    "uniform:spyings": {
+      "distinct_values": 1,
+      "documents": 33
+    },
+    "uniform:crossPromotionsFinished": {
+      "distinct_values": 1,
+      "documents": 33
+    },
+    "uniform:attacksPack": {
+      "distinct_values": 1,
+      "documents": 33
+    },
+    "uniform:spyingsPack": {
+      "distinct_values": 1,
+      "documents": 33
+    }
+  },
+  "recorded_writers": [
+    {
+      "branch": "set_resource_allies",
+      "source": "command.py:637",
+      "target": "maps[]/resourceAlliesMarket",
+      "client_sent_argument": "args[0]",
+      "effects": [
+        "writes the market resource from a client-sent value",
+        "stamps the addressed row's item[3] with time_now",
+        "calls finish_si on the addressed row"
+      ],
+      "semantics_derived": false,
+      "reproduced": false,
+      "note": "item[3] is reported verbatim; no reader of item[3] is claimed."
+    }
+  ],
+  "other_written_fields": {
+    "publishedOpenGraphUnit": "rt_open_graph_unit",
+    "marketPlaceFirstTime": "first_time_marketplace",
+    "numTradesDone": "trade_resource",
+    "timestampLastTrade": "trade_resource",
+    "timeStampEndPremium": "buy_premium_account"
+  },
+  "content_boundary": {
+    "owner": "social-tables-normalization",
+    "tables": [
+      "neighbor_assists",
+      "findable_items",
+      "social_items"
+    ],
+    "reward_decoded": false,
+    "coin_charged": false,
+    "worker_selected": false,
+    "eligibility_derived": false
+  },
+  "absent_helpers": [
+    {
+      "helper": "assist_reward",
+      "absent_because": "neighbor_assists reward is committed content owned by social-tables-normalization and has zero legacy consumers"
+    },
+    {
+      "helper": "assist_task",
+      "absent_because": "no legacy branch reads a neighbor_assists task; the field has zero occurrences across all eleven modules"
+    },
+    {
+      "helper": "assist_window",
+      "absent_because": "no eligibility, cooldown, or window rule exists to derive"
+    },
+    {
+      "helper": "friend_level",
+      "absent_because": "friendsHelpedCoveredItem has zero occurrences and is uniformly null in 33 of 33 documents"
+    },
+    {
+      "helper": "friend_state",
+      "absent_because": "no branch writes or reads any friend field"
+    },
+    {
+      "helper": "friend_request",
+      "absent_because": "no friend command exists among the 63 named branches"
+    },
+    {
+      "helper": "visit_state",
+      "absent_because": "no visit token occurs in any legacy module; world_id and worldChange are carried but never read"
+    },
+    {
+      "helper": "visit_map",
+      "absent_because": "no surface addresses another player's map"
+    },
+    {
+      "helper": "neighbor_map",
+      "absent_because": "neighborAssists is uniformly {} and has zero occurrences"
+    },
+    {
+      "helper": "social_reward",
+      "absent_because": "all 41 committed social content entries have zero legacy consumers"
+    },
+    {
+      "helper": "social_action",
+      "absent_because": "no branch dispatches on a social item"
+    },
+    {
+      "helper": "score_for",
+      "absent_because": "there is zero arithmetic on any score-like value in the dispatcher"
+    },
+    {
+      "helper": "leaderboard",
+      "absent_because": "the token occurs zero times across all eleven modules"
+    },
+    {
+      "helper": "ranking",
+      "absent_because": "the token occurs zero times; questsRank is read by admin_set_quest_rank and never written, which is not a ranking"
+    },
+    {
+      "helper": "allies_of",
+      "absent_because": "resourceAlliesMarket is a client-sent market resource, not a set of allies; no reader is claimed"
+    },
+    {
+      "helper": "gift_to",
+      "absent_because": "no gift command exists"
+    },
+    {
+      "helper": "invite_state",
+      "absent_because": "no invite token occurs in any legacy module"
+    },
+    {
+      "helper": "relationship",
+      "absent_because": "an empty container is reported verbatim and never read as a relationship count"
+    },
+    {
+      "helper": "cooperation",
+      "absent_because": "no cooperation command or state exists"
+    },
+    {
+      "helper": "spy_on",
+      "absent_because": "spyings and spyingsPack have zero occurrences and are uniformly empty and zero in 33 of 33 documents"
+    },
+    {
+      "helper": "attack_pack_for",
+      "absent_because": "attacksPack has zero occurrences and is uniformly 0"
+    },
+    {
+      "helper": "receive_assist",
+      "absent_because": "receivedAssists is uniformly {} with zero occurrences"
+    },
+    {
+      "helper": "send_assist",
+      "absent_because": "no branch writes an outgoing assist"
+    },
+    {
+      "helper": "help_reward",
+      "absent_because": "neighbor_assists rewards are owned by social-tables-normalization and are not decoded here"
+    },
+    {
+      "helper": "populate_example",
+      "absent_because": "the corpus holds no populated social field and this capability synthesizes none"
+    }
+  ],
+  "delivered_routes": [],
+  "fixture": {
+    "fixture_delivered": false,
+    "reason": "no social command exists to capture, and the corpus holds no populated social field",
+    "fabricated_precondition": false
+  },
+  "world_keys": [
+    "world_id",
+    "worldChange"
+  ],
+  "rejected_score_readings": [
+    {
+      "token": "lost",
+      "actual": "local unit-loss counter",
+      "source": "command.py:792, command.py:868"
+    },
+    {
+      "token": "won",
+      "actual": "auction-bet result",
+      "source": "auctions.py:164"
+    }
+  ],
+  "legacy_measured": {
+    "branches": 63,
+    "social_named_branches": 0,
+    "consumers:social_items": 0,
+    "consumers:findable_items": 0,
+    "consumers:neighbor_assists": 0
+  },
+  "claim_limits": [
+    "twelve of nineteen fields have zero legacy occurrences, which is a statement about the preserved server and says nothing about what the Flash client did",
+    "the committed investigation and the proposal counted thirteen by including questsRank, which admin_set_quest_rank both reads and writes; the re-derived figure is twelve and the proposal's number is corrected rather than the measurement",
+    "the uniform values are a corpus fact about 33 documents, not a claim about all players",
+    "no world, visit, or leaderboard concept is derived from the world keys",
+    "the recorded row-instant stamp is reported with no semantics derived",
+    "no parity is claimed: nothing here executes against the legacy server"
+  ]
+}
