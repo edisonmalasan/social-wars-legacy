@@ -248,6 +248,7 @@ const FRESH_PLAYER_LIMIT := {
 	"timeStampDartsReset": 0,
 	"timeStampDartsNewFree": 0,
 	"timeStampEndPremium": 0,
+	"crossPromotionsFinished": [],
 	"shoot_arm_reachable": false,
 	"free_arm_reachable": false,
 	"premium_arm_reachable": false,

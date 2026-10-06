@@ -1939,6 +1939,148 @@ no pixel-parity oracle** are claimed, because nothing is rendered. No Flash,
 Ruffle, ActionScript, or browser executes in any of these commands, and **no
 network is used at all**.
 
+Verified darts and premium commands (milestone M11 line 2; Godot 4.7.2.stable,
+Windows x64; `python` denotes the pinned interpreter, never the PATH alias). This
+is the first M11 line that **derives a value**: `buy_premium_account` is the first
+server-derived value the project has derived from a committed schedule rather
+than refused. The contract is committed in `docs/legacy-m11-darts.md` (PR #315,
+merged `7964523`), whose **§0b corrections C3/C4** this line is bound by; the
+proposal is PR #316, merged `7340c33`.
+
+```bash
+godot --headless --path apps/client-godot --script res://tests/test_darts.gd
+godot --headless --path apps/client-godot --script res://tests/test_darts.gd -- --report=<repo>/apps/client-godot/evidence/darts/report.json
+godot --headless --path apps/client-godot --script res://tests/test_social_state.gd
+godot --headless --path apps/client-godot --script res://tests/test_project_scope.gd
+python -B -m unittest discover -s apps/compat-api/tests -p "test_darts_envelope.py" -v
+python -B -m unittest discover -s apps/compat-api/tests -p "test_darts_endpoint.py" -v
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+openspec validate --all --strict
+```
+
+Purposes and observed results (2026-10-06): the hermetic darts suite (observed
+**610 checks**, exit 0; the 46th registered hermetic suite) over four delivered
+read-only modules — `darts_state.gd`, `premium_purchase.gd`, `week_reset.gd`,
+`darts_transitions.gd` — re-deriving its corpus figures from the committed
+documents every run; the **amended** social-state suite (**405 checks**); the
+**amended** scope suite (**2053 checks**, was 1832) after adding the four new
+client sources, the new suite, and the new report to its allow-list; the darts
+envelope suite (**82 tests**); the darts endpoint suite (**73 tests**); the
+**grown** compat suite (observed **`Ran 3077 tests … OK`**, exit 0 — **+156** over
+the 2921 baseline, because this line adds a state-mutating route); `verify.ps1`
+(exit 0, `PASS all checks succeeded`); `verify-boot.ps1` (exit 0, `PASS all checks
+succeeded`, **46 hermetic suites and 23 live phases**, guard digest
+`6978b959…ff348` **identical before and after**, and **976** log files inspected
+carrying zero `[test] FAIL`, `^ERROR:`, or `SCRIPT ERROR` lines); the content
+validator (exit 0, `result: valid` — 22 outputs, 21 schemas, 604 references); the
+preservation manifest (3,258 entries, 758,423,699 bytes, exit 0); and
+`openspec validate --all --strict` (**67 passed / 0 failed**). Evidence is the
+deterministic `darts-report-v1` report under `apps/client-godot/evidence/darts/`
+(digest **`e4859928…2a044`**, 28,484 bytes, byte-identical across **three**
+consecutive runs). `apps/client-godot/evidence/boot/boot-report.json` was
+**regenerated** and differs only in its `generated_utc`, its `git_commit`, the one
+added `test_darts` entry, and the log-index renumbering that follows — leaving it
+stale would have broken the battery's claim that rerunning reproduces its bytes.
+
+**The finding: a committed price with zero consumers.** The committed
+`PREMIUM_ACCOUNTS` schedule carries an amount beside every duration and that
+amount has **zero** consumers across all eleven legacy modules —
+`get_premium_days` returns the committed *duration* and never reads the amount
+beside it (`get_game_config.py:181-189`). So **no price is charged** and every one
+of the seven stored resource slots must be byte-identical. This is deliberately
+**not** the same mechanism as `research_buy_step_cash`, where the server
+*discards* a client-sent price; here it *ignores* a committed one. And "nothing is
+charged" is a **refusal, not parity**: `engine.apply_resources`
+(`engine.py:251-271`) applies a **client-sent** vector *before* the `if cmd ==`
+chain opens at `command.py:42`, and it unpacks **eight** slots (slot 0 read into
+`unknown` and never written; **seven** real write targets, each
+`max(current + delta, 0)`), so a legacy client could pair a debit with this
+purchase. The derived neutral vector forecloses that here, with no claim about
+what the Flash client did. **No executed-legacy fixture exists**, because
+`tests/saves/fresh-player.json` carries every darts field at its seeded value
+(shot list `[]`, `dartsGotExtra` False, all three instants `0`), so the shot arm
+and the extend arm have no committed coverage in either direction — which is also
+what makes the client-dictated `won_extra` refusal have **no corpus evidence at
+all** (correction C4: `dartsGotExtra` is `false` in **33 of 33** committed
+documents).
+
+**Two invariants were invented and refused, each with a corpus fact behind it.**
+The shot list is **unbounded** and the shot index is **never** tested against the
+committed `darts_items` schedule, because `villages/Nerri.json` records shot
+index `0`, which is absent from the committed `1..27` ids — a membership test
+would contradict the corpus rather than reproduce the branch. The shot index is
+delivered as client-sent intent with nothing derived and nothing bounded (design
+D10, Reading B); the response reports `shot_list_length_bound: null` and
+`schedule_membership_tested: false` as **source spellings without quotes**, while
+the JSON response spells them quoted.
+
+**A cross-line consequence was found and fixed at the source, not patched over.**
+Adding `/v0/darts` broke **eight** guards owned by four earlier delivered lines,
+and the cause is a delivered invariant rather than eight coincidences: every
+family slices a route's source from its `def` to *some* end marker, and two
+suites reach **forward across every route declared between them**
+(`test_research_endpoint` cuts at `@app.post("/v0/level_up")`), while four suites
+assert `markers[-1] == '@app.post("/v0/level_up")'`. Two placements were tried
+and rejected — after the level route, and between research and level_up — before
+the darts route was declared **second**, immediately after the tutorial route,
+which is the only slot no span reaches. The four `markers[-1]` invariants are
+therefore **untouched**, and the placement is now a **pinned property** rather
+than an accident: `test_tutorial_endpoint.RoutePlacementTests` gained `darts` in
+its names tuple and a new test asserting both the route's own single-function
+slice and its absence from both forward-reaching spans. **That guard was proven by
+injection, not trusted**: moving the route into the forbidden research→level_up
+slot produced **four independent detections** — the new test (twice), the
+delivered `test_the_two_most_fragile_delivered_spans_still_parse`, and 13
+research-suite errors — with a byte-identical restore (`5926d87b…5c1de`).
+
+**Two of my own measured figures were wrong in the endpoint suite, and both are
+recorded rather than quietly fixed.** A reset writes **six** fields but the
+changed set reports **four**, because the committed corpus already carries an
+empty shot list and a cleared extra flag; and a shot writes **three** but reports
+**two**, because `dartsHasFree` is already `false`. A third expectation — that a
+70-bit integer seed would be refused — was wrong in the other direction: Python
+integers are unbounded and the preserved branch stores whatever it is sent, so it
+is a legal intent, and refusing it would be exactly the kind of range rule this
+line refuses to invent. The suite now asserts the **values** plus a companion
+test that makes each flag genuinely move, so the smaller changed sets are proved
+to be the corpus's starting value rather than a narrower observation.
+
+**One deviation was recorded and one narrowing was decided.** The unreadable
+premium instant refuses **all four** actions, not just the premium one, because
+the response reports `instant_before`/`instant_after` for every action; that is
+asserted explicitly so it cannot read as an accident. And **no `darts-live` phase
+is delivered** — a live phase would first have to deliver a client darts
+transport (intent builder, typed result, `GameApi` forwarder, fake
+implementation), none of which is in this change's requirements, and a client able
+to fire `darts_shoot_balloon` is precisely the client surface this line exists to
+refuse. `godot-social-state` set the precedent of a state-mutating endpoint with
+no live phase; live phases stay at **23**.
+
+Claim limits: **no price is charged and no stored resource moves**; **no
+premium entitlement is granted by the delivered client** — the duration is
+derived and reported, and the server derives it again, and nothing here decides
+whether a player may act on it; **the extend arm has no corpus coverage**, as no
+committed document records a future instant; **the week reset delivers no
+mutation and no route at all**, because `engine.reset_stuff` writes the instant
+to **zero** rather than to the server clock, and that offset's own comment says it
+exists because timestamp zero is a Thursday and the reset should land on Monday —
+reported **as a comment**, deriving no weekday rule; **no shot is ever bounded,
+validated against the schedule, or resolved for a win**; **the client-dictated
+`won_extra` refusal is a divergence from the preserved branch, not parity**;
+parity is not claimed for any arm the corpus cannot exercise; **no windowed
+capture** and **no pixel-parity oracle** are claimed, because nothing is
+rendered; and absence of a token is not absence of a feature — the Flash client
+may have held darts and premium UI entirely client-side, which this oracle cannot
+verify. The four recorded flaky surfaces remain open: `test_no_server_is_running`
+port assertions (5055/5056), `verify-boot.ps1` treating any `^ERROR:` as a script
+error (grep `SCRIPT ERROR` too), the display-sensitive `verify.ps1`, and the
+`test_base.gd` abort-as-pass defect. No Flash, Ruffle, ActionScript, or browser
+executes in any of these commands, and every network call is loopback.
+
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 

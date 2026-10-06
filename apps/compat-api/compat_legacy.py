@@ -862,6 +862,84 @@ class LegacyBoot:
             )
         return list(ledger)
 
+    # --- darts and premium state (command.py:573-623, engine.py:230-249) ----
+
+    #: The darts and premium fields this service reads, in the order the
+    #: investigation measured them.  Every one lives in ``privateState``.
+    DARTS_FIELDS = (
+        "dartsRandomSeed",
+        "dartsBalloonsShot",
+        "dartsGotExtra",
+        "dartsHasFree",
+        "timeStampDartsReset",
+        "timeStampDartsNewFree",
+        "timeStampEndPremium",
+    )
+
+    def darts_state(self, user_id: str) -> Dict[str, Any]:
+        """Every recorded darts field plus the premium instant, as saved.
+
+        Returns a snapshot built from the live save: the legacy dispatcher
+        mutates the very objects this reads, so the endpoint takes the
+        pre-execution snapshot for its proofs and this accessor must hand back
+        **copies** of the two container values (``dartsBalloonsShot`` and the
+        instant) rather than references, exactly as :meth:`private_collections`
+        does.  A missing or wrongly-typed field raises
+        ``LegacyBootError("invalid_save_state")``: coercing an absent instant to
+        ``0`` would invent an authority the legacy server never had, because
+        ``0`` is itself a meaningful recorded value -- ``engine.reset_stuff``
+        writes it deliberately (``engine.py:249``).
+
+        Values are returned **verbatim**.  Nothing here is normalized, ordered,
+        deduplicated, or bounded: the recorded shot list is unordered by
+        construction and the corpus itself records a shot index outside the
+        committed schedule, so any tidying here would contradict the save.
+        """
+        private_state = self.save_document(user_id).get("privateState") or {}
+        snapshot: Dict[str, Any] = {}
+        for field in self.DARTS_FIELDS:
+            if field not in private_state:
+                raise LegacyBootError(
+                    "invalid_save_state",
+                    "save for user id %r has no privateState[%r]" % (user_id, field),
+                )
+            snapshot[field] = private_state[field]
+        if isinstance(snapshot["dartsBalloonsShot"], list):
+            snapshot["dartsBalloonsShot"] = list(snapshot["dartsBalloonsShot"])
+        return snapshot
+
+    def premium_instant(self, user_id: str) -> Optional[int]:
+        """``save["privateState"]["timeStampEndPremium"]`` as a stored integer.
+
+        Returns ``None`` -- never ``0`` -- when the field is absent or is not an
+        integer, so the caller can distinguish "this save records no premium
+        instant" from "this save records an instant of zero", which is the value
+        the whole committed corpus carries.
+        """
+        stored = (self.save_document(user_id).get("privateState") or {}).get(
+            "timeStampEndPremium"
+        )
+        if isinstance(stored, bool) or not isinstance(stored, int):
+            return None
+        return stored
+
+    def premium_days(self, package_index: Any) -> Optional[int]:
+        """The committed duration in **days** the legacy helper derives.
+
+        Delegates to the loaded configuration through the unchanged
+        ``get_game_config.get_premium_days`` (``get_game_config.py:181-189``),
+        so the oversized-index **clamp** and the missing-duration ``return 0``
+        fallback are reproduced where they were recorded rather than re-derived
+        here.  Returns ``None`` when the committed schedule does not resolve at
+        all, which is a server-side content failure rather than a client error.
+        """
+        if isinstance(package_index, bool) or not isinstance(package_index, int):
+            return None
+        try:
+            return int(self._config.get_premium_days(package_index))
+        except Exception:  # the committed schedule is absent or malformed
+            return None
+
     def execute_commands(self, user_id: str, envelope: Dict[str, object]) -> None:
         """Run the unchanged legacy ``command()`` batch dispatcher (D2).
 
