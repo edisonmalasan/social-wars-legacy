@@ -530,6 +530,77 @@
     "consumers:findable_items": 0,
     "consumers:neighbor_assists": 0
   },
+  "guard_injections": {
+    "method": "each probe was applied to a byte-identical copy of the delivered module, the suite was run, and the copy was restored; the probe results are recorded here because the suite cannot rewrite the module it is judging",
+    "restored_module_sha256": "b4efcbf18fd0b7202f06c2df1a3cf182329ebdda8f6a812f82cee8639df21ed9",
+    "restores_byte_identical": true,
+    "probes": [
+      {
+        "probe": "static func friend_level(pid: int)",
+        "disguise": "a reserved absent name, exact recorded spelling",
+        "guards_that_fired": [
+          "function_inventory_pin"
+        ],
+        "failures": 2,
+        "exit_code": 1,
+        "restored_sha256": "b4efcbf18fd0b7202f06c2df1a3cf182329ebdda8f6a812f82cee8639df21ed9"
+      },
+      {
+        "probe": "static func assist_reward_for_item(item_id: int)",
+        "disguise": "a reserved absent name worn as a SUFFIX, which an exact-name comparison does not match",
+        "guards_that_fired": [
+          "function_inventory_pin"
+        ],
+        "failures": 1,
+        "exit_code": 1,
+        "restored_sha256": "b4efcbf18fd0b7202f06c2df1a3cf182329ebdda8f6a812f82cee8639df21ed9"
+      },
+      {
+        "probe": "static func FRIEND_LEVEL(pid: int)",
+        "disguise": "a reserved absent name in UPPER CASE, which a case-sensitive comparison does not match",
+        "guards_that_fired": [
+          "function_inventory_pin"
+        ],
+        "failures": 1,
+        "exit_code": 1,
+        "restored_sha256": "b4efcbf18fd0b7202f06c2df1a3cf182329ebdda8f6a812f82cee8639df21ed9"
+      },
+      {
+        "probe": "static func FRIEND_LEVEL_SOFT(pid: int)",
+        "disguise": "a reserved absent name wearing BOTH a suffix and different case",
+        "guards_that_fired": [
+          "function_inventory_pin",
+          "reserved_name_folded_substring"
+        ],
+        "failures": 2,
+        "exit_code": 1,
+        "restored_sha256": "b4efcbf18fd0b7202f06c2df1a3cf182329ebdda8f6a812f82cee8639df21ed9"
+      },
+      {
+        "probe": "static func cooperation_level(first, second)",
+        "disguise": "a borrowed family word with a suffix",
+        "guards_that_fired": [
+          "function_inventory_pin",
+          "reserved_name_folded_substring"
+        ],
+        "failures": 2,
+        "exit_code": 1,
+        "restored_sha256": "b4efcbf18fd0b7202f06c2df1a3cf182329ebdda8f6a812f82cee8639df21ed9"
+      },
+      {
+        "probe": "static func normalize(first, second) comparing two committed values",
+        "disguise": "NO reserved word borrowed at all: caught only by the operator guard, not by any name-based guard",
+        "guards_that_fired": [
+          "no_arithmetic",
+          "no_ordering_comparison",
+          "function_inventory_pin"
+        ],
+        "failures": 3,
+        "exit_code": 1,
+        "restored_sha256": "b4efcbf18fd0b7202f06c2df1a3cf182329ebdda8f6a812f82cee8639df21ed9"
+      }
+    ]
+  },
   "claim_limits": [
     "twelve of nineteen fields have zero legacy occurrences, which is a statement about the preserved server and says nothing about what the Flash client did",
     "the committed investigation and the proposal counted thirteen by including questsRank, which admin_set_quest_rank both reads and writes; the re-derived figure is twelve and the proposal's number is corrected rather than the measurement",

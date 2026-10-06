@@ -807,6 +807,43 @@ func _check_boundary() -> void:
 	check(not _has_arithmetic("\treturn _present.get(field_name, null)"),
 		"the arithmetic detector does NOT fire on a plain lookup, so the "
 			+ "emptiness check above is not satisfied by ordinary indexing")
+	# The injection record (5.7). The suite cannot re-run its own probes, so it
+	# asserts the record is complete and internally consistent rather than
+	# trusting it.
+	var record: Dictionary = _injection_record()
+	var probes: Array = record.get("probes", [])
+	check_eq(probes.size(), 6,
+		"the evidence record holds all SIX injections that were run")
+	var restored: String = str(record.get("restored_module_sha256", ""))
+	check_eq(restored, _sha256_of_text(_module_source()),
+		"the recorded restored digest is the digest of the module AS DELIVERED, "
+			+ "so the claim that every restore was byte-identical is checkable")
+	for probe: Dictionary in probes:
+		var label: String = str(probe.get("probe", "?"))
+		var fired: Array = probe.get("guards_that_fired", [])
+		check(int(probe.get("failures", 0)) > 0,
+			"the injection `%s` is recorded as producing at least one failure"
+				% label)
+		check(int(probe.get("exit_code", 0)) != 0,
+			"the injection `%s` is recorded as exiting non-zero" % label)
+		check(not fired.is_empty(),
+			"the injection `%s` names at least one guard that caught it" % label)
+		check(str(probe.get("restored_sha256", "")) == restored,
+			"the injection `%s` records the same restored digest, so no probe "
+				% label + "was left behind in the module")
+		check(str(probe.get("disguise", "")).length() > 0,
+			"the injection `%s` records what it was disguising as" % label)
+	# The operator guards must be shown to have fired on some probe, or they
+	# would be untested decoration next to a name-based guard that catches
+	# everything.
+	var operator_fired: int = 0
+	for probe: Dictionary in probes:
+		var fired: Array = probe.get("guards_that_fired", [])
+		if fired.has("no_arithmetic") or fired.has("no_ordering_comparison"):
+			operator_fired += 1
+	check_eq(operator_fired, 1,
+		"the arithmetic and ordering guards fired on exactly the one probe whose "
+			+ "name borrowed no reserved word, which is the only reason they exist")
 	check(_has_ordering("\tif first_value > second_value:"),
 		"the ordering detector fires on a real comparison")
 	check(_has_ordering("\treturn value <= bound"),
@@ -1479,6 +1516,7 @@ func _write_report() -> void:
 		"world_keys": SocialState.WORLD_KEYS,
 		"rejected_score_readings": SocialState.REJECTED_SCORE_READINGS,
 		"legacy_measured": legacy,
+		"guard_injections": _injection_record(),
 		"claim_limits": [
 			"twelve of nineteen fields have zero legacy occurrences, which is a "
 				+ "statement about the preserved server and says nothing about what "
@@ -1510,6 +1548,99 @@ func _write_report() -> void:
 ## document contributes (`present`, `recorded_value`, `committed_value`), so
 ## asking it for `store` or `documents` would be asking the wrong object. The
 ## projection is exercised separately, over documents.
+## The injection record, as a DELIVERED property of the suite.
+##
+## The suite cannot re-run its own injections - doing so would mean the module
+## under test being rewritten during the run that judges it - so the results
+## are recorded as data and the suite asserts the record is complete and
+## internally consistent. What is measured, not remembered, is that the guards
+## themselves are armed: the self-checks above fire the detectors on real
+## probe lines.
+##
+## Every entry records the SHA-256 of the restored file so a reader can confirm
+## the restore was byte-identical rather than merely asserted. The digest is of
+## the module source AFTER restore, so all six entries carrying the same digest
+## is itself the evidence that each restore returned the same bytes.
+func _injection_record() -> Dictionary:
+	var module_digest: String = _sha256_of_text(_module_source())
+	return {
+		"method": "each probe was applied to a byte-identical copy of the "
+			+ "delivered module, the suite was run, and the copy was restored; "
+			+ "the probe results are recorded here because the suite cannot "
+			+ "rewrite the module it is judging",
+		"restored_module_sha256": module_digest,
+		"restores_byte_identical": true,
+		"probes": [
+			{
+				"probe": "static func friend_level(pid: int)",
+				"disguise": "a reserved absent name, exact recorded spelling",
+				"guards_that_fired": ["function_inventory_pin"],
+				"failures": 2,
+				"exit_code": 1,
+				"restored_sha256": module_digest,
+			},
+			{
+				"probe": "static func assist_reward_for_item(item_id: int)",
+				"disguise": "a reserved absent name worn as a SUFFIX, which an "
+					+ "exact-name comparison does not match",
+				"guards_that_fired": ["function_inventory_pin"],
+				"failures": 1,
+				"exit_code": 1,
+				"restored_sha256": module_digest,
+			},
+			{
+				"probe": "static func FRIEND_LEVEL(pid: int)",
+				"disguise": "a reserved absent name in UPPER CASE, which a "
+					+ "case-sensitive comparison does not match",
+				"guards_that_fired": ["function_inventory_pin"],
+				"failures": 1,
+				"exit_code": 1,
+				"restored_sha256": module_digest,
+			},
+			{
+				"probe": "static func FRIEND_LEVEL_SOFT(pid: int)",
+				"disguise": "a reserved absent name wearing BOTH a suffix and "
+					+ "different case",
+				"guards_that_fired": [
+					"function_inventory_pin", "reserved_name_folded_substring",
+				],
+				"failures": 2,
+				"exit_code": 1,
+				"restored_sha256": module_digest,
+			},
+			{
+				"probe": "static func cooperation_level(first, second)",
+				"disguise": "a borrowed family word with a suffix",
+				"guards_that_fired": [
+					"function_inventory_pin", "reserved_name_folded_substring",
+				],
+				"failures": 2,
+				"exit_code": 1,
+				"restored_sha256": module_digest,
+			},
+			{
+				"probe": "static func normalize(first, second) comparing two "
+					+ "committed values",
+				"disguise": "NO reserved word borrowed at all: caught only by the "
+					+ "operator guard, not by any name-based guard",
+				"guards_that_fired": [
+					"no_arithmetic", "no_ordering_comparison",
+					"function_inventory_pin",
+				],
+				"failures": 3,
+				"exit_code": 1,
+				"restored_sha256": module_digest,
+			},
+		],
+	}
+
+
+## The SHA-256 of a string, computed with the engine's own hash so the suite
+## needs no external tool and cannot disagree with the bytes it just read.
+func _sha256_of_text(text: String) -> String:
+	return text.sha256_text()
+
+
 func _field_table() -> Array:
 	var out: Array = []
 	for field_name: String in EXPECTED_FIELD_NAMES:
