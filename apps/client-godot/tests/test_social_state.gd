@@ -62,6 +62,13 @@ extends "res://tests/test_base.gd"
 ## `res://scripts/package_paths.gd`; redeclaring it here is a parse error.
 const SocialState := preload("res://scripts/social/social_state.gd")
 
+## The capability handed two of the measured fields. Preloaded so the hand-off can
+## be checked through its real API rather than by matching prose: an earlier
+## revision of `_check_handoff` asserted that the owner's source did not contain
+## the substring "social field", which this module's own explanatory comments
+## legitimately contain -- so the guard would have failed on a correct owner.
+const DartsState := preload("res://scripts/darts/darts_state.gd")
+
 ## Default destination of the bare `--report` flag.
 const DEFAULT_REPORT_PATH := "evidence/social-state/report.json"
 
@@ -125,7 +132,25 @@ const ABSENT_FAMILIES := [
 ## The module's whole public function inventory, pinned (design D7).
 const EXPECTED_FUNCTIONS := [
 	"field_names", "zero_occurrence_names", "store_of", "field_record", "project",
+	# Added by `godot-darts`, which re-filed two measured fields as FOREIGN.
+	# These three are classification accessors over `FOREIGN_FIELDS` -- they report
+	# ownership, not social behaviour. Their arrival is exactly what the
+	# whole-inventory pin is for: it refused them until they were declared here,
+	# with a reason, rather than passing unnoticed.
+	"social_field_names", "foreign_field_names", "foreign_owner_of",
 ]
+
+## The measured fields `godot-darts` measured and found NOT to be social.
+##
+## `timeStampEndPremium` is a paid-purchase instant whose value the server
+## derives from a committed schedule; `crossPromotionsFinished` is a
+## cross-promotion flag. Both stay measured HERE -- the census is about
+## occurrence -- while their ownership moves.
+const EXPECTED_FOREIGN_FIELDS := ["timeStampEndPremium", "crossPromotionsFinished"]
+
+## The capability handed those two fields. Verified to exist and to project them
+## by `_check_handoff`, so this is a hand-off and not an orphan.
+const FOREIGN_OWNER := "godot-darts"
 
 ## The instance-side public functions, pinned.
 const EXPECTED_INSTANCE_FUNCTIONS := [
@@ -144,6 +169,7 @@ var legacy := {}
 
 func run_scenario() -> void:
 	_check_projection()
+	_check_foreign_fields()
 	_check_absent()
 	_check_census()
 	_check_corpus()
@@ -152,6 +178,10 @@ func run_scenario() -> void:
 	_check_absence()
 	_check_visits()
 	_check_legacy()
+	# `_check_handoff` runs LAST on purpose: it is the only check that reads a
+	# module owned by another capability, so it is the one most likely to be
+	# reported as the cause of an unrelated failure above it.
+	_check_handoff()
 	if OS.get_cmdline_user_args().has("--report") \
 			or _has_report_argument():
 		_write_report()
@@ -171,7 +201,8 @@ func _has_report_argument() -> bool:
 func _check_projection() -> void:
 	var names: Array = SocialState.field_names()
 	check_eq(names.size(), 19,
-		"the projection delivers exactly the NINETEEN measured social fields")
+		"the projection delivers exactly the NINETEEN MEASURED fields (of which "
+			+ "SEVENTEEN are social; `_check_foreign_fields` covers the other two)")
 	check_eq(names, EXPECTED_FIELD_NAMES,
 		"the delivered field names equal the investigation's measured list, in order")
 
@@ -667,6 +698,204 @@ func _absorb_document(path: String, values: Dictionary) -> bool:
 				values[field_name] = {}
 			values[field_name][key] = int(values[field_name].get(key, 0)) + 1
 	return not map_objects.is_empty()
+
+
+# ---------------------------------------------------------------------------
+# Foreign fields (the `godot-darts` correction)
+# ---------------------------------------------------------------------------
+
+## The two measured fields that are NOT social, and the correction to the
+## premium field's recorded description.
+##
+## Recorded here with the reason the correction exists, because a corrected
+## record that does not say what it replaced is indistinguishable from a record
+## that was always right.
+##
+## What was wrong, verbatim: this module called all nineteen measured fields
+## "social", and recorded `timeStampEndPremium` as
+##
+##     "note": "a single instant write",  written_by: ["buy_premium_account"]
+##
+## while the requirement owning that record is titled *"The one real social-state
+## writer is recorded with its **client-sent value**"*. Both halves were wrong:
+## `command.py:612-623` writes the instant **twice** (`:619` on the set arm,
+## `:622` on the extend arm), and the value is **server-derived** from the
+## committed `PREMIUM_ACCOUNTS` schedule via `get_game_config.get_premium_days`.
+## `crossPromotionsFinished` is a cross-promotion flag.
+func _check_foreign_fields() -> void:
+	var measured: Array = SocialState.field_names()
+	var social: Array = SocialState.social_field_names()
+	var foreign: Array = SocialState.foreign_field_names()
+
+	check_eq(foreign, EXPECTED_FOREIGN_FIELDS,
+		"exactly the two measured fields `godot-darts` found are declared foreign")
+	check_eq(social.size(), 17,
+		"SEVENTEEN of the nineteen measured fields are social state, and the "
+			+ "count is derived from FIELDS minus FOREIGN_FIELDS rather than typed")
+	check_eq(social.size() + foreign.size(), measured.size(),
+		"the social and foreign counts partition the measured set exactly, so "
+			+ "re-filing a field can neither duplicate nor drop one")
+	check_eq(measured.size(), 19,
+		"the measured set is still NINETEEN: re-filing changes ownership, not "
+			+ "the census")
+
+	# every foreign name is genuinely a measured field -- otherwise the hand-off
+	# would be claiming ownership of something this capability never delivered
+	for name: String in foreign:
+		check(measured.has(name),
+			"the foreign field `%s` is still one of the measured fields" % name)
+		check(not social.has(name),
+			"the foreign field `%s` is NOT reported as social state" % name)
+		check(SocialState.foreign_owner_of(name) == FOREIGN_OWNER,
+			"the foreign field `%s` names `%s` as its owner"
+				% [name, FOREIGN_OWNER])
+	check_eq(SocialState.foreign_owner_of("neighborAssists"), "",
+		"a social field names no foreign owner, so the accessor is discriminating")
+	check_eq(SocialState.foreign_owner_of("not_a_measured_field"), "",
+		"an unmeasured name yields no foreign owner rather than a guessed one")
+
+	# The census is about OCCURRENCE; re-filing must not quietly change it.
+	check(SocialState.zero_occurrence_names().has("crossPromotionsFinished"),
+		"`crossPromotionsFinished` REMAINS in the zero-occurrence census: the "
+			+ "census measures occurrence, and re-filing ownership does not change "
+			+ "that result")
+	check_eq(SocialState.zero_occurrence_names().size(), 12,
+		"the zero-occurrence group is still TWELVE after the re-filing")
+
+	# The corrected record for the premium instant, asserted against the source
+	# of the correction rather than against the note's own wording.
+	var premium: Variant = SocialState.field_record("timeStampEndPremium")
+	check(premium is Dictionary, "the premium field still has a measured record")
+	var note: String = str((premium as Dictionary).get("note", ""))
+	# The note QUOTES the claim it replaces, so a substring test for the old
+	# wording would match the correction and fail -- an earlier revision of this
+	# check did exactly that. What is asserted instead is that the note is no
+	# LONGER the old claim, that it cites BOTH write sites, and that it states
+	# the derivation -- the last case-folded, because the note writes "SERVER-side".
+	check(note != "a single instant write",
+		"the premium record is no longer the note `a single instant write`")
+	check(note.contains(":619") and note.contains(":622"),
+		"the premium record cites BOTH write sites, command.py:619 (set arm) and "
+			+ ":622 (extend arm), so the two-write correction is checkable")
+	var folded: String = note.to_lower()
+	check(folded.contains("twice") and folded.contains("server"),
+		"the premium record states BOTH that the branch writes twice and that the "
+			+ "value is server-derived, so it cannot be read as a client-sent write")
+	check_eq((premium as Dictionary).get("foreign_to", ""), FOREIGN_OWNER,
+		"the premium field's record carries the foreign owner inline, so the "
+			+ "ownership is visible without a second lookup")
+	var cross: Variant = SocialState.field_record("crossPromotionsFinished")
+	check_eq((cross as Dictionary).get("foreign_to", ""), FOREIGN_OWNER,
+		"the cross-promotion field's record carries the foreign owner inline")
+	check(not str((cross as Dictionary).get("note", "")).contains("uniformly empty"),
+		"the cross-promotion record no longer describes the field as merely "
+			+ "uniformly empty; it states that the field is not social")
+
+	# every FOREIGN_FIELDS entry justifies itself, so the table cannot be padded
+	for entry: Dictionary in SocialState.FOREIGN_FIELDS:
+		check(str(entry.get("why_not_social", "")).length() > 0,
+			"the foreign entry for `%s` records why it is not social"
+				% str(entry.get("name", "?")))
+		check(str(entry.get("corrected_claim", "")).length() > 0,
+			"the foreign entry for `%s` records the claim it replaced"
+				% str(entry.get("name", "?")))
+		check(entry.get("still_measured_here", false) == true,
+			"the foreign entry for `%s` records that the field stays measured here"
+				% str(entry.get("name", "?")))
+
+
+## The hand-off is verified, not asserted (task 1.3).
+##
+## A hand-off to a capability that does not exist, or that does not actually
+## project the fields, is an orphan -- and an orphan is worse than the wrong
+## ownership this correction set out to fix. So the owner module is loaded and
+## asked whether it really carries both fields.
+##
+## This is the guard that makes the correction safe to make at all: if
+## `godot-darts` were ever renamed or dropped, this FAILS rather than leaving
+## two fields owned by nothing.
+func _check_handoff() -> void:
+	var owner_script: String = "res://scripts/darts/darts_state.gd"
+	# NOTE: `%` binds tighter than `+` in GDScript, so a message split across two
+	# literals formats only the SECOND one and the first literal's placeholder
+	# raises "not all arguments converted". The whole concatenation is
+	# parenthesized here for that reason -- the same trap this file documents.
+	check(FileAccess.file_exists(owner_script),
+		("the capability named as owner (`%s`) EXISTS: a hand-off to a missing "
+			+ "module would orphan both fields") % FOREIGN_OWNER)
+	if not FileAccess.file_exists(owner_script):
+		return
+
+	# GUARDED, NOT CALLED BLINDLY -- and this is load-bearing.
+	#
+	# `test_base.gd::_run` does `await run_scenario()`. A runtime error inside a
+	# check ABORTS that call rather than propagating, so `_finish()` then sees an
+	# empty `failures` array and reports `PASS` with exit 0 -- silently skipping
+	# every check after the abort point. That is not hypothetical: an earlier
+	# revision of this function called `DartsState.field_record()` unguarded,
+	# `darts_state.gd` failed to compile (an inner class may not reference the
+	# outer script's static by bare name), and this suite printed
+	# `PASS checks=392` with exit 0 while the hand-off checks never ran.
+	#
+	# Two details make the guard work:
+	#
+	#   * `owner_api` is typed `Variant`, so every call below is DYNAMIC. A
+	#     compile-time-resolved call on the preloaded class would fail to COMPILE
+	#     the whole suite instead of producing a check failure -- which would be
+	#     the same silent-skip problem one level up.
+	#   * `has_method` is non-static on a script object and cannot be called on
+	#     the class directly, so it only resolves through the dynamic alias. It
+	#     returns false for a script that failed to parse, which is exactly how an
+	#     unloadable owner is distinguished from a correct one.
+	#
+	# The shared harness defect itself is recorded as a follow-up in `AGENTS.md`;
+	# fixing it for all 45 hermetic suites is a separate change, and this suite
+	# deliberately does not depend on that having happened first.
+	var owner_api: Variant = DartsState
+	var required: Array = ["field_record", "field_names", "darts_field_names",
+		"is_client_sent"]
+	var unavailable: Array = []
+	for method_name: String in required:
+		var present: bool = owner_api.has_method(method_name)
+		check(present,
+			("the owning module exposes `%s`; a preloaded script that failed to "
+				+ "parse reports no methods, which is how an unloadable owner is "
+				+ "distinguished from a correct one") % method_name)
+		if not present:
+			unavailable.append(method_name)
+	if not unavailable.is_empty():
+		# Do not call into a script that cannot be called. The failures already
+		# recorded are what make the abort visible instead of silent.
+		return
+
+	# Verified through the owner's real API, not by matching its prose.
+	for name: String in EXPECTED_FOREIGN_FIELDS:
+		check(owner_api.field_record(name) != null,
+			"the owning module really projects the field `%s` it was handed, so "
+				% name + "the hand-off is not an orphan")
+		check(not (owner_api.darts_field_names() as Array).has(name),
+			("the owning module files `%s` as HANDED rather than as one of its own "
+				+ "darts fields, so ownership moved rather than the error")
+				% name)
+
+	# The owner's own classification must agree: the handed names are absent from
+	# its darts set and present in its handed set, so the two tables partition.
+	var owner_all: Array = owner_api.field_names() as Array
+	var owner_darts: Array = owner_api.darts_field_names() as Array
+	check_eq(owner_darts.size(), 6,
+		"the owning module classifies exactly SIX fields as darts state")
+	check_eq(owner_all.size(), 8,
+		"the owning module projects the six darts fields plus the two handed ones")
+	for name: String in EXPECTED_FOREIGN_FIELDS:
+		check(owner_all.has(name) and not owner_darts.has(name),
+			("the handed field `%s` is projected by its owner but is NOT one of "
+				+ "the owner's darts fields") % name)
+
+	# And the premium field's owner must record it as server-derived, which is the
+	# whole reason this capability stopped calling it a client-sent social write.
+	check(not bool(owner_api.is_client_sent("timeStampEndPremium")),
+		"the owning module records the premium instant as NOT client-sent, so the "
+			+ "ownership moved together with the corrected description")
 
 
 # ---------------------------------------------------------------------------
