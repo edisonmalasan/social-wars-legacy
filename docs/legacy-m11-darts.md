@@ -102,13 +102,91 @@ census is sound in **both** directions. The delivered number stands.
 
 ---
 
+## 0b. Corrections to THIS document, found during Apply
+
+These were found by the `godot-darts` Apply stage re-measuring §5 rather than
+inheriting it. Both correct §5's denominator, and the cause is a single
+**instrument fault** shared by every figure in that section. They are recorded
+here rather than edited into §5 silently, per the standing rule.
+
+### C3 — the "231 save-shaped JSON documents" are 33 canonical documents plus 198 generated fixtures
+
+§1 and §5 measure the corpus as *"every `.json` with a dict `privateState`"*, walked
+across the **whole repository**. That walk returns **231** files — and **200 of them
+are generated test fixtures** under `tests/fixtures/**`, specifically the
+`before.json`/`after.json` pairs that executed-legacy captures produce.
+
+Every one of those files is a *derived copy* of a canonical save, and a fixture
+records **both** sides of a transaction, so each fixture contributes two
+"documents" that are not independent observations at all. Counting them inflated
+the denominator roughly **sevenfold**.
+
+The canonical corpus — the settled definition the delivered `godot-social-state`
+suite already uses — is **`tests/saves` + `villages`, excluding
+`tests/saves/manifest.json`, counting a document that carries at least one map**:
+**33 documents**, all 33 of which carry a map. `villages` contributes 31 and
+`tests/saves` the remaining 2.
+
+**The corrected figures, measured over those 33 documents:**
+
+| Field | Distinct | Canonical distribution (was §5's fixture-inflated figure) |
+|---|---|---|
+| `dartsRandomSeed` | **15** | `2366` ×10, `0` ×5, `4555` ×3, `2137` ×3, `2184` ×2, 9 singletons |
+| `timeStampDartsReset` | **15** | `1672677498` ×10, `0` ×5, `1672069701` ×3, `1671881466` ×3, `1672167906` ×2, 9 singletons |
+| `timeStampDartsNewFree` | **21** | `0` ×5, `1672763991` ×3, `1672839826` ×3, `1672875500` ×3, 15 singletons |
+| `dartsHasFree` | **2** | `true` ×26, `false` ×7 (was `true` ×72, `false` ×159) |
+| `dartsBalloonsShot` | **4** | `[]` ×30, `[18, 17]` ×1, `[0]` ×1, `[18]` ×1 (was `[]` ×178, `[18, 17]` ×51) |
+| `dartsGotExtra` | **1** | `false` ×33 — unchanged, and see C4 |
+| `timeStampEndPremium` | **2** | `0` ×32, `1682945878` ×1 (was `0` ×184, `1682945878` ×47) |
+
+**Every distinct-value count in §5 is unchanged** — 15, 15, 21, 2, 4, 1, 2 all
+reproduce exactly. That is the tell: the fixtures are copies, so they repeat
+canonical values and add no new ones. Only the per-value *multiplicities* were
+wrong, which is why §5's conclusion survived even though its numbers did not.
+
+**What this changes and what it does not.** §5's substantive finding stands: darts
+and premium state is real, varied, and played, and `fresh-player.json` cannot
+exercise any of it. But two figures are now much thinner, and one of them is the
+figure a reader would most have relied on:
+
+- **"**47** additionally carry a live premium instant" is really **ONE** document,
+  `villages/Neutral.json`. The extend-arm finding in B2 was already recorded as
+  unproven against the corpus; it is now unproven against a *single* document
+  rather than against many.
+- **"**53** documents carry a fully played darts state" is really **28** of 33 —
+  the other **5** carry seed `0` and reset instant `0`, meaning darts was never
+  played in them.
+
+The delivered suite pins the **33-document** denominator and re-derives it, so this
+class of drift fails the run rather than rotting in a document.
+
+### C4 — `dartsGotExtra` is uniformly `false` in **33 of 33** documents, which strengthens the refusal
+
+§5 lists `dartsGotExtra` with one distinct value, `false`, but does not draw the
+conclusion the number supports. Over the canonical corpus it is `false` in **every**
+document, and the three documents that carry a non-empty shot list
+(`villages/AcidCaos.json` `[18, 17]`, `villages/Nerri.json` `[0]`,
+`villages/Scarlet.json` `[18]`) all record **losing** shots.
+
+So the corpus contains **no** document in which the client-dictated `won_extra`
+truthiness ever set the flag. The `godot-darts` refusal of that value is therefore
+recorded as having **no corpus evidence in either direction** — not as a case where
+the corpus shows the legacy behaviour working, and not as a case where it shows
+the legacy behaviour misfiring. It is simply unexercised.
+
+This cuts against the temptation to treat the refusal as low-risk because "the
+corpus shows players do win". The corpus shows the opposite, and a reader
+reconciling the two should not have to rediscover that.
+
+---
+
 ## 1. Denominators (settled, reproduced)
 
 | Quantity | Value | How measured |
 |---|---|---|
 | legacy modules searched | **11** | `command.py`, `engine.py`, `sessions.py`, `server.py`, `constants.py`, `version.py`, `auctions.py`, `bundle.py`, `get_game_config.py`, `get_player_info.py`, `legacy_command_recorder.py` — **all 11 present** |
 | named `command.py` dispatcher branches | **63** | `cmd == "…"` in raw source |
-| save-shaped JSON documents in the repository | **231** | every `.json` with a dict `privateState` |
+| save-shaped JSON documents in the repository | **231** | every `.json` with a dict `privateState` — **⚠ SUPERSEDED, see §0b C3: 200 of these are generated `tests/fixtures/**` files, so the canonical corpus is 33** |
 | committed `PREMIUM_ACCOUNTS` entries | **6** | `config/main.json` → `globals`, and `normalized/globals.json` verbatim |
 | committed normalized `darts_items` entries | **27** | `packages/game-content/normalized/darts_items.json`, ids `1..27` |
 
@@ -271,6 +349,11 @@ Measured properties, none of them derived:
 ---
 
 ## 5. What the corpus shows: darts and premium are **played**, not inert
+
+> **⚠ The figures in this section were measured over a fixture-inflated
+> denominator and are corrected in §0b C3.** The distinct-value counts all
+> reproduce exactly; the per-value multiplicities, the "53 played" and the
+> "47 premium" figures do not. The canonical corpus is **33** documents.
 
 Over the 231 save-shaped documents:
 

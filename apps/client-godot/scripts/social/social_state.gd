@@ -10,6 +10,20 @@ extends RefCounted
 ## **twelve of them have zero occurrences of any kind** across all eleven
 ## legacy modules - no read, no write, no mention.
 ##
+## **Nineteen MEASURED, seventeen SOCIAL (corrected by `godot-darts`)**
+##
+## The `godot-darts` change measured two of these fields and found that neither is
+## social: `timeStampEndPremium` is a paid-purchase instant whose value the server
+## DERIVES from a committed schedule, and `crossPromotionsFinished` is a
+## cross-promotion flag. This module therefore no longer calls all nineteen
+## "social". The census is unaffected -- it measures *occurrence*, not ownership --
+## so the pinned `ZERO_OCCURRENCE_FIELDS` still contains `crossPromotionsFinished`
+## and the re-derived set must still equal the pinned set. What changed is the
+## field set's *description*, and `timeStampEndPremium`'s recorded description,
+## which asserted a single client-sent write where `command.py:612-623` performs
+## two server-derived ones. See `FOREIGN_FIELDS`, and note the verification in
+## `test_social_state.gd`'s hand-off check.
+##
 ## The committed investigation and the original proposal both said THIRTEEN,
 ## counting `questsRank` in the group. That was wrong: `admin_set_quest_rank`
 ## both READS and WRITES it, so the field is in the read-and-written group and
@@ -201,12 +215,23 @@ const FIELDS := [
 		"name": "timeStampEndPremium", "store": STORE_PRIVATE,
 		"zero_occurrence": false, "written_by": ["buy_premium_account"],
 		"readers": [], "recorded_value": 0, "documents": 33,
-		"note": "a single instant write",
+		"foreign_to": "godot-darts",
+		"note": "NOT SOCIAL and NOT client-sent: this was recorded here as "
+			+ "\"a single instant write\" by a client-sent branch, and both halves "
+			+ "were wrong. command.py:612-623 writes it TWICE -- :619 on the set "
+			+ "arm, :622 on the extend arm -- and the value is derived SERVER-side "
+			+ "from the committed PREMIUM_ACCOUNTS schedule via "
+			+ "get_game_config.get_premium_days (get_game_config.py:181-189). "
+			+ "Corrected by the godot-darts change; see FOREIGN_FIELDS.",
 	},
 	{
 		"name": "crossPromotionsFinished", "store": STORE_PRIVATE,
 		"zero_occurrence": true, "written_by": [], "readers": [],
-		"recorded_value": [], "documents": 33, "note": "uniformly empty",
+		"recorded_value": [], "documents": 33,
+		"foreign_to": "godot-darts",
+		"note": "NOT SOCIAL: a cross-promotion flag, not a social fact. Still "
+			+ "zero-occurrence -- the census is about occurrence and is unchanged "
+			+ "by the re-filing. Foreign ownership is in FOREIGN_FIELDS.",
 	},
 ]
 
@@ -258,6 +283,10 @@ const RECORDED_WRITERS := [{
 }]
 
 ## The four other written fields and the branch that writes each.
+##
+## `timeStampEndPremium` remains mapped here because that branch really does write
+## it, but the mapping is NOT a claim of social ownership: the field is foreign
+## (see FOREIGN_FIELDS) and the recorded value is server-derived, not client-sent.
 const OTHER_WRITTEN_FIELDS := {
 	"publishedOpenGraphUnit": "rt_open_graph_unit",
 	"marketPlaceFirstTime": "first_time_marketplace",
@@ -265,6 +294,76 @@ const OTHER_WRITTEN_FIELDS := {
 	"timestampLastTrade": "trade_resource",
 	"timeStampEndPremium": "buy_premium_account",
 }
+
+## Measured fields that are NOT social state, and the capability that owns them.
+##
+## Recorded by the `godot-darts` change, which measured both fields and found that
+## neither is a social fact. Until then this capability called all nineteen of its
+## measured fields "social", and for `timeStampEndPremium` it also recorded the
+## branch as writing a single client-sent instant -- which is wrong twice over:
+## `command.py:612-623` writes the instant twice, once per arm, from a
+## **server-derived** value.
+##
+## The fields stay PRESENT in `FIELDS` and, for `crossPromotionsFinished`, stay in
+## `ZERO_OCCURRENCE_FIELDS`. The census measures *occurrence*; this table measures
+## *ownership*, and re-filing a field must not silently change a census result. So
+## the nineteen measured fields remain nineteen and the re-derived census still has
+## to equal the pinned set -- while the field set is now described honestly as
+## **seventeen social fields plus two foreign ones**.
+##
+## `owner` is verified, not asserted: the suite requires the named capability to
+## exist AND to project both fields, so this hand-off cannot rot into an orphan.
+const FOREIGN_FIELDS := [
+	{
+		"name": "timeStampEndPremium",
+		"owner": "godot-darts",
+		"why_not_social": "a paid-purchase instant with a server-derived "
+			+ "duration, not a social fact",
+		"still_measured_here": true,
+		"corrected_claim": "was recorded as \"a single instant write\" from a "
+			+ "client-sent argument; it is two writes (command.py:619 and :622) "
+			+ "from a committed schedule",
+	},
+	{
+		"name": "crossPromotionsFinished",
+		"owner": "godot-darts",
+		"why_not_social": "a cross-promotion flag, uniformly empty and never "
+			+ "read or written by any of the eleven legacy modules",
+		"still_measured_here": true,
+		"corrected_claim": "was filed as social state; the census result "
+			+ "(zero-occurrence) is unchanged and remains true",
+	},
+]
+
+## The number of measured fields that ARE social state, derived rather than typed.
+##
+## Kept as a function so the count cannot drift from `FIELDS` minus
+## `FOREIGN_FIELDS`. A hand-written 17 beside a nineteen-field table is exactly the
+## kind of pair that goes stale.
+static func social_field_names() -> Array:
+	var foreign: Array = foreign_field_names()
+	var out: Array = []
+	for entry: Dictionary in FIELDS:
+		var field_name: String = str(entry["name"])
+		if not foreign.has(field_name):
+			out.append(field_name)
+	return out
+
+
+## The measured fields declared foreign to this capability.
+static func foreign_field_names() -> Array:
+	var out: Array = []
+	for entry: Dictionary in FOREIGN_FIELDS:
+		out.append(str(entry["name"]))
+	return out
+
+
+## The capability that owns a foreign field, or `""` when the name is not foreign.
+static func foreign_owner_of(field_name: String) -> String:
+	for entry: Dictionary in FOREIGN_FIELDS:
+		if str(entry["name"]) == field_name:
+			return str(entry["owner"])
+	return ""
 
 ## Save keys carried by every document and read by nothing in the server.
 ##

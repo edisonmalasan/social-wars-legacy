@@ -899,6 +899,12 @@ class RoutePlacementTests(unittest.TestCase):
             "store", "upgrade", "construction", "collect", "expand",
             "queue", "collection", "resurrect", "quests", "research",
             "level_up", "combat", "place_stored", "sell_stored",
+            # Added by the darts line, which broke this invariant twice before
+            # it was placed: once by being declared after ``/v0/level_up``
+            # (four suites' ``markers[-1]``) and once between ``/v0/research``
+            # and ``/v0/level_up`` (the research suite's end marker, which
+            # reaches forward across every route declared between them).
+            "darts",
         )
         self.assertGreaterEqual(len(markers), 21)
         for name in names:
@@ -948,6 +954,72 @@ class RoutePlacementTests(unittest.TestCase):
                 [expected],
                 label,
             )
+
+    def test_the_darts_route_is_declared_in_a_slot_no_span_reaches(self) -> None:
+        """The darts route's own placement, pinned rather than left to chance.
+
+        This is the fourth delivered family to be broken by a route appended in
+        the natural place, so the darts route declares its position here instead
+        of relying on a reviewer noticing.  Two properties, both of which a
+        future edit can break independently:
+
+        1. the darts route's own slice -- its ``def`` to the **next** ``@app.``
+           decorator, the convention every delivered family uses -- parses as
+           exactly one function; and
+        2. it is declared in neither forward-reaching span, that is, not between
+           ``def v0_research()`` and the level decorator, and not between
+           ``def v0_level_up()`` and the corpus constant.
+
+        Property 2 is the one that actually failed twice during this line: both
+        forbidden slots look like perfectly reasonable places to append a route.
+        """
+        import ast
+        import textwrap
+
+        source = self.source()
+        markers = []
+        cursor = 0
+        for line in source.split("\n"):
+            markers.append((cursor, line.strip()))
+            cursor += len(line) + 1
+        decorators = sorted(
+            offset for offset, text in markers if text.startswith("@app.")
+        )
+
+        start = source.index("def v0_darts()")
+        following = [m for m in decorators if m > start]
+        self.assertTrue(following, "the darts route must not be the last route")
+        # Declared before the level route, whose "still the last one" position
+        # four delivered suites own through their ``markers[-1]`` assertion.
+        self.assertLess(start, source.index("def v0_level_up()"))
+        self.assertEqual(
+            [
+                n.name
+                for n in ast.parse(
+                    textwrap.dedent(source[start : following[0]].lstrip("\n"))
+                ).body
+                if isinstance(n, ast.FunctionDef)
+            ],
+            ["v0_darts"],
+        )
+
+        for label, span_start, span_end in (
+            ("research->level_up",
+             source.index("def v0_research()"),
+             source.index('@app.post("/v0/level_up")')),
+            ("level_up->corpus_constant",
+             source.index("def v0_level_up()"),
+             source.index(self.CORPUS_CONSTANT)),
+        ):
+            with self.subTest(span=label):
+                self.assertNotIn("def v0_darts(", source[span_start:span_end])
+
+        # And it is the second route, so the tutorial route's own "declared
+        # before every other route" claim survives it.
+        self.assertEqual(
+            [text for _, text in markers if text.startswith("@app.post")][1],
+            '@app.post("/v0/darts")',
+        )
 
     def test_the_placement_note_is_present_where_the_route_is_declared(self) -> None:
         source = self.source()

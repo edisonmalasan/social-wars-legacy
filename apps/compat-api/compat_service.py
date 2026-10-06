@@ -915,6 +915,7 @@ import collect_envelope
 import collection_envelope
 import combat_envelope
 import construction_envelope
+import darts_envelope
 import expand_envelope
 import level_envelope
 import magic_envelope
@@ -1122,6 +1123,10 @@ ERROR_CLIENT_SUPPLIED_PLAYER = "client_supplied_player"
 ERROR_CLIENT_SUPPLIED_NEXT_ID = "client_supplied_next_id"
 ERROR_CLIENT_SUPPLIED_AMOUNT = "client_supplied_amount"
 ERROR_CLIENT_SUPPLIED_PRICE = "client_supplied_price"
+ERROR_UNKNOWN_DARTS_ACTION = "unknown_darts_action"
+ERROR_INVALID_DARTS_SEED = "invalid_darts_seed"
+ERROR_INVALID_SHOT_INDEX = "invalid_shot_index"
+ERROR_INVALID_PACKAGE_INDEX = "invalid_package_index"
 ERROR_NOT_FOUND = "not_found"
 ERROR_METHOD_NOT_ALLOWED = "method_not_allowed"
 ERROR_INTERNAL = "internal_error"
@@ -2060,6 +2065,252 @@ def create_app(legacy: Optional[compat_legacy.LegacyBoot] = None) -> Flask:
                     "/%s/%s" % (tutorial_envelope.PLAYER_INFO_RECORD,
                                 tutorial_envelope.FLAG_KEY)
                 ],
+            ),
+            200,
+        )
+
+    @app.post("/v0/darts")
+    def v0_darts() -> Tuple[Dict[str, Any], int]:
+        """Execute one darts or premium intent through the unchanged legacy path.
+
+        One call carries **exactly one** legacy command, drawn from the closed
+        action set ``darts_reset`` / ``darts_new_free`` / ``darts_shoot_balloon``
+        / ``buy_premium_account`` (``command.py:573-623``).  Every envelope is
+        derived by :mod:`darts_envelope`; this route resolves, executes, and
+        then **proves** the post-state.
+
+        **Nothing is charged, and that is a refusal rather than parity.**  The
+        committed ``PREMIUM_ACCOUNTS`` schedule carries an amount beside every
+        duration and that amount has **zero** consumers across all eleven legacy
+        modules: ``get_premium_days`` returns the committed *duration* and never
+        reads the amount beside it (``get_game_config.py:181-189``).  So no
+        price is charged and every stored resource must be unchanged.  Because
+        ``engine.apply_resources`` applies a *client-sent* vector before
+        dispatch, a legacy client could pair a debit with this purchase; the
+        derived neutral vector forecloses that here without any claim about what
+        the Flash client did.
+
+        **The shot outcome is refused (design D3/D7).**  The preserved branch
+        writes ``dartsGotExtra`` only when a client-sent ``args[1]`` is truthy
+        (``command.py:604-605``).  The envelope therefore *derives* that slot as
+        ``False``: it must be present, or the branch raises ``IndexError``, and a
+        falsy value makes the conditional write not execute at all.  A client
+        claiming a win cannot move the flag, and the difference from the
+        preserved server is reported as a **divergence**, never as parity.
+
+        **The two invented rules are refused and reported.**  The shot list is
+        unbounded and the shot index is never tested against the committed
+        ``darts_items`` schedule: ``villages/Nerri.json`` records the shot index
+        ``0``, which is absent from the committed ``1..27`` ids, so a membership
+        test would contradict the corpus rather than reproduce the branch.
+
+        **Design D5 — the post-state proof is the premium instant AND the
+        complete stored resource set.**  For ``buy_premium_account`` the instant
+        must move by exactly the duration the committed schedule derives; for
+        every action all **seven** stored resource slots must be byte-identical.
+        The resource half is what makes the no-charge claim non-tautological: it
+        would fail for any balance movement, and it is compared against the
+        service's full seven-slot vocabulary rather than a subset.  Either half
+        failing is a reported ``internal_error``, never the legacy success.
+        """
+        payload = request.get_json(silent=True, force=True)
+        user_id, error = _resolve_user_id(payload)
+        if error is not None:
+            return error
+        assert user_id is not None and isinstance(payload, dict)
+        if user_id not in boot.known_user_ids():
+            return error_response(
+                404,
+                ERROR_UNKNOWN_USER_ID,
+                "no save exists for user_id %r" % user_id,
+            )
+
+        action = payload.get("action")
+        # Arguments are read from a dedicated key only.  Any top-level
+        # ``resources``/``price``/``days`` a client sends is ignored outright:
+        # the envelope derives its own neutral vector and its own duration.
+        arguments = payload.get("arguments", {})
+        if not isinstance(arguments, dict):
+            return error_response(
+                400,
+                ERROR_BAD_REQUEST,
+                "arguments must be an object, got %s" % type(arguments).__name__,
+            )
+
+        # Pre-execution reads, all before dispatch: the darts snapshot for the
+        # structural half of the proof, the seven stored resources for the
+        # value-level half, and the premium instant for the duration derivation.
+        try:
+            state_before = boot.darts_state(user_id)
+            resources_before = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        instant_before = boot.premium_instant(user_id)
+        if instant_before is None:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "this save records no premium instant this service can read as "
+                "an integer",
+            )
+
+        try:
+            envelope_payload = darts_envelope.build_envelope(action, arguments)
+        except darts_envelope.EnvelopeError as failure:
+            status_by_reason = {
+                darts_envelope.REASON_BAD_REQUEST: (400, ERROR_BAD_REQUEST),
+                darts_envelope.REASON_UNKNOWN_ACTION: (
+                    409,
+                    ERROR_UNKNOWN_DARTS_ACTION,
+                ),
+                darts_envelope.REASON_INVALID_SEED: (409, ERROR_INVALID_DARTS_SEED),
+                darts_envelope.REASON_INVALID_SHOT_INDEX: (
+                    409,
+                    ERROR_INVALID_SHOT_INDEX,
+                ),
+                darts_envelope.REASON_INVALID_PACKAGE_INDEX: (
+                    409,
+                    ERROR_INVALID_PACKAGE_INDEX,
+                ),
+            }
+            status, code = status_by_reason.get(failure.code, (500, ERROR_INTERNAL))
+            return error_response(status, code, "%s (%s)" % (failure, failure.code))
+
+        # The server's own clock, which is what the premium arm comparison and
+        # every recorded instant write are stamped with.
+        now = boot.server_time()
+
+        # Derive the premium facts BEFORE execution, so the proof can compare
+        # against a derivation rather than against whatever was executed.
+        premium_facts: Dict[str, Any] = {}
+        expected_instant: Optional[int] = None
+        if action == darts_envelope.PREMIUM_COMMAND:
+            package_index = arguments.get("package_index")
+            days = boot.premium_days(package_index)
+            if days is None:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "the committed PREMIUM_ACCOUNTS schedule does not resolve "
+                    "a duration for this index",
+                )
+            arm = "set" if now >= instant_before else "extend"
+            base = now if arm == "set" else instant_before
+            expected_instant = base + days * 86400
+            premium_facts = {
+                "package_index": package_index,
+                "days": days,
+                "seconds_per_day": 86400,
+                "seconds": days * 86400,
+                "arm": arm,
+                "arm_comparison": "now >= instant",
+                "server_clock": now,
+                "duration_source": "get_game_config.get_premium_days "
+                "(get_game_config.py:181-189)",
+                "duration_client_sent": False,
+                "charged": False,
+                "committed_amount_consumers": 0,
+            }
+
+        try:
+            boot.execute_commands(user_id, envelope_payload)
+        except Exception as failure:  # legacy raised after validation passed
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "legacy command execution failed: %s" % type(failure).__name__,
+            )
+
+        # Prove the post-state (design D5).  Either half failing is a reported
+        # failure, not the legacy success the dispatcher already returned.
+        try:
+            state_after = boot.darts_state(user_id)
+            resources_after = boot.resources(user_id)
+        except compat_legacy.LegacyBootError as failure:
+            return _legacy_boot_error(failure)
+        instant_after = boot.premium_instant(user_id)
+        if instant_after is None:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the premium instant is unreadable after execution",
+            )
+        if expected_instant is not None and instant_after != expected_instant:
+            return error_response(
+                500,
+                ERROR_INTERNAL,
+                "the premium instant is %r after execution, not the derived %r "
+                "(%s arm: %r + %r seconds)"
+                % (
+                    instant_after,
+                    expected_instant,
+                    premium_facts["arm"],
+                    now if premium_facts["arm"] == "set" else instant_before,
+                    premium_facts["seconds"],
+                ),
+            )
+        for name in sorted(resources_after):
+            if resources_after[name] != resources_before[name]:
+                return error_response(
+                    500,
+                    ERROR_INTERNAL,
+                    "resource %s is %r after execution, not the pre-execution %r: "
+                    "nothing is charged for darts or for a premium account, so "
+                    "the derived neutral vector requires every stored resource "
+                    "to be unchanged"
+                    % (name, resources_after[name], resources_before[name]),
+                )
+
+        # The client-dictated outcome, reported as a divergence and never as
+        # parity.  It is reported whatever the client claimed, so a caller can
+        # see that the claim was considered and refused.
+        divergences: List[Dict[str, Any]] = []
+        if action == darts_envelope.SHOOT_COMMAND:
+            claimed = bool(arguments.get("won_extra", False))
+            divergences.append(
+                {
+                    "field": "dartsGotExtra",
+                    "site": "command.py:604-605",
+                    "client_argument": "args[1]",
+                    "client_claimed_win": claimed,
+                    "delivered": False,
+                    "is_parity": False,
+                    "derived_outcome_slot": darts_envelope.DERIVED_SHOT_OUTCOME,
+                    "why": "the preserved branch honours a client-sent truthy "
+                    "args[1]; this service derives the slot as False so a "
+                    "client claim cannot move the flag",
+                    "corpus_evidence": "none in either direction: dartsGotExtra "
+                    "is false in all 33 canonical documents, so the corpus "
+                    "records no won shot at all",
+                }
+            )
+
+        changed = sorted(
+            field
+            for field in state_after
+            if state_after[field] != state_before.get(field)
+        )
+        return (
+            envelope(
+                boot,
+                result="success",
+                action=action,
+                darts_before=state_before,
+                darts_after=state_after,
+                darts_changed_fields=changed,
+                shot_index=arguments.get("shot_index"),
+                seed=arguments.get("seed"),
+                shot_list_length_bound=None,
+                schedule_membership_tested=False,
+                premium={
+                    "instant_before": instant_before,
+                    "instant_after": instant_after,
+                    **premium_facts,
+                },
+                divergences=divergences,
+                neutral_vector=darts_envelope.neutral_vector(),
+                client_supplied_resource_vector_ignored=True,
+                resources=resources_after,
             ),
             200,
         )

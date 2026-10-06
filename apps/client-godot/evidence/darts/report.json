@@ -1,0 +1,866 @@
+{
+  "schema": "darts-report-v1",
+  "capability": "godot-darts",
+  "kind": "server-derived value plus refusals",
+  "delivered": [
+    "a typed read-only projection of six darts state fields plus the two fields handed from godot-social-state",
+    "the three recorded darts transitions with their client-sent inputs named as client-sent",
+    "the premium duration derived from the committed PREMIUM_ACCOUNTS schedule, with its recorded index clamp",
+    "the premium arm selection by the recorded server-side comparison, with each arm's corpus reachability reported",
+    "the week-boundary reset as a pure predicate with no mutation and no route"
+  ],
+  "not_delivered": [
+    "any charge: the committed price has zero legacy consumers",
+    "the client-dictated shot outcome (refused, and recorded as a divergence rather than reproduced as parity)",
+    "any shot-list length bound",
+    "any schedule-membership test, which the corpus contradicts",
+    "any weekday rule, from the legacy author's own comment",
+    "any executed-legacy fixture",
+    "any rendering, darts table, or premium-buy screen"
+  ],
+  "fields": [
+    {
+      "name": "dartsRandomSeed",
+      "store": "privateState",
+      "distinct": 15,
+      "documents": 33,
+      "written_by": [
+        "darts_reset"
+      ],
+      "readers": [],
+      "client_sent": true,
+      "recorded_values": {
+        "2366": 10,
+        "0": 5,
+        "4555": 3,
+        "2137": 3,
+        "2184": 2,
+        "23340": 1,
+        "3595": 1,
+        "4627": 1,
+        "9709": 1,
+        "8704": 1,
+        "2900": 1,
+        "8538": 1,
+        "9919": 1,
+        "7018": 1,
+        "7808": 1
+      },
+      "note": "written from client args[0] by darts_reset and read by NO branch; no semantics are derived from it anywhere (design D10)",
+      "owned_by_this_capability": true
+    },
+    {
+      "name": "dartsBalloonsShot",
+      "store": "privateState",
+      "distinct": 4,
+      "documents": 33,
+      "written_by": [
+        "darts_reset",
+        "darts_shoot_balloon"
+      ],
+      "readers": [],
+      "client_sent": true,
+      "recorded_values": {
+        "[]": 30,
+        "[18,17]": 1,
+        "[0]": 1,
+        "[18]": 1
+      },
+      "note": "the ONLY played list in the corpus; 30 of 33 documents hold [] and the three that do not are named in OUT_OF_SCHEDULE_SHOTS",
+      "owned_by_this_capability": true
+    },
+    {
+      "name": "dartsGotExtra",
+      "store": "privateState",
+      "distinct": 1,
+      "documents": 33,
+      "written_by": [
+        "darts_shoot_balloon"
+      ],
+      "readers": [],
+      "client_sent": true,
+      "recorded_values": {
+        "false": 33
+      },
+      "note": "UNIFORMLY false in 33 of 33 documents, so the corpus records no won shot at all; the client-dictated write is refused and has no corpus evidence either way (C4)",
+      "owned_by_this_capability": true
+    },
+    {
+      "name": "dartsHasFree",
+      "store": "privateState",
+      "distinct": 2,
+      "documents": 33,
+      "written_by": [
+        "darts_reset",
+        "darts_new_free",
+        "darts_shoot_balloon"
+      ],
+      "readers": [],
+      "client_sent": false,
+      "recorded_values": {
+        "true": 26,
+        "false": 7
+      },
+      "note": "true in 26 of 33 documents, yet NO branch reads it to decide anything, so no eligibility rule is derived from it",
+      "owned_by_this_capability": true
+    },
+    {
+      "name": "timeStampDartsReset",
+      "store": "privateState",
+      "distinct": 15,
+      "documents": 33,
+      "written_by": [
+        "darts_reset",
+        "sessions.create_player",
+        "reset_stuff"
+      ],
+      "readers": [
+        "reset_stuff"
+      ],
+      "client_sent": false,
+      "recorded_values": {
+        "1672677498": 10,
+        "0": 5,
+        "1672069701": 3,
+        "1671881466": 3,
+        "1672167906": 2,
+        "1705671822": 1,
+        "1705940140": 1,
+        "1705775953": 1,
+        "1705795645": 1,
+        "1688698313": 1,
+        "1672159213": 1,
+        "1703527908": 1,
+        "1703527723": 1,
+        "1703544899": 1,
+        "1704755505": 1
+      },
+      "note": "the ONLY time-derived darts mutation; reset_stuff writes it to 0, never to the server clock (design D5)",
+      "owned_by_this_capability": true
+    },
+    {
+      "name": "timeStampDartsNewFree",
+      "store": "privateState",
+      "distinct": 21,
+      "documents": 33,
+      "written_by": [
+        "darts_reset",
+        "darts_new_free",
+        "darts_shoot_balloon"
+      ],
+      "readers": [],
+      "client_sent": false,
+      "recorded_values": {
+        "0": 5,
+        "1672763991": 3,
+        "1672839826": 3,
+        "1672875500": 3,
+        "1672098185": 2,
+        "1671967335": 2,
+        "1705744789": 1,
+        "1705940140": 1,
+        "1705775972": 1,
+        "1705795645": 1,
+        "1688927899": 1,
+        "1672159213": 1,
+        "1672069701": 1,
+        "1671867066": 1,
+        "1672167906": 1,
+        "1672250740": 1,
+        "1672677498": 1,
+        "1703527908": 1,
+        "1703527723": 1,
+        "1703557046": 1,
+        "1704761785": 1
+      },
+      "note": "stamped by three branches and read by none, so no availability window is derived from it",
+      "owned_by_this_capability": true
+    },
+    {
+      "name": "timeStampEndPremium",
+      "store": "privateState",
+      "distinct": 2,
+      "documents": 33,
+      "written_by": [
+        "buy_premium_account"
+      ],
+      "readers": [
+        "buy_premium_account"
+      ],
+      "client_sent": false,
+      "recorded_values": {
+        "0": 32,
+        "1682945878": 1
+      },
+      "note": "ONE document of 33 records a live instant (villages/Neutral.json, 1682945878 = 2023-05-01 12:57:58 UTC, in the past); the branch reads it and writes it twice from a committed schedule",
+      "owned_by_this_capability": false
+    },
+    {
+      "name": "crossPromotionsFinished",
+      "store": "privateState",
+      "distinct": 1,
+      "documents": 33,
+      "written_by": [],
+      "readers": [],
+      "client_sent": false,
+      "recorded_values": {
+        "[]": 33
+      },
+      "note": "uniformly empty and never touched by any of the eleven legacy modules; reported as an inert event-system flag, not as social state",
+      "owned_by_this_capability": false
+    }
+  ],
+  "corpus": {
+    "documents": 33,
+    "roots": 2,
+    "definition": "a document that carries at least one map",
+    "maps_observed": 33,
+    "village_documents": 31,
+    "premium_flag_documents": 0
+  },
+  "projection": {
+    "absent_document": [
+      "dartsRandomSeed",
+      "dartsBalloonsShot",
+      "dartsGotExtra",
+      "dartsHasFree",
+      "timeStampDartsReset",
+      "timeStampDartsNewFree",
+      "timeStampEndPremium",
+      "crossPromotionsFinished"
+    ],
+    "empty_document": []
+  },
+  "premium": {
+    "schedule": [
+      {
+        "time": 360.0,
+        "price": 800.0
+      },
+      {
+        "time": 180.0,
+        "price": 450.0
+      },
+      {
+        "time": 30.0,
+        "price": 80.0
+      },
+      {
+        "time": 7.0,
+        "price": 40.0
+      },
+      {
+        "time": 3.0,
+        "price": 20.0
+      },
+      {
+        "time": 1.0,
+        "price": 8.0
+      }
+    ],
+    "entries": 6,
+    "set_arm": {
+      "ok": true,
+      "error": "",
+      "command": "buy_premium_account",
+      "command_source": "command.py:612-623",
+      "field": "timeStampEndPremium",
+      "client_sent": {
+        "package_index": "args[0]",
+        "source": "command.py:612-623"
+      },
+      "duration_client_sent": false,
+      "duration_source": "get_game_config.py:181-189",
+      "duration_field": "time",
+      "duration_unit": "days",
+      "schedule_key": "PREMIUM_ACCOUNTS",
+      "schedule_owner": "globals-tuning-normalization",
+      "charged": false,
+      "resources_moved": 0,
+      "seconds_per_day": 86400,
+      "days": 1,
+      "seconds": 86400,
+      "arm": "set",
+      "instant_before": 500,
+      "instant_after": 87400,
+      "arm_record": {
+        "comparison": "now >= instant",
+        "site": "command.py:619",
+        "expression": "now + days * 86400",
+        "base": "the server clock",
+        "corpus_reachable": true,
+        "note": "taken by every committed document, because every committed instant has already passed"
+      },
+      "clamped": false
+    },
+    "extend_arm": {
+      "ok": true,
+      "error": "",
+      "command": "buy_premium_account",
+      "command_source": "command.py:612-623",
+      "field": "timeStampEndPremium",
+      "client_sent": {
+        "package_index": "args[0]",
+        "source": "command.py:612-623"
+      },
+      "duration_client_sent": false,
+      "duration_source": "get_game_config.py:181-189",
+      "duration_field": "time",
+      "duration_unit": "days",
+      "schedule_key": "PREMIUM_ACCOUNTS",
+      "schedule_owner": "globals-tuning-normalization",
+      "charged": false,
+      "resources_moved": 0,
+      "seconds_per_day": 86400,
+      "days": 1,
+      "seconds": 86400,
+      "arm": "extend",
+      "instant_before": 5000,
+      "instant_after": 91400,
+      "arm_record": {
+        "comparison": "not (now >= instant)",
+        "site": "command.py:622",
+        "expression": "instant + days * 86400",
+        "base": "the recorded premium instant",
+        "corpus_reachable": false,
+        "note": "UNREACHABLE in every committed document; coverage is crafted input only, never corpus evidence"
+      },
+      "clamped": false
+    }
+  },
+  "transitions": {
+    "reset": {
+      "ok": true,
+      "error": "",
+      "command": "darts_reset",
+      "command_source": "command.py:573-610",
+      "store": "privateState",
+      "clock_source": "server",
+      "clock": 1000,
+      "client_sent": {
+        "dartsRandomSeed": {
+          "argument": "args[0]",
+          "source": "command.py:573-610",
+          "role": "intent",
+          "stored_verbatim": true,
+          "semantics_derived": false
+        }
+      },
+      "written": {
+        "dartsRandomSeed": 7,
+        "dartsBalloonsShot": [],
+        "dartsHasFree": true,
+        "dartsGotExtra": false,
+        "timeStampDartsReset": 1000,
+        "timeStampDartsNewFree": 1000
+      },
+      "field_count": 6,
+      "refusals": [],
+      "divergences": [],
+      "extra_flag_from_client_claim": false,
+      "charged": false,
+      "resources_moved": 0,
+      "client_argument_count": 1,
+      "list_replaced": true,
+      "extra_flag_reset": true
+    },
+    "new_free": {
+      "ok": true,
+      "error": "",
+      "command": "darts_new_free",
+      "command_source": "command.py:573-610",
+      "store": "privateState",
+      "clock_source": "server",
+      "clock": 2000,
+      "client_sent": {},
+      "written": {
+        "dartsHasFree": true,
+        "timeStampDartsNewFree": 2000
+      },
+      "field_count": 2,
+      "refusals": [],
+      "divergences": [],
+      "extra_flag_from_client_claim": false,
+      "charged": false,
+      "resources_moved": 0,
+      "client_argument_count": 0
+    },
+    "shoot_win_claim": {
+      "ok": true,
+      "error": "",
+      "command": "darts_shoot_balloon",
+      "command_source": "command.py:573-610",
+      "store": "privateState",
+      "clock_source": "server",
+      "clock": 1000,
+      "client_sent": {
+        "dartsBalloonsShot": {
+          "argument": "args[0]",
+          "source": "command.py:573-610",
+          "role": "intent",
+          "value": 17,
+          "appended": true,
+          "already_recorded": false,
+          "derived_from_it": false,
+          "bounded_with_it": false
+        },
+        "dartsGotExtra": {
+          "argument": "args[1]",
+          "source": "command.py:573-610",
+          "role": "asserted outcome",
+          "claimed": true,
+          "delivered": false,
+          "note": "reproducing a client-dictated outcome is the apply_client_state pattern AGENTS.md names as Bad"
+        }
+      },
+      "written": {
+        "dartsBalloonsShot": [
+          18,
+          17
+        ],
+        "dartsHasFree": false,
+        "timeStampDartsNewFree": 1000
+      },
+      "field_count": 3,
+      "refusals": [
+        "args[1]"
+      ],
+      "divergences": [
+        {
+          "id": "args[1]",
+          "what": "the recorded branch sets the got-extra flag from a client truthiness; this capability never writes it",
+          "site": "command.py:604-605",
+          "is_parity": false,
+          "corpus_evidence": "none in either direction: dartsGotExtra is false in all 33 canonical documents (docs/legacy-m11-darts.md 0b C4)"
+        }
+      ],
+      "extra_flag_from_client_claim": false,
+      "charged": false,
+      "resources_moved": 0,
+      "client_argument_count": 1,
+      "recorded_shots_before": [
+        18
+      ],
+      "recorded_list_length": 2,
+      "length_bound": false,
+      "membership_tested": false
+    },
+    "shoot_out_of_schedule": {
+      "ok": true,
+      "error": "",
+      "command": "darts_shoot_balloon",
+      "command_source": "command.py:573-610",
+      "store": "privateState",
+      "clock_source": "server",
+      "clock": 5,
+      "client_sent": {
+        "dartsBalloonsShot": {
+          "argument": "args[0]",
+          "source": "command.py:573-610",
+          "role": "intent",
+          "value": 0,
+          "appended": true,
+          "already_recorded": false,
+          "derived_from_it": false,
+          "bounded_with_it": false
+        },
+        "dartsGotExtra": {
+          "argument": "args[1]",
+          "source": "command.py:573-610",
+          "role": "asserted outcome",
+          "claimed": false,
+          "delivered": false,
+          "note": "reproducing a client-dictated outcome is the apply_client_state pattern AGENTS.md names as Bad"
+        }
+      },
+      "written": {
+        "dartsBalloonsShot": [
+          0
+        ],
+        "dartsHasFree": false,
+        "timeStampDartsNewFree": 5
+      },
+      "field_count": 3,
+      "refusals": [],
+      "divergences": [],
+      "extra_flag_from_client_claim": false,
+      "charged": false,
+      "resources_moved": 0,
+      "client_argument_count": 1,
+      "recorded_shots_before": [],
+      "recorded_list_length": 1,
+      "length_bound": false,
+      "membership_tested": false
+    },
+    "write_counts": {
+      "darts_reset": 6,
+      "darts_new_free": 2,
+      "darts_shoot_balloon": 3
+    }
+  },
+  "week_reset": {
+    "offset_seconds": 259200,
+    "week_seconds": 604800,
+    "reset_value": 0,
+    "reset_value_is_clock": false,
+    "mutation_delivered": false,
+    "delivered_routes": [],
+    "intent_comment": {
+      "source": "engine.py:244",
+      "quoted": "take away 3 days since timestamp 0 is thursday, we want reset to happen on monday",
+      "delivered_as": "a comment",
+      "weekday_computed": false,
+      "why": "the offset is transcribed as the literal 259200 it is; deriving a weekday would invent a rule no preserved branch evaluates"
+    },
+    "out_of_scope_reset": {
+      "field": "numTradesDone",
+      "site": "engine.py:239-240",
+      "boundary": "day",
+      "delivered_here": false,
+      "why": "it is market-trade state, not darts state, and this capability projects darts state only"
+    }
+  },
+  "absent_helpers": [
+    {
+      "helper": "darts_charge",
+      "absent_because": "the committed PREMIUM_ACCOUNTS price has zero consumers across all eleven legacy modules, so premium is bought for free"
+    },
+    {
+      "helper": "premium_price",
+      "absent_because": "no legacy module reads the committed price beside any committed duration"
+    },
+    {
+      "helper": "shot_limit",
+      "absent_because": "darts_shoot_balloon appends with no length bound and none is invented"
+    },
+    {
+      "helper": "max_shots",
+      "absent_because": "no committed bound on the balloon list exists to reproduce"
+    },
+    {
+      "helper": "in_schedule",
+      "absent_because": "no membership test exists, and villages/Nerri.json records an accepted out-of-schedule shot, so adding one would contradict the corpus"
+    },
+    {
+      "helper": "verify_win",
+      "absent_because": "nothing in the eleven modules checks whether a shot was winnable"
+    },
+    {
+      "helper": "target_exists",
+      "absent_because": "the schedule is read to report its absence as a check, never consulted for existence"
+    },
+    {
+      "helper": "client_duration",
+      "absent_because": "the duration is derived from the committed schedule; no client value reaches it"
+    },
+    {
+      "helper": "darts_seed_order",
+      "absent_because": "the seed is written and read by no branch, so no ordering is derived"
+    },
+    {
+      "helper": "darts_eligibility",
+      "absent_because": "dartsHasFree is read by nothing, so no availability rule is derived"
+    },
+    {
+      "helper": "free_window",
+      "absent_because": "timeStampDartsNewFree is stamped by three branches and read by none"
+    },
+    {
+      "helper": "weekday_of",
+      "absent_because": "reset_stuff's offset comment mentions Thursday and Monday, but no weekday is computed anywhere in the preserved server"
+    },
+    {
+      "helper": "premium_entitlement",
+      "absent_because": "no committed document carries a premium flag, so no entitlement state exists to derive"
+    },
+    {
+      "helper": "darts_score",
+      "absent_because": "dartsGotExtra is the only outcome flag and it is refused; no score is kept or ranked"
+    },
+    {
+      "helper": "darts_ui",
+      "absent_because": "nothing is rendered; whether the Flash client showed darts is unverifiable from the preserved oracle"
+    }
+  ],
+  "content_ownership": {
+    "darts_schedule": {
+      "owner": "darts-schedule-normalization",
+      "first": 1,
+      "last": 27
+    },
+    "premium_schedule": {
+      "owner": "globals-tuning-normalization",
+      "domain": "globals",
+      "key": "PREMIUM_ACCOUNTS",
+      "duration_field": "time",
+      "duration_unit": "days"
+    }
+  },
+  "cost_record": {
+    "charged": false,
+    "resources_moved": 0,
+    "amount_field_consumers_measured": 0,
+    "source": "get_game_config.py:181-189",
+    "why": "get_premium_days returns the committed DURATION and never reads the committed amount beside it; no other legacy module reads it either, so a premium account is granted for nothing"
+  },
+  "premium_flag_absence": {
+    "flag_name": "premiumAccount",
+    "documents_carrying": 0,
+    "documents_measured": 33,
+    "boolean_derived": false,
+    "note": "there is no premium flag in any committed document; only the instant exists, so an expired premium is indistinguishable from none"
+  },
+  "live_premium_document": {
+    "document": "villages/Neutral.json",
+    "instant": 1682945878,
+    "elapsed": true,
+    "extend_arm_reachable": false,
+    "note": "every committed instant has PASSED, so the extend arm of buy_premium_account is unreachable in the corpus and any coverage of it is crafted input, never corpus evidence"
+  },
+  "out_of_schedule_shots": [
+    {
+      "document": "villages/AcidCaos.json",
+      "shots": [
+        18,
+        17
+      ],
+      "outside_schedule": []
+    },
+    {
+      "document": "villages/Nerri.json",
+      "shots": [
+        0
+      ],
+      "outside_schedule": [
+        0
+      ]
+    },
+    {
+      "document": "villages/Scarlet.json",
+      "shots": [
+        18
+      ],
+      "outside_schedule": []
+    }
+  ],
+  "handed_fields": [
+    {
+      "name": "timeStampEndPremium",
+      "store": "privateState",
+      "distinct": 2,
+      "documents": 33,
+      "recorded_values": {
+        "0": 32,
+        "1682945878": 1
+      },
+      "written_by": [
+        "buy_premium_account"
+      ],
+      "readers": [
+        "buy_premium_account"
+      ],
+      "client_sent": false,
+      "note": "ONE document of 33 records a live instant (villages/Neutral.json, 1682945878 = 2023-05-01 12:57:58 UTC, in the past); the branch reads it and writes it twice from a committed schedule"
+    },
+    {
+      "name": "crossPromotionsFinished",
+      "store": "privateState",
+      "distinct": 1,
+      "documents": 33,
+      "recorded_values": {
+        "[]": 33
+      },
+      "written_by": [],
+      "readers": [],
+      "client_sent": false,
+      "note": "uniformly empty and never touched by any of the eleven legacy modules; reported as an inert event-system flag, not as social state"
+    }
+  ],
+  "fresh_player_limit": {
+    "document": "tests/saves/fresh-player.json",
+    "dartsRandomSeed": 0,
+    "dartsBalloonsShot": [],
+    "dartsGotExtra": false,
+    "dartsHasFree": false,
+    "timeStampDartsReset": 0,
+    "timeStampDartsNewFree": 0,
+    "timeStampEndPremium": 0,
+    "crossPromotionsFinished": [],
+    "shoot_arm_reachable": false,
+    "free_arm_reachable": false,
+    "premium_arm_reachable": false,
+    "coverage_kind": "crafted input only"
+  },
+  "guard_injections": {
+    "method": "each probe was applied to a byte-identical copy of the real delivered module, this suite was run against it, the copy was restored, and the restored SHA-256 compared to the original; the suite cannot rewrite the module it is judging, so the orchestrator applies the probes and the MEASURED results are recorded here",
+    "probes_detected": 10,
+    "probes_missed": 0,
+    "all_restores_byte_identical": true,
+    "probes": [
+      {
+        "probe": "static func premium_charge(schedule, index)",
+        "module": "premium_purchase.gd",
+        "disguise": "the natural invented name for charging a premium account, but NOT itself a recorded absent name",
+        "guards_that_fired": [
+          "whole_inventory_pin"
+        ],
+        "failures": 1,
+        "exit_code": 1
+      },
+      {
+        "probe": "static func cost_for(item_id)",
+        "module": "premium_purchase.gd",
+        "disguise": "a generic invented cost helper, and NOT a recorded absent name",
+        "guards_that_fired": [
+          "whole_inventory_pin"
+        ],
+        "failures": 1,
+        "exit_code": 1
+      },
+      {
+        "probe": "static func in_schedule(shot_index)",
+        "module": "darts_transitions.gd",
+        "disguise": "the exact membership refusal this line exists to prevent, spelled exactly",
+        "guards_that_fired": [
+          "whole_inventory_pin",
+          "reserved_name_folded_substring"
+        ],
+        "failures": 2,
+        "exit_code": 1
+      },
+      {
+        "probe": "static func shot_limit()",
+        "module": "darts_transitions.gd",
+        "disguise": "an invented shot-list bound, spelled exactly",
+        "guards_that_fired": [
+          "whole_inventory_pin",
+          "reserved_name_folded_substring"
+        ],
+        "failures": 2,
+        "exit_code": 1
+      },
+      {
+        "probe": "static func verify_win(shot_index)",
+        "module": "darts_transitions.gd",
+        "disguise": "an invented win verification, spelled exactly",
+        "guards_that_fired": [
+          "whole_inventory_pin",
+          "reserved_name_folded_substring"
+        ],
+        "failures": 2,
+        "exit_code": 1
+      },
+      {
+        "probe": "static func normalize(first, second)",
+        "module": "week_reset.gd",
+        "disguise": "NO reserved word borrowed at all, so it can only be caught by the pin; this is why the pin is the gate",
+        "guards_that_fired": [
+          "whole_inventory_pin"
+        ],
+        "failures": 1,
+        "exit_code": 1
+      },
+      {
+        "probe": "static func CLIENT_DURATION(package_index)",
+        "module": "premium_purchase.gd",
+        "disguise": "a recorded absent name in UPPER CASE, which a case-sensitive comparison does not match",
+        "guards_that_fired": [
+          "whole_inventory_pin",
+          "reserved_name_folded_substring"
+        ],
+        "failures": 2,
+        "exit_code": 1
+      },
+      {
+        "probe": "a committed price read by SUBSCRIPT, (entry as Dictionary)[\"price\"]",
+        "module": "premium_purchase.gd",
+        "disguise": "not a reserved name at all: a silent reach into the refused field, which the inventory pin cannot see by design",
+        "guards_that_fired": [
+          "whole_inventory_pin",
+          "no_committed_price_read"
+        ],
+        "failures": 2,
+        "exit_code": 1
+      },
+      {
+        "probe": "a committed price read by .get(), (entry as Dictionary).get(\"price\", 0)",
+        "module": "premium_purchase.gd",
+        "disguise": "the second access FORM of the same silent read, so both spellings are proven rather than one",
+        "guards_that_fired": [
+          "whole_inventory_pin",
+          "no_committed_price_read",
+          "reserved_name_folded_substring"
+        ],
+        "failures": 3,
+        "exit_code": 1
+      },
+      {
+        "probe": "static func darts_charge_for(schedule)",
+        "module": "premium_purchase.gd",
+        "disguise": "a recorded absent name WEARING A SUFFIX, `darts_charge_for` contains `darts_charge`",
+        "guards_that_fired": [
+          "whole_inventory_pin",
+          "reserved_name_folded_substring"
+        ],
+        "failures": 2,
+        "exit_code": 1
+      }
+    ],
+    "measured_belt_limitation": "probes 1 and 2 fired ONE guard, not two. `premium_charge` and `cost_for` contain no recorded absent name and are not contained by one, so the case-folded substring belt stayed silent and only the whole-inventory pin caught them. The belt is therefore NOT a complete second line of defence: it fires only for names that overlap a recorded absent name, which is why the pin is the gate and this limitation is recorded rather than smoothed over",
+    "measured_parse_error_lesson": "two earlier probe attempts reported `failures=0 exit=1`, which is a PARSE ERROR rather than a clean detection: the injected body reached GDScript as `(entry as Dictionary)[\"\"price\"\"]` because a doubled quote inside a PowerShell double-quoted here-string is not collapsed. Those two runs proved nothing and were discarded rather than recorded as passing; both probes were rewritten and re-measured"
+  },
+  "expected_function_inventory": {
+    "res://scripts/darts/darts_state.gd": [
+      "field_names",
+      "darts_field_names",
+      "field_record",
+      "distinct_values_of",
+      "recorded_values_of",
+      "is_client_sent",
+      "project",
+      "_init",
+      "_projected_names",
+      "present",
+      "value",
+      "has_recorded_shots",
+      "premium_instant_is_future",
+      "present_names",
+      "absent_names"
+    ],
+    "res://scripts/darts/premium_purchase.gd": [
+      "committed_schedule",
+      "premium_days",
+      "premium_days_refusal",
+      "select_arm",
+      "instant_after",
+      "purchase",
+      "_is_clamped",
+      "_is_integral"
+    ],
+    "res://scripts/darts/week_reset.gd": [
+      "week_index",
+      "evaluate",
+      "_is_integral"
+    ],
+    "res://scripts/darts/darts_transitions.gd": [
+      "reset",
+      "new_free",
+      "shoot",
+      "_base",
+      "_refuse",
+      "_is_integral"
+    ]
+  },
+  "claim_limits": [
+    "the corpus denominator is 33 canonical documents, not the 231 the investigation reported: 200 of those were generated fixture files, each recording both sides of one transaction",
+    "dartsGotExtra is false in 33 of 33 documents, so the corpus records no won shot and the client-dictated outcome refusal has NO corpus evidence in either direction",
+    "nothing is charged, and that is a REFUSAL rather than parity: engine.apply_resources applies a client-sent eight-slot vector before dispatch, so a legacy client could pair a debit with the purchase",
+    "the committed price has zero consumers, which is a DIFFERENT mechanism from research_buy_step_cash, where the server discards a client-sent price; here it ignores a committed one",
+    "the extend arm is unreachable in the corpus because every committed instant has already passed, so its coverage here is crafted input and never corpus evidence",
+    "the shot index is accepted as client-sent intent per design D10; nothing is derived from it and nothing is bounded with it",
+    "no weekday rule is implemented: the legacy comment's Thursday/Monday rationale is recorded as a comment only",
+    "no parity is claimed anywhere: nothing here executes against the legacy server, and no executed-legacy fixture exists because the fresh-player document cannot drive this surface",
+    "absence of a token is not absence of a feature: whether the Flash client showed a darts table or a premium-buy screen is unverifiable from the preserved oracle",
+    "the premium instant is reported as recorded; no entitlement, flag, or expiry rule is derived from it"
+  ]
+}
