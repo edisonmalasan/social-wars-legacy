@@ -13,9 +13,17 @@ capabilities projecting the same rows would be drift waiting to happen.
 
 ## D2 — The zero-consumer census is **measured on every run**, never inherited
 
-The investigation recorded 13 of 19 fields with zero occurrences of any kind.
-A delivered suite that merely *asserted* `13` would be asserting a number that a
-future legacy edit could invalidate silently.
+The investigation recorded 13 of 19 fields with zero occurrences of any kind, and
+the Apply stage's own re-derivation found that figure to be **12**: the 13th
+field, `questsRank`, is both read and written by `admin_set_quest_rank` and so
+belongs to the read-and-written group, not this one. The measurement is correct
+and the recorded figure is not, so the number here and in the proposal is
+corrected to 12 and the correction is kept visible rather than quietly edited
+away. The suite pins 12.
+
+A delivered suite that merely *asserted* `12` would be asserting a number that a
+future legacy edit could invalidate silently — and, as this very case shows, that
+a past figure could invalidate too.
 
 The suite therefore **re-derives** the census across the declared module list on
 every run and requires the recomputed set to equal the pinned expectation in both
@@ -91,11 +99,21 @@ an oversight. This matches `godot-unit-animations` ("no animation behaviour for
 the legacy server to have") and `godot-unit-production` ("a stronger statement
 than a corpus limitation").
 
-## D9 — `questsRank` is the one field with a reader and no writer
+## D9 — `questsRank` is the one field with both a reader and a writer
 
-`admin_set_quest_rank` **reads** `questsRank`; nothing writes it. It is therefore
-not in the 13-field zero group, and the suite must place it correctly rather than
-folding it in by name similarity.
+`admin_set_quest_rank` (`command.py:745-750`) **reads** `questsRank`, assigns it,
+**and deletes the key** when the assignment is refused. So it is the one field
+that is neither zero-occurrence nor write-less, and the suite must place it
+correctly rather than folding it in by name similarity.
+
+This corrects the proposal's original D9, which asserted "a reader and no
+writer". That was a **lexer artifact**, not a judgement: the census matched the
+literal `privateState["x"]` form, so a write spelled through a local aliased
+after the save never registered. The census now counts identifier tokens and
+quoted subscripts as two separate forms and sums them, which is how the writer
+became visible at all. Both the module constant (`READ_WITHOUT_WRITTEN` became
+`READ_AND_WRITTEN`) and the zero-occurrence count (13 became 12) moved as a
+consequence.
 
 ## D10 — M11's classification advances; its exit criterion is not asserted
 

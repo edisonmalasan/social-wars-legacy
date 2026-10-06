@@ -24,8 +24,8 @@ committed fields with no legacy consumer.
 
 **2. Social state is persisted in every document and never written.** This is the
 finding that makes M11 a surface rather than a closure, and it is the same shape
-that made `godot-rewards` real. Of 19 measured social state fields, **13 have zero
-occurrences of any kind** — no read, no write, no mention:
+that made `godot-rewards` real. Of 19 measured social state fields, **12 have zero
+occurrences of any kind** - no read, no write, no mention:
 
 `friendsHelpedCoveredItem`, `neighborAssists`, `receivedAssists`,
 `firstTimeAlliance`, `helpMap`, `attacksSent`, `attacksReceived`, `attacksPack`,
