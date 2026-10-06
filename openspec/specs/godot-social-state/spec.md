@@ -1,6 +1,19 @@
-# Spec Delta
+# godot-social-state Specification
 
-## ADDED Requirements
+## Purpose
+Project the social state a committed save actually carries, and record the
+measured absence that is the finding: 12 of 19 social state fields have zero
+occurrences of any kind across all eleven legacy modules, and all 41 committed
+social content entries have zero consumers.
+
+This capability is deliberately named for **state** rather than for a feature.
+It asserts nothing about whether friends, visits, scores, or social rewards
+exist: a capability named `godot-friends` would claim exactly what this one
+measures to be absent. Zero-consumer is a statement about the **preserved
+server** and says nothing about the Flash client, which may have held social
+features entirely client-side.
+
+## Requirements
 
 ### Requirement: The delivered surface is a typed read-only projection of persisted social state, and it implies no social feature
 The capability SHALL project the social state a committed save carries, and SHALL
@@ -27,9 +40,11 @@ SHALL NOT add a field that the investigation did not measure.
 ### Requirement: The zero-consumer census is re-derived on every run and never merely asserted
 The suite SHALL re-derive, on every run, which social fields have zero occurrences of
 any kind across the declared legacy module list, and SHALL require the recomputed set
-to equal the pinned expectation in both directions. A legacy edit that adds or removes
-an occurrence SHALL fail the suite rather than silently contradicting the delivered
-claim.
+to equal the pinned expectation in both directions. The census SHALL count
+whole-identifier tokens and quoted subscripts as two separate forms and sum them, so a
+field reached through a string literal is not scored as absent. A legacy edit that adds
+or removes an occurrence SHALL fail the suite rather than silently contradicting the
+delivered claim.
 
 #### Scenario: Review the census provenance
 - **WHEN** a maintainer asks how the twelve-field zero-consumer group was established
