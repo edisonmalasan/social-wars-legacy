@@ -2,128 +2,128 @@
 
 ## 1. Normalization — `packages/game-content/tools/build_auctions.py`
 
-- [ ] 1.1 Read `config/auctionhouse.json` read-only. Do **not** import `auctions.py`.
-- [ ] 1.2 Emit one definition per committed entry, preserving committed order.
+- [x] 1.1 Read `config/auctionhouse.json` read-only. Do **not** import `auctions.py`.
+- [x] 1.2 Emit one definition per committed entry, preserving committed order.
       `legacy_id` stays the committed **string** `uuid`; `unit`, `level`,
       `interval`, `price`, `priceIncrement`, `betPrice` verbatim.
-- [ ] 1.3 Record the content source as the standalone file `config/auctionhouse.json`,
+- [x] 1.3 Record the content source as the standalone file `config/auctionhouse.json`,
       not one of `main.json`'s 20 keys.
-- [ ] 1.4 Perform **no** conversion of `interval`. Add no `seconds`/`duration`
+- [x] 1.4 Perform **no** conversion of `interval`. Add no `seconds`/`duration`
       field and no conversion factor as data.
-- [ ] 1.5 Resolve `unit` against `normalized/units.json`, carrying the resolved
+- [x] 1.5 Resolve `unit` against `normalized/units.json`, carrying the resolved
       display name. An unresolvable id is **recorded as unresolved**, still
       emitted, in order, and reported — never dropped or invented.
-- [ ] 1.6 Carry `betPrice` and record `bet_price_consumed: false`, citing the
+- [x] 1.6 Carry `betPrice` and record `bet_price_consumed: false`, citing the
       zero-consumer measurement (no `gold/coins/cash/wood/steel/oil/xp/mana/
       energy/cost/apply_resources`, and `apply_resources` is never called).
-- [ ] 1.7 Add `auction.schema.json` with the value types and the explicitly
+- [x] 1.7 Add `auction.schema.json` with the value types and the explicitly
       listed coercion ruleset.
-- [ ] 1.8 Emit exact round-trip evidence: every field of every entry equal to the
+- [x] 1.8 Emit exact round-trip evidence: every field of every entry equal to the
       committed source, covering all 7 keys across all 3 entries.
-- [ ] 1.9 Merge a new `auctions` section into the package manifest, leaving every
+- [x] 1.9 Merge a new `auctions` section into the package manifest, leaving every
       prior section byte-identical.
-- [ ] 1.10 Prove idempotence: two consecutive runs produce byte-identical output
+- [x] 1.10 Prove idempotence: two consecutive runs produce byte-identical output
       and manifest section.
 
 ## 2. Normalization verification
 
-- [ ] 2.1 `python -B packages/game-content/tools/build_auctions.py` exits 0.
-- [ ] 2.2 `python -B -m unittest discover -s packages/game-content/tests -p
+- [x] 2.1 `python -B packages/game-content/tools/build_auctions.py` exits 0.
+- [x] 2.2 `python -B -m unittest discover -s packages/game-content/tests -p
       test_build_auctions.py -v` passes.
-- [ ] 2.3 `python -B packages/game-content/tools/validate_content.py` exits 0 with
+- [x] 2.3 `python -B packages/game-content/tools/validate_content.py` exits 0 with
       the new output and schema counted.
-- [ ] 2.4 Confirm `git status` shows **no** change to `config/auctionhouse.json`,
+- [x] 2.4 Confirm `git status` shows **no** change to `config/auctionhouse.json`,
       any legacy module, any save or any fixture.
-- [ ] 2.5 Confirm **no `auctions/` directory** exists in the repository after the
+- [x] 2.5 Confirm **no `auctions/` directory** exists in the repository after the
       build — the probe's containment property must hold for the builder too.
 
 ## 3. Client projection — `apps/client-godot/scripts/social/`
 
-- [ ] 3.1 Add a read-only projection module reading the committed schedule
+- [x] 3.1 Add a read-only projection module reading the committed schedule
       **through the normalized content registry only**.
-- [ ] 3.2 Project `legacy_id`, `level`, `interval`, `price`, `priceIncrement`,
+- [x] 3.2 Project `legacy_id`, `level`, `interval`, `price`, `priceIncrement`,
       `betPrice`, unit id and resolved unit name, in committed order.
-- [ ] 3.3 Add the single named conversion `interval → seconds` with factor `60`,
+- [x] 3.3 Add the single named conversion `interval → seconds` with factor `60`,
       a named inverse, and a round-trip assertion over every committed entry.
-- [ ] 3.4 Derive **nothing** else. No price, fee, total, remaining time, round,
+- [x] 3.4 Derive **nothing** else. No price, fee, total, remaining time, round,
       winner or ranking — not inline, not in a helper.
-- [ ] 3.5 Record the expiry semantics verbatim: `endDate + 1` with no bidder,
+- [x] 3.5 Record the expiry semantics verbatim: `endDate + 1` with no bidder,
       `endDate + 60` with a bidder, round reset to the literal `1`, and
       `count_expired` computed and discarded.
-- [ ] 3.6 Record the bootstrap defect as an oracle property, citing
+- [x] 3.6 Record the bootstrap defect as an oracle property, citing
       `auctions.py:32` guarding `FILE_AH_CONFIG` while `:33` reads
       `FILE_AH_STATE`, and attributing inertness to **two** independent reasons.
-- [ ] 3.7 Record each client-dictated refusal with its measurement and label it
+- [x] 3.7 Record each client-dictated refusal with its measurement and label it
       a **divergence**, not parity: the unvalidated bid (bid `1` moved
       `currentPrice` `5000 → 1001`; `-5000` produced `-4000`), client-sent
       `checkFinish`, no winner from amounts, and `won` unconditionally `1`.
-- [ ] 3.8 Contain **no** state-document creation, default or repair path for this
+- [x] 3.8 Contain **no** state-document creation, default or repair path for this
       surface.
-- [ ] 3.9 Expose **no** callable action to place, bid on, start, extend or cancel
+- [x] 3.9 Expose **no** callable action to place, bid on, start, extend or cancel
       an auction, and no countdown, scheduler or clock read.
 
 ## 4. Suite — `apps/client-godot/tests/test_auction_schedule.gd`
 
-- [ ] 4.1 Assert the projection: three entries, committed order, committed
+- [x] 4.1 Assert the projection: three entries, committed order, committed
       `legacy_id` strings, every committed field verbatim, resolved unit names.
-- [ ] 4.2 Assert exactly one derivation, and assert the **absence** of the others
+- [x] 4.2 Assert exactly one derivation, and assert the **absence** of the others
       mechanically.
-- [ ] 4.3 Assert the conversion round-trips for every committed entry, from both
+- [x] 4.3 Assert the conversion round-trips for every committed entry, from both
       directions and across the one-unit boundary (`60 → 3600`).
-- [ ] 4.4 Re-derive every zero-consumer and absent-helper figure from the
+- [x] 4.4 Re-derive every zero-consumer and absent-helper figure from the
       committed legacy sources **on every run**, so a legacy edit fails the suite
       rather than silently contradicting it. Cover: `interval`/`expire`
       occurrences outside `auctions.py`; the three commented routes and the
       commented import; resource-token occurrences in the module; comparison
       operators against the four price identifiers.
-- [ ] 4.5 Pin the declared-function inventory of every delivered module, and
+- [x] 4.5 Pin the declared-function inventory of every delivered module, and
       assert the reserved-name absence **in both directions** over declared names
       (case-folded, by substring), not raw source.
-- [ ] 4.6 Assert the wording scope: the delivered text says "no **server-side**
+- [x] 4.6 Assert the wording scope: the delivered text says "no **server-side**
       reader" and never "dead" or "unused". Scope the token list to
       non-forbidden words, as `godot-friends` had to.
-- [ ] 4.7 Delegate the transport-token and raw-config-path guards to
+- [x] 4.7 Delegate the transport-token and raw-config-path guards to
       `test_project_scope.gd` by asserting the owner exists and its allow-list
       covers both delivered modules — do **not** duplicate a guard its own owner
       forbids.
-- [ ] 4.8 Prove the guards by injection: invented duration/round/winner helpers,
+- [x] 4.8 Prove the guards by injection: invented duration/round/winner helpers,
       a suffixed reserved-name helper, a name matching a committed field, and
       **one probe borrowing no reserved word** so the inventory is proven to be
       the real gate. Measure each probe's failure count and restore every file
       byte-identically.
-- [ ] 4.9 Assert the corpus figure: **zero** of the 10 genuine save documents
+- [x] 4.9 Assert the corpus figure: **zero** of the 10 genuine save documents
       carry any auction term, **excluding `tests/saves/manifest.json` by name**,
       and assert the exclusion is real by checking the manifest is in fact an
       index.
-- [ ] 4.10 Assert the registry is the only content path: no delivered module
+- [x] 4.10 Assert the registry is the only content path: no delivered module
       references a raw `config/` path for this schedule.
-- [ ] 4.11 Assert no route, no `apps/compat-api/**` change, and an unchanged
+- [x] 4.11 Assert no route, no `apps/compat-api/**` change, and an unchanged
       registered live-phase count.
-- [ ] 4.12 Write the deterministic evidence report via `--report=<path>`, with
+- [x] 4.12 Write the deterministic evidence report via `--report=<path>`, with
       tables generated from the live projection and registry.
-- [ ] 4.13 Register the suite in `verify-boot.ps1` and update the header prose
+- [x] 4.13 Register the suite in `verify-boot.ps1` and update the header prose
       (hermetic count, live count, assertion count).
-- [ ] 4.14 Amend `test_project_scope.gd`'s allow-list for the new client sources,
+- [x] 4.14 Amend `test_project_scope.gd`'s allow-list for the new client sources,
       the new suite and the new report.
 
 ## 5. Full verification
 
-- [ ] 5.1 `godot --headless --path apps/client-godot --script
+- [x] 5.1 `godot --headless --path apps/client-godot --script
       res://tests/test_auction_schedule.gd` exits 0.
-- [ ] 5.2 Same suite with `--report=<repo>/apps/client-godot/evidence/auction-schedule/report.json`
+- [x] 5.2 Same suite with `--report=<repo>/apps/client-godot/evidence/auction-schedule/report.json`
       is byte-identical across three consecutive runs.
-- [ ] 5.3 `powershell -File apps/client-godot/verify.ps1` exits 0.
-- [ ] 5.4 `powershell -File apps/client-godot/verify-boot.ps1` exits 0; inspect
+- [x] 5.3 `powershell -File apps/client-godot/verify.ps1` exits 0.
+- [x] 5.4 `powershell -File apps/client-godot/verify-boot.ps1` exits 0; inspect
       every log file for `[test] FAIL`, `^ERROR:` **and** `SCRIPT ERROR`.
-- [ ] 5.5 `python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v`
+- [x] 5.5 `python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v`
       is **unchanged** — this line touches `apps/compat-api/**` not at all.
-- [ ] 5.6 `python -B packages/game-content/tools/validate_content.py` exits 0.
-- [ ] 5.7 `python -B tools/hash-manifest/hash_manifest.py verify` exits 0. Record
+- [x] 5.6 `python -B packages/game-content/tools/validate_content.py` exits 0.
+- [x] 5.7 `python -B tools/hash-manifest/hash_manifest.py verify` exits 0. Record
       the new entry count and explain the delta.
-- [ ] 5.8 `openspec validate --all --strict` passes.
-- [ ] 5.9 `git status` shows no legacy, save, config, fixture or village byte
+- [x] 5.8 `openspec validate --all --strict` passes.
+- [x] 5.9 `git status` shows no legacy, save, config, fixture or village byte
       changed, and no `auctions/` directory created.
-- [ ] 5.10 Confirm the content-package byte-form of every new file: the recorded
+- [x] 5.10 Confirm the content-package byte-form of every new file: the recorded
       digest describes the **committed Git blob form** (LF), and the raw
       working-tree form is recorded separately with its own digest — the defect
       class recorded twice in this project.
@@ -405,3 +405,103 @@ file.
 **Fix branch:** `fix/auction-manifest-section-guard`, merged before the Archive
 stage. The Archive stage is therefore not purely archival for this change, and
 that deviation is recorded here rather than hidden inside it.
+
+### 6.3 Recorded at the Archive gate — ticking 48 boxes that Apply never ticked
+
+**19. All 48 boxes were unchecked at the Archive gate**, and one of them (2.2)
+had been reported verified without ever being run. Ticking them on the strength
+of the boxes' own history would repeat exactly that failure, so **no box was
+ticked until its task was re-derived from the implementation**. A throwaway
+verifier re-checks each task's claim and **refuses to write on a red result**;
+the result was **35 mechanically re-derived checks PASS / 0 FAIL**, plus 13
+measured live in the transcript (1.10, 2.1, 2.2, 2.3, and 5.1-5.10), covering
+all 48.
+
+**20. The verifier's first run reported 11 FAILs and every one was its own
+defect, not the delivered work's.** All eleven are recorded because a checker
+that cries wolf eleven times has told you nothing:
+
+| Task | What the verifier did wrong |
+| --- | --- |
+| 1.3 | split the builder on a Python ``def `` to find its header |
+| 1.4 | searched for a literal `* 60`, so it could not tell the two **prose** mentions of the legacy expression from a conversion |
+| 1.5 | read `normalized/units.json` as a list; it is a dict, so the name index came out **empty** and every comparison was vacuous |
+| 1.7 | looked for `coercion_ruleset`; the schema key is `x-coercion-ruleset` |
+| 1.9 | probed manifest keys that do not exist (inputs live under `inputs`) |
+| 3.1 | a `str.replace` with a zero count, which is a no-op |
+| 3.3 | used a **Python** `def\s+` regex against GDScript's `func`, and demanded a literal `60` where the code correctly uses the named constant `SECONDS_PER_MINUTE` — so it found zero arithmetic and reported **the opposite of the truth** |
+| 3.4, 3.9 | scanned `fee`, `winner`, `ranking`, `countdown`, `scheduler` in **raw source**, so the prose documenting their absence counted as their presence — the precise inversion those claims are about |
+| 3.5 | searched for the strings `+ 1` / `+ 60`; the semantics are recorded as structured keys |
+| 3.7 | searched for `checkFinish`; the recorded key is `client_sent_completion_flag` |
+
+The fix was **not** to weaken the checks but to strip GDScript `##` comments and
+string payloads before scanning for forbidden tokens — the two-state lexer this
+project already had to build for `godot-construction-assist` when its
+reserved-name guard tripped on its own inventory text. **A forbidden-token scan
+over raw source cannot distinguish "this helper exists" from "this module says
+no such helper exists", and every one of those claims is the second kind.**
+
+**21. The lexer then had two more defects of its own, found by measurement.**
+Stripping string payloads removed exactly the tokens task 3.2 checks, because
+GDScript **dictionary keys are string literals** — so two lexers were needed,
+one for forbidden-token scans and one that strips comments but keeps literals.
+And a `"""` docstring was not recognised, so the lone `"` in
+`auction["interval"]` **falsely closed it** and the rest of the builder returned
+to "code", making a prose line report as a conversion. Both were found by the
+verifier disagreeing with code I had already read, not by reading the lexer.
+
+**22. The verifier was then probed, because one that has only ever reported
+success is indistinguishable from one that does nothing.** **Twelve probes, all
+twelve detected, every restore byte-identical by sha256**, post-probe green:
+
+| Probe | Injected | Detected by |
+| --- | --- | --- |
+| P1 | a third `* SECONDS_PER_MINUTE` | 3.3 |
+| P2 | a `derive_winner` helper | 3.4 |
+| P3 | `FileAccess.open` on a state document | 3.8 **and** 3.1 |
+| P4 | a `start_countdown` helper | 3.9 |
+| P5, P9 | rename / remove the projected `betPrice`, `priceIncrement` | 3.2 |
+| P6 | `divergence: true` → `parity: true` | 3.7 |
+| P7 | no-bidder boundary `1` → `999` | 3.5 |
+| P8 | the forbidden word `dead` | 4.6 |
+| P10-P12 | coerce `legacy_id` to int, flip the consumption flag, emit a `seconds` field, **in the builder source** | **1.11** |
+
+**23. P10-P12 exposed a uniform gap in my own verifier, and it is the third
+instance of one class.** Tasks 1.2/1.4/1.6/1.8 all inspect the **committed
+output**, so a change to the **builder source** that would emit something
+different was invisible while the committed file was still checked in isolation —
+an artifact checked without the code that produces it. The same class as the
+stale-report gap (§6.1) and the missing-battery gap (item 17). Closed by an
+added check, **1.11**: rebuild into a **temporary work tree** with `--out-root`
+and compare the produced bytes against the committed ones — measured identical,
+**1542 bytes, sha256 `8e9c1d958010b24a…`**. 1.11 is **not** ticked, because it was
+not in the plan; it is a check this verification added and it is recorded here
+instead.
+
+Building that temporary work tree was itself non-obvious: an **empty**
+`--out-root` fails with `FileNotFoundError` on
+`packages/game-content/manifest.json`, because the builder merges into an
+existing manifest and reads the normalized units package for its reference edge.
+The shape was taken from the builder's own suite rather than guessed.
+
+**24. The probe harness damaged two delivered files, and this is the third
+recorded instance of the same defect class.** It read with universal newlines and
+wrote text back, **converting both `auction_schedule.gd` and `auction_oracle.gd`
+from CRLF to LF**, so all ten restores honestly reported
+`restored byte-identical: False` and the tree was left dirty. Recovered with
+`git checkout --` and confirmed through `git cat-file` that the committed blobs
+still hash to the recorded **`c04b416d8ef1c891…`** and **`6db9d6e6d1ec0558…`**
+at **19627** and **20744** bytes with **zero** CRLF — so no damage reached the
+repository, and the honest signal is what caught it. Prior instances: the
+byte-count guard fixed in PR #280, and a `git show > file` redirection writing
+**UTF-16LE** earlier in this stage. **Three instances, one root cause: tooling
+that rewrites bytes without asserting the bytes it read are the bytes it wrote
+back.** The fix is decoding UTF-8 directly rather than through text mode, which
+leaves a CRLF pair as two literal characters.
+
+**Disposition of the scratch tooling:** the verifier and its probe were
+**deleted, not committed**. They are honest instruments and they found four real
+defects, but they are single-use Archive-gate scaffolding, and committing a new
+tool during an archival stage — wired into no battery, guarded by nothing — would
+repeat the missing-battery gap this stage just recorded. The findings are in this
+section; the instruments are not in the tree.
