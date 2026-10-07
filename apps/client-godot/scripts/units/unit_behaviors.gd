@@ -328,10 +328,15 @@ static func inventory_record() -> Dictionary:
 ## says "twenty" of "twenty-two" behavioural committed fields have zero legacy
 ## consumers and then **names twenty-one** of them.  The named list is
 ## authoritative — it is countable, and every one of its twenty-one entries
-## measures **zero** — so the field count is **21**, and with the two fields
-## that DO have consumers the behavioural total is **23**, not 22.  The
+## measures **zero** — so the field count was **21**, and with the two fields
+## that DO have consumers the behavioural total was **23**, not 22.  The
 ## rejected figures are retained below rather than dropped, and every figure
 ## here is re-measured by the suite in the same run.
+##
+## LATER AMENDMENT by `godot-construction-assist`: 21 -> 22, and 23 -> 24,
+## because one further field (`giftable`) was measured to qualify and had been
+## MISSED.  That is a correction to the earlier measurement, not a rescope, and
+## the pre-amendment figure is retained below so the chain stays auditable.
 const ZERO_CONSUMER_FIELDS := [
 	{"field": "attack", "legacy_reads": 0, "unit_distinct": 131},
 	{"field": "attack_interval", "legacy_reads": 0, "unit_distinct": 12},
@@ -352,13 +357,43 @@ const ZERO_CONSUMER_FIELDS := [
 	{"field": "population", "legacy_reads": 0, "unit_distinct": 5},
 	{"field": "min_level", "legacy_reads": 0, "unit_distinct": 21},
 	{"field": "activation", "legacy_reads": 0, "unit_distinct": 1},
-	{"field": "gift_level", "legacy_reads": 0, "unit_distinct": 8},
+	{"field": "gift_level", "legacy_reads": 0, "unit_distinct": 8,
+		"building_distinct": 11},
 	{"field": "build_time", "legacy_reads": 0, "unit_distinct": 2},
+	# ADDED by `godot-construction-assist`, which measured the gift fields over
+	# the committed content.  `gift_level` was ALREADY here (units-only) and is
+	# COMPLETED with its buildings side; `giftable` was in NO census and is added.
+	{"field": "giftable", "legacy_reads": 0, "unit_distinct": 2,
+		"building_distinct": 2},
 ]
 
-const ZERO_CONSUMER_COUNT := 21
+## The census is over the seven legacy modules, which is scope-free: a field
+## qualifies if NOTHING reads it, whichever domain carries it. So `giftable`
+## BELONGS in the table and its absence was a gap, not a decision -- the gap is
+## recorded here because the amendment changed the count from 21 to 22 and a
+## silently-changed pin is how a census rots.
+##
+## `legacy_reads: 0` for both gift fields is MEASURED, not asserted: zero
+## whole-file occurrences and zero whole-word occurrences of either name across
+## all seven modules above.
+##
+## The `building_distinct` column exists ONLY on the two rows
+## `godot-construction-assist` measured. It is deliberately partial, and
+## `BUILDING_MEASURED_FIELD_COUNT` pins the size of that partial set so it
+## cannot quietly grow into a claim of full buildings-side coverage.
+const BUILDING_MEASURED_FIELDS := ["gift_level", "giftable"]
+const BUILDING_MEASURED_FIELD_COUNT := 2
+
+## Zero-consumer fields, and the correction chain that produced each figure.
+##
+## The `_RECORDED` constants hold the investigation's REJECTED figures; the
+## pre-amendment measurement is kept beside them so the chain reads
+## investigation 20 -> measured 21 -> amended 22, rather than the amendment
+## silently replacing a measurement a reader might still quote.
+const ZERO_CONSUMER_COUNT := 22
+const ZERO_CONSUMER_COUNT_PRE_AMEND := 21
 const ZERO_CONSUMER_COUNT_RECORDED := 20
-const BEHAVIOURAL_FIELD_COUNT := 23
+const BEHAVIOURAL_FIELD_COUNT := 24
 const BEHAVIOURAL_FIELD_COUNT_RECORDED := 22
 
 ## The seven committed combat fields, as a closed set so "no combat is
