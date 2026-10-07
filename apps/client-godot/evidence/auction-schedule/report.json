@@ -1,0 +1,815 @@
+{
+  "absent_helpers": [
+    {
+      "absent_because": "auctions.py:199 makes currentPrice a pure function of the client-sent bid, with zero comparison operators against bet_amount, currentPrice, beginPrice or betPrice; a price here would be a second, invented path",
+      "helper": "auction_price"
+    },
+    {
+      "absent_because": "the committed betPrice has no consumer anywhere in the preserved source, so there is no rule to apply it by",
+      "helper": "bid_fee"
+    },
+    {
+      "absent_because": "no total exists to compute: the module writes one price field and no arithmetic is applied to it",
+      "helper": "bid_total"
+    },
+    {
+      "absent_because": "nothing evaluates elapsed time, so a remaining duration would need a clock read and a comparison the oracle does not have",
+      "helper": "seconds_remaining"
+    },
+    {
+      "absent_because": "there is no request path, so no player is ever waiting on readiness",
+      "helper": "is_ready"
+    },
+    {
+      "absent_because": "the expiry offsets are recorded in auction_oracle.gd and reported; computing an expiry instant is the delivered timer this capability refuses",
+      "helper": "next_expiry"
+    },
+    {
+      "absent_because": "auctions.py:138 writes the literal 1 and never reads it; there is no counter to read",
+      "helper": "auction_round"
+    },
+    {
+      "absent_because": "auctions.py:127 computes count_expired and discards it; only remaining reaches beginDate",
+      "helper": "expired_round_count"
+    },
+    {
+      "absent_because": "bid amounts are never compared and betWinner appears only under a client-sent flag, so no amount determines a winner",
+      "helper": "winner_for"
+    },
+    {
+      "absent_because": "the winning check reads the LAST list element and answers relative to the user asked about, which is not an ordering",
+      "helper": "bidder_ranking"
+    },
+    {
+      "absent_because": "all three routes are commented out, so there is nothing to call",
+      "helper": "place_bid"
+    },
+    {
+      "absent_because": "creation happens inside a constructor that raises; no client triggers it",
+      "helper": "start_auction"
+    },
+    {
+      "absent_because": "the only extension is the recorded 60-second grace, which nothing settles",
+      "helper": "extend_auction"
+    },
+    {
+      "absent_because": "no branch in the module removes a live auction; expiry replaces one",
+      "helper": "cancel_auction"
+    },
+    {
+      "absent_because": "no settlement code exists and betUsers gates a window that never closes",
+      "helper": "settle_auction"
+    },
+    {
+      "absent_because": "the module cannot bootstrap, so a client that created the document would be implementing something the original never did",
+      "helper": "create_state_document"
+    },
+    {
+      "absent_because": "same reason, in the weaker form: an empty default would be a repair path",
+      "helper": "default_state_document"
+    },
+    {
+      "absent_because": "the defect is recorded in auction_oracle.gd and deliberately not fixed",
+      "helper": "repair_state_document"
+    },
+    {
+      "absent_because": "no scheduler, timer or countdown is delivered",
+      "helper": "tick"
+    },
+    {
+      "absent_because": "no clock read is delivered; every instant on this surface is committed content or a recorded offset",
+      "helper": "now_seconds"
+    }
+  ],
+  "arithmetic_allowance": {
+    "duration_seconds_from_interval": "*",
+    "interval_minutes_from_duration": "/"
+  },
+  "bet_price_record": {
+    "charged": false,
+    "committed_on_every_entry": true,
+    "committed_value": 2,
+    "ordinal_claimed": false,
+    "price_occurrences_raw_substring": 9,
+    "price_token_occurrences_whole_word": 4,
+    "projected_as": "the committed column, verbatim, so a reader can see what the config declares without any charge being implied",
+    "resource_token_whole_word_occurrences": 0,
+    "resource_tokens_searched": [
+      "gold",
+      "coins",
+      "cash",
+      "wood",
+      "steel",
+      "oil",
+      "xp",
+      "mana",
+      "energy",
+      "cost",
+      "apply_resources"
+    ],
+    "resources_debited": 0,
+    "server_side_readers": 0,
+    "structurally_identical_to": "the committed premium amount recorded by godot-darts: a committed price with zero consumers",
+    "the_difference_is_recorded": "the premium branch discards a client-sent price; this module ignores a committed one. Either way the resource vector is client-controlled and nothing is validated",
+    "the_one_token_whose_rules_disagree": "the experience token has zero whole-word matches and three raw matches, all inside the word `expired`",
+    "why_no_ordinal": "four earlier lines each numbered zero-consumer committed fields over a different scope and no reconciled census of them exists in the repository",
+    "why_those_two_price_figures_differ": "the raw matches include the longer committed identifiers carrying the word inside them, so only four are the token on its own",
+    "written_at": [
+      "auctions.py:97",
+      "auctions.py:137"
+    ]
+  },
+  "bootstrap_defect": {
+    "constructible": false,
+    "failure_cause": "the guard tests one file and the load reads a different one, so the branch that reads the state document is entered whenever the config exists and the state document does not",
+    "guard_site": "auctions.py:32",
+    "guard_target": "the committed standalone config document",
+    "guard_target_present": true,
+    "guard_tests": "FILE_AH_CONFIG",
+    "inertness_reasons": [
+      {
+        "independent_of_the_wiring": true,
+        "reason": "the constructor reads a file it did not test for",
+        "site": "auctions.py:32-33",
+        "why_it_matters": "repairing the commented import alone would still raise, so this is a defect in the module and not a choice about the wiring"
+      },
+      {
+        "independent_of_the_wiring": false,
+        "reason": "the module import and all three routes are commented out",
+        "site": "server.py:28-29, :186, :217, :248",
+        "why_it_matters": "this is what \"switched off\" refers to, but it is a second and separate reason; recording only this one would hide the defect"
+      }
+    ],
+    "makedirs_path": "resolved from a \".\" base, so relative to the process working directory",
+    "makedirs_site": "auctions.py:30-31",
+    "raised": "FileNotFoundError",
+    "read_name": "FILE_AH_STATE",
+    "read_site": "auctions.py:33",
+    "read_target": "the state document in the runtime auctions directory",
+    "read_target_present": false,
+    "repaired_here": false,
+    "state_document_created_here": false,
+    "why_not_repaired": "a client that bootstrapped successfully would be implementing something the original never did, and presenting it as parity would be false"
+  },
+  "capability": "godot-auction-schedule",
+  "claim_limits": [
+    "the schedule is delivered and the units are resolved; the prices are carried verbatim as committed columns and NO price is derived, charged or refunded anywhere",
+    "the one derived value is the duration in seconds. It is a length of the committed interval and it gates nothing: no countdown, no scheduler and no clock read exist",
+    "the expiry boundaries, the bootstrap defect and the client-dictated behaviours are RECORDED, not implemented, and each is a statement about the preserved server only",
+    "the reader census says NO SERVER-SIDE READER and never that a key is inert: every one of these keys is serialised to the wire by the disabled routes, so the Flash client may have read all of them. Nothing here says what that client displayed",
+    "the non-positive-interval refusal is a CONTENT-SHAPE refusal and not a parity claim: the preserved branch computes such a duration unchanged, and reproducing a zero or negative length of time is not something this line is for",
+    "the arithmetic census covers multiplication, division and remainder. It does NOT cover addition or subtraction, and no such claim is made for them",
+    "the corpus figure covers the ten committed canonical documents only; fixture step documents, the build cache and the saves index are excluded, and the exclusion of the index is load-bearing rather than ceremonial",
+    "no ordinal position is claimed for the committed bet price, because no reconciled census of zero-consumer committed fields exists in this repository",
+    "no executed-legacy fixture is delivered, and the reason is the absent request path rather than an absent corpus instance; the investigation's constructed-precondition figures are evidence about the module's logic and are not a capture",
+    "no windowed capture and no pixel-parity oracle are claimed, because nothing is rendered and no committed image matches this surface",
+    "the reserved-stem guard is a BELT, not the gate, and its coverage over the documented absent helpers is measured rather than assumed: eighteen of the twenty carry at least one reserved stem, and the two that do not -- `now_seconds`, a permutation of the reserved stem `seconds_now`, and `auction_round` -- would pass the naming guard and be caught only by the whole-function-inventory pin. A helper invented under a name that borrows no reserved stem and is then added to the inventory as well would pass both, which is why the inventory is compared as a pinned set rather than checked for absence"
+  ],
+  "client_dictated_refusals": [
+    {
+      "behaviour": "the stored current price is a pure function of the client-sent bid amount",
+      "comparison_operators_against_price_fields": 0,
+      "divergence": true,
+      "expression": "the client-sent amount plus the committed increment",
+      "id": "unvalidated_bid",
+      "measured": [
+        {
+          "client_sent": 1,
+          "note": "the price went DOWN by 3999",
+          "price_after": 1001,
+          "price_before": 5000
+        },
+        {
+          "client_sent": 0,
+          "price_after": 1000,
+          "price_before": 5000
+        },
+        {
+          "client_sent": -5000,
+          "price_after": -4000,
+          "price_before": 5000
+        },
+        {
+          "client_sent": 1000000000,
+          "price_after": 1000001000,
+          "price_before": 5000
+        }
+      ],
+      "parity": false,
+      "site": "auctions.py:199",
+      "why_refused": "reproducing a client-dictated price is the anti-pattern this project exists to refuse"
+    },
+    {
+      "behaviour": "the winner field appears only when a client-sent flag is truthy, and then only for the user asked about",
+      "comparison_operators_against_price_fields": 0,
+      "divergence": true,
+      "id": "client_sent_completion_flag",
+      "parity": false,
+      "site": "auctions.py:174-176",
+      "why_refused": "a client flag deciding an authoritative outcome is not reproduced; the record names the branch and stops"
+    },
+    {
+      "behaviour": "no bid amount is ever compared with any other amount",
+      "comparison_operators_against_price_fields": 0,
+      "divergence": true,
+      "id": "no_amount_compares_another",
+      "measured": "with two bids of 100 and 99999, the answer for the low bidder is not winning and the answer for the high bidder is winning, decided by list position and not by amount",
+      "parity": false,
+      "site": "auctions.py:160-176",
+      "why_refused": "no winner is derived from amounts, so no ranking helper is delivered"
+    },
+    {
+      "behaviour": "the win flag is the literal 1 for every auction and every user",
+      "comparison_operators_against_price_fields": 0,
+      "divergence": true,
+      "id": "unconditional_win_flag",
+      "parity": false,
+      "site": "auctions.py:164",
+      "why_refused": "a constant carrying no information is reported as a measurement and is not projected as a per-auction value"
+    },
+    {
+      "behaviour": "a bid naming an auction that does not exist changes nothing and raises nothing, and the route would still have answered success",
+      "comparison_operators_against_price_fields": 0,
+      "divergence": true,
+      "id": "silent_no_op_on_unknown_key",
+      "parity": false,
+      "site": "auctions.py:181",
+      "why_refused": "an authoritative write that silently succeeds is a server-side gap, and reproducing it is not parity"
+    },
+    {
+      "behaviour": "a client-sent round value is accepted and never read",
+      "comparison_operators_against_price_fields": 0,
+      "divergence": true,
+      "id": "client_round_never_read",
+      "parity": false,
+      "site": "auctions.py:180",
+      "why_refused": "there is no round counter, so no round input is modelled"
+    }
+  ],
+  "committed_config_byte_form": {
+    "comparable_forms": "the two digests describe DIFFERENT bytes and are not interchangeable; the repository records the LF form and this checkout may hold CRLF",
+    "crlf_count": 31,
+    "lf_normalised_bytes": 436,
+    "lf_normalised_sha256": "a8dc79616f5effe4e3eb4d56ab532a14e7eff32056e18438df88fd8781f6498e",
+    "mutated_by_this_line": false,
+    "path": "config/auctionhouse.json",
+    "working_tree_bytes": 467,
+    "working_tree_sha256": "0b4d74b3e69cfc58636eb3af9e89d0f88fd9f461f6d234e3e8c25f6f5ec33f0f"
+  },
+  "corpus": {
+    "carrying": [],
+    "scanned": 10
+  },
+  "corrections": [
+    "The recorded figure of three for the expiry term is a RAW SUBSTRING count. Its whole-word count is ZERO: all three raw matches sit inside the words `expired` and `count_expired`. The suite measures and asserts BOTH rules, and the disagreement is recorded rather than flattened. The conclusion is unaffected, because the claim that matters -- that neither term occurs outside the auction module -- holds under both rules.",
+    "The zero-consumer claim for the experience token is true as a WHOLE-WORD count and false as a raw substring count, which reports three matches, all inside the word `expired`.",
+    "A CORRECTION TO THIS SUITE'S OWN EARLIER CORRECTION, rather than to an inherited figure, and it is kept here because deleting it would hide a real defect. An earlier draft reported that TWO searched tokens disagree between the raw-substring rule and the whole-token rule, named `mana` alongside `xp`, and declared the committed normalization's `resource_tokens_substring.mana = 0` wrong by one. That was a defect in the AUDIT, not in the committed figure: the suite counted raw occurrences in a case-FOLDED copy of the module, while `build_auctions.py` counts them case-sensitively with `source_text.count(token)`, so the two sides were measured under DIFFERENT RULES and then compared against each other. Re-measured under the builder's own rule the disagreement is ONE token, `xp`, whose three raw matches all sit inside `expired` and `count_expired`; `mana` has zero raw and zero whole-token occurrences, so the committed zero is CORRECT and is left untouched. The case-folded view is still reported, as a separately labelled second measurement -- `Manage` at auctions.py:161 does contain that letter run -- but it makes no claim about the committed figure. No conclusion changes. Comparing two measurements taken under different rules, then calling the mismatch a correction, is exactly the error it appeared to be reporting.",
+    "The recorded price-token figure of four is a whole-word count; the raw substring count is nine, because the longer committed identifiers contain the word. Both are now recorded.",
+    "The committed config document's byte count is 467 in this working tree and 436 as the committed Git blob. The investigation recorded 467, which is the working-tree form. Both are recorded here with their own digests.",
+    "The state-key reader census is TRANSCRIBED from the committed investigation and is not re-derived here, because telling a write from a comparison needs a parse tree this suite does not build. What the suite measures is that every recorded key name really occurs in the recorded source."
+  ],
+  "delivered": [
+    "three committed definitions projected in committed order through the registry, every committed field verbatim and the resolved unit names against the normalized items package",
+    "exactly ONE derived value: the duration in seconds, from a committed interval in minutes, in one named function with a named inverse and a round trip over every committed entry",
+    "a mechanical arithmetic census: over a code-only view the delivered files contain one multiplication, one division and no remainder, all inside the two conversion functions",
+    "fail-closed refusals with no derived value on refusal, covering an absent registry, an absent domain, a malformed entry and a non-positive interval",
+    "the expiry semantics reported verbatim: endDate plus one with no bidder, endDate plus sixty with a bidder, the round reset to the literal one, and the elapsed-round count computed and discarded",
+    "the bootstrap defect as a property of the oracle, with BOTH line numbers and TWO independent reasons, and no repair",
+    "each client-dictated behaviour recorded with its measurement and labelled a divergence from the preserved branch",
+    "the reader census under the scoped phrase, with its classification marked as transcribed rather than re-derived here"
+  ],
+  "derivation": {
+    "additive_case_not_covered": "`+` is the string-concatenation operator and `-` appears in every `->` annotation, so neither is countable in this scanner; additive and subtractive derivation is caught by the inventory pin and the reserved-name guard instead",
+    "boundary_checked": {
+      "above": 3660,
+      "at_one_hour": 3600,
+      "below": 3540,
+      "one_minute": 60,
+      "zero": 0
+    },
+    "committed_unit": "minutes",
+    "derived_unit": "seconds",
+    "derived_values": 1,
+    "divisions_in_delivered_files": 1,
+    "factor": 60,
+    "forward": "duration_seconds_from_interval",
+    "inverse": "interval_minutes_from_duration",
+    "legacy_site": "auctions.py:76",
+    "multiplications_in_delivered_files": 1,
+    "name": "interval in minutes to duration in seconds",
+    "remainders_in_delivered_files": 0,
+    "round_trips": true
+  },
+  "encoding_records": {
+    "interval": {
+      "coerced": false,
+      "committed_unit": "minutes",
+      "derived_unit": "seconds",
+      "json_type": "Number",
+      "why": "auctions.py:76 converts once, and the committed table is normalized in its own unit so the conversion stays visible in code rather than hidden inside a data file"
+    },
+    "legacy_id": {
+      "coerced": false,
+      "committed_values": [
+        "1",
+        "2",
+        "3"
+      ],
+      "json_type": "String",
+      "why": "auctions.py:75 keys its state document by str(auction[\"uuid\"]), so an integer here would claim a type the source does not carry"
+    }
+  },
+  "excluded_document": {
+    "auction_term_occurrences": 3,
+    "delivered_record": {
+      "document": "tests/saves/manifest.json",
+      "identified_as_an_index_by": "its own shape: it carries `sources` and `fixtures` indexes and none of `maps`, `privateState` or `playerInfo`",
+      "load_bearing": true,
+      "measured_by": "test_auction_schedule.gd, against the committed bytes",
+      "reason": "an index of sources and fixtures, not a save",
+      "why_it_is_load_bearing": "the document DOES carry the auction term in raw occurrences, so a directory walk would have reported a carrying document that is not a save at all; excluding it by name is what makes the recorded zero-of-ten figure mean what it says"
+    },
+    "load_bearing": true,
+    "note": "a directory walk would have reported one of eleven documents carrying the term",
+    "path": "tests/saves/manifest.json",
+    "reason": "an index of sources and fixtures, not a save"
+  },
+  "expected_declarations": 17,
+  "expected_function_inventory": [
+    "committed_schedule",
+    "project",
+    "project_entry",
+    "entry_refusal",
+    "_numeric_refusal",
+    "duration_seconds_from_interval",
+    "interval_minutes_from_duration",
+    "round_trips",
+    "refusal_codes",
+    "refusal_reason",
+    "_refuse",
+    "_is_integral",
+    "bootstrap_record",
+    "expiry_record",
+    "refusal_ids",
+    "refusal_record",
+    "refusal_count"
+  ],
+  "expiry_semantics": {
+    "comparison": "strictly greater than endDate",
+    "expired_round_count": {
+      "computed": true,
+      "note": "only the remainder reaches the new begin instant, so five elapsed rounds produce one auction and the count itself is discarded",
+      "site": "auctions.py:127",
+      "used": false
+    },
+    "grace_gate": "the grace is gated on at least one recorded bidder",
+    "implemented_here": false,
+    "no_bidder_boundary_offset_seconds": 1,
+    "offered_to_a_player": false,
+    "one_bidder_boundary_offset_seconds": 60,
+    "round_read_anywhere": false,
+    "round_reset_literal": 1,
+    "round_reset_site": "auctions.py:138",
+    "test_site": "auctions.py:119",
+    "why_not": "nothing evaluates elapsed time and there is no request path through which a player could observe, wait for or act on a boundary"
+  },
+  "fixture_refusal": {
+    "delivered": false,
+    "investigation_figures_are_not_a_capture": "every figure in the committed investigation came from such a constructed precondition and is labelled as constructed at each step; they are evidence about the module's logic and are not carried forward as a fixture",
+    "not_a_corpus_limitation": true,
+    "reason": "the behaviour has no request path",
+    "the_rejected_route": "enabling the commented-out routes to obtain a genuine capture would modify legacy behaviour to make a modern test easier, which the repository rules forbid",
+    "what_a_fixture_would_require": "constructing the class directly against a hand-seeded state document, which is not a transaction any client made",
+    "why_not_a_corpus_limitation": "the blocker is not that the corpus lacks an auction instance; it is that all three routes and the import are commented out, so no client ever made the transaction",
+    "why_that_would_mislead": "it would present a surface that could never run as one that served requests, and it would license a round trip the client does not have"
+  },
+  "guard_injections": [
+    {
+      "contained_after_restore": true,
+      "disguise": "an invented DURATION helper: the remaining seconds on an auction, which is the countdown this capability refuses",
+      "engine_error_lines": 0,
+      "exit_code": 1,
+      "failures": 10,
+      "guards_that_fired": [
+        "whole_inventory_pin",
+        "declaration_count",
+        "distinct_count",
+        "unexpected_function",
+        "reserved_stem_borrowed",
+        "reserved_stem_remaining",
+        "reserved_stem_unborrowed",
+        "multiplication_total",
+        "arithmetic_carrier_not_allowed",
+        "absent_helper_really_absent"
+      ],
+      "probe": "static func seconds_remaining(entry: Dictionary) -> int",
+      "restore_byte_identical": true
+    },
+    {
+      "contained_after_restore": true,
+      "disguise": "an invented ROUND helper, reading a value the legacy module writes as a literal and never reads",
+      "engine_error_lines": 0,
+      "exit_code": 1,
+      "failures": 7,
+      "guards_that_fired": [
+        "whole_inventory_pin",
+        "declaration_count",
+        "distinct_count",
+        "unexpected_function",
+        "reserved_stem_borrowed",
+        "reserved_stem_current_round",
+        "reserved_stem_unborrowed"
+      ],
+      "probe": "static func current_round_for(entry: Dictionary) -> int",
+      "restore_byte_identical": true
+    },
+    {
+      "contained_after_restore": true,
+      "disguise": "an invented WINNER helper, which is the refusal the no-amount-compares record exists for",
+      "engine_error_lines": 0,
+      "exit_code": 1,
+      "failures": 8,
+      "guards_that_fired": [
+        "whole_inventory_pin",
+        "declaration_count",
+        "distinct_count",
+        "unexpected_function",
+        "reserved_stem_borrowed",
+        "reserved_stem_winner",
+        "reserved_stem_unborrowed",
+        "absent_helper_really_absent"
+      ],
+      "probe": "static func winner_for(entry: Dictionary) -> String",
+      "restore_byte_identical": true
+    },
+    {
+      "contained_after_restore": true,
+      "disguise": "a SUFFIXED helper wearing two reserved names as PREFIXES; an exact-name check would have passed this one",
+      "engine_error_lines": 0,
+      "exit_code": 1,
+      "failures": 9,
+      "guards_that_fired": [
+        "whole_inventory_pin",
+        "declaration_count",
+        "distinct_count",
+        "unexpected_function",
+        "reserved_stem_borrowed",
+        "reserved_stem_fee",
+        "reserved_stem_bid",
+        "fee_unborrowed",
+        "bid_unborrowed"
+      ],
+      "probe": "static func bid_fee_per_entry(entry: Dictionary) -> int",
+      "restore_byte_identical": true
+    },
+    {
+      "contained_after_restore": true,
+      "disguise": "a helper NAMED AFTER A COMMITTED FIELD, which would make the projection look as though it derived an increment",
+      "engine_error_lines": 0,
+      "exit_code": 1,
+      "failures": 7,
+      "guards_that_fired": [
+        "whole_inventory_pin",
+        "declaration_count",
+        "distinct_count",
+        "unexpected_function",
+        "reserved_stem_borrowed",
+        "reserved_stem_price",
+        "reserved_stem_unborrowed"
+      ],
+      "probe": "static func priceIncrement(entry: Dictionary) -> int",
+      "restore_byte_identical": true
+    },
+    {
+      "contained_after_restore": true,
+      "disguise": "the INVENTORY-ONLY probe: it borrows NO reserved stem, so the reserved-name guard CANNOT see it. This is the probe that shows the inventory pin is the real gate and the reserved-name guard is the belt",
+      "engine_error_lines": 0,
+      "exit_code": 1,
+      "failures": 4,
+      "guards_that_fired": [
+        "whole_inventory_pin",
+        "declaration_count",
+        "distinct_count",
+        "unexpected_function"
+      ],
+      "probe": "static func zone_alpha(entry: Dictionary) -> Dictionary",
+      "restore_byte_identical": true
+    },
+    {
+      "contained_after_restore": true,
+      "disguise": "the ARITHMETIC probe: a second multiplication outside the two named conversion functions, which is the exact shape an invented total or fee would take. It borrows no reserved stem either, so it proves the operator census AND the inventory pin",
+      "engine_error_lines": 0,
+      "exit_code": 1,
+      "failures": 6,
+      "guards_that_fired": [
+        "whole_inventory_pin",
+        "declaration_count",
+        "distinct_count",
+        "unexpected_function",
+        "multiplication_total",
+        "arithmetic_carrier_not_allowed"
+      ],
+      "probe": "static func zone_beta(value: int) -> int: return value * 2",
+      "restore_byte_identical": true
+    }
+  ],
+  "kind": "read-only projection of the committed auction schedule through the normalized content registry, plus a recorded description of the legacy auction house with nothing implemented",
+  "module_digests": {
+    "comparable_to_lf_normalised_digest": false,
+    "form": "sha256 over the raw working-tree bytes (CRLF on this checkout)",
+    "modules": {
+      "auction_oracle.gd": {
+        "path": "apps/client-godot/scripts/events/auction_oracle.gd",
+        "sha256": "6db9d6e6d1ec05589e8249bf34867168c130ae582f055a80ec7f88c35c2b1546"
+      },
+      "auction_schedule.gd": {
+        "path": "apps/client-godot/scripts/events/auction_schedule.gd",
+        "sha256": "c04b416d8ef1c891fd4adb443c6eecd6a2491cf0c203dd07b65be74da95021a0"
+      }
+    }
+  },
+  "not_delivered": [
+    "any route, any apps/compat-api/** change, any live phase and any executed-legacy fixture, so the compat suite is untouched and the live-phase count stays at twenty-three",
+    "any price, fee, total, remaining time, round number, winner or ranking: the price path is client-dictated, there is no round counter, and no winner is computed from amounts",
+    "any countdown, scheduler, timer or clock read",
+    "any state-document creation, default or repair path",
+    "any readiness or remaining-time helper a player could observe",
+    "a projection of the three round-history fields, which have no server-side reader and no writer beyond the expiry reset",
+    "a windowed capture and any pixel-parity oracle, because nothing is rendered and no committed image matches this surface"
+  ],
+  "projected_fields": [
+    "legacy_id",
+    "level",
+    "interval",
+    "price",
+    "priceIncrement",
+    "betPrice",
+    "unit",
+    "unit_name"
+  ],
+  "reader_census": {
+    "classification": "transcribed, not re-derived by this suite",
+    "keys_total": 21,
+    "no_server_side_reader": [
+      "beginPrice",
+      "betDetail",
+      "betPrice",
+      "betUsersPrev",
+      "betWinner",
+      "bidders",
+      "currentPrice",
+      "finished",
+      "isPrivate",
+      "level",
+      "prevRoundBidders",
+      "priceIncrement",
+      "round",
+      "userRounds",
+      "uuid",
+      "won"
+    ],
+    "read": [
+      "beginDate",
+      "betUsers",
+      "endDate",
+      "idUnit",
+      "isWinning"
+    ],
+    "round_residue": [
+      "betUsersPrev",
+      "prevRoundBidders",
+      "userRounds"
+    ],
+    "round_residue_note": "created, cleared on every expiry, and read by nothing: the residue of a round system that was never written, which is why they are recorded here rather than projected",
+    "scope": "reads are counted inside the one module; every key is serialised to the wire by the disabled routes",
+    "source": "docs/legacy-m11-event-systems.md section 8",
+    "with_intra_module_reader": 5,
+    "with_no_server_side_reader": 16
+  },
+  "refusal_reasons": {
+    "interval_not_positive": {
+      "kind": "content_shape",
+      "legacy_would_have": "computed auction[\"interval\"] * 60 unchanged",
+      "parity": false,
+      "why": "a zero or negative interval yields a zero or negative duration, which is not a length of time; refusing it keeps the one derivation meaningful rather than reproducing a nonsense value"
+    }
+  },
+  "refusals": [
+    "bet_price_not_integer",
+    "interval_not_integer",
+    "interval_not_positive",
+    "legacy_id_not_string",
+    "level_not_integer",
+    "no_committed_auctions_domain",
+    "price_increment_not_integer",
+    "price_not_integer",
+    "registry_absent",
+    "registry_has_no_legacy_ids",
+    "schedule_entry_not_object",
+    "schedule_not_array",
+    "unit_name_absent",
+    "unit_name_not_string",
+    "unit_not_integer"
+  ],
+  "registered_counts": {
+    "hermetic": 49,
+    "live_phases": 23,
+    "live_phases_changed_by_this_line": false
+  },
+  "reserved_stems": [
+    "price",
+    "fee",
+    "total",
+    "remaining",
+    "winner",
+    "rank",
+    "bid",
+    "place",
+    "start",
+    "extend",
+    "cancel",
+    "settle",
+    "tick",
+    "countdown",
+    "timer",
+    "clock",
+    "state_document",
+    "default_state",
+    "repair_state",
+    "next_expiry",
+    "is_ready",
+    "seconds_now",
+    "current_round",
+    "round_number",
+    "next_round",
+    "expired_round"
+  ],
+  "round_history": [
+    {
+      "field": "betUsersPrev",
+      "projected": false,
+      "why": "written and cleared, with no server-side reader"
+    },
+    {
+      "field": "prevRoundBidders",
+      "projected": false,
+      "why": "written and cleared, with no server-side reader"
+    },
+    {
+      "field": "userRounds",
+      "projected": false,
+      "why": "written and cleared, with no server-side reader"
+    }
+  ],
+  "route_records": [
+    {
+      "commented": true,
+      "kind": "import",
+      "reachable": false,
+      "site": "server.py:28-29",
+      "what": "the module import and the single construction call"
+    },
+    {
+      "commented": true,
+      "kind": "list",
+      "reachable": false,
+      "site": "server.py:186",
+      "what": "the list route returning every auction"
+    },
+    {
+      "commented": true,
+      "kind": "detail",
+      "reachable": false,
+      "site": "server.py:217",
+      "what": "the detail route returning one auction"
+    },
+    {
+      "commented": true,
+      "kind": "bid",
+      "reachable": false,
+      "site": "server.py:248",
+      "what": "the bid route writing a bid"
+    }
+  ],
+  "schedule": {
+    "committed_source": "config/auctionhouse.json",
+    "content_domain": "auctions",
+    "count": 3,
+    "entries": [
+      {
+        "betPrice": 2,
+        "bet_price_charged": false,
+        "committed_betPrice": 2,
+        "committed_price": 5000,
+        "committed_priceIncrement": 1000,
+        "duration_seconds": 7200,
+        "duration_unit": "seconds",
+        "fields_verbatim": true,
+        "interval_minutes": 120,
+        "interval_unit": "minutes",
+        "legacy_id": "1",
+        "level": 1,
+        "price": 5000,
+        "priceIncrement": 1000,
+        "price_derived_here": false,
+        "round_trips": true,
+        "unit": 1167,
+        "unit_name": "Blue Steel Bahamut",
+        "unit_resolved": "true"
+      },
+      {
+        "betPrice": 2,
+        "bet_price_charged": false,
+        "committed_betPrice": 2,
+        "committed_price": 1000,
+        "committed_priceIncrement": 200,
+        "duration_seconds": 3600,
+        "duration_unit": "seconds",
+        "fields_verbatim": true,
+        "interval_minutes": 60,
+        "interval_unit": "minutes",
+        "legacy_id": "2",
+        "level": 1,
+        "price": 1000,
+        "priceIncrement": 200,
+        "price_derived_here": false,
+        "round_trips": true,
+        "unit": 1168,
+        "unit_name": "Blue Steel Draggy",
+        "unit_resolved": "true"
+      },
+      {
+        "betPrice": 2,
+        "bet_price_charged": false,
+        "committed_betPrice": 2,
+        "committed_price": 8000,
+        "committed_priceIncrement": 1500,
+        "duration_seconds": 7200,
+        "duration_unit": "seconds",
+        "fields_verbatim": true,
+        "interval_minutes": 120,
+        "interval_unit": "minutes",
+        "legacy_id": "3",
+        "level": 2,
+        "price": 8000,
+        "priceIncrement": 1500,
+        "price_derived_here": false,
+        "round_trips": true,
+        "unit": 1226,
+        "unit_name": "Red Mercury Dragon",
+        "unit_resolved": "true"
+      }
+    ],
+    "order": "the registry's committed order, not a collation",
+    "read_path": "the normalized registry only; the committed standalone config document is read by this SUITE as an independent oracle and by no delivered module"
+  },
+  "schema": "auction-schedule-report-v1",
+  "state_document_boundary": {
+    "created_here": false,
+    "defaulted_here": false,
+    "enforced_by": "test_auction_schedule.gd, as an asserted absence",
+    "repaired_here": false,
+    "why": "the constructor cannot read the state document it wants, and a client that supplied one would be implementing a bootstrap the original never had",
+    "write_path_here": false
+  },
+  "term_record": {
+    "conclusion": "this is the only interval- or expiry-driven system in the preserved source, so this capability must not re-open the time-dependent surfaces other lines already own",
+    "expire": {
+      "distinct_lines": 3,
+      "outside_module_raw": 0,
+      "outside_module_whole_word": 0,
+      "raw_substring_occurrences": 3,
+      "recorded_figure_is_a": "raw substring count",
+      "recorded_investigation_figure": 3,
+      "rules_agree": false,
+      "sites": [
+        "auctions.py:126",
+        "auctions.py:127",
+        "auctions.py:148"
+      ],
+      "whole_word_occurrences": 0,
+      "why_they_differ": "every raw match sits inside the words `expired` and `count_expired`, so a token scan finds none of them"
+    },
+    "interval": {
+      "distinct_lines": 1,
+      "outside_module_raw": 0,
+      "outside_module_whole_word": 0,
+      "raw_substring_occurrences": 1,
+      "rules_agree": true,
+      "site": "auctions.py:76",
+      "whole_word_occurrences": 1
+    },
+    "modules_scanned": 11,
+    "why_the_distinction_is_recorded_rather_than_flattened": "reporting three without the rule would invite a reader to repeat the substring scan and to conclude the module names an expiry operation, which it does not; reporting zero alone would contradict a figure the committed investigation states as three"
+  },
+  "wording_scope": {
+    "enforced_by": "test_auction_schedule.gd, over both delivered modules",
+    "forbidden_words_declared_by": "test_auction_schedule.gd",
+    "required_phrase": "no server-side reader",
+    "scanned_over": [
+      "auction_schedule.gd",
+      "auction_oracle.gd"
+    ],
+    "why": "every state key is serialised to the wire by the disabled routes, so the Flash client may have read all of them. Absence of a reader in the preserved server is a statement about the preserved server and nothing more"
+  }
+}

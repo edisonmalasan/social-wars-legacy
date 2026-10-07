@@ -430,9 +430,9 @@ const NON_DERIVATION := [
 ## The measured content findings, including the **two** figures the M9
 ## investigation and this line's proposal got wrong.
 const CONTENT_ABSENCE := ("NO COMMITTED RESEARCH CONTENT IS INVENTED. MEASURED "
-	+ "over all 22 normalized files and config/main.json: (1) NO normalized "
+	+ "over all 23 normalized files and config/main.json: (1) NO normalized "
 	+ "package carries a research SECTION — no file has a top-level key of any "
-	+ "research kind, and all 22 are top-level arrays of domain rows; (2) the "
+	+ "research kind, and all 23 are top-level arrays of domain rows; (2) the "
 	+ "string 'research' appears in exactly TWO normalized files, not one: "
 	+ "buildings.json, ONCE, inside the `name` of legacy_id \"256\" (\"Research "
 	+ "Lab\"), and images.json, in exactly THREE rows whose `legacy_id`/`path` "

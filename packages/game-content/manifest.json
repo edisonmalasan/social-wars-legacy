@@ -1,4 +1,116 @@
 {
+  "auctions": {
+    "coercion_ruleset": "auction-coercion-ruleset-v1",
+    "content_fingerprint": "3cdcea148de403603bda0781e66ff00ab4bb56bbd66dcf1373c305123f180c2e",
+    "counts": {
+      "auctions": 3,
+      "bet_prices": [
+        2
+      ],
+      "interval_unit": "minutes",
+      "intervals": [
+        60,
+        120
+      ],
+      "levels": [
+        1,
+        2
+      ],
+      "resolved_units": 3,
+      "stored_auctions": 3,
+      "unresolved_units": 0
+    },
+    "inputs": {
+      "auctionhouse": {
+        "bytes": 467,
+        "file": "config/auctionhouse.json",
+        "sha256": "0b4d74b3e69cfc58636eb3af9e89d0f88fd9f461f6d234e3e8c25f6f5ec33f0f"
+      },
+      "content_source": "standalone committed file, not one of the 20 top-level keys of config/main.json; no patch layering and no mods pipeline apply to this table",
+      "legacy_module_measurement": {
+        "apply_resources_called": false,
+        "bet_price_write_sites": [
+          "auctions.py:97",
+          "auctions.py:137"
+        ],
+        "bytes": 7835,
+        "consumed": false,
+        "counting_rule": "whole-token occurrence in the module text, never a substring: one token (xp) is a substring artifact of expired/count_expired and is recorded beside the whole-token count so the two cannot be confused",
+        "executed": false,
+        "file": "auctions.py",
+        "imported": false,
+        "read_as_text_only": true,
+        "resource_token_substring_artifacts": {
+          "xp": [
+            "count_expired",
+            "expired"
+          ]
+        },
+        "resource_tokens_substring": {
+          "apply_resources": 0,
+          "cash": 0,
+          "coins": 0,
+          "cost": 0,
+          "energy": 0,
+          "gold": 0,
+          "mana": 0,
+          "oil": 0,
+          "steel": 0,
+          "wood": 0,
+          "xp": 3
+        },
+        "resource_tokens_whole_token": {
+          "apply_resources": 0,
+          "cash": 0,
+          "coins": 0,
+          "cost": 0,
+          "energy": 0,
+          "gold": 0,
+          "mana": 0,
+          "oil": 0,
+          "steel": 0,
+          "wood": 0,
+          "xp": 0
+        },
+        "self_called_methods": 9,
+        "sha256": "224605c36f5103ecbc2a4e0f1faf374c0433e26b3b66cd5d5afb7cbf142700e0"
+      },
+      "units_reference_edge": {
+        "counts": {
+          "units": 429
+        },
+        "file": "packages/game-content/normalized/units.json",
+        "union_legacy_ids": 429
+      }
+    },
+    "notes": [
+      "One definition per committed entry in committed order; nothing is added, removed, merged or deduplicated (rule A1).",
+      "legacy_id is the committed uuid JSON string verbatim; an integer would claim a type the source does not carry, and the legacy module keys its state document by that value (auctions.py:106) (rule A1).",
+      "interval is preserved in its committed unit, minutes, and is not converted; the single conversion the legacy module performs (seconds = auction[\"interval\"] * 60, auctions.py:76) belongs to the consuming client, and the factor 60 is deliberately not recorded as data here (rule A2).",
+      "unit resolves against normalized/units.json and the resolved display name is carried; an unresolvable id is emitted in committed order with a null name and reported, never dropped, replaced or invented (rule A3).",
+      "betPrice is carried verbatim and marked bet_price_consumed false beside the measured zero-consumer record: the module text holds zero whole-token occurrences of gold, coins, cash, wood, steel, oil, xp, mana, energy, cost or apply_resources and never calls apply_resources. betPrice is written into state at auctions.py:97 and auctions.py:137 and read nowhere (rule A4).",
+      "The legacy module is read as text for that measurement and is never imported or executed, because importing it would run an __init__ that creates an auctions/ state directory as a side effect of reading committed content (design D3).",
+      "No price, fee, total, remaining time, round, winner or ranking is derived, and no committed value is converted, defaulted or padded."
+    ],
+    "outputs": [
+      {
+        "bytes": 1542,
+        "file": "packages/game-content/normalized/auctions.json",
+        "sha256": "8e9c1d958010b24a25ddbf4b6ddd937fbec5cb8c3f732b25b947f768a4a031a7"
+      }
+    ],
+    "policy": "auction-normalization-v1",
+    "reported": [],
+    "result": "success",
+    "schema_version": 1,
+    "validation": {
+      "bet_price_consumers": 0,
+      "duplicate_ids": 0,
+      "missing_fields": 0,
+      "round_trip_diffs": 0,
+      "unresolved_unit_references": 0
+    }
+  },
   "coercion_ruleset": "coercion-ruleset-v1",
   "content_fingerprint": "44e5b9edd1eba2910833bb8e2f063175e51c5754e38c35177648e4de779df501",
   "counts": {

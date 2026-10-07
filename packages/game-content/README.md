@@ -1359,8 +1359,8 @@ Four families, each reported with a stable name, file, entry
 `legacy_id`, and field:
 
 - **structure** - the `normalized/` directory set equals the
-  manifest-recorded output set exactly (22 files, both directions), the
-  root record and all nine extension sections record `schema_version`,
+  manifest-recorded output set exactly (23 files, both directions), the
+  root record and all ten extension sections record `schema_version`,
   `result: success`, and `policy`, and every schema file exists and is
   structurally valid (object schema, `required` subset of `properties`,
   `kind` const).
@@ -1405,7 +1405,7 @@ python -B packages/game-content/tools/validate_content.py
 The optional `--repo-root PATH` relocates the same package reads.
 
 Exit 0 prints a deterministic JSON success report with
-`files_verified: 22`, `schemas_verified: 21`, `counts_checked: 22`, a
+`files_verified: 23`, `schemas_verified: 22`, `counts_checked: 23`, a
 per-file `entries` map, and `references_checked` (604 on the committed
 package); two runs print byte-identical reports. Exit 1 prints a
 `validation-failed` JSON report listing each problem sorted by family,

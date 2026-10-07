@@ -38,9 +38,14 @@ reproduce the client-dictated price as if it were parity.
   and the discarded `count_expired`.
 - Record the bootstrap defect as a **property of the oracle**, so a future
   implementation cannot silently "fix" it and claim parity.
-- **No route, no `apps/compat-api/**` change, no live phase, and no executed
-  legacy fixture.** The fixture is refused for a specific, measured reason rather
-  than a missing corpus row — see the design's recorded decisions.
+- **No route, no compatibility-API behaviour change, no live phase, and no
+  executed legacy fixture.** The fixture is refused for a specific, measured
+  reason rather than a missing corpus row — see the design's recorded decisions.
+  Amended at Apply: the original wording "no `apps/compat-api/**` change" was
+  falsified, because adding any normalized output forces one pinned
+  normalized-file count inside an existing compat-API content-absence guard to
+  move. That single count edit is the whole of the compat-API delta, and it is
+  recorded in design D5 and in the amended spec requirement.
 
 ### Revision to the committed contract, recorded rather than drifted past
 

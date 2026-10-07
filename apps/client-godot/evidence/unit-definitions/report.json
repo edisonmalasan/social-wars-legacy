@@ -121,8 +121,8 @@
 		"manifest": "packages/game-content/manifest.json",
 		"manifest_and_file_agree": true,
 		"manifest_bytes": 680410,
-		"manifest_bytes_verified": 1905917,
-		"manifest_outputs_verified": 22,
+		"manifest_bytes_verified": 1907459,
+		"manifest_outputs_verified": 23,
 		"manifest_sha256": "6a7121cdefddf4835ac90c408c98da762b7ccd7de866aea749368beffdad36e0",
 		"schema": "packages/game-content/schemas/unit.schema.json"
 	},

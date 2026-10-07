@@ -115,7 +115,7 @@ const EXPECTED_WRITER_SITES := [
 ## figures correct the M9 investigation and this line's proposal, which both
 ## state that `research` appears in exactly ONE normalized file and that
 ## `config/main.json` has NO key containing `research` at any depth.
-const EXPECTED_NORMALIZED_FILES := 22
+const EXPECTED_NORMALIZED_FILES := 23
 const EXPECTED_RESEARCH_FILES := {"buildings.json": 1, "images.json": 6}
 const EXPECTED_RESEARCH_LAB_ID := "256"
 const EXPECTED_RESEARCH_LAB_NAME := "Research Lab"

@@ -967,7 +967,7 @@ class ContentAbsenceTests(unittest.TestCase):
 
     def test_no_normalized_package_carries_a_research_section(self) -> None:
         files = self.normalized_files()
-        self.assertEqual(len(files), 22)
+        self.assertEqual(len(files), 23)
         for path in files:
             with self.subTest(path=path.name):
                 document = json.loads(path.read_text(encoding="utf-8"))

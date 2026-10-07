@@ -107,6 +107,16 @@
        tree-wide storage-ownership claim that REPLACED the collection suite's
        now-false whole-tree absence, and the report writer -- also with no
        endpoint, no request, and no mutation),
+       and the auction-schedule suite (the read-only projection of the
+       committed auction schedule read ONLY through the normalized
+       ContentRegistry: every committed field carried verbatim, the single
+       derived value and its named inverse, the fail-closed refusals that
+       omit the derived field entirely, the code-only arithmetic census that
+       admits one multiplication and one division, the recorded legacy
+       facts, the two corrections to the committed investigation, the
+       registry-is-the-only-content-path guard, the corpus census with its
+       by-name exclusion proven load-bearing, and the report writer -- also
+       with no endpoint, no request, and no mutation),
        (the loop passes the dead endpoint to every suite: the session and
        game-clock suites use it for their failure phase, the placement,
        purchase, move, sell, store, upgrade, construction, collect, and
@@ -489,7 +499,7 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_experience", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests", "test_tutorial", "test_stored_item_placement", "test_mission_vocabulary", "test_combat_actions", "test_damage_magic", "test_rewards", "test_social_state", "test_darts", "test_friends", "test_construction_assist")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_experience", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests", "test_tutorial", "test_stored_item_placement", "test_mission_vocabulary", "test_combat_actions", "test_damage_magic", "test_rewards", "test_social_state", "test_darts", "test_friends", "test_construction_assist", "test_auction_schedule")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a
