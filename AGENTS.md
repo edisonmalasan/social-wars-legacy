@@ -1527,6 +1527,32 @@ real question but would raise inside the harness's own `offline()` guard, whose
 reworking a shared containment assertion across 20 existing suites is a
 separate change, and guessing at the mechanism is how an unearned fix ships.
 
+**An eighth recorded flaky surface, found by the M11 friends line:
+`test_collect_endpoint.ContentRefusalTests.test_a_recent_instant_is_too_early`
+has a sub-second time budget and can fail under load.** It stubs the row's
+collection instant to `BOOT.server_time() - 299`, and `BOOT.server_time()` is
+`int(self._engine.timestamp_now())` -- the **live** clock
+(`compat_legacy.py:195-196`) -- while the refusal it expects, `too_early`, is
+decided against the endpoint's **own** live clock. So the test only holds while
+the gap between reading `reference` and the request landing is **under one
+second**; one second of build-up flips elapsed from 299 to 300, the first
+committed rung is reached, and the assertion sees `200 != 409`. It failed
+exactly once, inside `verify-boot.ps1`'s compat step, immediately after 47
+headless Godot suites had run; `test_collect_endpoint.py` alone then passed
+**five consecutive times** (`Ran 57 tests`, OK, ~1.85 s each) and the full
+discovery passed at `Ran 3077 tests ... OK`. **It is pre-existing and unrelated
+to the friends line**, whose diff touches **no** `apps/compat-api/**` file --
+established by `git diff --name-only` returning only
+`apps/client-godot/evidence/boot/boot-report.json`,
+`apps/client-godot/tests/test_project_scope.gd` and
+`apps/client-godot/verify-boot.ps1`, plus three new client-side paths. The
+sibling boundary test `test_the_rung_is_reached_at_exactly_the_first_threshold`
+confirms the mechanism: the refusal really is at elapsed 300. **Not fixed
+here** -- the honest fix belongs to `godot-building-collect`, which owns the
+collect refusal, and reworking an already-archived line's clock stub from an
+unrelated change is how an unearned fix ships. **Re-run before treating it as a
+regression.**
+
 Verified unit-tutorial commands (milestone M9 line 3; Godot 4.7.2.stable, Windows
 x64; `python` denotes the pinned interpreter, never the PATH alias). M9's deliver
 list is `XP`, `levels`, `quests`, `research`, `collections`, and
@@ -2080,6 +2106,172 @@ port assertions (5055/5056), `verify-boot.ps1` treating any `^ERROR:` as a scrip
 error (grep `SCRIPT ERROR` too), the display-sensitive `verify.ps1`, and the
 `test_base.gd` abort-as-pass defect. No Flash, Ruffle, ActionScript, or browser
 executes in any of these commands, and every network call is loopback.
+
+Verified friends-roster commands (milestone M11 line 3; Godot 4.7.2.stable, Windows
+x64; `python` denotes the pinned interpreter, never the PATH alias). M11's deliver
+list is `friends`, `visits`, `scores`, `social rewards`, `legacy event systems`,
+and `special mechanics`; this is its **third** line, and the **first in this
+project that adds no route and touches no Compatibility API file at all**. The
+binding investigation is `docs/legacy-m11-friends.md` (PR #321, merge `3df888a`,
+content `82b6df9`); the proposal is `friends-roster-projection` (PR #322, merge
+`f7cc36b`). **The deliver item's name turned out to be the opposite of what the
+preserved server has**, which is why the line delivers a *roster* and refuses the
+relationship vocabulary:
+
+```bash
+godot --headless --path apps/client-godot --script res://tests/test_friends.gd
+godot --headless --path apps/client-godot --script res://tests/test_friends.gd -- --report=<repo>/apps/client-godot/evidence/friends/report.json
+godot --headless --path apps/client-godot --script res://tests/test_social_state.gd
+godot --headless --path apps/client-godot --script res://tests/test_project_scope.gd
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+openspec validate --all --strict
+```
+
+Purposes and observed results (2026-10-07): the hermetic friends suite
+(observed **570 checks** PASS, exit 0; the **47th** registered hermetic suite)
+over a pure read-only projection of each roster entry as **12 carried
+`playerInfo` keys** plus **6 fields derived from `maps[0]`**, kept distinguishable
+per key; the **unchanged** sibling suites (`test_social_state` **405**,
+`test_project_scope` **2087** — was 2053, the allow-list grew by exactly three
+paths — `test_content_registry` **87**, `test_game_api_fake` **1322**,
+`test_scene_build` **36**, `test_darts` **610**); the **unchanged** compat suite
+(observed `Ran 3077 tests in 52.428s`, **OK**, exit 0 — a *verified* baseline,
+because this line adds no endpoint and touches `apps/compat-api/**` not at all);
+`verify.ps1` (exit 0, `PASS all checks succeeded`); `verify-boot.ps1` (exit 0,
+`PASS all checks succeeded`, **47 hermetic suites** was 46, **23 live phases
+UNCHANGED** because no live phase was delivered, **224 assertions** was 222,
+guard digest `6978b959…ff348` **identical before and after**, port 5056 released,
+no working-tree `saves/`, and **988** log files inspected carrying **zero**
+`[test] FAIL`, `^ERROR:`, or `SCRIPT ERROR` lines); `validate_content.py` (exit
+0, `result: valid` — 22 outputs, 21 schemas, 604 references); `hash_manifest.py
+verify` (**3,258 entries**, 758,423,699 bytes, exit 0); and
+`openspec validate --all --strict` (**68 passed / 0 failed**). Evidence is the
+deterministic `friends-report-v1` report under
+`apps/client-godot/evidence/friends/` (**29,220 bytes in LF form** — the
+committed Git blob form; sha256 `6318c9b5…81f4` taken over those bytes, and
+byte-identical across **three** consecutive runs).
+`apps/client-godot/evidence/boot/boot-report.json` was **regenerated** and its
+diff **inspected rather than assumed**: it contained only `generated_utc`, the
+advanced `git_commit` (`5240bb6` → `f7cc36b`, the proposal merge), the one added
+`test_friends` entry, and the **25** log-index renumberings that follow from
+inserting one command — every one of them confirmed to be the `log` field and
+nothing else, because a rename and a content change are easy to confuse in a
+51-insertion diff.
+
+**The finding: `friends` is a directory listing, not a social relationship.**
+`neighbors()` (`sessions.py:191-221`) returns **every other loaded village,
+unconditionally** — no add, no remove, no accept, no decline, no consent, no
+direction anywhere in the preserved source. Membership therefore derives from
+**code, never from a file count**: `every villages/*.json except initial.json`
+(skipped at `sessions.py:78`) gives 7 loaded villages, minus the two-pid literal
+pair gives **5** members. Both pids ship as a **literal** because
+`sessions.py:173-174` and `:196-197` hardcode them as string literals and
+nothing in `config/` or the normalized content package names them, so there is
+nothing to derive them *from*; deriving the exclusion from content is recorded as
+the **rejected alternative**, because a derivation from a file count is an
+invention that happens to agree with the corpus today. **The committed
+classification of `friends` was falsified before this line was proposed** —
+`docs/legacy-m11-social.md` §7 called it *zero legacy occurrences*, and re-counted
+over all eleven modules under six rules it has **5** whole-file and **4** code-only
+occurrences, all four code-only ones in `sessions.py`. That is why
+`godot-social-state`'s requirement 1 was **amended as an ownership hand-off**
+rather than left standing: its premise was measured false. The hand-off moves
+**zero** state fields, because a roster entry is not private state.
+
+**Three false attractions were recorded rather than followed**, each of which would
+have produced an invented rule: **`neighbors` has two meanings** (the bootstrap
+roster, and the `expansion_prices` requirement string at `boot_data.gd:607`);
+**`"100000"` is a routing prefix, not an identity test** (the visit dispatch's
+branch 3 is `user.startswith(100000)`, and no claim is made that the prefix
+identifies a quest map); and **`pic_square` is a dictionary key**, not a Facebook
+API call. The two roster channels are reported **side by side and not
+deduplicated** — **2** entry fields per roster from the Flash-embed-variable
+channel against **18** from v0 — because deduplicating near-duplicates would hide
+the disagreement that is the interesting fact; the FlashVar channel's four tokens
+(`friendsInfo`, `pic_square`, `fb_friends_str`, `uid`) measured **zero** across
+all **48** non-test compat service modules, while the bare word `FlashVar`
+measured **9** occurrences and is **pinned as a capture-tool-only** exception
+rather than silently folded in (`capture_legacy_fixtures.py` 1,
+`field_stability.py` 8 — both analysis tools, neither on the request path). The
+visit surface is recorded as a **divergence and delivered as nothing**: branch 2
+tests membership in the literal pair and then passes `100000030` for **both**, so
+requesting `100000031` returns `100000030`'s data; its failure mode is the **empty
+string with HTTP 200**; and a visit returns the visited player's **complete
+`privateState`**. No committed fixture exercises it.
+
+**A tautology was found and closed rather than shipped.** The privateState
+intersection reads each entry's **real** key names through a new
+`all_key_names()` rather than against the projection's own declared 18 — because
+a widened key table is exactly the edit the guard exists to catch, so checking
+against the declaration would have made the empty intersection true by
+construction. The measurement is real: the recording player's `privateState` has
+**47** keys (an earlier eyeball count of "50" was wrong; the measured figure is
+47) and the intersection is empty.
+
+**Seven injections, all detected, all byte-identically restored, and re-run
+against the final delivered state** because a later edit can silently restore a
+guard's coverage. Failure counts **3, 3, 4, 3, 3, 34, 1**; every probe exit 1.
+The whole-inventory pin is the real gate and the reserved-name guard is the belt,
+and the belt earned its place: probes 2 and 4 were **suffixed** helpers wearing a
+reserved name as a **prefix** (`roster_order_by_xp`, `assist_neighbor_reward`),
+which an exact-name check would have passed. Two pinned facts were corrected
+rather than tidied: the module declares **29 distinct function names across 34
+declarations**, so the inventory is compared as a **sorted-unique set** with the
+declaration count pinned separately — a positional list comparison fails against
+the delivered module itself, because `_init`, `carried_key_names`,
+`derived_key_names`, `entry_key_names` and `entry_key_count` are each declared
+**twice**; and the reserved name `select_entry` was **renamed**
+`select_from_roster`, because a bidirectional substring rule collided with the
+delivered accessor `entry`. Probe 6 produced a **34-failure cascade** instead of a
+tidy single failure, because emptying the roster costs thirty-three other checks;
+its own line is the **seventh** of the thirty-four, confirmed from a **full**
+failure listing because the harness's three-line sample would not have shown it.
+The module digest after all seven probes equalled the digest before the first:
+`ed4d88a8…b9dd`, 32,470 bytes, with zero NUL bytes and a final newline asserted
+on every restore, a loud abort when a probe's anchor text is absent, and
+`git diff --numstat --ignore-cr-at-eol` plus `git status --short` required to
+equal their pre-probe values (design D7's three measured harness defects).
+
+**Two literal tokens had to be reworded rather than relaxed.** Both no-Flash gates
+are **raw substring** scans over project sources, and `USERID` + the Flash
+variable name are in `test_project_scope.gd`'s `FORBIDDEN` table while the Flash
+variable name is also in `test_town_gate.gd`'s `RUNTIME_NEEDLES`. The module's
+prose therefore **describes** the transport and cites `templates/play.html:99` and
+`server.py:91` instead of quoting it, with the reason recorded at the site — and
+the suite's own boundary token list drops the two forbidden literals for the same
+reason, moving that claim onto the four **non-forbidden** roster tokens. Neither
+gate was relaxed to permit a quote. **The first `verify-boot.ps1` run of this line
+failed on exactly this**, and the failure is recorded rather than hidden.
+
+Claim limits: **no relationship, request, accept, decline, consent or lifecycle
+exists** and the delivered client cannot create one; **no order, rank, score,
+best, closest or total** is computed over roster values, because the served order
+follows `os.listdir()` and is already recorded as environment-dependent, so
+membership, entry count, carried key set and derived values are covered and
+**order is not**; **the saves-loop half of both channels has no executed
+evidence**, because the committed captures ran with no `saves/` directory, so the
+recorded roster is static-villages-only and that limit is **asserted, not noted**;
+**no assist reward** is derived (`neighborAssists`, `receivedAssists` and
+`resourcesTraded` have zero code-only occurrences); **no windowed capture and no
+pixel-parity oracle**, because nothing is rendered; and **absence of a server-side
+relationship says nothing about what the Flash client displayed**, which may have
+been entirely client-side. **An eighth recorded flaky surface was found and
+recorded, not fixed**: `test_collect_endpoint`'s
+`test_a_recent_instant_is_too_early` has a **sub-second** time budget, because it
+stubs the row instant to `BOOT.server_time() - 299` against the **live** clock
+while the `too_early` refusal is decided against the endpoint's **own** live clock,
+so one second of build-up flips `409` to `200`. It failed once, inside
+`verify-boot.ps1` immediately after 47 headless suites; the file then passed
+**five consecutive times** alone and the full discovery passed at 3077. It is
+pre-existing and unrelated — established by `git diff --name-only` returning no
+`apps/compat-api/**` path — and the honest fix belongs to `godot-building-collect`.
+The other seven recorded flaky surfaces remain open. No Flash, Ruffle,
+ActionScript, or browser executes in any of these commands, and **no network is
+used at all**.
 
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):

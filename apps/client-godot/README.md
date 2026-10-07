@@ -4427,3 +4427,137 @@ instant. **Nothing is rendered**, so there is no windowed capture and no pixel-p
 token is not absence of a feature -- the Flash client may have held darts and premium UI entirely
 client-side, which this oracle cannot verify. No Flash, Ruffle, ActionScript, or browser executes in any of
 these commands, and every network call is loopback.
+
+## Friends roster (`godot-friends`, M11 line 3)
+
+The binding contract is `docs/legacy-m11-friends.md` (PR #321, merge `3df888a`,
+content `82b6df9`). The proposal is `openspec/changes/friends-roster-projection/`.
+Delivered: one read-only module and one hermetic suite.
+
+```bash
+godot --headless --path apps/client-godot --script res://tests/test_friends.gd
+godot --headless --path apps/client-godot --script res://tests/test_friends.gd -- --report=<repo>/apps/client-godot/evidence/friends/report.json
+godot --headless --path apps/client-godot --script res://tests/test_social_state.gd
+godot --headless --path apps/client-godot --script res://tests/test_project_scope.gd
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+openspec validate --all --strict
+```
+
+### The finding: the deliver item's name is the opposite of what the server has
+
+`friends` is **not** "state-only with no consumer" -- that classification was falsified before this line
+was proposed (`friends` has 5 whole-file and 4 code-only occurrences across the eleven legacy modules, all
+four code-only ones in `sessions.py`). What the preserved server actually serves is `neighbors()`
+(`sessions.py:191-221`): **every other loaded village, unconditionally** -- a directory listing, not a
+social relationship. There is no add, no remove, no accept, no decline, no consent and no direction
+anywhere in the preserved source. So the line delivers a **roster** and refuses the relationship
+vocabulary, and the refusal is carried **structurally** by a 26-name reserved inventory plus a
+whole-inventory pin, because prose cannot fail.
+
+Membership therefore derives from **code**, never from a file count: `every villages/*.json except
+initial.json` (skipped at `sessions.py:78`) gives 7 loaded villages, minus the two-pid literal exclusion
+pair `100000030`/`100000031` gives **5** members. Both pids are shipped as a **literal**, because
+`sessions.py:173-174` and `:196-197` hardcode them as string literals and nothing in `config/` or in the
+normalized content package names them -- there is nothing to derive them *from*. Deriving the exclusion
+from content (a file-name pattern, or "the directory has eight files so the roster has five") is recorded
+as the **rejected alternative**, because a derivation from a file count is an invention that happens to
+agree with the corpus today.
+
+### The first line in this project that adds no route and touches no Compatibility API file
+
+`/v0/bootstrap` was measured already carrying the roster at `player_info.neighbors` -- **5 entries**,
+**18 keys** each, leaf-identical to the committed executed oracle on every entry -- so
+`apps/compat-api/**` is untouched and the compat suite must stay at its **3077** baseline. That is a
+*verified* result for this line, not a skipped check. Adding no route also leaves the pinned
+route-placement invariant untouched **by construction**, which is strictly safer than hunting a third
+forward-safe slot after `/v0/darts` took the only one.
+
+### The two roster channels are reported, not deduplicated
+
+The Flash-embed-variable channel (`fb_friends_str`, `sessions.py:168-189`) yields **2** entry fields per
+roster; the v0 channel yields **18**. They are near-duplicates and are reported side by side with their
+genuine disagreement on entry width surfaced, because deduplicating them would hide the disagreement that
+is the interesting fact. The FlashVar channel's four tokens -- `friendsInfo`, `pic_square`,
+`fb_friends_str`, `uid` -- were measured at **zero** occurrences across all **48** non-test compat service
+modules, so the modern client carries no dependency on it.
+
+### Three false attractions recorded rather than followed
+
+- **`neighbors` has two meanings.** The bootstrap roster, and the `expansion_prices` requirement string at
+  `boot_data.gd:607`. Only the first is projected.
+- **`"100000"` is a routing prefix, not an identity test.** The visit dispatch's branch 3 is
+  `user.startswith(100000)`; no claim is made that the prefix identifies a quest map.
+- **`pic_square` is a dictionary key**, not a Facebook API call.
+
+### The visit surface: a divergence, delivered as nothing
+
+`get_neighbor_info` (`server.py:155-182`) is recorded rather than reproduced, for three reasons. Branch 2
+tests membership in the two-pid pair and then passes the literal `100000030` for **both**, so requesting
+`100000031` returns `100000030`'s data -- reproducing that would reproduce a defect, and correcting it
+would be a divergence presented as parity. Its failure mode is the **empty string with HTTP 200**, not an
+error object. And a visit returns the visited player's **complete `privateState`**, which is the opposite
+of the roster. No committed fixture exercises it, so it is delivered as nothing.
+
+### Verification actually run (2026-10-07)
+
+- `test_friends.gd`: **570 checks** PASS, exit 0 -- the **47th** registered hermetic suite; evidence report
+  **29,220 bytes in LF form** (the committed Git blob form), sha256 `6318c9b5...81f4`, byte-identical
+  across **three** consecutive runs
+- `test_social_state.gd`: **405 checks**, exit 0, **unchanged** -- the ownership hand-off must not move it
+- `test_project_scope.gd`: **2087 checks** (was 2053), exit 0 -- the allow-list grew by exactly three paths
+- `test_content_registry.gd` **87**, `test_game_api_fake.gd` **1322**, `test_scene_build.gd` **36**,
+  `test_darts.gd` **610**, all **unchanged**
+- compat: `Ran 3077 tests in 52.428s`, **OK**, exit 0 -- the required unchanged baseline
+- `verify.ps1`: `PASS all checks succeeded`, exit 0
+- `verify-boot.ps1`: `PASS all checks succeeded`, exit 0; **47 hermetic suites** (was 46), **23 live phases
+  UNCHANGED** because no live phase was delivered; **224 assertions** (was 222); guard digest
+  `6978b959...ff348` **identical before and after**; port 5056 released; no working-tree `saves/`;
+  **988** log files inspected carrying **zero** `[test] FAIL`, `^ERROR:` or `SCRIPT ERROR` lines
+- `validate_content.py`: `result: valid`, 22 outputs, 21 schemas, 604 references, exit 0
+- `hash_manifest.py verify`: **3,258 entries**, 758,423,699 bytes, exit 0
+- `openspec validate --all --strict`: **68 passed / 0 failed** (68 items), exit 0
+
+### The seven injections, all detected, all byte-identically restored
+
+All seven were run **twice** -- once during implementation and once **against the final delivered state**,
+because a later edit can silently restore a guard's coverage. Every probe returned exit 1; the failure
+counts are **3, 3, 4, 3, 3, 34, 1**. The whole-inventory pin is the real gate and the reserved-name guard
+is the belt: probes 2 and 4 were **suffixed** helpers wearing a reserved name as a prefix
+(`roster_order_by_xp`, `assist_neighbor_reward`), which an exact-name check would have passed. Probe 6 is
+the immutability probe and it produced a **34-failure cascade** rather than a tidy single failure, because
+emptying the roster costs thirty-three other checks; its own line is the seventh of the thirty-four, which
+was confirmed from a **full** failure listing rather than from the harness's three-line sample.
+
+The harness itself was constrained by design D7, after three defects were measured in a guard-proof
+harness during the proposal stage: the module's SHA-256 is captured **before** each probe (never after, so
+a restore is never a self-comparison), each restored file is required to hold **zero NUL bytes** and a
+final newline, a probe whose anchor text is absent **aborts loudly** rather than silently degrading into
+"not detected", and `git diff --numstat --ignore-cr-at-eol` plus `git status --short` must equal their
+pre-probe values after every restore. The module digest after all seven probes equalled the digest before
+the first: `ed4d88a8...b9dd`, 32,470 bytes.
+
+### Why there is no `friends-live` phase
+
+This line adds no route, so a live phase would have to drive `/v0/bootstrap` and would prove nothing this
+line claims. `godot-darts` set the precedent for a line whose endpoint mutation is delivered with no live
+phase. Live phases stay at **23**.
+
+### Claim limits
+
+**No relationship, request, accept, decline, consent or lifecycle exists**, and the delivered client cannot
+create one. **No order, rank, score, best, closest or total** is computed over roster values: the served
+order follows `os.listdir()` and is already recorded as environment-dependent, so membership, entry count,
+carried key set and derived values are covered and **order is not**. **The saves-loop half of both channels
+has no executed evidence at all** -- the committed captures ran with no `saves/` directory -- so the
+recorded roster is static-villages-only and that limit is asserted, not noted. **No assist reward** is
+derived: `neighborAssists`, `receivedAssists` and `resourcesTraded` have zero code-only occurrences. **The
+privateState intersection is reported empty by measurement**, against the recording player's **47** real
+`privateState` keys read through each entry's own key names, because asserting the absence against a
+declared 18-key table would have been tautological. **Nothing is rendered**, so there is no windowed
+capture and no pixel-parity oracle. **Absence of a server-side relationship says nothing about what the
+Flash client displayed**, which may have been entirely client-side. No Flash, Ruffle, ActionScript, or
+browser executes in any of these commands, and no network is used at all.

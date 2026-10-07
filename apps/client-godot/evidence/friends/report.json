@@ -1,0 +1,799 @@
+{
+  "schema": "friends-report-v1",
+  "capability": "godot-friends",
+  "kind": "typed read-only projection of a roster, plus refusals",
+  "delivered": [
+    "a typed read-only projection of each roster entry as twelve carried playerInfo keys plus six fields derived from maps[0], kept distinguishable per key",
+    "membership reported as an UNORDERED SET, with no index and no ordering accessor, because the preserved order follows os.listdir() and is already recorded as environment-dependent",
+    "the two-pid literal exclusion pinned as a literal, with the derivation that was measured and rejected recorded beside it",
+    "both roster channels reported side by side and NOT deduplicated, with their genuine disagreement on entry width surfaced",
+    "the recording player's privateState keys intersected against every entry and the intersection REPORTED rather than assumed empty",
+    "one refusal code per malformed shape, discriminated on shape before any parser is invoked"
+  ],
+  "not_delivered": [
+    "any route: /v0/bootstrap already carried the roster at player_info.neighbors, so apps/compat-api/** is untouched and the compat suite must stay at 3077",
+    "any friendship relationship, request, accept, decline, consent or lifecycle: none exists in the preserved server",
+    "any order, rank, score, best, closest or total over roster values",
+    "any assist reward: neighborAssists, receivedAssists and resourcesTraded have zero code-only occurrences",
+    "the FlashVar channel: a FlashVar is not a modern-runtime surface, and its content is REPORTED rather than delivered",
+    "the visit surface: recorded as a divergence and delivered as nothing, because no committed fixture exercises it",
+    "any world or leaderboard concept derived from a carried world_id",
+    "any windowed capture and any pixel-parity oracle, because nothing is rendered"
+  ],
+  "entry_fields": [
+    {
+      "name": "cash",
+      "origin": "carried_player_info",
+      "declared_by_module": true
+    },
+    {
+      "name": "completed_tutorial",
+      "origin": "carried_player_info",
+      "declared_by_module": true
+    },
+    {
+      "name": "default_map",
+      "origin": "carried_player_info",
+      "declared_by_module": true
+    },
+    {
+      "name": "last_logged_in",
+      "origin": "carried_player_info",
+      "declared_by_module": true
+    },
+    {
+      "name": "map_names",
+      "origin": "carried_player_info",
+      "declared_by_module": true
+    },
+    {
+      "name": "map_sizes",
+      "origin": "carried_player_info",
+      "declared_by_module": true
+    },
+    {
+      "name": "name",
+      "origin": "carried_player_info",
+      "declared_by_module": true
+    },
+    {
+      "name": "pic",
+      "origin": "carried_player_info",
+      "declared_by_module": true
+    },
+    {
+      "name": "pid",
+      "origin": "carried_player_info",
+      "declared_by_module": true
+    },
+    {
+      "name": "sp_ref_cat_install",
+      "origin": "carried_player_info",
+      "declared_by_module": true
+    },
+    {
+      "name": "sp_ref_uid",
+      "origin": "carried_player_info",
+      "declared_by_module": true
+    },
+    {
+      "name": "world_id",
+      "origin": "carried_player_info",
+      "declared_by_module": true
+    },
+    {
+      "name": "xp",
+      "origin": "derived_from_maps_0",
+      "declared_by_module": true
+    },
+    {
+      "name": "level",
+      "origin": "derived_from_maps_0",
+      "declared_by_module": true
+    },
+    {
+      "name": "gold",
+      "origin": "derived_from_maps_0",
+      "declared_by_module": true
+    },
+    {
+      "name": "wood",
+      "origin": "derived_from_maps_0",
+      "declared_by_module": true
+    },
+    {
+      "name": "oil",
+      "origin": "derived_from_maps_0",
+      "declared_by_module": true
+    },
+    {
+      "name": "steel",
+      "origin": "derived_from_maps_0",
+      "declared_by_module": true
+    }
+  ],
+  "roster": {
+    "pids": [
+      "AcidCaos",
+      "Kiriakos",
+      "Nerri",
+      "Neutral",
+      "Scarlet"
+    ],
+    "entry_count": 5,
+    "entry_key_count": 18,
+    "carried_key_count": 12,
+    "derived_key_count": 6,
+    "membership_is_a_set": true,
+    "served_order": [
+      "AcidCaos",
+      "Kiriakos",
+      "Nerri",
+      "Neutral",
+      "Scarlet"
+    ],
+    "served_order_claimed": false,
+    "index_accessor": "none",
+    "mutating_accessor": "none",
+    "payload_mutated": false
+  },
+  "entries": [
+    {
+      "pid": "AcidCaos",
+      "key_count": 18,
+      "carried_key_count": 12,
+      "derived_key_count": 6,
+      "derived_values": {
+        "xp": 117012.0,
+        "level": 41.0,
+        "gold": 5898.0,
+        "wood": 1176.0,
+        "oil": 2750.0,
+        "steel": 107.0
+      }
+    },
+    {
+      "pid": "Kiriakos",
+      "key_count": 18,
+      "carried_key_count": 12,
+      "derived_key_count": 6,
+      "derived_values": {
+        "xp": 155520.0,
+        "level": 46.0,
+        "gold": 63540.0,
+        "wood": 32700.0,
+        "oil": 23970.0,
+        "steel": 9870.0
+      }
+    },
+    {
+      "pid": "Nerri",
+      "key_count": 18,
+      "carried_key_count": 12,
+      "derived_key_count": 6,
+      "derived_values": {
+        "xp": 122956.0,
+        "level": 42.0,
+        "gold": 58007.0,
+        "wood": 161960.0,
+        "oil": 129788.0,
+        "steel": 62811.0
+      }
+    },
+    {
+      "pid": "Neutral",
+      "key_count": 18,
+      "carried_key_count": 12,
+      "derived_key_count": 6,
+      "derived_values": {
+        "xp": 136878.0,
+        "level": 44.0,
+        "gold": 37691.0,
+        "wood": 19705.0,
+        "oil": 15401.0,
+        "steel": 14151.0
+      }
+    },
+    {
+      "pid": "Scarlet",
+      "key_count": 18,
+      "carried_key_count": 12,
+      "derived_key_count": 6,
+      "derived_values": {
+        "xp": 107694.0,
+        "level": 33.0,
+        "gold": 62395.0,
+        "wood": 96060.0,
+        "oil": 97521.0,
+        "steel": 94869.0
+      }
+    }
+  ],
+  "membership": {
+    "village_files": 8,
+    "loaded": [
+      "100000030",
+      "100000031",
+      "AcidCaos",
+      "Kiriakos",
+      "Nerri",
+      "Neutral",
+      "Scarlet"
+    ],
+    "excluded": [
+      "100000030",
+      "100000031"
+    ],
+    "members": [
+      "AcidCaos",
+      "Kiriakos",
+      "Nerri",
+      "Neutral",
+      "Scarlet"
+    ],
+    "derived_from_file_count": false,
+    "static_loop_rule": "the two-pid literal pair, applied to the loaded static-village loop ONLY",
+    "saves_loop_rule": "the requesting player's own pid, applied to the saves loop ONLY",
+    "walk_does_not_replicate": "is_valid_village (sessions.py), a second loader filter every committed village file passes",
+    "relationship_tokens": 9
+  },
+  "executed_oracles": {
+    "legacy_root_keys": [
+      "map",
+      "neighbors",
+      "playerInfo",
+      "privateState",
+      "processed_errors",
+      "result",
+      "timestamp"
+    ],
+    "legacy_neighbor_depth": "top level",
+    "bootstrap_entries": 5,
+    "bootstrap_leaves_verified": 90,
+    "bootstrap_pids": [
+      "AcidCaos",
+      "Kiriakos",
+      "Nerri",
+      "Neutral",
+      "Scarlet"
+    ],
+    "bootstrap_capture": "tests/fixtures/godot-compatibility-boot/steps/get_player_info/response.body",
+    "flashvar_entries": 5,
+    "flashvar_capture": "tests/fixtures/godot-compatibility-boot/steps/play_page/response.body",
+    "channels_agree_on_membership": true,
+    "channels_disagree_on_entry_width": true,
+    "coverage_limit": "the committed captures ran with no saves directory, so the saves-loop half of BOTH channels has NO executed evidence and the recorded roster is static-villages-only",
+    "descent_trap": {
+      "whole_envelope_refusal": "roster_absent",
+      "descended_projects": true,
+      "note": "the legacy fixture nests neighbors at the top level and the v0 envelope nests it at player_info.neighbors; the two shapes are recorded as distinct rather than assumed identical"
+    }
+  },
+  "refusals": {
+    "declared": [
+      "entry_not_an_object",
+      "payload_not_a_map",
+      "roster_absent",
+      "roster_not_a_list"
+    ],
+    "observed": [
+      {
+        "payload": "null",
+        "code": "payload_not_a_map"
+      },
+      {
+        "payload": "string(9)",
+        "code": "payload_not_a_map"
+      },
+      {
+        "payload": "array(0)",
+        "code": "payload_not_a_map"
+      },
+      {
+        "payload": "map(0 keys)",
+        "code": "roster_absent"
+      },
+      {
+        "payload": "map(1 keys)",
+        "code": "roster_absent"
+      },
+      {
+        "payload": "map(1 keys)",
+        "code": "roster_not_a_list"
+      },
+      {
+        "payload": "map(1 keys)",
+        "code": "roster_not_a_list"
+      },
+      {
+        "payload": "map(1 keys)",
+        "code": "roster_not_a_list"
+      },
+      {
+        "payload": "map(1 keys)",
+        "code": "entry_not_an_object"
+      },
+      {
+        "payload": "map(1 keys)",
+        "code": "entry_not_an_object"
+      },
+      {
+        "payload": "map(1 keys)",
+        "code": "entry_not_an_object"
+      }
+    ],
+    "cases": 11,
+    "parser_invoked": false
+  },
+  "channels": {
+    "flashvar_word_modules": [
+      "capture_legacy_fixtures.py",
+      "field_stability.py"
+    ],
+    "flashvar_word_occurrences": 9,
+    "table": [
+      {
+        "channel": "bootstrap_roster",
+        "function": "neighbors",
+        "source": "sessions.py:191-221",
+        "transport": "Compatibility API /v0/bootstrap, at player_info.neighbors",
+        "entry_field_count": 18,
+        "entry_fields": "twelve carried playerInfo keys plus six maps[0]-derived",
+        "carries_economy": true,
+        "carries_private_state": false,
+        "delivered": true,
+        "executed_evidence": "tests/fixtures/godot-compatibility-boot/steps/get_player_info/response.body"
+      },
+      {
+        "channel": "flashvar_roster",
+        "function": "fb_friends_str",
+        "source": "sessions.py:168-189",
+        "transport": "a Flash client embed variable, attribute name at templates/play.html:99 and served by server.py:91",
+        "entry_field_count": 2,
+        "entry_fields": "uid and pic_square",
+        "carries_economy": false,
+        "carries_private_state": false,
+        "delivered": false,
+        "delivered_because": "a Flash client embed variable is not a modern-runtime surface; AGENTS.md requires the modern client to depend on GameApi and never on a Flash client embed variable",
+        "executed_evidence": "tests/fixtures/godot-compatibility-boot/steps/play_page/response.body"
+      }
+    ],
+    "deduplicated": false,
+    "flashvar_in_v0_envelope": false,
+    "v0_census_modules": 48,
+    "v0_census_tokens": {
+      "friendsInfo": 0,
+      "pic_square": 0,
+      "fb_friends_str": 0,
+      "uid": 0
+    }
+  },
+  "recording_player_intersection": {
+    "rows_reported": 5,
+    "committed_intersection_empty": true,
+    "leak_probe_key": "deadHeroes",
+    "leak_probe_shared": [
+      "deadHeroes"
+    ],
+    "recording_private_state_keys": 47
+  },
+  "visit": {
+    "delivered": false,
+    "committed_fixture": false,
+    "discarded_pid_reproduced": false
+  },
+  "absence": {
+    "kept_string_view_arithmetic": 51,
+    "blanked_string_view_arithmetic": 0,
+    "views_disagree": true,
+    "function_declarations": 34,
+    "distinct_function_names": 29,
+    "absent_helpers": 26,
+    "reserved_names": 26,
+    "reserved_name_matching": "case-folded, by substring, both directions",
+    "index_accessor": "none",
+    "mutating_accessor": "none"
+  },
+  "boundary": {
+    "routes_delivered": 0,
+    "compat_routes": 24,
+    "compat_last_route": "/v0/level_up",
+    "compat_changed": false,
+    "flashvar_dependency": false,
+    "envelope_path": [
+      "player_info",
+      "neighbors"
+    ]
+  },
+  "exclusion_record": {
+    "excluded_pids": [
+      "100000030",
+      "100000031"
+    ],
+    "excluded_pids_are_literals": true,
+    "reason": "sessions.py:173-174 and :196-197 hardcode both pids as string literals. The committed comment `# general Mike` is the only statement anywhere of what they are, and nothing in config/ or in the normalized content package names them. There is therefore nothing to derive the pair FROM.",
+    "rejected_alternative": "deriving the exclusion from content - matching a village file-name pattern, or treating initial.json as the only unloaded file and taking the directory size as the roster size. The count follows from the CODE (every villages/*.json except initial.json, minus the literal pair), not from the eight files on disk. A derivation from a file count is an invention that happens to agree with the corpus today.",
+    "static_loop_rule": "the two-pid literal pair, applied to the loaded static-village loop ONLY",
+    "saves_loop_rule": "the requesting player's own pid, applied to the saves loop ONLY",
+    "uid_use": "the legacy local that names the recording player is read only by the saves-loop self-exclusion; it is never compared against a static village",
+    "derived_from_file_count": false
+  },
+  "membership_record": {
+    "total": true,
+    "unconditional": true,
+    "directional": false,
+    "consent_required": false,
+    "lifecycle": "none: no add, no remove, no pending, no accepted",
+    "selectable": false,
+    "social_tables_reconciled": false,
+    "why_not_reconciled": "the three committed social tables have 41 entries and ZERO legacy consumers, so there is nothing to reconcile a roster against; they are owned by godot-social-state",
+    "flash_client_behaviour": "unverifiable from this oracle - absence of a server-side relationship says nothing about what the SWF held, which may have been entirely client-side"
+  },
+  "handoff": {
+    "owner_of_roster": "godot-friends",
+    "owner_of_persisted_social_state": "godot-social-state",
+    "original_premise": "a capability named godot-friends would claim exactly what this one measures to be absent",
+    "premise_status": "measured FALSE by docs/legacy-m11-friends.md",
+    "measuring_figures": "friends has 5 whole-file and 4 code-only occurrences across the eleven legacy modules, all 4 code-only in sessions.py",
+    "surviving_reasoning": "neither capability names a surface after a social relationship, because none exists in the preserved server",
+    "roster_entry_is_private_state": false,
+    "moved_state_fields": 0
+  },
+  "executed_evidence": {
+    "bootstrap_roster_capture": "tests/fixtures/godot-compatibility-boot/steps/get_player_info/response.body",
+    "flashvar_roster_capture": "tests/fixtures/godot-compatibility-boot/steps/play_page/response.body",
+    "new_capture_fabricated": false,
+    "saves_loop_half_exercised": false,
+    "saves_loop_coverage_limit": "the committed captures ran with no saves directory, so the saves-loop half of BOTH channels has NO executed evidence and the recorded roster is static-villages-only",
+    "visit_arm_covered": false,
+    "order_covered": false,
+    "order_limit": "the served order follows os.listdir() and is already recorded as environment-dependent; membership, entry count, carried key set and derived values are covered, and order is not"
+  },
+  "visit_divergence": {
+    "delivered": false,
+    "surface": "get_neighbor_info, server.py:155-182",
+    "discarded_pid_branch": "branch 2 tests membership in the two-pid pair and then passes the literal 100000030 for BOTH, so requesting 100000031 returns 100000030's data",
+    "discarded_pid_reproduced": false,
+    "why_not": "reproducing it would reproduce a defect; correcting it would be a divergence presented as parity",
+    "failure_mode": "returns the empty string with HTTP 200 on failure, not an error object, so a typed client that parses it fails closed",
+    "private_state_exposure": "a visit returns the visited player's COMPLETE privateState, which is the opposite of the roster and is recorded as the preserved server's behaviour rather than delivered",
+    "map_number_default": "0 when map is falsy, so map=0 and an absent map are indistinguishable; a negative or out-of-range map is unguarded",
+    "committed_visit_fixture": false,
+    "prefix_is_not_identity": "branch 3 is user.startswith(100000), a ROUTING convention, independent of the quest membership test; no claim is made that the prefix identifies a quest map",
+    "world_or_leaderboard_derived": false
+  },
+  "channel_field_order_not_a_contract": {
+    "flashvar_capture_lists": [
+      "pic_square",
+      "uid"
+    ],
+    "flashvar_function_assigns": [
+      "uid",
+      "pic_square"
+    ],
+    "cause": "the template's JSON serializer, not the branch",
+    "claimed": false
+  },
+  "relationship_token_census": [
+    {
+      "token": "neighborAssists",
+      "code_only_occurrences": 0,
+      "lives_at": "privateState.neighborAssists",
+      "corpus_value": "{}",
+      "corpus_documents": 33
+    },
+    {
+      "token": "receivedAssists",
+      "code_only_occurrences": 0,
+      "lives_at": "maps[0].receivedAssists",
+      "corpus_value": "{}",
+      "corpus_documents": 33
+    },
+    {
+      "token": "resourcesTraded",
+      "code_only_occurrences": 0,
+      "lives_at": "maps[0].resourcesTraded",
+      "corpus_value": "{}",
+      "corpus_documents": 33
+    },
+    {
+      "token": "friendsHelpedCoveredItem",
+      "code_only_occurrences": 0,
+      "lives_at": "privateState.friendsHelpedCoveredItem",
+      "corpus_value": "null",
+      "corpus_documents": 33
+    },
+    {
+      "token": "firstTimeAlliance",
+      "code_only_occurrences": 0,
+      "lives_at": "privateState.firstTimeAlliance",
+      "corpus_value": "null",
+      "corpus_documents": 33
+    },
+    {
+      "token": "helpMap",
+      "code_only_occurrences": 0,
+      "lives_at": "privateState.helpMap",
+      "corpus_value": "[]",
+      "corpus_documents": 33
+    },
+    {
+      "token": "assist",
+      "code_only_occurrences": 0,
+      "lives_at": "-",
+      "corpus_value": "-",
+      "corpus_documents": 0
+    },
+    {
+      "token": "assists",
+      "code_only_occurrences": 0,
+      "lives_at": "-",
+      "corpus_value": "-",
+      "corpus_documents": 0
+    },
+    {
+      "token": "helped",
+      "code_only_occurrences": 0,
+      "lives_at": "-",
+      "corpus_value": "-",
+      "corpus_documents": 0
+    }
+  ],
+  "absent_helpers": [
+    {
+      "helper": "friend_of",
+      "absent_because": "membership is total and unconditional; nothing selects a subset"
+    },
+    {
+      "helper": "friendship_state",
+      "absent_because": "no friendship record exists in any of the eleven legacy modules"
+    },
+    {
+      "helper": "friend_request",
+      "absent_because": "no friend command exists among the 63 named dispatcher branches"
+    },
+    {
+      "helper": "accept_friend",
+      "absent_because": "nothing is pending, because nothing is ever requested"
+    },
+    {
+      "helper": "decline_friend",
+      "absent_because": "there is no consent step to decline"
+    },
+    {
+      "helper": "add_friend",
+      "absent_because": "membership is a loop over every loaded village, not an insertion"
+    },
+    {
+      "helper": "remove_friend",
+      "absent_because": "no branch removes a village from the roster"
+    },
+    {
+      "helper": "friendship_level",
+      "absent_because": "friendsHelpedCoveredItem has zero occurrences and is uniformly null in 33 of 33 documents"
+    },
+    {
+      "helper": "select_from_roster",
+      "absent_because": "no roster entry is selectable; the projection exposes no index"
+    },
+    {
+      "helper": "consent_of",
+      "absent_because": "no consent or opt-out field is read by anything"
+    },
+    {
+      "helper": "assist_neighbor",
+      "absent_because": "neighborAssists has zero code-only occurrences and is uniformly {} in 33 of 33 documents"
+    },
+    {
+      "helper": "gift_to",
+      "absent_because": "no gift command exists in the dispatcher"
+    },
+    {
+      "helper": "ally_of",
+      "absent_because": "resourceAlliesMarket is a client-sent market resource, not a set of allies; no reader is claimed and it is owned by godot-social-state"
+    },
+    {
+      "helper": "mutual_of",
+      "absent_because": "the roster is not directional, so no two entries can be compared"
+    },
+    {
+      "helper": "roster_order",
+      "absent_because": "the preserved order follows os.listdir() and is already recorded as environment-dependent; no order is asserted or derived"
+    },
+    {
+      "helper": "position_of",
+      "absent_because": "the projection exposes no index, so no position can be read"
+    },
+    {
+      "helper": "sort_roster",
+      "absent_because": "ordering committed roster values would invent a rule the corpus cannot support"
+    },
+    {
+      "helper": "best_neighbor",
+      "absent_because": "comparing two roster entries by any field would be a rule nothing in the preserved server states"
+    },
+    {
+      "helper": "closest_neighbor",
+      "absent_because": "no distance, rank or score over roster entries exists anywhere"
+    },
+    {
+      "helper": "rank_of",
+      "absent_because": "there is zero arithmetic on any score-like value in the dispatcher"
+    },
+    {
+      "helper": "visit_neighbor",
+      "absent_because": "no committed fixture exercises a visit and the branch discards the requested pid; recorded in VISIT_DIVERGENCE and delivered as nothing"
+    },
+    {
+      "helper": "visit_state",
+      "absent_because": "world_id and worldChange are carried but never read; no visit concept is derived"
+    },
+    {
+      "helper": "neighbor_session",
+      "absent_because": "the legacy resolver reaches saves then quests then villages and returns None; it is a session resolver, not a roster concept"
+    },
+    {
+      "helper": "world_of",
+      "absent_because": "world_id is carried in 33 of 33 documents with zero occurrences"
+    },
+    {
+      "helper": "leaderboard_of",
+      "absent_because": "the token occurs zero times across all eleven legacy modules"
+    },
+    {
+      "helper": "flashvar_channel",
+      "absent_because": "the friendsInfo FlashVar is a preserved-client transport, not a modern-runtime surface; its content is reported, not delivered"
+    }
+  ],
+  "delivered_routes": [],
+  "expected_function_inventory": [
+    "entry_key_count",
+    "entry_key_names",
+    "is_carried_key",
+    "is_derived_key",
+    "excluded_pids",
+    "is_excluded_static_pid",
+    "is_saves_loop_member",
+    "project",
+    "_init",
+    "pid",
+    "key_names",
+    "key_count",
+    "has_key",
+    "all_key_names",
+    "carried",
+    "derived",
+    "carried_key_names",
+    "derived_key_names",
+    "field",
+    "_refuse",
+    "ok",
+    "refusal_code",
+    "refusal_message",
+    "entry_count",
+    "pids",
+    "has_pid",
+    "entry",
+    "private_state_key_intersection",
+    "leaks_recording_private_state"
+  ],
+  "guard_injections": [
+    {
+      "probe": "static func friend_of(pid: String, other: String) -> bool: return pid == other, appended at module scope",
+      "disguise": "the exact reserved relationship helper, spelled exactly",
+      "guards_that_fired": [
+        "whole_inventory_pin",
+        "declaration_count",
+        "reserved_name_folded_substring"
+      ],
+      "exit_code": 1,
+      "failures": 3,
+      "restore_byte_identical": true,
+      "contained_after_restore": true
+    },
+    {
+      "probe": "static func roster_order_by_xp(payload: Variant) -> Array: return []",
+      "disguise": "a SUFFIXED helper wearing the reserved name `roster_order` as a prefix; an exact-name check would have passed this one",
+      "guards_that_fired": [
+        "whole_inventory_pin",
+        "declaration_count",
+        "reserved_name_folded_substring"
+      ],
+      "exit_code": 1,
+      "failures": 3,
+      "restore_byte_identical": true,
+      "contained_after_restore": true
+    },
+    {
+      "probe": "static func best_neighbor(entries: Array) -> Variant: comparing entries[0].xp against entries[1].xp with `>`",
+      "disguise": "the ORDERING probe: two roster values compared against each other, which is exactly the rule the committed os.listdir order makes unsupportable",
+      "guards_that_fired": [
+        "whole_inventory_pin",
+        "declaration_count",
+        "reserved_name_folded_substring",
+        "arithmetic_and_ordering_guard"
+      ],
+      "exit_code": 1,
+      "failures": 4,
+      "restore_byte_identical": true,
+      "contained_after_restore": true
+    },
+    {
+      "probe": "static func assist_neighbor_reward(entry: Variant) -> Variant: return null",
+      "disguise": "a differently-suffixed helper wearing the reserved name `assist_neighbor` as a prefix",
+      "guards_that_fired": [
+        "whole_inventory_pin",
+        "declaration_count",
+        "reserved_name_folded_substring"
+      ],
+      "exit_code": 1,
+      "failures": 3,
+      "restore_byte_identical": true,
+      "contained_after_restore": true
+    },
+    {
+      "probe": "func set_pid(new_pid: String) -> void: _pid = new_pid, added inside RosterEntry",
+      "disguise": "the READ-ONLY probe: a mutating accessor wearing a name that is NOT on the reserved list, so only the mutator shape and the inventory could catch it",
+      "guards_that_fired": [
+        "whole_inventory_pin",
+        "declaration_count",
+        "no_mutating_accessor"
+      ],
+      "exit_code": 1,
+      "failures": 3,
+      "restore_byte_identical": true,
+      "contained_after_restore": true
+    },
+    {
+      "probe": "`source[ROSTER_KEY] = []` inserted into RosterProjection._init before the roster is read",
+      "disguise": "the IMMUTABILITY probe: the projection writes through its own alias, which a GDScript Dictionary reference makes true of the CALLER's payload",
+      "guards_that_fired": [
+        "payload_not_mutated",
+        "thirty-three consequential checks"
+      ],
+      "exit_code": 1,
+      "failures": 34,
+      "restore_byte_identical": true,
+      "contained_after_restore": true,
+      "note": "the cascade is reported rather than tidied: emptying the roster costs thirty-three other checks, and the payload-not-mutated line is the seventh of the thirty-four. That line was confirmed present by a separate full-failure listing, because this probe's three-line sample alone would not have shown it"
+    },
+    {
+      "probe": "const DELIVERED_ROUTES := [\"/v0/friends\"] replacing the empty list",
+      "disguise": "the NO-ROUTE probe: adding an endpoint for a roster /v0/bootstrap already serves",
+      "guards_that_fired": [
+        "no_route_delivered"
+      ],
+      "exit_code": 1,
+      "failures": 1,
+      "restore_byte_identical": true,
+      "contained_after_restore": true
+    }
+  ],
+  "guard_injection_provenance": {
+    "module_sha256_before_and_after": "ed4d88a856b7aadbcb0288d861bab2be88ecd8214c9d778d8721159ca4eab9dd",
+    "module_bytes": 32470,
+    "probes": 7,
+    "all_failed": true,
+    "all_exit_1": true,
+    "all_restored_byte_identical": true,
+    "all_contained_after_restore": true,
+    "engine_error_lines": 0,
+    "re_run_against_final_state": true,
+    "clean_state_before_probes": "exit 0, 0 failures, 570 checks",
+    "clean_state_after_probes": "exit 0, 0 failures, 570 checks"
+  },
+  "claim_limits": [
+    "the projection is delivered; the TRANSPORT was already there, so nothing about this line is parity against a new endpoint and no executed-legacy capture was taken for it",
+    "both committed captures ran with NO saves directory, so the saves-loop half of BOTH channels has no executed evidence and every recorded observation is static-villages-only",
+    "the served ORDER is not claimed: it follows os.listdir() and is already recorded as environment-dependent in the committed field-stability record. Membership, entry count, carried key set and derived values are covered; order is not",
+    "the two-pid exclusion is a LITERAL in the preserved source and is shipped as a literal here; nothing in config/ or in the normalized content package names those pids, so there is nothing to derive the pair from",
+    "membership is TOTAL and UNCONDITIONAL: an unknown pid is a member, not a rejection. That is the preserved behaviour and the opposite of what a friends list would do",
+    "the two exclusion rules live in DIFFERENT scopes: the literal pair in the static-village loop, the self-exclusion in the saves loop only. A static village carrying your own pid is therefore still a member",
+    "the two channels are reported, not reconciled. They are near-duplicate functions that were not derived from one another and their entry widths differ eighteen against two",
+    "the FlashVar channel's absence from the v0 envelope is MEASURED here over forty-eight compat service modules, and the delivered client module carries no reference to it",
+    "the visit branch's discarded pid is recorded as a DIVERGENCE and reproduced as nothing: reproducing it would reproduce a defect and correcting it would be a divergence presented as parity",
+    "the ledger of a roster is somebody ELSE's save: an eighteen-key entry is not a privateState field, and this capability moves ZERO measured state fields out of godot-social-state",
+    "absence of a server-side relationship says nothing about what the Flash client held; the FlashVar may have been entirely client-side, and this oracle cannot verify either way",
+    "no windowed capture and no pixel-parity oracle are claimed, because nothing is rendered"
+  ]
+}
