@@ -134,6 +134,8 @@ const ALLOWED := [
 	"scripts/social/friends_roster.gd",
 	"scripts/social/construction_assist_state.gd",
 	"scripts/social/assist_transitions.gd",
+	"scripts/events/auction_schedule.gd",
+	"scripts/events/auction_oracle.gd",
 	"scripts/darts/darts_state.gd",
 	"scripts/darts/darts_transitions.gd",
 	"scripts/darts/premium_purchase.gd",
@@ -242,6 +244,10 @@ const ALLOWED := [
 	"evidence/darts/report.json",
 	"evidence/friends/report.json",
 	"evidence/construction-assist/report.json",
+	"scripts/events/auction_schedule.gd",
+	"scripts/events/auction_oracle.gd",
+	"tests/test_auction_schedule.gd",
+	"evidence/auction-schedule/report.json",
 ]
 
 ## The exact scene set the project may declare (set equality below).

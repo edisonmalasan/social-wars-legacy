@@ -104,9 +104,23 @@ counter (finding 6), and no winner is ever computed from amounts.
 The suite asserts this absence mechanically, as `godot-mission-vocabulary`
 asserted that the module contains no multiplication or division lines at all.
 
-### D5 — No route, no compat change, no live phase
+### D5 — No route, no server behaviour change, no live phase
 
-Three reasons, each independent:
+**Amended at Apply, with cause.** This decision originally read "no
+`apps/compat-api/**` change". Applying it falsified that claim: adding any
+normalized output to the content package forces one pinned count inside an
+existing compat-API guard to move. `test_research_envelope.py` asserts the
+normalized file count in `test_no_normalized_package_carries_a_research_section`,
+so it reads `23` instead of `22`. The edit is a count coupled to package size,
+not a behaviour change, and the guard still requires that no normalized file
+carries a research section.
+
+This is a general property of the package, not a quirk of this line: **any** new
+normalized output moves that count. It is recorded here so the next builder
+extension that reaches `apps/compat-api/**` knows the edit is expected and
+narrow, rather than discovering it as a violation.
+
+Three reasons, each independent, for the substance of the decision:
 
 - There is no request path to route. All three routes are commented out
   (finding 3).

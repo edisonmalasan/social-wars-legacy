@@ -155,10 +155,25 @@ Each of these is a **divergence** from the preserved branch, not parity.
 - **AND** the committed `betPrice` is reported as an unconsumed committed price
   rather than as a charge
 
-### Requirement: No route, no compatibility change, no live phase, no fixture
+### Requirement: No route, no server behaviour change, no live phase, no fixture
 
-This capability SHALL add no route, SHALL touch no `apps/compat-api/**` file,
+This capability SHALL add no route, SHALL change no compatibility-API behaviour,
 SHALL add no live phase, and SHALL capture no executed-legacy fixture.
+
+**Amended at Apply, with cause.** The requirement originally read "SHALL touch no
+`apps/compat-api/**` file". Applying it falsified that: adding any normalized
+output to the content package forces one pinned count inside an existing
+compat-API guard to move. `test_research_envelope.py`'s
+`test_no_normalized_package_carries_a_research_section` asserts the normalized
+file count, so it reads `23` instead of `22` after this change. That edit is a
+count coupled to package size, not a behaviour change, and the guard's meaning
+is untouched — it still requires that no normalized file carries a research
+section, and the new `auctions.json` does not.
+
+The narrower claim is the one that is actually true, so it is the one specified.
+No route is declared, no endpoint, envelope, dispatcher or save shape changes,
+and no server behaviour is added or altered. The recorded live-phase count is
+unchanged and the compat suite remains green at its established count.
 
 The fixture is refused for a specific measured reason, and the reason is **not**
 a missing corpus row: the auction behaviour has **no request path**, because all
@@ -172,7 +187,11 @@ which `AGENTS.md` forbids.
 
 - **WHEN** the change is applied
 - **THEN** no route is declared
-- **AND** no `apps/compat-api/**` file is modified
+- **AND** no compatibility-API endpoint, envelope, dispatcher or save shape
+  changes
+- **AND** the sole `apps/compat-api/**` edit is the normalized-file count pinned
+  by `test_no_normalized_package_carries_a_research_section`, which moves from 22
+  to 23 because the package grew, with the guard's assertion otherwise unchanged
 - **AND** the registered live-phase count is unchanged
 
 #### Scenario: No fixture is fabricated

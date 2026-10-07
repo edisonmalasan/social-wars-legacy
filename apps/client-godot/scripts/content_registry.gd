@@ -5,8 +5,8 @@ extends Node
 ## indexing and lookup", "Client asset resolution").
 ##
 ## The inventory is driven entirely by `packages/game-content/manifest.json`:
-## the root `outputs` list plus the outputs of the nine extension sections
-## (22 files) are read, their byte counts and SHA-256 digests are verified
+## the root `outputs` list plus the outputs of the ten extension sections
+## (23 files) are read, their byte counts and SHA-256 digests are verified
 ## against the manifest BEFORE the bytes are parsed, and each domain is
 ## indexed by `str(legacy_id)`. A missing, altered, unparseable, or
 ## duplicate-identified file fails the load with an explicit error naming
@@ -27,10 +27,10 @@ const Paths = preload("res://scripts/package_paths.gd")
 const PACKAGE_ROOT := "packages/game-content"
 ## Manifest file inside the package root.
 const MANIFEST_FILE := "manifest.json"
-## The nine extension sections whose `outputs` complete the inventory.
+## The ten extension sections whose `outputs` complete the inventory.
 const EXTENSION_SECTIONS := [
 	"quests", "tables", "economy", "social", "taxonomy", "darts",
-	"globals", "offers", "images",
+	"globals", "offers", "images", "auctions",
 ]
 ## Asset ID registry (repository-relative) and its identity contract.
 const ASSET_REGISTRY_FILE := "tools/asset-registry/asset_ids.json"

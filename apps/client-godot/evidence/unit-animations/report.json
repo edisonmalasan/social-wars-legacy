@@ -1037,8 +1037,8 @@
   "inputs": {
     "content_package": {
       "manifest": "packages/game-content/manifest.json",
-      "outputs_verified": 22,
-      "bytes_verified": 1905917,
+      "outputs_verified": 23,
+      "bytes_verified": 1907459,
       "fingerprint": "",
       "units_json_sha256": "6a7121cdefddf4835ac90c408c98da762b7ccd7de866aea749368beffdad36e0",
       "buildings_json_sha256": "13ac38e95312af44819a5e8e7af4d7efa306afe879415da872e66914721b2f4d"

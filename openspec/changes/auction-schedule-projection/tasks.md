@@ -140,14 +140,152 @@ So the expected figure for this change is **70**, and after Sync it becomes **71
 when the new main spec adds an item, returning to **70** at Archive when the
 change item is removed.
 
-### 6.1 To be completed during Apply
+### 6.1 Recorded during Apply
 
-Record every deviation from the tasks above and every figure corrected during
-implementation **here**, with its cause — never as a quiet edit. Note at minimum:
+Every item below was found during implementation or review, not inherited.
 
-- Any probe that fails with no `[test] FAIL` line (parse-error detection proves
-  nothing about a guard) and how the harness was fixed.
-- Any measured figure that differs from a figure asserted in
-  `docs/legacy-m11-event-systems.md` or in design D1–D10, and which was wrong.
-- Any guard that turned out to be able to pass when it should fail, as
-  `godot-friends` recorded for a bare two-character substring.
+**1. Module placement deviated from the task and was corrected by the
+orchestrator.** Task 3 named `apps/client-godot/scripts/events/auction_schedule.gd`.
+The implementation worker placed both modules under `scripts/social/` instead.
+They were moved to `scripts/events/` before acceptance, on two measured facts:
+`scripts/social/` holds exactly four modules and every one of them is genuinely
+social (`assist_transitions`, `construction_assist_state`, `friends_roster`, and
+the pre-existing set), while the closest precedent for reading a committed
+schedule through the registry, `premium_purchase.gd`, lives in `scripts/darts/`.
+The auction house has no friend, neighbor or assist concept, which is precisely
+what the investigation measured, so `social/` would have signalled semantics the
+preserved server does not have — the same misleading-name defect `godot-friends`
+corrected when its deliver item turned out to name the opposite of the surface.
+`scripts/social/` is back to its original four modules; the move touched two
+`preload`/`MODULE_PATH`/`*_REPO_PATH` constants and two `test_project_scope.gd`
+allow-list entries, and both affected suites were re-run afterwards.
+
+**2. The claim "no `apps/compat-api/**` file is modified" was FALSE, and the
+requirement is amended rather than the claim being dropped.** Adding any
+normalized output to the content package forces one pinned count inside an
+existing compat-API guard to move: `test_research_envelope.py`'s
+`test_no_normalized_package_carries_a_research_section` asserts the normalized
+file count, so it reads `23` where it read `22`. The spec requirement, design D5
+and the proposal's summary were all amended to the narrower claim that is true —
+no route, no endpoint, no envelope, no dispatcher, no save shape — with the
+cause recorded in each. The guard's meaning is untouched and in fact slightly
+strengthened: it still requires that no normalized file carries a research
+section, and it now also scans the new `auctions.json`, which carries no
+research key. This is a general property of the package, not a quirk of this
+line, and it is recorded so the next builder extension that reaches
+`apps/compat-api/**` knows the edit is expected and narrow instead of
+discovering it as a violation.
+
+**3. A false correction, found in the delivered report and reverted.** The
+first draft of the suite recorded a "FOURTH CORRECTION" asserting that two
+searched tokens disagree between the raw-substring and whole-token counting
+rules, naming `mana` alongside `xp`, and declaring the committed
+`resource_tokens_substring.mana = 0` wrong by one. That was wrong, and the
+committed figure is correct. The suite counted raw occurrences in a **case-folded**
+copy of the module (`module_text.to_lower()`), while `build_auctions.py` counts
+them **case-sensitively** with `source_text.count(token)`; the two sides were
+measured under different rules and then compared against each other.
+Re-measured under the builder's own rule, `mana` has zero raw and zero
+whole-token occurrences, so only `xp` disagrees. The suite now measures the
+builder's rule for every comparison against a committed figure, and reports the
+case-folded view separately as the differently-ruled measurement it is —
+`Manage` at `auctions.py:161` really does contain that letter run — without
+letting it make a claim about the committed figure. The false correction was
+replaced rather than deleted, because deleting it would hide the real defect.
+My own first re-measurement of this was also wrong in the opposite direction
+(case-sensitive, reporting zero everywhere) before the case-folded reading
+explained it; the case-folded count is 1 and the case-sensitive count is 0, and
+both are now pinned separately so neither can be confused for the other.
+
+**4. Two defects of the orchestrator's own tooling, recorded because both
+nearly produced a false conclusion.**
+  - *Backtick escaping.* A replacement block was first written through a
+    PowerShell double-quoted here-string. PowerShell consumes backticks as
+    escapes: the `b` of `build_auctions.py` vanished and the `r` of
+    `resource_tokens_substring` became a literal carriage return that split a
+    line. The suite then failed to parse. All such edits were moved to script
+    files, which is the harness fix.
+  - *Encoding on redirect.* `git show HEAD:<path> > file` writes **UTF-16LE**,
+    so a subsequent `Select-String` under-matched and I briefly concluded that
+    `HEAD`'s suite code did not emit the report block it demonstrably emits.
+    Re-checked against the working-tree file, which is byte-identical to `HEAD`
+    for that path. Byte-safe reads only, from here.
+
+**5. A stale committed report from an earlier line was exposed here, and
+regenerated.** Regenerating the nine prior evidence reports changed
+`evidence/unit-production/report.json` by more than the package census: an
+`experience` block appeared that the committed file never had. This was
+investigated rather than accepted, because the extra block was not a census
+field. The committed artifact is stale, and the staleness predates this change:
+`test_unit_production.gd` emits `"experience": ProductionFlow.experience_record()`
+and `production_flow.gd` supplies `arm_asymmetry`, `recorded_kinds` and
+`field_repaired`, but both files are **unmodified by this change**. The M9
+`godot-unit-experience` line amended the module and the suite and did not
+regenerate this report. Nothing catches it: `verify-boot.ps1` runs every suite
+**without** `--report=`, so committed report bytes are never compared against
+their own generator. Regenerating is correct — leaving it stale would preserve a
+false claim that rerunning reproduces the bytes — and the finding is recorded
+here because the gap is real: **no automated check compares any committed
+evidence report against the suite that writes it.** The other eight reports
+differ on package-census fields only, each verified leaf by leaf.
+
+**6. Nine prior evidence reports were regenerated, and only for the census.**
+Adding `auctions` changed the package from 22 to 23 outputs, so every report
+recording that census legitimately changed. Each was diffed leaf by leaf against
+`HEAD` and the differing paths are only
+`package_files`, `package_sha256`, `outputs_verified`, `bytes_verified`,
+`manifest_outputs_verified`, `manifest_bytes_verified`, `normalized_files` and
+`content_absence` — plus, for `unit-production`, the item in §5 above. Leaving
+them stale would break each line's claim that rerunning reproduces its bytes.
+
+**7. `references_checked` stays at 604.** The three new auction unit references
+are real but are **not** counted by the shared validator, so the cross-domain
+reference edge is proved by the builder's own tests alone and not by
+`validate_content.py`. This is recorded rather than left to look like full
+validator coverage.
+
+**8. `openspec validate --all --strict` counts 70, as §6.0 predicted.** No
+further correction to that figure.
+
+**9. Verification actually run, at the final state, after all edits above.**
+  - `test_auction_schedule.gd`: **1218 checks**, exit 0.
+  - `test_project_scope.gd`: **2223 checks**, exit 0.
+  - `verify.ps1`: exit 0, `PASS all checks succeeded`.
+  - `verify-boot.ps1`: exit 0, `PASS all checks succeeded`. One command and two
+    assertions added, both `ok: true`; guard digest identical before and after
+    (`6978b959…ff348`); port 5056 released; no working-tree `saves/`.
+  - **1092** log files inspected for `[test] FAIL`, `^ERROR:` **and**
+    `SCRIPT ERROR`: **zero** hits on all three. The first attempt at this grep
+    matched zero files because the logs are `.txt` and the filter said `.log`;
+    the zeros were vacuous and were re-measured.
+  - compat suite: `Ran 3077 tests … OK`, exit 0 — the baseline, unchanged.
+  - `validate_content.py`: exit 0, `result: valid`, 23 files, 22 schemas, 604
+    references.
+  - `hash_manifest.py verify`: exit 0, **3258 entries, 758423699 bytes**,
+    unchanged.
+  - `openspec validate --all --strict`: **70 passed, 0 failed**.
+  - Report: 36,636 bytes, sha256 `495d29abd4e38ae01be36222…`, LF form, and
+    **byte-identical across three consecutive runs**.
+
+**10. Five injection probes re-run independently by the orchestrator, not taken
+on the worker's word.** Failure counts are measured, and every restore is
+verified by sha256:
+  - a neutral helper borrowing **no** reserved word: **4** `[test] FAIL` lines.
+    This is the probe that matters most, because it shows the declared-function
+    inventory pin is the real gate and the reserved-name guard is the belt.
+  - a **suffixed** reserved stem (`winner` inside a longer name): **7** lines. An
+    exact-name check would have passed this.
+  - arithmetic in a non-permitted function: **6** lines, so the allowance is
+    per-function and not per-file.
+  - the forbidden word `dead` in the schedule module: **1** line.
+  - the forbidden word `unused` in the **oracle** module: **1** line, so the
+    wording guard covers both modules.
+  All five produced real `[test] FAIL` lines with no parse error, every restore
+  was byte-identical (`c04b416d8ef1c891…` and `6db9d6e6d1ec0558…`), and the
+  post-probe suite returned to exit 0.
+
+**11. No preservation material changed.** `auctions.py`,
+`config/auctionhouse.json`, `tests/saves/`, `villages/`, `tests/fixtures/`, and
+the normalized package, its schemas and its manifest all show **zero** modified
+paths. No runtime `auctions/` directory was created, which is the whole point of
+recording the module's bootstrap defect rather than repairing it.

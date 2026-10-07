@@ -6,7 +6,7 @@ extends "res://tests/test_base.gd"
 ##   * no implicit load happens at scene start (explicit-load contract);
 ##   * four fault classes fail closed with an error naming the offender,
 ##     each injected into a mutated COPY under `.godot/` (never the source);
-##   * the default load verifies all 22 manifest outputs (byte count +
+##   * the default load verifies all 23 manifest outputs (byte count +
 ##     SHA-256 before parse) and indexes them by `legacy_id`;
 ##   * lookups return exact stored entries or explicit not-found results;
 ##   * the public id enumeration reports the committed index order (not a
@@ -24,6 +24,7 @@ const EXPECTED_COUNTS := {
 	"images": 607,
 	"sounds": 139,
 	"globals": 105,
+	"auctions": 3,
 }
 ## The first `legacy_id` of each enumerated domain in the **committed index
 ## order** — the order the committed file lists its rows, not a collation of the
@@ -184,8 +185,8 @@ func _check_default_load(registry: Variant, package_dir: String) -> void:
 		% str(result.get("error", "")))
 	if not bool(result.get("ok", false)):
 		return
-	check_eq(int(result.get("files_verified", 0)), 22,
-		"all 22 manifest outputs are verified")
+	check_eq(int(result.get("files_verified", 0)), 23,
+		"all 23 manifest outputs are verified")
 	check(int(result.get("bytes_verified", 0)) > 1000000,
 		"verification covers the package bytes (%s)"
 		% str(result.get("bytes_verified", 0)))
@@ -195,15 +196,15 @@ func _check_default_load(registry: Variant, package_dir: String) -> void:
 		check_eq(registry.count(domain), EXPECTED_COUNTS[domain],
 			"count(%s) matches the manifest-verified entries" % domain)
 	var domain_list: Array = registry.domains_list()
-	check_eq(domain_list.size(), 22, "all 22 domains are indexed")
+	check_eq(domain_list.size(), 23, "all 23 domains are indexed")
 	check(registry.has_domain("buildings"), "has_domain finds buildings")
 	check(not registry.has_domain("nope"), "has_domain rejects an unknown name")
 	check_eq(registry.count("nope"), -1,
 		"count() reports -1 for an unknown domain, not 0")
 
 	var sections: Dictionary = registry.sections()
-	check_eq(sections.size(), 10,
-		"the manifest's 10 sections are reported")
+	check_eq(sections.size(), 11,
+		"the manifest's 11 sections are reported")
 	check_eq(sections.get("root", []), ["buildings", "units", "specials"],
 		"the root section contributes its three item domains")
 	var covered: Array = []

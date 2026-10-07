@@ -83,7 +83,7 @@
 			"validation": "none: no bounds check, no clamp, no membership test, no exception guard, and no existence check"
 		}
 	],
-	"content_absence": "NO COMMITTED RESEARCH CONTENT IS INVENTED. MEASURED over all 22 normalized files and config/main.json: (1) NO normalized package carries a research SECTION — no file has a top-level key of any research kind, and all 22 are top-level arrays of domain rows; (2) the string 'research' appears in exactly TWO normalized files, not one: buildings.json, ONCE, inside the `name` of legacy_id \"256\" (\"Research Lab\"), and images.json, in exactly THREE rows whose `legacy_id`/`path` are popupResearchCenter_buildingProcess.swf and its _2 and _3 variants — six occurrences in total, all asset references; (3) config/main.json has ZERO top-level content keys naming research and ZERO nested content-section keys, but it does have THREE keys containing the word, all of them under /images (the asset namespace whose keys are asset paths by construction), and exactly ONE string value containing it, /items/244/name = \"Research Lab\". MEASURED CORRECTION: the M9 investigation and this line's proposal both state that 'research' appears in exactly ONE normalized file and only inside one `name`, and that config/main.json has NO key containing 'research' at any depth. BOTH FIGURES ARE WRONG — it is two files and it is three image keys plus one value — and both are corrected here rather than shipped. The CONCLUSION is unchanged and is what matters: there is no committed research cost, step count, unlock requirement, or reward to derive a schedule from, so none is invented and no price, step count, requirement, or reward is computed anywhere in this repository (design D4)",
+	"content_absence": "NO COMMITTED RESEARCH CONTENT IS INVENTED. MEASURED over all 23 normalized files and config/main.json: (1) NO normalized package carries a research SECTION — no file has a top-level key of any research kind, and all 23 are top-level arrays of domain rows; (2) the string 'research' appears in exactly TWO normalized files, not one: buildings.json, ONCE, inside the `name` of legacy_id \"256\" (\"Research Lab\"), and images.json, in exactly THREE rows whose `legacy_id`/`path` are popupResearchCenter_buildingProcess.swf and its _2 and _3 variants — six occurrences in total, all asset references; (3) config/main.json has ZERO top-level content keys naming research and ZERO nested content-section keys, but it does have THREE keys containing the word, all of them under /images (the asset namespace whose keys are asset paths by construction), and exactly ONE string value containing it, /items/244/name = \"Research Lab\". MEASURED CORRECTION: the M9 investigation and this line's proposal both state that 'research' appears in exactly ONE normalized file and only inside one `name`, and that config/main.json has NO key containing 'research' at any depth. BOTH FIGURES ARE WRONG — it is two files and it is three image keys plus one value — and both are corrected here rather than shipped. The CONCLUSION is unchanged and is what matters: there is no committed research cost, step count, unlock requirement, or reward to derive a schedule from, so none is invented and no price, step count, requirement, or reward is computed anywhere in this repository (design D4)",
 	"corpus": {
 		"claim": "the committed corpus holds every research counter at its initial value [0, 0] on both tracks, and no placed row carries a research counter anywhere. That is why this line is the first M9 line with a real executed-legacy fixture, and it is a fact about the corpus, not evidence that research can be obtained, finished, or shown to be ready",
 		"resources": {
@@ -560,7 +560,7 @@
 		],
 		"config_top_level_keys": 20,
 		"corrections": "the M9 investigation and this line's proposal both state that 'research' appears in exactly ONE normalized file and only inside one `name`, and that config/main.json has NO key containing 'research' at any depth. Both figures are WRONG - two files, and three /images keys plus one value - and the conclusion is unchanged: no committed research cost, step count, unlock requirement, or reward exists, so none is invented (design D4)",
-		"normalized_files": 22,
+		"normalized_files": 23,
 		"normalized_files_containing_research": {
 			"buildings.json": 1,
 			"images.json": 6
@@ -664,8 +664,8 @@
 			"helper": "fast_forward"
 		}
 	],
-	"package_files": 67,
-	"package_sha256": "dba0a98b25c6fafdb7b752436d2f70fcfc8641ef5f977166aa2002a3f4b44ea0",
+	"package_files": 71,
+	"package_sha256": "ed0bc9cb761876574e7512ccd3809d5b71d59bf65fc9d74a4629dd4e07c63e5a",
 	"provenance": {
 		"derived": [
 			{
