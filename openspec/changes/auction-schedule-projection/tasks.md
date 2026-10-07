@@ -311,3 +311,97 @@ verified by sha256:
 the normalized package, its schemas and its manifest all show **zero** modified
 paths. No runtime `auctions/` directory was created, which is the whole point of
 recording the module's bootstrap defect rather than repairing it.
+
+### 6.2 Recorded at the Archive gate — a required check I did not run, and the defect it hid
+
+**12. Task 2.2 was never executed during Apply, and it was not optional.**
+Task 2.2 requires
+`python -B -m unittest discover -s packages/game-content/tests -p "test_build_auctions.py"`.
+Section 5's verification list ran `validate_content.py` (task 5.6) and **not**
+the builder's own suite, and I reported the Apply stage verified on that basis.
+That was a claim about a check I had not run, and it was wrong in a way that
+would have shipped broken work.
+
+Running it at the Archive gate produced `Ran 86 tests ... FAILED (failures=1)`:
+
+```
+FAIL: test_committed_manifest_prior_sections_are_byte_identical
+AssertionError: Lists differ: [] != ['auctions']
+```
+
+**13. The defect is a git-state-dependent guard that could only ever pass once.**
+The assertion compared the working-tree manifest against
+`git show HEAD:packages/game-content/manifest.json` and required
+`set(current) - set(committed) == ["auctions"]` — that the builder adds exactly
+its own section. That is true **only while the section is uncommitted**. Measured:
+`auctions` absent from `af63a77~1`, present from `af63a77` onward, and present
+in `HEAD` today. So the test was green on the Apply branch and became
+permanently red the instant the Apply PR merged, **including on `main`**,
+forever. It was a time bomb with a one-run fuse, and it was in a file the
+preservation manifest's byte guard does not execute.
+
+**14. The correction, and why the original form cannot be restored.** The claim
+under test is real — the merge re-serializes the whole manifest with
+`sort_keys`, so a prior section changing would mean the working manifest drifted
+for a reason other than this builder's section. Only its *reference* was wrong.
+The corrected form is state-independent and holds both before and after the
+commit: **no committed section may be removed**, **this builder's own section is
+present**, and **every section other than its own is byte-identical**.
+`auctions` is excluded from the byte-identity comparison because this builder
+owns it and is expected to have changed it.
+
+**15. The loosened guard is re-proven by injection, not trusted**, because a
+correction that loosens an assertion is exactly the change that can silently
+stop guarding. Three probes, each restored byte-identically
+(sha256 `e336f8dc218e2e9e…` before and after every one, `21` sections):
+
+| Probe | Injected | Result |
+| --- | --- | --- |
+| I1 | prior section `coercion_ruleset` drifts to `{"drifted": true}` | **detected** — `AssertionError: {'drifted': True} != 'coercion-ruleset-v1' : coercion_ruleset` |
+| I2 | unrelated section `content_fingerprint` removed | **detected** — the no-removal assertion names it |
+| I3 | this builder's **own** section `auctions` removed | **detected** — the no-removal assertion names it |
+
+**I3 is informative and is recorded rather than tidied**: removing the builder's
+own section also fires the **no-removal** assertion, because `auctions` *is* in
+the committed manifest. So the added presence assertion is **unreachable in the
+committed state** — it is a belt for the pre-commit window only. It is kept
+because it is cheap and it is what would catch a builder that never wrote its
+section at all in a fresh checkout, but this project records which guard is the
+real gate, and here the no-removal assertion is.
+
+**16. A harness defect of my own, recorded because it nearly produced three fake
+passes.** The first run of the injection probe reported
+`RESULT: A PROBE FAILED TO DETECT` while **all three probes had failed
+correctly** with the right `AssertionError`s. The probe asserted on expected
+*message text*; unittest reformats it, and the assertion that fires first is
+not always the one the probe was aimed at. The detection criterion was corrected
+to the test failing **plus which assertion named the target**, which is the claim
+worth reporting. Asserting on message text in a guard harness is the same defect
+class as asserting on a byte count that is line-ending dependent.
+
+**17. The detection gap this exposed, which is larger than the defect.**
+`packages/game-content` appears in `verify.ps1` exactly **once**, at line 197, and
+only inside the SHA-256 pre/post **byte** guard over the directory. **No battery
+executes any of the twelve** `packages/game-content/tests/test_*.py` suites — they
+are run by hand. That is why task 2.2 was missed, why this time bomb merged, and
+it is the **same class** as the stale-evidence-report gap already recorded in
+§6.1: a committed artifact with **no automated check comparing it against the
+code that produces it**. Two instances, one instrument, and neither is caught by
+`verify.ps1` or `verify-boot.ps1`. Closing it is recorded as a follow-up and
+**not** done here, because wiring twelve builder suites into a display-sensitive
+Windows battery is a separate change with its own evidence, not a footnote to a
+manifest guard.
+
+**18. Post-fix verification actually run**, all on this fix branch:
+`python -B -m unittest discover -s packages/game-content/tests -p "test_build_auctions.py"`
+→ `Ran 86 tests ... OK`, exit 0; the full
+`python -B -m unittest discover -s packages/game-content/tests -p "test_*.py"`
+→ **`Ran 559 tests ... OK`**, exit 0;
+`validate_content.py` → exit 0, `result: valid`, **23 files, 22 schemas, 604
+references**; `hash_manifest.py verify` → exit 0, **3258 entries, 758423699
+bytes**, unchanged. The only modified path in the working tree is the one test
+file.
+
+**Fix branch:** `fix/auction-manifest-section-guard`, merged before the Archive
+stage. The Archive stage is therefore not purely archival for this change, and
+that deviation is recorded here rather than hidden inside it.
