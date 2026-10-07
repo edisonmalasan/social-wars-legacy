@@ -136,9 +136,29 @@
 **70** with this one. My expectation was **71**, from assuming `--all` counts one
 item per delta spec. Measured: it counts an active **change** as one item
 (`✓ change/auction-schedule-projection`) and validates both delta specs inside it.
-So the expected figure for this change is **70**, and after Sync it becomes **71**
-when the new main spec adds an item, returning to **70** at Archive when the
-change item is removed.
+So the expected figure for this change is **70** before Sync.
+
+**CORRECTION, measured at Sync.** The sentence this note originally ended with
+predicted **71** after Sync and **70** at Archive. Both figures are wrong, by one
+each, and the cause is in the note itself rather than in the validator: it
+assumed the change adds **one** main spec ("when the new main spec adds an
+item"), while `auction-schedule-projection` declares **two** capabilities,
+`auction-schedule-normalization` and `godot-auction-schedule`. The validator was
+right and the arithmetic was not.
+
+Measured, with both new specs confirmed present and counted:
+
+| Stage | `--specs` | `--all` |
+| --- | --- | --- |
+| No active change | 69 | 69 |
+| Change active, before Sync | 69 | **70** |
+| After Sync, both main specs added | **71** | **72** |
+| After Archive, change item removed | 71 | **71** |
+
+So the correct sequence for this change is **70 → 72 → 71**, not 70 → 71 → 70. The
+structural point stands and is worth keeping: `--all` counts an active **change**
+as a single item and validates both delta specs inside it, so a change with *N*
+capabilities still costs one item until it is synced.
 
 ### 6.1 Recorded during Apply
 
@@ -245,7 +265,9 @@ reference edge is proved by the builder's own tests alone and not by
 validator coverage.
 
 **8. `openspec validate --all --strict` counts 70, as §6.0 predicted.** No
-further correction to that figure.
+further correction to that figure — **at Apply**. Sync then added the two main
+specs and the figure moved to **72**, which §6.0's original prediction of 71 got
+wrong by one; the correction and the measured table are in §6.0.
 
 **9. Verification actually run, at the final state, after all edits above.**
   - `test_auction_schedule.gd`: **1218 checks**, exit 0.
