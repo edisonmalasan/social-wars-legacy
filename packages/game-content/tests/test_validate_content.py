@@ -127,9 +127,9 @@ class TestStructureManifest(unittest.TestCase):
         self.assertEqual(code, 0, "stderr=%r stdout=%r" % (err, out))
         report = json.loads(out)
         self.assertEqual(report["result"], "valid")
-        self.assertEqual(report["files_verified"], 22)
-        self.assertEqual(report["schemas_verified"], 21)
-        self.assertEqual(report["counts_checked"], 22)
+        self.assertEqual(report["files_verified"], 23)
+        self.assertEqual(report["schemas_verified"], 22)
+        self.assertEqual(report["counts_checked"], 23)
         self.assertIsInstance(report["references_checked"], int)
         self.assertGreater(report["references_checked"], 0)
 
@@ -148,7 +148,7 @@ class TestStructureManifest(unittest.TestCase):
         schema_names = sorted(
             spec[2] for spec in validator.FILE_MAP.values()
             if spec[2] is not None)
-        self.assertEqual(len(schema_names), 21)
+        self.assertEqual(len(schema_names), 22)
         self.assertEqual(
             schema_names,
             sorted(path.name for path in SCHEMAS.iterdir()))

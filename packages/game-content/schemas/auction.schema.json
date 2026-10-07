@@ -1,0 +1,244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "packages/game-content/schemas/auction.schema.json",
+  "title": "Normalized auction schedule definition (standalone auctionhouse table)",
+  "description": "Contract for one normalized auction schedule entry: exactly one committed entry of the standalone `config/auctionhouse.json` table. The committed `uuid` stays the JSON string and becomes legacy_id verbatim (rule A1); `interval` is preserved in its committed unit, minutes, and is NOT converted (rule A2); `unit` resolves against the normalized units package and the resolved display name is carried (rule A3); `betPrice` is carried verbatim beside the measured record that it has zero consumers in the preserved server (rule A4). Every transformation is listed in x-coercion-ruleset: a coercion that cannot be listed is not permitted. The legacy module is read as text only and never imported or executed.",
+  "type": "object",
+  "required": [
+    "legacy_id",
+    "kind",
+    "source_file",
+    "source_layer",
+    "content_version",
+    "uuid",
+    "unit",
+    "unit_ref",
+    "unit_name",
+    "unit_resolved",
+    "level",
+    "interval",
+    "interval_unit",
+    "price",
+    "priceIncrement",
+    "betPrice",
+    "bet_price_consumed"
+  ],
+  "additionalProperties": false,
+  "x-coercion-ruleset": {
+    "version": "auction-coercion-ruleset-v1",
+    "policy": "auction-normalization-v1",
+    "rules": [
+      {
+        "committed_field": "uuid",
+        "committed_json_type": "string",
+        "normalized_field": "legacy_id",
+        "normalized_json_type": "string",
+        "transform": "identity",
+        "rule": "A1",
+        "note": "The committed uuid is already a JSON string and becomes legacy_id verbatim. It is NOT parsed into an integer: the legacy module keys its state document by that value (auctions.py:106) and the committed table declares it quoted, so an integer would claim a type the source does not carry."
+      },
+      {
+        "committed_field": "uuid",
+        "committed_json_type": "string",
+        "normalized_field": "uuid",
+        "normalized_json_type": "string",
+        "transform": "identity",
+        "rule": "A1",
+        "note": "Carried alongside legacy_id so the round-trip comparison covers the committed key verbatim and so a reader never has to infer it."
+      },
+      {
+        "committed_field": "unit",
+        "committed_json_type": "integer",
+        "normalized_field": "unit",
+        "normalized_json_type": "integer",
+        "transform": "identity",
+        "rule": "A3",
+        "note": "The committed unit id is carried as the native integer the source commits."
+      },
+      {
+        "committed_field": "unit",
+        "committed_json_type": "integer",
+        "normalized_field": "unit_ref",
+        "normalized_json_type": "string",
+        "transform": "decimal_form",
+        "rule": "A3",
+        "note": "Cross-domain reference edge: the decimal form of the committed integer, matched against the normalized units legacy_id set. Unresolvable ids are recorded unresolved, never replaced."
+      },
+      {
+        "committed_field": "unit",
+        "committed_json_type": "integer",
+        "normalized_field": "unit_name",
+        "normalized_json_type": ["string", "null"],
+        "transform": "resolved_display_name",
+        "rule": "A3",
+        "note": "The display name carried by the resolved normalized unit entry, or null when the id does not resolve. No name is invented, substituted or defaulted."
+      },
+      {
+        "committed_field": "unit",
+        "committed_json_type": "integer",
+        "normalized_field": "unit_resolved",
+        "normalized_json_type": "boolean",
+        "transform": "reference_membership",
+        "rule": "A3",
+        "note": "Whether unit_ref is present in the normalized units legacy-id set. Recorded rather than enforced: an unresolvable definition is still emitted, in committed order, and reported."
+      },
+      {
+        "committed_field": "level",
+        "committed_json_type": "integer",
+        "normalized_field": "level",
+        "normalized_json_type": "integer",
+        "transform": "identity",
+        "rule": "A1",
+        "note": "Committed verbatim. No level gate, threshold or reachability rule is derived; the corpus map level makes the committed level unreachable as a gate, which is a finding, not a normalization."
+      },
+      {
+        "committed_field": "interval",
+        "committed_json_type": "integer",
+        "normalized_field": "interval",
+        "normalized_json_type": "integer",
+        "transform": "identity",
+        "rule": "A2",
+        "note": "Committed verbatim in the committed unit, MINUTES. No conversion is performed here; the legacy module's single conversion (seconds = auction[\"interval\"] * 60, auctions.py:76) belongs to the consuming client in one named function, and the factor 60 is deliberately not recorded as data in this package."
+      },
+      {
+        "committed_field": "interval",
+        "committed_json_type": "integer",
+        "normalized_field": "interval_unit",
+        "normalized_json_type": "string",
+        "transform": "unit_label",
+        "rule": "A2",
+        "note": "The constant label \"minutes\". This is the committed unit name, not a conversion and not a factor, so a reader cannot mistake the carried value for seconds."
+      },
+      {
+        "committed_field": "price",
+        "committed_json_type": "integer",
+        "normalized_field": "price",
+        "normalized_json_type": "integer",
+        "transform": "identity",
+        "rule": "A1",
+        "note": "Committed verbatim. It seeds the legacy state's beginPrice/currentPrice, and currentPrice is a pure function of the client-sent bid, so no price rule is derived."
+      },
+      {
+        "committed_field": "priceIncrement",
+        "committed_json_type": "integer",
+        "normalized_field": "priceIncrement",
+        "normalized_json_type": "integer",
+        "transform": "identity",
+        "rule": "A1",
+        "note": "Committed verbatim. It is added to the client-sent bid with no comparison operator anywhere in the module, so no increment check is derived."
+      },
+      {
+        "committed_field": "betPrice",
+        "committed_json_type": "integer",
+        "normalized_field": "betPrice",
+        "normalized_json_type": "integer",
+        "transform": "identity",
+        "rule": "A4",
+        "note": "Committed verbatim. It is written into the legacy state document at auctions.py:97 and auctions.py:137 and read nowhere."
+      },
+      {
+        "committed_field": "betPrice",
+        "committed_json_type": "integer",
+        "normalized_field": "bet_price_consumed",
+        "normalized_json_type": "boolean",
+        "transform": "measured_zero_consumer_flag",
+        "rule": "A4",
+        "note": "Measured false beside the measurement that establishes it: the legacy module text holds zero whole-token occurrences of gold, coins, cash, wood, steel, oil, xp, mana, energy, cost or apply_resources and never calls apply_resources. The flag records an unconsumed committed price, not a meaningless one; no ordinal is claimed for it."
+      }
+    ],
+    "non_committed_fields": {
+      "kind": {
+        "derivation": "constant_classification",
+        "note": "Every committed entry maps to the single classification \"auction\"."
+      },
+      "source_file": {
+        "derivation": "constant_provenance",
+        "note": "The standalone committed file config/auctionhouse.json, which is NOT one of the 20 top-level keys of config/main.json, so no patch layering or mods pipeline applies to it."
+      },
+      "source_layer": {
+        "derivation": "constant_provenance",
+        "note": "The constant \"stored\": this table is read as committed and never layered, replaced or patched."
+      },
+      "content_version": {
+        "derivation": "sha256_fingerprint_of_input_bytes",
+        "note": "sha256 over the committed auction config bytes and the committed normalized units bytes. Sources carry no version stamp; the fingerprint is the version record."
+      }
+    }
+  },
+  "properties": {
+    "legacy_id": {
+      "type": "string",
+      "description": "Committed uuid preserved verbatim as the committed JSON string (rule A1): not the decimal form of an integer, because the source declares it quoted and the legacy module keys its state document by it (auctions.py:106)."
+    },
+    "kind": {
+      "const": "auction",
+      "description": "Classification of the standalone auctionhouse domain: every committed entry maps to auction."
+    },
+    "source_file": {
+      "const": "config/auctionhouse.json",
+      "description": "Origin file of the committed entry: the standalone committed auction table, which is outside the content census whose scope is the 20 top-level keys of config/main.json."
+    },
+    "source_layer": {
+      "const": "stored",
+      "description": "Layering origin: stored. This table carries no patch layering and no mods pipeline, unlike every sibling builder that reads config/main.json."
+    },
+    "content_version": {
+      "type": "string",
+      "description": "Content fingerprint (sha256 over the committed auction config bytes and the committed normalized units bytes); sources carry no version stamp."
+    },
+    "uuid": {
+      "type": "string",
+      "description": "The committed uuid, carried verbatim as the committed JSON string alongside legacy_id (rule A1)."
+    },
+    "unit": {
+      "type": "integer",
+      "description": "Committed unit id, kept verbatim (rule A3); must resolve against the normalized units legacy-ID set for unit_resolved to be true.",
+      "minimum": 0
+    },
+    "unit_ref": {
+      "type": "string",
+      "description": "Cross-domain unit reference: the decimal form of the committed integer unit id, validated against the normalized units legacy-ID set (rule A3)."
+    },
+    "unit_name": {
+      "type": ["string", "null"],
+      "description": "Display name carried by the resolved normalized unit entry, or null when the committed id does not resolve (rule A3). No name is invented or substituted."
+    },
+    "unit_resolved": {
+      "type": "boolean",
+      "description": "Whether unit_ref is present in the normalized units legacy-ID set (rule A3). Recorded rather than enforced: an unresolved definition is still emitted in committed order and reported."
+    },
+    "level": {
+      "type": "integer",
+      "description": "Committed level, kept verbatim (rule A1). No gate, threshold or reachability rule is derived.",
+      "minimum": 0
+    },
+    "interval": {
+      "type": "integer",
+      "description": "Committed interval, kept verbatim in the committed unit MINUTES and NOT converted (rule A2). The legacy module's single conversion (seconds = auction[\"interval\"] * 60, auctions.py:76) belongs to the consuming client, in one named function; no seconds or duration field is present and the factor 60 is not recorded as data.",
+      "minimum": 0
+    },
+    "interval_unit": {
+      "const": "minutes",
+      "description": "The committed unit label for interval (rule A2). A unit name, not a conversion and not a factor."
+    },
+    "price": {
+      "type": "integer",
+      "description": "Committed price, kept verbatim (rule A1). No price rule, clamp, floor or total is derived.",
+      "minimum": 0
+    },
+    "priceIncrement": {
+      "type": "integer",
+      "description": "Committed priceIncrement, kept verbatim (rule A1). No increment check is derived; the module holds zero comparison operators against its four price identifiers.",
+      "minimum": 0
+    },
+    "betPrice": {
+      "type": "integer",
+      "description": "Committed betPrice, kept verbatim (rule A4). Written into the legacy state document at auctions.py:97 and auctions.py:137 and read nowhere.",
+      "minimum": 0
+    },
+    "bet_price_consumed": {
+      "const": false,
+      "description": "Measured zero-consumer record for betPrice (rule A4): the legacy module text holds zero whole-token occurrences of gold, coins, cash, wood, steel, oil, xp, mana, energy, cost or apply_resources and never calls apply_resources. Const false because that measurement is re-measured from the committed module text on every build; a consumer appearing would fail the build rather than silently flip the flag."
+    }
+  }
+}

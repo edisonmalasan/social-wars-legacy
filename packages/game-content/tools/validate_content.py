@@ -30,7 +30,7 @@ sys.dont_write_bytecode = True
 PACKAGE_REL = ("packages", "game-content")
 SECTION_NAMES = (
     "quests", "tables", "economy", "social", "taxonomy",
-    "darts", "globals", "offers", "images",
+    "darts", "globals", "offers", "images", "auctions",
 )
 
 # Output file -> (section or None for the root record, count key that names
@@ -64,6 +64,7 @@ FILE_MAP = {
     "globals.json": ("globals", "globals", "global_entry.schema.json"),
     "offer_packs.json": ("offers", "offers", "offer_pack.schema.json"),
     "images.json": ("images", "images", "image_asset.schema.json"),
+    "auctions.json": ("auctions", "auctions", "auction.schema.json"),
 }
 
 ITEM_FILES = ("buildings.json", "units.json", "specials.json")
