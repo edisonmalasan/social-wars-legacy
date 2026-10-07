@@ -1,7 +1,33 @@
-# Spec Delta
+# godot-construction-assist Specification
 
-## ADDED Requirements
+## Purpose
+Project the Socially-In-Construction assist state a placed row actually carries,
+and record the measured finding that the surface is a **paid substitute for a
+friend**: the list records who filled each assist slot, the only value any writer
+ever appends is the integer `0`, and `engine.py:142` names that value verbatim as
+*"0 is for buying instead of hiring friends"*. The **friend arm has no writer
+anywhere**, which the committed corpus corroborates - 7 elements totalling exactly
+one distinct value.
 
+This capability is deliberately named for the **surface** rather than for the
+deliver item it serves, because the surface is the inverse of that item's name.
+The same recorded reason that withheld `godot-friends` applies here: naming a
+capability after a delivered surface would claim what the measurement disproves.
+What the measurement finds is that a `si` entry stands for a **paid** assist, and
+never for a **reward** - the append branch makes no resource application and no
+grant, and the delete branch removes one key and nothing else.
+
+The token's expansion is **not inferred**. `engine.py:19` states it verbatim as
+*"enable SI (Socially In Construction), because the game expects it"*, and the
+trailing clause is reported rather than dropped: the author's own admission that
+the game *expects* the field is the most informative sentence in the surface, and
+it is the reason a client-display concession is not reported as gameplay.
+
+Zero-consumer, no-writer, and grants-nothing are statements about the
+**preserved server**. They say nothing about what the Flash client displayed,
+which may have held a gifting interface entirely client-side.
+
+## Requirements
 ### Requirement: The delivered surface is a typed read-only projection of the Socially-In-Construction assist state, and it implies no social reward
 
 The capability SHALL deliver the `attr["si"]` assist state of a placed row as a

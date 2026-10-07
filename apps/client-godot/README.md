@@ -4675,8 +4675,11 @@ schemas, 604 references); the preservation manifest (**3,258 entries**, 758,423,
 
 Evidence is the deterministic `construction-assist-report-v1` report under
 `apps/client-godot/evidence/construction-assist/` (**21,384 bytes**, sha256 `776aa8c7...10e94`, byte-identical
-across three consecutive runs). The report is written in **LF form**, so its raw and LF byte counts are equal and
-its digest needs no form qualifier. It now also records the **sha256 of both delivered modules as they sit on
+across three consecutive runs). The report is written in **LF form** — the committed Git blob form — so its raw and LF byte
+counts are equal and its digest needs no form qualifier. The qualifier is load-bearing rather
+than decorative: the blob was re-verified at Sync time through `git cat-file` as **21,384** bytes
+with **zero** CRLF, while a CRLF working-tree checkout of the same content measures **21,981**
+bytes, so both the figure and the digest describe the blob. It now also records the **sha256 of both delivered modules as they sit on
 disk**, because every injection probe's credibility rests on a byte-identical restore; the record names its own
 form (`raw working-tree bytes`, CRLF) and asserts `comparable_to_lf_normalised_digest: false` so it cannot be
 misread against the harness's LF-normalised digests.
