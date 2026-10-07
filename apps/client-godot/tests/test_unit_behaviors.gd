@@ -862,14 +862,48 @@ func _check_fields(registry: Variant) -> Dictionary:
 			% UnitBehaviors.ZERO_CONSUMER_COUNT)
 	check_eq(int(UnitBehaviors.ZERO_CONSUMER_COUNT_RECORDED), 20,
 		"the investigation's own figure of twenty is RETAINED beside the "
-			+ "measured twenty-one, so the correction stays visible")
-	check_eq(int(UnitBehaviors.BEHAVIOURAL_FIELD_COUNT), 23,
-		"with the two consumed fields the behavioural total is 23")
+			+ "measured count, so the correction stays visible")
+	check_eq(int(UnitBehaviors.ZERO_CONSUMER_COUNT_PRE_AMEND), 21,
+		"and the PRE-AMENDMENT measurement of twenty-one is retained beside the "
+			+ "current twenty-two, so `godot-construction-assist`'s addition of "
+			+ "`giftable` reads as a correction and not as a rescope")
+	check_eq(int(UnitBehaviors.BEHAVIOURAL_FIELD_COUNT), 24,
+		"with the two consumed fields the behavioural total is 24")
 	check_eq(int(UnitBehaviors.BEHAVIOURAL_FIELD_COUNT_RECORDED), 22,
 		"the investigation's own total of twenty-two is RETAINED beside the "
-			+ "measured twenty-three")
+			+ "current twenty-four")
 	check_eq((UnitBehaviors.CONSUMED_BEHAVIOURAL_FIELDS as Array).size(), 2,
 		"exactly TWO behavioural committed fields have a legacy consumer")
+
+	# The PARTIAL buildings-side column, added by `godot-construction-assist`.
+	# Each recorded figure is re-measured over the committed buildings, and the
+	# size of the partial set is pinned so it cannot quietly become a claim of
+	# full buildings-side coverage.
+	var buildings_distinct: Dictionary = measured["buildings_distinct"] as Dictionary
+	var carrying: Array = []
+	for entry2: Dictionary in UnitBehaviors.ZERO_CONSUMER_FIELDS:
+		if entry2.has("building_distinct"):
+			carrying.append(str(entry2["field"]))
+			check_eq(int((buildings_distinct as Dictionary)
+					.get(str(entry2["field"]), -1)),
+				int(entry2["building_distinct"]),
+				"the MEASURED distinct committed building values of `%s` is the "
+					% str(entry2["field"]) + "recorded one")
+	carrying.sort()
+	var expected_carrying: Array = UnitBehaviors.BUILDING_MEASURED_FIELDS.duplicate()
+	expected_carrying.sort()
+	check_eq(carrying, expected_carrying,
+		"the `building_distinct` column exists on EXACTLY the two measured "
+			+ "gift rows, so its partiality stays recorded")
+	check_eq(expected_carrying.size(),
+		int(UnitBehaviors.BUILDING_MEASURED_FIELD_COUNT),
+		"and that partial set's size is pinned")
+	# `giftable` qualifies on its own measurement, in both domains.
+	check(_zero_consumer_names().has("giftable"),
+		"`giftable` is in the zero-consumer census, added by "
+			+ "`godot-construction-assist`")
+	check_eq(int((measured["units_distinct"] as Dictionary).get("giftable", -1)),
+		2, "and its MEASURED committed unit distribution has two values")
 	return measured
 
 

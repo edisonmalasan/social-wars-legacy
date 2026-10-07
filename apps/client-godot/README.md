@@ -4561,3 +4561,245 @@ declared 18-key table would have been tautological. **Nothing is rendered**, so 
 capture and no pixel-parity oracle. **Absence of a server-side relationship says nothing about what the
 Flash client displayed**, which may have been entirely client-side. No Flash, Ruffle, ActionScript, or
 browser executes in any of these commands, and no network is used at all.
+
+## Construction assist (`godot-construction-assist`, M11 line 4)
+
+The `social rewards` deliver item, whose committed contract is
+`docs/legacy-m11-social-rewards.md`. The capability is named for the surface rather than for the deliver item,
+because the surface is the **inverse** of the item's name.
+
+### The finding: the surface is a paid substitute for a friend, and the friend arm has no writer
+
+`docs/legacy-m11-social.md` section 7 classifies the three social-reward tables as *"content committed, behaviour
+absent"*. That measurement is reproduced and true of the tables, and **false of the deliver item**: the preserved
+server holds a social-assistance state machine none of them mention -- the map-row attribute-bag key `si`.
+
+The list records **who filled each assist slot**, and the only value any writer ever appends is the integer `0`.
+`engine.py:142` says so verbatim:
+
+```
+attr["si"].append(0) # 0 is for buying instead of hiring friends
+```
+
+So a `si` entry is a **paid substitute for a friend**. The friend arm has **no writer anywhere**: zero
+code-only occurrences of a non-`0` write path across all eleven legacy modules, corroborated by the committed
+corpus holding **7 elements totalling exactly ONE distinct value**.
+
+The token's expansion is **not inferred**. `engine.py:19` states it: `# enable SI (Socially In Construction),
+because the game expects it`. The trailing clause is recorded rather than dropped -- it is the author's own
+admission that the mechanism is a client-display concession rather than gameplay, and it is the single most
+informative sentence in the surface.
+
+### What is delivered, and what is refused
+
+Two read-only modules (design D3), 26 function declarations, no route:
+
+- `scripts/social/construction_assist_state.gd` -- the projection. It reports the recorded key verbatim,
+  distinguishing **absent** from **present-and-empty**, reporting element **types** rather than refusing them,
+  and failing closed on every malformed shape.
+- `scripts/social/assist_transitions.gd` -- the dispatch census. Three branches reach the key, and one is **not
+  named for it**: `set_resource_allies` reaches `finish_si` at `command.py:644`, so the DELETE path has two
+  dispatchers, not one.
+
+**No reward is granted, no resource is charged, no element is decoded, and no gifting interface exists.** None
+of the 63 named branches is named for a gift, and the committed `gift_level` and `giftable` fields have zero
+legacy consumers.
+
+### Three deliberate decisions, each recorded rather than assumed
+
+**No route and no `apps/compat-api/**` change (D1).** `attr["si"]` already rides `/v0/bootstrap`, so the compat
+suite is **unchanged at 3077** -- a re-run verified figure, not an inherited one. `/v0/assist` was rejected: a
+client affordance for a transaction that grants nothing is precisely the surface this capability exists to
+refuse.
+
+**No executed-legacy fixture -- a decision, not a limitation.** `buy_si_help` *creates* the key when it is
+absent (`engine.py:139-140`), so a capture was reachable. None was taken because a captured fixture would
+license the round trip this line declines to deliver.
+
+**No ordinal is claimed** for `gift_level` or `giftable`. No reconciled census of zero-consumer fields exists,
+and four earlier lines each numbered over a different scope, so a fifth number would be a fifth incomparable one.
+
+The missing key is **not** conflated with the empty list: three writers write three different values, and the
+corpus contains **53** rows carrying `si` of which only **3** are non-empty. The absent `friend_assistable` check
+is **recorded, not enforced**, because enforcing it would refuse **2** committed corpus rows.
+
+### The reconciliation, and why it is a reconciliation
+
+The gate-positive ids that the corpus never placed, and the `si` carriers on ungated ids, are both recorded as
+**four per-unit facts** after an earlier draft recorded `{"count": 4, "ids": [4, 12]}`, which mixed a row count
+with an id count. `si` carriers on ungated ids number **2** (ids **61**, **75**); gate-positive ids with no `si`
+number **10** of 26, of which only ids 4 and 12 are placed at all.
+
+A note claiming ids 61 and 75 were the corpus's *only* non-empty lists was **false** and is corrected: gated
+id **9** carries `[0, 0, 0]`. The correction is asserted by the suite so it cannot be reintroduced.
+
+**Both directions of the mismatch are now re-derived every run** rather than read back from the recorded table,
+because a table compared only against itself is not evidence. The gate-positive ids come from walking
+`buildings.json`, `units.json` and `specials.json` -- the corpus says which ids *carry* the key and only the
+content says which ids are *supposed to* -- and then the corpus is walked for carriers. Direction one (key
+without gate) yields `[61, 75]`; direction two (gate without key) yields the ten; the two derived sets are
+asserted **disjoint**, so neither can be a restatement of the other. The gate walk also carries the string-flag
+hazard `godot-unit-movement` measured: a bare truthiness test would count every carrier including a committed
+`"0"`, so the recorded flag string is compared instead.
+
+The corpus walker is extracted into `_measure_corpus(allow)` so the allow-list guard is provable by
+**injection**: an empty allow-list is passed as a second real call and must return zero documents, zero rows and
+zero assist rows. Without that, a walker ignoring its argument and falling back to a default would reproduce
+every figure and every comparison would still agree.
+
+### Verification actually run (2026-10-07)
+
+```bash
+godot --headless --path apps/client-godot --script res://tests/test_construction_assist.gd
+godot --headless --path apps/client-godot --script res://tests/test_construction_assist.gd -- --report=<repo>/apps/client-godot/evidence/construction-assist/report.json
+godot --headless --path apps/client-godot --script res://tests/test_unit_behaviors.gd
+godot --headless --path apps/client-godot --script res://tests/test_project_scope.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+openspec validate --all --strict
+```
+
+Purposes and observed results: the hermetic assist suite (observed **495 checks**, the **48th** registered
+hermetic suite, exit 0, zero engine error lines); the amended `gift_level`/`giftable` census suite (**598**); the
+amended scope suite (**2138**); the unchanged sibling suites (`test_social_state` **405**, `test_darts` **610**,
+`test_friends` **570**, `test_scene_build` **36**); `verify.ps1` exit 0; `verify-boot.ps1` exit 0 with **48
+hermetic suites** (was 47), **23 live phases UNCHANGED** because none is delivered, **226** assertions (was 224),
+guard digest `6978b959...ff348` identical before and after, port 5056 released, no working-tree `saves/`, and
+**1040** log files inspected carrying zero `[test] FAIL`, `^ERROR:`, or `SCRIPT ERROR` lines; the **unchanged**
+compat suite (`Ran 3077 tests ... OK`, exit 0); the content validator (exit 0, `result: valid` -- 22 outputs, 21
+schemas, 604 references); the preservation manifest (**3,258 entries**, 758,423,699 bytes, exit 0); and
+`openspec validate --all --strict` (**69 passed / 0 failed**).
+
+Evidence is the deterministic `construction-assist-report-v1` report under
+`apps/client-godot/evidence/construction-assist/` (**21,384 bytes**, sha256 `776aa8c7...10e94`, byte-identical
+across three consecutive runs). The report is written in **LF form**, so its raw and LF byte counts are equal and
+its digest needs no form qualifier. It now also records the **sha256 of both delivered modules as they sit on
+disk**, because every injection probe's credibility rests on a byte-identical restore; the record names its own
+form (`raw working-tree bytes`, CRLF) and asserts `comparable_to_lf_normalised_digest: false` so it cannot be
+misread against the harness's LF-normalised digests.
+
+`apps/client-godot/evidence/boot/boot-report.json` was **regenerated** and its diff **inspected rather than
+assumed**. Every one of the **51** insertions is accounted for: `generated_utc`, `git_commit`, **26** `log`
+renumberings (25 displaced plus the new suite's own index), the `test_construction_assist` entry block with
+`exit_code: 0` and `timed_out: false`, and its two new assertions both `ok: true`. No other key moved.
+
+### Four defects of this line's own work, found by measurement
+
+The suite was written before it had ever run, and its first four runs each found an **instrument** fault rather
+than a module fault:
+
+1. **The reserved-name guard scanned raw source text**, so `ABSENT_HELPERS`' own inventory text tripped it
+   unconditionally. It now compares **declared function names**, case-folded and by substring, in **both**
+   directions -- the shape `godot-friends` already records, where an exact-name check was measured to miss a
+   suffixed helper and a case-sensitive one to miss `Friend_Of`.
+2. **The ordinal guard had the same self-tripping shape**: the module's own *rationale* for refusing an ordinal
+   names four earlier lines' figures in a comment. A two-state lexer (`_code_only`) now strips comments and
+   string literals, and the suite **asserts the rationale is present**, so the guard cannot be "simplified" back.
+3. **The crafted-input assertions assumed JSON decoding.** A crafted GDScript literal is a real `int`; only the
+   JSON path yields a `float`. Both paths are now asserted **separately**, so neither masks the other -- which is
+   the sharper claim anyway.
+4. **The transport-token guard was removed rather than duplicated.** `test_project_scope.gd` forbids those
+   tokens in every allow-listed file, so a guard naming them can only exist in a form its own owner rejects --
+   the third instance of this shape in the project. The claim is **delegated, not dropped**: the suite asserts
+   the owner exists, and that the owner's allow-list covers both delivered modules, by reading the owner's own
+   source.
+
+Three parse and typo faults are also recorded rather than hidden: a multi-line `var x: Dictionary =` with the
+value on the next line; the absence of any `MULTILINE` `RegEx` flag on this engine; and a **misspelled
+dictionary key** (`of_these` for `of_those`) that aborted `_check_reconcile` mid-function. The third is the
+instructive one: the suite **exited 0 while printing `SCRIPT ERROR`**, because `test_base.gd` records a
+function abort as a pass. That recorded defect has now caught a real fault in this line twice.
+
+### The injections: eight probes, all detected, all byte-identically restored
+
+Failure counts are **measured**: **6, 5, 5, 4, 1, 2, 2, 1**, summing to **26**. The first draft recorded
+`3, 3, 3, 2, 1, 1` for six probes, and **every draft figure was an estimate of the guards rather than a count of
+them** -- the inventory pin is enforced by **four** independent checks, not the two the draft counted. Probe 6
+was raised from 1 to 2 by widening the probe itself, because the first version replaced only the first line of a
+three-line concatenated string and left `command.py:646` in the text.
+
+**Probe 8 found a real defect in the guard it was written to prove, which is why it exists.** Task 4.1 required
+that renaming the field in the owning module must fail the suite, and that needs **two** probes:
+
+- Probe 7 renames the committed gate field `friend_assistable` across all five occurrences in
+  `stored_item_flow.gd`. It fires **2** guards. The third ownership check names the bag key `si`, which that
+  rename does not touch, so two is the **correct** result and not a shortfall -- recorded on the probe row so it
+  cannot be misread as an undercount.
+- Probe 8 renames the bag key `si` to `s1`. **On its first run it exited 0.** The check matched `si` as a **bare
+  two-character substring**, and `si` occurs inside "assist", "position" and "using" throughout the owner
+  module, so the check **could never fail**. A two-letter token matched with `contains` is not a guard, it is
+  decoration. All three names are now matched as the **quoted literal** a GDScript source carries, and the suite
+  additionally asserts that the bare substring form is *still present* after a rename, so the reason the quoted
+  form is required cannot be unlearned.
+
+**A harness fault worth recording, because it nearly produced six fake passes.** The first run reported
+`failures=0` with **53** engine error lines on each function probe: the harness decoded CRLF bytes and re-applied
+CRLF to the whole text, writing `\r\r\n` on every pre-existing line, so the module stopped **parsing** and the
+suite exited 1 -- which a "did it exit non-zero?" gate records as a *detection*. The harness now normalises to LF
+before mutating **and aborts if a probe fails with no `[test] FAIL` line**, because a parse-error detection proves
+nothing about a guard.
+
+**The final-newline rule was then rewritten rather than satisfied, and that is a task deviation.** It asserted a
+universal *content* rule -- every probed file ends with a newline -- which is true of the two modules this change
+authored and **false of `stored_item_flow.gd`**, a pre-existing delivered file that legitimately ends with
+`return out` and no newline. So it was not detecting truncation, which is what it was written for; it was
+asserting a style property, and it aborted the probe set. The replacement pins the restored file's **final byte
+to the baseline** instead, and *reports* each file's newline state rather than guarding it -- a truncation still
+fails, and a file with no trailing newline probes cleanly. A universal content rule dressed as a restore rule is
+the same defect class as a transposed figure: it looks like a guard and is not one. A tautological check written
+during this fix (testing that a file both lacks and ends with a newline) was deleted before it shipped.
+
+All eight were re-measured against the final delivered state, with restores verified by sha256
+(`3de48bf2...bf381`, `1420c55b...e22c3`, and `716fb965...72cf9` for the borrowed owning module), zero NUL bytes
+asserted on every restore, and `git diff --numstat --ignore-cr-at-eol` plus `git status --short` equal to their
+pre-probe values. Probe 4 is the informative one among the first six: it borrows **no** reserved word, so only
+the inventory pin and the two count pins see it, which is what makes the pin the real gate and the reserved-name
+guard the belt.
+
+### Why there is no `construction-assist-live` phase
+
+This line adds no route, so a live phase would have to drive `/v0/bootstrap` and would prove nothing this line
+claims. `godot-darts` set the precedent. Live phases stay at **23**.
+
+### A tenth recorded flaky surface, found here and NOT fixed
+
+The full compat discovery failed **once** on
+`test_collection_endpoint.ContainmentTests.test_session_stays_byte_identical_and_bootstrap_changes_only_its_own_targets`,
+with `playerInfo.last_logged_in` 1791375563 against 1791375562 and every other field identical. The file then
+passed **five consecutive times** alone and the full discovery passed at **3077**, so it is the recorded
+**sixth flaky surface** firing again -- but the investigation found something the earlier record got wrong.
+
+That surface was previously *fixed* by exempting a volatile field, and the fix **was applied at the wrong depth
+and never took effect**. The guard iterates the top-level *sections* of `player_info` and tests each section name
+against `VOLATILE_PLAYER_INFO_FIELDS = {"last_logged_in"}` -- but the wall-clock stamp lives one level deeper,
+at `player_info.playerInfo.last_logged_in`. No top-level section is ever named `last_logged_in`, so the
+exemption is **dead code** and the nested field walks straight through to the per-section equality. That it *is*
+a clock and not state is settled by `test_compat_v0.py:333`, which asserts
+`player_info["playerInfo"]["last_logged_in"] == player_info["timestamp"]`.
+
+**Not fixed here.** This line touches no `apps/compat-api/**` file -- established by `git diff --name-only`
+returning none -- and design D1 excludes the area deliberately. The honest fix belongs to the capability that
+owns `/v0/session`, and reworking an already-archived line's containment assertion from an unrelated change is
+how an unearned fix ships. The other nine recorded flaky surfaces remain open.
+
+### Claim limits
+
+**No reward is paid, no resource moves, no element is decoded, and no element is ordered**: two committed
+elements are compared against each other nowhere, because there is exactly one distinct value. **No friend is
+hired or counted**, because no writer appends one. **No gifting threshold, comparison, interface, or eligibility
+window is derived**, and none is claimed to exist. **The gate is reported and never enforced.** **No corpus gap
+is explained away**: `map_add_item_from_item` bypasses the gate, and that is recorded as a fact about a second
+writer, **not** as an explanation, because nothing performs it in a way the corpus can be shown to follow. **No
+ordinal is claimed.** **Element types are reported, not refused**, because refusing them would invent a type rule
+the oracle does not have. **The reconciliation's explanation is not established** -- both directions are measured,
+but the two candidate explanations remain candidates and neither is. **Nothing is rendered**, so there is no
+windowed capture and no pixel-parity oracle, and **absence of a server-side behaviour says nothing about what the
+Flash client displayed.** No Flash, Ruffle, ActionScript, or browser executes in any of these commands, and **no
+network is used at all**.
+
+This line also **completes** the `godot-unit-behaviors` gift census rather than duplicating it: `gift_level` was
+already there units-only and now carries its buildings side, `giftable` was in **no** census and is added, and
+the correction chain is retained in full -- investigation 20, measured 21, **amended 22**.

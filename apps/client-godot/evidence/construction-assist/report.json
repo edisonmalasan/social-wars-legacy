@@ -1,0 +1,598 @@
+{
+  "schema": "construction-assist-report-v1",
+  "capability": "godot-construction-assist",
+  "kind": "typed read-only projection of one attribute-bag key, plus a recorded dispatch census",
+  "delivered": [
+    "a typed read-only projection of attr[\"si\"]: presence, recorded length, and each element's value and engine type verbatim",
+    "a MISSING key reported distinctly from an EMPTY list, because the three recorded writers produce three different states",
+    "four fail-closed refusals, discriminated on shape before any parser is invoked so no engine ERROR line is emitted",
+    "the three recorded dispatchers, every effect quoted from source and carrying reproduced: false, including the branch NOT named for the key",
+    "the corpus measurement re-derived every run over an explicit ten-document allow-list, with non-vacuity asserted",
+    "the reconciliation stated in per-unit figures, with the false \"only non-empty lists\" note corrected",
+    "two zero-consumer gift fields with NO ordinal claimed, completing the existing units-only census rather than duplicating it"
+  ],
+  "not_delivered": [
+    "any route: /v0/bootstrap already carried the key, so apps/compat-api/** is untouched and the compat suite stays at 3077",
+    "any reward, payout, charge or refund: the append branch applies no resource vector and the delete branch removes one key",
+    "any decode of the recorded 0 sentinel: its meaning is a quoted source comment, not a recovered encoding",
+    "any element typing rule: element types are reported verbatim, because refusing them would invent a rule the oracle lacks",
+    "the absent friend_assistable check, recorded but NOT enforced, because enforcing it would refuse two committed corpus rows",
+    "any ordinal position for the gift fields, because no reconciled census of zero-consumer committed fields exists",
+    "any projection of the three committed social content tables: a uniformity census only, which is why nothing decodes a reward",
+    "an executed-legacy fixture, a live phase, a windowed capture and any pixel-parity oracle"
+  ],
+  "projection": {
+    "carried": {
+      "present": true,
+      "recorded_length": 2,
+      "engine_type": "int",
+      "type_record": "int"
+    },
+    "from_json": {
+      "engine_type": "float",
+      "type_record": "int (decoded as float by this engine)"
+    },
+    "empty_list": {
+      "present": true,
+      "is_empty_list": true,
+      "recorded_length": 0
+    },
+    "missing_key": {
+      "present": false,
+      "is_empty_list": false,
+      "recorded_length": -1
+    },
+    "payload_mutated": false,
+    "untyped_elements": {
+      "refused": false,
+      "engine_types": [
+        "String",
+        "int",
+        "bool",
+        "Dictionary"
+      ]
+    },
+    "token": {
+      "key": "si",
+      "expansion": "Socially In Construction",
+      "expansion_inferred": false,
+      "quoted_source": "# enable SI (Socially In Construction), because the game expects it",
+      "source_file": "engine.py:19",
+      "concession": "because the game expects it"
+    },
+    "sentinel": {
+      "value": 0,
+      "quoted_source": "attr[\"si\"].append(0) # 0 is for buying instead of hiring friends",
+      "source_file": "engine.py:142",
+      "decoded": false,
+      "means": "a paid substitute for a friend",
+      "friend_arm_writers": 0,
+      "consumer_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "consumer_rules": [
+        "whole-file occurrences",
+        "whole-file distinct lines",
+        "code-only occurrences",
+        "code-only distinct lines",
+        "exact identifier tokens",
+        "quoted-access form"
+      ],
+      "modules": 11
+    }
+  },
+  "refusals": {
+    "codes": [
+      "assist_value_not_a_list",
+      "bag_not_an_object",
+      "bag_slot_absent",
+      "row_not_a_list"
+    ],
+    "cases": [
+      "assist_value_not_a_list",
+      "bag_not_an_object",
+      "bag_slot_absent",
+      "row_not_a_list"
+    ],
+    "refused_before_any_parser": true
+  },
+  "quoted_source": {
+    "token_expansion_source": "# enable SI (Socially In Construction), because the game expects it",
+    "sentinel_source": "attr[\"si\"].append(0) # 0 is for buying instead of hiring friends",
+    "bag_writer_quotes": 4,
+    "effect_quotes": 6,
+    "all_verified_verbatim": true
+  },
+  "dispatchers": {
+    "names": [
+      "buy_si_help",
+      "finish_si",
+      "set_resource_allies"
+    ],
+    "unnamed": "set_resource_allies",
+    "effect_count": 6,
+    "all_reproduced_false": true,
+    "precondition_shared_claim": false,
+    "bag_writers": [
+      "buy_si_help",
+      "finish_si",
+      "map_add_item"
+    ]
+  },
+  "corpus": {
+    "allow_list": [
+      "villages/AcidCaos.json",
+      "villages/General_Mike_30.json",
+      "villages/General_Mike_31.json",
+      "villages/Kiriakos.json",
+      "villages/Nerri.json",
+      "villages/Neutral.json",
+      "villages/Scarlet.json",
+      "villages/initial.json",
+      "tests/saves/fresh-player.json",
+      "tests/saves/fresh-player-pre-migration.json"
+    ],
+    "placed_rows": 3372,
+    "si_rows": 53,
+    "si_non_empty": 3,
+    "si_elements": 7,
+    "si_distinct_values": [
+      "0.0"
+    ],
+    "documents_present": 5,
+    "teams": [
+      1.0
+    ],
+    "row_slot_count": 8,
+    "re_derived_every_run": true,
+    "assertions_non_vacuous": true,
+    "unreadable": []
+  },
+  "reconciliation": {
+    "facts": [
+      "rows_carrying_si_on_ids_without_the_gate",
+      "gate_positive_ids_with_no_si",
+      "of_those_actually_placed",
+      "gate_positive_ids_never_placed"
+    ],
+    "candidate_count": 2,
+    "candidates_measured": false,
+    "gate_enforced": false,
+    "conclusion": "the presence of the key does not reliably indicate the committed gate, and the corpus proves that in both directions",
+    "re_derived_every_run": true,
+    "gate_positive_id_count": 26,
+    "direction_si_without_gate": [
+      61,
+      75
+    ],
+    "direction_gate_without_si": [
+      4,
+      5,
+      12,
+      167,
+      184,
+      202,
+      219,
+      247,
+      274,
+      296
+    ],
+    "direction_placed_ids": [
+      4,
+      12
+    ],
+    "direction_placed_row_total": 4,
+    "direction_never_placed_ids": [
+      5,
+      167,
+      184,
+      202,
+      219,
+      247,
+      274,
+      296
+    ],
+    "directions_disjoint": true,
+    "neither_side_implies_the_other": true
+  },
+  "gift_census": {
+    "fields": [
+      "giftable",
+      "gift_level"
+    ],
+    "ordinal_claimed": false,
+    "giftable_was_in_a_census": false,
+    "gift_level_completed": true
+  },
+  "ownership": {
+    "owners": [
+      "gate_derivation",
+      "state_fields",
+      "content_tables",
+      "gift_census"
+    ],
+    "gate_derivation_reimplemented": false,
+    "gate_spec_exists": true,
+    "same_committed_field_named": true,
+    "content_rows_projected": 0,
+    "social_items_ids_distinct": 26
+  },
+  "absence": {
+    "declared": 26,
+    "distinct": 26,
+    "inventory_matches": true,
+    "reserved_violations": [],
+    "reserved_match": "case-folded substring, both directions",
+    "helpers": [
+      "assist_reward",
+      "assist_payout",
+      "assist_progress",
+      "assist_ratio",
+      "assist_complete",
+      "friend_assist",
+      "friend_contribution",
+      "hired_friend",
+      "assist_eligibility",
+      "assist_charge",
+      "assist_refund",
+      "decode_sentinel",
+      "gift_threshold",
+      "gift_send",
+      "assist_window"
+    ],
+    "routes": 0,
+    "intents": 0,
+    "transport_tokens": 0,
+    "transport_gate": "delegated to test_project_scope.gd",
+    "transport_gate_delegated": true
+  },
+  "bag_writers": [
+    {
+      "writer": "map_add_item",
+      "site": "engine.py:24",
+      "recorded_source": "attr[\"si\"] = []",
+      "writes": "an empty list",
+      "charges": false,
+      "grants": false,
+      "gate_checked": true
+    },
+    {
+      "writer": "buy_si_help",
+      "site": "engine.py:139-140, engine.py:142",
+      "recorded_sources": [
+        "attr[\"si\"] = [ 0 ]",
+        "attr[\"si\"].append(0) # 0 is for buying instead of hiring friends"
+      ],
+      "writes": "the integer 0",
+      "charges": false,
+      "grants": false,
+      "gate_checked": false
+    },
+    {
+      "writer": "finish_si",
+      "site": "engine.py:147",
+      "recorded_source": "del attr[\"si\"]",
+      "writes": "nothing; the key is removed",
+      "charges": false,
+      "grants": false,
+      "gate_checked": false
+    }
+  ],
+  "ownership_records": {
+    "gate_derivation": {
+      "owner": "godot-stored-item-placement",
+      "owns": "the attribute-bag derivation at placement",
+      "here": "referenced, never reimplemented"
+    },
+    "state_fields": {
+      "owner": "godot-social-state",
+      "owns": "the persisted social state fields and the recorded instant stamp at command.py:643",
+      "here": "named as owner, not re-recorded"
+    },
+    "content_tables": {
+      "owner": "social-tables-normalization",
+      "owns": "neighbor_assists, findable_items and social_items",
+      "here": "uniformity census only; NO content row is projected"
+    },
+    "gift_census": {
+      "owner": "godot-unit-behaviors",
+      "owns": "the units-only gift_level census row",
+      "here": "completed with the buildings side, plus a giftable row"
+    }
+  },
+  "reward_census": [
+    {
+      "table": "neighbor_assists",
+      "field": "reward",
+      "entries": 5,
+      "distinct_values": 1,
+      "decoded": false
+    },
+    {
+      "table": "findable_items",
+      "field": "coins",
+      "entries": 10,
+      "distinct_values": 1,
+      "decoded": false
+    }
+  ],
+  "gate_record": {
+    "field": "friend_assistable",
+    "source": "properties.friend_assistable",
+    "consumer_site": "engine.py:22-23",
+    "flag_value": "1",
+    "flag_value_type": "String",
+    "buildings_carried": 26,
+    "buildings_total": 470,
+    "units_carried": 0,
+    "units_total": 429,
+    "special_carried": 0,
+    "special_total": 1,
+    "encoding_note": "the normalized package stores properties flags as strings; both the legacy int() at engine.py:23 and the owning delivered coercion read the string correctly, while a consumer comparing the raw value against an integer would read every carrier as false",
+    "reimplemented_here": false,
+    "owner": "godot-stored-item-placement"
+  },
+  "dispatch_precondition": {
+    "precondition": "the addressed map slot resolves to a row; no friend_assistable, type or team check exists in either dedicated branch",
+    "enforced_here": false,
+    "why_not": "enforcing the gate would refuse two committed corpus rows, and the preserved branch has no such check"
+  },
+  "excluded_from_corpus": [
+    {
+      "excluded": "tests/fixtures",
+      "reason": "fixture step documents are recorded evidence of a transaction, not canonical save documents"
+    },
+    {
+      "excluded": "apps/client-godot/.godot",
+      "reason": "a Godot build cache"
+    },
+    {
+      "excluded": "villages/quest",
+      "reason": "quest documents of a different shape, not placed-row saves"
+    },
+    {
+      "excluded": "tests/saves/manifest.json",
+      "reason": "a manifest of saves, not a save"
+    }
+  ],
+  "absent_helpers": [
+    {
+      "helper": "assist_reward",
+      "absent_because": "the append branch makes no resource application and no grant"
+    },
+    {
+      "helper": "assist_payout",
+      "absent_because": "no stored resource moves on either recorded branch"
+    },
+    {
+      "helper": "assist_progress",
+      "absent_because": "nothing reads a value or compares two of them"
+    },
+    {
+      "helper": "assist_ratio",
+      "absent_because": "no denominator exists to divide by"
+    },
+    {
+      "helper": "assist_complete",
+      "absent_because": "no branch tests an element against anything"
+    },
+    {
+      "helper": "friend_assist",
+      "absent_because": "the friend arm has zero consumers under six counting rules over eleven modules"
+    },
+    {
+      "helper": "friend_contribution",
+      "absent_because": "no writer appends anything but the paid sentinel"
+    },
+    {
+      "helper": "hired_friend",
+      "absent_because": "engine.py:142 names the sole value as buying INSTEAD of hiring"
+    },
+    {
+      "helper": "assist_eligibility",
+      "absent_because": "no window, cooldown or level gate exists to derive"
+    },
+    {
+      "helper": "assist_charge",
+      "absent_because": "the append branch charges nothing"
+    },
+    {
+      "helper": "assist_refund",
+      "absent_because": "the delete branch removes one key and nothing else"
+    },
+    {
+      "helper": "decode_sentinel",
+      "absent_because": "the 0 meaning is a quoted comment, not a recovered encoding"
+    },
+    {
+      "helper": "gift_threshold",
+      "absent_because": "gift_level has zero consumers, so no comparison is derivable"
+    },
+    {
+      "helper": "gift_send",
+      "absent_because": "no branch among the 63 named is named for a gift"
+    },
+    {
+      "helper": "assist_window",
+      "absent_because": "no eligibility window or cooldown exists"
+    }
+  ],
+  "delivered_routes": [],
+  "expected_function_inventory": [
+    "assist_key",
+    "dispatch_precondition",
+    "gate_record",
+    "gift_field_names",
+    "gift_field_record",
+    "project",
+    "refusal_codes",
+    "refusal_reason",
+    "sentinel_record",
+    "token_expansion",
+    "_element_type_record",
+    "_init",
+    "_refuse",
+    "element_records",
+    "is_empty_list",
+    "present",
+    "recorded_length",
+    "refusal_code",
+    "refusal_message",
+    "resolvable",
+    "dispatcher",
+    "dispatchers",
+    "effects",
+    "precondition",
+    "reproduced_flags",
+    "unnamed_dispatcher"
+  ],
+  "expected_declarations": 26,
+  "guard_injections": [
+    {
+      "probe": "static func assist_reward(count: int) -> int: return count",
+      "disguise": "the exact reserved reward helper, spelled exactly",
+      "guards_that_fired": [
+        "whole_inventory_pin",
+        "declaration_count",
+        "distinct_count",
+        "unexpected_function",
+        "absent_helper_defined",
+        "reserved_name_bidirectional"
+      ],
+      "exit_code": 1,
+      "failures": 6,
+      "engine_error_lines": 0,
+      "restore_byte_identical": true,
+      "contained_after_restore": true
+    },
+    {
+      "probe": "static func assist_reward_per_element(elements: Array) -> int: return elements.size()",
+      "disguise": "a SUFFIXED helper wearing the reserved name `assist_reward` as a PREFIX, and computing a payout per element; an exact-name check would have passed this one",
+      "guards_that_fired": [
+        "whole_inventory_pin",
+        "declaration_count",
+        "distinct_count",
+        "unexpected_function",
+        "reserved_name_bidirectional"
+      ],
+      "exit_code": 1,
+      "failures": 5,
+      "engine_error_lines": 0,
+      "restore_byte_identical": true,
+      "contained_after_restore": true
+    },
+    {
+      "probe": "static func hired_friend_count(row: Variant) -> int:",
+      "disguise": "the FRIEND-ARM probe: counting hired friends from a row, which is the reading engine.py:142 explicitly denies",
+      "guards_that_fired": [
+        "whole_inventory_pin",
+        "declaration_count",
+        "distinct_count",
+        "unexpected_function",
+        "reserved_name_bidirectional"
+      ],
+      "exit_code": 1,
+      "failures": 5,
+      "engine_error_lines": 0,
+      "restore_byte_identical": true,
+      "contained_after_restore": true
+    },
+    {
+      "probe": "static func scaled(values: Array) -> Array:, comparing elements[0] against elements[1] with `>`",
+      "disguise": "the ORDERING probe: two assist values compared against each other, and it borrows NO reserved word, so the reserved-name guard CANNOT see it. This is the probe that shows the inventory pin is the real gate and the reserved-name guard is the belt",
+      "guards_that_fired": [
+        "whole_inventory_pin",
+        "declaration_count",
+        "distinct_count",
+        "unexpected_function"
+      ],
+      "exit_code": 1,
+      "failures": 4,
+      "engine_error_lines": 0,
+      "restore_byte_identical": true,
+      "contained_after_restore": true
+    },
+    {
+      "probe": "\"reproduced\": true, replacing one of the six \"reproduced\": false flags",
+      "disguise": "a reproduced-effect flag flipped on a recorded dispatcher effect, claiming this line DELIVERS the branch",
+      "guards_that_fired": [
+        "reproduced_flag_is_all_false"
+      ],
+      "exit_code": 1,
+      "failures": 1,
+      "engine_error_lines": 0,
+      "restore_byte_identical": true,
+      "contained_after_restore": true
+    },
+    {
+      "probe": "set_resource_allies' recorded absent-row behaviour replaced with the shared RETURNS claim",
+      "disguise": "the shared-precondition claim REINSTATED, which is the false claim the accessor already records as refuted",
+      "guards_that_fired": [
+        "precondition_asymmetry"
+      ],
+      "exit_code": 1,
+      "failures": 2,
+      "engine_error_lines": 0,
+      "restore_byte_identical": true,
+      "contained_after_restore": true
+    },
+    {
+      "probe": "`friend_assistable` RENAMED to `friend_hireable` in all five occurrences inside the owning delivered derivation",
+      "disguise": "a rename of the committed gate FIELD on the owner side only, so the two capabilities no longer name the same field. This is the probe task 4.1 required and the first six could not make: it mutates a file this line does NOT own, which is the only way to show the ownership link is load-bearing",
+      "guards_that_fired": [
+        "owner_names_the_gate_field",
+        "owner_names_the_committed_source_path"
+      ],
+      "exit_code": 1,
+      "failures": 2,
+      "engine_error_lines": 0,
+      "restore_byte_identical": true,
+      "contained_after_restore": true,
+      "why_not_three": "the third ownership check names the bag KEY `si`, which this rename does not touch, so exactly two firing is the CORRECT result and not a shortfall"
+    },
+    {
+      "probe": "`const ATTR_ASSIST_KEY := \"si\"` renamed to `\"s1\"` in the owning delivered derivation",
+      "disguise": "the companion rename of the recorded bag KEY. Written because probe 7 fires two of the three ownership checks, and a guard proven by only two thirds of itself is not proven",
+      "guards_that_fired": [
+        "owner_names_the_bag_key"
+      ],
+      "exit_code": 1,
+      "failures": 1,
+      "engine_error_lines": 0,
+      "restore_byte_identical": true,
+      "contained_after_restore": true,
+      "found_a_real_defect": "this probe EXITED 0 on its first run, which is the finding: the check matched the two-character key as a BARE SUBSTRING, and `si` occurs inside \"assist\", \"position\" and \"using\" throughout the owner module, so the check could never fail. It is now matched as the quoted literal `\"si\"`, and the suite asserts the bare form too so the reason the quoted form is required cannot be unlearned"
+    }
+  ],
+  "module_digests": {
+    "form": "sha256 over the raw working-tree bytes (CRLF on this checkout)",
+    "comparable_to_lf_normalised_digest": false,
+    "modules": {
+      "construction_assist_state.gd": {
+        "path": "apps/client-godot/scripts/social/construction_assist_state.gd",
+        "sha256": "b646359260abd10a16415113ab74882784521ad616f213e7eedf4957a791d6fa"
+      },
+      "assist_transitions.gd": {
+        "path": "apps/client-godot/scripts/social/assist_transitions.gd",
+        "sha256": "f1373288a24f1c290a1f2dd57d3d334bf4f15baae134cdfac10a9cf55ecb5b1c"
+      }
+    }
+  },
+  "claim_limits": [
+    "the projection is delivered; the TRANSPORT already existed, so nothing here is parity against a new endpoint and no executed-legacy capture was taken",
+    "no executed-legacy fixture is delivered, and that is a DECISION: buy_si_help creates the key when absent, so a capture was reachable, unlike the M8 refusal lines where the corpus made it unreachable. The transaction grants nothing, charges nothing and appends a fixed sentinel",
+    "no live phase is delivered, so the count stays at 23; a client affordance for a transaction with no consequence is the surface this capability exists to refuse",
+    "the corpus measurement covers the ten committed canonical documents only. tests/fixtures step documents and the Godot build cache are excluded by name, because a directory walk swept them into these denominators before",
+    "the reconciled explanation for the two directions of the si/gate mismatch is NOT established. Two candidates are recorded as candidates and neither is measured",
+    "the absent friend_assistable check is recorded and deliberately not enforced, so the recorded divergence from the legacy branch is a gap, not a parity claim",
+    "the 0 sentinel's meaning is a QUOTED source comment. No encoding is recovered and no element is interpreted",
+    "absence of a legacy friend writer says nothing about what the Flash client displayed, which may have been entirely client-side",
+    "the social-items recurrence measured while writing this change is deliberately NOT delivered: the owning capability counts one definition per stored ENTRY and all 26 ids are distinct, so reporting the recurrence from a capability forbidden to project those rows would assert a grouping that capability does not make",
+    "no windowed capture and no pixel-parity oracle are claimed, because nothing is rendered"
+  ]
+}
