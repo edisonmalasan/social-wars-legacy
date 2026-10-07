@@ -576,15 +576,32 @@ class ManifestTests(unittest.TestCase):
     def test_committed_manifest_prior_sections_are_byte_identical(self):
         # The merge re-serializes the whole document with sort_keys, so a
         # prior section changing would mean the working manifest drifted from
-        # its committed form for a reason other than the new section.
+        # its committed form for a reason other than this builder's section.
+        #
+        # CORRECTED, and the correction matters. This assertion previously read
+        # `set(current) - set(committed) == ["auctions"]`, comparing the working
+        # manifest against `git show HEAD:`. That form is GIT-STATE DEPENDENT: it
+        # holds only while this section is uncommitted, and once the
+        # normalization commits it can never hold again on any branch. It was
+        # therefore a test that could only pass once and would then fail forever,
+        # including on main, which is exactly what happened.
+        #
+        # The claim under test is stated in a form that is true both before and
+        # after the commit: no section is REMOVED, every section other than this
+        # builder's own is byte-identical, and this builder's own section is
+        # present. `auctions` is excluded from the byte-identity comparison
+        # because this builder owns it and is expected to have changed it.
         import subprocess
         committed = json.loads(subprocess.check_output(
             ["git", "show", "HEAD:packages/game-content/manifest.json"]
         ).decode("utf-8"))
         current = json.loads((ROOT / "packages" / "game-content"
                               / "manifest.json").read_text(encoding="utf-8"))
-        self.assertEqual(sorted(set(current) - set(committed)), ["auctions"])
-        for key in sorted(set(committed)):
+        owned = "auctions"
+        self.assertEqual(sorted(set(committed) - set(current)), [],
+                         "no committed section may be removed")
+        self.assertIn(owned, current, "this builder's own section is present")
+        for key in sorted(set(committed) - {owned}):
             self.assertEqual(current[key], committed[key], key)
 
 
