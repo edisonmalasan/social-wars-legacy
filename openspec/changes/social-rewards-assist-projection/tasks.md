@@ -171,5 +171,13 @@ be unlearned.
   counts **6, 5, 5, 4, 1, 2, 2, 1**, summing to **26**.
 - The suite grew from 401 to **495** checks, and the report from 18,352 bytes
   (`9aff8f4c...d1711`) to **21,384** bytes (`776aa8c7...10e94`).
-- The report is written in **LF form**, so its raw and LF byte counts are equal
-  (21,384 both ways) and its digest needs no form qualifier.
+- The report is written in **LF form** — the committed Git blob form — so its raw and LF byte
+  counts are equal (21,384 both ways) and its digest needs no form qualifier.
+- **Corrected at Sync, found by measurement rather than assumed.** The unqualified form of the
+  claim above — that the raw and LF byte counts are simply *equal* — is true of the committed Git
+  blob and **false of a CRLF working-tree checkout**: the blob re-read through `git cat-file` is
+  **21,384** bytes with **zero** CRLF, while the same content in the working tree measured
+  **21,981**. The figure and the digest are therefore both **blob-form** figures, and this is now
+  stated rather than left to be true-by-luck of the checkout. This is the second instance of this
+  defect class in the project; the first was PR #280, where a fixture byte-count guard passed on an
+  LF checkout and failed on a CRLF one.
