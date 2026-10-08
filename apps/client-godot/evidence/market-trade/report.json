@@ -706,15 +706,17 @@
     },
     "module_digests": {
       "comparable_to_lf_normalised_digest": true,
-      "form": "sha256 over the raw working-tree bytes. Both modules delivered by this line are pure LF (zero CRLF), so for THESE files the raw digest and the LF-normalised digest are the SAME value and either may be compared against an LF manifest. The flag below is measured from the bytes rather than asserted, so if a future edit introduced CRLF it would flip to false and the check comparing the two would fire",
+      "form": "sha256 over the raw working-tree bytes, PLUS a second sha256 over the LF-normalised form of the same bytes. Both are recorded so a reader can compare against an LF manifest whichever form their checkout produced. The flag below is MEASURED from the bytes rather than asserted, so a CRLF checkout flips it to false without anything being edited -- which is why it describes the checkout and not the delivered file, and why no check may require it to be true. `.gitattributes` pins these paths to LF so the committed blobs and their digests reproduce on any checkout.",
       "modules": {
         "market_schedule.gd": {
           "path": "apps/client-godot/scripts/market/market_schedule.gd",
-          "sha256": "1f8d8dcff87fa2b55c7b12761710a000e96cac30ff169999399ec217c52707cc"
+          "sha256": "1f8d8dcff87fa2b55c7b12761710a000e96cac30ff169999399ec217c52707cc",
+          "sha256_lf_normalised": "1f8d8dcff87fa2b55c7b12761710a000e96cac30ff169999399ec217c52707cc"
         },
         "trade_counters.gd": {
           "path": "apps/client-godot/scripts/market/trade_counters.gd",
-          "sha256": "d8e1d8521161981243951210e45498d2354da4e37974c54380d1e186143a4732"
+          "sha256": "d8e1d8521161981243951210e45498d2354da4e37974c54380d1e186143a4732",
+          "sha256_lf_normalised": "d8e1d8521161981243951210e45498d2354da4e37974c54380d1e186143a4732"
         }
       }
     }

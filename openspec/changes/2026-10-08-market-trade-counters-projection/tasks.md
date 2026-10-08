@@ -308,3 +308,94 @@ guard that does not fire are the same defect class: they all *look* like evidenc
   the clamped-store/unclamped-print asymmetry — are added to the new `## Purpose`. A delta's
   Purpose is a proposal artefact; a main spec's is what a later reader uses to judge the
   requirements, and leaving these out would make the requirements look arbitrary.
+
+## 7. Correction record — post-Sync defect fix
+
+Carried on `fix/market-trade-lf-digest-check`, its own branch and PR, per the established
+precedent (`fix/auction-manifest-section-guard`) that an Apply- or Sync-stage defect gets its
+own branch rather than being folded into the next stage's diff. §6 is left intact; nothing here
+edits a §6 entry in place.
+
+### 7.1 The defect reproduced on `main`, and the committed evidence proves it
+
+- **7.1.1 The check asserted a property of the *checkout* as a required property of the
+  *delivered bytes*.** `_check_evidence_record()` ended with `check(modules_are_pure_lf(), …)`.
+  `core.autocrlf=true` (measured) and no `.gitattributes` rule for these paths meant a default
+  Windows checkout delivers **CRLF**, so `_modules_are_pure_lf()` correctly measured `false` and
+  the suite failed. This is the **same defect class as 6.1.2**, in the opposite direction: 6.1.2
+  hard-coded `false` when the truth was `true`, and this one required `true` when the truth is
+  *whatever the checkout produced*. Both mistake a property of how the file arrived for a
+  property of what was delivered. A checkout form is never a delivery guarantee.
+- **7.1.2 The committed `boot-report.json` on `main` records the failure**, which is the strongest
+  available evidence and needed no reproduction argument: `"pass": false`, `failures: ["test_market_trade
+  exits 0 (got 1)", "test_market_trade reports PASS"]`, with the `test_market_trade` command's
+  `exit_code: 1`. The Apply-stage battery had passed on the authoring checkout; the artifact that
+  shipped recorded a red run. The fix's regenerated report carries `"pass": true`, `failures: []`,
+  `exit_code: 0` — so the diff is **load-bearing** rather than cosmetic, and it is the third
+  recorded instance of the LF/checkout-form class after 6.1.2 and the byte-count guard
+  `godot-unit-experience` fixed.
+
+### 7.2 The fix, and why it is two things rather than one
+
+- **7.2.1 The check now asserts only checkout-independent facts.** Each module carries a second
+  `sha256_lf_normalised` beside its raw `sha256`, and the assertions are: both digests present and
+  64 hex chars; the flag equals a **fresh** measurement; each module's raw and LF digests are equal
+  **iff** the flag is true; both modules took one of the two branches, so neither was skipped; and
+  **never neither** — either the checkout is pure LF, or it is CRLF and the LF-normalised digests
+  are the ones to compare. No assertion requires the flag to be `true`, because that is the claim
+  that was wrong. The equality check is **non-tautological**: the two digests are computed by
+  independent routes (`FileAccess.get_sha256` over raw bytes vs `HashingContext` over a
+  hand-assembled LF-normalised copy), so their agreement is a cross-check rather than a value
+  compared with itself.
+- **7.2.2 `.gitattributes` pins the three paths to LF** (`apps/client-godot/scripts/market/*.gd`,
+  `apps/client-godot/tests/test_market_trade.gd`, `apps/client-godot/evidence/market-trade/report.json`),
+  **+12 lines** with the rationale in the file, on the `/packages/game-content/**` precedent.
+  Measured after: `git check-attr` resolves all three to `text: set, eol: lf` under
+  `core.autocrlf=true`. This is what makes the committed report's digests **reproducible on any
+  checkout**; 7.2.1 alone would make the suite pass everywhere but leave the evidence report's
+  recorded digests differing by checkout form. Both halves are needed and they fix different things.
+- **7.2.3 The final LF-normalisation helper goes through neither String path**, so 6.2.1's parse
+  error cannot recur: `FileAccess.get_file_as_bytes` → byte loop → `HashingContext`. The
+  intermediate attempt used `FileAccess.get_file_as_string`, which is what 6.2.1 recorded; the
+  byte-level form is what shipped.
+
+### 7.3 Proof, re-measurements, and the corrected figures
+
+- **7.3.1 The suite passes on both forms**: **1005 checks, exit 0** on a pure-LF tree, and
+  **1005 checks, exit 0** on a tree where all three files were rewritten to CRLF (554 / 389 / 2592
+  CRLF pairs measured). The second run is the defect proof — it is precisely the case that failed
+  on `main` — and the files were restored to zero CRLF pairs afterwards with `git checkout --`.
+- **7.3.2 Report regenerated and re-measured**: **40,006 bytes**, **zero CRLF**, sha256
+  **`b2e2c9c6c3f7c322b87539d97dea33276515aefa30d2ed99fd1d39f8ff15348e`**, byte-identical across
+  **three** runs including one written to a different output path. Suite reports **1007** checks
+  with `--report`. The **raw module digests are unchanged** — `1f8d8dcf…` and `d8e1d852…` — so the
+  diff against the previous report is only the two added `sha256_lf_normalised` fields and the
+  corrected `form` prose. That the LF-normalised digest equals the raw one for these two modules
+  is now **recorded per module** rather than argued in prose.
+- **7.3.3 Injection probes re-run after the suite edit**: still `6, 4, 7, 27, 8, 2, 2, 3, 4`,
+  summing to **63**. **No count moved**, and this is the second re-measurement against this final
+  state — a suite edit can silently change what a probe trips.
+- **7.3.4 Batteries re-run green on the fix branch**: `verify-boot.ps1` exit `0`,
+  **230/230** assertions ok, **80** commands with **zero** non-zero exits, **23** live phases,
+  guard digest `6978b959…ff348` **identical pre/post**, port 5056 released, no working-tree
+  `saves/`, and **1,144** log files carrying zero `[test] FAIL`, `^ERROR:`, or `SCRIPT ERROR` lines;
+  `verify.ps1` exit `0` (`PASS all checks succeeded`); compat suite **`Ran 3077 tests … OK`** exit
+  `0` (unchanged — this fix touches no `apps/compat-api/**` file, established by `git status`);
+  `validate_content.py` exit `0`, `result: valid`, **23 files / 22 schemas / 604 references**;
+  `hash_manifest.py verify` **3,258 entries / 758,423,699 bytes** exit `0`;
+  `openspec validate --all --strict` **73 passed / 0 failed** (72 main specs + 1 change).
+- **7.3.5 `boot-report.json` diff inspected rather than assumed**, and it is the fix's own
+  evidence: `generated_utc`, `git_commit` (`ab886f8` → `fccb9c5`), the `test_market_trade`
+  `exit_code` `1 → 0`, its two assertions `ok: false → true`, `failures` emptied, and
+  `pass: false → true`. **Nothing else changed** — 8 insertions, 9 deletions, no `log`
+  renumbering, because the command list is unchanged.
+- **7.3.6 Two recorded flaky surfaces fired on this branch, both on suites the fix does not
+  touch, and the third run passed.** Run 1: `test_town_upgrade` crashed with a Windows access
+  violation `0xC0000005`. Run 2: `test_game_api_live.gd` reported *"the live reference instant is
+  not older than the instant it stamped"* — a **second-boundary clock race** of the same family as
+  the recorded `server_time` surfaces, where a reference instant and a server-stamped instant are
+  compared for strict inequality and both land inside one second. Neither is caused by this change
+  (`git status` shows only `.gitattributes`, `test_market_trade.gd`, and two evidence reports; the
+  modules are hermetic and make no network call). Run 3: `PASS all checks succeeded`. Recorded as
+  the **eleventh** and **twelfth** surfaces; both remain open, and per the repo's rule they are
+  re-run rather than treated as regressions.

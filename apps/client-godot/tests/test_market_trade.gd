@@ -1900,24 +1900,58 @@ static func _modules_are_pure_lf() -> bool:
 
 func _module_digests() -> Dictionary:
 	return {
-		"form": "sha256 over the raw working-tree bytes. Both modules delivered by "
-			+ "this line are pure LF (zero CRLF), so for THESE files the raw digest "
-			+ "and the LF-normalised digest are the SAME value and either may be "
-			+ "compared against an LF manifest. The flag below is measured from the "
-			+ "bytes rather than asserted, so if a future edit introduced CRLF it "
-			+ "would flip to false and the check comparing the two would fire",
+		"form": "sha256 over the raw working-tree bytes, PLUS a second sha256 over the "
+			+ "LF-normalised form of the same bytes. Both are recorded so a reader can "
+			+ "compare against an LF manifest whichever form their checkout produced. "
+			+ "The flag below is MEASURED from the bytes rather than asserted, so a CRLF "
+			+ "checkout flips it to false without anything being edited -- which is why "
+			+ "it describes the checkout and not the delivered file, and why no check may "
+			+ "require it to be true. `.gitattributes` pins these paths to LF so the "
+			+ "committed blobs and their digests reproduce on any checkout.",
 		"comparable_to_lf_normalised_digest": _modules_are_pure_lf(),
 		"modules": {
 			"trade_counters.gd": {
 				"path": MODULE_REPO_PATH,
 				"sha256": FileAccess.get_sha256(MODULE_PATH),
+				"sha256_lf_normalised": _lf_normalised_sha256(MODULE_PATH),
 			},
 			"market_schedule.gd": {
 				"path": SCHEDULE_REPO_PATH,
 				"sha256": FileAccess.get_sha256(SCHEDULE_PATH),
+				"sha256_lf_normalised": _lf_normalised_sha256(SCHEDULE_PATH),
 			},
 		},
 	}
+
+
+## sha256 over the LF-normalised form of a file's bytes, computed WITHOUT going
+## through `String`: there is no `String(PackedByteArray)` constructor on this engine
+## and `String(raw)` is a parse error rather than a runtime one, so the bytes are
+## reassembled from `get_buffer` instead. This is deliberately an INDEPENDENT
+## computation from `FileAccess.get_sha256`, because the cross-check below compares
+## the two -- a comparison of a value against itself would guard nothing.
+func _lf_normalised_sha256(path: String) -> String:
+	if not FileAccess.file_exists(path):
+		return ""
+	var buffer: PackedByteArray = FileAccess.get_file_as_bytes(path)
+	if buffer.is_empty():
+		return ""
+	var normalised := PackedByteArray()
+	var index := 0
+	while index < buffer.size():
+		if buffer[index] == 0x0D and index + 1 < buffer.size() and buffer[index + 1] == 0x0A:
+			index += 1
+		normalised.append(buffer[index])
+		index += 1
+	return _sha256_bytes(normalised)
+
+
+func _sha256_bytes(bytes: PackedByteArray) -> String:
+	# `HashingContext` is the engine's own SHA-256, so this is not a reimplementation.
+	var context := HashingContext.new()
+	context.start(HashingContext.HASH_SHA256)
+	context.update(bytes)
+	return context.finish().hex_encode()
 
 
 func _check_evidence_record() -> void:
@@ -2005,14 +2039,45 @@ func _check_evidence_record() -> void:
 		var record2: Dictionary = modules[str(label[0])]
 		check(str(record2["sha256"]).length() == 64,
 			"module `%s` carries a full sha256 digest" % str(label[0]))
+		check(str(record2["sha256_lf_normalised"]).length() == 64,
+			"module `%s` ALSO carries an LF-normalised sha256, so the digest can "
+				% str(label[0])
+				+ "be compared against an LF manifest whatever form this checkout "
+				+ "produced")
 	check_eq(bool(digests["comparable_to_lf_normalised_digest"]),
 			_modules_are_pure_lf(),
 			"the digest-comparability flag matches a fresh measurement of the "
 				+ "module bytes, so it cannot drift from the form actually hashed")
-	check(bool(digests["comparable_to_lf_normalised_digest"]),
-		"both delivered modules are pure LF, so each raw digest IS that file's "
-			+ "LF-normalised digest and either form may be compared against an "
-			+ "LF manifest")
+	# The two digests are computed by INDEPENDENT routes -- `FileAccess.get_sha256`
+	# over the raw bytes, and `HashingContext` over a hand-assembled LF-normalised
+	# copy -- so agreeing on exactly the modules the flag names is a real
+	# cross-check and not a tautology.
+	var agree_with_flag := 0
+	var disagree_with_flag := 0
+	for module_name: String in modules:
+		var entry: Dictionary = modules[module_name]
+		if str(entry["sha256"]) == str(entry["sha256_lf_normalised"]):
+			agree_with_flag += 1
+			check(bool(digests["comparable_to_lf_normalised_digest"]),
+				"module `%s` hashes identically raw and LF-normalised, which is "
+					% module_name
+					+ "exactly what the comparability flag claims for it")
+		else:
+			disagree_with_flag += 1
+			check(not bool(digests["comparable_to_lf_normalised_digest"]),
+				"module `%s` hashes DIFFERENTLY raw and LF-normalised, so this "
+					% module_name
+					+ "checkout is CRLF and the flag correctly says so -- a state "
+					+ "that is recorded, not a failure")
+	check(agree_with_flag + disagree_with_flag == 2,
+		"both modules took one of the two digest branches, so neither was skipped")
+	# The claim that is actually TRUE on every checkout, and which the earlier
+	# version of this check got wrong: the flag describes the CHECKOUT, so it may be
+	# false, but an LF manifest comparison remains possible either way because the
+	# LF-normalised digest is always recorded.
+	check(bool(digests["comparable_to_lf_normalised_digest"]) or disagree_with_flag == 2,
+		"either this checkout is pure LF, or it is CRLF and the LF-normalised "
+			+ "digests are the ones to compare -- never neither")
 
 
 # ---------------------------------------------------------------------------
