@@ -1,0 +1,935 @@
+{
+  "absence": {
+    "counter_absent_helpers": [
+      {
+        "absent_because": "the legacy branch reads both of its arguments and uses neither and moves no resource, so there is no amount and nothing to price",
+        "helper": "trade_cost"
+      },
+      {
+        "absent_because": "the cap is a branch literal, not a rule: a helper returning it would look like a limit the preserved server never applied",
+        "helper": "cap_for"
+      },
+      {
+        "absent_because": "the count's only reader is its own increment, so no branch gates on it and there is nothing to enforce",
+        "helper": "enforce_trade_limit"
+      },
+      {
+        "absent_because": "no legacy branch refuses a trade, so a predicate returning a verdict would invent one",
+        "helper": "is_trade_allowed"
+      },
+      {
+        "absent_because": "command.py:473 prints the unclamped local and the stored value stays at the cap; bounding the reported figure would correct the oracle rather than reproduce it",
+        "helper": "remaining_trades_clamped"
+      },
+      {
+        "absent_because": "no request path exists, so no trade is ever recorded by this client",
+        "helper": "next_trade_state"
+      },
+      {
+        "absent_because": "the branch grants nothing and refuses nothing; offering the action would be an affordance for a transaction with no outcome",
+        "helper": "trade"
+      },
+      {
+        "absent_because": "the committed schedule is unread everywhere, so a ratio computed from it would be an invented economy",
+        "helper": "sell_ratio"
+      },
+      {
+        "absent_because": "the day-bucket reset belongs to the engine and already runs on the load path; a second copy would be a second source of truth",
+        "helper": "reset_count_now"
+      },
+      {
+        "absent_because": "fast_forward makes the instant client-writable, so any offset this module could offer would reproduce that divergence",
+        "helper": "advance_instant"
+      },
+      {
+        "absent_because": "resource movement would arrive client-sent before the dispatcher opens, which is the pattern this capability refuses",
+        "helper": "apply_vector"
+      },
+      {
+        "absent_because": "the reset predicate is reported from both day buckets and a countdown is the affordance this line declines to build",
+        "helper": "seconds_remaining_in_day"
+      },
+      {
+        "absent_because": "nothing reads the count, so a predicate would suggest an enforcement point that does not exist",
+        "helper": "is_at_cap"
+      },
+      {
+        "absent_because": "the committed schedule is read through the registry by the second delivered module and never transcribed here",
+        "helper": "market_schedule_value"
+      }
+    ],
+    "declared_function_count": 27,
+    "declared_function_inventory": [
+      "_committed",
+      "_is_integral",
+      "_is_string",
+      "_refuse",
+      "branch_inventory",
+      "branch_remaining_after_next_trade",
+      "branch_stored_after_next_trade",
+      "cap_record",
+      "committed_rows",
+      "consumer_rule",
+      "count_refusal",
+      "day_bucket",
+      "divergence_records",
+      "instant_refusal",
+      "no_derived_record",
+      "prefix_record",
+      "project",
+      "project_counters",
+      "project_row",
+      "refusal_codes",
+      "refusal_reason",
+      "reset_predicate_holds",
+      "row_refusal"
+    ],
+    "delivered_actions": [],
+    "delivered_requests": [],
+    "delivered_routes": [],
+    "ordinal_claimed": false,
+    "ordinal_note": "four conflicting ordinals already exist in this project's delivered records over four different scopes, so none is claimed here",
+    "required_absent_helpers": [
+      "trade_cost",
+      "cap_for",
+      "enforce_trade_limit",
+      "is_trade_allowed"
+    ],
+    "reserved_stem_note": "two candidate stems are deliberately absent: bare `cap` collides with the delivered cap_record and bare `trade` with the two delivered arithmetic functions. A guard that cannot be written without colliding with the delivered code is a guard that will be relaxed later",
+    "reserved_stems": [
+      "cost",
+      "price",
+      "fee",
+      "limit",
+      "allow",
+      "enforce",
+      "economy",
+      "period",
+      "ratio",
+      "advance",
+      "schedule",
+      "reset_count"
+    ],
+    "schedule_absent_helpers": [
+      {
+        "absent_because": "the committed percentage is unread by every legacy module, so a ratio from it would be an invented price rule",
+        "helper": "sell_ratio"
+      },
+      {
+        "absent_because": "the committed amount list is unread everywhere and the branch never consults it",
+        "helper": "trade_amount_for"
+      },
+      {
+        "absent_because": "the committed period is unread and nothing evaluates it, so converting it would need a clock and a rule the oracle does not have",
+        "helper": "period_seconds"
+      },
+      {
+        "absent_because": "the committed increment bound is unread and unbound to any branch",
+        "helper": "increment_bound"
+      },
+      {
+        "absent_because": "the committed decrement bound is unread for the same reason",
+        "helper": "decrement_bound"
+      },
+      {
+        "absent_because": "the committed base-cost object is unread and maps no resource name this client can spend",
+        "helper": "base_costs_for"
+      },
+      {
+        "absent_because": "the committed row carrying the same number as the branch literal has zero consumers, so it may not become load-bearing",
+        "helper": "schedule_cap"
+      },
+      {
+        "absent_because": "no price, period, percentage or total is computed anywhere, so there is nothing to summarise",
+        "helper": "economy_summary"
+      }
+    ]
+  },
+  "arithmetic": {
+    "clamp_tokens_found_in_printed_function": [],
+    "comparison_operators_found_in_printed_function": [],
+    "day_bucket_seconds": 86400,
+    "note": "the printed figure is UNCLAMPED while the stored value is clamped, so from the twenty-first recorded trade onward the stored value parks at the cap and the printed figure is negative. This contract reproduces both and corrects neither, and the absence of a clamp is asserted mechanically",
+    "table": [
+      {
+        "count_before": 18,
+        "increment_after_next_trade": 19,
+        "remaining_after_next_trade": 1,
+        "stored_after_next_trade": 19
+      },
+      {
+        "count_before": 19,
+        "increment_after_next_trade": 20,
+        "remaining_after_next_trade": 0,
+        "stored_after_next_trade": 20
+      },
+      {
+        "count_before": 20,
+        "increment_after_next_trade": 21,
+        "remaining_after_next_trade": -1,
+        "stored_after_next_trade": 20
+      },
+      {
+        "count_before": 24,
+        "increment_after_next_trade": 25,
+        "remaining_after_next_trade": -5,
+        "stored_after_next_trade": 20
+      }
+    ]
+  },
+  "branch_partition": {
+    "branches_mentioning_trade": [
+      "trade_resource"
+    ],
+    "declared_branches": 63,
+    "distinct_branch_names": 63,
+    "first_line": 42,
+    "last_line": 951,
+    "note": "the unhandled fallthrough is an `else:` and not a branch, which is why the count is sixty-three and not sixty-four",
+    "trade_branch_index": 30,
+    "trade_branch_line": 465,
+    "unhandled_fallthrough_line": 954
+  },
+  "capability": "godot-market-trade-counters",
+  "census": {
+    "module_count": 11,
+    "modules": [
+      "auctions.py",
+      "bundle.py",
+      "command.py",
+      "constants.py",
+      "engine.py",
+      "get_game_config.py",
+      "get_player_info.py",
+      "legacy_command_recorder.py",
+      "server.py",
+      "sessions.py",
+      "version.py"
+    ],
+    "prefix_raw_substring_note": "the bare prefix DOES occur in the preserved sources, six times in constants.py, because three committed market-named identifiers and three mission identifiers embed it. A zero-consumer claim about the bare prefix is therefore false, and the claim here is about the eight whole key names under three separately measured rules",
+    "prefix_raw_substring_sites": {
+      "constants.py": [
+        236,
+        237,
+        238,
+        1001,
+        1013,
+        1021
+      ]
+    },
+    "rows": [
+      {
+        "key": "MARKET_BASE_COSTS",
+        "quoted": 0,
+        "raw": 0,
+        "token": 0,
+        "where": []
+      },
+      {
+        "key": "MARKET_MAX_NUM_TRADES",
+        "quoted": 0,
+        "raw": 0,
+        "token": 0,
+        "where": []
+      },
+      {
+        "key": "MARKET_INCREMENT",
+        "quoted": 0,
+        "raw": 0,
+        "token": 0,
+        "where": []
+      },
+      {
+        "key": "MARKET_MAX_INCREMENTS",
+        "quoted": 0,
+        "raw": 0,
+        "token": 0,
+        "where": []
+      },
+      {
+        "key": "MARKET_MAX_DECREMENTS",
+        "quoted": 0,
+        "raw": 0,
+        "token": 0,
+        "where": []
+      },
+      {
+        "key": "MARKET_SELL_PERCENTAGE",
+        "quoted": 0,
+        "raw": 0,
+        "token": 0,
+        "where": []
+      },
+      {
+        "key": "MARKET_PERIOD_HOURS",
+        "quoted": 0,
+        "raw": 0,
+        "token": 0,
+        "where": []
+      },
+      {
+        "key": "MARKET_AMOUNT_TRADE",
+        "quoted": 0,
+        "raw": 0,
+        "token": 0,
+        "where": []
+      }
+    ],
+    "totals": {
+      "quoted": 0,
+      "raw": 0,
+      "token": 0
+    }
+  },
+  "claim_limits": [
+    "this is a PROJECTION and a RECORDED DESCRIPTION. No trade is performed, no counter is cleared, no instant is moved and no resource moves anywhere in the delivered client",
+    "the cap is STORED and never ENFORCED: the count's only reader is the increment that produces it, so nothing in the preserved server ever refused, gated, limited or ranked a player on it. The projection reports that and offers no limit of its own",
+    "the printed remaining figure goes NEGATIVE from the twenty-first recorded trade onward and is reproduced unclamped. That is recorded oracle behaviour, not an endorsed product decision, and the suite asserts mechanically that no clamp is introduced",
+    "the day reset is the engine's and is NOT reimplemented here. The predicate is evaluated and both day buckets are reported; the count is written to nothing",
+    "both client-dictated behaviours are DIVERGENCES from the delivered client, not parity: the legacy branch moves no resource because it reads its arguments and uses neither, and fast_forward makes the last-trade instant client-writable, so a client could walk it back across a day boundary and clear the count",
+    "no committed price, period, percentage, amount, bound or base-cost object is derived, charged or displayed. Every one of the eight committed rows has zero consumers under three separately measured rules, and there is no committed rule to apply any of them by",
+    "the equality between the branch's cap literal and a committed row's value is recorded as a COINCIDENCE. TWO committed rows carry the number twenty, so the report names the trades row specifically rather than the number",
+    "the bare prefix DOES occur in the preserved sources, six times in constants.py. A zero-consumer claim about the bare prefix would be false; the claim here is about the eight whole key names, and the bare occurrence is reported as a correction",
+    "the prefix/substring difference is a SELECTION rule, not an assertion that the three longer identifiers are irrelevant to the game -- they are simply not rows of a market schedule",
+    "every figure about the counters is a statement about the PRESERVED server. Absence of a server-side rule says nothing about what the Flash client displayed, which may have read the cap, priced a trade or drawn a countdown entirely client-side",
+    "parity is not claimed for any arm, because no executed-legacy fixture was captured: this line adds no endpoint and mutates nothing, so there is no transaction to record",
+    "no windowed capture and no pixel-parity oracle are claimed, because nothing is rendered"
+  ],
+  "corpus": {
+    "clamp_witness": {
+      "document": "villages/Nerri.json",
+      "witnesses": "the CLAMP: the stored count is parked at exactly the branch's own cap literal, which is the value a clamped store can only produce from a count at or above the cap"
+    },
+    "document_count": 10,
+    "documents": [
+      "villages/AcidCaos.json",
+      "villages/General_Mike_30.json",
+      "villages/General_Mike_31.json",
+      "villages/Kiriakos.json",
+      "villages/Nerri.json",
+      "villages/Neutral.json",
+      "villages/Scarlet.json",
+      "villages/initial.json",
+      "tests/saves/fresh-player.json",
+      "tests/saves/fresh-player-pre-migration.json"
+    ],
+    "nonzero_instant_documents": 2,
+    "premises": [
+      "command.py:471 assigns the server clock",
+      "command.py:913 is max(0, ... - seconds) and cannot raise",
+      "command.py:906 makes `seconds` client-supplied",
+      "engine.py:240 is the only writer that assigns a literal zero",
+      "command.py:470 is a clamp and cannot yield zero from a positive count"
+    ],
+    "reset_witness": {
+      "document": "villages/Neutral.json",
+      "witnesses": "the DAY RESET: a non-zero last-trade instant beside a zero count. command.py:471 is the only writer that can raise the instant from zero and command.py:913 floors at zero, so a trade demonstrably ran; the trade branch's own write is a clamp and cannot return the count to zero, so engine.py:240 is the only writer that could have done it"
+    },
+    "rows": [
+      {
+        "day_bucket": 0,
+        "document": "villages/AcidCaos.json",
+        "numTradesDone": 0.0,
+        "timestampLastTrade": 0.0
+      },
+      {
+        "day_bucket": 0,
+        "document": "villages/General_Mike_30.json",
+        "numTradesDone": 0.0,
+        "timestampLastTrade": 0.0
+      },
+      {
+        "day_bucket": 0,
+        "document": "villages/General_Mike_31.json",
+        "numTradesDone": 0.0,
+        "timestampLastTrade": 0.0
+      },
+      {
+        "day_bucket": 0,
+        "document": "villages/Kiriakos.json",
+        "numTradesDone": 0.0,
+        "timestampLastTrade": 0.0
+      },
+      {
+        "day_bucket": 19742,
+        "document": "villages/Nerri.json",
+        "numTradesDone": 20.0,
+        "timestampLastTrade": 1705776695.0
+      },
+      {
+        "day_bucket": 19479,
+        "document": "villages/Neutral.json",
+        "numTradesDone": 0.0,
+        "timestampLastTrade": 1683054101.0
+      },
+      {
+        "day_bucket": 0,
+        "document": "villages/Scarlet.json",
+        "numTradesDone": 0.0,
+        "timestampLastTrade": 0.0
+      },
+      {
+        "day_bucket": 0,
+        "document": "villages/initial.json",
+        "numTradesDone": 0.0,
+        "timestampLastTrade": 0.0
+      },
+      {
+        "day_bucket": 0,
+        "document": "tests/saves/fresh-player.json",
+        "numTradesDone": 0.0,
+        "timestampLastTrade": 0.0
+      },
+      {
+        "day_bucket": 0,
+        "document": "tests/saves/fresh-player-pre-migration.json",
+        "numTradesDone": 0.0,
+        "timestampLastTrade": 0.0
+      }
+    ],
+    "zero_instant_documents": 8
+  },
+  "counters": {
+    "argument_liveness_note": "the second argument's name occurs TWICE on its own line, once in the assignment and once in the trailing comment, so 'read and unused' is a code-only measurement and a raw-substring count would report a phantom second use",
+    "branch": "trade_resource",
+    "branch_inventory": {
+      "arguments": [
+        {
+          "name": "resource_type",
+          "site": "command.py:466",
+          "used": false
+        },
+        {
+          "comment": "1 if sold, 2 if bought",
+          "name": "sold",
+          "site": "command.py:467",
+          "used": false
+        }
+      ],
+      "branch": "trade_resource",
+      "branch_is_the_only_raising_writer_of_the_instant": true,
+      "counter_sites": {
+        "numTradesDone": {
+          "live_consumers": 0,
+          "readers": [
+            "command.py:469"
+          ],
+          "writers": [
+            "command.py:470",
+            "engine.py:240"
+          ]
+        },
+        "timestampLastTrade": {
+          "live_consumers": 1,
+          "readers": [
+            "engine.py:238"
+          ],
+          "writers": [
+            "command.py:471",
+            "command.py:913"
+          ]
+        }
+      },
+      "effects": [
+        {
+          "effect": "read the count into the increment",
+          "is_the_only_reader": true,
+          "site": "command.py:469"
+        },
+        {
+          "effect": "store min(20, increment)",
+          "is_a_write": true,
+          "site": "command.py:470"
+        },
+        {
+          "effect": "assign the server clock to the instant",
+          "is_a_write": true,
+          "only_raising_writer": true,
+          "site": "command.py:471"
+        },
+        {
+          "clamped": false,
+          "effect": "print 20 - increment from the UNCLAMPED local",
+          "site": "command.py:473"
+        }
+      ],
+      "reads_its_arguments": false,
+      "reset": {
+        "called_from": "get_player_info.py:9, on every player-info request",
+        "helper": "engine.reset_stuff",
+        "legacy_site": "engine.py:230-240",
+        "predicate_site": "engine.py:239",
+        "read_site": "engine.py:238",
+        "reimplemented_here": false,
+        "why": "the helper already runs on the load path, so a second copy of the day boundary here would be a second source of truth for one reset",
+        "write_site": "engine.py:240"
+      },
+      "resources_moved": 0,
+      "server_clock_source": "time_now = timestamp_now() at command.py:36",
+      "site": "command.py:465-473",
+      "state_locations": {
+        "map_row_fields": [
+          "numTradesDone",
+          "timestampLastTrade"
+        ],
+        "measured_at_run_time": true,
+        "note": "the private-state argument is accepted so this record can be measured, and it contributes no field to any projected value",
+        "private_state_fields": []
+      }
+    },
+    "branches_gating_on_the_count": 0,
+    "cap_derived_from_content": false,
+    "cap_enforced": false,
+    "cap_from_branch": 20,
+    "count_sites": {
+      "command.py": [
+        469,
+        470
+      ],
+      "engine.py": [
+        240
+      ]
+    },
+    "instant_sites": {
+      "command.py": [
+        471,
+        913
+      ],
+      "engine.py": [
+        238
+      ]
+    },
+    "reads_its_arguments": false,
+    "resources_moved": 0,
+    "site": "command.py:465-473"
+  },
+  "delivered": [
+    "two read-only typed projections with no route, no action, no request, no mutation and no transport",
+    "both counters carried verbatim, with a refused field's RAW recorded value travelling untouched beside its refusal and no typed counter derived from it",
+    "the legacy day-reset predicate EVALUATED and NOT PERFORMED, with the owning helper named and both day buckets reported",
+    "the branch's own CLAMPED stored value and its UNCLAMPED printed figure, kept apart and both reproducible",
+    "the committed market schedule through the registry alone, every committed value carried verbatim with nothing derived"
+  ],
+  "divergences": [
+    {
+      "class": "client dictates the outcome",
+      "delivered_behaviour": "no resource is moved and no resource vector is sent by any delivered client code",
+      "how_movement_would_arrive": "client-sent through engine.apply_resources (engine.py:251-271), applied at command.py:40, before the dispatcher chain opens at command.py:42",
+      "id": "client_sent_resource_movement",
+      "reproduced": false,
+      "what_the_branch_does": "reads resource_type at command.py:466 and sold at command.py:467 and uses neither, so it moves NO resource"
+    },
+    {
+      "class": "client dictates the outcome",
+      "consequence": "a client can walk the instant backward across a // 86400 boundary and clear the count",
+      "delivered_behaviour": "no operation writes, decrements or offsets the instant anywhere in the delivered client",
+      "id": "client_writable_instant",
+      "reproduced": false,
+      "what_the_branch_does": "fast_forward writes command.py:913 as map[\"timestampLastTrade\"] = max(0, map[\"timestampLastTrade\"] - seconds) with seconds = args[0], a client-supplied integer assigned at command.py:906"
+    }
+  ],
+  "guard_evidence": {
+    "harness_disciplines": [
+      "the probe result is the count of `[test] FAIL` LINES, never a non-zero exit, because a parse error also exits 1 and would prove nothing about a guard",
+      "a probe failing with no `[test] FAIL` line is a harness fault, not a detection, and aborts the probe set",
+      "text is normalised to LF BEFORE mutation and re-expanded afterwards",
+      "each restore is verified by sha256 with zero NUL bytes, and the final byte is pinned to the BASELINE rather than asserted to be a newline",
+      "git diff --numstat --ignore-cr-at-eol and git status --short must equal their pre-probe values after the set"
+    ],
+    "injection_record": [
+      {
+        "contained_after_restore": true,
+        "disguise": "an invented PRICE helper: the cost of one trade, which is exactly the derived economy this line refuses. It borrows the reserved stem `cost` and is one of the four absent helpers the design names explicitly",
+        "engine_error_lines": 0,
+        "exit_code": 1,
+        "failures": 6,
+        "guard_count_note": "SIX failures from SIX distinct guards, so no guard here fires twice for one injected function",
+        "guards_that_fired": [
+          "whole_inventory_pin",
+          "declaration_count",
+          "unexpected_function",
+          "reserved_stem_cost",
+          "reserved_stem_module_scan",
+          "absent_helper_really_absent"
+        ],
+        "probe": "static func trade_cost(row: Dictionary) -> int",
+        "restore_byte_identical": true,
+        "target": "trade_counters.gd"
+      },
+      {
+        "contained_after_restore": true,
+        "disguise": "an invented CAP ACCESSOR. It borrows NO reserved stem, because bare `cap` collides with the delivered `cap_record` and bare `trade` with the two delivered arithmetic functions -- so this probe is caught by the absent-helper guard alone and proves that guard is load-bearing in its own right",
+        "engine_error_lines": 0,
+        "exit_code": 1,
+        "failures": 4,
+        "guard_count_note": "the SECOND-LOWEST count of the nine, and four is three fewer than probe one because this probe borrows no stem",
+        "guards_that_fired": [
+          "whole_inventory_pin",
+          "declaration_count",
+          "unexpected_function",
+          "absent_helper_really_absent"
+        ],
+        "probe": "static func cap_for(row: Dictionary) -> int",
+        "restore_byte_identical": true,
+        "target": "trade_counters.gd"
+      },
+      {
+        "contained_after_restore": true,
+        "disguise": "a SUFFIXED helper wearing two reserved stems as one prefix, so an exact-name check would have passed it. It is also one of the four absent helpers the design names explicitly",
+        "engine_error_lines": 0,
+        "exit_code": 1,
+        "failures": 7,
+        "guard_count_note": "SEVEN failures from SEVEN guards: this probe wears TWO stems as one prefix, so the stem guard fires once per stem plus once for the whole-module scan",
+        "guards_that_fired": [
+          "whole_inventory_pin",
+          "declaration_count",
+          "unexpected_function",
+          "reserved_stem_limit",
+          "reserved_stem_enforce",
+          "reserved_stem_module_scan",
+          "absent_helper_really_absent"
+        ],
+        "probe": "static func enforce_trade_limit(row: Dictionary) -> bool",
+        "restore_byte_identical": true,
+        "target": "trade_counters.gd"
+      },
+      {
+        "contained_after_restore": true,
+        "disguise": "the D3 CLAMP PROBE: the printed figure bounded to zero. This is the single most tempting 'fix' in the whole surface, because it makes the oracle's negative output disappear -- and it borrows no reserved word at all, so only the no-clamping census and the inventory pin can see it",
+        "engine_error_lines": 0,
+        "exit_code": 1,
+        "failures": 27,
+        "guard_count_note": "TWENTY-SEVEN failures, by far the highest of the nine, and the reason is worth recording rather than hiding: a clamp is not one guard but a family, because the printed figure's negativeness is observed at TWENTY-ONE different counts (each negative-output row names the count it broke at) and again across the 0..30 sweep, so one edit is caught at many value levels rather than once. A one-line fix that silently erased the oracle's negative output could not pass this suite",
+        "guards_that_fired": [
+          "value_level_clamp_witness",
+          "zero_to_thirty_sweep",
+          "clamp_token_census",
+          "comparison_operator_census",
+          "operator_count",
+          "single_return"
+        ],
+        "probe": "return max(0, TRADE_CAP_FROM_BRANCH - (count + 1))",
+        "restore_byte_identical": true,
+        "target": "trade_counters.gd"
+      },
+      {
+        "contained_after_restore": true,
+        "disguise": "an invented RATIO carrying a division, so it fires the operator census AND the reserved-name guard AND the absent-helper guard -- proving those three are independent",
+        "engine_error_lines": 0,
+        "exit_code": 1,
+        "failures": 8,
+        "guard_count_note": "EIGHT failures from SEVEN distinct guards, and the eighth is the same absent-helper check firing a SECOND time: `sell_ratio` is listed in BOTH modules' absent-helper sets, so the message appears once per module. The record keeps distinct guard names and reports the measured failure count separately rather than pretending the two numbers are equal",
+        "guards_that_fired": [
+          "operator_census",
+          "whole_inventory_pin",
+          "declaration_count",
+          "unexpected_function",
+          "reserved_stem_ratio",
+          "reserved_stem_module_scan",
+          "absent_helper_really_absent"
+        ],
+        "probe": "static func sell_ratio(value: float) -> float: return value / 100.0",
+        "restore_byte_identical": true,
+        "target": "market_schedule.gd"
+      },
+      {
+        "contained_after_restore": true,
+        "disguise": "a TRANSCRIBED committed key. The schedule module is required to read its rows through the registry and to name NO committed key, so the forbidden list is derived at run time -- this probe fires the run-time-derived guard, not a transcribed one",
+        "engine_error_lines": 0,
+        "exit_code": 1,
+        "failures": 2,
+        "guard_count_note": "TWO failures, and both are needed: the first is the schedule census asserting no committed MARKET key appears as a quoted literal in EITHER module, the second is the recorded-evidence check asserting the schedule module names NO committed key at all. They were verified to be genuinely independent by running `MARKET_INCREMENT` on its own, which fires only the second -- so neither is a restatement of the other",
+        "guards_that_fired": [
+          "committed_key_literal_census",
+          "run_time_derived_committed_key_check"
+        ],
+        "probe": "const LEAKED_KEY := \"MARKET_MAX_NUM_TRADES\"",
+        "restore_byte_identical": true,
+        "target": "market_schedule.gd"
+      },
+      {
+        "contained_after_restore": true,
+        "disguise": "a FOREIGN STATE KEY in its QUOTED form, which the guard matches. The same key as a bare substring could never be caught, which is the recorded construction-assist defect this line inherits and asserts rather than repeats",
+        "engine_error_lines": 0,
+        "exit_code": 1,
+        "failures": 2,
+        "guard_count_note": "TWO failures: the counter module names no `ui` literal owned by godot-unit-queues, AND the suite's own companion check that the QUOTED form is genuinely absent rather than merely unmatched",
+        "guards_that_fired": [
+          "foreign_field_quoted_census",
+          "foreign_field_bare_form_absence"
+        ],
+        "probe": "const QUEUE_KEY := \"ui\"",
+        "restore_byte_identical": true,
+        "target": "trade_counters.gd"
+      },
+      {
+        "contained_after_restore": true,
+        "disguise": "the INVENTORY-ONLY probe: it borrows no reserved stem, names no absent helper, carries no operator and no committed key, so the whole-inventory pin is the ONLY thing that can see it. This is the probe that shows the pin is the real gate and the reserved-name guard is the belt",
+        "engine_error_lines": 0,
+        "exit_code": 1,
+        "failures": 3,
+        "guard_count_note": "THREE failures, the LOWEST of the nine, and that is the point of the probe: it borrows no reserved stem, names no absent helper, carries no operator, no committed key and no foreign field, so the whole-inventory pin is the ONLY thing that can see it. Remove the pin and this probe passes",
+        "guards_that_fired": [
+          "whole_inventory_pin",
+          "declaration_count",
+          "unexpected_function"
+        ],
+        "probe": "static func zone_alpha(row: Dictionary) -> Dictionary",
+        "restore_byte_identical": true,
+        "target": "trade_counters.gd"
+      },
+      {
+        "contained_after_restore": true,
+        "disguise": "the ARITHMETIC probe: a second operator in the schedule module, which is declared to contain none. It borrows no reserved stem either, so it proves the operator census is independent of the naming guard",
+        "engine_error_lines": 0,
+        "exit_code": 1,
+        "failures": 4,
+        "guard_count_note": "FOUR failures: the operator census asserting the schedule module contains no `*` at all, plus the same three inventory guards as the pin-only probe -- one MORE than that probe, which is the measurement that the operator census is a guard in its own right and not a special case of the pin",
+        "guards_that_fired": [
+          "operator_census",
+          "whole_inventory_pin",
+          "declaration_count",
+          "unexpected_function"
+        ],
+        "probe": "static func zone_beta(value: int) -> int: return value * 2",
+        "restore_byte_identical": true,
+        "target": "market_schedule.gd"
+      }
+    ],
+    "injection_record_provenance": {
+      "digest_pairing": "module_digests below is recomputed from the delivered bytes on every run; the recorded probe results were measured against these digests",
+      "executed_by_this_suite": false,
+      "kind": "transcribed record of a prior external harness run",
+      "what_is_asserted_in_run": "the internal consistency of the record: nine probes present, each naming a target, a disguise and a recorded failure count",
+      "what_is_not_asserted_in_run": "that the guards still fire. That was established by the external harness against these exact module digests, which are recomputed on every run of this suite and recorded alongside, so a change to either module invalidates the pairing on its face",
+      "why": "this function cannot execute a probe: it holds no OS.execute, no file write, no await, and no engine call, so every exit_code, failures and engine_error_lines value below is an observation recorded at the time the probes were run, not a live result of this run"
+    },
+    "module_digests": {
+      "comparable_to_lf_normalised_digest": true,
+      "form": "sha256 over the raw working-tree bytes. Both modules delivered by this line are pure LF (zero CRLF), so for THESE files the raw digest and the LF-normalised digest are the SAME value and either may be compared against an LF manifest. The flag below is measured from the bytes rather than asserted, so if a future edit introduced CRLF it would flip to false and the check comparing the two would fire",
+      "modules": {
+        "market_schedule.gd": {
+          "path": "apps/client-godot/scripts/market/market_schedule.gd",
+          "sha256": "1f8d8dcff87fa2b55c7b12761710a000e96cac30ff169999399ec217c52707cc"
+        },
+        "trade_counters.gd": {
+          "path": "apps/client-godot/scripts/market/trade_counters.gd",
+          "sha256": "d8e1d8521161981243951210e45498d2354da4e37974c54380d1e186143a4732"
+        }
+      }
+    }
+  },
+  "kind": "read-only typed projection of the two map-row market counters and of the committed market schedule read through the normalized content registry, plus a recorded description of the legacy trade branch with nothing implemented",
+  "ownership": {
+    "foreign_field_match_form": "the QUOTED LITERAL only; a bare substring match for a two-character key self-trips on ordinary English inside the delivered modules and could never fail",
+    "foreign_fields": [
+      {
+        "keys": [
+          "nu",
+          "ts",
+          "ui"
+        ],
+        "owner": "godot-unit-queues"
+      },
+      {
+        "keys": [
+          "si"
+        ],
+        "owner": "godot-construction-assist"
+      },
+      {
+        "keys": [
+          "weeklyRewardIndex",
+          "bonusNextId",
+          "timeStampMondayBonus",
+          "timestampLastBonus",
+          "weekly_reward",
+          "win_daily_bonus"
+        ],
+        "owner": "godot-rewards"
+      }
+    ],
+    "owners": [
+      {
+        "capability": "godot-unit-queues",
+        "needles": [
+          "KEY_COUNT",
+          "queue_keys()",
+          "atom-fusion speedup is recorded without a cost or a timer"
+        ],
+        "path": "tests/test_unit_queues.gd"
+      },
+      {
+        "capability": "godot-construction-assist",
+        "needles": [
+          "assist_key()",
+          "the recorded attribute-bag key"
+        ],
+        "path": "tests/test_construction_assist.gd"
+      },
+      {
+        "capability": "godot-rewards",
+        "needles": [
+          "weeklyRewardIndex",
+          "DAILY_BRANCH_FIRST",
+          "WEEKLY_BRANCH_FIRST",
+          "The weekly bound and both successors are RE-DERIVED"
+        ],
+        "path": "tests/test_rewards.gd"
+      },
+      {
+        "capability": "godot-darts",
+        "needles": [
+          "the projection delivers the six darts fields",
+          "plus the two handed ones"
+        ],
+        "path": "tests/test_darts.gd"
+      },
+      {
+        "capability": "globals-tuning-normalization",
+        "needles": [
+          "\"globals\": 105"
+        ],
+        "path": "tests/test_content_registry.gd"
+      }
+    ]
+  },
+  "remeasured_figures": [
+    "the eleven legacy root modules, declared as a closed set",
+    "the dispatcher's 63 named branches and their line span",
+    "the writer and reader sites of both counters",
+    "the eight committed rows and the three substring-only rows",
+    "the three-rule consumer census over all eight committed keys",
+    "the six bare-prefix occurrences in constants.py",
+    "both counters in all ten corpus documents",
+    "every cited legacy site, checked as a measurement"
+  ],
+  "reset": {
+    "called_from": "get_player_info.py:9, on every player-info request",
+    "helper": "engine.reset_stuff",
+    "legacy_site": "engine.py:230-240",
+    "predicate_site": "engine.py:239",
+    "read_site": "engine.py:238",
+    "reimplemented_here": false,
+    "why": "the helper already runs on the load path, so a second copy of the day boundary here would be a second source of truth for one reset",
+    "write_site": "engine.py:240"
+  },
+  "schedule": {
+    "cap_coincidence": {
+      "cap_from_branch": 20,
+      "coincident_key": "MARKET_MAX_NUM_TRADES",
+      "coincident_value": 20.0,
+      "derived": false,
+      "rows_carrying_the_same_number": [
+        "MARKET_MAX_NUM_TRADES",
+        "MARKET_PERIOD_HOURS"
+      ],
+      "why": "the coincident row has zero legacy consumers, so deriving a load-bearing cap from it would make an unread constant read. The equality is recorded as a coincidence, TWO committed rows carry the number twenty, and the delivered modules name no committed key at all"
+    },
+    "committed_file": "packages/game-content/normalized/globals.json",
+    "consumer_rule": {
+      "measured_by": "test_market_trade.gd",
+      "measured_by_delivered_module": false,
+      "modules_required": "all eleven legacy root modules; a consumer count over a subset is not a consumer count",
+      "raw_substring_is_not_the_rule": "the preserved server touches state through quoted keys, and a raw substring count also matches longer identifiers that embed the same word, so three measures are reported and the quoted-access one is the rule",
+      "rows_with_a_consumer_expected": 0,
+      "rule": "how many legacy occurrences of the committed key name, counted the way this codebase touches state",
+      "rule_id": "quoted-access over every legacy module"
+    },
+    "content_domain": "globals",
+    "globals_rows": 105,
+    "no_derived_record": {
+      "arithmetic_in_this_file": "none: no multiplication, no division and no remainder appear anywhere in it",
+      "derived_value_count": 0,
+      "derived_values": [],
+      "not_derived": [
+        "price",
+        "cost",
+        "fee",
+        "total",
+        "period",
+        "percentage",
+        "ratio",
+        "increment bound",
+        "decrement bound",
+        "trade cap",
+        "revenue"
+      ],
+      "why": "every committed value on this surface has zero legacy consumers, so there is no committed rule to apply any of them by, and an economy derived from unread content would be an invention"
+    },
+    "prefix_rows": 8,
+    "rows": [
+      {
+        "key": "MARKET_BASE_COSTS",
+        "source_file": "config/main.json",
+        "value": {
+          "o": 100.0,
+          "s": 150.0,
+          "w": 100.0
+        },
+        "value_type": "object"
+      },
+      {
+        "key": "MARKET_MAX_NUM_TRADES",
+        "source_file": "config/main.json",
+        "value": 20.0,
+        "value_type": "integer"
+      },
+      {
+        "key": "MARKET_INCREMENT",
+        "source_file": "config/main.json",
+        "value": 0.02,
+        "value_type": "number"
+      },
+      {
+        "key": "MARKET_MAX_INCREMENTS",
+        "source_file": "config/main.json",
+        "value": 200.0,
+        "value_type": "integer"
+      },
+      {
+        "key": "MARKET_MAX_DECREMENTS",
+        "source_file": "config/main.json",
+        "value": 25.0,
+        "value_type": "integer"
+      },
+      {
+        "key": "MARKET_SELL_PERCENTAGE",
+        "source_file": "config/main.json",
+        "value": 0.75,
+        "value_type": "number"
+      },
+      {
+        "key": "MARKET_PERIOD_HOURS",
+        "source_file": "config/main.json",
+        "value": 20.0,
+        "value_type": "integer"
+      },
+      {
+        "key": "MARKET_AMOUNT_TRADE",
+        "source_file": "config/main.json",
+        "value": [
+          100.0,
+          200.0,
+          300.0
+        ],
+        "value_type": "array"
+      }
+    ],
+    "selection": {
+      "rows_a_substring_rule_would_also_select": 11,
+      "rows_selected_by_this_rule": 8,
+      "rule": "a committed row belongs to this schedule only when its key BEGINS with the market prefix",
+      "selection_is": "prefix-anchored, never substring",
+      "substring_direction_measured_every_run_by": "test_market_trade.gd",
+      "why": "the committed table also carries rows that embed the same word inside a longer identifier, so a substring rule would select them as market-schedule rows and they are not"
+    },
+    "substring_only_keys": [
+      "ALLIES_MARKET_INCREMENTAL_COLLECT",
+      "ALLIES_MARKET_INITIAL_COLLECT",
+      "ALLIES_MARKET_TROLLS"
+    ],
+    "substring_only_rows": 3
+  },
+  "schema": "market-trade-report-v1"
+}
