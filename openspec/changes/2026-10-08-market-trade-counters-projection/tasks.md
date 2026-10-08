@@ -190,11 +190,22 @@ may edit `proposal.md`, `design.md`, `specs/`, or `tasks.md`.
 
 ## 5. Archive
 
-- [ ] 5.1 Confirm the roadmap `Project Status` block records this line and that M11's exit
-      criterion can now be assessed. **Root orchestrator only.**
-- [ ] 5.2 Sync the new capability into `openspec/specs/godot-market-trade-counters/spec.md`.
+- [x] 5.1 Confirm the roadmap `Project Status` block records this line and that M11's exit
+      criterion can now be assessed. **Root orchestrator only.** Done: thirteen ledger entries
+      added to `docs/DEVELOPMENT_ROADMAP.md`, each inserted **above** the entry it supersedes
+      and that entry retitled in place to the repository's established
+      *before this entry, retained in full* form. Nothing was deleted. The verdict recorded is
+      that **M11's exit criterion is MET** — every relevant system this oracle can see is now
+      classified, four are projected, and the rest are refused with the reason measured — with
+      the explicit note that this is a **different verdict from M10's** *unsatisfiable from this
+      oracle* and that the two must not be conflated.
+- [x] 5.2 Sync the new capability into `openspec/specs/godot-market-trade-counters/spec.md`.
       **No existing spec is amended** — the single existing mention,
-      `godot-building-resources/spec.md:119`, is an out-of-scope note this line satisfies.
+      `godot-building-resources/spec.md:119`, is an out-of-scope note this line satisfies. Done:
+      created at **7 requirements / 20 scenarios**, with the requirement-and-scenario body
+      **byte-identical** to the delta's (verified by comparing from the first
+      `### Requirement:` heading onward), and `openspec validate --all --strict` reporting
+      **73 passed / 0 failed = 72 main specs plus 1 change**.
 - [ ] 5.3 Archive as `2026-10-08-market-trade-counters-projection` on
       `chore/archive-market-trade-counters`, **merge commit**, branch deleted, back to updated
       `main`.
@@ -278,3 +289,22 @@ guard that does not fire are the same defect class: they all *look* like evidenc
 - **6.4.4** A verifier predicted **26** log renumberings; measured **25**. Off by one, no effect
   on the conclusion — recorded because a predicted figure that differs from the measured one is
   a claim that was never a measurement.
+
+### 6.5 Correction from the Sync stage
+
+- **6.5.1 The delta is not the same shape as a main spec, and a mechanical conversion loses
+  exactly that.** Converting the delta by dropping its `## ADDED Requirements` wrapper also
+  dropped the `## Requirements` header the main-spec schema **requires**, so
+  `openspec validate godot-market-trade-counters --strict` failed with *"Spec must have a
+  Requirements section."* Caught by strict validation rather than by reading the file, which is
+  the argument for running the strict gate on a **converted** artifact and not only on a
+  hand-written one.
+- **6.5.2 `openspec validate --all --strict` totals 73 after Sync, against 72 during the
+  change** — the composition is the claim, not the total: **72 main specs plus 1 change** now,
+  **71 plus 1** during, and **72 plus 0** once archived. Sync converts a change into a main spec
+  and Archive then removes the change, so **the total alone never says which stage is done.**
+- **6.5.3 One Sync edit deliberately goes beyond the delta.** The measured findings that shape
+  every requirement — the **8-of-10** corpus figure, the branch literal and its coincidence, and
+  the clamped-store/unclamped-print asymmetry — are added to the new `## Purpose`. A delta's
+  Purpose is a proposal artefact; a main spec's is what a later reader uses to judge the
+  requirements, and leaving these out would make the requirements look arbitrary.

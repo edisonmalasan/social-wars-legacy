@@ -1,12 +1,12 @@
 {
     "schema":  "godot-compatibility-boot/verify-boot-v1",
-    "generated_utc":  "2026-10-08T00:09:05Z",
+    "generated_utc":  "2026-10-08T00:29:05Z",
     "environment":  {
                         "engine_executable":  "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
                         "engine_version":  "4.7.2.stable.official.ed1daf0bf",
                         "python_executable":  "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
                         "python_version":  "3.9.13",
-                        "git_commit":  "9094dbe70d9a5682efafecada6c5161a987ce9f3",
+                        "git_commit":  "ab886f88f4f1e9395bfe2bbcd44b9e69054c7896",
                         "display_session":  false,
                         "network":  "loopback only (127.0.0.1)"
                     },
@@ -902,7 +902,7 @@
                                          "--",
                                          "--gameapi-endpoint=http://127.0.0.1:5057"
                                      ],
-                         "exit_code":  0,
+                         "exit_code":  1,
                          "timed_out":  false,
                          "log":  "apps/client-godot/.godot/verify-boot/55-test_market_trade.out.txt"
                      },
@@ -1964,12 +1964,12 @@
                            "ok":  true
                        },
                        {
-                           "name":  "test_market_trade exits 0 (got 0)",
-                           "ok":  true
+                           "name":  "test_market_trade exits 0 (got 1)",
+                           "ok":  false
                        },
                        {
                            "name":  "test_market_trade reports PASS",
-                           "ok":  true
+                           "ok":  false
                        },
                        {
                            "name":  "unreachable scenario exits 0 (got 0)",
@@ -2458,9 +2458,10 @@
                   "identical":  true
               },
     "failures":  [
-
+                     "test_market_trade exits 0 (got 1)",
+                     "test_market_trade reports PASS"
                  ],
-    "pass":  true,
+    "pass":  false,
     "claim_limits":  [
                          "read-only bootstrap parity for the fresh-save corpus",
                          "not gameplay parity",
