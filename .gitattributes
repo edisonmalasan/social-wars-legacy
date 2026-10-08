@@ -5,3 +5,15 @@
 /packages/game-content/** text eol=lf
 /tools/asset-registry/asset_ids.json text eol=lf
 /tools/asset-registry/coverage.json text eol=lf
+# Added by the market-trade-counters fix (2026-10-08). The delivered modules, their
+# suite, and their evidence report are hashed into `evidence/market-trade/report.json`
+# over RAW working-tree bytes, so a CRLF checkout would both flip the recorded
+# `comparable_to_lf_normalised_digest` flag and change the recorded digests -- making
+# the committed evidence report unreproducible on a default Windows checkout
+# (`core.autocrlf=true`), which is the same defect class as the LF-byte-count guard
+# `godot-unit-experience` fixed. Pinned LF, on the `/packages/game-content/**` precedent.
+# The delivered modules are pure LF in the committed blobs, so this records the intended
+# form rather than rewriting one.
+apps/client-godot/scripts/market/*.gd text eol=lf
+apps/client-godot/tests/test_market_trade.gd text eol=lf
+apps/client-godot/evidence/market-trade/report.json text eol=lf
