@@ -156,7 +156,13 @@ const RESOURCE_TOKENS := ["gold", "coins", "cash", "wood", "steel", "oil",
 ## The recorded registered counts, asserted against the battery's own source so
 ## a silent edit to either array fails here rather than only at the end of a
 ## five-minute run.
-const RECORDED_HERMETIC_COUNT := 49
+## AMENDED by `market-trade-counters-projection` (2026-10-08): 49 -> 50.
+## This pin is the battery's only registration count and it is load-bearing: adding a
+## hermetic suite fails it until the incoming line acknowledges the move. That is the
+## intended behaviour, so it is amended rather than relaxed. `test_market_trade` was
+## added at 50 and deliberately does NOT add a second pin of its own, so the next line
+## meets this one constant and not two.
+const RECORDED_HERMETIC_COUNT := 50
 const RECORDED_LIVE_PHASE_COUNT := 23
 
 var _module_source := ""

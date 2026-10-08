@@ -248,6 +248,10 @@ const ALLOWED := [
 	"scripts/events/auction_oracle.gd",
 	"tests/test_auction_schedule.gd",
 	"evidence/auction-schedule/report.json",
+	"scripts/market/trade_counters.gd",
+	"scripts/market/market_schedule.gd",
+	"tests/test_market_trade.gd",
+	"evidence/market-trade/report.json",
 ]
 
 ## The exact scene set the project may declare (set equality below).
