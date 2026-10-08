@@ -2510,6 +2510,120 @@ rule the oracle does not have and the corpus's only recorded element is an integ
 displayed**, which may have been entirely client-side. No Flash, Ruffle, ActionScript,
 or browser executes in any of these commands, and **no network is used at all**.
 
+Verified market-trade-counter commands (milestone M11 line 5; Godot 4.7.2.stable, Windows x64;
+`python` denotes the pinned interpreter, never the PATH alias). M11's deliver list is `friends`,
+`visits`, `scores`, `social rewards`, `legacy event systems`, and `special mechanics`; this is
+the **fifth** line, `special mechanics`, and the binding investigation is
+`docs/legacy-m11-special-mechanics.md` (PR #337, merge `1c8786b`). **The promoted surface is the
+market/trade counters, and the investigation's own rank #1 was displaced** — the atom-fusion
+queue is already owned by `godot-unit-queues` under that line's archived decision D6, so
+promoting it a second time would have produced two owners of one surface:
+
+```bash
+godot --headless --path apps/client-godot --script res://tests/test_market_trade.gd
+godot --headless --path apps/client-godot --script res://tests/test_market_trade.gd -- --report=<repo>/apps/client-godot/evidence/market-trade/report.json
+godot --headless --path apps/client-godot --script res://tests/test_auction_schedule.gd
+godot --headless --path apps/client-godot --script res://tests/test_project_scope.gd
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+python -B packages/game-content/tools/validate_content.py
+python -B tools/hash-manifest/hash_manifest.py verify
+openspec validate --all --strict
+```
+
+Purposes and observed results (2026-10-08): the hermetic market-trade suite (the **50th**
+registered hermetic suite) over two delivered read-only modules and one evidence report;
+`test_auction_schedule.gd` re-run after its `RECORDED_HERMETIC_COUNT` pin was amended **49 → 50**
+— the established pattern, since a count pin the incoming line *legitimately* moves is amended in
+place, where an already-archived line's **behavioural** assertion is not — while
+`RECORDED_LIVE_PHASE_COUNT := 23` was deliberately left alone, this line delivering no live phase;
+`verify.ps1` exit 0; `verify-boot.ps1` exit 0, **50 hermetic suites** (was 49), **23 live phases
+UNCHANGED**, **230 assertions** (was 228), guard digest `6978b959…ff348` **identical before and
+after**, and **1,144** log files inspected carrying zero `[test] FAIL`, `^ERROR:`, or
+`SCRIPT ERROR` lines; the **unchanged** compat suite (observed `Ran 3077 tests … OK`, exit 0 — a
+*verified re-run baseline*, because this line adds no endpoint and touches `apps/compat-api/**`
+not at all); the content validator (exit 0, `result: valid` — **23 files / 22 schemas / 604
+references**); the preservation manifest (**3,258 entries**, 758,423,699 bytes, exit 0); and
+`openspec validate --all --strict` (**72 passed / 0 failed** — the composition is **71 main specs
+plus 1 change** during the change and **72 main specs plus 0 changes** after Sync, so the total
+alone never says which stage is done). Evidence is the deterministic `market-trade-report-v1`
+report under `apps/client-godot/evidence/market-trade/` (sha256 `84827dd5…`, **39,636 bytes**,
+byte-identical across **three** consecutive runs including one to a different output path).
+`apps/client-godot/evidence/boot/boot-report.json` was **regenerated** and its diff **inspected
+rather than assumed**: 79 → 80 entries, exactly one added (`test_market_trade`), nothing removed,
+order preserved, and on the **25** retained entries **only the `log` field changed**.
+
+**The corpus measurement is what shapes every claim limit: 8 of 10** committed save documents
+record `timestampLastTrade == 0`, for which the reset predicate `now // 86400 != last_trade //
+86400` is **unconditionally true** and the count is cleared on every load — so the cap is
+reachable in the committed corpus in **`Nerri.json` only**. That is why the neutral-instant
+inference was *proved* rather than assumed: `command.py:471` is the **only** site that can raise
+the instant (`command.py:913` subtracts a **client-supplied** `seconds` and floors at zero), so a
+non-zero instant proves a trade actually ran. **The cap is the branch literal `20` at
+`command.py:470`, never derived from `MARKET_MAX_NUM_TRADES`** — and their equality is recorded
+as a **coincidence**, since that committed constant has zero consumers. **The unclamped print is
+reproduced, not corrected**: the remaining-trades figure goes negative from the 21st trade
+onward, delivered as a separately labelled field from the stored count so the divergence at
+`command.py:473` is visible rather than silent. The **reset predicate is reported, never
+performed**, and `engine.reset_stuff` is referenced as its owner rather than reimplemented.
+`market_schedule.gd` reads the **8** committed `MARKET_*` rows through an **injected** content
+registry, never transcribed, and contains **no** multiplication or division over a projected
+value, so the no-derivation claim is mechanically true. `DELIVERED_ROUTES`, `DELIVERED_ACTIONS`,
+and `DELIVERED_REQUESTS` are empty arrays: this line adds **no route**.
+
+**All nine injection probes were re-measured against the FINAL delivered state** — after the two
+edits below — because a later edit can silently restore or remove guard coverage, so a count
+measured mid-change does not describe the shipped bytes. Measured failures `6, 4, 7, 27, 8, 2,
+2, 3, 4`, summing to the recorded **63**, **no count moved**; every probe exited `1` with
+**zero** engine error lines, every restore was verified by sha256 against the pre-probe bytes,
+and `git diff --numstat --ignore-cr-at-eol` plus `git status --short` equalled their pre-probe
+values. Probe 4 (the clamp) is by far the highest at **27** because a clamp is not one guard but a
+family: the negative-output figure is observed at **21** different counts and again across the
+0..30 sweep. Probes 2 and 8 are the informative pair — both borrow no reserved stem, and the
+difference between them (**4** vs **3**) is the measurement that the inventory pin is the real
+gate and the reserved-stem guard the belt. The harness re-asserts the three recorded
+construction-assist defects rather than assuming them: **LF normalisation before mutation**,
+an **abort** when a probe reports zero `[test] FAIL` lines (a parse-error detection proves nothing
+about a guard), and restore verified by digest with **no universal trailing-newline rule**, and
+it runs the **baseline suite clean first** and aborts otherwise.
+
+**Three defects of this line's own work were found and fixed by measurement, and one disclosure
+was added.** (1) The report's `comparable_to_lf_normalised_digest` flag was **hard-coded `false`
+and was wrong**: its justification was a true statement about the *checkout* attached to a field
+named for the *files*, and both delivered modules are pure LF, so each raw digest **is** its
+LF-normalised digest — now measured by `_modules_are_pure_lf()`; three sibling reports carry the
+field as `false` and there it is correct, since those were CRLF files, and copying a field *and its
+value* across file forms is how a guard becomes a lie. (2) `String(PackedByteArray)` **does not
+exist** on this engine — `String(raw)` is a **parse** error, so it surfaced as an unparseable
+suite rather than a failing check; `FileAccess.get_file_as_string` replaced it. (3) The purity
+check asserted `sha(bytes) == bytes`, comparing a hex digest to un-hashed bytes, so `all(...)`
+printed `False` on two pure-LF files and would have led a reader to "fix" a correct file.
+Separately, `_injection_record()` was **disclosing itself as live evidence**: it is a transcribed
+table of a prior external harness run, and `INJECTION_PROVENANCE` now says the suite cannot
+execute a probe (no `OS.execute`, no file write, no `await`, no engine call) and distinguishes what
+the block asserts in run from what it does not — asserted, so it cannot be dropped by an edit that
+leaves the table intact.
+
+Claim limits: **no route, no live phase, no executed-legacy fixture, and no compat-API change** —
+all four decisions with measured reasons (design D1, D7), the fixture refusal being both a
+property of the corpus (8 of 10 documents) and a refusal to license a round trip this line does
+not deliver; **no enforcement**, because `numTradesDone`'s only reader is its own increment at
+`command.py:469`; **no price, period, percentage, or increment bound**, and **no resource
+movement**; **two divergences are recorded, not reproduced** — client-sent resource movement
+arriving via `engine.apply_resources` before the dispatcher opens at `command.py:42`, and the
+client-writable instant; **`Nerri.json` is one data point**, with no claim of parity for any other
+document and none that any player ever hit the cap twice; **no ordinal** is claimed for the
+zero-consumer count, four conflicting ordinals already existing over four different scopes; and
+**absence of a server rule says nothing about the Flash client**, which may have displayed, gated,
+or hid a market entirely client-side. **Recorded but not delivered here:** the atom-fusion
+**powerup purchase** (`buy_powerups` is a `# TODO` with a committed six-row ladder and zero
+consumers), `first_time_marketplace`, `rt_open_graph_unit`, and the **24-declaration**
+`SPELL_*`/`TECH_*` gap beside `godot-mission-vocabulary`. **Recorded but not fixed:** five sibling
+suites lack `--report=` absolute-path resolution — archived lines, so the honest fix belongs to
+whoever owns them. No Flash, Ruffle, ActionScript, or browser executes in any of these commands,
+and **no network is used at all**.
+
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 
