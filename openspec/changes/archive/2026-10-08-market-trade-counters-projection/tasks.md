@@ -206,9 +206,21 @@ may edit `proposal.md`, `design.md`, `specs/`, or `tasks.md`.
       **byte-identical** to the delta's (verified by comparing from the first
       `### Requirement:` heading onward), and `openspec validate --all --strict` reporting
       **73 passed / 0 failed = 72 main specs plus 1 change**.
-- [ ] 5.3 Archive as `2026-10-08-market-trade-counters-projection` on
+- [x] 5.3 Archive as `2026-10-08-market-trade-counters-projection` on
       `chore/archive-market-trade-counters`, **merge commit**, branch deleted, back to updated
-      `main`.
+      `main`. Done. **Ordering was not incidental:** the post-Sync LF defect fix (PR #341,
+      `4b214dc`) was merged **before** Archive began, because Archive moves this change's
+      artifacts out of `openspec/changes/` and a defect belonging to that change belongs ahead
+      of it rather than inside its archive commit — folding it in would have put a red-to-green
+      change to the suite inside a stage whose diff should be a pure rename plus ledger text.
+      All five artifacts moved with `git mv` and `git status` confirms **pure renames** — every
+      entry an `R` with **no** content modification, so the archived bytes are the merged bytes.
+      `openspec validate --all --strict` reports **72 passed / 0 failed = 72 main specs plus 0
+      changes** on the archive branch's tree, against Sync's **73 = 72 plus 1**: Archive removes
+      the change, and the total falls by exactly one, so **the composition is what distinguishes
+      the two stages**. (The first draft of this note claimed the total stayed at 73 and that the
+      archive tree carried "72 main specs plus 0 changes" — internally inconsistent, because 72
+      plus 0 is 72 and not 73. Measured, not assumed, and corrected here rather than shipped.)
 
 ---
 
