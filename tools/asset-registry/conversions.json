@@ -1,6 +1,6 @@
 {
   "counts": {
-    "output_bytes": 396434,
+    "output_bytes": 396417,
     "packages": 2
   },
   "inputs": {
@@ -24,8 +24,8 @@
       "bitmaps": 56,
       "directory": "assets/converted/units/10033_wild_elephant",
       "legacy_id": "10033_wild_elephant",
-      "output_bytes": 384701,
-      "package_sha256": "aa3f28cf8cc162143381a7390490b72f50aa68733cdd2ba2f9a5eb96d315d19c",
+      "output_bytes": 384684,
+      "package_sha256": "a40cc37691b662a123b99205156f73005ee3dc1d4cfbf35b12cce52d2f10b16b",
       "policy": "unit-conversion-v1"
     }
   ],

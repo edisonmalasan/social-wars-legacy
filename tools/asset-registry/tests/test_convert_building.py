@@ -26,7 +26,14 @@ def tag(code, payload):
 
 
 def rect_bytes(xmax_twips, ymax_twips):
-    nbits = max(xmax_twips.bit_length(), ymax_twips.bit_length(), 1)
+    # RECT coordinates are signed (SB) bit fields, so `Nbits` must be wide
+    # enough to hold every value as a signed field. Sizing it from the
+    # *unsigned* bit length produced fixtures whose declared field could not
+    # represent their own values -- rect_bytes(200, 100) declared 8 bits
+    # against a sign bit of 128 -- which only parsed because the converter
+    # read the fields unsigned. One extra bit makes them representable and
+    # leaves every expected value below unchanged.
+    nbits = max(xmax_twips.bit_length(), ymax_twips.bit_length(), 1) + 1
     bits = []
     for field in (0, xmax_twips, 0, ymax_twips):
         bits.append(format(field, "0%db" % nbits))

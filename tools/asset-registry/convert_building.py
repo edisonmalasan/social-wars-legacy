@@ -254,15 +254,41 @@ class BitReader:
         self.position = ((self.position + 7) // 8) * 8
 
 
+def sign_extend_bits(value, nbits):
+    """Decode one `SB` bit field, which `BitReader.read_bits` cannot express.
+
+    RECT coordinates are signed in the SWF format, so a field whose sign bit
+    within `nbits` is set carries a negative value. The correction is applied
+    per field and is deliberately NOT a uniform shift over the four
+    coordinates: only the fields whose own sign bit is set are adjusted, and
+    that is what reorders them relative to an unsigned reading.
+    """
+    if nbits <= 0:
+        return value
+    sign = 1 << (nbits - 1)
+    if value & sign:
+        return value - (1 << nbits)
+    return value
+
+
 def parse_rect_bits(reader, label):
     """Parse a RECT into (xmin, xmax, ymin, ymax) twips plus pixel size."""
     nbits = reader.read_bits(5, label)
     if nbits > 31:
         raise ValidationFailure(["rect nbits out of range at " + label])
-    xmin = reader.read_bits(nbits, label)
-    xmax = reader.read_bits(nbits, label)
-    ymin = reader.read_bits(nbits, label)
-    ymax = reader.read_bits(nbits, label)
+    xmin = sign_extend_bits(reader.read_bits(nbits, label), nbits)
+    xmax = sign_extend_bits(reader.read_bits(nbits, label), nbits)
+    ymin = sign_extend_bits(reader.read_bits(nbits, label), nbits)
+    ymax = sign_extend_bits(reader.read_bits(nbits, label), nbits)
+    if xmax < xmin or ymax < ymin:
+        raise ValidationFailure([
+            "inverted rect at " + label + ": xmin " + str(xmin)
+            + " xmax " + str(xmax) + " ymin " + str(ymin)
+            + " ymax " + str(ymax)])
+    # `width_px`/`height_px` are measured from the origin, not the far edge,
+    # so a shape that genuinely extends left of or above the origin has an
+    # origin-relative size of zero. That clamp is legitimate here precisely
+    # because an inverted rectangle is refused above instead of absorbed.
     return {"xmin": xmin, "xmax": xmax, "ymin": ymin, "ymax": ymax,
             "width_px": max(0, xmax // 20), "height_px": max(0, ymax // 20)}
 
@@ -411,7 +437,7 @@ def parse_shape_with_style(payload, tag, shape_id, label, collect_refs=False):
     actual_id = struct.unpack("<H", reader.read_bytes(2, label))[0]
     if actual_id != shape_id:
         raise ValidationFailure(["shape id mismatch at " + label])
-    bounds = parse_rect_bits(reader, label)
+    bounds = parse_rect_bits(reader, label + " tag " + str(tag))
     reader.align_to_byte()
     fills, lines = parse_style_arrays(reader, rgba, label)
     fill_bits = reader.read_bits(4, label)

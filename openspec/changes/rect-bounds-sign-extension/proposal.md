@@ -100,6 +100,14 @@ the full 81 tests green **with not one expectation value changed**.
   `tools/asset-registry/tests/test_convert_unit.py` — the `rect_bytes` fixture encoder only.
 - **Generated output**: `assets/converted/units/10033_wild_elephant/package.json` (19 of 28 shapes'
   `xmin`/`ymin`).
+- **Derived manifests**: `tools/asset-registry/conversions.json` (the elephant's `output_bytes`
+  384701 → 384684 and its `package_sha256`, plus the aggregate `counts.output_bytes`), and — as a
+  consequence of that — `tools/asset-registry/asset_ids.json`, which hashes `conversions.json` as a
+  recorded input. **Added during Apply:** the original Impact list omitted `asset_ids.json` and no
+  task covered regenerating it, so the full `tools/asset-registry/tests` discovery failed on
+  `test_build_asset_ids.RebuildDeterminismTests.test_rebuild_matches_committed_bytes` until it was
+  regenerated. Its diff is **one** input digest (`conversions.json`), with every other recorded input
+  and every count unchanged. `statuses.json` did not change.
 - **Capabilities**: `first-building-conversion`, `first-unit-conversion` (both modified).
 - **Unaffected**: `legacy-manifest.json` does not cover `assets/converted`, so the 3258-entry
   preservation manifest is unaffected. No SWF, save, config, village, or legacy source byte changes.
