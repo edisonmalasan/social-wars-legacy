@@ -741,7 +741,14 @@ parsers reject, not a claim about the SWF format: the causes are separately
 - Never imports a legacy application module, never uses
   subprocess/network/server/browser/Flash, never invokes a Flash runtime.
 - Writes converter output **only** beneath an explicitly required `--out-root`,
-  one directory per target, and refuses the repository root as that root.
+  one directory per target, and refuses an output root that is the repository
+  root **or lies beneath it**. The refusal is decided before anything is
+  created, so a refused root is not left behind. Containment is judged by
+  resolved path, so a sibling directory whose name merely starts with the
+  repository's is accepted. (The guard was widened from an equality test to a
+  containment test after verification found the original accepted an output
+  root one level down, which `evaluate()` would then have filled with
+  `<out-root>/<domain>/<stem>` inside the working copy.)
   Never writes `conversions.json`, `statuses.json`, or any converted package
   directory of the repository.
 - Writes `target_census.json` only on success. No bytecode (`-B` recommended),

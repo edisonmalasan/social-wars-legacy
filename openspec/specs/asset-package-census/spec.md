@@ -60,16 +60,29 @@ boundary is invented to fit a target that fails for two reasons.
 ### Requirement: The census is contained and preserves every input
 
 The census tool SHALL write only beneath an explicit output root and SHALL require one, never
-defaulting to the repository root. It SHALL NOT modify any sprite, extracted bitmap, inspection or
-extraction manifest, normalized content file, save, config, or village, and SHALL NOT write into
-`conversions.json`, `statuses.json`, or any converted package directory. It SHALL NOT use Flash, a
-browser, the network, a server, or a subprocess.
+defaulting to the repository root, and SHALL refuse an output root that is the repository root or
+lies beneath it, deciding that before it creates anything. It SHALL NOT modify any sprite, extracted
+bitmap, inspection or extraction manifest, normalized content file, save, config, or village, and
+SHALL NOT write into `conversions.json`, `statuses.json`, or any converted package directory. It
+SHALL NOT use Flash, a browser, the network, a server, or a subprocess.
 
 #### Scenario: Every write is contained
 
 - **WHEN** the census runs with an output root outside the repository
 - **THEN** the repository gains no file and loses none
 - **AND** the working tree is byte-identical before and after, apart from the committed report
+
+#### Scenario: Refuse an output root inside the repository
+
+- **WHEN** the census is given an output root that is the repository root or lies beneath it
+- **THEN** it exits non-zero with a message naming the refusal
+- **AND** it creates neither that output root nor any report
+
+#### Scenario: Judge containment by resolved path, not by name
+
+- **WHEN** the output root's path merely begins with the repository's path
+- **AND** it is a sibling rather than a descendant
+- **THEN** the census accepts it
 
 #### Scenario: No converter output escapes the root
 
