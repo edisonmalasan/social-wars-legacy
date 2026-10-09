@@ -15,8 +15,8 @@ const Loader = preload("res://scripts/package_loader.gd")
 
 const HOUSE_DIR := "assets/converted/buildings/0001_house_1_m"
 const ELEPHANT_DIR := "assets/converted/units/10033_wild_elephant"
-const HOUSE_CONTENT_VERSION := "ddeca79973ed603d3d2f3dc2e4527192cb3bf2350d349a17c460c94e791bd3f1"
-const ELEPHANT_CONTENT_VERSION := "9d8ad3b3f2087f6ba1c09fabd583a11d674f05a88b839f5bc6675db8a3ecfd5b"
+const HOUSE_CONTENT_VERSION := "c4e76e6d6b6cf176796ab9d263e4b074d086e8d967525ebcb06082841ce4fa0b"
+const ELEPHANT_CONTENT_VERSION := "a0c3861fd95cbe635537efd7223f46991580a6be66735a70c9b1904c8987c18f"
 const HOUSE_MATRIX := "d9400005000000"
 const ELEPHANT_MATRIX := "d940000500000ac36d90"
 

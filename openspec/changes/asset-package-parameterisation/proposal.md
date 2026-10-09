@@ -22,32 +22,84 @@ by `img_name == stem` (line 609) and the unit converter requires **both** `legac
 `img_name` to match (lines 313–314). Both already fail closed on a non-unique match. So the
 selection logic exists and is guarded; only the *inputs* are missing.
 
-### 2. Parameterisation is only half the story — 365 of 817 targets convert today
+### 2. Parameterisation is only half the story — 290 of 817 targets convert today
+
+> **CORRECTION (Apply stage, 2026-10-09).** This section originally read *"365 of 817"* and
+> reported units at **365 / 365 (100%)**, **587** packages available, and the unit converter as
+> generalising cleanly. **The unit figure was false; it was produced by a defect in the measuring
+> instrument, not by the unit converter.** See the correction record immediately below. The
+> corrected figures are **290 / 817**, units **68 / 365**, and **290** packages available. The
+> building figures below were re-measured and are **unchanged**.
 
 I ran both committed converters over **every** candidate, not a sample. A candidate is a sprite
 whose bitmaps are already `extracted` and whose `img_name` resolves to **exactly one** row in the
-committed normalized content. That is **452** buildings and **365** units.
+committed normalized content. That is **452** buildings and **365** units — re-confirmed by the
+delivered census.
 
 | | converts | fails |
 |---|---|---|
-| **units** | **365 / 365 (100%)** | 0 |
+| **units** | **68 / 365 (18.6%)** | **297 (81.4%)** |
 | **buildings** | **222 / 452 (49.1%)** | **230 (50.9%)** |
 
-The unit converter generalises cleanly because it decodes timeline records and never touches
-fills. The building converter does not, and its failures fall into **four disjoint classes** —
-**230** class mentions across **230** failing targets, so **every failing building has exactly
-one** class and these are four separate root causes, not one:
+Neither converter generalises cleanly. Building failures fall into **five disjoint classes** and
+unit failures into **seven**, with **no target in more than one class** in either domain, so the
+class boundaries are four/two separate root causes rather than one:
 
-| class | targets |
-|---|---|
-| `unresolvable bitmap fill … -> 65535` | **133** |
-| `unknown fill style` | **61** |
-| `unsupported shape tag: 83` | **20** |
-| `shape byte/bit overrun` | **16** |
+| domain | class | targets |
+|---|---|---|
+| building | `unresolvable bitmap fill at shape # -> #` | **133** |
+| building | `unknown fill style` | **61** |
+| building | `unsupported shape tag: 83` | **20** |
+| building | `shape byte overrun` / `shape bit overrun` | **14** / **2** |
+| unit | `shape byte overrun` | **90** |
+| unit | `unknown fill style` | **76** |
+| unit | `unsupported timeline tag … (PlaceObject#)` | **57** |
+| unit | `unsupported shape tag: 83` | **44** |
+| unit | `shape bit overrun` | **18** |
+| unit | `shape byte misaligned` | **11** |
+| unit | `unsupported tag in timeline` | **1** |
 
-So **587 packages are available immediately** and 230 buildings are blocked by unresolved format
-questions. That is the honest deliverable boundary, and it is why this change is scoped to
-*parameterisation and measurement*, not to mass conversion.
+The building **133 / 61 / 20 / 16** figures are unchanged and confirmed; **16** resolves to
+**14** `shape byte overrun` plus **2** `shape bit overrun`, which the original hand-written
+classifier had lumped through a catch-all branch.
+
+So **290 packages are available immediately** (222 buildings, 68 units) and **527 targets are
+blocked** by unresolved format questions. That is the honest deliverable boundary, and it is why
+this change is scoped to *parameterisation and measurement*, not to mass conversion.
+
+#### Correction record — the 365/365 unit figure was an artefact of the measuring instrument
+
+The Propose-stage measurement drove the converters by **reassigning their module-level target
+constants** in memory. It reassigned `TARGET_STEM` and `TARGET_LEGACY_ID`, but the pre-change
+`convert_unit.py` also carried a third constant:
+
+```python
+SOURCE = "assets/sprites/" + TARGET_STEM + ".swf"
+```
+
+`SOURCE` was computed **at import time**. Reassigning `TARGET_STEM` afterwards never moved it, so
+**every one of the 365 unit targets was parsed from the same `10033_wild_elephant.swf`** while
+being attributed to a different stem and `legacy_id`. The 365 "successes" were the elephant
+converted 365 times. The figure's implausibility — a perfect 365/365 — was the tell.
+
+Why it did not fail outright: the unit converter resolves each bitmap `character_id` against **the
+target's own** extraction directory, and the elephant's ids `[1, 3, 5, 7, 9, 11, 13, 15, 17, 20]`
+are all present in most unit sprites' directories (`1002_Red_Tank_m` has `[1, 3, 5, 7, 9, 11, 14,
+17, 20, 23]`). So the elephant's shape data resolved against each target's bitmaps and assembled
+without error.
+
+This is **precisely the failure mode design D1 exists to prevent**, and the census was the thing
+that caught it: D1 deletes the module constants so a batch run cannot silently re-derive one
+target. Independent confirmation, run after the fact against the parameterised CLI:
+
+- `convert_unit.py --target-stem 1006_red_bazooka_jeep_m --target-legacy-id 1006` → exit **1**,
+  `shape byte misaligned at swf assets/sprites/1006_red_bazooka_jeep_m.swf`
+- `convert_unit.py --target-stem 10023_gorilla --target-legacy-id 923` → exit **0**
+
+**What this does and does not change.** The *requirements* are unaffected: the census spec asks
+for the convertible set to be measured and refusals recorded, and it now is. What changed is the
+premise that a mass-conversion line could start with units — **no domain is 100% convertible**, so
+there is no domain where a line can be scoped without first resolving refusal classes.
 
 ### 3. Two plausible fixes were tried and both were refuted
 
@@ -114,7 +166,7 @@ holds across checkout forms"); the converters never received the same treatment.
 - **No fix for any of the 230 building refusals.** Three of the four classes are unresolved
   format questions and the fourth's cause is unestablished by my own contradictory measurements.
   Each is a separate investigation line.
-- **No mass conversion.** 587 packages are available; committing them is roughly 30,000 files and
+- **No mass conversion.** 290 packages are available; committing them is roughly 15,000 files and
   a preservation-manifest regeneration. That is a separate line with its own measured diff, and it
   delivers no client-visible progress while `package_paths.gd` still pins two packages.
 - **No client change.** `package_paths.gd`, the Godot client, the Compatibility API, and the

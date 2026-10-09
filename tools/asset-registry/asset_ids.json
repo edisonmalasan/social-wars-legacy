@@ -81,9 +81,9 @@
       "sha256": "6a7121cdefddf4835ac90c408c98da762b7ccd7de866aea749368beffdad36e0"
     },
     {
-      "bytes": 1260,
+      "bytes": 1225,
       "file": "tools/asset-registry/conversions.json",
-      "sha256": "eb7c800118441fef733c332e4927427eae64e3a8275ff4e625fef3d268a08528"
+      "sha256": "622c1489005c35a3dea0b931c46d80d872c60439f25dd3f595c70f9d6f16ad10"
     },
     {
       "bytes": 2896,

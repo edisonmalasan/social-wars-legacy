@@ -36,7 +36,23 @@ UNIT_BITMAP = b"UNIT-BITMAP"
 UNIT_PACKAGE_PATH = "assets/converted/units/10033_wild_elephant/package.json"
 
 
-def run_unit(argv):
+UNIT_TARGET_STEM = "10033_wild_elephant"
+UNIT_TARGET_LEGACY_ID = "933"
+
+
+def run_unit(argv, target_stem=UNIT_TARGET_STEM,
+             target_legacy_id=UNIT_TARGET_LEGACY_ID):
+    """Invoke the unit converter, supplying the target pair unless overridden.
+
+    Both halves are required CLI inputs (the tool has no defaults), and the pair
+    is what keeps the two-key uniqueness guard meaningful, so every existing
+    case states it here rather than the converter guessing.
+    """
+    argv = list(argv)
+    if target_stem is not None and "--target-stem" not in argv:
+        argv = ["--target-stem", target_stem] + argv
+    if target_legacy_id is not None and "--target-legacy-id" not in argv:
+        argv = ["--target-legacy-id", target_legacy_id] + argv
     stdout = io.StringIO()
     stderr = io.StringIO()
     with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
@@ -44,7 +60,11 @@ def run_unit(argv):
     return code, stdout.getvalue(), stderr.getvalue()
 
 
-def run_building(argv):
+def run_building(argv, target_stem="0001_house_1_m"):
+    """Invoke the building converter with an explicit target stem."""
+    argv = list(argv)
+    if target_stem is not None and "--target-stem" not in argv:
+        argv = ["--target-stem", target_stem] + argv
     stdout = io.StringIO()
     stderr = io.StringIO()
     with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
@@ -296,6 +316,114 @@ class SyntheticAssemblyTests(unittest.TestCase):
                                     "--out-root", str(self.work)])
         self.assertEqual(code, 0, stdout)
         self.assertEqual(snapshot(self.work), before)
+
+
+class TargetParameterTests(unittest.TestCase):
+    """Both target inputs are required, with no defaults (design D1/D2).
+
+    Two explicit parameters rather than one derived, because the stem->id
+    relation is unestablished (`10033_wild_elephant` is 933 and
+    `0001_house_1_m` is 1) and a wrong derivation would silently attach the
+    wrong definition to a package.
+    """
+
+    def setUp(self):
+        self.temporary, self.work = make_dual_fixture_tree()
+        self.addCleanup(self.temporary.cleanup)
+
+    def test_no_target_constants_exist(self):
+        self.assertFalse(hasattr(unit_converter, "TARGET_STEM"))
+        self.assertFalse(hasattr(unit_converter, "TARGET_LEGACY_ID"))
+        self.assertFalse(hasattr(unit_converter, "SOURCE"))
+
+    def test_invoking_without_a_target_exits_non_zero(self):
+        complete = ["--target-stem", UNIT_TARGET_STEM,
+                    "--target-legacy-id", UNIT_TARGET_LEGACY_ID]
+        cases = {
+            "--target-stem": [complete[2], complete[3]],
+            "--target-legacy-id": [complete[0], complete[1]],
+        }
+        for omitted, remaining in cases.items():
+            stderr = io.StringIO()
+            with contextlib.redirect_stdout(io.StringIO()), \
+                    contextlib.redirect_stderr(stderr):
+                with self.assertRaises(SystemExit) as caught:
+                    unit_converter.main(["--repo-root", str(self.work)]
+                                        + remaining)
+            self.assertNotEqual(caught.exception.code, 0)
+            self.assertIn(omitted, stderr.getvalue())
+
+    def test_invoking_without_a_target_writes_nothing(self):
+        before = sorted(str(p) for p in self.work.rglob("*"))
+        with contextlib.redirect_stdout(io.StringIO()), \
+                contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit):
+                unit_converter.main(["--repo-root", str(self.work)])
+        self.assertEqual(sorted(str(p) for p in self.work.rglob("*")), before)
+
+    def test_the_two_parameter_pair_is_not_derived_from_the_stem(self):
+        # A unit whose stem and legacy_id follow no relation the tool could
+        # compute must still convert when both are declared. This is the case a
+        # stem->id derivation would get wrong.
+        renamed = "99001_renamed_elephant"
+        renamed_id = "4107"
+        normalized = (self.work / "packages/game-content/normalized"
+                      / "units.json")
+        normalized.write_text(
+            normalized.read_text(encoding="utf-8")
+            .replace('"legacy_id": "933"', '"legacy_id": "' + renamed_id + '"')
+            .replace(UNIT_TARGET_STEM, renamed),
+            encoding="utf-8")
+        source = self.work / ("assets/sprites/" + UNIT_TARGET_STEM + ".swf")
+        source.rename(self.work / ("assets/sprites/" + renamed + ".swf"))
+        tools = self.work / "tools/asset-registry"
+        inspection = tools / "inspection.json"
+        inspection.write_text(
+            inspection.read_text(encoding="utf-8").replace(
+                UNIT_TARGET_STEM, renamed), encoding="utf-8")
+        extraction = tools / "image_extraction.json"
+        extraction.write_text(
+            extraction.read_text(encoding="utf-8").replace(
+                UNIT_TARGET_STEM, renamed), encoding="utf-8")
+        images = (self.work / "assets/converted/images"
+                  / UNIT_TARGET_STEM)
+        images.rename(self.work / "assets/converted/images" / renamed)
+        code, stdout, stderr = run_unit(["--repo-root", str(self.work)],
+                                        target_stem=renamed,
+                                        target_legacy_id=renamed_id)
+        self.assertEqual(code, 0, stderr + stdout)
+        document = json.loads(
+            (self.work / "assets/converted/units" / renamed
+             / "package.json").read_text(encoding="utf-8"))
+        self.assertEqual(document["legacy_id"], renamed)
+
+    def test_a_mismatched_legacy_id_fails_closed(self):
+        # The pair is the uniqueness guard: a right stem with a wrong id must
+        # not silently resolve to nothing, nor to a different definition.
+        code, stdout, _ = run_unit(["--repo-root", str(self.work)],
+                                   target_legacy_id="994")
+        self.assertEqual(code, 1)
+        self.assertIn("content ref not unique", stdout)
+
+    def test_source_for_derives_the_sprite_path_from_the_stem(self):
+        self.assertEqual(unit_converter.source_for("a_b"),
+                         "assets/sprites/a_b.swf")
+
+    def test_the_shared_fingerprint_is_line_ending_invariant(self):
+        first = building_converter.fingerprint_inputs(
+            self.work, (unit_converter.UNITS_FILE,
+                        unit_converter.REGISTRY_DIR / "inspection.json",
+                        unit_converter.REGISTRY_DIR / "image_extraction.json"))
+        for name in ("inspection.json", "image_extraction.json"):
+            path = self.work / "tools/asset-registry" / name
+            data = path.read_bytes()
+            if b"\n" in data:
+                path.write_bytes(data.replace(b"\n", b"\r\n"))
+        second = building_converter.fingerprint_inputs(
+            self.work, (unit_converter.UNITS_FILE,
+                        unit_converter.REGISTRY_DIR / "inspection.json",
+                        unit_converter.REGISTRY_DIR / "image_extraction.json"))
+        self.assertEqual(first, second)
 
 
 class SyntheticFailureTests(unittest.TestCase):
