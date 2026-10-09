@@ -31,7 +31,7 @@ const EXPECTED_STATUS := {
 	"item_sprites": {"converted": 2, "missing_source": 10},
 	"magic_sprites": {"missing_source": 0},
 	"sounds": {"missing_source": 0},
-	"images": {"missing_source": 32, "ambiguous": 50},
+	"images": {"missing_source": 32, "ambiguous": 0},
 }
 
 

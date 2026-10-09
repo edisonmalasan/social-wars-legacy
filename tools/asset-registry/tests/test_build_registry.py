@@ -212,13 +212,143 @@ class RealTreeJoinTests(unittest.TestCase):
         self.assertEqual(sounds["resolved"], 139)
         self.assertEqual(sounds["missing"], [])
 
-    def test_images_basename_tiers(self):
+    def test_images_path_first_tiers(self):
         images = self.coverage["domains"]["images"]
         self.assertEqual(images["references"], 607)
-        self.assertEqual(images["resolved"], 525)
-        self.assertEqual(images["basename_single"], 525)
-        self.assertEqual(images["basename_collision"], 50)
+        self.assertEqual(images["path_resolved"], 573)
+        self.assertEqual(images["fallback_resolved"], 2)
+        self.assertEqual(images["fallback_ambiguous"], 0)
+        self.assertEqual(images["resolved"], 575)
         self.assertEqual(len(images["missing"]), 32)
+        self.assertEqual(images["path_resolved"] + images["fallback_resolved"]
+                         + images["fallback_ambiguous"]
+                         + len(images["missing"]),
+                         images["references"])
+
+    def test_the_fallback_tier_names_its_two_members(self):
+        # Task 1.3: the fallback is recorded by name, not only as a count.
+        images = self.coverage["domains"]["images"]
+        self.assertEqual(images["fallback_resolved_refs"], [
+            "/chapters/simple/arachnids_old.jpg",
+            "/chapters/simple/orcs_old.jpg",
+        ])
+        self.assertEqual(len(images["fallback_resolved_refs"]),
+                         images["fallback_resolved"])
+        self.assertEqual(images["fallback_ambiguous_refs"], [])
+        self.assertEqual(len(images["fallback_ambiguous_refs"]),
+                         images["fallback_ambiguous"])
+
+    def test_no_image_reference_is_reported_as_a_collision(self):
+        # Task 1.4: the collision tier the old rule needed is empty and the
+        # field is gone, so no reference can be reported as one.
+        images = self.coverage["domains"]["images"]
+        self.assertNotIn("basename_collision", images)
+        self.assertNotIn("basename_single", images)
+        self.assertEqual(images["fallback_ambiguous"], 0)
+
+    def test_the_thirty_two_refusals_are_the_absent_files(self):
+        # Task 1.4: the 32 stay listed and none resolved.
+        images = self.coverage["domains"]["images"]
+        self.assertEqual(len(images["missing"]), 32)
+        self.assertEqual(images["missing"], sorted(set(images["missing"])))
+        registry_paths = {entry["path"]
+                          for entry in self.registry["entries"]}
+        for ref in images["missing"]:
+            joined = builder.IMAGE_WEB_ROOT + "/" + ref.lstrip("/")
+            self.assertNotIn(joined, registry_paths, ref)
+
+    def test_the_recorded_rule_names_the_web_root_and_the_fallback(self):
+        # Task 1.2: the recorded evidence describes the order performed.
+        rule = self.coverage["domains"]["images"]["rule"]
+        self.assertIn(builder.IMAGE_WEB_ROOT, rule)
+        self.assertIn("basename fallback", rule)
+        self.assertEqual(rule, builder.IMAGE_RULE)
+
+    def test_the_join_is_a_bijection_onto_the_web_root_corpus(self):
+        # Task 1.5, corrected: the bijection holds over the path-resolved
+        # tier, not over all 575 identified references. See design.md
+        # "Corrections found during Apply", C1.
+        tiers = self.real_tiers()
+        files = tiers["files"]
+
+        # The path-resolved tier is exactly a bijection: 573 references,
+        # 573 distinct corpus files, and that set is every corpus file
+        # under the web root -- so nothing there is left unreferenced.
+        path_files = [files[ref] for ref in tiers["path_resolved"]]
+        self.assertEqual(len(path_files), 573)
+        self.assertEqual(len(set(path_files)), 573)
+        under_root = {entry["path"] for entry in self.registry["entries"]
+                      if entry["path"].startswith(
+                          builder.IMAGE_WEB_ROOT + "/")}
+        self.assertEqual(len(under_root), 573)
+        self.assertEqual(set(path_files), under_root)
+
+        # All 575 identified references name 573 files, and the only two
+        # shared targets are the mis-pathed fallback references aliasing
+        # their chapters2 counterparts.
+        self.assertEqual(len(files), 575)
+        targets = {}
+        for ref, path in files.items():
+            targets.setdefault(path, []).append(ref)
+        shared = {path: refs for path, refs in targets.items() if len(refs) > 1}
+        self.assertEqual(len(shared), 2)
+        self.assertEqual(sorted(sorted(refs) for refs in shared.values()), [
+            ["/chapters/simple/arachnids_old.jpg",
+             "/chapters2/simple/arachnids_old.jpg"],
+            ["/chapters/simple/orcs_old.jpg",
+             "/chapters2/simple/orcs_old.jpg"],
+        ])
+        for refs in shared.values():
+            fallback = [ref for ref in refs
+                        if ref in tiers["fallback_resolved"]]
+            self.assertEqual(len(fallback), 1, refs)
+        # Every identified file lies under the web root: nothing is
+        # resolved to a file outside the corpus the rule claims to join.
+        self.assertEqual(set(files.values()) - under_root, set())
+
+    def test_the_bijection_assertion_is_not_tautological(self):
+        # Task 1.5, second half: revert the join to the basename-only rule
+        # and confirm the bijection assertion above actually fails. Without
+        # this, "the assertion passes" could mean "the assertion cannot fail".
+        tiers = self.basename_only_tiers()
+        under_root = {entry["path"] for entry in self.registry["entries"]
+                      if entry["path"].startswith(builder.IMAGE_WEB_ROOT + "/")}
+        # The old rule leaves 50 references with no file at all, so it
+        # cannot satisfy either half of the bijection assertion.
+        self.assertEqual(len(tiers["files"]), 525)
+        self.assertEqual(len(set(tiers["files"].values())), 523)
+        self.assertNotEqual(set(tiers["files"].values()), under_root)
+        self.assertEqual(len(tiers["fallback_ambiguous"]), 50)
+
+    def real_tiers(self):
+        """Re-derive the committed tiers from the committed inputs."""
+        return self.join_tiers(builder.join_image_refs)
+
+    def basename_only_tiers(self):
+        """The previous rule, reimplemented here as the negative control."""
+        def basename_only(refs, registry_paths, basenames):
+            tiers = {"path_resolved": [], "fallback_resolved": [],
+                     "fallback_ambiguous": [], "missing": [], "files": {}}
+            for ref in refs:
+                candidates = basenames.get(ref.rsplit("/", 1)[-1], [])
+                if len(candidates) == 1:
+                    tiers["fallback_resolved"].append(ref)
+                    tiers["files"][ref] = candidates[0]
+                elif candidates:
+                    tiers["fallback_ambiguous"].append(ref)
+                else:
+                    tiers["missing"].append(ref)
+            return tiers
+        return self.join_tiers(basename_only)
+
+    def join_tiers(self, join):
+        registry_paths = {entry["path"]
+                          for entry in self.registry["entries"]}
+        basenames = {}
+        for path in registry_paths:
+            basenames.setdefault(path.rsplit("/", 1)[-1], []).append(path)
+        refs = builder.extract_field_refs(ROOT, builder.IMAGES_FILE, "path")
+        return join(refs, registry_paths, basenames)
 
     def test_unreferenced_counts_sane(self):
         total_unreferenced = sum(self.coverage["unreferenced"].values())

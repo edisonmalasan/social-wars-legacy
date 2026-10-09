@@ -5,9 +5,14 @@
   },
   "domains": {
     "images": {
-      "basename_collision": 50,
-      "basename_single": 525,
       "distinct_references": 607,
+      "fallback_ambiguous": 0,
+      "fallback_ambiguous_refs": [],
+      "fallback_resolved": 2,
+      "fallback_resolved_refs": [
+        "/chapters/simple/arachnids_old.jpg",
+        "/chapters/simple/orcs_old.jpg"
+      ],
       "missing": [
         "/chapters/chapter_10_m.jpg",
         "/chapters/chapter_10_old.jpg",
@@ -42,9 +47,10 @@
         "/chapters/simple/prison2.jpg",
         "/intro/intro - copia.swf"
       ],
+      "path_resolved": 573,
       "references": 607,
-      "resolved": 525,
-      "rule": "basename match (web-root-relative form preserved, never rewritten)"
+      "resolved": 575,
+      "rule": "path-first under assets/images/en, basename fallback recorded"
     },
     "item_sprites": {
       "distinct_references": 872,
