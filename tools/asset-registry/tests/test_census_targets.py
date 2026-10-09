@@ -265,6 +265,44 @@ class CensusContainmentTests(unittest.TestCase):
         self.assertIn("must not be the repository root", stderr)
         self.assertFalse(report.exists())
 
+    def test_an_output_root_inside_the_repository_is_refused(self):
+        # The guard is containment, not equality. `evaluate()` builds
+        # `<out_root>/<domain>/<stem>`, so an out-root one level below the
+        # repository root would create that tree inside the working copy.
+        #
+        # The second assertion is the one the previous ordering could not pass:
+        # the containment check used to run *after* `mkdir`, so the refusal
+        # still left the out-root behind in the repository.
+        inside = self.work / "census-out"
+        report = self.out / "target_census.json"
+        code, _stdout, stderr = run_census(self.work, inside, report)
+        self.assertEqual(code, 2)
+        self.assertIn("must not be the repository root or inside it", stderr)
+        self.assertFalse(inside.exists())
+        self.assertFalse(report.exists())
+
+    def test_an_output_root_beneath_the_repository_is_refused(self):
+        # Deeper than the previous case, so the check cannot pass merely
+        # because it inspects one path level.
+        inside = self.work / "tools" / "asset-registry" / "census-out"
+        code, _stdout, stderr = run_census(self.work, inside,
+                                           self.out / "target_census.json")
+        self.assertEqual(code, 2)
+        self.assertIn("must not be the repository root or inside it", stderr)
+        self.assertFalse(inside.exists())
+
+    def test_an_output_root_that_merely_starts_with_the_repository_path_is_allowed(
+            self):
+        # The guard must compare resolved paths, not string prefixes: a sibling
+        # directory whose name merely starts with the repository's is outside it.
+        outside = self.work.parent / (self.work.name + "-sibling")
+        self.assertTrue(str(outside).startswith(str(self.work)))
+        self.assertNotEqual(outside.resolve(), self.work.resolve())
+        code, _stdout, stderr = run_census(self.work, outside,
+                                           self.out / "target_census.json")
+        self.assertEqual(code, 0, stderr)
+        self.assertTrue(outside.exists())
+
     def test_the_repository_gains_and_loses_no_file(self):
         before = converted(self.work)
         report = self.out / "target_census.json"

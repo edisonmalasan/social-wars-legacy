@@ -30,7 +30,6 @@ other than a refusal (a genuine tool failure), 1 the report could not be written
 """
 
 import argparse
-import importlib
 import json
 import re
 import shutil
@@ -281,6 +280,16 @@ def main(argv=None):
     args = parser.parse_args(argv)
     repo_root = args.repo_root or "."
     out_root = Path(args.out_root)
+    # The containment guard runs before anything is created. `evaluate()` builds
+    # `<out_root>/<domain>/<stem>`, so an out-root one level down would create
+    # that tree inside the working copy, which is exactly what this tool exists
+    # to prevent; checking after the mkdir would still leave the out-root behind.
+    repo_root_path = Path(repo_root).resolve()
+    out_root_path = out_root.resolve()
+    if out_root_path == repo_root_path or repo_root_path in out_root_path.parents:
+        print("census output root must not be the repository root or inside "
+              "it: " + str(out_root), file=sys.stderr)
+        return 2
     if not out_root.exists():
         try:
             out_root.mkdir(parents=True, exist_ok=True)
@@ -288,10 +297,6 @@ def main(argv=None):
             print("census output root could not be created: " + str(out_root),
                   file=sys.stderr)
             return 2
-    if out_root.resolve() == Path(repo_root).resolve():
-        print("census output root must not be the repository root: "
-              + str(out_root), file=sys.stderr)
-        return 2
     try:
         report = build_report(repo_root, out_root)
     except building_converter.InputError as error:
