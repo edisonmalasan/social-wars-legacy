@@ -65,16 +65,30 @@ independently, and D1's effect is attributable on its own.
 **D1 is not blocked on D2.** Nothing in this change makes the deferred sizes worse than the corruption
 they replace.
 
-### D3 — Fail closed on an inverted RECT rather than clamping
+### D3 — Fail closed on an inverted RECT, and keep the origin-relative clamp
 
-Replace `max(0, xmax // 20)` with a validation failure when `xmax < xmin` or `ymax < ymin`, keeping the
-extents unclamped so the failure is attributable.
+Raise a validation failure when `xmax < xmin` or `ymax < ymin`, identifying the file and tag.
 
 This is free, and that was measured rather than assumed: after D1 the population contains **0** inverted
 rectangles across all **290** targets and **4347** shapes, so the refusal costs nothing today. It is
 insurance — it converts a future malformed file from "silently reported as a zero-extent shape" into
 "refused with the file and tag named", which is the behaviour every neighbouring rule in these two
-capabilities already follows.
+capabilities already follows. Re-measured against the shipped parser: **0** targets refused.
+
+> **Correction, recorded during Apply.** This decision originally read "replace `max(0, xmax // 20)`
+> with a validation failure ... keeping the extents unclamped". Removing the clamp is **wrong**, and
+> the error was in the decision rather than in the code. The inversion guard alone does not make the
+> far edge non-negative: a shape may legitimately have `xmin = -118`, `xmax = -71`, which is correctly
+> ordered yet yields `-71 // 20 == -4` under Python's floor division. Deleting the clamp would
+> therefore have introduced **negative pixel sizes** where the population has none today.
+>
+> The clamp is correct for an origin-relative size — a shape extending left of the origin genuinely
+> has width zero — and it is only *illegitimate* when it is absorbing an inverted rectangle, which is
+> exactly what the new refusal now prevents. The shipped parser keeps the clamp and measures **0**
+> negative sizes and **0** refusals across all 290 targets.
+>
+> Keeping the clamp is also what reproduces the proposal's own measured table: `263_claw_alien_academy`
+> moves `width_px` 201 → **0**, not 201 → −4.
 
 The `nbits > 31` guard at `:260` is unreachable (a 5-bit field cannot exceed 31). It is left in place:
 removing it is unrelated cleanup and the change scope forbids it.

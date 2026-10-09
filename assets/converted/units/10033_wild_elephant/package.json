@@ -428,9 +428,9 @@
         "height_px": 176,
         "width_px": 158,
         "xmax": 3177,
-        "xmin": 7949,
+        "xmin": -243,
         "ymax": 3525,
-        "ymin": 7897
+        "ymin": -295
       },
       "character_id": 2,
       "fill_refs": [
@@ -465,7 +465,7 @@
         "xmax": 5198,
         "xmin": 18,
         "ymax": 4305,
-        "ymin": 16369
+        "ymin": -15
       },
       "character_id": 4,
       "fill_refs": [
@@ -535,7 +535,7 @@
         "xmax": 4900,
         "xmin": 0,
         "ymax": 3330,
-        "ymin": 16374
+        "ymin": -10
       },
       "character_id": 8,
       "fill_refs": [
@@ -598,9 +598,9 @@
         "height_px": 179,
         "width_px": 159,
         "xmax": 3180,
-        "xmin": 7952,
+        "xmin": -240,
         "ymax": 3580,
-        "ymin": 7772
+        "ymin": -420
       },
       "character_id": 12,
       "fill_refs": [
@@ -633,9 +633,9 @@
         "height_px": 177,
         "width_px": 158,
         "xmax": 3178,
-        "xmin": 7950,
+        "xmin": -242,
         "ymax": 3540,
-        "ymin": 7712
+        "ymin": -480
       },
       "character_id": 14,
       "fill_refs": [
@@ -668,9 +668,9 @@
         "height_px": 176,
         "width_px": 159,
         "xmax": 3182,
-        "xmin": 7954,
+        "xmin": -238,
         "ymax": 3527,
-        "ymin": 7799
+        "ymin": -393
       },
       "character_id": 16,
       "fill_refs": [
@@ -703,9 +703,9 @@
         "height_px": 176,
         "width_px": 159,
         "xmax": 3183,
-        "xmin": 7955,
+        "xmin": -237,
         "ymax": 3523,
-        "ymin": 7835
+        "ymin": -357
       },
       "character_id": 18,
       "fill_refs": [
@@ -740,7 +740,7 @@
         "xmax": 5195,
         "xmin": 555,
         "ymax": 4306,
-        "ymin": 16290
+        "ymin": -94
       },
       "character_id": 21,
       "fill_refs": [
@@ -775,7 +775,7 @@
         "xmax": 5207,
         "xmin": 767,
         "ymax": 4517,
-        "ymin": 16241
+        "ymin": -143
       },
       "character_id": 23,
       "fill_refs": [
@@ -810,7 +810,7 @@
         "xmax": 5218,
         "xmin": 478,
         "ymax": 4588,
-        "ymin": 16292
+        "ymin": -92
       },
       "character_id": 25,
       "fill_refs": [
@@ -845,7 +845,7 @@
         "xmax": 5220,
         "xmin": 260,
         "ymax": 4445,
-        "ymin": 16289
+        "ymin": -95
       },
       "character_id": 27,
       "fill_refs": [
@@ -880,7 +880,7 @@
         "xmax": 5290,
         "xmin": 310,
         "ymax": 3375,
-        "ymin": 16319
+        "ymin": -65
       },
       "character_id": 30,
       "fill_refs": [
@@ -915,7 +915,7 @@
         "xmax": 5300,
         "xmin": 540,
         "ymax": 3362,
-        "ymin": 16266
+        "ymin": -118
       },
       "character_id": 32,
       "fill_refs": [
@@ -950,7 +950,7 @@
         "xmax": 5350,
         "xmin": 650,
         "ymax": 3366,
-        "ymin": 16330
+        "ymin": -54
       },
       "character_id": 34,
       "fill_refs": [
@@ -985,7 +985,7 @@
         "xmax": 5274,
         "xmin": 154,
         "ymax": 3383,
-        "ymin": 16347
+        "ymin": -37
       },
       "character_id": 36,
       "fill_refs": [
@@ -1018,7 +1018,7 @@
         "height_px": 168,
         "width_px": 250,
         "xmax": 5004,
-        "xmin": 16308,
+        "xmin": -76,
         "ymax": 3360,
         "ymin": 100
       },
@@ -1288,9 +1288,9 @@
         "height_px": 142,
         "width_px": 191,
         "xmax": 3821,
-        "xmin": 6833,
+        "xmin": -1359,
         "ymax": 2850,
-        "ymin": 7782
+        "ymin": -410
       },
       "character_id": 57,
       "fill_refs": [
@@ -1323,9 +1323,9 @@
         "height_px": 167,
         "width_px": 204,
         "xmax": 4086,
-        "xmin": 6698,
+        "xmin": -1494,
         "ymax": 3355,
-        "ymin": 8087
+        "ymin": -105
       },
       "character_id": 59,
       "fill_refs": [
@@ -1358,7 +1358,7 @@
         "height_px": 195,
         "width_px": 199,
         "xmax": 3991,
-        "xmin": 6663,
+        "xmin": -1529,
         "ymax": 3910,
         "ymin": 490
       },

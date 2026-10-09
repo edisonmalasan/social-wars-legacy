@@ -333,3 +333,106 @@ that its attribution is not confounded with D1's.
 The desync family stays open and unproposed. Section 4.1 is the cautionary note
 for it: the reason that defect went unexamined was a plausible argument that was
 never checked, and the cheapest available test would have found it.
+
+---
+
+## 10. As landed
+
+The `fix/` line named in section 9 was proposed, applied, and merged as the
+OpenSpec change `rect-bounds-sign-extension` (branch `feat/rect-bounds-sign-extension`).
+D1 and D3 shipped; D2 remains deferred and un-implemented, exactly as recorded
+above, and this section does not reopen it.
+
+### What shipped
+
+`parse_rect_bits` now decodes each of the four RECT fields through a new
+`sign_extend_bits` helper, applied **per field**. The shape-bounds call site now
+passes `" tag " + str(tag)` so the new inversion refusal names the file and the
+tag. `BitReader.read_bits` is untouched, the unreachable `nbits > 31` guard is
+untouched, and no unrelated cleanup rode along.
+
+### One correction to this document's own D3
+
+D3 as written in section 5 said to replace the `max(0, xmax // 20)` clamp "keeping
+the extents unclamped". **That clause was wrong**, and the error was in the decision
+rather than in the code. The inversion guard alone does not make the far edge
+non-negative: a shape may legitimately have `xmin = -118`, `xmax = -71`, which is
+correctly ordered yet floors to `-71 // 20 == -4`. Deleting the clamp would have
+introduced negative pixel sizes where the population has none today.
+
+The clamp is correct for an origin-relative size — a shape extending left of the
+origin genuinely has width zero — and it is illegitimate only when it is absorbing
+an inverted rectangle, which is what the new refusal now prevents. **The clamp is
+retained**, which is also what reproduces this document's own measured table:
+`263_claw_alien_academy` moves `width_px` 201 → **0**, not 201 → −4. The same
+correction is recorded in the change's `design.md` §D3.
+
+### Measurements against the shipped parser
+
+Re-measured over the whole converted population with the shipped code imported
+as committed — no monkeypatching — routing every target through
+`census_targets.CONVERTER_BY_DOMAIN`:
+
+| Measurement | Result |
+| --- | --- |
+| Targets parsed | **290 / 290** |
+| Shapes | **4347** (count unchanged) |
+| Inverted rectangles remaining | **0** |
+| Refusals by the new inversion guard | **0** |
+| Negative `width_px`/`height_px` | **0** (the retained clamp) |
+| Per-field moves: `xmin` / `ymin` | **1987 / 1597** |
+| Per-field moves: `xmax` / `ymax` | **10 / 22** |
+| Per-field moves: `width_px` / `height_px` | **10 / 22** |
+
+Every figure reproduces section 4's table exactly. The **frame** rect is governed
+by the new refusal too and was scanned here; the earlier population probe had only
+counted shape bounds, so this is the first run that covers both.
+
+### The crafted fixtures were relying on the defect
+
+`rect_bytes` sized `Nbits` from the **unsigned** bit length, so `rect_bytes(200, 100)`
+declared 8 bits while carrying 200 (sign bit 128), and `rect_bytes(2000, 2000)`
+declared 11 while carrying 2000 (sign bit 1024). Neither is representable as the
+signed field the fixture itself declares. Measured as a three-variant A/B, each in
+its own process because loading both test modules into one process leaks state
+between runs and produced a test count that varied with variant order:
+
+| Variant | RECT parser | fixture encoder | Result |
+| --- | --- | --- | --- |
+| baseline | committed | committed | 81 tests, **0F / 0E** |
+| A | sign-extended | committed | 70 run, **9F / 2E** (11 tests never ran) |
+| B | sign-extended | one bit wider | 81 tests, **0F / 0E** |
+
+Variant B restored all 81 tests green **with not one expected value edited** — the
+fixtures were wrong, not the assertions. `test_convert_unit.py` imports the same
+`rect_bytes` function object, so there is one fixture encoder, not two.
+
+### Committed output
+
+Exactly one package changed bytes: `assets/converted/units/10033_wild_elephant/package.json`,
+19 of 28 shapes moving `xmin` (9) or `ymin` (17), with `xmax`, `ymax`, `width_px` and
+`height_px` unchanged on all 28 and no non-shape field changed — an origin-only
+correction. `assets/converted/buildings/0001_house_1_m/package.json` is
+byte-identical and was not rewritten. The unit converter's manifest entry updated
+attributably: the elephant's `output_bytes` 384701 → 384684 and its `package_sha256`,
+plus the aggregate `counts.output_bytes`. `statuses.json` did not change.
+
+### D2's interaction, restated for whoever picks it up
+
+All **32** size fields that move across **13** targets move **non-zero → 0**, because
+D1 corrects a far edge into negative territory while the size is still measured from
+the origin. That is the correct value for an origin-relative size and not a regression,
+but it is why D1 alone leaves those targets with correct-but-uninformative sizes, and
+why the two decisions were kept apart.
+
+### Verification actually run on the merged state
+
+- `python -B -m unittest discover -s tools/asset-registry/tests -p test_convert_building.py -v` → **26 tests, OK**, exit 0
+- `python -B -m unittest discover -s tools/asset-registry/tests -p test_convert_unit.py -v` → **55 tests, OK**, exit 0
+- `python -B tools/hash-manifest/hash_manifest.py verify` → **3258 entries, 758423699 bytes, commit e8c98a03**, exit 0
+- `python -B packages/game-content/tools/validate_content.py` → `result: valid`, 22 schemas, 23 files, 604 references, exit 0
+- `openspec validate --all --strict` → **75 passed / 0 failed**, exit 0
+- `git status` → no SWF, save, config, village, registry, coverage, inspection, or extraction-manifest byte changed
+
+No Flash, Ruffle, ActionScript, or browser executes in any of these commands, and
+no network is used.
