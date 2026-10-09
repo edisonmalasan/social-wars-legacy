@@ -7,7 +7,7 @@ The repository SHALL provide an offline builder that joins every distinct conten
 
 #### Scenario: Map every reference
 - **WHEN** the builder runs on the current worktree
-- **THEN** each distinct reference of the four domains has exactly one entry with one vocabulary status — the two converted packages recorded as `converted`, sprite and image names absent from the corpus recorded as `missing_source`, corpus-resolved MP3 sounds recorded as `passthrough`, and corpus-resolved sprite SWFs recorded as `extracted` or `pending` per the bitmap-extraction evidence, while the 607 image references record 566 `passthrough` from a file identified by the reference's own path, 9 `extracted`, and 32 `missing_source`, with no image entry left `ambiguous`
+- **THEN** each distinct reference of the four domains has exactly one entry with one vocabulary status — the two converted packages recorded as `converted`, sprite and image names absent from the corpus recorded as `missing_source`, corpus-resolved MP3 sounds recorded as `passthrough`, and corpus-resolved sprite SWFs recorded as `extracted` or `pending` per the bitmap-extraction evidence, while the 607 image references record 566 `passthrough` (564 whose file was identified by the reference's own path and 2 by the recorded basename fallback), 9 `extracted`, and 32 `missing_source`, with no image entry left `ambiguous`
 
 #### Scenario: Rerun determinism
 - **WHEN** the builder runs twice without tree changes
