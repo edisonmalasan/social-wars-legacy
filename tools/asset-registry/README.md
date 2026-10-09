@@ -653,3 +653,96 @@ exercised by the Godot asset-ID suite).
 ```bash
 python -B -m unittest discover -s tools/asset-registry/tests -p test_build_asset_ids.py -v
 ```
+
+# Conversion-target census (M12 line 1: measure the convertible population)
+
+A converter that runs without error on one target has not been shown to
+generalise. Both committed converters proved exactly one target each, and both
+carried that target as a module constant. This tool measures the whole
+convertible-candidate population and records the refusals, so a later claim of
+asset coverage rests on a re-runnable measurement rather than on an assumption.
+
+## Inputs
+
+- `tools/asset-registry/asset_ids.json` (`item_sprites` entries whose status is
+  `extracted`).
+- `packages/game-content/normalized/buildings.json` and `units.json`, joined on
+  `img_name`.
+
+Nothing is transcribed. No stem, no `legacy_id`, no class name and no count is
+written into the tool; the candidate set is derived from these files on every
+run.
+
+## Candidate rule
+
+A target is a convertible-candidate when its sprite's bitmaps are already
+recorded as `extracted` **and** its `img_name` resolves to **exactly one**
+normalized content row. The uniqueness requirement is the converter's own
+precondition: a stem with two rows would be refused for a content ambiguity that
+says nothing about convertibility, and counting it would report a refusal class
+that is really a data question. Committed population: **817** candidates
+(**452** buildings, **365** units).
+
+## Refusal classes
+
+A refusal class is the converter's own problem string reduced mechanically: the
+target's sprite path is replaced by `<target>` and every bare digit run by `#`.
+Nothing else is altered, so if the converters reword a refusal the class changes
+with them. Classes are **not** a hand-written taxonomy, and the tool does not
+force disjointness -- it reports a target matching several patterns as such,
+because a boundary invented to fit a target would hide the finding. Committed
+result: **8** classes, **0** targets in several classes.
+
+## Outputs
+
+- `tools/asset-registry/target_census.json` (policy `asset-target-census-v1`,
+  `schema_version` 1): `counts` (candidates, converted, refused, per-domain
+  split, class count, multi-class target count), `refusal_class_totals`, and one
+  `targets` row per candidate carrying `domain`, `stem`, content `legacy_id`,
+  `verdict`, the class, and on refusal the distinct problem strings verbatim.
+
+The report has **no** timestamp, host, or iteration-order field, and is
+byte-identical across reruns against unchanged inputs.
+
+## Validation gates
+
+A refusal by a converter is **data**, not a gate: the run records it and
+continues, and exits **0**. Non-zero exits are reserved for genuine tool
+failure -- **2** a required input unreadable or the output root unusable,
+**3** a converter raised something other than a refusal, **1** the report could
+not be written. No partial report is ever written.
+
+## Executable and invocation
+
+Verified executable used for this section's runs:
+`C:\Users\Edison\AppData\Local\Temp\opencode\cpython39\pkg\tools\python.exe`
+(CPython 3.9.13 Windows x64). `--out-root` and `--report` are both **required**
+and neither is defaulted, so no invocation can write a repository file by
+accident:
+
+```bash
+python -B tools/asset-registry/census_targets.py --out-root <outside-the-repo> --report tools/asset-registry/target_census.json
+python -B -m unittest discover -s tools/asset-registry/tests -p test_census_targets.py -v
+```
+
+## Evidence classification
+
+This tool establishes which conversion targets are convertible **as of the
+committed parsed subset**, and records why the rest are not. It is not evidence
+of asset validity, conversion correctness, rendering, visual fidelity, gameplay
+parity, or Godot loading. A refusal class is a recorded measurement of what the
+parsers reject, not a claim about the SWF format: the causes are separately
+**unestablished** and are follow-up investigation lines.
+
+## Containment
+
+- Reads only the committed registry and normalized content plus the sprite,
+  inspection and extraction files each converter needs.
+- Never imports a legacy application module, never uses
+  subprocess/network/server/browser/Flash, never invokes a Flash runtime.
+- Writes converter output **only** beneath an explicitly required `--out-root`,
+  one directory per target, and refuses the repository root as that root.
+  Never writes `conversions.json`, `statuses.json`, or any converted package
+  directory of the repository.
+- Writes `target_census.json` only on success. No bytecode (`-B` recommended),
+  no caches, no temporary files in the repository.

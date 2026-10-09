@@ -35,9 +35,19 @@ from pathlib import Path
 import convert_building as shared
 
 POLICY = "unit-conversion-v1"
-TARGET_STEM = "10033_wild_elephant"
-TARGET_LEGACY_ID = "933"
-SOURCE = "assets/sprites/" + TARGET_STEM + ".swf"
+
+# There are deliberately no TARGET_STEM / TARGET_LEGACY_ID defaults, and no
+# module-level source: the source path is derived from the declared stem at
+# call time. Two explicit parameters, not one derived, because the stem->id
+# relation is unestablished (`10033_wild_elephant` is 933 and
+# `0001_house_1_m` is 1) and a wrong derivation would silently attach the
+# wrong definition to a package. The pair is also what keeps the existing
+# two-key uniqueness guard meaningful.
+
+
+def source_for(target_stem):
+    """Sprite source path for a declared target stem."""
+    return "assets/sprites/" + target_stem + ".swf"
 
 NORMALIZED_DIR = shared.NORMALIZED_DIR
 UNITS_FILE = NORMALIZED_DIR / "units.json"
@@ -304,37 +314,38 @@ def resolve_characters(timeline, who, shape_ids, sprite_ids):
                  + str(character_id)])
 
 
-def build_package(repo_root, out_root):
+def build_package(repo_root, out_root, target_stem, target_legacy_id):
     root = Path(repo_root)
     layers = load_all(root)
+    source = source_for(target_stem)
     problems = []
     matches = [entry for entry in layers["units"]
                if isinstance(entry, dict)
-               and str(entry.get("legacy_id")) == TARGET_LEGACY_ID
-               and entry.get("img_name") == TARGET_STEM]
+               and str(entry.get("legacy_id")) == target_legacy_id
+               and entry.get("img_name") == target_stem]
     if len(matches) != 1:
         raise shared.ValidationFailure(
-            ["content ref not unique for unit " + TARGET_STEM
-             + " (legacy_id " + TARGET_LEGACY_ID + "): "
+            ["content ref not unique for unit " + target_stem
+             + " (legacy_id " + target_legacy_id + "): "
              + str(len(matches))])
     content = matches[0]
     entries = layers["inspection"].get("entries", {})
-    if SOURCE not in entries or not isinstance(entries[SOURCE], dict):
+    if source not in entries or not isinstance(entries[source], dict):
         raise shared.ValidationFailure(
-            ["inspection entry missing for " + SOURCE])
-    inspected = entries[SOURCE]
+            ["inspection entry missing for " + source])
+    inspected = entries[source]
     inspected_sprites = inspected.get("sprite_count")
     if type(inspected_sprites) is not int:
         raise shared.ValidationFailure(
-            ["inspection sprite count not integer for " + SOURCE])
+            ["inspection sprite count not integer for " + source])
     inspected_labels_raw = inspected.get("frame_labels")
     if not isinstance(inspected_labels_raw, list):
         raise shared.ValidationFailure(
-            ["inspection frame labels not array for " + SOURCE])
-    data = shared.read_bytes_file(root / SOURCE, "swf " + SOURCE)
+            ["inspection frame labels not array for " + source])
+    data = shared.read_bytes_file(root / source, "swf " + source)
     try:
-        body = shared.decompress_body(data, "swf " + SOURCE)
-        width, height, consumed = shared.parse_frame_size(body, "swf " + SOURCE)
+        body = shared.decompress_body(data, "swf " + source)
+        width, height, consumed = shared.parse_frame_size(body, "swf " + source)
         rest = consumed
         rate = struct.unpack("<H", body[rest:rest + 2])[0] / 256.0
         count = struct.unpack("<H", body[rest + 2:rest + 4])[0]
@@ -342,7 +353,7 @@ def build_package(repo_root, out_root):
         shapes = []
         shape_ids = set()
         for tag, shape_id, payload, context in shared.walk_shape_tags(
-                stream, "swf " + SOURCE):
+                stream, "swf " + source):
             if shape_id in shape_ids:
                 raise shared.ValidationFailure(
                     ["duplicate shape id " + str(shape_id)
@@ -352,7 +363,7 @@ def build_package(repo_root, out_root):
                 payload, tag, shape_id, context, collect_refs=True))
         state = {"sprites": [], "symbols": None}
         main_record = {"events": []}
-        observed_main = walk_timeline(stream, "swf " + SOURCE,
+        observed_main = walk_timeline(stream, "swf " + source,
                                       main_record, state)
     except shared.ValidationFailure as failure:
         raise shared.ValidationFailure(failure.problems)
@@ -362,7 +373,7 @@ def build_package(repo_root, out_root):
              + str(count) + " observed " + str(observed_main)])
     if len(state["sprites"]) != inspected_sprites:
         raise shared.ValidationFailure(
-            ["sprite count mismatch for " + SOURCE + ": inspection "
+            ["sprite count mismatch for " + source + ": inspection "
              + str(inspected_sprites) + " source "
              + str(len(state["sprites"]))])
     for sprite in state["sprites"]:
@@ -374,7 +385,7 @@ def build_package(repo_root, out_root):
                  + str(sprite["observed"])])
     if state["symbols"] is None:
         raise shared.ValidationFailure(
-            ["SymbolClass tag missing for " + SOURCE])
+            ["SymbolClass tag missing for " + source])
     sprite_ids = {sprite["sprite_id"] for sprite in state["sprites"]}
     main_timeline = finalize_timeline("main timeline", main_record, count)
     timelines = [(main_timeline, "main timeline")]
@@ -399,7 +410,7 @@ def build_package(repo_root, out_root):
         resolve_characters(timeline, who, shape_ids, sprite_ids)
     bitmap_by_id = {}
     for bitmap in layers["extraction"].get("bitmaps", []):
-        if isinstance(bitmap, dict) and bitmap.get("source") == SOURCE:
+        if isinstance(bitmap, dict) and bitmap.get("source") == source:
             for output in bitmap.get("outputs", []):
                 bitmap_by_id.setdefault(
                     bitmap.get("character_id"), []).append(output)
@@ -434,7 +445,7 @@ def build_package(repo_root, out_root):
     payloads = {}
     for bitmap_id in referenced_ids:
         for output in bitmap_by_id[bitmap_id]:
-            target = (CONVERTED_UNITS_DIR / TARGET_STEM
+            target = (CONVERTED_UNITS_DIR / target_stem
                       / output["file"].rsplit("/", 1)[-1]).as_posix()
             payloads[target] = shared.read_bytes_file(
                 root / output["file"], "extracted " + output["file"])
@@ -451,9 +462,9 @@ def build_package(repo_root, out_root):
     if problems:
         raise shared.ValidationFailure(problems)
     package = {
-        "legacy_id": TARGET_STEM,
+        "legacy_id": target_stem,
         "kind": "converted_unit",
-        "source_file": SOURCE,
+        "source_file": source,
         "source_layer": "converted(asset-registry)",
         "content_version": fingerprint,
         "content_ref": content,
@@ -472,7 +483,7 @@ def build_package(repo_root, out_root):
     package_schema = shared.load_loose_schema(
         root, UNIT_PACKAGE_SCHEMA_FILE.name)
     problems.extend(shared.validate_against_schema(
-        package, package_schema, "converted_unit " + TARGET_STEM))
+        package, package_schema, "converted_unit " + target_stem))
     if problems:
         raise shared.ValidationFailure(problems)
     package_payload = (json.dumps(package, indent=2, sort_keys=True) + "\n"
@@ -480,8 +491,8 @@ def build_package(repo_root, out_root):
     conversion_schema = shared.load_loose_schema(
         root, CONVERSION_SCHEMA_FILE.name)
     document = shared.merge_conversion_document(root, {
-        "legacy_id": TARGET_STEM,
-        "directory": (CONVERTED_UNITS_DIR / TARGET_STEM).as_posix(),
+        "legacy_id": target_stem,
+        "directory": (CONVERTED_UNITS_DIR / target_stem).as_posix(),
         "package_sha256": hashlib.sha256(package_payload).hexdigest(),
         "bitmaps": len(bitmaps),
         "output_bytes": len(package_payload) + sum(
@@ -498,14 +509,14 @@ def build_package(repo_root, out_root):
     if problems:
         raise shared.ValidationFailure(problems)
     merged = dict(layers["statuses"])
-    merged[SOURCE] = "converted"
+    merged[source] = "converted"
     return package, package_payload, document, merged, payloads
 
 
 def write_outputs(out_root, package, package_payload, document, statuses,
-                  payloads):
+                  payloads, target_stem):
     out = Path(out_root)
-    package_dir = out / CONVERTED_UNITS_DIR / TARGET_STEM
+    package_dir = out / CONVERTED_UNITS_DIR / target_stem
     package_dir.mkdir(parents=True, exist_ok=True)
     (package_dir / "package.json").write_bytes(package_payload)
     for relative, payload in payloads.items():
@@ -523,7 +534,7 @@ def write_outputs(out_root, package, package_payload, document, statuses,
     (out / REGISTRY_DIR / "statuses.json").write_bytes(statuses_payload)
     return {
         "package": {
-            "directory": (CONVERTED_UNITS_DIR / TARGET_STEM).as_posix(),
+            "directory": (CONVERTED_UNITS_DIR / target_stem).as_posix(),
             "bytes": len(package_payload),
             "sha256": hashlib.sha256(package_payload).hexdigest(),
         },
@@ -543,6 +554,13 @@ def write_outputs(out_root, package, package_payload, document, statuses,
 def build_argument_parser():
     parser = argparse.ArgumentParser(description=__doc__,
                                       allow_abbrev=False)
+    parser.add_argument("--target-stem", required=True,
+                        help="sprite stem to convert, e.g. 10033_wild_elephant "
+                             "(required: this tool has no default target)")
+    parser.add_argument("--target-legacy-id", required=True,
+                        help="normalized content legacy_id of the target, e.g. 933 "
+                             "(required, and paired with --target-stem: the two-key "
+                             "match is the uniqueness guard)")
     parser.add_argument("--repo-root",
                         help="repository root to read (default: current directory)")
     parser.add_argument("--out-root",
@@ -550,11 +568,11 @@ def build_argument_parser():
     return parser
 
 
-def run_build(repo_root, out_root):
+def run_build(repo_root, out_root, target_stem, target_legacy_id):
     package, package_payload, document, statuses, payloads = build_package(
-        repo_root, out_root)
+        repo_root, out_root, target_stem, target_legacy_id)
     digests = write_outputs(out_root, package, package_payload, document,
-                            statuses, payloads)
+                            statuses, payloads, target_stem)
     return package, document, digests
 
 
@@ -564,7 +582,9 @@ def main(argv=None):
     repo_root = args.repo_root or "."
     out_root = args.out_root or repo_root
     try:
-        _package, document, digests = run_build(repo_root, out_root)
+        _package, document, digests = run_build(repo_root, out_root,
+                                                args.target_stem,
+                                                args.target_legacy_id)
     except shared.ValidationFailure as failure:
         report = {
             "schema_version": SCHEMA_VERSION,

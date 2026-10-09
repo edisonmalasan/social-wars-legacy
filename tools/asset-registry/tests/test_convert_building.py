@@ -131,7 +131,16 @@ def snapshot(root):
             for path in Path(root).rglob("*")}
 
 
-def run_main(argv):
+def run_main(argv, target_stem="0001_house_1_m"):
+    """Invoke the converter, supplying the target stem unless a test overrides it.
+
+    The target is a required CLI input (there is deliberately no default), so
+    every existing case states it here rather than the converter guessing. A
+    case that is about the target itself passes `target_stem` explicitly.
+    """
+    argv = list(argv)
+    if target_stem is not None and "--target-stem" not in argv:
+        argv = ["--target-stem", target_stem] + argv
     stdout = io.StringIO()
     stderr = io.StringIO()
     with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
@@ -252,6 +261,108 @@ class SyntheticAssemblyTests(unittest.TestCase):
         self.assertEqual(self.statuses["statuses"],
                          {"assets/sprites/0001_house_1_m.swf": "converted"})
         self.assertEqual(self.statuses["policy"], "asset-statuses-v1")
+
+
+class TargetParameterTests(unittest.TestCase):
+    """The target stem is a required input with no default (design D1).
+
+    A silent default is the failure mode a batch run cannot detect: converting N
+    targets while one of them silently re-derived M4's single measured target
+    would be indistinguishable from doing the work. So the guard is that the
+    input is *absent* by default, not merely that it is honoured when given.
+    """
+
+    def setUp(self):
+        self.temporary, self.work = make_fixture_tree()
+        self.addCleanup(self.temporary.cleanup)
+
+    def test_no_target_stem_constant_exists(self):
+        self.assertFalse(hasattr(converter, "TARGET_STEM"))
+
+    def test_invoking_without_a_target_exits_non_zero(self):
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            with self.assertRaises(SystemExit) as caught:
+                converter.main(["--repo-root", str(self.work)])
+        self.assertNotEqual(caught.exception.code, 0)
+        self.assertIn("--target-stem", stderr.getvalue())
+
+    def test_invoking_without_a_target_writes_nothing(self):
+        before = snapshot(self.work)
+        with contextlib.redirect_stdout(io.StringIO()), \
+                contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit):
+                converter.main(["--repo-root", str(self.work),
+                                "--out-root", str(self.work)])
+        self.assertEqual(snapshot(self.work), before)
+
+    def test_an_explicit_target_converts(self):
+        code, stdout, _ = run_main(["--repo-root", str(self.work),
+                                    "--out-root", str(self.work)])
+        self.assertEqual(code, 0, stdout)
+        package = self.work / "assets/converted/buildings/0001_house_1_m"
+        self.assertTrue((package / "package.json").exists())
+
+    def test_a_different_target_is_assembled_into_its_own_directory(self):
+        # Rename the target everywhere the fixture names it, then convert the
+        # renamed target: the package shape must be identical and it must land
+        # under the new stem's directory, not the old one.
+        renamed = "0009_other_house"
+        content = self.work / "packages/game-content/normalized/buildings.json"
+        content.write_text(
+            content.read_text(encoding="utf-8").replace(
+                "0001_house_1_m", renamed), encoding="utf-8")
+        sprite = self.work / "assets/sprites/0001_house_1_m.swf"
+        sprite.rename(self.work / ("assets/sprites/" + renamed + ".swf"))
+        tools = self.work / "tools/asset-registry"
+        inspection = tools / "inspection.json"
+        inspection.write_text(
+            inspection.read_text(encoding="utf-8").replace(
+                "0001_house_1_m", renamed), encoding="utf-8")
+        extraction = tools / "image_extraction.json"
+        extraction.write_text(
+            extraction.read_text(encoding="utf-8").replace(
+                "0001_house_1_m", renamed), encoding="utf-8")
+        # The extracted bitmap the manifest now points at must exist under the
+        # renamed directory too: it is the target's own input, so renaming the
+        # target renames it.
+        images = self.work / "assets/converted/images/0001_house_1_m"
+        images.rename(self.work / "assets/converted/images" / renamed)
+        code, stdout, stderr = run_main(["--repo-root", str(self.work),
+                                         "--out-root", str(self.work)],
+                                        target_stem=renamed)
+        self.assertEqual(code, 0, stderr + stdout)
+        built = self.work / "assets/converted/buildings" / renamed
+        self.assertTrue((built / "package.json").exists())
+        self.assertFalse((self.work / "assets/converted/buildings"
+                          / "0001_house_1_m").exists())
+        document = json.loads(
+            (self.work / "assets/converted/buildings" / renamed
+             / "package.json").read_text(encoding="utf-8"))
+        self.assertEqual(document["legacy_id"], renamed)
+
+    def test_the_fingerprint_is_line_ending_invariant(self):
+        # The two fingerprint inputs that are not otherwise pinned carry CRLF on
+        # a default Windows checkout. The digest must not move because of that.
+        first = converter.fingerprint_inputs(self.work)
+        for name in ("inspection.json", "image_extraction.json"):
+            path = self.work / "tools/asset-registry" / name
+            data = path.read_bytes()
+            if b"\n" in data:
+                path.write_bytes(data.replace(b"\n", b"\r\n"))
+        second = converter.fingerprint_inputs(self.work)
+        self.assertEqual(first, second)
+
+    def test_fingerprint_bytes_leaves_binary_data_exact(self):
+        # Text is normalised; a payload carrying NUL is binary and must not be,
+        # or a bitmap's digest would stop matching its recorded extraction value.
+        binary = bytes(range(256)) + b"\r\n\r\n"
+        self.assertEqual(converter.fingerprint_bytes(binary), binary)
+
+    def test_fingerprint_bytes_normalises_text(self):
+        self.assertEqual(converter.fingerprint_bytes(b"a\r\nb\r\n"), b"a\nb\n")
+        self.assertEqual(converter.fingerprint_bytes(b"a\r\nb"), b"a\nb")
 
 
 class SyntheticFailureTests(unittest.TestCase):

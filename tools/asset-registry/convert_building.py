@@ -33,7 +33,12 @@ import sys
 POLICY = "building-conversion-v1"
 ENVELOPE_POLICY = "conversion-v1"
 SCHEMA_VERSION = 1
-TARGET_STEM = "0001_house_1_m"
+
+# There is deliberately no TARGET_STEM default. The target is a required
+# input (see `build_argument_parser`): a silent default is the failure mode a
+# batch run cannot detect, because converting N targets while one of them
+# silently re-derived M4's target would be indistinguishable from doing the
+# work.
 
 NORMALIZED_DIR = Path("packages") / "game-content" / "normalized"
 BUILDINGS_FILE = NORMALIZED_DIR / "buildings.json"
@@ -514,14 +519,42 @@ def load_all(root):
             "buildings": buildings, "statuses": statuses}
 
 
+def fingerprint_bytes(data):
+    """Bytes made line-ending invariant for text, exact for binary.
+
+    Two of the three fingerprint inputs (`inspection.json` and
+    `image_extraction.json`) carry CRLF on a default `core.autocrlf=true`
+    Windows checkout and LF everywhere else, and neither is byte-identical
+    across those forms. Hashing raw working-tree bytes therefore makes the
+    package's `content_version` -- the field that records which content build
+    a package was converted against -- checkout-dependent, so the same
+    committed content would fingerprint differently per machine and the two
+    committed packages would stop reproducing on any LF checkout.
+
+    This is the treatment `apps/compat-api/guard_baseline.py` already applies
+    to its own digests ("text digests are line-ending invariant, so the
+    baseline holds across checkout forms"), reused here on that precedent
+    rather than invented. Bytes that decode as UTF-8 without containing NUL
+    are treated as text and normalized CRLF -> LF; every other file is
+    hashed as its exact bytes.
+    """
+    try:
+        data.decode("utf-8")
+    except UnicodeDecodeError:
+        return data
+    if b"\x00" in data:
+        return data
+    return data.replace(b"\r\n", b"\n")
+
+
 def fingerprint_inputs(root, files=None):
     if files is None:
         files = (BUILDINGS_FILE, REGISTRY_DIR / "inspection.json",
                  REGISTRY_DIR / "image_extraction.json")
     digest = hashlib.sha256()
     for relative in files:
-        digest.update(read_bytes_file(root / relative,
-                                      "fingerprint " + relative.as_posix()))
+        digest.update(fingerprint_bytes(read_bytes_file(
+            root / relative, "fingerprint " + relative.as_posix())))
     return digest.hexdigest()
 
 
@@ -600,15 +633,15 @@ def merge_conversion_document(root, own_entry, own_inputs, tool_policy):
     }
 
 
-def build_package(repo_root, out_root):
+def build_package(repo_root, out_root, target_stem):
     root = Path(repo_root)
     layers = load_all(root)
-    source = "assets/sprites/" + TARGET_STEM + ".swf"
+    source = "assets/sprites/" + target_stem + ".swf"
     problems = []
     matches = [entry for entry in layers["buildings"]
-               if isinstance(entry, dict) and entry.get("img_name") == TARGET_STEM]
+               if isinstance(entry, dict) and entry.get("img_name") == target_stem]
     if len(matches) != 1:
-        raise ValidationFailure(["content ref not unique for " + TARGET_STEM + ": "
+        raise ValidationFailure(["content ref not unique for " + target_stem + ": "
                                  + str(len(matches))])
     content = matches[0]
     entries = layers["inspection"].get("entries", {})
@@ -650,7 +683,7 @@ def build_package(repo_root, out_root):
             if "bitmap_id" not in fill:
                 continue
             for output in bitmap_by_id[fill["bitmap_id"]]:
-                target = (CONVERTED_BUILDINGS_DIR / TARGET_STEM
+                target = (CONVERTED_BUILDINGS_DIR / target_stem
                           / output["file"].rsplit("/", 1)[-1]).as_posix()
                 payloads[target] = read_bytes_file(root / output["file"],
                                                    "extracted " + output["file"])
@@ -667,7 +700,7 @@ def build_package(repo_root, out_root):
     if problems:
         raise ValidationFailure(problems)
     package = {
-        "legacy_id": TARGET_STEM,
+        "legacy_id": target_stem,
         "kind": "converted_building",
         "source_file": source,
         "source_layer": "converted(asset-registry)",
@@ -687,15 +720,15 @@ def build_package(repo_root, out_root):
     }
     package_schema = load_loose_schema(root, PACKAGE_SCHEMA_FILE.name)
     problems.extend(validate_against_schema(
-        package, package_schema, "converted_building " + TARGET_STEM))
+        package, package_schema, "converted_building " + target_stem))
     if problems:
         raise ValidationFailure(problems)
     package_payload = (json.dumps(package, indent=2, sort_keys=True) + "\n"
                        ).encode("utf-8")
     conversion_schema = load_loose_schema(root, CONVERSION_SCHEMA_FILE.name)
     document = merge_conversion_document(root, {
-        "legacy_id": TARGET_STEM,
-        "directory": (CONVERTED_BUILDINGS_DIR / TARGET_STEM).as_posix(),
+        "legacy_id": target_stem,
+        "directory": (CONVERTED_BUILDINGS_DIR / target_stem).as_posix(),
         "package_sha256": hashlib.sha256(package_payload).hexdigest(),
         "bitmaps": len(bitmaps),
         "output_bytes": len(package_payload) + sum(
@@ -715,9 +748,10 @@ def build_package(repo_root, out_root):
     return package, package_payload, document, merged, payloads
 
 
-def write_outputs(out_root, package, package_payload, document, statuses, payloads):
+def write_outputs(out_root, package, package_payload, document, statuses, payloads,
+                  target_stem):
     out = Path(out_root)
-    package_dir = out / CONVERTED_BUILDINGS_DIR / TARGET_STEM
+    package_dir = out / CONVERTED_BUILDINGS_DIR / target_stem
     package_dir.mkdir(parents=True, exist_ok=True)
     (package_dir / "package.json").write_bytes(package_payload)
     for relative, payload in payloads.items():
@@ -733,7 +767,7 @@ def write_outputs(out_root, package, package_payload, document, statuses, payloa
     (out / REGISTRY_DIR / "statuses.json").write_bytes(statuses_payload)
     return {
         "package": {
-            "directory": (CONVERTED_BUILDINGS_DIR / TARGET_STEM).as_posix(),
+            "directory": (CONVERTED_BUILDINGS_DIR / target_stem).as_posix(),
             "bytes": len(package_payload),
             "sha256": hashlib.sha256(package_payload).hexdigest(),
         },
@@ -752,6 +786,9 @@ def write_outputs(out_root, package, package_payload, document, statuses, payloa
 
 def build_argument_parser():
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
+    parser.add_argument("--target-stem", required=True,
+                        help="sprite stem to convert, e.g. 0001_house_1_m "
+                             "(required: this tool has no default target)")
     parser.add_argument("--repo-root",
                         help="repository root to read (default: current directory)")
     parser.add_argument("--out-root",
@@ -759,11 +796,11 @@ def build_argument_parser():
     return parser
 
 
-def run_build(repo_root, out_root):
+def run_build(repo_root, out_root, target_stem):
     package, package_payload, document, statuses, payloads = build_package(
-        repo_root, out_root)
+        repo_root, out_root, target_stem)
     digests = write_outputs(out_root, package, package_payload, document,
-                            statuses, payloads)
+                            statuses, payloads, target_stem)
     return package, document, digests
 
 
@@ -773,7 +810,8 @@ def main(argv=None):
     repo_root = args.repo_root or "."
     out_root = args.out_root or repo_root
     try:
-        _package, document, digests = run_build(repo_root, out_root)
+        _package, document, digests = run_build(repo_root, out_root,
+                                                args.target_stem)
     except ValidationFailure as failure:
         report = {
             "schema_version": SCHEMA_VERSION,

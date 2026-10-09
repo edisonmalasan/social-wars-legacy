@@ -111,7 +111,7 @@
     "manifests": [
       {
         "path": "tools/asset-registry/conversions.json",
-        "sha256": "eb7c800118441fef733c332e4927427eae64e3a8275ff4e625fef3d268a08528"
+        "sha256": "622c1489005c35a3dea0b931c46d80d872c60439f25dd3f595c70f9d6f16ad10"
       },
       {
         "path": "tools/asset-registry/inspection.json",
@@ -125,12 +125,12 @@
     "packages": [
       {
         "dir": "assets/converted/buildings/0001_house_1_m",
-        "directory_sha256": "a63dc0afb6128c8b2e96877636ba4b697a61dcae277ec3b63d99a5764fc10e66",
+        "directory_sha256": "b98fc5abf795e6c94003843e924c20c0ceeedc4ecd5c8e1b0aa7a89a5da7d8ff",
         "files": 3
       },
       {
         "dir": "assets/converted/units/10033_wild_elephant",
-        "directory_sha256": "0eac109bc32cdf7919e613eaa18f89e43fc0177c46e272460588247b324058b4",
+        "directory_sha256": "036b55eb699cf29a809420b5dade0cc0aaa8c9999095040b2e262f8f999ada61",
         "files": 57
       }
     ]

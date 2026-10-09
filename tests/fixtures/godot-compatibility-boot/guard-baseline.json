@@ -4,8 +4,8 @@
     "file": "sha256 of the guarded file bytes, lowercase hex: text files (valid UTF-8 without NUL) normalized CRLF -> LF first, all other files exact bytes",
     "group": "SHA-256 of the ordinal-sorted \"<sha256>  <repo-relative posix path>\\n\" lines of every file in the group"
   },
-  "combined_sha256": "6978b9594f52b3f87ebe043b7d1ce0da67632d0a0537f0af7ea3d22f2e7ff348",
-  "generated_at_utc": "2026-09-27T02:25:11+00:00",
+  "combined_sha256": "13b2ccca56bfd7ea8d42e9ca3f0ac066aa6a5aae15c7a3dee99703ca972bcad1",
+  "generated_at_utc": "2026-10-09T02:32:51+00:00",
   "groups": {
     "config": {
       "absent_paths": [],
@@ -31,7 +31,7 @@
       "files": {
         "assets/converted/buildings/0001_house_1_m/1.jpg": "1c8ce8838969cefed8e8c2d574b7c933ffc2076506a13f16e731d573de9853c4",
         "assets/converted/buildings/0001_house_1_m/1_alpha.png": "6685b0af171e0da40313f26587551d976e63d48d2331ad96937c2e55d395e42c",
-        "assets/converted/buildings/0001_house_1_m/package.json": "7de262e9f5ec67b1dc57945137f3d5f9a27707d6587dddd4a508e72d366b92a7",
+        "assets/converted/buildings/0001_house_1_m/package.json": "ed6807d14257cdca2ddf34187fe9c45226bec372b784b3dd91e4db8f900f5f2a",
         "assets/converted/units/10033_wild_elephant/1.jpg": "adca085be63b02813c0692118bd93209cb6650d7f533388878871e9059a4a71e",
         "assets/converted/units/10033_wild_elephant/11.jpg": "a02595c982a8b9bc51b054b06f3e20dce8e2e810774dde5f61e75b9b7c4cac4d",
         "assets/converted/units/10033_wild_elephant/11_alpha.png": "ff4c45f3203eec949548cf16b77a9dd7a47e083decd4f697c45b84b7c3897a7d",
@@ -88,10 +88,10 @@
         "assets/converted/units/10033_wild_elephant/7_alpha.png": "6f5bcc5dde1cb1c66ec4d338732db3b959c0203fdb078065c62c2725929bb76a",
         "assets/converted/units/10033_wild_elephant/9.jpg": "7efba179e16a62e3b06487f0006e72bf2a9f859a1e1a1a3e38142cb31f987c1b",
         "assets/converted/units/10033_wild_elephant/9_alpha.png": "67bd323ccfa4dde436e0bf4c462beb909016db01630a1203f4a0dd73d609d56b",
-        "assets/converted/units/10033_wild_elephant/package.json": "c40b754c3660d42c30bd8ba2388354efb96a71fad0d9082a105563c10b05d1c7"
+        "assets/converted/units/10033_wild_elephant/package.json": "aa3f28cf8cc162143381a7390490b72f50aa68733cdd2ba2f9a5eb96d315d19c"
       },
       "files_count": 60,
-      "sha256": "aae02f094df3c81a3a25b6abe206c3934286e049a555f96c52fb2c34523a1784"
+      "sha256": "c92df28eb7f748727b297114c84a15cc32f081e29af36551512ff9718738fe74"
     },
     "legacy_sources": {
       "absent_paths": [],
@@ -115,20 +115,20 @@
       "absent_paths": [],
       "files": {
         "apps/client-godot/evidence/first-render/first-render.png": "da15d192a901d75c3dc0d394d7eef1f9066beca3423b58620645c7d613f2bae5",
-        "apps/client-godot/evidence/first-render/report.json": "9eda9d8358459f71e8f1df0f953ead00529fc49e21a478c65f808247887bc85a"
+        "apps/client-godot/evidence/first-render/report.json": "fa4ade65c7e152b78ba29f8a172fa053788b49108ad48ad7a2cdbbc1bbd53454"
       },
       "files_count": 2,
-      "sha256": "bbeca0493a2a63513ab7dd3d2ca878f32f2deeb41b74867048cc36c5dad61f0c"
+      "sha256": "e61e3bc80d27a8df39d37a7378531ca778491875f36530a9ca7328bb5e6b3d5d"
     },
     "registry_manifests": {
       "absent_paths": [],
       "files": {
-        "tools/asset-registry/conversions.json": "c6fc2ad31463e63f989bf0c73f41dcf6109693e93ff96083ae459b9160700e8b",
+        "tools/asset-registry/conversions.json": "622c1489005c35a3dea0b931c46d80d872c60439f25dd3f595c70f9d6f16ad10",
         "tools/asset-registry/image_extraction.json": "2a00538e52e6ccd51bc7cc648b6a87acafce548e313e0378913332d618ac2455",
         "tools/asset-registry/inspection.json": "47f8b795cb1b27fe00df72745b7a20548db4071b5480c24376ed07e1a844a6fb"
       },
       "files_count": 3,
-      "sha256": "66673648c75f4f1ef3c08dd789d6b8c5d140f8d82a0f588dd1e4b3496e09cb95"
+      "sha256": "77c929fab4a99c9a5a1eaba71c1adb475ee53c8f7000f2d69bfcab1d54b60577"
     },
     "saves": {
       "absent_paths": [

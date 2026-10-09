@@ -17,3 +17,56 @@
 apps/client-godot/scripts/market/*.gd text eol=lf
 apps/client-godot/tests/test_market_trade.gd text eol=lf
 apps/client-godot/evidence/market-trade/report.json text eol=lf
+# Added by asset-package-parameterisation (2026-10-09). Two of the two converters'
+# `fingerprint_inputs` sets -- `inspection.json` and `image_extraction.json` -- decide the
+# `content_version` recorded in each converted package and the `inputs.*_content_version`
+# keys in `conversions.json`. They were unpinned, so on a default `core.autocrlf=true`
+# Windows checkout their CRLF working-tree bytes fingerprinted differently from their LF
+# committed blobs, and neither package reproduced. The fingerprint now normalises text
+# line endings before hashing (the `apps/compat-api/guard_baseline.py` precedent), which
+# fixes the cause; these pins record the intended on-disk form so the raw bytes and the
+# LF-normalised bytes agree, rather than depending on the fix alone.
+tools/asset-registry/inspection.json text eol=lf
+tools/asset-registry/image_extraction.json text eol=lf
+# The generated manifest pair. `conversions.json` is hashed by
+# `tools/asset-registry/build_asset_ids.py` and both files are rewritten by every
+# converter run, so an unpinned CRLF form would put two checkout forms of the same
+# content into that hash (the same defect class as `asset_ids.json` above).
+tools/asset-registry/conversions.json text eol=lf
+tools/asset-registry/statuses.json text eol=lf
+# The census report and the converted package manifests, for the same reason: each is
+# compared byte-for-byte across checkout forms by the census test and the M4 conversion
+# replay, and each is written with explicit `\n` newlines by its producer.
+tools/asset-registry/target_census.json text eol=lf
+assets/converted/buildings/**/package.json text eol=lf
+assets/converted/units/**/package.json text eol=lf
+# `evidence/first-render/report.json` is pinned for a DIFFERENT reason than the
+# pins above, and the difference is recorded because I got it wrong first.
+#
+# `apps/compat-api/guard_baseline.py` does NOT hash raw working-tree bytes. Its
+# `guarded_bytes()` decodes each file as UTF-8, returns the exact bytes when that
+# decode fails or when a NUL is present (the first-render PNG), and otherwise
+# replaces CRLF with LF before hashing. All **91** recorded per-file digests
+# reproduce under that normalisation, so the baseline is **already**
+# line-ending invariant and needs no pin in order to verify on a CRLF checkout.
+#
+# I initially read the tool as hashing raw bytes, measured a CRLF checkout of this
+# file against the recorded digest, got a mismatch, and concluded - and committed -
+# a "pre-existing checkout-form defect" plus a pin justified by it. That
+# conclusion was **wrong**, and the error was in my instrument rather than in the
+# repository: I compared `sha256` of the raw checked-out bytes against a digest
+# computed over *normalised* bytes, so the mismatch was guaranteed and carried no
+# information. The pin is kept, for the honest and much weaker reason that this is
+# regenerated evidence whose own recorded digests should stay comparable across
+# checkout forms (the `market-trade` precedent); it is **not** required by
+# `guard_baseline.py`, which would be satisfied with or without it.
+apps/client-godot/evidence/first-render/report.json text eol=lf
+# This change's own two new Python sources and its census report. The census is
+# compared byte-for-byte across three consecutive runs and the committed report
+# is asserted identical to those runs, and `census_targets.py` is imported by the
+# suite -- so a CRLF checkout of a source that writes its own `\n` report is the
+# same unreproducibility. (Measured, not assumed: the two `.py` files were pure
+# LF in the working tree when this line was written, and the CRLF warning above is
+# git's own prediction for them.)
+tools/asset-registry/census_targets.py text eol=lf
+tools/asset-registry/tests/test_census_targets.py text eol=lf

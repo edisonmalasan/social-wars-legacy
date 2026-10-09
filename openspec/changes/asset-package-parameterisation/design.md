@@ -12,9 +12,17 @@ converters into a temporary output root. No repository file was written by any m
 are deleted. A run without a target fails closed with a clear message and writes nothing.
 
 *Rejected — keep the constant as the default.* A silent default is the failure mode a batch runner
-cannot detect: converting 587 targets while one of them silently re-derives M4's target would be
-indistinguishable from doing the work. The requirement is stated so a missing target is an error,
-not a fallback.
+cannot detect: converting the whole candidate population while one of them silently re-derives M4's
+target would be indistinguishable from doing the work. The requirement is stated so a missing target
+is an error, not a fallback.
+
+> **VINDICATED BY MEASUREMENT (Apply stage, 2026-10-09).** This paragraph's stated failure mode is
+> not hypothetical — the Propose-stage census *fell into it*. It drove the unit converter by
+> reassigning `TARGET_STEM`/`TARGET_LEGACY_ID`, missed the third constant `SOURCE = "assets/sprites/"
+> + TARGET_STEM + ".swf"` (computed at import time, therefore never moved), and so parsed the same
+> elephant SWF for all **365** unit targets. The result was a false **365 / 365 (100%)** unit
+> figure; the real figure is **68 / 365**. Full record in `proposal.md` §2. The third constant is
+> also why D2's deletion of module-level state is not limited to the two obvious names.
 
 *Rejected — a `--all` mode that sweeps every candidate.* That couples "parameterised" to "batch",
 and the batch needs a target list with an explicit order for the census to be deterministic
@@ -128,14 +136,39 @@ additional targets and regressed **0**; a separate 40-target probe found **697 u
 fix would be guessing. Each class is a separate investigation line, and the census report is what
 makes that line measurable.
 
+> **EXTENDED (Apply stage, 2026-10-09).** D7 scoped the refusal question to the *building* domain
+> and this change did not intend to extend it. The delivered census forced the extension: the unit
+> domain refuses **297 of 365** candidates across **seven** further classes — `shape byte overrun`
+> (**90**), `unknown fill style` (**76**), `unsupported timeline tag … (PlaceObject#)` (**57**),
+> `unsupported shape tag: 83` (**44**), `shape bit overrun` (**18**), `shape byte misaligned`
+> (**11**), `unsupported tag in timeline` (**1**). `unknown fill style` and `unsupported shape
+> tag: 83` now span **both** domains, and the two overrun classes are no longer building-only.
+>
+> **No fix is attempted for any of them**, exactly as D7 decided for the building classes, and none
+> is investigated here. What is claimed is only that they are *measured* and *classified*, with
+> **no target in more than one class** in either domain. Each remains a separate investigation
+> line. Notably, the unit converter's failure modes are dominated by shape decoding and timeline
+> tags, **not** by fills — so the Propose-stage reasoning that "the unit converter generalises
+> cleanly because it decodes timeline records and never touches fills" was wrong in both
+> directions: it does touch fills, and its timeline support does not generalise either.
+
 ## D8 — No mass conversion in this change
 
-**587** packages are available (**222** buildings + **365** units). Committing them is roughly
-30,000 files, regenerates the preservation manifest (currently **3,258 entries / 758,423,699
+**290** packages are available (**222** buildings + **68** units). Committing them is roughly
+15,000 files, regenerates the preservation manifest (currently **3,258 entries / 758,423,699
 bytes**), and delivers **no** client-visible progress while `apps/client-godot/scripts/package_paths.gd`
 pins exactly two packages. That diff deserves its own line with its own measured file count, byte
 total, and manifest delta. This change delivers the tooling and the census that makes that line
 possible.
+
+> **CORRECTED (Apply stage, 2026-10-09).** This decision originally read "**587** packages …
+> (**222** buildings + **365** units) … roughly 30,000 files". The unit half was a false figure
+> produced by a defect in the Propose-stage measuring instrument — see D1's vindication note and
+> `proposal.md` §2. Re-measured by the delivered census: **222** buildings + **68** units =
+> **290** available, **527** targets refused across **8** refusal classes. The decision itself is
+> unchanged and, if anything, strengthened: there is now **no domain that is 100% convertible**, so
+> the follow-up mass-conversion line cannot be scoped by domain and must first resolve refusal
+> classes.
 
 ## D9 — The `legacy_id` field carrying the stem is recorded, not corrected
 
