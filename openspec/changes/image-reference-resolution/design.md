@@ -155,3 +155,74 @@ outside it:
 - Whether `chapters2` supersedes `chapters` — a content-history question for a separate investigation.
 - Whether the 32 absent images should be authored or their references retired — a product decision.
 - Whether the 2 mis-pathed references or the corpus placement is the error — likewise a separate call.
+
+## Corrections found during Apply
+
+These were found by measurement while implementing, after this design was approved and merged. They are
+recorded rather than quietly edited, and none of them changes the approach, the specs' requirements, or
+the delivered behaviour — but one of them corrects a claim this document and the task list made, so it
+is corrected in both places.
+
+### C1 — The "bijection onto the corpus" holds over the path-resolved tier, not over all identified references
+
+The Risks section above cites "the corpus-wide bijection (573 refs → 573 files, zero unreferenced)" as
+the mitigation for path-first trusting a reference's directory. That figure is correct, and it was
+measured again here — but it describes the **path-resolved** tier specifically, and this design, the
+proposal and task 1.5 originally read it as covering every reference the join identifies.
+
+Measured on the committed corpus: 573 path-resolved references → 573 distinct files, exactly the set
+of files under `assets/images/en`, zero unreferenced. All **575** identified references → **573**
+distinct files. The two references that break distinctness are precisely the two fallback members:
+
+```
+assets/images/en/chapters2/simple/arachnids_old.jpg
+  <- /chapters2/simple/arachnids_old.jpg   (path-resolved)
+  <- /chapters/simple/arachnids_old.jpg     (fallback-resolved)
+assets/images/en/chapters2/simple/orcs_old.jpg
+  <- /chapters2/simple/orcs_old.jpg        (path-resolved)
+  <- /chapters/simple/orcs_old.jpg          (fallback-resolved)
+```
+
+This is not a defect and not a regression: the fallback exists precisely to resolve a reference whose
+directory is wrong, and the only file available for that wrong directory is the one the correct
+`chapters2` reference also names. Asserting distinctness over all 575 would have required asserting
+something false, so the assertion is written over the path-resolved tier with the two shared targets
+named explicitly — a stricter, more specific claim than the one originally written. Task 1.5 was
+amended in place to match, with this correction cited.
+
+### C2 — Two tools that compute the same join needed one shared implementation
+
+The proposal treated `build_asset_ids.py` as re-deriving the join independently and reconciling against
+`build_registry.py`'s recorded result. Implemented as written, that would be two copies of the rule,
+with the reconciliation as the only thing standing between them — and a rule change made in one place
+would show up as a coverage mismatch rather than as a wrong rule. `build_asset_ids.py` now calls
+`build_registry.join_image_refs` directly and takes its `rule` string from `build_registry.IMAGE_RULE`,
+so the two tools cannot record different rules for the same join. The reconciliation is **kept** — it
+now additionally reconciles the two named member lists, and it remains the check that catches a
+`coverage.json` that disagrees with a recomputation (probe P8 detects removing it). The check was
+strengthened rather than routed around.
+
+### C3 — The reconciliation needed a fourth tier field the spec does not name
+
+The `asset-registry` spec delta names three tiers: path-resolved, fallback-resolved, missing. But a
+reference can fail at its own path *and* match several files by basename — the case the
+`godot-content-registry` spec delta explicitly keeps reachable by retaining `ambiguous` in the closed
+vocabulary ("a reference that neither its path nor a single basename match identifies"). Recording only
+three tiers would leave that reference in none of them: silently absent from `coverage.json`, and the
+tier counts would no longer sum to the reference count. `coverage.json` therefore records
+`fallback_ambiguous` and `fallback_ambiguous_refs` as well, both empty on the committed corpus and both
+reconciled by the asset-ID tool. This is additive to the spec requirement, which specifies a minimum
+("SHALL record …"), and it is the only way the requirement can hold for a reference that is neither
+path-resolved, fallback-resolved, nor missing.
+
+### C4 — `registry.json`'s line-ending form is load-bearing for `asset_ids.json`, and this is pre-existing
+
+`asset_ids.json` records `registry.json`'s byte count and digest as an input. `build_registry.py` writes
+LF; the committed `registry.json` is checked out CRLF (`core.autocrlf=true`, no `eol=lf` attribute), so
+running `build_registry.py` changes that file's bytes and therefore changes `asset_ids.json`'s recorded
+input digest. `test_rebuild_matches_committed_bytes` then fails until `registry.json` is restored to its
+CRLF form. This was hit during this Apply, investigated, and **reproduced on stashed `main`** — it is
+pre-existing, order-dependent, and unrelated to this change. It is not fixed here: the honest fix belongs
+to the archived `asset-package-parameterisation` line that owns the `registry.json` worktree-form note in
+`tools/asset-registry/README.md`, and reworking an archived line's containment assertion from an
+unrelated change is how an unearned fix ships. Recorded as a known flaky surface.

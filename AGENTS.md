@@ -3082,7 +3082,18 @@ extraction manifests, writing the deterministic
 entries across the closed status vocabulary, byte-identical rerun), and
 they establish no asset validity, conversion correctness, rendering,
 gameplay parity, or Godot loading (client-side resolution is exercised
-by the Godot asset-ID suite).
+by the Godot asset-ID suite). The **image join is path-first**: each
+reference is resolved by its own path under the committed web root
+`assets/images/en`, and only when no corpus file sits there does a
+basename match apply, recorded as a distinct `fallback_resolved` tier
+(2 members today) rather than silently. `ambiguous` **remains in the closed
+status vocabulary and remains declarable** — it is unused for the committed
+images (0 of 607), not removed, so a future reference that neither its
+path nor a unique basename identifies is still reportable. The 32 image
+references with no file remain `missing_source`: they are absent under every
+extension repository-wide, so no resolver rule can close them and this is
+not presented as fixed. No image is rendered, decoded, or displayed by any
+of these commands.
 
 Verified offline content-validator commands (Windows x64 CPython 3.9.13):
 

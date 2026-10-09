@@ -36,6 +36,13 @@ EXCLUDE_PREFIXES = ("./.git/", "./saves/", "./temp/", "./new_assets/",
                     "./build/bundle", "./build/dist", "./build/work",
                     "./apps/")
 
+# The web root an image reference's own path is joined under.
+IMAGE_WEB_ROOT = "assets/images/en"
+# Recorded join contract for the image domain: the reference's own path
+# first, a basename match only as a recorded fallback.
+IMAGE_RULE = ("path-first under " + IMAGE_WEB_ROOT
+              + ", basename fallback recorded")
+
 NORMALIZED_DIR = Path("packages") / "game-content" / "normalized"
 REGISTRY_DIR = Path("tools") / "asset-registry"
 SCHEMA_DIR = REGISTRY_DIR / "schemas"
@@ -300,6 +307,38 @@ def join_sprite_stems(refs, registry_paths):
     return resolved, missing
 
 
+def join_image_refs(refs, registry_paths, basenames):
+    """Image rule: the reference's own path under the web root, then basename.
+
+    Returns the tiered references and a ref -> corpus file map for every
+    reference the join identifies by its own path or by the fallback. A
+    reference is reported per exactly one tier, in this order:
+
+    path_resolved        a corpus file exists at the reference's own path
+    fallback_resolved    no such file, and exactly one corpus file shares
+                         the reference's basename
+    fallback_ambiguous   no such file, and several corpus files share it
+    missing              no such file and no basename match at all
+    """
+    tiers = {"path_resolved": [], "fallback_resolved": [],
+             "fallback_ambiguous": [], "missing": [], "files": {}}
+    for ref in refs:
+        joined = IMAGE_WEB_ROOT + "/" + ref.lstrip("/")
+        if joined in registry_paths:
+            tiers["path_resolved"].append(ref)
+            tiers["files"][ref] = joined
+            continue
+        candidates = basenames.get(ref.rsplit("/", 1)[-1], [])
+        if len(candidates) == 1:
+            tiers["fallback_resolved"].append(ref)
+            tiers["files"][ref] = candidates[0]
+        elif candidates:
+            tiers["fallback_ambiguous"].append(ref)
+        else:
+            tiers["missing"].append(ref)
+    return tiers
+
+
 def build_coverage(root, registry):
     """Extract references, join against the registry, validate, return."""
     registry_paths = {entry["path"] for entry in registry["entries"]}
@@ -325,20 +364,14 @@ def build_coverage(root, registry):
     sound_resolved, sound_missing = join_sprite_stems(
         ["assets/sounds/" + ref + ".mp3" for ref in sound_refs], registry_paths)
 
-    image_tiers = {"basename_single": [], "basename_collision": [], "missing": []}
-    for ref in image_refs:
-        candidates = basenames.get(ref.rsplit("/", 1)[-1], [])
-        if len(candidates) == 1:
-            image_tiers["basename_single"].append(ref)
-        elif candidates:
-            image_tiers["basename_collision"].append(ref)
-        else:
-            image_tiers["missing"].append(ref)
+    image_tiers = join_image_refs(image_refs, registry_paths, basenames)
 
     referenced = set(item_resolved) | set(magic_resolved) | set(sound_resolved)
-    for candidates in (image_tiers["basename_single"], image_tiers["basename_collision"]):
-        for ref in candidates:
-            referenced.update(basenames[ref.rsplit("/", 1)[-1]])
+    for tier in ("path_resolved", "fallback_resolved"):
+        for ref in image_tiers[tier]:
+            referenced.add(image_tiers["files"][ref])
+    for ref in image_tiers["fallback_ambiguous"]:
+        referenced.update(basenames[ref.rsplit("/", 1)[-1]])
     unreferenced = {}
     for entry in registry["entries"]:
         if entry["path"] not in referenced:
@@ -373,11 +406,15 @@ def build_coverage(root, registry):
         "images": {
             "references": len(image_refs),
             "distinct_references": len(set(image_refs)),
-            "resolved": len(image_tiers["basename_single"]),
-            "basename_single": len(image_tiers["basename_single"]),
-            "basename_collision": len(image_tiers["basename_collision"]),
+            "resolved": (len(image_tiers["path_resolved"])
+                         + len(image_tiers["fallback_resolved"])),
+            "path_resolved": len(image_tiers["path_resolved"]),
+            "fallback_resolved": len(image_tiers["fallback_resolved"]),
+            "fallback_resolved_refs": sorted(image_tiers["fallback_resolved"]),
+            "fallback_ambiguous": len(image_tiers["fallback_ambiguous"]),
+            "fallback_ambiguous_refs": sorted(image_tiers["fallback_ambiguous"]),
             "missing": sorted(set(image_tiers["missing"])),
-            "rule": "basename match (web-root-relative form preserved, never rewritten)",
+            "rule": IMAGE_RULE,
         },
     }
     return {

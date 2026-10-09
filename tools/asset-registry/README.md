@@ -24,8 +24,20 @@ execution.
 - Item `img_name` comma-parts resolve as `assets/sprites/<stem>.swf`
   (case-sensitive); magic `img_name` as `assets/magic/<stem>.swf`;
   sound `file` as `assets/sounds/<stem>.mp3`.
-- Images paths resolve by basename with single/collision/missing
-  tiers; the web-root-relative form is preserved, never rewritten.
+- Images paths resolve **path-first**: the reference with its leading
+  separator removed is appended to the web root `assets/images/en`, and
+  a corpus file at that path identifies it. Only when no such file
+  exists does the join fall back to the reference's basename. The
+  reference's own path form is preserved, never rewritten. Tiers are
+  `path_resolved`, `fallback_resolved`, `fallback_ambiguous`, and
+  `missing`, and the fallback tier records its members by name.
+  Observed on the committed corpus: 573 path-resolved, 2 fallback-resolved
+  (`/chapters/simple/arachnids_old.jpg`, `/chapters/simple/orcs_old.jpg`,
+  whose files exist only under `chapters2/simple/`), 0 fallback-ambiguous,
+  32 missing — 607 references in total. The 32 stay missing: a
+  repository-wide search under every extension finds them absent, so no
+  resolver rule can close them; authoring or retiring them is a content
+  decision this repository does not make here.
 - Unmatched names are reported (missing lists), never errors; the
   report exists to prioritize conversion work.
 
@@ -35,8 +47,9 @@ execution.
   size, sha256 (worktree bytes), extension, directory class, and
   default status `registered`.
 - `tools/asset-registry/coverage.json`: per-domain resolved/missing
-  counts with missing-name lists, basename tiers, unreferenced-file
-  counts per directory class, and corpus totals.
+  counts with missing-name lists, image join tiers with the fallback
+  tier's members named, unreferenced-file counts per directory class,
+  and corpus totals.
 
 ## Validation gates (failures exit 1, outputs unwritten)
 
@@ -582,8 +595,10 @@ survives a fresh checkout.
 Reference extraction and join rules mirror `build_registry.py`'s coverage
 step exactly (item `img_name` comma-split, `magics.img_name`,
 `sounds.file`, `images.path`; `assets/sprites/<stem>.swf`,
-`assets/magic/<stem>.swf`, `assets/sounds/<stem>.mp3`, basename match for
-images). Each distinct reference gets exactly one status:
+`assets/magic/<stem>.swf`, `assets/sounds/<stem>.mp3`, and the path-first
+image join with its recorded basename fallback). The image `rule` string is
+taken from `build_registry.IMAGE_RULE`, so both tools record byte-identical
+rule text for the same join. Each distinct reference gets exactly one status:
 
 - `converted` — the reference equals a `conversions.json` package
   `legacy_id`; runtime is the package directory.
@@ -594,8 +609,12 @@ images). Each distinct reference gets exactly one status:
   (jpg/jpeg/png/mp3); runtime is the corpus file itself.
 - `pending` — source exists with no runtime output and no extraction
   record; no runtime path.
-- `ambiguous` — several corpus files share the image basename;
-  sorted candidates recorded, no runtime path.
+- `ambiguous` — no corpus file sits at the reference's own path under the
+  web root and several corpus files share its basename; sorted candidates
+  recorded, no runtime path. The status remains in the closed vocabulary and
+  remains declarable; it is simply **unused for the committed images**, where
+  the path-first join leaves 0 ambiguous entries (566 `passthrough`, 9
+  `extracted`, 32 `missing_source`).
 - `missing_source` — no corpus hit; the reference must appear in that
   domain's committed coverage `missing` list.
 
@@ -610,7 +629,8 @@ images). Each distinct reference gets exactly one status:
 ## Validation gates (failures exit 1, outputs unwritten)
 
 Coverage reconciliation (references, distinct, resolved, missing lists,
-and the images basename tiers), converted set equal to the conversion
+and the image tiers — the three counts and the two named member lists),
+converted set equal to the conversion
 packages, single output directory per extracted source, closed-vocabulary
 statuses, runtime-path contract (a runtime path exists iff the status
 carries one), entry/`reference_count` sums against distinct counts, and

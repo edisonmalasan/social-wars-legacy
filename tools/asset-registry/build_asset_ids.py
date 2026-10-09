@@ -9,7 +9,8 @@ runtime status from a closed vocabulary:
     extracted       bitmap outputs are recorded for the source SWF
     passthrough     the source file is already a runtime-readable format
     pending         the source exists but no runtime output exists yet
-    ambiguous       several corpus files share the image basename
+    ambiguous       no corpus file matches the reference's own path or its
+                    basename uniquely (unreachable for the committed corpus)
     missing_source  the corpus contains no matching source file
 
 The join rules and reference extraction mirror build_registry.py's coverage
@@ -48,7 +49,7 @@ RUNTIME_EXTENSIONS = (".jpg", ".jpeg", ".png", ".mp3")
 EXTRACTED_PREFIX = "assets/converted/images/"
 
 RULES = {
-    "images": "basename match (web-root-relative form preserved, never rewritten)",
+    "images": source.IMAGE_RULE,
     "item_sprites": "assets/sprites/<stem>.swf",
     "magic_sprites": "assets/magic/<stem>.swf",
     "sounds": "assets/sounds/<stem>.mp3",
@@ -115,18 +116,16 @@ def join_coverage_tiers(registry_paths, image_refs, item_refs, magic_refs,
     magic_joined = ["assets/magic/" + ref + ".swf" for ref in magic_refs]
     sound_joined = ["assets/sounds/" + ref + ".mp3" for ref in sound_refs]
 
-    image_tiers = {"basename_single": [], "basename_collision": [],
-                   "missing": []}
+    image_tiers = source.join_image_refs(image_refs, registry_paths, basenames)
     image_candidates = {}
     for ref in image_refs:
-        candidates = sorted(basenames.get(ref.rsplit("/", 1)[-1], []))
-        image_candidates[ref] = candidates
-        if len(candidates) == 1:
-            image_tiers["basename_single"].append(ref)
-        elif candidates:
-            image_tiers["basename_collision"].append(ref)
+        if ref in image_tiers["files"]:
+            image_candidates[ref] = [image_tiers["files"][ref]]
+        elif ref in image_tiers["fallback_ambiguous"]:
+            image_candidates[ref] = sorted(
+                basenames.get(ref.rsplit("/", 1)[-1], []))
         else:
-            image_tiers["missing"].append(ref)
+            image_candidates[ref] = []
 
     resolved = {
         "item_sprites": [ref for ref, joined in zip(item_refs, item_joined)
@@ -135,7 +134,8 @@ def join_coverage_tiers(registry_paths, image_refs, item_refs, magic_refs,
                           if joined in registry_paths],
         "sounds": [ref for ref, joined in zip(sound_refs, sound_joined)
                    if joined in registry_paths],
-        "images": list(image_tiers["basename_single"]),
+        "images": (list(image_tiers["path_resolved"])
+                   + list(image_tiers["fallback_resolved"])),
     }
     missing = {
         "item_sprites": sorted({ref for ref, joined in zip(item_refs,
@@ -180,14 +180,23 @@ def reconcile(coverage, references, resolved, missing, image_tiers):
                 "coverage mismatch: %s missing list recorded %r, recomputed %r"
                 % (kind, recorded_missing, missing[kind]))
         if kind == "images":
-            for field, recomputed in (("basename_single",
-                                       len(image_tiers["basename_single"])),
-                                      ("basename_collision",
-                                       len(image_tiers["basename_collision"]))):
+            for field, recomputed in (
+                    ("path_resolved", len(image_tiers["path_resolved"])),
+                    ("fallback_resolved",
+                     len(image_tiers["fallback_resolved"])),
+                    ("fallback_ambiguous",
+                     len(image_tiers["fallback_ambiguous"]))):
                 if recorded.get(field) != recomputed:
                     problems.append(
                         "coverage mismatch: images %s recorded %r, recomputed %d"
                         % (field, recorded.get(field), recomputed))
+            for field, tier in (("fallback_resolved_refs", "fallback_resolved"),
+                                ("fallback_ambiguous_refs",
+                                 "fallback_ambiguous")):
+                if recorded.get(field) != sorted(image_tiers[tier]):
+                    problems.append(
+                        "coverage mismatch: images %s list differs from the "
+                        "recomputed join" % field)
     return problems
 
 

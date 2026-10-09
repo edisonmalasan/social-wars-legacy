@@ -30,14 +30,13 @@ PINNED_REFERENCES = {
     "sounds": 139,
 }
 PINNED_RESOLVED = {
-    "images": 525,
+    "images": 575,
     "item_sprites": 907,
     "magic_sprites": 10,
     "sounds": 139,
 }
 PINNED_BY_KIND = {
-    "images": {"passthrough": 516, "extracted": 9, "ambiguous": 50,
-               "missing_source": 32},
+    "images": {"passthrough": 566, "extracted": 9, "missing_source": 32},
     "item_sprites": {"converted": 2, "extracted": 857, "pending": 3,
                      "missing_source": 10},
     "magic_sprites": {"extracted": 6, "pending": 4},
@@ -168,8 +167,158 @@ class EvidenceReconciliationTests(unittest.TestCase):
             self.assertEqual(counts["resolved_references"][kind],
                              domain["resolved"], kind)
         images = self.coverage["domains"]["images"]
-        self.assertEqual(images["basename_single"], 525)
-        self.assertEqual(images["basename_collision"], 50)
+        self.assertEqual(images["path_resolved"], 573)
+        self.assertEqual(images["fallback_resolved"], 2)
+        self.assertEqual(images["fallback_ambiguous"], 0)
+
+    def test_the_images_rule_text_is_byte_identical_in_both_tools(self):
+        # Task 2.1: both tools record the same rule for the same join.
+        self.assertEqual(builder.RULES["images"], source.IMAGE_RULE)
+        self.assertEqual(self.by_kind["images"]["rule"],
+                         self.coverage["domains"]["images"]["rule"])
+
+    def test_the_two_fallback_entries_keep_their_runtime_path(self):
+        # Task 2.3: the mis-pathed references still resolve, to the file
+        # they resolve to today.
+        entries = {entry["ref"]: entry for entry in self.entries("images")}
+        for ref, target in (
+                ("/chapters/simple/arachnids_old.jpg",
+                 "assets/images/en/chapters2/simple/arachnids_old.jpg"),
+                ("/chapters/simple/orcs_old.jpg",
+                 "assets/images/en/chapters2/simple/orcs_old.jpg")):
+            entry = entries[ref]
+            self.assertEqual(entry["status"], "passthrough", ref)
+            self.assertEqual(entry["source"], target, ref)
+            self.assertEqual(entry["runtime"], target, ref)
+            self.assertNotIn("candidates", entry, ref)
+
+    def test_the_thirty_two_absent_references_stay_absent(self):
+        # Task 2.6: no source, no runtime path, no candidate list, and no
+        # file created for any of them.
+        entries = {entry["ref"]: entry
+                   for entry in self.entries("images")}
+        missing = self.coverage["domains"]["images"]["missing"]
+        self.assertEqual(len(missing), 32)
+        for ref in missing:
+            entry = entries[ref]
+            self.assertEqual(entry["status"], "missing_source", ref)
+            self.assertIsNone(entry["source"], ref)
+            self.assertIsNone(entry["source_sha256"], ref)
+            self.assertIsNone(entry["runtime"], ref)
+            self.assertNotIn("candidates", entry, ref)
+        # Nothing exists at the path the join looks for, so no file was
+        # created for any of them: the reference is absent, not resolved.
+        looked_for = {}
+        for ref in missing:
+            looked_for[ref] = source.IMAGE_WEB_ROOT + "/" + ref.lstrip("/")
+        self.assertEqual(len(looked_for), 32)
+        for ref, path in looked_for.items():
+            self.assertFalse((ROOT / path).exists(), path)
+
+    def test_ambiguous_remains_declarable_and_still_refuses_a_runtime(self):
+        # Task 2.4: the status is unused for images, not removed, and the
+        # builder's own validation still refuses a runtime claim on it.
+        self.assertIn("ambiguous", builder.STATUSES)
+        entry = {"ref": "/a/b.jpg", "reference_count": 1,
+                 "status": "ambiguous", "source": None, "source_sha256": None,
+                 "runtime": "assets/images/en/a/b.jpg",
+                 "candidates": ["assets/images/en/a/b.jpg",
+                                "assets/images/en/c/b.jpg"]}
+        problems, counts = builder.validate_entries("images", [entry], 1)
+        self.assertTrue(problems)
+        self.assertTrue(any("must not claim a runtime path" in problem
+                            for problem in problems), problems)
+        self.assertEqual(counts, {"ambiguous": 1})
+        # And with no runtime claim it validates cleanly: it is declarable.
+        clean = dict(entry, runtime=None)
+        problems, counts = builder.validate_entries("images", [clean], 1)
+        self.assertEqual(problems, [])
+        self.assertEqual(counts, {"ambiguous": 1})
+
+    def test_the_join_agrees_with_the_previous_rule_wherever_it_resolved(self):
+        # Task 2.5, zero-disagreement property.
+        #
+        # The comparison is not "the new entry's source is in {join, old
+        # target}": that shape asks whether *source* equals either value
+        # and passes vacuously on two nulls (design.md D6). Instead the
+        # whole entry is built twice through the same classifier -- once
+        # with the previous basename-only candidates, once with the new
+        # path-first candidates -- and the two are compared field by field.
+        new_entries = {entry["ref"]: entry for entry in self.entries("images")}
+        tiers = self._recomputed_tiers()
+        previous = self._previous_rule_candidates()
+        old_entries = builder.build_kind_entries(
+            ROOT, "images", self._image_refs(), self._registry_paths(),
+            self._conversions(), self._extraction_dirs(), previous)
+        old_by_ref = {entry["ref"]: entry for entry in old_entries}
+
+        resolved_before = sorted(ref for ref, candidates in previous.items()
+                                 if len(candidates) == 1)
+        self.assertEqual(len(resolved_before), 525)
+        agreed = 0
+        for ref in resolved_before:
+            self.assertEqual(new_entries[ref], old_by_ref[ref], ref)
+            agreed += 1
+        self.assertEqual(agreed, 525)
+
+        # And every reference the previous rule could not resolve now is,
+        # with a real source rather than nulls on both sides.
+        # The previous rule left 50 as collisions and 32 as missing; only the
+        # collisions are this change's business, and each was a ref whose
+        # basename matched several corpus files.
+        unresolved = sorted(ref for ref, candidates in previous.items()
+                            if len(candidates) > 1)
+        self.assertEqual(len(unresolved), 50)
+        for ref in unresolved:
+            self.assertEqual(old_by_ref[ref]["status"], "ambiguous", ref)
+            self.assertIsNone(old_by_ref[ref]["source"], ref)
+            self.assertNotEqual(new_entries[ref]["status"], "ambiguous", ref)
+            self.assertIsNotNone(new_entries[ref]["source"], ref)
+            self.assertEqual(new_entries[ref]["source"],
+                             tiers["files"][ref], ref)
+
+    def _image_refs(self):
+        return source.extract_field_refs(ROOT, source.IMAGES_FILE, "path")
+
+    def _registry_paths(self):
+        return {entry["path"] for entry in read_json(
+            ROOT / builder.REGISTRY_FILE)["entries"]}
+
+    def _recomputed_tiers(self):
+        registry_paths = self._registry_paths()
+        basenames = {}
+        for path in registry_paths:
+            basenames.setdefault(path.rsplit("/", 1)[-1], []).append(path)
+        return source.join_image_refs(self._image_refs(), registry_paths,
+                                      basenames)
+
+    def _previous_rule_candidates(self):
+        """The basename-only join, reimplemented as the comparison baseline.
+
+        Values are the candidate list the old rule produced, so the old
+        rule's own `ambiguous` verdicts are reproduced rather than
+        assumed.
+        """
+        registry_paths = self._registry_paths()
+        basenames = {}
+        for path in registry_paths:
+            basenames.setdefault(path.rsplit("/", 1)[-1], []).append(path)
+        return {ref: sorted(basenames.get(ref.rsplit("/", 1)[-1], []))
+                for ref in self._image_refs()}
+
+    def _conversions(self):
+        conversions = {}
+        for package in read_json(ROOT / builder.CONVERSIONS_FILE)["packages"]:
+            conversions[package["legacy_id"]] = package["directory"]
+        return conversions
+
+    def _extraction_dirs(self):
+        directories = {}
+        for record in read_json(ROOT / builder.IMAGE_EXTRACTION_FILE)["bitmaps"]:
+            found = directories.setdefault(record["source"], set())
+            for output in record["outputs"]:
+                found.add(output["file"].rsplit("/", 1)[0])
+        return {origin: found for origin, found in directories.items() if found}
 
     def test_missing_lists_equal_coverage_missing_lists(self):
         counts = self.payload["counts"]
@@ -255,11 +404,11 @@ class EvidenceReconciliationTests(unittest.TestCase):
         self.assertEqual(counts["by_kind"], PINNED_BY_KIND)
         self.assertEqual(counts["entries"], 1627)
         self.assertEqual(counts["by_status"], {
-            "ambiguous": 50,
+            "ambiguous": 0,
             "converted": 2,
             "extracted": 872,
             "missing_source": 42,
-            "passthrough": 654,
+            "passthrough": 704,
             "pending": 7,
         })
         for kind in builder.KIND_ORDER:
@@ -331,6 +480,31 @@ class FailureTests(unittest.TestCase):
         self.assertIn("coverage mismatch", stdout)
         self.assertIn("validation-failed", stdout)
         self.assertEqual(files_under(out), [])
+
+    def test_tampered_image_tier_fails_closed(self):
+        # Task 2.2: the reconciliation reads the new tier fields, so a
+        # coverage copy that disagrees about any of them fails closed.
+        for field, value in (("path_resolved", 574),
+                             ("fallback_resolved", 3),
+                             ("fallback_ambiguous", 1),
+                             ("fallback_resolved_refs", ["/x.jpg"]),
+                             ("fallback_ambiguous_refs", ["/y.jpg"])):
+            with self.subTest(field=field):
+                temporary, work = make_input_root()
+                self.addCleanup(temporary.cleanup)
+                coverage_path = work / builder.COVERAGE_FILE
+                coverage = read_json(coverage_path)
+                coverage["domains"]["images"][field] = value
+                coverage_path.write_text(json.dumps(coverage),
+                                         encoding="utf-8")
+                out = work / "out"
+                out.mkdir()
+                code, stdout, _ = run_main(["--repo-root", str(work),
+                                            "--out-root", str(out)])
+                self.assertEqual(code, 1)
+                self.assertIn("coverage mismatch", stdout)
+                self.assertIn("validation-failed", stdout)
+                self.assertEqual(files_under(out), [])
 
     def test_missing_conversions_exits_2_without_writing(self):
         temporary, work = make_input_root()

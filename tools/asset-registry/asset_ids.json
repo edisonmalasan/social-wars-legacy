@@ -2,10 +2,9 @@
   "counts": {
     "by_kind": {
       "images": {
-        "ambiguous": 50,
         "extracted": 9,
         "missing_source": 32,
-        "passthrough": 516
+        "passthrough": 566
       },
       "item_sprites": {
         "converted": 2,
@@ -22,11 +21,11 @@
       }
     },
     "by_status": {
-      "ambiguous": 50,
+      "ambiguous": 0,
       "converted": 2,
       "extracted": 872,
       "missing_source": 42,
-      "passthrough": 654,
+      "passthrough": 704,
       "pending": 7
     },
     "distinct": {
@@ -43,7 +42,7 @@
       "sounds": 139
     },
     "resolved_references": {
-      "images": 525,
+      "images": 575,
       "item_sprites": 907,
       "magic_sprites": 10,
       "sounds": 139
@@ -86,9 +85,9 @@
       "sha256": "622c1489005c35a3dea0b931c46d80d872c60439f25dd3f595c70f9d6f16ad10"
     },
     {
-      "bytes": 2896,
+      "bytes": 3084,
       "file": "tools/asset-registry/coverage.json",
-      "sha256": "d08945af5f63900bd8315940a4954505e927ad03c7eeebe1ca5e516d1bbe0a93"
+      "sha256": "30bfbaf21817fcbf763c05607acde4baf62ddfeb219310e2a4aa1bb621a442b2"
     },
     {
       "bytes": 37304780,
@@ -105,28 +104,20 @@
     {
       "entries": [
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_1.jpg",
-            "assets/images/en/chapters2/chapter_1.jpg"
-          ],
           "ref": "/chapters/chapter_1.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters/chapter_1.jpg",
+          "source": "assets/images/en/chapters/chapter_1.jpg",
+          "source_sha256": "2c805b90dcdd15c7589e62f43c9ea5954bb6436f6ea47ae26424e3ef8142e88b",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_10.jpg",
-            "assets/images/en/chapters2/chapter_10.jpg"
-          ],
           "ref": "/chapters/chapter_10.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters/chapter_10.jpg",
+          "source": "assets/images/en/chapters/chapter_10.jpg",
+          "source_sha256": "290fc8400bbc446fba85d5e319df9993454b4b553cc87eac6ff3af804e8d49c3",
+          "status": "passthrough"
         },
         {
           "ref": "/chapters/chapter_10_m.jpg",
@@ -153,16 +144,12 @@
           "status": "missing_source"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_11.jpg",
-            "assets/images/en/chapters2/chapter_11.jpg"
-          ],
           "ref": "/chapters/chapter_11.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters/chapter_11.jpg",
+          "source": "assets/images/en/chapters/chapter_11.jpg",
+          "source_sha256": "0965c7eb1e15eb65d309c1c05c5c3e8763a363f74117aee777cacad6115b2a8b",
+          "status": "passthrough"
         },
         {
           "ref": "/chapters/chapter_11_m.jpg",
@@ -189,16 +176,12 @@
           "status": "missing_source"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_12.jpg",
-            "assets/images/en/chapters2/chapter_12.jpg"
-          ],
           "ref": "/chapters/chapter_12.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters/chapter_12.jpg",
+          "source": "assets/images/en/chapters/chapter_12.jpg",
+          "source_sha256": "41214cc9e6fb0ac2f4864a4375d13378afce4390a6c5f6f143a4da12d348451c",
+          "status": "passthrough"
         },
         {
           "ref": "/chapters/chapter_12_m.jpg",
@@ -233,16 +216,12 @@
           "status": "missing_source"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_2.jpg",
-            "assets/images/en/chapters2/chapter_2.jpg"
-          ],
           "ref": "/chapters/chapter_2.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters/chapter_2.jpg",
+          "source": "assets/images/en/chapters/chapter_2.jpg",
+          "source_sha256": "cb6aba5e4264cc3025185fa321d01d12bfc7409acb1ed9610e325376628edebc",
+          "status": "passthrough"
         },
         {
           "ref": "/chapters/chapter_2_m.jpg",
@@ -261,16 +240,12 @@
           "status": "missing_source"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_3.jpg",
-            "assets/images/en/chapters2/chapter_3.jpg"
-          ],
           "ref": "/chapters/chapter_3.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters/chapter_3.jpg",
+          "source": "assets/images/en/chapters/chapter_3.jpg",
+          "source_sha256": "b177bceca3f4d2af989bae4cfb3ca4b3432c47d1ec66709b1d72951b5df62849",
+          "status": "passthrough"
         },
         {
           "ref": "/chapters/chapter_3_m.jpg",
@@ -289,16 +264,12 @@
           "status": "missing_source"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_4.jpg",
-            "assets/images/en/chapters2/chapter_4.jpg"
-          ],
           "ref": "/chapters/chapter_4.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters/chapter_4.jpg",
+          "source": "assets/images/en/chapters/chapter_4.jpg",
+          "source_sha256": "bfa35d4c830693c5b195e47775ea53176b86e34446abb72fc5110fd7b57605ff",
+          "status": "passthrough"
         },
         {
           "ref": "/chapters/chapter_4_m.jpg",
@@ -317,16 +288,12 @@
           "status": "missing_source"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_5.jpg",
-            "assets/images/en/chapters2/chapter_5.jpg"
-          ],
           "ref": "/chapters/chapter_5.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters/chapter_5.jpg",
+          "source": "assets/images/en/chapters/chapter_5.jpg",
+          "source_sha256": "3d92f23b6d2db377c5a535b2ec65724a706ab577cbe89402d740867d4aaa48d2",
+          "status": "passthrough"
         },
         {
           "ref": "/chapters/chapter_5_m.jpg",
@@ -353,16 +320,12 @@
           "status": "missing_source"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_6.jpg",
-            "assets/images/en/chapters2/chapter_6.jpg"
-          ],
           "ref": "/chapters/chapter_6.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters/chapter_6.jpg",
+          "source": "assets/images/en/chapters/chapter_6.jpg",
+          "source_sha256": "cd97d615a5de08a03430128754604253349c267acd076043147311e1e78e9e2a",
+          "status": "passthrough"
         },
         {
           "ref": "/chapters/chapter_6_m.jpg",
@@ -389,16 +352,12 @@
           "status": "missing_source"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_7.jpg",
-            "assets/images/en/chapters2/chapter_7.jpg"
-          ],
           "ref": "/chapters/chapter_7.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters/chapter_7.jpg",
+          "source": "assets/images/en/chapters/chapter_7.jpg",
+          "source_sha256": "48478b25f8503fae506f5ebe988eb276e5df2d29e02858154b4b6d5c95c030ed",
+          "status": "passthrough"
         },
         {
           "ref": "/chapters/chapter_7_m.jpg",
@@ -425,16 +384,12 @@
           "status": "missing_source"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_8.jpg",
-            "assets/images/en/chapters2/chapter_8.jpg"
-          ],
           "ref": "/chapters/chapter_8.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters/chapter_8.jpg",
+          "source": "assets/images/en/chapters/chapter_8.jpg",
+          "source_sha256": "dca50d4586656a7fd9824734b10f1081bbec5d1974022d90377119a9dd756498",
+          "status": "passthrough"
         },
         {
           "ref": "/chapters/chapter_8_m.jpg",
@@ -453,16 +408,12 @@
           "status": "missing_source"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_9.jpg",
-            "assets/images/en/chapters2/chapter_9.jpg"
-          ],
           "ref": "/chapters/chapter_9.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters/chapter_9.jpg",
+          "source": "assets/images/en/chapters/chapter_9.jpg",
+          "source_sha256": "a1cdf85ea2d918c3255d3179a4b46dfb00579746beac1720e2facaab518c896b",
+          "status": "passthrough"
         },
         {
           "ref": "/chapters/chapter_9_m.jpg",
@@ -481,28 +432,20 @@
           "status": "missing_source"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/simple/aliens.jpg",
-            "assets/images/en/chapters2/simple/aliens.jpg"
-          ],
           "ref": "/chapters/simple/aliens.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters/simple/aliens.jpg",
+          "source": "assets/images/en/chapters/simple/aliens.jpg",
+          "source_sha256": "6e037025a8d4ad3dbd8d6c744b0bf1c3d449cf2c9328e52e41fd138ca0e67edb",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/simple/arachnids.jpg",
-            "assets/images/en/chapters2/simple/arachnids.jpg"
-          ],
           "ref": "/chapters/simple/arachnids.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters/simple/arachnids.jpg",
+          "source": "assets/images/en/chapters/simple/arachnids.jpg",
+          "source_sha256": "9bf10426bdaba70068788e7fd14e06b062444d33c25f24252bd0a40fc9fecd71",
+          "status": "passthrough"
         },
         {
           "ref": "/chapters/simple/arachnids_old.jpg",
@@ -513,16 +456,12 @@
           "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/simple/orcs.jpg",
-            "assets/images/en/chapters2/simple/orcs.jpg"
-          ],
           "ref": "/chapters/simple/orcs.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters/simple/orcs.jpg",
+          "source": "assets/images/en/chapters/simple/orcs.jpg",
+          "source_sha256": "8e823b1c0fa67172478906f5071ffa6f67e133b3835cd9a97096c6377c06ec90",
+          "status": "passthrough"
         },
         {
           "ref": "/chapters/simple/orcs_old.jpg",
@@ -549,172 +488,116 @@
           "status": "missing_source"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_1.jpg",
-            "assets/images/en/chapters2/chapter_1.jpg"
-          ],
           "ref": "/chapters2/chapter_1.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters2/chapter_1.jpg",
+          "source": "assets/images/en/chapters2/chapter_1.jpg",
+          "source_sha256": "2c805b90dcdd15c7589e62f43c9ea5954bb6436f6ea47ae26424e3ef8142e88b",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_10.jpg",
-            "assets/images/en/chapters2/chapter_10.jpg"
-          ],
           "ref": "/chapters2/chapter_10.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters2/chapter_10.jpg",
+          "source": "assets/images/en/chapters2/chapter_10.jpg",
+          "source_sha256": "da68efe07b14b9ad5f3a0f78842e01456b7d9183dbf8ce6aba156253bc3d716d",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_11.jpg",
-            "assets/images/en/chapters2/chapter_11.jpg"
-          ],
           "ref": "/chapters2/chapter_11.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters2/chapter_11.jpg",
+          "source": "assets/images/en/chapters2/chapter_11.jpg",
+          "source_sha256": "6fb257aae75a9694fa263c41c8d0269172c8bc59509b7d822c3b9f2f1d33d376",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_12.jpg",
-            "assets/images/en/chapters2/chapter_12.jpg"
-          ],
           "ref": "/chapters2/chapter_12.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters2/chapter_12.jpg",
+          "source": "assets/images/en/chapters2/chapter_12.jpg",
+          "source_sha256": "41214cc9e6fb0ac2f4864a4375d13378afce4390a6c5f6f143a4da12d348451c",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_2.jpg",
-            "assets/images/en/chapters2/chapter_2.jpg"
-          ],
           "ref": "/chapters2/chapter_2.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters2/chapter_2.jpg",
+          "source": "assets/images/en/chapters2/chapter_2.jpg",
+          "source_sha256": "cb6aba5e4264cc3025185fa321d01d12bfc7409acb1ed9610e325376628edebc",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_3.jpg",
-            "assets/images/en/chapters2/chapter_3.jpg"
-          ],
           "ref": "/chapters2/chapter_3.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters2/chapter_3.jpg",
+          "source": "assets/images/en/chapters2/chapter_3.jpg",
+          "source_sha256": "b177bceca3f4d2af989bae4cfb3ca4b3432c47d1ec66709b1d72951b5df62849",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_4.jpg",
-            "assets/images/en/chapters2/chapter_4.jpg"
-          ],
           "ref": "/chapters2/chapter_4.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters2/chapter_4.jpg",
+          "source": "assets/images/en/chapters2/chapter_4.jpg",
+          "source_sha256": "bfa35d4c830693c5b195e47775ea53176b86e34446abb72fc5110fd7b57605ff",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_5.jpg",
-            "assets/images/en/chapters2/chapter_5.jpg"
-          ],
           "ref": "/chapters2/chapter_5.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters2/chapter_5.jpg",
+          "source": "assets/images/en/chapters2/chapter_5.jpg",
+          "source_sha256": "86125adf9e1d6ceac4ea9d67b934243d415bf3df7b3e4b1d97748ce182656f66",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_6.jpg",
-            "assets/images/en/chapters2/chapter_6.jpg"
-          ],
           "ref": "/chapters2/chapter_6.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters2/chapter_6.jpg",
+          "source": "assets/images/en/chapters2/chapter_6.jpg",
+          "source_sha256": "550679dbd8bb7c042de5bf27307d84ab55108b7abc9e519bb3c3f84d00dae68a",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_7.jpg",
-            "assets/images/en/chapters2/chapter_7.jpg"
-          ],
           "ref": "/chapters2/chapter_7.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters2/chapter_7.jpg",
+          "source": "assets/images/en/chapters2/chapter_7.jpg",
+          "source_sha256": "86125adf9e1d6ceac4ea9d67b934243d415bf3df7b3e4b1d97748ce182656f66",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_8.jpg",
-            "assets/images/en/chapters2/chapter_8.jpg"
-          ],
           "ref": "/chapters2/chapter_8.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters2/chapter_8.jpg",
+          "source": "assets/images/en/chapters2/chapter_8.jpg",
+          "source_sha256": "dca50d4586656a7fd9824734b10f1081bbec5d1974022d90377119a9dd756498",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/chapter_9.jpg",
-            "assets/images/en/chapters2/chapter_9.jpg"
-          ],
           "ref": "/chapters2/chapter_9.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters2/chapter_9.jpg",
+          "source": "assets/images/en/chapters2/chapter_9.jpg",
+          "source_sha256": "a1cdf85ea2d918c3255d3179a4b46dfb00579746beac1720e2facaab518c896b",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/simple/aliens.jpg",
-            "assets/images/en/chapters2/simple/aliens.jpg"
-          ],
           "ref": "/chapters2/simple/aliens.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters2/simple/aliens.jpg",
+          "source": "assets/images/en/chapters2/simple/aliens.jpg",
+          "source_sha256": "6e037025a8d4ad3dbd8d6c744b0bf1c3d449cf2c9328e52e41fd138ca0e67edb",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/simple/arachnids.jpg",
-            "assets/images/en/chapters2/simple/arachnids.jpg"
-          ],
           "ref": "/chapters2/simple/arachnids.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters2/simple/arachnids.jpg",
+          "source": "assets/images/en/chapters2/simple/arachnids.jpg",
+          "source_sha256": "da68efe07b14b9ad5f3a0f78842e01456b7d9183dbf8ce6aba156253bc3d716d",
+          "status": "passthrough"
         },
         {
           "ref": "/chapters2/simple/arachnids_old.jpg",
@@ -725,16 +608,12 @@
           "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/chapters/simple/orcs.jpg",
-            "assets/images/en/chapters2/simple/orcs.jpg"
-          ],
           "ref": "/chapters2/simple/orcs.jpg",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/chapters2/simple/orcs.jpg",
+          "source": "assets/images/en/chapters2/simple/orcs.jpg",
+          "source_sha256": "6fb257aae75a9694fa263c41c8d0269172c8bc59509b7d822c3b9f2f1d33d376",
+          "status": "passthrough"
         },
         {
           "ref": "/chapters2/simple/orcs_old.jpg",
@@ -745,124 +624,84 @@
           "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/1.png",
-            "assets/images/en/packs/1.png"
-          ],
           "ref": "/goals/1.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/goals/1.png",
+          "source": "assets/images/en/goals/1.png",
+          "source_sha256": "c7068b5b3a8746261147cd175a29903704e56f8804d2f681f1b1f5d4f2c088dc",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/10.png",
-            "assets/images/en/packs/10.png"
-          ],
           "ref": "/goals/10.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/goals/10.png",
+          "source": "assets/images/en/goals/10.png",
+          "source_sha256": "b7d0c583b9cba72837cd5e7357cb8ba22890117984d553a4e327d1ad346d3a88",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/2.png",
-            "assets/images/en/packs/2.png"
-          ],
           "ref": "/goals/2.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/goals/2.png",
+          "source": "assets/images/en/goals/2.png",
+          "source_sha256": "783ca211396b1df6dfcbf399581031492513f30a090c9658bb53b4294877cbc2",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/3.png",
-            "assets/images/en/packs/3.png"
-          ],
           "ref": "/goals/3.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/goals/3.png",
+          "source": "assets/images/en/goals/3.png",
+          "source_sha256": "c314e97dad88707e34c9d720acdebb2951b7df0c9421f124780646f1ecf96ff7",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/4.png",
-            "assets/images/en/packs/4.png"
-          ],
           "ref": "/goals/4.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/goals/4.png",
+          "source": "assets/images/en/goals/4.png",
+          "source_sha256": "4f4771fb0249f4f9a3d95a64bbc7768647d684b1cda4eae95d55254ebbaebb76",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/5.png",
-            "assets/images/en/packs/5.png"
-          ],
           "ref": "/goals/5.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/goals/5.png",
+          "source": "assets/images/en/goals/5.png",
+          "source_sha256": "f431a6dac297e05041dd2f6bb63d0965090472957f3564a81e1967d29086fc35",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/6.png",
-            "assets/images/en/packs/6.png"
-          ],
           "ref": "/goals/6.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/goals/6.png",
+          "source": "assets/images/en/goals/6.png",
+          "source_sha256": "c230660e9cd11263ce7987d40dbc3e37023b9984ee8d9af7799477bcb53faaab",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/7.png",
-            "assets/images/en/packs/7.png"
-          ],
           "ref": "/goals/7.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/goals/7.png",
+          "source": "assets/images/en/goals/7.png",
+          "source_sha256": "fe346051dae2887de22830fd59ce9c2c9aeddec8cfb17e925e30b1277e92334d",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/8.png",
-            "assets/images/en/packs/8.png"
-          ],
           "ref": "/goals/8.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/goals/8.png",
+          "source": "assets/images/en/goals/8.png",
+          "source_sha256": "4b8bdb62835cefeae2a630b906d8f55248787b1ce0d8c2b5e142631336cceb4f",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/9.png",
-            "assets/images/en/packs/9.png"
-          ],
           "ref": "/goals/9.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/goals/9.png",
+          "source": "assets/images/en/goals/9.png",
+          "source_sha256": "c9c39ec62b6778e7a974bbf22c25e0057a512df01ae6f0925db5b3a10898fec7",
+          "status": "passthrough"
         },
         {
           "ref": "/goals/hint_1.jpg",
@@ -2449,28 +2288,20 @@
           "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/1.png",
-            "assets/images/en/packs/1.png"
-          ],
           "ref": "/packs/1.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/packs/1.png",
+          "source": "assets/images/en/packs/1.png",
+          "source_sha256": "e81493343b17a9a06531ba91b1ac29cff49d39430ebcd9f2366a826ccb9af476",
+          "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/10.png",
-            "assets/images/en/packs/10.png"
-          ],
           "ref": "/packs/10.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/packs/10.png",
+          "source": "assets/images/en/packs/10.png",
+          "source_sha256": "1a0e6dcf8e29c17b9725bb4a82ef1cdfde7ddaad04bfe7f85ed24583ce1e492a",
+          "status": "passthrough"
         },
         {
           "ref": "/packs/11.jpg",
@@ -2577,16 +2408,12 @@
           "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/2.png",
-            "assets/images/en/packs/2.png"
-          ],
           "ref": "/packs/2.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/packs/2.png",
+          "source": "assets/images/en/packs/2.png",
+          "source_sha256": "3d745e23b5f835a91af97532b3f3d0f2e39607be2617b4524ee6da82cd47d609",
+          "status": "passthrough"
         },
         {
           "ref": "/packs/20.png",
@@ -2685,16 +2512,12 @@
           "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/3.png",
-            "assets/images/en/packs/3.png"
-          ],
           "ref": "/packs/3.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/packs/3.png",
+          "source": "assets/images/en/packs/3.png",
+          "source_sha256": "d233651d405b60d5dccefaf367cba5e7a38e8b10a33f0a0bfb7a73073d5047b1",
+          "status": "passthrough"
         },
         {
           "ref": "/packs/30.png",
@@ -2801,16 +2624,12 @@
           "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/4.png",
-            "assets/images/en/packs/4.png"
-          ],
           "ref": "/packs/4.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/packs/4.png",
+          "source": "assets/images/en/packs/4.png",
+          "source_sha256": "ea986d29ac1cd2d5d94f30f334642d9d9a7c86a96e465d38bb5234fcc7c8dab2",
+          "status": "passthrough"
         },
         {
           "ref": "/packs/40.png",
@@ -2869,16 +2688,12 @@
           "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/5.png",
-            "assets/images/en/packs/5.png"
-          ],
           "ref": "/packs/5.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/packs/5.png",
+          "source": "assets/images/en/packs/5.png",
+          "source_sha256": "a90ff1339846020233366395322c112f4a61fc9e278e8bc5f31d254517636b82",
+          "status": "passthrough"
         },
         {
           "ref": "/packs/5_m.png",
@@ -2897,16 +2712,12 @@
           "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/6.png",
-            "assets/images/en/packs/6.png"
-          ],
           "ref": "/packs/6.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/packs/6.png",
+          "source": "assets/images/en/packs/6.png",
+          "source_sha256": "45026984e9bc5483d90b35a8c6a3ad8744cc8861f661637ca4146ea43367af8d",
+          "status": "passthrough"
         },
         {
           "ref": "/packs/6_m.png",
@@ -2925,16 +2736,12 @@
           "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/7.png",
-            "assets/images/en/packs/7.png"
-          ],
           "ref": "/packs/7.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/packs/7.png",
+          "source": "assets/images/en/packs/7.png",
+          "source_sha256": "7fa0f3b6f8eb4caf2b4a492348129428331ad5a00912dc2fba07a5cb4a4900e8",
+          "status": "passthrough"
         },
         {
           "ref": "/packs/7_m.png",
@@ -2953,16 +2760,12 @@
           "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/8.png",
-            "assets/images/en/packs/8.png"
-          ],
           "ref": "/packs/8.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/packs/8.png",
+          "source": "assets/images/en/packs/8.png",
+          "source_sha256": "e05645eb2f53052a864375fd8f8bc5f392eb441c200051c4ce8c1d1776c49eee",
+          "status": "passthrough"
         },
         {
           "ref": "/packs/8_m.png",
@@ -2981,16 +2784,12 @@
           "status": "passthrough"
         },
         {
-          "candidates": [
-            "assets/images/en/goals/9.png",
-            "assets/images/en/packs/9.png"
-          ],
           "ref": "/packs/9.png",
           "reference_count": 1,
-          "runtime": null,
-          "source": null,
-          "source_sha256": null,
-          "status": "ambiguous"
+          "runtime": "assets/images/en/packs/9.png",
+          "source": "assets/images/en/packs/9.png",
+          "source_sha256": "6b9ef1d9d604cac471f4697fa819b657d0761f55d11ceebc241c42714dab0133",
+          "status": "passthrough"
         },
         {
           "ref": "/quests/quest-0.jpg",
@@ -5162,7 +4961,7 @@
         }
       ],
       "kind": "images",
-      "rule": "basename match (web-root-relative form preserved, never rewritten)"
+      "rule": "path-first under assets/images/en, basename fallback recorded"
     },
     {
       "entries": [
