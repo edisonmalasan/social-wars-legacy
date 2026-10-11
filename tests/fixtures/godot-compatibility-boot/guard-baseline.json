@@ -4,8 +4,8 @@
     "file": "sha256 of the guarded file bytes, lowercase hex: text files (valid UTF-8 without NUL) normalized CRLF -> LF first, all other files exact bytes",
     "group": "SHA-256 of the ordinal-sorted \"<sha256>  <repo-relative posix path>\\n\" lines of every file in the group"
   },
-  "combined_sha256": "13b2ccca56bfd7ea8d42e9ca3f0ac066aa6a5aae15c7a3dee99703ca972bcad1",
-  "generated_at_utc": "2026-10-09T02:32:51+00:00",
+  "combined_sha256": "233be54815f52c600e1c247571dcbbd1866ec9c66a97c6ebe2fcc6f2fb609c57",
+  "generated_at_utc": "2026-10-11T07:08:26+00:00",
   "groups": {
     "config": {
       "absent_paths": [],
@@ -88,10 +88,10 @@
         "assets/converted/units/10033_wild_elephant/7_alpha.png": "6f5bcc5dde1cb1c66ec4d338732db3b959c0203fdb078065c62c2725929bb76a",
         "assets/converted/units/10033_wild_elephant/9.jpg": "7efba179e16a62e3b06487f0006e72bf2a9f859a1e1a1a3e38142cb31f987c1b",
         "assets/converted/units/10033_wild_elephant/9_alpha.png": "67bd323ccfa4dde436e0bf4c462beb909016db01630a1203f4a0dd73d609d56b",
-        "assets/converted/units/10033_wild_elephant/package.json": "aa3f28cf8cc162143381a7390490b72f50aa68733cdd2ba2f9a5eb96d315d19c"
+        "assets/converted/units/10033_wild_elephant/package.json": "a40cc37691b662a123b99205156f73005ee3dc1d4cfbf35b12cce52d2f10b16b"
       },
       "files_count": 60,
-      "sha256": "c92df28eb7f748727b297114c84a15cc32f081e29af36551512ff9718738fe74"
+      "sha256": "8fb8ce84294e02c833cbac621c065ae5b0207dd5b9d15978b7fbcc690aef0d48"
     },
     "legacy_sources": {
       "absent_paths": [],
@@ -115,20 +115,20 @@
       "absent_paths": [],
       "files": {
         "apps/client-godot/evidence/first-render/first-render.png": "da15d192a901d75c3dc0d394d7eef1f9066beca3423b58620645c7d613f2bae5",
-        "apps/client-godot/evidence/first-render/report.json": "fa4ade65c7e152b78ba29f8a172fa053788b49108ad48ad7a2cdbbc1bbd53454"
+        "apps/client-godot/evidence/first-render/report.json": "07b010b69b94ba365ce65db76c329c34b73a6e96c9ab196a919e34dbd6185add"
       },
       "files_count": 2,
-      "sha256": "e61e3bc80d27a8df39d37a7378531ca778491875f36530a9ca7328bb5e6b3d5d"
+      "sha256": "bd92477a251506fb39baa507ae46bc7a9d40551180140d00f65893344c825483"
     },
     "registry_manifests": {
       "absent_paths": [],
       "files": {
-        "tools/asset-registry/conversions.json": "622c1489005c35a3dea0b931c46d80d872c60439f25dd3f595c70f9d6f16ad10",
+        "tools/asset-registry/conversions.json": "f5d4118c35ac6a84db080218526a016855d05a3081f419e2f17e8035647d4d97",
         "tools/asset-registry/image_extraction.json": "2a00538e52e6ccd51bc7cc648b6a87acafce548e313e0378913332d618ac2455",
         "tools/asset-registry/inspection.json": "47f8b795cb1b27fe00df72745b7a20548db4071b5480c24376ed07e1a844a6fb"
       },
       "files_count": 3,
-      "sha256": "77c929fab4a99c9a5a1eaba71c1adb475ee53c8f7000f2d69bfcab1d54b60577"
+      "sha256": "4a1fbaeb5287237ba5b9ef901f0c288f46e7bf3b4d7e90293bdc140e8d6c276b"
     },
     "saves": {
       "absent_paths": [
