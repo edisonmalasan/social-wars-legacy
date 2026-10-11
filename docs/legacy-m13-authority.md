@@ -151,7 +151,7 @@ whether the caller owns the thing it is acting on.
 
 Measured over `apps/compat-api/`:
 
-- **25** `/v0` routes
+- **24** `/v0` routes
 - **104** declared `ERROR_*`-family refusal constants
 - **3** declared and referenced nowhere: `ERROR_INVALID_STEP`, `ERROR_MISSING_STEP`,
   `ERROR_NULL_STEP`
@@ -205,13 +205,43 @@ Recorded rather than quietly fixed, per the repository's standing practice.
   `boolean(Compare)`. The expectation was wrong, not the classifier; the instrument
   refused to report until the control was corrected. Recorded because a control that
   never fires is not a control.
-- **Route count corrected once.** An early truncated read reported 26 routes; measured
-  recursively across `apps/compat-api/**/*.py` the figure is **25**.
+- **Route count corrected twice, and the second correction discards the instrument
+  that produced the first.** An early truncated read reported 26 routes. A
+  path-recursive regex over `apps/compat-api/**/*.py` then reported **25** — and
+  that figure was wrong for a reason the regex could not see: the match set
+  includes `tests/test_unit_xp_fixture.py:412`, whose **docstring contains the
+  literal `@app.post("/v0/...")`** while describing the registration pattern.
+  A recursive text search cannot distinguish prose that quotes a decorator from
+  the decorator. The route table itself was then asked directly —
+  `app.url_map.iter_rules()`, filtered to `/v0`, built from a disposable corpus
+  exactly as the test harness does — and reports **24 rules, 24 distinct paths**,
+  every one `POST` except `/v0/session` (`GET`). A planted `add_url_rule` probe
+  was visible to the same enumeration, so the count is able to see a route it has
+  no other reason to find. **The 25 in the previous revision of this document is
+  withdrawn; 24 is measured against the registration itself.**
+- **A bad control, recorded because it looked like a passing one.** The route
+  enumeration's second control asserted that non-`/v0` rules exist, so that the
+  `/v0` filter could be shown to discriminate rather than match everything. There
+  are **zero** non-`/v0` rules — every registered rule is `/v0` — so the control
+  failed while the measurement it guarded was correct. The control's premise was
+  unestablished; it was removed rather than weakened, and the plant is the control
+  that actually constrains the result.
+- **Containment note.** The harness's `remove_corpus` calls
+  `shutil.rmtree(..., ignore_errors=True)`, which removed every file but left
+  three **empty** directories under the temp root. No working-tree `saves/` was
+  created and no save byte was written; the empty directories were removed
+  directly. Recorded because "the corpus was removed" and "the corpus's contents
+  were removed" are different claims.
 
 ## 8. Verification actually run for this document
 
 - `tools/command-catalog/verify_commands.py` — `catalog_commands: 63`,
   `command_branches: 63`, `result: "agreement"`, `problems: []`, exit 0.
+- The route table asked directly — `create_app(boot).url_map.iter_rules()` over a
+  disposable corpus built by `compat_test_harness.build_test_corpus()` and removed
+  after — reporting **24** `/v0` rules with a planted rule visible to the same
+  enumeration. This is the measurement behind the correction in section 7, and it
+  supersedes the textual count.
 - Three instruments re-run from committed sources, each refusing to report until its
   planted controls classified as planted; the two census scripts agree on 63 branches,
   76 conditions and 30 bare branches.
