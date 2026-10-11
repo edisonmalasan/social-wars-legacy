@@ -315,6 +315,16 @@ def parse_fill_style(reader, rgba, label):
         color = reader.read_bytes(4 if rgba else 3, label).hex()
         return {"type": fill_type, "color": color}
     if fill_type in FILL_GRADIENTS:
+        # The GRADIENTMATRIX precedes the GRADIENT record block, not the other
+        # way round. Two pinned authorities agree: the `swf` crate 0.3.0 reads
+        # `read_matrix()` before `read_gradient_flags()` and the records
+        # (src/read.rs:1689-1690), and the FILLSTYLE table lists GradientMatrix
+        # ahead of Gradient. Reading the block first desynchronises every later
+        # style byte in the shape, which is the defect measured in
+        # docs/legacy-m12-fill-gradient-layout.md -- there it produced a
+        # reserved InterpolationMethod (flags bits 6-7, values 2/3) in 159 of 159
+        # shapes against 0 of 182 for this order.
+        matrix = parse_matrix(reader, label)
         gradient_flags = reader.read_bits(8, label)
         count = gradient_flags & 0x0F
         spread = (gradient_flags >> 6) & 0x03
@@ -323,8 +333,11 @@ def parse_fill_style(reader, rgba, label):
             reader.read_bytes(1, label)
             reader.read_bytes(4 if rgba else 3, label)
         if fill_type == 0x13:
+            # The focal point trails the record block. Its position is retained
+            # from the shipped parser rather than newly established: the pinned
+            # crate reads no focal point at all, so it is not an authority here,
+            # and no committed shape carries fill type 0x13.
             reader.read_bytes(2, label)
-        matrix = parse_matrix(reader, label)
         return {"type": fill_type, "spread": spread,
                 "interpolation": interpolation, "ratios": count,
                 "matrix": matrix}

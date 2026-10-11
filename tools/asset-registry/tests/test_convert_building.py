@@ -672,5 +672,114 @@ class ContainmentTests(unittest.TestCase):
         self.assertNotIn("os.system", source)
 
 
+# --- Gradient FILLSTYLE field order ---------------------------------------
+#
+# The GRADIENTMATRIX precedes the GRADIENT record block. These tests pin that
+# order at the unit level, because the suite otherwise has zero gradient
+# coverage: nothing exercised the branch this fix corrects.
+#
+# The MATRIX used below consumes exactly 16 bits (measured, not assumed:
+# parse_matrix on b"\x88\x00" leaves the reader at 16 bits on a byte
+# boundary), so the byte-aligned gradient records that follow are read from a
+# byte boundary. That matters because BitReader.read_bytes *refuses* a
+# misaligned read, so a matrix ending mid-byte would fail in read_bytes and
+# demonstrate nothing about field order.
+
+def gradient_fill(fill_type=0x10, matrix=b"\x88\x00", flags=0x42,
+                  records=((0x00, (255, 0, 0, 255)),
+                           (0xFF, (0, 0, 255, 255)))):
+    """One gradient FILLSTYLE in the documented layout: MATRIX, then GRADIENT.
+
+    ``flags`` 0x42 is spread=1 (reflected), interpolation=0 (linear) and two
+    gradient points. The format defines interpolation 0 and 1; 2 and 3 are
+    reserved, and reading the record block first is what made the parser
+    decode a reserved value so often.
+
+    The colours are RGBA because every call here parses with ``rgba=True``:
+    a gradient record costs ratio + 4 bytes there, and 3-byte records would
+    raise a byte overrun that says nothing about field order.
+    """
+    payload = bytes([fill_type]) + matrix + bytes([flags])
+    for ratio, colour in records:
+        payload += bytes([ratio]) + bytes(colour)
+    return payload
+
+
+class GradientFieldOrderTests(unittest.TestCase):
+    """The gradient FILLSTYLE layout, pinned at the unit level."""
+
+    def parse_fill(self, fill_bytes):
+        return converter.parse_fill_style(
+            converter.BitReader(fill_bytes), True, "test")
+
+    def test_the_matrix_is_read_before_the_record_block(self):
+        fill = self.parse_fill(gradient_fill())
+        self.assertEqual(fill["type"], 0x10)
+        self.assertEqual(fill["matrix"], "8800")
+        self.assertEqual(fill["spread"], 1)
+        self.assertEqual(fill["interpolation"], 0)
+        self.assertEqual(fill["ratios"], 2)
+
+    def test_the_recorded_matrix_is_the_pair_that_precedes_the_flags(self):
+        """Pin the bytes, not just the field names.
+
+        This is the assertion that discriminates the two orders. Under the
+        shipped order the flags byte is consumed as the matrix, so the
+        recorded matrix would begin with the flags value instead of 0x88.
+        Both matrices here are byte-aligned, which is why the comparison is
+        about content rather than about a misalignment failure.
+        """
+        first = self.parse_fill(gradient_fill(matrix=b"\x88\x00", flags=0x42))
+        second = self.parse_fill(gradient_fill(matrix=b"\x8a\x00", flags=0x42))
+        self.assertEqual(first["matrix"], "8800")
+        self.assertEqual(second["matrix"], "8a00")
+        self.assertNotEqual(first["matrix"], second["matrix"])
+
+    def test_a_gradient_returns_the_committed_key_set(self):
+        """Return shape is unchanged by the fix: same keys as solid/bitmap."""
+        gradient = self.parse_fill(gradient_fill())
+        solid = converter.parse_fill_style(
+            converter.BitReader(bytes([0x00, 1, 2, 3, 255])), True, "test")
+        bitmap = converter.parse_fill_style(
+            converter.BitReader(bitmap_fill(7)), True, "test")
+        self.assertEqual(sorted(gradient),
+                         ["interpolation", "matrix", "ratios", "spread",
+                          "type"])
+        self.assertEqual(sorted(solid), ["color", "type"])
+        self.assertEqual(sorted(bitmap), ["bitmap_id", "matrix", "type"])
+
+    def test_a_gradient_does_not_desync_the_fills_that_follow_it(self):
+        """The consequence that actually mattered: later style bytes.
+
+        Reading the record block first consumes a different number of bytes,
+        so every later fill in the array is read from the wrong offset. A
+        solid fill directly after the gradient would come back carrying the
+        gradient's own bytes as its colour.
+        """
+        payload = (bytes([2]) + gradient_fill()
+                   + bytes([0x00, 1, 2, 3, 255]) + bytes([0]))
+        fills, lines = converter.parse_style_arrays(
+            converter.BitReader(payload), True, "test")
+        self.assertEqual(len(fills), 2)
+        self.assertEqual(fills[0]["type"], 0x10)
+        self.assertEqual(fills[0]["matrix"], "8800")
+        self.assertEqual(fills[1]["type"], 0x00)
+        self.assertEqual(fills[1]["color"], "010203ff")
+        self.assertEqual(lines, [])
+
+    def test_the_gradient_consumes_exactly_its_documented_bytes(self):
+        """The reader is left at a known offset, which both orders cannot share.
+
+        type (1) + MATRIX (2) + flags (1) + two 5-byte RGBA records (10) = 14.
+        Reading the record block first takes the record count out of the
+        MATRIX, which is 8 records for this matrix -- 40 bytes against the 11
+        remaining -- so the fill overruns and raises instead of returning.
+        """
+        payload = gradient_fill() + bytes([0xAA])
+        reader = converter.BitReader(payload)
+        converter.parse_fill_style(reader, True, "test")
+        self.assertEqual(reader.position, 14 * 8)
+        self.assertEqual(reader.read_bytes(1, "test"), b"\xaa")
+
 if __name__ == "__main__":
     unittest.main()
