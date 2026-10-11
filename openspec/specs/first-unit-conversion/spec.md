@@ -55,7 +55,7 @@ The tool SHALL parse `DefineSprite` bodies and their timeline tags (`PlaceObject
 - **THEN** validation fails with the offending sprite or tag identified and no outputs are written
 
 ### Requirement: Shape records with byte-aligned style arrays
-The tool SHALL parse SHAPEWITHSTYLE bounds, fill/line style arrays with counts and types, bitmap-fill character IDs, and raw matrices for every shape in the source, failing closed on other shape versions or unexpected layouts. Edge records SHALL be counted, never tessellated. The shared style parser SHALL align to a byte boundary after the fill-style array so files whose fill arrays end mid-byte parse, and existing package outputs SHALL be re-verified byte-identical under the fix. `RECT` coordinate fields SHALL be decoded as the signed bit fields the format specifies: a field whose sign bit within the declared `Nbits` is set SHALL be sign-extended to its negative value rather than read as a large unsigned value. A decoded `RECT` whose `xmax` is below its `xmin`, or whose `ymax` is below its `ymin`, SHALL fail closed as an inverted rectangle, and SHALL NOT be reported as an extent of zero.
+The tool SHALL parse SHAPEWITHSTYLE bounds, fill/line style arrays with counts and types, bitmap-fill character IDs, and raw matrices for every shape in the source, failing closed on other shape versions or unexpected layouts. Edge records SHALL be counted, never tessellated. The shared style parser SHALL align to a byte boundary after the fill-style array so files whose fill arrays end mid-byte parse, and existing package outputs SHALL be re-verified byte-identical under the fix. `RECT` coordinate fields SHALL be decoded as the signed bit fields the format specifies: a field whose sign bit within the declared `Nbits` is set SHALL be sign-extended to its negative value rather than read as a large unsigned value. A decoded `RECT` whose `xmax` is below its `xmin`, or whose `ymax` is below its `ymin`, SHALL fail closed as an inverted rectangle, and SHALL NOT be reported as an extent of zero. A gradient fill style SHALL read its `MATRIX` before its gradient record block, in the order the format specifies, and SHALL NOT read the record block first.
 
 #### Scenario: Parse the measured shapes under the alignment fix
 - **WHEN** the converter reads the elephant's 28 shapes (whose fill arrays end mid-byte and fail under the previous byte-strict read)
@@ -74,6 +74,11 @@ The tool SHALL parse SHAPEWITHSTYLE bounds, fill/line style arrays with counts a
 - **WHEN** a decoded `RECT` has `xmax` below `xmin`, or `ymax` below `ymin`
 - **THEN** validation fails with a non-zero exit and no writes
 - **AND** the extent is not floored at zero
+
+#### Scenario: Read a gradient fill style's matrix before its record block
+- **WHEN** the converter reads a fill style whose type is a linear or radial gradient
+- **THEN** the `MATRIX` is consumed before the gradient flags and gradient records, and the same bytes are never consumed in the reverse order
+- **AND** the fill style is reported with the same key set regardless of which order the bytes would have permitted
 
 #### Scenario: Reject an unexpected shape
 - **WHEN** a shape version or style layout falls outside the parsed subset
