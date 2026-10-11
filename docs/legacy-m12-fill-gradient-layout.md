@@ -337,6 +337,36 @@ exactly the move that would hide the drift rather than record it, and the honest
 fix belongs to whoever owns the guard. **This is a recorded surface, not a flaky
 one — it is deterministic and reproduces on clean `main`.**
 
+#### Sharpened after merge, by measurement this document did not originally make
+
+The paragraph above says the report "drifts in the same commit and for the same
+reason". That is **true**, and it is **less precise than the evidence supports** —
+so it is corrected here rather than left standing.
+
+Tracing the recorded digest across **all four** commits that have ever touched
+`conversions.json` shows `622c1489…` is **exactly** its `2d51b61` digest — the
+same commit that last wrote `guard-baseline.json`. The artefact is therefore
+**stale by precisely one commit**, not corrupted, and there is **one** stale-input
+cause with **two** consumers rather than two independent drifts.
+
+A third artefact closes the regression window at both ends: the committed
+`boot-report.json` was generated at `08eb31f`, which is **not** a descendant of
+`8961f8c` (2026-10-09 against 2026-10-10) and records all four guard checks
+`ok: true`. The guard passed at `08eb31f`, `8961f8c` changed two files it guards,
+and it has failed since.
+
+One further property, found by running the batteries and **not** expected:
+
+**`verify.ps1` passes while leaving the working tree dirty.** It reports
+`manifest bytes unchanged: tools/asset-registry/conversions.json` and then
+rewrites the committed `first-render/report.json`, recomputing the two stale
+digests. The diff is **byte-identical across runs** — two changed lines — so it
+is deterministic rather than flaky. A check that reports agreement while the
+record it certifies disagrees is not a green check, and a passing `verify.ps1`
+must not be read as covering that file. Neither it nor `verify-boot.ps1`'s
+rewrite of `boot-report.json` is committed by this investigation; both were
+returned to `HEAD`.
+
 ---
 
 ## 7. Where this leaves the cursor
