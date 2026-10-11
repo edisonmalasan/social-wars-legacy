@@ -58,7 +58,7 @@ The tool SHALL fail closed, with no writes, for a target whose shape records fal
 - **AND** no fix is adopted for it on the strength of either measurement alone
 
 ### Requirement: Shape-style record parsing
-The tool SHALL parse SHAPEWITHSTYLE bounds, fill/line style arrays with counts and types, bitmap-fill character IDs, and raw matrices, failing closed on other shape versions or unexpected layouts. Edge records SHALL be counted, never tessellated. `RECT` coordinate fields SHALL be decoded as the signed bit fields the format specifies: a field whose sign bit within the declared `Nbits` is set SHALL be sign-extended to its negative value rather than read as a large unsigned value. A decoded `RECT` whose `xmax` is below its `xmin`, or whose `ymax` is below its `ymin`, SHALL fail closed as an inverted rectangle, and SHALL NOT be reported as an extent of zero.
+The tool SHALL parse SHAPEWITHSTYLE bounds, fill/line style arrays with counts and types, bitmap-fill character IDs, and raw matrices, failing closed on other shape versions or unexpected layouts. Edge records SHALL be counted, never tessellated. `RECT` coordinate fields SHALL be decoded as the signed bit fields the format specifies: a field whose sign bit within the declared `Nbits` is set SHALL be sign-extended to its negative value rather than read as a large unsigned value. A decoded `RECT` whose `xmax` is below its `xmin`, or whose `ymax` is below its `ymin`, SHALL fail closed as an inverted rectangle, and SHALL NOT be reported as an extent of zero. A gradient fill style SHALL read its `MATRIX` before its gradient record block, in the order the format specifies, and SHALL NOT read the record block first.
 
 #### Scenario: Parse the measured shape
 - **WHEN** the converter reads DefineShape id 2
@@ -73,6 +73,11 @@ The tool SHALL parse SHAPEWITHSTYLE bounds, fill/line style arrays with counts a
 - **WHEN** a decoded `RECT` has `xmax` below `xmin`, or `ymax` below `ymin`
 - **THEN** validation fails identifying the file and tag
 - **AND** no package is written and the extent is not floored at zero
+
+#### Scenario: Read a gradient fill style's matrix before its record block
+- **WHEN** the converter reads a fill style whose type is a linear or radial gradient
+- **THEN** the `MATRIX` is consumed before the gradient flags and gradient records, and the same bytes are never consumed in the reverse order
+- **AND** the fill style is reported with the same key set regardless of which order the bytes would have permitted
 
 #### Scenario: Reject an unexpected shape
 - **WHEN** a shape version or style layout falls outside the parsed subset
