@@ -8,9 +8,15 @@ the source SWF timeline tags (ShowFrame counting, PlaceObject2,
 RemoveObject2, FrameLabel, SymbolClass, DefineSprite), and shape
 records parsed by the shared style parser (bounds, fill/line arrays,
 referenced fill indices), and writes
-`assets/converted/units/10033_wild_elephant/` (package.json plus
-byte-identical bitmap copies) with the `conversions.json` merge and a
-`converted` statuses merge.
+`assets/converted/units/10033_wild_elephant/` (package.json only) with
+the `conversions.json` merge and a `converted` statuses merge.
+
+The package directory receives **no bitmap bytes**. Each
+`bitmaps[].file` records the extraction output path itself
+(`assets/converted/images/<sprite>/<name>`), and the reference is
+*verified*: the referenced path is resolved, its bytes are hashed, and
+the digest must equal the sha256 the extraction manifest recorded,
+before anything is written.
 
 Timeline parsing only: depth-first placement decode, frame counting,
 and verbatim label names. Matrix, ratio, name, color, clip, and action
@@ -442,23 +448,24 @@ def build_package(repo_root, out_root, target_stem, target_legacy_id):
         root, (UNITS_FILE, REGISTRY_DIR / "inspection.json",
                REGISTRY_DIR / "image_extraction.json"))
     bitmaps = []
-    payloads = {}
     for bitmap_id in referenced_ids:
         for output in bitmap_by_id[bitmap_id]:
-            target = (CONVERTED_UNITS_DIR / target_stem
-                      / output["file"].rsplit("/", 1)[-1]).as_posix()
-            payloads[target] = shared.read_bytes_file(
-                root / output["file"], "extracted " + output["file"])
+            # The reference is recorded verbatim as the extraction
+            # output path, and the reference is *verified*: the file is
+            # resolved, hashed, and compared against the sha256 the
+            # extraction manifest recorded for it.
+            reference = output["file"]
+            payload = shared.read_bytes_file(
+                root / reference, "extracted " + reference)
+            digest = hashlib.sha256(payload).hexdigest()
+            if digest != output["sha256"]:
+                problems.append("bitmap digest mismatch at " + reference)
             bitmaps.append({
                 "character_id": bitmap_id,
-                "file": target,
-                "bytes": len(payloads[target]),
-                "sha256": hashlib.sha256(payloads[target]).hexdigest(),
-                "expected_sha256": output["sha256"],
+                "file": reference,
+                "bytes": len(payload),
+                "sha256": digest,
             })
-    for bitmap in bitmaps:
-        if bitmap["sha256"] != bitmap["expected_sha256"]:
-            problems.append("bitmap digest mismatch at " + bitmap["file"])
     if problems:
         raise shared.ValidationFailure(problems)
     package = {
@@ -490,15 +497,9 @@ def build_package(repo_root, out_root, target_stem, target_legacy_id):
                        ).encode("utf-8")
     conversion_schema = shared.load_loose_schema(
         root, CONVERSION_SCHEMA_FILE.name)
-    document = shared.merge_conversion_document(root, {
-        "legacy_id": target_stem,
-        "directory": (CONVERTED_UNITS_DIR / target_stem).as_posix(),
-        "package_sha256": hashlib.sha256(package_payload).hexdigest(),
-        "bitmaps": len(bitmaps),
-        "output_bytes": len(package_payload) + sum(
-            bitmap["bytes"] for bitmap in bitmaps),
-        "policy": POLICY,
-    }, {
+    document = shared.merge_conversion_document(root, shared.conversion_entry(
+        (CONVERTED_UNITS_DIR / target_stem).as_posix(), target_stem,
+        package_payload, len(bitmaps), POLICY), {
         "units": UNITS_FILE.as_posix(),
         "inspection": (REGISTRY_DIR / "inspection.json").as_posix(),
         "extraction": (REGISTRY_DIR / "image_extraction.json").as_posix(),
@@ -510,17 +511,16 @@ def build_package(repo_root, out_root, target_stem, target_legacy_id):
         raise shared.ValidationFailure(problems)
     merged = dict(layers["statuses"])
     merged[source] = "converted"
-    return package, package_payload, document, merged, payloads
+    return package, package_payload, document, merged
 
 
 def write_outputs(out_root, package, package_payload, document, statuses,
-                  payloads, target_stem):
+                  target_stem):
     out = Path(out_root)
     package_dir = out / CONVERTED_UNITS_DIR / target_stem
     package_dir.mkdir(parents=True, exist_ok=True)
     (package_dir / "package.json").write_bytes(package_payload)
-    for relative, payload in payloads.items():
-        (out / relative).write_bytes(payload)
+    removed = shared.remove_foreign_payloads(package_dir)
     conversions_payload = (json.dumps(document, indent=2, sort_keys=True)
                            + "\n").encode("utf-8")
     statuses_payload = (json.dumps({"schema_version": SCHEMA_VERSION,
@@ -537,6 +537,7 @@ def write_outputs(out_root, package, package_payload, document, statuses,
             "directory": (CONVERTED_UNITS_DIR / target_stem).as_posix(),
             "bytes": len(package_payload),
             "sha256": hashlib.sha256(package_payload).hexdigest(),
+            "removed_files": removed,
         },
         "conversions": {
             "file": (REGISTRY_DIR / "conversions.json").as_posix(),
@@ -569,10 +570,10 @@ def build_argument_parser():
 
 
 def run_build(repo_root, out_root, target_stem, target_legacy_id):
-    package, package_payload, document, statuses, payloads = build_package(
+    package, package_payload, document, statuses = build_package(
         repo_root, out_root, target_stem, target_legacy_id)
     digests = write_outputs(out_root, package, package_payload, document,
-                            statuses, payloads, target_stem)
+                            statuses, target_stem)
     return package, document, digests
 
 

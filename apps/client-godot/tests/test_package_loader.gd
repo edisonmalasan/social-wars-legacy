@@ -12,6 +12,8 @@ extends "res://tests/test_base.gd"
 ##   --scenario=oracle-tamper     bounds tampering must break the oracle
 
 const Loader = preload("res://scripts/package_loader.gd")
+# `Paths` (res://scripts/package_paths.gd) is already declared by the base
+# class this file extends; redeclaring it is a parse error, not a shadow.
 
 const HOUSE_DIR := "assets/converted/buildings/0001_house_1_m"
 const ELEPHANT_DIR := "assets/converted/units/10033_wild_elephant"
@@ -35,6 +37,7 @@ func run_scenario() -> void:
 		fail("unknown scenario: " + scenario)
 		return
 	_test_envelopes()
+	_test_bitmap_reference_containment()
 	_test_frame_1_resolution()
 	_test_matrix_and_oracle()
 	_test_compositing()
@@ -170,6 +173,85 @@ func _test_envelope_rejections() -> void:
 	rejected = Loader.validate_envelope([1, 2, 3], HOUSE_DIR)
 	check(not rejected.get("ok", false),
 		"non-object envelope must be rejected")
+
+
+# ---------------------------------------------------------------------------
+# 2.1b bitmap reference containment
+# ---------------------------------------------------------------------------
+
+## Every bitmap reference a package records must resolve inside
+## `Paths.BITMAP_REFERENCE_ROOT`, and the rule must actually refuse.
+##
+## Converted packages reference the shared extracted bitmap tree instead
+## of copying it, so the reference is no longer package-relative. The
+## check that replaced the package-directory prefix test is the whole
+## containment guarantee, and a guarantee nothing exercises is not a
+## guarantee -- so the refusals are enumerated here rather than left to
+## the shape of the rule's own prose.
+func _test_bitmap_reference_containment() -> void:
+	var accepted := Paths.BITMAP_REFERENCE_ROOT + "/a_sprite/1.jpg"
+	check_eq(Paths.bitmap_reference_error(accepted), "",
+		"a reference of the recorded form is accepted")
+
+	var refused := {
+		"": "empty reference",
+		Paths.BITMAP_REFERENCE_ROOT + "\\a_sprite\\1.jpg": "backslash separator",
+		"/" + accepted: "absolute path",
+		Paths.BITMAP_REFERENCE_ROOT + "/../saves/fresh-player.json":
+			"parent segment",
+		Paths.BITMAP_REFERENCE_ROOT + "/./a_sprite/1.jpg": "current segment",
+		Paths.BITMAP_REFERENCE_ROOT + "//a_sprite/1.jpg": "empty segment",
+		"saves/fresh-player.json": "outside the reference root",
+		"assets/sprites/0001_house_1_m.swf": "a preserved input",
+		Paths.BITMAP_REFERENCE_ROOT + "/1.jpg": "root with no sprite directory",
+		Paths.BITMAP_REFERENCE_ROOT + "/a/b/1.jpg": "too deep",
+		Paths.BITMAP_REFERENCE_ROOT: "the root itself",
+	}
+	for file in refused.keys():
+		var reason := str(refused[file])
+		check(Paths.bitmap_reference_error(str(file)) != "",
+			"bitmap reference must be refused: %s" % reason)
+
+	check(Paths.absolute_bitmap_is_contained(
+			Paths.repo_root().path_join(accepted)),
+		"a reference of the recorded form resolves inside the root")
+	check(not Paths.absolute_bitmap_is_contained(
+			Paths.repo_root().path_join("saves/fresh-player.json")),
+		"a resolved path outside the root is not contained")
+
+	# The real packages: every reference they record must satisfy the rule
+	# and hash to the digest they recorded. A positive case alone would
+	# pass against a rule that accepts everything.
+	var checked := 0
+	for dir in [HOUSE_DIR, ELEPHANT_DIR]:
+		var package := Loader.load_package(str(dir))
+		check(package.get("ok", false), "%s loads for containment" % dir)
+		if not package.get("ok", false):
+			continue
+		for entry in package["data"]["bitmaps"]:
+			var file := str(entry["file"])
+			checked += 1
+			check_eq(Paths.bitmap_reference_error(file), "",
+				"[%s] recorded reference is contained: %s" % [dir, file])
+	check(checked > 0, "containment walked at least one recorded reference")
+
+	# A tampered in-memory package: a reference pointing at a save must be
+	# refused by the real resolution path, not only by the rule in
+	# isolation, and the error must name the package.
+	var house := Loader.load_package(HOUSE_DIR)
+	if house.get("ok", false):
+		var tampered: Dictionary = _clone(house["data"])
+		(tampered["bitmaps"] as Array)[0]["file"] = "saves/fresh-player.json"
+		var tampered_package: Dictionary = _clone(house)
+		tampered_package["data"] = tampered
+		var resolved := Loader.resolve_frame_1(tampered_package)
+		check(not resolved.get("ok", false),
+			"a reference outside the root must fail frame-1 resolution")
+		var error := str(resolved.get("error", ""))
+		check(error.find(HOUSE_DIR) != -1,
+			"containment failure names the package (got: %s)" % error)
+		check(error.find(Paths.BITMAP_REFERENCE_ROOT) != -1,
+			"containment failure names the reference root (got: %s)" % error)
 
 
 ## One on-disk mutation: a copied package.json with an injected foreign

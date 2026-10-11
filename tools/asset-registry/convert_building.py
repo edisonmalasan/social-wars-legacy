@@ -7,8 +7,16 @@ package (content definition, placement tiles), and newly parsed
 SHAPEWITHSTYLE records (bounds, fill/line style arrays with counts and
 types, bitmap-fill character IDs, raw matrices, edge-record counts),
 and writes `assets/converted/buildings/0001_house_1_m/` (package.json
-plus byte-identical bitmap copies) with `tools/asset-registry/
-conversions.json` (package digests) and a `converted` statuses merge.
+only) with `tools/asset-registry/conversions.json` (package digests) and
+a `converted` statuses merge.
+
+The package directory receives **no bitmap bytes**. Each
+`bitmaps[].file` records the extraction output path itself
+(`assets/converted/images/<sprite>/<name>`), so a converted package is a
+manifest over the shared extracted tree rather than a self-contained
+copy of it. The reference is *verified*: the referenced path is
+resolved, its bytes are hashed, and the digest must equal the sha256 the
+extraction manifest recorded, before anything is written.
 
 Shape-style parsing only: bounds RECTs, style arrays, bitmap-fill IDs,
 matrices as raw bytes, and record-type counts. No edge-record
@@ -597,7 +605,8 @@ def fingerprint_inputs(root, files=None):
     return digest.hexdigest()
 
 
-def merge_conversion_document(root, own_entry, own_inputs, tool_policy):
+def merge_conversion_document(root, own_entry, own_inputs, tool_policy,
+                              base=None):
     """Merge this converter's package entry into the shared manifest.
 
     Reads the existing `conversions.json`, preserves foreign package
@@ -608,12 +617,18 @@ def merge_conversion_document(root, own_entry, own_inputs, tool_policy):
     `building-conversion-v1` envelope is migrated only by the building
     converter and only while it holds exactly the building entry; the
     unit converter rejects it with a clear failure.
+
+    `base` supplies that document from memory instead of from disk, so a
+    caller converting many targets accumulates into one manifest rather
+    than re-reading and rewriting the file 290 times. Omitting it is the
+    single-target path and is unchanged.
     """
     entries = []
     inputs = {}
     path = root / CONVERSIONS_FILE
-    if path.exists():
-        existing = read_json_file(path, "conversion manifest")
+    if base is not None or path.exists():
+        existing = base if base is not None else read_json_file(
+            path, "conversion manifest")
         if not isinstance(existing, dict):
             raise InputError("conversion manifest not object")
         policy = existing.get("policy")
@@ -672,6 +687,31 @@ def merge_conversion_document(root, own_entry, own_inputs, tool_policy):
     }
 
 
+def conversion_entry(package_directory, target_stem, package_payload, bitmap_count,
+                     tool_policy):
+    """The `conversions.json` package entry for one converted package.
+
+    `output_bytes` is the package.json byte total and nothing else: the
+    converter no longer copies bitmap bytes into the package directory,
+    so there is no second artifact to account for. The field's schema
+    description was amended with that change rather than left asserting
+    bytes this tool does not write.
+
+    This is a named function rather than an inline literal because the
+    mass converter builds one entry per target from the same shape, and
+    two spellings of one entry is how the manifest and its own generator
+    drift apart.
+    """
+    return {
+        "legacy_id": target_stem,
+        "directory": package_directory,
+        "package_sha256": hashlib.sha256(package_payload).hexdigest(),
+        "bitmaps": bitmap_count,
+        "output_bytes": len(package_payload),
+        "policy": tool_policy,
+    }
+
+
 def build_package(repo_root, out_root, target_stem):
     root = Path(repo_root)
     layers = load_all(root)
@@ -716,26 +756,31 @@ def build_package(repo_root, out_root, target_stem):
         raise ValidationFailure(problems)
     fingerprint = fingerprint_inputs(root)
     bitmaps = []
-    payloads = {}
     for shape in shapes:
         for fill in shape["fills"]:
             if "bitmap_id" not in fill:
                 continue
             for output in bitmap_by_id[fill["bitmap_id"]]:
-                target = (CONVERTED_BUILDINGS_DIR / target_stem
-                          / output["file"].rsplit("/", 1)[-1]).as_posix()
-                payloads[target] = read_bytes_file(root / output["file"],
-                                                   "extracted " + output["file"])
+                # The reference is recorded verbatim as the extraction
+                # output path, and the reference is *verified*: the file
+                # is resolved, hashed, and compared against the sha256
+                # the extraction manifest recorded for it. Without the
+                # copied bytes there is no second artifact, so this
+                # comparison is the only thing tying the manifest to
+                # real content -- dropping it would make
+                # `bitmaps[].sha256` an unverified transcription.
+                reference = output["file"]
+                payload = read_bytes_file(root / reference,
+                                          "extracted " + reference)
+                digest = hashlib.sha256(payload).hexdigest()
+                if digest != output["sha256"]:
+                    problems.append("bitmap digest mismatch at " + reference)
                 bitmaps.append({
                     "character_id": fill["bitmap_id"],
-                    "file": target,
-                    "bytes": len(payloads[target]),
-                    "sha256": hashlib.sha256(payloads[target]).hexdigest(),
-                    "expected_sha256": output["sha256"],
+                    "file": reference,
+                    "bytes": len(payload),
+                    "sha256": digest,
                 })
-    for bitmap in bitmaps:
-        if bitmap["sha256"] != bitmap["expected_sha256"]:
-            problems.append("bitmap digest mismatch at " + bitmap["file"])
     if problems:
         raise ValidationFailure(problems)
     package = {
@@ -765,15 +810,9 @@ def build_package(repo_root, out_root, target_stem):
     package_payload = (json.dumps(package, indent=2, sort_keys=True) + "\n"
                        ).encode("utf-8")
     conversion_schema = load_loose_schema(root, CONVERSION_SCHEMA_FILE.name)
-    document = merge_conversion_document(root, {
-        "legacy_id": target_stem,
-        "directory": (CONVERTED_BUILDINGS_DIR / target_stem).as_posix(),
-        "package_sha256": hashlib.sha256(package_payload).hexdigest(),
-        "bitmaps": len(bitmaps),
-        "output_bytes": len(package_payload) + sum(
-            bitmap["bytes"] for bitmap in bitmaps),
-        "policy": POLICY,
-    }, {
+    document = merge_conversion_document(root, conversion_entry(
+        (CONVERTED_BUILDINGS_DIR / target_stem).as_posix(), target_stem,
+        package_payload, len(bitmaps), POLICY), {
         "buildings": BUILDINGS_FILE.as_posix(),
         "inspection": (REGISTRY_DIR / "inspection.json").as_posix(),
         "extraction": (REGISTRY_DIR / "image_extraction.json").as_posix(),
@@ -784,17 +823,44 @@ def build_package(repo_root, out_root, target_stem):
         raise ValidationFailure(problems)
     merged = dict(layers["statuses"])
     merged[source] = "converted"
-    return package, package_payload, document, merged, payloads
+    return package, package_payload, document, merged
 
 
-def write_outputs(out_root, package, package_payload, document, statuses, payloads,
+def remove_foreign_payloads(package_dir):
+    """Delete any file in a package directory other than `package.json`.
+
+    A package directory is meant to hold its manifest and nothing else.
+    The two packages committed before the reference-instead-of-copy
+    change carry bitmap copies, and a re-run over them would otherwise
+    leave two resolution conventions in one corpus with a stale second
+    copy of bytes that are also, separately, recorded in the manifest.
+
+    The removal is scoped to the converter's *own* package directory and
+    only ever deletes regular files other than `package.json`, which
+    makes it unable to touch a manifest or to recurse. A subdirectory is
+    refused rather than deleted: nothing in this pipeline produces one,
+    so encountering one means the directory is not what this function
+    was written for and guessing would be the wrong response.
+    """
+    removed = []
+    for entry in sorted(package_dir.iterdir(), key=lambda item: item.name):
+        if entry.name == "package.json":
+            continue
+        if not entry.is_file():
+            raise InputError("unexpected directory inside a package "
+                             "directory: " + str(entry))
+        entry.unlink()
+        removed.append(entry.name)
+    return removed
+
+
+def write_outputs(out_root, package, package_payload, document, statuses,
                   target_stem):
     out = Path(out_root)
     package_dir = out / CONVERTED_BUILDINGS_DIR / target_stem
     package_dir.mkdir(parents=True, exist_ok=True)
     (package_dir / "package.json").write_bytes(package_payload)
-    for relative, payload in payloads.items():
-        (out / relative).write_bytes(payload)
+    removed = remove_foreign_payloads(package_dir)
     conversions_payload = (json.dumps(document, indent=2, sort_keys=True) + "\n"
                            ).encode("utf-8")
     statuses_payload = (json.dumps({"schema_version": SCHEMA_VERSION,
@@ -809,6 +875,7 @@ def write_outputs(out_root, package, package_payload, document, statuses, payloa
             "directory": (CONVERTED_BUILDINGS_DIR / target_stem).as_posix(),
             "bytes": len(package_payload),
             "sha256": hashlib.sha256(package_payload).hexdigest(),
+            "removed_files": removed,
         },
         "conversions": {
             "file": (REGISTRY_DIR / "conversions.json").as_posix(),
@@ -836,10 +903,10 @@ def build_argument_parser():
 
 
 def run_build(repo_root, out_root, target_stem):
-    package, package_payload, document, statuses, payloads = build_package(
+    package, package_payload, document, statuses = build_package(
         repo_root, out_root, target_stem)
     digests = write_outputs(out_root, package, package_payload, document,
-                            statuses, payloads, target_stem)
+                            statuses, target_stem)
     return package, document, digests
 
 

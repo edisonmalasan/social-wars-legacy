@@ -1,0 +1,3190 @@
+{
+  "bitmaps": [
+    {
+      "bytes": 4363,
+      "character_id": 1,
+      "file": "assets/converted/images/1009_good_girl_m/1.jpg",
+      "sha256": "23b8b76a3057b57f0d3946ec15c2b5b9bc6df8b1ecedb9bc3a7aac4d52c09ce7"
+    },
+    {
+      "bytes": 1118,
+      "character_id": 1,
+      "file": "assets/converted/images/1009_good_girl_m/1_alpha.png",
+      "sha256": "bd980e672337884b2d9645a78556bffec4d73d95a936c911bcd899c2bc7854ab"
+    },
+    {
+      "bytes": 4300,
+      "character_id": 3,
+      "file": "assets/converted/images/1009_good_girl_m/3.jpg",
+      "sha256": "6e35e1a1e7e5e6663bfcebaf91a3782641312ef65d6804f7967807b54b054122"
+    },
+    {
+      "bytes": 1068,
+      "character_id": 3,
+      "file": "assets/converted/images/1009_good_girl_m/3_alpha.png",
+      "sha256": "a459e2f46f4011450e0d6b4ae7a7e0fc3f17683d984455f6758aec8945be7b61"
+    },
+    {
+      "bytes": 4267,
+      "character_id": 5,
+      "file": "assets/converted/images/1009_good_girl_m/5.jpg",
+      "sha256": "66700d09e65745e9ac83942f3eecc214a1e251497f363a0d5bc4e27f12257679"
+    },
+    {
+      "bytes": 1095,
+      "character_id": 5,
+      "file": "assets/converted/images/1009_good_girl_m/5_alpha.png",
+      "sha256": "3861862c9a76aa45e560f623f9b129867b1047b8030d622d98c8ffcba85a5b2c"
+    },
+    {
+      "bytes": 4254,
+      "character_id": 8,
+      "file": "assets/converted/images/1009_good_girl_m/8.jpg",
+      "sha256": "824fe626ef66b8348a831e328730cda64bf13715ec65f92523681f2c8af25075"
+    },
+    {
+      "bytes": 1053,
+      "character_id": 8,
+      "file": "assets/converted/images/1009_good_girl_m/8_alpha.png",
+      "sha256": "86bd2d231da2f0f3232a1e3af349bfb400799aa0678c07ba59d66f54463a28c1"
+    },
+    {
+      "bytes": 4191,
+      "character_id": 10,
+      "file": "assets/converted/images/1009_good_girl_m/10.jpg",
+      "sha256": "f3eb4017a284e9acf7b2d712064d6a985b726047419f15a390e3666373672340"
+    },
+    {
+      "bytes": 1049,
+      "character_id": 10,
+      "file": "assets/converted/images/1009_good_girl_m/10_alpha.png",
+      "sha256": "d86db82628a58f54e2c11a48813271562fb10c4bb991f07c53aa4e1607f3ddbf"
+    },
+    {
+      "bytes": 4197,
+      "character_id": 12,
+      "file": "assets/converted/images/1009_good_girl_m/12.jpg",
+      "sha256": "08a533ace01fcdca9199ec085926c551db14910a328515eb474b33fc8a25f496"
+    },
+    {
+      "bytes": 1044,
+      "character_id": 12,
+      "file": "assets/converted/images/1009_good_girl_m/12_alpha.png",
+      "sha256": "0ba4c735fd974701871f6e3b059567b5caa31db32552baf8092fbcb0195103ff"
+    },
+    {
+      "bytes": 4717,
+      "character_id": 15,
+      "file": "assets/converted/images/1009_good_girl_m/15.jpg",
+      "sha256": "23a7490f11163c1ea5700bf0a394a253e3a19cdadb86a40aca65c8b1e168a7a5"
+    },
+    {
+      "bytes": 1053,
+      "character_id": 15,
+      "file": "assets/converted/images/1009_good_girl_m/15_alpha.png",
+      "sha256": "9726ea1fd50982b197ba304ff8e2517200835fc12c52cbfcbf2773cbb2fe2882"
+    },
+    {
+      "bytes": 4701,
+      "character_id": 17,
+      "file": "assets/converted/images/1009_good_girl_m/17.jpg",
+      "sha256": "c64e88a09387749b8918f17f053e1de01376498cf074ffa951b68239dc498d46"
+    },
+    {
+      "bytes": 1038,
+      "character_id": 17,
+      "file": "assets/converted/images/1009_good_girl_m/17_alpha.png",
+      "sha256": "592ea397ab13b62fb3ef85b576730d844f604097d7fea956e5601f8deec95fd3"
+    },
+    {
+      "bytes": 4705,
+      "character_id": 19,
+      "file": "assets/converted/images/1009_good_girl_m/19.jpg",
+      "sha256": "7bf89f8a6f3b6e0c02c223fd130eef0f46a7a3e9f1dcf05112f388f410ad0012"
+    },
+    {
+      "bytes": 1047,
+      "character_id": 19,
+      "file": "assets/converted/images/1009_good_girl_m/19_alpha.png",
+      "sha256": "ead0e84c90aad836a4adbe6157178620cf5550f97d3a574764a8b7000af3b883"
+    },
+    {
+      "bytes": 4636,
+      "character_id": 22,
+      "file": "assets/converted/images/1009_good_girl_m/22.jpg",
+      "sha256": "9668e70f1cc8eba6ffc4e4c6a2f142ec3e5ac95aebd4a86ae4051848b6c428cd"
+    },
+    {
+      "bytes": 1121,
+      "character_id": 22,
+      "file": "assets/converted/images/1009_good_girl_m/22_alpha.png",
+      "sha256": "e60ab72fa9a3f650a5e4f118a09623b0fa4043fc0cde6bb1b431092c3f5f75be"
+    },
+    {
+      "bytes": 4586,
+      "character_id": 24,
+      "file": "assets/converted/images/1009_good_girl_m/24.jpg",
+      "sha256": "c3292e6c222c4c2c7c7d6a383ec13bc7ee6eda1a9d6dabff89a276817e695d06"
+    },
+    {
+      "bytes": 1130,
+      "character_id": 24,
+      "file": "assets/converted/images/1009_good_girl_m/24_alpha.png",
+      "sha256": "fd6a1f7ef7aea6423b7c6e7901e30d1e665da7838f3b806b5c9ec2c8bdd086f7"
+    },
+    {
+      "bytes": 4587,
+      "character_id": 26,
+      "file": "assets/converted/images/1009_good_girl_m/26.jpg",
+      "sha256": "3c6489db18e7201eafe8bdcb1072ff2215b7ab7ea9bf3b7e1b6f40e11cf4d0cf"
+    },
+    {
+      "bytes": 1107,
+      "character_id": 26,
+      "file": "assets/converted/images/1009_good_girl_m/26_alpha.png",
+      "sha256": "e69ab3f5142f6b1b4a9bc95b55fe958d8c1a8549ddf1c93dacab6219f28a7fdf"
+    },
+    {
+      "bytes": 4953,
+      "character_id": 29,
+      "file": "assets/converted/images/1009_good_girl_m/29.jpg",
+      "sha256": "09bfb7d0de35c0570b68554a4a48abe8921443a2e1c64c7ffd1133aa0bbe6e9a"
+    },
+    {
+      "bytes": 1132,
+      "character_id": 29,
+      "file": "assets/converted/images/1009_good_girl_m/29_alpha.png",
+      "sha256": "92fedc1ca03abc6f2f8339bfa011e429d0816060f7a5d63d63b5f67c6a331c64"
+    },
+    {
+      "bytes": 4886,
+      "character_id": 31,
+      "file": "assets/converted/images/1009_good_girl_m/31.jpg",
+      "sha256": "b107e3a7eea0e624d58e2c7bb1a005654df7b5df3f062994698886d57d9bd2fb"
+    },
+    {
+      "bytes": 1138,
+      "character_id": 31,
+      "file": "assets/converted/images/1009_good_girl_m/31_alpha.png",
+      "sha256": "86f0dfc5f096aca11e66e4200068af00fe2238f2fa1452ce3f9cb89d2b703b07"
+    },
+    {
+      "bytes": 4910,
+      "character_id": 33,
+      "file": "assets/converted/images/1009_good_girl_m/33.jpg",
+      "sha256": "d821f793a5018a49a38c1fc99104ca7b746e2e19df209a9bd3a190775091f02a"
+    },
+    {
+      "bytes": 1136,
+      "character_id": 33,
+      "file": "assets/converted/images/1009_good_girl_m/33_alpha.png",
+      "sha256": "1b13e184ec94f13bde86b76b857d623192e8c4ff01a565a1f9ae3c295524e863"
+    },
+    {
+      "bytes": 4363,
+      "character_id": 36,
+      "file": "assets/converted/images/1009_good_girl_m/36.jpg",
+      "sha256": "23b8b76a3057b57f0d3946ec15c2b5b9bc6df8b1ecedb9bc3a7aac4d52c09ce7"
+    },
+    {
+      "bytes": 1118,
+      "character_id": 36,
+      "file": "assets/converted/images/1009_good_girl_m/36_alpha.png",
+      "sha256": "bd980e672337884b2d9645a78556bffec4d73d95a936c911bcd899c2bc7854ab"
+    },
+    {
+      "bytes": 4261,
+      "character_id": 38,
+      "file": "assets/converted/images/1009_good_girl_m/38.jpg",
+      "sha256": "58c7dd9b8f2515fe6829725e9473efb39cee889364a7fc3851faa7a8d0e94dd2"
+    },
+    {
+      "bytes": 1091,
+      "character_id": 38,
+      "file": "assets/converted/images/1009_good_girl_m/38_alpha.png",
+      "sha256": "7075c116fd0a701c2fd6b37b3c7791491af0a134e81bd2aa84921cd06ca09a89"
+    },
+    {
+      "bytes": 4366,
+      "character_id": 40,
+      "file": "assets/converted/images/1009_good_girl_m/40.jpg",
+      "sha256": "d25a52b1cfe5704a713cc76abe3a34d1f0a4d0ca4e98014107f76ca9a14b33bd"
+    },
+    {
+      "bytes": 1077,
+      "character_id": 40,
+      "file": "assets/converted/images/1009_good_girl_m/40_alpha.png",
+      "sha256": "d8eb35d6eab401b8da94a9269e4da14567bb8bb119aa23906d3d5e5dfc4e36a3"
+    },
+    {
+      "bytes": 4254,
+      "character_id": 43,
+      "file": "assets/converted/images/1009_good_girl_m/43.jpg",
+      "sha256": "824fe626ef66b8348a831e328730cda64bf13715ec65f92523681f2c8af25075"
+    },
+    {
+      "bytes": 1053,
+      "character_id": 43,
+      "file": "assets/converted/images/1009_good_girl_m/43_alpha.png",
+      "sha256": "86bd2d231da2f0f3232a1e3af349bfb400799aa0678c07ba59d66f54463a28c1"
+    },
+    {
+      "bytes": 4097,
+      "character_id": 45,
+      "file": "assets/converted/images/1009_good_girl_m/45.jpg",
+      "sha256": "83c91f5554d9e28101921b268dca656cfc4fbe21c8e9337bbf3b450dd9408ee9"
+    },
+    {
+      "bytes": 991,
+      "character_id": 45,
+      "file": "assets/converted/images/1009_good_girl_m/45_alpha.png",
+      "sha256": "8324c2373dcfbe312a95ce2367512f0deaf481e0f918e3eaa7438d289d578cb5"
+    },
+    {
+      "bytes": 4267,
+      "character_id": 47,
+      "file": "assets/converted/images/1009_good_girl_m/47.jpg",
+      "sha256": "c4206ea36f83785ccb619bd41404e991c0a5e642530d22054a454bf5bed8d6a7"
+    },
+    {
+      "bytes": 1066,
+      "character_id": 47,
+      "file": "assets/converted/images/1009_good_girl_m/47_alpha.png",
+      "sha256": "b2ea9f8c4fc746545301baacdd75abe2c2c2706329ddc9c2d0f58226685dbd08"
+    },
+    {
+      "bytes": 4717,
+      "character_id": 50,
+      "file": "assets/converted/images/1009_good_girl_m/50.jpg",
+      "sha256": "23a7490f11163c1ea5700bf0a394a253e3a19cdadb86a40aca65c8b1e168a7a5"
+    },
+    {
+      "bytes": 1053,
+      "character_id": 50,
+      "file": "assets/converted/images/1009_good_girl_m/50_alpha.png",
+      "sha256": "9726ea1fd50982b197ba304ff8e2517200835fc12c52cbfcbf2773cbb2fe2882"
+    },
+    {
+      "bytes": 4795,
+      "character_id": 52,
+      "file": "assets/converted/images/1009_good_girl_m/52.jpg",
+      "sha256": "4d9e55fa9c202cb2de4ad6af7e04f9e115dfd0a2149774de8bbf1b61f6746fd2"
+    },
+    {
+      "bytes": 1059,
+      "character_id": 52,
+      "file": "assets/converted/images/1009_good_girl_m/52_alpha.png",
+      "sha256": "6eb9263f75c3e51c71553a4bb360a38302493b8ff3af43348acaa9ec6c83947e"
+    },
+    {
+      "bytes": 4796,
+      "character_id": 54,
+      "file": "assets/converted/images/1009_good_girl_m/54.jpg",
+      "sha256": "a9cf4371adb31e78d86fe6e4c356c15205f8cffcf26ea173ae66e00b9f09c5bd"
+    },
+    {
+      "bytes": 1109,
+      "character_id": 54,
+      "file": "assets/converted/images/1009_good_girl_m/54_alpha.png",
+      "sha256": "8fc312427967334d86b9df0e0f0b0bf59e75cd933726e4e65514ef7a1631912b"
+    },
+    {
+      "bytes": 4636,
+      "character_id": 57,
+      "file": "assets/converted/images/1009_good_girl_m/57.jpg",
+      "sha256": "9668e70f1cc8eba6ffc4e4c6a2f142ec3e5ac95aebd4a86ae4051848b6c428cd"
+    },
+    {
+      "bytes": 1121,
+      "character_id": 57,
+      "file": "assets/converted/images/1009_good_girl_m/57_alpha.png",
+      "sha256": "e60ab72fa9a3f650a5e4f118a09623b0fa4043fc0cde6bb1b431092c3f5f75be"
+    },
+    {
+      "bytes": 4666,
+      "character_id": 59,
+      "file": "assets/converted/images/1009_good_girl_m/59.jpg",
+      "sha256": "5d7045dd4bd3df0654b0e816b17a3a5ced844ea79dfe83c6c66d74ce2f2f44b7"
+    },
+    {
+      "bytes": 1110,
+      "character_id": 59,
+      "file": "assets/converted/images/1009_good_girl_m/59_alpha.png",
+      "sha256": "540dc25f3b7127a74f25d5792a9e538887cdf929b1e79a5c392c6f5a6b6b2128"
+    },
+    {
+      "bytes": 4490,
+      "character_id": 61,
+      "file": "assets/converted/images/1009_good_girl_m/61.jpg",
+      "sha256": "bdb3196ab2d616d05abbab6e94c4bbec9bb9cdf9b7ef146f4aa710a193e5d40e"
+    },
+    {
+      "bytes": 1056,
+      "character_id": 61,
+      "file": "assets/converted/images/1009_good_girl_m/61_alpha.png",
+      "sha256": "5a981a48922bf21c76689b547ffab0e6804131a11252aa8c870d8605c17c5f9d"
+    },
+    {
+      "bytes": 4953,
+      "character_id": 64,
+      "file": "assets/converted/images/1009_good_girl_m/64.jpg",
+      "sha256": "09bfb7d0de35c0570b68554a4a48abe8921443a2e1c64c7ffd1133aa0bbe6e9a"
+    },
+    {
+      "bytes": 1132,
+      "character_id": 64,
+      "file": "assets/converted/images/1009_good_girl_m/64_alpha.png",
+      "sha256": "92fedc1ca03abc6f2f8339bfa011e429d0816060f7a5d63d63b5f67c6a331c64"
+    },
+    {
+      "bytes": 4966,
+      "character_id": 66,
+      "file": "assets/converted/images/1009_good_girl_m/66.jpg",
+      "sha256": "06919e538650886d066e7be5f273e4ffe882417cd64a6769c86d82c3fb70ae21"
+    },
+    {
+      "bytes": 1117,
+      "character_id": 66,
+      "file": "assets/converted/images/1009_good_girl_m/66_alpha.png",
+      "sha256": "77d5a2f82efd08524003bf7e457a70b4b657e9c866e98b398680d8970ed9df37"
+    },
+    {
+      "bytes": 4951,
+      "character_id": 68,
+      "file": "assets/converted/images/1009_good_girl_m/68.jpg",
+      "sha256": "292267ce4d056cf48f62c4e222aea2448a875fa08acf86b8addf7c4343b8ccda"
+    },
+    {
+      "bytes": 1128,
+      "character_id": 68,
+      "file": "assets/converted/images/1009_good_girl_m/68_alpha.png",
+      "sha256": "e2b57ca53779a1cab1986c31486dc5df4a27ac20d5e1ec86b134471778b4e6f9"
+    },
+    {
+      "bytes": 3988,
+      "character_id": 71,
+      "file": "assets/converted/images/1009_good_girl_m/71.jpg",
+      "sha256": "8d8fedaeb3ced32c560506e0e82278f999488fc94e4670d750bf2309b605c68e"
+    },
+    {
+      "bytes": 973,
+      "character_id": 71,
+      "file": "assets/converted/images/1009_good_girl_m/71_alpha.png",
+      "sha256": "ccfe7c6b7e08851c0581cb21540c484a0f0d69bffe75fd1872c2f91a5509ebe6"
+    },
+    {
+      "bytes": 4201,
+      "character_id": 74,
+      "file": "assets/converted/images/1009_good_girl_m/74.jpg",
+      "sha256": "37d50702ebf09095ae93f38006a9b6cdf268237fd0decb937d822dce13945519"
+    },
+    {
+      "bytes": 1043,
+      "character_id": 74,
+      "file": "assets/converted/images/1009_good_girl_m/74_alpha.png",
+      "sha256": "6e3878227165d78890984be66b4db984f45cd75eb2668ec9f3c4e3fec1d7f4cb"
+    },
+    {
+      "bytes": 4029,
+      "character_id": 76,
+      "file": "assets/converted/images/1009_good_girl_m/76.jpg",
+      "sha256": "a86ef96974220f5a459846f78db6948c927cf11038e8ead4aa2ae693ee7369b9"
+    },
+    {
+      "bytes": 1001,
+      "character_id": 76,
+      "file": "assets/converted/images/1009_good_girl_m/76_alpha.png",
+      "sha256": "b899003b19654f8dafcbc650140026bb141defcfb8685ccc579d8bd958c6ae51"
+    },
+    {
+      "bytes": 4019,
+      "character_id": 79,
+      "file": "assets/converted/images/1009_good_girl_m/79.jpg",
+      "sha256": "d8775e1bb4c03ecbb69262c8dceb8d76e2720a3cf1b9cd7439bcd66b32ea601a"
+    },
+    {
+      "bytes": 1068,
+      "character_id": 79,
+      "file": "assets/converted/images/1009_good_girl_m/79_alpha.png",
+      "sha256": "fcd3421ce98dc0f2558cba2ccc8d905e416495d99fcb616bcce5d5fe2a1dc80b"
+    },
+    {
+      "bytes": 5021,
+      "character_id": 81,
+      "file": "assets/converted/images/1009_good_girl_m/81.jpg",
+      "sha256": "0e3aec56a40686a8b9732a43a6dda4a0060ea12caea1da7a79cbb1fbf7f614f9"
+    },
+    {
+      "bytes": 1337,
+      "character_id": 81,
+      "file": "assets/converted/images/1009_good_girl_m/81_alpha.png",
+      "sha256": "06caa8f7cd0de75ffb239554aae4099098fe126b93cc52bfd8b0c20047f2dd33"
+    },
+    {
+      "bytes": 4175,
+      "character_id": 83,
+      "file": "assets/converted/images/1009_good_girl_m/83.jpg",
+      "sha256": "4a197815f03213ab2e7049531832107f9a1c43f3b0c83ae0eba97d79d10163a5"
+    },
+    {
+      "bytes": 1095,
+      "character_id": 83,
+      "file": "assets/converted/images/1009_good_girl_m/83_alpha.png",
+      "sha256": "098deddb826bf34825bdd1d0ef5149f7293df6bdc762e2f80d2c30410a9b3039"
+    },
+    {
+      "bytes": 4701,
+      "character_id": 86,
+      "file": "assets/converted/images/1009_good_girl_m/86.jpg",
+      "sha256": "23e298d67de27f1cd8eff5ce69fdca96bfd2095c7d93f8cabb46968d3d8af4aa"
+    },
+    {
+      "bytes": 1036,
+      "character_id": 86,
+      "file": "assets/converted/images/1009_good_girl_m/86_alpha.png",
+      "sha256": "c3a00bf17257a881d4f4e7254812e5dcf03b21c975610e3973582361c21bf49e"
+    },
+    {
+      "bytes": 5677,
+      "character_id": 88,
+      "file": "assets/converted/images/1009_good_girl_m/88.jpg",
+      "sha256": "9c0026fc5a3d89125c07d63fc7a19461997de552a4083f6bd50f0f7c18a533d6"
+    },
+    {
+      "bytes": 1262,
+      "character_id": 88,
+      "file": "assets/converted/images/1009_good_girl_m/88_alpha.png",
+      "sha256": "7ccf6f940c9829020a8a6e41688da9f85a23cc8483139ac6d7abc4226fbb9fe8"
+    },
+    {
+      "bytes": 4764,
+      "character_id": 90,
+      "file": "assets/converted/images/1009_good_girl_m/90.jpg",
+      "sha256": "d7ce28a7d2205e18a61c0def3b9ab4a252ae8ad362ccef071f1f1d49f656351b"
+    },
+    {
+      "bytes": 1041,
+      "character_id": 90,
+      "file": "assets/converted/images/1009_good_girl_m/90_alpha.png",
+      "sha256": "43419cba27b383fe2a917a78849623e794f28d7f2ad55674a43cba94f2aecd84"
+    },
+    {
+      "bytes": 4508,
+      "character_id": 93,
+      "file": "assets/converted/images/1009_good_girl_m/93.jpg",
+      "sha256": "a9d40823b36c2560147dfe886d7d8b019026167b85bead01d5b36b3a2edf8c6d"
+    },
+    {
+      "bytes": 1011,
+      "character_id": 93,
+      "file": "assets/converted/images/1009_good_girl_m/93_alpha.png",
+      "sha256": "56072e5fd657daf2692f3e9291eb06ed3bbd6cca09b6581ea9b4225012bceb17"
+    },
+    {
+      "bytes": 5550,
+      "character_id": 95,
+      "file": "assets/converted/images/1009_good_girl_m/95.jpg",
+      "sha256": "51ffc2db5b4a9804187090e06bd912131ff182811f83399f08b14541fbf0509c"
+    },
+    {
+      "bytes": 1251,
+      "character_id": 95,
+      "file": "assets/converted/images/1009_good_girl_m/95_alpha.png",
+      "sha256": "4ba05bc6170543ad1033e7d0971de5460f17c7c83076d90e16a98f9a9214be44"
+    },
+    {
+      "bytes": 4648,
+      "character_id": 97,
+      "file": "assets/converted/images/1009_good_girl_m/97.jpg",
+      "sha256": "28e17df97b11d44dd120f112d20750123ae8e602ee7881d426f326cda9098ab3"
+    },
+    {
+      "bytes": 1041,
+      "character_id": 97,
+      "file": "assets/converted/images/1009_good_girl_m/97_alpha.png",
+      "sha256": "f62f8720980855acf4a0131fddb19f7c4dd08866b240972c0d7abd7ddc4c0607"
+    },
+    {
+      "bytes": 4710,
+      "character_id": 100,
+      "file": "assets/converted/images/1009_good_girl_m/100.jpg",
+      "sha256": "ef02a44e5785947c312c0dbac691825fe4c75eb07a2b12c30054a21940dec2eb"
+    },
+    {
+      "bytes": 1018,
+      "character_id": 100,
+      "file": "assets/converted/images/1009_good_girl_m/100_alpha.png",
+      "sha256": "1358de2ebc520174c934b1198e4575179c120ebd3756ce5c1b60f4baa1819d9f"
+    },
+    {
+      "bytes": 5366,
+      "character_id": 102,
+      "file": "assets/converted/images/1009_good_girl_m/102.jpg",
+      "sha256": "bc08ea49755d743c0a461fc33961fba41b7f4812c85536721445d6bfd006c8f2"
+    },
+    {
+      "bytes": 1172,
+      "character_id": 102,
+      "file": "assets/converted/images/1009_good_girl_m/102_alpha.png",
+      "sha256": "c10096edaacd7ab07fea7e3c0243b0c4ee38b0286ff15dd3817016720db50407"
+    },
+    {
+      "bytes": 4716,
+      "character_id": 104,
+      "file": "assets/converted/images/1009_good_girl_m/104.jpg",
+      "sha256": "054d4348ad7af26aa34668f6843ef5113e5e546ee07872ba741ca24d066d185a"
+    },
+    {
+      "bytes": 1031,
+      "character_id": 104,
+      "file": "assets/converted/images/1009_good_girl_m/104_alpha.png",
+      "sha256": "cfd9023a1ed4adaacf99421bea2969fcb3876978f85e5f1936029865264d65c0"
+    },
+    {
+      "bytes": 4605,
+      "character_id": 107,
+      "file": "assets/converted/images/1009_good_girl_m/107.jpg",
+      "sha256": "4a875eead047d31778410116f770d952129806d75e5bfbeaef2eec6e12d38bf6"
+    },
+    {
+      "bytes": 1121,
+      "character_id": 107,
+      "file": "assets/converted/images/1009_good_girl_m/107_alpha.png",
+      "sha256": "8dfa2ce082061017eb13d09062e6cdea322dd4f6c7b2fd5195e6fcad83b86521"
+    },
+    {
+      "bytes": 4872,
+      "character_id": 109,
+      "file": "assets/converted/images/1009_good_girl_m/109.jpg",
+      "sha256": "56e2525505738a2ce6904f527a708171ff8c2f54cb8c8b6bfdb3f36c67b813df"
+    },
+    {
+      "bytes": 1047,
+      "character_id": 109,
+      "file": "assets/converted/images/1009_good_girl_m/109_alpha.png",
+      "sha256": "f6689b13e29a0316f4a5defd6d500e4c5e0f9ae63f359cf0ab97e6dc61384b94"
+    },
+    {
+      "bytes": 5060,
+      "character_id": 111,
+      "file": "assets/converted/images/1009_good_girl_m/111.jpg",
+      "sha256": "6edd6d68cc80df45c1ee1713266cd809582697c5b22217e2853a05e33c45fe35"
+    },
+    {
+      "bytes": 1122,
+      "character_id": 111,
+      "file": "assets/converted/images/1009_good_girl_m/111_alpha.png",
+      "sha256": "14fda89f25258dc502c93c371dc0f7baad8163f3cb6a21346f9e9b12b0f36fd2"
+    },
+    {
+      "bytes": 4614,
+      "character_id": 113,
+      "file": "assets/converted/images/1009_good_girl_m/113.jpg",
+      "sha256": "cd240f11bb21f2929f382090997aab1a75d79046697f5f051f70c3c7f0f904e4"
+    },
+    {
+      "bytes": 1055,
+      "character_id": 113,
+      "file": "assets/converted/images/1009_good_girl_m/113_alpha.png",
+      "sha256": "9abe76f9105045d2a7aa84319ec8705354c72af207c3b43759ed03f5294da052"
+    }
+  ],
+  "content_ref": {
+    "activation": 0,
+    "attack": 15,
+    "attack_interval": 35,
+    "attack_range": 5,
+    "best_against": "ft_ground",
+    "best_against_mult": 1,
+    "build_time": 0,
+    "building_limit_same_id": -1,
+    "building_limit_same_scf": -1,
+    "category_id": 7,
+    "clicks_to_build": 0,
+    "collect": 0,
+    "collect_type": "g",
+    "collect_xp": 2,
+    "content_version": "44e5b9edd1eba2910833bb8e2f063175e51c5754e38c35177648e4de779df501",
+    "cost": 0,
+    "cost_unit_cash": 2,
+    "costs": {
+      "g": 80,
+      "w": 160
+    },
+    "defense": 1,
+    "display_order": 99,
+    "elevation": 1,
+    "expiration": 0,
+    "gift_level": 4,
+    "giftable": 0,
+    "group_type": "SHORT_RANGE",
+    "height": 1,
+    "img_name": "1009_good_girl_m",
+    "in_store": 0,
+    "inventory_ids": null,
+    "kind": "unit",
+    "legacy_id": "1009",
+    "life": 250,
+    "max_collects": 0,
+    "max_elem_vol": 0,
+    "max_frame": 5,
+    "min_level": 2,
+    "name": "General Scarlett",
+    "new_item": 0,
+    "population": 1,
+    "premium_upgrade_costs": null,
+    "properties": {
+      "bulldozable": "1",
+      "ft_ground": "1",
+      "human": "1",
+      "resurrectable": "1",
+      "seeStealthUnits": "1"
+    },
+    "race": "h",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "subcat_functional": 80,
+    "subcategory_id": 7,
+    "syringes": 1,
+    "training_time": 0,
+    "trains_ids": -1,
+    "type": "u",
+    "unit_capacity": 0,
+    "upgrades_to": -1,
+    "velocity": 5,
+    "volume": 10,
+    "width": 1,
+    "xp": 7
+  },
+  "content_version": "a0c3861fd95cbe635537efd7223f46991580a6be66735a70c9b1904c8987c18f",
+  "frame_count": 1,
+  "frame_height": 400,
+  "frame_rate": 30.0,
+  "frame_width": 550,
+  "kind": "converted_unit",
+  "legacy_id": "1009_good_girl_m",
+  "main": {
+    "frame_count": 1,
+    "labels": [],
+    "placements": [
+      {
+        "character_id": 116,
+        "character_kind": "sprite",
+        "depth": 1,
+        "frame": 1,
+        "move": false
+      }
+    ],
+    "removes": []
+  },
+  "shapes": [
+    {
+      "bounds": {
+        "height_px": 122,
+        "width_px": 81,
+        "xmax": 1620,
+        "xmin": 0,
+        "ymax": 2440,
+        "ymin": 0
+      },
+      "character_id": 2,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 1,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 121,
+        "width_px": 81,
+        "xmax": 1620,
+        "xmin": 0,
+        "ymax": 2430,
+        "ymin": 30
+      },
+      "character_id": 4,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 3,
+          "matrix": "d940000500000601e0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 121,
+        "width_px": 81,
+        "xmax": 1620,
+        "xmin": 0,
+        "ymax": 2420,
+        "ymin": 40
+      },
+      "character_id": 6,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 5,
+          "matrix": "d940000500000700a0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 120,
+        "width_px": 77,
+        "xmax": 1540,
+        "xmin": 0,
+        "ymax": 2400,
+        "ymin": 0
+      },
+      "character_id": 9,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 8,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 119,
+        "width_px": 77,
+        "xmax": 1540,
+        "xmin": 0,
+        "ymax": 2390,
+        "ymin": 30
+      },
+      "character_id": 11,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 10,
+          "matrix": "d940000500000601e0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 119,
+        "width_px": 77,
+        "xmax": 1540,
+        "xmin": 0,
+        "ymax": 2380,
+        "ymin": 40
+      },
+      "character_id": 13,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 12,
+          "matrix": "d940000500000700a0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 118,
+        "width_px": 80,
+        "xmax": 1600,
+        "xmin": 0,
+        "ymax": 2360,
+        "ymin": 0
+      },
+      "character_id": 16,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 15,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 117,
+        "width_px": 80,
+        "xmax": 1600,
+        "xmin": 0,
+        "ymax": 2350,
+        "ymin": 30
+      },
+      "character_id": 18,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 17,
+          "matrix": "d940000500000601e0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 118,
+        "width_px": 80,
+        "xmax": 1600,
+        "xmin": 0,
+        "ymax": 2365,
+        "ymin": 45
+      },
+      "character_id": 20,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 19,
+          "matrix": "d940000500000700b4",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 117,
+        "width_px": 76,
+        "xmax": 1520,
+        "xmin": 0,
+        "ymax": 2340,
+        "ymin": 0
+      },
+      "character_id": 23,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 22,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 116,
+        "width_px": 76,
+        "xmax": 1520,
+        "xmin": 0,
+        "ymax": 2330,
+        "ymin": 30
+      },
+      "character_id": 25,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 24,
+          "matrix": "d940000500000601e0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 117,
+        "width_px": 76,
+        "xmax": 1520,
+        "xmin": 0,
+        "ymax": 2340,
+        "ymin": 40
+      },
+      "character_id": 27,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 26,
+          "matrix": "d940000500000700a0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 119,
+        "width_px": 77,
+        "xmax": 1540,
+        "xmin": 0,
+        "ymax": 2395,
+        "ymin": 35
+      },
+      "character_id": 30,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 29,
+          "matrix": "d9400005000007008c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 119,
+        "width_px": 77,
+        "xmax": 1540,
+        "xmin": 0,
+        "ymax": 2385,
+        "ymin": 65
+      },
+      "character_id": 32,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 31,
+          "matrix": "d94000050000080041",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 118,
+        "width_px": 77,
+        "xmax": 1540,
+        "xmin": 0,
+        "ymax": 2375,
+        "ymin": 75
+      },
+      "character_id": 34,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 33,
+          "matrix": "d9400005000008004b",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 122,
+        "width_px": 81,
+        "xmax": 1620,
+        "xmin": 0,
+        "ymax": 2440,
+        "ymin": 0
+      },
+      "character_id": 37,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 36,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 121,
+        "width_px": 80,
+        "xmax": 1614,
+        "xmin": -6,
+        "ymax": 2421,
+        "ymin": 21
+      },
+      "character_id": 39,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 38,
+          "matrix": "d9400005000006e950",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 121,
+        "width_px": 82,
+        "xmax": 1640,
+        "xmin": 0,
+        "ymax": 2420,
+        "ymin": 20
+      },
+      "character_id": 41,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 40,
+          "matrix": "d94000050000060140",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 119,
+        "width_px": 77,
+        "xmax": 1540,
+        "xmin": 0,
+        "ymax": 2390,
+        "ymin": -10
+      },
+      "character_id": 44,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 43,
+          "matrix": "d94000050000050580",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 119,
+        "width_px": 75,
+        "xmax": 1516,
+        "xmin": -4,
+        "ymax": 2392,
+        "ymin": 12
+      },
+      "character_id": 46,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 45,
+          "matrix": "d9400005000005e300",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 119,
+        "width_px": 77,
+        "xmax": 1550,
+        "xmin": 10,
+        "ymax": 2391,
+        "ymin": 11
+      },
+      "character_id": 48,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 47,
+          "matrix": "d940000500000552c0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 103,
+        "width_px": 67,
+        "xmax": 1357,
+        "xmin": -243,
+        "ymax": 2065,
+        "ymin": -295
+      },
+      "character_id": 51,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 50,
+          "matrix": "d940000500000ac36d90",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 103,
+        "width_px": 66,
+        "xmax": 1337,
+        "xmin": -243,
+        "ymax": 2069,
+        "ymin": -271
+      },
+      "character_id": 53,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 52,
+          "matrix": "d940000500000ac36f10",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 103,
+        "width_px": 68,
+        "xmax": 1378,
+        "xmin": -242,
+        "ymax": 2069,
+        "ymin": -271
+      },
+      "character_id": 55,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 54,
+          "matrix": "d940000500000ac3af10",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 117,
+        "width_px": 76,
+        "xmax": 1520,
+        "xmin": 0,
+        "ymax": 2350,
+        "ymin": 10
+      },
+      "character_id": 58,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 57,
+          "matrix": "d94000050000050280",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 117,
+        "width_px": 76,
+        "xmax": 1520,
+        "xmin": 0,
+        "ymax": 2355,
+        "ymin": 35
+      },
+      "character_id": 60,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 59,
+          "matrix": "d9400005000007008c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 117,
+        "width_px": 75,
+        "xmax": 1515,
+        "xmin": -5,
+        "ymax": 2355,
+        "ymin": 35
+      },
+      "character_id": 62,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 61,
+          "matrix": "d9400005000007f68c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 118,
+        "width_px": 77,
+        "xmax": 1540,
+        "xmin": 0,
+        "ymax": 2360,
+        "ymin": 0
+      },
+      "character_id": 65,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 64,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 118,
+        "width_px": 77,
+        "xmax": 1557,
+        "xmin": -3,
+        "ymax": 2362,
+        "ymin": 22
+      },
+      "character_id": 67,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 66,
+          "matrix": "d9400005000006f560",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 118,
+        "width_px": 76,
+        "xmax": 1527,
+        "xmin": -13,
+        "ymax": 2360,
+        "ymin": 20
+      },
+      "character_id": 69,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 68,
+          "matrix": "d9400005000006cd40",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 118,
+        "width_px": 52,
+        "xmax": 1049,
+        "xmin": -111,
+        "ymax": 2376,
+        "ymin": -84
+      },
+      "character_id": 72,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 71,
+          "matrix": "d940000500000891ac",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 118,
+        "width_px": 62,
+        "xmax": 1246,
+        "xmin": -114,
+        "ymax": 2374,
+        "ymin": -86
+      },
+      "character_id": 75,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 74,
+          "matrix": "d94000050000088eaa",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 118,
+        "width_px": 52,
+        "xmax": 1055,
+        "xmin": -125,
+        "ymax": 2365,
+        "ymin": -115
+      },
+      "character_id": 77,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 76,
+          "matrix": "d9400005000008838d",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 121,
+        "width_px": 76,
+        "xmax": 1520,
+        "xmin": 0,
+        "ymax": 2420,
+        "ymin": 0
+      },
+      "character_id": 80,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 79,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 121,
+        "width_px": 115,
+        "xmax": 2300,
+        "xmin": 0,
+        "ymax": 2423,
+        "ymin": 3
+      },
+      "character_id": 82,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 81,
+          "matrix": "d94000050000030c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 121,
+        "width_px": 75,
+        "xmax": 1515,
+        "xmin": -65,
+        "ymax": 2430,
+        "ymin": -10
+      },
+      "character_id": 84,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 83,
+          "matrix": "d9400005000008bff6",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 119,
+        "width_px": 70,
+        "xmax": 1407,
+        "xmin": -73,
+        "ymax": 2385,
+        "ymin": 5
+      },
+      "character_id": 87,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 86,
+          "matrix": "d9400005000008b705",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 119,
+        "width_px": 106,
+        "xmax": 2129,
+        "xmin": -71,
+        "ymax": 2386,
+        "ymin": 6
+      },
+      "character_id": 89,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 88,
+          "matrix": "d9400005000008b906",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 119,
+        "width_px": 70,
+        "xmax": 1415,
+        "xmin": -105,
+        "ymax": 2387,
+        "ymin": 7
+      },
+      "character_id": 91,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 90,
+          "matrix": "d94000050000089707",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 116,
+        "width_px": 74,
+        "xmax": 1480,
+        "xmin": 0,
+        "ymax": 2332,
+        "ymin": 12
+      },
+      "character_id": 94,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 93,
+          "matrix": "d94000050000050300",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 116,
+        "width_px": 110,
+        "xmax": 2200,
+        "xmin": 0,
+        "ymax": 2332,
+        "ymin": 12
+      },
+      "character_id": 96,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 95,
+          "matrix": "d94000050000050300",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 116,
+        "width_px": 73,
+        "xmax": 1468,
+        "xmin": -32,
+        "ymax": 2331,
+        "ymin": 11
+      },
+      "character_id": 98,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 97,
+          "matrix": "d9400005000007c02c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 119,
+        "width_px": 65,
+        "xmax": 1300,
+        "xmin": 0,
+        "ymax": 2380,
+        "ymin": 0
+      },
+      "character_id": 101,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 100,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 126,
+        "width_px": 65,
+        "xmax": 1300,
+        "xmin": 0,
+        "ymax": 2539,
+        "ymin": -1
+      },
+      "character_id": 103,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 102,
+          "matrix": "d940000500000230",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 118,
+        "width_px": 65,
+        "xmax": 1300,
+        "xmin": 0,
+        "ymax": 2374,
+        "ymin": -26
+      },
+      "character_id": 105,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 104,
+          "matrix": "d94000050000060260",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 116,
+        "width_px": 75,
+        "xmax": 1514,
+        "xmin": -6,
+        "ymax": 2334,
+        "ymin": -6
+      },
+      "character_id": 108,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 107,
+          "matrix": "d9400005000004aa",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 117,
+        "width_px": 84,
+        "xmax": 1692,
+        "xmin": 112,
+        "ymax": 2353,
+        "ymin": -7
+      },
+      "character_id": 110,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 109,
+          "matrix": "d940000500000870f9",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 131,
+        "width_px": 113,
+        "xmax": 2260,
+        "xmin": -20,
+        "ymax": 2631,
+        "ymin": 411
+      },
+      "character_id": 112,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 111,
+          "matrix": "d940000500000afb19b0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 150,
+        "width_px": 124,
+        "xmax": 2490,
+        "xmin": 90,
+        "ymax": 3000,
+        "ymin": 1140
+      },
+      "character_id": 114,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 113,
+          "matrix": "d940000500000c05a474",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    }
+  ],
+  "source_file": "assets/sprites/1009_good_girl_m.swf",
+  "source_layer": "converted(asset-registry)",
+  "sprites": [
+    {
+      "frame_count": 45,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 2,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 14,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 35,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 7
+    },
+    {
+      "frame_count": 45,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 9,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 11,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 14,
+          "move": true
+        },
+        {
+          "character_id": 13,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 11,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 35,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 14
+    },
+    {
+      "frame_count": 45,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 16,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 18,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 14,
+          "move": true
+        },
+        {
+          "character_id": 20,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 18,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 35,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 21
+    },
+    {
+      "frame_count": 45,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 23,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 25,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 14,
+          "move": true
+        },
+        {
+          "character_id": 27,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 25,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 35,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 28
+    },
+    {
+      "frame_count": 45,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 30,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 32,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 14,
+          "move": true
+        },
+        {
+          "character_id": 34,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 32,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 35,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 35
+    },
+    {
+      "frame_count": 12,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 37,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 39,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 37,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 41,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 42
+    },
+    {
+      "frame_count": 12,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 44,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 46,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 44,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 48,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 49
+    },
+    {
+      "frame_count": 12,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 51,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 53,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 51,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 55,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 56
+    },
+    {
+      "frame_count": 12,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 58,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 60,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 58,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 62,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 63
+    },
+    {
+      "frame_count": 12,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 65,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 67,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 65,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 69,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 70
+    },
+    {
+      "frame_count": 1,
+      "labels": [],
+      "placements": [],
+      "removes": [],
+      "sprite_id": 73
+    },
+    {
+      "frame_count": 7,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 72,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 73,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 75,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 77,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 6,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 78
+    },
+    {
+      "frame_count": 7,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 80,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 73,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 82,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 84,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 6,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 85
+    },
+    {
+      "frame_count": 7,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 87,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 73,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 89,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 91,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 6,
+          "move": true
+        }
+      ],
+      "removes": [
+        {
+          "depth": 2,
+          "frame": 4
+        }
+      ],
+      "sprite_id": 92
+    },
+    {
+      "frame_count": 7,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 94,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 73,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 96,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 98,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 6,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 99
+    },
+    {
+      "frame_count": 7,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 101,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 73,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 103,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 105,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 6,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 106
+    },
+    {
+      "frame_count": 10,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 108,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 110,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 112,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 114,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 115
+    },
+    {
+      "frame_count": 50,
+      "labels": [
+        {
+          "anchor": false,
+          "frame": 1,
+          "name": "QUIETO"
+        },
+        {
+          "anchor": false,
+          "frame": 6,
+          "name": "ANDAR"
+        },
+        {
+          "anchor": false,
+          "frame": 11,
+          "name": "ATAQUE"
+        },
+        {
+          "anchor": false,
+          "frame": 16,
+          "name": "MUERTE"
+        },
+        {
+          "anchor": false,
+          "frame": 21,
+          "name": "PICAR"
+        }
+      ],
+      "placements": [
+        {
+          "character_id": 7,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 14,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 2,
+          "move": false
+        },
+        {
+          "character_id": 21,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 3,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 4,
+          "move": false
+        },
+        {
+          "character_id": 35,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 5,
+          "move": false
+        },
+        {
+          "character_id": 42,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 6,
+          "move": false
+        },
+        {
+          "character_id": 49,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 7,
+          "move": false
+        },
+        {
+          "character_id": 56,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 8,
+          "move": false
+        },
+        {
+          "character_id": 63,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 9,
+          "move": false
+        },
+        {
+          "character_id": 70,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 10,
+          "move": false
+        },
+        {
+          "character_id": 78,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 11,
+          "move": false
+        },
+        {
+          "character_id": 85,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 12,
+          "move": false
+        },
+        {
+          "character_id": 92,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 13,
+          "move": false
+        },
+        {
+          "character_id": 99,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 14,
+          "move": false
+        },
+        {
+          "character_id": 106,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 15,
+          "move": false
+        },
+        {
+          "character_id": 115,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 16,
+          "move": false
+        }
+      ],
+      "removes": [
+        {
+          "depth": 1,
+          "frame": 2
+        },
+        {
+          "depth": 1,
+          "frame": 3
+        },
+        {
+          "depth": 1,
+          "frame": 4
+        },
+        {
+          "depth": 1,
+          "frame": 5
+        },
+        {
+          "depth": 1,
+          "frame": 6
+        },
+        {
+          "depth": 1,
+          "frame": 7
+        },
+        {
+          "depth": 1,
+          "frame": 8
+        },
+        {
+          "depth": 1,
+          "frame": 9
+        },
+        {
+          "depth": 1,
+          "frame": 10
+        },
+        {
+          "depth": 1,
+          "frame": 11
+        },
+        {
+          "depth": 1,
+          "frame": 12
+        },
+        {
+          "depth": 1,
+          "frame": 13
+        },
+        {
+          "depth": 1,
+          "frame": 14
+        },
+        {
+          "depth": 1,
+          "frame": 15
+        },
+        {
+          "depth": 1,
+          "frame": 16
+        },
+        {
+          "depth": 1,
+          "frame": 21
+        }
+      ],
+      "sprite_id": 116
+    }
+  ],
+  "symbols": [
+    {
+      "id": 116,
+      "name": "1009_good_girl_m"
+    },
+    {
+      "id": 115,
+      "name": "_1009_good_girl_fla.arquero1atacando3_4detras_18"
+    },
+    {
+      "id": 106,
+      "name": "_1009_good_girl_fla.arquero1atacandofrente_17"
+    },
+    {
+      "id": 99,
+      "name": "_1009_good_girl_fla.arquero1atacando3_4frente_16"
+    },
+    {
+      "id": 92,
+      "name": "_1009_good_girl_fla.arquero1atacandoperfil_15"
+    },
+    {
+      "id": 85,
+      "name": "_1009_good_girl_fla.arquero1muriendo_14"
+    },
+    {
+      "id": 78,
+      "name": "_1009_good_girl_fla.arquero1atacandodetras_12"
+    }
+  ]
+}

@@ -1,0 +1,2894 @@
+{
+  "bitmaps": [
+    {
+      "bytes": 7315,
+      "character_id": 1,
+      "file": "assets/converted/images/1124_ork_tank_1/1.jpg",
+      "sha256": "de628ea7d08f0bbcbb690bfd1dd7c90ed0af33c2bccae1374afac1bea34fb3d9"
+    },
+    {
+      "bytes": 847,
+      "character_id": 1,
+      "file": "assets/converted/images/1124_ork_tank_1/1_alpha.png",
+      "sha256": "a152c2def19ec86c59b6d842da081582c63b3a73479808ccbb8d3ed196c5117e"
+    },
+    {
+      "bytes": 9718,
+      "character_id": 3,
+      "file": "assets/converted/images/1124_ork_tank_1/3.jpg",
+      "sha256": "24f4c2593624a7e6e6e96fe2752b6a320908be792a1d9cc41e3f596b81824660"
+    },
+    {
+      "bytes": 1421,
+      "character_id": 3,
+      "file": "assets/converted/images/1124_ork_tank_1/3_alpha.png",
+      "sha256": "7971f5c2ac2a2d04c95df256651efc4b4c72aa37822d2b7f38c2e1727dc6c741"
+    },
+    {
+      "bytes": 9130,
+      "character_id": 5,
+      "file": "assets/converted/images/1124_ork_tank_1/5.jpg",
+      "sha256": "f615809e4d6e38ce29ebc84141be8d51814609fc7e321838510eb9209d4e457e"
+    },
+    {
+      "bytes": 1345,
+      "character_id": 5,
+      "file": "assets/converted/images/1124_ork_tank_1/5_alpha.png",
+      "sha256": "73559a8a7900366cb9adc798b1a559342d134d28a1283625cfa4b14bf6292f89"
+    },
+    {
+      "bytes": 10081,
+      "character_id": 7,
+      "file": "assets/converted/images/1124_ork_tank_1/7.jpg",
+      "sha256": "f1eb9657a33df688c46d6edd8c143918e5af59a23f45559fc555a3b03eed6470"
+    },
+    {
+      "bytes": 1435,
+      "character_id": 7,
+      "file": "assets/converted/images/1124_ork_tank_1/7_alpha.png",
+      "sha256": "a54838da3a84dc3d434a1bba7f17e8d073c79c0b20918e0e87621d8163a518dc"
+    },
+    {
+      "bytes": 7210,
+      "character_id": 9,
+      "file": "assets/converted/images/1124_ork_tank_1/9.jpg",
+      "sha256": "6b71be925853e97b3357d07d3b5b88a93e52b84f2e1138df0a086d39b77492bc"
+    },
+    {
+      "bytes": 946,
+      "character_id": 9,
+      "file": "assets/converted/images/1124_ork_tank_1/9_alpha.png",
+      "sha256": "45f90181bf2bd888d3a1545af4eb1a835933dc765049c2758721fc55a5591194"
+    },
+    {
+      "bytes": 7250,
+      "character_id": 11,
+      "file": "assets/converted/images/1124_ork_tank_1/11.jpg",
+      "sha256": "18b6c75c11aa9a79337c647d40519d36c11ab61a974642e1db90076ad6c88998"
+    },
+    {
+      "bytes": 905,
+      "character_id": 11,
+      "file": "assets/converted/images/1124_ork_tank_1/11_alpha.png",
+      "sha256": "900bdb119635f88df36a337fff9b0bf914de76fb07f1e8a947d3d81505bf5f60"
+    },
+    {
+      "bytes": 9696,
+      "character_id": 14,
+      "file": "assets/converted/images/1124_ork_tank_1/14.jpg",
+      "sha256": "e53b785aa5905db2a77723506d7384644c84a4695ac4ce7d1ffc6e6d226b787f"
+    },
+    {
+      "bytes": 1397,
+      "character_id": 14,
+      "file": "assets/converted/images/1124_ork_tank_1/14_alpha.png",
+      "sha256": "c01cc4e561b85f0a670bad9926c21ff1da8c7ceb2e31467ae6eab9e45561c84f"
+    },
+    {
+      "bytes": 9421,
+      "character_id": 17,
+      "file": "assets/converted/images/1124_ork_tank_1/17.jpg",
+      "sha256": "e27eff2b47355b0de7698d49afefc11a0009982c5f06b9bacd6a5720baf0d656"
+    },
+    {
+      "bytes": 1306,
+      "character_id": 17,
+      "file": "assets/converted/images/1124_ork_tank_1/17_alpha.png",
+      "sha256": "a0dde04281c63a1dd5d8fc3cc857b9cac60e5c644cccdcf08c811899b8f467db"
+    },
+    {
+      "bytes": 10122,
+      "character_id": 20,
+      "file": "assets/converted/images/1124_ork_tank_1/20.jpg",
+      "sha256": "dd65a73e6db9f24cd2b221fb6ca693ce662f0fcf3bc641a70d504d3b750850f2"
+    },
+    {
+      "bytes": 1452,
+      "character_id": 20,
+      "file": "assets/converted/images/1124_ork_tank_1/20_alpha.png",
+      "sha256": "fea71a63d1997f3dd5d9d2595bb0edbb31aeee9a54ffe3eb2064362db01f3122"
+    },
+    {
+      "bytes": 7036,
+      "character_id": 23,
+      "file": "assets/converted/images/1124_ork_tank_1/23.jpg",
+      "sha256": "f21a2d58f31548273bb93c79abb03a7c76503ae6d34d289aed8776210293f487"
+    },
+    {
+      "bytes": 986,
+      "character_id": 23,
+      "file": "assets/converted/images/1124_ork_tank_1/23_alpha.png",
+      "sha256": "236f8d9b139da0147f8cdd2b9041cd93f9c1fadb6a55cd33bdebf4fda508e22c"
+    },
+    {
+      "bytes": 7310,
+      "character_id": 27,
+      "file": "assets/converted/images/1124_ork_tank_1/27.jpg",
+      "sha256": "cfdb6f30a61abc9b131b22a2344f204d359625a97d7a76f143fbd56e9d9c5f84"
+    },
+    {
+      "bytes": 877,
+      "character_id": 27,
+      "file": "assets/converted/images/1124_ork_tank_1/27_alpha.png",
+      "sha256": "cd21cd55676868938c2bd7f788af0e018e81f8bbd02c6ddb88d40d2840f7ad74"
+    },
+    {
+      "bytes": 3129,
+      "character_id": 29,
+      "file": "assets/converted/images/1124_ork_tank_1/29.jpg",
+      "sha256": "6314616dbbe0b6f8c03a22591cd730383b16a42c802a67e428cb9043b14dd643"
+    },
+    {
+      "bytes": 2893,
+      "character_id": 29,
+      "file": "assets/converted/images/1124_ork_tank_1/29_alpha.png",
+      "sha256": "735c886764c01fd5e88759cc39bdc284542e192c32560d1ac72a934237d7b1f7"
+    },
+    {
+      "bytes": 4473,
+      "character_id": 31,
+      "file": "assets/converted/images/1124_ork_tank_1/31.jpg",
+      "sha256": "cbd9431dfbc9bf16ca3aac088a3b3dc6bbad7dcbddd879cbdb3c8a1e4c302c65"
+    },
+    {
+      "bytes": 4385,
+      "character_id": 31,
+      "file": "assets/converted/images/1124_ork_tank_1/31_alpha.png",
+      "sha256": "52efd5e7700936f721c09ecc701bb7d78cf82dd0f8fb574655234eb6cbf71a6b"
+    },
+    {
+      "bytes": 7462,
+      "character_id": 33,
+      "file": "assets/converted/images/1124_ork_tank_1/33.jpg",
+      "sha256": "efc4afa1d3b695e4e5f5fd263d16a2c67d29bbc456596c4f205501edf36366b0"
+    },
+    {
+      "bytes": 867,
+      "character_id": 33,
+      "file": "assets/converted/images/1124_ork_tank_1/33_alpha.png",
+      "sha256": "13c04a1ccc3391ec61a94e63d699f9fe31466fc07c6c72749e898759b222b895"
+    },
+    {
+      "bytes": 2303,
+      "character_id": 35,
+      "file": "assets/converted/images/1124_ork_tank_1/35.jpg",
+      "sha256": "20e8b30825a82b335114e88ba148a835f0790afc1721a224d8b54075a7fbeee2"
+    },
+    {
+      "bytes": 2198,
+      "character_id": 35,
+      "file": "assets/converted/images/1124_ork_tank_1/35_alpha.png",
+      "sha256": "f447a0f67c188beb8cf3deb8b9195929a2ff82ec5a883d33fdc3ae85ce2a2225"
+    },
+    {
+      "bytes": 7347,
+      "character_id": 37,
+      "file": "assets/converted/images/1124_ork_tank_1/37.jpg",
+      "sha256": "869b4bb680f119a373997c1210458b486f5ad6c2d5573e8274119ca15fb41d63"
+    },
+    {
+      "bytes": 899,
+      "character_id": 37,
+      "file": "assets/converted/images/1124_ork_tank_1/37_alpha.png",
+      "sha256": "d1f15a9f993315560ae73a0e50ca1b0c2858d8d5fbf93b11b3a6cd5fb543648b"
+    },
+    {
+      "bytes": 7266,
+      "character_id": 39,
+      "file": "assets/converted/images/1124_ork_tank_1/39.jpg",
+      "sha256": "5a7b73512c2b8cb90bc4cbe5568dce37de5a1e88e5e7ef9728560b349047bb5f"
+    },
+    {
+      "bytes": 853,
+      "character_id": 39,
+      "file": "assets/converted/images/1124_ork_tank_1/39_alpha.png",
+      "sha256": "851a489f21afa0326a0f80809459d37d524e8dd1e27087168e399f2b6defdf29"
+    },
+    {
+      "bytes": 9669,
+      "character_id": 42,
+      "file": "assets/converted/images/1124_ork_tank_1/42.jpg",
+      "sha256": "0d5a1fc1fe979278162ebaebe6ed0a2b3e020042b8afe30671b0c614ef061690"
+    },
+    {
+      "bytes": 1423,
+      "character_id": 42,
+      "file": "assets/converted/images/1124_ork_tank_1/42_alpha.png",
+      "sha256": "20c55ca9a24d2deefa7ccdbf276493bd1731c42963f1ae1e71f9c6957b457a57"
+    },
+    {
+      "bytes": 9745,
+      "character_id": 46,
+      "file": "assets/converted/images/1124_ork_tank_1/46.jpg",
+      "sha256": "e3cd2e64fa814b4ca4dd331294f5f2ac2aa4bc48c944349de981a82bbe7798b9"
+    },
+    {
+      "bytes": 1508,
+      "character_id": 46,
+      "file": "assets/converted/images/1124_ork_tank_1/46_alpha.png",
+      "sha256": "94aa05f96a68fff025b38711c165b5fdfd25cfb2fd9bde0de954eb204f9e6d17"
+    },
+    {
+      "bytes": 9636,
+      "character_id": 49,
+      "file": "assets/converted/images/1124_ork_tank_1/49.jpg",
+      "sha256": "e38ea8fb0aaf81f3b178365beb368cc1a58dc36d004d2085962f30701bda06e5"
+    },
+    {
+      "bytes": 1512,
+      "character_id": 49,
+      "file": "assets/converted/images/1124_ork_tank_1/49_alpha.png",
+      "sha256": "471701a215d67986017ab6ea998e65c97be7837dbedac9e599ee51d7612e20ff"
+    },
+    {
+      "bytes": 9558,
+      "character_id": 51,
+      "file": "assets/converted/images/1124_ork_tank_1/51.jpg",
+      "sha256": "fde0004fbfdb6d8fbbac6fccad140c5f154ba7990708963d25cacab7a61874ba"
+    },
+    {
+      "bytes": 1438,
+      "character_id": 51,
+      "file": "assets/converted/images/1124_ork_tank_1/51_alpha.png",
+      "sha256": "9369e256361f2c27ccf7bd6c515c73dbc08693602af6f39ebb69d9bb3276dd6b"
+    },
+    {
+      "bytes": 9073,
+      "character_id": 54,
+      "file": "assets/converted/images/1124_ork_tank_1/54.jpg",
+      "sha256": "fd60c5450af8b146669fd527417ecb025664fe874d3f9dd9f3bcc5811f2ea841"
+    },
+    {
+      "bytes": 1326,
+      "character_id": 54,
+      "file": "assets/converted/images/1124_ork_tank_1/54_alpha.png",
+      "sha256": "f1c624f0fed8f6f5f605e57954087718ebbf4211094f3d9a9511fde71144d17b"
+    },
+    {
+      "bytes": 9361,
+      "character_id": 58,
+      "file": "assets/converted/images/1124_ork_tank_1/58.jpg",
+      "sha256": "94586ba6ce71e978fb0eb5651eb581c02511e7ebbb26b8809dc9cc6bc24f340c"
+    },
+    {
+      "bytes": 1364,
+      "character_id": 58,
+      "file": "assets/converted/images/1124_ork_tank_1/58_alpha.png",
+      "sha256": "7395132ce65e33e1b8f25f3b1da0df91f082292b8a93bf05df7d6538cbeaaf23"
+    },
+    {
+      "bytes": 9367,
+      "character_id": 61,
+      "file": "assets/converted/images/1124_ork_tank_1/61.jpg",
+      "sha256": "c0aae877a1a97e5b17a4feff0d4516299e89b515dec99cd5f6a7b04dd9fd2aef"
+    },
+    {
+      "bytes": 1328,
+      "character_id": 61,
+      "file": "assets/converted/images/1124_ork_tank_1/61_alpha.png",
+      "sha256": "ecb8d82869ac36bb080ee81b53a78c8ba63a0ba3bc97dcedcc106641df08bd16"
+    },
+    {
+      "bytes": 9323,
+      "character_id": 63,
+      "file": "assets/converted/images/1124_ork_tank_1/63.jpg",
+      "sha256": "ef9d97c05459eeb77e98e3d8299af577ff3a2a94d331ebd68bc0bdde9754a2f4"
+    },
+    {
+      "bytes": 1334,
+      "character_id": 63,
+      "file": "assets/converted/images/1124_ork_tank_1/63_alpha.png",
+      "sha256": "7034272bf10a0361629c0f8ec6cba99a689b42399178b917496173b0bc23b31f"
+    },
+    {
+      "bytes": 10212,
+      "character_id": 68,
+      "file": "assets/converted/images/1124_ork_tank_1/68.jpg",
+      "sha256": "5e67abd41f7d68dfdb79807e3df43a4af656301641932636865cdd486fa3b099"
+    },
+    {
+      "bytes": 1505,
+      "character_id": 68,
+      "file": "assets/converted/images/1124_ork_tank_1/68_alpha.png",
+      "sha256": "5078a11dc68d26aafb5eb1db5f803726275a7988c0143657dd38e0746e3ce694"
+    },
+    {
+      "bytes": 10128,
+      "character_id": 71,
+      "file": "assets/converted/images/1124_ork_tank_1/71.jpg",
+      "sha256": "9f87af9f3242b9203a219b7e201ede5d5b778d92f8500ad14057dedb1f90af0e"
+    },
+    {
+      "bytes": 1491,
+      "character_id": 71,
+      "file": "assets/converted/images/1124_ork_tank_1/71_alpha.png",
+      "sha256": "a4d8a8d775296eb717deda57dcae08de42f16db76774086c66ed7cff5f068741"
+    },
+    {
+      "bytes": 10004,
+      "character_id": 73,
+      "file": "assets/converted/images/1124_ork_tank_1/73.jpg",
+      "sha256": "3f014a120c75bcee16b9de6e84095f4d21fbd9755cfc95c32ac288acec129f92"
+    },
+    {
+      "bytes": 1487,
+      "character_id": 73,
+      "file": "assets/converted/images/1124_ork_tank_1/73_alpha.png",
+      "sha256": "3c5ee81f367bdac562c22bd7462b4358e1575ab752f45cebaec9ac7043808416"
+    },
+    {
+      "bytes": 7165,
+      "character_id": 76,
+      "file": "assets/converted/images/1124_ork_tank_1/76.jpg",
+      "sha256": "4fdb9ba8d9e22cfd5b751736c8f6ef3f66ecff5d0abc56adc858cee17523cce1"
+    },
+    {
+      "bytes": 942,
+      "character_id": 76,
+      "file": "assets/converted/images/1124_ork_tank_1/76_alpha.png",
+      "sha256": "a9b98a7f867020a94ad17f06e885c82e59bdf80044ca68f9e3f8570cf975280d"
+    },
+    {
+      "bytes": 7765,
+      "character_id": 80,
+      "file": "assets/converted/images/1124_ork_tank_1/80.jpg",
+      "sha256": "6bda42d55ffdd96f17e8ade418bf4efe268c18f0217a63504c08c465929f95fc"
+    },
+    {
+      "bytes": 942,
+      "character_id": 80,
+      "file": "assets/converted/images/1124_ork_tank_1/80_alpha.png",
+      "sha256": "2ac81a4c3069e48682ccd70145e21f0f9735d857e570913bf3f44a02964691e1"
+    },
+    {
+      "bytes": 7832,
+      "character_id": 83,
+      "file": "assets/converted/images/1124_ork_tank_1/83.jpg",
+      "sha256": "d635e0eee524ff19d4bf99b3c1b4d2d2e4af4957d84cbe5c13296f4739641083"
+    },
+    {
+      "bytes": 922,
+      "character_id": 83,
+      "file": "assets/converted/images/1124_ork_tank_1/83_alpha.png",
+      "sha256": "9cdc8428ab25aea99e32ba66269776706d5b2137875df62ffbc2223975822e31"
+    },
+    {
+      "bytes": 7235,
+      "character_id": 85,
+      "file": "assets/converted/images/1124_ork_tank_1/85.jpg",
+      "sha256": "d402dfcbfd301ed5834196f87dde0ad46d8735880767fc4eaee109ea28268d9c"
+    },
+    {
+      "bytes": 919,
+      "character_id": 85,
+      "file": "assets/converted/images/1124_ork_tank_1/85_alpha.png",
+      "sha256": "f3673a55908171ac4395c120b1224c82be591f2b243f17bc462c5f38f2872ec8"
+    },
+    {
+      "bytes": 10117,
+      "character_id": 88,
+      "file": "assets/converted/images/1124_ork_tank_1/88.jpg",
+      "sha256": "fb9c7cb6558f3460e8e4881c54f2c73ebea0472dd5c10ba3a12e0bd250abae83"
+    },
+    {
+      "bytes": 1443,
+      "character_id": 88,
+      "file": "assets/converted/images/1124_ork_tank_1/88_alpha.png",
+      "sha256": "4a0be61e21bce49504839b94f2b2017b7eb20f51d9a61ec17e914b576085c583"
+    },
+    {
+      "bytes": 11795,
+      "character_id": 90,
+      "file": "assets/converted/images/1124_ork_tank_1/90.jpg",
+      "sha256": "6df64f09a458e2d60ac5ea8630014417ffde6303c40fb8044e783db0fccab7e3"
+    },
+    {
+      "bytes": 1865,
+      "character_id": 90,
+      "file": "assets/converted/images/1124_ork_tank_1/90_alpha.png",
+      "sha256": "a48c6cb190b302c487e7be871cab8e225583ab560478ffb91b63c50d7ab7cfe5"
+    },
+    {
+      "bytes": 11033,
+      "character_id": 92,
+      "file": "assets/converted/images/1124_ork_tank_1/92.jpg",
+      "sha256": "95be1374ee7a743f05d0848c834accd4f1c109f130f251a481e5ab1dbb6844cb"
+    },
+    {
+      "bytes": 2056,
+      "character_id": 92,
+      "file": "assets/converted/images/1124_ork_tank_1/92_alpha.png",
+      "sha256": "2cb3dc33402c867f241e1f3fbea5d223fd31e5e14aa32572539d00cf06c21db7"
+    }
+  ],
+  "content_ref": {
+    "activation": 0,
+    "attack": 18,
+    "attack_interval": 45,
+    "attack_range": 8,
+    "best_against": "ft_building",
+    "best_against_mult": 1,
+    "breeding_order": 15,
+    "build_time": 0,
+    "building_limit_same_id": -1,
+    "building_limit_same_scf": -1,
+    "category_id": 7,
+    "clicks_to_build": 0,
+    "collect": 0,
+    "collect_type": "g",
+    "collect_xp": 1,
+    "content_version": "44e5b9edd1eba2910833bb8e2f063175e51c5754e38c35177648e4de779df501",
+    "cost": 0,
+    "cost_unit_cash": 2,
+    "costs": {
+      "g": 175,
+      "s": 350
+    },
+    "defense": 1,
+    "display_order": 99,
+    "elevation": 1,
+    "expiration": 0,
+    "gift_level": 4,
+    "giftable": 0,
+    "group_type": "LAND_VEHICLE",
+    "height": 1,
+    "img_name": "1124_ork_tank_1",
+    "in_store": 0,
+    "inventory_ids": null,
+    "kind": "unit",
+    "legacy_id": "1124",
+    "life": 300,
+    "max_collects": 0,
+    "max_elem_vol": 0,
+    "max_frame": 5,
+    "min_level": 3,
+    "name": "Basic Ork Tank",
+    "new_item": 0,
+    "population": 2,
+    "premium_upgrade_costs": null,
+    "properties": {
+      "bulldozable": "1",
+      "ft_armored": "1",
+      "mechanic": "1",
+      "resurrectable": "1",
+      "seeStealthUnits": "1"
+    },
+    "race": "h",
+    "sm_training_time": 30000,
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "subcat_functional": 80,
+    "subcategory_id": 7,
+    "syringes": 1,
+    "training_time": 0,
+    "trains_ids": -1,
+    "type": "u",
+    "unit_capacity": 0,
+    "upgrades_to": -1,
+    "velocity": 6,
+    "volume": 10,
+    "width": 1,
+    "xp": 8
+  },
+  "content_version": "a0c3861fd95cbe635537efd7223f46991580a6be66735a70c9b1904c8987c18f",
+  "frame_count": 1,
+  "frame_height": 400,
+  "frame_rate": 15.0,
+  "frame_width": 550,
+  "kind": "converted_unit",
+  "legacy_id": "1124_ork_tank_1",
+  "main": {
+    "frame_count": 1,
+    "labels": [],
+    "placements": [
+      {
+        "character_id": 95,
+        "character_kind": "sprite",
+        "depth": 1,
+        "frame": 1,
+        "move": false
+      }
+    ],
+    "removes": []
+  },
+  "shapes": [
+    {
+      "bounds": {
+        "height_px": 158,
+        "width_px": 128,
+        "xmax": 2560,
+        "xmin": 20,
+        "ymax": 3173,
+        "ymin": 373
+      },
+      "character_id": 2,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 1,
+          "matrix": "d940000500000a051750",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 140,
+        "width_px": 181,
+        "xmax": 3620,
+        "xmin": 0,
+        "ymax": 2819,
+        "ymin": -1
+      },
+      "character_id": 4,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 3,
+          "matrix": "d940000500000230",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 138,
+        "width_px": 154,
+        "xmax": 3099,
+        "xmin": -101,
+        "ymax": 2760,
+        "ymin": 0
+      },
+      "character_id": 6,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 5,
+          "matrix": "d94000050000089b00",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 143,
+        "width_px": 169,
+        "xmax": 3380,
+        "xmin": 0,
+        "ymax": 2876,
+        "ymin": 36
+      },
+      "character_id": 8,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 7,
+          "matrix": "d94000050000070090",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 142,
+        "width_px": 123,
+        "xmax": 2460,
+        "xmin": 0,
+        "ymax": 2840,
+        "ymin": 0
+      },
+      "character_id": 10,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 9,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 139,
+        "width_px": 127,
+        "xmax": 2554,
+        "xmin": 14,
+        "ymax": 2794,
+        "ymin": -46
+      },
+      "character_id": 12,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 11,
+          "matrix": "d94000050000071d48",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 138,
+        "width_px": 179,
+        "xmax": 3598,
+        "xmin": -2,
+        "ymax": 2760,
+        "ymin": -60
+      },
+      "character_id": 15,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 14,
+          "matrix": "d9400005000007fd10",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 136,
+        "width_px": 159,
+        "xmax": 3191,
+        "xmin": 71,
+        "ymax": 2738,
+        "ymin": -62
+      },
+      "character_id": 18,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 17,
+          "matrix": "d940000500000847c2",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 142,
+        "width_px": 168,
+        "xmax": 3370,
+        "xmin": -10,
+        "ymax": 2849,
+        "ymin": -51
+      },
+      "character_id": 21,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 20,
+          "matrix": "d9400005000007ed34",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 142,
+        "width_px": 121,
+        "xmax": 2429,
+        "xmin": 9,
+        "ymax": 2842,
+        "ymin": -38
+      },
+      "character_id": 24,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 23,
+          "matrix": "d94000050000071368",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 158,
+        "width_px": 127,
+        "xmax": 2552,
+        "xmin": 12,
+        "ymax": 3178,
+        "ymin": 378
+      },
+      "character_id": 28,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 27,
+          "matrix": "d940000500000a0317a0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 41,
+        "width_px": 104,
+        "xmax": 2093,
+        "xmin": 415,
+        "ymax": 832,
+        "ymin": -557
+      },
+      "character_id": 30,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 29,
+          "matrix": "d542c38a161cc20b61f4a14cfc42",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 41,
+        "width_px": 104,
+        "xmax": 2093,
+        "xmin": 415,
+        "ymax": 832,
+        "ymin": -557
+      },
+      "character_id": 32,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 31,
+          "matrix": "d542c38a161cc20b61f4a14cfc42",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 158,
+        "width_px": 127,
+        "xmax": 2548,
+        "xmin": 8,
+        "ymax": 3174,
+        "ymin": 434
+      },
+      "character_id": 34,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 33,
+          "matrix": "d940000500000a021b20",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 41,
+        "width_px": 104,
+        "xmax": 2093,
+        "xmin": 415,
+        "ymax": 832,
+        "ymin": -557
+      },
+      "character_id": 36,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 35,
+          "matrix": "d542c38a161cc20b61f4a14cfc42",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 158,
+        "width_px": 127,
+        "xmax": 2552,
+        "xmin": 12,
+        "ymax": 3172,
+        "ymin": 472
+      },
+      "character_id": 38,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 37,
+          "matrix": "d940000500000a031d80",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 158,
+        "width_px": 127,
+        "xmax": 2549,
+        "xmin": 9,
+        "ymax": 3174,
+        "ymin": 434
+      },
+      "character_id": 40,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 39,
+          "matrix": "d940000500000a025b20",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 141,
+        "width_px": 181,
+        "xmax": 3620,
+        "xmin": 0,
+        "ymax": 2820,
+        "ymin": 0
+      },
+      "character_id": 43,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 42,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 54,
+        "width_px": 215,
+        "xmax": 4305,
+        "xmin": 2263,
+        "ymax": 1082,
+        "ymin": -1000
+      },
+      "character_id": 44,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 29,
+          "matrix": "d19c5819c58347c68c839746b32b8300",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 54,
+        "width_px": 215,
+        "xmax": 4305,
+        "xmin": 2263,
+        "ymax": 1082,
+        "ymin": -1000
+      },
+      "character_id": 45,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 31,
+          "matrix": "d19c5819c58347c68c839746b32b8300",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 142,
+        "width_px": 178,
+        "xmax": 3564,
+        "xmin": 4,
+        "ymax": 2849,
+        "ymin": 9
+      },
+      "character_id": 47,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 46,
+          "matrix": "d94000050000052240",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 54,
+        "width_px": 215,
+        "xmax": 4305,
+        "xmin": 2263,
+        "ymax": 1082,
+        "ymin": -1000
+      },
+      "character_id": 48,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 35,
+          "matrix": "d19c5819c58347c68c839746b32b8300",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 141,
+        "width_px": 181,
+        "xmax": 3620,
+        "xmin": 0,
+        "ymax": 2836,
+        "ymin": 76
+      },
+      "character_id": 50,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 49,
+          "matrix": "d9400005000008004c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 143,
+        "width_px": 177,
+        "xmax": 3550,
+        "xmin": -10,
+        "ymax": 2876,
+        "ymin": 36
+      },
+      "character_id": 52,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 51,
+          "matrix": "d9400005000007ec90",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 138,
+        "width_px": 154,
+        "xmax": 3098,
+        "xmin": -102,
+        "ymax": 2762,
+        "ymin": 62
+      },
+      "character_id": 55,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 54,
+          "matrix": "d94000050000089a3e",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 80,
+        "width_px": 185,
+        "xmax": 3714,
+        "xmin": 2194,
+        "ymax": 1603,
+        "ymin": -176
+      },
+      "character_id": 56,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 29,
+          "matrix": "c95e64579935500a057fb01ada7fa800",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 80,
+        "width_px": 185,
+        "xmax": 3714,
+        "xmin": 2194,
+        "ymax": 1603,
+        "ymin": -176
+      },
+      "character_id": 57,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 31,
+          "matrix": "c95e64579935500a057fb01ada7fa800",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 137,
+        "width_px": 154,
+        "xmax": 3088,
+        "xmin": -132,
+        "ymax": 2758,
+        "ymin": 18
+      },
+      "character_id": 59,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 58,
+          "matrix": "d9400005000009be0480",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 80,
+        "width_px": 185,
+        "xmax": 3714,
+        "xmin": 2194,
+        "ymax": 1603,
+        "ymin": -176
+      },
+      "character_id": 60,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 35,
+          "matrix": "c95e64579935500a057fb01ada7fa800",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 137,
+        "width_px": 154,
+        "xmax": 3085,
+        "xmin": -135,
+        "ymax": 2758,
+        "ymin": 18
+      },
+      "character_id": 62,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 61,
+          "matrix": "d9400005000009bc8480",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 138,
+        "width_px": 154,
+        "xmax": 3098,
+        "xmin": -122,
+        "ymax": 2771,
+        "ymin": 31
+      },
+      "character_id": 64,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 63,
+          "matrix": "d9400005000008861f",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 105,
+        "width_px": 215,
+        "xmax": 4311,
+        "xmin": 2584,
+        "ymax": 2107,
+        "ymin": 178
+      },
+      "character_id": 66,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 29,
+          "matrix": "ce865850cb0d5350b1657a8721ae1190",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 105,
+        "width_px": 215,
+        "xmax": 4311,
+        "xmin": 2584,
+        "ymax": 2107,
+        "ymin": 178
+      },
+      "character_id": 67,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 31,
+          "matrix": "ce865850cb0d5350b1657a8721ae1190",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 143,
+        "width_px": 169,
+        "xmax": 3390,
+        "xmin": -10,
+        "ymax": 2868,
+        "ymin": -12
+      },
+      "character_id": 69,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 68,
+          "matrix": "d9400005000005b500",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 105,
+        "width_px": 215,
+        "xmax": 4311,
+        "xmin": 2584,
+        "ymax": 2107,
+        "ymin": 178
+      },
+      "character_id": 70,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 35,
+          "matrix": "ce865850cb0d5350b1657a8721ae1190",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 143,
+        "width_px": 168,
+        "xmax": 3372,
+        "xmin": -28,
+        "ymax": 2867,
+        "ymin": -33
+      },
+      "character_id": 72,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 71,
+          "matrix": "d9400005000007c97c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 143,
+        "width_px": 169,
+        "xmax": 3382,
+        "xmin": -18,
+        "ymax": 2866,
+        "ymin": 6
+      },
+      "character_id": 74,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 73,
+          "matrix": "d9400005000006b860",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 142,
+        "width_px": 123,
+        "xmax": 2460,
+        "xmin": 0,
+        "ymax": 2840,
+        "ymin": 0
+      },
+      "character_id": 77,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 76,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 114,
+        "width_px": 107,
+        "xmax": 2140,
+        "xmin": 462,
+        "ymax": 2286,
+        "ymin": 897
+      },
+      "character_id": 78,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 29,
+          "matrix": "d6bd3c95e9e4c1f4a20b61a85c4500",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 114,
+        "width_px": 107,
+        "xmax": 2140,
+        "xmin": 462,
+        "ymax": 2286,
+        "ymin": 897
+      },
+      "character_id": 79,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 31,
+          "matrix": "d6bd3c95e9e4c1f4a20b61a85c4500",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 141,
+        "width_px": 122,
+        "xmax": 2454,
+        "xmin": -6,
+        "ymax": 2833,
+        "ymin": -67
+      },
+      "character_id": 81,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 80,
+          "matrix": "d9400005000008fabd",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 114,
+        "width_px": 107,
+        "xmax": 2140,
+        "xmin": 462,
+        "ymax": 2286,
+        "ymin": 897
+      },
+      "character_id": 82,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 35,
+          "matrix": "d6bd3c95e9e4c1f4a20b61a85c4500",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 141,
+        "width_px": 123,
+        "xmax": 2460,
+        "xmin": 0,
+        "ymax": 2832,
+        "ymin": -108
+      },
+      "character_id": 84,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 83,
+          "matrix": "d94000050000080094",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 141,
+        "width_px": 123,
+        "xmax": 2460,
+        "xmin": 0,
+        "ymax": 2833,
+        "ymin": -67
+      },
+      "character_id": 86,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 85,
+          "matrix": "d940000500000800bd",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 146,
+        "width_px": 172,
+        "xmax": 3454,
+        "xmin": -6,
+        "ymax": 2924,
+        "ymin": 24
+      },
+      "character_id": 89,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 88,
+          "matrix": "d9400005000006e980",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 153,
+        "width_px": 196,
+        "xmax": 3922,
+        "xmin": -158,
+        "ymax": 3065,
+        "ymin": 85
+      },
+      "character_id": 91,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 90,
+          "matrix": "d9400005000009b11540",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 145,
+        "width_px": 188,
+        "xmax": 3767,
+        "xmin": -173,
+        "ymax": 2918,
+        "ymin": 78
+      },
+      "character_id": 93,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 92,
+          "matrix": "d9400005000009a99380",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    }
+  ],
+  "source_file": "assets/sprites/1124_ork_tank_1.swf",
+  "source_layer": "converted(asset-registry)",
+  "sprites": [
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 2,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 12,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 13
+    },
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 15,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 16
+    },
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 18,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 19
+    },
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 8,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 21,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 22
+    },
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 10,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 24,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 25
+    },
+    {
+      "frame_count": 1,
+      "labels": [],
+      "placements": [],
+      "removes": [],
+      "sprite_id": 26
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 2,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 26,
+          "character_kind": "sprite",
+          "depth": 3,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 2,
+          "move": true
+        },
+        {
+          "character_id": 30,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 2,
+          "move": false
+        },
+        {
+          "character_id": 32,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 34,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 36,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 6,
+          "move": true
+        },
+        {
+          "character_id": 38,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 40,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [
+        {
+          "depth": 2,
+          "frame": 8
+        }
+      ],
+      "sprite_id": 41
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 26,
+          "character_kind": "sprite",
+          "depth": 3,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 43,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 2,
+          "move": true
+        },
+        {
+          "character_id": 44,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 2,
+          "move": false
+        },
+        {
+          "character_id": 45,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 47,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 48,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 6,
+          "move": true
+        },
+        {
+          "character_id": 50,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 52,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [
+        {
+          "depth": 2,
+          "frame": 8
+        }
+      ],
+      "sprite_id": 53
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 26,
+          "character_kind": "sprite",
+          "depth": 3,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 55,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 2,
+          "move": true
+        },
+        {
+          "character_id": 56,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 2,
+          "move": false
+        },
+        {
+          "character_id": 57,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 59,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 60,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 6,
+          "move": true
+        },
+        {
+          "character_id": 62,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 64,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [
+        {
+          "depth": 2,
+          "frame": 8
+        }
+      ],
+      "sprite_id": 65
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 8,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 26,
+          "character_kind": "sprite",
+          "depth": 3,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 66,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 2,
+          "move": false
+        },
+        {
+          "character_id": 67,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 69,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 70,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 6,
+          "move": true
+        },
+        {
+          "character_id": 72,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 74,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [
+        {
+          "depth": 2,
+          "frame": 8
+        }
+      ],
+      "sprite_id": 75
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 10,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 26,
+          "character_kind": "sprite",
+          "depth": 3,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 77,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 2,
+          "move": true
+        },
+        {
+          "character_id": 78,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 2,
+          "move": false
+        },
+        {
+          "character_id": 79,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 81,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 82,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 6,
+          "move": true
+        },
+        {
+          "character_id": 84,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 86,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [
+        {
+          "depth": 2,
+          "frame": 8
+        }
+      ],
+      "sprite_id": 87
+    },
+    {
+      "frame_count": 10,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 89,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 91,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 93,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 94
+    },
+    {
+      "frame_count": 25,
+      "labels": [
+        {
+          "anchor": false,
+          "frame": 1,
+          "name": "QUIETO"
+        },
+        {
+          "anchor": false,
+          "frame": 6,
+          "name": "ANDAR"
+        },
+        {
+          "anchor": false,
+          "frame": 11,
+          "name": "ATAQUE"
+        },
+        {
+          "anchor": false,
+          "frame": 16,
+          "name": "MUERTE"
+        },
+        {
+          "anchor": false,
+          "frame": 21,
+          "name": "PICAR"
+        }
+      ],
+      "placements": [
+        {
+          "character_id": 2,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 2,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 8,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 10,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 13,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 6,
+          "move": false
+        },
+        {
+          "character_id": 16,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 7,
+          "move": false
+        },
+        {
+          "character_id": 19,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 8,
+          "move": false
+        },
+        {
+          "character_id": 22,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 9,
+          "move": false
+        },
+        {
+          "character_id": 25,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 10,
+          "move": false
+        },
+        {
+          "character_id": 41,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 11,
+          "move": false
+        },
+        {
+          "character_id": 53,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 12,
+          "move": false
+        },
+        {
+          "character_id": 65,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 13,
+          "move": false
+        },
+        {
+          "character_id": 75,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 14,
+          "move": false
+        },
+        {
+          "character_id": 87,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 15,
+          "move": false
+        },
+        {
+          "character_id": 94,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 16,
+          "move": false
+        }
+      ],
+      "removes": [
+        {
+          "depth": 1,
+          "frame": 6
+        },
+        {
+          "depth": 1,
+          "frame": 7
+        },
+        {
+          "depth": 1,
+          "frame": 8
+        },
+        {
+          "depth": 1,
+          "frame": 9
+        },
+        {
+          "depth": 1,
+          "frame": 10
+        },
+        {
+          "depth": 1,
+          "frame": 11
+        },
+        {
+          "depth": 1,
+          "frame": 12
+        },
+        {
+          "depth": 1,
+          "frame": 13
+        },
+        {
+          "depth": 1,
+          "frame": 14
+        },
+        {
+          "depth": 1,
+          "frame": 15
+        },
+        {
+          "depth": 1,
+          "frame": 16
+        },
+        {
+          "depth": 1,
+          "frame": 21
+        }
+      ],
+      "sprite_id": 95
+    }
+  ],
+  "symbols": [
+    {
+      "id": 95,
+      "name": "1124_ork_tank_1"
+    },
+    {
+      "id": 94,
+      "name": "_1124_ork_tank_1_fla.arquero1atacando3_4detras_13"
+    },
+    {
+      "id": 87,
+      "name": "_1124_ork_tank_1_fla.arquero1atacandofrente_12"
+    },
+    {
+      "id": 75,
+      "name": "_1124_ork_tank_1_fla.arquero1atacando3_4frente_11"
+    },
+    {
+      "id": 65,
+      "name": "_1124_ork_tank_1_fla.arquero1atacandoperfil_10"
+    },
+    {
+      "id": 53,
+      "name": "_1124_ork_tank_1_fla.arquero1muriendo_9"
+    },
+    {
+      "id": 41,
+      "name": "_1124_ork_tank_1_fla.arquero1atacandodetras_7"
+    }
+  ]
+}

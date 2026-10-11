@@ -1,12 +1,12 @@
 {
     "schema":  "godot-compatibility-boot/verify-boot-v1",
-    "generated_utc":  "2026-10-11T07:28:25Z",
+    "generated_utc":  "2026-10-11T16:37:43Z",
     "environment":  {
                         "engine_executable":  "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
                         "engine_version":  "4.7.2.stable.official.ed1daf0bf",
                         "python_executable":  "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
                         "python_version":  "3.9.13",
-                        "git_commit":  "c51a82ef2fa202371e3c594e6c16223e8a70c363",
+                        "git_commit":  "658422011abae373813a6007581401a6b830c11e",
                         "display_session":  false,
                         "network":  "loopback only (127.0.0.1)"
                     },
@@ -27,7 +27,7 @@
                    "fixture_save_list":  "tests/fixtures/godot-compatibility-boot/steps/login_page/save-list.json",
                    "fixture_save_list_sha256":  "ad0404c2c340a48f06e2e49ae7eb7973978cd2ccb02ac6ff7bfba4eb75f6d9f4",
                    "guard_baseline":  "tests/fixtures/godot-compatibility-boot/guard-baseline.json",
-                   "guard_baseline_sha256":  "b0480ac8b130b56fcf01e611915e0a5bea5954c756f8b37e2511ec30971a358f"
+                   "guard_baseline_sha256":  "e7bf5435e82ec68cdd6f7b1bb558e33fb9f5bef6d5cf01d570e9939d6aa35f2f"
                },
     "switch":  {
                    "setting":  "gameapi/implementation",
@@ -2440,7 +2440,7 @@
                            "ok":  true
                        },
                        {
-                           "name":  "guarded bytes are identical before and after (pre=233be54815f52c600e1c247571dcbbd1866ec9c66a97c6ebe2fcc6f2fb609c57 post=233be54815f52c600e1c247571dcbbd1866ec9c66a97c6ebe2fcc6f2fb609c57)",
+                           "name":  "guarded bytes are identical before and after (pre=fe9686746fa28bb3e4be7b149dc176305237fb175f599ade85a903be9d2fbda1 post=fe9686746fa28bb3e4be7b149dc176305237fb175f599ade85a903be9d2fbda1)",
                            "ok":  true
                        },
                        {
@@ -2453,8 +2453,8 @@
                        }
                    ],
     "guard":  {
-                  "pre_combined_sha256":  "233be54815f52c600e1c247571dcbbd1866ec9c66a97c6ebe2fcc6f2fb609c57",
-                  "post_combined_sha256":  "233be54815f52c600e1c247571dcbbd1866ec9c66a97c6ebe2fcc6f2fb609c57",
+                  "pre_combined_sha256":  "fe9686746fa28bb3e4be7b149dc176305237fb175f599ade85a903be9d2fbda1",
+                  "post_combined_sha256":  "fe9686746fa28bb3e4be7b149dc176305237fb175f599ade85a903be9d2fbda1",
                   "identical":  true
               },
     "failures":  [

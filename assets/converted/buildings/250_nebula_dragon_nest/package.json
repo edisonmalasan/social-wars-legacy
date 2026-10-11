@@ -1,0 +1,126 @@
+{
+  "bitmaps": [
+    {
+      "bytes": 66790,
+      "character_id": 1,
+      "file": "assets/converted/images/250_nebula_dragon_nest/1.jpg",
+      "sha256": "4a63f81221dbaa440ce48d8d70072c8b99163440ab4cd652338bb52cd8dc42a0"
+    },
+    {
+      "bytes": 8600,
+      "character_id": 1,
+      "file": "assets/converted/images/250_nebula_dragon_nest/1_alpha.png",
+      "sha256": "96285fa12684d981de9b5814016d115223d9abeb170f8edb1ee5957f8ed23c36"
+    }
+  ],
+  "content_ref": {
+    "activation": 0,
+    "attack": 0,
+    "attack_interval": 0,
+    "attack_range": 0,
+    "best_against": "",
+    "best_against_mult": 1,
+    "build_time": 5,
+    "building_limit_same_id": -1,
+    "building_limit_same_scf": -1,
+    "category_id": 12,
+    "clicks_to_build": 1,
+    "collect": 0,
+    "collect_type": "g",
+    "collect_xp": 0,
+    "content_version": "44e5b9edd1eba2910833bb8e2f063175e51c5754e38c35177648e4de779df501",
+    "cost": 0,
+    "cost_unit_cash": 0,
+    "costs": {
+      "c": 34
+    },
+    "defense": 1,
+    "display_order": -3220,
+    "elevation": 4,
+    "expiration": 0,
+    "gift_level": 1,
+    "giftable": 0,
+    "group_type": "ACADEMY",
+    "height": 3,
+    "img_name": "250_nebula_dragon_nest",
+    "in_store": 1,
+    "inventory_ids": null,
+    "kind": "building",
+    "legacy_id": "250",
+    "life": 1500,
+    "max_collects": 0,
+    "max_elem_vol": 0,
+    "max_frame": 2,
+    "min_level": 8,
+    "name": "Nebular Dragon Rider Academy",
+    "new_item": 1,
+    "population": 0,
+    "premium_upgrade_costs": null,
+    "properties": {
+      "animated": "1",
+      "bulldozable": "1",
+      "demolishable": "1",
+      "ft_building": "1"
+    },
+    "race": "h",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "subcat_functional": 111,
+    "subcategory_id": 121,
+    "syringes": 0,
+    "training_time": 5,
+    "trains_ids": 1199,
+    "type": "b",
+    "unit_capacity": 0,
+    "upgrades_to": -1,
+    "velocity": 0,
+    "volume": 0,
+    "width": 3,
+    "xp": 100
+  },
+  "content_version": "c4e76e6d6b6cf176796ab9d263e4b074d086e8d967525ebcb06082841ce4fa0b",
+  "frame_count": 1,
+  "frame_height": 400,
+  "frame_rate": 24.0,
+  "frame_width": 550,
+  "kind": "converted_building",
+  "legacy_id": "250_nebula_dragon_nest",
+  "placement": {
+    "height": 3,
+    "width": 3
+  },
+  "shapes": [
+    {
+      "bounds": {
+        "height_px": 428,
+        "width_px": 432,
+        "xmax": 8640,
+        "xmin": 0,
+        "ymax": 8560,
+        "ymin": 0
+      },
+      "character_id": 2,
+      "fills": [
+        {
+          "bitmap_id": 1,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    }
+  ],
+  "source_file": "assets/sprites/250_nebula_dragon_nest.swf",
+  "source_layer": "converted(asset-registry)",
+  "symbols": [
+    "250_nebula_dragon_nest"
+  ]
+}

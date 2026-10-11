@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "tools/asset-registry/schemas/building_package.schema.json",
   "title": "Single converted building package",
-  "description": "Contract for one converted building package: identity, content and source provenance, frame data, symbols, parsed shape-style records with bitmap references, bitmap outputs with digests, and placement tiles recorded verbatim.",
+  "description": "Contract for one converted building package: identity, content and source provenance, frame data, symbols, parsed shape-style records with bitmap references, bitmap references into the shared extraction outputs with digests, and placement tiles recorded verbatim.",
   "type": "object",
   "required": [
     "legacy_id",
@@ -77,7 +77,7 @@
     },
     "bitmaps": {
       "type": "array",
-      "description": "Bitmap outputs with digests, byte-copied from extraction outputs.",
+      "description": "Bitmap references with digests. Each entry REPRESENTS a shared extraction output under assets/converted/images/<sprite>/, verified against that file's bytes; the package itself holds no bitmap copies.",
       "items": { "type": "object" }
     },
     "placement": {

@@ -252,14 +252,31 @@ class SyntheticAssemblyTests(unittest.TestCase):
         self.assertEqual(shape["records"]["straight"], 1)
         self.assertEqual(shape["records"]["end"], 1)
 
-    def test_bitmap_copies_match_extraction(self):
+    def test_bitmap_reference_matches_extraction(self):
+        """The bitmap is referenced in the shared extracted tree, not copied.
+
+        Under design D1 `bitmaps[].file` records the extraction output path.
+        The pinned property is that the reference is that shared path, that it
+        resolves to the staged extraction payload, and that the recorded
+        digest describes those bytes -- plus that the package directory holds
+        no copied payload.
+        """
         self.assertEqual(len(self.package["bitmaps"]), 1)
         bitmap = self.package["bitmaps"][0]
         self.assertEqual(bitmap["character_id"], 7)
+        self.assertEqual(bitmap["file"],
+                         "assets/converted/images/0001_house_1_m/7.jpg")
+        self.assertTrue(bitmap["file"].startswith("assets/converted/images/"),
+                        "reference left the shared extracted tree: %r"
+                        % (bitmap["file"],))
         data = (self.work / bitmap["file"]).read_bytes()
         self.assertEqual(data, b"BITMAP-7")
+        self.assertEqual(bitmap["bytes"], len(data))
         self.assertEqual(bitmap["sha256"],
                          hashlib.sha256(b"BITMAP-7").hexdigest())
+        directory = self.work / "assets/converted/buildings/0001_house_1_m"
+        self.assertEqual(sorted(path.name for path in directory.iterdir()),
+                         ["package.json"])
 
     def test_manifest_and_statuses(self):
         self.assertEqual(self.document["counts"]["packages"], 1)
@@ -477,16 +494,34 @@ class RealHouseTests(unittest.TestCase):
         self.assertEqual(shape["records"]["end"], 1)
         self.assertEqual(len(package["bitmaps"]), 2)
         for bitmap in package["bitmaps"]:
-            data = (self.out / bitmap["file"]).read_bytes()
-            self.assertEqual(hashlib.sha256(data).hexdigest(), bitmap["sha256"])
+            self.assertTrue(bitmap["file"].startswith(
+                "assets/converted/images/"),
+                "reference left the shared extracted tree: %r"
+                % (bitmap["file"],))
+            # The reference resolves against the repository root, which is
+            # where the shared extracted tree lives -- not against the
+            # disposable out-root, which now receives only manifests.
+            data = (ROOT / bitmap["file"]).read_bytes()
+            self.assertEqual(hashlib.sha256(data).hexdigest(),
+                             bitmap["sha256"])
+            self.assertEqual(len(data), bitmap["bytes"])
+        # D1: the package directory carries no copied payload at all.
         names = sorted((self.out / "assets" / "converted" / "buildings"
                         / "0001_house_1_m").iterdir())
-        self.assertEqual([path.name for path in names],
-                         ["1.jpg", "1_alpha.png", "package.json"])
+        self.assertEqual([path.name for path in names], ["package.json"])
 
     def test_regenerated_package_matches_committed_bytes(self):
         """Regression: the shared style-array alignment fix must leave the
-        committed house package (bytes and manifest digest) untouched."""
+        committed house package (bytes and manifest digest) untouched.
+
+        Under D1 the byte-for-byte comparison applies to `package.json` only,
+        because that is now the whole committed payload. The two bitmaps this
+        used to compare as files are compared as *references*: the committed
+        and freshly generated manifests must name the same shared extraction
+        paths, and those paths must resolve to bytes hashing to the recorded
+        digests. Comparing a manifest against itself would prove nothing, so
+        the digests are recomputed from disk rather than echoed.
+        """
         code, stdout, _ = run_main(["--repo-root", str(ROOT),
                                     "--out-root", str(self.out)])
         self.assertEqual(code, 0, stdout)
@@ -496,9 +531,22 @@ class RealHouseTests(unittest.TestCase):
         self.assertEqual(
             fresh, committed,
             "regenerated house package differs from the committed bytes")
-        for name in ("1.jpg", "1_alpha.png"):
-            self.assertEqual((self.out / relative / name).read_bytes(),
-                             (ROOT / relative / name).read_bytes(), name)
+        self.assertEqual(
+            sorted(path.name for path in (ROOT / relative).iterdir()),
+            ["package.json"],
+            "the committed package directory must carry no copied payload")
+        regenerated = json.loads(fresh.decode("utf-8"))
+        self.assertEqual(
+            [entry["file"] for entry in regenerated["bitmaps"]],
+            [entry["file"] for entry in json.loads(
+                committed.decode("utf-8"))["bitmaps"]])
+        for entry in regenerated["bitmaps"]:
+            self.assertTrue(entry["file"].startswith(
+                "assets/converted/images/"))
+            payload = (ROOT / entry["file"]).read_bytes()
+            self.assertEqual(hashlib.sha256(payload).hexdigest(),
+                             entry["sha256"], entry["file"])
+            self.assertEqual(len(payload), entry["bytes"])
         document = json.loads(
             (ROOT / "tools" / "asset-registry" / "conversions.json"
              ).read_text(encoding="utf-8"))
@@ -627,7 +675,6 @@ class ContainmentTests(unittest.TestCase):
             reads, writes = self.observed_sets(work, opened)
             self.assertEqual(writes, {
                 "assets/converted/buildings/0001_house_1_m/package.json",
-                "assets/converted/buildings/0001_house_1_m/7.jpg",
                 "tools/asset-registry/conversions.json",
                 "tools/asset-registry/statuses.json",
             })
@@ -645,7 +692,6 @@ class ContainmentTests(unittest.TestCase):
                          if after[path] != "directory"}
             self.assertEqual(new_files, {
                 "assets/converted/buildings/0001_house_1_m/package.json",
-                "assets/converted/buildings/0001_house_1_m/7.jpg",
                 "tools/asset-registry/conversions.json",
                 "tools/asset-registry/statuses.json",
             })

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "tools/asset-registry/schemas/unit_package.schema.json",
   "title": "Single converted unit package",
-  "description": "Contract for one converted unit package: identity, content and source provenance, frame data, SymbolClass id-name pairs, the root timeline, per-sprite animation inventories (labels, placements, removals), parsed shape-style records with referenced fill indices, and bitmap outputs with digests.",
+  "description": "Contract for one converted unit package: identity, content and source provenance, frame data, SymbolClass id-name pairs, the root timeline, per-sprite animation inventories (labels, placements, removals), parsed shape-style records with referenced fill indices, and bitmap references into the shared extraction outputs with digests.",
   "type": "object",
   "required": [
     "legacy_id",
@@ -351,7 +351,7 @@
     },
     "bitmaps": {
       "type": "array",
-      "description": "Copied bitmap outputs referenced by resolved fills.",
+      "description": "Bitmap references resolved by fills. Each entry REPRESENTS a shared extraction output under assets/converted/images/<sprite>/, verified against that file's bytes; the package itself holds no bitmap copies.",
       "items": {
         "type": "object",
         "required": ["character_id", "file", "bytes", "sha256"],

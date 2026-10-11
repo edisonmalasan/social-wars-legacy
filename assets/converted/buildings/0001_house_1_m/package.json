@@ -3,13 +3,13 @@
     {
       "bytes": 7194,
       "character_id": 1,
-      "file": "assets/converted/buildings/0001_house_1_m/1.jpg",
+      "file": "assets/converted/images/0001_house_1_m/1.jpg",
       "sha256": "1c8ce8838969cefed8e8c2d574b7c933ffc2076506a13f16e731d573de9853c4"
     },
     {
       "bytes": 1638,
       "character_id": 1,
-      "file": "assets/converted/buildings/0001_house_1_m/1_alpha.png",
+      "file": "assets/converted/images/0001_house_1_m/1_alpha.png",
       "sha256": "6685b0af171e0da40313f26587551d976e63d48d2331ad96937c2e55d395e42c"
     }
   ],

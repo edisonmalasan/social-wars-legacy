@@ -33,11 +33,11 @@
     },
     "counts": {
       "type": "object",
-      "description": "Conversion totals: package count and summed per-entry output byte total."
+      "description": "Conversion totals: package count and the summed package.json byte total across entries."
     },
     "packages": {
       "type": "array",
-      "description": "Converted package entries with digests, byte totals, and per-converter policies.",
+      "description": "Converted package entries with digests, package.json byte totals, and per-converter policies.",
       "items": {
         "type": "object",
         "required": [
@@ -69,7 +69,7 @@
           },
           "output_bytes": {
             "type": "integer",
-            "description": "Package.json bytes plus copied bitmap bytes; summed into counts.output_bytes.",
+            "description": "Package.json bytes. Converted packages reference the shared extracted bitmap tree rather than copying it, so no bitmap bytes are written into a package directory and none are counted here; summed into counts.output_bytes.",
             "minimum": 0
           },
           "policy": {

@@ -1,0 +1,2946 @@
+{
+  "bitmaps": [
+    {
+      "bytes": 7281,
+      "character_id": 1,
+      "file": "assets/converted/images/1002_Red_Tank_m/1.jpg",
+      "sha256": "c5f839a21569378c40f7e2e3bf63e576cca8ec6f1b3eb1753000e0b42b1331d0"
+    },
+    {
+      "bytes": 938,
+      "character_id": 1,
+      "file": "assets/converted/images/1002_Red_Tank_m/1_alpha.png",
+      "sha256": "ea519a9e2e8f771c1861c6887218414a19bee867ce503501685a65c2e45334ef"
+    },
+    {
+      "bytes": 11134,
+      "character_id": 3,
+      "file": "assets/converted/images/1002_Red_Tank_m/3.jpg",
+      "sha256": "0556f19deea4a55e266295a6642c3401a7af7d5ac21c3034cdd8a83c7a2707af"
+    },
+    {
+      "bytes": 1415,
+      "character_id": 3,
+      "file": "assets/converted/images/1002_Red_Tank_m/3_alpha.png",
+      "sha256": "d4fefcdc088a41f9962a9b0710ba9a59c66d67b3e8a5eb1b87bf0b5da4da43d0"
+    },
+    {
+      "bytes": 8957,
+      "character_id": 5,
+      "file": "assets/converted/images/1002_Red_Tank_m/5.jpg",
+      "sha256": "8183aae4ed7cb8a084c52d30b88ee9a1a7c8df07dee8d90f4f027aceac1b0508"
+    },
+    {
+      "bytes": 1328,
+      "character_id": 5,
+      "file": "assets/converted/images/1002_Red_Tank_m/5_alpha.png",
+      "sha256": "f1d4308502bbb3413ddef6cd6960a3be782f44eb485d8e42bc4c5b2dc0f2ab12"
+    },
+    {
+      "bytes": 10533,
+      "character_id": 7,
+      "file": "assets/converted/images/1002_Red_Tank_m/7.jpg",
+      "sha256": "142fd83d21197dcce76e3e4aa6af6957eeacf6d44dab510c3c8854d24345bf0b"
+    },
+    {
+      "bytes": 1446,
+      "character_id": 7,
+      "file": "assets/converted/images/1002_Red_Tank_m/7_alpha.png",
+      "sha256": "12fa7889b2e1410a619fc6cbc11d7f3b1ec0053df3e2039d372eda5e61bb73cb"
+    },
+    {
+      "bytes": 6738,
+      "character_id": 9,
+      "file": "assets/converted/images/1002_Red_Tank_m/9.jpg",
+      "sha256": "bdb40333424980f303120dd8deaa63dbd8cc5be7581b1b03288f0f951f4ee0f2"
+    },
+    {
+      "bytes": 1067,
+      "character_id": 9,
+      "file": "assets/converted/images/1002_Red_Tank_m/9_alpha.png",
+      "sha256": "169eda558cb79ef5778a926c594f46c83e5e9ab4ab34e3b59679846ac88b8c01"
+    },
+    {
+      "bytes": 7327,
+      "character_id": 11,
+      "file": "assets/converted/images/1002_Red_Tank_m/11.jpg",
+      "sha256": "3e0513d53ad8735f376f8b5c060a48826e6d6f9406d57b5f56a1c0a9e6fe5b70"
+    },
+    {
+      "bytes": 976,
+      "character_id": 11,
+      "file": "assets/converted/images/1002_Red_Tank_m/11_alpha.png",
+      "sha256": "f0267676e55526ccc63806896fa236dbef6389cf6cc6c58be81ebb7a2c9b05b7"
+    },
+    {
+      "bytes": 11035,
+      "character_id": 14,
+      "file": "assets/converted/images/1002_Red_Tank_m/14.jpg",
+      "sha256": "389e69dd3f58cd69fdb87915117c44d3901317ed16d1b3863fb3a7c414d09325"
+    },
+    {
+      "bytes": 1380,
+      "character_id": 14,
+      "file": "assets/converted/images/1002_Red_Tank_m/14_alpha.png",
+      "sha256": "7889396d666a6220d3a1ed18f8e487eae870495a611fb0625e81517f94e38884"
+    },
+    {
+      "bytes": 8927,
+      "character_id": 17,
+      "file": "assets/converted/images/1002_Red_Tank_m/17.jpg",
+      "sha256": "dd47aca3aaab4acac3e33b530ab7d02d70a5c07f3aba23429f76333233e233e3"
+    },
+    {
+      "bytes": 1316,
+      "character_id": 17,
+      "file": "assets/converted/images/1002_Red_Tank_m/17_alpha.png",
+      "sha256": "f67b1dd465d2c5824497ab130ce7d966eeb852e4bca3346c1682a08c00444b05"
+    },
+    {
+      "bytes": 10750,
+      "character_id": 20,
+      "file": "assets/converted/images/1002_Red_Tank_m/20.jpg",
+      "sha256": "ed080a6d436a843a5b52ed88df907f9bd2e722450d9163178cabd7e2f1a3c195"
+    },
+    {
+      "bytes": 1480,
+      "character_id": 20,
+      "file": "assets/converted/images/1002_Red_Tank_m/20_alpha.png",
+      "sha256": "a5752b2ea4bc4282180ca70940585042925349c37b4731c5657a119bd04d9173"
+    },
+    {
+      "bytes": 6695,
+      "character_id": 23,
+      "file": "assets/converted/images/1002_Red_Tank_m/23.jpg",
+      "sha256": "51bf00d1feca72984870c2a7ff6294174e2c52470c8da287159849923692478b"
+    },
+    {
+      "bytes": 1133,
+      "character_id": 23,
+      "file": "assets/converted/images/1002_Red_Tank_m/23_alpha.png",
+      "sha256": "c870fada87ffddabe9c784ac5677426c2cd46340a797f8884e51af2bf847823d"
+    },
+    {
+      "bytes": 7401,
+      "character_id": 27,
+      "file": "assets/converted/images/1002_Red_Tank_m/27.jpg",
+      "sha256": "20d1e81256e9b7ce0ea6290710922ac16311a3971478decfb3cfad8dbaebf3ef"
+    },
+    {
+      "bytes": 994,
+      "character_id": 27,
+      "file": "assets/converted/images/1002_Red_Tank_m/27_alpha.png",
+      "sha256": "e11e40776e30f1707d739e9fd954e3f64ed068c0c274a28dd712f498bf7df49b"
+    },
+    {
+      "bytes": 3129,
+      "character_id": 29,
+      "file": "assets/converted/images/1002_Red_Tank_m/29.jpg",
+      "sha256": "6314616dbbe0b6f8c03a22591cd730383b16a42c802a67e428cb9043b14dd643"
+    },
+    {
+      "bytes": 2893,
+      "character_id": 29,
+      "file": "assets/converted/images/1002_Red_Tank_m/29_alpha.png",
+      "sha256": "735c886764c01fd5e88759cc39bdc284542e192c32560d1ac72a934237d7b1f7"
+    },
+    {
+      "bytes": 4473,
+      "character_id": 31,
+      "file": "assets/converted/images/1002_Red_Tank_m/31.jpg",
+      "sha256": "cbd9431dfbc9bf16ca3aac088a3b3dc6bbad7dcbddd879cbdb3c8a1e4c302c65"
+    },
+    {
+      "bytes": 4385,
+      "character_id": 31,
+      "file": "assets/converted/images/1002_Red_Tank_m/31_alpha.png",
+      "sha256": "52efd5e7700936f721c09ecc701bb7d78cf82dd0f8fb574655234eb6cbf71a6b"
+    },
+    {
+      "bytes": 8115,
+      "character_id": 33,
+      "file": "assets/converted/images/1002_Red_Tank_m/33.jpg",
+      "sha256": "3e757749d150d89db326c8ca330f252b3b75c132958b5c46ab9838fa56000d9e"
+    },
+    {
+      "bytes": 976,
+      "character_id": 33,
+      "file": "assets/converted/images/1002_Red_Tank_m/33_alpha.png",
+      "sha256": "3a0bbb00d7532d287a0d63ee599b946c4400b17223e97129218863382cdb8375"
+    },
+    {
+      "bytes": 2303,
+      "character_id": 35,
+      "file": "assets/converted/images/1002_Red_Tank_m/35.jpg",
+      "sha256": "20e8b30825a82b335114e88ba148a835f0790afc1721a224d8b54075a7fbeee2"
+    },
+    {
+      "bytes": 2198,
+      "character_id": 35,
+      "file": "assets/converted/images/1002_Red_Tank_m/35_alpha.png",
+      "sha256": "f447a0f67c188beb8cf3deb8b9195929a2ff82ec5a883d33fdc3ae85ce2a2225"
+    },
+    {
+      "bytes": 8092,
+      "character_id": 37,
+      "file": "assets/converted/images/1002_Red_Tank_m/37.jpg",
+      "sha256": "ded7eecf87565d32db02b7e5d2ecd0ae0d9cd86d5577e9eb41f5b50415b99cb2"
+    },
+    {
+      "bytes": 1008,
+      "character_id": 37,
+      "file": "assets/converted/images/1002_Red_Tank_m/37_alpha.png",
+      "sha256": "d2780dc2165c1cfcb40ff5d9aa6100967815e51aa6d7339c1bd00208af6a07fe"
+    },
+    {
+      "bytes": 7345,
+      "character_id": 39,
+      "file": "assets/converted/images/1002_Red_Tank_m/39.jpg",
+      "sha256": "d966ac6257162cfc4674890a656b549f28d6a0ff8568b7747a8a7f1976e5f7a5"
+    },
+    {
+      "bytes": 996,
+      "character_id": 39,
+      "file": "assets/converted/images/1002_Red_Tank_m/39_alpha.png",
+      "sha256": "526fbca0091483ed60039dfc59f261b31d129601d8b9289fcb7c9517c5977b6d"
+    },
+    {
+      "bytes": 10994,
+      "character_id": 42,
+      "file": "assets/converted/images/1002_Red_Tank_m/42.jpg",
+      "sha256": "bbb901679ca41f964e85cfeaf1cf38907e37ed528233f964fd49993a7b5d9404"
+    },
+    {
+      "bytes": 1418,
+      "character_id": 42,
+      "file": "assets/converted/images/1002_Red_Tank_m/42_alpha.png",
+      "sha256": "502ad807bdf1047adc1085eb5f8c47307bebec0ed38bf1a2a5e1d7071340a8ca"
+    },
+    {
+      "bytes": 11444,
+      "character_id": 46,
+      "file": "assets/converted/images/1002_Red_Tank_m/46.jpg",
+      "sha256": "3522ba3c953b2fd9d461a67f08a0eacba39427dd667c17d6361b7b348e40e6db"
+    },
+    {
+      "bytes": 1566,
+      "character_id": 46,
+      "file": "assets/converted/images/1002_Red_Tank_m/46_alpha.png",
+      "sha256": "13c3518e173695a26d4901ac19ecdd1791fd40da8e14827c128805a818be95c7"
+    },
+    {
+      "bytes": 11450,
+      "character_id": 49,
+      "file": "assets/converted/images/1002_Red_Tank_m/49.jpg",
+      "sha256": "7cd10dad7c9010c08f43816b5085b2eb48fbefeac820d77d70df46575b967c34"
+    },
+    {
+      "bytes": 1575,
+      "character_id": 49,
+      "file": "assets/converted/images/1002_Red_Tank_m/49_alpha.png",
+      "sha256": "9adf9cefe875ccbbee5c7701358de6e80d6220b16ecf308459ba6fc3ae098122"
+    },
+    {
+      "bytes": 10838,
+      "character_id": 51,
+      "file": "assets/converted/images/1002_Red_Tank_m/51.jpg",
+      "sha256": "499195e687f2a234cea36011663df3844890eb8d58499700ad1dc1b5bab40e99"
+    },
+    {
+      "bytes": 1534,
+      "character_id": 51,
+      "file": "assets/converted/images/1002_Red_Tank_m/51_alpha.png",
+      "sha256": "8b761c022429bcfb0dfc281b67e2a7018e8a46b0a7c822e534ae10889f0855c4"
+    },
+    {
+      "bytes": 8626,
+      "character_id": 54,
+      "file": "assets/converted/images/1002_Red_Tank_m/54.jpg",
+      "sha256": "7d2718b8ccdcc9d5648d49ca91b5a0440e67f58ea1dca5cadf59239faa333898"
+    },
+    {
+      "bytes": 1321,
+      "character_id": 54,
+      "file": "assets/converted/images/1002_Red_Tank_m/54_alpha.png",
+      "sha256": "d51532f2fd6d39d88d4a7f1e0e67369caa8a45655cca6c6b5f66d9ad63fcb1ea"
+    },
+    {
+      "bytes": 9394,
+      "character_id": 58,
+      "file": "assets/converted/images/1002_Red_Tank_m/58.jpg",
+      "sha256": "13f561a55505e234b58e9728637ffda46be9845f3cc7f71d0e2232faaee694b0"
+    },
+    {
+      "bytes": 1360,
+      "character_id": 58,
+      "file": "assets/converted/images/1002_Red_Tank_m/58_alpha.png",
+      "sha256": "0fca37012ad9978b03c6e14eedb36755bd9065ea7769b954a712ff08775e94a3"
+    },
+    {
+      "bytes": 9229,
+      "character_id": 61,
+      "file": "assets/converted/images/1002_Red_Tank_m/61.jpg",
+      "sha256": "d3b8af9e61fb72785afb81dd135ac91030cb420b8ebe6ab43cf5169d487b234f"
+    },
+    {
+      "bytes": 1370,
+      "character_id": 61,
+      "file": "assets/converted/images/1002_Red_Tank_m/61_alpha.png",
+      "sha256": "f3bfcd553dd3d014b1921bc523ed96135557e9c9e6afa65c6a23c6dcc844019e"
+    },
+    {
+      "bytes": 8540,
+      "character_id": 63,
+      "file": "assets/converted/images/1002_Red_Tank_m/63.jpg",
+      "sha256": "b9de675379855862cff755591986e096d8a8ac0cb243b7f0dfb63600ec689721"
+    },
+    {
+      "bytes": 1305,
+      "character_id": 63,
+      "file": "assets/converted/images/1002_Red_Tank_m/63_alpha.png",
+      "sha256": "27d79a64b47c966f5cd0690ccc7d9ca1928051eed673ead50db0c4d2f10466c3"
+    },
+    {
+      "bytes": 10563,
+      "character_id": 66,
+      "file": "assets/converted/images/1002_Red_Tank_m/66.jpg",
+      "sha256": "4e42130b9c72771549f6f7128d6a0df00be58530ea5e9ef13ee120fbefc8c478"
+    },
+    {
+      "bytes": 1465,
+      "character_id": 66,
+      "file": "assets/converted/images/1002_Red_Tank_m/66_alpha.png",
+      "sha256": "e56fa7706617b7ba563dcbc1a2e7c8d25d0421ab68e6db85929cb392f5c30543"
+    },
+    {
+      "bytes": 11538,
+      "character_id": 70,
+      "file": "assets/converted/images/1002_Red_Tank_m/70.jpg",
+      "sha256": "7dab9c9a1236af0e22ff9d203ec2a7ec8231d1c08865a1cac3e3bf8b9921769d"
+    },
+    {
+      "bytes": 1486,
+      "character_id": 70,
+      "file": "assets/converted/images/1002_Red_Tank_m/70_alpha.png",
+      "sha256": "d95726c8b157bbaf43dee14c7ae97002ffa97a0737596a2b4def07afb220beb5"
+    },
+    {
+      "bytes": 11181,
+      "character_id": 73,
+      "file": "assets/converted/images/1002_Red_Tank_m/73.jpg",
+      "sha256": "a1becc8da989b397f63693e0c40fa9de9929e222aa619cc2dde3f791d9101e3f"
+    },
+    {
+      "bytes": 1480,
+      "character_id": 73,
+      "file": "assets/converted/images/1002_Red_Tank_m/73_alpha.png",
+      "sha256": "e96945ba36546306cbca984ac68ff2691b51efbca1be0985bbd85feaf699b127"
+    },
+    {
+      "bytes": 10561,
+      "character_id": 75,
+      "file": "assets/converted/images/1002_Red_Tank_m/75.jpg",
+      "sha256": "26520bfaac45d5d18cc1bd3e066328c98ede2403ea93da1caddd1cc16228f0cf"
+    },
+    {
+      "bytes": 1479,
+      "character_id": 75,
+      "file": "assets/converted/images/1002_Red_Tank_m/75_alpha.png",
+      "sha256": "9825f216d6a1cc6965770f33434b271a6633b49efe485ec67b976c1a62fd0220"
+    },
+    {
+      "bytes": 6667,
+      "character_id": 78,
+      "file": "assets/converted/images/1002_Red_Tank_m/78.jpg",
+      "sha256": "8164ffa48bc2bcf617ff5a5ebb0633488b965b84b863374b922b9c4ab6b0fbaa"
+    },
+    {
+      "bytes": 1059,
+      "character_id": 78,
+      "file": "assets/converted/images/1002_Red_Tank_m/78_alpha.png",
+      "sha256": "03e2e86cad6e63ef144ff79751fe909b0bfc2e2564f19966054c68148483ad29"
+    },
+    {
+      "bytes": 8129,
+      "character_id": 82,
+      "file": "assets/converted/images/1002_Red_Tank_m/82.jpg",
+      "sha256": "44ea790dfcdd7de6839049735172bfab0ecd9ab497d2a87b583c9f1511fbb741"
+    },
+    {
+      "bytes": 1066,
+      "character_id": 82,
+      "file": "assets/converted/images/1002_Red_Tank_m/82_alpha.png",
+      "sha256": "0ba4e3e636cbfd7c23bed1aa5e82b7a989ce4eb4e64054f6cefcd7a34ae152b2"
+    },
+    {
+      "bytes": 7630,
+      "character_id": 85,
+      "file": "assets/converted/images/1002_Red_Tank_m/85.jpg",
+      "sha256": "cef1ed85add570e97ae8cf1a608c2e8e6306bda55e7333897538ededbeb06063"
+    },
+    {
+      "bytes": 1063,
+      "character_id": 85,
+      "file": "assets/converted/images/1002_Red_Tank_m/85_alpha.png",
+      "sha256": "187b74cde84e086bc367d7b690d8636d5fa4119316cf500a28f44b6d42e198f5"
+    },
+    {
+      "bytes": 6606,
+      "character_id": 87,
+      "file": "assets/converted/images/1002_Red_Tank_m/87.jpg",
+      "sha256": "2477239e592c00c93b3cf86bf797b788ba5e237b1453779ee41aac980d68cdca"
+    },
+    {
+      "bytes": 1069,
+      "character_id": 87,
+      "file": "assets/converted/images/1002_Red_Tank_m/87_alpha.png",
+      "sha256": "21d206b006c0408c92ae9fe4302650118f461421c758a387c4b1e17c9df2d75b"
+    },
+    {
+      "bytes": 10439,
+      "character_id": 90,
+      "file": "assets/converted/images/1002_Red_Tank_m/90.jpg",
+      "sha256": "9760fd37162599b638b17af84dbdfb43a4d60eccbb3dc86110c1fbb4575eb2c4"
+    },
+    {
+      "bytes": 1494,
+      "character_id": 90,
+      "file": "assets/converted/images/1002_Red_Tank_m/90_alpha.png",
+      "sha256": "9e5debb87df0e99d8602785b4bb7ea7d1ab145a70a04af92c8d8f1bd14702245"
+    },
+    {
+      "bytes": 13849,
+      "character_id": 92,
+      "file": "assets/converted/images/1002_Red_Tank_m/92.jpg",
+      "sha256": "250d1b0b5f1c31e3207d802c1ba967435a9f12298d387b1fc95525b8ee5f9b41"
+    },
+    {
+      "bytes": 2020,
+      "character_id": 92,
+      "file": "assets/converted/images/1002_Red_Tank_m/92_alpha.png",
+      "sha256": "f28e6659a89034923054b44341c035bdfd4aa6e874da275ce9987fc67906386d"
+    },
+    {
+      "bytes": 13673,
+      "character_id": 94,
+      "file": "assets/converted/images/1002_Red_Tank_m/94.jpg",
+      "sha256": "688d6525c18738fb9554d3f20eae9f3d35861cfc23c27bd9e8909c30e9400aee"
+    },
+    {
+      "bytes": 1934,
+      "character_id": 94,
+      "file": "assets/converted/images/1002_Red_Tank_m/94_alpha.png",
+      "sha256": "38e7d380a62e2f31aee50c939d36507cf7de3765b860e229aee026e0c6b8c3ee"
+    }
+  ],
+  "content_ref": {
+    "activation": 0,
+    "attack": 18,
+    "attack_interval": 45,
+    "attack_range": 8,
+    "best_against": "ft_building",
+    "best_against_mult": 1,
+    "breeding_order": 7,
+    "build_time": 0,
+    "building_limit_same_id": -1,
+    "building_limit_same_scf": -1,
+    "category_id": 7,
+    "clicks_to_build": 0,
+    "collect": 0,
+    "collect_type": "g",
+    "collect_xp": 4,
+    "content_version": "44e5b9edd1eba2910833bb8e2f063175e51c5754e38c35177648e4de779df501",
+    "cost": 0,
+    "cost_unit_cash": 3,
+    "costs": {
+      "g": 300,
+      "o": 600
+    },
+    "defense": 1,
+    "display_order": 99,
+    "elevation": 1,
+    "expiration": 0,
+    "gift_level": 4,
+    "giftable": 0,
+    "group_type": "LAND_VEHICLE",
+    "height": 1,
+    "img_name": "1002_Red_Tank_m",
+    "in_store": 0,
+    "inventory_ids": null,
+    "kind": "unit",
+    "legacy_id": "1002",
+    "life": 150,
+    "max_collects": 0,
+    "max_elem_vol": 0,
+    "max_frame": 5,
+    "min_level": 11,
+    "name": "Red Tank",
+    "new_item": 0,
+    "population": 2,
+    "premium_upgrade_costs": null,
+    "properties": {
+      "bulldozable": "1",
+      "ft_armored": "1",
+      "mechanic": "1",
+      "resurrectable": "1",
+      "seeStealthUnits": "1"
+    },
+    "race": "h",
+    "sm_training_time": 14000,
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "subcat_functional": 80,
+    "subcategory_id": 7,
+    "syringes": 1,
+    "training_time": 0,
+    "trains_ids": -1,
+    "type": "u",
+    "unit_capacity": 0,
+    "upgrades_to": -1,
+    "velocity": 6,
+    "volume": 10,
+    "width": 1,
+    "xp": 27
+  },
+  "content_version": "a0c3861fd95cbe635537efd7223f46991580a6be66735a70c9b1904c8987c18f",
+  "frame_count": 1,
+  "frame_height": 400,
+  "frame_rate": 30.0,
+  "frame_width": 550,
+  "kind": "converted_unit",
+  "legacy_id": "1002_Red_Tank_m",
+  "main": {
+    "frame_count": 1,
+    "labels": [],
+    "placements": [
+      {
+        "character_id": 97,
+        "character_kind": "sprite",
+        "depth": 1,
+        "frame": 1,
+        "move": false
+      }
+    ],
+    "removes": []
+  },
+  "shapes": [
+    {
+      "bounds": {
+        "height_px": 180,
+        "width_px": 149,
+        "xmax": 2980,
+        "xmin": 20,
+        "ymax": 3613,
+        "ymin": 373
+      },
+      "character_id": 2,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 1,
+          "matrix": "d940000500000a051750",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 155,
+        "width_px": 220,
+        "xmax": 4400,
+        "xmin": 0,
+        "ymax": 3100,
+        "ymin": 0
+      },
+      "character_id": 4,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 3,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 147,
+        "width_px": 179,
+        "xmax": 3599,
+        "xmin": -101,
+        "ymax": 2940,
+        "ymin": 0
+      },
+      "character_id": 6,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 5,
+          "matrix": "d94000050000089b00",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 163,
+        "width_px": 204,
+        "xmax": 4080,
+        "xmin": 0,
+        "ymax": 3276,
+        "ymin": -4
+      },
+      "character_id": 8,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 7,
+          "matrix": "d94000050000040c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 158,
+        "width_px": 145,
+        "xmax": 2916,
+        "xmin": -24,
+        "ymax": 3160,
+        "ymin": 0
+      },
+      "character_id": 10,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 9,
+          "matrix": "d9400005000006a000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 160,
+        "width_px": 148,
+        "xmax": 2974,
+        "xmin": 14,
+        "ymax": 3208,
+        "ymin": -92
+      },
+      "character_id": 12,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 11,
+          "matrix": "d94000050000080ea4",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 152,
+        "width_px": 217,
+        "xmax": 4358,
+        "xmin": -2,
+        "ymax": 3040,
+        "ymin": -20
+      },
+      "character_id": 15,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 14,
+          "matrix": "d9400005000006fac0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 146,
+        "width_px": 184,
+        "xmax": 3693,
+        "xmin": 13,
+        "ymax": 2930,
+        "ymin": -70
+      },
+      "character_id": 18,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 17,
+          "matrix": "d94000050000080dba",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 165,
+        "width_px": 203,
+        "xmax": 4070,
+        "xmin": -10,
+        "ymax": 3309,
+        "ymin": -51
+      },
+      "character_id": 21,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 20,
+          "matrix": "d9400005000007ed34",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 158,
+        "width_px": 147,
+        "xmax": 2949,
+        "xmin": 9,
+        "ymax": 3162,
+        "ymin": -38
+      },
+      "character_id": 24,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 23,
+          "matrix": "d94000050000071368",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 180,
+        "width_px": 149,
+        "xmax": 2992,
+        "xmin": 12,
+        "ymax": 3618,
+        "ymin": 378
+      },
+      "character_id": 28,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 27,
+          "matrix": "d940000500000a0317a0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 38,
+        "width_px": 113,
+        "xmax": 2261,
+        "xmin": 583,
+        "ymax": 777,
+        "ymin": -612
+      },
+      "character_id": 30,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 29,
+          "matrix": "d542c38a161cc20b61f4a1691ef500",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 38,
+        "width_px": 113,
+        "xmax": 2261,
+        "xmin": 583,
+        "ymax": 777,
+        "ymin": -612
+      },
+      "character_id": 32,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 31,
+          "matrix": "d542c38a161cc20b61f4a1691ef500",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 180,
+        "width_px": 149,
+        "xmax": 2998,
+        "xmin": 18,
+        "ymax": 3604,
+        "ymin": 424
+      },
+      "character_id": 34,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 33,
+          "matrix": "d940000500000a049a80",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 38,
+        "width_px": 113,
+        "xmax": 2261,
+        "xmin": 583,
+        "ymax": 777,
+        "ymin": -612
+      },
+      "character_id": 36,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 35,
+          "matrix": "d542c38a161cc20b61f4a1691ef500",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 180,
+        "width_px": 149,
+        "xmax": 2992,
+        "xmin": 12,
+        "ymax": 3614,
+        "ymin": 494
+      },
+      "character_id": 38,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 37,
+          "matrix": "d940000500000a031ee0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 180,
+        "width_px": 149,
+        "xmax": 2989,
+        "xmin": 9,
+        "ymax": 3614,
+        "ymin": 434
+      },
+      "character_id": 40,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 39,
+          "matrix": "d940000500000a025b20",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 158,
+        "width_px": 230,
+        "xmax": 4616,
+        "xmin": 216,
+        "ymax": 3164,
+        "ymin": 64
+      },
+      "character_id": 43,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 42,
+          "matrix": "d94000050000096c1000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 52,
+        "width_px": 259,
+        "xmax": 5195,
+        "xmin": 3211,
+        "ymax": 1050,
+        "ymin": -1021
+      },
+      "character_id": 44,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 29,
+          "matrix": "d161cf161cf35439a45e32e1c86b7806",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 52,
+        "width_px": 259,
+        "xmax": 5195,
+        "xmin": 3211,
+        "ymax": 1050,
+        "ymin": -1021
+      },
+      "character_id": 45,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 31,
+          "matrix": "d161cf161cf35439a45e32e1c86b7806",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 159,
+        "width_px": 229,
+        "xmax": 4584,
+        "xmin": 224,
+        "ymax": 3183,
+        "ymin": 63
+      },
+      "character_id": 47,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 46,
+          "matrix": "d9400005000009700fc0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 52,
+        "width_px": 259,
+        "xmax": 5195,
+        "xmin": 3211,
+        "ymax": 1050,
+        "ymin": -1021
+      },
+      "character_id": 48,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 35,
+          "matrix": "d161cf161cf35439a45e32e1c86b7806",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 158,
+        "width_px": 231,
+        "xmax": 4624,
+        "xmin": 244,
+        "ymax": 3176,
+        "ymin": 56
+      },
+      "character_id": 50,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 49,
+          "matrix": "d94000050000097a0e00",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 159,
+        "width_px": 229,
+        "xmax": 4589,
+        "xmin": 249,
+        "ymax": 3187,
+        "ymin": 47
+      },
+      "character_id": 52,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 51,
+          "matrix": "d94000050000097c8bc0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 146,
+        "width_px": 179,
+        "xmax": 3598,
+        "xmin": -102,
+        "ymax": 2922,
+        "ymin": 62
+      },
+      "character_id": 55,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 54,
+          "matrix": "d94000050000089a3e",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 72,
+        "width_px": 202,
+        "xmax": 4059,
+        "xmin": 2539,
+        "ymax": 1457,
+        "ymin": -322
+      },
+      "character_id": 56,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 29,
+          "matrix": "c95e64579935500a057fb01af00f5f00",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 72,
+        "width_px": 202,
+        "xmax": 4059,
+        "xmin": 2539,
+        "ymax": 1457,
+        "ymin": -322
+      },
+      "character_id": 57,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 31,
+          "matrix": "c95e64579935500a057fb01af00f5f00",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 145,
+        "width_px": 179,
+        "xmax": 3598,
+        "xmin": -142,
+        "ymax": 2908,
+        "ymin": 168
+      },
+      "character_id": 59,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 58,
+          "matrix": "d9400005000009b92a00",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 72,
+        "width_px": 202,
+        "xmax": 4059,
+        "xmin": 2539,
+        "ymax": 1457,
+        "ymin": -322
+      },
+      "character_id": 60,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 35,
+          "matrix": "c95e64579935500a057fb01af00f5f00",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 145,
+        "width_px": 179,
+        "xmax": 3595,
+        "xmin": -145,
+        "ymax": 2908,
+        "ymin": 168
+      },
+      "character_id": 62,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 61,
+          "matrix": "d9400005000009b7aa00",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 145,
+        "width_px": 179,
+        "xmax": 3598,
+        "xmin": -142,
+        "ymax": 2911,
+        "ymin": 171
+      },
+      "character_id": 64,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 63,
+          "matrix": "d9400005000009b92ac0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 167,
+        "width_px": 203,
+        "xmax": 4062,
+        "xmin": -58,
+        "ymax": 3346,
+        "ymin": -14
+      },
+      "character_id": 67,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 66,
+          "matrix": "d94000050000078dc8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 112,
+        "width_px": 231,
+        "xmax": 4629,
+        "xmin": 2902,
+        "ymax": 2241,
+        "ymin": 312
+      },
+      "character_id": 68,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 29,
+          "matrix": "ce865850cb0d5350b1657a87242a15c0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 112,
+        "width_px": 231,
+        "xmax": 4629,
+        "xmin": 2902,
+        "ymax": 2241,
+        "ymin": 312
+      },
+      "character_id": 69,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 31,
+          "matrix": "ce865850cb0d5350b1657a87242a15c0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 164,
+        "width_px": 204,
+        "xmax": 4080,
+        "xmin": 0,
+        "ymax": 3298,
+        "ymin": -22
+      },
+      "character_id": 71,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 70,
+          "matrix": "d940000500000602a0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 112,
+        "width_px": 231,
+        "xmax": 4629,
+        "xmin": 2902,
+        "ymax": 2241,
+        "ymin": 312
+      },
+      "character_id": 72,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 35,
+          "matrix": "ce865850cb0d5350b1657a87242a15c0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 164,
+        "width_px": 204,
+        "xmax": 4082,
+        "xmin": 2,
+        "ymax": 3297,
+        "ymin": -3
+      },
+      "character_id": 74,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 73,
+          "matrix": "d940000500000354",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 164,
+        "width_px": 202,
+        "xmax": 4042,
+        "xmin": 2,
+        "ymax": 3296,
+        "ymin": -24
+      },
+      "character_id": 76,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 75,
+          "matrix": "d94000050000060a80",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 158,
+        "width_px": 143,
+        "xmax": 2860,
+        "xmin": 0,
+        "ymax": 3160,
+        "ymin": 0
+      },
+      "character_id": 79,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 78,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 121,
+        "width_px": 116,
+        "xmax": 2339,
+        "xmin": 661,
+        "ymax": 2437,
+        "ymin": 1048
+      },
+      "character_id": 80,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 29,
+          "matrix": "d6bd3c95e9e4c1f4a20b61a92349b8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 121,
+        "width_px": 116,
+        "xmax": 2339,
+        "xmin": 661,
+        "ymax": 2437,
+        "ymin": 1048
+      },
+      "character_id": 81,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 31,
+          "matrix": "d6bd3c95e9e4c1f4a20b61a92349b8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 158,
+        "width_px": 142,
+        "xmax": 2854,
+        "xmin": -6,
+        "ymax": 3173,
+        "ymin": -67
+      },
+      "character_id": 83,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 82,
+          "matrix": "d9400005000008fabd",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 121,
+        "width_px": 116,
+        "xmax": 2339,
+        "xmin": 661,
+        "ymax": 2437,
+        "ymin": 1048
+      },
+      "character_id": 84,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 35,
+          "matrix": "d6bd3c95e9e4c1f4a20b61a92349b8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 159,
+        "width_px": 143,
+        "xmax": 2860,
+        "xmin": 0,
+        "ymax": 3192,
+        "ymin": -88
+      },
+      "character_id": 86,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 85,
+          "matrix": "d940000500000800a8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 158,
+        "width_px": 143,
+        "xmax": 2860,
+        "xmin": 0,
+        "ymax": 3173,
+        "ymin": -67
+      },
+      "character_id": 88,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 87,
+          "matrix": "d940000500000800bd",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 169,
+        "width_px": 203,
+        "xmax": 4074,
+        "xmin": -6,
+        "ymax": 3384,
+        "ymin": 24
+      },
+      "character_id": 91,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 90,
+          "matrix": "d9400005000006e980",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 177,
+        "width_px": 236,
+        "xmax": 4722,
+        "xmin": -358,
+        "ymax": 3545,
+        "ymin": 85
+      },
+      "character_id": 93,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 92,
+          "matrix": "d940000500000aa68550",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 169,
+        "width_px": 242,
+        "xmax": 4847,
+        "xmin": -373,
+        "ymax": 3398,
+        "ymin": 118
+      },
+      "character_id": 95,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 94,
+          "matrix": "d940000500000aa2c760",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    }
+  ],
+  "source_file": "assets/sprites/1002_Red_Tank_m.swf",
+  "source_layer": "converted(asset-registry)",
+  "sprites": [
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 2,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 12,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 13
+    },
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 15,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 16
+    },
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 18,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 19
+    },
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 8,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 21,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 22
+    },
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 10,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 24,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 25
+    },
+    {
+      "frame_count": 1,
+      "labels": [],
+      "placements": [],
+      "removes": [],
+      "sprite_id": 26
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 2,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 26,
+          "character_kind": "sprite",
+          "depth": 3,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 2,
+          "move": true
+        },
+        {
+          "character_id": 30,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 2,
+          "move": false
+        },
+        {
+          "character_id": 32,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 34,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 36,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 6,
+          "move": true
+        },
+        {
+          "character_id": 38,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 40,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [
+        {
+          "depth": 2,
+          "frame": 8
+        }
+      ],
+      "sprite_id": 41
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 43,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 26,
+          "character_kind": "sprite",
+          "depth": 3,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 44,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 2,
+          "move": false
+        },
+        {
+          "character_id": 45,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 47,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 48,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 6,
+          "move": true
+        },
+        {
+          "character_id": 50,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 52,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [
+        {
+          "depth": 2,
+          "frame": 8
+        }
+      ],
+      "sprite_id": 53
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 26,
+          "character_kind": "sprite",
+          "depth": 3,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 55,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 2,
+          "move": true
+        },
+        {
+          "character_id": 56,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 2,
+          "move": false
+        },
+        {
+          "character_id": 57,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 59,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 60,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 6,
+          "move": true
+        },
+        {
+          "character_id": 62,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 64,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [
+        {
+          "depth": 2,
+          "frame": 8
+        }
+      ],
+      "sprite_id": 65
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 8,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 26,
+          "character_kind": "sprite",
+          "depth": 3,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 67,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 2,
+          "move": true
+        },
+        {
+          "character_id": 68,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 2,
+          "move": false
+        },
+        {
+          "character_id": 69,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 71,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 72,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 6,
+          "move": true
+        },
+        {
+          "character_id": 74,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 76,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [
+        {
+          "depth": 2,
+          "frame": 8
+        }
+      ],
+      "sprite_id": 77
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 10,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 26,
+          "character_kind": "sprite",
+          "depth": 3,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 79,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 2,
+          "move": true
+        },
+        {
+          "character_id": 80,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 2,
+          "move": false
+        },
+        {
+          "character_id": 81,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 83,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 84,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 6,
+          "move": true
+        },
+        {
+          "character_id": 86,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 88,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [
+        {
+          "depth": 2,
+          "frame": 8
+        }
+      ],
+      "sprite_id": 89
+    },
+    {
+      "frame_count": 10,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 91,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 93,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 95,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 96
+    },
+    {
+      "frame_count": 25,
+      "labels": [
+        {
+          "anchor": false,
+          "frame": 1,
+          "name": "QUIETO"
+        },
+        {
+          "anchor": false,
+          "frame": 6,
+          "name": "ANDAR"
+        },
+        {
+          "anchor": false,
+          "frame": 11,
+          "name": "ATAQUE"
+        },
+        {
+          "anchor": false,
+          "frame": 16,
+          "name": "MUERTE"
+        },
+        {
+          "anchor": false,
+          "frame": 21,
+          "name": "PICAR"
+        }
+      ],
+      "placements": [
+        {
+          "character_id": 2,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 2,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 8,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 10,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 13,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 6,
+          "move": false
+        },
+        {
+          "character_id": 16,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 7,
+          "move": false
+        },
+        {
+          "character_id": 19,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 8,
+          "move": false
+        },
+        {
+          "character_id": 22,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 9,
+          "move": false
+        },
+        {
+          "character_id": 25,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 10,
+          "move": false
+        },
+        {
+          "character_id": 41,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 11,
+          "move": false
+        },
+        {
+          "character_id": 53,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 12,
+          "move": false
+        },
+        {
+          "character_id": 65,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 13,
+          "move": false
+        },
+        {
+          "character_id": 77,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 14,
+          "move": false
+        },
+        {
+          "character_id": 89,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 15,
+          "move": false
+        },
+        {
+          "character_id": 96,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 16,
+          "move": false
+        }
+      ],
+      "removes": [
+        {
+          "depth": 1,
+          "frame": 6
+        },
+        {
+          "depth": 1,
+          "frame": 7
+        },
+        {
+          "depth": 1,
+          "frame": 8
+        },
+        {
+          "depth": 1,
+          "frame": 9
+        },
+        {
+          "depth": 1,
+          "frame": 10
+        },
+        {
+          "depth": 1,
+          "frame": 11
+        },
+        {
+          "depth": 1,
+          "frame": 12
+        },
+        {
+          "depth": 1,
+          "frame": 13
+        },
+        {
+          "depth": 1,
+          "frame": 14
+        },
+        {
+          "depth": 1,
+          "frame": 15
+        },
+        {
+          "depth": 1,
+          "frame": 16
+        },
+        {
+          "depth": 1,
+          "frame": 21
+        }
+      ],
+      "sprite_id": 97
+    }
+  ],
+  "symbols": [
+    {
+      "id": 97,
+      "name": "1002_Red_Tank_m"
+    },
+    {
+      "id": 96,
+      "name": "_1002_Red_Tank_m_fla.arquero1atacando3_4detras_13"
+    },
+    {
+      "id": 89,
+      "name": "_1002_Red_Tank_m_fla.arquero1atacandofrente_12"
+    },
+    {
+      "id": 77,
+      "name": "_1002_Red_Tank_m_fla.arquero1atacando3_4frente_11"
+    },
+    {
+      "id": 65,
+      "name": "_1002_Red_Tank_m_fla.arquero1atacandoperfil_10"
+    },
+    {
+      "id": 53,
+      "name": "_1002_Red_Tank_m_fla.arquero1muriendo_9"
+    },
+    {
+      "id": 41,
+      "name": "_1002_Red_Tank_m_fla.arquero1atacandodetras_7"
+    }
+  ]
+}
