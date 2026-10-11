@@ -5,11 +5,13 @@ Provide one assembled converted-unit package that inventories each sprite timeli
 ## Requirements
 
 ### Requirement: Single-unit package assembly
-The tool SHALL assemble `assets/converted/units/<target-stem>/` for the **declared target stem and its normalized content `legacy_id`**, both of which SHALL be required inputs; the tool SHALL NOT carry a default target or id. It SHALL record `package.json` (legacy_id, normalized unit definition ref, source provenance, frame data, symbols with export ids, per-sprite animation states, shape bounds/style/bitmap-ref records, bitmap outputs with digests) plus byte-identical bitmap copies. The definition SHALL be resolved by the pair (`legacy_id`, `img_name`) and SHALL fail closed unless exactly one normalized units entry matches. Bitmap digests SHALL match extraction outputs exactly.
+The tool SHALL assemble `assets/converted/units/<target-stem>/` for the **declared target stem and its normalized content `legacy_id`**, both of which SHALL be required inputs; the tool SHALL NOT carry a default target or id. It SHALL record `package.json` (legacy_id, normalized unit definition ref, source provenance, frame data, symbols with export ids, per-sprite animation states, shape bounds/style/bitmap-ref records, bitmap references with digests). The definition SHALL be resolved by the pair (`legacy_id`, `img_name`) and SHALL fail closed unless exactly one normalized units entry matches. Bitmap digests SHALL match extraction outputs exactly.
+
+**A package SHALL reference its bitmaps rather than copy them.** Each bitmap entry SHALL record the extraction output path under the shared extracted image tree, together with its byte count and SHA-256, and the package directory SHALL contain no copied bitmap bytes. The referenced path SHALL be resolved and its bytes SHALL be hashed during conversion, and a digest mismatch SHALL fail validation before any output is written.
 
 #### Scenario: Assemble the measured elephant
 - **WHEN** the converter runs on `10033_wild_elephant` with content id `933` against the current corpus after the extraction builds
-- **THEN** the package directory holds a validated `package.json` plus its JPEGs and alpha PNGs with matching digests, and frame data records 550×400 at 30.0 fps with 1 frame
+- **THEN** the package directory holds a validated `package.json` whose bitmap entries name the shared extracted image tree with matching digests and records no copied bitmap bytes, and frame data records 550×400 at 30.0 fps with 1 frame
 
 #### Scenario: Assemble a different target
 - **WHEN** the converter runs on any other declared target stem and content id whose bitmaps are extracted and whose pair resolves to exactly one normalized entry
@@ -26,6 +28,11 @@ The tool SHALL assemble `assets/converted/units/<target-stem>/` for the **declar
 - **THEN** exactly one normalized units entry matches the declared `legacy_id` and `img_name`, recorded verbatim with no other definition touched
 - **AND** a pair matching zero or more than one entry fails closed
 
+#### Scenario: A referenced bitmap is checked, not merely recorded
+- **WHEN** a referenced extraction path is missing, or its bytes do not hash to the recorded SHA-256
+- **THEN** validation fails identifying the bitmap, and no output is written
+
+
 ### Requirement: The unit package provenance digest is independent of the checkout's line endings
 The tool SHALL compute the input fingerprint that becomes the package's `content_version` over **line-ending-normalised** bytes, so that the same committed content yields the same `content_version` on an LF checkout and a CRLF checkout alike. The tool SHALL NOT hash raw working-tree bytes of any input whose line endings are not pinned.
 
@@ -38,6 +45,7 @@ The tool SHALL compute the input fingerprint that becomes the package's `content
 - **THEN** the recorded `content_version` changes from the previously committed raw-byte digest
 - **AND** `conversions.json` records the new `package_sha256` for this package
 - **AND** the other converter's foreign package entry and input keys are preserved verbatim
+
 
 ### Requirement: Per-sprite animation inventory
 The tool SHALL parse `DefineSprite` bodies and their timeline tags (`PlaceObject2`, `RemoveObject2`, `FrameLabel`, `ShowFrame`, `End`), recording for each sprite its id, declared frame count, frame labels with 1-based frame indices, placements (frame, depth, referenced character with kind, move flag), and removals; the root timeline SHALL be recorded the same way; `SymbolClass` mappings SHALL be recorded as id-name pairs. Label semantics SHALL be recorded as names only, never interpreted. Declared frame counts SHALL match observed `ShowFrame` counts, character references SHALL resolve, and unsupported timeline tags or unresolved references SHALL fail closed.
@@ -53,6 +61,7 @@ The tool SHALL parse `DefineSprite` bodies and their timeline tags (`PlaceObject
 #### Scenario: Reject an unresolvable timeline
 - **WHEN** a timeline contains an unsupported control tag, references an undefined character, or declares a frame count that differs from its observed `ShowFrame` count
 - **THEN** validation fails with the offending sprite or tag identified and no outputs are written
+
 
 ### Requirement: Shape records with byte-aligned style arrays
 The tool SHALL parse SHAPEWITHSTYLE bounds, fill/line style arrays with counts and types, bitmap-fill character IDs, and raw matrices for every shape in the source, failing closed on other shape versions or unexpected layouts. Edge records SHALL be counted, never tessellated. The shared style parser SHALL align to a byte boundary after the fill-style array so files whose fill arrays end mid-byte parse, and existing package outputs SHALL be re-verified byte-identical under the fix. `RECT` coordinate fields SHALL be decoded as the signed bit fields the format specifies: a field whose sign bit within the declared `Nbits` is set SHALL be sign-extended to its negative value rather than read as a large unsigned value. A decoded `RECT` whose `xmax` is below its `xmin`, or whose `ymax` is below its `ymin`, SHALL fail closed as an inverted rectangle, and SHALL NOT be reported as an extent of zero. A gradient fill style SHALL read its `MATRIX` before its gradient record block, in the order the format specifies, and SHALL NOT read the record block first.
@@ -84,6 +93,7 @@ The tool SHALL parse SHAPEWITHSTYLE bounds, fill/line style arrays with counts a
 - **WHEN** a shape version or style layout falls outside the parsed subset
 - **THEN** validation fails with a non-zero exit and no writes
 
+
 ### Requirement: Bitmap-fill resolution with recorded placeholders
 The tool SHALL validate that every fill referenced by shape records is in range and resolves to an extraction output with a `bitmap_id` other than `65535`, SHALL record unreferenced `bitmap_id 65535` placeholder fills verbatim without resolving them, and SHALL fail when a referenced fill is unresolvable, out of range, or `65535`.
 
@@ -94,6 +104,7 @@ The tool SHALL validate that every fill referenced by shape records is in range 
 #### Scenario: Detect an unresolvable referenced fill
 - **WHEN** a shape record references a fill with id `65535`, an index outside the fill array, or an id with no extraction output
 - **THEN** validation fails with a non-zero exit and no writes
+
 
 ### Requirement: The placeholder rule is scoped to the unit converter's own subset and is not widened
 The unit converter's recorded-placeholder handling for an **unreferenced** `bitmap_id 65535` fill, and its refusal of a **referenced** one, SHALL remain exactly as specified. The tool SHALL NOT extend that rule to the building converter, SHALL NOT relax it for units, and SHALL NOT treat a `65535` fill as resolvable. Whether the building converter's population requires the same rule is **not** established, and this capability asserts nothing about it.
@@ -108,8 +119,11 @@ The unit converter's recorded-placeholder handling for an **unreferenced** `bitm
 - **THEN** this capability's unit rule is not cited as the explanation for any of them
 - **AND** a change to the building converter's fill handling requires its own established cause
 
+
 ### Requirement: Neutral conversion manifest with merge
 The tool SHALL write `conversions.json` as a neutral `conversion-v1` envelope whose package entries each carry their own `policy` and byte count, with `counts` recomputed from the entries and `inputs` keys merged per domain; each converter SHALL preserve foreign package entries and input keys verbatim, replace only its own entry, stamp the envelope policy, and produce byte-identical output regardless of which converter ran last. The building converter SHALL accept a legacy `building-conversion-v1` envelope only while its sole entry is the building's own, and the unit converter SHALL reject a non-`conversion-v1` envelope.
+
+**A package entry's `output_bytes` SHALL be its `package.json` byte total.** Packages reference rather than copy their bitmaps, so no copied bitmap bytes exist to add.
 
 #### Scenario: Record both packages order-independently
 - **WHEN** the building and unit converters run in either order
@@ -119,16 +133,25 @@ The tool SHALL write `conversions.json` as a neutral `conversion-v1` envelope wh
 - **WHEN** the building converter runs against the legacy manifest (or the unit converter runs against it)
 - **THEN** the building converter rewrites it as `conversion-v1` with its fresh entry, while the unit converter fails closed with a clear message and no writes until the migration has run
 
+#### Scenario: The recorded byte total means what it says
+- **WHEN** a package entry's `output_bytes` is recorded
+- **THEN** the value equals that package's `package.json` byte length
+- **AND** no schema documentation describes it as including copied bitmap bytes
+
+
 ### Requirement: Validation and manifest-grade determinism
 The tool SHALL validate animation-state coverage, bitmap-fill resolution, content-ref uniqueness, schema fields, and determinism, and SHALL write the `conversions.json` merge plus a `converted` statuses merge only on success. It SHALL report success with exit 0 and any validation failure with a non-zero exit.
 
+**Determinism SHALL be demonstrated over three consecutive runs**, not two, because these artefacts are compared byte-for-byte across checkout forms by the census and conversion replay checks.
+
 #### Scenario: Prove outputs match inputs
-- **WHEN** the converter runs twice against unchanged inputs
-- **THEN** the package directory, `conversions.json`, and statuses output are byte-identical, and the digests recorded in `package.json` equal recomputed ones
+- **WHEN** the converter runs three consecutive times against unchanged inputs
+- **THEN** the package directory, `conversions.json`, and statuses output are byte-identical across all three, and the digests recorded in `package.json` equal recomputed ones
 
 #### Scenario: Fail closed without partial writes
 - **WHEN** any validation check fails
 - **THEN** the converter exits non-zero, writes no package files, manifest entries, or status changes, and leaves prior outputs byte-identical
+
 
 ### Requirement: Preservation-safe conversion tooling
 The tool SHALL parse tags and records only: no tessellation, no rasterization, no matrix, ratio, or script interpretation, no label-semantic interpretation, and no Flash, browser, server, network, or subprocess activity. It SHALL write only the package directory plus `conversions.json` and the statuses merge on success, SHALL leave sources, registry, coverage, inspection, and extraction manifests byte-identical, and SHALL not modify any other content definition.
