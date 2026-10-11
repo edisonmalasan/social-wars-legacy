@@ -278,15 +278,30 @@ class SyntheticAssemblyTests(unittest.TestCase):
         self.assertEqual(shape["records"]["straight"], 1)
         self.assertEqual(shape["records"]["end"], 1)
 
-    def test_bitmap_copy_matches_extraction(self):
+    def test_bitmap_reference_matches_extraction(self):
+        """The bitmap is *referenced* in the shared extracted tree, not copied.
+
+        Under design D1 `bitmaps[].file` records the extraction output path.
+        The property pinned here is therefore threefold and all of it is real:
+        the reference is the shared extraction path (not a package-relative
+        copy), the bytes it resolves to are the staged extraction payload, and
+        the recorded digest and byte total describe those bytes.
+        """
         self.assertEqual(self.package["bitmaps"], [{
             "character_id": 7,
-            "file": "assets/converted/units/10033_wild_elephant/7.jpg",
+            "file": "assets/converted/images/10033_wild_elephant/7.jpg",
             "bytes": len(UNIT_BITMAP),
             "sha256": hashlib.sha256(UNIT_BITMAP).hexdigest(),
         }])
-        copied = (self.work / self.package["bitmaps"][0]["file"]).read_bytes()
-        self.assertEqual(copied, UNIT_BITMAP)
+        referenced = self.package["bitmaps"][0]["file"]
+        self.assertTrue(referenced.startswith("assets/converted/images/"),
+                        "reference left the shared extracted tree: %r"
+                        % (referenced,))
+        self.assertEqual((self.work / referenced).read_bytes(), UNIT_BITMAP)
+        # And the package directory carries no copied payload at all.
+        directory = self.work / "assets/converted/units/10033_wild_elephant"
+        self.assertEqual(sorted(path.name for path in directory.iterdir()),
+                         ["package.json"])
 
     def test_manifest_and_statuses(self):
         self.assertEqual(self.document["policy"], "conversion-v1")
@@ -296,9 +311,11 @@ class SyntheticAssemblyTests(unittest.TestCase):
         self.assertEqual(entry["policy"], "unit-conversion-v1")
         self.assertEqual(entry["directory"],
                          "assets/converted/units/10033_wild_elephant")
+        # Under design D3 `output_bytes` is the package.json byte total only:
+        # nothing is copied into the package directory, so there are no
+        # payload bytes to add.
         package_bytes = (self.work / UNIT_PACKAGE_PATH).stat().st_size
-        self.assertEqual(entry["output_bytes"],
-                         package_bytes + len(UNIT_BITMAP))
+        self.assertEqual(entry["output_bytes"], package_bytes)
         payload = (self.work / UNIT_PACKAGE_PATH).read_bytes()
         self.assertEqual(hashlib.sha256(payload).hexdigest(),
                          entry["package_sha256"])
@@ -572,6 +589,14 @@ class SyntheticFailureTests(unittest.TestCase):
                       stdout)
 
     def test_bitmap_digest_mismatch(self):
+        """D2: the reference is verified, so a wrong digest still fails hard.
+
+        Under D1 there is no second artefact to compare, which makes this the
+        only thing tying the manifest to real content -- so the check must
+        still fire. The message names the *shared extraction path*, which is
+        exactly what the converter now resolves, and `build` independently
+        asserts that a failed run writes nothing.
+        """
         def mutate(work):
             rewrite_json(
                 work / "tools" / "asset-registry" / "image_extraction.json",
@@ -580,7 +605,7 @@ class SyntheticFailureTests(unittest.TestCase):
         code, stdout, _ = self.build(mutate)
         self.assertEqual(code, 1)
         self.assertIn("bitmap digest mismatch at "
-                      "assets/converted/units/10033_wild_elephant/7.jpg",
+                      "assets/converted/images/10033_wild_elephant/7.jpg",
                       stdout)
 
     def test_unsupported_shape_tag(self):
@@ -897,7 +922,16 @@ class RealElephantTests(unittest.TestCase):
             self.assertNotEqual(shape["fills"][index - 1].get("bitmap_id"),
                                 65535)
 
-    def test_bitmap_copies_match_extraction(self):
+    def test_bitmap_references_match_extraction(self):
+        """D1/D2: each reference *is* the extraction output path, verified.
+
+        The pin is not "a copy matched" any more -- there is no copy. What must
+        hold is that every recorded reference equals the extraction manifest's
+        own recorded path for that payload, resolves to real bytes in the
+        shared extracted tree, and that those bytes hash to the recorded
+        `sha256` and are `bytes` long. That is the whole contract: the manifest
+        points at the intended bytes, and the pointer is checked.
+        """
         extraction = json.loads(
             (ROOT / "tools" / "asset-registry" / "image_extraction.json"
              ).read_text(encoding="utf-8"))
@@ -915,13 +949,21 @@ class RealElephantTests(unittest.TestCase):
         self.assertEqual(names, set(expected))
         for entry in self.package["bitmaps"]:
             output = expected[Path(entry["file"]).name]
-            source_payload = (ROOT / output["file"]).read_bytes()
-            copied = (self.out / entry["file"]).read_bytes()
-            self.assertEqual(copied, source_payload)
-            self.assertEqual(len(copied), entry["bytes"])
-            self.assertEqual(hashlib.sha256(copied).hexdigest(),
+            # The reference is the extraction path verbatim, not a re-derivation.
+            self.assertEqual(entry["file"], output["file"])
+            self.assertTrue(entry["file"].startswith("assets/converted/images/"),
+                            "reference left the shared extracted tree: %r"
+                            % (entry["file"],))
+            payload = (ROOT / entry["file"]).read_bytes()
+            self.assertEqual(len(payload), entry["bytes"])
+            self.assertEqual(len(payload), output["bytes"])
+            self.assertEqual(hashlib.sha256(payload).hexdigest(),
                              entry["sha256"])
             self.assertEqual(entry["sha256"], output["sha256"])
+        # No copied payload: the emitted package directory holds one file.
+        directory = self.out / "assets" / "converted" / "units" / "10033_wild_elephant"
+        self.assertEqual(sorted(path.name for path in directory.iterdir()),
+                         ["package.json"])
 
     def test_reruns_byte_identical(self):
         self.assertEqual(self.first, self.second)
@@ -932,11 +974,25 @@ class RealElephantTests(unittest.TestCase):
                          (out / "statuses.json").read_bytes())
 
     def test_manifest_records_both_packages(self):
+        """Both converters' entries survive, and the rollups are consistent.
+
+        The literal `2` this used to assert was the whole manifest only when
+        exactly two packages were committed. It is now restated as the
+        invariant that survives mass conversion: the count equals the number
+        of listed entries, both policies are present and distinct, the
+        byte rollup is the sum of the entries, and the one foreign entry is
+        preserved verbatim from the committed manifest. No total is
+        hardcoded, because a total is a property of the corpus, not of this
+        converter.
+        """
         document = json.loads(self.first_manifest.decode("utf-8"))
         self.assertEqual(document["policy"], "conversion-v1")
-        self.assertEqual(document["counts"]["packages"], 2)
+        self.assertEqual(document["counts"]["packages"],
+                         len(document["packages"]))
+        self.assertGreaterEqual(document["counts"]["packages"], 2)
         entries = {entry["legacy_id"]: entry
                    for entry in document["packages"]}
+        self.assertEqual(len(entries), document["counts"]["packages"])
         root_manifest = json.loads(
             (ROOT / "tools" / "asset-registry" / "conversions.json"
              ).read_text(encoding="utf-8"))
@@ -952,6 +1008,10 @@ class RealElephantTests(unittest.TestCase):
         self.assertEqual(document["counts"]["output_bytes"],
                          sum(entry["output_bytes"]
                              for entry in document["packages"]))
+        # Every entry is a reference manifest, so every package directory is
+        # accounted for by exactly one committed package.json.
+        self.assertEqual(len(root_manifest["packages"]),
+                         document["counts"]["packages"])
         statuses = json.loads(self.first_statuses.decode("utf-8"))
         self.assertEqual(statuses["statuses"][ELEPHANT_SOURCE], "converted")
         self.assertEqual(statuses["statuses"][HOUSE_SOURCE], "converted")
@@ -1107,7 +1167,6 @@ class ContainmentTests(unittest.TestCase):
             reads, writes = self.observed_sets(work, opened)
             self.assertEqual(writes, {
                 "assets/converted/units/10033_wild_elephant/package.json",
-                "assets/converted/units/10033_wild_elephant/7.jpg",
                 "tools/asset-registry/conversions.json",
                 "tools/asset-registry/statuses.json",
             })
@@ -1125,7 +1184,6 @@ class ContainmentTests(unittest.TestCase):
                          if after[path] != "directory"}
             self.assertEqual(new_files, {
                 "assets/converted/units/10033_wild_elephant/package.json",
-                "assets/converted/units/10033_wild_elephant/7.jpg",
                 "tools/asset-registry/conversions.json",
                 "tools/asset-registry/statuses.json",
             })

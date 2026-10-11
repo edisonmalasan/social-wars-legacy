@@ -1,0 +1,7778 @@
+{
+  "bitmaps": [
+    {
+      "bytes": 13583,
+      "character_id": 1,
+      "file": "assets/converted/images/1091_missile_tank_m/1.jpg",
+      "sha256": "cd5c5cdc598eb05c2d622ba4a53650abf58dfd688898273de76254892d4451e6"
+    },
+    {
+      "bytes": 876,
+      "character_id": 1,
+      "file": "assets/converted/images/1091_missile_tank_m/1_alpha.png",
+      "sha256": "dd9e70ea253ff82301a966eb558b6b88cf93ce1bae9296dcd4d74632d3ed6a88"
+    },
+    {
+      "bytes": 19589,
+      "character_id": 3,
+      "file": "assets/converted/images/1091_missile_tank_m/3.jpg",
+      "sha256": "1e4d9be826d7050fcff9a52fd0dd3251cfa7ac51b490e41dba011c433f1d04c9"
+    },
+    {
+      "bytes": 2118,
+      "character_id": 3,
+      "file": "assets/converted/images/1091_missile_tank_m/3_alpha.png",
+      "sha256": "1d4b6e57aab8f4eea79c0fccc82b7a881a2fcdae76c9071ffdabe7ee05432297"
+    },
+    {
+      "bytes": 18487,
+      "character_id": 5,
+      "file": "assets/converted/images/1091_missile_tank_m/5.jpg",
+      "sha256": "f42e57a1f39a267d68ed775287e22b88ba8d4167fb6d3bc3a25cceadd2b3ab30"
+    },
+    {
+      "bytes": 1581,
+      "character_id": 5,
+      "file": "assets/converted/images/1091_missile_tank_m/5_alpha.png",
+      "sha256": "63e0600568ec22c3c99373b2c43e52007468a092af367de749d80d7157bb5aec"
+    },
+    {
+      "bytes": 20552,
+      "character_id": 7,
+      "file": "assets/converted/images/1091_missile_tank_m/7.jpg",
+      "sha256": "dccf205b7fdcd64345c387ecc0a7353a2e5d7dee6e5f242366a6d3df3bc17970"
+    },
+    {
+      "bytes": 1827,
+      "character_id": 7,
+      "file": "assets/converted/images/1091_missile_tank_m/7_alpha.png",
+      "sha256": "3e8a934938d92b3a9c23158880bd9ef5d73a84bd8cb7543cfe40481621485858"
+    },
+    {
+      "bytes": 14530,
+      "character_id": 9,
+      "file": "assets/converted/images/1091_missile_tank_m/9.jpg",
+      "sha256": "f4c3d203b6ec2c36f10ce3d7eb3a507287c62c31d2dae4340c55e5bae76305db"
+    },
+    {
+      "bytes": 743,
+      "character_id": 9,
+      "file": "assets/converted/images/1091_missile_tank_m/9_alpha.png",
+      "sha256": "56cba136aa6805a613c0048ccc65d1018929db1051fda0d8e135a8ff16d49088"
+    },
+    {
+      "bytes": 13381,
+      "character_id": 11,
+      "file": "assets/converted/images/1091_missile_tank_m/11.jpg",
+      "sha256": "55ffcfdf35d73d0315a92756f9ee6715876b7318eb300b27e6a38f7fb864c661"
+    },
+    {
+      "bytes": 851,
+      "character_id": 11,
+      "file": "assets/converted/images/1091_missile_tank_m/11_alpha.png",
+      "sha256": "b533cc9361f5e588f558eae7c9a140dc50948d34514126cab35f5b35220643da"
+    },
+    {
+      "bytes": 19723,
+      "character_id": 14,
+      "file": "assets/converted/images/1091_missile_tank_m/14.jpg",
+      "sha256": "41d7cd3aefb3cef2a79c3db1598a634c84f7aa9b3d18fadb99de2c61e0ada30d"
+    },
+    {
+      "bytes": 2111,
+      "character_id": 14,
+      "file": "assets/converted/images/1091_missile_tank_m/14_alpha.png",
+      "sha256": "dfa9727a711f06e59ecab6c2f48e408ba97591e448b354af83ecf8dd2def6344"
+    },
+    {
+      "bytes": 18481,
+      "character_id": 17,
+      "file": "assets/converted/images/1091_missile_tank_m/17.jpg",
+      "sha256": "4c630a72184a18d8ff74173766dfaff724399e0c0dc913b39990c00f7d472c12"
+    },
+    {
+      "bytes": 1663,
+      "character_id": 17,
+      "file": "assets/converted/images/1091_missile_tank_m/17_alpha.png",
+      "sha256": "1ef08b19108ce9799c625a424c0d6222b591af904ad9acfd529e4e61816f6bb0"
+    },
+    {
+      "bytes": 20390,
+      "character_id": 20,
+      "file": "assets/converted/images/1091_missile_tank_m/20.jpg",
+      "sha256": "d3072afabeb3fb798f720192d83f00991848a49f0321acfad7e3beb72dc95951"
+    },
+    {
+      "bytes": 1857,
+      "character_id": 20,
+      "file": "assets/converted/images/1091_missile_tank_m/20_alpha.png",
+      "sha256": "0fc9abe3e73b5f0a0482021e7eabc27d8cd066fa2bd812eb77ca9e0b30e367c2"
+    },
+    {
+      "bytes": 14371,
+      "character_id": 23,
+      "file": "assets/converted/images/1091_missile_tank_m/23.jpg",
+      "sha256": "f0ea939af9230231555b2c0cf4590158201898f40dfb70e28cb3f6cfc844bd76"
+    },
+    {
+      "bytes": 718,
+      "character_id": 23,
+      "file": "assets/converted/images/1091_missile_tank_m/23_alpha.png",
+      "sha256": "979ce0b92ec810da8ccb83dcac470e635bd320d67f16b60adec75b83742b089a"
+    },
+    {
+      "bytes": 13666,
+      "character_id": 26,
+      "file": "assets/converted/images/1091_missile_tank_m/26.jpg",
+      "sha256": "3d20152e8775e06b05da4a764706a218e52020ff4f67d42c0d6b7e1b566c03ec"
+    },
+    {
+      "bytes": 850,
+      "character_id": 26,
+      "file": "assets/converted/images/1091_missile_tank_m/26_alpha.png",
+      "sha256": "17dc69aff4fc100b922d6e8340f54bc90b508a24449ba7415c7b44f0d21a0b92"
+    },
+    {
+      "bytes": 15503,
+      "character_id": 29,
+      "file": "assets/converted/images/1091_missile_tank_m/29.jpg",
+      "sha256": "f2f4f1c99ee52e8546f12879d00d898b85c4f209d78512405db9765d0245cd02"
+    },
+    {
+      "bytes": 1069,
+      "character_id": 29,
+      "file": "assets/converted/images/1091_missile_tank_m/29_alpha.png",
+      "sha256": "1450b5299369d7dda49cba6759d0b97ac8efb039accb10b9c7b2f90853916a26"
+    },
+    {
+      "bytes": 17254,
+      "character_id": 31,
+      "file": "assets/converted/images/1091_missile_tank_m/31.jpg",
+      "sha256": "6de01492fbb4a6422cd0c450d23c1e89831e85b75bd6bdd60857121e92ab4fcc"
+    },
+    {
+      "bytes": 2004,
+      "character_id": 31,
+      "file": "assets/converted/images/1091_missile_tank_m/31_alpha.png",
+      "sha256": "847b5dbbcdd6222a36a77f9360f4cc834f1cda10fae4dfe5df7e12dbffee62af"
+    },
+    {
+      "bytes": 19337,
+      "character_id": 33,
+      "file": "assets/converted/images/1091_missile_tank_m/33.jpg",
+      "sha256": "1119d3ee72c66042cd8ad410e562179d1eeaebefddc660b664f05bd2be782cbc"
+    },
+    {
+      "bytes": 1637,
+      "character_id": 33,
+      "file": "assets/converted/images/1091_missile_tank_m/33_alpha.png",
+      "sha256": "375ed5301d4c737a1df00372da928c7f859fe07f2657e1cbfdecec52cca11530"
+    },
+    {
+      "bytes": 19601,
+      "character_id": 36,
+      "file": "assets/converted/images/1091_missile_tank_m/36.jpg",
+      "sha256": "03653403597de2d88ff535cc5e656a6f0fb060c6e5dabe8bb890488fd90e2d4a"
+    },
+    {
+      "bytes": 2122,
+      "character_id": 36,
+      "file": "assets/converted/images/1091_missile_tank_m/36_alpha.png",
+      "sha256": "a45109e487e70dbc111d154eb82e7eda8f6b13f6d2c4277001e7d369b4ef01b6"
+    },
+    {
+      "bytes": 22227,
+      "character_id": 38,
+      "file": "assets/converted/images/1091_missile_tank_m/38.jpg",
+      "sha256": "23bcd3a26654226d9db320ab65c158cb22e995b78cb28cac51c090f9921030ca"
+    },
+    {
+      "bytes": 3277,
+      "character_id": 38,
+      "file": "assets/converted/images/1091_missile_tank_m/38_alpha.png",
+      "sha256": "28f92dbb25e19e390d3d9e9133950223c8b1a23174fafad17cd682aa29b4bac4"
+    },
+    {
+      "bytes": 22781,
+      "character_id": 40,
+      "file": "assets/converted/images/1091_missile_tank_m/40.jpg",
+      "sha256": "dcd2fbe8595a61872f48de33ee08b488537d49a9c4a2f9a80adb05b92996ebae"
+    },
+    {
+      "bytes": 4654,
+      "character_id": 40,
+      "file": "assets/converted/images/1091_missile_tank_m/40_alpha.png",
+      "sha256": "477ca39b56ef7a60c46a7aae9682ebc19cca137444df32d66c9d53ed73733187"
+    },
+    {
+      "bytes": 25943,
+      "character_id": 42,
+      "file": "assets/converted/images/1091_missile_tank_m/42.jpg",
+      "sha256": "792dff91d556fc0878b1fb90e351f42bf809b4ec0876c3fe2d23f16b3cc12044"
+    },
+    {
+      "bytes": 4616,
+      "character_id": 42,
+      "file": "assets/converted/images/1091_missile_tank_m/42_alpha.png",
+      "sha256": "3f04761657e705ae04495c27a9d9ec8ba2a8e9c1ac80c8644ee35670498b9f62"
+    },
+    {
+      "bytes": 18547,
+      "character_id": 45,
+      "file": "assets/converted/images/1091_missile_tank_m/45.jpg",
+      "sha256": "54e0f4a7c8d08eee2872d164a1af9d73a54e583603ad90a8431fc51cb9928e4f"
+    },
+    {
+      "bytes": 1619,
+      "character_id": 45,
+      "file": "assets/converted/images/1091_missile_tank_m/45_alpha.png",
+      "sha256": "3c9e7705525a5643673c69292991299aafa827ecf8f77a6f5532fe6c240aba57"
+    },
+    {
+      "bytes": 21258,
+      "character_id": 47,
+      "file": "assets/converted/images/1091_missile_tank_m/47.jpg",
+      "sha256": "44d9f27cf029bc4a529a98018a256fb36b02f39842fd6b04cd2c0f7edff50c71"
+    },
+    {
+      "bytes": 3272,
+      "character_id": 47,
+      "file": "assets/converted/images/1091_missile_tank_m/47_alpha.png",
+      "sha256": "639a41efab47dcff6e31b07ef30be2968b894b28e624456cfe4801c050698433"
+    },
+    {
+      "bytes": 21871,
+      "character_id": 49,
+      "file": "assets/converted/images/1091_missile_tank_m/49.jpg",
+      "sha256": "231be931e0ecd4824efe9808d2ff7d18d66825e94d5efaad2283e760a9826940"
+    },
+    {
+      "bytes": 5254,
+      "character_id": 49,
+      "file": "assets/converted/images/1091_missile_tank_m/49_alpha.png",
+      "sha256": "9f83d9e2283961599cf06b4bbe733cd8b828033448b71e59297ee58efc998e5c"
+    },
+    {
+      "bytes": 22954,
+      "character_id": 51,
+      "file": "assets/converted/images/1091_missile_tank_m/51.jpg",
+      "sha256": "18bae2cbc21aee3a09bf6bce7f7308d6b05b0997c826f59fa1ca7298d42c3c6d"
+    },
+    {
+      "bytes": 4213,
+      "character_id": 51,
+      "file": "assets/converted/images/1091_missile_tank_m/51_alpha.png",
+      "sha256": "f99a1aa137208f352299b7085f2bd61b53b7d4c8217d2b18dce8fe262d720e25"
+    },
+    {
+      "bytes": 20474,
+      "character_id": 54,
+      "file": "assets/converted/images/1091_missile_tank_m/54.jpg",
+      "sha256": "8518ac8e6c57ff678af8bac36b474bd7a15fc130c8863e16ae78aa5ef0194bf5"
+    },
+    {
+      "bytes": 1795,
+      "character_id": 54,
+      "file": "assets/converted/images/1091_missile_tank_m/54_alpha.png",
+      "sha256": "94924fae84e37ce1c76015440cc455d3d73fece09c097353337eaa5fdc05d3d6"
+    },
+    {
+      "bytes": 22420,
+      "character_id": 56,
+      "file": "assets/converted/images/1091_missile_tank_m/56.jpg",
+      "sha256": "2409450784bd959ec515aac671a152ea79d4cfaeed9ec74538fc2f3a53c15077"
+    },
+    {
+      "bytes": 3017,
+      "character_id": 56,
+      "file": "assets/converted/images/1091_missile_tank_m/56_alpha.png",
+      "sha256": "ea78bce507b7f38b3d415e2affe000fd32578d4614a8cb99dc284686e949b0e0"
+    },
+    {
+      "bytes": 22803,
+      "character_id": 58,
+      "file": "assets/converted/images/1091_missile_tank_m/58.jpg",
+      "sha256": "32178deb9573244360c316c9bfaa4566920894446307b45df643d215c1c534cc"
+    },
+    {
+      "bytes": 4983,
+      "character_id": 58,
+      "file": "assets/converted/images/1091_missile_tank_m/58_alpha.png",
+      "sha256": "d51e038aa741ec6fc43b6c6a435ad40a9ef88acd7f9a05571e1483e012500561"
+    },
+    {
+      "bytes": 23363,
+      "character_id": 60,
+      "file": "assets/converted/images/1091_missile_tank_m/60.jpg",
+      "sha256": "e1454e6fb60ed9b634fd4a5e09df21e8d865cb11bafb730826f6370cbb0ac17e"
+    },
+    {
+      "bytes": 3861,
+      "character_id": 60,
+      "file": "assets/converted/images/1091_missile_tank_m/60_alpha.png",
+      "sha256": "ee5b0f06015c5b4c9f2da280163ef1c6458d02160698961560ad0456f295b348"
+    },
+    {
+      "bytes": 14812,
+      "character_id": 63,
+      "file": "assets/converted/images/1091_missile_tank_m/63.jpg",
+      "sha256": "447c389d07f5c8803a80bb77b05ba7fc667fbdca3eadea760b6c8a185cb4efce"
+    },
+    {
+      "bytes": 728,
+      "character_id": 63,
+      "file": "assets/converted/images/1091_missile_tank_m/63_alpha.png",
+      "sha256": "486bfed07b542ba960e35f604d3aa3c646a77694d0c1ffa2b7f4dc918c40ba9a"
+    },
+    {
+      "bytes": 15776,
+      "character_id": 65,
+      "file": "assets/converted/images/1091_missile_tank_m/65.jpg",
+      "sha256": "33d346e652f7678f1770dd2d39de4f156c1883aafbf3c81310b103d45b9e59dc"
+    },
+    {
+      "bytes": 1691,
+      "character_id": 65,
+      "file": "assets/converted/images/1091_missile_tank_m/65_alpha.png",
+      "sha256": "bf7f4f2e95ee7df5cc2f41c7f6c19a6728ab511a8600772493df61047ae7efd4"
+    },
+    {
+      "bytes": 15770,
+      "character_id": 67,
+      "file": "assets/converted/images/1091_missile_tank_m/67.jpg",
+      "sha256": "5acd3a4c5475769368c7fe3bf01174bbe6b25ba6c90f4cb4fbaf2cf5c596f443"
+    },
+    {
+      "bytes": 3022,
+      "character_id": 67,
+      "file": "assets/converted/images/1091_missile_tank_m/67_alpha.png",
+      "sha256": "4fa4ceef87e4bcd572e5eaa58a3c4ff9b6c944950273375612089ad25a9f72da"
+    },
+    {
+      "bytes": 15710,
+      "character_id": 69,
+      "file": "assets/converted/images/1091_missile_tank_m/69.jpg",
+      "sha256": "edda870256346dd7228632c29ff4e3748a22148e6ff2830273c787e97a53cc17"
+    },
+    {
+      "bytes": 1780,
+      "character_id": 69,
+      "file": "assets/converted/images/1091_missile_tank_m/69_alpha.png",
+      "sha256": "48f591d452b85b017af9588f520fa7d743dc24b36acc342ebfc2c1709319330c"
+    },
+    {
+      "bytes": 20484,
+      "character_id": 72,
+      "file": "assets/converted/images/1091_missile_tank_m/72.jpg",
+      "sha256": "b8baf114c86c454b65092e5d6e4f48d4b03650fbfe86eb1a1a4740ac2b6204ad"
+    },
+    {
+      "bytes": 1826,
+      "character_id": 72,
+      "file": "assets/converted/images/1091_missile_tank_m/72_alpha.png",
+      "sha256": "17ad42e9d219e48675e1dbc0cefe3467288b849341e3d4db831397dd5ad27e10"
+    },
+    {
+      "bytes": 20041,
+      "character_id": 74,
+      "file": "assets/converted/images/1091_missile_tank_m/74.jpg",
+      "sha256": "f8ae68d021faa1369b9da58f386018fded820e6682214cff7788defa31ae689b"
+    },
+    {
+      "bytes": 1973,
+      "character_id": 74,
+      "file": "assets/converted/images/1091_missile_tank_m/74_alpha.png",
+      "sha256": "0a949f13dbad070265a9f16205b19bfa4dcc0e963876d806cb2f7b5a4a3eb62c"
+    },
+    {
+      "bytes": 19927,
+      "character_id": 76,
+      "file": "assets/converted/images/1091_missile_tank_m/76.jpg",
+      "sha256": "b1796cbf55c7c32014c3bd28b1fd9fef7b03e379a42966b7e5303c7a0068718a"
+    },
+    {
+      "bytes": 1911,
+      "character_id": 76,
+      "file": "assets/converted/images/1091_missile_tank_m/76_alpha.png",
+      "sha256": "dd7c0d1e622c4b3cf131f9f4bfaa82b0b98942f879b2dcfd11bca2d66438c86b"
+    },
+    {
+      "bytes": 7814,
+      "character_id": 78,
+      "file": "assets/converted/images/1091_missile_tank_m/78.jpg",
+      "sha256": "6dd8a35986e6d8ecfd0600fd8fff394b67adf2cd72e341e262c2e339a47a8401"
+    },
+    {
+      "bytes": 3634,
+      "character_id": 78,
+      "file": "assets/converted/images/1091_missile_tank_m/78_alpha.png",
+      "sha256": "c1f4649159e1c652df256e1c5625d516acdf8a0fba0b6a91cab06df84d96a4eb"
+    },
+    {
+      "bytes": 20000,
+      "character_id": 80,
+      "file": "assets/converted/images/1091_missile_tank_m/80.jpg",
+      "sha256": "b61abf2b57a5c4cfd006a5c0b3434409383cf56fa05e58b96f91ff45236ffa50"
+    },
+    {
+      "bytes": 1745,
+      "character_id": 80,
+      "file": "assets/converted/images/1091_missile_tank_m/80_alpha.png",
+      "sha256": "d4fe00cc0ff57aef290f3da4bf2f10f78e66f54d7e961d0af9b8e7369fe1e3bd"
+    },
+    {
+      "bytes": 22807,
+      "character_id": 82,
+      "file": "assets/converted/images/1091_missile_tank_m/82.jpg",
+      "sha256": "33c95959fd96fbf6ef1a01f84ac5ec44522f089550a4895984dc2738ee4de64e"
+    },
+    {
+      "bytes": 14856,
+      "character_id": 82,
+      "file": "assets/converted/images/1091_missile_tank_m/82_alpha.png",
+      "sha256": "661e1cec87103fd37b51f9ae1d4957638f78ac2e7176e9f72f1d542bfe316968"
+    },
+    {
+      "bytes": 13003,
+      "character_id": 84,
+      "file": "assets/converted/images/1091_missile_tank_m/84.jpg",
+      "sha256": "ed7d48bb2366ea70a0a42ce97eb53b5317b4919b41f0e06a933c54ae1754776d"
+    },
+    {
+      "bytes": 9750,
+      "character_id": 84,
+      "file": "assets/converted/images/1091_missile_tank_m/84_alpha.png",
+      "sha256": "4d1c572707756d35dc5de6cf3c8a9bd9100d2259b25313943ee2bf24277af953"
+    },
+    {
+      "bytes": 12671,
+      "character_id": 86,
+      "file": "assets/converted/images/1091_missile_tank_m/86.jpg",
+      "sha256": "e7f467249cb299fe5c11ea76f2a328a7fdd7393db274912f3ed0e93070e7f6a3"
+    },
+    {
+      "bytes": 9052,
+      "character_id": 86,
+      "file": "assets/converted/images/1091_missile_tank_m/86_alpha.png",
+      "sha256": "23d52558049685693fb34768496802b572facc81591562b8a7f25fbb1b4439ae"
+    },
+    {
+      "bytes": 11844,
+      "character_id": 88,
+      "file": "assets/converted/images/1091_missile_tank_m/88.jpg",
+      "sha256": "5b6a122d48411f515ad9b6ce8de331a18f23597d079ff2d92ee71091bb294adb"
+    },
+    {
+      "bytes": 8097,
+      "character_id": 88,
+      "file": "assets/converted/images/1091_missile_tank_m/88_alpha.png",
+      "sha256": "3c0dd55aa1b85eb3a7dbf57112dd21e5217ccc9a91391d16a23f9837f3eae5e8"
+    },
+    {
+      "bytes": 14655,
+      "character_id": 90,
+      "file": "assets/converted/images/1091_missile_tank_m/90.jpg",
+      "sha256": "9cd79a0fe275535dacea969e28e711535a110f665b5477674459d6e53c1f1d0d"
+    },
+    {
+      "bytes": 7355,
+      "character_id": 90,
+      "file": "assets/converted/images/1091_missile_tank_m/90_alpha.png",
+      "sha256": "40ab22dc4b61a7ae6c2abe1097ac9d20456f0f733ff30acba2bf16510d7b6501"
+    },
+    {
+      "bytes": 14729,
+      "character_id": 92,
+      "file": "assets/converted/images/1091_missile_tank_m/92.jpg",
+      "sha256": "d0a25100732fa76b84ee444c1febbf3b4d8dabfe3fd58335069a28294d4877a0"
+    },
+    {
+      "bytes": 7391,
+      "character_id": 92,
+      "file": "assets/converted/images/1091_missile_tank_m/92_alpha.png",
+      "sha256": "779eb1c321ba2c77f1570a6263cef77df2f5641a0b8c547d8b0cb446bfe6eabd"
+    },
+    {
+      "bytes": 13062,
+      "character_id": 94,
+      "file": "assets/converted/images/1091_missile_tank_m/94.jpg",
+      "sha256": "b61bb580c0fe364d3c34e23c2026ff6e8593c39fea91ae1c7e5ebbff23ff44e7"
+    },
+    {
+      "bytes": 8295,
+      "character_id": 94,
+      "file": "assets/converted/images/1091_missile_tank_m/94_alpha.png",
+      "sha256": "18436ca6435253155bafe3e99905eb480b052aedd1dc8ff59068b054627b9ad0"
+    },
+    {
+      "bytes": 11848,
+      "character_id": 96,
+      "file": "assets/converted/images/1091_missile_tank_m/96.jpg",
+      "sha256": "d62f8c3a97594bd42dfaae4b0e1c2fefab07ddcb057237c07cbc471b99f9fe59"
+    },
+    {
+      "bytes": 8265,
+      "character_id": 96,
+      "file": "assets/converted/images/1091_missile_tank_m/96_alpha.png",
+      "sha256": "c8dfad912a98c290c8cc1a9969dc7324fe9a56015fdce86c2086e31f6a367d24"
+    },
+    {
+      "bytes": 10832,
+      "character_id": 98,
+      "file": "assets/converted/images/1091_missile_tank_m/98.jpg",
+      "sha256": "aec8bf45a28061a176469f2be28ad4e1cd759ecdbf87aa9ec0b9659b88c904a0"
+    },
+    {
+      "bytes": 8660,
+      "character_id": 98,
+      "file": "assets/converted/images/1091_missile_tank_m/98_alpha.png",
+      "sha256": "d51a2e8242c20da84a0afd544b412dbcb54f2532fbe223be39db04a659acbaf3"
+    },
+    {
+      "bytes": 10594,
+      "character_id": 100,
+      "file": "assets/converted/images/1091_missile_tank_m/100.jpg",
+      "sha256": "e2459156846dd743ed8ccd42c961fab6a0a06388955b3632bbdcc55793692597"
+    },
+    {
+      "bytes": 8522,
+      "character_id": 100,
+      "file": "assets/converted/images/1091_missile_tank_m/100_alpha.png",
+      "sha256": "fd12e76bea123971bffad33f9d511479412b524ff74585aa969cc90d191dd5fb"
+    },
+    {
+      "bytes": 10128,
+      "character_id": 102,
+      "file": "assets/converted/images/1091_missile_tank_m/102.jpg",
+      "sha256": "5195e0eab11a3b01ad6e804b1fc7d373c4c4bd91d72196b153b0b9bf38008675"
+    },
+    {
+      "bytes": 8074,
+      "character_id": 102,
+      "file": "assets/converted/images/1091_missile_tank_m/102_alpha.png",
+      "sha256": "527ab6829b398c9ad78cdb027c943d24a7918b98363e7b45724d1a594680c08b"
+    },
+    {
+      "bytes": 9570,
+      "character_id": 104,
+      "file": "assets/converted/images/1091_missile_tank_m/104.jpg",
+      "sha256": "6c58b898597a49143030ed04f16f51ab9ee70b5b162d7d722487159be41b4b54"
+    },
+    {
+      "bytes": 7681,
+      "character_id": 104,
+      "file": "assets/converted/images/1091_missile_tank_m/104_alpha.png",
+      "sha256": "585137a6d5f94c37b5f86a17c3890b5f34587ae8552b6777e3046fbe6623640d"
+    },
+    {
+      "bytes": 9058,
+      "character_id": 106,
+      "file": "assets/converted/images/1091_missile_tank_m/106.jpg",
+      "sha256": "c1fe62094d73142b1c8897827e663cb52a82b99bdb74dc8a1f379131c0b59e4d"
+    },
+    {
+      "bytes": 7347,
+      "character_id": 106,
+      "file": "assets/converted/images/1091_missile_tank_m/106_alpha.png",
+      "sha256": "cc335a008c2bbed0f8302eb6a61702ecf4fa2b8e1d127bf38154b7b6888e0fb9"
+    },
+    {
+      "bytes": 8434,
+      "character_id": 108,
+      "file": "assets/converted/images/1091_missile_tank_m/108.jpg",
+      "sha256": "6cd05f1427658ab51fd04f548cfc9103a70037728497db650057c4f798db3102"
+    },
+    {
+      "bytes": 6803,
+      "character_id": 108,
+      "file": "assets/converted/images/1091_missile_tank_m/108_alpha.png",
+      "sha256": "c7b1b65521b64b8818544bfd1ba199f07050afecc4504d4f6857367e9eae976a"
+    },
+    {
+      "bytes": 7569,
+      "character_id": 110,
+      "file": "assets/converted/images/1091_missile_tank_m/110.jpg",
+      "sha256": "3dbb32754a5ba7c4dd00ba2034e17a11b292db4e92260ebff46777ae9f1a1787"
+    },
+    {
+      "bytes": 6276,
+      "character_id": 110,
+      "file": "assets/converted/images/1091_missile_tank_m/110_alpha.png",
+      "sha256": "e37d4dc9b6d553bf7224677be7dea8b83cfb03c3141ebee98c0e9f9b695c568b"
+    },
+    {
+      "bytes": 7067,
+      "character_id": 112,
+      "file": "assets/converted/images/1091_missile_tank_m/112.jpg",
+      "sha256": "b4bdd9a7dc32241f12730d4eb5d639f6f0fb9872e887952967c2321ca08a1b34"
+    },
+    {
+      "bytes": 5918,
+      "character_id": 112,
+      "file": "assets/converted/images/1091_missile_tank_m/112_alpha.png",
+      "sha256": "199e4e21682c4e5a65dd7c7bb8cd7cc83750d594db9b19a4521652c1923f1a9b"
+    },
+    {
+      "bytes": 6120,
+      "character_id": 114,
+      "file": "assets/converted/images/1091_missile_tank_m/114.jpg",
+      "sha256": "798f21b9cc4ef175bd83b56b7a4dbb98876d07b11a1e0514d5c1a54e522ef4ca"
+    },
+    {
+      "bytes": 5432,
+      "character_id": 114,
+      "file": "assets/converted/images/1091_missile_tank_m/114_alpha.png",
+      "sha256": "d0817159998c397ff8e5890f2109de968214b1179fd2d2e0a32dc5eb6ae34e33"
+    },
+    {
+      "bytes": 5280,
+      "character_id": 116,
+      "file": "assets/converted/images/1091_missile_tank_m/116.jpg",
+      "sha256": "50a58d73aa6bd0af0bb17d418c9414338b2eb84f6f54859ca55e13cdefbcc6b7"
+    },
+    {
+      "bytes": 4792,
+      "character_id": 116,
+      "file": "assets/converted/images/1091_missile_tank_m/116_alpha.png",
+      "sha256": "d4c96e19d075d32d24825d0fe6cb4c7557a85671b37e52cc37670c56cda2f062"
+    },
+    {
+      "bytes": 4128,
+      "character_id": 118,
+      "file": "assets/converted/images/1091_missile_tank_m/118.jpg",
+      "sha256": "cb0b651852471c6ff0ba4aa3195ae334f770f86c413cb6f73c412f230b035009"
+    },
+    {
+      "bytes": 3691,
+      "character_id": 118,
+      "file": "assets/converted/images/1091_missile_tank_m/118_alpha.png",
+      "sha256": "ac3368cdde23162efe13a34d2b6513d0f5553e2f8baee40aa97af89e661bd7eb"
+    },
+    {
+      "bytes": 3240,
+      "character_id": 120,
+      "file": "assets/converted/images/1091_missile_tank_m/120.jpg",
+      "sha256": "c83c3e5dd1d1c14a202e592e2894acd3613d0e295d0a6a87c64b733cc601ef7a"
+    },
+    {
+      "bytes": 2895,
+      "character_id": 120,
+      "file": "assets/converted/images/1091_missile_tank_m/120_alpha.png",
+      "sha256": "331b047ad4ee3effca346fc237ff30748915233d9a0554287f09f0de998ed42e"
+    },
+    {
+      "bytes": 2202,
+      "character_id": 122,
+      "file": "assets/converted/images/1091_missile_tank_m/122.jpg",
+      "sha256": "d8f9ea592b748f02dba05efdade823b9907b10f25fb85ad081351028f443c548"
+    },
+    {
+      "bytes": 1815,
+      "character_id": 122,
+      "file": "assets/converted/images/1091_missile_tank_m/122_alpha.png",
+      "sha256": "9331246e8f07dfde8dbe645242db54e104857df50f8c64233c538e0261c9d9de"
+    },
+    {
+      "bytes": 13666,
+      "character_id": 125,
+      "file": "assets/converted/images/1091_missile_tank_m/125.jpg",
+      "sha256": "3d20152e8775e06b05da4a764706a218e52020ff4f67d42c0d6b7e1b566c03ec"
+    },
+    {
+      "bytes": 850,
+      "character_id": 125,
+      "file": "assets/converted/images/1091_missile_tank_m/125_alpha.png",
+      "sha256": "17dc69aff4fc100b922d6e8340f54bc90b508a24449ba7415c7b44f0d21a0b92"
+    },
+    {
+      "bytes": 14660,
+      "character_id": 127,
+      "file": "assets/converted/images/1091_missile_tank_m/127.jpg",
+      "sha256": "0403241faa82479c8f24af5e0437b9112fbca75aa2eccab052b73b95ba116175"
+    },
+    {
+      "bytes": 1012,
+      "character_id": 127,
+      "file": "assets/converted/images/1091_missile_tank_m/127_alpha.png",
+      "sha256": "956af6ea873ab4651ce8dc484d50fd98e7945994455bfd1c7eb9bf63f11800b3"
+    },
+    {
+      "bytes": 15584,
+      "character_id": 129,
+      "file": "assets/converted/images/1091_missile_tank_m/129.jpg",
+      "sha256": "7205d3c162730502e4454f801afddca0709e414b4b4c6b60308e6e9ca03754ef"
+    },
+    {
+      "bytes": 1308,
+      "character_id": 129,
+      "file": "assets/converted/images/1091_missile_tank_m/129_alpha.png",
+      "sha256": "e0e3ddf31da78658c049c83b87617762351b13c75fc860e5f3ea01bbe9607393"
+    },
+    {
+      "bytes": 17071,
+      "character_id": 131,
+      "file": "assets/converted/images/1091_missile_tank_m/131.jpg",
+      "sha256": "a2901ce582a84c1f1ea158eaa971008c9f0ed76e1dc583a27c493d593ab60fc7"
+    },
+    {
+      "bytes": 1447,
+      "character_id": 131,
+      "file": "assets/converted/images/1091_missile_tank_m/131_alpha.png",
+      "sha256": "e7d96a06b0980a68bf9795c0bca888d92f24d2d62a05360273d2a0ed787d768d"
+    },
+    {
+      "bytes": 15678,
+      "character_id": 133,
+      "file": "assets/converted/images/1091_missile_tank_m/133.jpg",
+      "sha256": "e17992e563ad9bd14205f7ed007d822ec883936abd7db7be7086ba00162dc371"
+    },
+    {
+      "bytes": 1237,
+      "character_id": 133,
+      "file": "assets/converted/images/1091_missile_tank_m/133_alpha.png",
+      "sha256": "985d2701b3bd4fb08c5c0717e6baf0c3a25b55a161660de6d07f722a24e0a768"
+    },
+    {
+      "bytes": 17155,
+      "character_id": 135,
+      "file": "assets/converted/images/1091_missile_tank_m/135.jpg",
+      "sha256": "10072c14c0e9408cc08f03ef39cebcad74e6a982fa413e19fb80d79ed85c38fa"
+    },
+    {
+      "bytes": 1512,
+      "character_id": 135,
+      "file": "assets/converted/images/1091_missile_tank_m/135_alpha.png",
+      "sha256": "7930cbde516cd7f10e42c8ed25499d19af7e1fd4b02d88814a05b78785d2fa9a"
+    },
+    {
+      "bytes": 15461,
+      "character_id": 137,
+      "file": "assets/converted/images/1091_missile_tank_m/137.jpg",
+      "sha256": "14f55596eae3a04d320a2e8908522c24aa46bd639adeb97cf30c70ffae0b16ef"
+    },
+    {
+      "bytes": 1277,
+      "character_id": 137,
+      "file": "assets/converted/images/1091_missile_tank_m/137_alpha.png",
+      "sha256": "34f2335ab1c0586ac47e496db5ed6c94818e957030711945781869b8f273f6cd"
+    },
+    {
+      "bytes": 17556,
+      "character_id": 139,
+      "file": "assets/converted/images/1091_missile_tank_m/139.jpg",
+      "sha256": "d74400829ed677962f73b014336bd1f3a5a3702c6311885013ad441a2447b7aa"
+    },
+    {
+      "bytes": 1423,
+      "character_id": 139,
+      "file": "assets/converted/images/1091_missile_tank_m/139_alpha.png",
+      "sha256": "f8e388dd692a359d8de040d5bd12be8f11b595849370846a20ed666cb47a45b1"
+    },
+    {
+      "bytes": 15161,
+      "character_id": 141,
+      "file": "assets/converted/images/1091_missile_tank_m/141.jpg",
+      "sha256": "ee17b6c96ae0b61ecfc2ae1fdd4f2d88ce824a5563d124b512fd9c1b0532aa7c"
+    },
+    {
+      "bytes": 1350,
+      "character_id": 141,
+      "file": "assets/converted/images/1091_missile_tank_m/141_alpha.png",
+      "sha256": "85d6293a564b8db5c8f6a8305ea61efb6a28c7544e5f6fd7d333101da19add7d"
+    },
+    {
+      "bytes": 17572,
+      "character_id": 143,
+      "file": "assets/converted/images/1091_missile_tank_m/143.jpg",
+      "sha256": "d5657392db88e5a761c1fc4178c9cd8bede651d9e4fca1bcf8b66102e606f634"
+    },
+    {
+      "bytes": 1499,
+      "character_id": 143,
+      "file": "assets/converted/images/1091_missile_tank_m/143_alpha.png",
+      "sha256": "2d95bd5115380d947835bca4b7b20151a39b813c595e57963599c96c5a148f1f"
+    },
+    {
+      "bytes": 15220,
+      "character_id": 145,
+      "file": "assets/converted/images/1091_missile_tank_m/145.jpg",
+      "sha256": "6716f1ad2e8f16dcf0634dcbf1c4f3dd453eb47b9c99de35c76844d72dde2e63"
+    },
+    {
+      "bytes": 1357,
+      "character_id": 145,
+      "file": "assets/converted/images/1091_missile_tank_m/145_alpha.png",
+      "sha256": "3dc9bd114f6173fd2258ffa42c15c6668b7952df60bf286fa9d56c2a0d83a79d"
+    },
+    {
+      "bytes": 17529,
+      "character_id": 147,
+      "file": "assets/converted/images/1091_missile_tank_m/147.jpg",
+      "sha256": "327ac9f5901b1f177d67ed8da8ebaee33ce1f682d0ee54f9fbabffc959217585"
+    },
+    {
+      "bytes": 1435,
+      "character_id": 147,
+      "file": "assets/converted/images/1091_missile_tank_m/147_alpha.png",
+      "sha256": "f69aaa86c37b3e04da6bb78e39b1a4c6836a88dd2212bacd318c4ae643751cd2"
+    },
+    {
+      "bytes": 14933,
+      "character_id": 149,
+      "file": "assets/converted/images/1091_missile_tank_m/149.jpg",
+      "sha256": "7b6f1cc410ee7e0b14038085f5e1ff877b179e738c371f713287b581ed210cc9"
+    },
+    {
+      "bytes": 1408,
+      "character_id": 149,
+      "file": "assets/converted/images/1091_missile_tank_m/149_alpha.png",
+      "sha256": "75977da3fac8a1147e7bb73ea82cf8ced08cdcd04921bf9fb7689a217e799833"
+    },
+    {
+      "bytes": 16360,
+      "character_id": 151,
+      "file": "assets/converted/images/1091_missile_tank_m/151.jpg",
+      "sha256": "18153f1fdb5ba2234ba03d36f04aadcca2c750daf12dfc9358e020154661d8bb"
+    },
+    {
+      "bytes": 1314,
+      "character_id": 151,
+      "file": "assets/converted/images/1091_missile_tank_m/151_alpha.png",
+      "sha256": "e8b5fd0b5e57ca0e835f44a905aef8c6f799fd9cfdb8d5f966fd5f12f9d5d7b5"
+    },
+    {
+      "bytes": 13666,
+      "character_id": 153,
+      "file": "assets/converted/images/1091_missile_tank_m/153.jpg",
+      "sha256": "3d20152e8775e06b05da4a764706a218e52020ff4f67d42c0d6b7e1b566c03ec"
+    },
+    {
+      "bytes": 850,
+      "character_id": 153,
+      "file": "assets/converted/images/1091_missile_tank_m/153_alpha.png",
+      "sha256": "17dc69aff4fc100b922d6e8340f54bc90b508a24449ba7415c7b44f0d21a0b92"
+    },
+    {
+      "bytes": 19606,
+      "character_id": 156,
+      "file": "assets/converted/images/1091_missile_tank_m/156.jpg",
+      "sha256": "3234520ef11d47d499c03a3ee317d18917e59ab08a8ca5ab3b326c00265f77cb"
+    },
+    {
+      "bytes": 2247,
+      "character_id": 156,
+      "file": "assets/converted/images/1091_missile_tank_m/156_alpha.png",
+      "sha256": "a473bf83827771fa25037d3a976938e068ef2bbb767e738a74054a21e3e90607"
+    },
+    {
+      "bytes": 20244,
+      "character_id": 158,
+      "file": "assets/converted/images/1091_missile_tank_m/158.jpg",
+      "sha256": "15990134f72c3a4e7636870fd65919c969b1073cb9009322b03708487bb7f192"
+    },
+    {
+      "bytes": 2326,
+      "character_id": 158,
+      "file": "assets/converted/images/1091_missile_tank_m/158_alpha.png",
+      "sha256": "633c99c51c99ecce0a117db9399fa2e2a02adbce8a1e21f20128c39be28923ec"
+    },
+    {
+      "bytes": 21048,
+      "character_id": 160,
+      "file": "assets/converted/images/1091_missile_tank_m/160.jpg",
+      "sha256": "3a6747377a240dce55baaf57e4f2474f19ef9764d41b2b77b0c46dd2d925ad56"
+    },
+    {
+      "bytes": 2947,
+      "character_id": 160,
+      "file": "assets/converted/images/1091_missile_tank_m/160_alpha.png",
+      "sha256": "9ca8ebb3becb6d9d011f4e83f3b9f1ae7fde6372524be5399af6109a4874cb91"
+    },
+    {
+      "bytes": 24239,
+      "character_id": 162,
+      "file": "assets/converted/images/1091_missile_tank_m/162.jpg",
+      "sha256": "f5f5d7fff5e67e660522ca41f4d2fe1c1d0cb38434b03d63818bfc8e346b9cf0"
+    },
+    {
+      "bytes": 4337,
+      "character_id": 162,
+      "file": "assets/converted/images/1091_missile_tank_m/162_alpha.png",
+      "sha256": "ee8ed8422e8b0d8704ce616fb4eb7c4c598b2bf9975d8028030acc2aa7db1c5b"
+    },
+    {
+      "bytes": 21592,
+      "character_id": 164,
+      "file": "assets/converted/images/1091_missile_tank_m/164.jpg",
+      "sha256": "1451877029a22bb7c1d2c169953ffdb3e47713ca5404e535507b43bc63a0c602"
+    },
+    {
+      "bytes": 4073,
+      "character_id": 164,
+      "file": "assets/converted/images/1091_missile_tank_m/164_alpha.png",
+      "sha256": "ef312ac7de81ff8b89ceaf2a3af5ff30b2f28b2417f741f384acf31d69a6339c"
+    },
+    {
+      "bytes": 23313,
+      "character_id": 166,
+      "file": "assets/converted/images/1091_missile_tank_m/166.jpg",
+      "sha256": "4b6bc58ca55ce34fa0e953f06b00656b72d17916831e5cb79bc6a7a39a791d89"
+    },
+    {
+      "bytes": 3661,
+      "character_id": 166,
+      "file": "assets/converted/images/1091_missile_tank_m/166_alpha.png",
+      "sha256": "04bdc25addd38d1b84a624a1e22e3496a62adfa035cc86ae02c5a50b12f82213"
+    },
+    {
+      "bytes": 20456,
+      "character_id": 168,
+      "file": "assets/converted/images/1091_missile_tank_m/168.jpg",
+      "sha256": "27328eb401e301c4dfe0cecaa420a89a74f6590ccd68dabf71620701333e88cd"
+    },
+    {
+      "bytes": 2733,
+      "character_id": 168,
+      "file": "assets/converted/images/1091_missile_tank_m/168_alpha.png",
+      "sha256": "91ec028b1abdb574f025ff80ae9da9ba3629307c8f4a4dd76cab0e4f0ba18d0f"
+    },
+    {
+      "bytes": 23621,
+      "character_id": 170,
+      "file": "assets/converted/images/1091_missile_tank_m/170.jpg",
+      "sha256": "08f1bf349c659dd4f87efd235a9b82f1d4dd39fab53a95c57908d8b4bfce287a"
+    },
+    {
+      "bytes": 3822,
+      "character_id": 170,
+      "file": "assets/converted/images/1091_missile_tank_m/170_alpha.png",
+      "sha256": "cf9e3f63e344fefebc90182cd12e1b2aab1b67da34e418d4240a6af15d65b58a"
+    },
+    {
+      "bytes": 21108,
+      "character_id": 172,
+      "file": "assets/converted/images/1091_missile_tank_m/172.jpg",
+      "sha256": "9c0a777e588e73e019003bd1d71fe44c171316fc731da481da78ab860de220b0"
+    },
+    {
+      "bytes": 3895,
+      "character_id": 172,
+      "file": "assets/converted/images/1091_missile_tank_m/172_alpha.png",
+      "sha256": "d98f4fede695367ebac1a15580fd0d06f6bc7cf84404ecfa7a43f18ec9498206"
+    },
+    {
+      "bytes": 22931,
+      "character_id": 174,
+      "file": "assets/converted/images/1091_missile_tank_m/174.jpg",
+      "sha256": "b0680d16e5e295758173bc481c7269dda3a5685825d6bed6e6c906a01f5dcdec"
+    },
+    {
+      "bytes": 3813,
+      "character_id": 174,
+      "file": "assets/converted/images/1091_missile_tank_m/174_alpha.png",
+      "sha256": "28eb389270ff25ef83f14cf527d2c57c47a2a1f0555aee22e823b2d1a4e648e8"
+    },
+    {
+      "bytes": 20658,
+      "character_id": 176,
+      "file": "assets/converted/images/1091_missile_tank_m/176.jpg",
+      "sha256": "a4bcc766ff9bc5aa733ac06f55222e9b16a344dbdb4b7e7aadd5502c8297ca6f"
+    },
+    {
+      "bytes": 2790,
+      "character_id": 176,
+      "file": "assets/converted/images/1091_missile_tank_m/176_alpha.png",
+      "sha256": "f3194d6d028ec876da4f678e5add9a2542d0b6e1db5cf41c9fc42616f116b9f1"
+    },
+    {
+      "bytes": 22915,
+      "character_id": 178,
+      "file": "assets/converted/images/1091_missile_tank_m/178.jpg",
+      "sha256": "bac2fe4b5f2ee14bf564113adb75cf7bd11463289b1ecf87eb3cf04754581075"
+    },
+    {
+      "bytes": 3482,
+      "character_id": 178,
+      "file": "assets/converted/images/1091_missile_tank_m/178_alpha.png",
+      "sha256": "ca0fc01948735eea8b2d9e755ec6d90dbb1fa5b1a3105cc28d187fd0094a02db"
+    },
+    {
+      "bytes": 20778,
+      "character_id": 180,
+      "file": "assets/converted/images/1091_missile_tank_m/180.jpg",
+      "sha256": "748285e3215d4a14d95728d81e4854d6fe65f012c671534f0bb56a2a77a07477"
+    },
+    {
+      "bytes": 3581,
+      "character_id": 180,
+      "file": "assets/converted/images/1091_missile_tank_m/180_alpha.png",
+      "sha256": "1be6bda7a17225893e81b17dafc63cf921be4d4054b44dee690a1f2b23a3e7c3"
+    },
+    {
+      "bytes": 22122,
+      "character_id": 182,
+      "file": "assets/converted/images/1091_missile_tank_m/182.jpg",
+      "sha256": "1116279637c1c7a0a9909161b382b83aa1bdb867fb74f9d0de0acd8f830c4283"
+    },
+    {
+      "bytes": 3795,
+      "character_id": 182,
+      "file": "assets/converted/images/1091_missile_tank_m/182_alpha.png",
+      "sha256": "7109c0df0ba78ec8ae385db577ad4154e48ef1ca3b86ba5949e7cdd24201a37d"
+    },
+    {
+      "bytes": 19057,
+      "character_id": 185,
+      "file": "assets/converted/images/1091_missile_tank_m/185.jpg",
+      "sha256": "d047d2a0b2926d81111e432a945ac9ab346870c1112c05f3158a2af210ca3664"
+    },
+    {
+      "bytes": 1750,
+      "character_id": 185,
+      "file": "assets/converted/images/1091_missile_tank_m/185_alpha.png",
+      "sha256": "4a2c62fc2ce0e1504f68575385da0eb2764bedfaf74ea0dc25d994c94ed03bb9"
+    },
+    {
+      "bytes": 20093,
+      "character_id": 187,
+      "file": "assets/converted/images/1091_missile_tank_m/187.jpg",
+      "sha256": "e95caa0f0ecfbe5504deb40c4de728ab8f8e6a2d68be4da1f7363806587850b2"
+    },
+    {
+      "bytes": 2592,
+      "character_id": 187,
+      "file": "assets/converted/images/1091_missile_tank_m/187_alpha.png",
+      "sha256": "9713e5a8af31ab7bf80f444379c5c152ab6965278fe6ef317b34b1eaff8062bb"
+    },
+    {
+      "bytes": 20338,
+      "character_id": 189,
+      "file": "assets/converted/images/1091_missile_tank_m/189.jpg",
+      "sha256": "71617befc8fd8bbd994f54d0b22b3aaab7c93a16193ca6987743d88d6b7ea798"
+    },
+    {
+      "bytes": 3661,
+      "character_id": 189,
+      "file": "assets/converted/images/1091_missile_tank_m/189_alpha.png",
+      "sha256": "e7ae9f6de8711f1bf8f0cdebf0f053163578fa6ba03a2edab055c056c8ac02b0"
+    },
+    {
+      "bytes": 22158,
+      "character_id": 191,
+      "file": "assets/converted/images/1091_missile_tank_m/191.jpg",
+      "sha256": "9b3c6415c128d475b438af62a9c628ac6d4201084658a8f15095df52fb3ec126"
+    },
+    {
+      "bytes": 3937,
+      "character_id": 191,
+      "file": "assets/converted/images/1091_missile_tank_m/191_alpha.png",
+      "sha256": "c80a5e77b5207a04206d07e80ba5d7435f94634403298329f801404a8bb2c658"
+    },
+    {
+      "bytes": 21109,
+      "character_id": 193,
+      "file": "assets/converted/images/1091_missile_tank_m/193.jpg",
+      "sha256": "59e48428077f3d4b72b1d0ed4f6c8eb13cd377438bd69fd81f397cd1ff23005e"
+    },
+    {
+      "bytes": 3800,
+      "character_id": 193,
+      "file": "assets/converted/images/1091_missile_tank_m/193_alpha.png",
+      "sha256": "05dc535267a09a21cfec34a050f906ef159d62e39e8d85343f3802b89bc12ba2"
+    },
+    {
+      "bytes": 22316,
+      "character_id": 195,
+      "file": "assets/converted/images/1091_missile_tank_m/195.jpg",
+      "sha256": "d4710c4510ad1315806747d5e891c223f885307b5e0f2a5cc50ef45e066d486d"
+    },
+    {
+      "bytes": 3892,
+      "character_id": 195,
+      "file": "assets/converted/images/1091_missile_tank_m/195_alpha.png",
+      "sha256": "da3bf14c82526c4387cb0df16e82f063bad27e24eed1df0fa235fa4efa99c25f"
+    },
+    {
+      "bytes": 19858,
+      "character_id": 197,
+      "file": "assets/converted/images/1091_missile_tank_m/197.jpg",
+      "sha256": "cedc6ff1ef5f95eb1594ed777cb75300e4cb3d90032d0124acce12e16cc5faa4"
+    },
+    {
+      "bytes": 3509,
+      "character_id": 197,
+      "file": "assets/converted/images/1091_missile_tank_m/197_alpha.png",
+      "sha256": "5f76d72a2dd3c8f93449c80e05498856d6e1017356cdaf07f08cc100be7301c7"
+    },
+    {
+      "bytes": 22236,
+      "character_id": 199,
+      "file": "assets/converted/images/1091_missile_tank_m/199.jpg",
+      "sha256": "7f50bec6f4ce89b9c25f912f5b34e685e59f898b4aa2d9400efd14d3b80104c9"
+    },
+    {
+      "bytes": 3819,
+      "character_id": 199,
+      "file": "assets/converted/images/1091_missile_tank_m/199_alpha.png",
+      "sha256": "116a17753f1e1f32cb070c96026531185877c38702a5f3aaa99c69c319de07f8"
+    },
+    {
+      "bytes": 20066,
+      "character_id": 201,
+      "file": "assets/converted/images/1091_missile_tank_m/201.jpg",
+      "sha256": "3940636e8a4209a688bbf258780702fa63e70c7e7b4f5502eed6292fefd344c1"
+    },
+    {
+      "bytes": 3619,
+      "character_id": 201,
+      "file": "assets/converted/images/1091_missile_tank_m/201_alpha.png",
+      "sha256": "f88f7eebeb686ef5a54bf6fcff4a786694f135244c5e5e4cacd27487fd8a55a5"
+    },
+    {
+      "bytes": 22138,
+      "character_id": 203,
+      "file": "assets/converted/images/1091_missile_tank_m/203.jpg",
+      "sha256": "f0e14e2f4a3f5fcbe7afc828ec48a2a1148ea1e853078ca6218ef9865c87e626"
+    },
+    {
+      "bytes": 3806,
+      "character_id": 203,
+      "file": "assets/converted/images/1091_missile_tank_m/203_alpha.png",
+      "sha256": "51fbe23f7bf4ab91b82d323a3ab7f3c5eb09ff2b0ddf0fabee0bfa50106a9a7c"
+    },
+    {
+      "bytes": 19883,
+      "character_id": 205,
+      "file": "assets/converted/images/1091_missile_tank_m/205.jpg",
+      "sha256": "6e1a5ddab805ba3324547e8c480cebfa01404c889ea864f5ca1bdf37b46c48ad"
+    },
+    {
+      "bytes": 3448,
+      "character_id": 205,
+      "file": "assets/converted/images/1091_missile_tank_m/205_alpha.png",
+      "sha256": "72b71ad1b4398bb91e7dfa6b474d55be19f624be0f32fe979c2810badea1dfd5"
+    },
+    {
+      "bytes": 21681,
+      "character_id": 207,
+      "file": "assets/converted/images/1091_missile_tank_m/207.jpg",
+      "sha256": "be69aadd96852ef6cd76794eafd68bd8dd0349950e1a8b5d8fe404f2babf26ec"
+    },
+    {
+      "bytes": 3729,
+      "character_id": 207,
+      "file": "assets/converted/images/1091_missile_tank_m/207_alpha.png",
+      "sha256": "39df81e58ee0f7d7bc1c42b20d6dd95eba284f6844a14ba7f88df95e4ae1ea11"
+    },
+    {
+      "bytes": 19869,
+      "character_id": 209,
+      "file": "assets/converted/images/1091_missile_tank_m/209.jpg",
+      "sha256": "bd32204293483365e4c6dde1583efed7b00fa750815086da8a97ef1b6774c36e"
+    },
+    {
+      "bytes": 3610,
+      "character_id": 209,
+      "file": "assets/converted/images/1091_missile_tank_m/209_alpha.png",
+      "sha256": "6be8e7698347c927425cc71542e31f2c2b6dc5e320fb1b397417cb1b4c873d07"
+    },
+    {
+      "bytes": 21045,
+      "character_id": 211,
+      "file": "assets/converted/images/1091_missile_tank_m/211.jpg",
+      "sha256": "a6b83fd51fb63d2e450ff5d0cdaa64e02ad66adfdfd96fce3c210fbfabdda90d"
+    },
+    {
+      "bytes": 3330,
+      "character_id": 211,
+      "file": "assets/converted/images/1091_missile_tank_m/211_alpha.png",
+      "sha256": "c334a43ea1bd06bb1b1fc7fc2d227b18291cef414971a9e1926efd31336782ff"
+    },
+    {
+      "bytes": 18753,
+      "character_id": 213,
+      "file": "assets/converted/images/1091_missile_tank_m/213.jpg",
+      "sha256": "224d1d568ea5368145b7dc41ea1e1ae9e0bd8174e960bdf5f690b43c0f10e046"
+    },
+    {
+      "bytes": 1744,
+      "character_id": 213,
+      "file": "assets/converted/images/1091_missile_tank_m/213_alpha.png",
+      "sha256": "33bde7a6b37c81c76fb8c4d36e2998c74b71109b39904f2289c491ad6f3c7f33"
+    },
+    {
+      "bytes": 20530,
+      "character_id": 216,
+      "file": "assets/converted/images/1091_missile_tank_m/216.jpg",
+      "sha256": "8a260adb27a1b1485e5c28b624998332fd2be445057106215ac21ab1fac79fce"
+    },
+    {
+      "bytes": 1955,
+      "character_id": 216,
+      "file": "assets/converted/images/1091_missile_tank_m/216_alpha.png",
+      "sha256": "d9b884e4c15f768e7d5c3567ec6ff9f635a8e157a402bc97102388b252f61c97"
+    },
+    {
+      "bytes": 21549,
+      "character_id": 218,
+      "file": "assets/converted/images/1091_missile_tank_m/218.jpg",
+      "sha256": "5a4549c54923d6c0999e030fe636c1a7292aedba4ac05ef9ee25af7c2a25be67"
+    },
+    {
+      "bytes": 2604,
+      "character_id": 218,
+      "file": "assets/converted/images/1091_missile_tank_m/218_alpha.png",
+      "sha256": "0ddf30e4d13c4cd7fdcdc7ddf252b04cdae449558db6d5f41f1eb9b518bd053d"
+    },
+    {
+      "bytes": 21421,
+      "character_id": 220,
+      "file": "assets/converted/images/1091_missile_tank_m/220.jpg",
+      "sha256": "f21d1167f17b6b14d166f5e6ad903b49706050dba0752f13af76ad1d47882cbf"
+    },
+    {
+      "bytes": 4249,
+      "character_id": 220,
+      "file": "assets/converted/images/1091_missile_tank_m/220_alpha.png",
+      "sha256": "676b4ea6e2238c21c8010bc2d19acacef6c359d720a81904fffabd936a682188"
+    },
+    {
+      "bytes": 22857,
+      "character_id": 222,
+      "file": "assets/converted/images/1091_missile_tank_m/222.jpg",
+      "sha256": "483fc9f997d24a9d38efd778354a90641fad2ddb29024267a260268e1e2a0bb1"
+    },
+    {
+      "bytes": 4010,
+      "character_id": 222,
+      "file": "assets/converted/images/1091_missile_tank_m/222_alpha.png",
+      "sha256": "3d2629745d346818ad79b4407fe8a7788757871c89c97d9c3a28684b1c295e12"
+    },
+    {
+      "bytes": 21940,
+      "character_id": 224,
+      "file": "assets/converted/images/1091_missile_tank_m/224.jpg",
+      "sha256": "b5b2b0d45412f9e3c2e87ce021b1635fd4434eb94b974469bb30cbd2b46d5388"
+    },
+    {
+      "bytes": 4504,
+      "character_id": 224,
+      "file": "assets/converted/images/1091_missile_tank_m/224_alpha.png",
+      "sha256": "e501105a813b53dfacc383b7f16febb60e3887fed1d1bf1763993d11471c7390"
+    },
+    {
+      "bytes": 23940,
+      "character_id": 226,
+      "file": "assets/converted/images/1091_missile_tank_m/226.jpg",
+      "sha256": "e8c8576e67c1d875e72c1f83c292f92dcce5e0dbeb1df2c50e2be69453dea47c"
+    },
+    {
+      "bytes": 3815,
+      "character_id": 226,
+      "file": "assets/converted/images/1091_missile_tank_m/226_alpha.png",
+      "sha256": "d4295e967cc313b8128fd4e0b57cbb980c33d8d3fe817c34d49e4c48bf760492"
+    },
+    {
+      "bytes": 22012,
+      "character_id": 228,
+      "file": "assets/converted/images/1091_missile_tank_m/228.jpg",
+      "sha256": "9fa47da0b3f299b1e94ba175372e316bb7fa0b51e038f8749ea883238ee60e10"
+    },
+    {
+      "bytes": 3598,
+      "character_id": 228,
+      "file": "assets/converted/images/1091_missile_tank_m/228_alpha.png",
+      "sha256": "567e61b133e876de36db660d1e00c843e0cf4dad4c70fcfffdac1c3984548859"
+    },
+    {
+      "bytes": 22147,
+      "character_id": 230,
+      "file": "assets/converted/images/1091_missile_tank_m/230.jpg",
+      "sha256": "5316455cfb91bc5a92f02c21b82b28cb9a3bee72fa2212ad314b607906c88178"
+    },
+    {
+      "bytes": 3426,
+      "character_id": 230,
+      "file": "assets/converted/images/1091_missile_tank_m/230_alpha.png",
+      "sha256": "a3a734df64e8fcd8e519865bf4520dd678a6cb178a8363b723b92534d313e22a"
+    },
+    {
+      "bytes": 22193,
+      "character_id": 232,
+      "file": "assets/converted/images/1091_missile_tank_m/232.jpg",
+      "sha256": "570b92c9a345fcaf68dbb22bf613bc5a02636f0bf6b55842c5ad2918931b6362"
+    },
+    {
+      "bytes": 4656,
+      "character_id": 232,
+      "file": "assets/converted/images/1091_missile_tank_m/232_alpha.png",
+      "sha256": "491fa8a26607f4ea2ea3054ecbaa8af88e9e81528e522435ec88756556d62d3a"
+    },
+    {
+      "bytes": 24199,
+      "character_id": 234,
+      "file": "assets/converted/images/1091_missile_tank_m/234.jpg",
+      "sha256": "2bf8d00c08e4cb8bab40e3759109d14e8544ec21314b89f32f64ecf490caee8d"
+    },
+    {
+      "bytes": 4022,
+      "character_id": 234,
+      "file": "assets/converted/images/1091_missile_tank_m/234_alpha.png",
+      "sha256": "1eb2c956dfe015bcb0b415bf13867c0136cae5a606560e767c49423ef2260789"
+    },
+    {
+      "bytes": 21899,
+      "character_id": 236,
+      "file": "assets/converted/images/1091_missile_tank_m/236.jpg",
+      "sha256": "940ed18ffa42d36c2aaa03e8f8b06601e8630c3e1a99b18b3ecbafb56013725a"
+    },
+    {
+      "bytes": 4561,
+      "character_id": 236,
+      "file": "assets/converted/images/1091_missile_tank_m/236_alpha.png",
+      "sha256": "f6f535875a8738530d62234a618788c83721797a70f25fb34b7259c3983836da"
+    },
+    {
+      "bytes": 22161,
+      "character_id": 238,
+      "file": "assets/converted/images/1091_missile_tank_m/238.jpg",
+      "sha256": "f84675cc8dc6ceda6f7ff11b2d2fdd6d0ff475743139fd5b4aea2af287dcb87e"
+    },
+    {
+      "bytes": 3737,
+      "character_id": 238,
+      "file": "assets/converted/images/1091_missile_tank_m/238_alpha.png",
+      "sha256": "34b7d131a64a7965d96576350cda2777f118c106a3e1e7bb63bb858c826e4cb4"
+    },
+    {
+      "bytes": 21853,
+      "character_id": 240,
+      "file": "assets/converted/images/1091_missile_tank_m/240.jpg",
+      "sha256": "492289d76bd68af89b1bac46f0ab3b4d7865d3b38cbc84004025ac9b7e8ad921"
+    },
+    {
+      "bytes": 3238,
+      "character_id": 240,
+      "file": "assets/converted/images/1091_missile_tank_m/240_alpha.png",
+      "sha256": "62ab4c9960c7be7764e0810b085fc53e3047077474499a03d9a43ded99e06453"
+    },
+    {
+      "bytes": 22808,
+      "character_id": 242,
+      "file": "assets/converted/images/1091_missile_tank_m/242.jpg",
+      "sha256": "1c88917535504c327e747204d3518ef7218dc7cb3033d34d2536cdd7635cc956"
+    },
+    {
+      "bytes": 3356,
+      "character_id": 242,
+      "file": "assets/converted/images/1091_missile_tank_m/242_alpha.png",
+      "sha256": "55de41594a98ae6e317d860e98a1286e8cb2105548d66b1677715bf7bfaacc7b"
+    },
+    {
+      "bytes": 21154,
+      "character_id": 244,
+      "file": "assets/converted/images/1091_missile_tank_m/244.jpg",
+      "sha256": "872528a88de526ada77c3642691da1c94ff73c5a2d60b3153267f5434571a3e8"
+    },
+    {
+      "bytes": 3127,
+      "character_id": 244,
+      "file": "assets/converted/images/1091_missile_tank_m/244_alpha.png",
+      "sha256": "5c36670066a3f9d097e98af9d7c2c804cb0c3fda798c3712f13bff29922fe366"
+    },
+    {
+      "bytes": 14697,
+      "character_id": 247,
+      "file": "assets/converted/images/1091_missile_tank_m/247.jpg",
+      "sha256": "4a9a60d3b8fe61cdf4dc163852b470e1a94f35f7487521aaddf767dc9651133c"
+    },
+    {
+      "bytes": 728,
+      "character_id": 247,
+      "file": "assets/converted/images/1091_missile_tank_m/247_alpha.png",
+      "sha256": "486bfed07b542ba960e35f604d3aa3c646a77694d0c1ffa2b7f4dc918c40ba9a"
+    },
+    {
+      "bytes": 15779,
+      "character_id": 249,
+      "file": "assets/converted/images/1091_missile_tank_m/249.jpg",
+      "sha256": "7eaee1cfd2e1c93465f72c3b7adaed2441f83064f82d6c6b18c37d2ccdc32afe"
+    },
+    {
+      "bytes": 1278,
+      "character_id": 249,
+      "file": "assets/converted/images/1091_missile_tank_m/249_alpha.png",
+      "sha256": "99f57f4f518c3c5da1bfdfed5ad0ed8741394358dcbd5357a2e48e84067b204b"
+    },
+    {
+      "bytes": 15678,
+      "character_id": 251,
+      "file": "assets/converted/images/1091_missile_tank_m/251.jpg",
+      "sha256": "0a25e16aa47e4e8bfc7f1d42af39db42a9e2250ecebb4cc6a5749104e9e34b23"
+    },
+    {
+      "bytes": 1900,
+      "character_id": 251,
+      "file": "assets/converted/images/1091_missile_tank_m/251_alpha.png",
+      "sha256": "86ed301f9adfc8f5eea73bc92405865359d1cab7dc7d382c9393f2d9fe9c1145"
+    },
+    {
+      "bytes": 16131,
+      "character_id": 253,
+      "file": "assets/converted/images/1091_missile_tank_m/253.jpg",
+      "sha256": "c3ba81014758dabaa4931afc485757baa114c035f9b04ee66cecf2c4fc837f97"
+    },
+    {
+      "bytes": 1841,
+      "character_id": 253,
+      "file": "assets/converted/images/1091_missile_tank_m/253_alpha.png",
+      "sha256": "b681f86fce4ec17bcfe5cfdf5a22aac3d69ac99e94733166514526f8cef9c1b1"
+    },
+    {
+      "bytes": 15644,
+      "character_id": 255,
+      "file": "assets/converted/images/1091_missile_tank_m/255.jpg",
+      "sha256": "9a4094658bda4c8e2575e301c1f3c9a1786140a6ed5e74a3624ee63f320d0037"
+    },
+    {
+      "bytes": 1920,
+      "character_id": 255,
+      "file": "assets/converted/images/1091_missile_tank_m/255_alpha.png",
+      "sha256": "bdc30c7fdd97a49572392b8a0db5e114626ddec3b6ca9f23d6c918b7537be082"
+    },
+    {
+      "bytes": 15776,
+      "character_id": 257,
+      "file": "assets/converted/images/1091_missile_tank_m/257.jpg",
+      "sha256": "06bd73a1ba6bbe4fe301ab9ce69f4a9023461456edf4eba25298bda3c6867b06"
+    },
+    {
+      "bytes": 1774,
+      "character_id": 257,
+      "file": "assets/converted/images/1091_missile_tank_m/257_alpha.png",
+      "sha256": "1d9e6dc87dc8d2e3299bfd0a7b8d6774231c2d685008803f56d42fe6d74ed304"
+    },
+    {
+      "bytes": 15176,
+      "character_id": 259,
+      "file": "assets/converted/images/1091_missile_tank_m/259.jpg",
+      "sha256": "d44306115e29d91fded2db69b0ec81e69e63812659ac44f070c15119daad374e"
+    },
+    {
+      "bytes": 1635,
+      "character_id": 259,
+      "file": "assets/converted/images/1091_missile_tank_m/259_alpha.png",
+      "sha256": "2c1e372dd4f9558fd33e978a895909e999b2a24598e325d739a6378f2e9b2de5"
+    },
+    {
+      "bytes": 15614,
+      "character_id": 261,
+      "file": "assets/converted/images/1091_missile_tank_m/261.jpg",
+      "sha256": "22952d401e846d1e45a033f7e6ca24c9fe6d58d143544fbd6b7ed96ffab69799"
+    },
+    {
+      "bytes": 1592,
+      "character_id": 261,
+      "file": "assets/converted/images/1091_missile_tank_m/261_alpha.png",
+      "sha256": "9d907b486b2ab6e628bca9dc0faad17c1b603b41011ca345c44affe8b4cd42ea"
+    },
+    {
+      "bytes": 15160,
+      "character_id": 263,
+      "file": "assets/converted/images/1091_missile_tank_m/263.jpg",
+      "sha256": "b78158b411b6da4636996ea3a777d7d55734a85c9643ead4cea8ad2dd98286ca"
+    },
+    {
+      "bytes": 1754,
+      "character_id": 263,
+      "file": "assets/converted/images/1091_missile_tank_m/263_alpha.png",
+      "sha256": "7b353c752efd218a9161d25f3cd822dc7eb9854ee5a8d75a3b123adc93381ff2"
+    },
+    {
+      "bytes": 15498,
+      "character_id": 265,
+      "file": "assets/converted/images/1091_missile_tank_m/265.jpg",
+      "sha256": "bb844743e1a5cf68225bec8a52706d9b030894ed00021ed21f385ecec5287586"
+    },
+    {
+      "bytes": 1339,
+      "character_id": 265,
+      "file": "assets/converted/images/1091_missile_tank_m/265_alpha.png",
+      "sha256": "b403a3e0317965f0580f7912a8fb19d264c400f17658be30aadc713e3bc307a2"
+    },
+    {
+      "bytes": 15106,
+      "character_id": 267,
+      "file": "assets/converted/images/1091_missile_tank_m/267.jpg",
+      "sha256": "60d2d63ff62466f0efe9c00a7945d8fd4a8d7df0053fe87f081be59fbd2a4932"
+    },
+    {
+      "bytes": 1561,
+      "character_id": 267,
+      "file": "assets/converted/images/1091_missile_tank_m/267_alpha.png",
+      "sha256": "e662a5ae8a175c2a44560f6751c347c27e04b979cef904babd6b3a411f14c814"
+    },
+    {
+      "bytes": 15370,
+      "character_id": 269,
+      "file": "assets/converted/images/1091_missile_tank_m/269.jpg",
+      "sha256": "0c6dafb4b0e478b7a4ae06348a828f7875114c5f6d871a5c6f55760fba72b279"
+    },
+    {
+      "bytes": 1278,
+      "character_id": 269,
+      "file": "assets/converted/images/1091_missile_tank_m/269_alpha.png",
+      "sha256": "f89fe84d9763dabb9f7f9b45c3563dc9410e833a5ac3a3e1955fa483679ed158"
+    },
+    {
+      "bytes": 15622,
+      "character_id": 271,
+      "file": "assets/converted/images/1091_missile_tank_m/271.jpg",
+      "sha256": "66c613011133743947b4b3b2cbec9f62dca1411953a59243d4bb9a4e8d15add1"
+    },
+    {
+      "bytes": 1473,
+      "character_id": 271,
+      "file": "assets/converted/images/1091_missile_tank_m/271_alpha.png",
+      "sha256": "255a8ce01cec4a51b12e18e688b614ab553c16a37d280747d71469811c36bfa2"
+    },
+    {
+      "bytes": 15696,
+      "character_id": 273,
+      "file": "assets/converted/images/1091_missile_tank_m/273.jpg",
+      "sha256": "185bfdd661e01d2033c8b2cd3ea8232fa2be832bb0dcca00430e11a71aaf7a89"
+    },
+    {
+      "bytes": 1303,
+      "character_id": 273,
+      "file": "assets/converted/images/1091_missile_tank_m/273_alpha.png",
+      "sha256": "5c22bfbab108f150174f3fc18627fea2da83808630fec977a1cb56acfbd2ec86"
+    },
+    {
+      "bytes": 14798,
+      "character_id": 275,
+      "file": "assets/converted/images/1091_missile_tank_m/275.jpg",
+      "sha256": "e07323a070c41970048b4c1f13cf6a3a1f5385d61c364f2262122344d9025e09"
+    },
+    {
+      "bytes": 728,
+      "character_id": 275,
+      "file": "assets/converted/images/1091_missile_tank_m/275_alpha.png",
+      "sha256": "486bfed07b542ba960e35f604d3aa3c646a77694d0c1ffa2b7f4dc918c40ba9a"
+    }
+  ],
+  "content_ref": {
+    "activation": 0,
+    "attack": 36,
+    "attack_interval": 35,
+    "attack_range": 12,
+    "best_against": "ft_building",
+    "best_against_mult": 1,
+    "breeding_order": 31,
+    "build_time": 0,
+    "building_limit_same_id": -1,
+    "building_limit_same_scf": -1,
+    "category_id": 7,
+    "clicks_to_build": 0,
+    "collect": 0,
+    "collect_type": "g",
+    "collect_xp": 3,
+    "content_version": "44e5b9edd1eba2910833bb8e2f063175e51c5754e38c35177648e4de779df501",
+    "cost": 0,
+    "cost_unit_cash": 2,
+    "costs": {
+      "g": 475,
+      "s": 875
+    },
+    "defense": 1,
+    "display_order": 99,
+    "elevation": 1,
+    "expiration": 0,
+    "gift_level": 4,
+    "giftable": 0,
+    "group_type": "LAND_VEHICLE",
+    "height": 1,
+    "img_name": "1091_missile_tank_m",
+    "in_store": 0,
+    "inventory_ids": null,
+    "kind": "unit",
+    "legacy_id": "1091",
+    "life": 630,
+    "max_collects": 0,
+    "max_elem_vol": 0,
+    "max_frame": 5,
+    "min_level": 8,
+    "name": "Missile Tank",
+    "new_item": 0,
+    "population": 2,
+    "premium_upgrade_costs": null,
+    "properties": {
+      "bulldozable": "1",
+      "ft_ground": "1",
+      "human": "1",
+      "resurrectable": "1",
+      "seeStealthUnits": "1"
+    },
+    "race": "h",
+    "sm_training_time": 62000,
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "subcat_functional": 80,
+    "subcategory_id": 7,
+    "syringes": 2,
+    "training_time": 0,
+    "trains_ids": -1,
+    "type": "u",
+    "unit_capacity": 0,
+    "upgrades_to": -1,
+    "velocity": 5,
+    "volume": 10,
+    "width": 1,
+    "xp": 35
+  },
+  "content_version": "a0c3861fd95cbe635537efd7223f46991580a6be66735a70c9b1904c8987c18f",
+  "frame_count": 1,
+  "frame_height": 400,
+  "frame_rate": 30.0,
+  "frame_width": 550,
+  "kind": "converted_unit",
+  "legacy_id": "1091_missile_tank_m",
+  "main": {
+    "frame_count": 1,
+    "labels": [],
+    "placements": [
+      {
+        "character_id": 278,
+        "character_kind": "sprite",
+        "depth": 1,
+        "frame": 1,
+        "move": false
+      }
+    ],
+    "removes": []
+  },
+  "shapes": [
+    {
+      "bounds": {
+        "height_px": 237,
+        "width_px": 163,
+        "xmax": 3276,
+        "xmin": 16,
+        "ymax": 4740,
+        "ymin": 0
+      },
+      "character_id": 2,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 1,
+          "matrix": "d94000050000064000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 242,
+        "width_px": 241,
+        "xmax": 4820,
+        "xmin": 0,
+        "ymax": 4840,
+        "ymin": 0
+      },
+      "character_id": 4,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 3,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 241,
+        "width_px": 211,
+        "xmax": 4226,
+        "xmin": 6,
+        "ymax": 4830,
+        "ymin": 30
+      },
+      "character_id": 6,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 5,
+          "matrix": "d940000500000619e0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 225,
+        "width_px": 241,
+        "xmax": 4820,
+        "xmin": 0,
+        "ymax": 4500,
+        "ymin": 0
+      },
+      "character_id": 8,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 7,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 125,
+        "width_px": 95,
+        "xmax": 1900,
+        "xmin": -1360,
+        "ymax": 2500,
+        "ymin": -1840
+      },
+      "character_id": 10,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 9,
+          "matrix": "d940000500000cab08d0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 237,
+        "width_px": 162,
+        "xmax": 3254,
+        "xmin": 14,
+        "ymax": 4750,
+        "ymin": 90
+      },
+      "character_id": 12,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 11,
+          "matrix": "d94000050000080e5a",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 242,
+        "width_px": 240,
+        "xmax": 4818,
+        "xmin": -2,
+        "ymax": 4840,
+        "ymin": 60
+      },
+      "character_id": 15,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 14,
+          "matrix": "d9400005000007fcf0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 241,
+        "width_px": 211,
+        "xmax": 4227,
+        "xmin": 7,
+        "ymax": 4837,
+        "ymin": 77
+      },
+      "character_id": 18,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 17,
+          "matrix": "d9400005000008074d",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 224,
+        "width_px": 241,
+        "xmax": 4820,
+        "xmin": 0,
+        "ymax": 4499,
+        "ymin": 59
+      },
+      "character_id": 21,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 20,
+          "matrix": "d940000500000700ec",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 125,
+        "width_px": 93,
+        "xmax": 1879,
+        "xmin": -1361,
+        "ymax": 2503,
+        "ymin": -1817
+      },
+      "character_id": 24,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 23,
+          "matrix": "d940000500000caaf8e7",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 282,
+        "width_px": 163,
+        "xmax": 3270,
+        "xmin": 10,
+        "ymax": 5653,
+        "ymin": 973
+      },
+      "character_id": 27,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 26,
+          "matrix": "d940000500000b014f34",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 282,
+        "width_px": 163,
+        "xmax": 3272,
+        "xmin": 12,
+        "ymax": 5658,
+        "ymin": 278
+      },
+      "character_id": 30,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 29,
+          "matrix": "d940000500000a031160",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 282,
+        "width_px": 165,
+        "xmax": 3310,
+        "xmin": -170,
+        "ymax": 5644,
+        "ymin": -1216
+      },
+      "character_id": 32,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 31,
+          "matrix": "d940000500000cf56b40",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 281,
+        "width_px": 163,
+        "xmax": 3270,
+        "xmin": 10,
+        "ymax": 5625,
+        "ymin": -2315
+      },
+      "character_id": 34,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 33,
+          "matrix": "d940000500000d0055bd40",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 268,
+        "width_px": 274,
+        "xmax": 5489,
+        "xmin": 669,
+        "ymax": 5370,
+        "ymin": 530
+      },
+      "character_id": 37,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 36,
+          "matrix": "d940000500000b53a848",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 267,
+        "width_px": 273,
+        "xmax": 5467,
+        "xmin": 146,
+        "ymax": 5355,
+        "ymin": 54
+      },
+      "character_id": 39,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 38,
+          "matrix": "d93ffd84fff62fb0289fb12922f8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 268,
+        "width_px": 298,
+        "xmax": 5974,
+        "xmin": -666,
+        "ymax": 5373,
+        "ymin": -667
+      },
+      "character_id": 41,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 40,
+          "matrix": "d940000500000bacd594",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 269,
+        "width_px": 363,
+        "xmax": 7264,
+        "xmin": -216,
+        "ymax": 5386,
+        "ymin": -1434
+      },
+      "character_id": 43,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 42,
+          "matrix": "d940000500000cf28a66",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 244,
+        "width_px": 257,
+        "xmax": 5158,
+        "xmin": 938,
+        "ymax": 4880,
+        "ymin": 80
+      },
+      "character_id": 46,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 45,
+          "matrix": "d940000500000b754140",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 247,
+        "width_px": 259,
+        "xmax": 5185,
+        "xmin": -75,
+        "ymax": 4959,
+        "ymin": -21
+      },
+      "character_id": 48,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 47,
+          "matrix": "d9400005000008b5eb",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 246,
+        "width_px": 260,
+        "xmax": 5200,
+        "xmin": -1020,
+        "ymax": 4938,
+        "ymin": -402
+      },
+      "character_id": 50,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 49,
+          "matrix": "d940000500000b8099b8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 245,
+        "width_px": 314,
+        "xmax": 6280,
+        "xmin": -840,
+        "ymax": 4900,
+        "ymin": -720
+      },
+      "character_id": 52,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 51,
+          "matrix": "d940000500000b9714c0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 238,
+        "width_px": 273,
+        "xmax": 5467,
+        "xmin": 647,
+        "ymax": 4760,
+        "ymin": 260
+      },
+      "character_id": 55,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 54,
+          "matrix": "d940000500000b50e410",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 238,
+        "width_px": 273,
+        "xmax": 5464,
+        "xmin": 4,
+        "ymax": 4770,
+        "ymin": -10
+      },
+      "character_id": 57,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 56,
+          "matrix": "d94000050000052580",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 238,
+        "width_px": 300,
+        "xmax": 6016,
+        "xmin": -904,
+        "ymax": 4760,
+        "ymin": -160
+      },
+      "character_id": 59,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 58,
+          "matrix": "d940000500000b8f1d80",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 238,
+        "width_px": 363,
+        "xmax": 7269,
+        "xmin": -1191,
+        "ymax": 4760,
+        "ymin": -40
+      },
+      "character_id": 61,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 60,
+          "matrix": "d940000500000cb59fd8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 270,
+        "width_px": 161,
+        "xmax": 3220,
+        "xmin": -40,
+        "ymax": 5413,
+        "ymin": 1073
+      },
+      "character_id": 64,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 63,
+          "matrix": "d940000500000cfd8431",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 270,
+        "width_px": 161,
+        "xmax": 3225,
+        "xmin": -35,
+        "ymax": 5413,
+        "ymin": 313
+      },
+      "character_id": 66,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 65,
+          "matrix": "d940000500000af75390",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 270,
+        "width_px": 161,
+        "xmax": 3220,
+        "xmin": -40,
+        "ymax": 5413,
+        "ymin": -187
+      },
+      "character_id": 68,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 67,
+          "matrix": "d9400005000009ec5140",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 270,
+        "width_px": 161,
+        "xmax": 3220,
+        "xmin": -40,
+        "ymax": 5413,
+        "ymin": -147
+      },
+      "character_id": 70,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 69,
+          "matrix": "d9400005000009ec5b40",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 226,
+        "width_px": 240,
+        "xmax": 4814,
+        "xmin": -6,
+        "ymax": 4524,
+        "ymin": 24
+      },
+      "character_id": 73,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 72,
+          "matrix": "d9400005000006e980",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 224,
+        "width_px": 237,
+        "xmax": 4757,
+        "xmin": -103,
+        "ymax": 4495,
+        "ymin": 95
+      },
+      "character_id": 75,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 74,
+          "matrix": "d9400005000008995f",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 223,
+        "width_px": 241,
+        "xmax": 4835,
+        "xmin": -145,
+        "ymax": 4473,
+        "ymin": 233
+      },
+      "character_id": 77,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 76,
+          "matrix": "d9400005000009b7ba40",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 365,
+        "xmax": 7317,
+        "xmin": -2683,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 79,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 78,
+          "matrix": "d940000500000dac2e0200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 223,
+        "width_px": 247,
+        "xmax": 4955,
+        "xmin": -185,
+        "ymax": 4464,
+        "ymin": 464
+      },
+      "character_id": 81,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 80,
+          "matrix": "d940000500000ad1dd00",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7327,
+        "xmin": -2673,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 83,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 82,
+          "matrix": "d940000500000dac7e0200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7326,
+        "xmin": -2674,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 85,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 84,
+          "matrix": "d940000500000dac760200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7327,
+        "xmin": -2673,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 87,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 86,
+          "matrix": "d940000500000dac7e0200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7326,
+        "xmin": -2674,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 89,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 88,
+          "matrix": "d940000500000dac760200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7326,
+        "xmin": -2674,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 91,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 90,
+          "matrix": "d940000500000dac760200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7326,
+        "xmin": -2674,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 93,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 92,
+          "matrix": "d940000500000dac760200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7326,
+        "xmin": -2674,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 95,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 94,
+          "matrix": "d940000500000dac760200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7327,
+        "xmin": -2673,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 97,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 96,
+          "matrix": "d940000500000dac7e0200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7326,
+        "xmin": -2674,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 99,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 98,
+          "matrix": "d940000500000dac760200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7326,
+        "xmin": -2674,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 101,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 100,
+          "matrix": "d940000500000dac760200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7326,
+        "xmin": -2674,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 103,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 102,
+          "matrix": "d940000500000dac760200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7327,
+        "xmin": -2673,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 105,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 104,
+          "matrix": "d940000500000dac7e0200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7326,
+        "xmin": -2674,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 107,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 106,
+          "matrix": "d940000500000dac760200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7326,
+        "xmin": -2674,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 109,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 108,
+          "matrix": "d940000500000dac760200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7326,
+        "xmin": -2674,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 111,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 110,
+          "matrix": "d940000500000dac760200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7326,
+        "xmin": -2674,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 113,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 112,
+          "matrix": "d940000500000dac760200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7326,
+        "xmin": -2674,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 115,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 114,
+          "matrix": "d940000500000dac760200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7326,
+        "xmin": -2674,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 117,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 116,
+          "matrix": "d940000500000dac760200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7326,
+        "xmin": -2674,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 119,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 118,
+          "matrix": "d940000500000dac760200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7326,
+        "xmin": -2674,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 121,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 120,
+          "matrix": "d940000500000dac760200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 366,
+        "xmax": 7326,
+        "xmin": -2674,
+        "ymax": 3960,
+        "ymin": -2040
+      },
+      "character_id": 123,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 67
+        },
+        {
+          "bitmap_id": 122,
+          "matrix": "d940000500000dac760200",
+          "type": 67
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 282,
+        "width_px": 163,
+        "xmax": 3272,
+        "xmin": 12,
+        "ymax": 5658,
+        "ymin": 978
+      },
+      "character_id": 126,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 125,
+          "matrix": "d940000500000b018f48",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 282,
+        "width_px": 163,
+        "xmax": 3272,
+        "xmin": 12,
+        "ymax": 5652,
+        "ymin": 212
+      },
+      "character_id": 128,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 127,
+          "matrix": "d9400005000009063500",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 282,
+        "width_px": 164,
+        "xmax": 3290,
+        "xmin": 10,
+        "ymax": 5657,
+        "ymin": -1203
+      },
+      "character_id": 130,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 129,
+          "matrix": "d940000500000c00ab4d",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 282,
+        "width_px": 163,
+        "xmax": 3275,
+        "xmin": 15,
+        "ymax": 5653,
+        "ymin": -1727
+      },
+      "character_id": 132,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 131,
+          "matrix": "d940000500000c00f941",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 282,
+        "width_px": 163,
+        "xmax": 3277,
+        "xmin": 17,
+        "ymax": 5654,
+        "ymin": -1106
+      },
+      "character_id": 134,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 133,
+          "matrix": "d940000500000c011bae",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 282,
+        "width_px": 163,
+        "xmax": 3279,
+        "xmin": 19,
+        "ymax": 5652,
+        "ymin": -1868
+      },
+      "character_id": 136,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 135,
+          "matrix": "d940000500000c0138b4",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 282,
+        "width_px": 165,
+        "xmax": 3307,
+        "xmin": 27,
+        "ymax": 5647,
+        "ymin": -853
+      },
+      "character_id": 138,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 137,
+          "matrix": "d940000500000b0372ac",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 282,
+        "width_px": 164,
+        "xmax": 3287,
+        "xmin": 27,
+        "ymax": 5642,
+        "ymin": -1598
+      },
+      "character_id": 140,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 139,
+          "matrix": "d940000500000c01b9c2",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 282,
+        "width_px": 163,
+        "xmax": 3267,
+        "xmin": -93,
+        "ymax": 5644,
+        "ymin": -856
+      },
+      "character_id": 142,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 141,
+          "matrix": "d940000500000bf472a0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 282,
+        "width_px": 164,
+        "xmax": 3290,
+        "xmin": 30,
+        "ymax": 5642,
+        "ymin": -1598
+      },
+      "character_id": 144,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 143,
+          "matrix": "d940000500000c01e9c2",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 281,
+        "width_px": 165,
+        "xmax": 3312,
+        "xmin": 32,
+        "ymax": 5635,
+        "ymin": -585
+      },
+      "character_id": 146,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 145,
+          "matrix": "d940000500000b0416dc",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 281,
+        "width_px": 164,
+        "xmax": 3294,
+        "xmin": 34,
+        "ymax": 5632,
+        "ymin": -1608
+      },
+      "character_id": 148,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 147,
+          "matrix": "d940000500000c0229b8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 281,
+        "width_px": 163,
+        "xmax": 3273,
+        "xmin": -87,
+        "ymax": 5630,
+        "ymin": -550
+      },
+      "character_id": 150,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 149,
+          "matrix": "d940000500000bf53768",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 281,
+        "width_px": 164,
+        "xmax": 3294,
+        "xmin": 34,
+        "ymax": 5635,
+        "ymin": -1445
+      },
+      "character_id": 152,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 151,
+          "matrix": "d940000500000c022a5b",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 281,
+        "width_px": 164,
+        "xmax": 3297,
+        "xmin": 37,
+        "ymax": 5638,
+        "ymin": 958
+      },
+      "character_id": 154,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 153,
+          "matrix": "d940000500000b04aef8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 267,
+        "width_px": 273,
+        "xmax": 5472,
+        "xmin": 632,
+        "ymax": 5340,
+        "ymin": 480
+      },
+      "character_id": 157,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 156,
+          "matrix": "d940000500000b4f0780",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 266,
+        "width_px": 273,
+        "xmax": 5474,
+        "xmin": 634,
+        "ymax": 5339,
+        "ymin": 479
+      },
+      "character_id": 159,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 158,
+          "matrix": "d940000500000b4f477c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 266,
+        "width_px": 298,
+        "xmax": 5967,
+        "xmin": 567,
+        "ymax": 5339,
+        "ymin": -101
+      },
+      "character_id": 161,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 160,
+          "matrix": "d940000500000b46fe6c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 266,
+        "width_px": 348,
+        "xmax": 6975,
+        "xmin": -705,
+        "ymax": 5332,
+        "ymin": -768
+      },
+      "character_id": 163,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 162,
+          "matrix": "d940000500000ba7f400",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 267,
+        "width_px": 272,
+        "xmax": 5455,
+        "xmin": -425,
+        "ymax": 5355,
+        "ymin": -525
+      },
+      "character_id": 165,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 164,
+          "matrix": "d940000500000bcaf7cc",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 268,
+        "width_px": 292,
+        "xmax": 5855,
+        "xmin": -765,
+        "ymax": 5360,
+        "ymin": -1080
+      },
+      "character_id": 167,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 166,
+          "matrix": "d940000500000cd03bc8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 267,
+        "width_px": 300,
+        "xmax": 6012,
+        "xmin": 632,
+        "ymax": 5355,
+        "ymin": 195
+      },
+      "character_id": 169,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 168,
+          "matrix": "d940000500000b4f030c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 267,
+        "width_px": 351,
+        "xmax": 7020,
+        "xmin": 220,
+        "ymax": 5355,
+        "ymin": -385
+      },
+      "character_id": 171,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 170,
+          "matrix": "d940000500000a3727f0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 267,
+        "width_px": 273,
+        "xmax": 5462,
+        "xmin": -378,
+        "ymax": 5347,
+        "ymin": -313
+      },
+      "character_id": 173,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 172,
+          "matrix": "d940000500000aa1ac70",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 268,
+        "width_px": 299,
+        "xmax": 5995,
+        "xmin": 15,
+        "ymax": 5360,
+        "ymin": -860
+      },
+      "character_id": 175,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 174,
+          "matrix": "d940000500000b01f290",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 267,
+        "width_px": 304,
+        "xmax": 6097,
+        "xmin": 617,
+        "ymax": 5347,
+        "ymin": 407
+      },
+      "character_id": 177,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 176,
+          "matrix": "d940000500000b4d265c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 267,
+        "width_px": 352,
+        "xmax": 7045,
+        "xmin": 525,
+        "ymax": 5345,
+        "ymin": -135
+      },
+      "character_id": 179,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 178,
+          "matrix": "d940000500000b41bde4",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 268,
+        "width_px": 272,
+        "xmax": 5447,
+        "xmin": -353,
+        "ymax": 5360,
+        "ymin": -80
+      },
+      "character_id": 181,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 180,
+          "matrix": "d940000500000aa7fb00",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 267,
+        "width_px": 296,
+        "xmax": 5930,
+        "xmin": -1030,
+        "ymax": 5345,
+        "ymin": -655
+      },
+      "character_id": 183,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 182,
+          "matrix": "d940000500000cbfad71",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 241,
+        "width_px": 211,
+        "xmax": 4220,
+        "xmin": -20,
+        "ymax": 4827,
+        "ymin": -13
+      },
+      "character_id": 186,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 185,
+          "matrix": "d9400005000006b330",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 241,
+        "width_px": 212,
+        "xmax": 4242,
+        "xmin": -998,
+        "ymax": 4827,
+        "ymin": -13
+      },
+      "character_id": 188,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 187,
+          "matrix": "d940000500000b835fcc",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 241,
+        "width_px": 212,
+        "xmax": 4259,
+        "xmin": -1921,
+        "ymax": 4827,
+        "ymin": -13
+      },
+      "character_id": 190,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 189,
+          "matrix": "d940000500000c87fff3",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 241,
+        "width_px": 267,
+        "xmax": 5349,
+        "xmin": -1671,
+        "ymax": 4827,
+        "ymin": -173
+      },
+      "character_id": 192,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 191,
+          "matrix": "d940000500000c979f53",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 241,
+        "width_px": 213,
+        "xmax": 4269,
+        "xmin": -1911,
+        "ymax": 4827,
+        "ymin": -513
+      },
+      "character_id": 194,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 193,
+          "matrix": "d940000500000c889dff",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 241,
+        "width_px": 265,
+        "xmax": 5315,
+        "xmin": -1565,
+        "ymax": 4827,
+        "ymin": -833
+      },
+      "character_id": 196,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 195,
+          "matrix": "d940000500000c9e3cbf",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 241,
+        "width_px": 218,
+        "xmax": 4362,
+        "xmin": -1798,
+        "ymax": 4827,
+        "ymin": -13
+      },
+      "character_id": 198,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 197,
+          "matrix": "d940000500000c8faff3",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 241,
+        "width_px": 272,
+        "xmax": 5440,
+        "xmin": -1580,
+        "ymax": 4827,
+        "ymin": -13
+      },
+      "character_id": 200,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 199,
+          "matrix": "d940000500000c9d4ff3",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 241,
+        "width_px": 215,
+        "xmax": 4317,
+        "xmin": -1703,
+        "ymax": 4827,
+        "ymin": -353
+      },
+      "character_id": 202,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 201,
+          "matrix": "d940000500000c959e9f",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 241,
+        "width_px": 273,
+        "xmax": 5465,
+        "xmin": -1415,
+        "ymax": 4827,
+        "ymin": -673
+      },
+      "character_id": 204,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 203,
+          "matrix": "d940000500000ca79d5f",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 241,
+        "width_px": 223,
+        "xmax": 4462,
+        "xmin": -1698,
+        "ymax": 4827,
+        "ymin": -13
+      },
+      "character_id": 206,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 205,
+          "matrix": "d940000500000c95eff3",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 241,
+        "width_px": 275,
+        "xmax": 5500,
+        "xmin": -1520,
+        "ymax": 4827,
+        "ymin": -13
+      },
+      "character_id": 208,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 207,
+          "matrix": "d940000500000ca10ff3",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 241,
+        "width_px": 221,
+        "xmax": 4425,
+        "xmin": -1695,
+        "ymax": 4827,
+        "ymin": -93
+      },
+      "character_id": 210,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 209,
+          "matrix": "d940000500000c961fa3",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 241,
+        "width_px": 276,
+        "xmax": 5525,
+        "xmin": -1435,
+        "ymax": 4827,
+        "ymin": -453
+      },
+      "character_id": 212,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 211,
+          "matrix": "d940000500000ca65e3b",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 241,
+        "width_px": 213,
+        "xmax": 4267,
+        "xmin": 27,
+        "ymax": 4827,
+        "ymin": -13
+      },
+      "character_id": 214,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 213,
+          "matrix": "d94000050000066f30",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 238,
+        "width_px": 273,
+        "xmax": 5467,
+        "xmin": 647,
+        "ymax": 4760,
+        "ymin": 200
+      },
+      "character_id": 217,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 216,
+          "matrix": "d940000500000b50e320",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 238,
+        "width_px": 273,
+        "xmax": 5460,
+        "xmin": 0,
+        "ymax": 4760,
+        "ymin": 200
+      },
+      "character_id": 219,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 218,
+          "matrix": "d9400005000009003200",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 238,
+        "width_px": 273,
+        "xmax": 5467,
+        "xmin": -1153,
+        "ymax": 4760,
+        "ymin": 200
+      },
+      "character_id": 221,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 220,
+          "matrix": "d940000500000cb7f0c8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 238,
+        "width_px": 301,
+        "xmax": 6030,
+        "xmin": -1170,
+        "ymax": 4760,
+        "ymin": -80
+      },
+      "character_id": 223,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 222,
+          "matrix": "d940000500000cb6efb0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 238,
+        "width_px": 291,
+        "xmax": 5835,
+        "xmin": -1265,
+        "ymax": 4760,
+        "ymin": -340
+      },
+      "character_id": 225,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 224,
+          "matrix": "d940000500000cb0feac",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 238,
+        "width_px": 346,
+        "xmax": 6925,
+        "xmin": -1235,
+        "ymax": 4760,
+        "ymin": 200
+      },
+      "character_id": 227,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 226,
+          "matrix": "d940000500000cb2d0c8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 238,
+        "width_px": 273,
+        "xmax": 5475,
+        "xmin": -1345,
+        "ymax": 4760,
+        "ymin": -380
+      },
+      "character_id": 229,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 228,
+          "matrix": "d940000500000cabfe84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 238,
+        "width_px": 303,
+        "xmax": 6062,
+        "xmin": -738,
+        "ymax": 4760,
+        "ymin": 200
+      },
+      "character_id": 231,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 230,
+          "matrix": "d940000500000ba3c320",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 238,
+        "width_px": 295,
+        "xmax": 5900,
+        "xmin": -1560,
+        "ymax": 4760,
+        "ymin": -560
+      },
+      "character_id": 233,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 232,
+          "matrix": "d940000500000c9e8dd0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 238,
+        "width_px": 355,
+        "xmax": 7110,
+        "xmin": -1230,
+        "ymax": 4760,
+        "ymin": 100
+      },
+      "character_id": 235,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 234,
+          "matrix": "d940000500000cb32064",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 238,
+        "width_px": 273,
+        "xmax": 5467,
+        "xmin": -1353,
+        "ymax": 4760,
+        "ymin": 200
+      },
+      "character_id": 237,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 236,
+          "matrix": "d940000500000cab70c8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 238,
+        "width_px": 307,
+        "xmax": 6140,
+        "xmin": -1280,
+        "ymax": 4760,
+        "ymin": 20
+      },
+      "character_id": 239,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 238,
+          "matrix": "d940000500000cb00014",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 238,
+        "width_px": 298,
+        "xmax": 5962,
+        "xmin": -378,
+        "ymax": 4760,
+        "ymin": 20
+      },
+      "character_id": 241,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 240,
+          "matrix": "d940000500000aa18140",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 238,
+        "width_px": 350,
+        "xmax": 7010,
+        "xmin": -550,
+        "ymax": 4760,
+        "ymin": 140
+      },
+      "character_id": 243,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 242,
+          "matrix": "d940000500000bbb4230",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 238,
+        "width_px": 273,
+        "xmax": 5470,
+        "xmin": -1370,
+        "ymax": 4760,
+        "ymin": -180
+      },
+      "character_id": 245,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 244,
+          "matrix": "d940000500000caa6f4c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 288,
+        "width_px": 158,
+        "xmax": 3176,
+        "xmin": -84,
+        "ymax": 5767,
+        "ymin": 1427
+      },
+      "character_id": 248,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 247,
+          "matrix": "d940000500000cfac593",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 288,
+        "width_px": 158,
+        "xmax": 3176,
+        "xmin": -84,
+        "ymax": 5767,
+        "ymin": 747
+      },
+      "character_id": 250,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 249,
+          "matrix": "d940000500000bf58bac",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 288,
+        "width_px": 159,
+        "xmax": 3182,
+        "xmin": -78,
+        "ymax": 5763,
+        "ymin": 263
+      },
+      "character_id": 252,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 251,
+          "matrix": "d940000500000aec9070",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 288,
+        "width_px": 158,
+        "xmax": 3177,
+        "xmin": -83,
+        "ymax": 5762,
+        "ymin": 402
+      },
+      "character_id": 254,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 253,
+          "matrix": "d940000500000aeb5920",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 288,
+        "width_px": 162,
+        "xmax": 3257,
+        "xmin": -83,
+        "ymax": 5762,
+        "ymin": 222
+      },
+      "character_id": 256,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 255,
+          "matrix": "d9400005000009d6b780",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 288,
+        "width_px": 159,
+        "xmax": 3186,
+        "xmin": -74,
+        "ymax": 5760,
+        "ymin": 420
+      },
+      "character_id": 258,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 257,
+          "matrix": "d940000500000aed9a40",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 288,
+        "width_px": 159,
+        "xmax": 3182,
+        "xmin": -78,
+        "ymax": 5760,
+        "ymin": 540
+      },
+      "character_id": 260,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 259,
+          "matrix": "d940000500000bf64870",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 288,
+        "width_px": 158,
+        "xmax": 3177,
+        "xmin": -83,
+        "ymax": 5762,
+        "ymin": 702
+      },
+      "character_id": 262,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 261,
+          "matrix": "d940000500000bf5aaf8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 288,
+        "width_px": 163,
+        "xmax": 3262,
+        "xmin": -78,
+        "ymax": 5762,
+        "ymin": 522
+      },
+      "character_id": 264,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 263,
+          "matrix": "d940000500000bf64828",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 288,
+        "width_px": 158,
+        "xmax": 3177,
+        "xmin": -83,
+        "ymax": 5760,
+        "ymin": 1020
+      },
+      "character_id": 266,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 265,
+          "matrix": "d940000500000bf5aff0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 288,
+        "width_px": 159,
+        "xmax": 3182,
+        "xmin": -78,
+        "ymax": 5760,
+        "ymin": 780
+      },
+      "character_id": 268,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 267,
+          "matrix": "d940000500000bf64c30",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 288,
+        "width_px": 159,
+        "xmax": 3182,
+        "xmin": -78,
+        "ymax": 5760,
+        "ymin": 960
+      },
+      "character_id": 270,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 269,
+          "matrix": "d940000500000bf64f00",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 288,
+        "width_px": 159,
+        "xmax": 3182,
+        "xmin": -78,
+        "ymax": 5762,
+        "ymin": 882
+      },
+      "character_id": 272,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 271,
+          "matrix": "d940000500000bf64dc8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 288,
+        "width_px": 159,
+        "xmax": 3182,
+        "xmin": -78,
+        "ymax": 5762,
+        "ymin": 742
+      },
+      "character_id": 274,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 273,
+          "matrix": "d940000500000bf64b98",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 288,
+        "width_px": 159,
+        "xmax": 3182,
+        "xmin": -78,
+        "ymax": 5762,
+        "ymin": 1422
+      },
+      "character_id": 276,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 275,
+          "matrix": "d940000500000cfb258e",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    }
+  ],
+  "source_file": "assets/sprites/1091_missile_tank_m.swf",
+  "source_layer": "converted(asset-registry)",
+  "sprites": [
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 2,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 12,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 13
+    },
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 15,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 16
+    },
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 18,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 19
+    },
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 8,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 21,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 22
+    },
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 10,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 24,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 25
+    },
+    {
+      "frame_count": 1,
+      "labels": [],
+      "placements": [],
+      "removes": [],
+      "sprite_id": 28
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 27,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 4,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 30,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 2,
+          "move": true
+        },
+        {
+          "character_id": 32,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 34,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 27,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 35
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 37,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 4,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 39,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 2,
+          "move": true
+        },
+        {
+          "character_id": 41,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 43,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 37,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 44
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 46,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 4,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 48,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 2,
+          "move": true
+        },
+        {
+          "character_id": 50,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 52,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 46,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 53
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 55,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 4,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 57,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 2,
+          "move": true
+        },
+        {
+          "character_id": 59,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 61,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 55,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 62
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 64,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 4,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 66,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 2,
+          "move": true
+        },
+        {
+          "character_id": 68,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 70,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 64,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 71
+    },
+    {
+      "frame_count": 30,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 73,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 75,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 77,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 79,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 8,
+          "move": false
+        },
+        {
+          "character_id": 81,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        },
+        {
+          "character_id": 83,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 10,
+          "move": true
+        },
+        {
+          "character_id": 85,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 11,
+          "move": true
+        },
+        {
+          "character_id": 87,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 12,
+          "move": true
+        },
+        {
+          "character_id": 89,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 13,
+          "move": true
+        },
+        {
+          "character_id": 91,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 14,
+          "move": true
+        },
+        {
+          "character_id": 93,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 15,
+          "move": true
+        },
+        {
+          "character_id": 95,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 16,
+          "move": true
+        },
+        {
+          "character_id": 97,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 17,
+          "move": true
+        },
+        {
+          "character_id": 99,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 18,
+          "move": true
+        },
+        {
+          "character_id": 101,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 19,
+          "move": true
+        },
+        {
+          "character_id": 103,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 20,
+          "move": true
+        },
+        {
+          "character_id": 105,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 21,
+          "move": true
+        },
+        {
+          "character_id": 107,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 22,
+          "move": true
+        },
+        {
+          "character_id": 109,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 23,
+          "move": true
+        },
+        {
+          "character_id": 111,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 24,
+          "move": true
+        },
+        {
+          "character_id": 113,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 115,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 26,
+          "move": true
+        },
+        {
+          "character_id": 117,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 27,
+          "move": true
+        },
+        {
+          "character_id": 119,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 28,
+          "move": true
+        },
+        {
+          "character_id": 121,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 29,
+          "move": true
+        },
+        {
+          "character_id": 123,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 30,
+          "move": true
+        }
+      ],
+      "removes": [
+        {
+          "depth": 2,
+          "frame": 12
+        }
+      ],
+      "sprite_id": 124
+    },
+    {
+      "frame_count": 36,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 126,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 4,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 6,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 8,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 128,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 130,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 132,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 134,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        },
+        {
+          "character_id": 136,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 13,
+          "move": true
+        },
+        {
+          "character_id": 138,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 15,
+          "move": true
+        },
+        {
+          "character_id": 140,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 18,
+          "move": true
+        },
+        {
+          "character_id": 142,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 20,
+          "move": true
+        },
+        {
+          "character_id": 144,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 23,
+          "move": true
+        },
+        {
+          "character_id": 146,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 148,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 28,
+          "move": true
+        },
+        {
+          "character_id": 150,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 30,
+          "move": true
+        },
+        {
+          "character_id": 152,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 33,
+          "move": true
+        },
+        {
+          "character_id": 154,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 35,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 155
+    },
+    {
+      "frame_count": 36,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 157,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 4,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 6,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 8,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 159,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 161,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 163,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 165,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        },
+        {
+          "character_id": 167,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 13,
+          "move": true
+        },
+        {
+          "character_id": 169,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 15,
+          "move": true
+        },
+        {
+          "character_id": 171,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 18,
+          "move": true
+        },
+        {
+          "character_id": 173,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 20,
+          "move": true
+        },
+        {
+          "character_id": 175,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 23,
+          "move": true
+        },
+        {
+          "character_id": 177,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 179,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 28,
+          "move": true
+        },
+        {
+          "character_id": 181,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 30,
+          "move": true
+        },
+        {
+          "character_id": 183,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 33,
+          "move": true
+        },
+        {
+          "character_id": 157,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 35,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 184
+    },
+    {
+      "frame_count": 36,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 186,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 4,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 6,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 8,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 188,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 190,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 192,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 194,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        },
+        {
+          "character_id": 196,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 13,
+          "move": true
+        },
+        {
+          "character_id": 198,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 15,
+          "move": true
+        },
+        {
+          "character_id": 200,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 18,
+          "move": true
+        },
+        {
+          "character_id": 202,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 20,
+          "move": true
+        },
+        {
+          "character_id": 204,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 23,
+          "move": true
+        },
+        {
+          "character_id": 206,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 208,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 28,
+          "move": true
+        },
+        {
+          "character_id": 210,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 30,
+          "move": true
+        },
+        {
+          "character_id": 212,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 33,
+          "move": true
+        },
+        {
+          "character_id": 214,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 35,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 215
+    },
+    {
+      "frame_count": 36,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 217,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 4,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 6,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 8,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 219,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 221,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 223,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 225,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        },
+        {
+          "character_id": 227,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 13,
+          "move": true
+        },
+        {
+          "character_id": 229,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 15,
+          "move": true
+        },
+        {
+          "character_id": 231,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 18,
+          "move": true
+        },
+        {
+          "character_id": 233,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 20,
+          "move": true
+        },
+        {
+          "character_id": 235,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 23,
+          "move": true
+        },
+        {
+          "character_id": 237,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 239,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 28,
+          "move": true
+        },
+        {
+          "character_id": 241,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 30,
+          "move": true
+        },
+        {
+          "character_id": 243,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 33,
+          "move": true
+        },
+        {
+          "character_id": 245,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 35,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 246
+    },
+    {
+      "frame_count": 36,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 248,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 4,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 6,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 8,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 250,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 252,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 254,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 256,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        },
+        {
+          "character_id": 258,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 13,
+          "move": true
+        },
+        {
+          "character_id": 260,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 15,
+          "move": true
+        },
+        {
+          "character_id": 262,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 18,
+          "move": true
+        },
+        {
+          "character_id": 264,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 20,
+          "move": true
+        },
+        {
+          "character_id": 266,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 23,
+          "move": true
+        },
+        {
+          "character_id": 268,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 270,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 28,
+          "move": true
+        },
+        {
+          "character_id": 272,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 30,
+          "move": true
+        },
+        {
+          "character_id": 274,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 33,
+          "move": true
+        },
+        {
+          "character_id": 276,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 35,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 277
+    },
+    {
+      "frame_count": 35,
+      "labels": [
+        {
+          "anchor": false,
+          "frame": 1,
+          "name": "QUIETO"
+        },
+        {
+          "anchor": false,
+          "frame": 6,
+          "name": "ANDAR"
+        },
+        {
+          "anchor": false,
+          "frame": 11,
+          "name": "ATAQUE"
+        },
+        {
+          "anchor": false,
+          "frame": 16,
+          "name": "MUERTE"
+        },
+        {
+          "anchor": false,
+          "frame": 31,
+          "name": "ESPECIAL"
+        }
+      ],
+      "placements": [
+        {
+          "character_id": 2,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 2,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 8,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 10,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 13,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 6,
+          "move": false
+        },
+        {
+          "character_id": 16,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 7,
+          "move": false
+        },
+        {
+          "character_id": 19,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 8,
+          "move": false
+        },
+        {
+          "character_id": 22,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 9,
+          "move": false
+        },
+        {
+          "character_id": 25,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 10,
+          "move": false
+        },
+        {
+          "character_id": 35,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 11,
+          "move": false
+        },
+        {
+          "character_id": 44,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 12,
+          "move": false
+        },
+        {
+          "character_id": 53,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 13,
+          "move": false
+        },
+        {
+          "character_id": 62,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 14,
+          "move": false
+        },
+        {
+          "character_id": 71,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 15,
+          "move": false
+        },
+        {
+          "character_id": 124,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 16,
+          "move": false
+        },
+        {
+          "character_id": 155,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 31,
+          "move": false
+        },
+        {
+          "character_id": 184,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 32,
+          "move": false
+        },
+        {
+          "character_id": 215,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 33,
+          "move": false
+        },
+        {
+          "character_id": 246,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 34,
+          "move": false
+        },
+        {
+          "character_id": 277,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 35,
+          "move": false
+        }
+      ],
+      "removes": [
+        {
+          "depth": 1,
+          "frame": 6
+        },
+        {
+          "depth": 1,
+          "frame": 7
+        },
+        {
+          "depth": 1,
+          "frame": 8
+        },
+        {
+          "depth": 1,
+          "frame": 9
+        },
+        {
+          "depth": 1,
+          "frame": 10
+        },
+        {
+          "depth": 1,
+          "frame": 11
+        },
+        {
+          "depth": 1,
+          "frame": 12
+        },
+        {
+          "depth": 1,
+          "frame": 13
+        },
+        {
+          "depth": 1,
+          "frame": 14
+        },
+        {
+          "depth": 1,
+          "frame": 15
+        },
+        {
+          "depth": 1,
+          "frame": 16
+        },
+        {
+          "depth": 1,
+          "frame": 31
+        },
+        {
+          "depth": 1,
+          "frame": 32
+        },
+        {
+          "depth": 1,
+          "frame": 33
+        },
+        {
+          "depth": 1,
+          "frame": 34
+        },
+        {
+          "depth": 1,
+          "frame": 35
+        }
+      ],
+      "sprite_id": 278
+    }
+  ],
+  "symbols": [
+    {
+      "id": 278,
+      "name": "1091_missile_tank_m"
+    },
+    {
+      "id": 124,
+      "name": "_1091_missile_tank_m_fla.arquero1atacando3_4detras_13"
+    },
+    {
+      "id": 71,
+      "name": "_1091_missile_tank_m_fla.arquero1atacandofrente_12"
+    },
+    {
+      "id": 62,
+      "name": "_1091_missile_tank_m_fla.arquero1atacando3_4frente_11"
+    },
+    {
+      "id": 53,
+      "name": "_1091_missile_tank_m_fla.arquero1atacandoperfil_10"
+    },
+    {
+      "id": 44,
+      "name": "_1091_missile_tank_m_fla.arquero1muriendo_9"
+    },
+    {
+      "id": 35,
+      "name": "_1091_missile_tank_m_fla.arquero1atacandodetras_7"
+    }
+  ]
+}

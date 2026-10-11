@@ -37,6 +37,69 @@ static func package_dir(repo_relative: String) -> String:
 static func package_json(repo_relative: String) -> String:
 	return package_dir(repo_relative).path_join("package.json")
 
+## The one tree a converted package may reference bitmap bytes from.
+##
+## Converted packages reference the shared extracted bitmap tree instead
+## of carrying byte-identical copies of it, so `bitmaps[].file` names an
+## extraction output under this root rather than a file inside the
+## package directory. This constant is the whole containment rule: a
+## package may name files under `assets/converted/images/` and nothing
+## else, so it still cannot reach a save, a config, a sprite, a
+## preserved input, or any other repository file. The package directory
+## prefix check this replaces was a *narrower* rule, not a stronger one;
+## it is not deleted here without being replaced by one that still
+## bounds what a package can make the client open.
+const BITMAP_REFERENCE_ROOT := "assets/converted/images"
+
+## Why a bitmap reference is refused, or "" when it is acceptable.
+##
+## Rejects, in order: an empty reference; a backslash (the reference is
+## recorded POSIX-style and a Windows separator would bypass the
+## segment rules below); an absolute path; any empty, "." or ".."
+## segment; anything not under `BITMAP_REFERENCE_ROOT`; and anything
+## that is not exactly `<root>/<sprite>/<file>`. The segment rules are
+## what make the prefix test meaningful -- a prefix test alone would
+## accept `assets/converted/images/../../saves/1.json`, which is the
+## whole class of bug the rule exists to stop.
+static func bitmap_reference_error(file: String) -> String:
+	if file.is_empty():
+		return "empty bitmap file reference"
+	if file.contains("\\"):
+		return "bitmap file reference is not POSIX-separated: " + file
+	if file.begins_with("/"):
+		return "bitmap file reference is absolute: " + file
+	var segments := file.split("/", true)
+	for segment in segments:
+		if segment.is_empty():
+			return "bitmap file reference carries an empty segment: " + file
+		if segment == "." or segment == "..":
+			return "bitmap file reference carries a relative segment: " + file
+	if not file.begins_with(BITMAP_REFERENCE_ROOT + "/"):
+		return ("bitmap file reference escapes " + BITMAP_REFERENCE_ROOT
+			+ ": " + file)
+	# Exactly `<sprite>/<file>` may follow the root. The earlier form of this
+	# check compared the *whole* path's segment count against a constant and
+	# rejected every recorded reference, because the root itself is three
+	# segments deep. Counting what follows the root states the rule without
+	# a second copy of the root's depth to keep in step.
+	var tail := file.substr(BITMAP_REFERENCE_ROOT.length() + 1)
+	if tail.split("/", true).size() != 2:
+		return ("bitmap file reference is not <" + BITMAP_REFERENCE_ROOT
+			+ ">/<sprite>/<file>: " + file)
+	return ""
+
+## Whether a resolved absolute bitmap path is still inside the reference
+## root once the engine has simplified it.
+##
+## The segment rules above already forbid `.` and `..`, so this is a
+## second, independent bound rather than a restatement: it is what still
+## holds if a future reference form ever reaches the join without
+## passing `bitmap_reference_error`.
+static func absolute_bitmap_is_contained(absolute: String) -> bool:
+	var root := repo_root().simplify_path()
+	return absolute.simplify_path().begins_with(
+		root + "/" + BITMAP_REFERENCE_ROOT + "/")
+
 ## Absolute path of the committed capture evidence.
 static func capture_png_path() -> String:
 	return project_dir().path_join("evidence/first-render/first-render.png")

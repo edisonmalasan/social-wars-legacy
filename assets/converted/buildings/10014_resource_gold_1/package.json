@@ -1,0 +1,125 @@
+{
+  "bitmaps": [
+    {
+      "bytes": 3861,
+      "character_id": 1,
+      "file": "assets/converted/images/10014_resource_gold_1/1.jpg",
+      "sha256": "53b0bd352b17deeb6bf0065c6479ce7fa1250993e8b19406affb3dadd10e46c1"
+    },
+    {
+      "bytes": 1039,
+      "character_id": 1,
+      "file": "assets/converted/images/10014_resource_gold_1/1_alpha.png",
+      "sha256": "aa42dbcd39310b8bc9b9823397550e9eba8d8efccdc4b533038a15b2773f5c19"
+    }
+  ],
+  "content_ref": {
+    "activation": 6,
+    "attack": 0,
+    "attack_interval": 0,
+    "attack_range": 0,
+    "best_against": "",
+    "best_against_mult": 1,
+    "build_time": 180,
+    "building_limit_same_id": -1,
+    "building_limit_same_scf": -1,
+    "category_id": 1,
+    "clicks_to_build": 0,
+    "collect": 10,
+    "collect_type": "g",
+    "collect_xp": 1,
+    "content_version": "44e5b9edd1eba2910833bb8e2f063175e51c5754e38c35177648e4de779df501",
+    "cost": 0,
+    "cost_unit_cash": 0,
+    "costs": {
+      "g": 30
+    },
+    "defense": 1,
+    "display_order": 73,
+    "elevation": 1,
+    "expiration": 0,
+    "gift_level": 0,
+    "giftable": 0,
+    "group_type": "",
+    "height": 1,
+    "img_name": "10014_resource_gold_1",
+    "in_store": 0,
+    "inventory_ids": null,
+    "kind": "building",
+    "legacy_id": "914",
+    "life": 1,
+    "max_collects": 0,
+    "max_elem_vol": 0,
+    "max_frame": 2,
+    "min_level": 0,
+    "name": "Gold",
+    "new_item": 0,
+    "population": 0,
+    "premium_upgrade_costs": null,
+    "properties": {
+      "bulldozable": "1",
+      "ft_building": "1",
+      "resource": "1"
+    },
+    "race": "n",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "subcat_functional": 127,
+    "subcategory_id": 12,
+    "syringes": 0,
+    "training_time": 0,
+    "trains_ids": -1,
+    "type": "b",
+    "unit_capacity": 4,
+    "upgrades_to": -1,
+    "velocity": 0,
+    "volume": 0,
+    "width": 1,
+    "xp": 0
+  },
+  "content_version": "c4e76e6d6b6cf176796ab9d263e4b074d086e8d967525ebcb06082841ce4fa0b",
+  "frame_count": 1,
+  "frame_height": 400,
+  "frame_rate": 24.0,
+  "frame_width": 550,
+  "kind": "converted_building",
+  "legacy_id": "10014_resource_gold_1",
+  "placement": {
+    "height": 1,
+    "width": 1
+  },
+  "shapes": [
+    {
+      "bounds": {
+        "height_px": 56,
+        "width_px": 109,
+        "xmax": 2180,
+        "xmin": 0,
+        "ymax": 1120,
+        "ymin": 0
+      },
+      "character_id": 2,
+      "fills": [
+        {
+          "bitmap_id": 1,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    }
+  ],
+  "source_file": "assets/sprites/10014_resource_gold_1.swf",
+  "source_layer": "converted(asset-registry)",
+  "symbols": [
+    "10014_resource_gold_1"
+  ]
+}

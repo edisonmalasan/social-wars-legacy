@@ -1,0 +1,838 @@
+{
+  "bitmaps": [
+    {
+      "bytes": 7560,
+      "character_id": 1,
+      "file": "assets/converted/images/1043_air_strike_m/1.jpg",
+      "sha256": "737e22f7978a1000021bd35f0349d65d34063860c5a4c576c91b9e9127362c11"
+    },
+    {
+      "bytes": 1909,
+      "character_id": 1,
+      "file": "assets/converted/images/1043_air_strike_m/1_alpha.png",
+      "sha256": "9a27e5a3ec3826b7b40676b6f219e1aa67737b4ec13d227bf02dccb2a96d9cd5"
+    },
+    {
+      "bytes": 1383,
+      "character_id": 3,
+      "file": "assets/converted/images/1043_air_strike_m/3.jpg",
+      "sha256": "6e8558ed2931e8e25b85902ded925f863b40e06d31a868806a5cde822c5f35d6"
+    },
+    {
+      "bytes": 308,
+      "character_id": 3,
+      "file": "assets/converted/images/1043_air_strike_m/3_alpha.png",
+      "sha256": "3aff84b50dd5b2dfbc1a53539dd7e4175c8a213e3aa642ae3aca5aa2a5b929f6"
+    },
+    {
+      "bytes": 1546,
+      "character_id": 5,
+      "file": "assets/converted/images/1043_air_strike_m/5.jpg",
+      "sha256": "05c1a1e7ca2108500256bfd878c670cb1ae1797c8b80d7179f9d42d4400d57fe"
+    },
+    {
+      "bytes": 374,
+      "character_id": 5,
+      "file": "assets/converted/images/1043_air_strike_m/5_alpha.png",
+      "sha256": "7f46d0889e06b8be89b3a39e347bb0ed2f3bc022b79a719df027aaeed9bd7fae"
+    },
+    {
+      "bytes": 10879,
+      "character_id": 8,
+      "file": "assets/converted/images/1043_air_strike_m/8.jpg",
+      "sha256": "642e8e9d34dbe89e0bc1c30b30810f1e34aa67a16c17cc78018f529119baa3a2"
+    },
+    {
+      "bytes": 2661,
+      "character_id": 8,
+      "file": "assets/converted/images/1043_air_strike_m/8_alpha.png",
+      "sha256": "b4d70251690ea27440ca94607831ea5420f54950ee55eed1896cd7b88c8189d9"
+    }
+  ],
+  "content_ref": {
+    "activation": 0,
+    "attack": 22,
+    "attack_interval": 35,
+    "attack_range": 10,
+    "best_against": "ft_armored",
+    "best_against_mult": 1,
+    "build_time": 0,
+    "building_limit_same_id": -1,
+    "building_limit_same_scf": -1,
+    "category_id": 7,
+    "clicks_to_build": 0,
+    "collect": 0,
+    "collect_type": "g",
+    "collect_xp": 5,
+    "content_version": "44e5b9edd1eba2910833bb8e2f063175e51c5754e38c35177648e4de779df501",
+    "cost": 0,
+    "cost_unit_cash": 3,
+    "costs": {
+      "g": 300,
+      "o": 600
+    },
+    "defense": 1,
+    "display_order": 115,
+    "elevation": 1,
+    "expiration": 0,
+    "gift_level": 1,
+    "giftable": 0,
+    "group_type": "AIR_VEHICLE",
+    "height": 1,
+    "img_name": "1043_air_strike_m",
+    "in_store": 0,
+    "inventory_ids": null,
+    "kind": "unit",
+    "legacy_id": "1043",
+    "life": 450,
+    "max_collects": 0,
+    "max_elem_vol": 0,
+    "max_frame": 5,
+    "min_level": 10,
+    "name": "Air Strike",
+    "new_item": 0,
+    "population": 2,
+    "premium_upgrade_costs": null,
+    "properties": {
+      "bulldozable": "1",
+      "ft_flying": "1",
+      "mechanic": "1",
+      "resurrectable": "1",
+      "seeStealthUnits": "1"
+    },
+    "race": "h",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "subcat_functional": 83,
+    "subcategory_id": 7,
+    "syringes": 1,
+    "training_time": 0,
+    "trains_ids": -1,
+    "type": "u",
+    "unit_capacity": 0,
+    "upgrades_to": -1,
+    "velocity": 15,
+    "volume": 10,
+    "width": 1,
+    "xp": 30
+  },
+  "content_version": "a0c3861fd95cbe635537efd7223f46991580a6be66735a70c9b1904c8987c18f",
+  "frame_count": 1,
+  "frame_height": 400,
+  "frame_rate": 24.0,
+  "frame_width": 550,
+  "kind": "converted_unit",
+  "legacy_id": "1043_air_strike_m",
+  "main": {
+    "frame_count": 1,
+    "labels": [],
+    "placements": [
+      {
+        "character_id": 11,
+        "character_kind": "sprite",
+        "depth": 1,
+        "frame": 1,
+        "move": false
+      }
+    ],
+    "removes": []
+  },
+  "shapes": [
+    {
+      "bounds": {
+        "height_px": 427,
+        "width_px": 620,
+        "xmax": 12409,
+        "xmin": 0,
+        "ymax": 8558,
+        "ymin": 0
+      },
+      "character_id": 2,
+      "fill_refs": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 1,
+          "matrix": "dac0000500000f60f20000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 1,
+          "matrix": "dac0000500000f54d629e0",
+          "type": 65
+        },
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 1,
+          "matrix": "dac0000500000f4178081c",
+          "type": 65
+        },
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 1,
+          "matrix": "dac0000500000e438044b0",
+          "type": 65
+        },
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 1,
+          "matrix": "dac0000500000e6810cf60",
+          "type": 65
+        },
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 1,
+          "matrix": "dac0000500000f47de5318",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 5,
+        "straight": 24,
+        "style_change": 11
+      },
+      "tag": 22
+    },
+    {
+      "bounds": {
+        "height_px": 44,
+        "width_px": 88,
+        "xmax": 1760,
+        "xmin": 1500,
+        "ymax": 890,
+        "ymin": 140
+      },
+      "character_id": 4,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 3,
+          "matrix": "d5400016000031770de8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 44,
+        "width_px": 88,
+        "xmax": 1760,
+        "xmin": 1500,
+        "ymax": 890,
+        "ymin": 140
+      },
+      "character_id": 6,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 5,
+          "matrix": "d5400016000031770de8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 318,
+        "width_px": 770,
+        "xmax": 15400,
+        "xmin": 1498,
+        "ymax": 6365,
+        "ymin": -1735
+      },
+      "character_id": 9,
+      "fill_refs": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 8,
+          "matrix": "d940000500000d2ed38a40",
+          "type": 65
+        },
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 8,
+          "matrix": "d940000500000f534826e0",
+          "type": 65
+        },
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 8,
+          "matrix": "d940000500000e62e4b720",
+          "type": 65
+        },
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 8,
+          "matrix": "d940000500000d6638dd40",
+          "type": 65
+        },
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 8,
+          "matrix": "d940000500000e7b1c0fa0",
+          "type": 65
+        },
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 8,
+          "matrix": "d940000500000e56479390",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 5,
+        "straight": 24,
+        "style_change": 11
+      },
+      "tag": 22
+    }
+  ],
+  "source_file": "assets/sprites/1043_air_strike_m.swf",
+  "source_layer": "converted(asset-registry)",
+  "sprites": [
+    {
+      "frame_count": 4,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 2,
+          "character_kind": "shape",
+          "depth": 6,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 7,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 8,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 9,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 10,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 11,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 12,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 13,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 14,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 15,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 16,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 17,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 18,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 7,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 8,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 9,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 10,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 11,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 12,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 13,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 14,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 15,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 16,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 17,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 18,
+          "frame": 3,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 7
+    },
+    {
+      "frame_count": 4,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 3,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 4,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 5,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 6,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 7,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 8,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 9,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 10,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 11,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 12,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 9,
+          "character_kind": "shape",
+          "depth": 18,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 3,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 4,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 5,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 6,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 7,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 8,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 9,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 10,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 11,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 12,
+          "frame": 3,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 10
+    },
+    {
+      "frame_count": 20,
+      "labels": [
+        {
+          "anchor": false,
+          "frame": 1,
+          "name": "QUIETO"
+        },
+        {
+          "anchor": false,
+          "frame": 6,
+          "name": "ANDAR"
+        },
+        {
+          "anchor": false,
+          "frame": 11,
+          "name": "ATAQUE"
+        },
+        {
+          "anchor": false,
+          "frame": 16,
+          "name": "MUERTE"
+        }
+      ],
+      "placements": [
+        {
+          "character_id": 7,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 10,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 4,
+          "move": false
+        },
+        {
+          "character_id": 7,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 6,
+          "move": false
+        },
+        {
+          "character_id": 10,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 9,
+          "move": false
+        }
+      ],
+      "removes": [
+        {
+          "depth": 1,
+          "frame": 4
+        },
+        {
+          "depth": 1,
+          "frame": 6
+        },
+        {
+          "depth": 1,
+          "frame": 9
+        }
+      ],
+      "sprite_id": 11
+    }
+  ],
+  "symbols": [
+    {
+      "id": 11,
+      "name": "1043_air_strike_m"
+    }
+  ]
+}

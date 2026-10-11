@@ -4,8 +4,8 @@
     "file": "sha256 of the guarded file bytes, lowercase hex: text files (valid UTF-8 without NUL) normalized CRLF -> LF first, all other files exact bytes",
     "group": "SHA-256 of the ordinal-sorted \"<sha256>  <repo-relative posix path>\\n\" lines of every file in the group"
   },
-  "combined_sha256": "233be54815f52c600e1c247571dcbbd1866ec9c66a97c6ebe2fcc6f2fb609c57",
-  "generated_at_utc": "2026-10-11T07:08:26+00:00",
+  "combined_sha256": "fe9686746fa28bb3e4be7b149dc176305237fb175f599ade85a903be9d2fbda1",
+  "generated_at_utc": "2026-10-11T15:30:04+00:00",
   "groups": {
     "config": {
       "absent_paths": [],
@@ -29,69 +29,11 @@
     "conversion_packages": {
       "absent_paths": [],
       "files": {
-        "assets/converted/buildings/0001_house_1_m/1.jpg": "1c8ce8838969cefed8e8c2d574b7c933ffc2076506a13f16e731d573de9853c4",
-        "assets/converted/buildings/0001_house_1_m/1_alpha.png": "6685b0af171e0da40313f26587551d976e63d48d2331ad96937c2e55d395e42c",
-        "assets/converted/buildings/0001_house_1_m/package.json": "ed6807d14257cdca2ddf34187fe9c45226bec372b784b3dd91e4db8f900f5f2a",
-        "assets/converted/units/10033_wild_elephant/1.jpg": "adca085be63b02813c0692118bd93209cb6650d7f533388878871e9059a4a71e",
-        "assets/converted/units/10033_wild_elephant/11.jpg": "a02595c982a8b9bc51b054b06f3e20dce8e2e810774dde5f61e75b9b7c4cac4d",
-        "assets/converted/units/10033_wild_elephant/11_alpha.png": "ff4c45f3203eec949548cf16b77a9dd7a47e083decd4f697c45b84b7c3897a7d",
-        "assets/converted/units/10033_wild_elephant/13.jpg": "dbb9d671297b8b07334d3dab756438cb3e34ab8ac20cbe9cef4cc12f98537617",
-        "assets/converted/units/10033_wild_elephant/13_alpha.png": "e4e60f0aec93ad1721cc26fce1e14ec2566f2ec63836ba87703c2ab27f9abc1b",
-        "assets/converted/units/10033_wild_elephant/15.jpg": "8798dfd08eaccc5e5aabf4ccc9895360a34ef1a3adc17b294d9dd8a8c2352840",
-        "assets/converted/units/10033_wild_elephant/15_alpha.png": "364443e1e65d42c315482aa3bf28b8059749bd25436b66dcc46fbd9ce836dfe6",
-        "assets/converted/units/10033_wild_elephant/17.jpg": "04e2e53db72ea0ee87686b211021aa288c3232e1348dbd0fb5f19d42429b58ed",
-        "assets/converted/units/10033_wild_elephant/17_alpha.png": "7939a7565ccfd745a4871e24ff26b564e61debbffa5b6479318d8b834a4dae6b",
-        "assets/converted/units/10033_wild_elephant/1_alpha.png": "e65eee0fd084a51ae9a8a17c3838a5584d38559b72520619829963481c337cea",
-        "assets/converted/units/10033_wild_elephant/20.jpg": "ba14581414567f6f0ab0f26689b08b481ec04eb34bcc44b11cd7f69bae959a03",
-        "assets/converted/units/10033_wild_elephant/20_alpha.png": "f44e323dd1be93c98f41901760c42b24cbe967107e16c8ff8fd836f86d54a9dc",
-        "assets/converted/units/10033_wild_elephant/22.jpg": "1a06e5338797eb0385392ee4da92e1c8acfa9a7a219565654fb8a8f8df03fb6d",
-        "assets/converted/units/10033_wild_elephant/22_alpha.png": "4a3525df106a5a52b1d4a07e602ba70de054ab929e6ec73e88aed808def21e57",
-        "assets/converted/units/10033_wild_elephant/24.jpg": "a6cb2396f192ecd57237d86f09ef486d8e141ed621b30a54d87d2fa3f2bd2767",
-        "assets/converted/units/10033_wild_elephant/24_alpha.png": "ecb31502f24f3ebfb1180fcdc3547efde194991cfa71abea53e17ea41a646a78",
-        "assets/converted/units/10033_wild_elephant/26.jpg": "680b7f2b41c5d9c5b0a4fdfd9649fb8eb9e317bfd21f3881f541b9d7dc16b1b5",
-        "assets/converted/units/10033_wild_elephant/26_alpha.png": "327b2cc7e0acfc841c50a0a0e88d1f6f420042b6419e0c948d9108221b7ee453",
-        "assets/converted/units/10033_wild_elephant/29.jpg": "8c05d4e850a457e9669bf2e740a05b0e5ae8980e09e2a6120cc52d7213bdcf31",
-        "assets/converted/units/10033_wild_elephant/29_alpha.png": "86741b7d317ac007d0d98d78edbfe3a305ed2e038d971a271706bf17636ed7f2",
-        "assets/converted/units/10033_wild_elephant/3.jpg": "282d587340b7a1ad6013a68401e5090714f437622a7ca2d42e5821142671d970",
-        "assets/converted/units/10033_wild_elephant/31.jpg": "ea4f0c2fa3d8f2ecc1b125c33d5f6e3143ab70b28f087fb0a493695163fb2a9a",
-        "assets/converted/units/10033_wild_elephant/31_alpha.png": "129754bd9b73fc0caea85f24f460d8d2e45ccdaf7b40c37b22ee687249885a95",
-        "assets/converted/units/10033_wild_elephant/33.jpg": "2c0f6f9d52c464d38ab945b5285f574fdca42dd7fc046d2b44bba51ca676a48d",
-        "assets/converted/units/10033_wild_elephant/33_alpha.png": "dc254863a514acd19467975f179c469ff8e96803c6fac199f901bc1f1971cf2c",
-        "assets/converted/units/10033_wild_elephant/35.jpg": "571d1fecc1ffd644dd99153fe728c3e799462cda4a775c5b387f6d6b7932cc76",
-        "assets/converted/units/10033_wild_elephant/35_alpha.png": "e34541191aba8c42f229d445a28b5c4cd6a23220d3e4fe04cbea70f890caefa1",
-        "assets/converted/units/10033_wild_elephant/38.jpg": "a2c5ee2bcc5bbba6a5f36f66becb5f7a6cdcb314785afff352035bb30c1e03e3",
-        "assets/converted/units/10033_wild_elephant/38_alpha.png": "bb56f7655b0fb165b9c3396b1b986ff2b50185b3fdee94fe7c5033af9010ea4a",
-        "assets/converted/units/10033_wild_elephant/3_alpha.png": "180da1a4f7a5681941b823cc1cda6cfd94272cbd1c7322fdcaee2d2356508f4e",
-        "assets/converted/units/10033_wild_elephant/40.jpg": "fd45c652ea824a1aa0013e115117b38363bcad3457fd9095b22412b9a38cc1b7",
-        "assets/converted/units/10033_wild_elephant/40_alpha.png": "e0479b6c8485a46736cc5ee2ff9340ae184334ae49b8c317e10b604509e99bff",
-        "assets/converted/units/10033_wild_elephant/42.jpg": "b2060911245b8bad6039b86c48cf48fd231d8bdd549d4bba26363e8c5c614e4b",
-        "assets/converted/units/10033_wild_elephant/42_alpha.png": "7d2f2f0e9b5a0328d8ecb48e92ae6e348dde7e1c26acb6016b797f8ee86d3664",
-        "assets/converted/units/10033_wild_elephant/44.jpg": "50d9c946930363d3b5e3904205f0e23c54f14f972a2fdef79f30f593327fa223",
-        "assets/converted/units/10033_wild_elephant/44_alpha.png": "ac043f055bbee52d37181ca0d5380a74c67dac81df8d6fc41f81beeb0f5bf5ba",
-        "assets/converted/units/10033_wild_elephant/47.jpg": "cf3d73e2d381a2f263aa4a6ab83b3a67b8f5588caea813c96e94329d79878997",
-        "assets/converted/units/10033_wild_elephant/47_alpha.png": "1eeb7f15da6f60408cbe4b85c01405b65a051b1940b4d54f97099c03d1e0ff00",
-        "assets/converted/units/10033_wild_elephant/49.jpg": "0ee0979eb030f035d3ab01090b77290799247c30b492792351ae6342a1663e4f",
-        "assets/converted/units/10033_wild_elephant/49_alpha.png": "a2b4d0594caec0024075b68cee9c40f5bc61fb3e6a0180ab0f8f282b4894d500",
-        "assets/converted/units/10033_wild_elephant/5.jpg": "553937e29eccb1b68b9ee922f34bd814767b951f1b78dfe9dca9edb5a2eb411c",
-        "assets/converted/units/10033_wild_elephant/51.jpg": "777c2e272437786b64e91630847cd7c386246c22bc23eae4971da5ac32733b75",
-        "assets/converted/units/10033_wild_elephant/51_alpha.png": "8798a63c7bef43b5659cd37b395c821160f9c203d18e3b395a30185bb4fac068",
-        "assets/converted/units/10033_wild_elephant/53.jpg": "b7ffd73f77abe33ad89b9b8cc56f29b10343627be911673d79b1d02cef88bf42",
-        "assets/converted/units/10033_wild_elephant/53_alpha.png": "3fce7cfbcc30d5cdd60943ba63f2df503a97c15236bbee897449927702268261",
-        "assets/converted/units/10033_wild_elephant/56.jpg": "2e1cd94b341cfe01b01d9ca240b6dadfecd254e38b5800b9bbb5760a316520d7",
-        "assets/converted/units/10033_wild_elephant/56_alpha.png": "c2a5d7206737cc45470398041582b53dfb74f5aabfc6dc6bcf9ffd4f37896f4e",
-        "assets/converted/units/10033_wild_elephant/58.jpg": "3cf1e8ad4aed838852df1a309ba8c7e584a4d2b6afb81b6a44437e1ceec72c82",
-        "assets/converted/units/10033_wild_elephant/58_alpha.png": "dfbf763c0a49e0e681eb3e370cbe63ec301649e2b20b1bf05acb58dd5946aa89",
-        "assets/converted/units/10033_wild_elephant/5_alpha.png": "a01f49e3ac15afd843a1bfb5412709bdbc16bb80bc874d9b207ee2329b3b10ce",
-        "assets/converted/units/10033_wild_elephant/60.jpg": "295325e31d95f1467a3e2d18b73686f853e6fdd0c672289b4c2dbdd868e705d6",
-        "assets/converted/units/10033_wild_elephant/60_alpha.png": "e0204f0cc56910983df452a0321e8d17d6e0671446dc648533625fd0c86574d7",
-        "assets/converted/units/10033_wild_elephant/7.jpg": "f8de2f2339347e9327fa0ab1a24d57c995f89691f135b7be5abf2e4c3d987249",
-        "assets/converted/units/10033_wild_elephant/7_alpha.png": "6f5bcc5dde1cb1c66ec4d338732db3b959c0203fdb078065c62c2725929bb76a",
-        "assets/converted/units/10033_wild_elephant/9.jpg": "7efba179e16a62e3b06487f0006e72bf2a9f859a1e1a1a3e38142cb31f987c1b",
-        "assets/converted/units/10033_wild_elephant/9_alpha.png": "67bd323ccfa4dde436e0bf4c462beb909016db01630a1203f4a0dd73d609d56b",
-        "assets/converted/units/10033_wild_elephant/package.json": "a40cc37691b662a123b99205156f73005ee3dc1d4cfbf35b12cce52d2f10b16b"
+        "assets/converted/buildings/0001_house_1_m/package.json": "30f1e1b05b99770a271ab9cf8a96652a62245e2ba193f7ed8178604eee6fc50c",
+        "assets/converted/units/10033_wild_elephant/package.json": "3a5b4b42e1c974094422cf65830a0ec55a980e0549cd46a759430258830e3b75"
       },
-      "files_count": 60,
-      "sha256": "8fb8ce84294e02c833cbac621c065ae5b0207dd5b9d15978b7fbcc690aef0d48"
+      "files_count": 2,
+      "sha256": "e97498b48e6df216ee21220a1fadcaa51c0bfc91864c48c096a9c1ca7093250a"
     },
     "legacy_sources": {
       "absent_paths": [],
@@ -115,20 +57,20 @@
       "absent_paths": [],
       "files": {
         "apps/client-godot/evidence/first-render/first-render.png": "da15d192a901d75c3dc0d394d7eef1f9066beca3423b58620645c7d613f2bae5",
-        "apps/client-godot/evidence/first-render/report.json": "07b010b69b94ba365ce65db76c329c34b73a6e96c9ab196a919e34dbd6185add"
+        "apps/client-godot/evidence/first-render/report.json": "aefd25a4e9ab3dea0a39b08b2e685f2e988a853c6cdac562c359abd4be86b4f4"
       },
       "files_count": 2,
-      "sha256": "bd92477a251506fb39baa507ae46bc7a9d40551180140d00f65893344c825483"
+      "sha256": "6fdf75a52a443380d8f89f8c1116720765e7af0da03ae93db6746d71c41a568d"
     },
     "registry_manifests": {
       "absent_paths": [],
       "files": {
-        "tools/asset-registry/conversions.json": "f5d4118c35ac6a84db080218526a016855d05a3081f419e2f17e8035647d4d97",
+        "tools/asset-registry/conversions.json": "68779e0083b8c99a95b817cd0bd981442f0ef6d9cacc1f1d1010cc75b8dcbc26",
         "tools/asset-registry/image_extraction.json": "2a00538e52e6ccd51bc7cc648b6a87acafce548e313e0378913332d618ac2455",
         "tools/asset-registry/inspection.json": "47f8b795cb1b27fe00df72745b7a20548db4071b5480c24376ed07e1a844a6fb"
       },
       "files_count": 3,
-      "sha256": "4a1fbaeb5287237ba5b9ef901f0c288f46e7bf3b4d7e90293bdc140e8d6c276b"
+      "sha256": "7e735f6d9c5bfd49f0f78a709686c3e00087733b32e0252c2d8976556133f62c"
     },
     "saves": {
       "absent_paths": [

@@ -7,8 +7,8 @@
         "passthrough": 566
       },
       "item_sprites": {
-        "converted": 2,
-        "extracted": 857,
+        "converted": 292,
+        "extracted": 567,
         "missing_source": 10,
         "pending": 3
       },
@@ -22,8 +22,8 @@
     },
     "by_status": {
       "ambiguous": 0,
-      "converted": 2,
-      "extracted": 872,
+      "converted": 292,
+      "extracted": 582,
       "missing_source": 42,
       "passthrough": 704,
       "pending": 7
@@ -80,9 +80,9 @@
       "sha256": "6a7121cdefddf4835ac90c408c98da762b7ccd7de866aea749368beffdad36e0"
     },
     {
-      "bytes": 1225,
+      "bytes": 90050,
       "file": "tools/asset-registry/conversions.json",
-      "sha256": "f5d4118c35ac6a84db080218526a016855d05a3081f419e2f17e8035647d4d97"
+      "sha256": "68779e0083b8c99a95b817cd0bd981442f0ef6d9cacc1f1d1010cc75b8dcbc26"
     },
     {
       "bytes": 3084,
@@ -5104,18 +5104,18 @@
         {
           "ref": "0018_market_1_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0018_market_1_m",
+          "runtime": "assets/converted/buildings/0018_market_1_m",
           "source": "assets/sprites/0018_market_1_m.swf",
           "source_sha256": "7da74b5fef09a8833168c8796d4718f6706d167ddaabe24cb24d305867d7acdc",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0019_prision_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0019_prision_m",
+          "runtime": "assets/converted/buildings/0019_prision_m",
           "source": "assets/sprites/0019_prision_m.swf",
           "source_sha256": "4158dea8a863788087024eb1e805da1b1696d266e5c40f97263fc863a0c80731",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0022_tower_1_m",
@@ -5128,26 +5128,26 @@
         {
           "ref": "0023_wall_1_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0023_wall_1_m",
+          "runtime": "assets/converted/buildings/0023_wall_1_m",
           "source": "assets/sprites/0023_wall_1_m.swf",
           "source_sha256": "573a35b6fb58aa31458e4c41ae3580b0e5cdaf559e88266a0bddf7586e3fa2f6",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0024_wall_2_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0024_wall_2_m",
+          "runtime": "assets/converted/buildings/0024_wall_2_m",
           "source": "assets/sprites/0024_wall_2_m.swf",
           "source_sha256": "71f26a334b2a288905e744301ac126c79eae20911df8aaec2218f594dbce472b",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0025_wall_3_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0025_wall_3_m",
+          "runtime": "assets/converted/buildings/0025_wall_3_m",
           "source": "assets/sprites/0025_wall_3_m.swf",
           "source_sha256": "9d35a9397a449a583e61b2014b9a72bee370e3e8d4eddacb197558bca104b415",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0026_command_center_1_m",
@@ -5160,10 +5160,10 @@
         {
           "ref": "0028_hospital_1_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0028_hospital_1_m",
+          "runtime": "assets/converted/buildings/0028_hospital_1_m",
           "source": "assets/sprites/0028_hospital_1_m.swf",
           "source_sha256": "f3c677d0e137c1bc98866cd5a5d5d3fe890196da964a214f0f65d1ed2a5aa8a3",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0030_academy_1_m",
@@ -5184,10 +5184,10 @@
         {
           "ref": "0037_hangar_1_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0037_hangar_1_m",
+          "runtime": "assets/converted/buildings/0037_hangar_1_m",
           "source": "assets/sprites/0037_hangar_1_m.swf",
           "source_sha256": "a036633332e3e3946105792b6942402e119c425457ffd170c288a7bd76ec8352",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0038_cannon_academy_1_m",
@@ -5264,18 +5264,18 @@
         {
           "ref": "0047_house_2_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0047_house_2_m",
+          "runtime": "assets/converted/buildings/0047_house_2_m",
           "source": "assets/sprites/0047_house_2_m.swf",
           "source_sha256": "5102b29706d3683f11ce3cdcce313064db516a363ce859e843cd4bb7c7d3f89d",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0048_house_3_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0048_house_3_m",
+          "runtime": "assets/converted/buildings/0048_house_3_m",
           "source": "assets/sprites/0048_house_3_m.swf",
           "source_sha256": "1cc45f24b0aab234ec9a7bda99931b2b874289f42e2754b8d4e5dd75b6136b17",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0049_torreta_horacio_m",
@@ -5376,114 +5376,114 @@
         {
           "ref": "0061_allies_building_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0061_allies_building_m",
+          "runtime": "assets/converted/buildings/0061_allies_building_m",
           "source": "assets/sprites/0061_allies_building_m.swf",
           "source_sha256": "fa7abe488670f334d54eb022890d41e0245ba7c25782b3ae820963b23399769b",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0062_cannon_academy_2_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0062_cannon_academy_2_m",
+          "runtime": "assets/converted/buildings/0062_cannon_academy_2_m",
           "source": "assets/sprites/0062_cannon_academy_2_m.swf",
           "source_sha256": "7ba573e67cbdaee8ecb85e80a785b4f16e319ebb96c8acd5e1b1130cddfb6400",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0063_cannon_academy_3_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0063_cannon_academy_3_m",
+          "runtime": "assets/converted/buildings/0063_cannon_academy_3_m",
           "source": "assets/sprites/0063_cannon_academy_3_m.swf",
           "source_sha256": "fee1c852e399a2ebf625ee02622a8c87f9a8b5bb362d85939320f0c593f9c67d",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0064_workshop_2_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0064_workshop_2_m",
+          "runtime": "assets/converted/buildings/0064_workshop_2_m",
           "source": "assets/sprites/0064_workshop_2_m.swf",
           "source_sha256": "07527d4e1b8778567ab86f002186f7188db52f7c93d9f2fce87ce818e5be4fb4",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0065_workshop_3_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0065_workshop_3_m",
+          "runtime": "assets/converted/buildings/0065_workshop_3_m",
           "source": "assets/sprites/0065_workshop_3_m.swf",
           "source_sha256": "b39a637fbfe71b09a010cd461b7b198d731912c4b44e67bd189f8e32a29e2c1e",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0066_stoneage_marvel_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0066_stoneage_marvel_m",
+          "runtime": "assets/converted/buildings/0066_stoneage_marvel_m",
           "source": "assets/sprites/0066_stoneage_marvel_m.swf",
           "source_sha256": "f6ceed4765220e7e47850a7fc78990cf06d89dcc38a1c9c899fac6b269ce0306",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0067_machupichu_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0067_machupichu_m",
+          "runtime": "assets/converted/buildings/0067_machupichu_m",
           "source": "assets/sprites/0067_machupichu_m.swf",
           "source_sha256": "07660cd48618d621b0df8fc4759774c2b4e59aa741f141de5330507aa109bbe9",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0068_iguazu_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0068_iguazu_m",
+          "runtime": "assets/converted/buildings/0068_iguazu_m",
           "source": "assets/sprites/0068_iguazu_m.swf",
           "source_sha256": "6ba48f62fb232920dfa73c1334afb8cbc9bb589a76a2ebbb23725b3c05acdeb7",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0069_sfinx_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0069_sfinx_m",
+          "runtime": "assets/converted/buildings/0069_sfinx_m",
           "source": "assets/sprites/0069_sfinx_m.swf",
           "source_sha256": "a73e0beff5988465e4378301394d1247a4b9d51a80a97dfe8084800c9eb0ef54",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0070_inca_god_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0070_inca_god_m",
+          "runtime": "assets/converted/buildings/0070_inca_god_m",
           "source": "assets/sprites/0070_inca_god_m.swf",
           "source_sha256": "6b42785eeef06cca9e5c8404810efe2074dbf678b739f758b59e6b110cc5fd7e",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0071_chichenitza_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0071_chichenitza_m",
+          "runtime": "assets/converted/buildings/0071_chichenitza_m",
           "source": "assets/sprites/0071_chichenitza_m.swf",
           "source_sha256": "9a34ef4e43d98e3d4e8c1007da599a673ccdeed273a142bf6444b4c0c2fd411c",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0072_babilonia_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0072_babilonia_m",
+          "runtime": "assets/converted/buildings/0072_babilonia_m",
           "source": "assets/sprites/0072_babilonia_m.swf",
           "source_sha256": "133a0b14cda65fb2b1ee6b22febe15cd0a68fe08e1eb722cde895a633384c756",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0073_Ankor_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0073_Ankor_m",
+          "runtime": "assets/converted/buildings/0073_Ankor_m",
           "source": "assets/sprites/0073_Ankor_m.swf",
           "source_sha256": "5675619d58fe3ac4882a8b648fff22ae58449dd079f3f0d55c65b6d37590857b",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0074_Allies_market_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0074_Allies_market_m",
+          "runtime": "assets/converted/buildings/0074_Allies_market_m",
           "source": "assets/sprites/0074_Allies_market_m.swf",
           "source_sha256": "9ee10cb434febd995e347ef4e8ba997b783701a27e2452f4bb8556dae42b8112",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0075_Spy_center_m",
@@ -5496,58 +5496,58 @@
         {
           "ref": "0076_hangar_2_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0076_hangar_2_m",
+          "runtime": "assets/converted/buildings/0076_hangar_2_m",
           "source": "assets/sprites/0076_hangar_2_m.swf",
           "source_sha256": "980d0d4470b7092612edc3286f188ec3c6160de83f0b02d8a7e38112a4cc81f3",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0077_hangar_3_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0077_hangar_3_m",
+          "runtime": "assets/converted/buildings/0077_hangar_3_m",
           "source": "assets/sprites/0077_hangar_3_m.swf",
           "source_sha256": "93f4ff38347c7604a666ac0af9d5618be230d821b0e09824d9805d49ba509544",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0078_wall_4_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0078_wall_4_m",
+          "runtime": "assets/converted/buildings/0078_wall_4_m",
           "source": "assets/sprites/0078_wall_4_m.swf",
           "source_sha256": "882ab16b205c59a37b6934af2db770dd8cfd8e90627598e7b0985bbd6e3ab3c8",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0079_wall_5_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0079_wall_5_m",
+          "runtime": "assets/converted/buildings/0079_wall_5_m",
           "source": "assets/sprites/0079_wall_5_m.swf",
           "source_sha256": "465aea9312804850e7d8ff8b636ba496ea7ebcb598cafeee3adeaa84b99e8c9c",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0080_fortress_1_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0080_fortress_1_m",
+          "runtime": "assets/converted/buildings/0080_fortress_1_m",
           "source": "assets/sprites/0080_fortress_1_m.swf",
           "source_sha256": "ed538136258699e2c7330c842aa7a49a6d708392a9cd205bcc73e658b6a8e500",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0081_fortress_2_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0081_fortress_2_m",
+          "runtime": "assets/converted/buildings/0081_fortress_2_m",
           "source": "assets/sprites/0081_fortress_2_m.swf",
           "source_sha256": "728a1b1941766825a8e0633bea501b349cb30d447d57599533624b49dc03ce61",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0082_fortress_3_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0082_fortress_3_m",
+          "runtime": "assets/converted/buildings/0082_fortress_3_m",
           "source": "assets/sprites/0082_fortress_3_m.swf",
           "source_sha256": "8ceb93cc57d5dcd46a1486020f60feb22c9b9004e88ca7b81cf930818ebfecdc",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0083_fortress_4_m",
@@ -5600,146 +5600,146 @@
         {
           "ref": "0089_nuclear_plant_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0089_nuclear_plant_m",
+          "runtime": "assets/converted/buildings/0089_nuclear_plant_m",
           "source": "assets/sprites/0089_nuclear_plant_m.swf",
           "source_sha256": "7ddad8c92578896e0a26813b4f8a9592888cb5096cf1bd16aa535f0fd837f6f4",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0090_market_2_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0090_market_2_m",
+          "runtime": "assets/converted/buildings/0090_market_2_m",
           "source": "assets/sprites/0090_market_2_m.swf",
           "source_sha256": "92346633576f36dd783cf11218248cea5ec7a8aa1f50cb42ebbcf01b042b4e2a",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0091_market_3_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0091_market_3_m",
+          "runtime": "assets/converted/buildings/0091_market_3_m",
           "source": "assets/sprites/0091_market_3_m.swf",
           "source_sha256": "43241a2bc5e1ac48cacdd054c3733f236a6995ed9cb1289ad9264e38b7583488",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0092_apple_tree_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0092_apple_tree_m",
+          "runtime": "assets/converted/buildings/0092_apple_tree_m",
           "source": "assets/sprites/0092_apple_tree_m.swf",
           "source_sha256": "46209aac6d5f321ae16cad3cb26c097846b1972f706cede54041616d1405812e",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0093_pear_tree_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0093_pear_tree_m",
+          "runtime": "assets/converted/buildings/0093_pear_tree_m",
           "source": "assets/sprites/0093_pear_tree_m.swf",
           "source_sha256": "40212289b47c2877cf3b44bc7a72a48e5be91deb3f2661468537a545bfe461ca",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0094_sponge_bush_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0094_sponge_bush_m",
+          "runtime": "assets/converted/buildings/0094_sponge_bush_m",
           "source": "assets/sprites/0094_sponge_bush_m.swf",
           "source_sha256": "e35ef5d9ab75a2e6faabebd8e39b13e29325aafd238fb86c18e3925dfe0160f7",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0095_little_fountain_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0095_little_fountain_m",
+          "runtime": "assets/converted/buildings/0095_little_fountain_m",
           "source": "assets/sprites/0095_little_fountain_m.swf",
           "source_sha256": "06b7b1a092b8860b0fa5b48a45cd49e523469a793ac9a8c27f9ffd4e005eb7dd",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0096_white_flowers_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0096_white_flowers_m",
+          "runtime": "assets/converted/buildings/0096_white_flowers_m",
           "source": "assets/sprites/0096_white_flowers_m.swf",
           "source_sha256": "2066ec34f56609f0f50a89f6dba140d6c9f0c23b6b5aa7d5bb663f8cfe54cc54",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0097_red_flowers_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0097_red_flowers_m",
+          "runtime": "assets/converted/buildings/0097_red_flowers_m",
           "source": "assets/sprites/0097_red_flowers_m.swf",
           "source_sha256": "1b628ce2634932aa592354c93ca5bf4b4e8970dc3c64abc66597ad1e810585d5",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0098_blue_flowers_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0098_blue_flowers_m",
+          "runtime": "assets/converted/buildings/0098_blue_flowers_m",
           "source": "assets/sprites/0098_blue_flowers_m.swf",
           "source_sha256": "f927faf8885ad82cb42b6a2ddad2761b507298123622cbc5ead9ec6314f9b0c3",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0100_red_leaf_flowers_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0100_red_leaf_flowers_m",
+          "runtime": "assets/converted/buildings/0100_red_leaf_flowers_m",
           "source": "assets/sprites/0100_red_leaf_flowers_m.swf",
           "source_sha256": "c0dfb0c520fbc1a222b4302d9236e5a37a7f8fa34c4ad7d6d3078028a84a0e5b",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0101_pink_leaf_flowers_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0101_pink_leaf_flowers_m",
+          "runtime": "assets/converted/buildings/0101_pink_leaf_flowers_m",
           "source": "assets/sprites/0101_pink_leaf_flowers_m.swf",
           "source_sha256": "24898d83bdafd16a0ee6a7ca0efe16e992bcb495264c680944a2a2c45486bfba",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0102_blue_leaf_flowers_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0102_blue_leaf_flowers_m",
+          "runtime": "assets/converted/buildings/0102_blue_leaf_flowers_m",
           "source": "assets/sprites/0102_blue_leaf_flowers_m.swf",
           "source_sha256": "7d566eca0a20a82113fd898e49bc63559d07dc8d55528f812715908de997f800",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0103_bush_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0103_bush_m",
+          "runtime": "assets/converted/buildings/0103_bush_m",
           "source": "assets/sprites/0103_bush_m.swf",
           "source_sha256": "a19b66ebf624f0dd66709f63f3304ebccd4e2bccf4770e9b4a58b05a805980f2",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0104_bancos_farolas_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0104_bancos_farolas_m",
+          "runtime": "assets/converted/buildings/0104_bancos_farolas_m",
           "source": "assets/sprites/0104_bancos_farolas_m.swf",
           "source_sha256": "b8c1b21f755d5a403059ec34735c5d402c7197bae65a389a49044748c3da3442",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0105_victory_arch_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0105_victory_arch_m",
+          "runtime": "assets/converted/buildings/0105_victory_arch_m",
           "source": "assets/sprites/0105_victory_arch_m.swf",
           "source_sha256": "e551f00a4ca9fab6a2adea84e0878a1a57f46ddd1b06ef7b4f23979d348cdd9d",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0106_fountain_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0106_fountain_m",
+          "runtime": "assets/converted/buildings/0106_fountain_m",
           "source": "assets/sprites/0106_fountain_m.swf",
           "source_sha256": "89009da6781af642f61f89a9c0ac47cb264fe231497f851945458d9e827eec92",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0107_sculpture_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0107_sculpture_m",
+          "runtime": "assets/converted/buildings/0107_sculpture_m",
           "source": "assets/sprites/0107_sculpture_m.swf",
           "source_sha256": "2b874940fcb1073c83b9f8a541fcbd28269c9aa3f7c89b441c9c6114415d8acb",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0108_grape_field_m",
@@ -5784,34 +5784,34 @@
         {
           "ref": "0113_disabled_jeeps_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0113_disabled_jeeps_m",
+          "runtime": "assets/converted/buildings/0113_disabled_jeeps_m",
           "source": "assets/sprites/0113_disabled_jeeps_m.swf",
           "source_sha256": "4b0cf19f284bd312fe189a28a8b2587aeda291541f12815f8ebe3e03582dc2e4",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0114_jeep_weels_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0114_jeep_weels_m",
+          "runtime": "assets/converted/buildings/0114_jeep_weels_m",
           "source": "assets/sprites/0114_jeep_weels_m.swf",
           "source_sha256": "bb6de414cc8f022ead15061cd386db3aae795943ba2d6b5dec2326d56f7edfae",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0115_supertank_ammo_1_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0115_supertank_ammo_1_m",
+          "runtime": "assets/converted/buildings/0115_supertank_ammo_1_m",
           "source": "assets/sprites/0115_supertank_ammo_1_m.swf",
           "source_sha256": "c6b340eddc2d2f6820e6db5d12930765204a487d48083b0fdc2e4be80942ffd7",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0116_supertank_ammo_2_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0116_supertank_ammo_2_m",
+          "runtime": "assets/converted/buildings/0116_supertank_ammo_2_m",
           "source": "assets/sprites/0116_supertank_ammo_2_m.swf",
           "source_sha256": "d3a758f05f55ed3ab3627a0d049f8e480cd98aca238464ecb59d059b470f75e9",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0117_disabled_supertank_m",
@@ -5824,58 +5824,58 @@
         {
           "ref": "0118_laboratory_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0118_laboratory_m",
+          "runtime": "assets/converted/buildings/0118_laboratory_m",
           "source": "assets/sprites/0118_laboratory_m.swf",
           "source_sha256": "e4caf16a1987a966ce916786acccb64a5e5aa692677e06c0f2fe23bcf4561a1c",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0119_tank_wheels_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0119_tank_wheels_m",
+          "runtime": "assets/converted/buildings/0119_tank_wheels_m",
           "source": "assets/sprites/0119_tank_wheels_m.swf",
           "source_sha256": "ba6e77657ea341f6e561d41d26bb5404407e46a410f48f302f715b3cdf6ff3eb",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0120_stolen_missiles_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0120_stolen_missiles_m",
+          "runtime": "assets/converted/buildings/0120_stolen_missiles_m",
           "source": "assets/sprites/0120_stolen_missiles_m.swf",
           "source_sha256": "ef9085745cefae90f5221d3fd5f7057420a164b41fd9a6fa8bc4c8ba215377c4",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0121_radio_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0121_radio_m",
+          "runtime": "assets/converted/buildings/0121_radio_m",
           "source": "assets/sprites/0121_radio_m.swf",
           "source_sha256": "a329cc694525d03a018879f785dfb01f9378718d86303acf23a9f3b5ccf67fb6",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0122_helipuerto_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0122_helipuerto_m",
+          "runtime": "assets/converted/buildings/0122_helipuerto_m",
           "source": "assets/sprites/0122_helipuerto_m.swf",
           "source_sha256": "87296147689e776114e01054a045ad0161a88afce0cc35e26e4efb940214692b",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0123_red_fortress_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0123_red_fortress_m",
+          "runtime": "assets/converted/buildings/0123_red_fortress_m",
           "source": "assets/sprites/0123_red_fortress_m.swf",
           "source_sha256": "cf899ed0b10770df4f7a907641e4e50f79e79696a112be13778ce4bdae3567bc",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0124_disabled_tanks_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0124_disabled_tanks_m",
+          "runtime": "assets/converted/buildings/0124_disabled_tanks_m",
           "source": "assets/sprites/0124_disabled_tanks_m.swf",
           "source_sha256": "71c83027504fa77af55b8435c214ea4ebae13a58a6519dd163751e72fbea8552",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0125_laboratory_m",
@@ -5888,18 +5888,18 @@
         {
           "ref": "0126_enemy_airport_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0126_enemy_airport_m",
+          "runtime": "assets/converted/buildings/0126_enemy_airport_m",
           "source": "assets/sprites/0126_enemy_airport_m.swf",
           "source_sha256": "02756b21f9359ce9a55e30512c41b5dd312967171b07b2346333f750c114f1b0",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0127_enemy_harbour_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0127_enemy_harbour_m",
+          "runtime": "assets/converted/buildings/0127_enemy_harbour_m",
           "source": "assets/sprites/0127_enemy_harbour_m.swf",
           "source_sha256": "b3fc627ea2842ad640d988e09d7516682d864b6eae50aa4108b610ac0d50b81a",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0128_rocket_launcher_m",
@@ -5920,58 +5920,58 @@
         {
           "ref": "0130_black_tank_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0130_black_tank_academy_m",
+          "runtime": "assets/converted/buildings/0130_black_tank_academy_m",
           "source": "assets/sprites/0130_black_tank_academy_m.swf",
           "source_sha256": "239d90b7dd889f9d049efc1f710750b3d952effed8d22a22c0389779b609a6a3",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0131_black_aircraft_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0131_black_aircraft_academy_m",
+          "runtime": "assets/converted/buildings/0131_black_aircraft_academy_m",
           "source": "assets/sprites/0131_black_aircraft_academy_m.swf",
           "source_sha256": "6a4e7f2cccbf81e42e02ccba7c4061073ee9f1d30c1a3d5c5cc25c72ec4779f0",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0132_troubled_traveller_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0132_troubled_traveller_m",
+          "runtime": "assets/converted/buildings/0132_troubled_traveller_m",
           "source": "assets/sprites/0132_troubled_traveller_m.swf",
           "source_sha256": "d32b5ccd5a9f18d3170f67828f5806db2bc91141f282b31d24cfb497f8ef5eac",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0133_injured_soldier_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0133_injured_soldier_m",
+          "runtime": "assets/converted/buildings/0133_injured_soldier_m",
           "source": "assets/sprites/0133_injured_soldier_m.swf",
           "source_sha256": "5b80f1d7e1117ab02d6184a79f2cb3875e9e75fe9e71216a2e47e2f8b4e8cd18",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0134_field_hospital_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0134_field_hospital_m",
+          "runtime": "assets/converted/buildings/0134_field_hospital_m",
           "source": "assets/sprites/0134_field_hospital_m.swf",
           "source_sha256": "c6ecbc537e20a19ef3cf673c609a65fd8e069522d60356e47e4aad5b2c99f196",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0135_engineer_barrack_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0135_engineer_barrack_m",
+          "runtime": "assets/converted/buildings/0135_engineer_barrack_m",
           "source": "assets/sprites/0135_engineer_barrack_m.swf",
           "source_sha256": "44ddf1cbfc3aca9dbbaa794080cc6c7626d2efdd8842481276fec82da102f70b",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0136_general_sculpture_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0136_general_sculpture_m",
+          "runtime": "assets/converted/buildings/0136_general_sculpture_m",
           "source": "assets/sprites/0136_general_sculpture_m.swf",
           "source_sha256": "6872d98db783c97b91df0cd3d1ad02c4e3435b1d5b2d8431fd70ef1901ce54ce",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0137_spy_academy_m",
@@ -5984,10 +5984,10 @@
         {
           "ref": "0138_mr_t_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0138_mr_t_academy_m",
+          "runtime": "assets/converted/buildings/0138_mr_t_academy_m",
           "source": "assets/sprites/0138_mr_t_academy_m.swf",
           "source_sha256": "f8a2002ae91e9b022752f4b67aac31372737bdbe062c9570ce945a80f80b3dbe",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0139_area_51_m",
@@ -6000,138 +6000,138 @@
         {
           "ref": "0140_recruitment_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0140_recruitment_m",
+          "runtime": "assets/converted/buildings/0140_recruitment_m",
           "source": "assets/sprites/0140_recruitment_m.swf",
           "source_sha256": "bda4c7a3dd7da7d58063b397fe42b5d98d195c40f5848116f6d9449a58613cc3",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0141_bazooka_academy_4_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0141_bazooka_academy_4_m",
+          "runtime": "assets/converted/buildings/0141_bazooka_academy_4_m",
           "source": "assets/sprites/0141_bazooka_academy_4_m.swf",
           "source_sha256": "32826a2eaab2d7f48c76f953d9641ae47977a4a736139c80bcc450d8240a6dc9",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0142_bazooka_academy_5_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0142_bazooka_academy_5_m",
+          "runtime": "assets/converted/buildings/0142_bazooka_academy_5_m",
           "source": "assets/sprites/0142_bazooka_academy_5_m.swf",
           "source_sha256": "4f2d2acfd682640b4913b3066f09ba35bc59068d2c44bf1e7391f57fc408edff",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0143_academy_4_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0143_academy_4_m",
+          "runtime": "assets/converted/buildings/0143_academy_4_m",
           "source": "assets/sprites/0143_academy_4_m.swf",
           "source_sha256": "785f1a63b5343b5d291571a718d22f0601d7c35a2a2d57d2222f7067f5d07edd",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0144_academy_5_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0144_academy_5_m",
+          "runtime": "assets/converted/buildings/0144_academy_5_m",
           "source": "assets/sprites/0144_academy_5_m.swf",
           "source_sha256": "45ecb3fb0ca74f6f2070cf42ff86d52c9228081bab619dfd4a05a78485c56dc6",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0145_mortar_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0145_mortar_academy_m",
+          "runtime": "assets/converted/buildings/0145_mortar_academy_m",
           "source": "assets/sprites/0145_mortar_academy_m.swf",
           "source_sha256": "949e2f52fc7f1ba21462c677115a8d2eca17456d5d8116ae606078cdebd2756b",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0146_copter_hangar_4_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0146_copter_hangar_4_m",
+          "runtime": "assets/converted/buildings/0146_copter_hangar_4_m",
           "source": "assets/sprites/0146_copter_hangar_4_m.swf",
           "source_sha256": "47ab4d2feb6380b2120055b762f188486ed7175e30e8397c4b7028d3abc8d74e",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0147_copter_hangar_5_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0147_copter_hangar_5_m",
+          "runtime": "assets/converted/buildings/0147_copter_hangar_5_m",
           "source": "assets/sprites/0147_copter_hangar_5_m.swf",
           "source_sha256": "f02ff0e33a73fc84cf8f8f8a4526588918190291413b71167a83141cb74cf719",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0148_artillery_garage_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0148_artillery_garage_m",
+          "runtime": "assets/converted/buildings/0148_artillery_garage_m",
           "source": "assets/sprites/0148_artillery_garage_m.swf",
           "source_sha256": "ad6897f61a6c7080a152f7f3009e20bbfb59abea43c7649718ea26b988a1a38d",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0149_antiaircraft_garage_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0149_antiaircraft_garage_m",
+          "runtime": "assets/converted/buildings/0149_antiaircraft_garage_m",
           "source": "assets/sprites/0149_antiaircraft_garage_m.swf",
           "source_sha256": "21ec0ae4137146ac0b78878e22bc7d34fa4d709f53215b4e0fb0e77cf2331e1c",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0150_tank_academy_4_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0150_tank_academy_4_m",
+          "runtime": "assets/converted/buildings/0150_tank_academy_4_m",
           "source": "assets/sprites/0150_tank_academy_4_m.swf",
           "source_sha256": "1309a0ba73ddc356ef71fbecb7656e5f3eebec466bde37025883e67dadc5dbbb",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0151_tank_academy_5_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0151_tank_academy_5_m",
+          "runtime": "assets/converted/buildings/0151_tank_academy_5_m",
           "source": "assets/sprites/0151_tank_academy_5_m.swf",
           "source_sha256": "49e9c4114d181fa39dd44e74c6303583c48e2c372bcc5ae9fb82a21b23d14837",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0152_robo_flag_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0152_robo_flag_m",
+          "runtime": "assets/converted/buildings/0152_robo_flag_m",
           "source": "assets/sprites/0152_robo_flag_m.swf",
           "source_sha256": "106329fde9418fefb911a9a98cc0881ff31009774d2a8bbf0275973fd676bd4a",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0153_robo_statue_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0153_robo_statue_m",
+          "runtime": "assets/converted/buildings/0153_robo_statue_m",
           "source": "assets/sprites/0153_robo_statue_m.swf",
           "source_sha256": "8a2d2116b5ffb0f4f813831127d60eeb3fdb53dc7a1a689c97c7a339fdce996a",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0154_robo_soldier_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0154_robo_soldier_academy_m",
+          "runtime": "assets/converted/buildings/0154_robo_soldier_academy_m",
           "source": "assets/sprites/0154_robo_soldier_academy_m.swf",
           "source_sha256": "dc35819a5a960fa516707dfc7162b17091b37b2bd924df3e758fc94c15b054dc",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0155_robo_swordsman_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0155_robo_swordsman_academy_m",
+          "runtime": "assets/converted/buildings/0155_robo_swordsman_academy_m",
           "source": "assets/sprites/0155_robo_swordsman_academy_m.swf",
           "source_sha256": "d1d8dc1e78a1bfea7de946c3928fc4cd5b878df92812b11ec4821ded0343c562",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0156_robo_bazooka_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0156_robo_bazooka_academy_m",
+          "runtime": "assets/converted/buildings/0156_robo_bazooka_academy_m",
           "source": "assets/sprites/0156_robo_bazooka_academy_m.swf",
           "source_sha256": "90157be3beb797a89e06ce853b01a3c771478de1e63d93a42c49fa6b059db2ab",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0157_jet_robosoldier_academy_m",
@@ -6144,10 +6144,10 @@
         {
           "ref": "0158_motorized_robosoldier_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0158_motorized_robosoldier_academy_m",
+          "runtime": "assets/converted/buildings/0158_motorized_robosoldier_academy_m",
           "source": "assets/sprites/0158_motorized_robosoldier_academy_m.swf",
           "source_sha256": "df8357540fe62fbe29fdf866bb61a867f7f0569c2e904b9597bef771c3bf52d2",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0159_retaliator_academy_m",
@@ -6160,34 +6160,34 @@
         {
           "ref": "0160_robo_lancer_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0160_robo_lancer_academy_m",
+          "runtime": "assets/converted/buildings/0160_robo_lancer_academy_m",
           "source": "assets/sprites/0160_robo_lancer_academy_m.swf",
           "source_sha256": "a7f39895a64343edd653e92ebc5ba60b09dfe87ff7ef13af1898eee93aa535a3",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0161_demolisher_tank_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0161_demolisher_tank_academy_m",
+          "runtime": "assets/converted/buildings/0161_demolisher_tank_academy_m",
           "source": "assets/sprites/0161_demolisher_tank_academy_m.swf",
           "source_sha256": "ed6667b94e6c903e5fc2355f628da2c8c1a7626b3d439150b22dd365767e7881",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0162_dreadnought_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0162_dreadnought_academy_m",
+          "runtime": "assets/converted/buildings/0162_dreadnought_academy_m",
           "source": "assets/sprites/0162_dreadnought_academy_m.swf",
           "source_sha256": "58d86e22d3385cad366b647631c8abf9e7f7071fa9aafd2371733a172dfc6623",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0163_robo_house_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0163_robo_house_m",
+          "runtime": "assets/converted/buildings/0163_robo_house_m",
           "source": "assets/sprites/0163_robo_house_m.swf",
           "source_sha256": "bf792a394b1eadabf4231512b5217248b392f3b95a27d476e140647579b18832",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0164_robo_turret_1_m",
@@ -6224,50 +6224,50 @@
         {
           "ref": "0168_skylander_hangar_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0168_skylander_hangar_m",
+          "runtime": "assets/converted/buildings/0168_skylander_hangar_m",
           "source": "assets/sprites/0168_skylander_hangar_m.swf",
           "source_sha256": "c5f696ef0ad33f528d036a78c385268e8b1dbe17577e7211c4d7a915380609c5",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0169_roboaxe_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0169_roboaxe_academy_m",
+          "runtime": "assets/converted/buildings/0169_roboaxe_academy_m",
           "source": "assets/sprites/0169_roboaxe_academy_m.swf",
           "source_sha256": "87c964721636ada2ebf1402378af3b048f2459f9d3c058c97916938ac1d6a69f",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0170_giant_walker_factory_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0170_giant_walker_factory_m",
+          "runtime": "assets/converted/buildings/0170_giant_walker_factory_m",
           "source": "assets/sprites/0170_giant_walker_factory_m.swf",
           "source_sha256": "76cad30603f4725c734564df76a66ba0858c90fe898f45789e9a41620908e7e8",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0171_missile_tank_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0171_missile_tank_academy_m",
+          "runtime": "assets/converted/buildings/0171_missile_tank_academy_m",
           "source": "assets/sprites/0171_missile_tank_academy_m.swf",
           "source_sha256": "3246d00edf2cafcb20bf5c88dc03ebc793517cf93346cfc6a9261c2c77776e75",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0172_steel_claws_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0172_steel_claws_academy_m",
+          "runtime": "assets/converted/buildings/0172_steel_claws_academy_m",
           "source": "assets/sprites/0172_steel_claws_academy_m.swf",
           "source_sha256": "af50828534bb5369214acfb7d25641ae96d9f33ea10d05670d3fdbd5218daece",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0174_fireman_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0174_fireman_academy_m",
+          "runtime": "assets/converted/buildings/0174_fireman_academy_m",
           "source": "assets/sprites/0174_fireman_academy_m.swf",
           "source_sha256": "650e753226b5765c033e2217ceda6387326001cd594f4187c02ce6a2e20ff809",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0175_alejandria_m",
@@ -6280,66 +6280,66 @@
         {
           "ref": "0176_maravilla_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0176_maravilla_m",
+          "runtime": "assets/converted/buildings/0176_maravilla_m",
           "source": "assets/sprites/0176_maravilla_m.swf",
           "source_sha256": "91c2c9c7a4d24c95b6f6281df13c8af28120caa7eb622208f27413341b9c1575",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0177_orc_soldier_academy_1_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0177_orc_soldier_academy_1_m",
+          "runtime": "assets/converted/buildings/0177_orc_soldier_academy_1_m",
           "source": "assets/sprites/0177_orc_soldier_academy_1_m.swf",
           "source_sha256": "e76f31c4b01df9b5daf6a88e9c93f12628bc60499d76bdc7557589d53357d304",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0178_orc_soldier_academy_2_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0178_orc_soldier_academy_2_m",
+          "runtime": "assets/converted/buildings/0178_orc_soldier_academy_2_m",
           "source": "assets/sprites/0178_orc_soldier_academy_2_m.swf",
           "source_sha256": "b4654c103dda3e3ab24679ac00eaef4f918a8ba2bde9ed4f4a50cf88652cb585",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0179_orc_boss_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0179_orc_boss_academy_m",
+          "runtime": "assets/converted/buildings/0179_orc_boss_academy_m",
           "source": "assets/sprites/0179_orc_boss_academy_m.swf",
           "source_sha256": "05d03c5acc63c371434368c266407bda911cdba7c87aeaac47177781aa3696ca",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0180_orc_rider_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0180_orc_rider_academy_m",
+          "runtime": "assets/converted/buildings/0180_orc_rider_academy_m",
           "source": "assets/sprites/0180_orc_rider_academy_m.swf",
           "source_sha256": "f45e3385eccdafc11c9b64c63fa10373547fa84b48fada0da6ba841221a5f022",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0181_orc_robot_factory_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0181_orc_robot_factory_m",
+          "runtime": "assets/converted/buildings/0181_orc_robot_factory_m",
           "source": "assets/sprites/0181_orc_robot_factory_m.swf",
           "source_sha256": "939e75b97c867f024d125b22ee83ef8494e59d40f6f2b91b015a38237ae610e5",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0182_orc_flamethrower_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0182_orc_flamethrower_academy_m",
+          "runtime": "assets/converted/buildings/0182_orc_flamethrower_academy_m",
           "source": "assets/sprites/0182_orc_flamethrower_academy_m.swf",
           "source_sha256": "eb790ae8728fc2bd4079ca16f6b58bd6fe042a5601fea41646177df085cd1a39",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0183_orc_house_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0183_orc_house_m",
+          "runtime": "assets/converted/buildings/0183_orc_house_m",
           "source": "assets/sprites/0183_orc_house_m.swf",
           "source_sha256": "a54a2058947d025f36a06658f7ff0747a77deaf880f12be127b5c5f2f04ac403",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0184_orc_farm_m",
@@ -6368,18 +6368,18 @@
         {
           "ref": "0187_orc_deco_1_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0187_orc_deco_1_m",
+          "runtime": "assets/converted/buildings/0187_orc_deco_1_m",
           "source": "assets/sprites/0187_orc_deco_1_m.swf",
           "source_sha256": "b9fc0ba5af8df596f2adb6ed835193cd9119f1f007bf42d4c95abe2ea5babe94",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0188_orc_deco_2_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0188_orc_deco_2_m",
+          "runtime": "assets/converted/buildings/0188_orc_deco_2_m",
           "source": "assets/sprites/0188_orc_deco_2_m.swf",
           "source_sha256": "11221e4ed15cb18dd14373ef18b2635676b659e34eb046bf058cc99f9208874c",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0189_orc_turret_2_m",
@@ -6392,58 +6392,58 @@
         {
           "ref": "0190_helicopter_hangar2_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0190_helicopter_hangar2_m",
+          "runtime": "assets/converted/buildings/0190_helicopter_hangar2_m",
           "source": "assets/sprites/0190_helicopter_hangar2_m.swf",
           "source_sha256": "a338fec729745453911ff4e878fc5ebf6ba8439a61ba89489c3ad23acf12c8a8",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0191_camion_orco_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0191_camion_orco_academy_m",
+          "runtime": "assets/converted/buildings/0191_camion_orco_academy_m",
           "source": "assets/sprites/0191_camion_orco_academy_m.swf",
           "source_sha256": "afef177f09d3353afb7e8a4db177d91900927ec1c86c21ab2662463ecb12f22f",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0192_orc_lanzamachetes_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0192_orc_lanzamachetes_academy_m",
+          "runtime": "assets/converted/buildings/0192_orc_lanzamachetes_academy_m",
           "source": "assets/sprites/0192_orc_lanzamachetes_academy_m.swf",
           "source_sha256": "3921c33c70ddcd01de2b1043e2361d6536133a7d4f97737cb242591364c82ce9",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0193_orc_mascota_kamikaze_academy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0193_orc_mascota_kamikaze_academy_m",
+          "runtime": "assets/converted/buildings/0193_orc_mascota_kamikaze_academy_m",
           "source": "assets/sprites/0193_orc_mascota_kamikaze_academy_m.swf",
           "source_sha256": "a84dba2580bb56e27e9d145fe2b750582e7089ba58c9dd562030c1ca22d9b6e7",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0194_orc_robot_2_factory_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0194_orc_robot_2_factory_m",
+          "runtime": "assets/converted/buildings/0194_orc_robot_2_factory_m",
           "source": "assets/sprites/0194_orc_robot_2_factory_m.swf",
           "source_sha256": "b2beb2975e2ae0f931b0b0659a38e98a93dfc2676d4ca3225877bc37ad96e6ad",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0195_orc_headquarters",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0195_orc_headquarters",
+          "runtime": "assets/converted/buildings/0195_orc_headquarters",
           "source": "assets/sprites/0195_orc_headquarters.swf",
           "source_sha256": "d0aef6fd19aa450c83b09652efc8400e9620be53ac3f126b2f223cf25fd6abdc",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0196_orc_sponge_bush",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0196_orc_sponge_bush",
+          "runtime": "assets/converted/buildings/0196_orc_sponge_bush",
           "source": "assets/sprites/0196_orc_sponge_bush.swf",
           "source_sha256": "6551bfdeda3f2c1d3a5353e3a30c533de6a3897d3348e2ddb9dd742eb40fed38",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0197_orc_lamp",
@@ -6456,50 +6456,50 @@
         {
           "ref": "0198_orc_bush",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0198_orc_bush",
+          "runtime": "assets/converted/buildings/0198_orc_bush",
           "source": "assets/sprites/0198_orc_bush.swf",
           "source_sha256": "d022cf550a2267db6f638c35ab0190fb65969675a9b98dca731229ec5190b706",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0199_space_station",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0199_space_station",
+          "runtime": "assets/converted/buildings/0199_space_station",
           "source": "assets/sprites/0199_space_station.swf",
           "source_sha256": "7597e2d6e3ed352d6abc16c1b7b15ee0eaf97fec85ed293f348df6f690ae3b49",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0200_orc_silo",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0200_orc_silo",
+          "runtime": "assets/converted/buildings/0200_orc_silo",
           "source": "assets/sprites/0200_orc_silo.swf",
           "source_sha256": "cc6d140de256fbc380da2e030edd4ec4bb6fd0ba0e65e80c66274789e2222240",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0201_orc_bunker",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0201_orc_bunker",
+          "runtime": "assets/converted/buildings/0201_orc_bunker",
           "source": "assets/sprites/0201_orc_bunker.swf",
           "source_sha256": "09b202ff4f7260d9c2e4ab3ca550b2ba19a2e441bc140ff7251ae5e4ded33fed",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0202_orc_resource_building",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0202_orc_resource_building",
+          "runtime": "assets/converted/buildings/0202_orc_resource_building",
           "source": "assets/sprites/0202_orc_resource_building.swf",
           "source_sha256": "cb2b1a62eea65aab82c67252c9bbc94a109e08040a9c82610408272c1a4acc66",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0203_orc_harbour",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0203_orc_harbour",
+          "runtime": "assets/converted/buildings/0203_orc_harbour",
           "source": "assets/sprites/0203_orc_harbour.swf",
           "source_sha256": "f6d3bdfdf65a5db09555385c0ac45bfee696742ed45fd1e41021195a4f94de73",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "0204_disabled_orc_supertank",
@@ -6512,10 +6512,10 @@
         {
           "ref": "0205_orc_fortress",
           "reference_count": 1,
-          "runtime": "assets/converted/images/0205_orc_fortress",
+          "runtime": "assets/converted/buildings/0205_orc_fortress",
           "source": "assets/sprites/0205_orc_fortress.swf",
           "source_sha256": "bca517d9611dad577e8c5c01f3e1187a54d729804d59b3a764af1dcff2d7a9c7",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10000_chained_bonus_giant_walker",
@@ -6568,10 +6568,10 @@
         {
           "ref": "10003_resource_oil_3",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10003_resource_oil_3",
+          "runtime": "assets/converted/buildings/10003_resource_oil_3",
           "source": "assets/sprites/10003_resource_oil_3.swf",
           "source_sha256": "46ac445f363803b11804bcd293a829673d5438f5b23f94b21b475c458368f33e",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10004_chained_transformer_archer",
@@ -6584,10 +6584,10 @@
         {
           "ref": "10004_resource_oil_4",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10004_resource_oil_4",
+          "runtime": "assets/converted/buildings/10004_resource_oil_4",
           "source": "assets/sprites/10004_resource_oil_4.swf",
           "source_sha256": "27da8931aa66aecdd389aa229f5ac46d42dc91421784da29040db574ecfb14bb",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10005_arbol1x1",
@@ -6664,10 +6664,10 @@
         {
           "ref": "10010_resource_steel_1",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10010_resource_steel_1",
+          "runtime": "assets/converted/buildings/10010_resource_steel_1",
           "source": "assets/sprites/10010_resource_steel_1.swf",
           "source_sha256": "312fca7fe04513ee12e271c20d676f70238eb1f3e485383fd37d8b4c4f71740c",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10011_chained_cannon_mech",
@@ -6680,10 +6680,10 @@
         {
           "ref": "10011_resource_steel_2",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10011_resource_steel_2",
+          "runtime": "assets/converted/buildings/10011_resource_steel_2",
           "source": "assets/sprites/10011_resource_steel_2.swf",
           "source_sha256": "cdba7f7d2d5977ff676598315c1a31ed7fa6739b5b9cbc0c0e45e09dc10ff21f",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10012_chained_brutus_mech",
@@ -6696,10 +6696,10 @@
         {
           "ref": "10012_resource_steel_3",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10012_resource_steel_3",
+          "runtime": "assets/converted/buildings/10012_resource_steel_3",
           "source": "assets/sprites/10012_resource_steel_3.swf",
           "source_sha256": "803e8875eb891843ddde50e7f09a4a1d720c68ddcccbae53be4a102835c7fb94",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10013_chained_caballero_zodiac",
@@ -6712,10 +6712,10 @@
         {
           "ref": "10013_resource_steel_4",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10013_resource_steel_4",
+          "runtime": "assets/converted/buildings/10013_resource_steel_4",
           "source": "assets/sprites/10013_resource_steel_4.swf",
           "source_sha256": "d01376b73e4c39a253933b02e34ae5fe15bdd42a77ac8fb2fed4fa19bcb88bf5",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10014_chained_bonus_ether_messiah_drone",
@@ -6728,10 +6728,10 @@
         {
           "ref": "10014_resource_gold_1",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10014_resource_gold_1",
+          "runtime": "assets/converted/buildings/10014_resource_gold_1",
           "source": "assets/sprites/10014_resource_gold_1.swf",
           "source_sha256": "4e0673139741669ad266f1c863df4a6e3f275038358f033cc5a8e04738e4cf3e",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10015_chained_advance_chest",
@@ -6744,10 +6744,10 @@
         {
           "ref": "10015_resource_gold_2",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10015_resource_gold_2",
+          "runtime": "assets/converted/buildings/10015_resource_gold_2",
           "source": "assets/sprites/10015_resource_gold_2.swf",
           "source_sha256": "533372ebbfd4c524a211e6c741425d91fb6a8f23dc3b78dd4183e06a1e6e649a",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10016_chained_60_off",
@@ -6760,10 +6760,10 @@
         {
           "ref": "10016_resource_gold_3",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10016_resource_gold_3",
+          "runtime": "assets/converted/buildings/10016_resource_gold_3",
           "source": "assets/sprites/10016_resource_gold_3.swf",
           "source_sha256": "6cb2b067b90a16a9871c740f8122ea1ec58b3b9a833d112f02f64332cb37e291",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10017_chained_liquid_mech",
@@ -6776,10 +6776,10 @@
         {
           "ref": "10017_resource_gold_4",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10017_resource_gold_4",
+          "runtime": "assets/converted/buildings/10017_resource_gold_4",
           "source": "assets/sprites/10017_resource_gold_4.swf",
           "source_sha256": "f58d957532c61890e2a4454c6da95b7429730ab8cccb1d9e3676fcb9ef09c235",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10018_chained_drill",
@@ -6792,10 +6792,10 @@
         {
           "ref": "10018_resource_oil_regen",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10018_resource_oil_regen",
+          "runtime": "assets/converted/buildings/10018_resource_oil_regen",
           "source": "assets/sprites/10018_resource_oil_regen.swf",
           "source_sha256": "350136737145e681d66d836f61ff971240bbae2726f83864e039aa3ca645ec00",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10019_chained_doctor_shock",
@@ -6808,10 +6808,10 @@
         {
           "ref": "10019_resource_steel_regen",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10019_resource_steel_regen",
+          "runtime": "assets/converted/buildings/10019_resource_steel_regen",
           "source": "assets/sprites/10019_resource_steel_regen.swf",
           "source_sha256": "35b836d0aceb7c7c5c6c2cc20b05966dd45a598bde6a77460e5b6f0ca5528450",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1001_worker_m",
@@ -6840,10 +6840,10 @@
         {
           "ref": "10020_resource_gold_regen",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10020_resource_gold_regen",
+          "runtime": "assets/converted/buildings/10020_resource_gold_regen",
           "source": "assets/sprites/10020_resource_gold_regen.swf",
           "source_sha256": "e57fa0e52e37a0ffab303e1e3dcc19ecfa179037921411d392569255099851e5",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10021_chained_professional_pack",
@@ -6872,10 +6872,10 @@
         {
           "ref": "10023_gorilla",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10023_gorilla",
+          "runtime": "assets/converted/units/10023_gorilla",
           "source": "assets/sprites/10023_gorilla.swf",
           "source_sha256": "12985f168091a20eb0665abc5bce7406899558512e621e542552ea4776fddd4f",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10024_chained_super_pack",
@@ -6960,10 +6960,10 @@
         {
           "ref": "1002_Red_Tank_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1002_Red_Tank_m",
+          "runtime": "assets/converted/units/1002_Red_Tank_m",
           "source": "assets/sprites/1002_Red_Tank_m.swf",
           "source_sha256": "7ecbfa7c18e652ee6885e6963b9097199cc35dbc230080142a26280f391222a9",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10030_arbol2x2",
@@ -7080,10 +7080,10 @@
         {
           "ref": "1003_cannon_2_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1003_cannon_2_m",
+          "runtime": "assets/converted/units/1003_cannon_2_m",
           "source": "assets/sprites/1003_cannon_2_m.swf",
           "source_sha256": "3db9dd9c0e806246ce4967bee321375305eba6f75d7c6be4c70fe8786d2c5680",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10040_chained_half_party_price_party_weekend",
@@ -7152,10 +7152,10 @@
         {
           "ref": "10044_destroyed_building_2",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10044_destroyed_building_2",
+          "runtime": "assets/converted/buildings/10044_destroyed_building_2",
           "source": "assets/sprites/10044_destroyed_building_2.swf",
           "source_sha256": "c874e4b7a4a36da8e0d97caf26cd85f8b356d71e6ee1db183f70f34bd168981d",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10045_chained_150_extra_cash",
@@ -7168,10 +7168,10 @@
         {
           "ref": "10045_destroyed_building_3",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10045_destroyed_building_3",
+          "runtime": "assets/converted/buildings/10045_destroyed_building_3",
           "source": "assets/sprites/10045_destroyed_building_3.swf",
           "source_sha256": "b9421853b6a0dc69869fe0c406307e84cd7e1c66b68e8426f16e034833f0072c",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10046_chained_40_off",
@@ -7184,10 +7184,10 @@
         {
           "ref": "10046_destroyed_building_4",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10046_destroyed_building_4",
+          "runtime": "assets/converted/buildings/10046_destroyed_building_4",
           "source": "assets/sprites/10046_destroyed_building_4.swf",
           "source_sha256": "98793237084ee1dcdc433a0fa26c1a72b03fcbfbe53974ec45082eb66dd9bb50",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10047_chained_destruction_pack",
@@ -7200,10 +7200,10 @@
         {
           "ref": "10047_destroyed_building_5_b",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10047_destroyed_building_5_b",
+          "runtime": "assets/converted/buildings/10047_destroyed_building_5_b",
           "source": "assets/sprites/10047_destroyed_building_5_b.swf",
           "source_sha256": "e7b08a606187a799310d539c5b4b033b116210054a3e212b95678adb0a64fc16",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10048_cross_dc",
@@ -7216,10 +7216,10 @@
         {
           "ref": "10048_oil_barrel",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10048_oil_barrel",
+          "runtime": "assets/converted/buildings/10048_oil_barrel",
           "source": "assets/sprites/10048_oil_barrel.swf",
           "source_sha256": "c6c2753c2e8e8ae094050c12e4a663b830ba739cada9c4a1c8c30187f8d19da4",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10049_chained_dark_ether_messiah_dual_blade_automech",
@@ -7240,10 +7240,10 @@
         {
           "ref": "1004_cannon_3_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1004_cannon_3_m",
+          "runtime": "assets/converted/units/1004_cannon_3_m",
           "source": "assets/sprites/1004_cannon_3_m.swf",
           "source_sha256": "3808272a13c55bd72d8553d54137f168b47ea51496ccd19366d5deebbef4e8b9",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10050_chained_spartan_warrior",
@@ -7256,10 +7256,10 @@
         {
           "ref": "10050_nice_fountain",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10050_nice_fountain",
+          "runtime": "assets/converted/buildings/10050_nice_fountain",
           "source": "assets/sprites/10050_nice_fountain.swf",
           "source_sha256": "4eefb296c258312cbcd858609f4bd52b9349470cc78c4cb863ee0f222fe809fb",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10051_chained_assault_pack",
@@ -7272,10 +7272,10 @@
         {
           "ref": "10051_orange_tree",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10051_orange_tree",
+          "runtime": "assets/converted/buildings/10051_orange_tree",
           "source": "assets/sprites/10051_orange_tree.swf",
           "source_sha256": "43789fdbbf4e9bdcc56e59f1649d073ebe099a2b2b90b10958a034f548e501d0",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10052_chained_widged_transformer",
@@ -7288,10 +7288,10 @@
         {
           "ref": "10052_chickens",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10052_chickens",
+          "runtime": "assets/converted/buildings/10052_chickens",
           "source": "assets/sprites/10052_chickens.swf",
           "source_sha256": "f062ecc096c4add6de24d0d554bdcb71b11132c6201c81ef4a033e0e8113b550",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10053_chained_spider_bot",
@@ -7304,10 +7304,10 @@
         {
           "ref": "10053_lost_rocket",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10053_lost_rocket",
+          "runtime": "assets/converted/buildings/10053_lost_rocket",
           "source": "assets/sprites/10053_lost_rocket.swf",
           "source_sha256": "5b9ad5112e8a92eb4caee1cb840550a69a06d95f1d80e8e1de9a518a05706d9e",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10054_100_bonus_draggy",
@@ -7320,10 +7320,10 @@
         {
           "ref": "10054_astronaut_pack",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10054_astronaut_pack",
+          "runtime": "assets/converted/buildings/10054_astronaut_pack",
           "source": "assets/sprites/10054_astronaut_pack.swf",
           "source_sha256": "48c834fad37df8f2ad8072d9ea76b1781e75d729d48d9df6d919cf7eb0084ce9",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10055_chained_ambush_chest",
@@ -7336,10 +7336,10 @@
         {
           "ref": "10055_destroyed_tank",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10055_destroyed_tank",
+          "runtime": "assets/converted/buildings/10055_destroyed_tank",
           "source": "assets/sprites/10055_destroyed_tank.swf",
           "source_sha256": "a7a2d90fd9974680c5e5632d173af99891ea50ad516138605195965d37a66361",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10056_chained_egyptian_warrior_mech",
@@ -7352,10 +7352,10 @@
         {
           "ref": "10056_lost_puppies",
           "reference_count": 1,
-          "runtime": "assets/converted/images/10056_lost_puppies",
+          "runtime": "assets/converted/buildings/10056_lost_puppies",
           "source": "assets/sprites/10056_lost_puppies.swf",
           "source_sha256": "0f743ad2df4f9bb40e31df529ca1e961ea6087cefbd132064381e5cfeff2e65c",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10057_chained_transformer_aracnid",
@@ -7400,18 +7400,18 @@
         {
           "ref": "1005_oil_barrels",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1005_oil_barrels",
+          "runtime": "assets/converted/buildings/1005_oil_barrels",
           "source": "assets/sprites/1005_oil_barrels.swf",
           "source_sha256": "2e5cbfc708acc20530ec9deda01a6644460cdb05bee652fd1f6d76783b674650",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1005_special_spy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1005_special_spy_m",
+          "runtime": "assets/converted/units/1005_special_spy_m",
           "source": "assets/sprites/1005_special_spy_m.swf",
           "source_sha256": "5ffc5ec2c11f8b74798418d61bb0ba00529fccab91ba8a63cfcc198d80af5bdb",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "10060_chained_storm_pack",
@@ -7744,18 +7744,18 @@
         {
           "ref": "1009_good_girl_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1009_good_girl_m",
+          "runtime": "assets/converted/units/1009_good_girl_m",
           "source": "assets/sprites/1009_good_girl_m.swf",
           "source_sha256": "e6351a654529d54fd78be58824b179144a64139620254a861fcaae7c8dd57da9",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1010_apc_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1010_apc_m",
+          "runtime": "assets/converted/units/1010_apc_m",
           "source": "assets/sprites/1010_apc_m.swf",
           "source_sha256": "b8b729a3e7c87c0e562982babdb4553364bc989df9b514ddf9afcf60cc34903a",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1011_bad_girl_m",
@@ -7768,18 +7768,18 @@
         {
           "ref": "1012_bad_boy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1012_bad_boy",
+          "runtime": "assets/converted/units/1012_bad_boy",
           "source": "assets/sprites/1012_bad_boy.swf",
           "source_sha256": "f43334e6a5599eec67b158afa15e29122a088f5a5217e7ecda9a03e4ca1db392",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1013_truck_1_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1013_truck_1_m",
+          "runtime": "assets/converted/units/1013_truck_1_m",
           "source": "assets/sprites/1013_truck_1_m.swf",
           "source_sha256": "272e7be9ce1e255bf679c2573e6562840187415294e6e0cd5339954b2ef5c318",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1014_machinegunjeep_1_m",
@@ -7808,74 +7808,74 @@
         {
           "ref": "1016_cannon_1_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1016_cannon_1_m",
+          "runtime": "assets/converted/units/1016_cannon_1_m",
           "source": "assets/sprites/1016_cannon_1_m.swf",
           "source_sha256": "bf9092453ad249ca03933a9eac406ea6392c293847a6345c8f9bb5cd2833f711",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1017_good_boy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1017_good_boy",
+          "runtime": "assets/converted/units/1017_good_boy",
           "source": "assets/sprites/1017_good_boy.swf",
           "source_sha256": "e6989f04ba256219ac1c4f05fa4549fe6494d73688aba4e892ef06dbe480d400",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1018_zodiac_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1018_zodiac_m",
+          "runtime": "assets/converted/units/1018_zodiac_m",
           "source": "assets/sprites/1018_zodiac_m.swf",
           "source_sha256": "8d463631cf44f042895a9e2eb717d0d35f4127d6c69a99aa78b7946532dd0095",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1019_ship_m2",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1019_ship_m2",
+          "runtime": "assets/converted/units/1019_ship_m2",
           "source": "assets/sprites/1019_ship_m2.swf",
           "source_sha256": "0be6fa3ee58e2b7f791fc0cabb48454c1131acf6380f12f30d694e0be5162cf0",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1020_soldier_2_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1020_soldier_2_m",
+          "runtime": "assets/converted/units/1020_soldier_2_m",
           "source": "assets/sprites/1020_soldier_2_m.swf",
           "source_sha256": "fb894d38e8ba171cb9fb400d785d0a794c4946a79153f5bfddc79affc31a709c",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1021_soldier_3_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1021_soldier_3_m",
+          "runtime": "assets/converted/units/1021_soldier_3_m",
           "source": "assets/sprites/1021_soldier_3_m.swf",
           "source_sha256": "1fb171f58dc6208640520b5ff8bbc1f5056af08e12db3c7c4af964a1642f346f",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1022_bazooka_2_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1022_bazooka_2_m",
+          "runtime": "assets/converted/units/1022_bazooka_2_m",
           "source": "assets/sprites/1022_bazooka_2_m.swf",
           "source_sha256": "3ee7ee27dcc966c6a609b72ce28a2a80718ab3be459ac35f142dceb5be88f208",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1023_bazooka_3_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1023_bazooka_3_m",
+          "runtime": "assets/converted/units/1023_bazooka_3_m",
           "source": "assets/sprites/1023_bazooka_3_m.swf",
           "source_sha256": "459814872d678becc7eb45e87ca69c5c127e01c9684bf50334ad0960666a579f",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1024_good_guillerma",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1024_good_guillerma",
+          "runtime": "assets/converted/units/1024_good_guillerma",
           "source": "assets/sprites/1024_good_guillerma.swf",
           "source_sha256": "9e940a9fc74c2b05069a178900dc18c7447da95852e72fbfd9305f75d33a0d76",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1025_aircraft_2_m",
@@ -7920,34 +7920,34 @@
         {
           "ref": "1030_machinegunjeep_2_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1030_machinegunjeep_2_m",
+          "runtime": "assets/converted/units/1030_machinegunjeep_2_m",
           "source": "assets/sprites/1030_machinegunjeep_2_m.swf",
           "source_sha256": "2afb62318c811f13db0ef0c1f4fc3d80c1ea2427e0ae678618d25138fece36c1",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1031_machinegunjeep_3_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1031_machinegunjeep_3_m",
+          "runtime": "assets/converted/units/1031_machinegunjeep_3_m",
           "source": "assets/sprites/1031_machinegunjeep_3_m.swf",
           "source_sha256": "50cc0ee25e3c6b9ae837ba04643cf24c9adb592f9c9d5fa3cf8e529746075de7",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1032_truck_3_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1032_truck_3_m",
+          "runtime": "assets/converted/units/1032_truck_3_m",
           "source": "assets/sprites/1032_truck_3_m.swf",
           "source_sha256": "654df0e6949a09dd545e77f2cd8752a184534e6b68ee72ef96d804a188b885b2",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1033_mr_cigar",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1033_mr_cigar",
+          "runtime": "assets/converted/units/1033_mr_cigar",
           "source": "assets/sprites/1033_mr_cigar.swf",
           "source_sha256": "a6b76fbda065dcef454a29d7e0c94362c133ed87b1834157fe72be41bf0ad590",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1034_un_allied_1_m",
@@ -7968,26 +7968,26 @@
         {
           "ref": "1035_truck_2_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1035_truck_2_m",
+          "runtime": "assets/converted/units/1035_truck_2_m",
           "source": "assets/sprites/1035_truck_2_m.swf",
           "source_sha256": "d527e92e63d1eddaca937e22be66cc44e04ae35a2af3213596b419f6435b7d51",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1036_double_bazooka_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1036_double_bazooka_m",
+          "runtime": "assets/converted/units/1036_double_bazooka_m",
           "source": "assets/sprites/1036_double_bazooka_m.swf",
           "source_sha256": "ab5c3b9b4dda419fc7b69b5676fe332f8c6f92ef869ca13ffe1f600491553a90",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1037_megatank",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1037_megatank",
+          "runtime": "assets/converted/units/1037_megatank",
           "source": "assets/sprites/1037_megatank.swf",
           "source_sha256": "78da599701288a9fcb93bf31a166e27354ab50b4343441cffbfe532ccbaff1be",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1038_red_helicopter_m",
@@ -8000,18 +8000,18 @@
         {
           "ref": "1042_good_guile",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1042_good_guile",
+          "runtime": "assets/converted/units/1042_good_guile",
           "source": "assets/sprites/1042_good_guile.swf",
           "source_sha256": "be59836c287ac57b243622f0172f1f9ed506f74a4bae992cd232b04fe0ebfa41",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1043_air_strike_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1043_air_strike_m",
+          "runtime": "assets/converted/units/1043_air_strike_m",
           "source": "assets/sprites/1043_air_strike_m.swf",
           "source_sha256": "333e4c9d1d1abe71b2ffec2ab6d8197fdfe76f2cf630e6a43a811603e70ced1a",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1044_double_bazooka_jeep_m",
@@ -8024,26 +8024,26 @@
         {
           "ref": "1045_double_gun_soldier_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1045_double_gun_soldier_m",
+          "runtime": "assets/converted/units/1045_double_gun_soldier_m",
           "source": "assets/sprites/1045_double_gun_soldier_m.swf",
           "source_sha256": "f3d25d942becf519fb010bad9be6f2be2aab41e0a66f887f8196e4367c01d7d5",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1046_flamethrower_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1046_flamethrower_m",
+          "runtime": "assets/converted/units/1046_flamethrower_m",
           "source": "assets/sprites/1046_flamethrower_m.swf",
           "source_sha256": "b4ba003122dde15e8b5e87ab7297a23fc3fe43a5780d06d70109889b15224490",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1047_black_tank_2_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1047_black_tank_2_m",
+          "runtime": "assets/converted/units/1047_black_tank_2_m",
           "source": "assets/sprites/1047_black_tank_2_m.swf",
           "source_sha256": "d68f036e3687baca374f8cbd18400b29575542d9955482b00b91d1751f3b592c",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1048_black_aircraft_2_m",
@@ -8056,26 +8056,26 @@
         {
           "ref": "1050_medic_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1050_medic_m",
+          "runtime": "assets/converted/units/1050_medic_m",
           "source": "assets/sprites/1050_medic_m.swf",
           "source_sha256": "d968553dbbdba8e5aa42645ef98ede6dea94c9a99738e75de692735ebd4ebba8",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1051_mechanic_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1051_mechanic_m",
+          "runtime": "assets/converted/units/1051_mechanic_m",
           "source": "assets/sprites/1051_mechanic_m.swf",
           "source_sha256": "56cccf59de268c93cc96fecf5ff4e17677c6616874e896ae5eb376ef982085b8",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1052_special_ops_2_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1052_special_ops_2_m",
+          "runtime": "assets/converted/units/1052_special_ops_2_m",
           "source": "assets/sprites/1052_special_ops_2_m.swf",
           "source_sha256": "a2acf312f2c51bc69dcf7e648ea9113499e3a9b39f7830ce5739aa3a4c4b616b",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1053_golem_boss_m",
@@ -8096,10 +8096,10 @@
         {
           "ref": "1055_mr_t_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1055_mr_t_m",
+          "runtime": "assets/converted/units/1055_mr_t_m",
           "source": "assets/sprites/1055_mr_t_m.swf",
           "source_sha256": "5a3d520c3270c01621e168da23ff4ffd3fa6a6632b15994c1f1c4aa9f9e9ff88",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1056_elephant_rider_m",
@@ -8120,34 +8120,34 @@
         {
           "ref": "1058_soldier_4_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1058_soldier_4_m",
+          "runtime": "assets/converted/units/1058_soldier_4_m",
           "source": "assets/sprites/1058_soldier_4_m.swf",
           "source_sha256": "dfedd66cd3b8ceed51e3e3283eeb293d8e02c2e1b39d7edac2e7fc425b822d95",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1059_soldier_5_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1059_soldier_5_m",
+          "runtime": "assets/converted/units/1059_soldier_5_m",
           "source": "assets/sprites/1059_soldier_5_m.swf",
           "source_sha256": "d88d9f3f44be55cd308c84b8d8c7113db8aaa8058abc31964f13a4887a602caa",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1060_mortar_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1060_mortar_m",
+          "runtime": "assets/converted/units/1060_mortar_m",
           "source": "assets/sprites/1060_mortar_m.swf",
           "source_sha256": "5a2733281ab61b4ba1affe1db20dc4ff33799e72608eff297d9ec0f3eec621b5",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1061_baby_robot_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1061_baby_robot_m",
+          "runtime": "assets/converted/units/1061_baby_robot_m",
           "source": "assets/sprites/1061_baby_robot_m.swf",
           "source_sha256": "5cc42250b28f0266aaa8e425ca4d1154e82dc0945c62cb656f1be2cbf7f50698",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1062_bumblebee_m",
@@ -8160,26 +8160,26 @@
         {
           "ref": "1063_bazooka_4_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1063_bazooka_4_m",
+          "runtime": "assets/converted/units/1063_bazooka_4_m",
           "source": "assets/sprites/1063_bazooka_4_m.swf",
           "source_sha256": "b68d168adb76df03c6986cfa147b02df10a9194405d2e5ebf19d69dceffa0d59",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1064_bazooka_5_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1064_bazooka_5_m",
+          "runtime": "assets/converted/units/1064_bazooka_5_m",
           "source": "assets/sprites/1064_bazooka_5_m.swf",
           "source_sha256": "1df5cdb6095178b388c6b05f15f7030328fcf9c951327a44c19472b53ff74da7",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1065_antiaircraft_battery_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1065_antiaircraft_battery_m",
+          "runtime": "assets/converted/units/1065_antiaircraft_battery_m",
           "source": "assets/sprites/1065_antiaircraft_battery_m.swf",
           "source_sha256": "6ef11e75945195e61dffef7db059191f483b0a9be52429d4d57478b3629e57b5",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1066_helicopter_4_m",
@@ -8208,42 +8208,42 @@
         {
           "ref": "1069_bigheaded_tank_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1069_bigheaded_tank_m",
+          "runtime": "assets/converted/units/1069_bigheaded_tank_m",
           "source": "assets/sprites/1069_bigheaded_tank_m.swf",
           "source_sha256": "5b6998b6649effb09456bac4decb4bbde8fb4eb6f81220b7cd01d824dc48da19",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1070_cannon_4_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1070_cannon_4_m",
+          "runtime": "assets/converted/units/1070_cannon_4_m",
           "source": "assets/sprites/1070_cannon_4_m.swf",
           "source_sha256": "637646980581ccad74f56753735d961ce0635a7bb5e936975ad169e255c01dce",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1071_cannon_5_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1071_cannon_5_m",
+          "runtime": "assets/converted/units/1071_cannon_5_m",
           "source": "assets/sprites/1071_cannon_5_m.swf",
           "source_sha256": "2774e39d7fe711bc5c1f0820a9bbd98a28051513ca71e0c5683ac4318b8de11b",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1072_rambo_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1072_rambo_m",
+          "runtime": "assets/converted/units/1072_rambo_m",
           "source": "assets/sprites/1072_rambo_m.swf",
           "source_sha256": "f978a1572b35b95ccef7c41ff33558c5f720fd3fc6874398835b5403f947e823",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1073_erradicator_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1073_erradicator_m",
+          "runtime": "assets/converted/units/1073_erradicator_m",
           "source": "assets/sprites/1073_erradicator_m.swf",
           "source_sha256": "99312219c8393f28cc9a0a589b417464cfd0025f4808a7d1ec8eeb7336a3eff6",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1074_punisher_m",
@@ -8280,26 +8280,26 @@
         {
           "ref": "1078_robo_bazooka_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1078_robo_bazooka_m",
+          "runtime": "assets/converted/units/1078_robo_bazooka_m",
           "source": "assets/sprites/1078_robo_bazooka_m.swf",
           "source_sha256": "42358402fbbd35fb6ce51f9c56644a1bbf7c5634bef2d71a5ce5540cc6ad26ff",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1079_robo_jumper_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1079_robo_jumper_m",
+          "runtime": "assets/converted/units/1079_robo_jumper_m",
           "source": "assets/sprites/1079_robo_jumper_m.swf",
           "source_sha256": "1fabe7c09289c8bf2e81632b42f78e949ec11d816cb24c9b1554259755476d1a",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1080_robo_biker_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1080_robo_biker_m",
+          "runtime": "assets/converted/units/1080_robo_biker_m",
           "source": "assets/sprites/1080_robo_biker_m.swf",
           "source_sha256": "bc8732569513ee9756f7d3039ea945098306d3a1debc4ea656ebbeecb82a69d1",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1081_xtreme_retaliator_m",
@@ -8320,10 +8320,10 @@
         {
           "ref": "1083_demlisher_tank_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1083_demlisher_tank_m",
+          "runtime": "assets/converted/units/1083_demlisher_tank_m",
           "source": "assets/sprites/1083_demlisher_tank_m.swf",
           "source_sha256": "24479f7678c1ed0b7fecd6359afa019c9b86a494a952214db807db9350e99e06",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1084_dreadnought_m",
@@ -8336,10 +8336,10 @@
         {
           "ref": "1085_metal_draggy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1085_metal_draggy_m",
+          "runtime": "assets/converted/units/1085_metal_draggy_m",
           "source": "assets/sprites/1085_metal_draggy_m.swf",
           "source_sha256": "74dabcf907e625f24843084e0c21116276f28a05b20345890f359abc74da2d95",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1088_skylander_m",
@@ -8360,18 +8360,18 @@
         {
           "ref": "1090_giant_walker_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1090_giant_walker_m",
+          "runtime": "assets/converted/units/1090_giant_walker_m",
           "source": "assets/sprites/1090_giant_walker_m.swf",
           "source_sha256": "50f32ed030ac737a8b8997ac2e9669b0795cf5af8d51f7840a6d0ca51248746c",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1091_missile_tank_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1091_missile_tank_m",
+          "runtime": "assets/converted/units/1091_missile_tank_m",
           "source": "assets/sprites/1091_missile_tank_m.swf",
           "source_sha256": "0e161a35f4b73da61729ff70c0c9502cb6a820e25fdb0b0a8b4e4b13e586770c",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1092_steel_claws_m",
@@ -8416,10 +8416,10 @@
         {
           "ref": "1097_red_draggy_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1097_red_draggy_m",
+          "runtime": "assets/converted/units/1097_red_draggy_m",
           "source": "assets/sprites/1097_red_draggy_m.swf",
           "source_sha256": "5e2b17dff123436cf415a72c10207cfe274388d710a8c8ba977684ea2520c5d7",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1098_blue_draggy_m",
@@ -8608,10 +8608,10 @@
         {
           "ref": "1120_metal_draggy_2_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1120_metal_draggy_2_m",
+          "runtime": "assets/converted/units/1120_metal_draggy_2_m",
           "source": "assets/sprites/1120_metal_draggy_2_m.swf",
           "source_sha256": "b7021e9ecb1d0e463f899749a7fb9dd0d1cefe996d1bda561b3ac5cd89002e62",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1121_buggy_2_m",
@@ -8640,18 +8640,18 @@
         {
           "ref": "1124_ork_tank_1",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1124_ork_tank_1",
+          "runtime": "assets/converted/units/1124_ork_tank_1",
           "source": "assets/sprites/1124_ork_tank_1.swf",
           "source_sha256": "787a821a993d0f7a7bc60936399e316f90e0efc7891bcfbdff411e2f7e806a1f",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1125_orc_worker",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1125_orc_worker",
+          "runtime": "assets/converted/units/1125_orc_worker",
           "source": "assets/sprites/1125_orc_worker.swf",
           "source_sha256": "36481fc1ebd75e22dff94a82e296a46dc2a6720acfd3017dd0b9f1777196627e",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1126_samurai_bot_m",
@@ -8680,18 +8680,18 @@
         {
           "ref": "1129_samurai_minibot",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1129_samurai_minibot",
+          "runtime": "assets/converted/units/1129_samurai_minibot",
           "source": "assets/sprites/1129_samurai_minibot.swf",
           "source_sha256": "d55737e07c83df6c3848db8aeae2144d51bb22ce9895960ef69c6483eeae2f91",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1129_samurai_minibot_m",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1129_samurai_minibot_m",
+          "runtime": "assets/converted/units/1129_samurai_minibot_m",
           "source": "assets/sprites/1129_samurai_minibot_m.swf",
           "source_sha256": "d55737e07c83df6c3848db8aeae2144d51bb22ce9895960ef69c6483eeae2f91",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1130_xplosive_boss_2",
@@ -8784,10 +8784,10 @@
         {
           "ref": "1154_axeman",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1154_axeman",
+          "runtime": "assets/converted/units/1154_axeman",
           "source": "assets/sprites/1154_axeman.swf",
           "source_sha256": "a54551ce706236a651e560c7fb7d3c52a598e470bd15a400c8ca47de4abbbfde",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1155_dwarf_soldier",
@@ -8896,10 +8896,10 @@
         {
           "ref": "1168_bahamut_metalico_draggy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1168_bahamut_metalico_draggy",
+          "runtime": "assets/converted/units/1168_bahamut_metalico_draggy",
           "source": "assets/sprites/1168_bahamut_metalico_draggy.swf",
           "source_sha256": "bc756661070b71f82d68db01455c8bb628ac645bd7519c56fd71867c962e51aa",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1169_transformer_skater",
@@ -8960,10 +8960,10 @@
         {
           "ref": "1176_kamikaze",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1176_kamikaze",
+          "runtime": "assets/converted/units/1176_kamikaze",
           "source": "assets/sprites/1176_kamikaze.swf",
           "source_sha256": "67cfa07c6ccd8e67c85b320f9e5b2cb4ac93a5b414f20a3278af01fc40cf66ae",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1177_ufo",
@@ -9104,18 +9104,18 @@
         {
           "ref": "1195_electric_draggy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1195_electric_draggy",
+          "runtime": "assets/converted/units/1195_electric_draggy",
           "source": "assets/sprites/1195_electric_draggy.swf",
           "source_sha256": "6d9af164ecffd99209ad68b23e5dfd9a504490a1fb4d997b0ff62276a229c365",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1196_black_draggy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1196_black_draggy",
+          "runtime": "assets/converted/units/1196_black_draggy",
           "source": "assets/sprites/1196_black_draggy.swf",
           "source_sha256": "315c3084fbade6493dcc23bd9bf69e1333dac50114f40962b0819d34bf0cfb39",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1197_herkules_matrix",
@@ -9128,10 +9128,10 @@
         {
           "ref": "1198_nebular_horse_rider",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1198_nebular_horse_rider",
+          "runtime": "assets/converted/units/1198_nebular_horse_rider",
           "source": "assets/sprites/1198_nebular_horse_rider.swf",
           "source_sha256": "dc80691c125f9ee5f2ee847fb22fd9463cac0601897130c973b5cda5fce36c54",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1199_nebular_dragon_rider",
@@ -10312,10 +10312,10 @@
         {
           "ref": "1357_bonecrushaDrone",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1357_bonecrushaDrone",
+          "runtime": "assets/converted/units/1357_bonecrushaDrone",
           "source": "assets/sprites/1357_bonecrushaDrone.swf",
           "source_sha256": "395e8b139428ca8c208b523f93617219b84118727b4aff1a7f3f117a25997d21",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1358_bushwacker",
@@ -10400,10 +10400,10 @@
         {
           "ref": "1369_atomicBonecrushaDrone",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1369_atomicBonecrushaDrone",
+          "runtime": "assets/converted/units/1369_atomicBonecrushaDrone",
           "source": "assets/sprites/1369_atomicBonecrushaDrone.swf",
           "source_sha256": "bd2db13c3ecbc833d18271377a88db26c43047bf9bd3725305361e216c25d1b1",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1370_masterDrone",
@@ -10808,10 +10808,10 @@
         {
           "ref": "1421_cyberInquisitorDrone",
           "reference_count": 1,
-          "runtime": "assets/converted/images/1421_cyberInquisitorDrone",
+          "runtime": "assets/converted/units/1421_cyberInquisitorDrone",
           "source": "assets/sprites/1421_cyberInquisitorDrone.swf",
           "source_sha256": "81c9888a8be0c3d2740065e24a8204feb25a38055f93999cd4cc6fd1e066d337",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "1422_knuckledragger",
@@ -10880,82 +10880,82 @@
         {
           "ref": "209_crusader_priest_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/209_crusader_priest_academy",
+          "runtime": "assets/converted/buildings/209_crusader_priest_academy",
           "source": "assets/sprites/209_crusader_priest_academy.swf",
           "source_sha256": "016a9f1b7b801fdbe7fefe7fb9ef8fc89af362faf2c6427d7a9dadff5a73050b",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "210_crusader_bot_factory",
           "reference_count": 1,
-          "runtime": "assets/converted/images/210_crusader_bot_factory",
+          "runtime": "assets/converted/buildings/210_crusader_bot_factory",
           "source": "assets/sprites/210_crusader_bot_factory.swf",
           "source_sha256": "b8ed89cef3e50c664c5cfa2d3942e0dbd34cf751d348c02f27e0af4c8a49f75f",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "211_axeman_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/211_axeman_academy",
+          "runtime": "assets/converted/buildings/211_axeman_academy",
           "source": "assets/sprites/211_axeman_academy.swf",
           "source_sha256": "0d16fe191a963f519fd15a33c8244ecec4722da08a74e6aa1ce59ff95966ca32",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "212_dwarf_soldier_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/212_dwarf_soldier_academy",
+          "runtime": "assets/converted/buildings/212_dwarf_soldier_academy",
           "source": "assets/sprites/212_dwarf_soldier_academy.swf",
           "source_sha256": "378733313d3bce80cbeacf52dc74bdd45cad57f2cfed2f47881ed74563bd0f4b",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "213_bear_knight_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/213_bear_knight_academy",
+          "runtime": "assets/converted/buildings/213_bear_knight_academy",
           "source": "assets/sprites/213_bear_knight_academy.swf",
           "source_sha256": "651deb64908279d5f5e54004c3a51fd90c76b2a916e3cb976fffc1c6f3c8490a",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "214_dwarf_tank_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/214_dwarf_tank_academy",
+          "runtime": "assets/converted/buildings/214_dwarf_tank_academy",
           "source": "assets/sprites/214_dwarf_tank_academy.swf",
           "source_sha256": "542e57f54e1754f6f5ff3e3f770fd78bab3ba36fc3de74513319c520c0ca02e2",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "215_viking_copter_II_hangar",
           "reference_count": 1,
-          "runtime": "assets/converted/images/215_viking_copter_II_hangar",
+          "runtime": "assets/converted/buildings/215_viking_copter_II_hangar",
           "source": "assets/sprites/215_viking_copter_II_hangar.swf",
           "source_sha256": "68066687eb678315c7e4be2c7892dc9614ae78406259e38c8a643183c06d0a1d",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "216_megahammer_dwarf_factory",
           "reference_count": 1,
-          "runtime": "assets/converted/images/216_megahammer_dwarf_factory",
+          "runtime": "assets/converted/buildings/216_megahammer_dwarf_factory",
           "source": "assets/sprites/216_megahammer_dwarf_factory.swf",
           "source_sha256": "7cea4921f08e013b759d56b8532f6ff3c5bccd1010adc872c90d6319f5b2a40d",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "217_dwarf_armored_core_factory",
           "reference_count": 1,
-          "runtime": "assets/converted/images/217_dwarf_armored_core_factory",
+          "runtime": "assets/converted/buildings/217_dwarf_armored_core_factory",
           "source": "assets/sprites/217_dwarf_armored_core_factory.swf",
           "source_sha256": "575591fc438ba33f162deadf5390856e5525f4f52203eff6e70047eb93ffdb10",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "218_dwarf_house",
           "reference_count": 1,
-          "runtime": "assets/converted/images/218_dwarf_house",
+          "runtime": "assets/converted/buildings/218_dwarf_house",
           "source": "assets/sprites/218_dwarf_house.swf",
           "source_sha256": "3c11758912b722f1903f7254baa9ea30f6e390b1db99028be50cc5989b1e5196",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "219_dwarf_farm",
@@ -10984,34 +10984,34 @@
         {
           "ref": "222_dwarf_wall",
           "reference_count": 1,
-          "runtime": "assets/converted/images/222_dwarf_wall",
+          "runtime": "assets/converted/buildings/222_dwarf_wall",
           "source": "assets/sprites/222_dwarf_wall.swf",
           "source_sha256": "909c1e75ab221471df60f4f934d1abd333c62c83e6a1b8568decb2c03d727299",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "223_dwarf_deco_1",
           "reference_count": 1,
-          "runtime": "assets/converted/images/223_dwarf_deco_1",
+          "runtime": "assets/converted/buildings/223_dwarf_deco_1",
           "source": "assets/sprites/223_dwarf_deco_1.swf",
           "source_sha256": "03f12d4737da3b27fe4c99eb1c3f8f74fbb66142205335c371f82f02cf9eb0cb",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "224_dwarf_deco_2",
           "reference_count": 1,
-          "runtime": "assets/converted/images/224_dwarf_deco_2",
+          "runtime": "assets/converted/buildings/224_dwarf_deco_2",
           "source": "assets/sprites/224_dwarf_deco_2.swf",
           "source_sha256": "22f632bc2438eec0ac60e9cba511f82f463e5ee3d3845854cd66c9fe89f7ba2f",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "225_alien_wall",
           "reference_count": 1,
-          "runtime": "assets/converted/images/225_alien_wall",
+          "runtime": "assets/converted/buildings/225_alien_wall",
           "source": "assets/sprites/225_alien_wall.swf",
           "source_sha256": "a90e052a2b107e3aa743789259319fc14819ae415f42df7d6415d2a126972934",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "226_alien_turret_1",
@@ -11032,10 +11032,10 @@
         {
           "ref": "228_spider_wall",
           "reference_count": 1,
-          "runtime": "assets/converted/images/228_spider_wall",
+          "runtime": "assets/converted/buildings/228_spider_wall",
           "source": "assets/sprites/228_spider_wall.swf",
           "source_sha256": "9e62a85e2bdee3ee37521a25f9ede9a157ac3fccc45d0cb684dae001b975b180",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "229_spider_turret_1",
@@ -11064,122 +11064,122 @@
         {
           "ref": "232_dwarf_deco_4",
           "reference_count": 1,
-          "runtime": "assets/converted/images/232_dwarf_deco_4",
+          "runtime": "assets/converted/buildings/232_dwarf_deco_4",
           "source": "assets/sprites/232_dwarf_deco_4.swf",
           "source_sha256": "5fc23b4c138f3357c8e7095be67f5ecfb0e6d331e54154f1196524de8cf83a33",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "233_viking_bazooka_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/233_viking_bazooka_academy",
+          "runtime": "assets/converted/buildings/233_viking_bazooka_academy",
           "source": "assets/sprites/233_viking_bazooka_academy.swf",
           "source_sha256": "8a40aff94efcd62a5dfd686388a8b73e7b9e83ecf427b4265742e1cbf9dbba6e",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "234_viking_motosquad_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/234_viking_motosquad_academy",
+          "runtime": "assets/converted/buildings/234_viking_motosquad_academy",
           "source": "assets/sprites/234_viking_motosquad_academy.swf",
           "source_sha256": "e41bb22194d4956c6921781216ef6cdc1325f70389e8d3ffe8149eb17ccc82f2",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "235_viking_rune_golem_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/235_viking_rune_golem_academy",
+          "runtime": "assets/converted/buildings/235_viking_rune_golem_academy",
           "source": "assets/sprites/235_viking_rune_golem_academy.swf",
           "source_sha256": "ac1fc8140d7130fbd6bb71ae414c0becf85c20815a6c1004439e25ba0f3c7c59",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "236_viking_sniper_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/236_viking_sniper_academy",
+          "runtime": "assets/converted/buildings/236_viking_sniper_academy",
           "source": "assets/sprites/236_viking_sniper_academy.swf",
           "source_sha256": "127f4a4202cfe20d7ceac6f03ff9f2f6a7ff839247add190ca15f888f1d69337",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "237_viking_butcher_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/237_viking_butcher_academy",
+          "runtime": "assets/converted/buildings/237_viking_butcher_academy",
           "source": "assets/sprites/237_viking_butcher_academy.swf",
           "source_sha256": "0d2127720e024af89a7e776a65ee1583c986ae6dc1d1f83ac1b6d3356ce0c9ee",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "238_kamikaze_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/238_kamikaze_academy",
+          "runtime": "assets/converted/buildings/238_kamikaze_academy",
           "source": "assets/sprites/238_kamikaze_academy.swf",
           "source_sha256": "fc33ddb761124304712df13b4936fc111fb36e52726de970b486e433e67434f3",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "239_laser_viking_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/239_laser_viking_academy",
+          "runtime": "assets/converted/buildings/239_laser_viking_academy",
           "source": "assets/sprites/239_laser_viking_academy.swf",
           "source_sha256": "d87b2dce2dfe13d4787a2b1149c12c901afe03a445453ea92d807313ec94cb3b",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "240_avatar_soldado_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/240_avatar_soldado_academy",
+          "runtime": "assets/converted/buildings/240_avatar_soldado_academy",
           "source": "assets/sprites/240_avatar_soldado_academy.swf",
           "source_sha256": "03205451f4633eca20a443edd171f02bce6341571aada43e3e7c9c038381411b",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "241_avatar_arquero_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/241_avatar_arquero_academy",
+          "runtime": "assets/converted/buildings/241_avatar_arquero_academy",
           "source": "assets/sprites/241_avatar_arquero_academy.swf",
           "source_sha256": "bf580f58b6af477fb7f80bb693da3c04f3e5bc61d9ec972effd08560865a66bb",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "242_avatar_great_warrior_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/242_avatar_great_warrior_academy",
+          "runtime": "assets/converted/buildings/242_avatar_great_warrior_academy",
           "source": "assets/sprites/242_avatar_great_warrior_academy.swf",
           "source_sha256": "e09efbecbfd850ae3c2a34d8cfdf78f546fc2386210b380c8972116b73cf3a7a",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "243_avatar_jinete_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/243_avatar_jinete_academy",
+          "runtime": "assets/converted/buildings/243_avatar_jinete_academy",
           "source": "assets/sprites/243_avatar_jinete_academy.swf",
           "source_sha256": "e44d604f7ee522e2b50185acad78efe5f6768b1f8d5f8fbe80c248e1654468c0",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "244_avatar_wall",
           "reference_count": 1,
-          "runtime": "assets/converted/images/244_avatar_wall",
+          "runtime": "assets/converted/buildings/244_avatar_wall",
           "source": "assets/sprites/244_avatar_wall.swf",
           "source_sha256": "ac3b4ec1b8277c2017320043cb218998092d20906da9f5220d3d135f05bd3bf2",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "245_avatar_turret",
           "reference_count": 1,
-          "runtime": "assets/converted/images/245_avatar_turret",
+          "runtime": "assets/converted/buildings/245_avatar_turret",
           "source": "assets/sprites/245_avatar_turret.swf",
           "source_sha256": "8c23d889de88f2b6b0a6edcf0a864299dc1b7aac003f2330a3f8d291554c24ce",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "246_avatar_house",
           "reference_count": 1,
-          "runtime": "assets/converted/images/246_avatar_house",
+          "runtime": "assets/converted/buildings/246_avatar_house",
           "source": "assets/sprites/246_avatar_house.swf",
           "source_sha256": "6a8b63bf2645a3e3c65897d238e2d328302da3e33eac67ff386a970fbc99b624",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "247_avatar_farm",
@@ -11192,50 +11192,50 @@
         {
           "ref": "248_avatar_deco",
           "reference_count": 1,
-          "runtime": "assets/converted/images/248_avatar_deco",
+          "runtime": "assets/converted/buildings/248_avatar_deco",
           "source": "assets/sprites/248_avatar_deco.swf",
           "source_sha256": "42bca140dfe5eeb1fe2f8cd195d3fb36f45c634bece9953f887c0ef311677f51",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "249_nebula_horse_rider_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/249_nebula_horse_rider_academy",
+          "runtime": "assets/converted/buildings/249_nebula_horse_rider_academy",
           "source": "assets/sprites/249_nebula_horse_rider_academy.swf",
           "source_sha256": "29227a8831ac8b1d1083a59705fb0797a5368dcfe24f06974446ad057a7885b1",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "250_nebula_dragon_nest",
           "reference_count": 1,
-          "runtime": "assets/converted/images/250_nebula_dragon_nest",
+          "runtime": "assets/converted/buildings/250_nebula_dragon_nest",
           "source": "assets/sprites/250_nebula_dragon_nest.swf",
           "source_sha256": "df00d722a83f2b2d436636e882284d0d5312732cfd8e6d3721ce3634529a1f44",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "251_nebula_motorized_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/251_nebula_motorized_academy",
+          "runtime": "assets/converted/buildings/251_nebula_motorized_academy",
           "source": "assets/sprites/251_nebula_motorized_academy.swf",
           "source_sha256": "647ff4be87fe0292d5845841cae0477d3586bc3a30160f5f70263a57a5efe6f3",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "252_skyscraper",
           "reference_count": 1,
-          "runtime": "assets/converted/images/252_skyscraper",
+          "runtime": "assets/converted/buildings/252_skyscraper",
           "source": "assets/sprites/252_skyscraper.swf",
           "source_sha256": "4c62ce40481833cef24162732397442714869331be8c28f061da9161de4a639d",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "253_parliament",
           "reference_count": 1,
-          "runtime": "assets/converted/images/253_parliament",
+          "runtime": "assets/converted/buildings/253_parliament",
           "source": "assets/sprites/253_parliament.swf",
           "source_sha256": "74658a8eacf225622f3a1f14a1fc4ddfeef2b5e2c5cbe48a3da00c594c6a97ab",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "254_nebula_priest_academy",
@@ -11248,10 +11248,10 @@
         {
           "ref": "255_nebula_blue_bicopter_hangar",
           "reference_count": 1,
-          "runtime": "assets/converted/images/255_nebula_blue_bicopter_hangar",
+          "runtime": "assets/converted/buildings/255_nebula_blue_bicopter_hangar",
           "source": "assets/sprites/255_nebula_blue_bicopter_hangar.swf",
           "source_sha256": "aa97602ba529858ceb5d515960af0b01ee746baa83290dfe0540181b522110d1",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "256_laboratory_tech",
@@ -11264,34 +11264,34 @@
         {
           "ref": "257_nebula_monster_rider_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/257_nebula_monster_rider_academy",
+          "runtime": "assets/converted/buildings/257_nebula_monster_rider_academy",
           "source": "assets/sprites/257_nebula_monster_rider_academy.swf",
           "source_sha256": "d6dfa220ffdc0131dc7b261c88f335548ee6d81ffb81f466b3cc6e95d1e46d6a",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "258_nebula_muze_warrior_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/258_nebula_muze_warrior_academy",
+          "runtime": "assets/converted/buildings/258_nebula_muze_warrior_academy",
           "source": "assets/sprites/258_nebula_muze_warrior_academy.swf",
           "source_sha256": "a198be1070d9efd3c09e7b482c136016b9784a45462e0bcad5b24543009afa2d",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "259_nebula_sniper_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/259_nebula_sniper_academy",
+          "runtime": "assets/converted/buildings/259_nebula_sniper_academy",
           "source": "assets/sprites/259_nebula_sniper_academy.swf",
           "source_sha256": "3873d605cb2f34e0ebc921f343efe4239e718c73b5e9fc130865058e1fcc04a8",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "260_dragon_rider_2_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/260_dragon_rider_2_academy",
+          "runtime": "assets/converted/buildings/260_dragon_rider_2_academy",
           "source": "assets/sprites/260_dragon_rider_2_academy.swf",
           "source_sha256": "3543ea50d13ced8fdc2ac92509e2ef5225e056672c7d883e6b2775a6e5538200",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "261_marketplace",
@@ -11304,82 +11304,82 @@
         {
           "ref": "262_venom_spider_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/262_venom_spider_academy",
+          "runtime": "assets/converted/buildings/262_venom_spider_academy",
           "source": "assets/sprites/262_venom_spider_academy.swf",
           "source_sha256": "bd4067d8d78c656899806c5c5fb13e4f35637ce349032aa77817895c6f175323",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "263_claw_alien_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/263_claw_alien_academy",
+          "runtime": "assets/converted/buildings/263_claw_alien_academy",
           "source": "assets/sprites/263_claw_alien_academy.swf",
           "source_sha256": "ebdbc877f302c466f067f4f2bca548e85f9329fb3620528587f8f8b1e3d51bfe",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "264_small_alien_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/264_small_alien_academy",
+          "runtime": "assets/converted/buildings/264_small_alien_academy",
           "source": "assets/sprites/264_small_alien_academy.swf",
           "source_sha256": "83ea610352be3ef70fd7a125f310bbb992707a6fdb9e022c6146cb8f7e573705",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "265_big_spider_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/265_big_spider_academy",
+          "runtime": "assets/converted/buildings/265_big_spider_academy",
           "source": "assets/sprites/265_big_spider_academy.swf",
           "source_sha256": "3432552eb41e5cc339f1c620cdd09520c3381fe65d6adda977c34276f1dbc481",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "266_tusk_alien_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/266_tusk_alien_academy",
+          "runtime": "assets/converted/buildings/266_tusk_alien_academy",
           "source": "assets/sprites/266_tusk_alien_academy.swf",
           "source_sha256": "cf921ae3e286d573d91836bc1668b1822a4905775c3a715d1a7881f77361e9b2",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "267_melee_spider_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/267_melee_spider_academy",
+          "runtime": "assets/converted/buildings/267_melee_spider_academy",
           "source": "assets/sprites/267_melee_spider_academy.swf",
           "source_sha256": "86d8a36fd08405cb1b552f1a8c907803d78cf93da0e3ea4b13daaad3345a6cbc",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "268_nebula_monster_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/268_nebula_monster_academy",
+          "runtime": "assets/converted/buildings/268_nebula_monster_academy",
           "source": "assets/sprites/268_nebula_monster_academy.swf",
           "source_sha256": "a6ddda3331727dbf64b239b7d3386b8b13be3ab1f37170696f7cc4593aa9a4d9",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "269_swat_soldier_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/269_swat_soldier_academy",
+          "runtime": "assets/converted/buildings/269_swat_soldier_academy",
           "source": "assets/sprites/269_swat_soldier_academy.swf",
           "source_sha256": "c41ffeeb59ac93d3b09811ea2ed51dcdec21f14e704de1780f4a7fbb9fbbe9f6",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "270_hercules_mech_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/270_hercules_mech_academy",
+          "runtime": "assets/converted/buildings/270_hercules_mech_academy",
           "source": "assets/sprites/270_hercules_mech_academy.swf",
           "source_sha256": "6982a0c0d7cca2c4ae496974995d30ccf9e0d05882ab63d5781a067359102f11",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "271_spatial_wall",
           "reference_count": 1,
-          "runtime": "assets/converted/images/271_spatial_wall",
+          "runtime": "assets/converted/buildings/271_spatial_wall",
           "source": "assets/sprites/271_spatial_wall.swf",
           "source_sha256": "b0d6e68bbfd661cd054e75d1122ff187c2e8bd7503d264cfb70b5953957c2762",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "272_spatial_turret",
@@ -11392,10 +11392,10 @@
         {
           "ref": "273_spatial_house",
           "reference_count": 1,
-          "runtime": "assets/converted/images/273_spatial_house",
+          "runtime": "assets/converted/buildings/273_spatial_house",
           "source": "assets/sprites/273_spatial_house.swf",
           "source_sha256": "adc07fba5af60fd86495d4453755515a3257a3475d8e6ce5cde0b59d53a78798",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "274_spatial_farm",
@@ -11408,10 +11408,10 @@
         {
           "ref": "275_spatial_deco",
           "reference_count": 1,
-          "runtime": "assets/converted/images/275_spatial_deco",
+          "runtime": "assets/converted/buildings/275_spatial_deco",
           "source": "assets/sprites/275_spatial_deco.swf",
           "source_sha256": "eee27745a79540d3466166fb2524ebeeb21f9864f94dcf6a5537ac170c9db46b",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "276_spatial_sward_academy",
@@ -11448,130 +11448,130 @@
         {
           "ref": "280_spatial_paladin_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/280_spatial_paladin_academy",
+          "runtime": "assets/converted/buildings/280_spatial_paladin_academy",
           "source": "assets/sprites/280_spatial_paladin_academy.swf",
           "source_sha256": "e4a6d29daab165cbbe2805c0b14d14bb7f930f5feebab477f7a4a9f519228d38",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "281_spatial_priest_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/281_spatial_priest_academy",
+          "runtime": "assets/converted/buildings/281_spatial_priest_academy",
           "source": "assets/sprites/281_spatial_priest_academy.swf",
           "source_sha256": "0a625bdb58d6bbc401505596bb670214876ce87df453346065eb2bae3700f5ef",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "282_spatial_space_ship_hangar",
           "reference_count": 1,
-          "runtime": "assets/converted/images/282_spatial_space_ship_hangar",
+          "runtime": "assets/converted/buildings/282_spatial_space_ship_hangar",
           "source": "assets/sprites/282_spatial_space_ship_hangar.swf",
           "source_sha256": "3485a5899ceebcfc492b666ab982eb992d40870d8e17ddce9a53cc3830fe35fa",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "283_reptile_gun_hangar",
           "reference_count": 1,
-          "runtime": "assets/converted/images/283_reptile_gun_hangar",
+          "runtime": "assets/converted/buildings/283_reptile_gun_hangar",
           "source": "assets/sprites/283_reptile_gun_hangar.swf",
           "source_sha256": "d9ecb95ee0278a8cddf0c8c09335110ebfd55e0c0014d50aa71d1993bab1fcf7",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "284_mega_bot_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/284_mega_bot_academy",
+          "runtime": "assets/converted/buildings/284_mega_bot_academy",
           "source": "assets/sprites/284_mega_bot_academy.swf",
           "source_sha256": "7f6ec532f7741ee4025b04d80edc4f88d8c6cd49739b874eec90a55c97e47e80",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "285_spatial_healer_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/285_spatial_healer_academy",
+          "runtime": "assets/converted/buildings/285_spatial_healer_academy",
           "source": "assets/sprites/285_spatial_healer_academy.swf",
           "source_sha256": "2ffa6c8994051485861d911530f4df0a6e58610e7f8f2d1353b7e46ce5cef2ad",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "286_spatial_exploration_module_hangar",
           "reference_count": 1,
-          "runtime": "assets/converted/images/286_spatial_exploration_module_hangar",
+          "runtime": "assets/converted/buildings/286_spatial_exploration_module_hangar",
           "source": "assets/sprites/286_spatial_exploration_module_hangar.swf",
           "source_sha256": "d012fb63f48aa5d05b78e31aee3e2c78f25e655e1f074dfa5a3b920d1594db15",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "287_gun_bot_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/287_gun_bot_academy",
+          "runtime": "assets/converted/buildings/287_gun_bot_academy",
           "source": "assets/sprites/287_gun_bot_academy.swf",
           "source_sha256": "40c6bc36c3887bd28fe2f7c3e153ef4b67caf7ae94cffcf8d3ba071916c80eff",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "288_silver_elf_gunner_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/288_silver_elf_gunner_academy",
+          "runtime": "assets/converted/buildings/288_silver_elf_gunner_academy",
           "source": "assets/sprites/288_silver_elf_gunner_academy.swf",
           "source_sha256": "e1e08ab56a305735a7eb39a59b3058397f0124a638e330ba22197db53abc6334",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "289_elf_dino_rider_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/289_elf_dino_rider_academy",
+          "runtime": "assets/converted/buildings/289_elf_dino_rider_academy",
           "source": "assets/sprites/289_elf_dino_rider_academy.swf",
           "source_sha256": "172fa85d55e2ab028588954950c4513150c9d734c20eb0b38b462f8811341995",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "290_destruction_wizard_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/290_destruction_wizard_academy",
+          "runtime": "assets/converted/buildings/290_destruction_wizard_academy",
           "source": "assets/sprites/290_destruction_wizard_academy.swf",
           "source_sha256": "631b5620823975101f2b4dfdc02d3e2343c5d4092cdd6c2339eeaace3daa61dc",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "291_plasma_striker_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/291_plasma_striker_academy",
+          "runtime": "assets/converted/buildings/291_plasma_striker_academy",
           "source": "assets/sprites/291_plasma_striker_academy.swf",
           "source_sha256": "5a576e4d554ea09d04839ab955f2de235eb935cef6de0618745e835e958359c9",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "292_winged_paladin_academy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/292_winged_paladin_academy",
+          "runtime": "assets/converted/buildings/292_winged_paladin_academy",
           "source": "assets/sprites/292_winged_paladin_academy.swf",
           "source_sha256": "59544a1ee735fd3053a3c5b3d03d3e1994d33e3437590ec2eeaf3c46f9ee912a",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "293_andromedaWall",
           "reference_count": 1,
-          "runtime": "assets/converted/images/293_andromedaWall",
+          "runtime": "assets/converted/buildings/293_andromedaWall",
           "source": "assets/sprites/293_andromedaWall.swf",
           "source_sha256": "33870d0433a7b2f9faa5f02c3d9a5c687f6452356d4e8c11ef26e43e2d8e3736",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "294_andromedaTurret",
           "reference_count": 1,
-          "runtime": "assets/converted/images/294_andromedaTurret",
+          "runtime": "assets/converted/buildings/294_andromedaTurret",
           "source": "assets/sprites/294_andromedaTurret.swf",
           "source_sha256": "3f2b86a3e837423f5d1e37a32709402181c7d50c1bcfdb2464cb0f637c8fe23d",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "295_andromedaHouse",
           "reference_count": 1,
-          "runtime": "assets/converted/images/295_andromedaHouse",
+          "runtime": "assets/converted/buildings/295_andromedaHouse",
           "source": "assets/sprites/295_andromedaHouse.swf",
           "source_sha256": "e099a151b8995383a99a5ba3b7a7b8f70c87de28d50f97a38f06fea58a536f88",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "296_andromedaFarm",
@@ -11584,50 +11584,50 @@
         {
           "ref": "297_andromedaDeco",
           "reference_count": 1,
-          "runtime": "assets/converted/images/297_andromedaDeco",
+          "runtime": "assets/converted/buildings/297_andromedaDeco",
           "source": "assets/sprites/297_andromedaDeco.swf",
           "source_sha256": "2e88c745b6e071f6aa7720fc7a0c94e4c2e87d4e309ca97a8f032dab556452e3",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "298_andromedaPrivateAcademy",
           "reference_count": 1,
-          "runtime": "assets/converted/images/298_andromedaPrivateAcademy",
+          "runtime": "assets/converted/buildings/298_andromedaPrivateAcademy",
           "source": "assets/sprites/298_andromedaPrivateAcademy.swf",
           "source_sha256": "db3d932f704316e6a31a7f34437dc33b7d4537f92623eb8c87e869792b6daba8",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "299_andromedaDroidFactory",
           "reference_count": 1,
-          "runtime": "assets/converted/images/299_andromedaDroidFactory",
+          "runtime": "assets/converted/buildings/299_andromedaDroidFactory",
           "source": "assets/sprites/299_andromedaDroidFactory.swf",
           "source_sha256": "17223362a90e715f22d70a6bcff327279ef921ad3c57b364e0f4082d5dbc5740",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "300_andromedaSpaceshipHangar",
           "reference_count": 1,
-          "runtime": "assets/converted/images/300_andromedaSpaceshipHangar",
+          "runtime": "assets/converted/buildings/300_andromedaSpaceshipHangar",
           "source": "assets/sprites/300_andromedaSpaceshipHangar.swf",
           "source_sha256": "73d1cf5302bea0701bae473395bf47bd5223df73bdaea3b35fd633588bbdc914",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "301_punisherBot_Factory",
           "reference_count": 1,
-          "runtime": "assets/converted/images/301_punisherBot_Factory",
+          "runtime": "assets/converted/buildings/301_punisherBot_Factory",
           "source": "assets/sprites/301_punisherBot_Factory.swf",
           "source_sha256": "c7f692aad119aaf0b06291b130b81b49540662eb3b62c6849630f6908b54f42b",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "302_atomFuser",
           "reference_count": 1,
-          "runtime": "assets/converted/images/302_atomFuser",
+          "runtime": "assets/converted/buildings/302_atomFuser",
           "source": "assets/sprites/302_atomFuser.swf",
           "source_sha256": "f2fcbca9fab32b745493285b658bb514548f22091e3da5bc429e3070cfdae3a5",
-          "status": "extracted"
+          "status": "converted"
         },
         {
           "ref": "965_chained_armored_core_alpha",

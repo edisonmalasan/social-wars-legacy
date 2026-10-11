@@ -473,7 +473,6 @@ static func _select_fill(shape: Dictionary, label: String,
 static func _resolve_bitmap_files(package: Dictionary, bitmap_id: int,
 		label: String, shape_id: int) -> Dictionary:
 	var data: Dictionary = package["data"]
-	var package_prefix := label + "/"
 	var jpg := ""
 	var alpha := ""
 	var jpg_sha := ""
@@ -482,11 +481,20 @@ static func _resolve_bitmap_files(package: Dictionary, bitmap_id: int,
 		if int(entry["character_id"]) != bitmap_id:
 			continue
 		var file := str(entry["file"])
-		if not file.begins_with(package_prefix):
+		# The reference must name a file under the shared extracted
+		# bitmap tree. The check that used to require a package-directory
+		# prefix was replaced rather than removed: it bounded what a
+		# package could make the client open, and so does this one, at
+		# `Paths.BITMAP_REFERENCE_ROOT`.
+		var reference_error := Paths.bitmap_reference_error(file)
+		if reference_error != "":
 			return {"ok": false,
-				"error": "[%s] bitmap file escapes the package directory: %s"
-					% [label, file]}
+				"error": "[%s] %s" % [label, reference_error]}
 		var absolute := Paths.repo_root().path_join(file)
+		if not Paths.absolute_bitmap_is_contained(absolute):
+			return {"ok": false,
+				"error": "[%s] bitmap file resolves outside %s: %s"
+					% [label, Paths.BITMAP_REFERENCE_ROOT, file]}
 		var checked := Paths.file_sha256_checked(absolute)
 		if not checked.get("ok", false):
 			return {"ok": false,

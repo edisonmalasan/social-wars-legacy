@@ -8,8 +8,9 @@ extends "res://tests/test_base.gd"
 ##              decoded from the preserved jpg and stretched over the
 ##              world rectangle, all 40 placements rendered as objects at
 ##              their saved cells with content footprints and metadata,
-##              the visual hierarchy choosing 31 thumbnails (keyed to
-##              transparency) + 9 footprint markers, camera world bounds
+##              the visual hierarchy choosing 17 converted sprites + 14
+##              thumbnails (keyed to transparency) + 9 footprint markers,
+##              camera world bounds
 ##              committed with the focus framed on the town, and the HUD
 ##              slot displaying exactly `str(state.value)` per field;
 ##   depth     the committed draw order is non-decreasing in isometric
@@ -48,11 +49,33 @@ const SLICE_VILLAGE_SHA256 := \
 	"ef217cf2004f97e53bb4f078b8bdd39a1301280d2f77f9ade877f8aaf26ee354"
 ## House I's cell in the village file (row `2061`: item 1 at (86,73)).
 const SLICE_HOUSE_CELL := Vector2i(86, 73)
-## Visual-source counts over the 576 village placements: the hierarchy
-## chooses 7 converted sprites (House I x1 + Wild Elephant x6), 543 keyed
-## thumbnails, 18 footprint markers, and 8 unknown-id placeholders.
+## Visual-source counts over the 576 village placements. These are no
+## longer a hand-transcribed snapshot of "the two packages someone
+## happened to convert": they are the measured result of the committed
+## hierarchy over the whole corpus, where `_expected_rung` below decides
+## each placement from the asset-registry status projected onto it plus
+## the thumbnail file on disk. Mass conversion (OpenSpec
+## `asset-package-mass-conversion`) moved 292 item sprites from
+## `extracted` to `converted`, so the committed status now selects the
+## sprite rung for 287 village placements: 267 of them resolve and 20
+## degrade to the footprint marker because their package carries a fill
+## type `package_loader.gd` does not render. `SLICE_DEGRADED_SPRITES`
+## pins that measured degradation per package so the 18 genuinely
+## thumbless markers and the 20 degraded ones stay distinguishable.
 const SLICE_COUNTS := {
-	"sprite": 7, "thumbnail": 543, "marker": 18, "placeholder": 8}
+	"sprite": 267, "thumbnail": 263, "marker": 38, "placeholder": 8}
+## The slice placements whose committed status selects the sprite rung
+## but whose package fails frame-1 resolution, keyed by the package
+## directory the loader names in its degradation reason. Measured, not
+## derived: 13 placements of item 93, 5 of item 1023, 1 each of items
+## 63 and 65, all carrying fill type 67 where `package_loader.gd`
+## renders only 65. This is a loader/converter gap, not a renderer
+## claim — see the suite's out-of-scope note.
+const SLICE_DEGRADED_SPRITES := {
+	"assets/converted/buildings/0063_cannon_academy_3_m": 1,
+	"assets/converted/buildings/0065_workshop_3_m": 1,
+	"assets/converted/buildings/0093_pear_tree_m": 13,
+	"assets/converted/units/1023_bazooka_3_m": 5}
 ## The content-unknown placeholder ids with their placement multiplicities
 ## (the six distinct ids of `state.unresolved_ids`, eight placements).
 const SLICE_PLACEHOLDER_IDS := [5000, 5001, 5004, 5005, 5007, 5007, 5007, 5008]
@@ -69,6 +92,63 @@ const THUMBLESS_MARKER_IDS := [928, 928, 929, 929, 929, 929, 929, 929, 929]
 ## Minimum keyed-background fraction per thumbnail (probe evidence: the
 ## nine fresh thumbnails key between 19% and 52% of their pixels).
 const MIN_KEYED_FRACTION := 0.15
+
+
+## The committed visual hierarchy (`town_visuals.gd`) restated over the
+## corpus instead of over the renderer: a placement whose committed item
+## sprite carries the `converted` status takes the sprite rung, any other
+## placement with a preserved thumbnail takes the thumbnail rung, one with
+## neither takes the footprint-marker rung, and a placement whose legacy id
+## is absent from content takes the placeholder rung. The two inputs are
+## the registry status already projected onto the placement and the
+## thumbnail file on disk — deliberately NOT the renderer's own loader
+## result, so a package that fails to resolve is reported as a degradation
+## instead of quietly agreeing with itself.
+static func _expected_rung(placement: Variant) -> String:
+	if not bool(placement.content_ok):
+		return TownVisuals.SOURCE_PLACEHOLDER
+	if str(placement.asset_status) == "converted":
+		return TownVisuals.SOURCE_SPRITE
+	if FileAccess.file_exists(Paths.repo_root().path_join(
+			"assets/thumbs/%s.jpg" % str(placement.img_name))):
+		return TownVisuals.SOURCE_THUMBNAIL
+	return TownVisuals.SOURCE_MARKER
+
+
+## Compares every rendered object against `_expected_rung` and splits the
+## differences into genuine mismatches and recorded degradations, so the
+## two are never mistaken for one another. Returns
+## `{"mismatched": [...], "degraded": {package_dir: placement_count}}`;
+## `degraded` is empty when every placement took the rung it committed to.
+static func _hierarchy_report(objects: Array) -> Dictionary:
+	var mismatched: Array = []
+	var degraded: Dictionary = {}
+	for object in objects:
+		var expected := _expected_rung(object.placement)
+		var actual := str(object.visual_source)
+		if actual == expected:
+			continue
+		var reason := str(object.visual_error)
+		if expected == TownVisuals.SOURCE_SPRITE \
+				and actual == TownVisuals.SOURCE_MARKER \
+				and not reason.is_empty():
+			var package := _degraded_package(reason)
+			degraded[package] = int(degraded.get(package, 0)) + 1
+			continue
+		mismatched.append("id %d at %s: committed %s, rendered %s (%s)"
+			% [int(object.legacy_id), object.cell, expected, actual,
+				reason if not reason.is_empty() else "no reason recorded"])
+	return {"mismatched": mismatched, "degraded": degraded}
+
+
+## The package directory a degradation reason names — the loader brackets
+## it — or "" when the reason names none.
+static func _degraded_package(reason: String) -> String:
+	var open := reason.find("[")
+	var close := reason.find("]", open + 1)
+	if open < 0 or close < 0:
+		return ""
+	return reason.substr(open + 1, close - open - 1)
 
 
 func run_scenario() -> void:
@@ -178,16 +258,26 @@ func _check_built_view(town: Node2D, state: Variant) -> void:
 	check_eq(object_footprints, placement_footprints,
 		"every object uses its content footprint (no texture-derived size)")
 
-	# Visual hierarchy: 31 thumbnails + 9 markers, no sprites, no
-	# placeholders in the fresh save; markers are exactly the placements
-	# of the two thumbless ids; thumbnails are background-keyed.
+	# Visual hierarchy: the committed four-rung ladder over the fresh
+	# save's 40 placements. Mass conversion moved item 23 (Wall I, 16
+	# placements) and item 909 (Space Station, 1) to the `converted`
+	# status, so 17 now take the sprite rung, 14 the thumbnail rung
+	# (keyed to transparency), 9 the footprint marker, 0 the
+	# placeholder. The counts are pinned AND each placement is checked
+	# against the rung its own committed status selects, so the two
+	# cannot drift apart silently.
 	var counts: Dictionary = town.object_counts_by_source()
-	check_eq(int(counts.get("thumbnail", 0)), 31,
-		"31 placements choose the preserved thumbnail")
-	check_eq(int(counts.get("marker", 0)), 9,
-		"9 thumbless placements choose the footprint marker")
-	check_eq(int(counts.get("sprite", 0)), 0,
-		"no fresh placement has a converted package sprite")
+	# `object_counts_by_source` omits a rung no object took, so the
+	# absent "placeholder" key IS the assertion that the fresh save has
+	# none — checked explicitly below rather than by faking a zero into
+	# the expected dictionary.
+	check_eq(counts, {"sprite": 17, "thumbnail": 14, "marker": 9},
+		"the fresh save renders 17 sprites, 14 thumbnails, 9 markers")
+	var fresh_report: Dictionary = _hierarchy_report(town.objects)
+	check_eq(fresh_report.get("mismatched", []), [],
+		"every fresh placement renders the rung its committed status selects")
+	check_eq(fresh_report.get("degraded", {}), {},
+		"no fresh placement's converted package fails to resolve")
 	check_eq(int(counts.get("placeholder", 0)), 0,
 		"no fresh placement is a content-unknown placeholder")
 	var marker_ids: Array = []
@@ -419,6 +509,21 @@ func _check_slice(registry: Variant) -> void:
 		"all 576 village placements render as objects")
 	check_eq(slice.object_counts_by_source(), SLICE_COUNTS,
 		"the visual hierarchy counts match the village")
+	# The counts above are only trustworthy if each placement took the
+	# rung its own committed status selects. Split the difference from
+	# `_expected_rung` into genuine mismatches and recorded
+	# degradations, so a renderer that quietly downgraded a whole
+	# village cannot pass on the aggregate counts alone. The 20
+	# degraded placements are a `package_loader.gd` gap (fill type 67
+	# against a loader that renders 65), NOT a claim about the
+	# renderer; they are pinned per package so they stay countable.
+	var slice_report: Dictionary = _hierarchy_report(slice.objects)
+	check_eq(slice_report.get("mismatched", []), [],
+		"every slice placement renders the rung its committed status "
+		+ "selects, apart from the packages recorded as degraded")
+	check_eq(slice_report.get("degraded", {}), SLICE_DEGRADED_SPRITES,
+		"the 20 degraded slice sprites are exactly the four packages "
+		+ "carrying the fill type the loader does not render")
 
 	# Converted sprites: one House I + six Wild Elephant, each at its
 	# legacy-saved cell with its content footprint and native frame.

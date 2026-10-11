@@ -1,0 +1,3074 @@
+{
+  "bitmaps": [
+    {
+      "bytes": 15286,
+      "character_id": 1,
+      "file": "assets/converted/images/1071_cannon_5_m/1.jpg",
+      "sha256": "91d4fbce65fec4199b207120fd156d6b964958b149990e2c4fd36c3782bcad56"
+    },
+    {
+      "bytes": 1422,
+      "character_id": 1,
+      "file": "assets/converted/images/1071_cannon_5_m/1_alpha.png",
+      "sha256": "054060538dfe5f354ee0d615191f5158fa85a2f7070e6213c8877a10fb246165"
+    },
+    {
+      "bytes": 16505,
+      "character_id": 3,
+      "file": "assets/converted/images/1071_cannon_5_m/3.jpg",
+      "sha256": "003f19e343977142a55c4ac653881c16f251efb66273f508aa49c56c2f4bdcaa"
+    },
+    {
+      "bytes": 2045,
+      "character_id": 3,
+      "file": "assets/converted/images/1071_cannon_5_m/3_alpha.png",
+      "sha256": "d890f1d90d1b13e4b9887baa2f698badc095e4983a2635f6fa7ac0637b78f534"
+    },
+    {
+      "bytes": 16776,
+      "character_id": 5,
+      "file": "assets/converted/images/1071_cannon_5_m/5.jpg",
+      "sha256": "7c6825de35d014d1ca406e590e7fd3e649b1e4f5e1f2109ea3facddab7912a47"
+    },
+    {
+      "bytes": 1429,
+      "character_id": 5,
+      "file": "assets/converted/images/1071_cannon_5_m/5_alpha.png",
+      "sha256": "66be5be7bde492b470669e8add78fa9c05251074697f91a4a4a636c57ff2ff6a"
+    },
+    {
+      "bytes": 17192,
+      "character_id": 7,
+      "file": "assets/converted/images/1071_cannon_5_m/7.jpg",
+      "sha256": "c23841d97479729023fd7539500392124b5d388b948e2b786575e44812759565"
+    },
+    {
+      "bytes": 1820,
+      "character_id": 7,
+      "file": "assets/converted/images/1071_cannon_5_m/7_alpha.png",
+      "sha256": "0c003429786addf22897d67f18e42d7b30a9208d6e4d8d7cde9541c681a5ee7f"
+    },
+    {
+      "bytes": 16465,
+      "character_id": 9,
+      "file": "assets/converted/images/1071_cannon_5_m/9.jpg",
+      "sha256": "92d5eb3cf7b54c0d0dec93c3138f508582e35f82b6d34ef776b3c40d93715e68"
+    },
+    {
+      "bytes": 1119,
+      "character_id": 9,
+      "file": "assets/converted/images/1071_cannon_5_m/9_alpha.png",
+      "sha256": "5f4dc69d3df1b3d75763247bc2f9796b99326d7fe9030dfa1f125f2310dc99a4"
+    },
+    {
+      "bytes": 15113,
+      "character_id": 11,
+      "file": "assets/converted/images/1071_cannon_5_m/11.jpg",
+      "sha256": "70176cfde319b24e5f80e17c5a0456529a113aa16a6bbd4cb059feab0de77976"
+    },
+    {
+      "bytes": 1356,
+      "character_id": 11,
+      "file": "assets/converted/images/1071_cannon_5_m/11_alpha.png",
+      "sha256": "f593dc9bb2cf8b4e51157abc268720f8f4206021eb62fc8427d474c851dfe816"
+    },
+    {
+      "bytes": 16282,
+      "character_id": 14,
+      "file": "assets/converted/images/1071_cannon_5_m/14.jpg",
+      "sha256": "2fe2486b050715d81b613b2d8504c10351b5d73a73848f59b4e996ac8639daa8"
+    },
+    {
+      "bytes": 2038,
+      "character_id": 14,
+      "file": "assets/converted/images/1071_cannon_5_m/14_alpha.png",
+      "sha256": "a5e35979b745b9082f114a35a502b13e19a2c1440b5c0ef55e16c9c7a48b87d0"
+    },
+    {
+      "bytes": 16697,
+      "character_id": 17,
+      "file": "assets/converted/images/1071_cannon_5_m/17.jpg",
+      "sha256": "878d4133d2aca1e79051048da03a2a881d1da90d9e8af85b765493ad5e9f58e1"
+    },
+    {
+      "bytes": 1432,
+      "character_id": 17,
+      "file": "assets/converted/images/1071_cannon_5_m/17_alpha.png",
+      "sha256": "100793a8da87d2d214d0ea5acadb0a6b894216440fe61fa094f7f6fd08d7d722"
+    },
+    {
+      "bytes": 16912,
+      "character_id": 20,
+      "file": "assets/converted/images/1071_cannon_5_m/20.jpg",
+      "sha256": "6912daf2c19ffb88ca17f6e7b23516d962a4fa094c847c82baf8c0619eb0f351"
+    },
+    {
+      "bytes": 1791,
+      "character_id": 20,
+      "file": "assets/converted/images/1071_cannon_5_m/20_alpha.png",
+      "sha256": "8ed4d5975d1931dfb524ee5aca77e92a132d1118f6645d1463f0c994bec7a239"
+    },
+    {
+      "bytes": 16496,
+      "character_id": 23,
+      "file": "assets/converted/images/1071_cannon_5_m/23.jpg",
+      "sha256": "e078e712f3dbc0296e0679274bdc038ab5de9a9331845dea846fdda9fa8fe22e"
+    },
+    {
+      "bytes": 1082,
+      "character_id": 23,
+      "file": "assets/converted/images/1071_cannon_5_m/23_alpha.png",
+      "sha256": "151b12ac8d15f4e0da64843ef6ce1835386578b9f166326e2f1c693f0479060e"
+    },
+    {
+      "bytes": 15242,
+      "character_id": 26,
+      "file": "assets/converted/images/1071_cannon_5_m/26.jpg",
+      "sha256": "39348fd2da7fa699036bf1454772c9c468b43a9df5396cbeb7b3e2a967ae0658"
+    },
+    {
+      "bytes": 1437,
+      "character_id": 26,
+      "file": "assets/converted/images/1071_cannon_5_m/26_alpha.png",
+      "sha256": "5218e47d8b611defff9436de3b3e692217444813b2d6a75c70c70eacfb4803e9"
+    },
+    {
+      "bytes": 15157,
+      "character_id": 29,
+      "file": "assets/converted/images/1071_cannon_5_m/29.jpg",
+      "sha256": "3f6b7a92335b0f3480f389fbcde82ec57ff115be63f24b1039c1558114aa36ef"
+    },
+    {
+      "bytes": 1402,
+      "character_id": 29,
+      "file": "assets/converted/images/1071_cannon_5_m/29_alpha.png",
+      "sha256": "baa98a10e120bf2edf0cb5fb5648125b897c87dfe9bdce2b84d5db17b32768d3"
+    },
+    {
+      "bytes": 3129,
+      "character_id": 31,
+      "file": "assets/converted/images/1071_cannon_5_m/31.jpg",
+      "sha256": "6314616dbbe0b6f8c03a22591cd730383b16a42c802a67e428cb9043b14dd643"
+    },
+    {
+      "bytes": 2893,
+      "character_id": 31,
+      "file": "assets/converted/images/1071_cannon_5_m/31_alpha.png",
+      "sha256": "735c886764c01fd5e88759cc39bdc284542e192c32560d1ac72a934237d7b1f7"
+    },
+    {
+      "bytes": 4473,
+      "character_id": 33,
+      "file": "assets/converted/images/1071_cannon_5_m/33.jpg",
+      "sha256": "cbd9431dfbc9bf16ca3aac088a3b3dc6bbad7dcbddd879cbdb3c8a1e4c302c65"
+    },
+    {
+      "bytes": 4385,
+      "character_id": 33,
+      "file": "assets/converted/images/1071_cannon_5_m/33_alpha.png",
+      "sha256": "52efd5e7700936f721c09ecc701bb7d78cf82dd0f8fb574655234eb6cbf71a6b"
+    },
+    {
+      "bytes": 14839,
+      "character_id": 35,
+      "file": "assets/converted/images/1071_cannon_5_m/35.jpg",
+      "sha256": "001199443c0a13ee470668d64dbdf98c8b85e058a9fb8b6f417085b08292c810"
+    },
+    {
+      "bytes": 1344,
+      "character_id": 35,
+      "file": "assets/converted/images/1071_cannon_5_m/35_alpha.png",
+      "sha256": "27b8bdc253afd22b095ec16e52e8393abf3aa9c227a290437403d151c73671d7"
+    },
+    {
+      "bytes": 2303,
+      "character_id": 37,
+      "file": "assets/converted/images/1071_cannon_5_m/37.jpg",
+      "sha256": "20e8b30825a82b335114e88ba148a835f0790afc1721a224d8b54075a7fbeee2"
+    },
+    {
+      "bytes": 2198,
+      "character_id": 37,
+      "file": "assets/converted/images/1071_cannon_5_m/37_alpha.png",
+      "sha256": "f447a0f67c188beb8cf3deb8b9195929a2ff82ec5a883d33fdc3ae85ce2a2225"
+    },
+    {
+      "bytes": 15131,
+      "character_id": 39,
+      "file": "assets/converted/images/1071_cannon_5_m/39.jpg",
+      "sha256": "e510b270b595b30bb405a40046dea9fde26d340d86c4180e780b083ee6c6d768"
+    },
+    {
+      "bytes": 1402,
+      "character_id": 39,
+      "file": "assets/converted/images/1071_cannon_5_m/39_alpha.png",
+      "sha256": "8b67facb03402a34beabef4417ad93d8b21aabb1f8ca0e430e59045749e2940c"
+    },
+    {
+      "bytes": 16518,
+      "character_id": 42,
+      "file": "assets/converted/images/1071_cannon_5_m/42.jpg",
+      "sha256": "cd37fb5ffad250a6f413a38b3656482a2bb6e87fdabe891630760aa80b19d164"
+    },
+    {
+      "bytes": 2041,
+      "character_id": 42,
+      "file": "assets/converted/images/1071_cannon_5_m/42_alpha.png",
+      "sha256": "0e7ad1e5a12246d625831be72e1dc5ca435147467737a935b8ceb13fe9289699"
+    },
+    {
+      "bytes": 16054,
+      "character_id": 44,
+      "file": "assets/converted/images/1071_cannon_5_m/44.jpg",
+      "sha256": "f6ce2668964b8da1cff9abd05d064d4460a81e2870a807101550fa95bad216f6"
+    },
+    {
+      "bytes": 1984,
+      "character_id": 44,
+      "file": "assets/converted/images/1071_cannon_5_m/44_alpha.png",
+      "sha256": "e772532486257c7de017a21d55e517b22757eca7b5ea281441d31e622e27a8b9"
+    },
+    {
+      "bytes": 15895,
+      "character_id": 48,
+      "file": "assets/converted/images/1071_cannon_5_m/48.jpg",
+      "sha256": "6ebce9a385e8da9085816f31e43d98c120431c712e82a74a996d3f45f84ee10f"
+    },
+    {
+      "bytes": 1919,
+      "character_id": 48,
+      "file": "assets/converted/images/1071_cannon_5_m/48_alpha.png",
+      "sha256": "daf24661520362516527e6890e1ad5284950a7127a3667d7deed853811440d41"
+    },
+    {
+      "bytes": 16043,
+      "character_id": 51,
+      "file": "assets/converted/images/1071_cannon_5_m/51.jpg",
+      "sha256": "414426b12d9e39261058f5ba4358fa6a7999ab875b817c3d845c632ad4ec0673"
+    },
+    {
+      "bytes": 1972,
+      "character_id": 51,
+      "file": "assets/converted/images/1071_cannon_5_m/51_alpha.png",
+      "sha256": "64a9caa877b5468e667d1b1852a4f9e113b546f95c8741169e47ca71ce1c876f"
+    },
+    {
+      "bytes": 16672,
+      "character_id": 54,
+      "file": "assets/converted/images/1071_cannon_5_m/54.jpg",
+      "sha256": "ed9155c3ae5ffc49e95d6f017670713f8d9913398c98d43d34ed406535385c09"
+    },
+    {
+      "bytes": 1454,
+      "character_id": 54,
+      "file": "assets/converted/images/1071_cannon_5_m/54_alpha.png",
+      "sha256": "6a7ad371b37310a0566de312a3c122e84fce02da92d363809adcdc96e0ea91a7"
+    },
+    {
+      "bytes": 16779,
+      "character_id": 56,
+      "file": "assets/converted/images/1071_cannon_5_m/56.jpg",
+      "sha256": "cd1b17b8cea5dc6e55f87ec3542252e62036aa4fc721900247c4d8b420584411"
+    },
+    {
+      "bytes": 1471,
+      "character_id": 56,
+      "file": "assets/converted/images/1071_cannon_5_m/56_alpha.png",
+      "sha256": "c062d094112e68ecc937c755bb9f0e4d659441bb5455f89eaf3188dded8737af"
+    },
+    {
+      "bytes": 16977,
+      "character_id": 60,
+      "file": "assets/converted/images/1071_cannon_5_m/60.jpg",
+      "sha256": "6ad89b5135948804b176d020ed8db906dd285e5bfa174b956f00094f0b38720a"
+    },
+    {
+      "bytes": 1474,
+      "character_id": 60,
+      "file": "assets/converted/images/1071_cannon_5_m/60_alpha.png",
+      "sha256": "18232e3ef6cd84935649535af4527b2d34c57720bd56b70c8e61e9f241fdbd2c"
+    },
+    {
+      "bytes": 16740,
+      "character_id": 63,
+      "file": "assets/converted/images/1071_cannon_5_m/63.jpg",
+      "sha256": "70f35ec83aefa6bd595f9bf798052aac63d83b4325fceda5d1cde1ffa7bcb5cf"
+    },
+    {
+      "bytes": 1464,
+      "character_id": 63,
+      "file": "assets/converted/images/1071_cannon_5_m/63_alpha.png",
+      "sha256": "63881a5f00d65c93888609b908b84c085e6d6de9d547199f82e0eac02b43beea"
+    },
+    {
+      "bytes": 17213,
+      "character_id": 66,
+      "file": "assets/converted/images/1071_cannon_5_m/66.jpg",
+      "sha256": "972094eff479604a8757c6346da6b2ffab5a59e125a12f0e33526b31ddc368dd"
+    },
+    {
+      "bytes": 1818,
+      "character_id": 66,
+      "file": "assets/converted/images/1071_cannon_5_m/66_alpha.png",
+      "sha256": "8d8dfb2e83705fd6886317a29b0b37fcb727d11c176a846db9f5d9e8a7c4c5da"
+    },
+    {
+      "bytes": 17352,
+      "character_id": 68,
+      "file": "assets/converted/images/1071_cannon_5_m/68.jpg",
+      "sha256": "e83089b36c58a1761124fb4a5f95f444d64e8098e0c70f1956f33d2240943a9d"
+    },
+    {
+      "bytes": 1864,
+      "character_id": 68,
+      "file": "assets/converted/images/1071_cannon_5_m/68_alpha.png",
+      "sha256": "f5e3cab1764392223a987782c21df516e33ecfd135ef793bffad9034f6b6f35f"
+    },
+    {
+      "bytes": 17664,
+      "character_id": 72,
+      "file": "assets/converted/images/1071_cannon_5_m/72.jpg",
+      "sha256": "f128d93a4dd7134ff0cd1d9f94385277ec48d493bce487d8559c3191f08532de"
+    },
+    {
+      "bytes": 1903,
+      "character_id": 72,
+      "file": "assets/converted/images/1071_cannon_5_m/72_alpha.png",
+      "sha256": "630ef9f40ff608108105b351b71c57d314ed3c3fbff8da71c52440a8ba02ce01"
+    },
+    {
+      "bytes": 17285,
+      "character_id": 75,
+      "file": "assets/converted/images/1071_cannon_5_m/75.jpg",
+      "sha256": "6c456ce26db1f80f0063c39cadf5a75891e5eed4a0b83971ee19e47d4952d2f8"
+    },
+    {
+      "bytes": 1856,
+      "character_id": 75,
+      "file": "assets/converted/images/1071_cannon_5_m/75_alpha.png",
+      "sha256": "e05f6787f76a50caf58fa225e8697e043ed272c14208c3ec01d66f2d8e8c25da"
+    },
+    {
+      "bytes": 16376,
+      "character_id": 78,
+      "file": "assets/converted/images/1071_cannon_5_m/78.jpg",
+      "sha256": "6f1de9a2df3e8753054ba298e552ad16edf32947a094e2a644827b6a5d3a48a4"
+    },
+    {
+      "bytes": 1138,
+      "character_id": 78,
+      "file": "assets/converted/images/1071_cannon_5_m/78_alpha.png",
+      "sha256": "92bac282f0846443951465f5da3f23b2c7a43bdbd4efbb9c0ba91aeaf5621642"
+    },
+    {
+      "bytes": 16776,
+      "character_id": 80,
+      "file": "assets/converted/images/1071_cannon_5_m/80.jpg",
+      "sha256": "e866909d3fc2d200f16070a8faebf9aedd98127be046074b810963d743f866f9"
+    },
+    {
+      "bytes": 1090,
+      "character_id": 80,
+      "file": "assets/converted/images/1071_cannon_5_m/80_alpha.png",
+      "sha256": "925ffcbe24a010c2f2e8ad32c300525c0d0b599401fad4fb68fb3f707a1dbb00"
+    },
+    {
+      "bytes": 16383,
+      "character_id": 84,
+      "file": "assets/converted/images/1071_cannon_5_m/84.jpg",
+      "sha256": "884d2149e4c51aff682e01376edddd263c5320c3a74593971726c06d97795724"
+    },
+    {
+      "bytes": 1039,
+      "character_id": 84,
+      "file": "assets/converted/images/1071_cannon_5_m/84_alpha.png",
+      "sha256": "b43bb1ca0a967f46fc71c3f02133544bb4fa972c2d0970b9459cc50698b5a329"
+    },
+    {
+      "bytes": 16641,
+      "character_id": 87,
+      "file": "assets/converted/images/1071_cannon_5_m/87.jpg",
+      "sha256": "b2c96e811d6160c5f735cd2450c49f04ea91c99033b1ec83ad6c523ac4fa533c"
+    },
+    {
+      "bytes": 1090,
+      "character_id": 87,
+      "file": "assets/converted/images/1071_cannon_5_m/87_alpha.png",
+      "sha256": "925ffcbe24a010c2f2e8ad32c300525c0d0b599401fad4fb68fb3f707a1dbb00"
+    },
+    {
+      "bytes": 17224,
+      "character_id": 90,
+      "file": "assets/converted/images/1071_cannon_5_m/90.jpg",
+      "sha256": "b67ebbcba8bde5442cf28fd503c16e3b17623ae2faf70063cb6e4e3769494eb9"
+    },
+    {
+      "bytes": 1824,
+      "character_id": 90,
+      "file": "assets/converted/images/1071_cannon_5_m/90_alpha.png",
+      "sha256": "ee3a23e263bf37c6faf1c475fd7cb2629eb7703194dfc7ca758d4d615a11a25e"
+    },
+    {
+      "bytes": 17048,
+      "character_id": 92,
+      "file": "assets/converted/images/1071_cannon_5_m/92.jpg",
+      "sha256": "f7cfed3832ccdec566cabb8a55ea5f6113a886cb0e83df07d2a6eecaee8b9719"
+    },
+    {
+      "bytes": 1881,
+      "character_id": 92,
+      "file": "assets/converted/images/1071_cannon_5_m/92_alpha.png",
+      "sha256": "a817ba2a062980f0c208bec001516e23761c173d1ca9e9a09a1fe62c09242be1"
+    },
+    {
+      "bytes": 17908,
+      "character_id": 94,
+      "file": "assets/converted/images/1071_cannon_5_m/94.jpg",
+      "sha256": "f482e3ba9d31dfe9f437c16a305ad26ff8f31586598b23cbcd79a7688ed13788"
+    },
+    {
+      "bytes": 1858,
+      "character_id": 94,
+      "file": "assets/converted/images/1071_cannon_5_m/94_alpha.png",
+      "sha256": "4fd62609dc1cb386ce2946c80b8d58c17ff59e28fafcab1e5c6b94bea6e1ad91"
+    },
+    {
+      "bytes": 17742,
+      "character_id": 96,
+      "file": "assets/converted/images/1071_cannon_5_m/96.jpg",
+      "sha256": "1b64796886922faf7b93cd8a84d5902fef4de2b3cab7490c40afaf5cd7a0ec5d"
+    },
+    {
+      "bytes": 1817,
+      "character_id": 96,
+      "file": "assets/converted/images/1071_cannon_5_m/96_alpha.png",
+      "sha256": "56fb8d960c700c6e1a674d2313302030dca6e801203af07b7aacee6e96429275"
+    }
+  ],
+  "content_ref": {
+    "activation": 0,
+    "attack": 34,
+    "attack_interval": 45,
+    "attack_range": 13,
+    "best_against": "ft_building",
+    "best_against_mult": 1,
+    "breeding_order": 30,
+    "build_time": 0,
+    "building_limit_same_id": -1,
+    "building_limit_same_scf": -1,
+    "category_id": 7,
+    "clicks_to_build": 0,
+    "collect": 0,
+    "collect_type": "g",
+    "collect_xp": 3,
+    "content_version": "44e5b9edd1eba2910833bb8e2f063175e51c5754e38c35177648e4de779df501",
+    "cost": 0,
+    "cost_unit_cash": 3,
+    "costs": {
+      "g": 475,
+      "s": 950
+    },
+    "defense": 1,
+    "display_order": 99,
+    "elevation": 1,
+    "expiration": 0,
+    "gift_level": 4,
+    "giftable": 0,
+    "group_type": "LAND_VEHICLE",
+    "height": 1,
+    "img_name": "1071_cannon_5_m",
+    "in_store": 0,
+    "inventory_ids": null,
+    "kind": "unit",
+    "legacy_id": "1071",
+    "life": 600,
+    "max_collects": 0,
+    "max_elem_vol": 0,
+    "max_frame": 5,
+    "min_level": 8,
+    "name": "Tank V",
+    "new_item": 0,
+    "population": 3,
+    "premium_upgrade_costs": null,
+    "properties": {
+      "bulldozable": "1",
+      "ft_armored": "1",
+      "mechanic": "1",
+      "resurrectable": "1",
+      "seeStealthUnits": "1"
+    },
+    "race": "h",
+    "sm_training_time": 60000,
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "subcat_functional": 80,
+    "subcategory_id": 7,
+    "syringes": 1,
+    "training_time": 0,
+    "trains_ids": -1,
+    "type": "u",
+    "unit_capacity": 0,
+    "upgrades_to": -1,
+    "velocity": 6,
+    "volume": 10,
+    "width": 1,
+    "xp": 35
+  },
+  "content_version": "a0c3861fd95cbe635537efd7223f46991580a6be66735a70c9b1904c8987c18f",
+  "frame_count": 1,
+  "frame_height": 400,
+  "frame_rate": 30.0,
+  "frame_width": 550,
+  "kind": "converted_unit",
+  "legacy_id": "1071_cannon_5_m",
+  "main": {
+    "frame_count": 1,
+    "labels": [],
+    "placements": [
+      {
+        "character_id": 99,
+        "character_kind": "sprite",
+        "depth": 1,
+        "frame": 1,
+        "move": false
+      }
+    ],
+    "removes": []
+  },
+  "shapes": [
+    {
+      "bounds": {
+        "height_px": 243,
+        "width_px": 167,
+        "xmax": 3356,
+        "xmin": 16,
+        "ymax": 4860,
+        "ymin": 0
+      },
+      "character_id": 2,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 1,
+          "matrix": "d94000050000064000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 193,
+        "width_px": 273,
+        "xmax": 5460,
+        "xmin": 0,
+        "ymax": 3860,
+        "ymin": 0
+      },
+      "character_id": 4,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 3,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 160,
+        "width_px": 251,
+        "xmax": 5020,
+        "xmin": 0,
+        "ymax": 3200,
+        "ymin": 0
+      },
+      "character_id": 6,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 5,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 182,
+        "width_px": 269,
+        "xmax": 5380,
+        "xmin": 0,
+        "ymax": 3640,
+        "ymin": 0
+      },
+      "character_id": 8,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 7,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 201,
+        "width_px": 167,
+        "xmax": 3340,
+        "xmin": 0,
+        "ymax": 4020,
+        "ymin": 0
+      },
+      "character_id": 10,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 9,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 243,
+        "width_px": 167,
+        "xmax": 3354,
+        "xmin": 14,
+        "ymax": 4860,
+        "ymin": 60
+      },
+      "character_id": 12,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 11,
+          "matrix": "d94000050000071cf0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 193,
+        "width_px": 273,
+        "xmax": 5462,
+        "xmin": 62,
+        "ymax": 3864,
+        "ymin": 44
+      },
+      "character_id": 15,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 14,
+          "matrix": "d94000050000077cb0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 160,
+        "width_px": 252,
+        "xmax": 5051,
+        "xmin": 11,
+        "ymax": 3200,
+        "ymin": 40
+      },
+      "character_id": 18,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 17,
+          "matrix": "d940000500000716a0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 181,
+        "width_px": 269,
+        "xmax": 5384,
+        "xmin": 4,
+        "ymax": 3639,
+        "ymin": 39
+      },
+      "character_id": 21,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 20,
+          "matrix": "d9400005000007089c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 201,
+        "width_px": 166,
+        "xmax": 3339,
+        "xmin": -1,
+        "ymax": 4024,
+        "ymin": 44
+      },
+      "character_id": 24,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 23,
+          "matrix": "d9400005000007feb0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 256,
+        "width_px": 167,
+        "xmax": 3352,
+        "xmin": 12,
+        "ymax": 5138,
+        "ymin": 278
+      },
+      "character_id": 27,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 26,
+          "matrix": "d940000500000a031160",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 256,
+        "width_px": 167,
+        "xmax": 3356,
+        "xmin": 16,
+        "ymax": 5126,
+        "ymin": 406
+      },
+      "character_id": 30,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 29,
+          "matrix": "d940000500000a041960",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 38,
+        "width_px": 124,
+        "xmax": 2484,
+        "xmin": 806,
+        "ymax": 779,
+        "ymin": -610
+      },
+      "character_id": 32,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 31,
+          "matrix": "d542c38a161cc20b61f4a16c9af600",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 38,
+        "width_px": 124,
+        "xmax": 2484,
+        "xmin": 806,
+        "ymax": 779,
+        "ymin": -610
+      },
+      "character_id": 34,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 33,
+          "matrix": "d542c38a161cc20b61f4a16c9af600",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 256,
+        "width_px": 167,
+        "xmax": 3356,
+        "xmin": 16,
+        "ymax": 5128,
+        "ymin": 588
+      },
+      "character_id": 36,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 35,
+          "matrix": "d940000500000b020930",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 37,
+        "width_px": 126,
+        "xmax": 2524,
+        "xmin": 846,
+        "ymax": 751,
+        "ymin": -638
+      },
+      "character_id": 38,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 37,
+          "matrix": "d542c38a161cc20b61f4a16d3ae800",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 256,
+        "width_px": 167,
+        "xmax": 3356,
+        "xmin": 16,
+        "ymax": 5128,
+        "ymin": 408
+      },
+      "character_id": 40,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 39,
+          "matrix": "d940000500000a041980",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 196,
+        "width_px": 283,
+        "xmax": 5676,
+        "xmin": 216,
+        "ymax": 3924,
+        "ymin": 64
+      },
+      "character_id": 43,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 42,
+          "matrix": "d94000050000096c1000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 195,
+        "width_px": 283,
+        "xmax": 5674,
+        "xmin": 214,
+        "ymax": 3913,
+        "ymin": 153
+      },
+      "character_id": 45,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 44,
+          "matrix": "d94000050000096b2640",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 54,
+        "width_px": 295,
+        "xmax": 5907,
+        "xmin": 3923,
+        "ymax": 1081,
+        "ymin": -990
+      },
+      "character_id": 46,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 31,
+          "matrix": "d161cf161cf35439a45e32e1c9cf7844",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 54,
+        "width_px": 295,
+        "xmax": 5907,
+        "xmin": 3923,
+        "ymax": 1081,
+        "ymin": -990
+      },
+      "character_id": 47,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 33,
+          "matrix": "d161cf161cf35439a45e32e1c9cf7844",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 196,
+        "width_px": 284,
+        "xmax": 5682,
+        "xmin": 222,
+        "ymax": 3931,
+        "ymin": 171
+      },
+      "character_id": 49,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 48,
+          "matrix": "d94000050000096f2ac0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 54,
+        "width_px": 295,
+        "xmax": 5907,
+        "xmin": 3923,
+        "ymax": 1081,
+        "ymin": -990
+      },
+      "character_id": 50,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 37,
+          "matrix": "d161cf161cf35439a45e32e1c9cf7844",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 195,
+        "width_px": 283,
+        "xmax": 5671,
+        "xmin": 211,
+        "ymax": 3916,
+        "ymin": 156
+      },
+      "character_id": 52,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 51,
+          "matrix": "d940000500000969a700",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 158,
+        "width_px": 247,
+        "xmax": 4945,
+        "xmin": -75,
+        "ymax": 3179,
+        "ymin": -21
+      },
+      "character_id": 55,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 54,
+          "matrix": "d9400005000008b5eb",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 159,
+        "width_px": 247,
+        "xmax": 4946,
+        "xmin": -74,
+        "ymax": 3182,
+        "ymin": -18
+      },
+      "character_id": 57,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 56,
+          "matrix": "d9400005000008b6ee",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 72,
+        "width_px": 284,
+        "xmax": 5692,
+        "xmin": 4172,
+        "ymax": 1451,
+        "ymin": -328
+      },
+      "character_id": 58,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 31,
+          "matrix": "c95e64579935500a057fb01cab0fd700",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 72,
+        "width_px": 284,
+        "xmax": 5692,
+        "xmin": 4172,
+        "ymax": 1451,
+        "ymin": -328
+      },
+      "character_id": 59,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 33,
+          "matrix": "c95e64579935500a057fb01cab0fd700",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 159,
+        "width_px": 247,
+        "xmax": 4941,
+        "xmin": -79,
+        "ymax": 3180,
+        "ymin": -40
+      },
+      "character_id": 61,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 60,
+          "matrix": "d9400005000008b1d8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 76,
+        "width_px": 282,
+        "xmax": 5652,
+        "xmin": 4132,
+        "ymax": 1521,
+        "ymin": -258
+      },
+      "character_id": 62,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 37,
+          "matrix": "c95e64579935500a057fb01ca9cfdfc0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 159,
+        "width_px": 247,
+        "xmax": 4946,
+        "xmin": -74,
+        "ymax": 3184,
+        "ymin": -16
+      },
+      "character_id": 64,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 63,
+          "matrix": "d9400005000008b6f0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 179,
+        "width_px": 270,
+        "xmax": 5414,
+        "xmin": 34,
+        "ymax": 3589,
+        "ymin": -51
+      },
+      "character_id": 67,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 66,
+          "matrix": "d94000050000074534",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 179,
+        "width_px": 270,
+        "xmax": 5412,
+        "xmin": 32,
+        "ymax": 3581,
+        "ymin": -139
+      },
+      "character_id": 69,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 68,
+          "matrix": "d9400005000009105d40",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 129,
+        "width_px": 280,
+        "xmax": 5610,
+        "xmin": 3883,
+        "ymax": 2588,
+        "ymin": 659
+      },
+      "character_id": 70,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 31,
+          "matrix": "ce865850cb0d5350b1657a872bd42098",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 129,
+        "width_px": 280,
+        "xmax": 5610,
+        "xmin": 3883,
+        "ymax": 2588,
+        "ymin": 659
+      },
+      "character_id": 71,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 33,
+          "matrix": "ce865850cb0d5350b1657a872bd42098",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 178,
+        "width_px": 270,
+        "xmax": 5412,
+        "xmin": 32,
+        "ymax": 3576,
+        "ymin": -284
+      },
+      "character_id": 73,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 72,
+          "matrix": "d940000500000a082e40",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 125,
+        "width_px": 277,
+        "xmax": 5554,
+        "xmin": 3827,
+        "ymax": 2512,
+        "ymin": 583
+      },
+      "character_id": 74,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 37,
+          "matrix": "ce865850cb0d5350b1657a872b641e38",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 178,
+        "width_px": 270,
+        "xmax": 5412,
+        "xmin": 32,
+        "ymax": 3578,
+        "ymin": -142
+      },
+      "character_id": 76,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 75,
+          "matrix": "d9400005000009105c80",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 165,
+        "xmax": 3305,
+        "xmin": -35,
+        "ymax": 3979,
+        "ymin": -41
+      },
+      "character_id": 79,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 78,
+          "matrix": "d9400005000007bb5c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 165,
+        "xmax": 3304,
+        "xmin": -36,
+        "ymax": 3973,
+        "ymin": -167
+      },
+      "character_id": 81,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 80,
+          "matrix": "d9400005000009ee5640",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 225,
+        "width_px": 126,
+        "xmax": 2532,
+        "xmin": 854,
+        "ymax": 4501,
+        "ymin": 3112
+      },
+      "character_id": 82,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 31,
+          "matrix": "d6bd3c95e9e4c1f4a20b61c4f2228e",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 225,
+        "width_px": 126,
+        "xmax": 2532,
+        "xmin": 854,
+        "ymax": 4501,
+        "ymin": 3112
+      },
+      "character_id": 83,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 33,
+          "matrix": "d6bd3c95e9e4c1f4a20b61c4f2228e",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 198,
+        "width_px": 165,
+        "xmax": 3300,
+        "xmin": -40,
+        "ymax": 3972,
+        "ymin": -328
+      },
+      "character_id": 85,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 84,
+          "matrix": "d940000500000af62b80",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 225,
+        "width_px": 126,
+        "xmax": 2532,
+        "xmin": 854,
+        "ymax": 4501,
+        "ymin": 3112
+      },
+      "character_id": 86,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 37,
+          "matrix": "d6bd3c95e9e4c1f4a20b61c4f2228e",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 199,
+        "width_px": 165,
+        "xmax": 3300,
+        "xmin": -40,
+        "ymax": 3983,
+        "ymin": -157
+      },
+      "character_id": 88,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 87,
+          "matrix": "d9400005000009ec58c0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 183,
+        "width_px": 268,
+        "xmax": 5374,
+        "xmin": -6,
+        "ymax": 3664,
+        "ymin": 24
+      },
+      "character_id": 91,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 90,
+          "matrix": "d9400005000006e980",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 182,
+        "width_px": 268,
+        "xmax": 5372,
+        "xmin": -8,
+        "ymax": 3655,
+        "ymin": 55
+      },
+      "character_id": 93,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 92,
+          "matrix": "d9400005000007f0dc",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 183,
+        "width_px": 269,
+        "xmax": 5380,
+        "xmin": -100,
+        "ymax": 3670,
+        "ymin": 10
+      },
+      "character_id": 95,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 94,
+          "matrix": "d94000050000089c0a",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 183,
+        "width_px": 269,
+        "xmax": 5380,
+        "xmin": -100,
+        "ymax": 3662,
+        "ymin": 62
+      },
+      "character_id": 97,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 96,
+          "matrix": "d94000050000089c3e",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    }
+  ],
+  "source_file": "assets/sprites/1071_cannon_5_m.swf",
+  "source_layer": "converted(asset-registry)",
+  "sprites": [
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 2,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 12,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 13
+    },
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 15,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 16
+    },
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 18,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 19
+    },
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 8,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 21,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 22
+    },
+    {
+      "frame_count": 6,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 10,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 24,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 25
+    },
+    {
+      "frame_count": 1,
+      "labels": [],
+      "placements": [],
+      "removes": [],
+      "sprite_id": 28
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 27,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 3,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 5,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 7,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 9,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": null,
+          "character_kind": null,
+          "depth": 1,
+          "frame": 2,
+          "move": true
+        },
+        {
+          "character_id": 30,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 32,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 5,
+          "move": false
+        },
+        {
+          "character_id": 34,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 36,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 38,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 9,
+          "move": true
+        },
+        {
+          "character_id": 40,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [
+        {
+          "depth": 2,
+          "frame": 11
+        }
+      ],
+      "sprite_id": 41
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 43,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 3,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 5,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 7,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 9,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 45,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 46,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 5,
+          "move": false
+        },
+        {
+          "character_id": 47,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 49,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 50,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 9,
+          "move": true
+        },
+        {
+          "character_id": 52,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [
+        {
+          "depth": 2,
+          "frame": 11
+        }
+      ],
+      "sprite_id": 53
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 55,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 3,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 5,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 7,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 9,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 57,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 58,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 5,
+          "move": false
+        },
+        {
+          "character_id": 59,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 61,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 62,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 9,
+          "move": true
+        },
+        {
+          "character_id": 64,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [
+        {
+          "depth": 2,
+          "frame": 11
+        }
+      ],
+      "sprite_id": 65
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 67,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 3,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 5,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 7,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 9,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 69,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 70,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 5,
+          "move": false
+        },
+        {
+          "character_id": 71,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 73,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 74,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 9,
+          "move": true
+        },
+        {
+          "character_id": 76,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [
+        {
+          "depth": 2,
+          "frame": 11
+        }
+      ],
+      "sprite_id": 77
+    },
+    {
+      "frame_count": 13,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 79,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 3,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 5,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 7,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 9,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 81,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 82,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 5,
+          "move": false
+        },
+        {
+          "character_id": 83,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 85,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 86,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 9,
+          "move": true
+        },
+        {
+          "character_id": 88,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [
+        {
+          "depth": 2,
+          "frame": 11
+        }
+      ],
+      "sprite_id": 89
+    },
+    {
+      "frame_count": 10,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 91,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 93,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 95,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 97,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 98
+    },
+    {
+      "frame_count": 25,
+      "labels": [
+        {
+          "anchor": false,
+          "frame": 1,
+          "name": "QUIETO"
+        },
+        {
+          "anchor": false,
+          "frame": 6,
+          "name": "ANDAR"
+        },
+        {
+          "anchor": false,
+          "frame": 11,
+          "name": "ATAQUE"
+        },
+        {
+          "anchor": false,
+          "frame": 16,
+          "name": "MUERTE"
+        },
+        {
+          "anchor": false,
+          "frame": 21,
+          "name": "PICAR"
+        }
+      ],
+      "placements": [
+        {
+          "character_id": 2,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 2,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 8,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 10,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 13,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 6,
+          "move": false
+        },
+        {
+          "character_id": 16,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 7,
+          "move": false
+        },
+        {
+          "character_id": 19,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 8,
+          "move": false
+        },
+        {
+          "character_id": 22,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 9,
+          "move": false
+        },
+        {
+          "character_id": 25,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 10,
+          "move": false
+        },
+        {
+          "character_id": 41,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 11,
+          "move": false
+        },
+        {
+          "character_id": 53,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 12,
+          "move": false
+        },
+        {
+          "character_id": 65,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 13,
+          "move": false
+        },
+        {
+          "character_id": 77,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 14,
+          "move": false
+        },
+        {
+          "character_id": 89,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 15,
+          "move": false
+        },
+        {
+          "character_id": 98,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 16,
+          "move": false
+        }
+      ],
+      "removes": [
+        {
+          "depth": 1,
+          "frame": 6
+        },
+        {
+          "depth": 1,
+          "frame": 7
+        },
+        {
+          "depth": 1,
+          "frame": 8
+        },
+        {
+          "depth": 1,
+          "frame": 9
+        },
+        {
+          "depth": 1,
+          "frame": 10
+        },
+        {
+          "depth": 1,
+          "frame": 11
+        },
+        {
+          "depth": 1,
+          "frame": 12
+        },
+        {
+          "depth": 1,
+          "frame": 13
+        },
+        {
+          "depth": 1,
+          "frame": 14
+        },
+        {
+          "depth": 1,
+          "frame": 15
+        },
+        {
+          "depth": 1,
+          "frame": 16
+        },
+        {
+          "depth": 1,
+          "frame": 21
+        }
+      ],
+      "sprite_id": 99
+    }
+  ],
+  "symbols": [
+    {
+      "id": 99,
+      "name": "1071_cannon_5_m"
+    },
+    {
+      "id": 98,
+      "name": "_1071_cannon_5_m_fla.arquero1atacando3_4detras_13"
+    },
+    {
+      "id": 89,
+      "name": "_1071_cannon_5_m_fla.arquero1atacandofrente_12"
+    },
+    {
+      "id": 77,
+      "name": "_1071_cannon_5_m_fla.arquero1atacando3_4frente_11"
+    },
+    {
+      "id": 65,
+      "name": "_1071_cannon_5_m_fla.arquero1atacandoperfil_10"
+    },
+    {
+      "id": 53,
+      "name": "_1071_cannon_5_m_fla.arquero1muriendo_9"
+    },
+    {
+      "id": 41,
+      "name": "_1071_cannon_5_m_fla.arquero1atacandodetras_7"
+    }
+  ]
+}

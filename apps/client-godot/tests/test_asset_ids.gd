@@ -27,8 +27,17 @@ const EXPECTED_DISTINCT := {
 	"sounds": 138,
 }
 ## pinned coverage-derived per-status counts (spec reconciliation scenarios).
+## `item_sprites.converted` is the count of distinct item sprite references
+## whose asset the committed registry now records with a converted package
+## directory on disk. It was 2 (House I and Wild Elephant, the two packages
+## converted by hand before mass conversion); the
+## `asset-package-mass-conversion` change converted 290 more, so the
+## committed registry records 292 converted / 567 extracted / 10
+## missing_source / 3 pending over its 872 distinct item sprites. Measured
+## from `counts.by_kind.item_sprites` in the same committed file this suite
+## reads; the `EXPECTED_DISTINCT` sum check above still holds unchanged.
 const EXPECTED_STATUS := {
-	"item_sprites": {"converted": 2, "missing_source": 10},
+	"item_sprites": {"converted": 292, "missing_source": 10},
 	"magic_sprites": {"missing_source": 0},
 	"sounds": {"missing_source": 0},
 	"images": {"missing_source": 32, "ambiguous": 0},

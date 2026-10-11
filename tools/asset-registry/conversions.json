@@ -1,7 +1,7 @@
 {
   "counts": {
-    "output_bytes": 396417,
-    "packages": 2
+    "output_bytes": 9083691,
+    "packages": 292
   },
   "inputs": {
     "buildings": "packages/game-content/normalized/buildings.json",
@@ -16,16 +16,2336 @@
       "bitmaps": 2,
       "directory": "assets/converted/buildings/0001_house_1_m",
       "legacy_id": "0001_house_1_m",
-      "output_bytes": 11733,
-      "package_sha256": "ed6807d14257cdca2ddf34187fe9c45226bec372b784b3dd91e4db8f900f5f2a",
+      "output_bytes": 2895,
+      "package_sha256": "30f1e1b05b99770a271ab9cf8a96652a62245e2ba193f7ed8178604eee6fc50c",
       "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0018_market_1_m",
+      "legacy_id": "0018_market_1_m",
+      "output_bytes": 2873,
+      "package_sha256": "47b25e6148ccb599fc12dc7a02e19ff827812c9a350218291dbfb87472db1c00",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0019_prision_m",
+      "legacy_id": "0019_prision_m",
+      "output_bytes": 2837,
+      "package_sha256": "281e31c927ff6fa1be07f0709ae8c764c7f501ef95d7e4a25b4a31597d2c116d",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0023_wall_1_m",
+      "legacy_id": "0023_wall_1_m",
+      "output_bytes": 2870,
+      "package_sha256": "58d377edff3b3ab88078d07110639fd97ac5705cdae060056ca544133b9ba7f6",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0024_wall_2_m",
+      "legacy_id": "0024_wall_2_m",
+      "output_bytes": 2873,
+      "package_sha256": "08841308447b190d900181dd1134bb8143c935ad633a75a86682f7faddba8f47",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0025_wall_3_m",
+      "legacy_id": "0025_wall_3_m",
+      "output_bytes": 2877,
+      "package_sha256": "94abe84bc0baffc4f7ec902e87eff896a965212fabd9e1faf1d669e450a6922a",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0028_hospital_1_m",
+      "legacy_id": "0028_hospital_1_m",
+      "output_bytes": 2890,
+      "package_sha256": "23d4c00e8c31693c903cae00ebd9b67a02c855ba85c90cbd7d630d188b0a7baa",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0037_hangar_1_m",
+      "legacy_id": "0037_hangar_1_m",
+      "output_bytes": 3344,
+      "package_sha256": "7d194df9e6b9b3c63db5904d2d64c4ae03f3ade7b4935155fc58bbc97f711a1e",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0047_house_2_m",
+      "legacy_id": "0047_house_2_m",
+      "output_bytes": 2901,
+      "package_sha256": "e01064fc603cba836df3588219e7e5bfc383b09437892b9d3d11c91716922ec3",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0048_house_3_m",
+      "legacy_id": "0048_house_3_m",
+      "output_bytes": 2906,
+      "package_sha256": "c879d0a220bcdd45cf0656645edfe1e5f4c2712d4808c3b47a1b5133386b84e3",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0061_allies_building_m",
+      "legacy_id": "0061_allies_building_m",
+      "output_bytes": 2957,
+      "package_sha256": "9659fc03494c3d865e05f3ee38dbd57470fc820481f7fe30b497c4324844ba02",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 46,
+      "directory": "assets/converted/buildings/0062_cannon_academy_2_m",
+      "legacy_id": "0062_cannon_academy_2_m",
+      "output_bytes": 23581,
+      "package_sha256": "327d1a0b770349ddf59a04a3ec30b1f6416d2291d2b266ef956411ac1298ccd5",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 46,
+      "directory": "assets/converted/buildings/0063_cannon_academy_3_m",
+      "legacy_id": "0063_cannon_academy_3_m",
+      "output_bytes": 23585,
+      "package_sha256": "486bfd617a50cfac4ab087f915f153bcfc463f76bb22b1d708ed427400c9ccac",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 16,
+      "directory": "assets/converted/buildings/0064_workshop_2_m",
+      "legacy_id": "0064_workshop_2_m",
+      "output_bytes": 9370,
+      "package_sha256": "e15e9dad88cbd95b0f7843e2abdd84d9867aaa13c3eed67fa99b608c195df1b1",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 16,
+      "directory": "assets/converted/buildings/0065_workshop_3_m",
+      "legacy_id": "0065_workshop_3_m",
+      "output_bytes": 9375,
+      "package_sha256": "0c554e9ec6b71249f7a47d687e641ee12c6cf8b5aa0781d1f239d506820e7a99",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0066_stoneage_marvel_m",
+      "legacy_id": "0066_stoneage_marvel_m",
+      "output_bytes": 2976,
+      "package_sha256": "95019b202edb85e6bc6ab94c74719f78e23c855b2228746c4683831c4fd1f045",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0067_machupichu_m",
+      "legacy_id": "0067_machupichu_m",
+      "output_bytes": 2950,
+      "package_sha256": "49b35a762d912003a30af21b9ae4df574d78a90bc00de09206a81aa8e8fbc12d",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0068_iguazu_m",
+      "legacy_id": "0068_iguazu_m",
+      "output_bytes": 2920,
+      "package_sha256": "baa9970938c9a4e24a2da9f512811ff3cdc54cb51a755191de1d5cf9da0769bf",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0069_sfinx_m",
+      "legacy_id": "0069_sfinx_m",
+      "output_bytes": 2914,
+      "package_sha256": "9639f13fb726ee714f5ae5f28ccce95c764ec0c9c637faafbaacc0525662a798",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0070_inca_god_m",
+      "legacy_id": "0070_inca_god_m",
+      "output_bytes": 2934,
+      "package_sha256": "4e579981adbfc5e1f9016e26d2c94bf5d725322db83f3b08c90639a652c67280",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0071_chichenitza_m",
+      "legacy_id": "0071_chichenitza_m",
+      "output_bytes": 2955,
+      "package_sha256": "62d86ce52173d45bd0cf36082a0eb38264ead0c44b0a4abf3df2d5f6211cc516",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0072_babilonia_m",
+      "legacy_id": "0072_babilonia_m",
+      "output_bytes": 2941,
+      "package_sha256": "75878ed7aef80e0cdeb0c924b970b4c9a1f144c1fda7de9fa4aacbb7671019c3",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0073_Ankor_m",
+      "legacy_id": "0073_Ankor_m",
+      "output_bytes": 2911,
+      "package_sha256": "e2dadc42bd8955e5372a35519f244e411d3810a3c4e3475d00d8e54199863cd7",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0074_Allies_market_m",
+      "legacy_id": "0074_Allies_market_m",
+      "output_bytes": 2915,
+      "package_sha256": "f7a96185934cb94ea47f3df9059e82dd2db8d45e6e88955d893433400f0371d8",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0076_hangar_2_m",
+      "legacy_id": "0076_hangar_2_m",
+      "output_bytes": 3349,
+      "package_sha256": "b0ce730387124320ed5fc9bb959637e09d4baa2281e49451041497f308e766b0",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0077_hangar_3_m",
+      "legacy_id": "0077_hangar_3_m",
+      "output_bytes": 3351,
+      "package_sha256": "c87ab232aa297be53eca1c3aafb2af88fb9890a9eb05c7e19bfdf62888cfa246",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0078_wall_4_m",
+      "legacy_id": "0078_wall_4_m",
+      "output_bytes": 2878,
+      "package_sha256": "5f83ee4a9cd21254f15bb149eb4f81c82479b868c1d5677de3b55f254ea9fcdd",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0079_wall_5_m",
+      "legacy_id": "0079_wall_5_m",
+      "output_bytes": 2877,
+      "package_sha256": "c1e67392cce11ebf282018431a14406af634bf1f6da1d15b1c5140c3a758d62f",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0080_fortress_1_m",
+      "legacy_id": "0080_fortress_1_m",
+      "output_bytes": 2935,
+      "package_sha256": "2a79e8d9b507c334ab01f913888a396f0e0b9ed167a0d21886061fc1cb083b69",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0081_fortress_2_m",
+      "legacy_id": "0081_fortress_2_m",
+      "output_bytes": 2913,
+      "package_sha256": "9831b730166f601ce979de9d51ae8a6c9ec8d88458b6f03f2064aa6d3f9f2bdd",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0082_fortress_3_m",
+      "legacy_id": "0082_fortress_3_m",
+      "output_bytes": 2911,
+      "package_sha256": "bdf35e28a17cbd853a5c6ab52a3dba62ee69b6b75b105bfecff9cec6c605cf90",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0089_nuclear_plant_m",
+      "legacy_id": "0089_nuclear_plant_m",
+      "output_bytes": 2944,
+      "package_sha256": "6670feb1e264e6ba0158c6670d2bfeb38ea5a30cf25ce4882e433d729c048c24",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0090_market_2_m",
+      "legacy_id": "0090_market_2_m",
+      "output_bytes": 2925,
+      "package_sha256": "24382320fe1d7e00e4c17c49a0a362c7693a3ab76e2d2286712b0c77c68c82b8",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0091_market_3_m",
+      "legacy_id": "0091_market_3_m",
+      "output_bytes": 2884,
+      "package_sha256": "da1cbcef3c97eee743feb54e9eabbe8a29641aed125ebdb527b9bae561a07466",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0092_apple_tree_m",
+      "legacy_id": "0092_apple_tree_m",
+      "output_bytes": 2907,
+      "package_sha256": "d7e79a18b32a687f3bc54604c10376234b2241428afda2b106a6ed488e5746a4",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0093_pear_tree_m",
+      "legacy_id": "0093_pear_tree_m",
+      "output_bytes": 2900,
+      "package_sha256": "5b15958cb44d09dc5f6e43c788427373cbced2b854cd7d1ce04a9ca7f5c851cc",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0094_sponge_bush_m",
+      "legacy_id": "0094_sponge_bush_m",
+      "output_bytes": 2912,
+      "package_sha256": "195aa6135d52da34703130bba9c5192df2f52051bd5194611b89166ca1e83f95",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0095_little_fountain_m",
+      "legacy_id": "0095_little_fountain_m",
+      "output_bytes": 2943,
+      "package_sha256": "67531cd0426d8ee8da1a1124c23b955d91a17e9d75b87eaf1f28db93d1d65b1f",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0096_white_flowers_m",
+      "legacy_id": "0096_white_flowers_m",
+      "output_bytes": 2924,
+      "package_sha256": "b1e737a577a9227c84b424ffae96a20819a09b9766b1f6e16a8cae92c6c5c1e4",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0097_red_flowers_m",
+      "legacy_id": "0097_red_flowers_m",
+      "output_bytes": 2912,
+      "package_sha256": "09763ff3d2610eacdb91f987d73a4a87d0d6f37f73a675c678fc46680772d158",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0098_blue_flowers_m",
+      "legacy_id": "0098_blue_flowers_m",
+      "output_bytes": 2921,
+      "package_sha256": "13669b4271bdda0dccd2980b7e494bc844b840ffccb6b7f3c4bce350bf57bcea",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0100_red_leaf_flowers_m",
+      "legacy_id": "0100_red_leaf_flowers_m",
+      "output_bytes": 2949,
+      "package_sha256": "5f1592971c0ddd720cac1134395bd50acf791355eedd1a84c341c0b5f41a959b",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0101_pink_leaf_flowers_m",
+      "legacy_id": "0101_pink_leaf_flowers_m",
+      "output_bytes": 2958,
+      "package_sha256": "566735d35b51e85566371e0199f2db8c2d89b52948bf56c60fd828ff2a14821f",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0102_blue_leaf_flowers_m",
+      "legacy_id": "0102_blue_leaf_flowers_m",
+      "output_bytes": 2958,
+      "package_sha256": "9aa86654f3124d516d9207b907b1374a016c7447d149fb8fbaf2d062b41f1230",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0103_bush_m",
+      "legacy_id": "0103_bush_m",
+      "output_bytes": 2865,
+      "package_sha256": "8c10c1526689c573115d9e7296af8b10043e302d0ea4ba333e17ada79a9cf472",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0104_bancos_farolas_m",
+      "legacy_id": "0104_bancos_farolas_m",
+      "output_bytes": 2926,
+      "package_sha256": "741c5988a3871a415218295345c17a437b7514a9eb837e64af80c779564f671a",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0105_victory_arch_m",
+      "legacy_id": "0105_victory_arch_m",
+      "output_bytes": 2924,
+      "package_sha256": "fa7c7dbb9cf96e9f9b123f8474a9ad667108c0831b37c433fb32a4d6be930b34",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0106_fountain_m",
+      "legacy_id": "0106_fountain_m",
+      "output_bytes": 2898,
+      "package_sha256": "0c146d92c5045ca47a4028b72c7aac8f4ff8ba41db7fca209a98b5a1b0001bd7",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0107_sculpture_m",
+      "legacy_id": "0107_sculpture_m",
+      "output_bytes": 2903,
+      "package_sha256": "cf4e46a32f26b5e6479ad4a832b6c1d9c575969a1f5f8676fb123cefebc3f313",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0113_disabled_jeeps_m",
+      "legacy_id": "0113_disabled_jeeps_m",
+      "output_bytes": 2868,
+      "package_sha256": "2de0971bb59b39c3a4acfc5f5f9e852c6781eecf807618a246f27fd3cb6d8d6a",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0114_jeep_weels_m",
+      "legacy_id": "0114_jeep_weels_m",
+      "output_bytes": 2840,
+      "package_sha256": "bdacbd15c202d7418f4791bb0ce5055a6668830bdcf54a7e6845e29fe639bb24",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0115_supertank_ammo_1_m",
+      "legacy_id": "0115_supertank_ammo_1_m",
+      "output_bytes": 2879,
+      "package_sha256": "6a5ca067ebdc64f7d2a145c2aa0a2e38c94810643d58a5b764139b1fdcec389e",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0116_supertank_ammo_2_m",
+      "legacy_id": "0116_supertank_ammo_2_m",
+      "output_bytes": 2879,
+      "package_sha256": "fc634963e2381aa2c81f07b84748d077e5ee95553e7c7efa325c4fb5063c451d",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0118_laboratory_m",
+      "legacy_id": "0118_laboratory_m",
+      "output_bytes": 5765,
+      "package_sha256": "75f2d0db1be79b8bf9cbc33bfa37e9341cf916f3c74ad86e4ea9eb832f606f96",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0119_tank_wheels_m",
+      "legacy_id": "0119_tank_wheels_m",
+      "output_bytes": 2846,
+      "package_sha256": "7e3cfa421c7b4bce4d09394da2b73cdf0d877b79915eb0f64c0b5939f4db79ca",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0120_stolen_missiles_m",
+      "legacy_id": "0120_stolen_missiles_m",
+      "output_bytes": 2875,
+      "package_sha256": "8470aadc6e385d5a11cd4943b2ac69bd806ee1fb07debf49a2d9968c1ffc91cb",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0121_radio_m",
+      "legacy_id": "0121_radio_m",
+      "output_bytes": 3267,
+      "package_sha256": "83eb16044ac3f74a26a6f7234186b1142cbe293a66635b8e4bffaf16e1ae88d3",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0122_helipuerto_m",
+      "legacy_id": "0122_helipuerto_m",
+      "output_bytes": 3302,
+      "package_sha256": "4c65309ed0ec99f6d3adc1deee327b1408c42b510855b6779c4e6839a7e8f31f",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0123_red_fortress_m",
+      "legacy_id": "0123_red_fortress_m",
+      "output_bytes": 2854,
+      "package_sha256": "cf6d94f15f59d4f9c1005ef7569dddbc4eb9c61014a26c0f1ec6d75656705121",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0124_disabled_tanks_m",
+      "legacy_id": "0124_disabled_tanks_m",
+      "output_bytes": 2868,
+      "package_sha256": "dd8b6b30efa6804e0d8946ff0ba2b57b801c4f04645720b6e7e4157562ba02b7",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 4,
+      "directory": "assets/converted/buildings/0126_enemy_airport_m",
+      "legacy_id": "0126_enemy_airport_m",
+      "output_bytes": 4261,
+      "package_sha256": "d53007c96de6cda7b1d83bc998722a0eb3989c4cc1738759b514c3e58b1b7124",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 6,
+      "directory": "assets/converted/buildings/0127_enemy_harbour_m",
+      "legacy_id": "0127_enemy_harbour_m",
+      "output_bytes": 6624,
+      "package_sha256": "51fda2b8d14b7f947bd822f6651f9df16c645733d2b586a21b4da993f30ac42a",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0130_black_tank_academy_m",
+      "legacy_id": "0130_black_tank_academy_m",
+      "output_bytes": 2952,
+      "package_sha256": "522952c9f50a1f257ee2149611b91b14741bd674f909408f9abf16c467fae3b5",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0131_black_aircraft_academy_m",
+      "legacy_id": "0131_black_aircraft_academy_m",
+      "output_bytes": 2980,
+      "package_sha256": "cf1069352b1af80812fb776b619dd7b0ede49d8014ed9522620e2432e216440d",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0132_troubled_traveller_m",
+      "legacy_id": "0132_troubled_traveller_m",
+      "output_bytes": 2990,
+      "package_sha256": "09ff59b39af22784c7ae26e5cfaa9c8043c6021ceda886116e5be5b826dfc207",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0133_injured_soldier_m",
+      "legacy_id": "0133_injured_soldier_m",
+      "output_bytes": 2969,
+      "package_sha256": "6e025107f0fcb6a7de75dfb8cc45ee590d437a175f172a273e37a85fcc909b27",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0134_field_hospital_m",
+      "legacy_id": "0134_field_hospital_m",
+      "output_bytes": 2924,
+      "package_sha256": "9078ba7843c9d636f10ae318e2b7cbab841577f9306355cae6558f54980d3f25",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0135_engineer_barrack_m",
+      "legacy_id": "0135_engineer_barrack_m",
+      "output_bytes": 2942,
+      "package_sha256": "afcacdaa84f041686a41ce96e8a1c39a1cc4ecad38fb5c6b95f4b9c3fdee9169",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0136_general_sculpture_m",
+      "legacy_id": "0136_general_sculpture_m",
+      "output_bytes": 2961,
+      "package_sha256": "d7363bc4497e25199751d8fc131097b9a3ed4b2668f1b1eae49671e69099b4f1",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0138_mr_t_academy_m",
+      "legacy_id": "0138_mr_t_academy_m",
+      "output_bytes": 2909,
+      "package_sha256": "8a3025a82210cef3c50647e9ee5b5214a6e5199dd7f511217602ea9c6eecb5f1",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0140_recruitment_m",
+      "legacy_id": "0140_recruitment_m",
+      "output_bytes": 2900,
+      "package_sha256": "d406b3cb95774a27f56ca2cd710f023b4dc3bec1ea8799bd13a3a8beb4fa2852",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0141_bazooka_academy_4_m",
+      "legacy_id": "0141_bazooka_academy_4_m",
+      "output_bytes": 2948,
+      "package_sha256": "4b1b52da9cf1586adce9e3e04aa458fcc3df67f9c5090bffcd4b70f85cc64765",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0142_bazooka_academy_5_m",
+      "legacy_id": "0142_bazooka_academy_5_m",
+      "output_bytes": 2949,
+      "package_sha256": "3ba6202a3fc0d4e90de6d4f5253ae9f8e4762d089a77df5c6f7984e13b837923",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0143_academy_4_m",
+      "legacy_id": "0143_academy_4_m",
+      "output_bytes": 2891,
+      "package_sha256": "9cf79ae5a5bb61b9235bb72a315c4d42709c01a26561a0f57f63456f6e873d72",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0144_academy_5_m",
+      "legacy_id": "0144_academy_5_m",
+      "output_bytes": 2891,
+      "package_sha256": "088fe0a23cbdca9c3b292f2559e5ff3bd91948104101d53c0f7e2733ddf886e1",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0145_mortar_academy_m",
+      "legacy_id": "0145_mortar_academy_m",
+      "output_bytes": 2923,
+      "package_sha256": "f0ea745dde2a5807f96deeb104ad928e32ffa99c621210675eceabde17eb0886",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0146_copter_hangar_4_m",
+      "legacy_id": "0146_copter_hangar_4_m",
+      "output_bytes": 2967,
+      "package_sha256": "5b475dc3ed6d42bbed7baffc247be0f78b18cc7822375915be9d9d918411fc6c",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0147_copter_hangar_5_m",
+      "legacy_id": "0147_copter_hangar_5_m",
+      "output_bytes": 2965,
+      "package_sha256": "8d2215ac272c247239228cb81330134f3c20ae2b02d1dafd0f5c1c001da9d135",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0148_artillery_garage_m",
+      "legacy_id": "0148_artillery_garage_m",
+      "output_bytes": 2968,
+      "package_sha256": "c2ec05076f8da93186c21370f5da3b01e198784641ea4ce3e9ce9eb17e377144",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0149_antiaircraft_garage_m",
+      "legacy_id": "0149_antiaircraft_garage_m",
+      "output_bytes": 2983,
+      "package_sha256": "74c0230ac6aba1c3a45eb7a71dd480bebad601908e17c8f96d2bc7064a926e93",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0150_tank_academy_4_m",
+      "legacy_id": "0150_tank_academy_4_m",
+      "output_bytes": 2927,
+      "package_sha256": "0220be9f9b8a482502760b5477b375774cb1251edc674e66c21b8c112f4b6077",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0151_tank_academy_5_m",
+      "legacy_id": "0151_tank_academy_5_m",
+      "output_bytes": 2942,
+      "package_sha256": "13c61ee4be602dca8fa29daae87e0a079aa0236a70e9d311a3ae0d7fd353f2dd",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0152_robo_flag_m",
+      "legacy_id": "0152_robo_flag_m",
+      "output_bytes": 2906,
+      "package_sha256": "c0e8e1b301ae360920dcf5cb7af69437926cd7a39aa38e24d5fd5c2250c7536f",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0153_robo_statue_m",
+      "legacy_id": "0153_robo_statue_m",
+      "output_bytes": 2920,
+      "package_sha256": "5fed642355497ae7c24878c3158f5017c869aa95a08785a9122cb8a2a03797dc",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0154_robo_soldier_academy_m",
+      "legacy_id": "0154_robo_soldier_academy_m",
+      "output_bytes": 2974,
+      "package_sha256": "93d2014924eea6baa1203dbcdead51ca241d715a4734ccf3e89313ea8f3f79cd",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0155_robo_swordsman_academy_m",
+      "legacy_id": "0155_robo_swordsman_academy_m",
+      "output_bytes": 2989,
+      "package_sha256": "86a5097fdeebfd887d9341dbd08f9c485ed0aae6c9472a2437022063abf0dc7d",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0156_robo_bazooka_academy_m",
+      "legacy_id": "0156_robo_bazooka_academy_m",
+      "output_bytes": 2975,
+      "package_sha256": "965a48d6cc7db746a9139ab5e84c1d641b74d654de351b25dfd06d12380bdbc2",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0158_motorized_robosoldier_academy_m",
+      "legacy_id": "0158_motorized_robosoldier_academy_m",
+      "output_bytes": 3025,
+      "package_sha256": "e09768cc3ddb8f6c0f97e1bf5c454ad829a9b202854d4a6969214d0d380ec8d0",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0160_robo_lancer_academy_m",
+      "legacy_id": "0160_robo_lancer_academy_m",
+      "output_bytes": 2955,
+      "package_sha256": "a3c514580a42afebd7800c20301384f6a15274dc36697afc11733163a14ae5db",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0161_demolisher_tank_academy_m",
+      "legacy_id": "0161_demolisher_tank_academy_m",
+      "output_bytes": 2982,
+      "package_sha256": "419fb75a29615de993627a1b2c672c93f55b4d626ce40c59901b675cd90c1407",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0162_dreadnought_academy_m",
+      "legacy_id": "0162_dreadnought_academy_m",
+      "output_bytes": 2955,
+      "package_sha256": "96d4312d04ed7c6a06ea43edb1296baacd21a28275120f04586153af7af0150f",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0163_robo_house_m",
+      "legacy_id": "0163_robo_house_m",
+      "output_bytes": 2917,
+      "package_sha256": "874afe6c586f78ddd8ab4270d21771849ddbdc710664d9768285e1f73e69fcb9",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0168_skylander_hangar_m",
+      "legacy_id": "0168_skylander_hangar_m",
+      "output_bytes": 2944,
+      "package_sha256": "a2cc35e4babcbc74152563514824c9527c35bc5e45fa82f9d933a11c45a4e1e5",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0169_roboaxe_academy_m",
+      "legacy_id": "0169_roboaxe_academy_m",
+      "output_bytes": 2932,
+      "package_sha256": "b1c78074b81bc07229e60173527123c39971fef5c33438e1ba088e714ff7b995",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0170_giant_walker_factory_m",
+      "legacy_id": "0170_giant_walker_factory_m",
+      "output_bytes": 2963,
+      "package_sha256": "6f2855401dfeaef751e8af8f3be6709fc49ad2bd7c58e17092f39b6e9c14aebb",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0171_missile_tank_academy_m",
+      "legacy_id": "0171_missile_tank_academy_m",
+      "output_bytes": 2963,
+      "package_sha256": "6294e9593a092b380d23a5fd4a7beaeea021652bc2f5f426bd591f4346e8400e",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0172_steel_claws_academy_m",
+      "legacy_id": "0172_steel_claws_academy_m",
+      "output_bytes": 2964,
+      "package_sha256": "bd74e85330e2b1ce60aace0903900e6fd4b6cb207701374b3834b2302e9c7db0",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0174_fireman_academy_m",
+      "legacy_id": "0174_fireman_academy_m",
+      "output_bytes": 2932,
+      "package_sha256": "3e9bf97ec257742f94a58e529e6e686c63c0a878af82a5c6e679afcd44fc2102",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0176_maravilla_m",
+      "legacy_id": "0176_maravilla_m",
+      "output_bytes": 2942,
+      "package_sha256": "51327c9ff7c336bcfc5768384085199e0ef6f95665609a10ee7f19254411507b",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0177_orc_soldier_academy_1_m",
+      "legacy_id": "0177_orc_soldier_academy_1_m",
+      "output_bytes": 2973,
+      "package_sha256": "95d2972f94ab2073710b7d03eb2aaaf0698aa77dc38bf564b40e6afbe5e3057a",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0178_orc_soldier_academy_2_m",
+      "legacy_id": "0178_orc_soldier_academy_2_m",
+      "output_bytes": 2973,
+      "package_sha256": "1ed912d0f724780aa58e915cfcab4e94e087af36755d01d94adbfc753b6bb49c",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0179_orc_boss_academy_m",
+      "legacy_id": "0179_orc_boss_academy_m",
+      "output_bytes": 2939,
+      "package_sha256": "f9228e316067004476fd798a3447d7539c8ff2d47f6a466c50494f8b6db4c999",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0180_orc_rider_academy_m",
+      "legacy_id": "0180_orc_rider_academy_m",
+      "output_bytes": 2943,
+      "package_sha256": "edb15a9182424434580b7dffd9b86708cb4da2356700c9733872ff1dfbe4f72e",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0181_orc_robot_factory_m",
+      "legacy_id": "0181_orc_robot_factory_m",
+      "output_bytes": 2946,
+      "package_sha256": "f0d89f7678ff831c2a1a3ecadcfda261b1b52f83534b336a17b850fec24f210b",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0182_orc_flamethrower_academy_m",
+      "legacy_id": "0182_orc_flamethrower_academy_m",
+      "output_bytes": 2986,
+      "package_sha256": "8ac256ad2d31e1e548ec979dcea61fbd7cb3665cf03f27790e8307ba9fccd21d",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0183_orc_house_m",
+      "legacy_id": "0183_orc_house_m",
+      "output_bytes": 2917,
+      "package_sha256": "19f1180355e92aebccd9eacebe553abde66ccd16d29b9610074f40ae8825be95",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0187_orc_deco_1_m",
+      "legacy_id": "0187_orc_deco_1_m",
+      "output_bytes": 2919,
+      "package_sha256": "41d217a02e4f75a9282ba2efecfe8391fb7dee0e9832a654ff69b4d8e5ff3c07",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0188_orc_deco_2_m",
+      "legacy_id": "0188_orc_deco_2_m",
+      "output_bytes": 2914,
+      "package_sha256": "80adcaa2229777d1368f62332539cd4125279898c89d725e502c6f94b0a85e1c",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0190_helicopter_hangar2_m",
+      "legacy_id": "0190_helicopter_hangar2_m",
+      "output_bytes": 2951,
+      "package_sha256": "a40876aa3d70d9844132966a3139e6c850258a7479c6d77a1c210260879c9076",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0191_camion_orco_academy_m",
+      "legacy_id": "0191_camion_orco_academy_m",
+      "output_bytes": 2973,
+      "package_sha256": "03082baa1892dbbc8501bbc21ef88f305cf13a6d4de4206843e2cf8b33d9c099",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0192_orc_lanzamachetes_academy_m",
+      "legacy_id": "0192_orc_lanzamachetes_academy_m",
+      "output_bytes": 2998,
+      "package_sha256": "837ff30e1d4b676d1ce47a1c6d11aea9409a25b18acb7e7c9adae20c3657e5f9",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0193_orc_mascota_kamikaze_academy_m",
+      "legacy_id": "0193_orc_mascota_kamikaze_academy_m",
+      "output_bytes": 3017,
+      "package_sha256": "673ec158495bb7fcd2f8452c0b2feffb807e5b359b01749421ff33797b2dc053",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0194_orc_robot_2_factory_m",
+      "legacy_id": "0194_orc_robot_2_factory_m",
+      "output_bytes": 2960,
+      "package_sha256": "347a8f3066c5b79f4154f4a110c71e4d3b7f6328ca5ca36d8cc1db5189eae6c2",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0195_orc_headquarters",
+      "legacy_id": "0195_orc_headquarters",
+      "output_bytes": 2905,
+      "package_sha256": "ed529105c97d50c33d8e845cc9bc0d55157e0e6e0f914897cc9c8908c27e8da1",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0196_orc_sponge_bush",
+      "legacy_id": "0196_orc_sponge_bush",
+      "output_bytes": 2933,
+      "package_sha256": "427ed7131fbb04bc3ab34d67def12eba7e841480b9408115d621d25eaa291395",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0198_orc_bush",
+      "legacy_id": "0198_orc_bush",
+      "output_bytes": 2885,
+      "package_sha256": "1506d0785b9305b3ea21a4a34fce97dfe429e839bd42b2833b726e6a38343257",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0199_space_station",
+      "legacy_id": "0199_space_station",
+      "output_bytes": 2868,
+      "package_sha256": "0e3f9c52a57309ee6464a9e1d5a96b05c7f1662c1c7d2c37712709045626f0c4",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0200_orc_silo",
+      "legacy_id": "0200_orc_silo",
+      "output_bytes": 2883,
+      "package_sha256": "364bfcaf2247b199e4974e50d1cac28c7841469bb5589b4c6bce37c0147d0180",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0201_orc_bunker",
+      "legacy_id": "0201_orc_bunker",
+      "output_bytes": 2910,
+      "package_sha256": "bd76f53cb546d08dbbe11454c35b665b379fb342fc4fd73418dc982e73bd4019",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0202_orc_resource_building",
+      "legacy_id": "0202_orc_resource_building",
+      "output_bytes": 3043,
+      "package_sha256": "e008ee57639df1ca0fc3478347e3a9934b7fa15da43dd05e11263583da3e308c",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0203_orc_harbour",
+      "legacy_id": "0203_orc_harbour",
+      "output_bytes": 2851,
+      "package_sha256": "bfcd67bb0cfd685cd97bbb108c75067d41e60151df2adcb5456bc368db1a295b",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/0205_orc_fortress",
+      "legacy_id": "0205_orc_fortress",
+      "output_bytes": 2909,
+      "package_sha256": "0c64a7d291dc766ea7d00eab681f761911490554b4e50dec98edef5f4c64de77",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10003_resource_oil_3",
+      "legacy_id": "10003_resource_oil_3",
+      "output_bytes": 2886,
+      "package_sha256": "96606c84be1ff252a6b144010bf5dcddb12ed5e0092828f99acf64e8b3de7a4f",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10004_resource_oil_4",
+      "legacy_id": "10004_resource_oil_4",
+      "output_bytes": 2886,
+      "package_sha256": "95f094ba0a780b65f4526d79f406a4f661ea85eedba2db6f0d92440da4901a48",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10010_resource_steel_1",
+      "legacy_id": "10010_resource_steel_1",
+      "output_bytes": 2899,
+      "package_sha256": "b0eabfbced99f17baf0d8330ffd126f8764d3dd7f3122b1c8a2050e220abe67a",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10011_resource_steel_2",
+      "legacy_id": "10011_resource_steel_2",
+      "output_bytes": 2900,
+      "package_sha256": "d706da63ebdf0da089ff6e66f8cb125fe455fe73fcac6f95350ebd11d3e97089",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10012_resource_steel_3",
+      "legacy_id": "10012_resource_steel_3",
+      "output_bytes": 2900,
+      "package_sha256": "6cf6234ff052b097195c9efb707a8a22aad35d6a71dc1de7ccab4f1c3c6916ea",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10013_resource_steel_4",
+      "legacy_id": "10013_resource_steel_4",
+      "output_bytes": 2900,
+      "package_sha256": "fb42ec4a40ad5e522b7a9f3e7963492a97d58131d2c74cf87229ce30ed91f6c2",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10014_resource_gold_1",
+      "legacy_id": "10014_resource_gold_1",
+      "output_bytes": 2893,
+      "package_sha256": "c90d5a634224019c8bd2c793eea259d14589ac3c5d9f27ed0391a292f647726b",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10015_resource_gold_2",
+      "legacy_id": "10015_resource_gold_2",
+      "output_bytes": 2892,
+      "package_sha256": "62efb5699d623bab11a54cfacb608301cedea4c08fd6bdc5a3949bb945996434",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10016_resource_gold_3",
+      "legacy_id": "10016_resource_gold_3",
+      "output_bytes": 2892,
+      "package_sha256": "9c2a0d250205fb9d7f3cc5e032d34337df4af3de07b21ad12d3853cef0b6905d",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10017_resource_gold_4",
+      "legacy_id": "10017_resource_gold_4",
+      "output_bytes": 2892,
+      "package_sha256": "5c03bbb0fae138102a07cd00474b4bcc57103842c5deb9e0b8e55a4eb4069285",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10018_resource_oil_regen",
+      "legacy_id": "10018_resource_oil_regen",
+      "output_bytes": 2931,
+      "package_sha256": "847bbce07ea20bd2953259e5739d5254f4efc5834d8e11300c6ec6c6b3c119f0",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10019_resource_steel_regen",
+      "legacy_id": "10019_resource_steel_regen",
+      "output_bytes": 2946,
+      "package_sha256": "5026dc352ce48f23966c53b48b367433d5dc2ae566b4ce3ac376446e96c5b994",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10020_resource_gold_regen",
+      "legacy_id": "10020_resource_gold_regen",
+      "output_bytes": 2939,
+      "package_sha256": "846ce68552ead1edb0d772aedcac79cadc6c35fd4649e242582fc4afccb8527f",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10044_destroyed_building_2",
+      "legacy_id": "10044_destroyed_building_2",
+      "output_bytes": 2893,
+      "package_sha256": "316595a09fee55c4ffe9aaa0c9c3308d49a0314e5c14d5c7190f6abaa6d91f8a",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10045_destroyed_building_3",
+      "legacy_id": "10045_destroyed_building_3",
+      "output_bytes": 2893,
+      "package_sha256": "c6573e9f54ceefc9a9e3112e4cafffcb4f1a7363d775943feb0e2dc1fa28d45b",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10046_destroyed_building_4",
+      "legacy_id": "10046_destroyed_building_4",
+      "output_bytes": 2893,
+      "package_sha256": "0702a6fc01ed6041eed9f9607fc3449e1d83d06995fa190086dd9f17ff0c7604",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10047_destroyed_building_5_b",
+      "legacy_id": "10047_destroyed_building_5_b",
+      "output_bytes": 2905,
+      "package_sha256": "b705e999aa76fce2b273c63d6ddafd7ca76c35220c35cfba9fea962a27008af0",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 1,
+      "directory": "assets/converted/buildings/10048_oil_barrel",
+      "legacy_id": "10048_oil_barrel",
+      "output_bytes": 2632,
+      "package_sha256": "672416909da7f47d77b1ec3bf2b299e7041840076739c507ae4d670bb098a075",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10050_nice_fountain",
+      "legacy_id": "10050_nice_fountain",
+      "output_bytes": 3892,
+      "package_sha256": "bf675425b79201cf0a59c631b6dd06a4fe92ecf6edf26ad7c6f79d28513a570a",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10051_orange_tree",
+      "legacy_id": "10051_orange_tree",
+      "output_bytes": 2928,
+      "package_sha256": "f2d2a477b64a96560c1865c5ced697be6c70fa8c17f5c6b028eed16f36f3373d",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10052_chickens",
+      "legacy_id": "10052_chickens",
+      "output_bytes": 2907,
+      "package_sha256": "c3a3838f6e67fb7c0786ee601c8672bfed73d7ff63fe4179d742408510462e52",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10053_lost_rocket",
+      "legacy_id": "10053_lost_rocket",
+      "output_bytes": 2927,
+      "package_sha256": "80f94f9259460c7c5d4622873b08595f704fc18de2bd22eea7acff5e4c215809",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10054_astronaut_pack",
+      "legacy_id": "10054_astronaut_pack",
+      "output_bytes": 2948,
+      "package_sha256": "8151a7b7f3237d8e5d30e9f1e49d36536662405a19a9795389a6aada415b5fa5",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10055_destroyed_tank",
+      "legacy_id": "10055_destroyed_tank",
+      "output_bytes": 2948,
+      "package_sha256": "94f22c7dc5aca36d602085ee851c728374a8f44d276b5c399b0e06736641e559",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/10056_lost_puppies",
+      "legacy_id": "10056_lost_puppies",
+      "output_bytes": 2935,
+      "package_sha256": "09e72d45408de9ba4ae12e7780e1ed0c4373ae98c74c1a7df47b490cb7658380",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/1005_oil_barrels",
+      "legacy_id": "1005_oil_barrels",
+      "output_bytes": 2926,
+      "package_sha256": "94b087212b023cd52da647236ab33a746e9410f2304063ecec8a5630501402e5",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/209_crusader_priest_academy",
+      "legacy_id": "209_crusader_priest_academy",
+      "output_bytes": 2966,
+      "package_sha256": "7116c97e1897b77a746f18ad9c6810ce2a139528d2e9c316e6fe01a59c89b81b",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/210_crusader_bot_factory",
+      "legacy_id": "210_crusader_bot_factory",
+      "output_bytes": 2945,
+      "package_sha256": "27db29c81df2c197fc626e6eb0c0bcc30cdb2813963d38c92e9fa208486f2a4d",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/211_axeman_academy",
+      "legacy_id": "211_axeman_academy",
+      "output_bytes": 2912,
+      "package_sha256": "c9f76e72f643c116d203c69edb809a05c52ff37133029a627bdececa24e06314",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/212_dwarf_soldier_academy",
+      "legacy_id": "212_dwarf_soldier_academy",
+      "output_bytes": 2962,
+      "package_sha256": "45848d95ffe51e8f917ce0ff44b263d4d1998d931eec7e7a8588c15e71a4f4f3",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/213_bear_knight_academy",
+      "legacy_id": "213_bear_knight_academy",
+      "output_bytes": 2942,
+      "package_sha256": "9c17991ea9a6d312d820d0c419382f9a5c7ec4ae9b0fa7aafeb7145547d05179",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/214_dwarf_tank_academy",
+      "legacy_id": "214_dwarf_tank_academy",
+      "output_bytes": 2957,
+      "package_sha256": "84cd0ac59d53e5cb4fb32815c9877d2bfaf33ae1336b3d794573573e99c17810",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/215_viking_copter_II_hangar",
+      "legacy_id": "215_viking_copter_II_hangar",
+      "output_bytes": 2968,
+      "package_sha256": "f197a837839eb47c7531ac7aa4b00272401cd8431d39f4d7860410ae14e54497",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/216_megahammer_dwarf_factory",
+      "legacy_id": "216_megahammer_dwarf_factory",
+      "output_bytes": 2977,
+      "package_sha256": "f5e1537d5b71c48c53dc30d11998968da5f6ba024aa5781b3a316745e42701a7",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/217_dwarf_armored_core_factory",
+      "legacy_id": "217_dwarf_armored_core_factory",
+      "output_bytes": 2984,
+      "package_sha256": "c654eabe763aa9bcbabb7682a407bf879ecc92028f8a8a9308898aca4ff022ee",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/218_dwarf_house",
+      "legacy_id": "218_dwarf_house",
+      "output_bytes": 2910,
+      "package_sha256": "531c2055f8a50bc073a570ed82a3d70132ce21983f88cb3ee76dbcb4ad6155e3",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/222_dwarf_wall",
+      "legacy_id": "222_dwarf_wall",
+      "output_bytes": 2889,
+      "package_sha256": "30089bf805bb5c621f15ad2f4f90aa1433d334723f87e958726a39d2d59640c2",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/223_dwarf_deco_1",
+      "legacy_id": "223_dwarf_deco_1",
+      "output_bytes": 2908,
+      "package_sha256": "22cd103185dc6e49309b4318db8ab4138f5706207480806dbea1f89f03af2733",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/224_dwarf_deco_2",
+      "legacy_id": "224_dwarf_deco_2",
+      "output_bytes": 2910,
+      "package_sha256": "151e3bbd7d7dd76d1fe149f627091ae50333a53fd11aa5031b56f1463004a809",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/225_alien_wall",
+      "legacy_id": "225_alien_wall",
+      "output_bytes": 2885,
+      "package_sha256": "76d0e2a7ce9726f22ad65697cd6d23d75dacadf4cf88be1d81a14f3f701e4aeb",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/228_spider_wall",
+      "legacy_id": "228_spider_wall",
+      "output_bytes": 2892,
+      "package_sha256": "5020c8d0398407191d574c3016b60532e50bd534a98780774af955284308143c",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/232_dwarf_deco_4",
+      "legacy_id": "232_dwarf_deco_4",
+      "output_bytes": 2906,
+      "package_sha256": "d41cc1457abd8c6b60d566feb6e14189c018dcec57048c0f604b40864aae82ab",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/233_viking_bazooka_academy",
+      "legacy_id": "233_viking_bazooka_academy",
+      "output_bytes": 2968,
+      "package_sha256": "87d67149d7e00eb42be686f1a60d80de1bf3a8a407fa10e0f9c1217c97b79c2e",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/234_viking_motosquad_academy",
+      "legacy_id": "234_viking_motosquad_academy",
+      "output_bytes": 2977,
+      "package_sha256": "42ee0e86f4e175cb799c6dad1e3f3a573c8abd80fe4cb8385644caed56fa3ad1",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/235_viking_rune_golem_academy",
+      "legacy_id": "235_viking_rune_golem_academy",
+      "output_bytes": 2977,
+      "package_sha256": "591037dacc2e8414cc33b56655cea02bbb41d10f6a897b943ce47fa603061b70",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/236_viking_sniper_academy",
+      "legacy_id": "236_viking_sniper_academy",
+      "output_bytes": 2958,
+      "package_sha256": "f1366942a83aab9c53517ac02c07cf00bacc5a0196a1641b0c520b3a5cc79722",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/237_viking_butcher_academy",
+      "legacy_id": "237_viking_butcher_academy",
+      "output_bytes": 2959,
+      "package_sha256": "f0afcc53732f8c3ec90318dad0a1d6a4aa416015e8ff55719ac75d6c105c899b",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/238_kamikaze_academy",
+      "legacy_id": "238_kamikaze_academy",
+      "output_bytes": 2921,
+      "package_sha256": "27b3e049fb508adda419a5ad57140c63f20e545da5b444d628c7c2913e0e9c25",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/239_laser_viking_academy",
+      "legacy_id": "239_laser_viking_academy",
+      "output_bytes": 2945,
+      "package_sha256": "dad0829fc5a2b4c3cd0a488b362952ebd6ad87abebb855dbc04ea21ac0a2d20b",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/240_avatar_soldado_academy",
+      "legacy_id": "240_avatar_soldado_academy",
+      "output_bytes": 2970,
+      "package_sha256": "512437a74e1b41ca690f00e6dfc8e8d4ebd6c1c700c16f2e7d1547f400ea5c80",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/241_avatar_arquero_academy",
+      "legacy_id": "241_avatar_arquero_academy",
+      "output_bytes": 2968,
+      "package_sha256": "8bd59baa450247842500d9a08bb6c56d713ba48d1b7564900548f7911aa02417",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/242_avatar_great_warrior_academy",
+      "legacy_id": "242_avatar_great_warrior_academy",
+      "output_bytes": 3006,
+      "package_sha256": "14491b2dea4017b4daaa2ef023cd8f2869f772c8f5db4a11c6f4f81f5f6b077d",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/243_avatar_jinete_academy",
+      "legacy_id": "243_avatar_jinete_academy",
+      "output_bytes": 2959,
+      "package_sha256": "651b57cdb997ed973c64c65a34539a6f979223a5618ed96811e3ee20fa9e8bb1",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/244_avatar_wall",
+      "legacy_id": "244_avatar_wall",
+      "output_bytes": 2896,
+      "package_sha256": "c3d9ebc66b19598c9aa7185e7f10087602e5397d572adbeeba942fa15ad9b943",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/245_avatar_turret",
+      "legacy_id": "245_avatar_turret",
+      "output_bytes": 2951,
+      "package_sha256": "617ea296004a913589ebd59d72b13c44b3211a843eb011c176b2b08a3b8f9ca1",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/246_avatar_house",
+      "legacy_id": "246_avatar_house",
+      "output_bytes": 2920,
+      "package_sha256": "e2fed6f884496c4e3feeb28937e370ff99ef451914e6831c3b00366748494c9c",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 8,
+      "directory": "assets/converted/buildings/248_avatar_deco",
+      "legacy_id": "248_avatar_deco",
+      "output_bytes": 5674,
+      "package_sha256": "38fdca073fc71ec08a069d495fccefd87dc73b9c9845b4ff4524316beb5d2986",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/249_nebula_horse_rider_academy",
+      "legacy_id": "249_nebula_horse_rider_academy",
+      "output_bytes": 3012,
+      "package_sha256": "5c073bdb5f75e750d983dacec84ec5a3b4172c2cb7e62418612a08e0d7f3c721",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/250_nebula_dragon_nest",
+      "legacy_id": "250_nebula_dragon_nest",
+      "output_bytes": 2968,
+      "package_sha256": "08952f761bb3e873c142313648d8685c0fca59de7d0268fcc5381b5ff26014d6",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/251_nebula_motorized_academy",
+      "legacy_id": "251_nebula_motorized_academy",
+      "output_bytes": 2981,
+      "package_sha256": "673a484591a673247a15f494ef4cd0270f426ba883c461f1dba9693cc08c1c82",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/252_skyscraper",
+      "legacy_id": "252_skyscraper",
+      "output_bytes": 2897,
+      "package_sha256": "d97ae38f75131d4882853124a98c9c6b206afa47e8cffb09e4ce88a7607478bf",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/253_parliament",
+      "legacy_id": "253_parliament",
+      "output_bytes": 4437,
+      "package_sha256": "3725353d411e86da67a56e838ab4e7964945466727eef84d1148641263e51834",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/255_nebula_blue_bicopter_hangar",
+      "legacy_id": "255_nebula_blue_bicopter_hangar",
+      "output_bytes": 2994,
+      "package_sha256": "a24d14e4da6d08cd29e25aa6b9eded76626446d58f19ed2cd0025a0f32dc349c",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/257_nebula_monster_rider_academy",
+      "legacy_id": "257_nebula_monster_rider_academy",
+      "output_bytes": 3027,
+      "package_sha256": "63a63924d39b4e3e9216162c739d8c47df6157359d0aab7610aac015626b09d3",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/258_nebula_muze_warrior_academy",
+      "legacy_id": "258_nebula_muze_warrior_academy",
+      "output_bytes": 2995,
+      "package_sha256": "8e40b7a56a890442852f504772098901f0a47ba29035412271caa96b8b12af24",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/259_nebula_sniper_academy",
+      "legacy_id": "259_nebula_sniper_academy",
+      "output_bytes": 2980,
+      "package_sha256": "37c1d3d4ce0e0bc6617418bf138eb770ab1981317ece41975541a5ebdbab8358",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/260_dragon_rider_2_academy",
+      "legacy_id": "260_dragon_rider_2_academy",
+      "output_bytes": 2970,
+      "package_sha256": "bfa3fdbf03c02f9321b6d2647df5fc4554c4b9300211096846a148079876b13a",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/262_venom_spider_academy",
+      "legacy_id": "262_venom_spider_academy",
+      "output_bytes": 2949,
+      "package_sha256": "127252f1e09286083c2bfb6144f2d8677f6e3fb44b56c3f0217985ea75009495",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/263_claw_alien_academy",
+      "legacy_id": "263_claw_alien_academy",
+      "output_bytes": 5279,
+      "package_sha256": "e581de92bb4d5c61aff9d0453237f55c098e8b9861c62bb28811f9a3fa42c687",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/264_small_alien_academy",
+      "legacy_id": "264_small_alien_academy",
+      "output_bytes": 5285,
+      "package_sha256": "1c96fe06b6c483e225d362f786824dd2b08bf814d0f577c1f552c8f88cee6db2",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/265_big_spider_academy",
+      "legacy_id": "265_big_spider_academy",
+      "output_bytes": 2957,
+      "package_sha256": "0d189cd16013bfad43a5e8c51abe74b2add306ffc46b7af9b0cb31b53d59b38a",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/266_tusk_alien_academy",
+      "legacy_id": "266_tusk_alien_academy",
+      "output_bytes": 5304,
+      "package_sha256": "3d9da714e685e1b4f9b72688e243a58247c6c400f47c9b00b8542897bdb05431",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/267_melee_spider_academy",
+      "legacy_id": "267_melee_spider_academy",
+      "output_bytes": 2971,
+      "package_sha256": "94c357655b894b6f9dc0ce27edfc2112f95dd4d0e6d0cf563572628c38bbedf5",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/268_nebula_monster_academy",
+      "legacy_id": "268_nebula_monster_academy",
+      "output_bytes": 2981,
+      "package_sha256": "fa5070a02b90bd98755eea4b3915af00d321dc44d97c7a73cb9b72dd93708aaa",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/269_swat_soldier_academy",
+      "legacy_id": "269_swat_soldier_academy",
+      "output_bytes": 2972,
+      "package_sha256": "f7c9b515f44ba8fe5b9b03e50793ee325d5ad2710aebfaf89595b2dc4eb991f8",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/270_hercules_mech_academy",
+      "legacy_id": "270_hercules_mech_academy",
+      "output_bytes": 2975,
+      "package_sha256": "cccaa1f2f0aecebe79106a2d67675364a83c079ff495848e3841ff5d281d6b58",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/271_spatial_wall",
+      "legacy_id": "271_spatial_wall",
+      "output_bytes": 2901,
+      "package_sha256": "890bb8d2657ee5cf75a1143c5329204e66b28f1d099a90634f2220ee7c048fa1",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/273_spatial_house",
+      "legacy_id": "273_spatial_house",
+      "output_bytes": 2925,
+      "package_sha256": "de568823a3d263e4bf17a91694144dcb6bab9085d90a6db78a4469d984f397e0",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/275_spatial_deco",
+      "legacy_id": "275_spatial_deco",
+      "output_bytes": 2911,
+      "package_sha256": "056020d1d004362a81d5efd9c73c52483f2b18c3e38e9021119b5fb76e1e5917",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/280_spatial_paladin_academy",
+      "legacy_id": "280_spatial_paladin_academy",
+      "output_bytes": 2965,
+      "package_sha256": "ceac47c0b7331005debdc9b1fa2f26333f22faaf68769cb36314be25e80842ce",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/281_spatial_priest_academy",
+      "legacy_id": "281_spatial_priest_academy",
+      "output_bytes": 2985,
+      "package_sha256": "40d05eeb6f24d6c677c3fce3bc1d7a4bb5b5d96065991759641064ead94bb906",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/282_spatial_space_ship_hangar",
+      "legacy_id": "282_spatial_space_ship_hangar",
+      "output_bytes": 2975,
+      "package_sha256": "2bae5306f44a0f7e983e6efe3b0d8d98fb1f23b3e9601e77c07c997cfecaaad7",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/283_reptile_gun_hangar",
+      "legacy_id": "283_reptile_gun_hangar",
+      "output_bytes": 2936,
+      "package_sha256": "7cd0e4311e63f549946c2553d9bdac69a46430595db2039f4af277d7cdb4ff17",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/284_mega_bot_academy",
+      "legacy_id": "284_mega_bot_academy",
+      "output_bytes": 2943,
+      "package_sha256": "5a229716ca619edb1a1ecf8d3ecfa2ec7314f70b81fe293d378a4a0283f25150",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/285_spatial_healer_academy",
+      "legacy_id": "285_spatial_healer_academy",
+      "output_bytes": 2964,
+      "package_sha256": "dd0e3a709972d957165909cbf868d3b746f0fd0b00fd8a745e3b6f1301a76cb8",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/286_spatial_exploration_module_hangar",
+      "legacy_id": "286_spatial_exploration_module_hangar",
+      "output_bytes": 3031,
+      "package_sha256": "ede1142b50022baf139d4a4d76572866a9f73e80bba9225cf29af8ba378a5654",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/287_gun_bot_academy",
+      "legacy_id": "287_gun_bot_academy",
+      "output_bytes": 2936,
+      "package_sha256": "e54570ff61dfbffcfb561a7d79eb6f367fbe4dd89ad856c86e322b6a6bb606fd",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/288_silver_elf_gunner_academy",
+      "legacy_id": "288_silver_elf_gunner_academy",
+      "output_bytes": 2983,
+      "package_sha256": "e10dfc7aaca5a6d042a47f195f7c82210ede5369b572655554d17e7e3744e4b6",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/289_elf_dino_rider_academy",
+      "legacy_id": "289_elf_dino_rider_academy",
+      "output_bytes": 2966,
+      "package_sha256": "269467d7789ab1638dc6ec754d3dbcbb8924089cc70f1d7ab48a22dcf610e5e4",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/290_destruction_wizard_academy",
+      "legacy_id": "290_destruction_wizard_academy",
+      "output_bytes": 2994,
+      "package_sha256": "23f4ef01482438172eae619f76f665705a8e95a99530a375200d3be6ea31196b",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/291_plasma_striker_academy",
+      "legacy_id": "291_plasma_striker_academy",
+      "output_bytes": 2969,
+      "package_sha256": "9155f1855ed218363ae550ae8091485689ff93bdcad1b86f4905cf8c653d0c6d",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/292_winged_paladin_academy",
+      "legacy_id": "292_winged_paladin_academy",
+      "output_bytes": 2962,
+      "package_sha256": "31faca6228c3946ef633fe3d8f9972a19442ced5a7c85c2ca6d0336f5bef1cef",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/293_andromedaWall",
+      "legacy_id": "293_andromedaWall",
+      "output_bytes": 2910,
+      "package_sha256": "0111c73f8bd8c87da1d2631019f9f45bdc6070aa21f9c55174d43b4e19e8a61c",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/294_andromedaTurret",
+      "legacy_id": "294_andromedaTurret",
+      "output_bytes": 2964,
+      "package_sha256": "e802797dd2562cab1903f8f1f02b9da2a53326982fe49b8c969db221719bf9cd",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/295_andromedaHouse",
+      "legacy_id": "295_andromedaHouse",
+      "output_bytes": 2934,
+      "package_sha256": "5a0cb8d26776f5f4b0d366f43b3dfa51e1106efb78106888f9f5e2b2ad6a09e1",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/297_andromedaDeco",
+      "legacy_id": "297_andromedaDeco",
+      "output_bytes": 2920,
+      "package_sha256": "16e220b030ad3053ea053523a1e52cbf14fa00213ddf17307100ee04758bd904",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/298_andromedaPrivateAcademy",
+      "legacy_id": "298_andromedaPrivateAcademy",
+      "output_bytes": 2976,
+      "package_sha256": "3c0d6cd15cb0d65fe74de5072fb5cdca752643d0f590c11a5f130f877c2592c8",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/299_andromedaDroidFactory",
+      "legacy_id": "299_andromedaDroidFactory",
+      "output_bytes": 2960,
+      "package_sha256": "93ecb120a5c3e1f74ae3476188d28d110644c281d51c7e0748533d4e203fac86",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/300_andromedaSpaceshipHangar",
+      "legacy_id": "300_andromedaSpaceshipHangar",
+      "output_bytes": 2981,
+      "package_sha256": "5cf3bf76ee319421ef50a13a86b70d1958e6eae67e8e865362fe3f18aa1c54f6",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 2,
+      "directory": "assets/converted/buildings/301_punisherBot_Factory",
+      "legacy_id": "301_punisherBot_Factory",
+      "output_bytes": 2946,
+      "package_sha256": "86005afb491792b1bd95785c59f028b027ddb2b683cc350013d23552f6b9c189",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 6,
+      "directory": "assets/converted/buildings/302_atomFuser",
+      "legacy_id": "302_atomFuser",
+      "output_bytes": 13311,
+      "package_sha256": "ec718c0c92b24fa6041557ddb881d3ac16b8af37a29aa9560411de87f4f6451d",
+      "policy": "building-conversion-v1"
+    },
+    {
+      "bitmaps": 126,
+      "directory": "assets/converted/units/10023_gorilla",
+      "legacy_id": "10023_gorilla",
+      "output_bytes": 87389,
+      "package_sha256": "d32ae84a53a83336f9fd38f563d052da47a54b549f6c48f5660a604d76882e9f",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 72,
+      "directory": "assets/converted/units/1002_Red_Tank_m",
+      "legacy_id": "1002_Red_Tank_m",
+      "output_bytes": 64460,
+      "package_sha256": "97d4dcb96c27092d62667a976604a33530b7e08d157df979ac97c87d9a23b081",
+      "policy": "unit-conversion-v1"
     },
     {
       "bitmaps": 56,
       "directory": "assets/converted/units/10033_wild_elephant",
       "legacy_id": "10033_wild_elephant",
-      "output_bytes": 384684,
-      "package_sha256": "a40cc37691b662a123b99205156f73005ee3dc1d4cfbf35b12cce52d2f10b16b",
+      "output_bytes": 40453,
+      "package_sha256": "3a5b4b42e1c974094422cf65830a0ec55a980e0549cd46a759430258830e3b75",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 72,
+      "directory": "assets/converted/units/1003_cannon_2_m",
+      "legacy_id": "1003_cannon_2_m",
+      "output_bytes": 64473,
+      "package_sha256": "847c37098c4e1ed35a353d8c9e68340ea4488c8ca8b38126a19135158b2bd338",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 72,
+      "directory": "assets/converted/units/1004_cannon_3_m",
+      "legacy_id": "1004_cannon_3_m",
+      "output_bytes": 64461,
+      "package_sha256": "b7d6acc6df9610ae9bb2738fd004cd80a97dc79db75672bc358321cffb9942d4",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 42,
+      "directory": "assets/converted/units/1005_special_spy_m",
+      "legacy_id": "1005_special_spy_m",
+      "output_bytes": 59214,
+      "package_sha256": "58f527341ad88c0be1fd2bef799748f98476c5025e3d670e072fe0294b0a3a14",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 98,
+      "directory": "assets/converted/units/1009_good_girl_m",
+      "legacy_id": "1009_good_girl_m",
+      "output_bytes": 71399,
+      "package_sha256": "f7a26844ac002107230843a88760a014e9a7f784dd3f08744436b66f1e1daf8a",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 66,
+      "directory": "assets/converted/units/1010_apc_m",
+      "legacy_id": "1010_apc_m",
+      "output_bytes": 68492,
+      "package_sha256": "ebebe822e7246a420c7e3dce70784cd79bfa93437ed9a99fc3f35327cd52f031",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 98,
+      "directory": "assets/converted/units/1012_bad_boy",
+      "legacy_id": "1012_bad_boy",
+      "output_bytes": 71058,
+      "package_sha256": "b05c0db69978ddb86164c5550249d27b7832530e0223842bac161f0d1412ab6a",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 28,
+      "directory": "assets/converted/units/1013_truck_1_m",
+      "legacy_id": "1013_truck_1_m",
+      "output_bytes": 22649,
+      "package_sha256": "d1775dd497989876efa9e3f15b6e5d19c3e531e8b1d630f0420f4913b57b19e2",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 72,
+      "directory": "assets/converted/units/1016_cannon_1_m",
+      "legacy_id": "1016_cannon_1_m",
+      "output_bytes": 64441,
+      "package_sha256": "4e81de27fe499a17960dc0ded30566fedc65e49939a197012eaf46a18f989042",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 98,
+      "directory": "assets/converted/units/1017_good_boy",
+      "legacy_id": "1017_good_boy",
+      "output_bytes": 71231,
+      "package_sha256": "37c28ac657501ebf92d9fe975b7e77de51e039c647b96f873b115dd4ba301e0a",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 60,
+      "directory": "assets/converted/units/1018_zodiac_m",
+      "legacy_id": "1018_zodiac_m",
+      "output_bytes": 69984,
+      "package_sha256": "cafb6e369a6ff2e97bc72cb3ce72cf5e6822fca14f6ff4ea635411a3f33c173e",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 120,
+      "directory": "assets/converted/units/1019_ship_m2",
+      "legacy_id": "1019_ship_m2",
+      "output_bytes": 119293,
+      "package_sha256": "85eede28c6b12314a1312df136dfb13700c6b6338b44920d14d69d6ef13e9452",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 98,
+      "directory": "assets/converted/units/1020_soldier_2_m",
+      "legacy_id": "1020_soldier_2_m",
+      "output_bytes": 71253,
+      "package_sha256": "4a872546e13faa839ac52a2c2094bae7bf0d0016320fd418c83c54b227352a25",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 98,
+      "directory": "assets/converted/units/1021_soldier_3_m",
+      "legacy_id": "1021_soldier_3_m",
+      "output_bytes": 71339,
+      "package_sha256": "ed73548b07e5ddbd277f1e2cf5bdf31dbb51dff450068c966067c1e00e6c1fc4",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 104,
+      "directory": "assets/converted/units/1022_bazooka_2_m",
+      "legacy_id": "1022_bazooka_2_m",
+      "output_bytes": 85600,
+      "package_sha256": "338707fee3bddc425e119bada184457ce6225a21b8e22ee009af67623c6dbd11",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 110,
+      "directory": "assets/converted/units/1023_bazooka_3_m",
+      "legacy_id": "1023_bazooka_3_m",
+      "output_bytes": 86641,
+      "package_sha256": "c5e0f82f6638d71222b8c28522281e7fb8fc9aab9531dafc66fddc6aaeb1a7c4",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 98,
+      "directory": "assets/converted/units/1024_good_guillerma",
+      "legacy_id": "1024_good_guillerma",
+      "output_bytes": 72639,
+      "package_sha256": "1042b268a6c59b67651eb20620019185d717928f1cf8d6cde3607290ec2fed62",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 64,
+      "directory": "assets/converted/units/1030_machinegunjeep_2_m",
+      "legacy_id": "1030_machinegunjeep_2_m",
+      "output_bytes": 60227,
+      "package_sha256": "2fd495e2890276d486e16fe08c5719d8ccf409eb5512a79d85be80598abe9bac",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 64,
+      "directory": "assets/converted/units/1031_machinegunjeep_3_m",
+      "legacy_id": "1031_machinegunjeep_3_m",
+      "output_bytes": 60483,
+      "package_sha256": "da2ede36d1acbb3c8d70dee68b5e283b6d987d2862860cdf883b45c7c6f00536",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 68,
+      "directory": "assets/converted/units/1032_truck_3_m",
+      "legacy_id": "1032_truck_3_m",
+      "output_bytes": 49247,
+      "package_sha256": "a0736fe39b862d059bce37224b68bb632deb94330058f9621694b2ea41460baf",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 106,
+      "directory": "assets/converted/units/1033_mr_cigar",
+      "legacy_id": "1033_mr_cigar",
+      "output_bytes": 82369,
+      "package_sha256": "d49d833f7f22abaa1142579084e3284beeac37db7d50db7203eeeadf98c54e74",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 28,
+      "directory": "assets/converted/units/1035_truck_2_m",
+      "legacy_id": "1035_truck_2_m",
+      "output_bytes": 23993,
+      "package_sha256": "43282245633e5a8f593cdf59332c67a78c2a3c00c7ce81935d742efa418f74ec",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 104,
+      "directory": "assets/converted/units/1036_double_bazooka_m",
+      "legacy_id": "1036_double_bazooka_m",
+      "output_bytes": 91224,
+      "package_sha256": "2f1e6d68048d70f61e41e67704facb4818e867371463a56bbd4aade0e78de892",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 94,
+      "directory": "assets/converted/units/1037_megatank",
+      "legacy_id": "1037_megatank",
+      "output_bytes": 117309,
+      "package_sha256": "40e0af18431adf6553c5e60125679a230ebf95421cd39970c51badc795a5150d",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 98,
+      "directory": "assets/converted/units/1042_good_guile",
+      "legacy_id": "1042_good_guile",
+      "output_bytes": 71956,
+      "package_sha256": "11b85ee141f20b99a6844bafdf08547182c5031e4216b486f8a9ccce6033eced",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 8,
+      "directory": "assets/converted/units/1043_air_strike_m",
+      "legacy_id": "1043_air_strike_m",
+      "output_bytes": 18340,
+      "package_sha256": "d1371e94ba17ff46d6cdda958f4b6d0e54aa239420ac9ba2629a828be0879b5a",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 98,
+      "directory": "assets/converted/units/1045_double_gun_soldier_m",
+      "legacy_id": "1045_double_gun_soldier_m",
+      "output_bytes": 73848,
+      "package_sha256": "baf3ccbe873f0ac0354acd1ec4a8a299a169506fdfecbc6e4ab930c4b28e9964",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 96,
+      "directory": "assets/converted/units/1046_flamethrower_m",
+      "legacy_id": "1046_flamethrower_m",
+      "output_bytes": 95610,
+      "package_sha256": "f3e4fe164e97393e481e3c4575629f0f4ba323e70f2169343c4981c537bb4b4c",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 56,
+      "directory": "assets/converted/units/1047_black_tank_2_m",
+      "legacy_id": "1047_black_tank_2_m",
+      "output_bytes": 57139,
+      "package_sha256": "61b12a4e66240efae0425652f9e1b0c18cd32d49bebc0c46126b01dd5d87ddcd",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 98,
+      "directory": "assets/converted/units/1050_medic_m",
+      "legacy_id": "1050_medic_m",
+      "output_bytes": 71460,
+      "package_sha256": "b4c3fda71b35b9a079afaf460a31afd73f4d819c58ad10bf8f3db90437844d71",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 68,
+      "directory": "assets/converted/units/1051_mechanic_m",
+      "legacy_id": "1051_mechanic_m",
+      "output_bytes": 51968,
+      "package_sha256": "102d780371506673682a60e3f4dcd8336d0d93f424ed75746992202a34d35d13",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 194,
+      "directory": "assets/converted/units/1052_special_ops_2_m",
+      "legacy_id": "1052_special_ops_2_m",
+      "output_bytes": 143623,
+      "package_sha256": "c2139d76e18a9c6391abd6eda033d3dff676ee898f76bf2e85942fc48f9beb5b",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 98,
+      "directory": "assets/converted/units/1055_mr_t_m",
+      "legacy_id": "1055_mr_t_m",
+      "output_bytes": 71267,
+      "package_sha256": "f1519ce0b2c71fccbe39c326816d999dc482004b2ecb186e93e2dd37f54dc97e",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 98,
+      "directory": "assets/converted/units/1058_soldier_4_m",
+      "legacy_id": "1058_soldier_4_m",
+      "output_bytes": 71366,
+      "package_sha256": "84f9fd4314aa1f9210d594ebf69ea48bac6c0b3aa999c1d07c6a6587eeabd0d3",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 98,
+      "directory": "assets/converted/units/1059_soldier_5_m",
+      "legacy_id": "1059_soldier_5_m",
+      "output_bytes": 71286,
+      "package_sha256": "8cefd2d7ece129fee4f516f799003ef027e3adf939f291bf12c7213046fa4ba5",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 172,
+      "directory": "assets/converted/units/1060_mortar_m",
+      "legacy_id": "1060_mortar_m",
+      "output_bytes": 151998,
+      "package_sha256": "72fb712f60293839e8eec1fedec74df961c9cf5ce372c3d502da7998609cba59",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 180,
+      "directory": "assets/converted/units/1061_baby_robot_m",
+      "legacy_id": "1061_baby_robot_m",
+      "output_bytes": 125882,
+      "package_sha256": "ed9c320ebbb58f239c0339326309ef40803a956ba6866defd79a3ac2b5738574",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 110,
+      "directory": "assets/converted/units/1063_bazooka_4_m",
+      "legacy_id": "1063_bazooka_4_m",
+      "output_bytes": 86615,
+      "package_sha256": "eca7737ba0e4f58c8b1a2fad0f1754d0f07ba316b32c1ab2a8f27d89ae86a3e2",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 110,
+      "directory": "assets/converted/units/1064_bazooka_5_m",
+      "legacy_id": "1064_bazooka_5_m",
+      "output_bytes": 86689,
+      "package_sha256": "9c0b592ea45750227badb17dffdc9a1ab666206b1a00e3416aeb7d239c30f09d",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 82,
+      "directory": "assets/converted/units/1065_antiaircraft_battery_m",
+      "legacy_id": "1065_antiaircraft_battery_m",
+      "output_bytes": 96006,
+      "package_sha256": "d9c71a06a7ef39a1a74cac29caf097d914d28fe56be85bb2e7df49afb1e7aa07",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 74,
+      "directory": "assets/converted/units/1069_bigheaded_tank_m",
+      "legacy_id": "1069_bigheaded_tank_m",
+      "output_bytes": 65548,
+      "package_sha256": "137c697b52ea93d736fd0c9375d01eb4ff72a8b00e970a5ba310123da4302f90",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 74,
+      "directory": "assets/converted/units/1070_cannon_4_m",
+      "legacy_id": "1070_cannon_4_m",
+      "output_bytes": 65160,
+      "package_sha256": "0e8d0e22b562e7e13500aa40534164a3a9dcf0a4944f771606403b8f2c88b224",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 74,
+      "directory": "assets/converted/units/1071_cannon_5_m",
+      "legacy_id": "1071_cannon_5_m",
+      "output_bytes": 67394,
+      "package_sha256": "d4e03668ab41ed9a5b333d340aa01fb6955d08392b0c2555b9ee2b0e405e1a3b",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 182,
+      "directory": "assets/converted/units/1072_rambo_m",
+      "legacy_id": "1072_rambo_m",
+      "output_bytes": 125223,
+      "package_sha256": "2067d667e8123b22108213bc5e6bc57bd4a082a208d1a51bcb44a0589f69f369",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 134,
+      "directory": "assets/converted/units/1073_erradicator_m",
+      "legacy_id": "1073_erradicator_m",
+      "output_bytes": 104004,
+      "package_sha256": "0032bb3356135c5d9c746888f0250da5dd6e74fe180ff4f10ec49a0a03b06a28",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 110,
+      "directory": "assets/converted/units/1078_robo_bazooka_m",
+      "legacy_id": "1078_robo_bazooka_m",
+      "output_bytes": 89068,
+      "package_sha256": "b80c97f5660bd885872a5b6e11e9e40d288039860a4cea62d46223a83c82b12b",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 88,
+      "directory": "assets/converted/units/1079_robo_jumper_m",
+      "legacy_id": "1079_robo_jumper_m",
+      "output_bytes": 65950,
+      "package_sha256": "c305f8984a9c45287b5c35cfda743806d3afcbccfc924cf4001813e486908145",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 52,
+      "directory": "assets/converted/units/1080_robo_biker_m",
+      "legacy_id": "1080_robo_biker_m",
+      "output_bytes": 48230,
+      "package_sha256": "7ef19d3edf4a20c4266799a07b0985813d070fa8098ca86131500a096151ccbe",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 74,
+      "directory": "assets/converted/units/1083_demlisher_tank_m",
+      "legacy_id": "1083_demlisher_tank_m",
+      "output_bytes": 65670,
+      "package_sha256": "2033ca63beb73fd31776017394ccd6de77b73b35cb2a2f1b68518a582ae47f00",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 214,
+      "directory": "assets/converted/units/1085_metal_draggy_m",
+      "legacy_id": "1085_metal_draggy_m",
+      "output_bytes": 150534,
+      "package_sha256": "c1489074d731adce0fb0abe8514981065237160f4c6b78b99caac9a628cf7512",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 180,
+      "directory": "assets/converted/units/1090_giant_walker_m",
+      "legacy_id": "1090_giant_walker_m",
+      "output_bytes": 124730,
+      "package_sha256": "cfdefcdfc26361bb39df9ac1eac7e931f3f51b74e35c77d4bf4172d0eaac2b32",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 260,
+      "directory": "assets/converted/units/1091_missile_tank_m",
+      "legacy_id": "1091_missile_tank_m",
+      "output_bytes": 178816,
+      "package_sha256": "c66185ec53475f4a9acce68af1899372c217301e526a361388c6e20d4bac075c",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 112,
+      "directory": "assets/converted/units/1097_red_draggy_m",
+      "legacy_id": "1097_red_draggy_m",
+      "output_bytes": 86302,
+      "package_sha256": "562477af114a10f1e880f1c6929cf3c35bc88693dae736d74018d0a854ed6308",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 214,
+      "directory": "assets/converted/units/1120_metal_draggy_2_m",
+      "legacy_id": "1120_metal_draggy_2_m",
+      "output_bytes": 150423,
+      "package_sha256": "2a8e441858e53f5ad2048f37221a216f0c1a543914e7f73de5c28cf6fb819625",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 70,
+      "directory": "assets/converted/units/1124_ork_tank_1",
+      "legacy_id": "1124_ork_tank_1",
+      "output_bytes": 63228,
+      "package_sha256": "95b720534e1adb3bbd4b9e791aa72a48201dad2b54609c479741bce14dd4385d",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 108,
+      "directory": "assets/converted/units/1125_orc_worker",
+      "legacy_id": "1125_orc_worker",
+      "output_bytes": 94903,
+      "package_sha256": "d6657173e1a9b7f31d230dd65c0b56cee99c08bd30b93b59055cb5a9dcad4a43",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 126,
+      "directory": "assets/converted/units/1129_samurai_minibot",
+      "legacy_id": "1129_samurai_minibot",
+      "output_bytes": 90675,
+      "package_sha256": "4c1018b748130060aea2cad0295e9fa54273502473db35e3087eb00f85c15c7d",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 126,
+      "directory": "assets/converted/units/1129_samurai_minibot_m",
+      "legacy_id": "1129_samurai_minibot_m",
+      "output_bytes": 90874,
+      "package_sha256": "a75cb1d13df25e0009204325bddd284885e8648d6578f069b2b1f7176d3c5706",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 118,
+      "directory": "assets/converted/units/1154_axeman",
+      "legacy_id": "1154_axeman",
+      "output_bytes": 81562,
+      "package_sha256": "f21008239e6dfe91f2deb271bc0d34a4c3aa7e407a47c2f2901f001830022f42",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 138,
+      "directory": "assets/converted/units/1168_bahamut_metalico_draggy",
+      "legacy_id": "1168_bahamut_metalico_draggy",
+      "output_bytes": 104751,
+      "package_sha256": "a084ac819c3a5a0feb84b3e0113f24aa998d4ae0102521ed0c4bba94bd8d78b3",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 160,
+      "directory": "assets/converted/units/1176_kamikaze",
+      "legacy_id": "1176_kamikaze",
+      "output_bytes": 116424,
+      "package_sha256": "32290eab382f4fa6b4d3ec80f766ee060cbc70fb1ff48f3cf1c99e8dfc267a6c",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 102,
+      "directory": "assets/converted/units/1195_electric_draggy",
+      "legacy_id": "1195_electric_draggy",
+      "output_bytes": 454387,
+      "package_sha256": "1a358c12575082daa68add1fb5e1d3b87166d4a5605fbae153120db7eddf372d",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 214,
+      "directory": "assets/converted/units/1196_black_draggy",
+      "legacy_id": "1196_black_draggy",
+      "output_bytes": 150291,
+      "package_sha256": "59d9e425773013378e919237e35a5a20e9fe7b6cfb6148d2f72f2d1d9d49915d",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 126,
+      "directory": "assets/converted/units/1198_nebular_horse_rider",
+      "legacy_id": "1198_nebular_horse_rider",
+      "output_bytes": 89758,
+      "package_sha256": "1b53c6734dd0cf7aacdc1bbed8ebfc32c8cc37014cf4a9ebd4c3830f41af4505",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 214,
+      "directory": "assets/converted/units/1357_bonecrushaDrone",
+      "legacy_id": "1357_bonecrushaDrone",
+      "output_bytes": 1154563,
+      "package_sha256": "2a04b4427ca782072deb1a5bdcb404f3a197985a188d2edc37b26783831d120f",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 224,
+      "directory": "assets/converted/units/1369_atomicBonecrushaDrone",
+      "legacy_id": "1369_atomicBonecrushaDrone",
+      "output_bytes": 1165181,
+      "package_sha256": "510bf900f8304f18ab71b273386d0c761ca9525026b8900e70fd14a4fb9a7823",
+      "policy": "unit-conversion-v1"
+    },
+    {
+      "bitmaps": 70,
+      "directory": "assets/converted/units/1421_cyberInquisitorDrone",
+      "legacy_id": "1421_cyberInquisitorDrone",
+      "output_bytes": 142981,
+      "package_sha256": "946571589e964e5f277fbb5c560f0b3c0e3519e0ec06aebce33b3db6cf23de12",
       "policy": "unit-conversion-v1"
     }
   ],

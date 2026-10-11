@@ -48,7 +48,7 @@ extends RefCounted
 ## ## The recorded RATE is reported, never applied (D1)
 ##
 ## `frame_rate` is copied through exactly as the committed package records it —
-## `30.0` for the one committed unit package — and is **never** multiplied by a
+## `30.0` for the one package this projection reads — and is **never** multiplied by a
 ## frame count to produce a duration or a frame time. `rate_applied` is a constant
 ## false and `rate_applied_to` the empty string, and the suite proves it
 ## behaviourally as well: the same package projected beside a definition whose
@@ -80,15 +80,18 @@ extends RefCounted
 ## ## `max_frame` is NOT the asset's frame count, and what it means is NOT
 ## ## claimed (D2)
 ##
-## For the one committed converted unit package the committed definition and the
-## parse of the asset its own committed `img_name` names **disagree**: committed
+## For the one converted unit package this projection reads, the committed
+## definition and the parse of the asset its own committed `img_name` names
+## **disagree**: committed
 ## `max_frame` **2**, the parsed root `frame_count` **1**, and the sprite that
 ## actually holds the five labels **29** frames. The content names exactly the
 ## asset the package parsed, so the two describe the same unit and disagree.
 ## `max_frame` is therefore **adopted nowhere** here — not as a frame count, not
 ## as a duration, not as a loop bound, not as a state count — and **no** claim is
 ## made about what it means, because this is **one** data point over **one**
-## committed converted package. The measurement is sufficient to REFUSE the
+## package read here. Sixty-nine unit packages are committed, so a distribution
+## is measurable from the assets; it is not measured here. The measurement is
+## sufficient to REFUSE the
 ## adoption, which is what this line does; it is not sufficient to explain the
 ## field, and a later line reading only the *name* would reasonably but wrongly
 ## adopt it.
@@ -108,10 +111,12 @@ extends RefCounted
 ## reads nothing from disk, so the same function serves the client, the hermetic
 ## suite, and the deterministic report. `resolve_asset()` and
 ## `coverage_record()` are the two functions that touch the filesystem, and both
-## do so **read-only** through the repository path helper. Exactly **one** converted
-## unit package is committed, so the projection's coverage is exactly one unit and
-## `coverage_record()` reports that count explicitly: a later conversion is a
-## visible addition, never a silent widening of this evidence.
+## do so **read-only** through the repository path helper. Sixty-nine converted
+## unit packages and 223 converted building packages are committed, and this
+## projection reads exactly ONE package's bytes, so its measured coverage is
+## exactly one unit and `coverage_record()` reports that measured count beside the
+## corpus counts: a later conversion is a visible addition to the corpus counts,
+## never a silent widening of the measured evidence.
 
 ## Repository path resolution, for the two read-only disk functions only.
 const Paths = preload("res://scripts/package_paths.gd")
@@ -371,14 +376,15 @@ const ANIMATION_FIELDS_COVERAGE := ("All SIX fields are present on ALL 429 "
 ## quotes it, because a constant may not forward-reference another one.
 const MAX_FRAME_RULE := ("THE COMMITTED max_frame IS NOT THE PARSED FRAME COUNT "
 	+ "OF THE ANIMATION ASSET ITS OWN COMMITTED img_name NAMES. For the one "
-	+ "committed converted unit package the committed max_frame is 2, the parsed "
+	+ "converted unit package this projection reads the committed max_frame is 2, "
+	+ "the parsed "
 	+ "root frame_count is 1, and the sprite that actually holds the five recorded "
 	+ "labels has 29 frames - and the content names EXACTLY the asset that package "
 	+ "parsed, so the numbers describe the same unit and DISAGREE. Therefore "
 	+ "max_frame is ADOPTED NOWHERE in this client: not as a frame count, not as a "
 	+ "duration, not as a loop bound, and not as a state count. It is reported as "
 	+ "CONTENT ONLY, and WHAT IT MEANS IS NOT CLAIMED, because the measurement is "
-	+ "ONE data point over ONE committed converted package (design D2)")
+	+ "ONE data point over the ONE package this projection reads (design D2)")
 
 ## The whole non-equivalence finding, with all three measured numbers and the
 ## refusals attached to it. This is the decision the investigation turned up: a
@@ -407,13 +413,16 @@ const MAX_FRAME_NON_EQUIVALENCE := {
 	"adopted_anywhere": false,
 	"max_frame_role": "content-only",
 	"data_points": 1,
-	"converted_unit_packages": 1,
-	"converted_building_packages": 1,
+	"measured_unit_packages": EVIDENCE_UNIT_PACKAGES,
+	"committed_unit_packages": COMMITTED_UNIT_PACKAGE_COUNT,
+	"committed_building_packages": COMMITTED_BUILDING_PACKAGE_COUNT,
 	"what_max_frame_means": "NOT CLAIMED. The measurement is ONE data point over "
-		+ "ONE committed converted unit package, which is sufficient to REFUSE "
-		+ "adopting max_frame as a frame count and insufficient to explain it. No "
-		+ "claim is made about what it means and no distribution over the corpus "
-		+ "is measurable from one package",
+		+ "the ONE converted unit package this projection actually "
+		+ "reads, which is sufficient to REFUSE adopting max_frame as a frame count "
+		+ "and insufficient to explain it. Sixty-nine unit packages are now "
+		+ "committed and 69 units name one, so a distribution is measurable from "
+		+ "the assets - it is simply not measured here, and no claim is made about "
+		+ "what max_frame means for any package or unit but this one",
 	"rule": MAX_FRAME_RULE,
 }
 
@@ -705,24 +714,42 @@ const CONVERTED_UNITS_DIR := "assets/converted/units"
 const CONVERTED_BUILDINGS_DIR := "assets/converted/buildings"
 const PACKAGE_FILE := "package.json"
 
-## The one committed converted unit package, named here so the coverage is
-## visible rather than assumed. A later conversion is an ADDITION to this
-## constant, never a silent widening of the evidence.
-const CONVERTED_UNIT_PACKAGES := ["10033_wild_elephant"]
-const CONVERTED_UNIT_PACKAGE_COUNT := 1
-const CONVERTED_BUILDING_PACKAGE_COUNT := 1
+## The committed converted unit package whose OWN BYTES this projection reads
+## and pins, named here so the evidence is visible rather than assumed. This is
+## the linkage EVIDENCE set, not the corpus: a later mass conversion adds
+## packages to the corpus without widening what has been read here, so a new
+## package is an addition to the committed counts below and never a silent
+## widening of the measured evidence. The measured coverage therefore stays one
+## unit whatever the corpus holds, and the suite re-derives the counts from the
+## committed tree on every run so neither can drift untested.
+const EVIDENCE_UNIT_PACKAGES := ["10033_wild_elephant"]
+const EVIDENCE_UNIT_PACKAGE_COUNT := 1
 
-## The one unit whose committed `img_name` names a committed converted package,
-## and therefore the whole measured coverage of this projection.
+## The committed converted package counts, re-measured over the working tree on
+## 2026-10-11 after the mass conversion (`asset-package-mass-conversion`, design
+## D1) committed 290 census-convertible packages on top of the two M4 ones.
+## Recorded as counts and not as transcribed stem lists on purpose: a pinned
+## COUNT is checkable against the committed directories every run, while a
+## transcribed list of 69 or 223 names would be an input that rots silently.
+const COMMITTED_UNIT_PACKAGE_COUNT := 69
+const COMMITTED_BUILDING_PACKAGE_COUNT := 223
+
+## The unit whose committed `img_name` names a committed converted package AND
+## whose package this projection reads in full, so the whole measured linkage
+## evidence is one unit. This is not the same claim as "only one committed unit
+## names a package": 69 do, and the corpus counts above say so.
 const COVERED_UNIT_LEGACY_ID := "933"
 const COVERED_UNIT_SPRITE_REFERENCE := "10033_wild_elephant"
-const COVERAGE_STATEMENT := ("THE PROJECTION'S COVERAGE IS EXACTLY ONE UNIT, AND "
-	+ "IT IS RECORDED RATHER THAN ASSUMED. Exactly ONE converted unit package is "
-	+ "committed - 10033_wild_elephant - and exactly ONE converted building "
-	+ "package, so no distribution over the 429 committed units is measurable at "
-	+ "all and NO claim is made for any unit other than the Wild Elephant. The "
-	+ "refusals generalise to all units as a statement about the LEGACY SOURCE, "
-	+ "not about the assets; the linkage evidence does not (design D5)")
+const COVERAGE_STATEMENT := ("THE PROJECTION'S MEASURED LINKAGE EVIDENCE IS EXACTLY "
+	+ "ONE UNIT, AND IT IS RECORDED RATHER THAN ASSUMED. Sixty-nine converted unit "
+	+ "packages and 223 converted building packages are committed, and 69 of the "
+	+ "429 committed units name one - so a distribution over the units IS now "
+	+ "measurable from the assets. It is NOT measured here: this projection reads "
+	+ "exactly ONE package's bytes - 10033_wild_elephant - so NO claim is made for "
+	+ "any unit other than the Wild Elephant, and the rest are committed content "
+	+ "this line leaves to whoever reads them. The refusals generalise to all units "
+	+ "as a statement about the LEGACY SOURCE, not about the assets; the linkage "
+	+ "evidence does not (design D5)")
 
 ## The committed units whose `img_name` is a COMMA-JOINED list rather than one
 ## sprite reference. They name **no single** asset, so the projection refuses
@@ -767,7 +794,7 @@ const ASSET_RECONVERTED := false
 const ASSET_MANUFACTURED := ("NO COVERAGE IS MANUFACTURED. No conversion or "
 	+ "extraction output is regenerated to cover another unit, the committed "
 	+ "conversion package and the registry manifests stay byte-identical, and "
-	+ "the projection's one-package coverage is recorded as exactly that (design D5)")
+	+ "the projection's MEASURED one-package coverage is recorded as exactly that (design D5)")
 
 # ---------------------------------------------------------------------------
 # The evidence's non-claims
@@ -789,16 +816,18 @@ const NON_CLAIMS := [
 		+ "have zero occurrences across the seven legacy modules",
 	"max_frame IS NOT ADOPTED AS A FRAME COUNT, A DURATION, A LOOP BOUND, OR A "
 		+ "STATE COUNT, and WHAT IT MEANS IS NOT CLAIMED: the measurement is one "
-		+ "data point over one committed converted package",
+		+ "data point over the one converted package this projection reads",
 	"NO LEGACY BRANCH SELECTS AN ANIMATION: the count of animation commands "
 		+ "among the dispatcher's 63 named branches is ZERO",
 	"NO ANIMATION IS PLAYED, ANIMATED, OR RENDERED, and the converted unit "
 		+ "package establishes asset and timeline LINKAGE ONLY, never playback "
 		+ "correctness, animation correctness, or visual fidelity",
-	"NO CLAIM IS MADE FOR ANY UNIT OTHER THAN THE ONE COMMITTED CONVERTED "
-		+ "PACKAGE, which is the only coverage measured: exactly one converted "
-		+ "unit package is committed, so no distribution over the corpus is "
-		+ "measurable at all",
+	"NO CLAIM IS MADE FOR ANY UNIT OTHER THAN THE ONE UNIT WHOSE CONVERTED "
+		+ "PACKAGE THIS PROJECTION READS (10033_wild_elephant), which is the only "
+		+ "coverage measured: sixty-nine converted unit packages are committed and "
+		+ "sixty-nine units name one, so a distribution is measurable from the "
+		+ "assets - it is simply not measured here, and reading another package "
+		+ "would be a different measurement rather than an extension of this one",
 	"NO EXECUTED-LEGACY FIXTURE WAS CAPTURED, and the reason is the ABSENCE OF "
 		+ "ANIMATION BEHAVIOUR in the legacy server rather than only a corpus "
 		+ "limitation",
@@ -855,7 +884,7 @@ const PROVENANCE := {
 			+ "unlike the properties flags, which are committed as STRINGS",
 			"evidence": "the measured variant type of every unit's max_frame "
 				+ "entry as the registry hands it over"},
-		{"fact": "the one committed converted unit package records a root "
+		{"fact": "the converted unit package this projection reads records a root "
 			+ "frame_count of 1, a frame_rate of 30.0, seven sprites - five at "
 			+ "20 frames and one at 7, all with no labels - and one sprite, id "
 			+ "63, at 29 frames carrying five labels",
@@ -871,8 +900,8 @@ const PROVENANCE := {
 			+ "the committed img_name equals the package's own legacy_id",
 			"evidence": "the committed package's own content_ref against its "
 				+ "own parse, compared in this same run by the suite"},
-		{"fact": "exactly one converted unit package and exactly one converted "
-			+ "building package are committed",
+		{"fact": "sixty-nine converted unit packages and 223 converted building "
+			+ "packages are committed, and 69 of the 429 committed units name one",
 			"evidence": "a read-only directory enumeration of "
 				+ "assets/converted/units and assets/converted/buildings"},
 		{"fact": "M4's recorded conversion limit for a unit is a per-sprite "
@@ -885,7 +914,8 @@ const PROVENANCE := {
 		{"fact": "the line's deliverable is an asset-linkage projection plus "
 			+ "auditable refusals rather than an animation mechanism",
 			"evidence": "derived (design D1): with zero animation commands, no "
-				+ "server-selected state, and one committed package, a mechanism "
+				+ "server-selected state, and one package this projection actually reads, a "
+			+ "mechanism "
 				+ "would be invented, while five recorded labels are exactly the "
 				+ "material a later line would reach for to build a state machine "
 				+ "with nothing to anchor it on"},
@@ -1317,7 +1347,9 @@ static func non_claims() -> Array:
 
 ## The measured asset coverage, with the converted package directories
 ## enumerated read-only so a later conversion is a visible addition here rather
-## than an assumption.
+## than an assumption. The measured corpus counts and the recorded expected
+## counts are BOTH reported, so a conversion that moves the corpus without
+## moving the recorded count is visible rather than absorbed.
 static func coverage_record() -> Dictionary:
 	return {
 		"converted_units_dir": CONVERTED_UNITS_DIR,
@@ -1325,8 +1357,10 @@ static func coverage_record() -> Dictionary:
 		"unit_packages": _package_names(CONVERTED_UNITS_DIR),
 		"unit_package_count": _package_names(CONVERTED_UNITS_DIR).size(),
 		"building_package_count": _package_names(CONVERTED_BUILDINGS_DIR).size(),
-		"unit_packages_recorded": (CONVERTED_UNIT_PACKAGES as Array).duplicate(),
-		"unit_package_count_recorded": CONVERTED_UNIT_PACKAGE_COUNT,
+		"unit_packages_recorded": (EVIDENCE_UNIT_PACKAGES as Array).duplicate(),
+		"unit_package_count_recorded": EVIDENCE_UNIT_PACKAGE_COUNT,
+		"unit_package_count_expected": COMMITTED_UNIT_PACKAGE_COUNT,
+		"building_package_count_expected": COMMITTED_BUILDING_PACKAGE_COUNT,
 		"covered_unit_legacy_id": COVERED_UNIT_LEGACY_ID,
 		"covered_unit_sprite_reference": COVERED_UNIT_SPRITE_REFERENCE,
 		"ambiguous_reference_units": (AMBIGUOUS_REFERENCE_UNITS as Array)

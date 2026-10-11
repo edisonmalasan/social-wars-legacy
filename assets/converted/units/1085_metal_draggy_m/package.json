@@ -1,0 +1,6580 @@
+{
+  "bitmaps": [
+    {
+      "bytes": 6351,
+      "character_id": 1,
+      "file": "assets/converted/images/1085_metal_draggy_m/1.jpg",
+      "sha256": "4482e1e74db21190104515e2e0e60213669f6cd98da6bcb44f094e0ef13f8b9f"
+    },
+    {
+      "bytes": 1145,
+      "character_id": 1,
+      "file": "assets/converted/images/1085_metal_draggy_m/1_alpha.png",
+      "sha256": "96c463e691a387fad04106450c630ecb0cb8626d97bd610973c6eeeeb89c0013"
+    },
+    {
+      "bytes": 6465,
+      "character_id": 3,
+      "file": "assets/converted/images/1085_metal_draggy_m/3.jpg",
+      "sha256": "c3dbdc6f9ff7391679a73c07674a1b3d6ac6b8ce5bf3eac3b327165ddc497a3e"
+    },
+    {
+      "bytes": 1396,
+      "character_id": 3,
+      "file": "assets/converted/images/1085_metal_draggy_m/3_alpha.png",
+      "sha256": "1979c54aad6acff883bbebaebbee2f0743a4011fdd122723dbb4ea8b8eeef32f"
+    },
+    {
+      "bytes": 5809,
+      "character_id": 5,
+      "file": "assets/converted/images/1085_metal_draggy_m/5.jpg",
+      "sha256": "9b3cf58f797ff912ef64639903f28b184579099b6c45ee036ed94b7020c9185e"
+    },
+    {
+      "bytes": 1315,
+      "character_id": 5,
+      "file": "assets/converted/images/1085_metal_draggy_m/5_alpha.png",
+      "sha256": "7d784d719bdc6bf66dcc2395dc20ef3e827299cc438134d2814580532c9b95a5"
+    },
+    {
+      "bytes": 4832,
+      "character_id": 7,
+      "file": "assets/converted/images/1085_metal_draggy_m/7.jpg",
+      "sha256": "17fd8dfd216c57649d8433af9e4e33962d04f6c396f23da7a2e6349c0d0ed2dc"
+    },
+    {
+      "bytes": 1060,
+      "character_id": 7,
+      "file": "assets/converted/images/1085_metal_draggy_m/7_alpha.png",
+      "sha256": "3ba612ee9cb0a4b27412ba740d4814b375492cc406a06ccfc3cf29b78824a8d0"
+    },
+    {
+      "bytes": 5894,
+      "character_id": 11,
+      "file": "assets/converted/images/1085_metal_draggy_m/11.jpg",
+      "sha256": "5444ce48b94947c0ef54be72c7aa37eb34d27151af9b6dc955507f25f461d01e"
+    },
+    {
+      "bytes": 943,
+      "character_id": 11,
+      "file": "assets/converted/images/1085_metal_draggy_m/11_alpha.png",
+      "sha256": "68e0e81e389a6d2e0d132163eec050e5889499360cbbdaa3040cd00acf9a3022"
+    },
+    {
+      "bytes": 5565,
+      "character_id": 13,
+      "file": "assets/converted/images/1085_metal_draggy_m/13.jpg",
+      "sha256": "13741fd1608c1b26ddfb2cb864e9a89ed3ee19602e1e4cdc8ba08b15ae6590b1"
+    },
+    {
+      "bytes": 989,
+      "character_id": 13,
+      "file": "assets/converted/images/1085_metal_draggy_m/13_alpha.png",
+      "sha256": "8ee52609e1f5bb2c27d01e35179e68f2a921d4edb2f0bfc385208704f45cb850"
+    },
+    {
+      "bytes": 5571,
+      "character_id": 15,
+      "file": "assets/converted/images/1085_metal_draggy_m/15.jpg",
+      "sha256": "b3b544480f6806196b25a7299664b66264430bab3b7ab3dfb6efceb4ead8ca61"
+    },
+    {
+      "bytes": 933,
+      "character_id": 15,
+      "file": "assets/converted/images/1085_metal_draggy_m/15_alpha.png",
+      "sha256": "eec8f9dcd83ee1e0a38841e12b3cc72b22bc3a5f22cd8d9873343f4e29b36717"
+    },
+    {
+      "bytes": 6301,
+      "character_id": 17,
+      "file": "assets/converted/images/1085_metal_draggy_m/17.jpg",
+      "sha256": "3e53572ca332980b0fff44b6ab9219d68e40bbce1e49c423c6b1fa9463eb417c"
+    },
+    {
+      "bytes": 1062,
+      "character_id": 17,
+      "file": "assets/converted/images/1085_metal_draggy_m/17_alpha.png",
+      "sha256": "925369efcfc9575e052b3ab464d8998fdf0f9e8c2c8608776c85df4c5291dd38"
+    },
+    {
+      "bytes": 5457,
+      "character_id": 20,
+      "file": "assets/converted/images/1085_metal_draggy_m/20.jpg",
+      "sha256": "4a81f04214afad52256b34d0bc14d02efbd942e1a7fce1de509bfa2664983714"
+    },
+    {
+      "bytes": 841,
+      "character_id": 20,
+      "file": "assets/converted/images/1085_metal_draggy_m/20_alpha.png",
+      "sha256": "17e75d9017135ca6de4fc401670259b7da5f2917bdc22718b6a087ae93d1eb0a"
+    },
+    {
+      "bytes": 5069,
+      "character_id": 22,
+      "file": "assets/converted/images/1085_metal_draggy_m/22.jpg",
+      "sha256": "7a3e492695a714c3c81f5fdb19cb9091083784e24614db6f0092c991b97730b5"
+    },
+    {
+      "bytes": 725,
+      "character_id": 22,
+      "file": "assets/converted/images/1085_metal_draggy_m/22_alpha.png",
+      "sha256": "d5d15722f86b0ba360d947d25b6e80ea26abb96bdc5d4d87edef8d535c8d298a"
+    },
+    {
+      "bytes": 4753,
+      "character_id": 24,
+      "file": "assets/converted/images/1085_metal_draggy_m/24.jpg",
+      "sha256": "62ab8585f12defd48acb0142c24cb54d386a8d7898466d933defc238b6348342"
+    },
+    {
+      "bytes": 647,
+      "character_id": 24,
+      "file": "assets/converted/images/1085_metal_draggy_m/24_alpha.png",
+      "sha256": "4f68ee1af071bc878cc10648e9b783dc4aaa0a8262dbcbb75572408148100aca"
+    },
+    {
+      "bytes": 4892,
+      "character_id": 26,
+      "file": "assets/converted/images/1085_metal_draggy_m/26.jpg",
+      "sha256": "bde2bfcedb14e0ec211b54b07d9fb0a73a9824cd8c5a497e75ded543a0e39962"
+    },
+    {
+      "bytes": 727,
+      "character_id": 26,
+      "file": "assets/converted/images/1085_metal_draggy_m/26_alpha.png",
+      "sha256": "b7d6963aa4cbe80a6de14492b13df1389d7e87d233266679ebabf0e30e08a7bf"
+    },
+    {
+      "bytes": 6525,
+      "character_id": 29,
+      "file": "assets/converted/images/1085_metal_draggy_m/29.jpg",
+      "sha256": "93d4e0c97088991c337c42132ebefcd53b4298937a391be30335fcc2345afe02"
+    },
+    {
+      "bytes": 1158,
+      "character_id": 29,
+      "file": "assets/converted/images/1085_metal_draggy_m/29_alpha.png",
+      "sha256": "6b6e1ed1b5927c8257d874e441a39df5f64fe809d559f12c8ab1e17046bdcae4"
+    },
+    {
+      "bytes": 6074,
+      "character_id": 31,
+      "file": "assets/converted/images/1085_metal_draggy_m/31.jpg",
+      "sha256": "02696720a2484624aa9ae80f3635e3bfb121f61ae65576a8133b1e249fa85baf"
+    },
+    {
+      "bytes": 1017,
+      "character_id": 31,
+      "file": "assets/converted/images/1085_metal_draggy_m/31_alpha.png",
+      "sha256": "18a5af42b5e40919d4abcc311f336fa0c684db2705d0b2cc4d28f6faa2c72bc4"
+    },
+    {
+      "bytes": 6076,
+      "character_id": 33,
+      "file": "assets/converted/images/1085_metal_draggy_m/33.jpg",
+      "sha256": "708fc8044fecedadbcb245514088224508ec3f3320518b9886735d0a5e225fde"
+    },
+    {
+      "bytes": 991,
+      "character_id": 33,
+      "file": "assets/converted/images/1085_metal_draggy_m/33_alpha.png",
+      "sha256": "59974765cad726fedac9be818374f632fa1bd156e2353e8a7034737731049cd3"
+    },
+    {
+      "bytes": 5823,
+      "character_id": 35,
+      "file": "assets/converted/images/1085_metal_draggy_m/35.jpg",
+      "sha256": "c8810cb56d1f1caa18d47fe4be0c4d7dee89d6891e0bdc96cb6134e9b4cf1540"
+    },
+    {
+      "bytes": 883,
+      "character_id": 35,
+      "file": "assets/converted/images/1085_metal_draggy_m/35_alpha.png",
+      "sha256": "122653016da81a8ec4cf5f70435810d4e4a459baca0e711561bc717f84d20b68"
+    },
+    {
+      "bytes": 6595,
+      "character_id": 38,
+      "file": "assets/converted/images/1085_metal_draggy_m/38.jpg",
+      "sha256": "c3dd2967c38eb888060dca9a40c7224792531cdd07ec7041b6bb68dbd7216957"
+    },
+    {
+      "bytes": 1300,
+      "character_id": 38,
+      "file": "assets/converted/images/1085_metal_draggy_m/38_alpha.png",
+      "sha256": "33d742cf26402243a1bc32e4695cfa143771abda2392e64efdfd2a6dc85017c8"
+    },
+    {
+      "bytes": 6524,
+      "character_id": 40,
+      "file": "assets/converted/images/1085_metal_draggy_m/40.jpg",
+      "sha256": "cec46585658930653a67381a790899dceb9cb4bf89238e46d6746be425990d44"
+    },
+    {
+      "bytes": 1255,
+      "character_id": 40,
+      "file": "assets/converted/images/1085_metal_draggy_m/40_alpha.png",
+      "sha256": "cc22f8c6a12fea86c8fd49e587e632937f269641d3b873c5016699e88a9003cd"
+    },
+    {
+      "bytes": 5912,
+      "character_id": 42,
+      "file": "assets/converted/images/1085_metal_draggy_m/42.jpg",
+      "sha256": "ba7fe8d0421202fab96f780c6bf07124bc2c6f217800fc177b818d1a598de714"
+    },
+    {
+      "bytes": 1110,
+      "character_id": 42,
+      "file": "assets/converted/images/1085_metal_draggy_m/42_alpha.png",
+      "sha256": "f4ef9bed9de1ee533b73a3f4b4da4c8e25e45054d7eb8ba3dc86fdc7bff02cb7"
+    },
+    {
+      "bytes": 5730,
+      "character_id": 44,
+      "file": "assets/converted/images/1085_metal_draggy_m/44.jpg",
+      "sha256": "3f892de00a94ebf226f08e0792de1191b3c80e9b6b8e9b39f3b8bdf40d251760"
+    },
+    {
+      "bytes": 1006,
+      "character_id": 44,
+      "file": "assets/converted/images/1085_metal_draggy_m/44_alpha.png",
+      "sha256": "c4da254e1cb4698ff89a69a31eaa01e48f1fde79a3eed01a259d41f36831bfae"
+    },
+    {
+      "bytes": 6378,
+      "character_id": 47,
+      "file": "assets/converted/images/1085_metal_draggy_m/47.jpg",
+      "sha256": "b318ebb9ffa9a053f61261a75809c4ba7310e2e6b2f03b76d4b7216aa913bba5"
+    },
+    {
+      "bytes": 1152,
+      "character_id": 47,
+      "file": "assets/converted/images/1085_metal_draggy_m/47_alpha.png",
+      "sha256": "fc7750ccbe0d962284388cbe17c68c817a4d5b7baf4fe6b54f33dfa5101e9a16"
+    },
+    {
+      "bytes": 6621,
+      "character_id": 50,
+      "file": "assets/converted/images/1085_metal_draggy_m/50.jpg",
+      "sha256": "3a6f96d59120de7253578be429a9f5d9c762afe109e10eba7544a20d5d4ec0db"
+    },
+    {
+      "bytes": 1274,
+      "character_id": 50,
+      "file": "assets/converted/images/1085_metal_draggy_m/50_alpha.png",
+      "sha256": "2e1beb94f34546dc49dded9f7145c57042139b4b53884ff54274fb09fa3613ed"
+    },
+    {
+      "bytes": 7030,
+      "character_id": 52,
+      "file": "assets/converted/images/1085_metal_draggy_m/52.jpg",
+      "sha256": "66faad8cb864e3dbb313e6b7020f408aed4ddc645aed721f3d63a33651f3f86c"
+    },
+    {
+      "bytes": 1472,
+      "character_id": 52,
+      "file": "assets/converted/images/1085_metal_draggy_m/52_alpha.png",
+      "sha256": "10d7e44e3d83088a07e634115aaa2a60767b0ebb6ca9d7587d4b4fa6bc992eb8"
+    },
+    {
+      "bytes": 7047,
+      "character_id": 54,
+      "file": "assets/converted/images/1085_metal_draggy_m/54.jpg",
+      "sha256": "07e4bdb6edbb38d0c19ab31ba4be0c71d32d36a3e24a08b7919f392af383fd08"
+    },
+    {
+      "bytes": 1543,
+      "character_id": 54,
+      "file": "assets/converted/images/1085_metal_draggy_m/54_alpha.png",
+      "sha256": "f03a3052b27a724f1272465e0fd17317e230f0559d18ac553d571d5ffd5db4e7"
+    },
+    {
+      "bytes": 7428,
+      "character_id": 56,
+      "file": "assets/converted/images/1085_metal_draggy_m/56.jpg",
+      "sha256": "4890c4ff65e807d1136b8ee094288693699b9f11eafe45ccfd97ffa1c47a53e5"
+    },
+    {
+      "bytes": 2234,
+      "character_id": 56,
+      "file": "assets/converted/images/1085_metal_draggy_m/56_alpha.png",
+      "sha256": "fde559e713c0d992c77873f203183127c085bef25505e408f04cfb97a24dcbfd"
+    },
+    {
+      "bytes": 7446,
+      "character_id": 58,
+      "file": "assets/converted/images/1085_metal_draggy_m/58.jpg",
+      "sha256": "bd0d5ee0bb14f7fcea34eebd95cd4be4d30d06e30f3e2c03f9b94f9dc456257c"
+    },
+    {
+      "bytes": 2310,
+      "character_id": 58,
+      "file": "assets/converted/images/1085_metal_draggy_m/58_alpha.png",
+      "sha256": "fd9a644a36f65ee12d20352773cc7c9caa9f975ae94596c1ede58a67ce42b7bb"
+    },
+    {
+      "bytes": 7472,
+      "character_id": 60,
+      "file": "assets/converted/images/1085_metal_draggy_m/60.jpg",
+      "sha256": "a8ba554dd74b269c81a4876d209f6da97c0f7140bb55b85cc64f9d79165b45ad"
+    },
+    {
+      "bytes": 2386,
+      "character_id": 60,
+      "file": "assets/converted/images/1085_metal_draggy_m/60_alpha.png",
+      "sha256": "9706fbb556026a3ec6c1ef96065697c11086b50c5efe589de25f7f928db72a44"
+    },
+    {
+      "bytes": 7335,
+      "character_id": 62,
+      "file": "assets/converted/images/1085_metal_draggy_m/62.jpg",
+      "sha256": "36f309054d5a70e2714277f462f2327161d5d1db2965da2e72ad50471b98f1e6"
+    },
+    {
+      "bytes": 2320,
+      "character_id": 62,
+      "file": "assets/converted/images/1085_metal_draggy_m/62_alpha.png",
+      "sha256": "b0cbf403fc8004368c8f0cd8747a1e4ce4d102ca202db7ef27e876bad6dc9910"
+    },
+    {
+      "bytes": 7039,
+      "character_id": 64,
+      "file": "assets/converted/images/1085_metal_draggy_m/64.jpg",
+      "sha256": "9d09573b9f8bd535133289c93be33ae45d2e4b93368f1eb7816aef3b71088d70"
+    },
+    {
+      "bytes": 1525,
+      "character_id": 64,
+      "file": "assets/converted/images/1085_metal_draggy_m/64_alpha.png",
+      "sha256": "2b00666f1c94e4a30382c7208399664d57610a1f5f2fc9a3986e3beb6a728499"
+    },
+    {
+      "bytes": 6097,
+      "character_id": 67,
+      "file": "assets/converted/images/1085_metal_draggy_m/67.jpg",
+      "sha256": "8501ab2c2816b73c067eb64e2757b361aca03f002f7bb986cbf5f659b105584d"
+    },
+    {
+      "bytes": 1021,
+      "character_id": 67,
+      "file": "assets/converted/images/1085_metal_draggy_m/67_alpha.png",
+      "sha256": "4d78add9dbc0e632575189397690ecb4aa2f2643ac8116b65a750e5ba78c8dcc"
+    },
+    {
+      "bytes": 6146,
+      "character_id": 69,
+      "file": "assets/converted/images/1085_metal_draggy_m/69.jpg",
+      "sha256": "2c317c425fa2a486bec4090d254e31b042d0b67a7d560b132416d7dcc3a26852"
+    },
+    {
+      "bytes": 1085,
+      "character_id": 69,
+      "file": "assets/converted/images/1085_metal_draggy_m/69_alpha.png",
+      "sha256": "1d5098d9ec49b1607868480de7bf270acafb6e4b7293795d9ba0d85ff8b7dbda"
+    },
+    {
+      "bytes": 6544,
+      "character_id": 71,
+      "file": "assets/converted/images/1085_metal_draggy_m/71.jpg",
+      "sha256": "b12b46d0a7dd71ec0cf77c296efc5123bab5bdb91b7f78838748bc2b153781dd"
+    },
+    {
+      "bytes": 1138,
+      "character_id": 71,
+      "file": "assets/converted/images/1085_metal_draggy_m/71_alpha.png",
+      "sha256": "7bbc465ab15ca62b8a433459a6de65e494729dbedda5614f67bd9716290e00b1"
+    },
+    {
+      "bytes": 6993,
+      "character_id": 73,
+      "file": "assets/converted/images/1085_metal_draggy_m/73.jpg",
+      "sha256": "1edcbda0386f6192e001860c2e62df6e57003afd069e9474eaf7f356d06eabe1"
+    },
+    {
+      "bytes": 1484,
+      "character_id": 73,
+      "file": "assets/converted/images/1085_metal_draggy_m/73_alpha.png",
+      "sha256": "ed7709be23e613cb24222608dc0b59a3e740bd2aa54d5d1512ffd65d77c8493b"
+    },
+    {
+      "bytes": 7629,
+      "character_id": 75,
+      "file": "assets/converted/images/1085_metal_draggy_m/75.jpg",
+      "sha256": "b056423151443943345a495a5726db31ebd7595dbe1d0645230a49d40a7d7c6b"
+    },
+    {
+      "bytes": 2183,
+      "character_id": 75,
+      "file": "assets/converted/images/1085_metal_draggy_m/75_alpha.png",
+      "sha256": "f94d8eb291588bcfc473e33caf1f46f0e490604402e3d44b38a7548556d16b16"
+    },
+    {
+      "bytes": 7594,
+      "character_id": 77,
+      "file": "assets/converted/images/1085_metal_draggy_m/77.jpg",
+      "sha256": "745c174a2ba82b7dbe174456f9a435a47cf54a80f15d7e69eca8a92dbd5c1fa5"
+    },
+    {
+      "bytes": 2481,
+      "character_id": 77,
+      "file": "assets/converted/images/1085_metal_draggy_m/77_alpha.png",
+      "sha256": "7d09bd1fecc5561f9c861669c1b8e813533cbfdf568c8a118635743fb9d93560"
+    },
+    {
+      "bytes": 7645,
+      "character_id": 79,
+      "file": "assets/converted/images/1085_metal_draggy_m/79.jpg",
+      "sha256": "1c6f2a678fc1a7b48112847bd822230521ccb7e90d3f8a66908977942fff4ac2"
+    },
+    {
+      "bytes": 2753,
+      "character_id": 79,
+      "file": "assets/converted/images/1085_metal_draggy_m/79_alpha.png",
+      "sha256": "1e83d6cc79a3e84dd441fb5efbbcbb0cc9838574a1d8a4d0ee3183af973b9ee4"
+    },
+    {
+      "bytes": 7325,
+      "character_id": 81,
+      "file": "assets/converted/images/1085_metal_draggy_m/81.jpg",
+      "sha256": "76292dcd192bda051b1d15bd11f6c5e52dc2f17f7a5e2a221d01cc89e74de924"
+    },
+    {
+      "bytes": 2623,
+      "character_id": 81,
+      "file": "assets/converted/images/1085_metal_draggy_m/81_alpha.png",
+      "sha256": "ebe669905008b4a7c1f45893a4401cc8d3ddb4d97ddcf03d4f37b3b742fe485b"
+    },
+    {
+      "bytes": 6702,
+      "character_id": 83,
+      "file": "assets/converted/images/1085_metal_draggy_m/83.jpg",
+      "sha256": "e2f196434efebc1f9d9e5b0cf147ca26197398b0f3577e3642f6bbbfb6d03409"
+    },
+    {
+      "bytes": 1555,
+      "character_id": 83,
+      "file": "assets/converted/images/1085_metal_draggy_m/83_alpha.png",
+      "sha256": "766c8431f0fb2f69a6cfb89af59ced8a86124fa4f5365749ff77c5b552f72b38"
+    },
+    {
+      "bytes": 5458,
+      "character_id": 86,
+      "file": "assets/converted/images/1085_metal_draggy_m/86.jpg",
+      "sha256": "48a5cdce28c6b6e570a640256d5616c1b2aa5d4f772d2323a4d8fe33fba246b5"
+    },
+    {
+      "bytes": 851,
+      "character_id": 86,
+      "file": "assets/converted/images/1085_metal_draggy_m/86_alpha.png",
+      "sha256": "db505f4029a319cac2ed7c70bf0e410326df6f03f38a3465b7e77a616cc9750d"
+    },
+    {
+      "bytes": 5479,
+      "character_id": 88,
+      "file": "assets/converted/images/1085_metal_draggy_m/88.jpg",
+      "sha256": "e70bed1a0d295176ec138f7f9c5d73cb462211c672b3fef6aaa38b75e3b325dd"
+    },
+    {
+      "bytes": 812,
+      "character_id": 88,
+      "file": "assets/converted/images/1085_metal_draggy_m/88_alpha.png",
+      "sha256": "fbfb6a88c54dd4357a264a4d2a1595bbb4bc312f0feb80638ee9bf17849c9a64"
+    },
+    {
+      "bytes": 5878,
+      "character_id": 90,
+      "file": "assets/converted/images/1085_metal_draggy_m/90.jpg",
+      "sha256": "56ddbbc07af3971c73d10b92c34850ec51cc80384f8a842898edfd8fe7afb1b7"
+    },
+    {
+      "bytes": 963,
+      "character_id": 90,
+      "file": "assets/converted/images/1085_metal_draggy_m/90_alpha.png",
+      "sha256": "94a65e8295d4c4d492d0f7cf344245d2d5a2223c631309df39b02385e545177c"
+    },
+    {
+      "bytes": 6347,
+      "character_id": 92,
+      "file": "assets/converted/images/1085_metal_draggy_m/92.jpg",
+      "sha256": "c7866e31f8359c88028354dcf0584fb4117e08daf68318a69e286e9097f99d8e"
+    },
+    {
+      "bytes": 1370,
+      "character_id": 92,
+      "file": "assets/converted/images/1085_metal_draggy_m/92_alpha.png",
+      "sha256": "72b048693f7ede3b9cb4c21798a9ec259e665b7fc0dfd3f9eb25c738d81c7094"
+    },
+    {
+      "bytes": 6968,
+      "character_id": 94,
+      "file": "assets/converted/images/1085_metal_draggy_m/94.jpg",
+      "sha256": "824654c949e0ce515bd957a7af922d0099ee24fbed5dc41dcfff1b01a6054586"
+    },
+    {
+      "bytes": 2095,
+      "character_id": 94,
+      "file": "assets/converted/images/1085_metal_draggy_m/94_alpha.png",
+      "sha256": "a1e17e98e80f2e52e5fc71e32810edf9f4e4aeb9094c50d39f594839d3b38efe"
+    },
+    {
+      "bytes": 7038,
+      "character_id": 96,
+      "file": "assets/converted/images/1085_metal_draggy_m/96.jpg",
+      "sha256": "17e9c3b01394d5d39d1fc726c46a45d8d3305ee0b25af28d0032d2f143352c9f"
+    },
+    {
+      "bytes": 2356,
+      "character_id": 96,
+      "file": "assets/converted/images/1085_metal_draggy_m/96_alpha.png",
+      "sha256": "abeaf8b36c6631bc972c77269d7cdca57182f07f2e759d906c09230a98c52f6d"
+    },
+    {
+      "bytes": 7148,
+      "character_id": 98,
+      "file": "assets/converted/images/1085_metal_draggy_m/98.jpg",
+      "sha256": "3a64f6cc920307a553e4906ca646487607eee16c75834095ba23fccbec0da676"
+    },
+    {
+      "bytes": 2701,
+      "character_id": 98,
+      "file": "assets/converted/images/1085_metal_draggy_m/98_alpha.png",
+      "sha256": "60a03f2a35831b5bb3606cef0bcb2904e4342a3850c1af162f1631fd23378865"
+    },
+    {
+      "bytes": 6904,
+      "character_id": 100,
+      "file": "assets/converted/images/1085_metal_draggy_m/100.jpg",
+      "sha256": "6775a74e11fdb66ae1df58e81ab822263c4c12459d13db386f6e7253c929a0b7"
+    },
+    {
+      "bytes": 2792,
+      "character_id": 100,
+      "file": "assets/converted/images/1085_metal_draggy_m/100_alpha.png",
+      "sha256": "f8bce3456c4282857988cfe70314080f52c39bd8cbcc5855341ab8e875366b63"
+    },
+    {
+      "bytes": 6185,
+      "character_id": 102,
+      "file": "assets/converted/images/1085_metal_draggy_m/102.jpg",
+      "sha256": "beb98899ef60384deaa736eec53d53766122a07d22e9fbdbf3c30a86589a4c23"
+    },
+    {
+      "bytes": 1624,
+      "character_id": 102,
+      "file": "assets/converted/images/1085_metal_draggy_m/102_alpha.png",
+      "sha256": "bc242db4a64c2e2f0025e639be500bfd0f6a45855f6b0936fc3cef7af52b3591"
+    },
+    {
+      "bytes": 6752,
+      "character_id": 105,
+      "file": "assets/converted/images/1085_metal_draggy_m/105.jpg",
+      "sha256": "28d42438401ba9b610842c07503e3e2a18b74f7bdbac0608a08eda8a2056ee6b"
+    },
+    {
+      "bytes": 1122,
+      "character_id": 105,
+      "file": "assets/converted/images/1085_metal_draggy_m/105_alpha.png",
+      "sha256": "2100f5ec850b02523177a8aa7d220ed789870d75ece58fea88424a8a84d09b74"
+    },
+    {
+      "bytes": 6760,
+      "character_id": 107,
+      "file": "assets/converted/images/1085_metal_draggy_m/107.jpg",
+      "sha256": "68c14e79ca07be6e197286b1be5ef9f69ab6f5ab08db6b887e9c71f37c7960d6"
+    },
+    {
+      "bytes": 1094,
+      "character_id": 107,
+      "file": "assets/converted/images/1085_metal_draggy_m/107_alpha.png",
+      "sha256": "624719f28498898856e3e98b55093d3e5b699f96169ddbcf19e09b43d4f0c40f"
+    },
+    {
+      "bytes": 6892,
+      "character_id": 109,
+      "file": "assets/converted/images/1085_metal_draggy_m/109.jpg",
+      "sha256": "4e060d8f7b6ff4f7f03ad1bce1ffc7ed02273bfb5ffcddf08dc7d91dae350fe7"
+    },
+    {
+      "bytes": 1106,
+      "character_id": 109,
+      "file": "assets/converted/images/1085_metal_draggy_m/109_alpha.png",
+      "sha256": "d20347936392e998fd94c2651f04b9b254e6a3bc28df555d42732ecf6e1ed95d"
+    },
+    {
+      "bytes": 7191,
+      "character_id": 111,
+      "file": "assets/converted/images/1085_metal_draggy_m/111.jpg",
+      "sha256": "49dfbb03016766b5d8fcdbe3f85576927dc285b3d62cfd4649912c479a9a0069"
+    },
+    {
+      "bytes": 1415,
+      "character_id": 111,
+      "file": "assets/converted/images/1085_metal_draggy_m/111_alpha.png",
+      "sha256": "90f4d0f5f46ba34955b4a17e7ed8e1ee46c3e258e6efded909abe3785f57b7ee"
+    },
+    {
+      "bytes": 7793,
+      "character_id": 113,
+      "file": "assets/converted/images/1085_metal_draggy_m/113.jpg",
+      "sha256": "595a118771a70984f29eb3c83352ed7bcfdb31b983bc1f9fe389e7482d03badc"
+    },
+    {
+      "bytes": 2217,
+      "character_id": 113,
+      "file": "assets/converted/images/1085_metal_draggy_m/113_alpha.png",
+      "sha256": "5fa9b000734bb511b5d04c8e5dec7bba891409fdac2509534ac5279333b00c71"
+    },
+    {
+      "bytes": 7995,
+      "character_id": 115,
+      "file": "assets/converted/images/1085_metal_draggy_m/115.jpg",
+      "sha256": "d841f69e0225bb3aa309bb41ef2eb245be62c3cc627d8e2de739ea658a1dd03e"
+    },
+    {
+      "bytes": 2355,
+      "character_id": 115,
+      "file": "assets/converted/images/1085_metal_draggy_m/115_alpha.png",
+      "sha256": "5c3dd7f907d800c90f6d6af0087608590b57e9f789826b0ea23adc9ad8b5598b"
+    },
+    {
+      "bytes": 8067,
+      "character_id": 117,
+      "file": "assets/converted/images/1085_metal_draggy_m/117.jpg",
+      "sha256": "24125366d87515f7bf2668f3aa2851460781b1d3c05380e87e85e4b26ca51f69"
+    },
+    {
+      "bytes": 2711,
+      "character_id": 117,
+      "file": "assets/converted/images/1085_metal_draggy_m/117_alpha.png",
+      "sha256": "4fa75d9f4c7244698cdcfe4df2076317cefeaadff036062d157f83be791f04d4"
+    },
+    {
+      "bytes": 7883,
+      "character_id": 119,
+      "file": "assets/converted/images/1085_metal_draggy_m/119.jpg",
+      "sha256": "51bcecf1fc64a2e43b402cf74355a1cdb93ad3c7b8a2fd2af40b6aab6cfd1e7f"
+    },
+    {
+      "bytes": 2704,
+      "character_id": 119,
+      "file": "assets/converted/images/1085_metal_draggy_m/119_alpha.png",
+      "sha256": "27a386dcd506db19320f1108c2df1c6079afe50170e1ce7e485ce217ff2753b8"
+    },
+    {
+      "bytes": 7181,
+      "character_id": 121,
+      "file": "assets/converted/images/1085_metal_draggy_m/121.jpg",
+      "sha256": "ed6314f34a76b23c75ca2ac9530ea78f27839fa730796eca05f5446cb4618b7e"
+    },
+    {
+      "bytes": 1567,
+      "character_id": 121,
+      "file": "assets/converted/images/1085_metal_draggy_m/121_alpha.png",
+      "sha256": "eb94fffbc3d9a3fd74fa173984478f661ec854308f182677d7b15e6b98e60a9f"
+    },
+    {
+      "bytes": 6602,
+      "character_id": 124,
+      "file": "assets/converted/images/1085_metal_draggy_m/124.jpg",
+      "sha256": "e5aeb8bb2c160c6ba2e7c0e79a6d847df4bc117663c840fc57d2ec4f0b154deb"
+    },
+    {
+      "bytes": 1289,
+      "character_id": 124,
+      "file": "assets/converted/images/1085_metal_draggy_m/124_alpha.png",
+      "sha256": "f5ddb7692e79acdb3a9dd3d40c239163f62af8e0bd3dae2e3bbfb3ee466be7f7"
+    },
+    {
+      "bytes": 6413,
+      "character_id": 126,
+      "file": "assets/converted/images/1085_metal_draggy_m/126.jpg",
+      "sha256": "56d6cee94304e42686d84ad98f837ca5d6a88115fd142fc732fa5a173b848e81"
+    },
+    {
+      "bytes": 1273,
+      "character_id": 126,
+      "file": "assets/converted/images/1085_metal_draggy_m/126_alpha.png",
+      "sha256": "164ae03fb9c40cf4fb523ac53b730c911dea3648e922202993d36a424f924fe3"
+    },
+    {
+      "bytes": 6029,
+      "character_id": 128,
+      "file": "assets/converted/images/1085_metal_draggy_m/128.jpg",
+      "sha256": "feee1d577d81db2a7f2a6e8d77b0831612b066bb93b3f48d133f9040347d32f5"
+    },
+    {
+      "bytes": 1290,
+      "character_id": 128,
+      "file": "assets/converted/images/1085_metal_draggy_m/128_alpha.png",
+      "sha256": "40556992385b03f1ef6888c3ff696a386d5cd136790fbad6be9bd98774872557"
+    },
+    {
+      "bytes": 6417,
+      "character_id": 130,
+      "file": "assets/converted/images/1085_metal_draggy_m/130.jpg",
+      "sha256": "a22f6f9befb26288360be2a82d3cfbcad8f95b8480ee49bf739176d2094cb84e"
+    },
+    {
+      "bytes": 1597,
+      "character_id": 130,
+      "file": "assets/converted/images/1085_metal_draggy_m/130_alpha.png",
+      "sha256": "9642731e3d2ab9295ef392ca4b7bc7a16db54f029f334091d128e42e5fe5f23b"
+    },
+    {
+      "bytes": 6988,
+      "character_id": 132,
+      "file": "assets/converted/images/1085_metal_draggy_m/132.jpg",
+      "sha256": "d4ef95d79e70aa549b6bb22e54b8dda39ced81429c90d1501924a95b24bb05d0"
+    },
+    {
+      "bytes": 2387,
+      "character_id": 132,
+      "file": "assets/converted/images/1085_metal_draggy_m/132_alpha.png",
+      "sha256": "7b4e1cbc11ba24734aa43bb474e6d0c42ad87233ffdeac91805c3706ee1818e7"
+    },
+    {
+      "bytes": 7062,
+      "character_id": 134,
+      "file": "assets/converted/images/1085_metal_draggy_m/134.jpg",
+      "sha256": "3891d0d84acaab6aa4550d5c8c1224e9170d719c7067e06c8cc8cb6972d8d1cd"
+    },
+    {
+      "bytes": 2613,
+      "character_id": 134,
+      "file": "assets/converted/images/1085_metal_draggy_m/134_alpha.png",
+      "sha256": "7fbebcc148061d0586c4c23cb4a65db217bd7f5c89f8c570a264f6370323c070"
+    },
+    {
+      "bytes": 7233,
+      "character_id": 136,
+      "file": "assets/converted/images/1085_metal_draggy_m/136.jpg",
+      "sha256": "4c840f91b7eb6558f0eaac37e4abfe333226d950bd04620ea10257014b432d14"
+    },
+    {
+      "bytes": 2856,
+      "character_id": 136,
+      "file": "assets/converted/images/1085_metal_draggy_m/136_alpha.png",
+      "sha256": "644926fdd9bc12e93c62180a638e1e5c2b41500647f4031061cc6d58c061ed03"
+    },
+    {
+      "bytes": 7013,
+      "character_id": 138,
+      "file": "assets/converted/images/1085_metal_draggy_m/138.jpg",
+      "sha256": "3e28b91bd9f0a590857e65f7295fc9f757084587274f7410763a4bdfb14e7514"
+    },
+    {
+      "bytes": 2840,
+      "character_id": 138,
+      "file": "assets/converted/images/1085_metal_draggy_m/138_alpha.png",
+      "sha256": "8513434a6dbfbfc3de85beb6bc058f457b4329849635fe0570ab4faaefe54eb9"
+    },
+    {
+      "bytes": 6325,
+      "character_id": 140,
+      "file": "assets/converted/images/1085_metal_draggy_m/140.jpg",
+      "sha256": "1499443bdba08a4987b320333a04ae1979c04dcca4ed831958b97e4109580dbd"
+    },
+    {
+      "bytes": 1770,
+      "character_id": 140,
+      "file": "assets/converted/images/1085_metal_draggy_m/140_alpha.png",
+      "sha256": "0aef632b85a0429540672aacac651c94589a1a5d019d3c722264f12c206d4f3e"
+    },
+    {
+      "bytes": 6331,
+      "character_id": 143,
+      "file": "assets/converted/images/1085_metal_draggy_m/143.jpg",
+      "sha256": "2d4b44a395ccc84e3bc80bf587eb495d9d602f505136471c36ae3bcd6d79acd9"
+    },
+    {
+      "bytes": 1086,
+      "character_id": 143,
+      "file": "assets/converted/images/1085_metal_draggy_m/143_alpha.png",
+      "sha256": "13b51a9dd9ea4701e01abc1e9a3a5d615a720744462250aee8b5080ae26757ae"
+    },
+    {
+      "bytes": 6190,
+      "character_id": 145,
+      "file": "assets/converted/images/1085_metal_draggy_m/145.jpg",
+      "sha256": "8b9ac93151687f83298d59e98532b3a5c9bc8688feabd05d11426fcfc285b252"
+    },
+    {
+      "bytes": 1083,
+      "character_id": 145,
+      "file": "assets/converted/images/1085_metal_draggy_m/145_alpha.png",
+      "sha256": "ead0d5dcaa9c446afb179c2117536440edd730bbb74cc445cbd780c790ffacbd"
+    },
+    {
+      "bytes": 6086,
+      "character_id": 147,
+      "file": "assets/converted/images/1085_metal_draggy_m/147.jpg",
+      "sha256": "283fff32710a5788c3bb9e751b70d7bd0d39568dbb6514cfbcaf3f5e9bfdba2e"
+    },
+    {
+      "bytes": 1017,
+      "character_id": 147,
+      "file": "assets/converted/images/1085_metal_draggy_m/147_alpha.png",
+      "sha256": "f968353a84e2c7fec2756e8795a8b583de03843079726747350a5c86f07ae090"
+    },
+    {
+      "bytes": 5398,
+      "character_id": 149,
+      "file": "assets/converted/images/1085_metal_draggy_m/149.jpg",
+      "sha256": "03bc0d4f561883b9a168ff325598ecfb797f0de5842fe068cb58e7fdb979c016"
+    },
+    {
+      "bytes": 743,
+      "character_id": 149,
+      "file": "assets/converted/images/1085_metal_draggy_m/149_alpha.png",
+      "sha256": "2d7d43463dbb7ad1d77071508b8832deee551cf181112f27fdbe8fdb73521f61"
+    },
+    {
+      "bytes": 7814,
+      "character_id": 151,
+      "file": "assets/converted/images/1085_metal_draggy_m/151.jpg",
+      "sha256": "6dd8a35986e6d8ecfd0600fd8fff394b67adf2cd72e341e262c2e339a47a8401"
+    },
+    {
+      "bytes": 3634,
+      "character_id": 151,
+      "file": "assets/converted/images/1085_metal_draggy_m/151_alpha.png",
+      "sha256": "c1f4649159e1c652df256e1c5625d516acdf8a0fba0b6a91cab06df84d96a4eb"
+    },
+    {
+      "bytes": 7814,
+      "character_id": 153,
+      "file": "assets/converted/images/1085_metal_draggy_m/153.jpg",
+      "sha256": "6dd8a35986e6d8ecfd0600fd8fff394b67adf2cd72e341e262c2e339a47a8401"
+    },
+    {
+      "bytes": 3634,
+      "character_id": 153,
+      "file": "assets/converted/images/1085_metal_draggy_m/153_alpha.png",
+      "sha256": "c1f4649159e1c652df256e1c5625d516acdf8a0fba0b6a91cab06df84d96a4eb"
+    },
+    {
+      "bytes": 22807,
+      "character_id": 155,
+      "file": "assets/converted/images/1085_metal_draggy_m/155.jpg",
+      "sha256": "33c95959fd96fbf6ef1a01f84ac5ec44522f089550a4895984dc2738ee4de64e"
+    },
+    {
+      "bytes": 14856,
+      "character_id": 155,
+      "file": "assets/converted/images/1085_metal_draggy_m/155_alpha.png",
+      "sha256": "661e1cec87103fd37b51f9ae1d4957638f78ac2e7176e9f72f1d542bfe316968"
+    },
+    {
+      "bytes": 22807,
+      "character_id": 157,
+      "file": "assets/converted/images/1085_metal_draggy_m/157.jpg",
+      "sha256": "33c95959fd96fbf6ef1a01f84ac5ec44522f089550a4895984dc2738ee4de64e"
+    },
+    {
+      "bytes": 14856,
+      "character_id": 157,
+      "file": "assets/converted/images/1085_metal_draggy_m/157_alpha.png",
+      "sha256": "661e1cec87103fd37b51f9ae1d4957638f78ac2e7176e9f72f1d542bfe316968"
+    },
+    {
+      "bytes": 12671,
+      "character_id": 159,
+      "file": "assets/converted/images/1085_metal_draggy_m/159.jpg",
+      "sha256": "e7f467249cb299fe5c11ea76f2a328a7fdd7393db274912f3ed0e93070e7f6a3"
+    },
+    {
+      "bytes": 9052,
+      "character_id": 159,
+      "file": "assets/converted/images/1085_metal_draggy_m/159_alpha.png",
+      "sha256": "23d52558049685693fb34768496802b572facc81591562b8a7f25fbb1b4439ae"
+    },
+    {
+      "bytes": 13062,
+      "character_id": 161,
+      "file": "assets/converted/images/1085_metal_draggy_m/161.jpg",
+      "sha256": "b61bb580c0fe364d3c34e23c2026ff6e8593c39fea91ae1c7e5ebbff23ff44e7"
+    },
+    {
+      "bytes": 8295,
+      "character_id": 161,
+      "file": "assets/converted/images/1085_metal_draggy_m/161_alpha.png",
+      "sha256": "18436ca6435253155bafe3e99905eb480b052aedd1dc8ff59068b054627b9ad0"
+    },
+    {
+      "bytes": 11848,
+      "character_id": 163,
+      "file": "assets/converted/images/1085_metal_draggy_m/163.jpg",
+      "sha256": "d62f8c3a97594bd42dfaae4b0e1c2fefab07ddcb057237c07cbc471b99f9fe59"
+    },
+    {
+      "bytes": 8265,
+      "character_id": 163,
+      "file": "assets/converted/images/1085_metal_draggy_m/163_alpha.png",
+      "sha256": "c8dfad912a98c290c8cc1a9969dc7324fe9a56015fdce86c2086e31f6a367d24"
+    },
+    {
+      "bytes": 10832,
+      "character_id": 165,
+      "file": "assets/converted/images/1085_metal_draggy_m/165.jpg",
+      "sha256": "aec8bf45a28061a176469f2be28ad4e1cd759ecdbf87aa9ec0b9659b88c904a0"
+    },
+    {
+      "bytes": 8660,
+      "character_id": 165,
+      "file": "assets/converted/images/1085_metal_draggy_m/165_alpha.png",
+      "sha256": "d51a2e8242c20da84a0afd544b412dbcb54f2532fbe223be39db04a659acbaf3"
+    },
+    {
+      "bytes": 10594,
+      "character_id": 167,
+      "file": "assets/converted/images/1085_metal_draggy_m/167.jpg",
+      "sha256": "e2459156846dd743ed8ccd42c961fab6a0a06388955b3632bbdcc55793692597"
+    },
+    {
+      "bytes": 8522,
+      "character_id": 167,
+      "file": "assets/converted/images/1085_metal_draggy_m/167_alpha.png",
+      "sha256": "fd12e76bea123971bffad33f9d511479412b524ff74585aa969cc90d191dd5fb"
+    },
+    {
+      "bytes": 10128,
+      "character_id": 169,
+      "file": "assets/converted/images/1085_metal_draggy_m/169.jpg",
+      "sha256": "5195e0eab11a3b01ad6e804b1fc7d373c4c4bd91d72196b153b0b9bf38008675"
+    },
+    {
+      "bytes": 8074,
+      "character_id": 169,
+      "file": "assets/converted/images/1085_metal_draggy_m/169_alpha.png",
+      "sha256": "527ab6829b398c9ad78cdb027c943d24a7918b98363e7b45724d1a594680c08b"
+    },
+    {
+      "bytes": 9570,
+      "character_id": 171,
+      "file": "assets/converted/images/1085_metal_draggy_m/171.jpg",
+      "sha256": "6c58b898597a49143030ed04f16f51ab9ee70b5b162d7d722487159be41b4b54"
+    },
+    {
+      "bytes": 7681,
+      "character_id": 171,
+      "file": "assets/converted/images/1085_metal_draggy_m/171_alpha.png",
+      "sha256": "585137a6d5f94c37b5f86a17c3890b5f34587ae8552b6777e3046fbe6623640d"
+    },
+    {
+      "bytes": 9058,
+      "character_id": 173,
+      "file": "assets/converted/images/1085_metal_draggy_m/173.jpg",
+      "sha256": "c1fe62094d73142b1c8897827e663cb52a82b99bdb74dc8a1f379131c0b59e4d"
+    },
+    {
+      "bytes": 7347,
+      "character_id": 173,
+      "file": "assets/converted/images/1085_metal_draggy_m/173_alpha.png",
+      "sha256": "cc335a008c2bbed0f8302eb6a61702ecf4fa2b8e1d127bf38154b7b6888e0fb9"
+    },
+    {
+      "bytes": 8434,
+      "character_id": 175,
+      "file": "assets/converted/images/1085_metal_draggy_m/175.jpg",
+      "sha256": "6cd05f1427658ab51fd04f548cfc9103a70037728497db650057c4f798db3102"
+    },
+    {
+      "bytes": 6803,
+      "character_id": 175,
+      "file": "assets/converted/images/1085_metal_draggy_m/175_alpha.png",
+      "sha256": "c7b1b65521b64b8818544bfd1ba199f07050afecc4504d4f6857367e9eae976a"
+    },
+    {
+      "bytes": 7569,
+      "character_id": 177,
+      "file": "assets/converted/images/1085_metal_draggy_m/177.jpg",
+      "sha256": "3dbb32754a5ba7c4dd00ba2034e17a11b292db4e92260ebff46777ae9f1a1787"
+    },
+    {
+      "bytes": 6276,
+      "character_id": 177,
+      "file": "assets/converted/images/1085_metal_draggy_m/177_alpha.png",
+      "sha256": "e37d4dc9b6d553bf7224677be7dea8b83cfb03c3141ebee98c0e9f9b695c568b"
+    },
+    {
+      "bytes": 7067,
+      "character_id": 179,
+      "file": "assets/converted/images/1085_metal_draggy_m/179.jpg",
+      "sha256": "b4bdd9a7dc32241f12730d4eb5d639f6f0fb9872e887952967c2321ca08a1b34"
+    },
+    {
+      "bytes": 5918,
+      "character_id": 179,
+      "file": "assets/converted/images/1085_metal_draggy_m/179_alpha.png",
+      "sha256": "199e4e21682c4e5a65dd7c7bb8cd7cc83750d594db9b19a4521652c1923f1a9b"
+    },
+    {
+      "bytes": 6120,
+      "character_id": 181,
+      "file": "assets/converted/images/1085_metal_draggy_m/181.jpg",
+      "sha256": "798f21b9cc4ef175bd83b56b7a4dbb98876d07b11a1e0514d5c1a54e522ef4ca"
+    },
+    {
+      "bytes": 5432,
+      "character_id": 181,
+      "file": "assets/converted/images/1085_metal_draggy_m/181_alpha.png",
+      "sha256": "d0817159998c397ff8e5890f2109de968214b1179fd2d2e0a32dc5eb6ae34e33"
+    },
+    {
+      "bytes": 5280,
+      "character_id": 183,
+      "file": "assets/converted/images/1085_metal_draggy_m/183.jpg",
+      "sha256": "50a58d73aa6bd0af0bb17d418c9414338b2eb84f6f54859ca55e13cdefbcc6b7"
+    },
+    {
+      "bytes": 4792,
+      "character_id": 183,
+      "file": "assets/converted/images/1085_metal_draggy_m/183_alpha.png",
+      "sha256": "d4c96e19d075d32d24825d0fe6cb4c7557a85671b37e52cc37670c56cda2f062"
+    },
+    {
+      "bytes": 4128,
+      "character_id": 185,
+      "file": "assets/converted/images/1085_metal_draggy_m/185.jpg",
+      "sha256": "cb0b651852471c6ff0ba4aa3195ae334f770f86c413cb6f73c412f230b035009"
+    },
+    {
+      "bytes": 3691,
+      "character_id": 185,
+      "file": "assets/converted/images/1085_metal_draggy_m/185_alpha.png",
+      "sha256": "ac3368cdde23162efe13a34d2b6513d0f5553e2f8baee40aa97af89e661bd7eb"
+    },
+    {
+      "bytes": 3240,
+      "character_id": 187,
+      "file": "assets/converted/images/1085_metal_draggy_m/187.jpg",
+      "sha256": "c83c3e5dd1d1c14a202e592e2894acd3613d0e295d0a6a87c64b733cc601ef7a"
+    },
+    {
+      "bytes": 2895,
+      "character_id": 187,
+      "file": "assets/converted/images/1085_metal_draggy_m/187_alpha.png",
+      "sha256": "331b047ad4ee3effca346fc237ff30748915233d9a0554287f09f0de998ed42e"
+    },
+    {
+      "bytes": 2202,
+      "character_id": 189,
+      "file": "assets/converted/images/1085_metal_draggy_m/189.jpg",
+      "sha256": "d8f9ea592b748f02dba05efdade823b9907b10f25fb85ad081351028f443c548"
+    },
+    {
+      "bytes": 1815,
+      "character_id": 189,
+      "file": "assets/converted/images/1085_metal_draggy_m/189_alpha.png",
+      "sha256": "9331246e8f07dfde8dbe645242db54e104857df50f8c64233c538e0261c9d9de"
+    },
+    {
+      "bytes": 6602,
+      "character_id": 192,
+      "file": "assets/converted/images/1085_metal_draggy_m/192.jpg",
+      "sha256": "e5aeb8bb2c160c6ba2e7c0e79a6d847df4bc117663c840fc57d2ec4f0b154deb"
+    },
+    {
+      "bytes": 1289,
+      "character_id": 192,
+      "file": "assets/converted/images/1085_metal_draggy_m/192_alpha.png",
+      "sha256": "f5ddb7692e79acdb3a9dd3d40c239163f62af8e0bd3dae2e3bbfb3ee466be7f7"
+    },
+    {
+      "bytes": 6363,
+      "character_id": 194,
+      "file": "assets/converted/images/1085_metal_draggy_m/194.jpg",
+      "sha256": "07cbac3a177612f80142c89d06c6a26b580010ce549853af352bd077f9cf2b95"
+    },
+    {
+      "bytes": 1306,
+      "character_id": 194,
+      "file": "assets/converted/images/1085_metal_draggy_m/194_alpha.png",
+      "sha256": "55539d6551ad25873b94abf2e72b91d4997cd3e6588d5b5fc7a3e5ce329ef897"
+    },
+    {
+      "bytes": 6463,
+      "character_id": 196,
+      "file": "assets/converted/images/1085_metal_draggy_m/196.jpg",
+      "sha256": "12e052f75ca7c3ea891ebeb3a4775eb977b374ad3ef9e01427537a02d556b94e"
+    },
+    {
+      "bytes": 1341,
+      "character_id": 196,
+      "file": "assets/converted/images/1085_metal_draggy_m/196_alpha.png",
+      "sha256": "c96adf3d5fc2b9e4f1ff95e9953c7a39527e38441241084eca65f8ff98860b2b"
+    },
+    {
+      "bytes": 6548,
+      "character_id": 198,
+      "file": "assets/converted/images/1085_metal_draggy_m/198.jpg",
+      "sha256": "107e066db6b31ff4b1ccb96533f7822e3949e3f12752401e6833fe7149452a6f"
+    },
+    {
+      "bytes": 1334,
+      "character_id": 198,
+      "file": "assets/converted/images/1085_metal_draggy_m/198_alpha.png",
+      "sha256": "e1578797c044ad7c73ddd860856d682557703f33feb31fb901a6e40181b00c23"
+    },
+    {
+      "bytes": 6472,
+      "character_id": 200,
+      "file": "assets/converted/images/1085_metal_draggy_m/200.jpg",
+      "sha256": "9c6da2efc832adce00adc094778457a4b17fea2987dcc0542abd214d65a39d26"
+    },
+    {
+      "bytes": 1392,
+      "character_id": 200,
+      "file": "assets/converted/images/1085_metal_draggy_m/200_alpha.png",
+      "sha256": "2fcc0b21938aabc8af6be4e9b23da3ce08e904520b3a1faf1c531acbb602bd4a"
+    },
+    {
+      "bytes": 6493,
+      "character_id": 202,
+      "file": "assets/converted/images/1085_metal_draggy_m/202.jpg",
+      "sha256": "eebafa0ab55473f0e6b4f7276311e45ecd87d8eaf0b9b1b45285202ec669f01a"
+    },
+    {
+      "bytes": 1379,
+      "character_id": 202,
+      "file": "assets/converted/images/1085_metal_draggy_m/202_alpha.png",
+      "sha256": "1f127943d28eaf76596e29174c5f7d704de03fc1277686f13531fdc46d7ad4cc"
+    },
+    {
+      "bytes": 6319,
+      "character_id": 204,
+      "file": "assets/converted/images/1085_metal_draggy_m/204.jpg",
+      "sha256": "becf294d12333351371e16cfa0f3ab62ab6b8ed14cc8cc9b0e03531817be3135"
+    },
+    {
+      "bytes": 1352,
+      "character_id": 204,
+      "file": "assets/converted/images/1085_metal_draggy_m/204_alpha.png",
+      "sha256": "20540d0cc3d2a55adcd0590a55284699575f542d4fa04995a0748b8ef78a36e5"
+    },
+    {
+      "bytes": 1670,
+      "character_id": 206,
+      "file": "assets/converted/images/1085_metal_draggy_m/206.jpg",
+      "sha256": "656c0fd1d97df3cd1a8be1b5c54c19c49293518aa10439b2a33753afacac97ab"
+    },
+    {
+      "bytes": 1715,
+      "character_id": 206,
+      "file": "assets/converted/images/1085_metal_draggy_m/206_alpha.png",
+      "sha256": "0da20e502615dd7ba7ef822caf9fd247b6df47339936424f36fd4c1eda95fc63"
+    },
+    {
+      "bytes": 1714,
+      "character_id": 208,
+      "file": "assets/converted/images/1085_metal_draggy_m/208.jpg",
+      "sha256": "7bd0d6cf467dfb53212c83141d35d670f82506e92c02643671cd0def01328541"
+    },
+    {
+      "bytes": 2072,
+      "character_id": 208,
+      "file": "assets/converted/images/1085_metal_draggy_m/208_alpha.png",
+      "sha256": "16e16c48d22a5cd5479825045fc580421b92e33573e41766d12b1560258bfdc3"
+    },
+    {
+      "bytes": 1773,
+      "character_id": 210,
+      "file": "assets/converted/images/1085_metal_draggy_m/210.jpg",
+      "sha256": "183cd1a15f1bc8e9f9d781097325640dceed3201ee51cf934d9bec45b4957af8"
+    },
+    {
+      "bytes": 2522,
+      "character_id": 210,
+      "file": "assets/converted/images/1085_metal_draggy_m/210_alpha.png",
+      "sha256": "6499df6647f9bdf0768998844cd2fe01bde10a2c184d66f79acc76d8fb9359ce"
+    },
+    {
+      "bytes": 1835,
+      "character_id": 212,
+      "file": "assets/converted/images/1085_metal_draggy_m/212.jpg",
+      "sha256": "a5d8f687a2f5fe3f8c3fd49b5ddea324d5deacd68172518f95daa15457d29c05"
+    },
+    {
+      "bytes": 2893,
+      "character_id": 212,
+      "file": "assets/converted/images/1085_metal_draggy_m/212_alpha.png",
+      "sha256": "1fb100e23663d1ebc7075f27552f1e22fe0b82e37b882fd3c871110942e0a3d0"
+    },
+    {
+      "bytes": 1918,
+      "character_id": 214,
+      "file": "assets/converted/images/1085_metal_draggy_m/214.jpg",
+      "sha256": "6ffc667a7b0226a3deaa78417b0e7f5d2778647a9d77c75ca5aad754f30a52aa"
+    },
+    {
+      "bytes": 3250,
+      "character_id": 214,
+      "file": "assets/converted/images/1085_metal_draggy_m/214_alpha.png",
+      "sha256": "a28eb0c232adef3ce0cf22117da031302f08a2046427f8c4c8b6feb64739c959"
+    },
+    {
+      "bytes": 1925,
+      "character_id": 216,
+      "file": "assets/converted/images/1085_metal_draggy_m/216.jpg",
+      "sha256": "984d8031a79376e34f2ef7c0469b925ab5421d5211d09e706b8f8a3778f08313"
+    },
+    {
+      "bytes": 3459,
+      "character_id": 216,
+      "file": "assets/converted/images/1085_metal_draggy_m/216_alpha.png",
+      "sha256": "5f4701ee951750c5a7b7797670724e275c47f360d7d514f7263c2e5ffa364d43"
+    },
+    {
+      "bytes": 1871,
+      "character_id": 218,
+      "file": "assets/converted/images/1085_metal_draggy_m/218.jpg",
+      "sha256": "e369090d962fbff352c7fc7bfe4e4de09c992c973deec323a5d484ffb59ac622"
+    },
+    {
+      "bytes": 3515,
+      "character_id": 218,
+      "file": "assets/converted/images/1085_metal_draggy_m/218_alpha.png",
+      "sha256": "a03e783febfe7a10447d3a098ec6de528b25c5b94765f002455392959abe5793"
+    },
+    {
+      "bytes": 1755,
+      "character_id": 220,
+      "file": "assets/converted/images/1085_metal_draggy_m/220.jpg",
+      "sha256": "71ee8856cac7af04cbf6f1896325d89291d442d20f62d0372fdcf6369a8f5dfe"
+    },
+    {
+      "bytes": 3343,
+      "character_id": 220,
+      "file": "assets/converted/images/1085_metal_draggy_m/220_alpha.png",
+      "sha256": "2dbe72536456619690c4d23b53905b4700758b88fdeb5a1027450bc86f783374"
+    },
+    {
+      "bytes": 1550,
+      "character_id": 222,
+      "file": "assets/converted/images/1085_metal_draggy_m/222.jpg",
+      "sha256": "fabc41d71e4b5be21d133f4b4aaafca6db9ed27e4712c8e3e7f91c86a8427abf"
+    },
+    {
+      "bytes": 2914,
+      "character_id": 222,
+      "file": "assets/converted/images/1085_metal_draggy_m/222_alpha.png",
+      "sha256": "d5e5bc59e1001d7a59df9c3c3a8ac03ce8c3f7a37ad3dbfd6ffa3a75def10d17"
+    },
+    {
+      "bytes": 1208,
+      "character_id": 224,
+      "file": "assets/converted/images/1085_metal_draggy_m/224.jpg",
+      "sha256": "1157fd0ca1e92cbb7a96ca6ef6770fe98643178c95fb54f4ff65c8aeb3a66e6b"
+    },
+    {
+      "bytes": 2139,
+      "character_id": 224,
+      "file": "assets/converted/images/1085_metal_draggy_m/224_alpha.png",
+      "sha256": "3a54675716dc0115dc27af469e47b66d5ea30df81d257a1e8ddbcc921cb239d6"
+    },
+    {
+      "bytes": 882,
+      "character_id": 226,
+      "file": "assets/converted/images/1085_metal_draggy_m/226.jpg",
+      "sha256": "b99fd00983dec103635867f7a056e1b864078f76fbb3d09411d96418856991a7"
+    },
+    {
+      "bytes": 1359,
+      "character_id": 226,
+      "file": "assets/converted/images/1085_metal_draggy_m/226_alpha.png",
+      "sha256": "5d973a1ed01de29a5c874dbe6c2adda24e8c94b76dd03a3e18ee331247148fc1"
+    }
+  ],
+  "content_ref": {
+    "activation": 0,
+    "attack": 25,
+    "attack_interval": 30,
+    "attack_range": 11,
+    "best_against": "ft_ground",
+    "best_against_mult": 1,
+    "breeding_order": 20,
+    "build_time": 0,
+    "building_limit_same_id": -1,
+    "building_limit_same_scf": -1,
+    "category_id": 7,
+    "clicks_to_build": 0,
+    "collect": 0,
+    "collect_type": "g",
+    "collect_xp": 3,
+    "content_version": "44e5b9edd1eba2910833bb8e2f063175e51c5754e38c35177648e4de779df501",
+    "cost": 0,
+    "cost_unit_cash": 3,
+    "costs": {
+      "c": 4
+    },
+    "defense": 1,
+    "display_order": 115,
+    "elevation": 1,
+    "expiration": 0,
+    "gift_level": 1,
+    "giftable": 0,
+    "group_type": "AIR_VEHICLE",
+    "height": 1,
+    "img_name": "1085_metal_draggy_m",
+    "in_store": 0,
+    "inventory_ids": null,
+    "kind": "unit",
+    "legacy_id": "1085",
+    "life": 410,
+    "max_collects": 0,
+    "max_elem_vol": 0,
+    "max_frame": 5,
+    "min_level": 8,
+    "name": "Metal Draggy",
+    "new_item": 0,
+    "population": 2,
+    "premium_upgrade_costs": null,
+    "properties": {
+      "bulldozable": "1",
+      "ft_flying": "1",
+      "mechanic": "1",
+      "resurrectable": "1",
+      "seeStealthUnits": "1"
+    },
+    "race": "h",
+    "sm_training_time": 40000,
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "subcat_functional": 83,
+    "subcategory_id": 7,
+    "syringes": 2,
+    "training_time": 0,
+    "trains_ids": -1,
+    "type": "u",
+    "unit_capacity": 0,
+    "upgrades_to": -1,
+    "velocity": 8,
+    "volume": 10,
+    "width": 1,
+    "xp": 30
+  },
+  "content_version": "a0c3861fd95cbe635537efd7223f46991580a6be66735a70c9b1904c8987c18f",
+  "frame_count": 1,
+  "frame_height": 400,
+  "frame_rate": 30.0,
+  "frame_width": 550,
+  "kind": "converted_unit",
+  "legacy_id": "1085_metal_draggy_m",
+  "main": {
+    "frame_count": 1,
+    "labels": [],
+    "placements": [
+      {
+        "character_id": 229,
+        "character_kind": "sprite",
+        "depth": 1,
+        "frame": 1,
+        "move": false
+      }
+    ],
+    "removes": []
+  },
+  "shapes": [
+    {
+      "bounds": {
+        "height_px": 111,
+        "width_px": 153,
+        "xmax": 3068,
+        "xmin": -172,
+        "ymax": 2220,
+        "ymin": -80
+      },
+      "character_id": 2,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 1,
+          "matrix": "d9400005000009aa6c00",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 111,
+        "width_px": 177,
+        "xmax": 3553,
+        "xmin": -647,
+        "ymax": 2235,
+        "ymin": 215
+      },
+      "character_id": 4,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 3,
+          "matrix": "d940000500000baf235c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 107,
+        "width_px": 165,
+        "xmax": 3306,
+        "xmin": -414,
+        "ymax": 2140,
+        "ymin": 340
+      },
+      "character_id": 6,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 5,
+          "matrix": "d940000500000a989540",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 128,
+        "width_px": 128,
+        "xmax": 2566,
+        "xmin": 326,
+        "ymax": 2576,
+        "ymin": 276
+      },
+      "character_id": 8,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 7,
+          "matrix": "d940000500000a519140",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 0,
+        "width_px": 40,
+        "xmax": 812,
+        "xmin": -720,
+        "ymax": -1,
+        "ymin": -2801
+      },
+      "character_id": 10,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "color": "99660000",
+          "type": 0
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 32
+    },
+    {
+      "bounds": {
+        "height_px": 114,
+        "width_px": 143,
+        "xmax": 2864,
+        "xmin": 424,
+        "ymax": 2280,
+        "ymin": 0
+      },
+      "character_id": 12,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 11,
+          "matrix": "d940000500000a6a0000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 113,
+        "width_px": 143,
+        "xmax": 2868,
+        "xmin": 368,
+        "ymax": 2266,
+        "ymin": 106
+      },
+      "character_id": 14,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 13,
+          "matrix": "d940000500000a5c06a0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 118,
+        "width_px": 160,
+        "xmax": 3200,
+        "xmin": 540,
+        "ymax": 2364,
+        "ymin": 344
+      },
+      "character_id": 16,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 15,
+          "matrix": "d940000500000b438560",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 143,
+        "width_px": 163,
+        "xmax": 3264,
+        "xmin": 524,
+        "ymax": 2867,
+        "ymin": 307
+      },
+      "character_id": 18,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 17,
+          "matrix": "d940000500000b4184cc",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 106,
+        "width_px": 134,
+        "xmax": 2680,
+        "xmin": 0,
+        "ymax": 2120,
+        "ymin": 0
+      },
+      "character_id": 21,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 20,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 104,
+        "width_px": 132,
+        "xmax": 2640,
+        "xmin": -420,
+        "ymax": 2080,
+        "ymin": 400
+      },
+      "character_id": 23,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 22,
+          "matrix": "d940000500000a971900",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 116,
+        "width_px": 137,
+        "xmax": 2750,
+        "xmin": -110,
+        "ymax": 2330,
+        "ymin": 650
+      },
+      "character_id": 25,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 24,
+          "matrix": "d940000500000bf24a28",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 118,
+        "width_px": 139,
+        "xmax": 2786,
+        "xmin": 66,
+        "ymax": 2365,
+        "ymin": 445
+      },
+      "character_id": 27,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 26,
+          "matrix": "d940000500000a109bd0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 120,
+        "width_px": 140,
+        "xmax": 2816,
+        "xmin": -24,
+        "ymax": 2400,
+        "ymin": 0
+      },
+      "character_id": 30,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 29,
+          "matrix": "d9400005000006a000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 111,
+        "width_px": 139,
+        "xmax": 2780,
+        "xmin": -420,
+        "ymax": 2225,
+        "ymin": 165
+      },
+      "character_id": 32,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 31,
+          "matrix": "d940000500000a970a50",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 121,
+        "width_px": 145,
+        "xmax": 2910,
+        "xmin": -150,
+        "ymax": 2426,
+        "ymin": 486
+      },
+      "character_id": 34,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 33,
+          "matrix": "d940000500000ada9e60",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 135,
+        "width_px": 139,
+        "xmax": 2788,
+        "xmin": 48,
+        "ymax": 2718,
+        "ymin": 418
+      },
+      "character_id": 36,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 35,
+          "matrix": "d940000500000a0c1a20",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 111,
+        "width_px": 161,
+        "xmax": 3232,
+        "xmin": -8,
+        "ymax": 2220,
+        "ymin": 0
+      },
+      "character_id": 39,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 38,
+          "matrix": "d9400005000005c000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 107,
+        "width_px": 196,
+        "xmax": 3931,
+        "xmin": -629,
+        "ymax": 2150,
+        "ymin": 310
+      },
+      "character_id": 41,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 40,
+          "matrix": "d940000500000bb164d8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 98,
+        "width_px": 186,
+        "xmax": 3720,
+        "xmin": -700,
+        "ymax": 1960,
+        "ymin": 380
+      },
+      "character_id": 43,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 42,
+          "matrix": "d940000500000ba885f0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 111,
+        "width_px": 182,
+        "xmax": 3647,
+        "xmin": -493,
+        "ymax": 2220,
+        "ymin": 380
+      },
+      "character_id": 45,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 44,
+          "matrix": "d940000500000a84d7c0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 110,
+        "width_px": 153,
+        "xmax": 3069,
+        "xmin": -171,
+        "ymax": 2216,
+        "ymin": -84
+      },
+      "character_id": 48,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 47,
+          "matrix": "d9400005000009aaeb00",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 112,
+        "width_px": 159,
+        "xmax": 3191,
+        "xmin": -269,
+        "ymax": 2257,
+        "ymin": -143
+      },
+      "character_id": 51,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 50,
+          "matrix": "d940000500000abcf710",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 113,
+        "width_px": 168,
+        "xmax": 3362,
+        "xmin": -478,
+        "ymax": 2278,
+        "ymin": -222
+      },
+      "character_id": 53,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 52,
+          "matrix": "d940000500000a88b220",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 113,
+        "width_px": 168,
+        "xmax": 3362,
+        "xmin": -478,
+        "ymax": 2278,
+        "ymin": -222
+      },
+      "character_id": 55,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 54,
+          "matrix": "d940000500000a88b220",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 113,
+        "width_px": 167,
+        "xmax": 3358,
+        "xmin": -482,
+        "ymax": 2278,
+        "ymin": -222
+      },
+      "character_id": 57,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 56,
+          "matrix": "d940000500000a87b220",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 113,
+        "width_px": 168,
+        "xmax": 3362,
+        "xmin": -478,
+        "ymax": 2278,
+        "ymin": -222
+      },
+      "character_id": 59,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 58,
+          "matrix": "d940000500000a88b220",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 113,
+        "width_px": 168,
+        "xmax": 3362,
+        "xmin": -478,
+        "ymax": 2268,
+        "ymin": -232
+      },
+      "character_id": 61,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 60,
+          "matrix": "d940000500000a88b180",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 113,
+        "width_px": 168,
+        "xmax": 3362,
+        "xmin": -478,
+        "ymax": 2266,
+        "ymin": -234
+      },
+      "character_id": 63,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 62,
+          "matrix": "d940000500000a88b160",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 113,
+        "width_px": 168,
+        "xmax": 3362,
+        "xmin": -478,
+        "ymax": 2266,
+        "ymin": -234
+      },
+      "character_id": 65,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 64,
+          "matrix": "d940000500000a88b160",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 115,
+        "width_px": 138,
+        "xmax": 2770,
+        "xmin": 150,
+        "ymax": 2300,
+        "ymin": 40
+      },
+      "character_id": 68,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 67,
+          "matrix": "d94000050000094b0a00",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 116,
+        "width_px": 143,
+        "xmax": 2870,
+        "xmin": 130,
+        "ymax": 2320,
+        "ymin": 40
+      },
+      "character_id": 70,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 69,
+          "matrix": "d9400005000009410a00",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 114,
+        "width_px": 153,
+        "xmax": 3070,
+        "xmin": 70,
+        "ymax": 2290,
+        "ymin": 10
+      },
+      "character_id": 72,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 71,
+          "matrix": "d9400005000008460a",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 114,
+        "width_px": 158,
+        "xmax": 3170,
+        "xmin": 70,
+        "ymax": 2280,
+        "ymin": 0
+      },
+      "character_id": 74,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 73,
+          "matrix": "d94000050000084600",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 114,
+        "width_px": 179,
+        "xmax": 3590,
+        "xmin": 70,
+        "ymax": 2280,
+        "ymin": 0
+      },
+      "character_id": 76,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 75,
+          "matrix": "d94000050000084600",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 114,
+        "width_px": 180,
+        "xmax": 3610,
+        "xmin": 70,
+        "ymax": 2280,
+        "ymin": 0
+      },
+      "character_id": 78,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 77,
+          "matrix": "d94000050000084600",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 114,
+        "width_px": 184,
+        "xmax": 3690,
+        "xmin": 70,
+        "ymax": 2280,
+        "ymin": 0
+      },
+      "character_id": 80,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 79,
+          "matrix": "d94000050000084600",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 114,
+        "width_px": 186,
+        "xmax": 3730,
+        "xmin": 70,
+        "ymax": 2280,
+        "ymin": 0
+      },
+      "character_id": 82,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 81,
+          "matrix": "d94000050000084600",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 114,
+        "width_px": 160,
+        "xmax": 3210,
+        "xmin": 70,
+        "ymax": 2280,
+        "ymin": 0
+      },
+      "character_id": 84,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 83,
+          "matrix": "d94000050000084600",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 106,
+        "width_px": 130,
+        "xmax": 2607,
+        "xmin": -73,
+        "ymax": 2125,
+        "ymin": 5
+      },
+      "character_id": 87,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 86,
+          "matrix": "d9400005000008b705",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 104,
+        "width_px": 134,
+        "xmax": 2690,
+        "xmin": -70,
+        "ymax": 2080,
+        "ymin": 0
+      },
+      "character_id": 89,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 88,
+          "matrix": "d9400005000008ba00",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 106,
+        "width_px": 138,
+        "xmax": 2766,
+        "xmin": -74,
+        "ymax": 2120,
+        "ymin": -20
+      },
+      "character_id": 91,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 90,
+          "matrix": "d9400005000008b6ec",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 106,
+        "width_px": 138,
+        "xmax": 2766,
+        "xmin": -74,
+        "ymax": 2120,
+        "ymin": -20
+      },
+      "character_id": 93,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 92,
+          "matrix": "d9400005000008b6ec",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 120,
+        "width_px": 158,
+        "xmax": 3166,
+        "xmin": -74,
+        "ymax": 2400,
+        "ymin": -20
+      },
+      "character_id": 95,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 94,
+          "matrix": "d9400005000008b6ec",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 119,
+        "width_px": 160,
+        "xmax": 3206,
+        "xmin": -74,
+        "ymax": 2380,
+        "ymin": -20
+      },
+      "character_id": 97,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 96,
+          "matrix": "d9400005000008b6ec",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 122,
+        "width_px": 164,
+        "xmax": 3286,
+        "xmin": -74,
+        "ymax": 2440,
+        "ymin": -20
+      },
+      "character_id": 99,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 98,
+          "matrix": "d9400005000008b6ec",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 124,
+        "width_px": 168,
+        "xmax": 3360,
+        "xmin": -60,
+        "ymax": 2480,
+        "ymin": -20
+      },
+      "character_id": 101,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 100,
+          "matrix": "d940000500000789b0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 107,
+        "width_px": 144,
+        "xmax": 2880,
+        "xmin": -60,
+        "ymax": 2140,
+        "ymin": -20
+      },
+      "character_id": 103,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 102,
+          "matrix": "d940000500000789b0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 120,
+        "width_px": 128,
+        "xmax": 2560,
+        "xmin": 0,
+        "ymax": 2412,
+        "ymin": 12
+      },
+      "character_id": 106,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 105,
+          "matrix": "d94000050000050300",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 123,
+        "width_px": 127,
+        "xmax": 2554,
+        "xmin": -46,
+        "ymax": 2461,
+        "ymin": 41
+      },
+      "character_id": 108,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 107,
+          "matrix": "d9400005000007a4a4",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 127,
+        "width_px": 127,
+        "xmax": 2556,
+        "xmin": -184,
+        "ymax": 2550,
+        "ymin": 30
+      },
+      "character_id": 110,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 109,
+          "matrix": "d9400005000009a40780",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 127,
+        "width_px": 135,
+        "xmax": 2716,
+        "xmin": -184,
+        "ymax": 2550,
+        "ymin": 30
+      },
+      "character_id": 112,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 111,
+          "matrix": "d9400005000009a40780",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 137,
+        "width_px": 156,
+        "xmax": 3136,
+        "xmin": -184,
+        "ymax": 2740,
+        "ymin": 0
+      },
+      "character_id": 114,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 113,
+          "matrix": "d9400005000009a40000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 137,
+        "width_px": 158,
+        "xmax": 3176,
+        "xmin": -184,
+        "ymax": 2740,
+        "ymin": 0
+      },
+      "character_id": 116,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 115,
+          "matrix": "d9400005000009a40000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 141,
+        "width_px": 162,
+        "xmax": 3256,
+        "xmin": -184,
+        "ymax": 2820,
+        "ymin": 0
+      },
+      "character_id": 118,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 117,
+          "matrix": "d9400005000009a40000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 143,
+        "width_px": 165,
+        "xmax": 3316,
+        "xmin": -184,
+        "ymax": 2860,
+        "ymin": 0
+      },
+      "character_id": 120,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 119,
+          "matrix": "d9400005000009a40000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 126,
+        "width_px": 142,
+        "xmax": 2848,
+        "xmin": -192,
+        "ymax": 2520,
+        "ymin": 0
+      },
+      "character_id": 122,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 121,
+          "matrix": "d9400005000009a00000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 111,
+        "width_px": 162,
+        "xmax": 3240,
+        "xmin": 0,
+        "ymax": 2220,
+        "ymin": 0
+      },
+      "character_id": 125,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 124,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 107,
+        "width_px": 166,
+        "xmax": 3320,
+        "xmin": 0,
+        "ymax": 2144,
+        "ymin": 4
+      },
+      "character_id": 127,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 126,
+          "matrix": "d940000500000404",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 108,
+        "width_px": 168,
+        "xmax": 3376,
+        "xmin": -64,
+        "ymax": 2160,
+        "ymin": -20
+      },
+      "character_id": 129,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 128,
+          "matrix": "d9400005000008c0ec",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 120,
+        "width_px": 168,
+        "xmax": 3372,
+        "xmin": -68,
+        "ymax": 2400,
+        "ymin": -20
+      },
+      "character_id": 131,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 130,
+          "matrix": "d9400005000008bcec",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 140,
+        "width_px": 169,
+        "xmax": 3384,
+        "xmin": -56,
+        "ymax": 2800,
+        "ymin": -20
+      },
+      "character_id": 133,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 132,
+          "matrix": "d940000500000791b0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 142,
+        "width_px": 168,
+        "xmax": 3376,
+        "xmin": -64,
+        "ymax": 2840,
+        "ymin": -20
+      },
+      "character_id": 135,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 134,
+          "matrix": "d9400005000008c0ec",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 145,
+        "width_px": 168,
+        "xmax": 3376,
+        "xmin": -64,
+        "ymax": 2900,
+        "ymin": -20
+      },
+      "character_id": 137,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 136,
+          "matrix": "d9400005000008c0ec",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 148,
+        "width_px": 169,
+        "xmax": 3380,
+        "xmin": -60,
+        "ymax": 2960,
+        "ymin": -20
+      },
+      "character_id": 139,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 138,
+          "matrix": "d940000500000789b0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 123,
+        "width_px": 169,
+        "xmax": 3380,
+        "xmin": -60,
+        "ymax": 2460,
+        "ymin": -20
+      },
+      "character_id": 141,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 140,
+          "matrix": "d940000500000789b0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 113,
+        "width_px": 142,
+        "xmax": 2854,
+        "xmin": -6,
+        "ymax": 2274,
+        "ymin": -146
+      },
+      "character_id": 144,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 143,
+          "matrix": "d9400005000009fd5b80",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 146,
+        "width_px": 141,
+        "xmax": 2834,
+        "xmin": 154,
+        "ymax": 2930,
+        "ymin": 210
+      },
+      "character_id": 146,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 145,
+          "matrix": "d94000050000094d3480",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 218,
+        "width_px": 115,
+        "xmax": 2312,
+        "xmin": 112,
+        "ymax": 4373,
+        "ymin": 1333
+      },
+      "character_id": 148,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 147,
+          "matrix": "d940000500000c070535",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 216,
+        "width_px": 141,
+        "xmax": 2820,
+        "xmin": -60,
+        "ymax": 4320,
+        "ymin": 2540
+      },
+      "character_id": 150,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 149,
+          "matrix": "d940000500000dfe227b00",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 152,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 151,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 154,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 153,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 156,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 155,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 158,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 157,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 160,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 159,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 162,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 161,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 164,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 163,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 166,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 165,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 168,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 167,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 170,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 169,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 172,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 171,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 174,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 173,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 176,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 175,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 178,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 177,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 180,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 179,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 182,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 181,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 184,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 183,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 186,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 185,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 188,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 187,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 232,
+        "width_px": 227,
+        "xmax": 4540,
+        "xmin": -1860,
+        "ymax": 4641,
+        "ymin": 801
+      },
+      "character_id": 190,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 189,
+          "matrix": "d599998ccccc322f0c84",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 147,
+        "width_px": 143,
+        "xmax": 2874,
+        "xmin": -366,
+        "ymax": 2940,
+        "ymin": 720
+      },
+      "character_id": 193,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 192,
+          "matrix": "d940000500000bd24b40",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 143,
+        "width_px": 145,
+        "xmax": 2903,
+        "xmin": -297,
+        "ymax": 2863,
+        "ymin": 763
+      },
+      "character_id": 195,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 194,
+          "matrix": "d940000500000bdaebec",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 143,
+        "width_px": 146,
+        "xmax": 2925,
+        "xmin": -335,
+        "ymax": 2878,
+        "ymin": 758
+      },
+      "character_id": 197,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 196,
+          "matrix": "d940000500000bd62bd8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 137,
+        "width_px": 147,
+        "xmax": 2955,
+        "xmin": -365,
+        "ymax": 2744,
+        "ymin": 604
+      },
+      "character_id": 199,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 198,
+          "matrix": "d940000500000bd26970",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 130,
+        "width_px": 148,
+        "xmax": 2970,
+        "xmin": -390,
+        "ymax": 2612,
+        "ymin": 472
+      },
+      "character_id": 201,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 200,
+          "matrix": "d940000500000a9e9d80",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 129,
+        "width_px": 149,
+        "xmax": 2989,
+        "xmin": -411,
+        "ymax": 2597,
+        "ymin": 437
+      },
+      "character_id": 203,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 202,
+          "matrix": "d940000500000a995b50",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 132,
+        "width_px": 150,
+        "xmax": 3017,
+        "xmin": -423,
+        "ymax": 2646,
+        "ymin": 426
+      },
+      "character_id": 205,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 204,
+          "matrix": "d940000500000a965aa0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 123,
+        "width_px": 110,
+        "xmax": 2216,
+        "xmin": 247,
+        "ymax": 2470,
+        "ymin": 720
+      },
+      "character_id": 207,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 206,
+          "matrix": "d95e0785781e0b1eeb40",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 124,
+        "width_px": 110,
+        "xmax": 2216,
+        "xmin": 247,
+        "ymax": 2493,
+        "ymin": 743
+      },
+      "character_id": 209,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 208,
+          "matrix": "d95e0785781e0b1eeb9c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 124,
+        "width_px": 110,
+        "xmax": 2216,
+        "xmin": 247,
+        "ymax": 2493,
+        "ymin": 743
+      },
+      "character_id": 211,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 210,
+          "matrix": "d95e0785781e0b1eeb9c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 124,
+        "width_px": 110,
+        "xmax": 2216,
+        "xmin": 247,
+        "ymax": 2493,
+        "ymin": 743
+      },
+      "character_id": 213,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 212,
+          "matrix": "d95e0785781e0b1eeb9c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 124,
+        "width_px": 110,
+        "xmax": 2216,
+        "xmin": 247,
+        "ymax": 2493,
+        "ymin": 743
+      },
+      "character_id": 215,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 214,
+          "matrix": "d95e0785781e0b1eeb9c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 124,
+        "width_px": 110,
+        "xmax": 2216,
+        "xmin": 247,
+        "ymax": 2493,
+        "ymin": 743
+      },
+      "character_id": 217,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 216,
+          "matrix": "d95e0785781e0b1eeb9c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 124,
+        "width_px": 110,
+        "xmax": 2216,
+        "xmin": 247,
+        "ymax": 2493,
+        "ymin": 743
+      },
+      "character_id": 219,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 218,
+          "matrix": "d95e0785781e0b1eeb9c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 124,
+        "width_px": 110,
+        "xmax": 2216,
+        "xmin": 247,
+        "ymax": 2493,
+        "ymin": 743
+      },
+      "character_id": 221,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 220,
+          "matrix": "d95e0785781e0b1eeb9c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 124,
+        "width_px": 110,
+        "xmax": 2216,
+        "xmin": 247,
+        "ymax": 2493,
+        "ymin": 743
+      },
+      "character_id": 223,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 222,
+          "matrix": "d95e0785781e0b1eeb9c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 124,
+        "width_px": 110,
+        "xmax": 2216,
+        "xmin": 247,
+        "ymax": 2493,
+        "ymin": 743
+      },
+      "character_id": 225,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 224,
+          "matrix": "d95e0785781e0b1eeb9c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 124,
+        "width_px": 110,
+        "xmax": 2216,
+        "xmin": 247,
+        "ymax": 2493,
+        "ymin": 743
+      },
+      "character_id": 227,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 226,
+          "matrix": "d95e0785781e0b1eeb9c",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    }
+  ],
+  "source_file": "assets/sprites/1085_metal_draggy_m.swf",
+  "source_layer": "converted(asset-registry)",
+  "sprites": [
+    {
+      "frame_count": 18,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 2,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 8,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 13,
+          "move": true
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 16,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 9
+    },
+    {
+      "frame_count": 18,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 12,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 14,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 16,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 18,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        },
+        {
+          "character_id": 16,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 13,
+          "move": true
+        },
+        {
+          "character_id": 14,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 16,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 19
+    },
+    {
+      "frame_count": 18,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 21,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 23,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 25,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 27,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        },
+        {
+          "character_id": 25,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 13,
+          "move": true
+        },
+        {
+          "character_id": 23,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 16,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 28
+    },
+    {
+      "frame_count": 18,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 30,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 32,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 34,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 36,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        },
+        {
+          "character_id": 34,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 13,
+          "move": true
+        },
+        {
+          "character_id": 32,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 16,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 37
+    },
+    {
+      "frame_count": 18,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 39,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 41,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 43,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 45,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        },
+        {
+          "character_id": 43,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 13,
+          "move": true
+        },
+        {
+          "character_id": 41,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 16,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 46
+    },
+    {
+      "frame_count": 1,
+      "labels": [],
+      "placements": [],
+      "removes": [],
+      "sprite_id": 49
+    },
+    {
+      "frame_count": 34,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 48,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 49,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 51,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 53,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 55,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        },
+        {
+          "character_id": 57,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 12,
+          "move": true
+        },
+        {
+          "character_id": 59,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 13,
+          "move": true
+        },
+        {
+          "character_id": 61,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 14,
+          "move": true
+        },
+        {
+          "character_id": 63,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 15,
+          "move": true
+        },
+        {
+          "character_id": 65,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 16,
+          "move": true
+        },
+        {
+          "character_id": 2,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 17,
+          "move": true
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 20,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 23,
+          "move": true
+        },
+        {
+          "character_id": 8,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 26,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 29,
+          "move": true
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 32,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 66
+    },
+    {
+      "frame_count": 34,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 68,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 49,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 70,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 72,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 74,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        },
+        {
+          "character_id": 76,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        },
+        {
+          "character_id": 78,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 12,
+          "move": true
+        },
+        {
+          "character_id": 80,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 13,
+          "move": true
+        },
+        {
+          "character_id": 82,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 14,
+          "move": true
+        },
+        {
+          "character_id": 84,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 15,
+          "move": true
+        },
+        {
+          "character_id": 12,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 17,
+          "move": true
+        },
+        {
+          "character_id": 14,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 20,
+          "move": true
+        },
+        {
+          "character_id": 16,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 23,
+          "move": true
+        },
+        {
+          "character_id": 18,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 26,
+          "move": true
+        },
+        {
+          "character_id": 16,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 29,
+          "move": true
+        },
+        {
+          "character_id": 14,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 32,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 85
+    },
+    {
+      "frame_count": 33,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 87,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 49,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 89,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 91,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 93,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        },
+        {
+          "character_id": 95,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        },
+        {
+          "character_id": 97,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 12,
+          "move": true
+        },
+        {
+          "character_id": 99,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 13,
+          "move": true
+        },
+        {
+          "character_id": 101,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 14,
+          "move": true
+        },
+        {
+          "character_id": 103,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 15,
+          "move": true
+        },
+        {
+          "character_id": 21,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 16,
+          "move": true
+        },
+        {
+          "character_id": 23,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 19,
+          "move": true
+        },
+        {
+          "character_id": 25,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 22,
+          "move": true
+        },
+        {
+          "character_id": 27,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 25,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 28,
+          "move": true
+        },
+        {
+          "character_id": 23,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 31,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 104
+    },
+    {
+      "frame_count": 33,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 106,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 49,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 108,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 110,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 112,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        },
+        {
+          "character_id": 114,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        },
+        {
+          "character_id": 116,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 12,
+          "move": true
+        },
+        {
+          "character_id": 118,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 13,
+          "move": true
+        },
+        {
+          "character_id": 120,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 14,
+          "move": true
+        },
+        {
+          "character_id": 122,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 15,
+          "move": true
+        },
+        {
+          "character_id": 30,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 16,
+          "move": true
+        },
+        {
+          "character_id": 32,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 19,
+          "move": true
+        },
+        {
+          "character_id": 34,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 22,
+          "move": true
+        },
+        {
+          "character_id": 36,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 34,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 28,
+          "move": true
+        },
+        {
+          "character_id": 32,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 31,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 123
+    },
+    {
+      "frame_count": 33,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 125,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 49,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 127,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 129,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 131,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        },
+        {
+          "character_id": 133,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        },
+        {
+          "character_id": 135,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 12,
+          "move": true
+        },
+        {
+          "character_id": 137,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 13,
+          "move": true
+        },
+        {
+          "character_id": 139,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 14,
+          "move": true
+        },
+        {
+          "character_id": 141,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 15,
+          "move": true
+        },
+        {
+          "character_id": 39,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 16,
+          "move": true
+        },
+        {
+          "character_id": 41,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 19,
+          "move": true
+        },
+        {
+          "character_id": 43,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 22,
+          "move": true
+        },
+        {
+          "character_id": 45,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 43,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 28,
+          "move": true
+        },
+        {
+          "character_id": 41,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 31,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 142
+    },
+    {
+      "frame_count": 33,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 144,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 146,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 148,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": null,
+          "character_kind": null,
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        },
+        {
+          "character_id": 150,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 13,
+          "move": true
+        },
+        {
+          "character_id": 152,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 13,
+          "move": false
+        },
+        {
+          "character_id": 154,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 14,
+          "move": true
+        },
+        {
+          "character_id": 156,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 15,
+          "move": true
+        },
+        {
+          "character_id": 158,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 16,
+          "move": true
+        },
+        {
+          "character_id": 160,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 17,
+          "move": true
+        },
+        {
+          "character_id": 162,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 18,
+          "move": true
+        },
+        {
+          "character_id": 164,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 19,
+          "move": true
+        },
+        {
+          "character_id": 166,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 20,
+          "move": true
+        },
+        {
+          "character_id": 168,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 21,
+          "move": true
+        },
+        {
+          "character_id": 170,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 22,
+          "move": true
+        },
+        {
+          "character_id": 172,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 23,
+          "move": true
+        },
+        {
+          "character_id": 174,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 24,
+          "move": true
+        },
+        {
+          "character_id": 176,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 178,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 26,
+          "move": true
+        },
+        {
+          "character_id": 180,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 27,
+          "move": true
+        },
+        {
+          "character_id": 182,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 28,
+          "move": true
+        },
+        {
+          "character_id": 184,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 29,
+          "move": true
+        },
+        {
+          "character_id": 186,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 30,
+          "move": true
+        },
+        {
+          "character_id": 188,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 31,
+          "move": true
+        },
+        {
+          "character_id": 190,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 32,
+          "move": true
+        }
+      ],
+      "removes": [
+        {
+          "depth": 2,
+          "frame": 17
+        },
+        {
+          "depth": 1,
+          "frame": 33
+        }
+      ],
+      "sprite_id": 191
+    },
+    {
+      "frame_count": 26,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 193,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 49,
+          "character_kind": "sprite",
+          "depth": 3,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 195,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 3,
+          "move": true
+        },
+        {
+          "character_id": 197,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 5,
+          "move": true
+        },
+        {
+          "character_id": 199,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 201,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        },
+        {
+          "character_id": 203,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 13,
+          "move": true
+        },
+        {
+          "character_id": 205,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 16,
+          "move": true
+        },
+        {
+          "character_id": 207,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 16,
+          "move": false
+        },
+        {
+          "character_id": 209,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 17,
+          "move": true
+        },
+        {
+          "character_id": 211,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 18,
+          "move": true
+        },
+        {
+          "character_id": 213,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 19,
+          "move": true
+        },
+        {
+          "character_id": 215,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 20,
+          "move": true
+        },
+        {
+          "character_id": 217,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 21,
+          "move": true
+        },
+        {
+          "character_id": 219,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 22,
+          "move": true
+        },
+        {
+          "character_id": 221,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 23,
+          "move": true
+        },
+        {
+          "character_id": 223,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 24,
+          "move": true
+        },
+        {
+          "character_id": 225,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 227,
+          "character_kind": "shape",
+          "depth": 2,
+          "frame": 26,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 228
+    },
+    {
+      "frame_count": 30,
+      "labels": [
+        {
+          "anchor": false,
+          "frame": 1,
+          "name": "QUIETO"
+        },
+        {
+          "anchor": false,
+          "frame": 6,
+          "name": "ANDAR"
+        },
+        {
+          "anchor": false,
+          "frame": 11,
+          "name": "ATAQUE"
+        },
+        {
+          "anchor": false,
+          "frame": 16,
+          "name": "MUERTE"
+        },
+        {
+          "anchor": false,
+          "frame": 21,
+          "name": "PICAR"
+        }
+      ],
+      "placements": [
+        {
+          "character_id": 9,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 10,
+          "character_kind": "shape",
+          "depth": 4,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 19,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 2,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 3,
+          "move": false
+        },
+        {
+          "character_id": 37,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 4,
+          "move": false
+        },
+        {
+          "character_id": 46,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 5,
+          "move": false
+        },
+        {
+          "character_id": 9,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 6,
+          "move": false
+        },
+        {
+          "character_id": 19,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 7,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 8,
+          "move": false
+        },
+        {
+          "character_id": 37,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 9,
+          "move": false
+        },
+        {
+          "character_id": 46,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 10,
+          "move": false
+        },
+        {
+          "character_id": 66,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 11,
+          "move": false
+        },
+        {
+          "character_id": 85,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 12,
+          "move": false
+        },
+        {
+          "character_id": 104,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 13,
+          "move": false
+        },
+        {
+          "character_id": 123,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 14,
+          "move": false
+        },
+        {
+          "character_id": 142,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 15,
+          "move": false
+        },
+        {
+          "character_id": 191,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 16,
+          "move": false
+        },
+        {
+          "character_id": 228,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 26,
+          "move": false
+        }
+      ],
+      "removes": [
+        {
+          "depth": 1,
+          "frame": 2
+        },
+        {
+          "depth": 1,
+          "frame": 3
+        },
+        {
+          "depth": 1,
+          "frame": 4
+        },
+        {
+          "depth": 1,
+          "frame": 5
+        },
+        {
+          "depth": 1,
+          "frame": 6
+        },
+        {
+          "depth": 1,
+          "frame": 7
+        },
+        {
+          "depth": 1,
+          "frame": 8
+        },
+        {
+          "depth": 1,
+          "frame": 9
+        },
+        {
+          "depth": 1,
+          "frame": 10
+        },
+        {
+          "depth": 1,
+          "frame": 11
+        },
+        {
+          "depth": 1,
+          "frame": 12
+        },
+        {
+          "depth": 1,
+          "frame": 13
+        },
+        {
+          "depth": 1,
+          "frame": 14
+        },
+        {
+          "depth": 1,
+          "frame": 15
+        },
+        {
+          "depth": 1,
+          "frame": 16
+        },
+        {
+          "depth": 1,
+          "frame": 21
+        },
+        {
+          "depth": 4,
+          "frame": 26
+        }
+      ],
+      "sprite_id": 229
+    }
+  ],
+  "symbols": [
+    {
+      "id": 229,
+      "name": "1085_metal_draggy_m"
+    },
+    {
+      "id": 228,
+      "name": "_1085_metal_draggy_m_fla.arquero1atacandoperfilcopy_14"
+    },
+    {
+      "id": 191,
+      "name": "_1085_metal_draggy_m_fla.arquero1atacando3_4detras_13"
+    }
+  ]
+}

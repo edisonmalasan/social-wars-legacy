@@ -37,12 +37,26 @@ PINNED_RESOLVED = {
 }
 PINNED_BY_KIND = {
     "images": {"passthrough": 566, "extracted": 9, "missing_source": 32},
-    "item_sprites": {"converted": 2, "extracted": 857, "pending": 3,
+    "item_sprites": {"converted": 292, "extracted": 567, "pending": 3,
                      "missing_source": 10},
     "magic_sprites": {"extracted": 6, "pending": 4},
     "sounds": {"passthrough": 138},
 }
-PINNED_PACKAGES = {
+
+# The mass conversion (`asset-package-mass-conversion`) committed 290
+# census-convertible packages on top of M4's two, so the converted count moved
+# from 2 to 292 while the DISTINCT and REFERENCE counts did not move at all -
+# the same sprites that were `extracted` are now `converted`.
+PINNED_CONVERTED_PACKAGE_COUNT = 292
+
+# The two packages M4 committed before the mass conversion. Pinned by name
+# because they are the ORIGINAL evidence this whole registry was built around,
+# and a mass regeneration that silently dropped them would leave every other
+# assertion in this file passing. The full set of 292 is deliberately NOT
+# transcribed here: a pinned COUNT is checkable against the committed
+# conversions manifest on every run, while a transcribed list of 292 names is an
+# input that rots silently and re-breaks this suite on the next conversion.
+PINNED_ORIGINAL_M4_PACKAGES = {
     "0001_house_1_m": "assets/converted/buildings/0001_house_1_m",
     "10033_wild_elephant": "assets/converted/units/10033_wild_elephant",
 }
@@ -338,7 +352,21 @@ class EvidenceReconciliationTests(unittest.TestCase):
     def test_converted_entries_equal_conversion_packages(self):
         packages = {package["legacy_id"]: package["directory"]
                     for package in self.conversions["packages"]}
-        self.assertEqual(packages, PINNED_PACKAGES)
+        # every committed package, named by the committed conversions manifest,
+        # with a directory that really exists - the reconciliation the
+        # transcribed list used to make by luck rather than by construction
+        self.assertEqual(len(packages), len(self.conversions["packages"]),
+                         "conversion package legacy ids are distinct")
+        self.assertEqual(len(packages), PINNED_CONVERTED_PACKAGE_COUNT)
+        for legacy_id, directory in packages.items():
+            self.assertTrue(directory.startswith("assets/converted/"),
+                            legacy_id)
+            self.assertTrue((ROOT / directory / "package.json").is_file(),
+                            legacy_id)
+        for legacy_id, directory in PINNED_ORIGINAL_M4_PACKAGES.items():
+            self.assertEqual(packages.get(legacy_id), directory,
+                             "M4's original evidence package %s survived the "
+                             "mass conversion unchanged" % legacy_id)
         converted = {entry["ref"]: entry["runtime"]
                      for entry in self.entries("item_sprites")
                      if entry["status"] == "converted"}
@@ -365,7 +393,9 @@ class EvidenceReconciliationTests(unittest.TestCase):
                     runtime.startswith(builder.EXTRACTED_PREFIX), runtime)
                 self.assertEqual(dirs_by_source.get(entry["source"]), {runtime},
                                  entry["ref"])
-                self.assertNotIn(entry["ref"], PINNED_PACKAGES)
+                self.assertNotIn(entry["ref"],
+                                 {package["legacy_id"]
+                                  for package in self.conversions["packages"]})
         self.assertEqual(checked, counts_extracted(self.payload))
 
     def test_vocabulary_and_runtime_contract(self):
@@ -405,8 +435,8 @@ class EvidenceReconciliationTests(unittest.TestCase):
         self.assertEqual(counts["entries"], 1627)
         self.assertEqual(counts["by_status"], {
             "ambiguous": 0,
-            "converted": 2,
-            "extracted": 872,
+            "converted": 292,
+            "extracted": 582,
             "missing_source": 42,
             "passthrough": 704,
             "pending": 7,

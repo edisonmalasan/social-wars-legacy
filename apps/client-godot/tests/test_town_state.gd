@@ -144,6 +144,13 @@ func _check_fresh_parse(payload: Variant, registry: Variant) -> void:
 	check_eq(state.missing, [],
 		"no displayed field is missing from the fresh payload")
 	# Content resolution spot checks across the footprint range.
+	# The status argument of `_content_ok` is the committed asset-ID-registry
+	# status for the placement's own `img_name`, so each spot check pins a
+	# corpus fact rather than a projection convention. Space Station's
+	# sprite is `0199_space_station`, whose status moved from `extracted` to
+	# `converted` when the mass conversion (OpenSpec
+	# `asset-package-mass-conversion`) produced a converted package for it;
+	# the other three ids still name `extracted` sprites with no package.
 	var by_item := {}
 	for placement in state.placements:
 		if not by_item.has(placement.item):
@@ -153,7 +160,8 @@ func _check_fresh_parse(payload: Variant, registry: Variant) -> void:
 	check(_content_ok(by_item, 26, Vector2i(4, 4), "Command Center",
 		"building", "extracted"), "Command Center resolves 4x4")
 	check(_content_ok(by_item, 909, Vector2i(12, 6), "Space Station",
-		"building", "extracted"), "Space Station resolves 12x6")
+		"building", "converted"),
+		"Space Station resolves 12x6 against a converted sprite")
 	check(_content_ok(by_item, 929, Vector2i(5, 5), "Bridge", "building",
 		"extracted"), "Bridge resolves 5x5")
 	# Resource and summary values equal the fixture save exactly.

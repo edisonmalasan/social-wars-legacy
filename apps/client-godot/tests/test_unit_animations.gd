@@ -32,7 +32,8 @@ extends "res://tests/test_base.gd"
 ##               module declares EXACTLY the linkage accessors of D1-D5 and none
 ##               of the ABSENT_HELPERS;
 ##   boundary    no compatibility surface and no animate intent;
-##   coverage    the one-package coverage measured, and the ambiguous-reference
+##   coverage    the measured one-package coverage recorded against the committed
+##               corpus it sits in, and the ambiguous-reference
 ##               refusal over the committed set;
 ##   legacy      every recorded legacy figure re-derived from the committed source
 ##               in this same run, so no count is taken on trust.
@@ -55,7 +56,7 @@ const EXPECTED_FIELD_NAMES := [
 	"root_frame_count", "frame_rate",
 ]
 
-## The one committed converted unit package, repository-relative.
+## The converted unit package this projection reads, repository-relative.
 const PACKAGE_RELATIVE := "assets/converted/units/10033_wild_elephant/package.json"
 
 ## The committed unit whose own `img_name` names that package.
@@ -66,11 +67,8 @@ const COVERED_UNIT_ID := "933"
 ## committed content rather than over invented input.
 const AMBIGUOUS_UNIT_ID := "1001"
 
-## A committed unit whose `img_name` names no committed converted package, so the
-## absent-asset refusal is exercised through the real resolution path.
-const UNCONVERTED_UNIT_ID := "923"
-
-## The five labels the one committed converted package records, verbatim and in
+## The five labels the converted package this projection reads records, verbatim
+## and in
 ## committed order, each with its recorded frame position. This table is the
 ## suite's own transcription of the committed bytes, so a projection that altered
 ## a name, a position, the order, or the anchor fails the run.
@@ -210,6 +208,34 @@ func _definition(registry: Variant, id_text: String) -> Variant:
 	return resolved["entry"]
 
 
+## A committed unit whose `img_name` names no committed converted package, so the
+## absent-asset refusal is exercised through the real resolution path. The id is
+## DERIVED from the committed content and the committed package directories on
+## every run by `_first_unconverted_unit_id` rather than transcribed, because the
+## mass conversion (`asset-package-mass-conversion`) legitimately changed which
+## units have a package - a transcribed id rots silently the moment one more unit
+## is converted, and the refusal would quietly stop being exercised at all.
+##
+## The FIRST committed unit, in committed registry order, whose `img_name` names
+## no committed converted unit package. Returns "" when the committed set is
+## fully converted, which the caller refuses loudly rather than treating as a
+## skip - a fully converted corpus is a real change this suite would have to be
+## rewritten for, not a reason to stop asserting.
+func _first_unconverted_unit_id(registry: Variant) -> String:
+	var names: Array = UnitAnimations.coverage_record().get("unit_packages",
+		[]) as Array
+	var listed: Array = registry.legacy_ids("units").get("ids", []) as Array
+	for id_text: Variant in listed:
+		var entry: Dictionary = registry.get_entry("units",
+			str(id_text)).get("entry", {}) as Dictionary
+		var reference := str(entry.get("img_name", ""))
+		if reference.is_empty() or reference.contains(","):
+			continue
+		if not names.has(reference):
+			return str(id_text)
+	return ""
+
+
 ## Every reported value is compared against the committed bytes this suite read
 ## itself, so "verbatim" is a measurement rather than a claim.
 func _check_projection(registry: Variant, package: Dictionary) -> Dictionary:
@@ -248,8 +274,8 @@ func _check_projection(registry: Variant, package: Dictionary) -> Dictionary:
 	var result: Dictionary = UnitAnimations.resolve_asset(definition)
 
 	check_eq(bool(result.get("ok", false)), true,
-		"the one committed converted unit package resolves for the committed "
-			+ "definition that names it")
+		"the converted unit package this projection reads resolves for the "
+			+ "committed definition that names it")
 	check_eq(bool(result.get("resolvable", false)), true,
 		"the projection reports the asset as resolvable")
 	check_eq(str(result.get("package_relative_path", "")),
@@ -259,7 +285,7 @@ func _check_projection(registry: Variant, package: Dictionary) -> Dictionary:
 			+ "sprite reference the definition names")
 	check_eq(str(result.get("package_legacy_id", "")),
 		UnitAnimations.COVERED_UNIT_SPRITE_REFERENCE,
-		"the resolved package is the one committed converted unit package")
+		"the resolved package is the recorded evidence package")
 	check_eq(str(result.get("package_kind", "")), "converted_unit",
 		"the resolved package is recorded as a converted unit package")
 	check_eq(bool(result.get("asset_named_by_content", false)), true,
@@ -545,8 +571,12 @@ func _check_refusal(registry: Variant, package: Dictionary) -> Dictionary:
 	measured["ambiguous"] = 1
 
 	# a committed definition whose sprite reference names NO committed package
+	var unconverted_id := _first_unconverted_unit_id(registry)
+	check(not unconverted_id.is_empty(),
+		"at least one committed unit names no committed converted unit package, "
+			+ "so the absent-asset refusal stays exercised over real content")
 	var unconverted: Dictionary = UnitAnimations.resolve_asset(
-		_definition(registry, UNCONVERTED_UNIT_ID))
+		_definition(registry, unconverted_id))
 	check_eq(bool(unconverted.get("ok", true)), false,
 		"a committed definition naming no committed converted package is "
 			+ "refused through the real resolution path")
@@ -559,6 +589,7 @@ func _check_refusal(registry: Variant, package: Dictionary) -> Dictionary:
 		"an absent asset reports a null root frame count, never a nominal 1")
 	check_eq(int(unconverted.get("label_count", -1)), 0,
 		"an absent asset reports no label, never a single-frame animation")
+	measured["unconverted_unit"] = unconverted_id
 
 	# an invalid definition is a NAMED ABSENCE of the committed fields, never a
 	# reason to refuse the linkage itself
@@ -892,12 +923,26 @@ func _check_max_frame(registry: Variant, package: Dictionary) -> Dictionary:
 	# the one-data-point statements
 	check_eq(int(record.get("data_points", 0)), 1,
 		"the record states that the measurement is ONE data point")
-	check_eq(int(record.get("converted_unit_packages", 0)), 1,
-		"the record states that exactly one converted unit package is committed")
+	check_eq(int(record.get("measured_unit_packages", []).size()), 1,
+		"the record states that this projection MEASURED exactly one converted "
+			+ "unit package, which is the one it reads")
+	check_eq(int(record.get("committed_unit_packages", 0)),
+		UnitAnimations.COMMITTED_UNIT_PACKAGE_COUNT,
+		"the record pins the committed unit-package count, which the coverage "
+			+ "check re-derives from the committed tree in this same run")
+	check(int(record.get("committed_unit_packages", 0))
+			> int(record.get("measured_unit_packages", []).size()),
+		"the committed corpus holds MORE converted unit packages than this "
+			+ "projection measures, so the measured coverage is a strict subset "
+			+ "and no claim is made about the rest")
+	check_eq(int(record.get("committed_building_packages", 0)),
+		UnitAnimations.COMMITTED_BUILDING_PACKAGE_COUNT,
+		"the record pins the committed building-package count, likewise "
+			+ "re-derived in this same run")
 	check(str(record.get("what_max_frame_means", "")).contains("NOT CLAIMED"),
 		"the record states that what max_frame means is NOT claimed")
 	check(str(record.get("what_max_frame_means", "")).contains("ONE"),
-		"the record ties its refusal to the single committed package")
+		"the record ties its refusal to the single package it actually reads")
 	check_eq(bool(record.get("generalises", true)), false,
 		"the record states that the one data point does NOT generalise")
 	check(str(record.get("rule", "")).contains("ADOPTED NOWHERE"),
@@ -1161,28 +1206,57 @@ func _check_boundary() -> void:
 # The coverage record (design D5)
 # ---------------------------------------------------------------------------
 
-## The one-package coverage, measured rather than assumed, and the ambiguous
-## -reference refusal over the committed set.
+## The measured one-package coverage recorded against the committed corpus it
+## sits in, and the ambiguous-reference refusal over the committed set.
 func _check_coverage(registry: Variant) -> Dictionary:
 	var record: Dictionary = UnitAnimations.coverage_record()
 	var measured: Dictionary = {"unit_packages": 0, "building_packages": 0,
 		"covered_units": [], "ambiguous_units": []}
 
+	# the COMMITTED CORPUS, re-derived from the working tree on every run
 	var names: Array = record.get("unit_packages", []) as Array
 	measured["unit_packages"] = names.size()
-	check_eq(names, UnitAnimations.CONVERTED_UNIT_PACKAGES,
-		"exactly ONE converted unit package is committed, and it is the one "
-			+ "this projection reads")
-	check_eq(int(record.get("unit_package_count", 0)), 1,
-		"the recorded converted-unit-package count is one")
-	check_eq(int(record.get("unit_package_count_recorded", 0)),
-		int(record.get("unit_package_count", -1)),
-		"the recorded count and the measured count agree, so a later "
-			+ "conversion would have to change both")
+	check_eq(names.size(), UnitAnimations.COMMITTED_UNIT_PACKAGE_COUNT,
+		"the recorded committed unit-package count is the measured one, so a "
+			+ "later conversion has to change both")
+	check_eq(int(record.get("unit_package_count", 0)), names.size(),
+		"the record's own count agrees with the names it lists")
+	check_eq(int(record.get("unit_package_count_expected", 0)),
+		UnitAnimations.COMMITTED_UNIT_PACKAGE_COUNT,
+		"the record pins the same committed unit-package count again, so the "
+			+ "count cannot be asserted against itself")
 	measured["building_packages"] = int(record.get("building_package_count", 0))
-	check_eq(int(record.get("building_package_count", 0)), 1,
-		"exactly ONE converted building package is committed, so no "
-			+ "distribution over the corpus is measurable from the assets")
+	check_eq(int(record.get("building_package_count", 0)),
+		UnitAnimations.COMMITTED_BUILDING_PACKAGE_COUNT,
+		"the recorded committed building-package count is the measured one")
+	check_eq(int(record.get("building_package_count_expected", 0)),
+		UnitAnimations.COMMITTED_BUILDING_PACKAGE_COUNT,
+		"the record pins the committed building-package count again")
+	check(UnitAnimations.COMMITTED_UNIT_PACKAGE_COUNT > 1,
+		"more than one converted unit package is committed, so a distribution "
+			+ "over the corpus IS measurable from the assets - a later line may "
+			+ "measure it, and this one does not")
+
+	# the MEASURED EVIDENCE: the subset this projection actually reads
+	var evidence: Array = record.get("unit_packages_recorded", []) as Array
+	check_eq(evidence, UnitAnimations.EVIDENCE_UNIT_PACKAGES,
+		"the recorded evidence package list is exactly the one this projection "
+			+ "reads")
+	check_eq(int(record.get("unit_package_count_recorded", 0)),
+		UnitAnimations.EVIDENCE_UNIT_PACKAGE_COUNT,
+		"the recorded evidence-package count is one")
+	check_eq(int(record.get("unit_package_count_recorded", 0)), evidence.size(),
+		"the recorded evidence count agrees with the evidence list it names")
+	var unmeasured: Array = []
+	for each_name: Variant in names:
+		if not evidence.has(each_name):
+			unmeasured.append(str(each_name))
+	check_eq(unmeasured.size(),
+		UnitAnimations.COMMITTED_UNIT_PACKAGE_COUNT
+			- UnitAnimations.EVIDENCE_UNIT_PACKAGE_COUNT,
+		"every committed unit package that is NOT read here is accounted for, "
+			+ "so the measured coverage is a strict subset rather than the corpus")
+
 	check_eq(str(record.get("covered_unit_legacy_id", "")),
 		UnitAnimations.COVERED_UNIT_LEGACY_ID,
 		"the recorded covered unit is legacy id 933, the Wild Elephant")
@@ -1190,9 +1264,12 @@ func _check_coverage(registry: Variant) -> Dictionary:
 		"no conversion or extraction output is regenerated to cover another "
 			+ "unit")
 	check(str(record.get("statement", "")).contains("EXACTLY ONE UNIT"),
-		"the coverage statement says the coverage is exactly one unit")
+		"the coverage statement says the MEASURED coverage is exactly one unit")
+	check(str(record.get("statement", "")).contains("Sixty-nine"),
+		"the coverage statement records the committed corpus counts rather "
+			+ "than leaving them to be assumed")
 
-	# measured over the committed set: exactly one unit's committed sprite
+	# measured over the committed set: every unit whose committed sprite
 	# reference names a committed converted package
 	var covered: Array = []
 	var ambiguous: Array = []
@@ -1207,9 +1284,35 @@ func _check_coverage(registry: Variant) -> Dictionary:
 			ambiguous.append(str(id_text))
 	measured["covered_units"] = covered
 	measured["ambiguous_units"] = ambiguous
-	check_eq(covered, [UnitAnimations.COVERED_UNIT_LEGACY_ID],
-		"exactly ONE committed unit names a committed converted package, so the "
-			+ "projection's measured coverage is one unit")
+	check(covered.has(UnitAnimations.COVERED_UNIT_LEGACY_ID),
+		"the recorded covered unit is among the units naming a committed "
+			+ "converted package")
+	check_eq(covered.size(), UnitAnimations.COMMITTED_UNIT_PACKAGE_COUNT,
+		"as many committed units name a committed converted package as there "
+			+ "are committed converted unit packages, and both figures are "
+			+ "re-derived from the committed tree in this same run")
+	var covered_refs: Array = []
+	for id_text: Variant in covered:
+		covered_refs.append(str(_definition(registry,
+			str(id_text)).get("img_name", "")))
+	var distinct_refs: Array = []
+	for reference: Variant in covered_refs:
+		if not distinct_refs.has(reference):
+			distinct_refs.append(reference)
+	check_eq(distinct_refs.size(), covered_refs.size(),
+		"the covered units name DISTINCT committed packages, so the coverage "
+			+ "count is not inflated by two units sharing one reference")
+	check_eq(distinct_refs.size(), names.size(),
+		"the covered units name one committed package for one, so the unit "
+			+ "figure and the package figure cannot drift apart")
+	var unclaimed: Array = []
+	for each_name: Variant in names:
+		if not covered_refs.has(each_name):
+			unclaimed.append(str(each_name))
+	check_eq(unclaimed, [],
+		"every committed converted unit package is named by a committed unit, "
+			+ "so the coverage figure covers the corpus rather than a subset "
+			+ "of it")
 	check_eq(ambiguous, UnitAnimations.AMBIGUOUS_REFERENCE_UNITS,
 		"exactly 5 committed units carry a COMMA-JOINED sprite reference, and "
 			+ "each of them is refused rather than split")
@@ -1509,7 +1612,7 @@ func _sorted_keys(value: Dictionary) -> Array:
 func _read_package() -> Dictionary:
 	var absolute := Paths.repo_root().path_join(PACKAGE_RELATIVE)
 	if not FileAccess.file_exists(absolute):
-		fail("the one committed converted unit package is present at %s: this "
+		fail("the converted unit package this projection reads is present at %s: this "
 			% PACKAGE_RELATIVE
 			+ "line's whole linkage evidence is read out of it, and a missing "
 			+ "file would make the report vacuous")

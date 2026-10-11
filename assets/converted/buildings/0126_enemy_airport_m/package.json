@@ -1,0 +1,188 @@
+{
+  "bitmaps": [
+    {
+      "bytes": 92428,
+      "character_id": 1,
+      "file": "assets/converted/images/0126_enemy_airport_m/1.jpg",
+      "sha256": "601c833a7767d9541a6ebc88a3999491e7208bc06ddc096cd1b1aa0a5f5f787d"
+    },
+    {
+      "bytes": 14933,
+      "character_id": 1,
+      "file": "assets/converted/images/0126_enemy_airport_m/1_alpha.png",
+      "sha256": "b38d18703abbb144348a9314c1a4b152043b2f0e4501da24a8efd42c02b366e4"
+    },
+    {
+      "bytes": 89987,
+      "character_id": 6,
+      "file": "assets/converted/images/0126_enemy_airport_m/6.jpg",
+      "sha256": "982d50e96eef9e18c4653e8119d2df582e45fb47a515074a32e7ec5dbcf0c2a5"
+    },
+    {
+      "bytes": 14801,
+      "character_id": 6,
+      "file": "assets/converted/images/0126_enemy_airport_m/6_alpha.png",
+      "sha256": "e02501667d83a26ff9636f117ac5dad5a100b0d4b631ffaec536f7325dcdfdd7"
+    }
+  ],
+  "content_ref": {
+    "activation": 0,
+    "attack": 0,
+    "attack_interval": 0,
+    "attack_range": 0,
+    "best_against": "",
+    "best_against_mult": 1,
+    "build_time": 5,
+    "building_limit_same_id": -1,
+    "building_limit_same_scf": -1,
+    "category_id": 8,
+    "clicks_to_build": 1,
+    "collect": 0,
+    "collect_type": "g",
+    "collect_xp": 0,
+    "content_version": "44e5b9edd1eba2910833bb8e2f063175e51c5754e38c35177648e4de779df501",
+    "cost": 0,
+    "cost_unit_cash": 0,
+    "costs": {
+      "w": 30
+    },
+    "defense": 1,
+    "display_order": 0,
+    "elevation": 1,
+    "expiration": 0,
+    "gift_level": 1,
+    "giftable": 0,
+    "group_type": "CHAPTER ITEM",
+    "height": 4,
+    "img_name": "0126_enemy_airport_m",
+    "in_store": 0,
+    "inventory_ids": null,
+    "kind": "building",
+    "legacy_id": "126",
+    "life": 1000,
+    "max_collects": 0,
+    "max_elem_vol": 0,
+    "max_frame": 1,
+    "min_level": 1,
+    "name": "Enemy's airport",
+    "new_item": 0,
+    "population": 0,
+    "premium_upgrade_costs": null,
+    "properties": {
+      "ft_building": "1"
+    },
+    "race": "-",
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "subcat_functional": 812,
+    "subcategory_id": 81,
+    "syringes": 0,
+    "training_time": 0,
+    "trains_ids": -1,
+    "type": "b",
+    "unit_capacity": 0,
+    "upgrades_to": -1,
+    "velocity": 0,
+    "volume": 0,
+    "width": 4,
+    "xp": 3
+  },
+  "content_version": "c4e76e6d6b6cf176796ab9d263e4b074d086e8d967525ebcb06082841ce4fa0b",
+  "frame_count": 1,
+  "frame_height": 800,
+  "frame_rate": 24.0,
+  "frame_width": 800,
+  "kind": "converted_building",
+  "legacy_id": "0126_enemy_airport_m",
+  "placement": {
+    "height": 4,
+    "width": 4
+  },
+  "shapes": [
+    {
+      "bounds": {
+        "height_px": 732,
+        "width_px": 758,
+        "xmax": 15160,
+        "xmin": 0,
+        "ymax": 14640,
+        "ymin": 0
+      },
+      "character_id": 2,
+      "fills": [
+        {
+          "bitmap_id": 1,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 25,
+        "width_px": 25,
+        "xmax": 502,
+        "xmin": 0,
+        "ymax": 502,
+        "ymin": 0
+      },
+      "character_id": 3,
+      "fills": [
+        {
+          "color": "ff0000",
+          "type": 0
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 8,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 0,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 732,
+        "width_px": 758,
+        "xmax": 15160,
+        "xmin": 0,
+        "ymax": 14640,
+        "ymin": 0
+      },
+      "character_id": 7,
+      "fills": [
+        {
+          "bitmap_id": 6,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    }
+  ],
+  "source_file": "assets/sprites/0126_enemy_airport_m.swf",
+  "source_layer": "converted(asset-registry)",
+  "symbols": [
+    "0126_enemy_airport_m"
+  ]
+}

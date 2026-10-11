@@ -1,0 +1,3249 @@
+{
+  "bitmaps": [
+    {
+      "bytes": 4445,
+      "character_id": 1,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/1.jpg",
+      "sha256": "4c0e706f9c1f2efcd9d7ed036ff49599b3aca437b0a4fdf44d8197b8efb7fd65"
+    },
+    {
+      "bytes": 1078,
+      "character_id": 1,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/1_alpha.png",
+      "sha256": "ed1875237d6bc9530e2bf75940dcf1e1bac14998baf53b43a49af45d5bbc6016"
+    },
+    {
+      "bytes": 4399,
+      "character_id": 3,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/3.jpg",
+      "sha256": "ab90b56a1a73b95bb7b0523631b605bff248915b0e622f9b1e4c04f205778ef7"
+    },
+    {
+      "bytes": 1051,
+      "character_id": 3,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/3_alpha.png",
+      "sha256": "e65f0fd0197bc68c0d3ba394cf0dd4b011a808b7dd38ee4dbd828687c02c2aeb"
+    },
+    {
+      "bytes": 4592,
+      "character_id": 5,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/5.jpg",
+      "sha256": "501c9bbdc246dc04ebf57c35f71b5b0e8856b9c58c2f0e6e220fac1a540489c0"
+    },
+    {
+      "bytes": 1059,
+      "character_id": 5,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/5_alpha.png",
+      "sha256": "9eaaf9f1755036b8534b9e3a679ab0fdf7a7cb816832af076210da102a55876d"
+    },
+    {
+      "bytes": 5059,
+      "character_id": 8,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/8.jpg",
+      "sha256": "74dc3816b56f2d67c05716215fbd28eefecf0182f4976e7675649546a7650964"
+    },
+    {
+      "bytes": 1326,
+      "character_id": 8,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/8_alpha.png",
+      "sha256": "fc346c47eac9fca8a15a810570ec96ca4c6a14ee872297382b8d0a8fa22835d2"
+    },
+    {
+      "bytes": 5051,
+      "character_id": 10,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/10.jpg",
+      "sha256": "9a37515e72a98804b937a18195309e1caabd2f91f01921cd4443f136ae68cd6f"
+    },
+    {
+      "bytes": 1283,
+      "character_id": 10,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/10_alpha.png",
+      "sha256": "4376750de48b8219a686fecbed6870d341d9c7e817dbfc4994792b2099a909ce"
+    },
+    {
+      "bytes": 5064,
+      "character_id": 12,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/12.jpg",
+      "sha256": "2dbdce4668dcb5ef9e8cfbf5c5aecbefea4403b1f8d0fe7382553dd3b908060a"
+    },
+    {
+      "bytes": 1279,
+      "character_id": 12,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/12_alpha.png",
+      "sha256": "a12be353040c8a7a3f44ed4e656313182f5a182cb7c8d8066ca336f3e998a319"
+    },
+    {
+      "bytes": 4867,
+      "character_id": 15,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/15.jpg",
+      "sha256": "783a9296e632628e8766a468a815ab404c716e2e9a0439c00cb75cc116dc4e0e"
+    },
+    {
+      "bytes": 1137,
+      "character_id": 15,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/15_alpha.png",
+      "sha256": "57df4db9b5d83c0aac42c1cd02e049e0ee4d336e326882180881803681f4648f"
+    },
+    {
+      "bytes": 4904,
+      "character_id": 17,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/17.jpg",
+      "sha256": "d95a1ae5f4d8a7934834b90b3687449edf8a6db8e5008737bd669a38cb65a562"
+    },
+    {
+      "bytes": 1150,
+      "character_id": 17,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/17_alpha.png",
+      "sha256": "ba09b4cf334caff0361cbae62057f314e2fbd14d4a9254e3b348428e9906e481"
+    },
+    {
+      "bytes": 4894,
+      "character_id": 19,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/19.jpg",
+      "sha256": "48c7485ef0f2b561e21afeafcb06890f8def5f1770e4232943f340b3c3a9cbd7"
+    },
+    {
+      "bytes": 1134,
+      "character_id": 19,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/19_alpha.png",
+      "sha256": "8589dffe98f8adf7428e15495f8e4c5bdc7e79314e3127b4aa49b27dbc80399e"
+    },
+    {
+      "bytes": 5541,
+      "character_id": 22,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/22.jpg",
+      "sha256": "569b519827a6a10dad034f15223aea78cde26e5dd9829c0dad86460bdb1dfa09"
+    },
+    {
+      "bytes": 1369,
+      "character_id": 22,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/22_alpha.png",
+      "sha256": "147099e5abe4b36d07505c1516aadccfdd59d6e0bff32f82bd98911350dddec3"
+    },
+    {
+      "bytes": 5564,
+      "character_id": 24,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/24.jpg",
+      "sha256": "61a7690ae84b95d6a64085ad9ed2c403287cb80d177d806f22d1fe8cb7a469a0"
+    },
+    {
+      "bytes": 1334,
+      "character_id": 24,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/24_alpha.png",
+      "sha256": "99d503022e9ea170ae59fe8864e0b2657407dd5f4dddf5951150891da99f7ee7"
+    },
+    {
+      "bytes": 5605,
+      "character_id": 26,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/26.jpg",
+      "sha256": "cba1307af582ffd31a0afdf8a52a0b3b3f053054039add29f8e8bec78c65e952"
+    },
+    {
+      "bytes": 1330,
+      "character_id": 26,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/26_alpha.png",
+      "sha256": "736be52f63d2fb612e775bdbae3e7470e123825bd5b8e32db599e2fdeef5035f"
+    },
+    {
+      "bytes": 5175,
+      "character_id": 29,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/29.jpg",
+      "sha256": "e45f4764b459130b79c8aaedb24be12cee3a6a75211621569b36e6db3b2ad103"
+    },
+    {
+      "bytes": 1122,
+      "character_id": 29,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/29_alpha.png",
+      "sha256": "064c8a01897a0f749bd9ed289e7ea49444a58a62844c133051c91059be0c2ada"
+    },
+    {
+      "bytes": 5023,
+      "character_id": 31,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/31.jpg",
+      "sha256": "e6aaa4979104ad000c96daa25a4bd15372a8131497c94d96bb75b24a8701e707"
+    },
+    {
+      "bytes": 1121,
+      "character_id": 31,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/31_alpha.png",
+      "sha256": "de63cb57bb361ba920dc34073e74ba6823e4b18ccf9940cf9cb207d85afa7d0f"
+    },
+    {
+      "bytes": 5190,
+      "character_id": 33,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/33.jpg",
+      "sha256": "4e64960bfcd8de949755ac55e7b4448c94d3d3be294cfb8fa68eb3d88fd8815f"
+    },
+    {
+      "bytes": 1134,
+      "character_id": 33,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/33_alpha.png",
+      "sha256": "0645675eadb6fa8027816637f9a0d016334e516ad191d7d9de04b26355916c52"
+    },
+    {
+      "bytes": 4365,
+      "character_id": 36,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/36.jpg",
+      "sha256": "1cdff288e9d9cb0e8fcd1cfa0d4a81ab0a83e82d317b5a187cb6f26663937d9f"
+    },
+    {
+      "bytes": 1082,
+      "character_id": 36,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/36_alpha.png",
+      "sha256": "29b30cfdddc6234919e2ed4487d7ca6474810c244991d82a92518b8eca8bd735"
+    },
+    {
+      "bytes": 4405,
+      "character_id": 38,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/38.jpg",
+      "sha256": "54eac1b8a70fd51363e24ff2100bdb67195763398c61a58db93c6c55abf903b5"
+    },
+    {
+      "bytes": 1061,
+      "character_id": 38,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/38_alpha.png",
+      "sha256": "1bc6083011cd8cb51521c5fe6ca490b25bfed0936c81a5ff56816b0dab969ab5"
+    },
+    {
+      "bytes": 4362,
+      "character_id": 40,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/40.jpg",
+      "sha256": "d8de5b2a2af271fc3d57e8836491f03b8d02d493ad60a41670ffdf83962d7885"
+    },
+    {
+      "bytes": 1056,
+      "character_id": 40,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/40_alpha.png",
+      "sha256": "6146b198ea95a00617a1880729faebec5cfe696e988da4feef70eb926d70d08e"
+    },
+    {
+      "bytes": 5058,
+      "character_id": 43,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/43.jpg",
+      "sha256": "8f4c5f4aee496d41c0475450e2d7c09c590fdab2b59d69d54732c75d989b9dd3"
+    },
+    {
+      "bytes": 1321,
+      "character_id": 43,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/43_alpha.png",
+      "sha256": "d70503826273849944b35b82a5ab4039bb4f14aff16240b4125ba140031b4c55"
+    },
+    {
+      "bytes": 5011,
+      "character_id": 45,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/45.jpg",
+      "sha256": "e320e6e12c2b99ddd23b09bb122ff3388e80b7d36103dbc3811f74427dd2c4bf"
+    },
+    {
+      "bytes": 1308,
+      "character_id": 45,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/45_alpha.png",
+      "sha256": "1752ca5e2e4e48b4ea625340ea92b243d4ef03cfa495d6710273aa284b3d0008"
+    },
+    {
+      "bytes": 5172,
+      "character_id": 47,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/47.jpg",
+      "sha256": "3d1cd5677fdfc165bee0822dca7114ae5ad014499050a707c2755935d6d082c1"
+    },
+    {
+      "bytes": 1352,
+      "character_id": 47,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/47_alpha.png",
+      "sha256": "322fb8288be1b89d58aa085abef836afe52c4a67370e5218ff13fce74dbd2528"
+    },
+    {
+      "bytes": 4888,
+      "character_id": 50,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/50.jpg",
+      "sha256": "2c8f3fe43c6232cb4b9b321fe52b724dc6a3a3efbe1f176eaaa7458737d3deb8"
+    },
+    {
+      "bytes": 1139,
+      "character_id": 50,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/50_alpha.png",
+      "sha256": "437495260808cd69e288f63b03300b35c0d804c0e7e37e55196482e73b1fc0db"
+    },
+    {
+      "bytes": 5049,
+      "character_id": 52,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/52.jpg",
+      "sha256": "0fd3e75cff3506f5d13b41fb88b6e364634d81f9ac46c119947d8baee5e89cf0"
+    },
+    {
+      "bytes": 1205,
+      "character_id": 52,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/52_alpha.png",
+      "sha256": "275ae80125d9594b4cc308c272bee2c5905bb1cd854166af2f22a4ade5d80fd6"
+    },
+    {
+      "bytes": 5079,
+      "character_id": 54,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/54.jpg",
+      "sha256": "fed0e405b5c455c7c3b6b82ffdedc120efaa2d834839cd6c62b5a0434bf774cc"
+    },
+    {
+      "bytes": 1176,
+      "character_id": 54,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/54_alpha.png",
+      "sha256": "652fbdfb86e416d49bae5868aee0e6227d1556e352b9dcc9ee822e6f7fef2c4f"
+    },
+    {
+      "bytes": 5502,
+      "character_id": 57,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/57.jpg",
+      "sha256": "385cb1da2430f7a85af1de8bb246d7f1952a4c0e0e04fbb02351a5b5593dddfb"
+    },
+    {
+      "bytes": 1340,
+      "character_id": 57,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/57_alpha.png",
+      "sha256": "9fce0f9ea37d404a8924476e73adc4d9c71392ddfce3ba03a2d314ff9f224fa9"
+    },
+    {
+      "bytes": 5536,
+      "character_id": 59,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/59.jpg",
+      "sha256": "02864f3926b55e861086d6222be17a747f93e71cd4f363c5c9f31cf10398e67a"
+    },
+    {
+      "bytes": 1353,
+      "character_id": 59,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/59_alpha.png",
+      "sha256": "2837286a467cdb228f89c14d8b210b088b33696480bfbd62b127b83822571e85"
+    },
+    {
+      "bytes": 5441,
+      "character_id": 61,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/61.jpg",
+      "sha256": "f2a32ac89e9888522e72ead7de604a4cba02ebd0d16a85b1bdf241c641e1145d"
+    },
+    {
+      "bytes": 1335,
+      "character_id": 61,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/61_alpha.png",
+      "sha256": "05c59db7da086f7f59b6414b523e4a4730bf00545e5671fafbeeddf288b58cf0"
+    },
+    {
+      "bytes": 5159,
+      "character_id": 64,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/64.jpg",
+      "sha256": "0367a4a7c7531e81be7298d9cd46247248923b73e331962976350fd71237bfc4"
+    },
+    {
+      "bytes": 1153,
+      "character_id": 64,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/64_alpha.png",
+      "sha256": "773e3582212a710a713b1f88fe55bd2961ca9a009fd294ee68cad3f41bef155c"
+    },
+    {
+      "bytes": 5184,
+      "character_id": 66,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/66.jpg",
+      "sha256": "4f9ecb9621faa8762a846d7e7f7461264a09a03c1a0e079f8747b040f91bc416"
+    },
+    {
+      "bytes": 1097,
+      "character_id": 66,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/66_alpha.png",
+      "sha256": "c7098780a03609434e9de7b492362d5fc28179d9d8ce1215a7bea094c144da86"
+    },
+    {
+      "bytes": 5214,
+      "character_id": 68,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/68.jpg",
+      "sha256": "f2bb1a35a9234a480c80e8cc8507f03a65de6727f2ab92157bbe0a7246b9fee1"
+    },
+    {
+      "bytes": 1147,
+      "character_id": 68,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/68_alpha.png",
+      "sha256": "393a836f42255a36a02042e2d4159e841d5866494ed271b3ddfc3ac9a9ad6422"
+    },
+    {
+      "bytes": 4393,
+      "character_id": 71,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/71.jpg",
+      "sha256": "ce610574596153e53f8d53861680da61b05b335d8306aa976467ac41ba5f8d71"
+    },
+    {
+      "bytes": 1071,
+      "character_id": 71,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/71_alpha.png",
+      "sha256": "116619815bc920ba74195286d396faace5f2f038dda63bae5676951ccea85eee"
+    },
+    {
+      "bytes": 5664,
+      "character_id": 74,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/74.jpg",
+      "sha256": "f312c7334628e103b701640256c1f8fd93794bdca1867cffefd2bd7df85ab3b6"
+    },
+    {
+      "bytes": 1417,
+      "character_id": 74,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/74_alpha.png",
+      "sha256": "68ce2bb4e0d447417f96c28facc0da682ca9f28283ffb6d0221ff91febec51c5"
+    },
+    {
+      "bytes": 4393,
+      "character_id": 76,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/76.jpg",
+      "sha256": "ce610574596153e53f8d53861680da61b05b335d8306aa976467ac41ba5f8d71"
+    },
+    {
+      "bytes": 1071,
+      "character_id": 76,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/76_alpha.png",
+      "sha256": "116619815bc920ba74195286d396faace5f2f038dda63bae5676951ccea85eee"
+    },
+    {
+      "bytes": 5060,
+      "character_id": 79,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/79.jpg",
+      "sha256": "9f462ebcc67d75caee20de57b95a0247f137d8c56daf67dc67a58707d4b94ae3"
+    },
+    {
+      "bytes": 1316,
+      "character_id": 79,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/79_alpha.png",
+      "sha256": "0f67a068d9310d53d0b6fa427c7c4b87798a1916ec1b434ed446d9bc90eadf48"
+    },
+    {
+      "bytes": 6690,
+      "character_id": 81,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/81.jpg",
+      "sha256": "5f2650c96812d0d48f1e35e9788fd0b0fc053da639a110f26322e968d030a233"
+    },
+    {
+      "bytes": 1763,
+      "character_id": 81,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/81_alpha.png",
+      "sha256": "72d0c08042ee1d4f758f5d1e1379c457d660aaaef33a5f0af051bc86646c0cf5"
+    },
+    {
+      "bytes": 5060,
+      "character_id": 83,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/83.jpg",
+      "sha256": "9f462ebcc67d75caee20de57b95a0247f137d8c56daf67dc67a58707d4b94ae3"
+    },
+    {
+      "bytes": 1316,
+      "character_id": 83,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/83_alpha.png",
+      "sha256": "0f67a068d9310d53d0b6fa427c7c4b87798a1916ec1b434ed446d9bc90eadf48"
+    },
+    {
+      "bytes": 4888,
+      "character_id": 86,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/86.jpg",
+      "sha256": "2c8f3fe43c6232cb4b9b321fe52b724dc6a3a3efbe1f176eaaa7458737d3deb8"
+    },
+    {
+      "bytes": 1139,
+      "character_id": 86,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/86_alpha.png",
+      "sha256": "437495260808cd69e288f63b03300b35c0d804c0e7e37e55196482e73b1fc0db"
+    },
+    {
+      "bytes": 5925,
+      "character_id": 88,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/88.jpg",
+      "sha256": "3222975e8a09f32e37ba1e6e18e389846314e5b5fbd0e905c73fd2a3f5d90a2a"
+    },
+    {
+      "bytes": 1440,
+      "character_id": 88,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/88_alpha.png",
+      "sha256": "159b89b2acfcf6e0bafa7ca52fad601980055bd350cd128bd7bc59075a0e29cb"
+    },
+    {
+      "bytes": 4888,
+      "character_id": 90,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/90.jpg",
+      "sha256": "2c8f3fe43c6232cb4b9b321fe52b724dc6a3a3efbe1f176eaaa7458737d3deb8"
+    },
+    {
+      "bytes": 1139,
+      "character_id": 90,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/90_alpha.png",
+      "sha256": "437495260808cd69e288f63b03300b35c0d804c0e7e37e55196482e73b1fc0db"
+    },
+    {
+      "bytes": 5468,
+      "character_id": 93,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/93.jpg",
+      "sha256": "8162600e1e6e3f458b8e2c984d52c9eb785b7bf0ce365bb3b1c4e953a64955cb"
+    },
+    {
+      "bytes": 1341,
+      "character_id": 93,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/93_alpha.png",
+      "sha256": "ad04d92deec97fc776c11361c55e77a44f8a32019ca2c8ac4a89be6d2de6a940"
+    },
+    {
+      "bytes": 6740,
+      "character_id": 95,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/95.jpg",
+      "sha256": "0bcd8ec414c40175a9e94d00677c143881f298fe1fdecff62160133cb06053c0"
+    },
+    {
+      "bytes": 1725,
+      "character_id": 95,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/95_alpha.png",
+      "sha256": "2f74bd9458c01ac6a3bfc342de2bbdaf26b4268dfa22f61752f60a0d8b04e54c"
+    },
+    {
+      "bytes": 5468,
+      "character_id": 97,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/97.jpg",
+      "sha256": "8162600e1e6e3f458b8e2c984d52c9eb785b7bf0ce365bb3b1c4e953a64955cb"
+    },
+    {
+      "bytes": 1341,
+      "character_id": 97,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/97_alpha.png",
+      "sha256": "ad04d92deec97fc776c11361c55e77a44f8a32019ca2c8ac4a89be6d2de6a940"
+    },
+    {
+      "bytes": 5180,
+      "character_id": 100,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/100.jpg",
+      "sha256": "9948a7752fc00c09b05233ad2e80e9bc2c5d6a3ed0842837d43c2d39c3532fe8"
+    },
+    {
+      "bytes": 1120,
+      "character_id": 100,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/100_alpha.png",
+      "sha256": "abe2d3af65bc834cfbb005b05a39fe8ff6913b74efa1078755850c25016f8c2f"
+    },
+    {
+      "bytes": 6364,
+      "character_id": 102,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/102.jpg",
+      "sha256": "376cf028dd6eb90c06d715ec22b08489b4949537c39e516bc690d282ae519c7e"
+    },
+    {
+      "bytes": 1377,
+      "character_id": 102,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/102_alpha.png",
+      "sha256": "d8dcab5c6712d0fd546d017ea995c67519a355a46930d89453b6d6692dd63268"
+    },
+    {
+      "bytes": 5180,
+      "character_id": 104,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/104.jpg",
+      "sha256": "9948a7752fc00c09b05233ad2e80e9bc2c5d6a3ed0842837d43c2d39c3532fe8"
+    },
+    {
+      "bytes": 1120,
+      "character_id": 104,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/104_alpha.png",
+      "sha256": "abe2d3af65bc834cfbb005b05a39fe8ff6913b74efa1078755850c25016f8c2f"
+    },
+    {
+      "bytes": 5474,
+      "character_id": 107,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/107.jpg",
+      "sha256": "dfad5d3e2d8ebac9db9e0bfbc9d6ed463bfbdceb8547be4cc9e66afa6f8dd17c"
+    },
+    {
+      "bytes": 1331,
+      "character_id": 107,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/107_alpha.png",
+      "sha256": "da70c90d1bcde6b6be97df149146c8417c7b73133cdc2c08ae6d52f22a4225f7"
+    },
+    {
+      "bytes": 5439,
+      "character_id": 109,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/109.jpg",
+      "sha256": "37a86e917abaf6a4029956b9b0111de59a0846015e8e8179c583f3f3a69ba765"
+    },
+    {
+      "bytes": 1291,
+      "character_id": 109,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/109_alpha.png",
+      "sha256": "78f82d6e65897d1afe0a28546e29eb0bb7473babd9b3b273d57e98a01d3c86c0"
+    },
+    {
+      "bytes": 5521,
+      "character_id": 111,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/111.jpg",
+      "sha256": "f90a19da30a4002575cc80d448e2eedf38fdda69599b10865658bd7c8b324f02"
+    },
+    {
+      "bytes": 1303,
+      "character_id": 111,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/111_alpha.png",
+      "sha256": "a1633b958dc414e5d8d4a7773d57ab7db18b1bce317a7527ad468157603be6f0"
+    },
+    {
+      "bytes": 5382,
+      "character_id": 113,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/113.jpg",
+      "sha256": "542c8954412b6693de313f72d8db71e74c00bcb2c36e994c88b9f3a80cafbeef"
+    },
+    {
+      "bytes": 1137,
+      "character_id": 113,
+      "file": "assets/converted/images/1045_double_gun_soldier_m/113_alpha.png",
+      "sha256": "451daa3fffe6adce7922758bb8dc7562741cc1dd9380d41d1db2b84378b55fe6"
+    }
+  ],
+  "content_ref": {
+    "activation": 0,
+    "attack": 18,
+    "attack_interval": 35,
+    "attack_range": 7,
+    "best_against": "ft_armored",
+    "best_against_mult": 1,
+    "breeding_order": 5,
+    "build_time": 0,
+    "building_limit_same_id": -1,
+    "building_limit_same_scf": -1,
+    "category_id": 7,
+    "clicks_to_build": 0,
+    "collect": 0,
+    "collect_type": "g",
+    "collect_xp": 3,
+    "content_version": "44e5b9edd1eba2910833bb8e2f063175e51c5754e38c35177648e4de779df501",
+    "cost": 0,
+    "cost_unit_cash": 2,
+    "costs": {
+      "g": 250,
+      "s": 500
+    },
+    "defense": 1,
+    "display_order": 99,
+    "elevation": 1,
+    "expiration": 0,
+    "gift_level": 4,
+    "giftable": 0,
+    "group_type": "LONG_RANGE",
+    "height": 1,
+    "img_name": "1045_double_gun_soldier_m",
+    "in_store": 0,
+    "inventory_ids": null,
+    "kind": "unit",
+    "legacy_id": "1045",
+    "life": 110,
+    "max_collects": 0,
+    "max_elem_vol": 0,
+    "max_frame": 5,
+    "min_level": 5,
+    "name": "Double Gun Soldier",
+    "new_item": 0,
+    "population": 1,
+    "premium_upgrade_costs": null,
+    "properties": {
+      "bulldozable": "1",
+      "ft_ground": "1",
+      "human": "1",
+      "resurrectable": "1",
+      "seeStealthUnits": "1"
+    },
+    "race": "h",
+    "sm_training_time": 10000,
+    "source_file": "config/main.json",
+    "source_layer": "stored",
+    "subcat_functional": 80,
+    "subcategory_id": 7,
+    "syringes": 1,
+    "training_time": 0,
+    "trains_ids": -1,
+    "type": "u",
+    "unit_capacity": 0,
+    "upgrades_to": -1,
+    "velocity": 6,
+    "volume": 10,
+    "width": 1,
+    "xp": 15
+  },
+  "content_version": "a0c3861fd95cbe635537efd7223f46991580a6be66735a70c9b1904c8987c18f",
+  "frame_count": 1,
+  "frame_height": 400,
+  "frame_rate": 30.0,
+  "frame_width": 550,
+  "kind": "converted_unit",
+  "legacy_id": "1045_double_gun_soldier_m",
+  "main": {
+    "frame_count": 1,
+    "labels": [],
+    "placements": [
+      {
+        "character_id": 116,
+        "character_kind": "sprite",
+        "depth": 1,
+        "frame": 1,
+        "move": false
+      }
+    ],
+    "removes": []
+  },
+  "shapes": [
+    {
+      "bounds": {
+        "height_px": 129,
+        "width_px": 78,
+        "xmax": 1560,
+        "xmin": 0,
+        "ymax": 2580,
+        "ymin": 20
+      },
+      "character_id": 2,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 1,
+          "matrix": "d94000050000060140",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 129,
+        "width_px": 78,
+        "xmax": 1570,
+        "xmin": -10,
+        "ymax": 2580,
+        "ymin": 60
+      },
+      "character_id": 4,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 3,
+          "matrix": "d9400005000007ecf0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 128,
+        "width_px": 79,
+        "xmax": 1590,
+        "xmin": -30,
+        "ymax": 2570,
+        "ymin": 90
+      },
+      "character_id": 6,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 5,
+          "matrix": "d9400005000008e25a",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 123,
+        "width_px": 115,
+        "xmax": 2300,
+        "xmin": 0,
+        "ymax": 2460,
+        "ymin": 20
+      },
+      "character_id": 9,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 8,
+          "matrix": "d94000050000060140",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 123,
+        "width_px": 115,
+        "xmax": 2310,
+        "xmin": -10,
+        "ymax": 2460,
+        "ymin": 80
+      },
+      "character_id": 11,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 10,
+          "matrix": "d9400005000008f650",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 123,
+        "width_px": 116,
+        "xmax": 2320,
+        "xmin": -20,
+        "ymax": 2470,
+        "ymin": 130
+      },
+      "character_id": 13,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 12,
+          "matrix": "d9400005000009f62080",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 123,
+        "width_px": 114,
+        "xmax": 2280,
+        "xmin": 20,
+        "ymax": 2460,
+        "ymin": 0
+      },
+      "character_id": 16,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 15,
+          "matrix": "d94000050000065000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 123,
+        "width_px": 115,
+        "xmax": 2300,
+        "xmin": 20,
+        "ymax": 2470,
+        "ymin": 50
+      },
+      "character_id": 18,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 17,
+          "matrix": "d940000500000728c8",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 123,
+        "width_px": 115,
+        "xmax": 2300,
+        "xmin": 20,
+        "ymax": 2470,
+        "ymin": 90
+      },
+      "character_id": 20,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 19,
+          "matrix": "d9400005000008145a",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 123,
+        "width_px": 116,
+        "xmax": 2320,
+        "xmin": 0,
+        "ymax": 2460,
+        "ymin": -20
+      },
+      "character_id": 23,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 22,
+          "matrix": "d940000500000602c0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 123,
+        "width_px": 116,
+        "xmax": 2320,
+        "xmin": -20,
+        "ymax": 2460,
+        "ymin": 40
+      },
+      "character_id": 25,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 24,
+          "matrix": "d9400005000007d8a0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 123,
+        "width_px": 117,
+        "xmax": 2340,
+        "xmin": -20,
+        "ymax": 2460,
+        "ymin": 60
+      },
+      "character_id": 27,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 26,
+          "matrix": "d9400005000007d8f0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 130,
+        "width_px": 79,
+        "xmax": 1580,
+        "xmin": 0,
+        "ymax": 2600,
+        "ymin": 20
+      },
+      "character_id": 30,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 29,
+          "matrix": "d94000050000060140",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 130,
+        "width_px": 79,
+        "xmax": 1580,
+        "xmin": -20,
+        "ymax": 2600,
+        "ymin": 60
+      },
+      "character_id": 32,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 31,
+          "matrix": "d9400005000007d8f0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 129,
+        "width_px": 80,
+        "xmax": 1600,
+        "xmin": -40,
+        "ymax": 2590,
+        "ymin": 90
+      },
+      "character_id": 34,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 33,
+          "matrix": "d9400005000008d85a",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 126,
+        "width_px": 78,
+        "xmax": 1560,
+        "xmin": 0,
+        "ymax": 2520,
+        "ymin": 0
+      },
+      "character_id": 37,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 36,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 126,
+        "width_px": 77,
+        "xmax": 1540,
+        "xmin": -20,
+        "ymax": 2520,
+        "ymin": -20
+      },
+      "character_id": 39,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 38,
+          "matrix": "d9400005000006b2c0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 126,
+        "width_px": 77,
+        "xmax": 1540,
+        "xmin": -20,
+        "ymax": 2520,
+        "ymin": 40
+      },
+      "character_id": 41,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 40,
+          "matrix": "d9400005000007d8a0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 122,
+        "width_px": 114,
+        "xmax": 2280,
+        "xmin": -20,
+        "ymax": 2440,
+        "ymin": 0
+      },
+      "character_id": 44,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 43,
+          "matrix": "d9400005000006b000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 121,
+        "width_px": 114,
+        "xmax": 2280,
+        "xmin": -20,
+        "ymax": 2420,
+        "ymin": -40
+      },
+      "character_id": 46,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 45,
+          "matrix": "d9400005000007d960",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 121,
+        "width_px": 113,
+        "xmax": 2260,
+        "xmin": -40,
+        "ymax": 2420,
+        "ymin": -40
+      },
+      "character_id": 48,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 47,
+          "matrix": "d9400005000007b160",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 109,
+        "width_px": 101,
+        "xmax": 2020,
+        "xmin": -240,
+        "ymax": 2180,
+        "ymin": -280
+      },
+      "character_id": 51,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 50,
+          "matrix": "d940000500000ac42e80",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 109,
+        "width_px": 104,
+        "xmax": 2080,
+        "xmin": -200,
+        "ymax": 2180,
+        "ymin": -280
+      },
+      "character_id": 53,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 52,
+          "matrix": "d940000500000ace2e80",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 109,
+        "width_px": 99,
+        "xmax": 1990,
+        "xmin": -290,
+        "ymax": 2180,
+        "ymin": -280
+      },
+      "character_id": 55,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 54,
+          "matrix": "d940000500000ab7ae80",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 122,
+        "width_px": 116,
+        "xmax": 2320,
+        "xmin": 0,
+        "ymax": 2440,
+        "ymin": 0
+      },
+      "character_id": 58,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 57,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 123,
+        "width_px": 115,
+        "xmax": 2310,
+        "xmin": -10,
+        "ymax": 2460,
+        "ymin": 40
+      },
+      "character_id": 60,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 59,
+          "matrix": "d9400005000007eca0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 123,
+        "width_px": 116,
+        "xmax": 2320,
+        "xmin": 0,
+        "ymax": 2460,
+        "ymin": 40
+      },
+      "character_id": 62,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 61,
+          "matrix": "d940000500000700a0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 129,
+        "width_px": 79,
+        "xmax": 1580,
+        "xmin": 0,
+        "ymax": 2580,
+        "ymin": 0
+      },
+      "character_id": 65,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 64,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 130,
+        "width_px": 79,
+        "xmax": 1590,
+        "xmin": 10,
+        "ymax": 2600,
+        "ymin": 60
+      },
+      "character_id": 67,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 66,
+          "matrix": "d940000500000714f0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 129,
+        "width_px": 78,
+        "xmax": 1570,
+        "xmin": -10,
+        "ymax": 2580,
+        "ymin": -20
+      },
+      "character_id": 69,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 68,
+          "matrix": "d9400005000006dac0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 122,
+        "width_px": 73,
+        "xmax": 1460,
+        "xmin": -100,
+        "ymax": 2440,
+        "ymin": -80
+      },
+      "character_id": 72,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 71,
+          "matrix": "d94000050000089cb0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 122,
+        "width_px": 72,
+        "xmax": 1450,
+        "xmin": -110,
+        "ymax": 2450,
+        "ymin": -490
+      },
+      "character_id": 75,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 74,
+          "matrix": "d940000500000ae4a160",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 122,
+        "width_px": 72,
+        "xmax": 1440,
+        "xmin": -120,
+        "ymax": 2440,
+        "ymin": -80
+      },
+      "character_id": 77,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 76,
+          "matrix": "d940000500000888b0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 122,
+        "width_px": 115,
+        "xmax": 2300,
+        "xmin": 0,
+        "ymax": 2440,
+        "ymin": 0
+      },
+      "character_id": 80,
+      "fill_refs": [
+        1
+      ],
+      "fills": [
+        {
+          "bitmap_id": 79,
+          "matrix": "d9400005000000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 121,
+        "width_px": 145,
+        "xmax": 2900,
+        "xmin": 0,
+        "ymax": 2430,
+        "ymin": -370
+      },
+      "character_id": 82,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 81,
+          "matrix": "d940000500000a0028e0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 122,
+        "width_px": 114,
+        "xmax": 2290,
+        "xmin": -10,
+        "ymax": 2440,
+        "ymin": 0
+      },
+      "character_id": 84,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 83,
+          "matrix": "d9400005000005b000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 123,
+        "width_px": 109,
+        "xmax": 2180,
+        "xmin": -80,
+        "ymax": 2460,
+        "ymin": 0
+      },
+      "character_id": 87,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 86,
+          "matrix": "d9400005000008b000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 123,
+        "width_px": 139,
+        "xmax": 2784,
+        "xmin": -136,
+        "ymax": 2466,
+        "ymin": 6
+      },
+      "character_id": 89,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 88,
+          "matrix": "d9400005000009bc0180",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 123,
+        "width_px": 108,
+        "xmax": 2170,
+        "xmin": -90,
+        "ymax": 2460,
+        "ymin": 0
+      },
+      "character_id": 91,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 90,
+          "matrix": "d9400005000008a600",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 121,
+        "width_px": 116,
+        "xmax": 2320,
+        "xmin": 0,
+        "ymax": 2422,
+        "ymin": 2
+      },
+      "character_id": 94,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 93,
+          "matrix": "d940000500000308",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 122,
+        "width_px": 144,
+        "xmax": 2880,
+        "xmin": -40,
+        "ymax": 2442,
+        "ymin": 22
+      },
+      "character_id": 96,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 95,
+          "matrix": "d9400005000007b058",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 121,
+        "width_px": 115,
+        "xmax": 2310,
+        "xmin": -10,
+        "ymax": 2420,
+        "ymin": 0
+      },
+      "character_id": 98,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 97,
+          "matrix": "d9400005000005b000",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 128,
+        "width_px": 79,
+        "xmax": 1580,
+        "xmin": 0,
+        "ymax": 2560,
+        "ymin": -20
+      },
+      "character_id": 101,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 100,
+          "matrix": "d940000500000602c0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 134,
+        "width_px": 79,
+        "xmax": 1580,
+        "xmin": 0,
+        "ymax": 2690,
+        "ymin": -30
+      },
+      "character_id": 103,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 102,
+          "matrix": "d94000050000060220",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 128,
+        "width_px": 79,
+        "xmax": 1580,
+        "xmin": 0,
+        "ymax": 2560,
+        "ymin": -20
+      },
+      "character_id": 105,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 104,
+          "matrix": "d940000500000602c0",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 125,
+        "width_px": 116,
+        "xmax": 2320,
+        "xmin": 0,
+        "ymax": 2500,
+        "ymin": 80
+      },
+      "character_id": 108,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 107,
+          "matrix": "d94000050000080050",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 125,
+        "width_px": 125,
+        "xmax": 2510,
+        "xmin": 70,
+        "ymax": 2500,
+        "ymin": 260
+      },
+      "character_id": 110,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 109,
+          "matrix": "d940000500000a119040",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 125,
+        "width_px": 144,
+        "xmax": 2881,
+        "xmin": -199,
+        "ymax": 2510,
+        "ymin": 670
+      },
+      "character_id": 112,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 111,
+          "matrix": "d940000500000be72a78",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    },
+    {
+      "bounds": {
+        "height_px": 151,
+        "width_px": 142,
+        "xmax": 2851,
+        "xmin": -389,
+        "ymax": 3030,
+        "ymin": 1410
+      },
+      "character_id": 114,
+      "fill_refs": [
+        2
+      ],
+      "fills": [
+        {
+          "bitmap_id": 65535,
+          "matrix": "d9400005000000",
+          "type": 65
+        },
+        {
+          "bitmap_id": 113,
+          "matrix": "d940000500000ce7b582",
+          "type": 65
+        }
+      ],
+      "lines": [],
+      "records": {
+        "curved": 0,
+        "end": 1,
+        "new_styles": 0,
+        "straight": 4,
+        "style_change": 1
+      },
+      "tag": 2
+    }
+  ],
+  "source_file": "assets/sprites/1045_double_gun_soldier_m.swf",
+  "source_layer": "converted(asset-registry)",
+  "sprites": [
+    {
+      "frame_count": 45,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 2,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 14,
+          "move": true
+        },
+        {
+          "character_id": 6,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 4,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 35,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 7
+    },
+    {
+      "frame_count": 45,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 9,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 11,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 14,
+          "move": true
+        },
+        {
+          "character_id": 13,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 11,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 35,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 14
+    },
+    {
+      "frame_count": 45,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 16,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 18,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 14,
+          "move": true
+        },
+        {
+          "character_id": 20,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 18,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 35,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 21
+    },
+    {
+      "frame_count": 45,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 23,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 25,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 14,
+          "move": true
+        },
+        {
+          "character_id": 27,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 25,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 35,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 28
+    },
+    {
+      "frame_count": 45,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 30,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 32,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 14,
+          "move": true
+        },
+        {
+          "character_id": 34,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 25,
+          "move": true
+        },
+        {
+          "character_id": 32,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 35,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 35
+    },
+    {
+      "frame_count": 14,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 37,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 39,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 37,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 41,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 42
+    },
+    {
+      "frame_count": 14,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 44,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 46,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 44,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 48,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 49
+    },
+    {
+      "frame_count": 14,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 51,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 53,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 51,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 55,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 56
+    },
+    {
+      "frame_count": 14,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 58,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 60,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 58,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 62,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 63
+    },
+    {
+      "frame_count": 14,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 65,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 67,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 65,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 8,
+          "move": true
+        },
+        {
+          "character_id": 69,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 11,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 70
+    },
+    {
+      "frame_count": 1,
+      "labels": [],
+      "placements": [],
+      "removes": [],
+      "sprite_id": 73
+    },
+    {
+      "frame_count": 7,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 72,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 73,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 73,
+          "character_kind": "sprite",
+          "depth": 4,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 75,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 77,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 6,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 78
+    },
+    {
+      "frame_count": 7,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 80,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 73,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 73,
+          "character_kind": "sprite",
+          "depth": 4,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 82,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 84,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 6,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 85
+    },
+    {
+      "frame_count": 7,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 87,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 73,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 73,
+          "character_kind": "sprite",
+          "depth": 4,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 89,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 91,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 6,
+          "move": true
+        },
+        {
+          "character_id": null,
+          "character_kind": null,
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 92
+    },
+    {
+      "frame_count": 7,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 94,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 73,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 73,
+          "character_kind": "sprite",
+          "depth": 4,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 96,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 98,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 6,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 99
+    },
+    {
+      "frame_count": 7,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 101,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 73,
+          "character_kind": "sprite",
+          "depth": 2,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 73,
+          "character_kind": "sprite",
+          "depth": 4,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 103,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 105,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 6,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 106
+    },
+    {
+      "frame_count": 10,
+      "labels": [],
+      "placements": [
+        {
+          "character_id": 108,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 110,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 4,
+          "move": true
+        },
+        {
+          "character_id": 112,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 7,
+          "move": true
+        },
+        {
+          "character_id": 114,
+          "character_kind": "shape",
+          "depth": 1,
+          "frame": 10,
+          "move": true
+        }
+      ],
+      "removes": [],
+      "sprite_id": 115
+    },
+    {
+      "frame_count": 25,
+      "labels": [
+        {
+          "anchor": false,
+          "frame": 1,
+          "name": "QUIETO"
+        },
+        {
+          "anchor": false,
+          "frame": 6,
+          "name": "ANDAR"
+        },
+        {
+          "anchor": false,
+          "frame": 11,
+          "name": "ATAQUE"
+        },
+        {
+          "anchor": false,
+          "frame": 16,
+          "name": "MUERTE"
+        },
+        {
+          "anchor": false,
+          "frame": 21,
+          "name": "PICAR"
+        }
+      ],
+      "placements": [
+        {
+          "character_id": 7,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 1,
+          "move": false
+        },
+        {
+          "character_id": 14,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 2,
+          "move": false
+        },
+        {
+          "character_id": 21,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 3,
+          "move": false
+        },
+        {
+          "character_id": 28,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 4,
+          "move": false
+        },
+        {
+          "character_id": 35,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 5,
+          "move": false
+        },
+        {
+          "character_id": 42,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 6,
+          "move": false
+        },
+        {
+          "character_id": 49,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 7,
+          "move": false
+        },
+        {
+          "character_id": 56,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 8,
+          "move": false
+        },
+        {
+          "character_id": 63,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 9,
+          "move": false
+        },
+        {
+          "character_id": 70,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 10,
+          "move": false
+        },
+        {
+          "character_id": 78,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 11,
+          "move": false
+        },
+        {
+          "character_id": 85,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 12,
+          "move": false
+        },
+        {
+          "character_id": 92,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 13,
+          "move": false
+        },
+        {
+          "character_id": 99,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 14,
+          "move": false
+        },
+        {
+          "character_id": 106,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 15,
+          "move": false
+        },
+        {
+          "character_id": 115,
+          "character_kind": "sprite",
+          "depth": 1,
+          "frame": 16,
+          "move": false
+        }
+      ],
+      "removes": [
+        {
+          "depth": 1,
+          "frame": 2
+        },
+        {
+          "depth": 1,
+          "frame": 3
+        },
+        {
+          "depth": 1,
+          "frame": 4
+        },
+        {
+          "depth": 1,
+          "frame": 5
+        },
+        {
+          "depth": 1,
+          "frame": 6
+        },
+        {
+          "depth": 1,
+          "frame": 7
+        },
+        {
+          "depth": 1,
+          "frame": 8
+        },
+        {
+          "depth": 1,
+          "frame": 9
+        },
+        {
+          "depth": 1,
+          "frame": 10
+        },
+        {
+          "depth": 1,
+          "frame": 11
+        },
+        {
+          "depth": 1,
+          "frame": 12
+        },
+        {
+          "depth": 1,
+          "frame": 13
+        },
+        {
+          "depth": 1,
+          "frame": 14
+        },
+        {
+          "depth": 1,
+          "frame": 15
+        },
+        {
+          "depth": 1,
+          "frame": 16
+        },
+        {
+          "depth": 1,
+          "frame": 21
+        }
+      ],
+      "sprite_id": 116
+    }
+  ],
+  "symbols": [
+    {
+      "id": 116,
+      "name": "1045_double_gun_soldier_m"
+    },
+    {
+      "id": 115,
+      "name": "_1045_double_gun_soldier_m_fla.arquero1atacando3_4detras_18"
+    },
+    {
+      "id": 106,
+      "name": "_1045_double_gun_soldier_m_fla.arquero1atacandofrente_17"
+    },
+    {
+      "id": 99,
+      "name": "_1045_double_gun_soldier_m_fla.arquero1atacando3_4frente_16"
+    },
+    {
+      "id": 92,
+      "name": "_1045_double_gun_soldier_m_fla.arquero1atacandoperfil_15"
+    },
+    {
+      "id": 85,
+      "name": "_1045_double_gun_soldier_m_fla.arquero1muriendo_14"
+    },
+    {
+      "id": 78,
+      "name": "_1045_double_gun_soldier_m_fla.arquero1atacandodetras_12"
+    }
+  ]
+}
