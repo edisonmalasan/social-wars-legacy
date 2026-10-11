@@ -5,11 +5,14 @@ Provide one assembled converted-building package linking parsed shape records to
 ## Requirements
 
 ### Requirement: Single-building package assembly
-The tool SHALL assemble `assets/converted/buildings/<target-stem>/` for the **declared target stem**, with `package.json` (legacy_id, content definition ref, source provenance, frame data, symbols, shape bounds/style/bitmap-ref records, bitmap outputs with digests, placement tiles) plus byte-identical bitmap copies. The target stem SHALL be a required input; the tool SHALL NOT carry a default target. The content definition SHALL be resolved by `img_name` and SHALL fail closed unless exactly one normalized buildings entry matches. Bitmap digests SHALL match extraction outputs exactly, and every package field other than `content_version` SHALL be identical in shape and meaning to the package assembled for any other target.
+The tool SHALL assemble `assets/converted/buildings/<target-stem>/` for the **declared target stem**, with `package.json` (legacy_id, content definition ref, source provenance, frame data, symbols, shape bounds/style/bitmap-ref records, bitmap references with digests, placement tiles). The target stem SHALL be a required input; the tool SHALL NOT carry a default target. The content definition SHALL be resolved by `img_name` and SHALL fail closed unless exactly one normalized buildings entry matches. Bitmap digests SHALL match extraction outputs exactly, and every package field other than `content_version` SHALL be identical in shape and meaning to the package assembled for any other target.
+
+**A package SHALL reference its bitmaps rather than copy them.** Each bitmap entry SHALL record the extraction output path under the shared extracted image tree, together with its byte count and SHA-256, and the package directory SHALL contain no copied bitmap bytes. The referenced path SHALL be resolved and its bytes SHALL be hashed during conversion, and a digest mismatch SHALL fail validation before any output is written. Converting a bitmap reference SHALL NOT depend on a prior copy existing in the package directory.
 
 #### Scenario: Assemble the measured house
 - **WHEN** the converter runs on `0001_house_1_m` against the current corpus
-- **THEN** the package directory holds a validated `package.json` plus the JPEG and alpha PNG with matching digests
+- **THEN** the package directory holds a validated `package.json` whose bitmap entries name the shared extracted image tree with matching digests
+- **AND** the package directory holds no copied bitmap bytes
 
 #### Scenario: Assemble a different target
 - **WHEN** the converter runs on any other declared target stem whose bitmaps are extracted and whose `img_name` resolves to exactly one normalized entry
@@ -26,6 +29,11 @@ The tool SHALL assemble `assets/converted/buildings/<target-stem>/` for the **de
 - **THEN** exactly one normalized buildings entry matches `img_name`, with tiles and costs recorded verbatim
 - **AND** a stem matching zero or more than one entry fails closed
 
+#### Scenario: A referenced bitmap is checked, not merely recorded
+- **WHEN** a referenced extraction path is missing, or its bytes do not hash to the recorded SHA-256
+- **THEN** validation fails identifying the bitmap, and no output is written
+
+
 ### Requirement: The package provenance digest is independent of the checkout's line endings
 The tool SHALL compute the input fingerprint that becomes the package's `content_version` over **line-ending-normalised** bytes, so that the same committed content yields the same `content_version` on an LF checkout and a CRLF checkout alike. The tool SHALL NOT hash raw working-tree bytes of any input whose line endings are not pinned. This is the treatment `apps/compat-api/guard_baseline.py` already applies to its own digests.
 
@@ -38,6 +46,7 @@ The tool SHALL compute the input fingerprint that becomes the package's `content
 - **THEN** the recorded `content_version` changes from the previously committed raw-byte digest
 - **AND** `conversions.json` records the new `package_sha256` for this package
 - **AND** the compatibility guard baseline covering both conversion packages and the registry manifests is regenerated in the same change
+
 
 ### Requirement: Buildings outside the parsed subset are refused and the refusals are measured
 The tool SHALL fail closed, with no writes, for a target whose shape records fall outside the parsed subset, and the refusal SHALL name the file and the offending record. The tool SHALL NOT relax, widen, or reinterpret the parsed subset to make a target convertible, and SHALL NOT skip an unresolvable fill, an unknown style, or an unsupported tag. The refusal classes observed across the candidate population SHALL be recorded as data by the census capability rather than suppressed.
@@ -56,6 +65,7 @@ The tool SHALL fail closed, with no writes, for a target whose shape records fal
 - **WHEN** a refusal class dominates the population but its cause has not been established
 - **THEN** it is recorded as unestablished with the measurements that disagree
 - **AND** no fix is adopted for it on the strength of either measurement alone
+
 
 ### Requirement: Shape-style record parsing
 The tool SHALL parse SHAPEWITHSTYLE bounds, fill/line style arrays with counts and types, bitmap-fill character IDs, and raw matrices, failing closed on other shape versions or unexpected layouts. Edge records SHALL be counted, never tessellated. `RECT` coordinate fields SHALL be decoded as the signed bit fields the format specifies: a field whose sign bit within the declared `Nbits` is set SHALL be sign-extended to its negative value rather than read as a large unsigned value. A decoded `RECT` whose `xmax` is below its `xmin`, or whose `ymax` is below its `ymin`, SHALL fail closed as an inverted rectangle, and SHALL NOT be reported as an extent of zero. A gradient fill style SHALL read its `MATRIX` before its gradient record block, in the order the format specifies, and SHALL NOT read the record block first.
@@ -88,8 +98,11 @@ The tool SHALL parse SHAPEWITHSTYLE bounds, fill/line style arrays with counts a
 - **THEN** 19 of its 28 shapes record a corrected `xmin` or `ymin`
 - **AND** no shape's `width_px` or `height_px` changes
 
+
 ### Requirement: Validation and conversion manifest
 The tool SHALL validate bounds presence, bitmap-fill resolution, content-ref uniqueness, schema fields, and determinism, and SHALL write `conversions.json` plus a `converted` statuses merge. It SHALL report success with exit 0 and any validation failure with a non-zero exit, writing outputs only on success.
+
+**`output_bytes` SHALL be the package.json byte total.** Because a package references its bitmaps rather than copying them, no copied bitmap bytes exist to add; the field SHALL NOT be documented as including them.
 
 #### Scenario: Detect an unresolvable bitmap fill
 - **WHEN** a bitmap-fill ID has no extracted output
@@ -97,11 +110,23 @@ The tool SHALL validate bounds presence, bitmap-fill resolution, content-ref uni
 
 #### Scenario: Prove outputs match inputs
 - **WHEN** package outputs are re-derived in memory
-- **THEN** records, copies, digests, and counts are recomputed equal before any write
+- **THEN** records, references, digests, and counts are recomputed equal before any write
+
+#### Scenario: The recorded byte total means what it says
+- **WHEN** `conversions.json` records a package's `output_bytes`
+- **THEN** the value equals that package's `package.json` byte length
+- **AND** no documentation describes it as including copied bitmap bytes
+
 
 ### Requirement: Preservation-safe conversion tooling
 The tool SHALL NOT tessellate, rasterize, interpret matrices or scripts, relocate, or modify any source asset; SHALL NOT use Flash, browser, network, server, or subprocess execution; and SHALL write only the package directory plus manifests on success. Registry, coverage, inspection, and extraction manifests SHALL remain untouched.
 
+**The tool SHALL NOT regenerate or modify the preservation manifest.** The preservation manifest is built from the Git tree of a single pinned commit, so files added by later commits cannot enter it; a conversion run that rewrote it would be asserting a change that cannot occur.
+
 #### Scenario: Convert without source side effects
 - **WHEN** the converter succeeds or fails
 - **THEN** every source asset and prior manifest remains byte-identical and only package outputs plus manifests are created or replaced
+
+#### Scenario: The preservation manifest does not move
+- **WHEN** conversion succeeds and packages are committed
+- **THEN** the preservation manifest still verifies at its original entry count and byte total
