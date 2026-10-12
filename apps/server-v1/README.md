@@ -19,21 +19,25 @@ is retired per domain, later, once each domain has a verified v1 replacement.
 
 ## What exists today
 
-One route.
+Two routes.
 
-| | |
-| --- | --- |
-| Route | `POST /v1/collect` |
-| Request | `{"player_id": <uuid>, "row": <int>}` — intent only |
-| Success | `200` with `result`, `action`, `instant`, `rung`, `derived_deltas`, `resources_before`, `resources_after`, `derivation_id`, `protocol` |
-| Gameplay refusal | `409` with `result: "refused"` and a `code` |
-| Structural refusal | `400` |
-| Unknown player | `404` |
-| Loopback | `127.0.0.1:5057`, no host option |
-| Protocol name | `server-v1` |
+| | `collect` | `collection` |
+| --- | --- | --- |
+| Route | `POST /v1/collect` | `POST /v1/collection` |
+| Request | `{"player_id": <uuid>, "row": <int>}` — intent only | `{"player_id": <uuid>, "collection_id": <int>}` — intent only |
+| Derives | a payout rung from committed `COLLECT_MINUTES` | a price, a requirement set and a prize from committed `collections` |
+| Charges | nothing (a payout) | `cashPrice` (a **debit**) |
+| Mutates | `maps/0/items/<row>/3` | `maps/0/store/<prize>`, `playerInfo/cash`, `privateState/collections` |
+| Refusals | `409`, plus `400`/`404`/`500` | `409`, plus `400`/`404`/`500` |
 
-There is no other route. `ROUTES` in `server_v1_app.py` is the inventory and the
-tests assert it has exactly one entry.
+Shared for both: a `200` carrying `result`, `action`, the derived figures, and
+`protocol`; a gameplay refusal as `409` with `result: "refused"` and a `code`; a
+structural refusal as `400`; an unknown player as `404`. Loopback
+`127.0.0.1:5057`, no host option; protocol name `server-v1`.
+
+`ROUTES` in `server_v1_app.py` is the inventory, `run.py`'s startup banner reads
+that same mapping rather than transcribing it, and `tests/test_app.py` asserts the
+set has exactly these two entries.
 
 ## Layering
 
@@ -41,7 +45,8 @@ tests assert it has exactly one entry.
 run.py              process, port, exit codes, containment
 server_v1_app.py    transport: parse intent -> call domain -> serialise outcome
 server_v1_intent.py the boundary: refuses any client-dictated outcome field
-server_v1_collect.py the one slice: decide, act, prove
+server_v1_collect.py the first slice: decide, act, prove
+server_v1_collection.py the second slice: a grant, not a payout
 server_v1_economy.py the ONLY place a resource delta is derived
 server_v1_outcomes.py typed success (requires a derivation) / typed refusal
 server_v1_refusals.py the closed refusal vocabulary and its status table
@@ -55,8 +60,9 @@ Design **D2** is the load-bearing decision: the boundary is a domain service, no
 route middleware. Middleware would have let a second route be added without
 re-deciding who is allowed to move a balance. Here, adding a route means calling
 `derive_collection_payout` or writing another derivation beside it, and the AST
-invariant test in `tests/test_boundary_invariant.py` fails if a second derivation
-appears anywhere in the directory.
+invariant test in `tests/test_boundary_invariant.py` fails if a second
+`ResourceDerivation` call site, or any `CollectionGrant` construction outside the
+economy, appears anywhere in the directory.
 
 ## Verified commands
 
@@ -129,6 +135,37 @@ nothing cannot satisfy half one, and a derivation that moved the wrong amount
 cannot satisfy half two. Both halves were proven sensitive by injection, not
 trusted; see the correction notes in `tests/test_parity_v0_collect.py` and
 `tests/test_collect.py`.
+
+## The collection grant: four derived rules
+
+`server_v1_collection` replaces a fourteen-line branch (`command.py:504-523`) that
+grants a committed prize **unconditionally** and appends to the ledger only if the
+id is absent. v1 adds three rules the branch does not have, each in a recorded
+fixed order — alias/unresolvable id, content readability, already claimed,
+eligibility, affordability — so every refusal is independently reachable:
+
+| Rule | Source | Status |
+| --- | --- | --- |
+| alias (id `< 1` clamps to collection 1 through `max(0, id-1)`) | the branch's own index | **derived** (design D3) |
+| eligibility (`hold every committed item_ids`) | committed `collections.item_ids`, **zero legacy consumers** | **derived** (design D4) |
+| price (`cashPrice`) | committed `collections.cashPrice`, **zero legacy consumers** | **derived** (design D5) |
+| once-only (`privateState.collections`) | the branch's conditional append | **derived** (design D6) |
+
+Because none of the four was observed from the Flash client, each is a
+**divergence** from the preserved branch and never parity. `CollectionGrant` is a
+separate derivation type rather than a `ResourceDerivation` with a negative delta:
+`ResourceDerivation` forbids negative deltas by construction, and a collection has
+no ladder, no rung and no elapsed time.
+
+Its post-execution proof has **four** halves — granted quantity, no unexpected
+storage key besides the granted one, every stored resource moved by exactly the
+derived delta, and the ledger exactly one longer — each proven sensitive by
+injection in `tests/test_collection.py`, and each rolled back on failure.
+
+**A recorded limit:** the proof does **not** catch a stored key that *vanishes*.
+`server_v1_collection._prove` says so in its own docstring, and
+`tests/test_collection.py` asserts the behaviour rather than quoting the claim,
+so the day the gap is closed the test fails and the docstring must move with it.
 
 ## Evidence
 

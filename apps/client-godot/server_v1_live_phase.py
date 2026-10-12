@@ -39,6 +39,24 @@ ASGI app is serving, that the delivered route exists, and that the refusal
 vocabulary is live - all three, none of them vacuously. A socket-level
 "something is listening" probe would only prove the third.
 
+## Collection phases seed the corpus, and that is declared, not hidden
+
+``--seed-collection=<id>`` copies one committed row's ``item_ids`` and
+``cashPrice`` into the disposable corpus save before the wrapped command runs.
+
+It exists because **the committed fresh-player corpus cannot exercise a grant**:
+its ``maps[0]["store"]`` is ``{}`` so it holds none of the fifty distinct item ids
+the ten committed collections require, and its ``playerInfo.cash`` is ``5``
+against a cheapest committed price of ``9``.  A collection phase without the seed
+could drive only refusals, which would leave the line's central claim with no
+executed evidence.
+
+The seed is **scaffolding, not derivation**: it copies two committed fields and
+decides nothing about eligibility, affordability or the prize.  What it wrote is
+printed and carried in the ``seeded`` field of the ``LIVE-PHASE-SUMMARY`` record.
+The seed runs **before** the pre-command digest is taken, so
+``--expect-save-mutation`` measures the grant rather than the seed.
+
 ## Containment
 
 * ``run.py`` is started exactly as its own module documents it (pinned
@@ -89,10 +107,25 @@ import urllib.request
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SERVICE = os.path.join("apps", "server-v1", "run.py")
 COLLECT_PATH = "/v1/collect"
+COLLECTION_PATH = "/v1/collection"
+#: The only route paths this harness will write into a summary. A closed set
+#: rather than a free string, because a typo in ``--route-path`` would
+#: otherwise produce a passing phase whose evidence file names a route that
+#: does not exist -- the same class of defect as a summary that names the
+#: wrong one, and the reason ``--route-path`` exists at all.
+KNOWN_ROUTE_PATHS = (COLLECT_PATH, COLLECTION_PATH)
 STARTUP_DEADLINE_SECONDS = 90
 GODOT_TIMEOUT_SECONDS = 600
 CORPUS_PREFIX = "socialwars-server-v1-"
 SAVE_SUFFIX = ".save.json"
+#: How many times the committed price the seed puts in the save's cash balance.
+#: Above one so the grant is affordable even if some later step charged again;
+#: the service is what decides affordability, and this harness must not be the
+#: reason a grant happens.
+SEED_CASH_MULTIPLE = 2
+#: How many of each required item the seed puts in storage. One is the minimum
+#: that satisfies "the player holds it"; the eligibility rule is the service's.
+SEED_ITEM_QUANTITY = 1
 
 failures = []
 passed = 0
@@ -212,13 +245,163 @@ def corpus_player_id(corpus):
     return matched[0][: -len(SAVE_SUFFIX)]
 
 
+def save_path(corpus, player_id):
+    return os.path.join(corpus, "saves", player_id + SAVE_SUFFIX)
+
+
 def save_digest(corpus, player_id):
-    path = os.path.join(corpus, "saves", player_id + SAVE_SUFFIX)
+    path = save_path(corpus, player_id)
     try:
         with open(path, "rb") as handle:
             return hashlib.sha256(handle.read()).hexdigest()
     except OSError:
         return ""
+
+
+def committed_collections(corpus):
+    """The ``collections`` array the *service itself* reads, as a list.
+
+    Read from ``<corpus>/config/main.json`` and not from the repository's
+    normalized package, because the service loads ``config/main.json`` out of the
+    corpus it was handed: seeding from a different document than the one the
+    service reads would be seeding against a second source of truth, and the two
+    could disagree without anything noticing.
+    """
+    path = os.path.join(corpus, "config", "main.json")
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            document = json.load(handle)
+    except (OSError, ValueError):
+        return None
+    if not isinstance(document, dict):
+        return None
+    rows = document.get("collections")
+    return rows if isinstance(rows, list) else None
+
+
+def seed_collection(corpus, player_id, collection_id):
+    """Put one collection's requirements and its price into the corpus save.
+
+    Returns a record of what was written, or ``{"ok": False, "error": ...}``.
+
+    ## Why this exists at all
+
+    **The committed fresh-player corpus cannot exercise a collection grant, and
+    the proposal's premise that it could is false.**  Measured, not assumed:
+
+    * every one of the ten committed collections requires **five** item ids, and
+      the corpus's ``maps[0]["store"]`` is ``{}`` - it holds none of the fifty
+      distinct requirement ids across the table;
+    * the corpus's ``playerInfo.cash`` is **5**, and the cheapest committed
+      ``cashPrice`` is **9** (collection 7).  Even a perfectly eligible player
+      would be refused for affordability.
+
+    So an unseeded collection phase could only ever drive refusals, and the
+    phase's whole purpose - proving the server *grants* - would be unreachable.
+    The alternative was to drop the live phase for this route, which would have
+    left the line's central claim with no executed evidence at all.  Seeding a
+    **disposable** corpus is the smaller departure, and it is declared rather
+    than silent: the record below is printed and carried in the phase summary.
+
+    ## What this is not
+
+    * **It is not a second derivation.**  It copies one committed row's
+      ``item_ids`` and ``cashPrice`` into the save.  It decides nothing about
+      eligibility, nothing about affordability, and nothing about the prize.  The
+      service still reads its own content and still derives its own answer; if
+      the two ever disagreed, the phase would go red, which is the property that
+      makes the seed safe to use.
+    * **It does not reproduce the alias rule.**  ``collection_id`` must be
+      ``>= 1`` here and the committed row is read at ``collection_id - 1``; an
+      id that the preserved branch would clamp onto row 0 is **refused** by this
+      harness rather than silently seeded as collection 1, because a harness that
+      reimplemented the domain's indexing rule would be a second place where that
+      rule could drift.
+    * **It writes nothing the phase keeps.**  The corpus is disposable and is
+      removed on the clean-stop path, and the working tree is asserted to hold no
+      ``saves/`` directory afterwards.
+
+    ## Ordering, which matters
+
+    The seed runs **before** ``digest_before`` is recorded.  Otherwise the
+    ``--expect-save-mutation`` check would compare "untouched corpus" against
+    "granted corpus" and pass for the wrong reason - on the seed alone, even if
+    the grant never happened.  Recording the digest after the seed is what makes
+    that check measure the grant.
+    """
+    if collection_id < 1:
+        return {"ok": False, "error": "collection id %r must be >= 1" % collection_id}
+    rows = committed_collections(corpus)
+    if rows is None:
+        return {"ok": False, "error": "no readable collections array in the corpus"}
+    position = collection_id - 1
+    if position >= len(rows):
+        return {
+            "ok": False,
+            "error": "collection %d is position %d of %d committed rows"
+            % (collection_id, position, len(rows)),
+        }
+    row = rows[position]
+    if not isinstance(row, dict):
+        return {"ok": False, "error": "committed row %d is not an object" % position}
+
+    requirement_text = row.get("item_ids")
+    price_text = row.get("cashPrice")
+    try:
+        requirements = json.loads(requirement_text) if isinstance(
+            requirement_text, str) else requirement_text
+        price = int(price_text)
+    except (TypeError, ValueError) as error:
+        return {"ok": False, "error": "committed row %d is not readable: %s" % (position, error)}
+    if not isinstance(requirements, list) or not all(
+        isinstance(value, int) and not isinstance(value, bool) for value in requirements
+    ):
+        return {"ok": False, "error": "committed row %d item_ids is not a list of ids" % position}
+
+    path = save_path(corpus, player_id)
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            document = json.load(handle)
+    except (OSError, ValueError) as error:
+        return {"ok": False, "error": "corpus save is unreadable: %s" % error}
+    try:
+        store = document["maps"][0]["store"]
+        info = document["playerInfo"]
+    except (KeyError, IndexError, TypeError) as error:
+        return {"ok": False, "error": "corpus save has no store/playerInfo: %s" % error}
+    if not isinstance(store, dict) or not isinstance(info, dict):
+        return {"ok": False, "error": "corpus save store/playerInfo is not an object"}
+
+    added = []
+    for item_id in requirements:
+        key = str(item_id)
+        held = store.get(key)
+        if isinstance(held, bool) or not isinstance(held, int) or held < SEED_ITEM_QUANTITY:
+            store[key] = SEED_ITEM_QUANTITY
+            added.append(item_id)
+    cash_before = info.get("cash")
+    if isinstance(cash_before, bool) or not isinstance(cash_before, int):
+        return {"ok": False, "error": "corpus save cash is not an integer: %r" % (cash_before,)}
+    cash_after = max(cash_before, price * SEED_CASH_MULTIPLE)
+    info["cash"] = cash_after
+
+    try:
+        with open(path, "w", encoding="utf-8", newline="\n") as handle:
+            json.dump(document, handle, indent=4)
+    except OSError as error:
+        return {"ok": False, "error": "corpus save could not be seeded: %s" % error}
+
+    return {
+        "ok": True,
+        "collection_id": collection_id,
+        "position": position,
+        "requirement_ids": requirements,
+        "committed_price": price,
+        "items_added": added,
+        "quantity_per_item": SEED_ITEM_QUANTITY,
+        "cash_before": cash_before,
+        "cash_after": cash_after,
+    }
 
 
 def main(argv=None):
@@ -247,6 +430,29 @@ def main(argv=None):
         help="fail unless the disposable corpus save changes while the wrapped "
         "command runs",
     )
+    parser.add_argument(
+        "--seed-collection",
+        type=int,
+        default=None,
+        help="seed the disposable corpus save with that collection's committed "
+        "requirements and price, so a grant is reachable at all; the "
+        "fresh-player corpus holds neither (see seed_collection)",
+    )
+    parser.add_argument(
+        "--route-path",
+        default=COLLECT_PATH,
+        help="the route this phase exercises, recorded in the summary. "
+        "Defaults to %s because that is the collect phase. It is an explicit "
+        "argument rather than a constant because the first version of this "
+        "harness wrote the collect route into EVERY summary: the "
+        "collection-live-v1 phase reported \"route\": \"POST /v1/collect\" "
+        "while it had just driven POST /v1/collection, so the evidence file "
+        "named the wrong route for a passing phase. A reader of that summary "
+        "would have believed the collect route was the one exercised, and no "
+        "assertion would have caught it, because the route under test is "
+        "chosen by the Godot suite the caller passes, not by this harness."
+        % COLLECT_PATH,
+    )
     parser.add_argument("command", nargs=argparse.REMAINDER, help="command after --")
     args = parser.parse_args(argv)
 
@@ -264,6 +470,17 @@ def main(argv=None):
         # make every downstream assertion ambiguous. Refused, not overwritten.
         print("FAIL do not pass --player-id=; this harness supplies it in-phase")
         print("LIVE-PHASE-SUMMARY %s" % json.dumps({"name": args.name, "ok": False}))
+        return 1
+
+    if args.route_path not in KNOWN_ROUTE_PATHS:
+        print(
+            "FAIL --route-path %r is not a route this harness knows; known: %s"
+            % (args.route_path, ", ".join(KNOWN_ROUTE_PATHS))
+        )
+        print(
+            "LIVE-PHASE-SUMMARY %s"
+            % json.dumps({"name": args.name, "ok": False, "route_path": args.route_path})
+        )
         return 1
 
     before = temp_corpora()
@@ -324,13 +541,14 @@ def main(argv=None):
     corpus = ""
     player_id = ""
     digest_before = ""
+    seeded = {}
     if ready:
         banner = parse_banner(read_service_log(out_path, err_path))
         corpus = str(banner.get("corpus") or "")
         check("service banner names the disposable corpus", bool(corpus), corpus)
         check(
-            "service banner reports one route",
-            banner.get("routes") == ["POST /v1/collect"],
+            "service banner reports exactly the two delivered routes",
+            banner.get("routes") == ["POST /v1/collect", "POST /v1/collection"],
             str(banner.get("routes")),
         )
         check(
@@ -344,6 +562,18 @@ def main(argv=None):
             bool(player_id),
             corpus,
         )
+        if player_id and args.seed_collection is not None:
+            # BEFORE the pre-command digest, deliberately: see
+            # `seed_collection`'s "Ordering, which matters".
+            seeded = seed_collection(corpus, player_id, args.seed_collection)
+            check(
+                "disposable corpus seeded with collection %d's committed "
+                "requirements and price" % args.seed_collection,
+                bool(seeded.get("ok")),
+                json.dumps(seeded, sort_keys=True),
+            )
+            if seeded.get("ok"):
+                print("seeded corpus: %s" % json.dumps(seeded, sort_keys=True))
         if player_id and args.expect_save_mutation:
             digest_before = save_digest(corpus, player_id)
             check(
@@ -488,7 +718,12 @@ def main(argv=None):
         "name": args.name,
         "port": args.port,
         "endpoint": "http://127.0.0.1:%d" % args.port,
-        "route": "POST %s" % COLLECT_PATH,
+        # The route the CALLER's suite exercises, not this harness's readiness
+        # probe. Readiness is always a POST /v1/collect for an unknown save --
+        # see the module docstring -- so deriving this from COLLECT_PATH
+        # reported the collect route for the collection phase, which is the bug
+        # --route-path's help text records.
+        "route": "POST %s" % args.route_path,
         "readiness_status": status,
         "readiness_code": body.get("code"),
         "godot_exit": godot_exit,
@@ -500,6 +735,10 @@ def main(argv=None):
         "checks_failed": len(failures),
         "failures": failures,
         "save_mutation_checked": bool(args.expect_save_mutation),
+        # Carried so the summary states what scaffolding the phase applied, rather
+        # than leaving a reader to assume the corpus was untouched. `{}` means
+        # nothing was seeded.
+        "seeded": seeded,
         "ok": not failures,
     }
     print("LIVE-PHASE-SUMMARY %s" % json.dumps(summary, sort_keys=True))

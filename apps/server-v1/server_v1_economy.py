@@ -241,6 +241,116 @@ def _issue(**values: Any) -> ResourceDerivation:
     return ResourceDerivation(__token__=_ISSUANCE_TOKEN, **values)
 
 
+def issue_collection_grant(**values: Any) -> "CollectionGrant":
+    """Construct a :class:`CollectionGrant`.  The only construction site.
+
+    Shares :data:`_ISSUANCE_TOKEN` with :func:`_issue` because the token's
+    meaning is "this module's economy authority derived it", and a collection
+    grant is derived by the same authority from committed content and recorded
+    state.  Splitting it into a second token would suggest a second economy,
+    which is the thing design **D8** in ``server_v1_refusals`` exists to
+    prevent: one place a derived value can be born.
+    """
+    return CollectionGrant(__token__=_ISSUANCE_TOKEN, **values)
+
+
+class CollectionGrant(BaseModel):
+    """The committed-derived collection grant: cost, yield, and requirements.
+
+    The second derivation this authority issues, and the first that is a
+    **debit** rather than a payout.  That is deliberate and is recorded on the
+    field below rather than discovered in a balance: :class:`ResourceDerivation`
+    explicitly refuses negative deltas because "a debit belongs to a different
+    domain with its own derivation", so this is that derivation.
+
+    **Why this is not a :class:`ResourceDerivation`.**  A collection has no
+    ladder, no rung, and no elapsed time.  Forcing it into the payout
+    derivation would have required inventing four values that mean nothing here
+    (``rung_index``, ``rung_threshold_seconds``, ``rung_multiplier``,
+    ``elapsed_seconds``), and an invented ``rung_index=0`` would have read as a
+    claim that the committed rung zero paid for it.  The two derivations share
+    the issuance gate and nothing else, which is the honest shape: same
+    authority, different question.
+
+    What it carries, all of it either read from the committed table or read from
+    the store, none of it computed from a request field:
+
+    ``requested_collection_id``
+        the id the client sent, echoed so the response can report what was
+        asked rather than what was resolved;
+    ``resolved_collection_id``
+        the committed table's own ``id`` at the position the request addressed,
+        which is the id the ledger is written with;
+    ``position``
+        the 0-based position actually used, i.e. ``max(0, requested - 1)``;
+    ``clamp_moved``
+        whether the legacy clamp changed the addressed position, reported so the
+        two can never be silently conflated (a grant whose ``clamp_moved`` is
+        true is unreachable through this service - the slice refuses it - and
+        the field exists so a reader can see that, not so a caller can rely on
+        it);
+    ``requirement_ids``
+        the committed ``item_ids`` the eligibility check evaluated;
+    ``price``
+        the committed ``cashPrice``, in stored cash;
+    ``prize_item_id`` / ``prize_quantity``
+        the committed ``prize``, which is exactly one entry on every committed
+        row;
+    ``grant_id``
+        a per-grant identifier, so two grants in one log are distinguishable.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    requested_collection_id: int
+    resolved_collection_id: int
+    position: int
+    clamp_moved: bool
+    requirement_ids: Tuple[int, ...]
+    price: int
+    prize_item_id: int
+    prize_quantity: int
+    grant_id: str = Field(default_factory=lambda: uuid.uuid4().hex)
+
+    #: The **signed** change to each stored resource.  Negative is legal here and
+    #: only here: this derivation debits ``cash`` by the committed price and
+    #: changes nothing else, so the post-execution proof can assert over the
+    #: complete stored set rather than over the one key it expects to move.
+    _deltas: Mapping[str, int] = PrivateAttr(default_factory=dict)
+    #: The committed row this grant came from, decoded, for the response.
+    _committed: Mapping[str, Any] = PrivateAttr(default_factory=dict)
+
+    def __init__(self, **values: Any) -> None:
+        if values.pop("__token__", None) is not _ISSUANCE_TOKEN:
+            raise TypeError(
+                "CollectionGrant is issued only by server_v1_economy; a "
+                "collection success cannot be constructed without a grant here"
+            )
+        deltas = dict(values.pop("deltas", {}))
+        committed = dict(values.pop("committed", {}))
+        super().__init__(**values)
+        object.__setattr__(self, "_deltas", MappingProxyType(deltas))
+        object.__setattr__(self, "_committed", MappingProxyType(committed))
+
+    @property
+    def deltas(self) -> Mapping[str, int]:
+        """Named resource -> **signed** derived change, read-only."""
+        return self._deltas
+
+    @property
+    def committed(self) -> Mapping[str, Any]:
+        """The committed inputs this grant was derived from, read-only."""
+        return self._committed
+
+    def delta_for(self, resource: str) -> int:
+        """The derived change to one stored resource; ``0`` when untouched."""
+        return int(self.deltas.get(resource, 0))
+
+    def applies_to(self, resource: str) -> bool:
+        """Whether this grant claims to change ``resource`` at all."""
+        return resource in self.deltas
+
+
 def derive_collection_payout(
     content: CommittedContent,
     *,
@@ -443,8 +553,10 @@ __all__ = [
     "EXPERIENCE_RESOURCE",
     "NEVER_PAID_RESOURCES",
     "SECONDS_PER_COMMITTED_MINUTE",
+    "CollectionGrant",
     "EconomyError",
     "Ladder",
     "ResourceDerivation",
     "derive_collection_payout",
+    "issue_collection_grant",
 ]

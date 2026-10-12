@@ -4,9 +4,9 @@ extends Node
 ##
 ## ## What this implementation delivers, and what it refuses
 ##
-## v1 exposes exactly **one** route, `POST /v1/collect`, and this
-## implementation implements exactly that one intent. Every other facade intent
-## answers with the **client-local** code
+## v1 exposes exactly **two** routes, `POST /v1/collect` and
+## `POST /v1/collection`, and this implementation implements exactly those two
+## intents. Every other facade intent answers with the **client-local** code
 ## `unsupported_by_server_v1` and **never touches the transport at all** - which
 ## is the honest answer for a surface that does not exist, and is deliberately
 ## different from a server refusal: `unsupported_by_server_v1` is not in
@@ -23,10 +23,14 @@ extends Node
 ##
 ## `list_sessions()` and `get_bootstrap()` refuse too. v1 has no session list
 ## and no bootstrap route, so there is **no v1 answer to model** for them: the
-## typed result carries the local code and nothing else. `collect_income()` is
-## the one intent whose v1 answer has its own typed result
-## (`server_v1_collect_result.gd`), because v1's shape genuinely differs from
-## v0's - see that module's header for the full reason.
+## typed result carries the local code and nothing else. `collect_income()` and
+## `complete_collection_town()` are the two intents whose v1 answers have their
+## own typed results (`server_v1_collect_result.gd` and
+## `server_v1_collection_result.gd`), because v1's shapes genuinely differ from
+## v0's - see those modules' headers for the full reasons. `GameApi`'s declared
+## return types for those two are `Variant` with the concrete types named in its
+## own comment (and asserted by `tests/test_server_v1.gd` and
+## `tests/test_collection_v1.gd`).
 ##
 ## ## Scope and loopback
 ##
@@ -56,11 +60,14 @@ const RewardFlow = preload("res://scripts/rewards/reward_flow.gd")
 const TutorialFlow = preload("res://scripts/progression/tutorial_flow.gd")
 const ServerV1Collect = preload(
 	"res://scripts/gameapi/server_v1_collect_result.gd")
+const ServerV1Collection = preload(
+	"res://scripts/gameapi/server_v1_collection_result.gd")
 
 ## Loopback default: v1 binds `127.0.0.1` only and its own port, 5057
 ## (design D7; `apps/server-v1/server_v1_settings.py`).
 const DEFAULT_ENDPOINT := "http://127.0.0.1:5057"
 const COLLECT_PATH := "/v1/collect"
+const COLLECTION_PATH := "/v1/collection"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -118,12 +125,43 @@ static func _intent_body(user_id: String, item_index: int) -> Dictionary:
 	return {"player_id": user_id, "row": item_index}
 
 
+## The second implemented intent: a collection **completion**, as intent only.
+##
+## The body carries a save identity, a committed collection id, and nothing else
+## - no price, no requirement list, no prize, no expected balance. The id is
+## sent even when it is negative, because v1 refuses an id that the preserved
+## branch would have clamped onto collection 1 **by name**
+## (`aliased_collection_id`), and a client that filtered it out first would get
+## `malformed_request` instead - a different answer to a different question.
+## `tests/test_collection_v1.gd` asserts this body is exactly `player_id` and
+## `collection_id`, so this client cannot smuggle a value even by accident.
+func complete_collection_town(user_id: String,
+		collection_id: int) -> ServerV1Collection.CollectionGrantResult:
+	var outcome := await _call(COLLECTION_PATH, JSON.stringify(
+		_collection_intent_body(user_id, collection_id)))
+	if not outcome.get("ok", false):
+		return ServerV1Collection.grant_failure(
+			str(outcome.get("code", ServerV1Collection.CODE_BAD_REQUEST)),
+			str(outcome.get("message", "")))
+	return ServerV1Collection.parse_grant(outcome.get("payload"))
+
+
+## The v1 collection intent: two fields, verbatim. This is the whole request.
+static func _collection_intent_body(user_id: String,
+		collection_id: int) -> Dictionary:
+	return {"player_id": user_id, "collection_id": collection_id}
+
+
 # --- intents v1 does not have ------------------------------------------------
 #
 # Each answers `unsupported_by_server_v1` through its OWN typed result's
 # `_failure` factory, and none of them touches `_call`. They are grouped rather
 # than interleaved because they are uniform on purpose: there is one decision
-# (v1 exposes one route) and twenty-one identical consequences.
+# (v1 exposes **two** routes) and twenty-two identical consequences. The count
+# moved from twenty-one when `POST /v1/collection` landed: `complete_collection_town`
+# joined the two implemented intents above and left this section, and
+# `tests/test_server_v1.gd` pins the remaining twenty-two by name so the move is
+# measured rather than assumed.
 
 
 func list_sessions() -> BootData.SaveListResult:
@@ -210,13 +248,6 @@ func pop_queue_unit_town(user_id: String,
 	return _unsupported(BootData.queue_failure(
 		ServerV1Collect.CODE_UNSUPPORTED,
 		"Server v1 exposes no queue route; this client sends no request."))
-
-
-func complete_collection_town(user_id: String,
-		collection_id: int) -> BootData.CollectionResult:
-	return _unsupported(BootData.collection_failure(
-		ServerV1Collect.CODE_UNSUPPORTED,
-		"Server v1 exposes no collection route; this client sends no request."))
 
 
 func resurrect_hero_town(user_id: String, x: int,

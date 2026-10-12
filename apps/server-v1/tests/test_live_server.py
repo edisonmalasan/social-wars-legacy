@@ -466,7 +466,9 @@ class CorpusContainmentTests(unittest.TestCase):
         # tested the temp root instead, and passed for any path under it.
         self.assertTrue(Path(banner["corpus"]).name.startswith(TEMP_PREFIX))
         self.assertEqual(port, banner["port"])
-        self.assertEqual(["POST /v1/collect"], banner["routes"])
+        self.assertEqual(
+            ["POST /v1/collect", "POST /v1/collection"], banner["routes"]
+        )
         self.assertEqual(FIXTURE_INSTANT, banner["fixed_now"])
 
     def test_no_corpus_directory_survives_a_graceful_stop(self) -> None:
@@ -519,10 +521,18 @@ class StartupContractTests(unittest.TestCase):
         # reader would guess: the first version asked for a nested "provenance"
         # key and reported a missing-field failure that read like a defect in
         # the loader.
+        #
+        # ``collection_rows`` was added when the second route arrived: the
+        # banner is the only record of what content a process actually read, and
+        # a route that resolves an id into a positional row needs the row count
+        # to be on the record.  The pin is an **exact set**, so the key had to be
+        # added here rather than the check loosened into a subset test — a
+        # subset assertion could not catch a provenance field being dropped.
         self.assertEqual(
             {
                 "applied_mods",
                 "applied_patches",
+                "collection_rows",
                 "distinct_item_ids",
                 "item_entries",
                 "missing_mods",
@@ -532,6 +542,7 @@ class StartupContractTests(unittest.TestCase):
             },
             set(banner["content"]),
         )
+        self.assertEqual(10, banner["content"]["collection_rows"])
         self.assertEqual(["make_dynamic"], banner["content"]["skipped_loader_steps"])
 
     def test_an_unknown_flag_is_refused_rather_than_ignored(self) -> None:

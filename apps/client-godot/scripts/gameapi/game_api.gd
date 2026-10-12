@@ -395,7 +395,7 @@ func build_construction(user_id: String, item_index: int,
 ## against its own arithmetic.
 ##
 ## ## The declared return type is `Variant`, and that is the ONE widening in
-## this facade, done deliberately rather than by drift.
+## this facade for a **payout**, done deliberately rather than by drift.
 ##
 ## `fake` and `legacy_v0` both return `BootData.CollectResult`. `server_v1`
 ## returns `ServerV1Collect.CollectResult`, because **v1's answer is a
@@ -525,10 +525,35 @@ func pop_queue_unit_town(user_id: String,
 ## server verifies nothing about whether a collection was earned, so a caller may
 ## name any of the ten committed collections. What a caller cannot do is choose
 ## the contents.
+##
+## ## The declared return type is `Variant`, and that is the SECOND widening on
+## this facade, for the same reason `collect_income` above and by the same
+## measurement.
+##
+## `fake` and `legacy_v0` both return `BootData.CollectionResult`.
+## `server_v1` returns `ServerV1Collection.CollectionGrantResult`, because v1's
+## answer is a **grant** and a grant is a different shape, not a different value
+## of the same shape: it reports a **negative** named delta where v0 reports what
+## the player received, it carries the server's own addressing decision
+## (`requested_id` beside `resolved_id`, plus `clamp_moved`) because v1 *refuses*
+## an id the preserved branch would have clamped, and it carries storage and
+## ledger read-back state that v0 never proved anything about
+## (`scripts/gameapi/server_v1_collection_result.gd` states the full reason).
+## Narrowing v1's answer into `BootData.CollectionResult` would require this
+## client to **sign-flip** a debit into a payout and **invent** an index
+## resolution the service refused to produce — either of which puts arithmetic in
+## the client, which is what this milestone exists to stop.
+##
+## The cost is measured rather than assumed: every call site of
+## `complete_collection_town` in this project binds its result to a `Variant` or
+## an untyped local, no caller loses a compile-time type, and the concrete types
+## of all three implementations are asserted in `tests/test_collection_v1.gd` so a
+## fourth implementation cannot quietly add a fourth shape. Every other intent on
+## this facade keeps its concrete declared type.
 func complete_collection_town(user_id: String,
-		collection_id: int) -> BootData.CollectionResult:
+		collection_id: int) -> Variant:
 	collection_requests += 1
-	var result: BootData.CollectionResult = await _impl.complete_collection_town(
+	var result: Variant = await _impl.complete_collection_town(
 		user_id, collection_id)
 	return result
 

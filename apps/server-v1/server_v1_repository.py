@@ -303,6 +303,162 @@ class SaveDocument:
         bag = self.row_attr(index)
         return any(key in bag for key in self.CONSTRUCTION_ATTR_KEYS)
 
+    # ------------------------------------------------- storage and ledger --
+    #: ``maps[0]["store"]``: the item-id -> quantity map a **stored** item rides.
+    #: This is where ``place_stored_item`` reads from and ``store_item`` writes
+    #: to (``command.py:233-256``), and it is where a collections **prize** is
+    #: granted.  Keyed by string, because JSON object keys are strings and the
+    #: legacy branch itself writes ``store[itemstr] = qty`` after ``str(item)``.
+    STORAGE_PATH: Tuple[str, ...] = ("maps", 0, "store")
+    #: ``privateState["collections"]``: the collection ledger.  A list of
+    #: collection ids, appended by ``complete_collection`` at
+    #: ``command.py:517-518``.
+    LEDGER_PATH: Tuple[str, ...] = ("privateState", "collections")
+
+    def private_state(self) -> Dict[str, Any]:
+        """``privateState``, or :class:`RepositoryError`.
+
+        Structural, like :meth:`first_map`: the ledger lives here and the
+        ``si`` assist list does too, so a document with no ``privateState``
+        object is a document v1 cannot reason about rather than an empty one.
+        """
+        state = self._raw.get("privateState")
+        if not isinstance(state, dict):
+            raise RepositoryError(
+                "unreadable_state",
+                "save %r has no privateState object" % self.player_id,
+            )
+        return state
+
+    def storage(self) -> Dict[str, Any]:
+        """``maps[0]["store"]`` as a **snapshot copy**, or :class:`RepositoryError`.
+
+        A **missing** store key is refused rather than defaulted to ``{}``: the
+        corpus records an empty ``store`` object, so an absent one means a
+        document whose shape v1 does not know.
+
+        **This returns a copy, and that is load-bearing rather than
+        defensive.**  The first version returned the live nested object — the
+        same choice :meth:`items` makes — and the collection slice's
+        post-execution proof then compared the store **against itself**: it read
+        the "before" snapshot, then granted, then re-read, and the quantity
+        half compared a mutated dict against itself and reported a movement of
+        ``0`` on a successful grant.  It was caught by
+        ``tests/test_collection.py`` failing every success case with
+        ``storage_granted_quantity``, not by inspection.  A live read is safe
+        only for a caller that never compares across a write; the grant slice is
+        exactly such a caller, so the default is the copy and
+        :meth:`_storage_node` is the private live path for the one writer.
+        """
+        return dict(self._storage_node())
+
+    def _storage_node(self) -> Dict[str, Any]:
+        """The **live** ``maps[0]["store"]`` object, or :class:`RepositoryError`.
+
+        Private because a caller holding it can mutate the document without
+        going through :meth:`set_storage_quantity`, which is the only reason
+        the set of paths v1 can change stays enumerable from this file.
+        """
+        node: Any = self._raw
+        for step in self.STORAGE_PATH:
+            try:
+                node = node[step]
+            except (KeyError, IndexError, TypeError):
+                raise RepositoryError(
+                    "unreadable_state",
+                    "save %r has no store object at /%s"
+                    % (self.player_id, "/".join(str(s) for s in self.STORAGE_PATH)),
+                )
+        if not isinstance(node, dict):
+            raise RepositoryError(
+                "unreadable_state",
+                "save %r store is not an object" % self.player_id,
+            )
+        return node
+
+    def storage_quantity(self, item_id: int) -> int:
+        """How many of ``item_id`` the player holds, or ``0`` when absent.
+
+        Raises rather than coercing when a recorded quantity is not an integer:
+        a string ``"1"`` is a state this service cannot reason about, and
+        reading it as ``1`` would let a grant proceed on a shape the store does
+        not actually have.
+        """
+        raw = self.storage().get(str(item_id), 0)
+        if isinstance(raw, bool) or not isinstance(raw, int):
+            raise RepositoryError(
+                "unreadable_state",
+                "save %r store quantity for item %d is not an integer: %r"
+                % (self.player_id, item_id, raw),
+            )
+        return int(raw)
+
+    def set_storage_quantity(self, item_id: int, value: int) -> None:
+        """Write the held quantity for one item id, keyed as JSON keys it.
+
+        Assigning to an **existing** key keeps its position, and a new key is
+        appended, which is what the preserved branch does too: it mutates a
+        dict loaded from the file and serialises that same dict
+        (``command.py:517``), so a grant that adds a key appends it.
+        """
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise RepositoryError(
+                "unreadable_state",
+                "refusing to write a non-integer storage quantity %r" % (value,)
+            )
+        if value < 0:
+            raise RepositoryError(
+                "unreadable_state",
+                "refusing to write a negative storage quantity %r" % (value,),
+            )
+        self._storage_node()[str(item_id)] = value
+
+    def ledger(self) -> List[int]:
+        """The recorded collection ledger, in stored order.
+
+        An **absent** key reads as an empty ledger: "nothing claimed yet" is
+        the only honest reading of a document that never recorded a claim, and
+        refusing it would make the first-ever claim refusable.  A key that
+        exists but is not a list of integers is refused instead, because a
+        malformed ledger means v1 cannot tell what has already been claimed,
+        and that is exactly the question the once-only rule turns on.
+        """
+        raw = self.private_state().get("collections", [])
+        if raw is None:
+            return []
+        if not isinstance(raw, list):
+            raise RepositoryError(
+                "unreadable_state",
+                "save %r collection ledger is not a list" % self.player_id,
+            )
+        claimed: List[int] = []
+        for entry in raw:
+            if isinstance(entry, bool) or not isinstance(entry, int):
+                raise RepositoryError(
+                    "unreadable_state",
+                    "save %r collection ledger entry %r is not an integer"
+                    % (self.player_id, entry),
+                )
+            claimed.append(int(entry))
+        return claimed
+
+    def set_ledger(self, claimed: Tuple[int, ...]) -> None:
+        """Write the collection ledger, creating the key when it was absent.
+
+        Creating it is the closest available equivalent to the preserved
+        branch's ``append`` on a document that already carries the key: the
+        corpus does carry it (``[]``), so the two agree where the corpus can
+        exercise them, and where it does not carry one the recorded meaning is
+        still "nothing claimed yet".
+        """
+        for entry in claimed:
+            if isinstance(entry, bool) or not isinstance(entry, int):
+                raise RepositoryError(
+                    "unreadable_state",
+                    "refusing to write a non-integer ledger entry %r" % (entry,)
+                )
+        self.private_state()["collections"] = [int(entry) for entry in claimed]
+
     # ---------------------------------------------------------------- helpers --
     def _row_int(self, row: List[Any], position: int, label: str) -> int:
         if len(row) <= position:
@@ -442,8 +598,10 @@ class FilesystemSaveRepository:
 
 __all__ = [
     "ITEMS_PATH",
+    "LEDGER_PATH",
     "STORED_RESOURCE_NAMES",
     "STORED_RESOURCE_PATHS",
+    "STORAGE_PATH",
     "FilesystemSaveRepository",
     "RepositoryError",
     "SaveDocument",

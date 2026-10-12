@@ -70,6 +70,23 @@ class RefusalCode(str, Enum):
     CAPPED_COLLECTION = "capped_collection"
     BELOW_FIRST_RUNG = "below_first_rung"
     CONSTRUCTION_IN_PROGRESS = "construction_in_progress"
+    #: The requested collection id does not name a distinct committed
+    #: collection: the integer zero and every negative id clamp to the first row
+    #: through the legacy ``max(0, collection - 1)`` index, so they resolve to
+    #: collection 1 and are refused rather than served its prize (design D3).
+    ALIASED_COLLECTION_ID = "aliased_collection_id"
+    #: No committed collection resolves at the id's position (design D3).
+    UNRESOLVABLE_COLLECTION = "unresolvable_collection"
+    #: The player does not hold every committed ``item_ids`` entry (design D4).
+    COLLECTION_NOT_ELIGIBLE = "collection_not_eligible"
+    #: The collection is already in the player's recorded ledger (design D6).
+    COLLECTION_ALREADY_CLAIMED = "collection_already_claimed"
+    #: The stored cash is below the collection's committed ``cashPrice``
+    #: (design D5).  Note this is **affordability**, which is a different
+    #: question from ``no_committed_income``/``capped_collection``: those two are
+    #: about content v1 refuses to interpret, this one is about a balance v1
+    #: read.
+    INSUFFICIENT_CASH = "insufficient_cash"
 
     # -- server-side integrity: never a client-visible gameplay answer -------
     UNREADABLE_STATE = "unreadable_state"
@@ -97,6 +114,11 @@ REFUSAL_HTTP_STATUS: Dict[RefusalCode, int] = {
     RefusalCode.CAPPED_COLLECTION: 409,
     RefusalCode.BELOW_FIRST_RUNG: 409,
     RefusalCode.CONSTRUCTION_IN_PROGRESS: 409,
+    RefusalCode.ALIASED_COLLECTION_ID: 409,
+    RefusalCode.UNRESOLVABLE_COLLECTION: 409,
+    RefusalCode.COLLECTION_NOT_ELIGIBLE: 409,
+    RefusalCode.COLLECTION_ALREADY_CLAIMED: 409,
+    RefusalCode.INSUFFICIENT_CASH: 409,
     # Something on this server is wrong.  These are deliberately *not*
     # disguised as gameplay answers.
     RefusalCode.UNREADABLE_STATE: 500,
@@ -135,6 +157,25 @@ REFUSAL_CODE_PURPOSE: Dict[RefusalCode, str] = {
         "the row carries construction state and its instant is a build start, "
         "not a last-collection instant"
     ),
+    RefusalCode.ALIASED_COLLECTION_ID: (
+        "the requested collection id clamps to the first committed collection "
+        "and therefore names no distinct collection"
+    ),
+    RefusalCode.UNRESOLVABLE_COLLECTION: (
+        "no committed collection resolves at the position the requested id "
+        "addresses"
+    ),
+    RefusalCode.COLLECTION_NOT_ELIGIBLE: (
+        "the player does not hold every item id in the collection's committed "
+        "requirement list"
+    ),
+    RefusalCode.COLLECTION_ALREADY_CLAIMED: (
+        "the collection is already present in the player's recorded collection "
+        "ledger, so the prize has already been granted"
+    ),
+    RefusalCode.INSUFFICIENT_CASH: (
+        "the player's stored cash is below the collection's committed price"
+    ),
     RefusalCode.UNREADABLE_STATE: "stored state this service cannot read",
     RefusalCode.UNREADABLE_CONTENT: "committed content this service cannot read",
     RefusalCode.POST_CONDITION_VIOLATION: (
@@ -158,6 +199,11 @@ V0_EQUIVALENT_CODES: Dict[RefusalCode, str] = {
     RefusalCode.CAPPED_COLLECTION: "capped_collection",
     RefusalCode.BELOW_FIRST_RUNG: "too_early",
     RefusalCode.CONSTRUCTION_IN_PROGRESS: "construction_in_progress",
+    RefusalCode.ALIASED_COLLECTION_ID: "(none — v0 clamps and serves it)",
+    RefusalCode.UNRESOLVABLE_COLLECTION: "(none — v0 raises or clamps)",
+    RefusalCode.COLLECTION_NOT_ELIGIBLE: "(none — v0 reports eligibility unchecked)",
+    RefusalCode.COLLECTION_ALREADY_CLAIMED: "(none — v0 grants again)",
+    RefusalCode.INSUFFICIENT_CASH: "(none — v0 charges nothing)",
     RefusalCode.UNREADABLE_STATE: "internal_error",
     RefusalCode.UNREADABLE_CONTENT: "internal_error",
     RefusalCode.POST_CONDITION_VIOLATION: "internal_error",
