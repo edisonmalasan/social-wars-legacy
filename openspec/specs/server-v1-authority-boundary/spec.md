@@ -4,9 +4,19 @@
 
 Defines where authority lives in Server v1: every resource movement is derived by the
 server from player intent, refusal is a typed decision the domain makes and the client
-receives, and one transaction demonstrates both end to end. This is the boundary the
-39 legacy branches with no modern route behind them will land in, so it is specified
-before any of them are ported rather than after.
+receives, and transactions demonstrate both end to end. This is the boundary the legacy
+branches still lacking modern authority will land in, so it is specified before any of
+them are ported rather than after.
+
+Two figures are corrected here rather than inherited, because a spec is the source of
+truth and a known-falsified number in one is worse than an absent one. "One transaction"
+was true when this capability was written and is true of neither end: `collect` and
+`complete_collection` are now both specified below. "The 39 legacy branches with no
+modern route" was `tools/route-coverage`'s **citation** count promoted into a coverage
+claim; measured by executing each committed envelope builder, **40** of the 63 named
+branches are dispatched by a v0 route and **23** by none, and **2** branches now have
+authoritative v1 routes, leaving **61** without one. The tool answers the question it
+was built to answer and was not changed.
 
 ## Requirements
 
@@ -94,6 +104,22 @@ so that a derivation which moved nothing could not pass as success.
 against a captured executed-legacy fixture, so v1's first slice is measured against an
 existing oracle rather than a new one.
 
+The boundary SHALL be demonstrated end to end by **at least two** transactions, and the
+second SHALL exercise at least one rule the first does not.
+
+`collect` remains the worked example of a **derived payout**: the server derives what a
+`collect` *yields* from committed income content, and the client selects only which row
+to collect.
+
+`complete_collection` is the worked example of a **derived grant behind derived
+preconditions**: the server derives what the collection *yields* from the committed
+prize, whether the caller *may* claim it from the committed requirement list, what it
+*costs* from the committed price, and whether it *has already* been claimed from the
+recorded ledger. Each of those four is a rule `collect` does not exercise.
+
+Both SHALL derive every resource movement from committed content, SHALL refuse a
+client-supplied resource delta outright, and a refusal in either SHALL move nothing.
+
 #### Scenario: A collected row advances its instant and pays exactly the derived amount
 
 - **WHEN** a collection succeeds on an addressable row that has reached a committed rung
@@ -112,6 +138,19 @@ existing oracle rather than a new one.
 - **WHEN** a collection is requested on a row carrying construction state
 - **THEN** the domain refuses it with a named reason
 - **AND** the row's construction instants are unchanged
+
+#### Scenario: The boundary has two worked transactions, not one
+
+- **WHEN** the boundary is exercised
+- **THEN** both `collect` and `complete_collection` are specified end to end
+- **AND** each derives every resource movement from committed content
+- **AND** each refuses a client-supplied delta outright rather than clamping it
+
+#### Scenario: A refused collection completion moves nothing
+
+- **WHEN** a collection completion is refused for any reason
+- **THEN** storage, the collection ledger, and every stored resource are byte-identical to before
+- **AND** no partial grant survives the refusal
 
 ### Requirement: v1 coexists with v0 and changes no v0 behaviour
 
