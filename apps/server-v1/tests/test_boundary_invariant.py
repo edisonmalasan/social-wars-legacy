@@ -44,6 +44,13 @@ DERIVATION_OWNER = "server_v1_economy.py"
 #: The one module permitted to construct a :class:`ResourceDerivation`.
 ISSUANCE_OWNER = "server_v1_economy.py"
 
+#: Every ``Derivation`` subclass, by constructor name, so the boundary guard is
+#: one data-driven check rather than one check per type.  Read from the enum-ish
+#: declaration below rather than transcribed twice: a third derivation added
+#: without a row here is caught by
+#: :meth:`DerivationLivesInOnePlaceTests.test_every_derivation_is_guarded`.
+DERIVATION_CONSTRUCTORS: Tuple[str, ...] = ("ResourceDerivation", "CollectionGrant")
+
 
 def module_name(path: Path) -> str:
     return path.name
@@ -199,19 +206,70 @@ class DerivationLivesInOnePlaceTests(unittest.TestCase):
         string annotations to satisfy it.  The boundary claim is about the
         **call**: outside the owner, no module may invoke the constructor, and
         the constructor's own token gate refuses it even if one tries.
+
+        The check is **data-driven over both derivation types**, not two copies
+        of itself.  ``CollectionGrant`` is a second ``Derivation`` subclass with
+        its own constructor, and a guard that named only ``ResourceDerivation``
+        would have passed while a module outside the economy built grants
+        directly — the same "one type, one rule" assumption that makes a
+        hand-maintained pair of guards drift.  Measured before this amendment:
+        both constructors are invoked exactly once, both inside
+        ``server_v1_economy.py``.
         """
-        offenders = {
-            module_name(path): sum(
-                1
-                for node in ast.walk(parsed(path))
-                if isinstance(node, ast.Call)
-                and isinstance(node.func, ast.Name)
-                and node.func.id == "ResourceDerivation"
-            )
-            for path in APP_MODULES
-            if module_name(path) != ISSUANCE_OWNER
+        offenders: Dict[str, Dict[str, int]] = {}
+        for path in APP_MODULES:
+            if module_name(path) == ISSUANCE_OWNER:
+                continue
+            counts = {}
+            for node in ast.walk(parsed(path)):
+                if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Name):
+                    continue
+                if node.func.id in DERIVATION_CONSTRUCTORS:
+                    counts[node.func.id] = counts.get(node.func.id, 0) + 1
+            if counts:
+                offenders[module_name(path)] = counts
+        self.assertEqual({}, offenders, "a derivation was constructed outside the economy")
+
+    def test_every_derivation_is_guarded(self) -> None:
+        """The name list above cannot fall behind what the economy actually defines.
+
+        Without this, a third derivation type added to
+        ``server_v1_economy.py`` would be constructible from any module and the
+        guard would still be green — a **silent** failure, which is the only
+        unacceptable kind.  The equality runs in both directions: an unlisted
+        subclass is a failure, and so is a listed name the economy no longer
+        defines.
+
+        **There is no ``Derivation`` base class to introspect, and this test does
+        not pretend there is.**  The design decision behind the second type was
+        that it is deliberately *not* a ``ResourceDerivation`` — that model
+        forbids a negative delta, because a debit belongs to a different domain
+        with its own derivation — so the two share a private issuance token and
+        nothing else.  A first draft of this check imported a
+        ``server_v1_derivation`` module and walked a ``Derivation`` base; it
+        failed with ``ModuleNotFoundError`` because the premise was the design
+        I had rejected.  The measured substitute is the property that is
+        actually true and just as strict: the economy's frozen ``BaseModel``
+        subclasses **are** the derivations.
+        """
+        from pydantic import BaseModel
+
+        import server_v1_economy as economy
+
+        declared = {
+            name
+            for name, obj in vars(economy).items()
+            if isinstance(obj, type)
+            and issubclass(obj, BaseModel)
+            and obj is not BaseModel
+            and obj.__module__ == economy.__name__
         }
-        self.assertEqual({module_name(path): 0 for path in APP_MODULES if module_name(path) != ISSUANCE_OWNER}, offenders)
+        self.assertEqual(declared, set(DERIVATION_CONSTRUCTORS))
+        # A control, so an empty scan cannot satisfy the equality above.
+        self.assertGreaterEqual(len(declared), 2)
+        for name in sorted(DERIVATION_CONSTRUCTORS):
+            with self.subTest(derivation=name):
+                self.assertTrue(getattr(economy, name).model_config.get("frozen"))
 
     def test_only_the_outcomes_module_names_the_success_type_in_a_field(self) -> None:
         """A ``Success`` cannot be built without a derivation, so who may hold one
@@ -222,6 +280,26 @@ class DerivationLivesInOnePlaceTests(unittest.TestCase):
             if "Success" in imported_names(parsed(path))
         }
         self.assertLessEqual(holders, {"server_v1_outcomes.py", "server_v1_collect.py"})
+
+    def test_only_the_collection_slice_holds_a_collection_success(self) -> None:
+        """The same claim for the second success type, measured separately.
+
+        ``test_only_the_outcomes_module_names_the_success_type_in_a_field`` checks
+        an **exact set match** on the imported name ``Success``, so it is
+        *unaffected* by ``CollectionSuccess`` — which is correct, not a gap in
+        it, and is why that check is not weakened here.  It also means the check
+        says nothing about who may build the grant's success model, so this one
+        states it.  Measured before writing it: ``CollectionSuccess`` is
+        imported by ``server_v1_collection.py`` and by nothing else; it is
+        **defined** in ``server_v1_outcomes.py``, which is therefore not a
+        holder.
+        """
+        holders = {
+            module_name(path)
+            for path in APP_MODULES
+            if "CollectionSuccess" in imported_names(parsed(path))
+        }
+        self.assertLessEqual(holders, {"server_v1_collection.py"})
 
 
 class TransportNamesNoReasonTests(unittest.TestCase):

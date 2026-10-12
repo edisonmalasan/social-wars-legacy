@@ -92,7 +92,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import uvicorn  # noqa: E402
 
-from server_v1_app import create_app  # noqa: E402
+from server_v1_app import ROUTES, create_app  # noqa: E402
 from server_v1_content import load_content  # noqa: E402
 from server_v1_corpus import (  # noqa: E402
     REPO_ROOT,
@@ -246,7 +246,10 @@ def main(argv: Optional[List[str]] = None) -> int:
                 "corpus": str(corpus),
                 "corpus_owned_by_runner": owned_corpus is not None,
                 "content": content.provenance(),
-                "routes": ["POST /v1/collect"],
+                # Read from the app's own inventory rather than transcribed, so
+                # the banner cannot under-report a delivered route: a third
+                # route would be listed by ``ROUTES`` and not by this list.
+                "routes": sorted(ROUTES),
                 "fixed_now": args.fixed_now,
             },
             indent=4,

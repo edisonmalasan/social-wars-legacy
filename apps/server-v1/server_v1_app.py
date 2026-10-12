@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""The HTTP surface: one route, and no arithmetic (design D2).
+"""The HTTP surface: two routes, and no arithmetic (design D2).
 
-``create_app`` returns a FastAPI application with exactly one delivered route,
-``POST /v1/collect``.  The route's entire job, per design D2, is:
+``create_app`` returns a FastAPI application with exactly two delivered routes,
+``POST /v1/collect`` and ``POST /v1/collection``.  Each route's entire job, per
+design D2, is:
 
 1. hand the request bytes to :mod:`server_v1_intent`, which turns them into an
    intent or refuses;
@@ -42,6 +43,7 @@ from typing import Any, Callable, Dict
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from server_v1_collection import complete_collection
 from server_v1_collect import collect
 from server_v1_content import CommittedContent
 from server_v1_intent import intent_from_json
@@ -50,9 +52,14 @@ from server_v1_refusals import Refusal
 from server_v1_repository import SaveRepository
 from server_v1_settings import PROTOCOL
 
-#: The one route this line delivers, named so a test enumerates routes from a
-#: declaration rather than from a regex over the source.
-ROUTES: Dict[str, str] = {"POST /v1/collect": "collect"}
+#: The two delivered routes, named so a test enumerates routes from a
+#: declaration rather than from a regex over the source.  One row per route:
+#: adding a route adds a row, and ``test_app.py`` asserts this mapping agrees
+#: with the paths declared below.
+ROUTES: Dict[str, str] = {
+    "POST /v1/collect": "collect",
+    "POST /v1/collection": "collection",
+}
 
 ROUTE_PREFIX = "/v1"
 
@@ -67,6 +74,19 @@ ROUTE_PREFIX = "/v1"
 #: deleting correct code.  ``test_the_route_path_is_the_declared_one`` asserts
 #: the two agree, so the duplication cannot drift.
 COLLECT_PATH = "/v1/collect"
+
+#: The second route this line delivers.  A literal for the same reason
+#: :data:`COLLECT_PATH` is: a ``BinOp`` in the transport is a failed invariant,
+#: and the concatenation form was the first version of the first one.
+#:
+#: **The path is ``/v1/collection`` and not ``/v1/complete_collection``**, so it
+#: parallels ``/v1/collect`` rather than the legacy branch's command name.  The
+#: reason is recorded rather than incidental: a route path is a *client*
+#: surface, and naming it after the legacy command would make v1's vocabulary a
+#: subset of ``command.py``'s 63 branch names, which is the inheritance the
+#: boundary exists to stop.  ``tests/test_app.py`` asserts the literal agrees
+#: with ``ROUTE_PREFIX`` so the duplication cannot drift.
+COLLECTION_PATH = "/v1/collection"
 
 
 def create_app(
@@ -101,6 +121,22 @@ def create_app(
             )
         return JSONResponse(status_code=SUCCESS_HTTP_STATUS, content=_envelope(outcome))
 
+    @app.post(COLLECTION_PATH)
+    async def post_collection(request: Request) -> JSONResponse:
+        body = await request.body()
+        parsed = intent_from_json("collection", body)
+        if isinstance(parsed, Refusal):
+            return JSONResponse(
+                status_code=parsed.http_status, content=_envelope(parsed)
+            )
+
+        outcome: Outcome = complete_collection(parsed, content, repository, clock())
+        if isinstance(outcome, Refusal):
+            return JSONResponse(
+                status_code=outcome.http_status, content=_envelope(outcome)
+            )
+        return JSONResponse(status_code=SUCCESS_HTTP_STATUS, content=_envelope(outcome))
+
     return app
 
 
@@ -117,4 +153,4 @@ def _envelope(value: Any) -> Dict[str, Any]:
     return body
 
 
-__all__ = ["COLLECT_PATH", "ROUTES", "ROUTE_PREFIX", "create_app"]
+__all__ = ["COLLECT_PATH", "COLLECTION_PATH", "ROUTES", "ROUTE_PREFIX", "create_app"]

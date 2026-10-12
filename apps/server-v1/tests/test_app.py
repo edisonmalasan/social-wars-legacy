@@ -118,7 +118,10 @@ class TransportStructureTests(unittest.TestCase):
     def test_the_inventory_is_not_empty(self) -> None:
         """A guard satisfied by an empty scan is the defect class itself."""
         self.assertIsInstance(transport_source(), ast.Module)
-        self.assertEqual({"POST /v1/collect"}, set(ROUTES))
+        self.assertEqual(
+            {"POST /v1/collect", "POST /v1/collection"},
+            set(ROUTES),
+        )
 
     def test_the_route_path_is_the_declared_one(self) -> None:
         """The literal cannot drift from ``ROUTE_PREFIX`` without failing here."""

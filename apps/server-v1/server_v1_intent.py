@@ -48,33 +48,72 @@ a resource word, as ``instant_cost_report`` or ``my_gold_pick`` do, is
 directions of that distinction are pinned over the whole vocabulary by
 ``tests/test_intent.py``.
 
-The allowed keys for the one delivered action, ``collect``:
+The allowed keys for the two delivered actions:
 
-``player_id``
-    the save this intent is about.  Required, non-empty, a string.
-``row``
-    the addressable placed row, as a non-negative integer.  Required.
+``collect``
+    ``player_id`` — the save this intent is about, a non-empty string.  ``row``
+    — the addressable placed row, a **non-negative** integer.  Both required.
 
-Nothing else.  Notably absent and deliberately *not* accepted: ``amount``,
-``resource``, ``tier``, ``time``, ``now``, ``price``, and any of the delta keys.
+``collection``
+    ``player_id`` — the save this intent is about, a non-empty string.
+    ``collection_id`` — the committed collection id, an integer that **may be
+    zero or negative**, so the slice can refuse it as an *aliased id* rather
+    than the request layer calling it malformed (see
+    :data:`NON_NEGATIVE_ADDRESSING`).  Both required.
+
+Each action's schema is closed over its own two keys, so a ``collect`` request
+that carries ``collection_id`` is an ``unknown_request_field`` and vice versa.
+Nothing else is accepted.  Notably absent and deliberately *not* accepted:
+``amount``, ``resource``, ``tier``, ``time``, ``now``, ``price``, ``cash``,
+``prize``, ``item_ids`` and any of the delta keys.
 """
 
 from __future__ import annotations
 
 import json
 from collections.abc import Mapping
-from typing import Any, Dict, FrozenSet, Tuple, Union
+from typing import Any, Dict, FrozenSet, Optional, Tuple, Union
 
 from pydantic import BaseModel, ConfigDict
 
 from server_v1_refusals import Refusal, RefusalCode
 
-#: The one delivered action.  A mapping rather than a single constant, so the
+#: The delivered actions.  A mapping rather than a single constant, so the
 #: allowed key set is a property of the *action* and adding a route adds a row
 #: instead of a branch.
-INTENT_SCHEMAS: Dict[str, Dict[str, FrozenSet[str]]] = {
+INTENT_SCHEMAS: Dict[str, FrozenSet[str]] = {
     "collect": frozenset({"player_id", "row"}),
+    "collection": frozenset({"player_id", "collection_id"}),
 }
+
+#: The one addressing field each action requires, and therefore the one field
+#: that tells the two intents apart.  Deliberately a **second** row per action
+#: rather than a branch at the parse site, so adding a route cannot forget to
+#: declare how it is addressed: the closed key set above already guarantees
+#: exactly this field is present, because for both delivered actions
+#: ``allowed == required``.
+ADDRESSING_FIELDS: Dict[str, str] = {
+    "collect": "row",
+    "collection": "collection_id",
+}
+
+#: Actions whose addressing field may legally be **negative**.
+#:
+#: ``row`` is a placement index, so it cannot: a negative row is a malformed
+#: request, and the intent layer says so.  ``collection_id`` is a committed
+#: **id**, and the preserved server reaches it through the positional index
+#: ``max(0, collection - 1)`` (``get_game_config.py:170-175``), which means the
+#: integer zero and every negative id land on collection one.  Refusing a
+#: negative collection id here as ``malformed_request`` would be the *wrong*
+#: refusal for the *right* reason: it would report a request-shape error where
+#: the domain has a named rule about an **aliased id**.  So the intent layer
+#: accepts any integer and lets the slice refuse it as ``aliased_collection_id``
+#: (design D3), which is the refusal that names the collision it resolves to.
+#:
+#: The asymmetry is deliberate and measured rather than assumed: a request
+#: carrying ``row: -1`` must be refused, and refusing the *other* negative the
+#: same way would hide the alias rule the slice exists to apply.
+NON_NEGATIVE_ADDRESSING: FrozenSet[str] = frozenset({"row"})
 
 #: Keys whose *name* says the client is trying to dictate an outcome.  Matched
 #: case-folded, on whole underscore-separated segments, against the request's
@@ -164,20 +203,34 @@ DELTA_MODIFIERS: FrozenSet[str] = frozenset(
 
 
 class Intent(BaseModel):
-    """A validated player intent: what should happen, and about what."""
+    """A validated player intent: what should happen, and about what.
+
+    Two addressing fields, exactly one set.  They are ``Optional`` rather than
+    split into two models because :func:`parse_intent` constructs one of them
+    from :data:`ADDRESSING_FIELDS` and the transport never builds an ``Intent``
+    itself — so the "which one is set" question is answered at construction
+    rather than at every use, and ``addressed_path`` reports the one that is.
+    """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     action: str
     player_id: str
-    row: int
+    #: A placement row index.  Set for ``collect``; ``None`` otherwise.
+    row: Optional[int] = None
+    #: A committed collection id.  Set for ``collection``; ``None`` otherwise.
+    #: May be **zero or negative**, on purpose — see
+    #: :data:`NON_NEGATIVE_ADDRESSING`.
+    collection_id: Optional[int] = None
 
     def addressed_path(self) -> str:
         """A JSON-pointer-ish description of what this intent addresses.
 
-        Used in refusal detail so a client can see exactly which row was
-        addressed.  It reports the address, never a balance.
+        Used in refusal detail so a client can see exactly which row or which
+        ledger was addressed.  It reports the address, never a balance.
         """
+        if self.collection_id is not None:
+            return "/privateState/collections"
         return "/maps/0/items/%d" % self.row
 
 
@@ -283,16 +336,34 @@ def parse_intent(action: str, body: Any) -> IntentOutcome:
             "player_id must be a non-empty string",
             {"received": type(player_id).__name__},
         )
-    row = body.get("row")
+
+    addressing = ADDRESSING_FIELDS[action]
+    target = body.get(addressing)
     # ``bool`` is an ``int`` in Python, so ``True`` would address row 1.
-    if isinstance(row, bool) or not isinstance(row, int) or row < 0:
+    if isinstance(target, bool) or not isinstance(target, int):
         return _refuse(
             RefusalCode.MALFORMED_REQUEST,
-            "row must be a non-negative integer",
-            {"received": type(row).__name__},
+            "%s must be an integer" % addressing,
+            {"addressing_field": addressing, "received": type(target).__name__},
+        )
+    if addressing in NON_NEGATIVE_ADDRESSING and target < 0:
+        return _refuse(
+            RefusalCode.MALFORMED_REQUEST,
+            "%s must be a non-negative integer" % addressing,
+            {"addressing_field": addressing, "received": target},
         )
 
-    return Intent(action=action, player_id=player_id, row=row)
+    return Intent(
+        action=action,
+        player_id=player_id,
+        # The field the action declares as its own is the one that is set; the
+        # other stays ``None``.  Two conditional expressions rather than an
+        # ``**{addressing: target}`` unpack, because that form cannot be
+        # type-checked and would let a mis-declared table produce an intent
+        # with neither field set.
+        row=target if addressing == "row" else None,
+        collection_id=target if addressing == "collection_id" else None,
+    )
 
 
 def intent_from_json(action: str, raw: bytes) -> IntentOutcome:
@@ -400,6 +471,7 @@ def _refuse(code: RefusalCode, message: str, detail: Dict[str, Any]) -> Refusal:
 
 
 __all__ = [
+    "ADDRESSING_FIELDS",
     "DELTA_KEYS",
     "DELTA_MODIFIERS",
     "INTENT_SCHEMAS",

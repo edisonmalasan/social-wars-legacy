@@ -94,6 +94,7 @@ class CommittedContent:
         self._document = document
         self._items = document.get("items")
         self._globals = document.get("globals")
+        self._collections = document.get("collections")
         self.applied_patches = applied_patches
         self.applied_mods = applied_mods
         self.missing_patches = missing_patches
@@ -287,6 +288,174 @@ class CommittedContent:
             return None
         return value
 
+    # ------------------------------------------------------- collections table ---
+    #: The committed collections section's fields this module reads.  Named as a
+    #: tuple so a test can assert the reader covers exactly the four the
+    #: repository's own normalization declares, instead of a chosen example.
+    COLLECTION_FIELDS: Tuple[str, ...] = ("id", "item_ids", "prize", "cashPrice")
+
+    def collection_rows(self) -> Tuple[Mapping[str, Any], ...]:
+        """The committed ``collections`` rows, verbatim, in array order.
+
+        **Verbatim means string-encoded.**  Measured on the committed raw
+        configuration, every one of the ten rows stores ``id`` and
+        ``cashPrice`` as **strings** and ``item_ids`` and ``prize`` as
+        **embedded JSON strings** (``'[66,67,68,69,70]'``,
+        ``'{"1085":1}'``).  The readers below decode those encodings; this one
+        does not, so a test can compare the loaded bytes against the committed
+        normalized package field by field.
+
+        An absent or non-array section yields ``()`` rather than raising, so a
+        caller can refuse an unresolvable collection with a *content* reason
+        instead of a load failure.  Whether an empty table is acceptable is not
+        this module's decision; it reports what it found.
+        """
+        rows = self._collections
+        if not isinstance(rows, list):
+            return ()
+        return tuple(row for row in rows if isinstance(row, Mapping))
+
+    def collection_row(self, index: int) -> Optional[Mapping[str, Any]]:
+        """One committed collections row **by position**, or ``None``.
+
+        Positional, not by id, because that is the addressing the preserved
+        branch uses: ``get_collection_prize`` (``get_game_config.py:170-175``)
+        computes ``index = max(0, collection - 1)`` and indexes the array.  v1
+        keeps the positional index (design D2) and refuses the clamp (design
+        D3), but it does not re-address the table by id, because that would be
+        a second addressing rule with the same name.
+        """
+        rows = self.collection_rows()
+        if isinstance(index, bool) or not isinstance(index, int):
+            return None
+        if index < 0 or index >= len(rows):
+            return None
+        return rows[index]
+
+    def collection_id(self, index: int) -> Optional[int]:
+        """A row's committed ``id`` as an ``int``, or ``None``.
+
+        Stored as a **string** on every committed row, so this is a decoding,
+        not a conversion.  ``None`` means the field is absent or unreadable,
+        which is kept distinct from ``0``: a row whose id will not parse is a
+        content defect, and reporting it as id ``0`` would make it address
+        collection 1's prize.
+        """
+        text = self._collection_text(index, "id")
+        if text is None or text == "":
+            return None
+        try:
+            return int(text)
+        except (TypeError, ValueError):
+            return None
+
+    def collection_cash_price(self, index: int) -> Optional[int]:
+        """A row's committed ``cashPrice`` as a non-negative ``int``, or ``None``.
+
+        Stored as a string; see :meth:`collection_id`.  Negative prices are
+        refused here rather than clamped, because a negative price would make a
+        debit a credit, and clamping it to ``0`` would make the service claim
+        the committed price was free.
+        """
+        text = self._collection_text(index, "cashPrice")
+        if text is None or text == "":
+            return None
+        try:
+            value = int(text)
+        except (TypeError, ValueError):
+            return None
+        if value < 0:
+            return None
+        return value
+
+    def collection_requirement_ids(self, index: int) -> Optional[Tuple[int, ...]]:
+        """A row's committed ``item_ids``, decoded, or ``None``.
+
+        Stored as an embedded JSON **array string**.  Decoding is this module's
+        job in the same way ``item_non_negative_int`` decodes a committed
+        string field: the *shape* is content's, and the *rule* about what the
+        ids mean belongs to :mod:`server_v1_collection`.
+
+        An empty list is a real resolved value and is **not** ``None``: a
+        collection with no requirements is a content shape v1 does not have an
+        opinion about, and conflating it with "unreadable" would let a
+        malformed row pass an all-or-nothing test vacuously.
+        """
+        decoded = self._collection_json(index, "item_ids")
+        if not isinstance(decoded, list):
+            return None
+        ids: List[int] = []
+        for value in decoded:
+            if isinstance(value, bool) or not isinstance(value, int):
+                return None
+            ids.append(int(value))
+        return tuple(ids)
+
+    def collection_prize(self, index: int) -> Optional[Tuple[int, int]]:
+        """A row's committed ``prize`` as ``(item_id, quantity)``, or ``None``.
+
+        Stored as an embedded JSON object string mapping **string** keys to
+        counts, and every committed row carries exactly one entry.
+
+        **Only** a single-entry prize resolves.  A zero-entry or multi-entry
+        prize is ``None``, because returning the first of several would silently
+        pick one of the committed outcomes the server never chose.  The string
+        key is decoded to an ``int`` here so the caller never sees a store key;
+        a key that will not parse as an integer is ``None`` too, since the save
+        document's own keys are integers.
+        """
+        decoded = self._collection_json(index, "prize")
+        if not isinstance(decoded, dict) or len(decoded) != 1:
+            return None
+        key, quantity = next(iter(decoded.items()))
+        if isinstance(quantity, bool) or not isinstance(quantity, int):
+            return None
+        if isinstance(key, str):
+            try:
+                item_id = int(key)
+            except (TypeError, ValueError):
+                return None
+        elif isinstance(key, int) and not isinstance(key, bool):
+            item_id = int(key)
+        else:
+            return None
+        return (item_id, int(quantity))
+
+    def _collection_text(self, index: int, field: str) -> Optional[str]:
+        row = self.collection_row(index)
+        if row is None or field not in row:
+            return None
+        raw = row[field]
+        if raw is None or isinstance(raw, bool):
+            return None
+        if isinstance(raw, str):
+            return raw.strip()
+        if isinstance(raw, int):
+            return str(raw)
+        return None
+
+    def _collection_json(self, index: int, field: str) -> Any:
+        """Decode one committed embedded-JSON string field, or raise.
+
+        ``ContentError`` rather than ``None`` for a **malformed** encoding:
+        "the field is absent" is reported as ``None`` by
+        :meth:`_collection_text` and reaches the caller as an unresolvable
+        collection, while "the field is present and does not parse" is a content
+        defect the service must not paper over by treating the requirement list
+        as empty.
+        """
+        text = self._collection_text(index, field)
+        if text is None:
+            return None
+        try:
+            return json.loads(text)
+        except ValueError as error:
+            raise ContentError(
+                "no_collection",
+                "committed %s at position %d is not decodable JSON: %s"
+                % (field, index, error),
+            )
+
     def provenance(self) -> Dict[str, Any]:
         """What was loaded, for the response envelope and the containment record."""
         return {
@@ -298,6 +467,7 @@ class CommittedContent:
             "missing_mods": list(self.missing_mods),
             "removed_duplicate_items": self.removed_duplicate_items,
             "skipped_loader_steps": list(SKIPPED_LOADER_STEPS),
+            "collection_rows": len(self.collection_rows()),
         }
 
 
