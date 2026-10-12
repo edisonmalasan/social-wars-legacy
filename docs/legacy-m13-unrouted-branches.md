@@ -27,19 +27,37 @@ trusted.
 **The recorded figure of 39 unrouted branches is an overstatement and is
 corrected to 23** (§2).
 
-The 23 partition cleanly into six groups. **Only one branch is a port
-candidate**, and the group counts below sum to 23 by measurement, not by
-construction:
+The 23 partition cleanly into six groups. **No branch is a port candidate**
+(was written as "only one"; see the correction below and §11), and the group
+counts sum to 23 by measurement, not by construction:
 
 | Class | Count | Branches | What v1's answer is |
 | --- | --- | --- | --- |
 | A — catalog-classified must-not-migrate | 2 | `flash_debug`, `fast_forward` | refusal, never a route |
 | B — the branch writes nothing | 3 | `ping`, `set_variables`, `buy_powerups` | nothing to make authoritative |
-| C — unbounded client-dictated grant or destruction | 6 | `store_add_items`, `batch_remove`, `pop_unit`, `push_unit`, `add_inventory_item`, `remove_inventory_item` | refusal, never a route |
+| C — unbounded client-dictated grant or destruction | **7** | `store_add_items`, `batch_remove`, `pop_unit`, `push_unit`, `add_inventory_item`, `remove_inventory_item`, **`buy_offer_pack`** *(moved here by §11)* | refusal, never a route |
 | D — client-sent value, no committed rule | 7 | `orient`, `trade_resource`, `first_time_marketplace`, `rt_open_graph_unit`, `unit_collections_completed`, `add_xp_unit`, `soulmixer_speedup` | refusal, never a route |
 | E — already owned by a delivered capability's refusal | 4 | `buy_si_help`, `finish_si`, `set_resource_allies`, `push_queue_unit2` | already decided; a second surface would drift |
-| **F — committed content supplies both the selector and the answer** | **1** | **`buy_offer_pack`** | **port candidate** |
-| | **23** | | |
+| **F — committed content supplies both the selector and the answer** | **0** | *(was 1: `buy_offer_pack`, **withdrawn** by §11)* | **no port candidate** |
+| | **23** | | | |
+
+The class counts still sum to **23**, and `buy_offer_pack` moves from F to **C**
+rather than falling out of the partition. That is the honest reclassification:
+once content cannot supply the grant, what the branch does *is* grant an
+unbounded client-dictated item list with no committed rule — which is exactly
+what Class C describes, and the same verdict Class C's other six members carry.
+
+> **THE HEADLINE OF THIS DOCUMENT CHANGED AFTER IT WAS MERGED, AND THE CHANGE IS
+> THE FINDING.** As first written, the last row read **`buy_offer_pack`, port
+> candidate**, and the document's answer was "port this one". **§11 withdraws
+> it.** Committed content supplies the *selector* and the *price* for that branch
+> but **explicitly declines to decode the item grant** — by committed policy, not
+> by omission — so the grant is determinate for **1 of 44** packs and the branch
+> is not portable.
+>
+> **So the corrected headline is: all 23 unrouted branches are refusal-only, and
+> M13 line 2 has no port candidate among them.** §11.5 records the redirect that
+> follows. **Nothing is proposed here.**
 
 ---
 
@@ -199,7 +217,7 @@ there is nothing left here to port.
 A branch that writes nothing cannot be made authoritative, because there is no
 state for authority to attach to.
 
-### Class C — unbounded client-dictated grant or destruction (6)
+### Class C — unbounded client-dictated grant or destruction (7)
 
 | Branch | Source | What it does |
 | --- | --- | --- |
@@ -209,10 +227,12 @@ state for authority to attach to.
 | `push_unit` | `command.py:365-382` | Pops a row off the map into a client-named building at client-named indexes. |
 | `add_inventory_item` | `command.py:488-495` | `inventory_add` on a client item id and quantity. |
 | `remove_inventory_item` | `command.py:496-503` | `inventory_remove` on a client item id and quantity. |
+| **`buy_offer_pack`** | `command.py:710-718` | **Moved here by §11.** Reads `package_id` and never uses it; `json.loads`'s a client-sent list and adds every element to storage. |
 
-All six are refusal-only under any honest reading: with no committed rule saying
+All seven are refusal-only under any honest reading: with no committed rule saying
 *what* may be destroyed or granted, a server that implements them faithfully is
-a pass-through.
+a pass-through. `buy_offer_pack` carries a committed *selector* and a committed
+*price* — but not a committed *grant*, which is the half that matters (§11).
 
 ### Class D — client-sent value, no committed rule (7)
 
@@ -262,11 +282,25 @@ surfaces that can drift apart.
 respectively — but they sit in Class D because their *shape* independently
 rules them out, and the overlap is recorded rather than hidden.
 
-### Class F — committed content supplies both the selector and the answer (1)
+### Class F — committed content supplies both the selector and the answer (0)
 
-**`buy_offer_pack`** is the only branch in the repository where a server can
-derive the whole effect from committed content rather than inventing a rule, and
-it is therefore the entire port-candidate set. §5 is about it.
+**WITHDRAWN 2026-10-13 — this class is EMPTY, and the branch this document put
+in it (`buy_offer_pack`) is not a port candidate after all.** The claim it rested
+on was that committed `offer_packs` content "supplies both the selector and the
+answer". The selector half is true. The **answer half is false**, and not because
+the content is missing: `packages/game-content/README.md` lines 1146-1149
+**explicitly and by committed policy refuse to decode** the structures a grant
+would depend on —
+
+> No value is rebalanced, reinterpreted semantically, repaired, or assigned new
+> meaning. Flat repetition, pair seconds, and group membership are carried as
+> observed structures, never decoded as quantities, prices, weights, or choice
+> rules.
+
+So the item grant — the substance of every purchasable pack — is indeterminate
+by the repository's own recorded decision, not by accident. Measured: the grant
+is determinate for **1 of 44** packs. Full measurement, and the redirect it
+forces, are in **§11**.
 
 > An earlier draft of this document put `buy_offer_pack` in a class of its own
 > called "Class D" and gave that class a size of **6**. That 6 was a pack count
@@ -279,7 +313,21 @@ it is therefore the entire port-candidate set. §5 is about it.
 
 ---
 
-## 5. `buy_offer_pack` — the one branch where committed content can close the hole
+## 5. `buy_offer_pack` — the branch this document first recommended, and why that recommendation is withdrawn
+
+> **READ §11 BEFORE RELYING ON ANYTHING IN THIS SECTION.** This section's
+> conclusion — that `buy_offer_pack` is the one branch where committed content
+> supplies both the selector and the answer, and is therefore the port candidate
+> — is **WITHDRAWN**. The selector half survives; the answer half does not. The
+> branch is real and the authority hole is real; what does not survive is the
+> claim that content says what the grant should be. §11 measures why, and shows
+> the grant is determinate for **1 of 44** packs.
+>
+> The rest of this section is left standing rather than rewritten, because the
+> error it makes is instructive: **it read a field named `item_refs`, assumed the
+> name meant "the items this pack grants", and never checked the normalization
+> layer's own contract for what that field is.** A name is not a specification,
+> and this repository records that lesson repeatedly.
 
 ### 5.1 The legacy branch
 
@@ -395,13 +443,25 @@ required before capturing a fixture and which most of the 23 cannot meet.
 
 The pattern is worth stating plainly: **the largest holes and the best port
 candidates are disjoint.** `flash_debug` can set six balances to arbitrary
-values and cannot be ported under any reading. `buy_offer_pack` can mint
-arbitrary items and is the one branch where committed content says exactly what
-the grant should be.
+values and cannot be ported under any reading.
+
+> **CORRECTION (§11): the second half of the sentence above is WITHDRAWN.**
+> `buy_offer_pack` can mint arbitrary items, but committed content does **not**
+> say what the grant should be — its item grant is indeterminate for **43 of 44**
+> packs by the content package's own explicit policy. With `buy_offer_pack`
+> withdrawn there is **no** best port candidate among the 23, so the
+> "disjoint sets" observation survives only as a statement about `flash_debug`:
+> the largest holes have no counterpart at all.
 
 ---
 
 ## 7. Recommendation
+
+> **WITHDRAWN IN FULL — see §11.** The recommendation below was to port
+> `buy_offer_pack` as M13 line 2. It is withdrawn because the derivation it
+> depends on — that content supplies the grant — is false. **The premise of
+> this section is retained so the error stays visible and is not re-made by a
+> later reader who trusts the heading.**
 
 Port **`buy_offer_pack`** as M13 line 2, and deliver it the way M13 line 1
 delivered `collect`:
@@ -419,11 +479,22 @@ This is the only Class-F candidate, and it is the only branch in the repository
 where the legacy dispatcher receives a client-supplied answer to a question
 committed content can answer.
 
+> **Every sentence in this block is WITHDRAWN (§11).** "The only branch in the
+> repository where committed content can answer" is **false**: content supplies
+> the selector and the price, and declines to decode the grant.
+
 ---
 
 ## 8. What is still unresolved, and must be before a proposal
 
 These are open questions, deliberately not settled here.
+
+> **§11 answers two of these six, and its answers are what withdraw §7.** Q2
+> (the `groups`/`pairs` semantics) is answered: **they have no committed
+> semantics at all**, by explicit policy rather than by omission — see §11.2. Q4
+> (whether pack 18 is the same transaction as `buy_premium_account`) is answered:
+> **it is not independent** — see §11.4. Q1, Q3, Q5 and Q6 remain open and are
+> restated below unchanged.
 
 1. **The two committed leaf anomalies reproduce and are not yet characterised.**
    Over all 579 leaves across the 44 packs, leaf types are **578 `int` + 1
@@ -470,19 +541,23 @@ All enumeration was additionally performed by executing the committed envelope
 modules against a throwaway interpreter with `apps/compat-api` on `sys.path`. No
 service was started, no port was bound, and no save was written.
 
-**Two repository files are modified by this stage:** this document, and the
-correction note added to `docs/legacy-m13-collect-v1.md` (§2) so that the
-falsified figure is withdrawn at its source rather than only contradicted
-elsewhere. Every legacy source line quoted in §4 was checked against the working
-tree at the range stated, by locating the `cmd == "<branch>"` header and
-confirming it sits at the claimed first line — **19 of 19 verified, zero
-mismatches**.
+**Two repository files are modified by the stage that introduced this
+document:** this document, and the correction note added to
+`docs/legacy-m13-collect-v1.md` (§2) so that the falsified figure is withdrawn at
+its source rather than only contradicted elsewhere. Every legacy source line
+quoted in §4 was checked against the working tree at the range stated, by
+locating the `cmd == "<branch>"` header and confirming it sits at the claimed
+first line — **19 of 19 verified, zero mismatches**.
+
+**§11 was added afterwards and modified this document only** — no other file, no
+normalization rule, no schema, no committed byte.
 
 ## 10. Claim limits
 
-- **This document proposes nothing.** It recommends `buy_offer_pack` and stops.
-  The OpenSpec change, its design decisions, and its ten derived rules are a
-  later stage and none of them are settled here.
+- **This document proposes nothing.** It recommended `buy_offer_pack`, and **that
+  recommendation is withdrawn by §11**. It now stops with **no port candidate**.
+  The OpenSpec change, its design decisions, and its derived rules are a later
+  stage and none of them are settled here.
 - **No claim about what the Flash client did.** Every statement is about the
   preserved Python server and the committed content. Absence of a server-side
   rule says nothing about client-side behaviour, which may have been entirely
@@ -498,3 +573,121 @@ mismatches**.
   explicit that the cause is unestablished.
 - **No parity is claimed for any arm.** No fixture was captured and no legacy
   server was executed.
+
+---
+
+## 11. A correction that withdraws §5 and §7, and empties Class F
+
+*Added 2026-10-13, after PR #386 merged. Written because the merged record
+recommended a branch it had not actually checked, and leaving that standing
+would repeat the failure this repository has recorded many times: a figure or a
+claim carried forward without being measured.*
+
+### 11.1 What is withdrawn
+
+Three claims, in §5, §6 and §7, are **WITHDRAWN**:
+
+1. **"Committed `offer_packs` content supplies both the selector and the
+   answer."** The selector half is **true**; the answer half is **false**.
+2. **`buy_offer_pack` is the port candidate, and therefore the whole of Class F.**
+3. **"The largest holes and the best port candidates are disjoint."** True only
+   of `flash_debug`; with `buy_offer_pack` gone there is no counterpart class at
+   all.
+
+### 11.2 The error, stated exactly
+
+The normalized package carries a field on **all 44** packs called `item_refs`,
+holding the pack's item ids as decimal strings in stored traversal order. §5
+treated the name as a specification — "the items this pack grants" — and derived
+a grant from it.
+
+**`item_refs` is not a grant schedule.** It is a *reference-resolution* field.
+`packages/game-content/README.md` rule **F3** defines it as the ids that "must
+resolve against the normalized items legacy-ID set", and the same section closes
+with a rule that is the whole of this correction:
+
+> No value is rebalanced, reinterpreted semantically, repaired, or assigned new
+> meaning. **Flat repetition, pair seconds, and group membership are carried as
+> observed structures, never decoded as quantities, prices, weights, or choice
+> rules.**
+> — `packages/game-content/README.md:1146-1149`
+
+So the three structures a grant would depend on are **explicitly undecoded by
+committed policy**:
+
+| Structure | Packs | What a grant would need to know | Committed? |
+| --- | --- | --- | --- |
+| `flat` repetition | **4** (ids 2, 3, 15, 16) | whether `[1004, 1004, 1004, 1004]` is 4 units or 1 | **no** — never decoded as a quantity |
+| `groups` membership | **37** | whether 3 groups of 3 is all 9, one per group, or one group | **no** — never decoded as a choice rule |
+| `pairs` seconds | **1** (id 4) | what `[[67, 35], [85, 70], …]`'s second element means | **no** — recorded opaque |
+
+**Measured: the item grant is determinate for exactly 1 of 44 packs** — pack
+**1**, `items: [1042, 84]`, shape `flat`, no repetition, and so the only pack
+whose grant is read off the content without assigning a meaning to anything.
+Pack 1 is also the **only** pack granting any resource (5000 each of gold, wood,
+steel, oil), so the intersection of "determinate item grant" and "grants a
+resource" is exactly **{1}**.
+
+The `groups` case is the sharpest. **25 of the 37** `groups` packs have groups
+of **mixed** length — ids 20-44 carry lengths 3 *and* 6 — so "one item per
+group" yields **2** items and "every leaf" yields **9**. The two readings differ
+by more than a factor of four and nothing in committed content chooses between
+them.
+
+### 11.3 Two alternatives that were checked and excluded
+
+- **The normalization is not lossy.** Checked, not assumed: the raw `items` in
+  `config/main.json` is **identical** to the normalized `items` for all three
+  sampled shapes (packs 1, 4, 5). The information is not being dropped in
+  normalization; it was never in the content.
+- **No second table supplies the grant.** `offer_packs` is the **only** one of
+  the 20 top-level content keys whose name mentions a pack or an offer. There is
+  no pack-to-grant mapping hiding elsewhere in committed content.
+
+### 11.4 The `premium_account` pack, which closes the loop
+
+Pack **18** ("Premium Account", `type: "premium_account"`, `items_shape: null`,
+`items: null`, `cost_cash: 0`) is the only pack with **no** item component, so it
+is the only pack whose grant is trivially determinate — and its grant is an
+*entitlement*, not an item. The only `premium_account`-typed pack is 18, and the
+branch that grants a premium entitlement is `buy_premium_account`, which is
+**already routed** at `/v0/darts` and already owned by `godot-darts`. This
+resolves open question 4 of §8: pack 18 is the offer-pack **display** of a
+purchase owned elsewhere, not an independent transaction, and porting
+`buy_offer_pack` would create a second surface for one entitlement.
+
+### 11.5 What this forces, and the redirect
+
+**Class F is empty. All 23 unrouted branches are refusal-only.** That is the
+honest state of the surface, and it is a real finding rather than a dead end:
+the one branch whose authority hole looked *derivable* turns out to be the one
+branch whose content **declines to derive itself**.
+
+It also redirects M13 line 2. The remaining authority work is the other half of
+the surface — the **39 dispatched-but-non-authoritative** branches behind the v0
+routes — and those are selectable by **the same criterion line 1 was selected
+by**, which is recorded in `docs/legacy-m13-authority.md` decision **D6**: `collect`
+was chosen as the first slice because "v0's is already proven against a captured
+executed-legacy fixture". Applied to the 23 v0 routes, that criterion selects
+among routes that already have **21 executed-legacy fixture captures** behind
+them, rather than among branches that have none. `collect`'s own sibling
+`/v0/purchase` (`buy_stored_item_cash`) is the nearest of them by surface.
+
+**No port candidate is selected here.** Selecting one is the proposal stage's
+job, and the standing instruction — investigate first, do not propose a line
+unprompted — is unchanged.
+
+### 11.6 Non-claims
+
+- **Nothing about the Flash client.** That the client may have flattened,
+  weighted, or randomised these structures is unobservable here and remains so.
+- **No claim that the shapes are meaningless.** They are certainly meaningful to
+  the game; only their *meaning* is not recoverable from committed content or
+  from the preserved server.
+- **No claim that a future line cannot deliver them.** Delivering a
+  `groups` or `pairs` grant requires a rule this repository does not contain. A
+  future line may derive one from new evidence; this document only records that
+  no such rule is committed today.
+- **`item_refs` is not removed or deprecated.** It remains correct as a
+  reference-resolution field, and this correction changes no normalization rule,
+  no schema, and no committed byte.
