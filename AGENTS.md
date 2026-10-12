@@ -2746,11 +2746,25 @@ allow-listed**, which also exposed that this suite is absent from
 `verify-boot.ps1` entirely and is owned by `verify.ps1`.
 
 Claim limits: **this line delivers authority for exactly one of the 63 named
-legacy branches**, `collect`; **39 of the 63 branches have no route at all**
+legacy branches**, `collect`; **23 of the 63 branches have no route at all**
 behind either server, and the other **23** Compatibility API routes have **no
-authoritative counterpart**, so 23 routes stay non-authoritative and 39
-branches stay unrouted -- both remaining work, never implied parity; the
-compatibility surface is
+authoritative counterpart**, so 23 routes stay non-authoritative and **62**
+branches stay non-authoritative -- both remaining work, never implied parity;
+**FIGURE CORRECTION (2026-10-13, orchestrator; measured in
+`docs/legacy-m13-unrouted-branches.md`, PR #386, merge `c982d4c`): this
+paragraph originally read "39 of the 63 branches have no route at all" and
+"39 branches stay unrouted", and both are WITHDRAWN.** The 39 was
+`tools/route-coverage/`'s **citation** count promoted into a coverage claim: the
+tool measures whether a route handler cites a branch with a resolving
+`command.py:NNN` line span, and **16** of its 39 are in fact dispatched.
+Measured by executing each committed envelope builder and reading the branch out
+of the batch it returns, **40** of 63 branches are dispatched by a v0 route and
+**23** by none, with all **23** inside the tool's 39 and **zero** disputes in
+either direction. The "39 branches stay unrouted" claim additionally counted only
+the unrouted branches and omitted the **39** dispatched-but-non-authoritative
+ones, so the correct non-authoritative total is **63 - 1 = 62**. The tool itself
+is not wrong and was not changed; it answers the question it was built to answer.
+The compatibility surface is
 `collect` alone and no other intent is routed; **the 21 other facade intents
 are refused client-locally** with code `unsupported_by_server_v1` and never
 reach the transport, each through its own typed result's `_failure` factory;
