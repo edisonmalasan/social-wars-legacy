@@ -209,8 +209,8 @@ const OWNERSHIP := [
 ## The recorded registered counts, asserted against the battery's OWN source so a
 ## silent edit to either registered array fails here rather than only at the end
 ## of a five-minute run.
-const RECORDED_HERMETIC_COUNT := 51
-const RECORDED_LIVE_PHASE_COUNT := 24
+const RECORDED_HERMETIC_COUNT := 52
+const RECORDED_LIVE_PHASE_COUNT := 25
 
 ## The committed rows whose KEY carries the market word inside a longer
 ## identifier. These are exactly what a substring rule would have dragged into a
@@ -1544,7 +1544,7 @@ func _check_route_boundary() -> void:
 			found = id_expression.search(hermetic_match.get_string(1),
 				found.get_end())
 	check_eq(hermetic_names.size(), RECORDED_HERMETIC_COUNT,
-		"the battery registers exactly fifty-one hermetic suites")
+		"the battery registers exactly fifty-two hermetic suites")
 	check(hermetic_names.has("test_market_trade"), "and this suite is one of them")
 
 	var live := RegEx.new()
@@ -1586,7 +1586,7 @@ func _check_route_boundary() -> void:
 			v1_found = v1_name.search(v1_match.get_string(1),
 				v1_found.get_end())
 	check_eq(live_names.size(), RECORDED_LIVE_PHASE_COUNT,
-		"the battery registers exactly twenty-four live phases, across BOTH "
+		"the battery registers exactly twenty-five live phases, across BOTH "
 			+ "its registered loops")
 	for name3: Variant in live_names:
 		check(not str(name3).to_lower().contains("market"),

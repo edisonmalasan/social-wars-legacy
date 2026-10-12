@@ -1,0 +1,107 @@
+{
+	"claims": {
+		"client_compares_two_reported_grant_fields": false,
+		"client_computes_a_price": false,
+		"client_computes_a_prize": false,
+		"client_evaluates_eligibility": false,
+		"client_filters_a_negative_id": false,
+		"parity_with_legacy_claimed": false,
+		"unsupported_intent_touches_transport": false
+	},
+	"enforced_by": {
+		"client_compares_two_reported_grant_fields": "_check_no_field_reconciliation (all ten pairs; added because probe P4 found the claim was prose-only)",
+		"client_computes_a_price": "_check_no_client_arithmetic (guard A) + _check_absent_derivation_helpers",
+		"client_computes_a_prize": "_check_absent_derivation_helpers (belt) + _check_no_client_arithmetic (gate)",
+		"client_evaluates_eligibility": "_check_absent_derivation_helpers",
+		"client_filters_a_negative_id": "_check_intent_body",
+		"parity_with_legacy_claimed": "not a claim; v1 is new behaviour and no legacy oracle exists",
+		"unsupported_intent_touches_transport": "test_server_v1.gd; this suite asserts the intent LEFT its unsupported table (_check_unsupported_intent_left_the_table)"
+	},
+	"intent": {
+		"action": "collection",
+		"client_local_codes": [
+			"unsupported_by_server_v1",
+			"bad_request"
+		],
+		"collection_path": "/v1/collection",
+		"facade_return_type": "Variant",
+		"facade_widening_is_the_second": true,
+		"impl_return_types": {
+			"scripts/gameapi/fake_api.gd": "BootData.CollectionResult",
+			"scripts/gameapi/legacy_v0_api.gd": "BootData.CollectionResult",
+			"scripts/gameapi/server_v1_api.gd": "ServerV1Collection.CollectionGrantResult"
+		},
+		"negative_id_is_filtered_client_side": false,
+		"protocol": "server-v1",
+		"request_fields": [
+			"player_id",
+			"collection_id"
+		]
+	},
+	"limits": {
+		"client_sees_a_before_state": false,
+		"committed_corpus_can_exercise_the_grant": false,
+		"eligibility_is_derived": true,
+		"fixture_is_a_captured_legacy_oracle": false,
+		"legacy_branch": "command.py:504-523",
+		"legacy_command": "complete_collection",
+		"live_phase_requires_a_seeded_disposable_corpus": true,
+		"pixel_parity": false,
+		"price_is_derived": true,
+		"prize_is_committed": true,
+		"v1_routes_delivered_total": 2,
+		"windowed_capture": false
+	},
+	"modules": {
+		"scripts/gameapi/server_v1_api.gd": {
+			"bytes": 17432,
+			"pure_lf": false,
+			"raw_sha256": "94bebcd09940832b4ac4106e232d9908ff804413ec170f9c1086f43a1c60515c"
+		},
+		"scripts/gameapi/server_v1_collection_result.gd": {
+			"bytes": 14611,
+			"pure_lf": true,
+			"raw_sha256": "63d1ac4f1e4d64362f14c7b6abcb2bf575dac5c074c31f55980c5ad105ce3397"
+		}
+	},
+	"modules_are_pure_lf": false,
+	"refusals": {
+		"client_local_codes_are_server_codes": false,
+		"declared_by_the_committed_table": 17,
+		"grant_code_count": 5,
+		"grant_codes": [
+			"aliased_collection_id",
+			"collection_already_claimed",
+			"collection_not_eligible",
+			"insufficient_cash",
+			"unresolvable_collection"
+		]
+	},
+	"report": "collection-v1-report-v1",
+	"typed_result": {
+		"fail_closed_cases": 34,
+		"grant_fields": [
+			"requested_id",
+			"resolved_id",
+			"position",
+			"clamp_moved",
+			"grant_id"
+		],
+		"refuses_on_failure": [
+			"grant",
+			"resources_after",
+			"requirement_ids",
+			"derived_deltas",
+			"ledger_after"
+		],
+		"stored_resource_names": [
+			"xp",
+			"gold",
+			"wood",
+			"oil",
+			"steel",
+			"cash",
+			"mana"
+		]
+	}
+}

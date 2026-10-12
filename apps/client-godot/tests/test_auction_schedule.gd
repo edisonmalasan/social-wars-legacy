@@ -162,8 +162,8 @@ const RESOURCE_TOKENS := ["gold", "coins", "cash", "wood", "steel", "oil",
 ## intended behaviour, so it is amended rather than relaxed. `test_market_trade` was
 ## added at 50 and deliberately does NOT add a second pin of its own, so the next line
 ## meets this one constant and not two.
-const RECORDED_HERMETIC_COUNT := 51
-const RECORDED_LIVE_PHASE_COUNT := 24
+const RECORDED_HERMETIC_COUNT := 52
+const RECORDED_LIVE_PHASE_COUNT := 25
 
 var _module_source := ""
 var _oracle_source := ""
@@ -1586,7 +1586,11 @@ func _check_route_boundary() -> void:
 			found2 = name_expression.search(live_match.get_string(1),
 				found2.get_end())
 	# The count was amended 23 -> 24 by the Server v1 line, which added a
-	# phase. This suite's OWN line still adds none, and that is asserted
+	# phase, and then 24 -> 25 by the collection-grant line, which added a
+	# SECOND v1 phase in the second registered loop. Both moves are the
+	# established pattern: a count pin the incoming line *legitimately* moves
+	# is amended in place, where an archived line's *behavioural* assertion is
+	# not. This suite's OWN line still adds none, and that is asserted
 	# separately and still holds: the count it owns is the count of phases
 	# naming its surface, which the loop below requires to be zero.
 	# A SECOND registered loop exists since the Server v1 line: the battery

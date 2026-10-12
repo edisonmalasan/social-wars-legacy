@@ -520,7 +520,7 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_experience", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests", "test_tutorial", "test_stored_item_placement", "test_mission_vocabulary", "test_combat_actions", "test_damage_magic", "test_rewards", "test_social_state", "test_darts", "test_friends", "test_construction_assist", "test_auction_schedule", "test_market_trade", "test_server_v1")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_experience", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests", "test_tutorial", "test_stored_item_placement", "test_mission_vocabulary", "test_combat_actions", "test_damage_magic", "test_rewards", "test_social_state", "test_darts", "test_friends", "test_construction_assist", "test_auction_schedule", "test_market_trade", "test_server_v1", "test_collection_v1")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a
@@ -1014,13 +1014,84 @@ try {
         @{
             Name = "server-v1-live"
             Assertions = "server-v1 live phase"
-            # The one delivered route writes the row's collection instant and
+            # The delivered collect route writes the row's collection instant and
             # pays a content-derived payout, so a real POST /v1/collect must
             # mutate the disposable corpus save. Refused if it does not.
             ExpectSaveMutation = $true
+            # The harness's own typed markers: the live transaction really
+            # happened against a real service and reported derived values.
+            # Asserting them here rather than only trusting the harness's exit
+            # code is what stops a phase that somehow skipped the request from
+            # passing on the harness's word alone. Per-phase and per-marker
+            # rather than one shared regex, because the two routes report
+            # different things and a shared regex would either ignore the second
+            # route's evidence or fire on the first route's.
+            Markers = @(
+                @{
+                    Regex = '\[test\] live-server-v1 row=(\d+) rung_index=(\d+) threshold_seconds=(\d+) multiplier=([\d.]+) deltas=(\{[^}]*\}) derivation=([0-9a-f]+)'
+                    Because = "the client typed a real v1 collect answer"
+                    Groups = @(
+                        @{ Group = 1; Test = "2"; Because = "it addressed the corpus's own income row (row 2)" }
+                        @{ Group = 2; Op = "ne"; Test = "-1"; Because = "v1 reported a derived rung" }
+                        @{ Group = 5; Test = '"wood":\d+'; Because = "the payout moved wood, so it is not the neutral vector" }
+                        @{ Group = 6; Test = "^[0-9a-f]{32}$"; Because = "the answer carried a 32-character derivation id" }
+                    )
+                }
+            )
             Arguments = @(
                 "--headless", "--path", $projectRel,
                 "--script", "res://tests/test_server_v1.gd",
+                "--", "--scenario=live",
+                "--gameapi=server_v1",
+                "--gameapi-endpoint=http://127.0.0.1:$ServerV1Port"
+            )
+        }
+        @{
+            Name = "collection-live-v1"
+            Assertions = "server-v1 collection live phase"
+            # The committed fresh-player corpus cannot exercise a grant: its store
+            # is {} and its cash is 5 against a cheapest committed price of 9.
+            # The harness therefore seeds the disposable corpus with collection
+            # 7's committed requirements and price -- declared, printed, and
+            # carried in the summary's `seeded` field -- so a real grant is
+            # reachable at all. The digest the mutation proof compares is taken
+            # AFTER the seed, so the proof measures the grant and not the seed.
+            ExpectSaveMutation = $true
+            SeedCollection = 7
+            RoutePath = "/v1/collection"
+            Markers = @(
+                @{
+                    Regex = '\[test\] live-server-v1-collection collection=(\d+) resolved=(\d+) requested=(\d+) position=(\d+) price=(\d+) deltas=(\{[^}]*\}) granted_item=(\d+) quantity=(\d+) stored_after=(\d+) ledger=(\[.*?\])'
+                    Because = "the client typed a real v1 collection grant answer"
+                    Groups = @(
+                        @{ Group = 1; Test = "7"; Because = "it addressed the seeded collection (id 7)" }
+                        @{ Group = 2; Test = "7"; Because = "v1 resolved it to the same id, so nothing was clamped (design D3)" }
+                        @{ Group = 3; Test = "7"; Because = "and the id the server read back is the id the client sent" }
+                        @{ Group = 4; Test = "6"; Because = "it read committed row 6, the position id-1" }
+                        @{ Group = 5; Op = "ne"; Test = "0"; Because = "v1 derived a non-zero committed price" }
+                        @{ Group = 6; Test = '"cash":-\d+'; Because = "the grant debited cash by a named delta" }
+                        @{ Group = 7; Op = "ne"; Test = "-1"; Because = "v1 named a granted item" }
+                        @{ Group = 8; Op = "ne"; Test = "0"; Because = "v1 granted a non-zero quantity" }
+                        @{ Group = 9; Op = "ne"; Test = "0"; Because = "the server's read-back storage quantity is non-zero" }
+                        @{ Group = 10; Test = ".*\b7\b.*"; Because = "the ledger grew to carry collection 7" }
+                    )
+                }
+                @{
+                    Regex = '\[test\] live-server-v1-collection-refusal code=collection_already_claimed'
+                    Because = "the once-only ledger refused a second claim"
+                }
+                @{
+                    Regex = '\[test\] live-server-v1-collection-refusal code=aliased_collection_id'
+                    Because = "v1 refused an id the preserved branch would have clamped"
+                }
+                @{
+                    Regex = '\[test\] live-server-v1-collection-refusal code=unresolvable_collection'
+                    Because = "v1 refused an id outside the committed table"
+                }
+            )
+            Arguments = @(
+                "--headless", "--path", $projectRel,
+                "--script", "res://tests/test_collection_v1.gd",
                 "--", "--scenario=live",
                 "--gameapi=server_v1",
                 "--gameapi-endpoint=http://127.0.0.1:$ServerV1Port"
@@ -1037,43 +1108,91 @@ try {
         if ($v1Phase.ContainsKey("ExpectSaveMutation")) {
             $v1Args += "--expect-save-mutation"
         }
+        if ($v1Phase.ContainsKey("SeedCollection")) {
+            $v1Args += "--seed-collection=$($v1Phase.SeedCollection)"
+            if ($v1Phase.ContainsKey("RoutePath")) {
+                # Without this the harness's summary named the collect route for
+                # EVERY phase, so collection-live-v1 recorded
+                # `"route": "POST /v1/collect"` while it had just driven
+                # POST /v1/collection. Nothing failed: the evidence file simply
+                # described the wrong route for a phase that genuinely passed, and
+                # no assertion could catch it, because the route under test is
+                # chosen by the Godot suite the caller passes, not by the harness.
+                $v1Args += "--route-path=$($v1Phase.RoutePath)"
+            }
+        }
         $v1Args += @("--", $GodotExe) + $v1Phase.Arguments
         $v1Run = Invoke-Python -Arguments $v1Args -TimeoutSeconds 900 -Name $v1Phase.Name
         $v1PhaseLogs[$v1Phase.Name] = $v1Run.Combined
         Report-Result ($v1Run.ExitCode -eq 0) `
             "$($v1Phase.Assertions): live phase exits 0 (got $($v1Run.ExitCode))"
-        # The harness's own typed marker: the live collection really happened
-        # against a real service and reported a derived rung. Asserting it here
-        # rather than only trusting the harness's exit code means a phase that
-        # somehow skipped the request cannot pass on the harness's word alone.
-        $v1Marker = [regex]::Match(
-            $v1Run.Combined,
-            '\[test\] live-server-v1 row=(\d+) rung_index=(\d+) threshold_seconds=(\d+) multiplier=([\d.]+) deltas=(\{[^}]*\}) derivation=([0-9a-f]+)')
-        Report-Result $v1Marker.Success `
-            "$($v1Phase.Assertions): the client typed a real v1 collection answer"
-        if ($v1Marker.Success) {
-            Report-Result ($v1Marker.Groups[1].Value -eq "2") `
-                "$($v1Phase.Assertions): it addressed the corpus's own income row (row 2)"
-            Report-Result ($v1Marker.Groups[2].Value -ne "-1") `
-                "$($v1Phase.Assertions): v1 reported a derived rung (got $($v1Marker.Groups[2].Value))"
-            Report-Result ($v1Marker.Groups[5].Value -match '"wood":\d+') `
-                "$($v1Phase.Assertions): the payout moved wood, so it is not the neutral vector"
-            Report-Result ($v1Marker.Groups[6].Value.Length -eq 32) `
-                "$($v1Phase.Assertions): the answer carried a 32-character derivation id"
+        foreach ($v1Marker in $v1Phase.Markers) {
+            $v1Match = [regex]::Match($v1Run.Combined, $v1Marker.Regex)
+            Report-Result $v1Match.Success "$($v1Phase.Assertions): $($v1Marker.Because)"
+            if (-not $v1Match.Success) { continue }
+            if (-not $v1Marker.ContainsKey("Groups")) { continue }
+            foreach ($v1Group in $v1Marker.Groups) {
+                $v1Value = $v1Match.Groups[$v1Group.Group].Value
+                # `Test` is a **regular expression**, not a literal, and the
+                # default operator is therefore `-match`. This was measured, not
+                # reasoned: the first generalised version of this loop compared
+                # with `-eq` / `-ne`, and verify-boot.ps1 failed on exactly the
+                # four groups whose `Test` is a pattern --
+                #   '"wood":\d+'            '^[0-9a-f]{32}$'
+                #   '"cash":-\d+'           '.*\b7\b.*'
+                # The other seven groups used bare numbers and would have passed
+                # under either operator, so the mistake was invisible on two
+                # thirds of the evidence and fatal on the third that mattered.
+                #
+                # `-notmatch` is a *search*, not a whole-string inequality, so a
+                # `Test` of "0" under `ne` fails any value merely CONTAINING a
+                # zero. That is a real property of regex `ne` and it is why the
+                # `ne` groups here anchor their intent in the pattern
+                # (`-1`, `"0"`) rather than relying on numeric sense.
+                #
+                # An unknown `Op` fails loudly instead of defaulting, so a typo
+                # in a phase table cannot read as a pass.
+                if (-not $v1Group.ContainsKey("Op") -or $v1Group.Op -eq "eq") {
+                    $v1Ok = ($v1Value -match $v1Group.Test)
+                } elseif ($v1Group.Op -eq "ne") {
+                    $v1Ok = ($v1Value -notmatch $v1Group.Test)
+                } else {
+                    Report-Result $false `
+                        "$($v1Phase.Assertions): marker group $($v1Group.Group) declares the unknown operator '$($v1Group.Op)'"
+                    continue
+                }
+                Report-Result $v1Ok `
+                    "$($v1Phase.Assertions): $($v1Group.Because) (got '$v1Value')"
+            }
         }
         $v1SummaryLine = ""
         foreach ($line in ($v1Run.Combined -split "`r?`n")) {
             if ($line.StartsWith("LIVE-PHASE-SUMMARY ")) { $v1SummaryLine = $line }
         }
+        $v1PhaseExpectedRoute = "/v1/collect"
+        if ($v1Phase.ContainsKey("RoutePath")) {
+            $v1PhaseExpectedRoute = $v1Phase.RoutePath
+        }
         $v1SummaryOk = $false
         if ($v1SummaryLine -ne "") {
             try {
                 $v1Summary = $v1SummaryLine.Substring("LIVE-PHASE-SUMMARY ".Length) | ConvertFrom-Json
+                # The route under test is a property of the PHASE, not of the
+                # harness: readiness is always a POST /v1/collect for an unknown
+                # save, and the harness used to write that one constant into every
+                # summary. Asserting it literally therefore AGREED WITH THE BUG --
+                # collection-live-v1 recorded the collect route and this very
+                # assertion confirmed it. Deriving the expectation from the phase
+                # table is the fix; the default keeps the collect phase asserting
+                # exactly what it asserted before. (The comment sits ABOVE the
+                # expression, not inside it: a backtick line-continuation followed
+                # by a `#` comment comments out the rest of the logical line on
+                # Windows PowerShell 5.1, which is a parse error, not a comment.)
                 $v1SummaryOk = ($v1Summary.ok -eq $true -and $v1Summary.godot_exit -eq 0 `
                     -and $v1Summary.server_exit -eq 0 `
                     -and $v1Summary.readiness_status -eq 404 `
                     -and $v1Summary.readiness_code -eq "unknown_player" `
-                    -and $v1Summary.route -eq "POST /v1/collect" `
+                    -and $v1Summary.route -eq ("POST " + $v1PhaseExpectedRoute) `
                     -and $v1Summary.save_mutation_checked -eq $true)
             } catch { $v1SummaryOk = $false }
         }

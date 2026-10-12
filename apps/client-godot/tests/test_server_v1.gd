@@ -34,6 +34,25 @@ extends "res://tests/test_base.gd"
 ## `server_v1_refusals.py` and asserts neither is a declared key, so the
 ## distinction is checked against the real table instead of a copy of it.
 ##
+## ## What this suite no longer covers, and where it went
+##
+## This suite was written for v1's **first** route and owns everything about
+## that route. The second route, `POST /v1/collection`, changed three things
+## here and each is recorded at its site rather than in a changelog:
+##
+## * `complete_collection_town` left `UNSUPPORTED_INTENTS` (it is implemented
+##   now, so the local refusal it was asserted to produce is gone);
+## * `OBSERVED_REFUSALS` grew from twelve codes to seventeen, because the
+##   vocabulary is shared and five codes belong to the grant slice;
+## * the report's `v1_routes_delivered` / `legacy_commands_covered` moved 1 -> 2.
+##
+## **The point of recording it here is that this suite still passes after all
+## three changes.** A suite that had been left asserting the removed refusal
+## would have gone red, which would have been reported as a regression rather
+## than as a stale guard; instead the stale rows were deleted and the pin that
+## would have noticed them (the refusal-vocabulary size) moved deliberately.
+## The collect route's own coverage is unchanged.
+##
 ## ## This file may not spell a transport token
 ##
 ## `test_project_scope.gd` confines three transport tokens to the two
@@ -120,6 +139,18 @@ const OBSERVED_REFUSALS := {
 	"post_condition_violation": 500,
 	"unreadable_content": 500,
 	"unreadable_state": 500,
+	# -- added by the second v1 route (complete_collection) --
+	# Each status is read out of `apps/server-v1/server_v1_refusals.py`, and
+	# `_check_local_codes_are_not_server_codes` asserts every name here is
+	# declared there, so this table cannot claim a status the service does not
+	# use. Only the NAMES are needed by the client -- the client never sees a
+	# status -- so the status column exists to catch a code that was added to
+	# this suite with a status the service does not have.
+	"aliased_collection_id": 409,
+	"unresolvable_collection": 409,
+	"collection_not_eligible": 409,
+	"collection_already_claimed": 409,
+	"insufficient_cash": 409,
 }
 
 ## Every intent `ServerV1Api` refuses locally, with the result type the FACADE
@@ -129,12 +160,19 @@ const OBSERVED_REFUSALS := {
 ## answer really carries a code under the name that class uses.
 ##
 ## The fourth column is NOT uniform, and that is a measured fact about two
-## already-delivered lines rather than a choice made here: 21 of the 23 result
+## already-delivered lines rather than a choice made here: 21 of the 22 result
 ## classes store `error_code`/`error_message`, while `MagicFlow.MagicResult` and
 ## `RewardFlow.RewardResult` store `reason`/`error`.
 ## `_check_unsupported_intents` asserts that count so the divergence stays
 ## visible instead of being normalised away, and nothing in the v1 client adapts
 ## to it - the client only ever reads the facade's declared type.
+##
+## **`complete_collection_town` is NOT in this table.** It was, until the second
+## v1 route landed: v1 now implements it, so `ServerV1Api` answers it through the
+## transport instead of refusing it locally. The table lists the intents v1 does
+## NOT have, and keeping a delivered one would have kept asserting a refusal the
+## client no longer produces -- the exact failure mode where a guard pins a stale
+## claim. Its implementation is covered by `tests/test_collection_v1.gd`.
 const UNSUPPORTED_INTENTS := [
 	["list_sessions", "BootData.SaveListResult", "error_code", "error_message"],
 	["get_bootstrap", "BootData.BootstrapResult", "error_code", "error_message"],
@@ -149,7 +187,6 @@ const UNSUPPORTED_INTENTS := [
 	["level_up_town", "BootData.LevelUpResult", "error_code", "error_message"],
 	["push_queue_unit_town", "BootData.QueueResult", "error_code", "error_message"],
 	["pop_queue_unit_town", "BootData.QueueResult", "error_code", "error_message"],
-	["complete_collection_town", "BootData.CollectionResult", "error_code", "error_message"],
 	["resurrect_hero_town", "BehaviorFlow.ResurrectResult", "error_code", "error_message"],
 	["advance_research_town", "ResearchFlow.ResearchResult", "error_code", "error_message"],
 	["advance_quest_town", "QuestFlow.QuestResult", "error_code", "error_message"],
@@ -248,7 +285,7 @@ func _check_observed_success_parses() -> void:
 ## Every refusal v1 declares travels through the SAME field, verbatim, with no
 ## partial payload.
 func _check_refusal_pass_through() -> void:
-	check_eq(OBSERVED_REFUSALS.size(), 12,
+	check_eq(OBSERVED_REFUSALS.size(), 17,
 		"every refusal code v1 declares is covered by this suite")
 	for code in OBSERVED_REFUSALS:
 		var label := "the refusal %s" % code
@@ -437,7 +474,7 @@ func _check_unsupported_intents() -> void:
 		answered += 1
 	check_eq(divergent, 2,
 		"exactly two delivered result classes name their refusal code differently"
-		+ " from the other 21")
+		+ " from the other 20")
 	info("result classes with a divergent refusal field name: %s"
 		% ", ".join(PackedStringArray(divergent_names)))
 	check_eq(answered, UNSUPPORTED_INTENTS.size(),
@@ -477,8 +514,6 @@ func _call_unsupported(api: Variant, method: String) -> Variant:
 			return await api.push_queue_unit_town("player-1", 1)
 		"pop_queue_unit_town":
 			return await api.pop_queue_unit_town("player-1", 1)
-		"complete_collection_town":
-			return await api.complete_collection_town("player-1", 1)
 		"resurrect_hero_town":
 			return await api.resurrect_hero_town("player-1", 1, 2)
 		"advance_research_town":
@@ -887,8 +922,15 @@ func _write_report() -> void:
 				"not a claim; v1 is new behaviour and no legacy oracle exists",
 		},
 		"limits": {
-			"v1_routes_delivered": 1,
-			"legacy_commands_covered": 1,
+			# Both counts moved from 1 when the second v1 route landed. The
+			# second LEGACY command is counted here because `collect` and
+			# `complete_collection` are two distinct named branches of
+			# `command.py` -- the 63-branch total is the whole dispatcher,
+			# and the remaining 61 are unrouted on v1 whether or not v0
+			# serves them. `test_collection_v1.gd` owns that route's own
+			# coverage; this suite owns the collect route's.
+			"v1_routes_delivered": 2,
+			"legacy_commands_covered": 2,
 			"legacy_commands_total": 63,
 			"fixture_is_a_captured_legacy_oracle": false,
 			"windowed_capture": false,
