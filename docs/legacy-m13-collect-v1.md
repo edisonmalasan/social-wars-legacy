@@ -116,6 +116,17 @@ is D4 (paying `0.25` of the base below the first rung).
   `tools/route-coverage/` reports 24 of 63 branches covered by a v0 route and
   39 uncovered; this line covers exactly one of the 24.
 
+  > **Corrected 2026-10-13 by `docs/legacy-m13-unrouted-branches.md` §2.** The
+  > first sentence stands; the second misreads its instrument. The route
+  > count of 24 and "exactly one of the 24" are correct and unchanged, but
+  > `tools/route-coverage/` measures whether a handler **cites** a branch with
+  > a resolving `command.py:NNN` line span — a documentation measure, not an
+  > implementation one — and **16** of its 39 "uncovered" branches are in fact
+  > dispatched by a route. The number of branches no route dispatches is
+  > **23**, not 39. The tool itself is not wrong and is not changed; it answers
+  > the question it was built to answer. What was wrong was promoting its
+  > conservative headline into a coverage claim.
+
 ## A correction recorded against this document's own first draft
 
 Two figures in the **ESTABLISHED/DERIVED** tables above were inherited from
