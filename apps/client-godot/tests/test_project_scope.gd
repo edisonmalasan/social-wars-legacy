@@ -85,6 +85,7 @@ const ALLOWED := [
 	"scripts/gameapi/game_api.gd",
 	"scripts/gameapi/legacy_v0_api.gd",
 	"scripts/gameapi/server_v1_api.gd",
+	"scripts/gameapi/server_v1_collection_result.gd",
 	"scripts/gameapi/server_v1_collect_result.gd",
 	"scripts/layout.gd",
 	"scripts/package_loader.gd",
@@ -151,6 +152,7 @@ const ALLOWED := [
 	"tests/test_base.gd",
 	"tests/test_boot_scene.gd",
 	"tests/test_camera_controls.gd",
+	"tests/test_collection_v1.gd",
 	"tests/test_content_registry.gd",
 	"tests/test_game_api_fake.gd",
 	"tests/test_game_api_live.gd",
@@ -259,6 +261,7 @@ const ALLOWED := [
 	"tests/test_market_trade.gd",
 	"evidence/market-trade/report.json",
 	"evidence/server-v1/report.json",
+	"evidence/collection-v1/report.json",
 ]
 
 ## The exact scene set the project may declare (set equality below).
