@@ -413,3 +413,153 @@ The interpreter download hash identifies this run's bytes only. Root GET
 success does not validate Requests' disabled remote branch or every Flask API.
 OpenSpec acceptance, task state, roadmap reconciliation, and Git/PR lifecycle
 remain the coordinator's responsibility.
+
+## Server v1 additions (2026-10-12)
+
+Milestone M13 added the first runtime dependency of the authoritative server,
+`apps/server-v1/`. This section **adds to** the record above and edits none of
+it: the pinned interpreter, the legacy Flask/Werkzeug pair, and every claim in
+the sections above are unchanged and remain as recorded.
+
+### Verified interpreter
+
+| Item | Recorded value | Evidence |
+| --- | --- | --- |
+| Interpreter | pinned CPython **3.9.13**, Windows x64 | Repository evidence; the same executable as every entry above |
+| Resolution constraint | `fastapi >=0.129.0` and `uvicorn >=0.40.0` declare `Requires-Python >=3.10` and are unresolvable here | Measured by the resolver, not read from a changelog |
+| Ceiling on this interpreter | `fastapi==0.128.8`, `uvicorn==0.39.0` | `<pinned>\python.exe -m pip install -r requirements.txt`, exit 0, and `<pinned>\python.exe -m pip --isolated check` reporting `No broken requirements found.`, exit 0 |
+
+CPython 3.9.13 is therefore the **binding constraint** on the v1 dependency
+set, and the pins below are the newest versions pip can install for it. A
+different interpreter would resolve a different set; these pins are not a
+statement that 0.128.8 is the newest FastAPI.
+
+### Correction to this section's install evidence (2026-10-12)
+
+**The pins above were correct; the evidence for them named an interpreter that
+had never been installed into.** The row above now names the pinned
+executable explicitly, because the first version of it did not and the claim
+was false as written.
+
+What happened, in the order it was found:
+
+1. The section recorded `pip install -r requirements.txt`, exit 0, against
+   "this interpreter" - the pinned CPython 3.9.13 at
+   `%TEMP%\opencode\cpython39\pkg\tools\python.exe`, which is the executable
+   `verify-boot.ps1` selects when `PINNED_PYTHON` is unset.
+2. The install had in fact been run against the **PATH** `python`,
+   `%LOCALAPPDATA%\Programs\Python\Python39\python.exe`. Same 3.9.13, same
+   architecture, **different installation** with its own `Lib\site-packages`.
+   Both interpreters satisfy `sys.version == 3.9.13`, so a version check cannot
+   tell them apart.
+3. **The battery found it, not a check.** The `server-v1-live` phase died with
+   `server_exit=1` and no diagnostic in its own output, because the harness
+   starts `apps/server-v1/run.py` and captures both of its streams into files
+   under `%TEMP%` that it never mentions. The cause was only readable by opening
+   `%TEMP%\server-v1-live-phase-err.txt` by hand:
+   `ModuleNotFoundError: No module named 'uvicorn'`.
+4. Measured on the pinned executable: `flask` 2.2.5 present; **`fastapi`,
+   `pydantic`, `uvicorn`, `starlette`, `h11` and `anyio` all absent** - none of
+   the twelve, not one.
+
+Corrected by running the install for real on the pinned interpreter. It
+resolved exactly the twelve packages at exactly the recorded versions, exit 0,
+and `pip --isolated check` reports `No broken requirements found.`, exit 0.
+The `apps/server-v1` suite was then re-run **on that interpreter**: `Ran 210
+tests`, `OK`, exit 0. Every Server v1 figure in this repository is now a
+figure from the pinned executable and not from the PATH alias.
+
+Two changes follow from the cause, not from this one instance:
+
+* `server_v1_live_phase.py` now prints a bounded tail of both service streams,
+  with the failed checks, whenever any check fails. A harness whose failure
+  mode is "know which temp file to open" is a harness that will be
+  misdiagnosed next time.
+* **The installed environment is not the repository.** Nothing in Git records
+  which interpreter has what installed, so this class of defect can recur for
+  any future dependency. It is recorded here rather than treated as closed.
+
+### Pinned versions, exactly as resolved
+
+Direct dependencies added by this change:
+
+| Package | Version | Why it is here |
+| --- | --- | --- |
+| `fastapi` | 0.128.8 | design D4; the ASGI application and the request typing |
+| `pydantic` | 2.12.4 | design D4; the frozen domain models and the intent schemas |
+| `uvicorn` | 0.39.0 | **not** named by D4; see the recorded addition below |
+
+Transitives resolved and pinned by the same install:
+
+| Package | Version |
+| --- | --- |
+| `starlette` | 0.49.3 |
+| `anyio` | 4.12.1 |
+| `exceptiongroup` | 1.3.1 |
+| `annotated-doc` | 0.0.5 |
+| `annotated-types` | 0.7.0 |
+| `typing-inspection` | 0.4.2 |
+| `pydantic-core` | 2.41.5 |
+| `h11` | 0.16.0 |
+
+Two transitive requirements were **already** pinned above by earlier work and
+are deliberately not duplicated: `anyio` requires `idna>=2.8` and Requests already
+pins `idna==3.19`; `uvicorn` requires `click>=7.0` and Flask already pins
+`click==8.1.8`.
+
+### Deliberately NOT added: `httpx`
+
+`fastapi.testclient.TestClient` requires `httpx`, so `httpx` would have been the
+only **test-only** dependency this repository would have gained. It was not
+added. The suite instead calls the ASGI application object directly, in-process,
+through `apps/server-v1/tests/asgi_caller.py`. One test module does bind a real
+socket (`test_live_server.py`) so that the binding claim is checked against a
+socket rather than against an in-process object.
+
+### Deliberately deferred: SQLAlchemy and Alembic
+
+Not installed. design D4 defers persistence migration to M14; `apps/server-v1/`
+reads the committed save document through a repository seam
+(`server_v1_repository.py`) and has no ORM and no migration tool.
+
+### Verification actually run
+
+| Command | Result |
+| --- | --- |
+| `python -m pip install -r requirements.txt` | exit **0**, every requirement already satisfied |
+| `python -m pip --isolated check` | exit **0**, `No broken requirements found.` |
+| `python -B -m unittest discover -s apps/server-v1/tests -p "test_*.py"` | **210 tests**, exit **0** |
+| `python -B -c "import fastapi, pydantic, uvicorn"` under 3.9.13 | imports cleanly |
+
+### Why `uvicorn` is here although D4 did not name it
+
+Design D4 adds FastAPI and Pydantic. FastAPI cannot bind a TCP port without an
+ASGI server, and this milestone's own task 1.4 requires v1 to bind a port
+distinct from 5055 and 5056, so the addition is forced by the tasks rather than
+chosen. It is recorded here rather than folded silently into D4.
+
+### Ports
+
+| Surface | Port | Source |
+| --- | --- | --- |
+| legacy Flask server | 5055 | `server.py:40-43` |
+| Compatibility API v0 | 5056 | `apps/compat-api/compat_service.py:937` |
+| **Server v1** | **5057** | `apps/server-v1/server_v1_settings.py` |
+
+`assert_port_is_distinct()` raises when 5057 collides with a reserved port, and
+`tests/test_settings.py` calls it, so the distinctness is a checked property
+rather than a comment. On the verified host `netsh interface ipv4 show
+excludedportrange protocol=tcp` reports only 5357, so 5057 is bindable here;
+that is a measurement of **this** host and not a guarantee about any other.
+
+### Limits of this verification
+
+This records a package install, a consistency check, an import check, and a
+210-test suite run on this exact host and interpreter. It establishes **no**
+runtime server start-up beyond the loopback process the suite itself starts and
+stops, **no** gameplay behaviour, **no** save migration, and **no** parity with
+the Compatibility API beyond the single executed-legacy transaction the parity
+test compares. Wheel hashes are still not locked or vendored, exactly as
+recorded above, so future package-index availability and artifact integrity
+remain a separate concern. `uvicorn` was added here and is **not** part of the
+legacy Flask/Werkzeug baseline, which is untouched.

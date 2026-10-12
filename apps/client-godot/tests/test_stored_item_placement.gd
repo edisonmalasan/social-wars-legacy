@@ -155,6 +155,16 @@ const STORAGE_OWNERS := [
 	"res://scripts/gameapi/game_api.gd",
 	"res://scripts/gameapi/legacy_v0_api.gd",
 	"res://scripts/gameapi/fake_api.gd",
+	# Server v1 is the THIRD `GameApi` implementation and was added to this list
+	# by the M13 line, the second time this shape has had to be amended (the
+	# first is recorded in `godot-unit-collection`). It is an ownership
+	# hand-off, not a loosening: every implementation must name the intents it
+	# serves, and `server_v1_api.gd` names all twenty-one it does NOT serve,
+	# because refusing an intent requires naming it. Every other file in the
+	# tree is still required to be free of both tokens, which is the claim that
+	# actually matters.
+	"res://scripts/gameapi/server_v1_api.gd",
+	"res://tests/test_server_v1.gd",
 	"res://tests/test_stored_item_placement.gd",
 ]
 

@@ -209,8 +209,8 @@ const OWNERSHIP := [
 ## The recorded registered counts, asserted against the battery's OWN source so a
 ## silent edit to either registered array fails here rather than only at the end
 ## of a five-minute run.
-const RECORDED_HERMETIC_COUNT := 50
-const RECORDED_LIVE_PHASE_COUNT := 23
+const RECORDED_HERMETIC_COUNT := 51
+const RECORDED_LIVE_PHASE_COUNT := 24
 
 ## The committed rows whose KEY carries the market word inside a longer
 ## identifier. These are exactly what a substring rule would have dragged into a
@@ -1544,7 +1544,7 @@ func _check_route_boundary() -> void:
 			found = id_expression.search(hermetic_match.get_string(1),
 				found.get_end())
 	check_eq(hermetic_names.size(), RECORDED_HERMETIC_COUNT,
-		"the battery registers exactly fifty hermetic suites")
+		"the battery registers exactly fifty-one hermetic suites")
 	check(hermetic_names.has("test_market_trade"), "and this suite is one of them")
 
 	var live := RegEx.new()
@@ -1563,9 +1563,31 @@ func _check_route_boundary() -> void:
 			live_names.append(found2.get_string(1))
 			found2 = name_expression.search(live_match.get_string(1),
 				found2.get_end())
+	# A SECOND registered loop exists since the Server v1 line: the battery
+	# declares `$serverV1Phases` alongside `$livePhases`, on its own port and
+	# its own harness. The original extraction saw only the first loop, so it
+	# reported twenty-three and its pin passed unchanged while a twenty-fourth
+	# registered phase sat in the battery unseen. A census scoped to what
+	# existed when it was written is not a census. This one now matches its own
+	# name - every registered live phase, from every loop - and because the
+	# per-surface checks below run over the widened list, a future phase that
+	# reached for this surface would be caught in the loop this suite could
+	# not previously see.
+	var v1_live := RegEx.new()
+	v1_live.compile("\\$serverV1Phases = @\\(([\\s\\S]*?)\\n    \\)\\r?\\n")
+	var v1_match: RegExMatch = v1_live.search(boot)
+	check(v1_match != null, "the battery declares a server-v1 live-phase list")
+	if v1_match != null:
+		var v1_name := RegEx.new()
+		v1_name.compile("Name\\s*=\\s*\"([^\"]+)\"")
+		var v1_found: RegExMatch = v1_name.search(v1_match.get_string(1))
+		while v1_found != null:
+			live_names.append(v1_found.get_string(1))
+			v1_found = v1_name.search(v1_match.get_string(1),
+				v1_found.get_end())
 	check_eq(live_names.size(), RECORDED_LIVE_PHASE_COUNT,
-		"the registered live-phase count is UNCHANGED at twenty-three, so this "
-			+ "line adds none")
+		"the battery registers exactly twenty-four live phases, across BOTH "
+			+ "its registered loops")
 	for name3: Variant in live_names:
 		check(not str(name3).to_lower().contains("market"),
 			"no live phase mentions this surface (%s)" % str(name3))

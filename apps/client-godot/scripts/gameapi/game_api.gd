@@ -41,14 +41,21 @@ extends Node
 ##               built-in HTTP request client; endpoint from the project
 ##               setting `gameapi/endpoint` (default: loopback 127.0.0.1 on
 ##               the documented v0 port).
+##   server_v1 - JSON over loopback HTTP to Server v1 through the built-in HTTP
+##               request client, on **its own** loopback port (design D7). v1
+##               exposes exactly one route, so this implementation implements
+##               exactly one intent (`collect_income`); every other intent
+##               answers the client-local `unsupported_by_server_v1` **without
+##               touching the transport**.
 ##
 ## Runtime overrides for verification (user arguments after `--`):
 ##
-##   --gameapi=fake|legacy_v0   implementation switch
-##   --gameapi-endpoint=<url>   endpoint override (legacy_v0 only)
+##   --gameapi=fake|legacy_v0|server_v1   implementation switch
+##   --gameapi-endpoint=<url>   endpoint override (legacy_v0 and server_v1)
 ##
-## verify-boot.ps1 passes these explicitly; nothing outside `legacy_v0_api`
-## ever names an endpoint (the scope test enforces that).
+## verify-boot.ps1 passes these explicitly; nothing outside `legacy_v0_api` and
+## `server_v1_api` ever names an endpoint (the scope test enforces that, and
+## asserts the carrier set is exactly those two files).
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
@@ -60,15 +67,17 @@ const QuestFlow = preload("res://scripts/units/quest_flow.gd")
 const TutorialFlow = preload("res://scripts/progression/tutorial_flow.gd")
 const FakeApi = preload("res://scripts/gameapi/fake_api.gd")
 const LegacyV0Api = preload("res://scripts/gameapi/legacy_v0_api.gd")
+const ServerV1Api = preload("res://scripts/gameapi/server_v1_api.gd")
 
 const SETTING_IMPLEMENTATION := "gameapi/implementation"
 const SETTING_ENDPOINT := "gameapi/endpoint"
 const IMPL_FAKE := "fake"
 const IMPL_LEGACY_V0 := "legacy_v0"
+const IMPL_SERVER_V1 := "server_v1"
 const ARG_IMPLEMENTATION := "--gameapi="
 const ARG_ENDPOINT := "--gameapi-endpoint="
 
-## Selected implementation: "fake" or "legacy_v0".
+## Selected implementation: "fake", "legacy_v0", or "server_v1".
 var implementation := IMPL_FAKE
 ## Endpoint for the legacy-v0 implementation ("" = the loopback default).
 var endpoint := ""
@@ -198,7 +207,7 @@ var magic_requests := 0
 ## refusal is about what the client tried to send.
 var reward_requests := 0
 
-## The active implementation node (FakeApi or LegacyV0Api).
+## The active implementation node (FakeApi, LegacyV0Api, or ServerV1Api).
 var _impl: Variant = null
 var _configured := false
 
@@ -215,9 +224,10 @@ func _ready() -> void:
 ## runtime overrides.
 func configure(implementation_name: String, endpoint_url: String = "") -> void:
 	var resolved := implementation_name
-	if resolved != IMPL_FAKE and resolved != IMPL_LEGACY_V0:
-		push_error("[gameapi] unknown implementation %r (expected %r or %r)"
-			% [resolved, IMPL_FAKE, IMPL_LEGACY_V0])
+	if resolved != IMPL_FAKE and resolved != IMPL_LEGACY_V0 \
+			and resolved != IMPL_SERVER_V1:
+		push_error("[gameapi] unknown implementation %r (expected %r, %r or %r)"
+			% [resolved, IMPL_FAKE, IMPL_LEGACY_V0, IMPL_SERVER_V1])
 		resolved = IMPL_FAKE
 	_configured = true
 	implementation = resolved
@@ -231,6 +241,12 @@ func configure(implementation_name: String, endpoint_url: String = "") -> void:
 		legacy.endpoint = endpoint
 		add_child(legacy)
 		_impl = legacy
+	elif implementation == IMPL_SERVER_V1:
+		var v1 := ServerV1Api.new()
+		v1.name = "ServerV1Api"
+		v1.endpoint = endpoint
+		add_child(v1)
+		_impl = v1
 	else:
 		var fake := FakeApi.new()
 		fake.name = "FakeApi"
@@ -375,12 +391,33 @@ func build_construction(user_id: String, item_index: int,
 ## the row as read BEFORE execution and the row re-read AFTER it, so
 ## presentation code replaces the selected typed placement's row with `row`,
 ## takes the balances and experience from `resources`, and evaluates its
-## readout against `reference_time` — never against its own clock and never
+## readout against `reference_time` - never against its own clock and never
 ## against its own arithmetic.
+##
+## ## The declared return type is `Variant`, and that is the ONE widening in
+## this facade, done deliberately rather than by drift.
+##
+## `fake` and `legacy_v0` both return `BootData.CollectResult`. `server_v1`
+## returns `ServerV1Collect.CollectResult`, because **v1's answer is a
+## different shape, not a different value of the same shape**: it names the
+## balances it moved instead of carrying the legacy eight-slot `payout` vector,
+## and it reports no row pair and no reference instant at all
+## (`scripts/gameapi/server_v1_collect_result.gd` states the full reason).
+## Narrowing v1's answer into `BootData.CollectResult` would require this client
+## to **synthesise** a fixed-width vector from named deltas or **invent** a row
+## the service never reported - either of which puts arithmetic in the client,
+## which is exactly what this milestone exists to stop.
+##
+## The cost of the widening is measured rather than assumed: **every** call site
+## of `collect_income` in this project binds its result to a `Variant` or an
+## untyped local, so no caller loses a compile-time type, and the concrete types
+## of all three implementations are asserted in `tests/test_server_v1.gd` so a
+## fourth implementation cannot quietly add a fourth shape. Every other intent
+## on this facade keeps its concrete declared type.
 func collect_income(user_id: String,
-		item_index: int) -> BootData.CollectResult:
+		item_index: int) -> Variant:
 	collect_requests += 1
-	var result: BootData.CollectResult = await _impl.collect_income(
+	var result: Variant = await _impl.collect_income(
 		user_id, item_index)
 	return result
 
@@ -773,6 +810,9 @@ func describe_transport() -> String:
 	var legacy := _impl as LegacyV0Api
 	if legacy != null:
 		return legacy.resolved_endpoint()
+	var v1 := _impl as ServerV1Api
+	if v1 != null:
+		return v1.resolved_endpoint()
 	return ""
 
 

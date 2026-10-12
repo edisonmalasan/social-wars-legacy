@@ -1,12 +1,12 @@
 {
     "schema":  "godot-compatibility-boot/verify-boot-v1",
-    "generated_utc":  "2026-10-11T16:37:43Z",
+    "generated_utc":  "2026-10-12T13:59:06Z",
     "environment":  {
                         "engine_executable":  "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
                         "engine_version":  "4.7.2.stable.official.ed1daf0bf",
                         "python_executable":  "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
                         "python_version":  "3.9.13",
-                        "git_commit":  "658422011abae373813a6007581401a6b830c11e",
+                        "git_commit":  "f00e30d82d72a12dcf2ede3723fdabb242a4775f",
                         "display_session":  false,
                         "network":  "loopback only (127.0.0.1)"
                     },
@@ -20,7 +20,7 @@
                                 ],
                     "endpoint":  "http://127.0.0.1:5056",
                     "port":  5056,
-                    "unreachable_endpoint":  "http://127.0.0.1:5057",
+                    "unreachable_endpoint":  "http://127.0.0.1:5059",
                     "disposable_corpus":  true
                 },
     "inputs":  {
@@ -116,7 +116,7 @@
                                          "--script",
                                          "res://tests/test_package_loader.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -132,7 +132,7 @@
                                          "--script",
                                          "res://tests/test_scene_build.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -148,7 +148,7 @@
                                          "--script",
                                          "res://tests/test_game_api_fake.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -164,7 +164,7 @@
                                          "--script",
                                          "res://tests/test_boot_scene.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -180,7 +180,7 @@
                                          "--script",
                                          "res://tests/test_session.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -196,7 +196,7 @@
                                          "--script",
                                          "res://tests/test_game_clock.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -212,7 +212,7 @@
                                          "--script",
                                          "res://tests/test_camera_controls.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -228,7 +228,7 @@
                                          "--script",
                                          "res://tests/test_ui_foundation.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -244,7 +244,7 @@
                                          "--script",
                                          "res://tests/test_settings.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -260,7 +260,7 @@
                                          "--script",
                                          "res://tests/test_audio_manager.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -276,7 +276,7 @@
                                          "--script",
                                          "res://tests/test_town_iso.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -292,7 +292,7 @@
                                          "--script",
                                          "res://tests/test_town_state.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -308,7 +308,7 @@
                                          "--script",
                                          "res://tests/test_town_hud.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -324,7 +324,7 @@
                                          "--script",
                                          "res://tests/test_town_resources.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -340,7 +340,7 @@
                                          "--script",
                                          "res://tests/test_town_selection.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -356,7 +356,7 @@
                                          "--script",
                                          "res://tests/test_town_scene.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -372,7 +372,7 @@
                                          "--script",
                                          "res://tests/test_town_placement.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -388,7 +388,7 @@
                                          "--script",
                                          "res://tests/test_town_purchase.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -404,7 +404,7 @@
                                          "--script",
                                          "res://tests/test_town_move.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -420,7 +420,7 @@
                                          "--script",
                                          "res://tests/test_town_sell.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -436,7 +436,7 @@
                                          "--script",
                                          "res://tests/test_town_store.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -452,7 +452,7 @@
                                          "--script",
                                          "res://tests/test_town_upgrade.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -468,7 +468,7 @@
                                          "--script",
                                          "res://tests/test_town_construction.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -484,7 +484,7 @@
                                          "--script",
                                          "res://tests/test_town_collect.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -500,7 +500,7 @@
                                          "--script",
                                          "res://tests/test_town_expand.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -516,7 +516,7 @@
                                          "--script",
                                          "res://tests/test_town_xp.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -532,7 +532,7 @@
                                          "--script",
                                          "res://tests/test_town_gate.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -548,7 +548,7 @@
                                          "--script",
                                          "res://tests/test_unit_definitions.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -564,7 +564,7 @@
                                          "--script",
                                          "res://tests/test_unit_instances.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -580,7 +580,7 @@
                                          "--script",
                                          "res://tests/test_unit_queues.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -596,7 +596,7 @@
                                          "--script",
                                          "res://tests/test_unit_production.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -612,7 +612,7 @@
                                          "--script",
                                          "res://tests/test_unit_experience.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -628,7 +628,7 @@
                                          "--script",
                                          "res://tests/test_unit_collection.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -644,7 +644,7 @@
                                          "--script",
                                          "res://tests/test_unit_movement.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -660,7 +660,7 @@
                                          "--script",
                                          "res://tests/test_unit_animations.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -676,7 +676,7 @@
                                          "--script",
                                          "res://tests/test_unit_behaviors.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -692,7 +692,7 @@
                                          "--script",
                                          "res://tests/test_research.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -708,7 +708,7 @@
                                          "--script",
                                          "res://tests/test_quests.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -724,7 +724,7 @@
                                          "--script",
                                          "res://tests/test_tutorial.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -740,7 +740,7 @@
                                          "--script",
                                          "res://tests/test_stored_item_placement.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -756,7 +756,7 @@
                                          "--script",
                                          "res://tests/test_mission_vocabulary.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -772,7 +772,7 @@
                                          "--script",
                                          "res://tests/test_combat_actions.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -788,7 +788,7 @@
                                          "--script",
                                          "res://tests/test_damage_magic.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -804,7 +804,7 @@
                                          "--script",
                                          "res://tests/test_rewards.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -820,7 +820,7 @@
                                          "--script",
                                          "res://tests/test_social_state.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -836,7 +836,7 @@
                                          "--script",
                                          "res://tests/test_darts.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -852,7 +852,7 @@
                                          "--script",
                                          "res://tests/test_friends.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -868,7 +868,7 @@
                                          "--script",
                                          "res://tests/test_construction_assist.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -884,7 +884,7 @@
                                          "--script",
                                          "res://tests/test_auction_schedule.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
@@ -900,11 +900,27 @@
                                          "--script",
                                          "res://tests/test_market_trade.gd",
                                          "--",
-                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
                          "log":  "apps/client-godot/.godot/verify-boot/55-test_market_trade.out.txt"
+                     },
+                     {
+                         "name":  "test_server_v1",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_server_v1.gd",
+                                         "--",
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/56-test_server_v1.out.txt"
                      },
                      {
                          "name":  "boot-unreachable",
@@ -918,11 +934,38 @@
                                          "--",
                                          "--scenario=unreachable",
                                          "--gameapi=legacy_v0",
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/57-boot-unreachable.out.txt"
+                     },
+                     {
+                         "name":  "server-v1-live",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+                                         "-B",
+                                         "apps/client-godot/server_v1_live_phase.py",
+                                         "--port",
+                                         "5057",
+                                         "--name",
+                                         "server-v1-live",
+                                         "--expect-save-mutation",
+                                         "--",
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_server_v1.gd",
+                                         "--",
+                                         "--scenario=live",
+                                         "--gameapi=server_v1",
                                          "--gameapi-endpoint=http://127.0.0.1:5057"
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/56-boot-unreachable.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/58-server-v1-live.out.txt"
                      },
                      {
                          "name":  "boot-main-live",
@@ -945,7 +988,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/57-boot-main-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/59-boot-main-live.out.txt"
                      },
                      {
                          "name":  "gameapi-live",
@@ -969,7 +1012,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/58-gameapi-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/60-gameapi-live.out.txt"
                      },
                      {
                          "name":  "boot-api-error-live",
@@ -996,7 +1039,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/59-boot-api-error-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/61-boot-api-error-live.out.txt"
                      },
                      {
                          "name":  "placement-live",
@@ -1022,7 +1065,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/60-placement-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/62-placement-live.out.txt"
                      },
                      {
                          "name":  "purchase-live",
@@ -1048,7 +1091,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/61-purchase-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/63-purchase-live.out.txt"
                      },
                      {
                          "name":  "move-live",
@@ -1074,7 +1117,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/62-move-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/64-move-live.out.txt"
                      },
                      {
                          "name":  "sell-live",
@@ -1100,7 +1143,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/63-sell-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/65-sell-live.out.txt"
                      },
                      {
                          "name":  "store-live",
@@ -1126,7 +1169,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/64-store-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/66-store-live.out.txt"
                      },
                      {
                          "name":  "upgrade-live",
@@ -1152,7 +1195,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/65-upgrade-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/67-upgrade-live.out.txt"
                      },
                      {
                          "name":  "construction-live",
@@ -1178,7 +1221,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/66-construction-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/68-construction-live.out.txt"
                      },
                      {
                          "name":  "collect-live",
@@ -1204,7 +1247,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/67-collect-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/69-collect-live.out.txt"
                      },
                      {
                          "name":  "expand-live",
@@ -1230,7 +1273,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/68-expand-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/70-expand-live.out.txt"
                      },
                      {
                          "name":  "level-up-live",
@@ -1255,7 +1298,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/69-level-up-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/71-level-up-live.out.txt"
                      },
                      {
                          "name":  "queue-live",
@@ -1281,7 +1324,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/70-queue-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/72-queue-live.out.txt"
                      },
                      {
                          "name":  "collection-live",
@@ -1307,7 +1350,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/71-collection-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/73-collection-live.out.txt"
                      },
                      {
                          "name":  "behavior-live",
@@ -1333,7 +1376,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/72-behavior-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/74-behavior-live.out.txt"
                      },
                      {
                          "name":  "research-live",
@@ -1359,7 +1402,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/73-research-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/75-research-live.out.txt"
                      },
                      {
                          "name":  "quests-live",
@@ -1385,7 +1428,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/74-quests-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/76-quests-live.out.txt"
                      },
                      {
                          "name":  "tutorial-live",
@@ -1411,7 +1454,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/75-tutorial-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/77-tutorial-live.out.txt"
                      },
                      {
                          "name":  "stored-placement-live",
@@ -1437,7 +1480,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/76-stored-placement-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/78-stored-placement-live.out.txt"
                      },
                      {
                          "name":  "combat-live",
@@ -1463,7 +1506,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/77-combat-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/79-combat-live.out.txt"
                      },
                      {
                          "name":  "magic-live",
@@ -1489,7 +1532,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/78-magic-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/80-magic-live.out.txt"
                      },
                      {
                          "name":  "reward-live",
@@ -1515,7 +1558,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/79-reward-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/81-reward-live.out.txt"
                      },
                      {
                          "name":  "guard-post",
@@ -1527,7 +1570,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/80-guard-post.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/82-guard-post.out.txt"
                      }
                  ],
     "assertions":  [
@@ -1544,7 +1587,11 @@
                            "ok":  true
                        },
                        {
-                           "name":  "unreachable port 5057 has nothing listening",
+                           "name":  "unreachable port 5059 has nothing listening",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 port 5057 has nothing listening before the v1 phase",
                            "ok":  true
                        },
                        {
@@ -1972,6 +2019,14 @@
                            "ok":  true
                        },
                        {
+                           "name":  "test_server_v1 exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_server_v1 reports PASS",
+                           "ok":  true
+                       },
+                       {
                            "name":  "unreachable scenario exits 0 (got 0)",
                            "ok":  true
                        },
@@ -1985,6 +2040,34 @@
                        },
                        {
                            "name":  "unreachable scenario was asserted, not silently accepted",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 live phase: live phase exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 live phase: the client typed a real v1 collection answer",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 live phase: it addressed the corpus\u0027s own income row (row 2)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 live phase: v1 reported a derived rung (got 3)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 live phase: the payout moved wood, so it is not the neutral vector",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 live phase: the answer carried a 32-character derivation id",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 live phase: summary records v1 readiness, a clean teardown, and the save-mutation proof",
                            "ok":  true
                        },
                        {
@@ -2445,6 +2528,10 @@
                        },
                        {
                            "name":  "service port 5056 was released after teardown",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 port 5057 was released after teardown",
                            "ok":  true
                        },
                        {

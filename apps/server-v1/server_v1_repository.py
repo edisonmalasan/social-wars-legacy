@@ -1,0 +1,451 @@
+#!/usr/bin/env python3
+"""The repository seam: the only way Server v1 touches a save document.
+
+**Design D5** puts a seam between the domain and storage so that M14's
+PostgreSQL is a substitution rather than a rewrite.  This module is that seam:
+a :class:`SaveRepository` protocol the domain depends on, a
+:class:`FilesystemSaveRepository` implementation over the committed save
+document shape, and a :class:`SaveDocument` view that names the seven stored
+resources and the placement rows v1 owns.
+
+Three properties this module is responsible for, and the tests that hold them:
+
+**Unknown fields survive (task 3.2).**  A document is read as parsed JSON and
+written back from the same parsed structure; nothing is rebuilt from a model,
+nothing is filtered, and nothing is normalised.  A field v1 does not model is
+therefore not merely preserved but *unreachable* to be dropped: there is no
+code path that reconstructs a document from known keys.  ``AGENTS.md``'s
+``legacy_extra`` discipline is satisfied by construction here rather than by
+convention, because there is no ``legacy_extra`` bucket — v1 has no idea which
+fields it does not model.
+
+**Decide before mutate (spec: "A refused action moves nothing").**  The
+repository offers an explicit :meth:`SaveRepository.write`; a caller that
+refused must simply not call it.  Nothing in this module writes on read, and
+nothing caches an in-memory document that a later read would return — every
+read goes to disk, so a refusal that skipped the write leaves the file's bytes
+exactly as they were.
+
+**A read/write round trip reproduces the document (task 3.1).**  At the
+*value* level this is exact.  At the *byte* level it is not, and the divergence
+is deliberate and measured rather than discovered later:
+
+* legacy writes with ``json.dump(village, f, indent=4)`` (``sessions.py:253``)
+  under ``open(..., 'w')``, which emits CRLF line endings on Windows and **no
+  trailing newline**;
+* the committed seed ``tests/saves/fresh-player.json`` is therefore CRLF with
+  no trailing newline;
+* v1 writes with ``newline="\\n"``, so LF with no trailing newline.
+
+So a v1 round trip of an untouched document is byte-identical to v1's *own*
+previous write and value-identical to the seed, but not byte-identical to the
+seed.  The write is LF-deterministic on purpose: a save that changes its line
+endings depending on the host it was written on is not comparable across hosts,
+and determinism is what makes the write-idempotence assertion meaningful.
+``tests/test_repository.py`` asserts value equality, write idempotence (a second
+write produces identical bytes), and the recorded CRLF->LF normalisation, rather
+than claiming a byte identity it does not have.
+
+The seven stored resources are **ESTABLISHED** from ``engine.apply_resources``
+(``engine.py:251-271``): the map's ``xp``, ``gold``, ``wood``, ``oil``,
+``steel``, ``playerInfo.cash`` and ``privateState.mana``.  That function's
+eighth slot is read into a local named ``unknown`` and never written, so it has
+no stored value and is deliberately absent from
+:data:`STORED_RESOURCE_PATHS`.  The ``max(current + delta, 0)`` clamp is the
+behaviour v1 is replacing; no clamp is reproduced here, and this module adds no
+floor of its own.
+"""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Protocol, Tuple, runtime_checkable
+
+#: The seven stored resources, named by where they are stored, not by the
+#: vector's slot order.  **ESTABLISHED** from ``engine.apply_resources``; see
+#: the module docstring.  The names are the save document's own field names, so
+#: ``gold`` is ``gold`` and not ``coins`` — a discrepancy the M7 resource-readout
+#: line already found and corrected in the Godot client.
+STORED_RESOURCE_PATHS: Dict[str, Tuple[str, ...]] = {
+    "xp": ("maps", 0, "xp"),
+    "gold": ("maps", 0, "gold"),
+    "wood": ("maps", 0, "wood"),
+    "oil": ("maps", 0, "oil"),
+    "steel": ("maps", 0, "steel"),
+    "cash": ("playerInfo", "cash"),
+    "mana": ("privateState", "mana"),
+}
+
+#: Insertion-ordered, so the post-execution proof can walk the resources in a
+#: fixed order and produce a deterministic response.
+STORED_RESOURCE_NAMES: Tuple[str, ...] = tuple(STORED_RESOURCE_PATHS)
+
+#: Placement rows live at ``maps[0]["items"][str(index)]``.  The **string** key
+#: is established: legacy's ``engine.map_get_item`` looks a row up by
+#: ``str(index)`` (``engine.py:36-40``), so a row addressed with an integer key
+#: is a different row as far as the preserved server is concerned.
+ITEMS_PATH: Tuple[str, ...] = ("maps", 0, "items")
+
+
+class RepositoryError(Exception):
+    """A save document this service cannot read or write, with a machine code."""
+
+    def __init__(self, code: str, message: str) -> None:
+        super().__init__(message)
+        self.code = code
+
+
+@runtime_checkable
+class SaveRepository(Protocol):
+    """The persistence surface the domain depends on (design D5).
+
+    Deliberately tiny: *list*, *read*, *write*.  A domain that needs a fourth
+    operation is telling us the seam is wrong, and M14's job is to implement
+    this same three-method protocol over PostgreSQL rather than to widen it here.
+    """
+
+    def player_ids(self) -> Tuple[str, ...]:
+        """Every save this repository holds, in a stable sorted order."""
+
+    def read(self, player_id: str) -> "SaveDocument":
+        """The stored document for ``player_id``, or raise :class:`RepositoryError`."""
+
+    def write(self, document: "SaveDocument") -> None:
+        """Persist ``document`` in full, preserving every field it carries."""
+
+
+class SaveDocument:
+    """One save document, with named access to the paths v1 owns.
+
+    Wraps the parsed JSON rather than copying it: v1 reads through this view and
+    writes the whole thing back, so a field this view cannot name is still
+    written out exactly as it was read.  The wrapper exists to make the seven
+    resource paths and the row addressing *named and singular* — not to model
+    the document.
+    """
+
+    def __init__(self, player_id: str, raw: Dict[str, Any], path: Path) -> None:
+        self.player_id = player_id
+        self._raw = raw
+        self.path = path
+
+    # -------------------------------------------------------------- raw view --
+    @property
+    def raw(self) -> Dict[str, Any]:
+        """The underlying parsed document.
+
+        Exposed for the *preservation* assertions — a test reads a field through
+        here to prove v1 did not drop it — not for mutation by domain code.
+        Domain code mutates through the named accessors below so that the set of
+        paths v1 can change is enumerable from this file.
+        """
+        return self._raw
+
+    def snapshot(self) -> Dict[str, Any]:
+        """A deep, JSON-round-tripped copy of the document.
+
+        Used for before/after comparison inside one request.  ``json.loads(
+        json.dumps(...))`` is a *copy*, so a snapshot taken before an execution
+        cannot alias the live document and report the after-state as the
+        before-state — the aliasing hazard ``LegacyBoot.map_expansions``
+        explicitly avoids by copying, and the reason it exists.
+        """
+        return json.loads(json.dumps(self._raw))
+
+    # --------------------------------------------------------- structural ----
+    def first_map(self) -> Dict[str, Any]:
+        """``maps[0]``, or :class:`RepositoryError` if the document has none."""
+        maps = self._raw.get("maps")
+        if not isinstance(maps, list) or not maps or not isinstance(maps[0], dict):
+            raise RepositoryError(
+                "unreadable_state",
+                "save %r has no first map object" % self.player_id,
+            )
+        return maps[0]
+
+    def items(self) -> Dict[str, Any]:
+        """``maps[0]["items"]``, or :class:`RepositoryError`."""
+        rows = self.first_map().get("items")
+        if not isinstance(rows, dict):
+            raise RepositoryError(
+                "unreadable_state",
+                "save %r has no placements object" % self.player_id,
+            )
+        return rows
+
+    def row(self, index: int) -> Optional[List[Any]]:
+        """The placement row at ``index``, addressed as legacy addresses it.
+
+        ``None`` means "no row at that key", which is the collection slice's
+        ``unaddressable_row`` case.  A row that exists but is not a list is a
+        different state and raises, because silently treating it as absent would
+        let a malformed save look like an empty one.
+        """
+        value = self.items().get(str(index))
+        if value is None:
+            return None
+        if not isinstance(value, list):
+            raise RepositoryError(
+                "unreadable_state",
+                "save %r row %d is not a placement list" % (self.player_id, index),
+            )
+        return value
+
+    # ------------------------------------------------------------ resources --
+    def resources(self) -> Dict[str, int]:
+        """Every stored resource, read by its own path.
+
+        Raises rather than defaulting: a missing or non-integer balance is a
+        state this service cannot reason about, and reporting it as ``0`` would
+        let a derivation pay into a balance it never read.
+        """
+        values: Dict[str, int] = {}
+        for name in STORED_RESOURCE_NAMES:
+            raw = self._resolve(name)
+            if isinstance(raw, bool) or not isinstance(raw, int):
+                raise RepositoryError(
+                    "unreadable_state",
+                    "save %r resource %r is not an integer" % (self.player_id, name),
+                )
+            values[name] = raw
+        return values
+
+    def set_resource(self, name: str, value: int) -> None:
+        """Write one stored resource, by its own path."""
+        if name not in STORED_RESOURCE_PATHS:
+            raise RepositoryError(
+                "unknown_resource", "no stored resource is named %r" % name
+            )
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise RepositoryError(
+                "unreadable_state",
+                "refusing to write a non-integer %r value %r" % (name, value),
+            )
+        self._assign(name, value)
+
+    # ------------------------------------------------------------ row fields --
+    #: ``item[3]`` is both a construction start instant (written by ``activate``)
+    #: and a last-collection instant (written by ``collect``).  The overlap is
+    #: established — ``docs/legacy-construction-timing.md`` and
+    #: ``docs/legacy-collect-income.md`` — and is the reason the collection
+    #: slice refuses a row that also carries construction state.
+    ROW_INSTANT = 3
+    ROW_ITEM = 0
+    ROW_ATTR = 6
+    #: The keys a construction writes into a row's attribute bag, and the one a
+    #: queue start writes.  Presence of any of them means the row is not idle.
+    CONSTRUCTION_ATTR_KEYS = ("cp", "nc")
+
+    def row_instant(self, index: int) -> int:
+        """``item[3]`` as an integer, or :class:`RepositoryError`."""
+        row = self.row(index)
+        if row is None:
+            raise RepositoryError(
+                "unaddressable_row", "save %r has no row %d" % (self.player_id, index)
+            )
+        return self._row_int(row, self.ROW_INSTANT, "instant")
+
+    def set_row_instant(self, index: int, value: int) -> None:
+        """Write ``item[3]``."""
+        row = self.row(index)
+        if row is None:
+            raise RepositoryError(
+                "unaddressable_row", "save %r has no row %d" % (self.player_id, index)
+            )
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise RepositoryError(
+                "unreadable_state", "refusing to write a non-integer instant %r" % (value,)
+            )
+        row[self.ROW_INSTANT] = value
+
+    def row_item_id(self, index: int) -> int:
+        """``item[0]`` — the item the placed row is — as an integer."""
+        row = self.row(index)
+        if row is None:
+            raise RepositoryError(
+                "unaddressable_row", "save %r has no row %d" % (self.player_id, index)
+            )
+        return self._row_int(row, self.ROW_ITEM, "item id")
+
+    def row_attr(self, index: int) -> Dict[str, Any]:
+        """``item[6]`` — a row's attribute bag, verified to be an object."""
+        row = self.row(index)
+        if row is None:
+            raise RepositoryError(
+                "unaddressable_row", "save %r has no row %d" % (self.player_id, index)
+            )
+        if len(row) <= self.ROW_ATTR:
+            raise RepositoryError(
+                "unreadable_state",
+                "save %r row %d has no attribute bag" % (self.player_id, index),
+            )
+        bag = row[self.ROW_ATTR]
+        if not isinstance(bag, dict):
+            raise RepositoryError(
+                "unreadable_state",
+                "save %r row %d attribute bag is not an object" % (self.player_id, index),
+            )
+        return bag
+
+    def row_is_under_construction(self, index: int) -> bool:
+        """Whether the row's attribute bag carries construction state.
+
+        ``nc`` is the construction click counter, seeded to ``0`` by
+        ``engine`` from the item's ``clicks_to_build`` and incremented by the
+        build-click command; ``cp`` is a speedup or duration the construction
+        line writes.  Both are **presence** signals, not value signals: a row
+        whose bag carries ``nc: 0`` is still a row a construction command has
+        touched, and treating "zero" as "idle" would be exactly the string-flag
+        hazard ``godot-unit-movement`` measured (``"0"`` is truthy as a string in
+        GDScript) in the other direction.
+        """
+        bag = self.row_attr(index)
+        return any(key in bag for key in self.CONSTRUCTION_ATTR_KEYS)
+
+    # ---------------------------------------------------------------- helpers --
+    def _row_int(self, row: List[Any], position: int, label: str) -> int:
+        if len(row) <= position:
+            raise RepositoryError(
+                "unreadable_state",
+                "save %r row is shorter than %d fields" % (self.player_id, position + 1),
+            )
+        value = row[position]
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise RepositoryError(
+                "unreadable_state",
+                "save %r row %s is not an integer" % (self.player_id, label),
+            )
+        return int(value)
+
+    def _resolve(self, name: str) -> Any:
+        node: Any = self._raw
+        for step in STORED_RESOURCE_PATHS[name]:
+            try:
+                node = node[step]
+            except (KeyError, IndexError, TypeError):
+                raise RepositoryError(
+                    "unreadable_state",
+                    "save %r has no %r resource at /%s"
+                    % (self.player_id, name, "/".join(str(s) for s in STORED_RESOURCE_PATHS[name])),
+                )
+        return node
+
+    def _assign(self, name: str, value: int) -> None:
+        path = STORED_RESOURCE_PATHS[name]
+        node: Any = self._raw
+        for step in path[:-1]:
+            node = node[step]
+        node[path[-1]] = value
+
+
+class FilesystemSaveRepository:
+    """A repository over ``<root>/saves/<player_id>.save.json``.
+
+    ``root`` is the **corpus**, named explicitly; nothing here resolves a path
+    from the process working directory.  That is what makes the containment
+    assertion possible: a test can hand this repository a disposable directory,
+    assert the bytes that directory holds afterwards, and assert the working
+    tree is untouched — where a working-directory-relative repository would
+    make "untouched" unprovable.
+
+    The filename convention is legacy's (``sessions.save_session``,
+    ``sessions.py:250``): ``"{USERID}.save.json"``.
+    """
+
+    #: Name legacy gives a save file.  ``USERID`` is the value the client sends,
+    #: which for the committed corpus is the ``playerInfo.pid`` string.
+    FILE_SUFFIX = ".save.json"
+
+    def __init__(self, root: Path) -> None:
+        self.root = Path(root)
+        self._saves = self.root / "saves"
+
+    def saves_dir(self) -> Path:
+        """The directory this repository reads and writes, for containment."""
+        return self._saves
+
+    def player_ids(self) -> Tuple[str, ...]:
+        """Every save in the directory, sorted, with the suffix stripped."""
+        if not self._saves.is_dir():
+            return ()
+        found: List[str] = []
+        for entry in self._saves.iterdir():
+            if entry.is_file() and entry.name.endswith(self.FILE_SUFFIX):
+                found.append(entry.name[: -len(self.FILE_SUFFIX)])
+        return tuple(sorted(found))
+
+    def path_for(self, player_id: str) -> Path:
+        """The file one player's save lives in.
+
+        ``player_id`` is **not** sanitised into a path by escaping: a value
+        containing a path separator or ``..`` would address a file outside the
+        saves directory, so this refuses it.  The refused ids are reported by
+        name rather than silently mapped, because "no such player" and "that
+        player id is not addressable" are different facts and the domain
+        answers them differently.
+        """
+        if not player_id or "/" in player_id or "\\" in player_id:
+            raise RepositoryError(
+                "unaddressable_player", "player id %r is not addressable" % player_id
+            )
+        if player_id in (".", "..") or "\x00" in player_id:
+            raise RepositoryError(
+                "unaddressable_player", "player id %r is not addressable" % player_id
+            )
+        return self._saves / ("%s%s" % (player_id, self.FILE_SUFFIX))
+
+    def read(self, player_id: str) -> SaveDocument:
+        """Read one save, or :class:`RepositoryError`.
+
+        Read fresh every call and never cached: caching would make the
+        post-execution proof compare a live object with itself.
+        """
+        path = self.path_for(player_id)
+        if not path.is_file():
+            raise RepositoryError(
+                "unknown_player", "no save document for player %r" % player_id
+            )
+        try:
+            raw = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as error:
+            raise RepositoryError(
+                "unreadable_state", "save %r is unreadable: %s" % (player_id, error)
+            )
+        if not isinstance(raw, dict):
+            raise RepositoryError(
+                "unreadable_state", "save %r is not a JSON object" % player_id
+            )
+        return SaveDocument(player_id, raw, path)
+
+    def write(self, document: SaveDocument) -> None:
+        """Write the whole document back, in v1's LF-deterministic form.
+
+        ``indent=4`` matches legacy's; ``newline="\\n"`` is the deliberate
+        divergence documented in the module docstring.  No trailing newline,
+        also matching legacy.
+        """
+        path = document.path
+        if not path.parent.is_dir():
+            raise RepositoryError(
+                "unreadable_state", "save directory does not exist: %s" % path.parent
+            )
+        try:
+            with open(path, "w", encoding="utf-8", newline="\n") as stream:
+                json.dump(document.raw, stream, indent=4)
+        except OSError as error:
+            raise RepositoryError(
+                "unreadable_state", "save %r could not be written: %s"
+                % (document.player_id, error)
+            )
+
+
+__all__ = [
+    "ITEMS_PATH",
+    "STORED_RESOURCE_NAMES",
+    "STORED_RESOURCE_PATHS",
+    "FilesystemSaveRepository",
+    "RepositoryError",
+    "SaveDocument",
+    "SaveRepository",
+]

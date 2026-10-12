@@ -4,8 +4,10 @@ extends "res://tests/test_base.gd"
 ## scope").
 ##
 ## Asserts that `apps/client-godot/` contains exactly the render-verification
-## content plus the allow-listed foundation files (GameApi with its two
-## implementations, boot data, boot scene), the content-registry work (the
+## content plus the allow-listed foundation files (GameApi with its three
+## implementations - fake, legacy v0, and Server v1 - plus the boot data,
+## the boot scene, and Server v1's own typed collect result), the
+## content-registry work (the
 ## ContentRegistry autoload with its script, its content suite, and the
 ## asset-ID suite), the session and game-clock work (the Session and
 ## GameClock autoloads with their scaffold scripts and suites), the
@@ -66,6 +68,7 @@ const ALLOWED := [
 	"verify.ps1",
 	"verify-boot.ps1",
 	"compat_live_phase.py",
+	"server_v1_live_phase.py",
 	"scenes/boot.tscn",
 	"scenes/first_render.tscn",
 	"scenes/town.tscn",
@@ -81,6 +84,8 @@ const ALLOWED := [
 	"scripts/gameapi/fake_api.gd",
 	"scripts/gameapi/game_api.gd",
 	"scripts/gameapi/legacy_v0_api.gd",
+	"scripts/gameapi/server_v1_api.gd",
+	"scripts/gameapi/server_v1_collect_result.gd",
 	"scripts/layout.gd",
 	"scripts/package_loader.gd",
 	"scripts/package_paths.gd",
@@ -154,6 +159,7 @@ const ALLOWED := [
 	"tests/test_project_scope.gd",
 	"tests/test_scene_build.gd",
 	"tests/test_session.gd",
+	"tests/test_server_v1.gd",
 	"tests/test_settings.gd",
 	"tests/test_town_gate.gd",
 	"tests/test_town_collect.gd",
@@ -252,6 +258,7 @@ const ALLOWED := [
 	"scripts/market/market_schedule.gd",
 	"tests/test_market_trade.gd",
 	"evidence/market-trade/report.json",
+	"evidence/server-v1/report.json",
 ]
 
 ## The exact scene set the project may declare (set equality below).
@@ -297,12 +304,23 @@ const FORBIDDEN := [
 	"https://",
 ]
 
-## Transport tokens allowed in exactly one file: the legacy-v0
-## implementation (spec: "Keep legacy transport out of the UI" — only the
-## legacy-v0 implementation may reference the compat endpoint or the HTTP
-## request client).
+## Transport tokens allowed in exactly two files: the two `GameApi`
+## implementations that speak to a loopback service (spec: "Keep legacy
+## transport out of the UI" - only an implementation may reference an endpoint
+## or the HTTP request client).
+##
+## **AMENDED from a single file to a declared pair, and strengthened rather
+## than weakened.** The original guard scanned the ALLOW-LIST for restricted
+## tokens, which proves no *listed* file carries one but cannot prove that no
+## *unlisted* file does - that was covered only indirectly, by the file
+## inventory failing on an unexpected file. The guard now also derives the
+## carrier set from the project itself and asserts it is **exactly** the
+## declared pair, so an implementation that appears without being declared (or a
+## declared one that stops being an implementation) fails here.
 const LEGACY_V0_FILE := "scripts/gameapi/legacy_v0_api.gd"
-const RESTRICTED_TO_LEGACY_V0 := [
+const SERVER_V1_FILE := "scripts/gameapi/server_v1_api.gd"
+const TRANSPORT_FILES := [LEGACY_V0_FILE, SERVER_V1_FILE]
+const RESTRICTED_TO_TRANSPORT_IMPLS := [
 	"http://",
 	"HTTPRequest",
 	"HTTPClient",
@@ -424,10 +442,12 @@ func _check_project_config(root: String) -> void:
 
 
 ## Every script and scene must avoid the legacy protocol, Flash runtimes,
-## non-loopback transports and the deferred game systems; transport tokens
-## are confined to the legacy-v0 implementation file.
+## non-loopback transports and the deferred game systems; transport tokens are
+## confined to the two declared implementation files, and the carrier set is
+## MEASURED from the project rather than assumed.
 func _check_sources(root: String) -> void:
 	var scanned := 0
+	var carriers: Array = []
 	for relative in ALLOWED:
 		var extension := str(relative).get_extension()
 		if extension != "gd" and extension != "tscn":
@@ -448,19 +468,36 @@ func _check_sources(root: String) -> void:
 		for token in FORBIDDEN:
 			check(body.find(token) == -1,
 				"%s must not reference %s" % [relative, token])
-		for token in RESTRICTED_TO_LEGACY_V0:
-			if str(relative) == LEGACY_V0_FILE:
-				continue
-			check(body.find(token) == -1,
-				"%s must not reference %s (confined to %s)"
-				% [relative, token, LEGACY_V0_FILE])
+		var carries := false
+		for token in RESTRICTED_TO_TRANSPORT_IMPLS:
+			if body.find(token) != -1:
+				carries = true
+			if not TRANSPORT_FILES.has(str(relative)):
+				check(body.find(token) == -1,
+					("%s must not reference %s (confined to the two declared "
+					+ "GameApi implementations)") % [relative, token])
+		if carries:
+			carriers.append(str(relative))
 	check_eq(FORBIDDEN.size(), 13,
 		"the forbidden-token list is intact (this file is the only source "
 		+ "excluded from the scan)")
-	check_eq(RESTRICTED_TO_LEGACY_V0.size(), 3,
-		"the legacy-v0-only token list is intact")
-	check(ALLOWED.has(LEGACY_V0_FILE),
-		"the legacy-v0 implementation is allow-listed and scanned")
+	check_eq(RESTRICTED_TO_TRANSPORT_IMPLS.size(), 3,
+		"the transport-only token list is intact")
+	check_eq(TRANSPORT_FILES.size(), 2,
+		"exactly two files are declared transport carriers")
+	for declared in TRANSPORT_FILES:
+		check(ALLOWED.has(declared),
+			"%s is allow-listed and scanned" % declared)
+	# The MEASURED carrier set, compared against the declared one. This is what
+	# catches an implementation appearing - or losing its transport - without a
+	# declaration change, and it is why a clean zero is never taken on trust: a
+	# declared carrier that stopped carrying fails here too.
+	carriers.sort()
+	var expected_carriers: Array = TRANSPORT_FILES.duplicate()
+	expected_carriers.sort()
+	check_eq(carriers, expected_carriers,
+		"the files carrying a transport token are exactly the two declared "
+		+ "GameApi implementations")
 	info("sources scanned for forbidden references: %s" % scanned)
 
 

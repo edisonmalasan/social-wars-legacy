@@ -2624,6 +2624,168 @@ suites lack `--report=` absolute-path resolution — archived lines, so the hone
 whoever owns them. No Flash, Ruffle, ActionScript, or browser executes in any of these commands,
 and **no network is used at all**.
 
+Verified server-v1 authority-boundary commands (milestone M13 line 1; Godot
+4.7.2.stable, Windows x64; `python` denotes the pinned CPython 3.9.13 that
+`verify-boot.ps1` selects, never the PATH alias; `godot` denotes the installed
+engine). This is the **first line in the project whose deliverable is a second
+server rather than a client projection**, and the only one whose subject is
+authority rather than reproduction. The legacy server applies a client-sent
+resource vector unconditionally before dispatch (`command.py:40`) for all 63
+named branches and answers success unconditionally (`server.py:318-322`);
+`apps/server-v1/` is the first slice that refuses that vector instead of
+applying it. `apps/compat-api/` is **not** modified by this line and is the
+oracle v1 is measured against, not a thing being replaced:
+
+```bash
+python -m pip install -r requirements.txt
+python -m pip --isolated check
+python -B -m unittest discover -s apps/server-v1/tests -p "test_*.py" -v
+godot --headless --path apps/client-godot --script res://tests/test_server_v1.gd -- --gameapi-endpoint=http://127.0.0.1:5059
+godot --headless --path apps/client-godot --script res://tests/test_server_v1.gd -- --report=<repo>/apps/client-godot/evidence/server-v1/report.json
+python -B apps/client-godot/server_v1_live_phase.py --port 5057 --name server-v1-live --expect-save-mutation -- <godot> --headless --path apps/client-godot --script res://tests/test_server_v1.gd -- --scenario=live --gameapi=server_v1 --gameapi-endpoint=http://127.0.0.1:5057
+powershell -File apps/client-godot/verify.ps1
+powershell -File apps/client-godot/verify-boot.ps1
+python -B -m unittest discover -s apps/compat-api/tests -p "test_*.py" -v
+openspec validate --all --strict
+python -B tools/hash-manifest/hash_manifest.py verify
+```
+
+Purposes and observed results (2026-10-12): the pinned dependency install
+(exit 0; twelve packages resolved at the versions `requirements.txt` pins) and
+`pip --isolated check` (`No broken requirements found.`, exit 0); the v1
+service suite (**`Ran 210 tests`**, `OK`, exit 0, across 12 test modules);
+the hermetic client suite (observed **516 checks**, **517** with `--report`;
+the **51st** registered hermetic suite) over `ServerV1Api`, the third
+`GameApi` implementation, and its own typed result module; the deterministic
+`server-v1-report-v1` report under `apps/client-godot/evidence/server-v1/`
+(**4,316 bytes**, sha256 `aaa7bf1b...6eee`, byte-identical across three
+consecutive runs); the v1 live phase standalone (**14 harness checks**, exit 0,
+corpus save mutated `25df5b5a...` -> `9ae07e0e...`, corpus removed, no
+`socialwars-server-v1-*` leftover, port 5057 released); `verify.ps1` (exit 0,
+`PASS all checks succeeded`); `verify-boot.ps1` (exit 0,
+`PASS all checks succeeded`; **51 hermetic suites**, **24 live phases** -- 23
+Compatibility API phases plus the v1 one -- **241 assertions** (was 226), guard
+digest `fe968674...` **identical before and after**, and **82** referenced logs
+carrying zero `SCRIPT ERROR`, `^ERROR:`, or `[test] FAIL` lines); the
+**unchanged** Compatibility API suite (observed `Ran 3077 tests ... OK`, exit 0,
+with `git diff --name-only -- apps/compat-api` returning **no path**);
+`openspec validate --all --strict` (**76 passed / 0 failed**); and the
+preservation manifest (**3,258 entries**, 758,423,699 bytes, exit 0) at commit
+`e8c98a03c902eba70323538dc5d4eaba2f2927a1`, unmoved. Both services listen on
+loopback only -- v0 on `127.0.0.1:5056`, v1 on `127.0.0.1:5057` -- and every
+network call in these commands is loopback.
+
+**The delivered slice is `POST /v1/collect`, one route, and its answer differs
+from v0's by design.** v1's success body carries the derived rung
+(`{"index":3,"threshold_seconds":28800,"multiplier":3.0}`), a 32-character
+`derivation_id`, the derived deltas (`{"xp":3,"wood":60}`), `resources_after`,
+`row_instant` and `"protocol":"server-v1"`; v0's captured body is
+`b'{"result":"success"}\r\n'` and nothing else, because v0's server never
+computed anything. The refusal vocabulary is a **fresh set of 12 codes**, not a
+subset of v0's 104 (D10): `malformed_request`, `client_supplied_delta` and
+`unknown_request_field` are `400`; `unknown_player` is `404`; `unaddressable_row`,
+`no_committed_income`, `capped_collection`, `below_first_rung` and
+`construction_in_progress` are `409`; `unreadable_state`, `unreadable_content`
+and `post_condition_violation` are `500`. The one code -> status table lives in
+`server_v1_refusals.py`, not in any route, so no route can grow its own answer
+-- which is the shape D2 chose after v0 accumulated 24 of them.
+
+**The anti-invention guards are structural and were proven by injection, not
+trusted: twelve probes, twelve detected, every restore byte-identical and
+sha256-verified.** Six python probes (the domain owns derivation in exactly one
+place, the request layer cannot reach a balance, the transport names no refusal
+code, the vocabulary is closed) and six client probes. `v1`'s claim that
+derivation lives in one place is a pinned inventory rather than a convention,
+which is why the "no client delta" rule is testable instead of aspirational.
+
+**Three recorded corrections, all found by measurement rather than inspection.**
+(1) **The install evidence named the wrong interpreter, and the battery caught
+it rather than any check.** `docs/legacy-baseline.md` recorded
+`pip install -r requirements.txt`, exit 0, for "this interpreter"; the install
+had in fact been run against the **PATH** `python`
+(`%LOCALAPPDATA%\Programs\Python\Python39\python.exe`), which is the same
+3.9.13 but a different installation with its own `Lib\site-packages`, so no
+version check distinguishes them. Measured on the pinned executable:
+`flask` 2.2.5 present and **none** of `fastapi`, `pydantic`, `uvicorn`,
+`starlette`, `h11`, `anyio`. The pins were correct; the provenance was not.
+Corrected by running the install for real on the pinned interpreter (twelve
+packages, exit 0) and re-running the v1 suite **there** (210 tests, OK).
+(2) **The harness could not explain itself.** The failed `server-v1-live` run
+died with `server_exit=1` and no diagnostic in its own output, because
+`server_v1_live_phase.py` writes both of the service's streams to files under
+`%TEMP%` and never mentions them -- so the cause
+(`ModuleNotFoundError: No module named 'uvicorn'`) was findable only by
+opening one by hand. It now prints a bounded tail of both streams plus the
+failed checks whenever anything fails, and that was proven by injection (a
+deliberately missing script: both tails printed, exit 1) rather than trusted.
+(3) **A clean zero was computed over a directory that accumulates stale logs.**
+`.godot/verify-boot/` is never cleaned, so the first pass of this section's
+error census counted **599** files, most of them from earlier runs. Recomputed
+over the **82** logs this run's own report references: all present, zero error
+lines. A clean zero over an accumulating directory is not evidence about the
+current run.
+
+**Two cross-line guards had to be widened rather than satisfied, which is
+recorded here because the widening is the stronger state.** `test_auction_schedule.gd`
+and `test_market_trade.gd` hold the battery's two count pins; both went
+50 -> **51** hermetic and 23 -> **24** live phases. The original live-phase
+regex read only `$livePhases`, so while the new v1 phase is registered in a
+**second** loop (`$serverV1Phases`) both suites kept reporting 23 with a 24th
+phase registered and unseen -- a pin that could not see the thing it was
+counting. The per-surface "no live phase mentions auction/market" checks now
+run over the widened list too. Separately, `test_stored_item_placement.gd`'s
+boundary went red because `server_v1_api.gd` names the 21 intents it refuses
+and refusing an intent requires naming it; that is the **second** time this
+repository has had to amend this shape (`godot-unit-collection` recorded the
+first), and the amendment is the established ownership hand-off -- the list
+already carried `legacy_v0_api.gd` and `fake_api.gd` -- not a loosening, so
+every other file in the tree is still required free of both tokens
+(546 checks, was 544). `test_project_scope.gd` caught a stray
+`__pycache__/*.pyc` that my own `py_compile` created; it was **deleted, not
+allow-listed**, which also exposed that this suite is absent from
+`verify-boot.ps1` entirely and is owned by `verify.ps1`.
+
+Claim limits: **this line delivers authority for exactly one of the 63 named
+legacy branches**, `collect`; **39 of the 63 branches have no route at all**
+behind either server, and the other **23** Compatibility API routes have **no
+authoritative counterpart**, so 23 routes stay non-authoritative and 39
+branches stay unrouted -- both remaining work, never implied parity; the
+compatibility surface is
+`collect` alone and no other intent is routed; **the 21 other facade intents
+are refused client-locally** with code `unsupported_by_server_v1` and never
+reach the transport, each through its own typed result's `_failure` factory;
+**no executed-legacy fixture was captured** -- the oracle is the committed v0
+fixture under `tests/fixtures/godot-building-collect/`, read as bytes and never
+re-captured, so parity here is against recorded evidence and not against a
+live legacy server; **the ten derived rules (D1-D10 in
+`docs/legacy-m13-collect-v1.md`) were never observed** -- no legacy branch reads
+either ladder global, and the single committed transaction sits at the top rung
+from unbounded elapsed time -- so each is recorded with its rejected
+alternative, and `docs/legacy-m13-collect-v1.md` is the authority for which
+rules are established and which are derived; **`GameApi.collect_income`'s
+declared return type was widened to `Variant`**, the one widening in the facade,
+because v1's response shape genuinely differs from v0's; **no SQL, no
+PostgreSQL, and no Alembic migration** exists (D4 defers them; the repository
+seam is a filesystem implementation over the committed save shape, with
+unknown-field preservation asserted on every read and write); **no v1 route
+exists for anything the Compatibility API already serves**, and coexistence is
+D1 -- `apps/compat-api` is 5,752,183 B over 122,022 lines and 24 routes
+against `command.py` + `engine.py` + `server.py` at 51,275 B over 1,572 lines,
+a measured **112.2x** -- which is why v0 remains v1's parity oracle rather than
+being retired here. The recorded flaky surfaces **remain open**, and this line
+claims **no ordinal for them**: the surrounding sections disagree on the count
+(`test_no_server_is_running`'s port assertions on 5055/5056; `verify-boot.ps1`
+treating any `^ERROR:` as a script error; the display-sensitive `verify.ps1`;
+`test_collect_endpoint`'s sub-second `too_early` budget; `test_base.gd`
+recording a function abort as a pass; the `test_quest_endpoint` transient), and
+a single number over that class would be the same mistake this project has
+already recorded once. **This line adds one more**: `tests/test_live_server.py`
+can fail on a TIME_WAIT socket at 5057. And the interpreter environment is not
+in Git, so the install defect corrected above can recur for any future
+dependency. No Flash, Ruffle,
+ActionScript, or browser executes in any of these commands, and every network
+call is loopback.
+
 Verified town vertical-slice commands (Godot 4.7.2.stable, Windows x64;
 the two windowed captures need an interactive display session):
 
