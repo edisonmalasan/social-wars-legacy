@@ -162,8 +162,8 @@ const RESOURCE_TOKENS := ["gold", "coins", "cash", "wood", "steel", "oil",
 ## intended behaviour, so it is amended rather than relaxed. `test_market_trade` was
 ## added at 50 and deliberately does NOT add a second pin of its own, so the next line
 ## meets this one constant and not two.
-const RECORDED_HERMETIC_COUNT := 50
-const RECORDED_LIVE_PHASE_COUNT := 23
+const RECORDED_HERMETIC_COUNT := 51
+const RECORDED_LIVE_PHASE_COUNT := 24
 
 var _module_source := ""
 var _oracle_source := ""
@@ -1585,9 +1585,34 @@ func _check_route_boundary() -> void:
 			live_names.append(found2.get_string(1))
 			found2 = name_expression.search(live_match.get_string(1),
 				found2.get_end())
+	# The count was amended 23 -> 24 by the Server v1 line, which added a
+	# phase. This suite's OWN line still adds none, and that is asserted
+	# separately and still holds: the count it owns is the count of phases
+	# naming its surface, which the loop below requires to be zero.
+	# A SECOND registered loop exists since the Server v1 line: the battery
+	# declares `$serverV1Phases` alongside `$livePhases`, on its own port and
+	# its own harness. The original extraction saw only the first loop, so it
+	# reported twenty-three and its pin passed unchanged while a twenty-fourth
+	# registered phase sat in the battery unseen. A census scoped to what
+	# existed when it was written is not a census. This one now matches its own
+	# name - every registered live phase, from every loop - and because the
+	# per-surface checks below run over the widened list, a future phase that
+	# reached for this surface would be caught in the loop this suite could
+	# not previously see.
+	var v1_live := RegEx.new()
+	v1_live.compile("\\$serverV1Phases = @\\(([\\s\\S]*?)\\n    \\)\\r?\\n")
+	var v1_match: RegExMatch = v1_live.search(boot)
+	check(v1_match != null, "the battery declares a server-v1 live-phase list")
+	if v1_match != null:
+		var v1_name := RegEx.new()
+		v1_name.compile("Name\\s*=\\s*\"([^\"]+)\"")
+		var v1_found: RegExMatch = v1_name.search(v1_match.get_string(1))
+		while v1_found != null:
+			live_names.append(v1_found.get_string(1))
+			v1_found = v1_name.search(v1_match.get_string(1),
+				v1_found.get_end())
 	check_eq(live_names.size(), RECORDED_LIVE_PHASE_COUNT,
-		"the registered live-phase count is UNCHANGED at twenty-three, so this "
-			+ "line adds none")
+		"every registered live phase, from BOTH loops, matches the recorded pin")
 	for name3: Variant in live_names:
 		check(not str(name3).to_lower().contains("auction"),
 			"no live phase mentions this surface (%s)" % str(name3))

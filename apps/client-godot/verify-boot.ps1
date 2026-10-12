@@ -275,7 +275,13 @@ param(
     [string]$GodotExe = "",
     [string]$PythonExe = "",
     [int]$Port = 5056,
-    [int]$DeadPort = 5057
+    # 5059 and NOT 5057: the dead port is handed to every hermetic suite as the
+    # endpoint whose transport must FAIL, and design D7 gives Server v1 its own
+    # port on 5057 for a later live phase in this same run. One port cannot be
+    # both - a leaked v1 listener would silently turn a transport-failure
+    # expectation into a live-service one, i.e. a guard that fails GREEN.
+    [int]$DeadPort = 5059,
+    [int]$ServerV1Port = 5057
 )
 
 $ErrorActionPreference = "Stop"
@@ -480,6 +486,8 @@ try {
         "service port $Port is free before the run"
     Report-Result (-not (Test-PortListening $DeadPort)) `
         "unreachable port $DeadPort has nothing listening"
+    Report-Result (-not (Test-PortListening $ServerV1Port)) `
+        "server-v1 port $ServerV1Port has nothing listening before the v1 phase"
 
     # --- 3. guard baseline, pre-run ----------------------------------------
 
@@ -512,7 +520,7 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_experience", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests", "test_tutorial", "test_stored_item_placement", "test_mission_vocabulary", "test_combat_actions", "test_damage_magic", "test_rewards", "test_social_state", "test_darts", "test_friends", "test_construction_assist", "test_auction_schedule", "test_market_trade")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_experience", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests", "test_tutorial", "test_stored_item_placement", "test_mission_vocabulary", "test_combat_actions", "test_damage_magic", "test_rewards", "test_social_state", "test_darts", "test_friends", "test_construction_assist", "test_auction_schedule", "test_market_trade", "test_server_v1")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a
@@ -994,6 +1002,85 @@ try {
         }
     )
 
+    # --- 7b. Server v1 live phases (design D7, its own port and harness) ---
+    #
+    # A SEPARATE loop, not a flag on the loop below: that loop hard-codes
+    # `compat_live_phase.py`, the v0 port, and v0-only summary parsing, and
+    # twenty-three archived phases already pass through it. Perturbing it to
+    # carry a service that has no `/v0/session`, no compat corpus prefix and a
+    # JSON banner instead of a log line is exactly the change that breaks an
+    # archived phase nobody is re-testing.
+    $serverV1Phases = @(
+        @{
+            Name = "server-v1-live"
+            Assertions = "server-v1 live phase"
+            # The one delivered route writes the row's collection instant and
+            # pays a content-derived payout, so a real POST /v1/collect must
+            # mutate the disposable corpus save. Refused if it does not.
+            ExpectSaveMutation = $true
+            Arguments = @(
+                "--headless", "--path", $projectRel,
+                "--script", "res://tests/test_server_v1.gd",
+                "--", "--scenario=live",
+                "--gameapi=server_v1",
+                "--gameapi-endpoint=http://127.0.0.1:$ServerV1Port"
+            )
+        }
+    )
+
+    $v1PhaseLogs = @{}
+    foreach ($v1Phase in $serverV1Phases) {
+        $v1Args = @(
+            "-B", "apps/client-godot/server_v1_live_phase.py",
+            "--port", "$ServerV1Port", "--name", $v1Phase.Name
+        )
+        if ($v1Phase.ContainsKey("ExpectSaveMutation")) {
+            $v1Args += "--expect-save-mutation"
+        }
+        $v1Args += @("--", $GodotExe) + $v1Phase.Arguments
+        $v1Run = Invoke-Python -Arguments $v1Args -TimeoutSeconds 900 -Name $v1Phase.Name
+        $v1PhaseLogs[$v1Phase.Name] = $v1Run.Combined
+        Report-Result ($v1Run.ExitCode -eq 0) `
+            "$($v1Phase.Assertions): live phase exits 0 (got $($v1Run.ExitCode))"
+        # The harness's own typed marker: the live collection really happened
+        # against a real service and reported a derived rung. Asserting it here
+        # rather than only trusting the harness's exit code means a phase that
+        # somehow skipped the request cannot pass on the harness's word alone.
+        $v1Marker = [regex]::Match(
+            $v1Run.Combined,
+            '\[test\] live-server-v1 row=(\d+) rung_index=(\d+) threshold_seconds=(\d+) multiplier=([\d.]+) deltas=(\{[^}]*\}) derivation=([0-9a-f]+)')
+        Report-Result $v1Marker.Success `
+            "$($v1Phase.Assertions): the client typed a real v1 collection answer"
+        if ($v1Marker.Success) {
+            Report-Result ($v1Marker.Groups[1].Value -eq "2") `
+                "$($v1Phase.Assertions): it addressed the corpus's own income row (row 2)"
+            Report-Result ($v1Marker.Groups[2].Value -ne "-1") `
+                "$($v1Phase.Assertions): v1 reported a derived rung (got $($v1Marker.Groups[2].Value))"
+            Report-Result ($v1Marker.Groups[5].Value -match '"wood":\d+') `
+                "$($v1Phase.Assertions): the payout moved wood, so it is not the neutral vector"
+            Report-Result ($v1Marker.Groups[6].Value.Length -eq 32) `
+                "$($v1Phase.Assertions): the answer carried a 32-character derivation id"
+        }
+        $v1SummaryLine = ""
+        foreach ($line in ($v1Run.Combined -split "`r?`n")) {
+            if ($line.StartsWith("LIVE-PHASE-SUMMARY ")) { $v1SummaryLine = $line }
+        }
+        $v1SummaryOk = $false
+        if ($v1SummaryLine -ne "") {
+            try {
+                $v1Summary = $v1SummaryLine.Substring("LIVE-PHASE-SUMMARY ".Length) | ConvertFrom-Json
+                $v1SummaryOk = ($v1Summary.ok -eq $true -and $v1Summary.godot_exit -eq 0 `
+                    -and $v1Summary.server_exit -eq 0 `
+                    -and $v1Summary.readiness_status -eq 404 `
+                    -and $v1Summary.readiness_code -eq "unknown_player" `
+                    -and $v1Summary.route -eq "POST /v1/collect" `
+                    -and $v1Summary.save_mutation_checked -eq $true)
+            } catch { $v1SummaryOk = $false }
+        }
+        Report-Result $v1SummaryOk `
+            "$($v1Phase.Assertions): summary records v1 readiness, a clean teardown, and the save-mutation proof"
+    }
+
     $phaseLogs = @{}
     foreach ($phase in $livePhases) {
         $phaseArgs = @(
@@ -1400,6 +1487,8 @@ try {
 
     Report-Result (-not (Test-PortListening $Port)) `
         "service port $Port was released after teardown"
+    Report-Result (-not (Test-PortListening $ServerV1Port)) `
+        "server-v1 port $ServerV1Port was released after teardown"
     $workingSaves = Join-Path $repoRoot "saves"
     Report-Result (-not (Test-Path -LiteralPath $workingSaves)) `
         "no working-tree saves/ directory was created"

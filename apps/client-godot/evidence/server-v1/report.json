@@ -1,0 +1,187 @@
+{
+	"claims": {
+		"client_clamps_coerces_or_ignores_a_client_delta": false,
+		"client_local_codes_are_server_codes": false,
+		"client_performs_arithmetic_on_a_reported_value": false,
+		"observed_payload_is_one_transaction": true,
+		"parity_with_legacy_claimed": false,
+		"unsupported_intent_touches_transport": false
+	},
+	"enforced_by": {
+		"client_clamps_coerces_or_ignores_a_client_delta": "_check_no_client_arithmetic (guard B) + _check_intent_body",
+		"client_local_codes_are_server_codes": "_check_local_codes_are_not_server_codes",
+		"client_performs_arithmetic_on_a_reported_value": "_check_no_client_arithmetic (guard A)",
+		"observed_payload_is_one_transaction": "_check_observed_success_parses + _check_live",
+		"parity_with_legacy_claimed": "not a claim; v1 is new behaviour and no legacy oracle exists",
+		"unsupported_intent_touches_transport": "_check_unsupported_intents"
+	},
+	"implementation": {
+		"action": "collect",
+		"client_local_codes": [
+			"unsupported_by_server_v1",
+			"bad_request"
+		],
+		"collect_path": "/v1/collect",
+		"default_endpoint": "http://127.0.0.1:5057",
+		"impl_return_types": {
+			"scripts/gameapi/fake_api.gd": "BootData.CollectResult",
+			"scripts/gameapi/legacy_v0_api.gd": "BootData.CollectResult",
+			"scripts/gameapi/server_v1_api.gd": "ServerV1Collect.CollectResult"
+		},
+		"protocol": "server-v1",
+		"sampled_server_refusal_count": 12,
+		"sampled_server_refusals": [
+			"below_first_rung",
+			"capped_collection",
+			"client_supplied_delta",
+			"construction_in_progress",
+			"malformed_request",
+			"no_committed_income",
+			"post_condition_violation",
+			"unaddressable_row",
+			"unknown_player",
+			"unknown_request_field",
+			"unreadable_content",
+			"unreadable_state"
+		],
+		"stored_resource_names": [
+			"xp",
+			"gold",
+			"wood",
+			"oil",
+			"steel",
+			"cash",
+			"mana"
+		],
+		"unsupported_intent_count": 23,
+		"unsupported_intent_fields": {
+			"advance_quest_town": [
+				"error_code",
+				"error_message"
+			],
+			"advance_research_town": [
+				"error_code",
+				"error_message"
+			],
+			"build_construction": [
+				"error_code",
+				"error_message"
+			],
+			"combat_town": [
+				"error_code",
+				"error_message"
+			],
+			"complete_collection_town": [
+				"error_code",
+				"error_message"
+			],
+			"complete_tutorial_town": [
+				"error_code",
+				"error_message"
+			],
+			"expand_town": [
+				"error_code",
+				"error_message"
+			],
+			"get_bootstrap": [
+				"error_code",
+				"error_message"
+			],
+			"level_up_town": [
+				"error_code",
+				"error_message"
+			],
+			"list_sessions": [
+				"error_code",
+				"error_message"
+			],
+			"magic_town": [
+				"reason",
+				"error"
+			],
+			"move_building": [
+				"error_code",
+				"error_message"
+			],
+			"place_building": [
+				"error_code",
+				"error_message"
+			],
+			"place_stored_item_town": [
+				"error_code",
+				"error_message"
+			],
+			"pop_queue_unit_town": [
+				"error_code",
+				"error_message"
+			],
+			"purchase_item": [
+				"error_code",
+				"error_message"
+			],
+			"push_queue_unit_town": [
+				"error_code",
+				"error_message"
+			],
+			"resurrect_hero_town": [
+				"error_code",
+				"error_message"
+			],
+			"reward_town": [
+				"reason",
+				"error"
+			],
+			"sell_building": [
+				"error_code",
+				"error_message"
+			],
+			"sell_stored_item_town": [
+				"error_code",
+				"error_message"
+			],
+			"store_building": [
+				"error_code",
+				"error_message"
+			],
+			"upgrade_building": [
+				"error_code",
+				"error_message"
+			]
+		},
+		"unsupported_intents": [
+			"list_sessions",
+			"get_bootstrap",
+			"place_building",
+			"purchase_item",
+			"move_building",
+			"sell_building",
+			"store_building",
+			"upgrade_building",
+			"build_construction",
+			"expand_town",
+			"level_up_town",
+			"push_queue_unit_town",
+			"pop_queue_unit_town",
+			"complete_collection_town",
+			"resurrect_hero_town",
+			"advance_research_town",
+			"advance_quest_town",
+			"complete_tutorial_town",
+			"place_stored_item_town",
+			"sell_stored_item_town",
+			"combat_town",
+			"magic_town",
+			"reward_town"
+		]
+	},
+	"limits": {
+		"client_sees_a_before_state": false,
+		"fixture_is_a_captured_legacy_oracle": false,
+		"legacy_commands_covered": 1,
+		"legacy_commands_total": 63,
+		"pixel_parity": false,
+		"v1_routes_delivered": 1,
+		"windowed_capture": false
+	},
+	"report": "server-v1-report-v1"
+}
