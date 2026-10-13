@@ -25,14 +25,23 @@ states that "none of it is read to compute a value, gate an operation, or derive
 situation to `push_queue_unit2` at `queue_envelope`, which the same document caught and
 excluded by hand; the caution was applied to one parked branch and missed on the other.
 The split is therefore **39**
-dispatched by a v0 route and **24** by none. **2** branches have authoritative v1 routes,
-leaving **61** without one; that figure is independent of routing and is unchanged. It is
+dispatched by a v0 route and **24** by none. **4** branches have authoritative v1 routes,
+leaving **59** without one; that figure is independent of routing and is unchanged. It is
 restated because an investigation accompanying this correction proposed raising it to
 **62** by subtracting a single authoritative branch, which would have been arithmetically
 wrong in the other direction: `complete_collection` is authoritative too.
 `tools/route-coverage` answers the question it was built to answer and was not changed;
 it had already filed `buy_mana_new` under `branches_mentioned_by_name_only` with a
 negation marker.
+
+**A further correction, from the magic authority line.** `buy_magic` and `use_magic` are now
+authoritative, which is what moves the pair **2**/**61** to **4**/**59**. The routed/unrouted split
+of **39**/**24** is unchanged and is not restated as a new claim; `buy_mana_new` remains dispatched
+by no v0 route, and `POST /v1/magic` cannot reach it either, because that route's operation
+vocabulary is closed to two values. The change here is a **widening**: every requirement already
+specified stays true, and the requirement below gains a third worked transaction covering the
+case the capability never had - a transaction that moves **no** stored resource at all, whose
+absence of a cost is itself proven rather than assumed.
 
 ## Requirements
 
@@ -120,8 +129,8 @@ so that a derivation which moved nothing could not pass as success.
 against a captured executed-legacy fixture, so v1's first slice is measured against an
 existing oracle rather than a new one.
 
-The boundary SHALL be demonstrated end to end by **at least two** transactions, and the
-second SHALL exercise at least one rule the first does not.
+The boundary SHALL be demonstrated end to end by **at least three** transactions, and
+the second and third SHALL each exercise at least one rule the first does not.
 
 `collect` remains the worked example of a **derived payout**: the server derives what a
 `collect` *yields* from committed income content, and the client selects only which row
@@ -133,8 +142,18 @@ prize, whether the caller *may* claim it from the committed requirement list, wh
 *costs* from the committed price, and whether it *has already* been claimed from the
 recorded ledger. Each of those four is a rule `collect` does not exercise.
 
-Both SHALL derive every resource movement from committed content, SHALL refuse a
-client-supplied resource delta outright, and a refusal in either SHALL move nothing.
+The magic counter transition is the worked example of a **derived state transition
+that moves no stored resource**: the server derives the identity's new counter value
+from its own recorded state and from a bound recorded in the preserved source, the
+client selects only which committed magic the identity names, and no committed
+price, mana cost, or effect magnitude is read to produce it. It demonstrates the
+boundary's refusal half on a transaction whose preserved-server counterpart charged
+nothing, because the only mechanism by which a legacy client could have paid was a
+resource vector applied before the dispatcher opened.
+
+All three SHALL derive every resource movement they make from committed content,
+SHALL refuse a client-supplied resource delta outright, and a refusal in any of them
+SHALL move nothing.
 
 #### Scenario: A collected row advances its instant and pays exactly the derived amount
 
@@ -162,11 +181,25 @@ client-supplied resource delta outright, and a refusal in either SHALL move noth
 - **AND** each derives every resource movement from committed content
 - **AND** each refuses a client-supplied delta outright rather than clamping it
 
+#### Scenario: The boundary has a third worked transaction that moves no resource at all
+
+- **WHEN** the boundary is exercised
+- **THEN** `collect`, `complete_collection`, and the magic counter transition are all specified end to end
+- **AND** each derives every resource movement it makes from committed content
+- **AND** the magic counter transition derives no cost, and the absence of that cost is itself proven rather than assumed
+- **AND** each refuses a client-supplied delta outright rather than clamping it
+
 #### Scenario: A refused collection completion moves nothing
 
 - **WHEN** a collection completion is refused for any reason
 - **THEN** storage, the collection ledger, and every stored resource are byte-identical to before
 - **AND** no partial grant survives the refusal
+
+#### Scenario: A transaction that derives no cost is still on the boundary
+
+- **WHEN** a worked transaction charges nothing because the preserved server charged nothing and no committed content establishes a price
+- **THEN** the absence of the charge is a specified property with a proof that asserts every stored resource is byte-identical
+- **AND** a charge of any size on any stored resource fails that proof
 
 ### Requirement: v1 coexists with v0 and changes no v0 behaviour
 
