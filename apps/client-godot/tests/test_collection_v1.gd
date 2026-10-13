@@ -573,8 +573,8 @@ func _check_grant_codes_live_in_the_grant_module() -> void:
 	for line in refusals.split("\n"):
 		if _looks_like_status_row(str(line)):
 			declared += 1
-	check_eq(declared, 17,
-		"the committed refusal table still maps exactly seventeen codes")
+	check_eq(declared, 19,
+		"the committed refusal table still maps exactly nineteen codes")
 
 
 ## The two client-local codes are minted here, never sent to v1, and therefore
@@ -699,7 +699,7 @@ func _check_absent_derivation_helpers() -> void:
 		API_SCRIPT: [
 			"_ready", "_call", "_failure", "_transport_message",
 			"resolved_endpoint", "_unsupported", "_intent_body",
-			"_collection_intent_body", "collect_income",
+			"_collection_intent_body", "_magic_intent_body", "collect_income",
 			"complete_collection_town", "list_sessions", "get_bootstrap",
 			"place_building", "purchase_item", "move_building", "sell_building",
 			"store_building", "upgrade_building", "build_construction",
@@ -835,9 +835,14 @@ func _check_widening_justification_is_recorded() -> void:
 	check(body.find("payout") != -1,
 		"and the recorded reason distinguishes a payout from a grant")
 	var api_body := _project_source(API_SCRIPT)
-	check(api_body.find("twenty-two") != -1,
+	# **Count pin, amended in place by the magic line**, which is what moved it:
+	# `magic_town` left the unsupported table because v1 implements it now, so
+	# both the table and the transport's own recorded figure went 22 -> 21. The
+	# collected suite is not the magic suite's owner; the pin is kept as a pin so
+	# a later departure or arrival cannot move it unnoticed.
+	check(api_body.find("twenty-one") != -1,
 		"the transport module's local refusal count was corrected to the "
-		+ "twenty-two intents v1 still does not have")
+		+ "twenty-one intents v1 still does not have")
 	check(facade.find("complete_collection_town") != -1,
 		"and the facade really does declare the second widened intent")
 
@@ -875,13 +880,17 @@ func _check_unsupported_intent_left_the_table() -> void:
 			names.append(candidate.substr(2, candidate.find("\",") - 2))
 	check(closed, "the unsupported table's closing bracket was found, so the "
 		+ "read is bounded by it rather than by the end of the file")
-	check_eq(names.size(), 22,
-		"the collect suite pins exactly the twenty-two intents v1 lacks")
+	check_eq(names.size(), 21,
+		"the collect suite pins exactly the twenty-one intents v1 lacks,"
+		+ " amended from twenty-two when magic_town left the table")
 	check(not names.has("complete_collection_town"),
 		"complete_collection_town left the unsupported table, because v1 "
 		+ "implements it now")
 	check(not names.has("collect_income"),
 		"and so did the first v1 intent")
+	check(not names.has("magic_town"),
+		"and so did the third v1 intent, measured by name rather than inferred"
+		+ " from the count")
 	check(names.has("place_building"),
 		"the table is still a real list, not an emptied one")
 

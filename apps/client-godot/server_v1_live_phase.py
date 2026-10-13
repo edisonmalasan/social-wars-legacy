@@ -108,12 +108,27 @@ REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 SERVICE = os.path.join("apps", "server-v1", "run.py")
 COLLECT_PATH = "/v1/collect"
 COLLECTION_PATH = "/v1/collection"
+MAGIC_PATH = "/v1/magic"
 #: The only route paths this harness will write into a summary. A closed set
 #: rather than a free string, because a typo in ``--route-path`` would
 #: otherwise produce a passing phase whose evidence file names a route that
 #: does not exist -- the same class of defect as a summary that names the
 #: wrong one, and the reason ``--route-path`` exists at all.
-KNOWN_ROUTE_PATHS = (COLLECT_PATH, COLLECTION_PATH)
+#:
+#: ``/v1/magic`` was **added** to the set rather than the banner check below
+#: generalised into a count, and that is the point: a count still passes when the
+#: routes are named wrongly or reported out of order, and this harness has
+#: already shipped one summary that named the wrong route for a passing phase,
+#: which is the whole reason ``--route-path`` exists in the first place.
+KNOWN_ROUTE_PATHS = (COLLECT_PATH, COLLECTION_PATH, MAGIC_PATH)
+#: The route list the service must print in its startup banner, **in this exact
+#: order**. Named once so the banner check below and a reader of this file
+#: cannot disagree about how many routes v1 serves or what they are called.
+EXPECTED_BANNER_ROUTES = [
+    "POST %s" % COLLECT_PATH,
+    "POST %s" % COLLECTION_PATH,
+    "POST %s" % MAGIC_PATH,
+]
 STARTUP_DEADLINE_SECONDS = 90
 GODOT_TIMEOUT_SECONDS = 600
 CORPUS_PREFIX = "socialwars-server-v1-"
@@ -464,13 +479,15 @@ def main(argv=None):
         print("LIVE-PHASE-SUMMARY %s" % json.dumps({"name": args.name, "ok": False}))
         return 1
 
-    if any(argument.startswith("--player-id=") for argument in command):
-        # The id is derived in-phase from the corpus this harness starts, so a
-        # caller cannot supply one: two candidate identities in one phase would
-        # make every downstream assertion ambiguous. Refused, not overwritten.
-        print("FAIL do not pass --player-id=; this harness supplies it in-phase")
-        print("LIVE-PHASE-SUMMARY %s" % json.dumps({"name": args.name, "ok": False}))
-        return 1
+    for reserved in ("--player-id=", "--corpus="):
+        if any(argument.startswith(reserved) for argument in command):
+            # Both are derived in-phase from the corpus this harness starts, so a
+            # caller cannot supply one: two candidate identities -- or two
+            # candidate corpora -- in one phase would make every downstream
+            # assertion ambiguous. Refused, not overwritten.
+            print("FAIL do not pass %s; this harness supplies it in-phase" % reserved)
+            print("LIVE-PHASE-SUMMARY %s" % json.dumps({"name": args.name, "ok": False}))
+            return 1
 
     if args.route_path not in KNOWN_ROUTE_PATHS:
         print(
@@ -547,8 +564,9 @@ def main(argv=None):
         corpus = str(banner.get("corpus") or "")
         check("service banner names the disposable corpus", bool(corpus), corpus)
         check(
-            "service banner reports exactly the two delivered routes",
-            banner.get("routes") == ["POST /v1/collect", "POST /v1/collection"],
+            "service banner reports exactly the %d delivered routes, in order"
+            % len(EXPECTED_BANNER_ROUTES),
+            banner.get("routes") == EXPECTED_BANNER_ROUTES,
             str(banner.get("routes")),
         )
         check(
@@ -590,6 +608,19 @@ def main(argv=None):
         # from the engine's user-argument list, so it lands after the `--`
         # separator the caller already provided.
         command += ["--player-id=" + player_id]
+        # ...and the corpus **path**, for the same reason.  Task 7.3 asks the
+        # magic phase to assert, per operation, that "exactly one leaf path
+        # changed" and that all seven stored resources are byte-identical -- and
+        # neither is answerable from the response alone: the response reports
+        # what the server chose to say, so a client that diffed it would be
+        # diffing the server's own summary of itself.  The file is the evidence.
+        #
+        # The corpus lives in the system temp root, is disposable, and is removed
+        # on teardown; the wrapped command may **read** it and nothing else.  It
+        # is passed alongside `--player-id=` rather than in place of it, and both
+        # are refused if the caller supplies one, so two candidate corpora can
+        # never be in play at once.
+        command += ["--corpus=" + corpus]
         print("running: %s" % " ".join(command))
         process = None
         pumped = []

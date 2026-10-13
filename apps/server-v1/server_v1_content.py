@@ -95,6 +95,7 @@ class CommittedContent:
         self._items = document.get("items")
         self._globals = document.get("globals")
         self._collections = document.get("collections")
+        self._magics = document.get("magics")
         self.applied_patches = applied_patches
         self.applied_mods = applied_mods
         self.missing_patches = missing_patches
@@ -456,6 +457,135 @@ class CommittedContent:
                 % (field, index, error),
             )
 
+    # ---------------------------------------------------------- magics table --
+    #: The committed magics section's fields this module reads.  A tuple, for
+    #: the same reason :data:`COLLECTION_FIELDS` is one: a test can then assert
+    #: the reader's declared surface against the normalized package's own field
+    #: set rather than against a chosen example.
+    MAGIC_FIELDS: Tuple[str, ...] = (
+        "id",
+        "name",
+        "description",
+        "mana",
+        "area",
+        "level",
+        "gold",
+        "cash",
+        "img_name",
+        "target",
+    )
+
+    def magic_rows(self) -> Tuple[Mapping[str, Any], ...]:
+        """The committed ``magics`` rows, verbatim, in array order.
+
+        An absent or non-array section yields ``()`` rather than raising, for
+        the same reason :meth:`collection_rows` does: the caller then refuses an
+        identity no committed row carries with a *content* reason instead of
+        turning a missing table into a load failure.  Whether an empty table is
+        acceptable is not this module's decision; it reports what it found.
+        """
+        rows = self._magics
+        if not isinstance(rows, list):
+            return ()
+        return tuple(row for row in rows if isinstance(row, Mapping))
+
+    def magic_row(self, magic_id: int) -> Optional[Mapping[str, Any]]:
+        """The committed magic row whose ``id`` column is ``magic_id``, or ``None``.
+
+        **Keyed by the committed ``id`` column, not by position** (design D3),
+        and that is a measured decision rather than a preference: the preserved
+        ``buy_magic``/``use_magic`` branches never index the table at all — they
+        use the client's value as a ledger key and never consult ``magics.json``
+        — so there is no legacy index base to reproduce and the question is
+        "which committed row is this id", not "which position does it name".
+        Both candidate readings were checked against the corpus: the zero-based
+        *position* reading is **falsified** by ``villages/Neutral.json``, whose
+        ledger key ``"10"`` is out of range for a ten-row zero-based table and
+        whose four other keys would retarget to different spells, while the
+        one-based ``id`` reading is supported by ``id == position + 1`` on all ten
+        rows with no gaps and by all five corpus keys resolving.
+
+        A ``bool`` is refused here for the same reason :meth:`collection_row`
+        refuses one: ``True`` is an ``int`` in Python and would otherwise name
+        magic 1 without ever being an identity.
+        """
+        if isinstance(magic_id, bool) or not isinstance(magic_id, int):
+            return None
+        for row in self.magic_rows():
+            value = row.get("id")
+            if isinstance(value, bool) or not isinstance(value, int):
+                continue
+            if int(value) == magic_id:
+                return row
+        return None
+
+    def magic_ids(self) -> Tuple[int, ...]:
+        """The committed ``id`` values, in array order.
+
+        Returned as an index, not a lookup, so the id space is inspectable: the
+        per-route claim that the space is contiguous needs the whole sequence,
+        and building it here means the assertion reads the table rather than a
+        transcribed range.
+        """
+        ids: List[int] = []
+        for row in self.magic_rows():
+            value = row.get("id")
+            if isinstance(value, bool) or not isinstance(value, int):
+                continue
+            ids.append(int(value))
+        return tuple(ids)
+
+    def magic_field(self, magic_id: int, name: str) -> Any:
+        """One committed magic field, **verbatim**, or ``None`` when absent.
+
+        This is a *reader*, not an interpreter, and the distinction is the point
+        of design D2: the committed table carries four numeric columns
+        (``gold``, ``cash``, ``mana``, ``level``) and **none of them is named a
+        price**, so nothing here combines them, scales them, or turns one into
+        another.  A row the table does not carry and a field the row does not
+        carry are both ``None``, which is deliberately indistinguishable: both
+        mean "committed content does not describe this", and neither is a zero.
+        """
+        row = self.magic_row(magic_id)
+        if row is None:
+            return None
+        return row.get(name)
+
+    def magic_area(self, magic_id: int) -> Optional[Tuple[int, ...]]:
+        """A row's committed ``area``, decoded, or ``None``.
+
+        **Stored as an embedded JSON string** (``"[5,7,9]"``) on every committed
+        row and coerced to a list by the repository's own normalization; the
+        coercion is recorded, not interpreted, exactly as for the collections
+        table's ``item_ids``/``prize``.  Decoding is a decoding: it recovers the
+        shape content already decided and says nothing about what the numbers
+        mean.
+        """
+        raw = self.magic_field(magic_id, "area")
+        if raw is None or isinstance(raw, bool):
+            return None
+        if isinstance(raw, (list, tuple)):
+            decoded: Any = list(raw)
+        elif isinstance(raw, str):
+            try:
+                decoded = json.loads(raw)
+            except ValueError as error:
+                raise ContentError(
+                    "no_magic",
+                    "committed area for magic %r is not decodable JSON: %s"
+                    % (magic_id, error),
+                )
+        else:
+            return None
+        if not isinstance(decoded, list):
+            return None
+        values: List[int] = []
+        for value in decoded:
+            if isinstance(value, bool) or not isinstance(value, int):
+                return None
+            values.append(int(value))
+        return tuple(values)
+
     def provenance(self) -> Dict[str, Any]:
         """What was loaded, for the response envelope and the containment record."""
         return {
@@ -468,6 +598,7 @@ class CommittedContent:
             "removed_duplicate_items": self.removed_duplicate_items,
             "skipped_loader_steps": list(SKIPPED_LOADER_STEPS),
             "collection_rows": len(self.collection_rows()),
+            "magic_rows": len(self.magic_rows()),
         }
 
 

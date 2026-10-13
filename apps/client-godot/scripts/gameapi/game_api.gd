@@ -788,10 +788,29 @@ func combat_town(user_id: String, action: Variant,
 ## key and for `buy` they do **not** agree -- that is the divergence this line
 ## exists to report, so a caller that sees `matches_derived == false` is seeing a
 ## measured difference between the two implementations, not a defect.
+## ## The declared return type widened, and why that is not a loss
+##
+## This method previously declared `MagicFlow.MagicResult`, which was correct
+## while `ServerV1Api` refused locally. It is now `Variant`, because v1's magic
+## answer is genuinely a different shape from v0's and narrowing it would require
+## this client to **invent** one of three things: a `matches_derived` comparison
+## against a legacy value v1 never computed, an `addressing` block v1 reports
+## differently, or a price field v1 answers `null` for forever (the three
+## "divergences" named in the v1 answer are **reasons**, not recomputed figures).
+## Any of the three would put a rule in the client, which is what this milestone
+## exists to stop.
+##
+## The cost is measured rather than assumed: **all five** call sites of
+## `magic_town` in this project (`tests/test_damage_magic.gd`) bind the result to
+## a `Variant`, so no caller loses a compile-time type, and the concrete declared
+## types of all **three** implementations are asserted in `tests/test_server_v1.gd`
+## so a fourth cannot quietly add a fourth shape. This is the **third** such
+## widening on this facade (`collect_income` and `complete_collection_town` are
+## the two before it) and the first this line needed.
 func magic_town(user_id: String, action: Variant,
-		magic_id: Variant) -> MagicFlow.MagicResult:
+		magic_id: Variant) -> Variant:
 	magic_requests += 1
-	var result: MagicFlow.MagicResult = await _impl.magic_town(
+	var result: Variant = await _impl.magic_town(
 		user_id, action, magic_id)
 	return result
 

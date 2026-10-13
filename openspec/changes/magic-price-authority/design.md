@@ -545,6 +545,65 @@ claiming a derivation it cannot justify.
    legible. Assert the save mutated on each operation, and that all seven stored
    resources are unchanged across both.
 
+## Corrections (recorded during Apply, 2026-10-13)
+
+Three items, corrected **here** rather than in place, as task 10.4 directs. The first
+two were reported by the implementation subagent and **independently re-verified**
+against `packages/game-content/normalized/magics.json` before being recorded here -
+the table is 10 rows and 15 columns, of which **six** are numeric. The third is a
+boundary the task set left unfixed and the implementation had to settle on evidence.
+
+### C1 - The committed table carries **six** numeric columns, not four
+
+**Wrong.** D2's evidence item 1 ("Four numeric columns, no disambiguator") and the
+row-7 contradiction-table entry ("`magics.json` has **four** unnamed numeric
+columns").
+
+**Measured.** The six numeric columns are `id`, `mana`, `level`, `gold`, `cash` and
+`target`. `id` and `target` are numbers too, so "four" undercounts the surface the
+refusal has to hold against.
+
+**The decision is unchanged, and in fact slightly stronger.** The four columns a
+price could plausibly be read from are the four naming a *resource or a level* -
+`gold`, `cash`, `mana`, `level` - and **no** column at all, numeric or otherwise, is
+named a price. That is the claim D2 makes, and it holds over six columns as well as
+four. The delivered suite carries the two lists separately (`NUMERIC_COLUMNS` = 6,
+`PRICE_CANDIDATE_COLUMNS` = 4) precisely so the counts cannot be confused again.
+
+### C2 - D6's cap rejection cited one column that does not contain the value
+
+**Wrong.** D6's "Rejected alternative: derive the cap from committed content", which
+cites "the same value occurs among the committed `level`/`mana` columns".
+
+**Measured.** `50` occurs in exactly two committed cells - magic `id` 5
+(`Shortcircuit Inductor`) `level` = 50, and magic `id` 1 (`AirStrike`) `cash` = 50. It
+does **not** occur in `mana` at all, whose six distinct values span 8..20. So `level`
+is right and `mana` is wrong.
+
+**The rejection stands and its reasoning is unaffected.** The preserved source applies
+the literal `50` with no content reference, so a matching value elsewhere in the table
+is a property of the value distribution rather than a provenance. Naming `mana` was an
+error in the illustration, not in the argument.
+
+### C3 - D6's cap boundary was left unfixed by the task set, and is settled here
+
+**Gap.** D6 fixes the cap value (`50`) and the refusal for a counter already above it,
+but never fixes what happens **at** exactly the cap.
+
+**Settled as accept-at-cap (option B), on evidence rather than preference.** `before
+== 50` succeeds as a recorded no-op; `before == 51` is refused `counter_above_cap`.
+The measured basis is that the preserved `use_magic` arm is *itself* a no-op at exactly
+50, because `min(50, 51) == 50`. The third option - refuse at the cap - would have
+refused a transaction the preserved branch performs.
+
+**Recorded here because this is a design boundary, not a task detail.** The task
+record carries the same decision at `tasks.md` 3.3 and 10.5; the two agree.
+
+### Checked and found sound
+
+The line attribution task 10.4 also asks for is **correct** as recorded above:
+`buy_magic` is `command.py:652`-`:662` and `use_magic` `command.py:664`-`:674`.
+
 ## Open Questions
 
 - **Q1.** Is a counter a charge at all? Both arms increase and nothing consumes, so
