@@ -20,28 +20,28 @@ trusted.
 | Named dispatcher branches | **63** | `tools/command-catalog/verify_commands.py` (`result: agreement`, exit 0) |
 | `/v0` routes | **24** | `tools/route-coverage/verify_route_coverage.py` (`routes: 24`) |
 | Routes that dispatch a branch | **22** | measured, §3 |
-| Branches a route dispatches | **40** | measured, §3 |
-| **Branches no route dispatches** | **23** | measured, §3 |
-| Branches with an authoritative v1 route | **1** (`collect`) | `apps/server-v1/` |
+| Branches a route dispatches | **39** | measured, §3 |
+| **Branches no route dispatches** | **24** | measured, §3 |
+| Branches with an authoritative v1 route | **4** (`collect`, `complete_collection`, `buy_magic`, `use_magic`) over **3** v1 routes | `apps/server-v1/` |
 
 **The recorded figure of 39 unrouted branches is an overstatement and is
-corrected to 23** (§2).
+corrected to 24** (§2, further corrected by §2.1).
 
-The 23 partition cleanly into six groups. **No branch is a port candidate**
+The 24 partition cleanly into six groups. **No branch is a port candidate**
 (was written as "only one"; see the correction below and §11), and the group
-counts sum to 23 by measurement, not by construction:
+counts sum to 24 by measurement, not by construction:
 
 | Class | Count | Branches | What v1's answer is |
 | --- | --- | --- | --- |
 | A — catalog-classified must-not-migrate | 2 | `flash_debug`, `fast_forward` | refusal, never a route |
-| B — the branch writes nothing | 3 | `ping`, `set_variables`, `buy_powerups` | nothing to make authoritative |
+| B — the branch writes nothing | 4 | `ping`, `set_variables`, `buy_powerups`, **`buy_mana_new`** *(moved here by §2.1)* | nothing to make authoritative |
 | C — unbounded client-dictated grant or destruction | **7** | `store_add_items`, `batch_remove`, `pop_unit`, `push_unit`, `add_inventory_item`, `remove_inventory_item`, **`buy_offer_pack`** *(moved here by §11)* | refusal, never a route |
 | D — client-sent value, no committed rule | 7 | `orient`, `trade_resource`, `first_time_marketplace`, `rt_open_graph_unit`, `unit_collections_completed`, `add_xp_unit`, `soulmixer_speedup` | refusal, never a route |
 | E — already owned by a delivered capability's refusal | 4 | `buy_si_help`, `finish_si`, `set_resource_allies`, `push_queue_unit2` | already decided; a second surface would drift |
 | **F — committed content supplies both the selector and the answer** | **0** | *(was 1: `buy_offer_pack`, **withdrawn** by §11)* | **no port candidate** |
-| | **23** | | | |
+| | **24** | | | |
 
-The class counts still sum to **23**, and `buy_offer_pack` moves from F to **C**
+The class counts still sum to **24**, and `buy_offer_pack` moves from F to **C**
 rather than falling out of the partition. That is the honest reclassification:
 once content cannot supply the grant, what the branch does *is* grant an
 unbounded client-dictated item list with no committed rule — which is exactly
@@ -55,13 +55,13 @@ what Class C describes, and the same verdict Class C's other six members carry.
 > by omission — so the grant is determinate for **1 of 44** packs and the branch
 > is not portable.
 >
-> **So the corrected headline is: all 23 unrouted branches are refusal-only, and
+> **So the corrected headline is: all 24 unrouted branches are refusal-only, and
 > M13 line 2 has no port candidate among them.** §11.5 records the redirect that
 > follows. **Nothing is proposed here.**
 
 ---
 
-## 2. Correction: 39 → 23
+## 2. Correction: 39 → 23 *(superseded — see §2.1)*
 
 `docs/legacy-m13-collect-v1.md:115-117` records:
 
@@ -91,15 +91,17 @@ The gap is exactly measurable in both directions, and both directions were
 measured:
 
 - **The tool's uncovered set is a strict superset of the truly undispatched
-  set.** All **23** branches no route dispatches appear in the tool's 39
+  set.** All **24** branches no route dispatches appear in the tool's 39
   `branches_without_cited_route`. **Zero** disputes in that direction.
-- **16** branches the tool files as uncovered *are* dispatched, their handlers
+- **15** branches the tool files as uncovered *are* dispatched, their handlers
   simply do not cite them with a `command.py:NNN` span: `activate_item_click`,
-  `add_click`, `admin_set_quest_rank`, `buy`, `buy_mana_new`,
-  `buy_premium_account`, `buy_stored_item_cash`, `collect_mission`,
-  `complete_goal`, `darts_new_free`, `darts_reset`, `next_research_item`,
-  `pop_queue_unit`, `research_buy_step_cash`, `reset_research_item`,
-  `use_magic`.
+  `add_click`, `admin_set_quest_rank`, `buy`, `buy_premium_account`,
+  `buy_stored_item_cash`, `collect_mission`, `complete_goal`, `darts_new_free`,
+  `darts_reset`, `next_research_item`, `pop_queue_unit`,
+  `research_buy_step_cash`, `reset_research_item`, `use_magic`. *(This list
+  was originally recorded as **16** and included `buy_mana_new`. That single
+  entry is WITHDRAWN by §2.1, which is why the count here is **15** and not
+  16.)*
 
 The tool is not wrong and is **not** to be changed: it answers the question it
 was built to answer, and its own output already carries the permissive reading
@@ -107,11 +109,66 @@ was built to answer, and its own output already carries the permissive reading
 `branches_without_cited_route_permissive_reading: 26`) alongside the
 conservative headline. What was wrong was one sentence that read the headline as
 a coverage claim. `26` is the tool's own closest answer to the real figure and
-it is still **3 high**, because a name-only mention is weaker evidence than an
-executed envelope builder.
+it is still **2 high** against the measured **24**, because a name-only mention
+is weaker evidence than an executed envelope builder.
 
 **Nothing else in that sentence changes.** "this line covers exactly one of the
 24" is correct and unaffected, and the route count of 24 is correct.
+
+### 2.1 Second correction: 40 / 23 → 39 / 24
+
+*Added 2026-10-13, after the §2 correction was merged. Written because §2 itself
+was wrong by exactly one branch, and because the error is instructive: a figure
+corrected by one method and then never re-measured by that method inherits the
+same failure it corrected.*
+
+**The `40` dispatched / `23` undispatched pair recorded by §2 is WITHDRAWN. The
+measured pair is `39` dispatched / `24` undispatched**, summing to 63. Every
+count of *branches* in this document has been restated to that pair. The route
+count of **24**, the 22 dispatching routes, and the v1 surface are unaffected by
+this correction — though note that the v1 surface was **one** route covering one
+branch when §2 was written and is now **3** routes covering **4** branches
+(`collect`, `complete_collection`, `buy_magic`, `use_magic`), which is what makes
+the non-authoritative totals **59** branches and **21** routes rather than the
+`62` recorded before them.
+
+**The cause is `buy_mana_new`, and it is a single citation that does not
+correspond to a dispatch.** `apps/compat-api/magic_envelope.py:152` declares
+`NO_OP_COMMAND = "buy_mana_new"`, which is what the route-coverage tool reads as
+a citation. That constant is used only inside `REPORTED_DAMAGE_VOCABULARY`
+(`magic_envelope.py:717-724`), a *reported* record of a branch the route
+declines; the name **never appears in a constructed `commands` batch**. So the
+dispatched figure was **40** by exactly one overcount, and `buy_mana_new` is
+**genuinely unrouted**.
+
+**Therefore §2's list of 16 branches is 15**, and `buy_mana_new` is removed
+from it. The other 15 names — `activate_item_click`, `add_click`,
+`admin_set_quest_rank`, `buy`, `buy_premium_account`, `buy_stored_item_cash`,
+`collect_mission`, `complete_goal`, `darts_new_free`, `darts_reset`,
+`next_research_item`, `pop_queue_unit`, `research_buy_step_cash`,
+`reset_research_item`, `use_magic` — **all reproduce as dispatched**.
+
+**Measurement.** Executing all **21** envelope modules' builders (**41** calls,
+**0** failures) and reading the branch out of each returned `commands` batch
+yields exactly **39** dispatched and **24** unrouted, summing to **63**. The
+newly-unrouted 24 are exactly the prior 23 plus `buy_mana_new`. The tool's
+permissive figure of **26** is therefore **2 high**, not 3.
+
+**What survives §2 unchanged, and is now the load-bearing half of it:** the
+tool's `39` is a **citation** count, not a coverage count; the tool is not wrong
+and was **not** changed; and the direction "every undispatched branch appears in
+the tool's 39" holds with **zero** disputes, which now spans **24** names
+instead of 23.
+
+**`buy_mana_new` joins Class B** (`command.py:649-650` — a single
+`print("Bought mana")` whose own trailing comment reads
+`# Nothing needs to be done here :)`), because a branch that writes nothing
+cannot be made authoritative. §3's dispatch table originally listed it against
+`/v0/magic`, and **that cell is corrected here rather than left standing**: it was
+the row the earlier measurement was read off, so leaving it would have preserved
+the exact figure this correction withdraws. §2's own history is still kept rather
+than rewritten, because that text is a record of what was argued, not of what is
+dispatched.
 
 ---
 
@@ -164,12 +221,12 @@ than reading a name.
 | `/v0/research` | `next_research_step`, `research_buy_step_cash`, `next_research_item`, `reset_research_item` |
 | `/v0/level_up` | `level_up` |
 | `/v0/reward` | `weekly_reward`, `win_daily_bonus` |
-| `/v0/magic` | `buy_magic`, `use_magic`, `buy_mana_new` |
+| `/v0/magic` | `buy_magic`, `use_magic` |
 | `/v0/darts` | `darts_reset`, `darts_new_free`, `darts_shoot_balloon`, `buy_premium_account` |
 | `/v0/combat` | `end_attack`, `kill`, `kill_iid` |
 | `/v0/session`, `/v0/bootstrap` | *(read-only; dispatch no branch)* |
 
-`63 − 40 = 23`. Two cautions on this table, both load-bearing:
+`63 − 39 = 24`. Two cautions on this table, both load-bearing:
 
 - The 22-route figure counts **routes**, and 24 routes exist. `/v0/session` is a
   `GET` and `/v0/bootstrap` is a read that builds no batch, so 22 is the number
@@ -182,7 +239,7 @@ than reading a name.
 
 ---
 
-## 4. The 23 unrouted branches
+## 4. The 24 unrouted branches
 
 Every claim in this section is against `command.py` source read directly, not
 against the command catalog's prose.
@@ -198,13 +255,14 @@ against the command catalog's prose.
 the catalog already classifies it `must-not-migrate`. Porting it would *add* a
 hole, not close one.
 
-### Class B — the branch writes nothing at all (3)
+### Class B — the branch writes nothing at all (4)
 
 | Branch | Source | What it does |
 | --- | --- | --- |
 | `ping` | `command.py:948-949` | `print("Pong")`. |
 | `set_variables` | `command.py:951-952` | `print("Set player resources")`. |
 | `buy_powerups` | `command.py:720-725` | `print("Buy Atom Fusion PowerUP")` under a bare `# TODO`. |
+| **`buy_mana_new`** | `command.py:649-650` | **Moved here by §2.1.** A single `print("Bought mana")` whose own trailing comment reads `# Nothing needs to be done here :)`. |
 
 `set_variables` is the sharp one, and it is grouped here rather than by the
 catalog's classification because the reason matters more than the label: its
@@ -305,11 +363,14 @@ forces, are in **§11**.
 > An earlier draft of this document put `buy_offer_pack` in a class of its own
 > called "Class D" and gave that class a size of **6**. That 6 was a pack count
 > that had drifted into a branch count, and the four classes as then written did
-> not partition the 23 — `set_variables` and the three socially-in-construction
-> branches sat outside every class and the arithmetic summed to 23 by accident.
-> The six classes above partition all 23 with no branch in two classes and none
-> omitted, and the class letters were relettered so the old "Class D" could not
-> be mistaken for the new "Class D".
+> not partition the set — `set_variables` and the three socially-in-construction
+> branches sat outside every class and the arithmetic summed correctly **by
+> accident**. The six classes above partition the whole set with no branch in two
+> classes and none omitted, and the class letters were relettered so the old
+> "Class D" could not be mistaken for the new "Class D". (That set was **23**
+> branches when this was written and is **24** after §2.1; both this paragraph
+> and the partition are stated in the current figure, and the accident described
+> was an accident in *coverage*, not a coincidence of totals.)
 
 ---
 
@@ -420,16 +481,16 @@ The cheapest pack costs **20** cash. The fresh-player corpus therefore has
 genuine `insufficient_resources` refusal with no fixture fabrication, while
 `villages/AcidCaos.json` (cash **500**) can afford the full ladder. **Both arms
 are exercisable against committed corpora**, which is the condition M13 line 1
-required before capturing a fixture and which most of the 23 cannot meet.
+required before capturing a fixture and which most of the 24 cannot meet.
 
 ---
 
-## 6. Why the other 21 are not port candidates
+## 6. Why the other 24 are not port candidates
 
 | Candidate | Why not |
 | --- | --- |
 | `flash_debug`, `fast_forward` | Catalog-classified `must-not-migrate`; a route would add an authority hole. |
-| `ping`, `set_variables` | Write nothing. No authority surface to make authoritative. |
+| `ping`, `set_variables`, `buy_mana_new` | Write nothing. No authority surface to make authoritative. `buy_mana_new`'s entire body is one `print("Bought mana")` whose own trailing comment reads `# Nothing needs to be done here :)`; it joined this set by §2.1. |
 | `buy_powerups` | Body is a `# TODO` and a `print`; writes nothing. |
 | `store_add_items` | Client-sent id list with **no selector at all**, so no committed table can be indexed. Refusal is the only honest answer. |
 | `batch_remove` | A client-supplied destruction list. There is no committed content describing what may be removed in bulk. |
@@ -440,6 +501,7 @@ required before capturing a fixture and which most of the 23 cannot meet.
 | `pop_unit`, `push_unit` | Client-dictated coordinates, team, and item id. Already recorded by `godot-unit-movement` and `godot-unit-instances` as the exact untrusted shape v1 must refuse. |
 | `add_xp_unit`, `soulmixer_speedup` | Already owned by `godot-unit-experience` and `godot-unit-queues` as deliberate refusals; `soulmixer_speedup` also computes a cost it never charges. |
 | `buy_si_help`, `finish_si`, `set_resource_allies` | Already owned by `godot-construction-assist`; the only writer appends the integer `0` and no cost is ever charged. |
+| `push_queue_unit2` | Its constant is declared in `queue_envelope`, but `/v0/queue`'s action set is closed at `push`/`pop` and the handler states the exclusion explicitly (§3). A declared constant is not a dispatch — the same distinction §2.1 applied to `buy_mana_new`. |
 
 The pattern is worth stating plainly: **the largest holes and the best port
 candidates are disjoint.** `flash_debug` can set six balances to arbitrary
@@ -449,7 +511,7 @@ values and cannot be ported under any reading.
 > `buy_offer_pack` can mint arbitrary items, but committed content does **not**
 > say what the grant should be — its item grant is indeterminate for **43 of 44**
 > packs by the content package's own explicit policy. With `buy_offer_pack`
-> withdrawn there is **no** best port candidate among the 23, so the
+> withdrawn there is **no** best port candidate among the 24, so the
 > "disjoint sets" observation survives only as a statement about `flash_debug`:
 > the largest holes have no counterpart at all.
 
@@ -523,7 +585,7 @@ These are open questions, deliberately not settled here.
 5. **No executed-legacy fixture exists for `buy_offer_pack`.** One is capturable
    (§5.4) but has not been captured, so every parity statement here is a
    prediction, not evidence.
-6. **The 23 figure is measured over the routes as they stand.** Any future v0
+6. **The 24 figure is measured over the routes as they stand.** Any future v0
    route changes it, and the `route-coverage` tool's 24/39 will keep disagreeing
    with it by design. The reconciliation in §2 is a property of the current
    tree and would need re-measuring, not re-deriving.
@@ -562,8 +624,8 @@ normalization rule, no schema, no committed byte.
   preserved Python server and the committed content. Absence of a server-side
   rule says nothing about client-side behaviour, which may have been entirely
   client-driven.
-- **The 23 is a count of *dispatch*, not of *correctness*.** A route dispatching
-  a branch does not make it authoritative; 40 dispatched branches include many
+- **The 24 is a count of *dispatch*, not of *correctness*.** A route dispatching
+  a branch does not make it authoritative; 39 dispatched branches include many
   that reproduce a client-sent vector, and those are recorded as such by the
   lines that own them.
 - **Zero-consumer figures are about the seven legacy root modules only.** They
@@ -658,17 +720,23 @@ purchase owned elsewhere, not an independent transaction, and porting
 
 ### 11.5 What this forces, and the redirect
 
-**Class F is empty. All 23 unrouted branches are refusal-only.** That is the
+**Class F is empty. All 24 unrouted branches are refusal-only.** That is the
 honest state of the surface, and it is a real finding rather than a dead end:
 the one branch whose authority hole looked *derivable* turns out to be the one
 branch whose content **declines to derive itself**.
 
 It also redirects M13 line 2. The remaining authority work is the other half of
-the surface — the **39 dispatched-but-non-authoritative** branches behind the v0
+the surface — the **35 dispatched-but-non-authoritative** branches behind the v0
+routes (**39** dispatched, less the **4** that v1 now makes authoritative: all four
+of `collect`, `complete_collection`, `buy_magic`, `use_magic` are dispatched by a
+v0 route, so subtracting them is what turns the dispatched count into the
+dispatched-*but-not-authoritative* count; the earlier `39` here was the same
+off-by-one arithmetic read off the withdrawn `40`) —
 routes — and those are selectable by **the same criterion line 1 was selected
 by**, which is recorded in `docs/legacy-m13-authority.md` decision **D6**: `collect`
 was chosen as the first slice because "v0's is already proven against a captured
-executed-legacy fixture". Applied to the 23 v0 routes, that criterion selects
+executed-legacy fixture". Applied to the **22** dispatching v0 routes, that
+criterion selects
 among routes that already have **21 executed-legacy fixture captures** behind
 them, rather than among branches that have none. `collect`'s own sibling
 `/v0/purchase` (`buy_stored_item_cash`) is the nearest of them by surface.

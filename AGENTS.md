@@ -2746,10 +2746,12 @@ allow-listed**, which also exposed that this suite is absent from
 `verify-boot.ps1` entirely and is owned by `verify.ps1`.
 
 Claim limits: **this line delivers authority for exactly one of the 63 named
-legacy branches**, `collect`; **23 of the 63 branches have no route at all**
-behind either server, and the other **23** Compatibility API routes have **no
-authoritative counterpart**, so 23 routes stay non-authoritative and **62**
-branches stay non-authoritative -- both remaining work, never implied parity;
+legacy branches**, `collect`; **24 of the 63 branches have no route at all**
+behind either server, and **21** Compatibility API **routes** have **no
+authoritative counterpart** (*a route count, distinct from the separate
+facade-intent count of 21 further down this paragraph*), so **21** routes stay
+non-authoritative and **59** branches stay non-authoritative -- both remaining
+work, never implied parity;
 **FIGURE CORRECTION (2026-10-13, orchestrator; measured in
 `docs/legacy-m13-unrouted-branches.md`, PR #386, merge `c982d4c`): this
 paragraph originally read "39 of the 63 branches have no route at all" and
@@ -2764,6 +2766,33 @@ either direction. The "39 branches stay unrouted" claim additionally counted onl
 the unrouted branches and omitted the **39** dispatched-but-non-authoritative
 ones, so the correct non-authoritative total is **63 - 1 = 62**. The tool itself
 is not wrong and was not changed; it answers the question it was built to answer.
+
+**FIGURE CORRECTION (2026-10-13, orchestrator, second correction; measured in
+`docs/legacy-m13-unrouted-branches.md` §2.1): the
+`40` dispatched / `23` undispatched pair and the `63 - 1 = 62` non-authoritative
+total recorded immediately above are WITHDRAWN.** The measured pair is **39**
+dispatched / **24** undispatched, summing to 63; the cause is
+**`buy_mana_new`**, which `apps/compat-api/magic_envelope.py:152` declares as
+`NO_OP_COMMAND` -- the route-coverage tool reads that as a citation, but the
+constant is used only inside `REPORTED_DAMAGE_VOCABULARY`
+(`magic_envelope.py:717-724`), a *reported* record of a branch the route
+declines, and the name never appears in a constructed `commands` batch. The
+"**16** of its 39 are in fact dispatched" figure is therefore **15**; the other
+15 names all reproduce as dispatched. Executing all 21 envelope modules'
+builders (41 calls, 0 failures) and reading the branch out of each returned
+batch yields exactly **39** and **24**. The correct non-authoritative totals are
+therefore **59** branches and **21** routes: `apps/server-v1/server_v1_app.py`
+declares exactly **3** v1 routes -- `COLLECT_PATH = "/v1/collect"`,
+`COLLECTION_PATH = "/v1/collection"`, `MAGIC_PATH = "/v1/magic"` -- covering
+**4** named legacy branches (`collect`, `complete_collection`, `buy_magic`,
+`use_magic`, the last two through the magic route's `operation` field whose
+closed value set is `{"buy", "use"}` at `server_v1_intent.py:136-138`), so
+`63 - 4 = 59` branches and `24 - 3 = 21` routes. **`tools/route-coverage/`
+remains correct and is unchanged** -- it answers the question it was built to
+answer, and no claim-limit, guard, or recorded instrument fault is weakened by
+this correction. The **21** above is a count of **routes**; the **21** facade
+intents refused client-locally later in this paragraph is a different
+quantity and the two are not interchangeable.
 The compatibility surface is
 `collect` alone and no other intent is routed; **the 21 other facade intents
 are refused client-locally** with code `unsupported_by_server_v1` and never
