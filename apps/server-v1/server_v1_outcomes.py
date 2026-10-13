@@ -347,22 +347,170 @@ class MagicSuccess(BaseModel):
         }
 
 
+#: The preserved branch's recorded behaviour, quoted in the response so a client
+#: can see the divergence rather than infer it.  **Data, not a second
+#: derivation**, and the same reasoning as :data:`PRESERVED_MAGIC_BEHAVIOUR`:
+#: nothing in v1 reproduces a legacy combat value, because there is no committed
+#: value that names one.
+#:
+#: **Declared here, not in :mod:`server_v1_combat`,** for the reason
+#: :data:`PRESERVED_MAGIC_BEHAVIOUR` gives: the dependency runs the other way.
+PRESERVED_COMBAT_BEHAVIOUR: Dict[str, str] = {
+    "destruction": (
+        "command.py:868 computes lost = max(0, unit[2] - unit[3]) from two numbers "
+        "the CLIENT sends, and command.py:872 destroys that many rows through "
+        "map_lose_item, so the count is client-dictated in full; the committed "
+        "source labels the two numbers only 'A' and 'B'"
+    ),
+    "ledger": (
+        "engine.py:223 pushes each destroyed row onto privateState['deadHeroes'] "
+        "through push_dead_unit, which requires the row's team to be exactly 1 "
+        "(engine.py:151) and the item's committed resurrectable to be greater than "
+        "zero (engine.py:159-162); v1 reports both gates and credits nothing"
+    ),
+    "absent_value": (
+        "command.py:866 and :874 dereference attacker_units and victim without a "
+        "None check, so an omitted shape raises, the batch is discarded before the "
+        "save is written (command.py:30,32), and the response is an HTTP 500; this "
+        "is established by execution on fixture steps 2 and 4, not reasoned"
+    ),
+    "reached": (
+        "map_lose_item has exactly two call sites -- command.py:796 (end_quest) and "
+        "command.py:872 (end_attack) -- so two branches reach one helper; "
+        "godot-unit-behaviors counted push_dead_unit's callers and map_lose_item "
+        "separately and called it three doors, and that archived line is not edited"
+    ),
+}
+
+
+class CombatSuccess(BaseModel):
+    """A combat resolution that resolved an identity and destroyed nothing.
+
+    **The first v1 success that writes nothing at all**, and therefore the one
+    whose post-execution proof is the strongest instrument in this repository:
+    the *entire* persisted document, every key, is byte-identical after the
+    request -- not the addressed subtree, not the seven stored resources, and not
+    the dead-hero ledger alone.
+
+    That is what makes this model separate from the other three rather than a
+    fourth instance of one of them:
+
+    * it carries **no derivation**, because this surface has none to carry -- the
+      preserved branch's only quantity is a subtraction of two client numbers,
+      and no committed column names an outcome;
+    * it carries the **refused** client figure beside the code that refused it,
+      so a client can see what it sent and why it was not applied, without v1
+      ever having computed a count from it;
+    * it carries both committed gates **reported**, with
+      :attr:`gates_enforced` fixed at ``False`` -- the gates are facts about what
+      the preserved server *would* have done, and the transaction has nothing to
+      gate because it destroys nothing;
+    * it carries the proof as **ordered named checks**
+      (:attr:`proof`), so a reader can see which half is a specification check
+      and which half is the falsifiable one, rather than being told in prose.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    action: str
+    #: The committed unit identity the request named, verified against the
+    #: committed unit table before anything else happened.
+    unit_id: int
+    #: The instant the transaction reported (Unix seconds).  The preserved branch
+    #: records no instant for this action, so nothing in the store holds it.
+    instant: int
+    #: Every stored resource, read **back** from the store after the
+    #: (non-)write, so a caller cannot report a success without having read what
+    #: it reports.
+    state: Dict[str, int] = Field(min_length=1)
+    #: The committed row facts, verbatim and never compared.
+    committed: Dict[str, Any]
+    #: Both recorded gates, each reported with its own presence flag so an
+    #: absent committed value is never reported as a zero.
+    gates: Dict[str, Any]
+    #: The two helpers' asymmetry, stated rather than reconciled.
+    team_asymmetry: Dict[str, Any]
+    #: What the request tried to destroy and why it was not applied.  Carries
+    #: the refused figure **verbatim** -- never a count v1 derived from it.
+    destruction: Dict[str, Any]
+    #: The post-execution proof: ordered ``(check, held)`` pairs.  An empty
+    #: tuple would be a success reporting no proof at all, which is not a state
+    #: this model is allowed to be constructed into.
+    proof: Tuple[Tuple[str, bool], ...] = Field(min_length=1)
+    #: Every leaf path that differed between the pre-request and post-request
+    #: documents.  Empty on every success this surface can produce, and reported
+    #: rather than asserted, so a destruction would name *which* leaves moved.
+    leaf_paths_changed: Tuple[str, ...]
+    #: Whether the whole persisted document was byte-identical across the
+    #: transaction.  The falsifiable half of the proof.
+    document_unchanged: bool
+    #: Whether either reported gate was enforced as a precondition.  A constant
+    #: ``False``, declared so a reader does not have to infer it from the
+    #: absence of a refusal.
+    gates_enforced: bool = False
+
+    def payload(self) -> Dict[str, Any]:
+        """The transport body for this success (envelope added by the route).
+
+        Reports the committed facts and the **refused** figure, and carries no
+        ``derived_deltas`` key at all rather than an empty one -- exactly as the
+        magic slice does, because a destruction of nothing is the claim this
+        slice exists to make and an empty mapping invites a reader to treat it
+        as a formatting accident.
+        """
+        return {
+            "result": "success",
+            "action": self.action,
+            "instant": self.instant,
+            "combat": {
+                "unit_id": self.unit_id,
+                "identity_field": "unit_id",
+                "identity_resolved_against": "the committed items rows with type u",
+            },
+            "committed": dict(self.committed),
+            "gates": dict(self.gates),
+            "gates_enforced": self.gates_enforced,
+            "team_asymmetry": dict(self.team_asymmetry),
+            "destruction": dict(self.destruction),
+            "rows_destroyed": 0,
+            "resources_after": dict(self.state),
+            "stored_resources_compared": sorted(self.state),
+            "proof": [list(entry) for entry in self.proof],
+            "leaf_paths_changed": list(self.leaf_paths_changed),
+            "document_unchanged": self.document_unchanged,
+            "derived_damage": None,
+            "derived_destruction_count": None,
+            "damage_derived": False,
+            "derivation_performed": None,
+            "ledger_credited": False,
+            "ledger_covered_by": (
+                "the whole-document comparison, not a subset read: the dead-hero "
+                "ledger is one key among every key compared"
+            ),
+            "preserved_branch_behaviour": PRESERVED_COMBAT_BEHAVIOUR,
+        }
+
+
 __all__ = [
+    "PRESERVED_COMBAT_BEHAVIOUR",
     "PRESERVED_MAGIC_BEHAVIOUR",
     "SUCCESS_HTTP_STATUS",
     "CollectionSuccess",
+    "CombatSuccess",
     "MagicSuccess",
     "Outcome",
     "Success",
 ]
 
 
-#: What a domain service returns.  Four arms, no ``None``.
+#: What a domain service returns.  Five arms, no ``None``.
 #:
-#: The three successes are separate frozen models rather than one model with
+#: The four successes are separate frozen models rather than one model with
 #: optional halves, and :class:`CollectionSuccess`'s own docstring says why;
-#: :class:`MagicSuccess` carries the same argument with nothing left to remove.
+#: :class:`MagicSuccess` carries the same argument with nothing left to remove
+#: and :class:`CombatSuccess` the same argument once more, now with no
+#: derivation at all and a whole-document proof in place of a transition.
 #: Declared last, after every class it names, because ``Union`` resolves its
 #: arguments when it is evaluated: the first version of this module put the
 #: union above ``CollectionSuccess`` and the service failed to import at all.
-Outcome = Union[Success, CollectionSuccess, MagicSuccess, Refusal]
+Outcome = Union[Success, CollectionSuccess, MagicSuccess, CombatSuccess, Refusal]

@@ -173,6 +173,12 @@ const OBSERVED_REFUSALS := {
 ## NOT have, and keeping a delivered one would have kept asserting a refusal the
 ## client no longer produces -- the exact failure mode where a guard pins a stale
 ## claim. Its implementation is covered by `tests/test_collection_v1.gd`.
+##
+## **`combat_town` is NOT in this table either**, for the same reason and by the
+## same mechanism, when the fourth v1 route landed: it moved to the implemented
+## set and its own suite is `tests/test_combat_v1.gd`. The count therefore fell
+## from twenty-one to twenty, measured by the size assertion below rather than
+## assumed from the arithmetic.
 const UNSUPPORTED_INTENTS := [
 	["list_sessions", "BootData.SaveListResult", "error_code", "error_message"],
 	["get_bootstrap", "BootData.BootstrapResult", "error_code", "error_message"],
@@ -193,7 +199,6 @@ const UNSUPPORTED_INTENTS := [
 	["complete_tutorial_town", "TutorialFlow.TutorialResult", "error_code", "error_message"],
 	["place_stored_item_town", "BootData.StoredPlacementResult", "error_code", "error_message"],
 	["sell_stored_item_town", "BootData.StoredSaleResult", "error_code", "error_message"],
-	["combat_town", "CombatFlow.CombatResult", "error_code", "error_message"],
 	["reward_town", "RewardFlow.RewardResult", "reason", "error"],
 ]
 
@@ -502,19 +507,26 @@ func _check_unsupported_intents() -> void:
 ## on disk**, so the hand-off cannot dangle. This is the same shape
 ## `godot-unit-collection` established and `godot-stored-item-placement` re-used;
 ## the owner list lives in the receiving suite, never in two places at once.
-const MAGIC_SUITE := "res://tests/test_magic_v1.gd"
-const HANDED_OFF_INTENTS := ["magic_town"]
+## The suite each handed-off intent is owned by, and the intents themselves.
+## `combat_town` was added when the fourth v1 route landed; its owning suite is
+## `test_combat_v1.gd`, so the hand-off cannot dangle either.
+const HANDED_OFF_SUITES := {
+	"magic_town": "res://tests/test_magic_v1.gd",
+	"combat_town": "res://tests/test_combat_v1.gd",
+}
+const HANDED_OFF_INTENTS := ["magic_town", "combat_town"]
 
 
 func _check_magic_intent_hand_off() -> void:
 	for intent in UNSUPPORTED_INTENTS:
 		check(not HANDED_OFF_INTENTS.has(str(intent[0])),
 			"%s left the unsupported table and must not be back in it" % str(intent[0]))
-	check(ResourceLoader.exists(MAGIC_SUITE),
-		"the suite that took %s over exists" % ", ".join(HANDED_OFF_INTENTS))
-	check_eq(UNSUPPORTED_INTENTS.size(), 21,
-		"twenty-one intents remain locally refused, one fewer than before the"
-		+ " magic route landed")
+	for intent in HANDED_OFF_INTENTS:
+		check(ResourceLoader.exists(str(HANDED_OFF_SUITES[intent])),
+			"the suite that took %s over exists" % intent)
+	check_eq(UNSUPPORTED_INTENTS.size(), 20,
+		"twenty intents remain locally refused, one fewer than before the"
+		+ " combat route landed")
 	info("intents handed off: %s" % ", ".join(HANDED_OFF_INTENTS))
 
 

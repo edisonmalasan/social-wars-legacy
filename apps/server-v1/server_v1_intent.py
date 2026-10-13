@@ -71,11 +71,32 @@ The allowed keys for the three delivered actions:
     ``operation`` — one of the closed set in :data:`INTENT_OPERATION_VALUES`.
     All three required.
 
+``combat``
+    ``player_id`` — the save this intent is about, a non-empty string.
+    ``unit_id`` — the committed unit identity, an integer that **may be zero or
+    negative**, for the same measured reason as ``magic_id``: the preserved
+    ``end_attack`` branch never indexes the committed table, so zero and every
+    negative id name no row rather than aliasing a position.  Both required, and
+    **no** third key: the route carries exactly one action, so there is no
+    ``operation`` row for it in :data:`INTENT_OPERATION_FIELDS`.
+
 Each action's schema is closed over its own keys, so a ``collect`` request
 that carries ``collection_id`` is an ``unknown_request_field`` and vice versa.
 Nothing else is accepted.  Notably absent and deliberately *not* accepted:
 ``amount``, ``resource``, ``tier``, ``time``, ``now``, ``price``, ``cash``,
 ``prize``, ``item_ids`` and any of the delta keys.
+
+**One shape is recognised rather than merely unknown.**  ``attacker_units`` is
+the preserved ``end_attack`` branch's *actual* destruction wire shape — the list
+whose ``unit[2] - unit[3]`` is the count it destroys (``command.py:866-872``) —
+so a request carrying it is refused by name, through
+:data:`DESTRUCTION_KEYS`, rather than being treated as an arbitrary unknown key.
+The refusal is the **domain's** (``client_dictated_destruction``, 409), because a
+decision about what a transaction would have destroyed belongs to the domain and
+not to a layer that only reads key names; this module carries the figure
+**verbatim** in :attr:`Intent.destruction_request` and computes nothing from it.
+The sibling spellings ``victim`` and ``victim_units`` are **not** in that set:
+neither is a destruction, so both remain ``unknown_request_field`` (400).
 """
 
 from __future__ import annotations
@@ -95,6 +116,7 @@ INTENT_SCHEMAS: Dict[str, FrozenSet[str]] = {
     "collect": frozenset({"player_id", "row"}),
     "collection": frozenset({"player_id", "collection_id"}),
     "magic": frozenset({"player_id", "magic_id", "operation"}),
+    "combat": frozenset({"player_id", "unit_id"}),
 }
 
 #: The one addressing field each action requires, and therefore the one field
@@ -112,6 +134,36 @@ ADDRESSING_FIELDS: Dict[str, str] = {
     "collect": "row",
     "collection": "collection_id",
     "magic": "magic_id",
+    "combat": "unit_id",
+}
+
+#: The one action that declares no operation field, named as data.
+#:
+#: ``combat`` is the one delivered action whose schema length equals its
+#: addressing contract, so it is also the one where the extra-key argument on
+#: :data:`ADDRESSING_FIELDS` does not apply: the route carries exactly one
+#: action, and a second operation name over a single action would be line 3's D7
+#: problem restated on a route with nothing to distinguish.  Declared rather than
+#: inferred so a future fifth action cannot add an operation by accident.
+NO_OPERATION_FIELD_ACTIONS: FrozenSet[str] = frozenset({"combat"})
+
+#: The preserved branches' **actual destruction wire shapes**, per action.
+#:
+#: ``attacker_units`` is not an invented spelling: it is the name the preserved
+#: ``end_attack`` branch gives the list it iterates at ``command.py:866``, whose
+#: ``unit[2] - unit[3]`` is the number of rows the transaction destroys
+#: (``command.py:868-872``).  Recognising it is what lets a v1 request that
+#: speaks the preserved dialect be refused **by name** -- the domain's own
+#: ``client_dictated_destruction`` (409) -- rather than as an arbitrary unknown
+#: key, while the domain still never computes a count from it.
+#:
+#: **Only the destruction shape is listed.**  ``victim`` and ``victim_units`` are
+#: not destruction figures, so they stay ``unknown_request_field`` (400); adding
+#: them here would widen the rule from "names what would be destroyed" to "looks
+#: like the branch", which is the substring-matching mistake
+#: :func:`_is_delta_key` records and rejected.
+DESTRUCTION_KEYS: Dict[str, FrozenSet[str]] = {
+    "combat": frozenset({"attacker_units"}),
 }
 
 #: The one **non-addressing** required key each action declares, and therefore
@@ -272,11 +324,27 @@ class Intent(BaseModel):
     #: The slice refuses them as ``unknown_magic_id``, which is the true
     #: statement — they name no committed row at all.
     magic_id: Optional[int] = None
+    #: A committed **unit** id.  Set for ``combat``; ``None`` otherwise.  Also
+    #: **not** in :data:`NON_NEGATIVE_ADDRESSING`, for the same reason as
+    #: ``magic_id``: the preserved ``end_attack`` branch never indexes the
+    #: committed table, so zero and every negative id name no committed unit row
+    #: and there is no positional clamp for one to alias.  The slice refuses them
+    #: as ``unaddressable_row``, which is the true statement -- they name no
+    #: committed row at all.
+    unit_id: Optional[int] = None
     #: Which of the action's declared operations the client asked for.  Set for
     #: every action in :data:`INTENT_OPERATION_FIELDS`; ``None`` otherwise.  A
     #: value outside the action's closed set never reaches here: it is refused
     #: as ``malformed_request`` in :func:`parse_intent`.
     operation: Optional[str] = None
+    #: The preserved branch's destruction shape, carried **verbatim**, or
+    #: ``None``.
+    #:
+    #: ``Any`` rather than a declared type on purpose: this value is never
+    #: interpreted, counted, bounded, or compared, and typing it as a list would
+    #: be an invitation to read it as one.  The domain reports it beside the code
+    #: that refused it and derives nothing from it.
+    destruction_request: Optional[Any] = None
 
     def addressed_path(self) -> str:
         """A JSON-pointer-ish description of what this intent addresses.
@@ -284,11 +352,20 @@ class Intent(BaseModel):
         Used in refusal detail so a client can see exactly which row, ledger
         key, or committed magic row was addressed.  It reports the address, never
         a balance.
+
+        ``combat`` resolves to ``/maps/0/items``, the **container**, and not to a
+        key inside it: a combat identity is a committed **item id**, and the
+        rows it could name are every key whose slot 0 equals it -- which may be
+        none, one, or several, and which no JSON pointer can express.  Naming the
+        container is the honest address; the domain reports the actual matching
+        keys beside it.
         """
         if self.collection_id is not None:
             return "/privateState/collections"
         if self.magic_id is not None:
             return "/privateState/magics/%d" % self.magic_id
+        if self.unit_id is not None:
+            return "/maps/0/items"
         return "/maps/0/items/%d" % self.row
 
 
@@ -334,11 +411,21 @@ def parse_intent(action: str, body: Any) -> IntentOutcome:
 
     1. the body is a JSON object (``malformed_request``);
     2. no key is delta-shaped (``client_supplied_delta``);
-    3. no key is outside the action's schema (``unknown_request_field``);
-    4. the required keys are present and correctly typed
+    3. the preserved branch's own destruction shape is recognised and carried
+       rather than answered as an unknown key -- **not a refusal here**, see
+       :data:`DESTRUCTION_KEYS`;
+    4. no key is outside the action's schema (``unknown_request_field``);
+    5. the required keys are present and correctly typed
        (``malformed_request``);
-    5. the action's declared ``operation``, if it declares one, names one of its
+    6. the action's declared ``operation``, if it declares one, names one of its
        declared values (``malformed_request``).
+
+    Step 3 decides nothing.  It recognises a key, excludes it from the closed-key
+    set at step 4, and carries its value into :attr:`Intent.destruction_request`;
+    the domain then refuses the request **by name**.  A layer that only reads key
+    names has no rule about what a transaction would have destroyed, so naming
+    ``client_dictated_destruction`` here would be this module deciding a
+    question it cannot see.
 
     Order matters for a client: a request carrying both a delta and an unknown
     key is reported as a delta attempt, because that is the security-relevant
@@ -347,7 +434,9 @@ def parse_intent(action: str, body: Any) -> IntentOutcome:
     client is not told to supply a field it already sent.
 
     No value from ``body`` ever reaches a balance.  The only values that leave
-    this function are the action name, the player id, and the row index.
+    this function are the action name, the player id, the one addressing value
+    the action declares, its declared operation, and the recognised destruction
+    shape carried verbatim.
     """
     if action not in INTENT_SCHEMAS:
         # Not reachable through the delivered route; a fail-closed answer rather
@@ -378,8 +467,33 @@ def parse_intent(action: str, body: Any) -> IntentOutcome:
             {"delta_fields": delta_keys, "refused_field": delta_keys[0]},
         )
 
-    # (3) closed key set.
-    unknown = sorted(str(key) for key in body if str(key) not in allowed)
+    # (2b) the preserved branch's own destruction shape, **recognised** here and
+    # **decided** by the domain.
+    #
+    # ``attacker_units`` is not a delta *resource* but it does dictate an
+    # outcome, so the closed-key check below must not answer it as an arbitrary
+    # unknown field; the domain owns the decision and names the refusal, because a
+    # decision about what a transaction would have destroyed belongs to the domain
+    # and not to a layer that only reads key names (design D4, D5).
+    #
+    # What happens here is **recognition and carriage**: the key is recognised,
+    # excluded from the unknown-key set, and its value carried into
+    # :attr:`Intent.destruction_request` verbatim.  Nothing in this module
+    # interprets, counts, bounds, or compares it, and this module names no
+    # domain refusal code.
+    destruction_keys = DESTRUCTION_KEYS.get(action, frozenset())
+    carried = sorted(str(key) for key in body if str(key) in destruction_keys)
+
+    # (3) closed key set, over the keys this action neither defines nor
+    # recognises.  The recognised destruction shapes are excluded **here** and
+    # only here: including them would answer a preserved-dialect request as an
+    # arbitrary unknown field and the domain's named refusal would be
+    # unreachable.
+    unknown = sorted(
+        str(key)
+        for key in body
+        if str(key) not in allowed and str(key) not in destruction_keys
+    )
     if unknown:
         return _refuse(
             RefusalCode.UNKNOWN_REQUEST_FIELD,
@@ -453,7 +567,14 @@ def parse_intent(action: str, body: Any) -> IntentOutcome:
         row=target if addressing == "row" else None,
         collection_id=target if addressing == "collection_id" else None,
         magic_id=target if addressing == "magic_id" else None,
+        unit_id=target if addressing == "unit_id" else None,
         operation=operation,
+        # The recognised destruction field's value, verbatim and unexamined.
+        # ``carried`` is sorted, so a request naming two recognised shapes would
+        # carry the first by name -- which is why the table lists exactly one
+        # shape per action, and why the domain reports the carried key beside
+        # the value rather than reporting a value alone.
+        destruction_request=body[carried[0]] if carried else None,
     )
 
 
@@ -565,9 +686,12 @@ __all__ = [
     "ADDRESSING_FIELDS",
     "DELTA_KEYS",
     "DELTA_MODIFIERS",
+    "DESTRUCTION_KEYS",
     "INTENT_OPERATION_FIELDS",
     "INTENT_OPERATION_VALUES",
     "INTENT_SCHEMAS",
+    "NO_OPERATION_FIELD_ACTIONS",
+    "NON_NEGATIVE_ADDRESSING",
     "Intent",
     "IntentOutcome",
     "intent_from_json",

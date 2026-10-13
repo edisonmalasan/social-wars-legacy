@@ -233,6 +233,12 @@ class SaveDocument:
     ROW_INSTANT = 3
     ROW_ITEM = 0
     ROW_ATTR = 6
+    #: ``item[7]`` is the row's recorded **player team**, and the only field the
+    #: preserved dead-hero gate reads (``push_dead_unit``'s ``if item[7] != 1:
+    #: return False``, ``engine.py:151``).  The selectors here are truthy tests
+    #: of the *same* slot (``map_lose_item``, ``engine.py:221``), which is the
+    #: asymmetry the combat slice reports rather than reconciles.
+    ROW_TEAM = 7
     #: The keys a construction writes into a row's attribute bag, and the one a
     #: queue start writes.  Presence of any of them means the row is not idle.
     CONSTRUCTION_ATTR_KEYS = ("cp", "nc")
@@ -267,6 +273,75 @@ class SaveDocument:
                 "unaddressable_row", "save %r has no row %d" % (self.player_id, index)
             )
         return self._row_int(row, self.ROW_ITEM, "item id")
+
+    def row_team(self, index: int) -> int:
+        """``item[7]`` — the row's recorded player team, as an integer.
+
+        A **reader only**: nothing in the delivered v1 surface writes a team, and
+        there is deliberately no ``set_row_team``, because a team is a fact about
+        which side a row was placed for rather than a value a transaction derives.
+
+        ``0`` and ``None`` are both unreadable answers here and both raise,
+        because ``map_lose_item``'s selector is a **truthy** test
+        (``engine.py:221``): a team of ``0`` is a row that helper skips, and
+        reporting it as a team the reader understood would invent a placement
+        the selector would never have chosen.  The legacy selector's tolerance
+        for *any* truthy value, against ``push_dead_unit``'s exact-``1`` test,
+        is the asymmetry the combat slice reports; this reader takes neither side.
+        """
+        row = self.row(index)
+        if row is None:
+            raise RepositoryError(
+                "unaddressable_row", "save %r has no row %d" % (self.player_id, index)
+            )
+        team = self._row_int(row, self.ROW_TEAM, "team")
+        if team == 0:
+            raise RepositoryError(
+                "unreadable_state",
+                "save %r row %d records team 0, which the preserved placement "
+                "selector never chooses" % (self.player_id, index),
+            )
+        return team
+
+    def rows_for_item_id(self, item_id: int) -> Tuple[int, ...]:
+        """Every recorded map key whose row carries ``item_id``, in stored order.
+
+        **The scan order is the preserved one.**  ``map_lose_item``
+        (``engine.py:218-225``) walks ``map["items"]`` key by key and takes the
+        **first** row whose item id matches *and* whose team is truthy, popping it
+        and starting the walk again, so a repeated destruction of the same id
+        consumes successive matches in recorded order.  This accessor keeps that
+        order so a caller reporting which rows exist for an identity is reporting
+        the rows the preserved helper would have considered, in the sequence it
+        would have consumed them.
+
+        It is a **reader**: it returns keys, removes nothing, and hands out no
+        row object.  The combat slice uses it to report whether the addressed
+        identity has a row at all, which is a report rather than a selection --
+        the addressed identity names a **committed item id**, and the preserved
+        branch's own subject is the per-tuple ``unit[0]`` (``command.py:870``),
+        not a map key.
+        """
+        if isinstance(item_id, bool) or not isinstance(item_id, int):
+            return ()
+        keys: List[int] = []
+        for key, row in self.items().items():
+            if not isinstance(row, list) or len(row) <= self.ROW_ITEM:
+                raise RepositoryError(
+                    "unreadable_state",
+                    "save %r row %r is not a readable placement row"
+                    % (self.player_id, key),
+                )
+            value = row[self.ROW_ITEM]
+            if isinstance(value, bool) or not isinstance(value, int):
+                raise RepositoryError(
+                    "unreadable_state",
+                    "save %r row %r does not record an integer item id"
+                    % (self.player_id, key),
+                )
+            if int(value) == item_id:
+                keys.append(int(key))
+        return tuple(keys)
 
     def row_attr(self, index: int) -> Dict[str, Any]:
         """``item[6]`` — a row's attribute bag, verified to be an object."""

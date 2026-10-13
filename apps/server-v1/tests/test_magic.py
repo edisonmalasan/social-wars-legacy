@@ -2018,15 +2018,24 @@ class IntentTests(unittest.TestCase):
 
 
 class VocabularyTests(unittest.TestCase):
-    """Task 1: the two new codes, and the pin one step from tripping."""
+    """Task 1: the two new codes, and the pin one step from tripping.
+
+    **Amended by the combat line (M13 line 4), which added a twentieth code.**
+    The rationale is the same one recorded at the pin itself in
+    ``test_boundary_invariant.py``: the table held 19, this line adds exactly
+    one, and the bound exists so that a reviewer must read a *failing test*
+    before the vocabulary grows.  A guard that pins its own text is unusual and
+    is kept, precisely so that a quiet amendment to the number here cannot
+    outlive the number it describes.
+    """
 
     def test_exactly_two_codes_were_added(self) -> None:
-        self.assertEqual(19, len(list(RefusalCode)))
+        self.assertEqual(20, len(list(RefusalCode)))
         self.assertIn(RefusalCode.UNKNOWN_MAGIC_ID, list(RefusalCode))
         self.assertIn(RefusalCode.COUNTER_ABOVE_CAP, list(RefusalCode))
 
     def test_the_vocabulary_is_one_code_from_tripping_the_size_pin(self) -> None:
-        """Task 10.3: the pin is ``< 20`` and this line leaves it at 19.
+        """Task 10.3, restated: the pin is ``< 21`` and this line leaves it at 20.
 
         Asserted rather than left as a note, so the next line to need a code
         cannot pass the pin by not knowing how close it is.  The pin's own
@@ -2034,9 +2043,9 @@ class VocabularyTests(unittest.TestCase):
         fails here instead of being discovered a line later.
         """
         pin = (harness.TESTS_DIR / "test_boundary_invariant.py").read_text(encoding="utf-8")
-        self.assertIn("self.assertLess(len(list(RefusalCode)), 20)", pin)
-        self.assertLess(len(list(RefusalCode)), 20)
-        self.assertEqual(19, len(list(RefusalCode)))
+        self.assertIn("self.assertLess(len(list(RefusalCode)), 21)", pin)
+        self.assertLess(len(list(RefusalCode)), 21)
+        self.assertEqual(20, len(list(RefusalCode)))
 
     def test_both_new_codes_are_named_by_the_domain(self) -> None:
         source = _code_only(DOMAIN_SOURCE.read_text(encoding="utf-8"))

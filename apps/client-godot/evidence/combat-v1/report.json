@@ -1,0 +1,335 @@
+{
+	"claims": {
+		"client_computes_a_destruction_count": false,
+		"client_computes_damage": false,
+		"client_credits_a_ledger": false,
+		"client_evaluates_a_gate": false,
+		"client_filters_an_identity": false,
+		"client_relates_two_reported_values": false,
+		"parity_with_legacy_claimed": false,
+		"unsupported_intent_touches_transport": false
+	},
+	"committed_table": {
+		"absent_resurrectable_count": 3,
+		"absent_resurrectable_ids": [
+			923,
+			933,
+			1176
+		],
+		"mirror_stores_them_as": "whole JSON numbers for eight of the nine",
+		"nine_columns_present_on_every_row": true,
+		"served_table_stores_them_as": "strings, all nine",
+		"source_read_by_this_client": "packages/game-content/normalized/units.json",
+		"stored_source": "config/main.json",
+		"stored_source_is_unpatched": true,
+		"stored_source_rows": 778,
+		"stored_source_unit_rows": 308,
+		"the_ninth_column": "best_against",
+		"the_ninth_column_is_a_string_in_both": true,
+		"unit_id_first": 923,
+		"unit_id_last": 1431,
+		"unit_rows": 429,
+		"why_the_mirror_is_read": "the stored source holds 308 unit rows ending at id 1306 while the loaded table v1 answered from holds 429 ending at 1431; a client cannot apply the content patches, so both figures are measured and both are recorded rather than one being quietly preferred"
+	},
+	"corrections": [
+		{
+			"changed_a_conclusion": false,
+			"consequence": "the encoding contrast is real but applies to eight columns, not nine; the ninth is prose in either form",
+			"inherited": "the committed mirror stores the nine combat columns as integers while the served table stores them as strings",
+			"measured": "eight of the nine are whole JSON numbers on all 429 mirror rows; the ninth, best_against, is a JSON string in BOTH tables (429 of 429)"
+		},
+		{
+			"changed_a_conclusion": false,
+			"consequence": "the claim was false as written; the honest claim is that every argument is a local _whole_number already validated, and that is pinned instead",
+			"inherited": "the typed-result module never calls int() on a reported value",
+			"measured": "it makes 7 int() calls, wrapping destroyed, instant, unit, resolved, count, amount and value"
+		},
+		{
+			"changed_a_conclusion": false,
+			"consequence": "the real limitation is the opposite one -- a def at the START of a docstring line IS counted -- and that is what is pinned now",
+			"inherited": "the Python function-name scan over-counts a commented definition",
+			"measured": "it counts none: strip_edges leaves the #, and the scan then requires the line to begin with 'def '"
+		},
+		{
+			"changed_a_conclusion": false,
+			"consequence": "the check is now element-for-element equality against the committed file order, which is stronger than set equality",
+			"inherited": "the observed unaddressable answer lists the committed unit ids in ascending order",
+			"measured": "it lists them in the committed mirror's own row order, which is not sorted; sorting either side yields 39 positional disagreements"
+		},
+		{
+			"changed_a_conclusion": false,
+			"consequence": "the harness and the suite both place combat third; the banner check compares a whole list, so a wrong order fails a passing phase",
+			"inherited": "the combat route is the fourth route, so it belongs last in the startup banner",
+			"measured": "run.py prints sorted(ROUTES), and the sorted order is collect, collection, COMBAT, magic"
+		},
+		{
+			"changed_a_conclusion": true,
+			"consequence": "renamed _report_block and made kind-preserving; two chained % operations in the same module were also runtime-only failures, found by the fail-closed walk and now guarded mechanically",
+			"inherited": "the typed result has a function named _mapping",
+			"measured": "the delivered module's _mapping stringified every report value, turning destruction.applied into the string 'false' -- so its own boolean refusal check raised an engine error and NO real answer could be accepted"
+		},
+		{
+			"changed_a_conclusion": true,
+			"consequence": "both are now refused; they are reports of a mutation this route has no write path for, and a success whose own fields contradicted it",
+			"inherited": "an answer may report a changed leaf path or a document that moved and still parse",
+			"measured": "the delivered parser accepted a non-empty leaf_paths_changed and a document_unchanged of false"
+		},
+		{
+			"changed_a_conclusion": false,
+			"consequence": "replaced with a null committed value on a present key, and a seven-case family built on the absent-key answer where the rules actually bite",
+			"inherited": "two fail-closed cases exercised the absent-key gate rules",
+			"measured": "both were applied to the unit-1001 answer, where present is true: one was a no-op and one was a legitimate false verdict on a PRESENT key"
+		}
+	],
+	"enforced_by": {
+		"client_computes_a_destruction_count": "_check_intent_body + _check_absent_derivation_helpers + _check_domain_inventory + _check_fail_closed (the derived-destruction-count cases)",
+		"client_computes_damage": "_check_no_client_arithmetic (guard A, empty exception list) + _check_absent_derivation_helpers + _check_domain_reserved_stems + _check_fail_closed (the derived-damage cases)",
+		"client_credits_a_ledger": "_check_fail_closed (the ledger_credited case) + _check_live (the empty ledger assertion)",
+		"client_evaluates_a_gate": "_check_no_line_compares_two_reported_values + _check_fail_closed (the enforced-gate cases)",
+		"client_filters_an_identity": "_check_intent_body (two fields, and the action parameter never reaching the body)",
+		"client_relates_two_reported_values": "_check_no_line_compares_two_reported_values (containment + the operator-gated pair rule, with a positive control)",
+		"parity_with_legacy_claimed": "not a claim; v1 is new authority and the legacy branch's outcome is client-dictated, so there is no parity to claim",
+		"unsupported_intent_touches_transport": "test_server_v1.gd; this suite asserts the intent LEFT its unsupported table (_check_unsupported_intent_left_the_table)"
+	},
+	"injection_probes": {
+		"asserted_in_run": [
+			"the pinned whole function inventories, as data",
+			"the reserved-stem predicate, by planted positive and stem-free controls",
+			"the Python name scan's own limitations, by four hand-built strings"
+		],
+		"every_probe_reported_at_least_one_fail_line": true,
+		"every_restore_byte_identical": true,
+		"measured_total_fail_lines": 17,
+		"transcribed_from_external_harness_run": [
+			{
+				"borrows_reserved_stem": true,
+				"fail_lines": 3,
+				"file": "server_v1_combat_result.gd",
+				"probe": "client destruction_count_for(unit)"
+			},
+			{
+				"borrows_reserved_stem": true,
+				"fail_lines": 3,
+				"file": "server_v1_combat_result.gd",
+				"probe": "client honor_payout(honor) -- SUFFIXED helper"
+			},
+			{
+				"borrows_reserved_stem": false,
+				"fail_lines": 2,
+				"file": "server_v1_combat_result.gd",
+				"probe": "client column_pick(row) -- borrows NO stem"
+			},
+			{
+				"borrows_reserved_stem": true,
+				"fail_lines": 4,
+				"file": "server_v1_combat.py",
+				"probe": "domain destruction_count_for()"
+			},
+			{
+				"borrows_reserved_stem": true,
+				"fail_lines": 3,
+				"file": "server_v1_combat.py",
+				"probe": "domain honor_payout_x() -- SUFFIXED helper"
+			},
+			{
+				"borrows_reserved_stem": false,
+				"fail_lines": 2,
+				"file": "server_v1_combat.py",
+				"probe": "domain column_pick() -- borrows NO stem"
+			}
+		],
+		"which_guard_is_the_real_gate": "the pinned whole inventory. The stem-free probes score LOWER (2) than the stem-bearing ones (3-4), because the stem scan adds a second independent detection - so the reserved-stem check is the belt and the inventory is the gate, which is the shape godot-friends measured and this line reproduces"
+	},
+	"intent": {
+		"action": "combat",
+		"action_is_forwarded": false,
+		"client_local_codes": [
+			"unsupported_by_server_v1",
+			"bad_request"
+		],
+		"combat_path": "/v1/combat",
+		"facade_return_type": "Variant",
+		"facade_widening_is_the_fourth": true,
+		"impl_return_types": {
+			"scripts/gameapi/fake_api.gd": "CombatFlow.CombatResult",
+			"scripts/gameapi/legacy_v0_api.gd": "CombatFlow.CombatResult",
+			"scripts/gameapi/server_v1_api.gd": "ServerV1Combat.CombatAuthorityResult"
+		},
+		"protocol": "server-v1",
+		"request_fields": [
+			"player_id",
+			"unit_id"
+		]
+	},
+	"limits": {
+		"branch_wire_shape_is_client_reachable": false,
+		"client_sees_a_before_state": false,
+		"damage_rule_is_derived": false,
+		"destruction_count_is_derived": false,
+		"fixture_is_a_captured_legacy_oracle": false,
+		"fixtures_are_observed_v1_answers": true,
+		"gate_rule_is_derived": false,
+		"ledger_rule_is_derived": false,
+		"legacy_branch": "command.py:862-875",
+		"legacy_command": "end_attack",
+		"legacy_destruction_count_is_client_dictated": true,
+		"legacy_ledger_helper": "engine.py:149-170",
+		"live_phase_asserts_an_empty_document_diff": true,
+		"live_phase_expects_a_save_mutation": false,
+		"live_phase_seeds_nothing": true,
+		"pixel_parity": false,
+		"python_name_scan_over_counts_a_comment": true,
+		"resurrectable_gate_zero_unexercised_live": true,
+		"team_gate_row_list_unexercised_live": true,
+		"v1_routes_delivered_total": 4,
+		"windowed_capture": false
+	},
+	"modules": {
+		"scripts/gameapi/server_v1_api.gd": {
+			"bytes": 24135,
+			"pure_lf": false,
+			"raw_sha256": "2b189df82fae74ca734f4ece4841a6f30604543227467d7453785137cfa0ee1f"
+		},
+		"scripts/gameapi/server_v1_combat_result.gd": {
+			"bytes": 29142,
+			"pure_lf": true,
+			"raw_sha256": "b3f8694dbc2f60e2309150efa4bba31754b138a0dbb86e5261d411e30fb419c7"
+		}
+	},
+	"modules_are_pure_lf": false,
+	"observed_answers": {
+		"captured_over": "the real ASGI stack against a disposable corpus",
+		"distinct_codes": [
+			"client_dictated_destruction",
+			"client_supplied_delta",
+			"malformed_request",
+			"unaddressable_row",
+			"unknown_player",
+			"unknown_request_field"
+		],
+		"keys_the_parser_reads_no_field_of": [
+			"ledger_covered_by"
+		],
+		"refusal_condition_count": 7,
+		"refusal_conditions": [
+			"a BUILDING id offered as a unit",
+			"a client-sent resource delta",
+			"a field the intent schema does not define",
+			"a non-canonical identity form",
+			"a player with no save document",
+			"a request carrying the branch's own wire shape",
+			"identity naming no committed unit row"
+		],
+		"retyped_by_hand": false,
+		"success_top_level_keys": [
+			"action",
+			"combat",
+			"committed",
+			"damage_derived",
+			"derivation_performed",
+			"derived_damage",
+			"derived_destruction_count",
+			"destruction",
+			"document_unchanged",
+			"gates",
+			"gates_enforced",
+			"instant",
+			"leaf_paths_changed",
+			"ledger_covered_by",
+			"ledger_credited",
+			"preserved_branch_behaviour",
+			"proof",
+			"protocol",
+			"resources_after",
+			"result",
+			"rows_destroyed",
+			"stored_resources_compared",
+			"team_asymmetry"
+		],
+		"successes": 2
+	},
+	"refusals": {
+		"client_local_codes_are_server_codes": false,
+		"declared_by_the_shared_table": 20,
+		"domain_named_codes": [
+			"CLIENT_DICTATED_DESTRUCTION",
+			"MALFORMED_REQUEST",
+			"POST_CONDITION_VIOLATION",
+			"UNADDRESSABLE_ROW",
+			"UNKNOWN_PLAYER",
+			"UNREADABLE_CONTENT",
+			"UNREADABLE_STATE"
+		],
+		"expected": {
+			"client_dictated_destruction": [
+				"CLIENT_DICTATED_DESTRUCTION",
+				409,
+				true
+			],
+			"client_supplied_delta": [
+				"CLIENT_SUPPLIED_DELTA",
+				400,
+				false
+			],
+			"malformed_request": [
+				"MALFORMED_REQUEST",
+				400,
+				true
+			],
+			"unaddressable_row": [
+				"UNADDRESSABLE_ROW",
+				409,
+				true
+			],
+			"unknown_player": [
+				"UNKNOWN_PLAYER",
+				404,
+				true
+			],
+			"unknown_request_field": [
+				"UNKNOWN_REQUEST_FIELD",
+				400,
+				false
+			]
+		}
+	},
+	"report": "combat-v1-report-v1",
+	"typed_result": {
+		"fail_closed_cases": 110,
+		"proof_checks": [
+			"identity_resolved_to_reported_row",
+			"reported_gates_match_content_and_state",
+			"no_leaf_path_changed",
+			"whole_document_unchanged",
+			"resources_unchanged"
+		],
+		"refuses_a_changed_leaf_path": true,
+		"refuses_a_credited_ledger": true,
+		"refuses_a_moved_document": true,
+		"refuses_a_nonzero_rows_destroyed": true,
+		"refuses_absent_read_as_zero": true,
+		"refuses_an_enforced_gate": true,
+		"reported_as": "strings; the committed encoding, never read as numbers",
+		"reported_committed_columns": [
+			"attack",
+			"defense",
+			"life",
+			"attack_interval",
+			"attack_range",
+			"best_against",
+			"best_against_mult",
+			"min_level",
+			"syringes"
+		],
+		"stored_resource_count": 7,
+		"stored_resource_names": [
+			"xp",
+			"gold",
+			"wood",
+			"oil",
+			"steel",
+			"cash",
+			"mana"
+		]
+	}
+}

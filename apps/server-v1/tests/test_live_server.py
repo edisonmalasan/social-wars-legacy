@@ -466,17 +466,24 @@ class CorpusContainmentTests(unittest.TestCase):
         # tested the temp root instead, and passed for any path under it.
         self.assertTrue(Path(banner["corpus"]).name.startswith(TEMP_PREFIX))
         self.assertEqual(port, banner["port"])
-        # A count pin the third route legitimately moved: the banner lists the
-        # served inventory verbatim and the magic line added one row to it.  The
-        # pin is amended in place with its **order** asserted too, because a
-        # sorted or set-derived banner would satisfy a subset test and not this
-        # one -- and the order is the declaration order in ``server_v1_app.ROUTES``,
-        # which is what makes the banner a report rather than a rendering.
+        # A count pin two routes legitimately moved: the banner lists the
+        # served inventory verbatim, the magic line added one row to it, and the
+        # combat line added another.  The pin is amended in place with its
+        # **order** asserted too, because a sorted or set-derived banner would
+        # satisfy a subset test and not this one -- and the order is the
+        # declaration order in ``server_v1_app.ROUTES``, which is what makes the
+        # banner a report rather than a rendering.  The count is asserted
+        # separately so a banner that grew *and* lost a row cannot pass.
         self.assertEqual(
-            ["POST /v1/collect", "POST /v1/collection", "POST /v1/magic"],
+            [
+                "POST /v1/collect",
+                "POST /v1/collection",
+                "POST /v1/combat",
+                "POST /v1/magic",
+            ],
             banner["routes"],
         )
-        self.assertEqual(3, len(banner["routes"]))
+        self.assertEqual(4, len(banner["routes"]))
         self.assertEqual(FIXTURE_INSTANT, banner["fixed_now"])
 
     def test_no_corpus_directory_survives_a_graceful_stop(self) -> None:
@@ -543,6 +550,15 @@ class StartupContractTests(unittest.TestCase):
         # against.  **This is an extension of the pin, not a loosening of it** —
         # the assertion is still an exact set, so a fourth content field will
         # also have to be added here deliberately.
+        #
+        # ``unit_rows`` was added by the combat line for that same reason and by
+        # that same mechanism: the fourth route resolves a committed **unit** id
+        # against the ``type == "u"`` rows, and the row count is what says how
+        # many rows that lookup could ever resolve into.  The figure is **not**
+        # the whole table: it is the count *after* the committed type column is
+        # applied, so it is a different number from ``item_entries`` and from
+        # ``distinct_item_ids``, and a reader who expects it to match either is
+        # reading it as the wrong thing.
         self.assertEqual(
             {
                 "applied_mods",
@@ -555,11 +571,13 @@ class StartupContractTests(unittest.TestCase):
                 "missing_patches",
                 "removed_duplicate_items",
                 "skipped_loader_steps",
+                "unit_rows",
             },
             set(banner["content"]),
         )
         self.assertEqual(10, banner["content"]["collection_rows"])
         self.assertEqual(10, banner["content"]["magic_rows"])
+        self.assertEqual(429, banner["content"]["unit_rows"])
         self.assertEqual(["make_dynamic"], banner["content"]["skipped_loader_steps"])
 
     def test_an_unknown_flag_is_refused_rather_than_ignored(self) -> None:

@@ -763,10 +763,32 @@ func sell_stored_item_town(user_id: String,
 ## transport is touched, and the refusal is a NAMED one, separate from the
 ## server-side eligibility check: "you may not dictate this" and "there is
 ## nothing to destroy" are different answers (design D2).
+## ## The declared return type is `Variant`, and that is the **fourth** widening
+##
+## Measured, not assumed: the three implementations genuinely disagree on what a
+## combat answer **is**. `fake_api.gd` and `legacy_v0_api.gd` both return
+## `CombatFlow.CombatResult`, which is the projection of the **preserved** server
+## and carries a destruction figure and a `resolve` action. `ServerV1Api` returns
+## `ServerV1Combat.CombatAuthorityResult`, which reports `rows_destroyed: 0`
+## unconditionally and a proof that nothing changed
+## (`scripts/gameapi/server_v1_combat_result.gd` states the full reason).
+##
+## Narrowing v1's answer into `CombatFlow.CombatResult` would require this client
+## to **invent** a destruction figure v1 refused to derive, or to report a
+## `resolve` action against a route that has exactly one action and no operation
+## field at all. Either would put a rule in the client that the server does not
+## have - which is the thing this milestone exists to stop.
+##
+## The cost of the widening is measured rather than assumed: **every** call site
+## of `combat_town` in this project binds its result to a `Variant` or an
+## untyped local, so no caller loses a compile-time type, and the concrete types
+## of all three implementations are asserted in `tests/test_server_v1.gd` and
+## `tests/test_combat_v1.gd` so a fourth implementation cannot quietly add a
+## fourth shape.
 func combat_town(user_id: String, action: Variant,
-		addressing: Variant) -> CombatFlow.CombatResult:
+		addressing: Variant) -> Variant:
 	combat_requests += 1
-	var result: CombatFlow.CombatResult = await _impl.combat_town(
+	var result: Variant = await _impl.combat_town(
 		user_id, action, addressing)
 	return result
 

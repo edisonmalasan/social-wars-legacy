@@ -97,6 +97,20 @@ class RefusalCode(str, Enum):
     #: recorded literal bound, so the bounded derivation cannot produce a value
     #: from it.  The recorded counter is reported, never rewritten (design D6).
     COUNTER_ABOVE_CAP = "counter_above_cap"
+    #: The request dictated how many rows the transaction destroys.  The
+    #: preserved branch derives its count as ``max(0, unit[2] - unit[3])``
+    #: (``command.py:868``) over two numbers the **client** sends, so the count
+    #: is client-dictated and v1 refuses it outright: it is not applied, and it
+    #: is not narrowed to a v1-derived figure either, because no committed value
+    #: names an outcome for this action (design D5).
+    #:
+    #: **One code, not four.**  The same branch also reads and discards four
+    #: other client quantities — ``honor``, ``resources``, ``resources_victim``
+    #: and ``townhall_gold``.  Those are refused by the existing
+    #: ``client_supplied_delta`` **key-name** channel rather than by a code each,
+    #: because a code per un-derivable quantity is how a closed vocabulary stops
+    #: being closed.
+    CLIENT_DICTATED_DESTRUCTION = "client_dictated_destruction"
 
     # -- server-side integrity: never a client-visible gameplay answer -------
     UNREADABLE_STATE = "unreadable_state"
@@ -131,6 +145,7 @@ REFUSAL_HTTP_STATUS: Dict[RefusalCode, int] = {
     RefusalCode.INSUFFICIENT_CASH: 409,
     RefusalCode.UNKNOWN_MAGIC_ID: 409,
     RefusalCode.COUNTER_ABOVE_CAP: 409,
+    RefusalCode.CLIENT_DICTATED_DESTRUCTION: 409,
     # Something on this server is wrong.  These are deliberately *not*
     # disguised as gameplay answers.
     RefusalCode.UNREADABLE_STATE: 500,
@@ -196,6 +211,10 @@ REFUSAL_CODE_PURPOSE: Dict[RefusalCode, str] = {
         "the player's recorded counter for this magic is already above the "
         "recorded literal bound, so no next value can be derived from it"
     ),
+    RefusalCode.CLIENT_DICTATED_DESTRUCTION: (
+        "the request carried a destruction count, which v1 refuses rather than "
+        "applies or narrows to a v1-derived figure"
+    ),
     RefusalCode.UNREADABLE_STATE: "stored state this service cannot read",
     RefusalCode.UNREADABLE_CONTENT: "committed content this service cannot read",
     RefusalCode.POST_CONDITION_VIOLATION: (
@@ -226,6 +245,21 @@ V0_EQUIVALENT_CODES: Dict[RefusalCode, str] = {
     RefusalCode.INSUFFICIENT_CASH: "(none — v0 charges nothing)",
     RefusalCode.UNKNOWN_MAGIC_ID: "unknown_magic_id",
     RefusalCode.COUNTER_ABOVE_CAP: "counter_above_cap",
+    # **The status difference is deliberate, so it is recorded here rather than
+    # left to be discovered as an inconsistency.**  The counterpart is
+    # ``apps/compat-api/combat_envelope.py``'s refusal named
+    # ``client_dictated_destruction``, the same literal v1 reuses as its code
+    # *value*; its rule text is the ``CLIENT_DICTATED_REFUSAL`` constant there,
+    # which v1 does not import (the table is documentation, not a dependency).
+    #
+    # v0's answer is a **4xx** because v0 applies the client-sent resource
+    # vector *before* the dispatcher chain opens (``command.py:40``), so a
+    # destruction figure reaches stored state as part of a request v0 treats as
+    # structurally wrong.  v1's answer is a **409** because the request is
+    # well-formed and the player exists: it names an action whose outcome
+    # conflicts with what the client is allowed to decide.  The codes agree; the
+    # statuses do not, and deliberately so.
+    RefusalCode.CLIENT_DICTATED_DESTRUCTION: "client_dictated_destruction",
     RefusalCode.UNREADABLE_STATE: "internal_error",
     RefusalCode.UNREADABLE_CONTENT: "internal_error",
     RefusalCode.POST_CONDITION_VIOLATION: "internal_error",
