@@ -8,15 +8,31 @@ receives, and transactions demonstrate both end to end. This is the boundary the
 branches still lacking modern authority will land in, so it is specified before any of
 them are ported rather than after.
 
-Two figures are corrected here rather than inherited, because a spec is the source of
+Three figures are corrected here rather than inherited, because a spec is the source of
 truth and a known-falsified number in one is worse than an absent one. "One transaction"
 was true when this capability was written and is true of neither end: `collect` and
 `complete_collection` are now both specified below. "The 39 legacy branches with no
 modern route" was `tools/route-coverage`'s **citation** count promoted into a coverage
-claim; measured by executing each committed envelope builder, **40** of the 63 named
-branches are dispatched by a v0 route and **23** by none, and **2** branches now have
-authoritative v1 routes, leaving **61** without one. The tool answers the question it
-was built to answer and was not changed.
+claim. **The correction that replaced it was itself wrong by one.** It read **40** of the
+63 named branches as dispatched by a v0 route and **23** as dispatched by none, on the
+strength of `docs/legacy-m13-unrouted-branches.md`, whose route table listed
+`buy_mana_new` under `/v0/magic`. **`buy_mana_new` is not dispatched.** `magic_envelope`
+declares `MAGIC_COMMANDS` as the two-tuple `(buy_magic, use_magic)`, parks
+`buy_mana_new` as `NO_OP_COMMAND` with the note that it is "**not** delivered", and its
+only other occurrence sits inside `REPORTED_DAMAGE_VOCABULARY`, whose own rule field
+states that "none of it is read to compute a value, gate an operation, or derive a limit";
+`compat_service.py` contains no occurrence of the name at all. This is the identical
+situation to `push_queue_unit2` at `queue_envelope`, which the same document caught and
+excluded by hand; the caution was applied to one parked branch and missed on the other.
+The split is therefore **39**
+dispatched by a v0 route and **24** by none. **2** branches have authoritative v1 routes,
+leaving **61** without one; that figure is independent of routing and is unchanged. It is
+restated because an investigation accompanying this correction proposed raising it to
+**62** by subtracting a single authoritative branch, which would have been arithmetically
+wrong in the other direction: `complete_collection` is authoritative too.
+`tools/route-coverage` answers the question it was built to answer and was not changed;
+it had already filed `buy_mana_new` under `branches_mentioned_by_name_only` with a
+negation marker.
 
 ## Requirements
 
