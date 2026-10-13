@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""The HTTP surface: three routes, and no arithmetic (design D2).
+"""The HTTP surface: four routes, and no arithmetic (design D2).
 
-``create_app`` returns a FastAPI application with exactly three delivered routes,
-``POST /v1/collect``, ``POST /v1/collection``, and ``POST /v1/magic``.  Each
-route's entire job, per design D2, is:
+``create_app`` returns a FastAPI application with exactly four delivered routes,
+``POST /v1/collect``, ``POST /v1/collection``, ``POST /v1/combat``, and
+``POST /v1/magic``.  Each route's entire job, per design D2, is:
 
 1. hand the request bytes to :mod:`server_v1_intent`, which turns them into an
    intent or refuses;
@@ -51,6 +51,7 @@ from fastapi.responses import JSONResponse
 
 from server_v1_collection import complete_collection
 from server_v1_collect import collect
+from server_v1_combat import apply_combat
 from server_v1_content import CommittedContent
 from server_v1_intent import intent_from_json
 from server_v1_magic import apply_magic
@@ -59,13 +60,14 @@ from server_v1_refusals import Refusal
 from server_v1_repository import SaveRepository
 from server_v1_settings import PROTOCOL
 
-#: The three delivered routes, named so a test enumerates routes from a
+#: The four delivered routes, named so a test enumerates routes from a
 #: declaration rather than from a regex over the source.  One row per route:
 #: adding a route adds a row, and ``test_app.py`` asserts this mapping agrees
 #: with the paths declared below.
 ROUTES: Dict[str, str] = {
     "POST /v1/collect": "collect",
     "POST /v1/collection": "collection",
+    "POST /v1/combat": "combat",
     "POST /v1/magic": "magic",
 }
 
@@ -109,6 +111,20 @@ COLLECTION_PATH = "/v1/collection"
 #: legacy branch name would describe it.  ``tests/test_app.py`` asserts the
 #: literal agrees with :data:`ROUTE_PREFIX` so the duplication cannot drift.
 MAGIC_PATH = "/v1/magic"
+
+#: The fourth route this line delivers, and a literal for the same reason as the
+#: other three.
+#:
+#: The path is ``/v1/combat``, and **not** ``/v1/attack`` and not
+#: ``/v1/end_attack``.  Both rejected spellings are worth naming because each
+#: would assert something false about what the route can do: ``attack`` names a
+#: second action the route does not have (there is one, design D1), and
+#: ``end_attack`` inherits the legacy command name -- the inheritance
+#: :data:`COLLECTION_PATH` records as the reason a route names the **surface**.
+#: ``combat`` is the surface: it is what a client asks about, and the preserved
+#: branch's own name for a transaction that destroys rows is not something this
+#: route can do, because it destroys nothing.
+COMBAT_PATH = "/v1/combat"
 
 
 def create_app(
@@ -159,15 +175,48 @@ def create_app(
             )
         return JSONResponse(status_code=SUCCESS_HTTP_STATUS, content=_envelope(outcome))
 
+    @app.post(COMBAT_PATH)
+    async def post_combat(request: Request) -> JSONResponse:
+        """Adapt one combat intent, call the domain, translate the outcome.
+
+        Body for body identical to the other three, and for the reason
+        :func:`post_magic` records: there is nothing about a combat request the
+        transport interprets.  In particular the transport does **not** decide
+        whether the request carries a destruction shape -- that recognition
+        happens in the intent layer and the refusal is the domain's, so a route
+        that grew a ``destruction_request`` branch here would be a transport
+        deciding a question about what a transaction would have destroyed.
+
+        The route is a *report*, so its success status is the same
+        ``SUCCESS_HTTP_STATUS`` the mutating routes use: the request succeeded
+        and the answer is that nothing changed.  A route whose success meant "a
+        battle happened" would be the anti-pattern design D1 refuses.
+        """
+        body = await request.body()
+        parsed = intent_from_json("combat", body)
+        if isinstance(parsed, Refusal):
+            return JSONResponse(
+                status_code=parsed.http_status, content=_envelope(parsed)
+            )
+
+        outcome: Outcome = apply_combat(parsed, content, repository, clock())
+        if isinstance(outcome, Refusal):
+            return JSONResponse(
+                status_code=outcome.http_status, content=_envelope(outcome)
+            )
+        return JSONResponse(status_code=SUCCESS_HTTP_STATUS, content=_envelope(outcome))
+
     @app.post(MAGIC_PATH)
     async def post_magic(request: Request) -> JSONResponse:
         """Adapt one magic intent, call the domain, translate the outcome.
 
-        Deliberately identical to the other two handlers, body for body.  The
-        three routes have nothing to distinguish them: the operation the client
+        Deliberately identical to the other three handlers, body for body.  The
+        four routes have nothing to distinguish them: the operation the client
         asked for is **inside the parsed intent**, not a second parameter here,
-        so a fourth route cannot grow a per-route branch without failing the
-        structural guard that compares these three function bodies.
+        so a fifth route cannot grow a per-route branch without failing the
+        structural guard that compares these four function bodies
+        (``tests/test_app.py::test_every_route_handler_has_the_same_body_shape``,
+        which is what makes this claim true rather than asserted).
         """
         body = await request.body()
         parsed = intent_from_json("magic", body)
@@ -201,6 +250,7 @@ def _envelope(value: Any) -> Dict[str, Any]:
 
 __all__ = [
     "COLLECT_PATH",
+    "COMBAT_PATH",
     "COLLECTION_PATH",
     "MAGIC_PATH",
     "ROUTES",

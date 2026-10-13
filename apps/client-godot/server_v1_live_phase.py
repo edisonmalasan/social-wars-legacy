@@ -109,6 +109,10 @@ SERVICE = os.path.join("apps", "server-v1", "run.py")
 COLLECT_PATH = "/v1/collect"
 COLLECTION_PATH = "/v1/collection"
 MAGIC_PATH = "/v1/magic"
+#: The combat route is a **report**, not a mutation: it resolves a committed unit
+#: identity, reports both ``push_dead_unit`` gates and destroys nothing. It has no
+#: ``--expect-save-mutation`` phase because there is no save to expect to move.
+COMBAT_PATH = "/v1/combat"
 #: The only route paths this harness will write into a summary. A closed set
 #: rather than a free string, because a typo in ``--route-path`` would
 #: otherwise produce a passing phase whose evidence file names a route that
@@ -120,13 +124,14 @@ MAGIC_PATH = "/v1/magic"
 #: routes are named wrongly or reported out of order, and this harness has
 #: already shipped one summary that named the wrong route for a passing phase,
 #: which is the whole reason ``--route-path`` exists in the first place.
-KNOWN_ROUTE_PATHS = (COLLECT_PATH, COLLECTION_PATH, MAGIC_PATH)
+KNOWN_ROUTE_PATHS = (COLLECT_PATH, COLLECTION_PATH, COMBAT_PATH, MAGIC_PATH)
 #: The route list the service must print in its startup banner, **in this exact
 #: order**. Named once so the banner check below and a reader of this file
 #: cannot disagree about how many routes v1 serves or what they are called.
 EXPECTED_BANNER_ROUTES = [
     "POST %s" % COLLECT_PATH,
     "POST %s" % COLLECTION_PATH,
+    "POST %s" % COMBAT_PATH,
     "POST %s" % MAGIC_PATH,
 ]
 STARTUP_DEADLINE_SECONDS = 90

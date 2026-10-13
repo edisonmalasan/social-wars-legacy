@@ -43,11 +43,13 @@ from harness import (
 )
 from server_v1_app import (
     COLLECT_PATH,
+    COMBAT_PATH,
     MAGIC_PATH,
     ROUTE_PREFIX,
     ROUTES,
     create_app,
 )
+from server_v1_intent import INTENT_SCHEMAS
 from server_v1_outcomes import SUCCESS_HTTP_STATUS
 
 FIXTURE_INSTANT = 1790705901
@@ -92,6 +94,29 @@ def non_docstring_strings(tree: ast.Module) -> List[str]:
     ]
 
 
+#: The bare function names a route handler may legitimately call.  Anything else
+#: called as a bare ``Name`` is a domain entry point and is folded to a
+#: placeholder, so the shape comparison is about structure rather than about
+#: which slice each route reaches.
+TRANSPORT_VOCABULARY = frozenset(
+    {
+        "JSONResponse",
+        "dict",
+        "intent_from_json",
+        "isinstance",
+    }
+)
+
+
+def _is_docstring_statement(node: ast.stmt) -> bool:
+    """True for a bare string expression in statement position."""
+    return (
+        isinstance(node, ast.Expr)
+        and isinstance(node.value, ast.Constant)
+        and isinstance(node.value.value, str)
+    )
+
+
 class Route:
     """A synchronous facade over the in-process ASGI caller.
 
@@ -125,13 +150,18 @@ class TransportStructureTests(unittest.TestCase):
         """A guard satisfied by an empty scan is the defect class itself.
 
         The set is exact and is **extended**, never loosened, when a route is
-        added: ``POST /v1/magic`` was appended by the third deliver line and the
-        assertion stayed an equality, so a fourth route still has to be added
-        here deliberately.
+        added: ``POST /v1/magic`` was appended by the third deliver line and
+        ``POST /v1/combat`` by the fourth, and the assertion stayed an equality
+        both times, so a fifth route still has to be added here deliberately.
         """
         self.assertIsInstance(transport_source(), ast.Module)
         self.assertEqual(
-            {"POST /v1/collect", "POST /v1/collection", "POST /v1/magic"},
+            {
+                "POST /v1/collect",
+                "POST /v1/collection",
+                "POST /v1/combat",
+                "POST /v1/magic",
+            },
             set(ROUTES),
         )
 
@@ -141,6 +171,8 @@ class TransportStructureTests(unittest.TestCase):
         self.assertEqual("/v1/collect", COLLECT_PATH)
         self.assertEqual(ROUTE_PREFIX + "/magic", MAGIC_PATH)
         self.assertEqual("/v1/magic", MAGIC_PATH)
+        self.assertEqual(ROUTE_PREFIX + "/combat", COMBAT_PATH)
+        self.assertEqual("/v1/combat", COMBAT_PATH)
 
     def test_the_transport_declares_no_arithmetic_operator(self) -> None:
         """No ``+``, ``-``, ``*``, ``/``: the transport may not compute anything.
@@ -192,6 +224,92 @@ class TransportStructureTests(unittest.TestCase):
             and node.value.id == "RefusalCode"
         }
         self.assertEqual(set(), codes)
+
+    def test_every_route_handler_has_the_same_body_shape(self) -> None:
+        """The claim ``post_magic``'s docstring makes, made mechanical.
+
+        That docstring asserted that "a fourth route cannot grow a per-route
+        branch without failing the structural guard that compares these three
+        function bodies" -- and **no such guard existed**.  The three whole-module
+        guards above (no arithmetic, no status literal, no refusal code) cover a
+        per-route branch only if the branch commits one of those three sins; a
+        branch that inspects the parsed intent, or sends a different success
+        body, would have passed all of them.  The claim was an unearned
+        assertion in a source docstring, which is the defect class this
+        repository has recorded repeatedly, so this test makes it true instead of
+        leaving the prose standing.
+
+        Two differences between the handlers are **legitimate** and are
+        normalised away rather than forbidden:
+
+        1. the route literal in the decorator -- each route declares its own
+           :data:`COMBAT_PATH`-style constant, and the decorator is the one
+           place that name appears; and
+        2. the action name handed to ``intent_from_json``, which is the single
+           string that tells two otherwise-identical handlers apart; and
+        3. the **domain function** each handler calls -- ``collect``,
+           ``complete_collection``, ``apply_magic``, ``apply_combat`` -- because
+           that name is what the route exists to reach.  Every *other* bare
+           function call is compared by name, so a handler that grew a call to
+           some fourth helper would fail here.
+
+        The docstring is also excluded, because each handler explains itself and
+        the prose legitimately differs -- four handlers explaining the same body
+        identically would be the duplication worth removing, not adding.
+
+        Everything else must match exactly: the ``await``, the two refusal
+        translations, the domain call, and the success return.
+        """
+        shapes = {}
+        for node in ast.walk(transport_source()):
+            if not isinstance(node, ast.AsyncFunctionDef):
+                continue
+            if not node.name.startswith("post_"):
+                continue
+            body = [
+                statement
+                for statement in node.body
+                if not _is_docstring_statement(statement)
+            ]
+            # The action name is the one string a handler may legitimately differ
+            # by; fold it to a placeholder so the comparison is about structure.
+            for inner in ast.walk(ast.Module(body=list(body), type_ignores=[])):
+                if (
+                    isinstance(inner, ast.Constant)
+                    and isinstance(inner.value, str)
+                    and inner.value in INTENT_SCHEMAS
+                ):
+                    inner.value = "<action>"
+                # The domain entry point is the third legitimate difference:
+                # each route calls its own domain function, and that name is
+                # what the route is *for*.  Only a bare ``Name`` call that is not
+                # part of the transport's own vocabulary is folded, so a handler
+                # that called some other helper would still be compared by name.
+                if (
+                    isinstance(inner, ast.Call)
+                    and isinstance(inner.func, ast.Name)
+                    and inner.func.id not in TRANSPORT_VOCABULARY
+                ):
+                    inner.func = ast.Name(id="<domain>", ctx=ast.Load())
+            shapes[node.name] = ast.dump(ast.Module(body=list(body), type_ignores=[]))
+
+        self.assertEqual(
+            {"post_collect", "post_collection", "post_combat", "post_magic"},
+            set(shapes),
+            "every POST route must be a handler this guard compares",
+        )
+        distinct = set(shapes.values())
+        self.assertEqual(
+            1,
+            len(distinct),
+            "the %d route handlers differ in shape:\n%s"
+            % (
+                len(shapes),
+                "\n".join(
+                    "%s: %s" % (name, shape[:400]) for name, shape in shapes.items()
+                ),
+            ),
+        )
 
     def test_the_route_prefix_is_v1_and_not_v0(self) -> None:
         self.assertEqual("/v1", ROUTE_PREFIX)

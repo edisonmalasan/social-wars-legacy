@@ -573,8 +573,9 @@ func _check_grant_codes_live_in_the_grant_module() -> void:
 	for line in refusals.split("\n"):
 		if _looks_like_status_row(str(line)):
 			declared += 1
-	check_eq(declared, 19,
-		"the committed refusal table still maps exactly nineteen codes")
+	check_eq(declared, 20,
+		"the committed refusal table still maps exactly twenty codes, amended "
+		+ "from nineteen when client_dictated_destruction joined it")
 
 
 ## The two client-local codes are minted here, never sent to v1, and therefore
@@ -699,7 +700,8 @@ func _check_absent_derivation_helpers() -> void:
 		API_SCRIPT: [
 			"_ready", "_call", "_failure", "_transport_message",
 			"resolved_endpoint", "_unsupported", "_intent_body",
-			"_collection_intent_body", "_magic_intent_body", "collect_income",
+			"_collection_intent_body", "_combat_intent_body",
+			"_magic_intent_body", "collect_income",
 			"complete_collection_town", "list_sessions", "get_bootstrap",
 			"place_building", "purchase_item", "move_building", "sell_building",
 			"store_building", "upgrade_building", "build_construction",
@@ -835,14 +837,24 @@ func _check_widening_justification_is_recorded() -> void:
 	check(body.find("payout") != -1,
 		"and the recorded reason distinguishes a payout from a grant")
 	var api_body := _project_source(API_SCRIPT)
-	# **Count pin, amended in place by the magic line**, which is what moved it:
-	# `magic_town` left the unsupported table because v1 implements it now, so
-	# both the table and the transport's own recorded figure went 22 -> 21. The
-	# collected suite is not the magic suite's owner; the pin is kept as a pin so
-	# a later departure or arrival cannot move it unnoticed.
-	check(api_body.find("twenty-one") != -1,
-		"the transport module's local refusal count was corrected to the "
-		+ "twenty-one intents v1 still does not have")
+	# **Count pin, amended in place twice.** The magic line moved it because
+	# `magic_town` left the unsupported table, taking both the table and the
+	# transport's own recorded figure 22 -> 21; the combat line moved it again
+	# the same way, 21 -> 20, because `combat_town` left too. The collected
+	# suite is not the owner of either; the pin is kept as a pin so a later
+	# departure or arrival cannot move it unnoticed.
+	#
+	# The first version of this guard grepped for the bare word `twenty`, which
+	# would have passed on the word `twenty-two` sitting in the very same
+	# comment -- the comment records the *history* of the count, so the
+	# superseded spellings are still in the text and a substring of `twenty`
+	# cannot tell the live figure from a retired one. Pinning the live phrase
+	# and separately asserting the superseded spelling is GONE is what keeps the
+	# pin worth anything.
+	check(api_body.find("twenty identical consequences") != -1,
+		"the transport module's local refusal count names the live figure")
+	check(api_body.find("twenty-one identical consequences") == -1,
+		"and the superseded twenty-one spelling is gone from the live count")
 	check(facade.find("complete_collection_town") != -1,
 		"and the facade really does declare the second widened intent")
 
@@ -880,9 +892,10 @@ func _check_unsupported_intent_left_the_table() -> void:
 			names.append(candidate.substr(2, candidate.find("\",") - 2))
 	check(closed, "the unsupported table's closing bracket was found, so the "
 		+ "read is bounded by it rather than by the end of the file")
-	check_eq(names.size(), 21,
-		"the collect suite pins exactly the twenty-one intents v1 lacks,"
-		+ " amended from twenty-two when magic_town left the table")
+	check_eq(names.size(), 20,
+		"the collect suite pins exactly the twenty intents v1 lacks,"
+		+ " amended from twenty-two as magic_town and then combat_town left "
+		+ "the table")
 	check(not names.has("complete_collection_town"),
 		"complete_collection_town left the unsupported table, because v1 "
 		+ "implements it now")

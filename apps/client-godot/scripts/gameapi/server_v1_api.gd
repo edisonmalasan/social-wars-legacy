@@ -4,9 +4,9 @@ extends Node
 ##
 ## ## What this implementation delivers, and what it refuses
 ##
-## v1 exposes exactly **three** routes, `POST /v1/collect`,
-## `POST /v1/collection` and `POST /v1/magic`, and this implementation
-## implements exactly those three
+## v1 exposes exactly **four** routes, `POST /v1/collect`,
+## `POST /v1/collection`, `POST /v1/combat` and `POST /v1/magic`, and this
+## implementation implements exactly those four
 ## intents. Every other facade intent answers with the **client-local** code
 ## `unsupported_by_server_v1` and **never touches the transport at all** - which
 ## is the honest answer for a surface that does not exist, and is deliberately
@@ -15,7 +15,7 @@ extends Node
 ## therefore cannot be one of v1's codes.
 ##
 ## Those refusals still return each intent's **own** declared typed result (a
-## `BootData.SellResult` for a sell, a `CombatFlow.CombatResult` for a combat
+## `BootData.SellResult` for a sell, a `RewardFlow.RewardResult` for a reward
 ## action, and so on), built by that type's own `_failure` factory, so the
 ## facade's declared return type keeps holding and a caller that ignores the
 ## error code still gets a well-formed object rather than `null`.
@@ -24,11 +24,13 @@ extends Node
 ##
 ## `list_sessions()` and `get_bootstrap()` refuse too. v1 has no session list
 ## and no bootstrap route, so there is **no v1 answer to model** for them: the
-## typed result carries the local code and nothing else. `collect_income()` and
-## `complete_collection_town()` and `magic_town()` are the three intents whose v1
+## typed result carries the local code and nothing else. `collect_income()`,
+## `complete_collection_town()`, `combat_town()` and `magic_town()` are the four
+## intents whose v1
 ## answers have their
 ## own typed results (`server_v1_collect_result.gd`,
-## `server_v1_collection_result.gd` and `server_v1_magic_result.gd`), because v1's
+## `server_v1_collection_result.gd`, `server_v1_combat_result.gd` and
+## `server_v1_magic_result.gd`), because v1's
 ## shapes genuinely differ from
 ## v0's - see those modules' headers for the full reasons. `GameApi`'s declared
 ## return types for those two are `Variant` with the concrete types named in its
@@ -55,7 +57,6 @@ extends Node
 
 const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
-const CombatFlow = preload("res://scripts/units/combat_flow.gd")
 const ResearchFlow = preload("res://scripts/units/research_flow.gd")
 const QuestFlow = preload("res://scripts/units/quest_flow.gd")
 const RewardFlow = preload("res://scripts/rewards/reward_flow.gd")
@@ -64,6 +65,8 @@ const ServerV1Collect = preload(
 	"res://scripts/gameapi/server_v1_collect_result.gd")
 const ServerV1Collection = preload(
 	"res://scripts/gameapi/server_v1_collection_result.gd")
+const ServerV1Combat = preload(
+	"res://scripts/gameapi/server_v1_combat_result.gd")
 const ServerV1Magic = preload(
 	"res://scripts/gameapi/server_v1_magic_result.gd")
 
@@ -72,6 +75,7 @@ const ServerV1Magic = preload(
 const DEFAULT_ENDPOINT := "http://127.0.0.1:5057"
 const COLLECT_PATH := "/v1/collect"
 const COLLECTION_PATH := "/v1/collection"
+const COMBAT_PATH := "/v1/combat"
 const MAGIC_PATH := "/v1/magic"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
@@ -225,16 +229,72 @@ static func _magic_intent_body(user_id: String, operation: String,
 	}
 
 
+## The fourth implemented intent: a **combat identity**, as intent only.
+##
+## ## What this sends, and what it deliberately does not
+##
+## The body carries a save identity and a committed unit id, and nothing else —
+## no damage, no hit, no destruction count, no expected balance, and **no
+## `action`**. That last omission is the one worth stating: the facade's
+## `combat_town` signature has an `action` parameter because the legacy-v0 route
+## spells its body field `action`, and v1 has **one** action and no operation
+## field at all (design D1). Sending it would invent a second request kind the
+## server does not have, and a server that ignored it would answer a request the
+## client believes it made.
+##
+## `addressing` is the committed unit id and it is sent **exactly as the caller
+## gave it**, including a float or a string form, because v1 refuses a
+## non-canonical identity by name (`unknown_magic_id`) and a client that
+## normalised it first would turn that specific answer into
+## `malformed_request` — the mistake `complete_collection_town` above documents
+## avoiding, in the opposite direction.
+##
+## **No destruction shape can be sent at all**, because none is built here. The
+## preserved branch's wire shape (`attacker_units`) has no field in this request,
+## so the client cannot smuggle a destruction figure even by accident, and v1's
+## `client_dictated_destruction` refusal exists for a caller who builds a body by
+## other means rather than for this one.
+##
+## ## The declared return type changed, and that is recorded
+##
+## This implementation previously returned `CombatFlow.CombatResult` by
+## refusing, and now returns `ServerV1Combat.CombatAuthorityResult`, for the
+## reason `server_v1_combat_result.gd`'s header records in full: the two surfaces
+## disagree on what a combat answer **is**. v0's reports a destruction figure and
+## a `resolve` action; v1's reports `rows_destroyed: 0` unconditionally and a
+## proof that nothing changed. One model absorbing both would have to pick a sign
+## convention for three fields that mean different things in the two.
+func combat_town(user_id: String, action: Variant,
+		addressing: Variant) -> ServerV1Combat.CombatAuthorityResult:
+	var outcome := await _call(COMBAT_PATH, JSON.stringify(
+		_combat_intent_body(user_id, addressing)))
+	if not outcome.get("ok", false):
+		return ServerV1Combat.combat_failure(
+			str(outcome.get("code", ServerV1Collect.CODE_BAD_REQUEST)),
+			str(outcome.get("message", "")))
+	return ServerV1Combat.parse_combat_authority(outcome.get("payload"))
+
+
+## The v1 combat intent: two fields, verbatim. This is the whole request.
+##
+## `action` is accepted by the enclosing function and **not forwarded here**, and
+## that is deliberate rather than forgotten: the signature is the facade's, and
+## `tests/test_combat_v1.gd` asserts this body's key set is exactly `player_id`
+## and `unit_id`, so the omission is measured rather than asserted in a comment.
+static func _combat_intent_body(user_id: String, unit_id: Variant) -> Dictionary:
+	return {"player_id": user_id, "unit_id": unit_id}
+
+
 # --- intents v1 does not have ------------------------------------------------
 #
 # Each answers `unsupported_by_server_v1` through its OWN typed result's
 # `_failure` factory, and none of them touches `_call`. They are grouped rather
 # than interleaved because they are uniform on purpose: there is one decision
-# (v1 exposes **three** routes) and twenty-one identical consequences. The count
-# moved from twenty-two when `POST /v1/magic` landed: `magic_town` joined the three
-# implemented intents above and left this section, and
-# `tests/test_server_v1.gd` pins the remaining twenty-one by name so the move is
-# measured rather than assumed.
+# (v1 exposes **four** routes) and twenty identical consequences. The count moved
+# from twenty-two when `POST /v1/magic` landed and again when `POST /v1/combat`
+# landed: `magic_town` and then `combat_town` joined the implemented intents above
+# and left this section, and `tests/test_server_v1.gd` pins the remaining twenty
+# by name so each move is measured rather than assumed.
 
 
 func list_sessions() -> BootData.SaveListResult:
@@ -364,13 +424,6 @@ func sell_stored_item_town(user_id: String,
 	return _unsupported(BootData.stored_sale_failure(
 		ServerV1Collect.CODE_UNSUPPORTED,
 		"Server v1 exposes no stored-sale route; this client sends no request."))
-
-
-func combat_town(user_id: String, action: Variant,
-		addressing: Variant) -> CombatFlow.CombatResult:
-	return _unsupported(CombatFlow.combat_failure(
-		ServerV1Collect.CODE_UNSUPPORTED,
-		"Server v1 exposes no combat route; this client sends no request."))
 
 
 func reward_town(user_id: String,

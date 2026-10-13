@@ -489,7 +489,18 @@ class VocabularyIsClosedTests(unittest.TestCase):
         """A closed vocabulary that grew to v0's 104 would not be the decision."""
         from server_v1_refusals import RefusalCode
 
-        self.assertLess(len(list(RefusalCode)), 20)
+        # **Why 21, and why the ceiling is a decision prompt rather than a
+        # constant that happened to be written down.**  The table held **19**
+        # codes when the first v1 line delivered it; the combat line adds
+        # **exactly one** (``client_dictated_destruction``) and the table now
+        # holds **20**.  This bound was previously ``< 20``, which meant the
+        # nineteenth-to-twentieth addition could not land without a reviewer
+        # reading a *failing test* — that is the point of the assertion, and it
+        # is why the number moved deliberately rather than being weakened to
+        # ``<=``, which would have removed the prompt while leaving the intent.
+        # At 20 codes the next addition trips this again, so the vocabulary
+        # cannot keep growing without someone deciding that it should.
+        self.assertLess(len(list(RefusalCode)), 21)
         self.assertGreater(len(list(RefusalCode)), 0)
 
     def test_every_code_maps_to_exactly_one_status(self) -> None:

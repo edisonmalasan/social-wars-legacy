@@ -586,6 +586,191 @@ class CommittedContent:
             values.append(int(value))
         return tuple(values)
 
+    # --------------------------------------------------------- unit id space --
+    #: The committed ``type`` value a **unit** row carries, as a literal and not
+    #: a derived label: the three committed id spaces are separated by this
+    #: column and by nothing else, so an identity validated against the unit
+    #: space cannot accidentally name a building or the one special.
+    UNIT_TYPE = "u"
+
+    def ids_for_type(self, type_value: str) -> Tuple[int, ...]:
+        """Every committed item id whose ``type`` column is ``type_value``.
+
+        Read from the **cleaned** ``items`` array rather than from a per-type
+        table, because the committed configuration stores one array and a
+        ``type`` column, and a second index maintained beside it could disagree
+        with the array it indexes.  Ids that will not parse as an integer are
+        skipped rather than guessed at, and the array order is preserved so a
+        caller comparing two id spaces sees the committed order rather than a
+        sort of it.
+        """
+        ids: List[int] = []
+        for row in self.item_rows():
+            if str(row.get("type")) != type_value:
+                continue
+            value = row.get("id")
+            if isinstance(value, bool) or not isinstance(value, (int, str)):
+                continue
+            try:
+                ids.append(int(value))
+            except ValueError:
+                continue
+        return tuple(ids)
+
+    def unit_rows(self) -> Tuple[Mapping[str, Any], ...]:
+        """The committed **unit** rows, verbatim, in array order.
+
+        ``type`` is the whole of the separation: measured over the committed
+        configuration this is **429** rows carrying ``type`` ``"u"``, against
+        **470** carrying ``"b"`` and **1** carrying ``"l"``, with **zero** id
+        overlap between the three spaces.  The suite re-derives that overlap
+        from this reader on every run rather than asserting a constant.
+        """
+        return tuple(
+            row for row in self.item_rows() if str(row.get("type")) == self.UNIT_TYPE
+        )
+
+    def unit_row(self, unit_id: int) -> Optional[Mapping[str, Any]]:
+        """The committed unit row whose ``id`` column is ``unit_id``, or ``None``.
+
+        **Keyed by the committed ``id`` column, which is the column the
+        repository's normalized package names ``legacy_id``,** and not by
+        position in the unit array: an identity is a content id, and the
+        preserved branch has no positional index for it -- its subject is the
+        per-tuple item id at ``command.py:870`` (``item = unit[0]``), which is a
+        committed id and not a position.
+
+        **Restricted to ``type`` ``"u"``** for the measured reason in
+        :meth:`unit_rows`: a lookup that ignored the column would let a building
+        or the one special be addressed as a combat identity.  ``0`` and every
+        negative id resolve to no row, which is the true statement about them --
+        there is no positional clamp here for a non-positive id to alias, the
+        same asymmetry ``server_v1_magic.magic_row`` records.
+        """
+        if isinstance(unit_id, bool) or not isinstance(unit_id, int):
+            return None
+        for row in self.unit_rows():
+            value = row.get("id")
+            if isinstance(value, bool) or not isinstance(value, (int, str)):
+                continue
+            try:
+                if int(value) == unit_id:
+                    return row
+            except ValueError:
+                continue
+        return None
+
+    def unit_ids(self) -> Tuple[int, ...]:
+        """The committed unit id space, in array order.
+
+        An index rather than a lookup, for the same reason as
+        :meth:`magic_ids`: the refusal that names an out-of-table identity needs
+        the whole space to report, and building it here means the assertion reads
+        the committed table instead of a transcribed range.
+        """
+        return self.ids_for_type(self.UNIT_TYPE)
+
+    def unit_properties(self, unit_id: int) -> Optional[Mapping[str, Any]]:
+        """A unit row's committed ``properties``, **decoded**, or ``None``.
+
+        **Stored as an embedded JSON string** on every committed row -- measured,
+        ``'{"ft_building":"1","bulldozable":"1",...}'`` -- and decoded by the
+        repository's own normalization into an object.  Decoding recovers a shape
+        content already decided and says nothing about what the keys mean; the
+        keys themselves are read one at a time by :meth:`unit_flag`.
+
+        A malformed encoding raises :class:`ContentError` rather than degrading
+        to ``None``, exactly as :meth:`_collection_json` does: "the field is
+        absent" and "the field is present and does not parse" are different
+        facts, and the first is a real committed shape while the second is a
+        content defect this service must not paper over.
+        """
+        row = self.unit_row(unit_id)
+        if row is None:
+            return None
+        raw = row.get("properties")
+        if raw is None or isinstance(raw, bool):
+            return None
+        if isinstance(raw, Mapping):
+            return raw
+        if not isinstance(raw, str):
+            return None
+        if raw.strip() == "":
+            # The preserved helper's own first gate is ``if not properties:
+            # return False`` (``engine.py:155-156``), so an empty committed
+            # properties value is an **absence** there rather than a parse.
+            return None
+        try:
+            decoded = json.loads(raw)
+        except ValueError as error:
+            raise ContentError(
+                "no_unit",
+                "committed properties for unit %r is not decodable JSON: %s"
+                % (unit_id, error),
+            )
+        if not isinstance(decoded, dict):
+            return None
+        return decoded
+
+    def unit_flag(self, unit_id: int, name: str) -> Optional[Any]:
+        """One committed ``properties`` key, **verbatim**, or ``None`` when absent.
+
+        ``None`` is the absence and is **never** a zero: the preserved helper
+        tests key presence and returns ``False`` on an absent key
+        (``engine.py:159-160``) rather than reading it as ``0``, so a reader that
+        collapsed the two would report a committed fact the source never states.
+        Measured on the committed content: ``resurrectable`` is the **string**
+        ``"1"`` on **426** of **429** units and **absent** on ids ``923``,
+        ``933`` and ``1176`` -- three units whose absence is exactly the case
+        this accessor keeps distinct.
+        """
+        properties = self.unit_properties(unit_id)
+        if properties is None:
+            return None
+        if name not in properties:
+            return None
+        value = properties[name]
+        if isinstance(value, (dict, list)):
+            return None
+        return value
+
+    def unit_flag_is_positive(self, unit_id: int, name: str) -> Optional[bool]:
+        """Whether a committed flag reads as **greater than zero**, or ``None``.
+
+        The comparison is the preserved helper's own (``int(properties[name]) >
+        0``, ``engine.py:162``) and nothing more: no scaling, no clamping, no
+        default.  ``None`` means the flag is absent or will not parse as an
+        integer, and both are reported rather than resolved -- a value legacy
+        would raise on is a value v1 refuses to interpret, which is the same
+        posture every other unparseable committed field takes in this module.
+
+        **The value is compared as a number, never as a truthy test.**
+        The committed flags are **strings**, and a non-empty string is truthy in
+        both languages this repository writes in: ``"0"`` would pass a bare
+        ``if value:`` while the preserved helper reads it as zero.  Measured on
+        the committed content, every one of the 426 present ``resurrectable``
+        values is ``"1"``, so no committed row distinguishes the two readings --
+        which is exactly why the reader has to.
+        """
+        raw = self.unit_flag(unit_id, name)
+        if raw is None:
+            return None
+        if isinstance(raw, bool):
+            return None
+        if isinstance(raw, int):
+            return raw > 0
+        if isinstance(raw, float):
+            return raw > 0
+        if isinstance(raw, str):
+            text = raw.strip()
+            if text == "":
+                return None
+            try:
+                return int(text) > 0
+            except ValueError:
+                return None
+        return None
+
     def provenance(self) -> Dict[str, Any]:
         """What was loaded, for the response envelope and the containment record."""
         return {
@@ -599,6 +784,7 @@ class CommittedContent:
             "skipped_loader_steps": list(SKIPPED_LOADER_STEPS),
             "collection_rows": len(self.collection_rows()),
             "magic_rows": len(self.magic_rows()),
+            "unit_rows": len(self.unit_rows()),
         }
 
 

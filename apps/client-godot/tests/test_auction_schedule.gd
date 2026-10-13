@@ -162,8 +162,8 @@ const RESOURCE_TOKENS := ["gold", "coins", "cash", "wood", "steel", "oil",
 ## intended behaviour, so it is amended rather than relaxed. `test_market_trade` was
 ## added at 50 and deliberately does NOT add a second pin of its own, so the next line
 ## meets this one constant and not two.
-const RECORDED_HERMETIC_COUNT := 53
-const RECORDED_LIVE_PHASE_COUNT := 26
+const RECORDED_HERMETIC_COUNT := 54
+const RECORDED_LIVE_PHASE_COUNT := 27
 ##
 ## **Amended 52 -> 53 and 25 -> 26 by the magic line**, which is what moved
 ## them: `test_magic_v1` joined `$hermetic` and `magic-live-v1` joined
@@ -178,8 +178,12 @@ const RECORDED_LIVE_PHASE_COUNT := 26
 ## `v1_live.compile("\$serverV1Phases = @\(([\s\S]*?)\n    \)\r?\n")`,
 ## whose names are appended into the SAME `live_names` array - so the pin does
 ## see the v1 phases. `test_market_trade.gd` carries the same pair at 1554/1577.
-## The totals measured in verify-boot.ps1 after this line's two registrations are
-## 53 hermetic suites, 23 v0 live phases and 3 v1 live phases.
+## The totals measured in verify-boot.ps1 after the combat line's registration
+## are 54 hermetic suites, 23 v0 live phases and 4 v1 live phases. The prose
+## numbers are written out rather than derived from the constants above,
+## precisely so that a line which bumps a pin without bumping the sentence is
+## visible in the diff: two hand-maintained spellings of one fact is a weaker
+## statement than the pin, and the pin is what the battery reads.
 var _module_source := ""
 var _oracle_source := ""
 var _registry: Variant = null

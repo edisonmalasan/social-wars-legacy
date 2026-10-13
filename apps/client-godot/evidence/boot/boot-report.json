@@ -1,12 +1,12 @@
 {
     "schema":  "godot-compatibility-boot/verify-boot-v1",
-    "generated_utc":  "2026-10-13T10:16:18Z",
+    "generated_utc":  "2026-10-13T21:18:48Z",
     "environment":  {
                         "engine_executable":  "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
                         "engine_version":  "4.7.2.stable.official.ed1daf0bf",
                         "python_executable":  "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
                         "python_version":  "3.9.13",
-                        "git_commit":  "061a262ee88a22c61fd25cb5d0f9a3b244268812",
+                        "git_commit":  "530f7eea43a4cc4eea6a5f6c7c51d94ff35635b9",
                         "display_session":  false,
                         "network":  "loopback only (127.0.0.1)"
                     },
@@ -955,6 +955,22 @@
                          "log":  "apps/client-godot/.godot/verify-boot/58-test_magic_v1.out.txt"
                      },
                      {
+                         "name":  "test_combat_v1",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_combat_v1.gd",
+                                         "--",
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/59-test_combat_v1.out.txt"
+                     },
+                     {
                          "name":  "boot-unreachable",
                          "command":  [
                                          "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
@@ -970,7 +986,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/59-boot-unreachable.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/60-boot-unreachable.out.txt"
                      },
                      {
                          "name":  "server-v1-live",
@@ -997,7 +1013,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/60-server-v1-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/61-server-v1-live.out.txt"
                      },
                      {
                          "name":  "collection-live-v1",
@@ -1026,7 +1042,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/61-collection-live-v1.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/62-collection-live-v1.out.txt"
                      },
                      {
                          "name":  "magic-live-v1",
@@ -1054,7 +1070,34 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/62-magic-live-v1.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/63-magic-live-v1.out.txt"
+                     },
+                     {
+                         "name":  "combat-live-v1",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+                                         "-B",
+                                         "apps/client-godot/server_v1_live_phase.py",
+                                         "--port",
+                                         "5057",
+                                         "--name",
+                                         "combat-live-v1",
+                                         "--route-path=/v1/combat",
+                                         "--",
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_combat_v1.gd",
+                                         "--",
+                                         "--scenario=live",
+                                         "--gameapi=server_v1",
+                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/64-combat-live-v1.out.txt"
                      },
                      {
                          "name":  "boot-main-live",
@@ -1077,7 +1120,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/63-boot-main-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/65-boot-main-live.out.txt"
                      },
                      {
                          "name":  "gameapi-live",
@@ -1101,7 +1144,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/64-gameapi-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/66-gameapi-live.out.txt"
                      },
                      {
                          "name":  "boot-api-error-live",
@@ -1128,7 +1171,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/65-boot-api-error-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/67-boot-api-error-live.out.txt"
                      },
                      {
                          "name":  "placement-live",
@@ -1154,7 +1197,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/66-placement-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/68-placement-live.out.txt"
                      },
                      {
                          "name":  "purchase-live",
@@ -1180,7 +1223,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/67-purchase-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/69-purchase-live.out.txt"
                      },
                      {
                          "name":  "move-live",
@@ -1206,7 +1249,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/68-move-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/70-move-live.out.txt"
                      },
                      {
                          "name":  "sell-live",
@@ -1232,7 +1275,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/69-sell-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/71-sell-live.out.txt"
                      },
                      {
                          "name":  "store-live",
@@ -1258,7 +1301,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/70-store-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/72-store-live.out.txt"
                      },
                      {
                          "name":  "upgrade-live",
@@ -1284,7 +1327,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/71-upgrade-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/73-upgrade-live.out.txt"
                      },
                      {
                          "name":  "construction-live",
@@ -1310,7 +1353,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/72-construction-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/74-construction-live.out.txt"
                      },
                      {
                          "name":  "collect-live",
@@ -1336,7 +1379,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/73-collect-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/75-collect-live.out.txt"
                      },
                      {
                          "name":  "expand-live",
@@ -1362,7 +1405,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/74-expand-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/76-expand-live.out.txt"
                      },
                      {
                          "name":  "level-up-live",
@@ -1387,7 +1430,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/75-level-up-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/77-level-up-live.out.txt"
                      },
                      {
                          "name":  "queue-live",
@@ -1413,7 +1456,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/76-queue-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/78-queue-live.out.txt"
                      },
                      {
                          "name":  "collection-live",
@@ -1439,7 +1482,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/77-collection-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/79-collection-live.out.txt"
                      },
                      {
                          "name":  "behavior-live",
@@ -1465,7 +1508,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/78-behavior-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/80-behavior-live.out.txt"
                      },
                      {
                          "name":  "research-live",
@@ -1491,7 +1534,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/79-research-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/81-research-live.out.txt"
                      },
                      {
                          "name":  "quests-live",
@@ -1517,7 +1560,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/80-quests-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/82-quests-live.out.txt"
                      },
                      {
                          "name":  "tutorial-live",
@@ -1543,7 +1586,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/81-tutorial-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/83-tutorial-live.out.txt"
                      },
                      {
                          "name":  "stored-placement-live",
@@ -1569,7 +1612,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/82-stored-placement-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/84-stored-placement-live.out.txt"
                      },
                      {
                          "name":  "combat-live",
@@ -1595,7 +1638,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/83-combat-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/85-combat-live.out.txt"
                      },
                      {
                          "name":  "magic-live",
@@ -1621,7 +1664,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/84-magic-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/86-magic-live.out.txt"
                      },
                      {
                          "name":  "reward-live",
@@ -1647,7 +1690,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/85-reward-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/87-reward-live.out.txt"
                      },
                      {
                          "name":  "guard-post",
@@ -1659,7 +1702,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/86-guard-post.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/88-guard-post.out.txt"
                      }
                  ],
     "assertions":  [
@@ -2132,6 +2175,14 @@
                            "ok":  true
                        },
                        {
+                           "name":  "test_combat_v1 exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_combat_v1 reports PASS",
+                           "ok":  true
+                       },
+                       {
                            "name":  "unreachable scenario exits 0 (got 0)",
                            "ok":  true
                        },
@@ -2168,7 +2219,7 @@
                            "ok":  true
                        },
                        {
-                           "name":  "server-v1 live phase: the answer carried a 32-character derivation id (got \u00270db7e5a309424761a0b71368cc726f1e\u0027)",
+                           "name":  "server-v1 live phase: the answer carried a 32-character derivation id (got \u0027bacfd1493e5045d385f433d0b2ef1f65\u0027)",
                            "ok":  true
                        },
                        {
@@ -2260,7 +2311,7 @@
                            "ok":  true
                        },
                        {
-                           "name":  "server-v1 magic live phase: the answer carried a 32-character transition id (got \u00279122aec6da93448f9020cbe375bb9578\u0027)",
+                           "name":  "server-v1 magic live phase: the answer carried a 32-character transition id (got \u00276e58da2122cd44c98020b04ac3437e3e\u0027)",
                            "ok":  true
                        },
                        {
@@ -2297,6 +2348,78 @@
                        },
                        {
                            "name":  "server-v1 magic live phase: summary records v1 readiness, a clean teardown, and the save-mutation proof",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 combat live phase: a real POST /v1/combat resolves committed unit 1001, reports both push_dead_unit gates without enforcing either, destroys no row and writes no dead-hero ledger key, and leaves the disposable corpus save byte-identical: live phase exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 combat live phase: a real POST /v1/combat resolves committed unit 1001, reports both push_dead_unit gates without enforcing either, destroys no row and writes no dead-hero ledger key, and leaves the disposable corpus save byte-identical: the client typed a real v1 combat answer",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 combat live phase: a real POST /v1/combat resolves committed unit 1001, reports both push_dead_unit gates without enforcing either, destroys no row and writes no dead-hero ledger key, and leaves the disposable corpus save byte-identical: it addressed committed unit 1001 (Worker I), the unit the corpus does NOT place (got \u00271001\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 combat live phase: a real POST /v1/combat resolves committed unit 1001, reports both push_dead_unit gates without enforcing either, destroys no row and writes no dead-hero ledger key, and leaves the disposable corpus save byte-identical: v1 destroyed no row, because the client sent no lossy tuple (got \u00270\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 combat live phase: a real POST /v1/combat resolves committed unit 1001, reports both push_dead_unit gates without enforcing either, destroys no row and writes no dead-hero ledger key, and leaves the disposable corpus save byte-identical: and credited no dead-hero ledger entry, because the branch\u0027s own gates both decline (got \u0027false\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 combat live phase: a real POST /v1/combat resolves committed unit 1001, reports both push_dead_unit gates without enforcing either, destroys no row and writes no dead-hero ledger key, and leaves the disposable corpus save byte-identical: v1 reports the whole persisted document byte-identical (got \u0027true\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 combat live phase: a real POST /v1/combat resolves committed unit 1001, reports both push_dead_unit gates without enforcing either, destroys no row and writes no dead-hero ledger key, and leaves the disposable corpus save byte-identical: and names zero changed leaf paths (got \u00270\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 combat live phase: a real POST /v1/combat resolves committed unit 1001, reports both push_dead_unit gates without enforcing either, destroys no row and writes no dead-hero ledger key, and leaves the disposable corpus save byte-identical: the comparison named all seven stored balances, so \u0027nothing moved\u0027 is not \u0027nothing was read\u0027 (got \u00277\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 combat live phase: a real POST /v1/combat resolves committed unit 1001, reports both push_dead_unit gates without enforcing either, destroys no row and writes no dead-hero ledger key, and leaves the disposable corpus save byte-identical: NO gate was enforced, which is the recorded Server v1 / M13 gap (design D7) (got \u0027false\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 combat live phase: a real POST /v1/combat resolves committed unit 1001, reports both push_dead_unit gates without enforcing either, destroys no row and writes no dead-hero ledger key, and leaves the disposable corpus save byte-identical: the suite recomputed the file-level difference itself",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 combat live phase: a real POST /v1/combat resolves committed unit 1001, reports both push_dead_unit gates without enforcing either, destroys no row and writes no dead-hero ledger key, and leaves the disposable corpus save byte-identical: the file-level half: ZERO changed leaf paths, read off the saved bytes rather than trusted from the answer (got \u00270\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 combat live phase: a real POST /v1/combat resolves committed unit 1001, reports both push_dead_unit gates without enforcing either, destroys no row and writes no dead-hero ledger key, and leaves the disposable corpus save byte-identical: and the dead-hero ledger is still empty, so no ledger key was created (got \u00270\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 combat live phase: a real POST /v1/combat resolves committed unit 1001, reports both push_dead_unit gates without enforcing either, destroys no row and writes no dead-hero ledger key, and leaves the disposable corpus save byte-identical: the corpus really does place rows, so \u0027nothing moved\u0027 is a statement about a document that has something in it (got \u002740\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 combat live phase: a real POST /v1/combat resolves committed unit 1001, reports both push_dead_unit gates without enforcing either, destroys no row and writes no dead-hero ledger key, and leaves the disposable corpus save byte-identical: v1 refused a player with no save document",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 combat live phase: a real POST /v1/combat resolves committed unit 1001, reports both push_dead_unit gates without enforcing either, destroys no row and writes no dead-hero ledger key, and leaves the disposable corpus save byte-identical: v1 refused a unit id that is not a whole number",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 combat live phase: a real POST /v1/combat resolves committed unit 1001, reports both push_dead_unit gates without enforcing either, destroys no row and writes no dead-hero ledger key, and leaves the disposable corpus save byte-identical: v1 refused both a committed building id and the integer zero, neither clamped",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 combat live phase: a real POST /v1/combat resolves committed unit 1001, reports both push_dead_unit gates without enforcing either, destroys no row and writes no dead-hero ledger key, and leaves the disposable corpus save byte-identical: summary records v1 readiness, a clean teardown, and the save-mutation proof",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 combat live phase: a real POST /v1/combat resolves committed unit 1001, reports both push_dead_unit gates without enforcing either, destroys no row and writes no dead-hero ledger key, and leaves the disposable corpus save byte-identical: DELIBERATELY asserts no save mutation -- the summary reports the mutation check was not requested, which is this route\u0027s deliverable, and the suite\u0027s own -diff leaves=0 marker is the file-level half of that claim",
                            "ok":  true
                        },
                        {

@@ -520,7 +520,7 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_experience", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests", "test_tutorial", "test_stored_item_placement", "test_mission_vocabulary", "test_combat_actions", "test_damage_magic", "test_rewards", "test_social_state", "test_darts", "test_friends", "test_construction_assist", "test_auction_schedule", "test_market_trade", "test_server_v1", "test_collection_v1", "test_magic_v1")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_experience", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests", "test_tutorial", "test_stored_item_placement", "test_mission_vocabulary", "test_combat_actions", "test_damage_magic", "test_rewards", "test_social_state", "test_darts", "test_friends", "test_construction_assist", "test_auction_schedule", "test_market_trade", "test_server_v1", "test_collection_v1", "test_magic_v1", "test_combat_v1")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a
@@ -1145,6 +1145,67 @@ try {
                 "--gameapi-endpoint=http://127.0.0.1:$ServerV1Port"
             )
         }
+        @{
+            Name = "combat-live-v1"
+            Assertions = "server-v1 combat live phase: a real POST /v1/combat resolves committed unit 1001, reports both push_dead_unit gates without enforcing either, destroys no row and writes no dead-hero ledger key, and leaves the disposable corpus save byte-identical"
+            # NO ExpectSaveMutation, and the omission is deliberate rather than
+            # forgotten. This is the FIRST v1 route whose whole deliverable is a
+            # refusal to mutate: the legacy branch the route mirrors
+            # (`command.py:end_attack`) only destroys a row when the client sends
+            # a lossy tuple, and this client sends none, so design D4's answer is
+            # "nothing happened and here is the whole-document proof that nothing
+            # happened". The harness's file-digest comparison is therefore still
+            # run by `server_v1_live_phase.py` for the *absence* of a change --
+            # it is the same reading, asserted by the suite's own
+            # `_touched_leaf_paths(before, after) == []` check and by the
+            # `-diff leaves=0` marker below, which is what pins the claim to the
+            # bytes rather than to this file's word. Adding ExpectSaveMutation
+            # here would assert the exact opposite of the deliverable.
+            RoutePath = "/v1/combat"
+            Markers = @(
+                @{
+                    Regex = '\[test\] live-server-v1-combat unit=(\d+) rows_destroyed=(\d+) ledger_credited=(\S+) document_unchanged=(\S+) leaves=(\d+) compared=(\d+) gates_enforced=(\S+)'
+                    Because = "the client typed a real v1 combat answer"
+                    Groups = @(
+                        @{ Group = 1; Test = "1001"; Because = "it addressed committed unit 1001 (Worker I), the unit the corpus does NOT place" }
+                        @{ Group = 2; Test = "0"; Because = "v1 destroyed no row, because the client sent no lossy tuple" }
+                        @{ Group = 3; Test = "false"; Because = "and credited no dead-hero ledger entry, because the branch's own gates both decline" }
+                        @{ Group = 4; Test = "true"; Because = "v1 reports the whole persisted document byte-identical" }
+                        @{ Group = 5; Test = "0"; Because = "and names zero changed leaf paths" }
+                        @{ Group = 6; Test = "7"; Because = "the comparison named all seven stored balances, so 'nothing moved' is not 'nothing was read'" }
+                        @{ Group = 7; Test = "false"; Because = "NO gate was enforced, which is the recorded Server v1 / M13 gap (design D7)" }
+                    )
+                }
+                @{
+                    Regex = '\[test\] live-server-v1-combat-diff leaves=(\d+) ledger_keys=(\d+) placed_rows=(\d+)'
+                    Because = "the suite recomputed the file-level difference itself"
+                    Groups = @(
+                        @{ Group = 1; Test = "0"; Because = "the file-level half: ZERO changed leaf paths, read off the saved bytes rather than trusted from the answer" }
+                        @{ Group = 2; Test = "0"; Because = "and the dead-hero ledger is still empty, so no ledger key was created" }
+                        @{ Group = 3; Op = "ne"; Test = "^0$"; Because = "the corpus really does place rows, so 'nothing moved' is a statement about a document that has something in it" }
+                    )
+                }
+                @{
+                    Regex = '\[test\] live-server-v1-combat-refusal code=unknown_player'
+                    Because = "v1 refused a player with no save document"
+                }
+                @{
+                    Regex = '\[test\] live-server-v1-combat-refusal code=malformed_request'
+                    Because = "v1 refused a unit id that is not a whole number"
+                }
+                @{
+                    Regex = '\[test\] live-server-v1-combat-refusal code=unaddressable_row'
+                    Because = "v1 refused both a committed building id and the integer zero, neither clamped"
+                }
+            )
+            Arguments = @(
+                "--headless", "--path", $projectRel,
+                "--script", "res://tests/test_combat_v1.gd",
+                "--", "--scenario=live",
+                "--gameapi=server_v1",
+                "--gameapi-endpoint=http://127.0.0.1:$ServerV1Port"
+            )
+        }
     )
 
     $v1PhaseLogs = @{}
@@ -1206,6 +1267,17 @@ try {
                 #
                 # An unknown `Op` fails loudly instead of defaulting, so a typo
                 # in a phase table cannot read as a pass.
+                #
+                # The `combat-live-v1` placed-row group is anchored `^0$` rather
+                # than bare `0`, and it is the first group here whose value is a
+                # row COUNT rather than an id, price or quantity. The corpus
+                # places **40** rows, and `40` CONTAINS a `0` -- so the bare
+                # pattern failed a correct phase, which is the search-not-equality
+                # trap documented above, hit from the other direction: not a
+                # value that should have been caught being let through, but a
+                # value that should have passed being rejected. Anchoring makes
+                # the group mean what its `Because` says: the count is not
+                # exactly zero.
                 if (-not $v1Group.ContainsKey("Op") -or $v1Group.Op -eq "eq") {
                     $v1Ok = ($v1Value -match $v1Group.Test)
                 } elseif ($v1Group.Op -eq "ne") {
@@ -1227,6 +1299,12 @@ try {
         if ($v1Phase.ContainsKey("RoutePath")) {
             $v1PhaseExpectedRoute = $v1Phase.RoutePath
         }
+        # Whether this phase WANTS a save mutation, read from the table rather
+        # than asserted as a constant. `combat-live-v1` is the one v1 phase that
+        # does not want one, because the route it drives delivers a refusal to
+        # mutate; every earlier v1 phase does, because every earlier v1 route
+        # writes a leaf. Both directions are asserted below.
+        $v1PhaseWantsMutation = $v1Phase.ContainsKey("ExpectSaveMutation")
         $v1SummaryOk = $false
         if ($v1SummaryLine -ne "") {
             try {
@@ -1247,11 +1325,28 @@ try {
                     -and $v1Summary.readiness_status -eq 404 `
                     -and $v1Summary.readiness_code -eq "unknown_player" `
                     -and $v1Summary.route -eq ("POST " + $v1PhaseExpectedRoute) `
-                    -and $v1Summary.save_mutation_checked -eq $true)
+                    -and ($v1Summary.save_mutation_checked -eq $v1PhaseWantsMutation))
+                # The save-mutation half above is now DERIVED from the phase table
+                # rather than hard-coded to `$true`, because `combat-live-v1`
+                # deliberately declares no `ExpectSaveMutation`: that route's
+                # whole deliverable is that nothing moved, so a phase that
+                # asserted a mutation would be asserting the opposite of the
+                # feature. `$v1PhaseWantsMutation` is `$false` for such a phase
+                # and `$true` otherwise, so this is a two-sided assertion rather
+                # than a relaxation: a phase that declares a mutation and does not
+                # report the proof still fails, AND a phase that declares no
+                # mutation and reports one anyway still fails. The proof itself
+                # for the no-mutation case lives in the suite, which recomputes
+                # the touched-leaf-path set off the saved bytes rather than
+                # trusting the answer's own `document_unchanged` word.
             } catch { $v1SummaryOk = $false }
         }
         Report-Result $v1SummaryOk `
             "$($v1Phase.Assertions): summary records v1 readiness, a clean teardown, and the save-mutation proof"
+        if (-not $v1PhaseWantsMutation) {
+            Report-Result ($v1SummaryOk -eq $true -and $v1Summary.save_mutation_checked -eq $false) `
+                "$($v1Phase.Assertions): DELIBERATELY asserts no save mutation -- the summary reports the mutation check was not requested, which is this route's deliverable, and the suite's own -diff leaves=0 marker is the file-level half of that claim"
+        }
     }
 
     $phaseLogs = @{}

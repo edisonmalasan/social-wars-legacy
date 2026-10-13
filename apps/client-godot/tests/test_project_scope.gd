@@ -88,6 +88,7 @@ const ALLOWED := [
 	"scripts/gameapi/server_v1_collection_result.gd",
 	"scripts/gameapi/server_v1_collect_result.gd",
 	"scripts/gameapi/server_v1_magic_result.gd",
+	"scripts/gameapi/server_v1_combat_result.gd",
 	"scripts/layout.gd",
 	"scripts/package_loader.gd",
 	"scripts/package_paths.gd",
@@ -159,6 +160,7 @@ const ALLOWED := [
 	"tests/test_game_api_live.gd",
 	"tests/test_game_clock.gd",
 	"tests/test_magic_v1.gd",
+	"tests/test_combat_v1.gd",
 	"tests/test_package_loader.gd",
 	"tests/test_project_scope.gd",
 	"tests/test_scene_build.gd",
@@ -265,6 +267,7 @@ const ALLOWED := [
 	"evidence/server-v1/report.json",
 	"evidence/collection-v1/report.json",
 	"evidence/magic-v1/report.json",
+	"evidence/combat-v1/report.json",
 ]
 
 ## The exact scene set the project may declare (set equality below).
