@@ -129,8 +129,8 @@ so that a derivation which moved nothing could not pass as success.
 against a captured executed-legacy fixture, so v1's first slice is measured against an
 existing oracle rather than a new one.
 
-The boundary SHALL be demonstrated end to end by **at least three** transactions, and
-the second and third SHALL each exercise at least one rule the first does not.
+The boundary SHALL be demonstrated end to end by **at least four** transactions, and the
+second, third, and fourth SHALL each exercise at least one rule the first does not.
 
 `collect` remains the worked example of a **derived payout**: the server derives what a
 `collect` *yields* from committed income content, and the client selects only which row
@@ -151,9 +151,22 @@ boundary's refusal half on a transaction whose preserved-server counterpart char
 nothing, because the only mechanism by which a legacy client could have paid was a
 resource vector applied before the dispatcher opened.
 
-All three SHALL derive every resource movement they make from committed content,
-SHALL refuse a client-supplied resource delta outright, and a refusal in any of them
-SHALL move nothing.
+The combat resolution is the worked example of a **refused destruction behind a reported
+gate**: the server derives **no** destruction quantity, because the preserved branch's
+only quantity is a subtraction of two client numbers and the committed content carries
+no value naming this branch's outcome; instead it resolves and reports the two committed
+conditions under which the preserved server would credit a destroyed row — the recorded
+player team and a committed `resurrectable` flag — without enforcing either and without
+writing the ledger, and refuses the client's destruction figure outright. It demonstrates
+the boundary's refusal half on a transaction whose preserved-server counterpart removed
+a placed row and incremented a ledger, and whose post-execution proof is **whole-document
+byte-identity** including the dead-hero ledger, the strongest such instrument on this
+boundary.
+
+All four SHALL derive every resource movement they make from committed content, SHALL
+refuse a client-supplied resource delta outright, and a refusal in any of them SHALL
+move nothing. The combat transaction, which makes no resource movement at all, SHALL
+additionally destroy no row and leave the dead-hero ledger byte-identical.
 
 #### Scenario: A collected row advances its instant and pays exactly the derived amount
 
@@ -189,6 +202,14 @@ SHALL move nothing.
 - **AND** the magic counter transition derives no cost, and the absence of that cost is itself proven rather than assumed
 - **AND** each refuses a client-supplied delta outright rather than clamping it
 
+#### Scenario: The boundary has a fourth worked transaction that destroys nothing
+
+- **WHEN** the boundary is exercised
+- **THEN** `collect`, `complete_collection`, the magic counter transition, and the combat resolution are all specified end to end
+- **AND** the combat resolution derives no destruction and destroys no row
+- **AND** the combat resolution reports, without enforcing, the two committed conditions the preserved server would have applied to credit the ledger
+- **AND** each refuses a client-supplied delta outright rather than clamping it
+
 #### Scenario: A refused collection completion moves nothing
 
 - **WHEN** a collection completion is refused for any reason
@@ -200,6 +221,12 @@ SHALL move nothing.
 - **WHEN** a worked transaction charges nothing because the preserved server charged nothing and no committed content establishes a price
 - **THEN** the absence of the charge is a specified property with a proof that asserts every stored resource is byte-identical
 - **AND** a charge of any size on any stored resource fails that proof
+
+#### Scenario: A transaction that destroys nothing is still on the boundary
+
+- **WHEN** a worked transaction destroys no row because the preserved server's destruction quantity is not derivable from committed content
+- **THEN** the absence of the destruction is a specified property with a proof that asserts the whole persisted document, including the dead-hero ledger, is byte-identical
+- **AND** a destruction of any size at any identity fails that proof
 
 ### Requirement: v1 coexists with v0 and changes no v0 behaviour
 
