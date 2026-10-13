@@ -1,5 +1,37 @@
 # Tasks
 
+> **The checkboxes below are deliberately left unchecked, and that is the honest
+> state of the record, not an omission.**
+>
+> The implementing subagent was cut off by API rate limiting twice and never
+> reported completion, so it never reached the step that ticks boxes. The
+> orchestrator then finished the remaining surface directly. Ticking 73 boxes
+> from a diff would be exactly the "checked task box as evidence" failure the
+> repository rules forbid, and ticking the subset that happened to be verified
+> would understate the record differently. So no box moved.
+>
+> What was actually verified, re-run in the final state by the orchestrator:
+>
+> | Check | Result |
+> |---|---|
+> | `apps/server-v1` suite | `Ran 519 tests ... OK` (baseline 376, +143) |
+> | `test_combat_v1` hermetic | `PASS checks=415`; `report.json` byte-identical across runs, `sha256 8cd770cf...` |
+> | Compatibility API | `Ran 3077 tests ... OK`; `git diff --name-only -- apps/compat-api` -> no path |
+> | `verify-boot.ps1` | `PASS all checks succeeded` |
+> | `verify.ps1` | `PASS all checks succeeded` |
+> | `openspec validate --all --strict` | 79 passed / 0 failed |
+> | preservation manifest | 3,258 entries unmoved |
+>
+> Three defects were found by the battery rather than by inspection, and are
+> recorded in the Apply commit: a cross-check that compared two spellings of the
+> same fact, two client-side twins of line 3's refusal-count pin, and a live-phase
+> assertion that rejected a correct phase because `-notmatch` is a search rather
+> than an inequality. The anti-invention guards were proven by injection rather
+> than cited -- the implementing agent never reported them -- with measured
+> failure counts of 2 (reserved stem) and 1 (no reserved stem), both restores
+> verified byte-identical at `sha256 2c186313c96c7f17`. A third probe broke
+> parsing and was **discarded** rather than reported.
+
 ## 1. Refusal vocabulary
 
 - [ ] 1.1 Read `apps/server-v1/server_v1_refusals.py` and record the existing closed
