@@ -194,7 +194,6 @@ const UNSUPPORTED_INTENTS := [
 	["place_stored_item_town", "BootData.StoredPlacementResult", "error_code", "error_message"],
 	["sell_stored_item_town", "BootData.StoredSaleResult", "error_code", "error_message"],
 	["combat_town", "CombatFlow.CombatResult", "error_code", "error_message"],
-	["magic_town", "MagicFlow.MagicResult", "reason", "error"],
 	["reward_town", "RewardFlow.RewardResult", "reason", "error"],
 ]
 
@@ -227,6 +226,7 @@ func run_scenario() -> void:
 	_check_fail_closed()
 	_check_local_codes_are_not_server_codes()
 	await _check_unsupported_intents()
+	_check_magic_intent_hand_off()
 	_check_intent_body()
 	_check_no_client_arithmetic()
 	await _check_facade_registration()
@@ -472,8 +472,8 @@ func _check_unsupported_intents() -> void:
 			"%s explains itself rather than answering with a bare code" % method)
 		check(not answer.ok, "%s is a failure" % method)
 		answered += 1
-	check_eq(divergent, 2,
-		"exactly two delivered result classes name their refusal code differently"
+	check_eq(divergent, 1,
+		"exactly one delivered result class names its refusal code differently"
 		+ " from the other 20")
 	info("result classes with a divergent refusal field name: %s"
 		% ", ".join(PackedStringArray(divergent_names)))
@@ -484,6 +484,38 @@ func _check_unsupported_intents() -> void:
 	check_eq(api.transport_requests, 0,
 		"NO unsupported intent touched the transport")
 	api.queue_free()
+
+
+## ## `magic_town` left this suite's unsupported table, and that is an ownership
+## ## HAND-OFF rather than a deletion
+##
+## When Server v1 gained `POST /v1/magic`, `ServerV1Api.magic_town` stopped being a
+## local refusal and became a real transport call, so the row this suite used to
+## pin was **wrong** the moment the route landed. Deleting the row alone would
+## leave the table quieter and the claim weaker, because nothing would then assert
+## that the intent was re-owned rather than quietly forgotten - and a fourth
+## implementation could add a fifth magic shape without any suite noticing.
+##
+## So both halves are asserted. The first is the absence, which is the whole
+## point: no row in `UNSUPPORTED_INTENTS` names an intent `ServerV1Api` now
+## implements. The second is that the suite which took the intent over **exists
+## on disk**, so the hand-off cannot dangle. This is the same shape
+## `godot-unit-collection` established and `godot-stored-item-placement` re-used;
+## the owner list lives in the receiving suite, never in two places at once.
+const MAGIC_SUITE := "res://tests/test_magic_v1.gd"
+const HANDED_OFF_INTENTS := ["magic_town"]
+
+
+func _check_magic_intent_hand_off() -> void:
+	for intent in UNSUPPORTED_INTENTS:
+		check(not HANDED_OFF_INTENTS.has(str(intent[0])),
+			"%s left the unsupported table and must not be back in it" % str(intent[0]))
+	check(ResourceLoader.exists(MAGIC_SUITE),
+		"the suite that took %s over exists" % ", ".join(HANDED_OFF_INTENTS))
+	check_eq(UNSUPPORTED_INTENTS.size(), 21,
+		"twenty-one intents remain locally refused, one fewer than before the"
+		+ " magic route landed")
+	info("intents handed off: %s" % ", ".join(HANDED_OFF_INTENTS))
 
 
 func _call_unsupported(api: Variant, method: String) -> Variant:
@@ -528,8 +560,6 @@ func _call_unsupported(api: Variant, method: String) -> Variant:
 			return await api.sell_stored_item_town("player-1", 1085)
 		"combat_town":
 			return await api.combat_town("player-1", "resolve", 1)
-		"magic_town":
-			return await api.magic_town("player-1", "buy", 1)
 		"reward_town":
 			return await api.reward_town("player-1", "daily")
 	return null

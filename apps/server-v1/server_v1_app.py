@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""The HTTP surface: two routes, and no arithmetic (design D2).
+"""The HTTP surface: three routes, and no arithmetic (design D2).
 
-``create_app`` returns a FastAPI application with exactly two delivered routes,
-``POST /v1/collect`` and ``POST /v1/collection``.  Each route's entire job, per
-design D2, is:
+``create_app`` returns a FastAPI application with exactly three delivered routes,
+``POST /v1/collect``, ``POST /v1/collection``, and ``POST /v1/magic``.  Each
+route's entire job, per design D2, is:
 
 1. hand the request bytes to :mod:`server_v1_intent`, which turns them into an
    intent or refuses;
@@ -29,11 +29,17 @@ transport never has to name ``malformed_request``.
 The success status is the one thing the transport is allowed to know without
 asking: :data:`~server_v1_outcomes.SUCCESS_HTTP_STATUS`, ``200``.
 
-Both response bodies come from the domain value's own ``payload()``, with the
-protocol name added and nothing else.  A refusal therefore carries the reason
-the domain chose, never a per-route rewording, and the client can distinguish
-the two surfaces by their ``result`` field — the spec's "the client can
+All three response bodies come from the domain value's own ``payload()``, with
+the protocol name added and nothing else.  A refusal therefore carries the reason
+the domain chose, never a per-route rewording, and the client can distinguish the
+three surfaces by their ``result`` field — the spec's "the client can
 distinguish it from a transport failure" scenario.
+
+**All three handler bodies are identical but for three tokens**: the path
+constant, the action string, and the domain function.  The magic surface carries
+**two** preserved operations and they travel inside the parsed intent rather than
+as a route parameter, which is what keeps a single handler total instead of
+growing a per-operation branch here.
 """
 
 from __future__ import annotations
@@ -47,18 +53,20 @@ from server_v1_collection import complete_collection
 from server_v1_collect import collect
 from server_v1_content import CommittedContent
 from server_v1_intent import intent_from_json
+from server_v1_magic import apply_magic
 from server_v1_outcomes import SUCCESS_HTTP_STATUS, Outcome
 from server_v1_refusals import Refusal
 from server_v1_repository import SaveRepository
 from server_v1_settings import PROTOCOL
 
-#: The two delivered routes, named so a test enumerates routes from a
+#: The three delivered routes, named so a test enumerates routes from a
 #: declaration rather than from a regex over the source.  One row per route:
 #: adding a route adds a row, and ``test_app.py`` asserts this mapping agrees
 #: with the paths declared below.
 ROUTES: Dict[str, str] = {
     "POST /v1/collect": "collect",
     "POST /v1/collection": "collection",
+    "POST /v1/magic": "magic",
 }
 
 ROUTE_PREFIX = "/v1"
@@ -87,6 +95,20 @@ COLLECT_PATH = "/v1/collect"
 #: boundary exists to stop.  ``tests/test_app.py`` asserts the literal agrees
 #: with ``ROUTE_PREFIX`` so the duplication cannot drift.
 COLLECTION_PATH = "/v1/collection"
+
+#: The third route this line delivers, and a literal for the same reason as the
+#: other two.  **A third route means the concatenation mistake could have been
+#: made a second time**, so the reason is restated rather than cross-referenced:
+#: a ``BinOp`` in this module is a failed invariant, and
+#: ``tests/test_app.TransportStructureTests`` walks the AST of this file and fails
+#: on one.
+#:
+#: The path is ``/v1/magic`` rather than ``/v1/buy_magic``, for the same reason
+#: :data:`COLLECTION_PATH` is not ``/v1/complete_collection``: the route names the
+#: **surface**, and the surface carries both preserved operations, so no single
+#: legacy branch name would describe it.  ``tests/test_app.py`` asserts the
+#: literal agrees with :data:`ROUTE_PREFIX` so the duplication cannot drift.
+MAGIC_PATH = "/v1/magic"
 
 
 def create_app(
@@ -137,6 +159,30 @@ def create_app(
             )
         return JSONResponse(status_code=SUCCESS_HTTP_STATUS, content=_envelope(outcome))
 
+    @app.post(MAGIC_PATH)
+    async def post_magic(request: Request) -> JSONResponse:
+        """Adapt one magic intent, call the domain, translate the outcome.
+
+        Deliberately identical to the other two handlers, body for body.  The
+        three routes have nothing to distinguish them: the operation the client
+        asked for is **inside the parsed intent**, not a second parameter here,
+        so a fourth route cannot grow a per-route branch without failing the
+        structural guard that compares these three function bodies.
+        """
+        body = await request.body()
+        parsed = intent_from_json("magic", body)
+        if isinstance(parsed, Refusal):
+            return JSONResponse(
+                status_code=parsed.http_status, content=_envelope(parsed)
+            )
+
+        outcome: Outcome = apply_magic(parsed, content, repository, clock())
+        if isinstance(outcome, Refusal):
+            return JSONResponse(
+                status_code=outcome.http_status, content=_envelope(outcome)
+            )
+        return JSONResponse(status_code=SUCCESS_HTTP_STATUS, content=_envelope(outcome))
+
     return app
 
 
@@ -153,4 +199,11 @@ def _envelope(value: Any) -> Dict[str, Any]:
     return body
 
 
-__all__ = ["COLLECT_PATH", "COLLECTION_PATH", "ROUTES", "ROUTE_PREFIX", "create_app"]
+__all__ = [
+    "COLLECT_PATH",
+    "COLLECTION_PATH",
+    "MAGIC_PATH",
+    "ROUTES",
+    "ROUTE_PREFIX",
+    "create_app",
+]

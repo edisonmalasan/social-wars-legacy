@@ -459,6 +459,109 @@ class SaveDocument:
                 )
         self.private_state()["collections"] = [int(entry) for entry in claimed]
 
+    # ----------------------------------------------------------- magic ledger --
+    #: Where the magic counter map lives, named as a tuple for the same reason
+    #: :data:`LEDGER_PATH` is one.
+    MAGIC_LEDGER_PATH: Tuple[str, ...] = ("privateState", "magics")
+
+    def magic_ledger(self) -> Dict[str, Any]:
+        """``privateState["magics"]``, verbatim, or :class:`RepositoryError`.
+
+        **An absent key is refused rather than read as empty**, and that is the
+        opposite of :meth:`ledger`'s absent-key rule on purpose, with two
+        measured reasons between them.
+
+        An absent **collection** ledger honestly means "nothing claimed yet",
+        because the claim is the thing being recorded.  An absent **magic**
+        ledger instead means a document whose shape v1 cannot read: the
+        preserved server's own migration (``version.py:32-37``) coerces an
+        absent or non-dict ``magics`` into ``{}`` **before** any branch runs, so
+        a document reaching a branch with no ``magics`` object is not a shape
+        the legacy pipeline produces at all.  Refusing keeps v1 from answering
+        "your counter is zero" about a state the server never recorded.
+
+        A non-dict value is refused for the same reason, and for a second one:
+        ``int`` on a list or a string would either raise deep inside the slice
+        or coerce something the document never meant.
+
+        **This refusal is unreachable through the committed corpus**: all **33**
+        save documents already carry a dict ``magics``, exactly because the
+        migration ran on each of them.  It is exercised over an in-memory row
+        instead, which is the pattern ``no_build_time`` used on line 1.
+        """
+        raw = self.private_state().get("magics")
+        if not isinstance(raw, dict):
+            raise RepositoryError(
+                "unreadable_state",
+                "save %r has no magic ledger object at /%s"
+                % (
+                    self.player_id,
+                    "/".join(str(step) for step in self.MAGIC_LEDGER_PATH),
+                ),
+            )
+        return raw
+
+    def magic_counter(self, magic_id: int) -> int:
+        """The recorded counter for one magic id, or ``0`` when absent.
+
+        Keyed as ``str(magic_id)``, which is the preserved branches' own key
+        form (``str(magic_id)`` at ``command.py:659`` and ``:671``) and coincides
+        with the committed id space because v1 validates the identity against
+        the committed ``id`` column first (design D3).  The preserved server
+        never validates it, which is why the executed fixture recorded a float
+        identity producing a **distinct** key ``"1.0"``; v1 refuses that request
+        as ``malformed_request`` at the intent layer instead of growing a second
+        key space.
+
+        An absent entry reads as **zero** rather than being refused: the derived
+        transition needs a prior value, and "no recorded counter" has exactly
+        one honest reading.  A recorded value that is not an integer **is**
+        refused, for the same reason :meth:`storage_quantity` refuses one.
+
+        **Membership, not ``.get()``, and the difference is measurable.**  A
+        first version read ``self.magic_ledger().get(str(magic_id))`` and treated
+        a returned ``None`` as absence, which made a ledger entry recorded as
+        ``{"1": null}`` read as zero and then be **overwritten** by the derived
+        value -- a destruction of a recorded-but-unreadable entry that the
+        docstring above says must be refused.  ``{"1": null}`` is a recorded
+        entry whose value is not an integer, not an absent key, and only a
+        membership test can tell the two apart.
+        """
+        ledger = self.magic_ledger()
+        key = str(magic_id)
+        if key not in ledger:
+            return 0
+        raw = ledger[key]
+        if isinstance(raw, bool) or not isinstance(raw, int):
+            raise RepositoryError(
+                "unreadable_state",
+                "save %r magic counter %r is not an integer"
+                % (self.player_id, raw),
+            )
+        return int(raw)
+
+    def set_magic_counter(self, magic_id: int, value: int) -> None:
+        """Write the counter for one magic id, creating the key when absent.
+
+        Creating it is the closest available equivalent to the preserved
+        branch's ``else`` arm, and the two differ in a way this method cannot
+        reproduce: the branch writes **zero** for an identity with no recorded
+        entry, so its "acquire a spell you hold none of" path increments
+        nothing.  v1 writes the value it derived.  That is recorded as a
+        divergence in the response payload, never as parity.
+        """
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise RepositoryError(
+                "unreadable_state",
+                "refusing to write a non-integer magic counter %r" % (value,),
+            )
+        if value < 0:
+            raise RepositoryError(
+                "unreadable_state",
+                "refusing to write a negative magic counter %r" % (value,),
+            )
+        self.magic_ledger()[str(magic_id)] = int(value)
+
     # ---------------------------------------------------------------- helpers --
     def _row_int(self, row: List[Any], position: int, label: str) -> int:
         if len(row) <= position:

@@ -520,7 +520,7 @@ try {
 
     # --- 5. hermetic Godot suites ------------------------------------------
 
-    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_experience", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests", "test_tutorial", "test_stored_item_placement", "test_mission_vocabulary", "test_combat_actions", "test_damage_magic", "test_rewards", "test_social_state", "test_darts", "test_friends", "test_construction_assist", "test_auction_schedule", "test_market_trade", "test_server_v1", "test_collection_v1")
+    $hermetic = @("test_package_loader", "test_scene_build", "test_game_api_fake", "test_boot_scene", "test_session", "test_game_clock", "test_camera_controls", "test_ui_foundation", "test_settings", "test_audio_manager", "test_town_iso", "test_town_state", "test_town_hud", "test_town_resources", "test_town_selection", "test_town_scene", "test_town_placement", "test_town_purchase", "test_town_move", "test_town_sell", "test_town_store", "test_town_upgrade", "test_town_construction", "test_town_collect", "test_town_expand", "test_town_xp", "test_town_gate", "test_unit_definitions", "test_unit_instances", "test_unit_queues", "test_unit_production", "test_unit_experience", "test_unit_collection", "test_unit_movement", "test_unit_animations", "test_unit_behaviors", "test_research", "test_quests", "test_tutorial", "test_stored_item_placement", "test_mission_vocabulary", "test_combat_actions", "test_damage_magic", "test_rewards", "test_social_state", "test_darts", "test_friends", "test_construction_assist", "test_auction_schedule", "test_market_trade", "test_server_v1", "test_collection_v1", "test_magic_v1")
     foreach ($suite in $hermetic) {
         # The dead endpoint is passed to every suite: test_session and
         # test_game_clock read it (their follow-up failing boot replaces a
@@ -1097,6 +1097,54 @@ try {
                 "--gameapi-endpoint=http://127.0.0.1:$ServerV1Port"
             )
         }
+        @{
+            Name = "magic-live-v1"
+            Assertions = "server-v1 magic live phase"
+            # The delivered magic route writes one ledger leaf and charges
+            # nothing, so a real POST /v1/magic must mutate the disposable corpus
+            # save. Refused if it does not. Nothing is seeded: the fresh corpus's
+            # ledger is already `{}`, which is already exercisable, so the buy
+            # ADDS the leaf and the use CHANGES it. Seeding here would have made
+            # the file-level diff measure the seed.
+            ExpectSaveMutation = $true
+            RoutePath = "/v1/magic"
+            Markers = @(
+                @{
+                    Regex = '\[test\] live-server-v1-magic operation=(buy|use) requested=(\d+) resolved=(\d+) transition=([0-9a-f]+) before=(\d+) after=(\d+) cap=(\d+) price_charged=(null|-?\d+) compared=(\d+) divergences=(\d+)'
+                    Because = "the client typed a real v1 magic counter answer"
+                    Groups = @(
+                        @{ Group = 1; Test = "buy"; Because = "the first operation was the buy" }
+                        @{ Group = 2; Test = "1"; Because = "it addressed the corpus's own magic (id 1)" }
+                        @{ Group = 3; Test = "1"; Because = "v1 resolved it to the same id, so nothing was clamped" }
+                        @{ Group = 4; Test = "^[0-9a-f]{32}$"; Because = "the answer carried a 32-character transition id" }
+                        @{ Group = 5; Test = "0"; Because = "the ledger key was absent before the buy" }
+                        @{ Group = 6; Test = "1"; Because = "and the transition raised it to one" }
+                        @{ Group = 7; Test = "50"; Because = "the answer reports the preserved branch's cap literal" }
+                        @{ Group = 8; Test = "null"; Because = "NOTHING was charged: the literal word null, which is design D2's whole finding" }
+                        @{ Group = 9; Test = "7"; Because = "the comparison named all seven stored balances" }
+                    )
+                }
+                @{
+                    Regex = '\[test\] live-server-v1-magic-refusal code=unknown_magic_id'
+                    Because = "v1 refused a magic id outside the committed table"
+                }
+                @{
+                    Regex = '\[test\] live-server-v1-magic-refusal code=malformed_request'
+                    Because = "v1 refused a non-canonical identity and an operation outside the closed set"
+                }
+                @{
+                    Regex = '\[test\] live-server-v1-magic-refusal code=unknown_player'
+                    Because = "v1 refused a player with no save document"
+                }
+            )
+            Arguments = @(
+                "--headless", "--path", $projectRel,
+                "--script", "res://tests/test_magic_v1.gd",
+                "--", "--scenario=live",
+                "--gameapi=server_v1",
+                "--gameapi-endpoint=http://127.0.0.1:$ServerV1Port"
+            )
+        }
     )
 
     $v1PhaseLogs = @{}
@@ -1110,16 +1158,22 @@ try {
         }
         if ($v1Phase.ContainsKey("SeedCollection")) {
             $v1Args += "--seed-collection=$($v1Phase.SeedCollection)"
-            if ($v1Phase.ContainsKey("RoutePath")) {
-                # Without this the harness's summary named the collect route for
-                # EVERY phase, so collection-live-v1 recorded
-                # `"route": "POST /v1/collect"` while it had just driven
-                # POST /v1/collection. Nothing failed: the evidence file simply
-                # described the wrong route for a phase that genuinely passed, and
-                # no assertion could catch it, because the route under test is
-                # chosen by the Godot suite the caller passes, not by the harness.
-                $v1Args += "--route-path=$($v1Phase.RoutePath)"
-            }
+        }
+        # **Deliberately NOT nested inside the seeding branch above.** Without
+        # this the harness's summary named the collect route for EVERY phase, so
+        # collection-live-v1 recorded `"route": "POST /v1/collect"` while it had
+        # just driven POST /v1/collection. Nothing failed: the evidence file
+        # simply described the wrong route for a phase that genuinely passed,
+        # and no assertion could catch it, because the route under test is
+        # chosen by the Godot suite the caller passes, not by the harness.
+        #
+        # The nesting that would have hidden it a second time was removed with
+        # the magic phase: a phase that seeds nothing could never reach a
+        # `RoutePath` branch gated on seeding, so magic-live-v1 would have
+        # recorded the collect route while driving /v1/magic. Seeding and naming
+        # a route are independent facts about a phase.
+        if ($v1Phase.ContainsKey("RoutePath")) {
+            $v1Args += "--route-path=$($v1Phase.RoutePath)"
         }
         $v1Args += @("--", $GodotExe) + $v1Phase.Arguments
         $v1Run = Invoke-Python -Arguments $v1Args -TimeoutSeconds 900 -Name $v1Phase.Name

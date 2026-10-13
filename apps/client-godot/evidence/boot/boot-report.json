@@ -1,12 +1,12 @@
 {
     "schema":  "godot-compatibility-boot/verify-boot-v1",
-    "generated_utc":  "2026-10-12T22:04:54Z",
+    "generated_utc":  "2026-10-13T10:16:18Z",
     "environment":  {
                         "engine_executable":  "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
                         "engine_version":  "4.7.2.stable.official.ed1daf0bf",
                         "python_executable":  "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
                         "python_version":  "3.9.13",
-                        "git_commit":  "617bf0521a956a5d0759496124131929f267768a",
+                        "git_commit":  "061a262ee88a22c61fd25cb5d0f9a3b244268812",
                         "display_session":  false,
                         "network":  "loopback only (127.0.0.1)"
                     },
@@ -939,6 +939,22 @@
                          "log":  "apps/client-godot/.godot/verify-boot/57-test_collection_v1.out.txt"
                      },
                      {
+                         "name":  "test_magic_v1",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_magic_v1.gd",
+                                         "--",
+                                         "--gameapi-endpoint=http://127.0.0.1:5059"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/58-test_magic_v1.out.txt"
+                     },
+                     {
                          "name":  "boot-unreachable",
                          "command":  [
                                          "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
@@ -954,7 +970,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/58-boot-unreachable.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/59-boot-unreachable.out.txt"
                      },
                      {
                          "name":  "server-v1-live",
@@ -981,7 +997,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/59-server-v1-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/60-server-v1-live.out.txt"
                      },
                      {
                          "name":  "collection-live-v1",
@@ -1010,7 +1026,35 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/60-collection-live-v1.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/61-collection-live-v1.out.txt"
+                     },
+                     {
+                         "name":  "magic-live-v1",
+                         "command":  [
+                                         "C:\\Users\\Edison\\AppData\\Local\\Temp\\opencode\\cpython39\\pkg\\tools\\python.exe",
+                                         "-B",
+                                         "apps/client-godot/server_v1_live_phase.py",
+                                         "--port",
+                                         "5057",
+                                         "--name",
+                                         "magic-live-v1",
+                                         "--expect-save-mutation",
+                                         "--route-path=/v1/magic",
+                                         "--",
+                                         "C:\\Users\\Edison\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\\Godot_v4.7.2-stable_win64.exe",
+                                         "--headless",
+                                         "--path",
+                                         "apps/client-godot",
+                                         "--script",
+                                         "res://tests/test_magic_v1.gd",
+                                         "--",
+                                         "--scenario=live",
+                                         "--gameapi=server_v1",
+                                         "--gameapi-endpoint=http://127.0.0.1:5057"
+                                     ],
+                         "exit_code":  0,
+                         "timed_out":  false,
+                         "log":  "apps/client-godot/.godot/verify-boot/62-magic-live-v1.out.txt"
                      },
                      {
                          "name":  "boot-main-live",
@@ -1033,7 +1077,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/61-boot-main-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/63-boot-main-live.out.txt"
                      },
                      {
                          "name":  "gameapi-live",
@@ -1057,7 +1101,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/62-gameapi-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/64-gameapi-live.out.txt"
                      },
                      {
                          "name":  "boot-api-error-live",
@@ -1084,7 +1128,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/63-boot-api-error-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/65-boot-api-error-live.out.txt"
                      },
                      {
                          "name":  "placement-live",
@@ -1110,7 +1154,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/64-placement-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/66-placement-live.out.txt"
                      },
                      {
                          "name":  "purchase-live",
@@ -1136,7 +1180,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/65-purchase-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/67-purchase-live.out.txt"
                      },
                      {
                          "name":  "move-live",
@@ -1162,7 +1206,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/66-move-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/68-move-live.out.txt"
                      },
                      {
                          "name":  "sell-live",
@@ -1188,7 +1232,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/67-sell-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/69-sell-live.out.txt"
                      },
                      {
                          "name":  "store-live",
@@ -1214,7 +1258,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/68-store-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/70-store-live.out.txt"
                      },
                      {
                          "name":  "upgrade-live",
@@ -1240,7 +1284,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/69-upgrade-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/71-upgrade-live.out.txt"
                      },
                      {
                          "name":  "construction-live",
@@ -1266,7 +1310,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/70-construction-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/72-construction-live.out.txt"
                      },
                      {
                          "name":  "collect-live",
@@ -1292,7 +1336,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/71-collect-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/73-collect-live.out.txt"
                      },
                      {
                          "name":  "expand-live",
@@ -1318,7 +1362,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/72-expand-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/74-expand-live.out.txt"
                      },
                      {
                          "name":  "level-up-live",
@@ -1343,7 +1387,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/73-level-up-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/75-level-up-live.out.txt"
                      },
                      {
                          "name":  "queue-live",
@@ -1369,7 +1413,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/74-queue-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/76-queue-live.out.txt"
                      },
                      {
                          "name":  "collection-live",
@@ -1395,7 +1439,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/75-collection-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/77-collection-live.out.txt"
                      },
                      {
                          "name":  "behavior-live",
@@ -1421,7 +1465,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/76-behavior-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/78-behavior-live.out.txt"
                      },
                      {
                          "name":  "research-live",
@@ -1447,7 +1491,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/77-research-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/79-research-live.out.txt"
                      },
                      {
                          "name":  "quests-live",
@@ -1473,7 +1517,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/78-quests-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/80-quests-live.out.txt"
                      },
                      {
                          "name":  "tutorial-live",
@@ -1499,7 +1543,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/79-tutorial-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/81-tutorial-live.out.txt"
                      },
                      {
                          "name":  "stored-placement-live",
@@ -1525,7 +1569,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/80-stored-placement-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/82-stored-placement-live.out.txt"
                      },
                      {
                          "name":  "combat-live",
@@ -1551,7 +1595,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/81-combat-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/83-combat-live.out.txt"
                      },
                      {
                          "name":  "magic-live",
@@ -1577,7 +1621,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/82-magic-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/84-magic-live.out.txt"
                      },
                      {
                          "name":  "reward-live",
@@ -1603,7 +1647,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/83-reward-live.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/85-reward-live.out.txt"
                      },
                      {
                          "name":  "guard-post",
@@ -1615,7 +1659,7 @@
                                      ],
                          "exit_code":  0,
                          "timed_out":  false,
-                         "log":  "apps/client-godot/.godot/verify-boot/84-guard-post.out.txt"
+                         "log":  "apps/client-godot/.godot/verify-boot/86-guard-post.out.txt"
                      }
                  ],
     "assertions":  [
@@ -2080,6 +2124,14 @@
                            "ok":  true
                        },
                        {
+                           "name":  "test_magic_v1 exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "test_magic_v1 reports PASS",
+                           "ok":  true
+                       },
+                       {
                            "name":  "unreachable scenario exits 0 (got 0)",
                            "ok":  true
                        },
@@ -2116,7 +2168,7 @@
                            "ok":  true
                        },
                        {
-                           "name":  "server-v1 live phase: the answer carried a 32-character derivation id (got \u0027affa01fe622240e58cd4bf81eb34c1ab\u0027)",
+                           "name":  "server-v1 live phase: the answer carried a 32-character derivation id (got \u00270db7e5a309424761a0b71368cc726f1e\u0027)",
                            "ok":  true
                        },
                        {
@@ -2185,6 +2237,66 @@
                        },
                        {
                            "name":  "server-v1 collection live phase: summary records v1 readiness, a clean teardown, and the save-mutation proof",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 magic live phase: live phase exits 0 (got 0)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 magic live phase: the client typed a real v1 magic counter answer",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 magic live phase: the first operation was the buy (got \u0027buy\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 magic live phase: it addressed the corpus\u0027s own magic (id 1) (got \u00271\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 magic live phase: v1 resolved it to the same id, so nothing was clamped (got \u00271\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 magic live phase: the answer carried a 32-character transition id (got \u00279122aec6da93448f9020cbe375bb9578\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 magic live phase: the ledger key was absent before the buy (got \u00270\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 magic live phase: and the transition raised it to one (got \u00271\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 magic live phase: the answer reports the preserved branch\u0027s cap literal (got \u002750\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 magic live phase: NOTHING was charged: the literal word null, which is design D2\u0027s whole finding (got \u0027null\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 magic live phase: the comparison named all seven stored balances (got \u00277\u0027)",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 magic live phase: v1 refused a magic id outside the committed table",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 magic live phase: v1 refused a non-canonical identity and an operation outside the closed set",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 magic live phase: v1 refused a player with no save document",
+                           "ok":  true
+                       },
+                       {
+                           "name":  "server-v1 magic live phase: summary records v1 readiness, a clean teardown, and the save-mutation proof",
                            "ok":  true
                        },
                        {

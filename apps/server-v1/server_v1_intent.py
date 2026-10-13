@@ -48,7 +48,7 @@ a resource word, as ``instant_cost_report`` or ``my_gold_pick`` do, is
 directions of that distinction are pinned over the whole vocabulary by
 ``tests/test_intent.py``.
 
-The allowed keys for the two delivered actions:
+The allowed keys for the three delivered actions:
 
 ``collect``
     ``player_id`` — the save this intent is about, a non-empty string.  ``row``
@@ -61,7 +61,17 @@ The allowed keys for the two delivered actions:
     than the request layer calling it malformed (see
     :data:`NON_NEGATIVE_ADDRESSING`).  Both required.
 
-Each action's schema is closed over its own two keys, so a ``collect`` request
+``magic``
+    ``player_id`` — the save this intent is about, a non-empty string.
+    ``magic_id`` — the committed magic id, an integer that **may be zero or
+    negative**: the preserved ``buy_magic``/``use_magic`` branches never index
+    the committed table, so there is no positional clamp for a non-positive id
+    to alias and the slice refuses it as ``unknown_magic_id`` rather than this
+    layer calling it malformed (see :data:`NON_NEGATIVE_ADDRESSING`).
+    ``operation`` — one of the closed set in :data:`INTENT_OPERATION_VALUES`.
+    All three required.
+
+Each action's schema is closed over its own keys, so a ``collect`` request
 that carries ``collection_id`` is an ``unknown_request_field`` and vice versa.
 Nothing else is accepted.  Notably absent and deliberately *not* accepted:
 ``amount``, ``resource``, ``tier``, ``time``, ``now``, ``price``, ``cash``,
@@ -84,17 +94,47 @@ from server_v1_refusals import Refusal, RefusalCode
 INTENT_SCHEMAS: Dict[str, FrozenSet[str]] = {
     "collect": frozenset({"player_id", "row"}),
     "collection": frozenset({"player_id", "collection_id"}),
+    "magic": frozenset({"player_id", "magic_id", "operation"}),
 }
 
 #: The one addressing field each action requires, and therefore the one field
 #: that tells the two intents apart.  Deliberately a **second** row per action
 #: rather than a branch at the parse site, so adding a route cannot forget to
 #: declare how it is addressed: the closed key set above already guarantees
-#: exactly this field is present, because for both delivered actions
-#: ``allowed == required``.
+#: exactly this field is present, because for every delivered action
+#: ``allowed == required``.  That held for the first two actions and is
+#: **deliberately no longer true**: ``magic`` carries a third key, ``operation``,
+#: which is a required key but **not** an addressing field.  The addressing
+#: contract that does hold is stated by :data:`ADDRESSING_FIELDS` on its own, and
+#: the extra key is declared beside it in :data:`INTENT_OPERATION_FIELDS` rather
+#: than being inferred from a schema's length.
 ADDRESSING_FIELDS: Dict[str, str] = {
     "collect": "row",
     "collection": "collection_id",
+    "magic": "magic_id",
+}
+
+#: The one **non-addressing** required key each action declares, and therefore
+#: the one field whose *value* is a closed vocabulary rather than an address.
+#:
+#: ``operation`` is the third key of the magic intent and exists because the
+#: preserved surface really does distinguish two request kinds
+#: (``buy_magic``/``use_magic``), so collapsing them at the request layer would
+#: either discard the client's intent or force the domain to guess which branch
+#: it is standing in for.  It is declared here **as data** rather than as an
+#: ``if`` in :func:`parse_intent` or in the transport, for the reason design D1
+#: of the magic line records: a closed set that lives in a table cannot be
+#: extended by editing a branch, and ``tests/test_intent.py`` asserts every
+#: declared action with a value set closes over exactly the values it declares.
+INTENT_OPERATION_FIELDS: Dict[str, str] = {"magic": "operation"}
+
+#: The closed value set for each declared operation field, keyed by the field's
+#: name so a second action reusing ``operation`` cannot silently share or
+#: override the first's vocabulary.  A value outside the set is
+#: ``malformed_request`` — a request-shape error, decided here, in the one
+#: module that owns request shape.
+INTENT_OPERATION_VALUES: Dict[str, FrozenSet[str]] = {
+    "operation": frozenset({"buy", "use"}),
 }
 
 #: Actions whose addressing field may legally be **negative**.
@@ -205,11 +245,13 @@ DELTA_MODIFIERS: FrozenSet[str] = frozenset(
 class Intent(BaseModel):
     """A validated player intent: what should happen, and about what.
 
-    Two addressing fields, exactly one set.  They are ``Optional`` rather than
-    split into two models because :func:`parse_intent` constructs one of them
-    from :data:`ADDRESSING_FIELDS` and the transport never builds an ``Intent``
+    One addressing field and one operation, exactly one of each set.  They are
+    ``Optional`` rather than split into separate models because
+    :func:`parse_intent` constructs them from :data:`ADDRESSING_FIELDS` and
+    :data:`INTENT_OPERATION_FIELDS` and the transport never builds an ``Intent``
     itself — so the "which one is set" question is answered at construction
-    rather than at every use, and ``addressed_path`` reports the one that is.
+    rather than at every use, and :meth:`addressed_path` reports the address that
+    is.
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
@@ -222,15 +264,31 @@ class Intent(BaseModel):
     #: May be **zero or negative**, on purpose — see
     #: :data:`NON_NEGATIVE_ADDRESSING`.
     collection_id: Optional[int] = None
+    #: A committed magic id.  Set for ``magic``; ``None`` otherwise.  Also
+    #: **not** in :data:`NON_NEGATIVE_ADDRESSING`, and for the opposite reason to
+    #: ``collection_id``: the preserved ``buy_magic``/``use_magic`` branches
+    #: never index the committed table, so there is no positional clamp for zero
+    #: or a negative to alias and no ``aliased_magic_id`` refusal is warranted.
+    #: The slice refuses them as ``unknown_magic_id``, which is the true
+    #: statement — they name no committed row at all.
+    magic_id: Optional[int] = None
+    #: Which of the action's declared operations the client asked for.  Set for
+    #: every action in :data:`INTENT_OPERATION_FIELDS`; ``None`` otherwise.  A
+    #: value outside the action's closed set never reaches here: it is refused
+    #: as ``malformed_request`` in :func:`parse_intent`.
+    operation: Optional[str] = None
 
     def addressed_path(self) -> str:
         """A JSON-pointer-ish description of what this intent addresses.
 
-        Used in refusal detail so a client can see exactly which row or which
-        ledger was addressed.  It reports the address, never a balance.
+        Used in refusal detail so a client can see exactly which row, ledger
+        key, or committed magic row was addressed.  It reports the address, never
+        a balance.
         """
         if self.collection_id is not None:
             return "/privateState/collections"
+        if self.magic_id is not None:
+            return "/privateState/magics/%d" % self.magic_id
         return "/maps/0/items/%d" % self.row
 
 
@@ -278,7 +336,9 @@ def parse_intent(action: str, body: Any) -> IntentOutcome:
     2. no key is delta-shaped (``client_supplied_delta``);
     3. no key is outside the action's schema (``unknown_request_field``);
     4. the required keys are present and correctly typed
-       (``malformed_request``).
+       (``malformed_request``);
+    5. the action's declared ``operation``, if it declares one, names one of its
+       declared values (``malformed_request``).
 
     Order matters for a client: a request carrying both a delta and an unknown
     key is reported as a delta attempt, because that is the security-relevant
@@ -353,6 +413,35 @@ def parse_intent(action: str, body: Any) -> IntentOutcome:
             {"addressing_field": addressing, "received": target},
         )
 
+    # (4b) the action's declared operation, from its closed value set.
+    #
+    # Declared as data (:data:`INTENT_OPERATION_VALUES`) rather than as a branch
+    # here or in the transport, so a fourth operation can only be added by
+    # editing the table -- and the table is what a test reads to assert the set
+    # is exactly what the delivered domain accepts.  A request naming no
+    # operation field, a non-string operation, and an undeclared operation value
+    # are one refusal with three different ``received`` spellings rather than
+    # three refusals, because they are one fact: the request does not name an
+    # operation this action declares.
+    operation_field = INTENT_OPERATION_FIELDS.get(action)
+    operation: Optional[str] = None
+    if operation_field is not None:
+        operation_values = INTENT_OPERATION_VALUES[operation_field]
+        raw_operation = body.get(operation_field)
+        if not isinstance(raw_operation, str) or raw_operation not in operation_values:
+            return _refuse(
+                RefusalCode.MALFORMED_REQUEST,
+                "%s must be one of %s" % (operation_field, sorted(operation_values)),
+                {
+                    "operation_field": operation_field,
+                    "allowed_operations": sorted(operation_values),
+                    "received": raw_operation
+                    if isinstance(raw_operation, str)
+                    else type(raw_operation).__name__,
+                },
+            )
+        operation = raw_operation
+
     return Intent(
         action=action,
         player_id=player_id,
@@ -363,6 +452,8 @@ def parse_intent(action: str, body: Any) -> IntentOutcome:
         # with neither field set.
         row=target if addressing == "row" else None,
         collection_id=target if addressing == "collection_id" else None,
+        magic_id=target if addressing == "magic_id" else None,
+        operation=operation,
     )
 
 
@@ -474,6 +565,8 @@ __all__ = [
     "ADDRESSING_FIELDS",
     "DELTA_KEYS",
     "DELTA_MODIFIERS",
+    "INTENT_OPERATION_FIELDS",
+    "INTENT_OPERATION_VALUES",
     "INTENT_SCHEMAS",
     "Intent",
     "IntentOutcome",

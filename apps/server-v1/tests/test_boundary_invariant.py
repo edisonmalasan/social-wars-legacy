@@ -122,6 +122,33 @@ def refusal_code_attributes(tree: ast.Module) -> Set[str]:
     }
 
 
+def declared_names(tree: ast.Module) -> Set[str]:
+    """Every class and function name a module declares, at any depth.
+
+    Distinct from :func:`imported_names`, which cannot see a module's *own*
+    declarations at all -- the reason ``server_v1_outcomes.py`` is not a holder
+    of ``CollectionSuccess``.  Docstrings are prose about a rule and would
+    satisfy any guard that scans for a name, so the walk deliberately reads
+    identifiers rather than string constants.
+    """
+    return {
+        node.name
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef))
+    }
+
+
+def code_names(tree: ast.Module) -> Set[str]:
+    """Every identifier a module's **code** reads, excluding docstrings.
+
+    An ``ast.Name`` node only exists for an identifier in executable position, so
+    a mention inside prose cannot satisfy this.  Together with
+    :func:`imported_names` and :func:`declared_names` it covers the three places
+    a name can appear: imported, declared, used.
+    """
+    return {node.id for node in ast.walk(tree) if isinstance(node, ast.Name)}
+
+
 def parsed(path: Path) -> ast.Module:
     return ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
 
@@ -300,6 +327,79 @@ class DerivationLivesInOnePlaceTests(unittest.TestCase):
             if "CollectionSuccess" in imported_names(parsed(path))
         }
         self.assertLessEqual(holders, {"server_v1_collection.py"})
+
+    def test_only_the_magic_slice_holds_a_magic_success(self) -> None:
+        """The same claim for the third success type, measured separately.
+
+        The two checks above are both **exact imported-name matches**, so
+        ``MagicSuccess`` is unaffected by either of them -- which is correct,
+        not a gap, and is the reason neither is widened here.  Widening them into
+        a prefix or substring match would make each one cover a model it was not
+        written about and would lose the "not a holder" side of the claim for the
+        other two.
+
+        Stated separately because ``MagicSuccess`` is gated on a **different**
+        authority than its two predecessors: not a
+        :class:`~server_v1_economy.ResourceDerivation` but a
+        :class:`~server_v1_magic.MagicTransition`, which is issued by a private
+        token in that module rather than by the economy.  ``MagicTransition`` is
+        therefore deliberately **not** a fourth ``Derivation`` -- putting it in
+        the economy would have widened
+        ``test_every_derivation_is_guarded`` -- and this check is what keeps the
+        narrower fact honest.
+
+        Measured before writing it: ``MagicSuccess`` is imported by
+        ``server_v1_magic.py`` and by nothing else.  It is **defined** in
+        ``server_v1_outcomes.py``, which is therefore not a holder.
+        """
+        holders = {
+            module_name(path)
+            for path in APP_MODULES
+            if "MagicSuccess" in imported_names(parsed(path))
+        }
+        self.assertLessEqual(holders, {"server_v1_magic.py"})
+
+    def test_a_magic_transition_is_not_a_resource_derivation(self) -> None:
+        """``MagicTransition`` must stay outside the economy's derivation set.
+
+        :data:`DERIVATION_CONSTRUCTORS` is the closed set this file's own
+        derivation guards are written against, and
+        ``test_the_derivation_constructors_are_exactly_what_the_economy_defines``
+        asserts the economy agrees with it.  A counter model placed in
+        ``server_v1_economy`` would therefore have to join that set to satisfy
+        them, widening a guard that is correctly narrow.
+
+        ``test_every_derivation_is_guarded`` consequently still passes
+        **unamended** for the magic line, and this check states why that is the
+        right outcome rather than a lucky one.  The second assertion is the
+        mechanical form of the first: the model lives in this slice's module, so
+        the economy never sees it.
+        """
+        self.assertNotIn("MagicTransition", DERIVATION_CONSTRUCTORS)
+        self.assertEqual(
+            ("ResourceDerivation", "CollectionGrant"),
+            DERIVATION_CONSTRUCTORS,
+            "adding a fourth derivation name would widen every guard in this class",
+        )
+        declaring = {
+            module_name(path)
+            for path in APP_MODULES
+            if "MagicTransition" in declared_names(parsed(path))
+        }
+        self.assertEqual({"server_v1_magic.py"}, declaring)
+        # Every other place the name can appear -- imported, or read in code.
+        # The issuance token is module-private, so a name reaching any other
+        # module could only be a reference to a value it cannot construct.
+        naming = {
+            module_name(path)
+            for path in APP_MODULES
+            if path.name != "server_v1_magic.py"
+            and (
+                "MagicTransition" in imported_names(parsed(path))
+                or "MagicTransition" in code_names(parsed(path))
+            )
+        }
+        self.assertEqual(set(), naming)
 
 
 class TransportNamesNoReasonTests(unittest.TestCase):

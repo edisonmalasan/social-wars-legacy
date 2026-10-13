@@ -4,8 +4,9 @@ extends Node
 ##
 ## ## What this implementation delivers, and what it refuses
 ##
-## v1 exposes exactly **two** routes, `POST /v1/collect` and
-## `POST /v1/collection`, and this implementation implements exactly those two
+## v1 exposes exactly **three** routes, `POST /v1/collect`,
+## `POST /v1/collection` and `POST /v1/magic`, and this implementation
+## implements exactly those three
 ## intents. Every other facade intent answers with the **client-local** code
 ## `unsupported_by_server_v1` and **never touches the transport at all** - which
 ## is the honest answer for a surface that does not exist, and is deliberately
@@ -24,9 +25,11 @@ extends Node
 ## `list_sessions()` and `get_bootstrap()` refuse too. v1 has no session list
 ## and no bootstrap route, so there is **no v1 answer to model** for them: the
 ## typed result carries the local code and nothing else. `collect_income()` and
-## `complete_collection_town()` are the two intents whose v1 answers have their
-## own typed results (`server_v1_collect_result.gd` and
-## `server_v1_collection_result.gd`), because v1's shapes genuinely differ from
+## `complete_collection_town()` and `magic_town()` are the three intents whose v1
+## answers have their
+## own typed results (`server_v1_collect_result.gd`,
+## `server_v1_collection_result.gd` and `server_v1_magic_result.gd`), because v1's
+## shapes genuinely differ from
 ## v0's - see those modules' headers for the full reasons. `GameApi`'s declared
 ## return types for those two are `Variant` with the concrete types named in its
 ## own comment (and asserted by `tests/test_server_v1.gd` and
@@ -55,19 +58,21 @@ const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
 const CombatFlow = preload("res://scripts/units/combat_flow.gd")
 const ResearchFlow = preload("res://scripts/units/research_flow.gd")
 const QuestFlow = preload("res://scripts/units/quest_flow.gd")
-const MagicFlow = preload("res://scripts/units/magic_flow.gd")
 const RewardFlow = preload("res://scripts/rewards/reward_flow.gd")
 const TutorialFlow = preload("res://scripts/progression/tutorial_flow.gd")
 const ServerV1Collect = preload(
 	"res://scripts/gameapi/server_v1_collect_result.gd")
 const ServerV1Collection = preload(
 	"res://scripts/gameapi/server_v1_collection_result.gd")
+const ServerV1Magic = preload(
+	"res://scripts/gameapi/server_v1_magic_result.gd")
 
 ## Loopback default: v1 binds `127.0.0.1` only and its own port, 5057
 ## (design D7; `apps/server-v1/server_v1_settings.py`).
 const DEFAULT_ENDPOINT := "http://127.0.0.1:5057"
 const COLLECT_PATH := "/v1/collect"
 const COLLECTION_PATH := "/v1/collection"
+const MAGIC_PATH := "/v1/magic"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -152,15 +157,83 @@ static func _collection_intent_body(user_id: String,
 	return {"player_id": user_id, "collection_id": collection_id}
 
 
+## The third implemented intent: a magic **counter transition**, as intent only.
+##
+## ## Why this one is the interesting one
+##
+## The other two v1 intents charge something, and the charge is derived from
+## committed content. This one **charges nothing at all**, and that is not an
+## omission in the server: no committed column of the ten-row magic table is
+## named as a price, so there is nothing to derive one from (design D2). The
+## request therefore carries an identity and an **operation**, and nothing else -
+## and the absence of a price is carried in the answer as an explicit
+## `price_charged: null` rather than as a missing field, so "nothing was charged"
+## can never be confused with "the answer said nothing".
+##
+## ## `action` becomes `operation`, and it is sent unfiltered
+##
+## The facade's `magic_town(action, ...)` parameter is called `action` because the
+## **legacy-v0** route spells its body field `action`; v1's field is `operation`
+## and carries the same closed set `{buy, use}`. It is sent **verbatim and
+## unchecked**, because a client that pre-filtered it would turn v1's named
+## `malformed_request` into a client-local code — and that is exactly the mistake
+## `complete_collection_town` above documents avoiding for a negative collection
+## id. A wrong operation therefore reaches v1, is refused there by name, and comes
+## back through `error_code` like every other v1 refusal.
+##
+## ## The declared return type changed, and that is recorded
+##
+## This implementation previously returned `MagicFlow.MagicResult` by refusing.
+## It now returns `ServerV1Magic.MagicCounterResult`, because v1's magic answer is
+## genuinely a different shape from v0's: v0 reports `command`, `addressing`,
+## `ordering_rule`, `validation_order`, `cap_uniformity`, three `legacy_*`
+## strings, `recorded_after`/`legacy_expected_after`/`matches_derived` and a
+## `no_damage` claim, while v1 reports a `transition`, a `counter` block, the
+## committed row verbatim, and divergence **reasons** rather than a recomputed
+## legacy value. A single model could not absorb both without picking a sign
+## convention and re-deriving a legacy figure - i.e. inventing two rules.
+## `GameApi.magic_town`'s declared return type is therefore widened to `Variant`
+## with the concrete types named in its comment, which is the **third** widening
+## of that kind in this facade and the **first** one this line needed
+## (`collect_income` and `complete_collection_town` are the two before it).
+func magic_town(user_id: String, action: Variant,
+		magic_id: Variant) -> ServerV1Magic.MagicCounterResult:
+	var outcome := await _call(MAGIC_PATH, JSON.stringify(
+		_magic_intent_body(user_id, str(action), magic_id)))
+	if not outcome.get("ok", false):
+		return ServerV1Magic.magic_failure(
+			str(outcome.get("code", ServerV1Collect.CODE_BAD_REQUEST)),
+			str(outcome.get("message", "")))
+	return ServerV1Magic.parse_magic_counter(outcome.get("payload"))
+
+
+## The v1 magic intent: three fields, verbatim. This is the whole request.
+##
+## **`magic_id` is sent exactly as the caller gave it**, including a float or a
+## string form, because v1 refuses a non-canonical identity by name
+## (`unknown_magic_id`) and a client that normalised it first would turn that
+## specific answer into `malformed_request`. Four fields are **not** sent and
+## could not be smuggled even by accident: a count, a price, a delta and a
+## balance. `tests/test_magic_v1.gd` asserts this body is exactly `player_id`,
+## `operation` and `magic_id`.
+static func _magic_intent_body(user_id: String, operation: String,
+		magic_id: Variant) -> Dictionary:
+	return {
+		"player_id": user_id,
+		"operation": operation,
+		"magic_id": magic_id,
+	}
+
+
 # --- intents v1 does not have ------------------------------------------------
 #
 # Each answers `unsupported_by_server_v1` through its OWN typed result's
 # `_failure` factory, and none of them touches `_call`. They are grouped rather
 # than interleaved because they are uniform on purpose: there is one decision
-# (v1 exposes **two** routes) and twenty-two identical consequences. The count
-# moved from twenty-one when `POST /v1/collection` landed: `complete_collection_town`
-# joined the two implemented intents above and left this section, and
-# `tests/test_server_v1.gd` pins the remaining twenty-two by name so the move is
+# (v1 exposes **three** routes) and twenty-one identical consequences. The count
+# moved from twenty-two when `POST /v1/magic` landed: `magic_town` joined the three
+# implemented intents above and left this section, and
+# `tests/test_server_v1.gd` pins the remaining twenty-one by name so the move is
 # measured rather than assumed.
 
 
@@ -298,13 +371,6 @@ func combat_town(user_id: String, action: Variant,
 	return _unsupported(CombatFlow.combat_failure(
 		ServerV1Collect.CODE_UNSUPPORTED,
 		"Server v1 exposes no combat route; this client sends no request."))
-
-
-func magic_town(user_id: String, action: Variant,
-		magic_id: Variant) -> MagicFlow.MagicResult:
-	return _unsupported(MagicFlow.magic_failure(
-		ServerV1Collect.CODE_UNSUPPORTED,
-		"Server v1 exposes no magic route; this client sends no request."))
 
 
 func reward_town(user_id: String,

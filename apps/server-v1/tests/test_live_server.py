@@ -466,9 +466,17 @@ class CorpusContainmentTests(unittest.TestCase):
         # tested the temp root instead, and passed for any path under it.
         self.assertTrue(Path(banner["corpus"]).name.startswith(TEMP_PREFIX))
         self.assertEqual(port, banner["port"])
+        # A count pin the third route legitimately moved: the banner lists the
+        # served inventory verbatim and the magic line added one row to it.  The
+        # pin is amended in place with its **order** asserted too, because a
+        # sorted or set-derived banner would satisfy a subset test and not this
+        # one -- and the order is the declaration order in ``server_v1_app.ROUTES``,
+        # which is what makes the banner a report rather than a rendering.
         self.assertEqual(
-            ["POST /v1/collect", "POST /v1/collection"], banner["routes"]
+            ["POST /v1/collect", "POST /v1/collection", "POST /v1/magic"],
+            banner["routes"],
         )
+        self.assertEqual(3, len(banner["routes"]))
         self.assertEqual(FIXTURE_INSTANT, banner["fixed_now"])
 
     def test_no_corpus_directory_survives_a_graceful_stop(self) -> None:
@@ -528,6 +536,13 @@ class StartupContractTests(unittest.TestCase):
         # to be on the record.  The pin is an **exact set**, so the key had to be
         # added here rather than the check loosened into a subset test — a
         # subset assertion could not catch a provenance field being dropped.
+        #
+        # ``magic_rows`` was added by the magic line for the same reason and by
+        # the same mechanism: the third route resolves an id into a committed row,
+        # and the banner is still the only record of the table it resolved
+        # against.  **This is an extension of the pin, not a loosening of it** —
+        # the assertion is still an exact set, so a fourth content field will
+        # also have to be added here deliberately.
         self.assertEqual(
             {
                 "applied_mods",
@@ -535,6 +550,7 @@ class StartupContractTests(unittest.TestCase):
                 "collection_rows",
                 "distinct_item_ids",
                 "item_entries",
+                "magic_rows",
                 "missing_mods",
                 "missing_patches",
                 "removed_duplicate_items",
@@ -543,6 +559,7 @@ class StartupContractTests(unittest.TestCase):
             set(banner["content"]),
         )
         self.assertEqual(10, banner["content"]["collection_rows"])
+        self.assertEqual(10, banner["content"]["magic_rows"])
         self.assertEqual(["make_dynamic"], banner["content"]["skipped_loader_steps"])
 
     def test_an_unknown_flag_is_refused_rather_than_ignored(self) -> None:

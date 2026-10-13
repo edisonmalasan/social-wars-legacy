@@ -87,6 +87,16 @@ class RefusalCode(str, Enum):
     #: about content v1 refuses to interpret, this one is about a balance v1
     #: read.
     INSUFFICIENT_CASH = "insufficient_cash"
+    #: The requested magic id names no distinct committed magic row.  Unlike
+    #: ``ALIASED_COLLECTION_ID`` there is no clamped neighbour to distinguish:
+    #: the preserved ``buy_magic``/``use_magic`` branches never index the
+    #: committed table at all, so zero and every negative simply resolve to
+    #: nothing rather than aliasing another row (design D3 of this line).
+    UNKNOWN_MAGIC_ID = "unknown_magic_id"
+    #: The player's recorded counter for this magic is already above the
+    #: recorded literal bound, so the bounded derivation cannot produce a value
+    #: from it.  The recorded counter is reported, never rewritten (design D6).
+    COUNTER_ABOVE_CAP = "counter_above_cap"
 
     # -- server-side integrity: never a client-visible gameplay answer -------
     UNREADABLE_STATE = "unreadable_state"
@@ -119,6 +129,8 @@ REFUSAL_HTTP_STATUS: Dict[RefusalCode, int] = {
     RefusalCode.COLLECTION_NOT_ELIGIBLE: 409,
     RefusalCode.COLLECTION_ALREADY_CLAIMED: 409,
     RefusalCode.INSUFFICIENT_CASH: 409,
+    RefusalCode.UNKNOWN_MAGIC_ID: 409,
+    RefusalCode.COUNTER_ABOVE_CAP: 409,
     # Something on this server is wrong.  These are deliberately *not*
     # disguised as gameplay answers.
     RefusalCode.UNREADABLE_STATE: 500,
@@ -176,6 +188,14 @@ REFUSAL_CODE_PURPOSE: Dict[RefusalCode, str] = {
     RefusalCode.INSUFFICIENT_CASH: (
         "the player's stored cash is below the collection's committed price"
     ),
+    RefusalCode.UNKNOWN_MAGIC_ID: (
+        "the requested magic id names no distinct row of the committed magic "
+        "table"
+    ),
+    RefusalCode.COUNTER_ABOVE_CAP: (
+        "the player's recorded counter for this magic is already above the "
+        "recorded literal bound, so no next value can be derived from it"
+    ),
     RefusalCode.UNREADABLE_STATE: "stored state this service cannot read",
     RefusalCode.UNREADABLE_CONTENT: "committed content this service cannot read",
     RefusalCode.POST_CONDITION_VIOLATION: (
@@ -204,6 +224,8 @@ V0_EQUIVALENT_CODES: Dict[RefusalCode, str] = {
     RefusalCode.COLLECTION_NOT_ELIGIBLE: "(none — v0 reports eligibility unchecked)",
     RefusalCode.COLLECTION_ALREADY_CLAIMED: "(none — v0 grants again)",
     RefusalCode.INSUFFICIENT_CASH: "(none — v0 charges nothing)",
+    RefusalCode.UNKNOWN_MAGIC_ID: "unknown_magic_id",
+    RefusalCode.COUNTER_ABOVE_CAP: "counter_above_cap",
     RefusalCode.UNREADABLE_STATE: "internal_error",
     RefusalCode.UNREADABLE_CONTENT: "internal_error",
     RefusalCode.POST_CONDITION_VIOLATION: "internal_error",

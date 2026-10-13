@@ -1,0 +1,149 @@
+{
+	"claims": {
+		"client_computes_a_price": false,
+		"client_derives_the_next_counter": false,
+		"client_evaluates_a_level_gate": false,
+		"client_filters_an_identity_or_operation": false,
+		"client_relates_two_reported_values": false,
+		"parity_with_legacy_claimed": false,
+		"unsupported_intent_touches_transport": false
+	},
+	"committed_table": {
+		"area_is_an_embedded_json_string": true,
+		"no_column_is_named_a_price": true,
+		"numeric_columns": [
+			"cash",
+			"gold",
+			"id",
+			"level",
+			"mana",
+			"target"
+		],
+		"price_candidate_columns": [
+			"gold",
+			"cash",
+			"mana",
+			"level"
+		],
+		"raw_table_has_no_kind_column": true,
+		"rows": 10,
+		"source": "config/main.json"
+	},
+	"enforced_by": {
+		"client_computes_a_price": "_check_no_client_arithmetic (guard A) + _check_absent_derivation_helpers + _check_domain_reserved_stems + _check_committed_table_is_re_derived + _check_fail_closed (the priced-answer case)",
+		"client_derives_the_next_counter": "_check_no_line_compares_two_reported_values + _check_domain_inventory",
+		"client_evaluates_a_level_gate": "_check_no_line_compares_two_reported_values + _check_absent_derivation_helpers + _check_fail_closed (the enforced-gate case)",
+		"client_filters_an_identity_or_operation": "_check_intent_body",
+		"client_relates_two_reported_values": "_check_no_line_compares_two_reported_values (five pairs)",
+		"parity_with_legacy_claimed": "not a claim; v1 is new behaviour and no legacy oracle exists",
+		"unsupported_intent_touches_transport": "test_server_v1.gd; this suite asserts the intent LEFT its unsupported table (_check_unsupported_intent_left_the_table)"
+	},
+	"intent": {
+		"action": "magic",
+		"client_local_codes": [
+			"unsupported_by_server_v1",
+			"bad_request"
+		],
+		"facade_return_type": "Variant",
+		"facade_widening_is_the_third": true,
+		"impl_return_types": {
+			"scripts/gameapi/fake_api.gd": "MagicFlow.MagicResult",
+			"scripts/gameapi/legacy_v0_api.gd": "MagicFlow.MagicResult",
+			"scripts/gameapi/server_v1_api.gd": "ServerV1Magic.MagicCounterResult"
+		},
+		"magic_path": "/v1/magic",
+		"negative_id_is_filtered_client_side": false,
+		"operation_is_filtered_client_side": false,
+		"operations": [
+			"buy",
+			"use"
+		],
+		"protocol": "server-v1",
+		"request_fields": [
+			"player_id",
+			"magic_id",
+			"operation"
+		]
+	},
+	"limits": {
+		"cap_is_a_preserved_branch_literal": true,
+		"client_sees_a_before_state": false,
+		"counter_rule_is_derived": true,
+		"fixture_is_a_captured_legacy_oracle": false,
+		"fixtures_are_observed_v1_answers": true,
+		"ledger_shape_refusal_needs_an_in_memory_row": true,
+		"legacy_branch": "command.py:652-675",
+		"legacy_command": "buy_magic / use_magic",
+		"level_gate_is_derived": false,
+		"live_phase_seeds_nothing": true,
+		"pixel_parity": false,
+		"price_is_derived": false,
+		"python_name_scan_over_counts_a_docstring": true,
+		"v1_routes_delivered_total": 3,
+		"windowed_capture": false
+	},
+	"modules": {
+		"scripts/gameapi/server_v1_api.gd": {
+			"bytes": 21076,
+			"pure_lf": false,
+			"raw_sha256": "534635d6d6bd5a433e213d05839439eb9f7ca23e0809e1f11470d47a7979ee22"
+		},
+		"scripts/gameapi/server_v1_magic_result.gd": {
+			"bytes": 24310,
+			"pure_lf": false,
+			"raw_sha256": "ef39db7067ca48d91664f2bd7e31472cc94bd6ea8857993a1a8dc8a79e1b4ca7"
+		}
+	},
+	"modules_are_pure_lf": false,
+	"refusals": {
+		"client_local_codes_are_server_codes": false,
+		"declared_by_the_committed_table": 19,
+		"distinct_codes": [
+			"client_supplied_delta",
+			"counter_above_cap",
+			"malformed_request",
+			"unknown_magic_id",
+			"unknown_player",
+			"unreadable_state"
+		],
+		"observed_condition_count": 9,
+		"observed_conditions": [
+			"client-supplied delta",
+			"counter above the bound",
+			"non-canonical identity form",
+			"operation outside the closed set",
+			"unknown identity",
+			"unknown player",
+			"unknown request field",
+			"unreadable ledger",
+			"unreadable ledger entry"
+		]
+	},
+	"report": "magic-v1-report-v1",
+	"typed_result": {
+		"fail_closed_cases": 77,
+		"refuses_a_denied_shared_transition": true,
+		"refuses_a_non_null_price_charged": true,
+		"reported_committed_fields": [
+			"id",
+			"name",
+			"gold",
+			"cash",
+			"mana",
+			"level",
+			"target",
+			"area",
+			"kind"
+		],
+		"stored_resource_count": 7,
+		"stored_resource_names": [
+			"xp",
+			"gold",
+			"wood",
+			"oil",
+			"steel",
+			"cash",
+			"mana"
+		]
+	}
+}

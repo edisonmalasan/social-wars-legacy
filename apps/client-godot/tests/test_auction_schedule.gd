@@ -162,9 +162,24 @@ const RESOURCE_TOKENS := ["gold", "coins", "cash", "wood", "steel", "oil",
 ## intended behaviour, so it is amended rather than relaxed. `test_market_trade` was
 ## added at 50 and deliberately does NOT add a second pin of its own, so the next line
 ## meets this one constant and not two.
-const RECORDED_HERMETIC_COUNT := 52
-const RECORDED_LIVE_PHASE_COUNT := 25
-
+const RECORDED_HERMETIC_COUNT := 53
+const RECORDED_LIVE_PHASE_COUNT := 26
+##
+## **Amended 52 -> 53 and 25 -> 26 by the magic line**, which is what moved
+## them: `test_magic_v1` joined `$hermetic` and `magic-live-v1` joined
+## `$serverV1Phases`. A count pin an incoming line legitimately moves is
+## amended in place, which is the established pattern.
+##
+## The live figure was **MEASURED, not assumed**, because task 6.8 required it
+## and because the server-v1 line recorded that a pin unable to see the thing it
+## counts is worse than no pin at all. Measured in this file's own source: the
+## `$livePhases` regex is `live.compile("\$livePhases = @\(([\s\S]*?)\n    \)")`
+## and a **second** regex reads the widened list,
+## `v1_live.compile("\$serverV1Phases = @\(([\s\S]*?)\n    \)\r?\n")`,
+## whose names are appended into the SAME `live_names` array - so the pin does
+## see the v1 phases. `test_market_trade.gd` carries the same pair at 1554/1577.
+## The totals measured in verify-boot.ps1 after this line's two registrations are
+## 53 hermetic suites, 23 v0 live phases and 3 v1 live phases.
 var _module_source := ""
 var _oracle_source := ""
 var _registry: Variant = null

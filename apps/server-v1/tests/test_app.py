@@ -41,7 +41,13 @@ from harness import (
     remove_corpus,
     seed_player_id,
 )
-from server_v1_app import COLLECT_PATH, ROUTE_PREFIX, ROUTES, create_app
+from server_v1_app import (
+    COLLECT_PATH,
+    MAGIC_PATH,
+    ROUTE_PREFIX,
+    ROUTES,
+    create_app,
+)
 from server_v1_outcomes import SUCCESS_HTTP_STATUS
 
 FIXTURE_INSTANT = 1790705901
@@ -116,10 +122,16 @@ class TransportStructureTests(unittest.TestCase):
     """The structural half, asserted about this file's own subject."""
 
     def test_the_inventory_is_not_empty(self) -> None:
-        """A guard satisfied by an empty scan is the defect class itself."""
+        """A guard satisfied by an empty scan is the defect class itself.
+
+        The set is exact and is **extended**, never loosened, when a route is
+        added: ``POST /v1/magic`` was appended by the third deliver line and the
+        assertion stayed an equality, so a fourth route still has to be added
+        here deliberately.
+        """
         self.assertIsInstance(transport_source(), ast.Module)
         self.assertEqual(
-            {"POST /v1/collect", "POST /v1/collection"},
+            {"POST /v1/collect", "POST /v1/collection", "POST /v1/magic"},
             set(ROUTES),
         )
 
@@ -127,6 +139,8 @@ class TransportStructureTests(unittest.TestCase):
         """The literal cannot drift from ``ROUTE_PREFIX`` without failing here."""
         self.assertEqual(ROUTE_PREFIX + "/collect", COLLECT_PATH)
         self.assertEqual("/v1/collect", COLLECT_PATH)
+        self.assertEqual(ROUTE_PREFIX + "/magic", MAGIC_PATH)
+        self.assertEqual("/v1/magic", MAGIC_PATH)
 
     def test_the_transport_declares_no_arithmetic_operator(self) -> None:
         """No ``+``, ``-``, ``*``, ``/``: the transport may not compute anything.
