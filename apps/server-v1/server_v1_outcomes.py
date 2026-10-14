@@ -10,16 +10,28 @@ unconstructible, and the only way to obtain a derivation is to have the economy
 authority derive one from committed content and recorded state.
 
 The union :data:`Outcome` is what every domain service returns: a
-:class:`Success`, a :class:`CollectionSuccess`, a :class:`MagicSuccess`, or a
+:class:`Success`, a :class:`CollectionSuccess`, a :class:`MagicSuccess`, a
+:class:`CombatSuccess`, a :class:`RewardSuccess`, or a
 :class:`~server_v1_refusals.Refusal`.  There is no other arm, and there is no
 ``None`` — a domain function that has decided nothing has a bug, and the type
-says so.  **The third and fourth arms are further successes, not refusal
+says so.  **The third and later arms are further successes, not refusal
 variants**: a collection *grant* is a genuinely different transaction from a
 collection *payout*, and the difference is a shape difference (no row, no rung,
 a prize in storage and a price in cash) rather than a value difference, so it
 earns its own frozen model with its own required derivation; and a magic
 *counter transition* is a third shape again — no row, no rung, no elapsed time,
 **no price and no deltas at all** — so it earns a third.
+
+**The reward arm (M13 line 5) is a counter transition with the counter replaced
+by a cursor, and it is a distinct shape for a reason the other four do not
+have: it is the only one that writes a value it did not pay for.**  Every other
+success either moves a client-free derivation into a stored row, grants a
+committed prize, or advances a bounded counter.  A reward success advances a
+cursor **and grants nothing**, so a reader who saw only "the cursor moved" would
+conclude the player was paid.  :class:`RewardSuccess` therefore carries the
+no-payout claim as a **field** (:attr:`RewardSuccess.derived_payout`,
+:attr:`RewardSuccess.paid`) and proves it by comparing the **whole** stored
+resource set, rather than leaving it to the prose above.
 
 What a :class:`Success` carries:
 
@@ -494,23 +506,231 @@ class CombatSuccess(BaseModel):
 __all__ = [
     "PRESERVED_COMBAT_BEHAVIOUR",
     "PRESERVED_MAGIC_BEHAVIOUR",
+    "PRESERVED_REWARD_BEHAVIOUR",
     "SUCCESS_HTTP_STATUS",
     "CollectionSuccess",
     "CombatSuccess",
     "MagicSuccess",
     "Outcome",
+    "RewardSuccess",
     "Success",
 ]
 
 
-#: What a domain service returns.  Five arms, no ``None``.
+#: What the two preserved reward branches actually do, reported beside every
+#: reward success so a client can see the gap between the oracle and this line
+#: without reading either.
 #:
-#: The four successes are separate frozen models rather than one model with
+#: **Every entry is a recorded fact, and none is a v1 behaviour.**  This is the
+#: same discipline :data:`PRESERVED_COMBAT_BEHAVIOUR` records, and it matters
+#: more here: the reward branches *sound* like payouts -- one is called
+#: ``win_daily_bonus`` and the committed table is called ``DAILY_GOLD_REWARDS`` --
+#: so a reader who saw only "the daily cursor advanced" would have every reason
+#: to think gold changed hands.
+PRESERVED_REWARD_BEHAVIOUR: Dict[str, str] = {
+    "weekly_branch": (
+        "weekly_reward (command.py:345-363): the new cursor is "
+        "(stored + 1) % get_weekly_reward_length(), so the arithmetic is the "
+        "server's while its input is the client's"
+    ),
+    "weekly_client_input": (
+        "the preserved branch reads the next cursor from the request, so a "
+        "client could move the weekly cursor anywhere the modulus allowed"
+    ),
+    "weekly_stamped_instant": (
+        "timeStampMondayBonus is written by the branch and read by nothing: "
+        "no legacy module consumes it, so no eligibility rule exists to "
+        "reproduce"
+    ),
+    "daily_branch": (
+        "win_daily_bonus (command.py:444-463): next_id = args[1] + 1 and "
+        "if next_id > 5: next_id = 1, so an oversized client-sent value wraps "
+        "a recorded 4 back to 1"
+    ),
+    "daily_backwards_move": (
+        "that wrap moves the recorded cursor BACKWARDS, 4 -> 1, and this line "
+        "records it as a divergence rather than reproducing it, because "
+        "reproducing a client-directed cursor regression would defeat the "
+        "purpose of making the cursor authoritative"
+    ),
+    "daily_grant": (
+        "the daily arm's grant is a client-sent item id written into storage "
+        "and a deduplicating unit list, which is exactly why v1 refuses a "
+        "client-sent item by name and pays nothing"
+    ),
+    "daily_bound_literal": (
+        "the daily bound 5 is the literal in the preserved source "
+        "(command.py:451, the `if next_id > 5` test), not a length; it "
+        "coincides with len(DAILY_GOLD_REWARDS) == 5 and the agreement is a "
+        "coincidence. command.py:446 is the OTHER line -- `next_id = args[1] + "
+        "1` -- which is the client input this line replaces, so citing it as the "
+        "bound's provenance would point a reader at the very thing the "
+        "derivation refuses. The table said :446 and was corrected here; "
+        "test_reward.py asserts the corrected figure so it cannot regress"
+    ),
+    "paid": (
+        "neither branch credits a stored resource: the daily arm writes an "
+        "item into storage and the non-granting arm only prints"
+    ),
+    "schedules": (
+        "DAILY_GOLD_REWARDS and MONDAY_BONUS_REWARDS are reported and left "
+        "unread; applying either would diverge from an oracle that pays "
+        "nothing"
+    ),
+}
+
+
+class RewardSuccess(BaseModel):
+    """A reward cursor that advanced, with the no-payout claim as a field.
+
+    **The only success in this module that proves its own emptiness**, and the
+    reason is structural rather than stylistic.  The other four either carry a
+    :class:`~server_v1_economy.ResourceDerivation` or carry none because there
+    is nothing to derive; this one carries a *movement* -- the cursor really did
+    change in the stored document -- beside the absence of every consequence a
+    movement of that name would normally imply.  A reader can therefore not
+    infer "paid" from "advanced", which is the inference this line exists to
+    prevent.
+
+    Three fields make that claim falsifiable rather than asserted:
+
+    * :attr:`derived_payout` is ``None`` and :attr:`paid` is ``False``, declared
+      so a reader is not left to infer them from a missing key;
+    * :attr:`state` is the **complete** stored resource set read back after the
+      transaction, and the post-execution proof compares every one of its
+      members against the pre-request value, so a grant of any size at any
+      resource fails;
+    * :attr:`leaf_paths_changed` reports **every** leaf that moved in the whole
+      document, so the two the cursor and its stamped instant are expected to
+      be is a checkable set rather than a promise.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    action: str
+    #: Which cursor was advanced: ``weekly`` or ``daily``, verbatim from the
+    #: intent's closed operation set.  Never a third value.
+    operation: str
+    #: The cursor read **from the recorded document** before the transaction.
+    #: Reported so a client can see that the successor came from here and not
+    #: from itself.
+    cursor_before: int
+    #: The derived successor: ``stored + 1``, then the bound's own rule.
+    cursor_after: int
+    #: ``cursor_after - cursor_before``, signed.  Reported as its own field so a
+    #: backwards move would be visible as a negative rather than hidden inside
+    #: two unsigned values a reader must subtract by hand.
+    cursor_change: int
+    #: The bound applied, and **where it came from** -- the preserved literal
+    #: for daily, the accessor's own count for weekly.  Both spellings, because
+    #: the whole point of this line's bound split is that the two are not the
+    #: same kind of number.
+    bound: Dict[str, Any]
+    #: The stamped instant before and after.  Written and reported; never read
+    #: to decide anything, because no legacy module reads it.
+    instant_before: int
+    instant_after: int
+    #: The cursor's real storage path beside the request's container address,
+    #: because the request addresses no key and the domain resolves one.
+    cursor_path: str
+    #: Every stored resource, read back after the transaction.
+    state: Dict[str, int] = Field(min_length=1)
+    #: Ordered ``(check, held)`` pairs.  A reward success reporting no proof at
+    #: all is not a state this model can be constructed into.
+    proof: Tuple[Tuple[str, bool], ...] = Field(min_length=1)
+    #: Every leaf path that differed between the pre-request and post-request
+    #: documents.  Expected to be exactly the cursor and the stamped instant;
+    #: reported rather than asserted, so a third movement would name itself.
+    leaf_paths_changed: Tuple[str, ...]
+    #: The post-execution no-payout facts, as fields rather than as prose.
+    derived_payout: None = None
+    paid: bool = False
+    #: The committed schedules, **reported and unread**.  Each entry carries its
+    #: own count so a reader can see that the schedule exists and that nothing
+    #: was read from it.
+    schedules: Dict[str, Any]
+    #: Whether an eligibility, cooldown, daily-window, weekly-period, or
+    #: already-claimed rule was consulted.  A constant ``False``: the stamped
+    #: instant has no reader in the preserved server, so there is no rule to
+    #: apply and deriving one would be an invention.
+    eligibility_derived: bool = False
+    #: Where the stored cursor sat relative to the bound's own addressable
+    #: positions, reported rather than enforced (task 1.4's third report).
+    #:
+    #: The committed corpus carries ``bonusNextId`` as ``0`` in seven of its ten
+    #: reward-bearing documents, and the daily branch's arithmetic can only
+    #: produce ``1..5`` -- so a real corpus document sits off that arm's ladder.
+    #: Clamping it into range would write a number the oracle never wrote and
+    #: make the stored value disagree with the reported one, so the gap is
+    #: reported and nothing is derived to close it.
+    #:
+    #: **Shape is closed and asserted by** ``tests/test_reward.py``: ``bound``,
+    #: ``addressable_positions``, ``unaddressable_cursors``, ``gap_reported``,
+    #: ``clamped``, and ``resolution``.  ``clamped`` is hard ``0`` and the suite
+    #: asserts it rather than trusting it, because a field named for a thing the
+    #: line refuses to do is worth nothing unless something checks it.
+    addressability: Dict[str, Any] = Field(default_factory=dict)
+
+    def payload(self) -> Dict[str, Any]:
+        """The transport body for this success (envelope added by the route).
+
+        Carries **no** ``derived_deltas`` key and **no** ``grant`` key, rather
+        than empty ones.  Both would invite a reader to treat the absence as a
+        formatting accident instead of the claim it is, and ``derived_deltas``
+        is in fact the key every one of the other three successes uses for a
+        real, server-derived figure.
+        """
+        return {
+            "result": "success",
+            "action": self.action,
+            "instant": self.instant_after,
+            "reward": {
+                "operation": self.operation,
+                "cursor_before": self.cursor_before,
+                "cursor_after": self.cursor_after,
+                "cursor_change": self.cursor_change,
+                "cursor_path": self.cursor_path,
+                "cursor_derived_from": "the recorded cursor, never the request",
+                "bound": dict(self.bound),
+                "instant_before": self.instant_before,
+                "instant_after": self.instant_after,
+                "instant_gating": False,
+                # Task 1.4's third report, emitted beside the bound it is
+                # relative to.  **Absent when there is no gap would be wrong**
+                # -- the whole claim is that the transaction always says where
+                # the stored cursor sat -- so it is emitted unconditionally,
+                # with ``gap_reported: false`` when there is nothing to report.
+                "addressability": dict(self.addressability),
+            },
+            "resources_after": dict(self.state),
+            "stored_resources_compared": sorted(self.state),
+            "proof": [list(entry) for entry in self.proof],
+            "leaf_paths_changed": list(self.leaf_paths_changed),
+            "derived_payout": None,
+            "paid": False,
+            "eligibility_derived": False,
+            "schedules": dict(self.schedules),
+            "preserved_branch_behaviour": PRESERVED_REWARD_BEHAVIOUR,
+        }
+
+
+#: What a domain service returns.  Six arms, no ``None``.
+#:
+#: The five successes are separate frozen models rather than one model with
 #: optional halves, and :class:`CollectionSuccess`'s own docstring says why;
-#: :class:`MagicSuccess` carries the same argument with nothing left to remove
-#: and :class:`CombatSuccess` the same argument once more, now with no
-#: derivation at all and a whole-document proof in place of a transition.
-#: Declared last, after every class it names, because ``Union`` resolves its
-#: arguments when it is evaluated: the first version of this module put the
-#: union above ``CollectionSuccess`` and the service failed to import at all.
-Outcome = Union[Success, CollectionSuccess, MagicSuccess, CombatSuccess, Refusal]
+#: :class:`MagicSuccess` carries the same argument with nothing left to remove,
+#: :class:`CombatSuccess` the same argument once more, now with no derivation at
+#: all and a whole-document proof in place of a transition, and
+#: :class:`RewardSuccess` it once more for a different reason -- it moves a
+#: stored value while paying nothing.  Declared last, after every class it
+#: names, because ``Union`` resolves its arguments when it is evaluated: the
+#: first version of this module put the union above ``CollectionSuccess`` and the
+#: service failed to import at all.
+Outcome = Union[
+    Success,
+    CollectionSuccess,
+    MagicSuccess,
+    CombatSuccess,
+    RewardSuccess,
+    Refusal,
+]

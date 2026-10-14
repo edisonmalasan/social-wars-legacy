@@ -54,14 +54,14 @@
 	},
 	"modules": {
 		"scripts/gameapi/server_v1_api.gd": {
-			"bytes": 17432,
+			"bytes": 26576,
 			"pure_lf": false,
-			"raw_sha256": "94bebcd09940832b4ac4106e232d9908ff804413ec170f9c1086f43a1c60515c"
+			"raw_sha256": "1bf3f085a199a44c399fc3a5d677a8f5f37f254533d4bec7244b4f3445f12a1f"
 		},
 		"scripts/gameapi/server_v1_collection_result.gd": {
-			"bytes": 14611,
-			"pure_lf": true,
-			"raw_sha256": "63d1ac4f1e4d64362f14c7b6abcb2bf575dac5c074c31f55980c5ad105ce3397"
+			"bytes": 14958,
+			"pure_lf": false,
+			"raw_sha256": "6f7679194b472eacf610f2f9f848d6f12da6722d108730b26c5ac1d1b7113993"
 		}
 	},
 	"modules_are_pure_lf": false,

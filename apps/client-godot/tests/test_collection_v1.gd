@@ -573,9 +573,10 @@ func _check_grant_codes_live_in_the_grant_module() -> void:
 	for line in refusals.split("\n"):
 		if _looks_like_status_row(str(line)):
 			declared += 1
-	check_eq(declared, 20,
-		"the committed refusal table still maps exactly twenty codes, amended "
-		+ "from nineteen when client_dictated_destruction joined it")
+	check_eq(declared, 25,
+		"the committed refusal table still maps exactly twenty-five codes,"
+		+ " amended from nineteen through client_dictated_destruction and"
+		+ " then the five client_dictated_* grant codes")
 
 
 ## The two client-local codes are minted here, never sent to v1, and therefore
@@ -701,7 +702,7 @@ func _check_absent_derivation_helpers() -> void:
 			"_ready", "_call", "_failure", "_transport_message",
 			"resolved_endpoint", "_unsupported", "_intent_body",
 			"_collection_intent_body", "_combat_intent_body",
-			"_magic_intent_body", "collect_income",
+			"_magic_intent_body", "_reward_intent_body", "collect_income",
 			"complete_collection_town", "list_sessions", "get_bootstrap",
 			"place_building", "purchase_item", "move_building", "sell_building",
 			"store_building", "upgrade_building", "build_construction",
@@ -851,10 +852,17 @@ func _check_widening_justification_is_recorded() -> void:
 	# cannot tell the live figure from a retired one. Pinning the live phrase
 	# and separately asserting the superseded spelling is GONE is what keeps the
 	# pin worth anything.
-	check(api_body.find("twenty identical consequences") != -1,
+	check(api_body.find("nineteen identical consequences") != -1,
 		"the transport module's local refusal count names the live figure")
-	check(api_body.find("twenty-one identical consequences") == -1,
-		"and the superseded twenty-one spelling is gone from the live count")
+	# **The superseded-spelling check moves WITH the live figure.** It asserted
+	# `twenty-one` was gone because that was the previous value; with the live
+	# figure at nineteen, the spelling that must be absent is `twenty`. Both
+	# retired words stay in the transport module's own paragraph as history,
+	# which is precisely why this guard pins a whole phrase and not a bare
+	# word -- a substring of `twenty` would match `twenty-two` in the very
+	# comment it is reading.
+	check(api_body.find("twenty identical consequences") == -1,
+		"and the superseded twenty spelling is gone from the live count")
 	check(facade.find("complete_collection_town") != -1,
 		"and the facade really does declare the second widened intent")
 
@@ -892,10 +900,10 @@ func _check_unsupported_intent_left_the_table() -> void:
 			names.append(candidate.substr(2, candidate.find("\",") - 2))
 	check(closed, "the unsupported table's closing bracket was found, so the "
 		+ "read is bounded by it rather than by the end of the file")
-	check_eq(names.size(), 20,
-		"the collect suite pins exactly the twenty intents v1 lacks,"
-		+ " amended from twenty-two as magic_town and then combat_town left "
-		+ "the table")
+	check_eq(names.size(), 19,
+		"the collect suite pins exactly the nineteen intents v1 lacks,"
+		+ " amended from twenty-two as magic_town, then combat_town, then"
+		+ " reward_town left the table")
 	check(not names.has("complete_collection_town"),
 		"complete_collection_town left the unsupported table, because v1 "
 		+ "implements it now")

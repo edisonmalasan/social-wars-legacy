@@ -1,0 +1,380 @@
+{
+	"claims": {
+		"client_clamps_a_cursor": false,
+		"client_computes_a_successor": false,
+		"client_evaluates_an_eligibility_window": false,
+		"client_filters_an_operation": false,
+		"client_prices_a_reward": false,
+		"client_reads_either_schedule": false,
+		"client_relates_two_reported_values": false,
+		"client_sends_a_grant_channel": false,
+		"client_takes_the_no_payout_fields_from_the_wire": false,
+		"live_scenario_shipped": false,
+		"parity_with_legacy_claimed": false,
+		"unsupported_intent_touches_transport": false
+	},
+	"domain": {
+		"declared_functions": [
+			"_addressability",
+			"_addressable_positions",
+			"_changed_leaf_paths",
+			"_cursor_now",
+			"_derive",
+			"_expected_leaf_paths",
+			"_refuse",
+			"_repository_refusal",
+			"_stamp_key",
+			"_weekly_bound",
+			"advance_reward",
+			"declared_operations",
+			"reward_cursor_path"
+		],
+		"grant_channels": [
+			"cell",
+			"item",
+			"map_index",
+			"player"
+		],
+		"module": "apps/server-v1/server_v1_reward.py",
+		"operation_count": 2
+	},
+	"enforced_by": {
+		"client_clamps_a_cursor": "_check_no_line_compares_two_reported_values (cursor_before with clamped) + _check_absent_derivation_helpers (clamp)",
+		"client_computes_a_successor": "_check_no_line_compares_two_reported_values (five pairs) + _check_absent_derivation_helpers",
+		"client_evaluates_an_eligibility_window": "_check_no_line_compares_two_reported_values (the instant pair) + _check_fail_closed (instant_gating must be false, not merely present)",
+		"client_filters_an_operation": "_check_intent_body (an off-set operation travels verbatim)",
+		"client_prices_a_reward": "_check_no_client_arithmetic (guards A and B, empty exception list) + _check_absent_derivation_helpers + _check_domain_reserved_stems",
+		"client_reads_either_schedule": "_check_absent_derivation_helpers (the schedule stem, with the one size-pinned reporting-name exception)",
+		"client_relates_two_reported_values": "_check_no_line_compares_two_reported_values (per line, with a control that a split-line module is not read as relating)",
+		"client_sends_a_grant_channel": "_check_intent_body (the forbidden key set, empty as built) + _check_observed_refusals_parse (five channels, five codes)",
+		"client_takes_the_no_payout_fields_from_the_wire": "_check_observed_success_parses (a body that lies about all three still parses to paid:false, payout:null, eligibility:false)",
+		"live_scenario_shipped": "_check_no_live_arm_and_no_socket (four claims, each with a control)",
+		"parity_with_legacy_claimed": "not a claim; v1 is new behaviour and no legacy oracle exists for a cursor the preserved server derived from client input",
+		"unsupported_intent_touches_transport": "test_server_v1.gd; this suite asserts the intent LEFT its unsupported table (_check_unsupported_intent_left_the_table)"
+	},
+	"forbidden_relations": [
+		[
+			"cursor_before",
+			"cursor_after"
+		],
+		[
+			"cursor_before",
+			"clamped"
+		],
+		[
+			"instant_before",
+			"instant_after"
+		],
+		[
+			"cursor_after",
+			"bound"
+		],
+		[
+			"cursor_before",
+			"unaddressable_cursors"
+		]
+	],
+	"injection_probes": {
+		"asserted_in_run": [
+			"the pinned whole function inventories, as data",
+			"the reserved-stem predicate, by planted positive and stem-free controls",
+			"the no-live-arm guard's own span reader, by a planted dispatcher string that must be found AND must carry exactly one conditional",
+			"the fail-closed walk's anti-vacuity anchor, which parses the unmodified captured success first"
+		],
+		"baseline_asserted_green_before_the_run_and_after_every_restore": true,
+		"coverage_narrowing_is_refused": "the re-measured set deliberately probes two surfaces the sixteen-row table also probed and no probe of an earlier draft reached: a declared helper named for a live arm (A14), which is the only way to exercise the DELIVERED_MODULES name scan, and a transport endpoint constant in the typed module (A15), where A9 moves the API's own path. Replacing a disclosure with fewer rows would have made the evidence quieter and weaker at the same time.",
+		"every_probe_ran_without_a_parse_or_engine_error": true,
+		"every_probe_reported_at_least_one_fail_line": true,
+		"every_restore_verified_by_sha256_against_pre_probe_bytes": true,
+		"measured_total_fail_lines": 42,
+		"probe_count": 15,
+		"the_harness_itself_fault_twice_before_it_measured_anything": "recorded because both faults are the ones this repository has already recorded once and neither is visible in the output. First, the restore path decoded raw CRLF *bytes* and then applied `.replace(chr(10), chr(13)+chr(10))` a second time, rewriting every pre-existing line ending as CR CR LF; the sha256 restore check caught it, which is the check's entire purpose, and the fix was to normalise to LF on the way in so the conversion happens once. Second, the probe anchor for the intent body occurred twice in `server_v1_api.gd`, and the harness refused it rather than mutating one of the two -- which is why that probe's anchor spans the whole function signature instead of the two lines it replaced.",
+		"transcribed_from_external_harness_run": [
+			{
+				"borrows_reserved_stem": false,
+				"fail_lines": 12,
+				"file": "server_v1_reward_result.gd",
+				"is_the_anchor": true,
+				"probe": "A1 re-instate the str() truthiness defect"
+			},
+			{
+				"borrows_reserved_stem": true,
+				"fail_lines": 4,
+				"file": "server_v1_reward_result.gd",
+				"probe": "A2 result an invented payout helper"
+			},
+			{
+				"borrows_reserved_stem": true,
+				"fail_lines": 4,
+				"file": "server_v1_reward_result.gd",
+				"probe": "A3 result a SUFFIXED helper wearing a reserved stem as a prefix"
+			},
+			{
+				"borrows_reserved_stem": true,
+				"fail_lines": 1,
+				"file": "server_v1_reward_result.gd",
+				"probe": "A4 result a mixed-case reserved helper"
+			},
+			{
+				"borrows_reserved_stem": false,
+				"fail_lines": 3,
+				"file": "server_v1_reward_result.gd",
+				"probe": "A5 result arithmetic over a reported value"
+			},
+			{
+				"borrows_reserved_stem": false,
+				"fail_lines": 3,
+				"file": "server_v1_reward_result.gd",
+				"probe": "A6 result a line comparing two reported values"
+			},
+			{
+				"borrows_reserved_stem": false,
+				"fail_lines": 1,
+				"file": "server_v1_reward_result.gd",
+				"probe": "A7 result `paid` read off the wire instead of declared"
+			},
+			{
+				"borrows_reserved_stem": false,
+				"fail_lines": 2,
+				"file": "server_v1_reward_result.gd",
+				"probe": "A14 result a declared helper named for a live arm"
+			},
+			{
+				"borrows_reserved_stem": false,
+				"fail_lines": 1,
+				"file": "server_v1_reward_result.gd",
+				"probe": "A15 result a transport endpoint constant"
+			},
+			{
+				"borrows_reserved_stem": false,
+				"fail_lines": 1,
+				"file": "server_v1_reward_result.gd",
+				"probe": "A13 result a refusal code invented client-side"
+			},
+			{
+				"borrows_reserved_stem": false,
+				"fail_lines": 4,
+				"file": "server_v1_api.gd",
+				"probe": "A8 api a third key on the reward intent body"
+			},
+			{
+				"borrows_reserved_stem": false,
+				"fail_lines": 1,
+				"file": "server_v1_api.gd",
+				"probe": "A9 api the reward route moved off its prefix"
+			},
+			{
+				"borrows_reserved_stem": false,
+				"fail_lines": 1,
+				"file": "game_api.gd",
+				"probe": "A11 facade reward_town narrowed back to a concrete type"
+			},
+			{
+				"borrows_reserved_stem": false,
+				"fail_lines": 2,
+				"file": "test_server_v1.gd",
+				"probe": "A10 test_server_v1 the unsupported table regains reward_town"
+			},
+			{
+				"borrows_reserved_stem": false,
+				"fail_lines": 2,
+				"file": "server_v1_reward.py",
+				"probe": "A12 domain a declared function renamed"
+			}
+		],
+		"which_guard_is_the_real_gate": "two different answers, and the split is the useful part. For an invented DERIVATION the gate is the pinned whole inventory: A5 and A6 borrow no reserved stem and still score 3 each, because the inventory pin and the two count pins see them alone, while the stem-bearing A2 and A3 score 4 -- two detections for one planted line. So the reserved-stem check is the belt and the inventory is the gate there. For the ANTI-VACUITY anchor the answer inverts: A1 borrows no stem and scores 12, because the guard that catches it is not a name scan at all -- it is `_check_fail_closed`'s first statement, which parses the unmodified captured success. A name scan would not have noticed that every probe in the previous, sixteen-row table was firing against a module that refused everything."
+	},
+	"intent": {
+		"action": "reward",
+		"client_local_codes": [
+			"unsupported_by_server_v1",
+			"bad_request"
+		],
+		"facade_return_type": "Variant",
+		"facade_widening_is_the_fifth": true,
+		"grant_channels_are_refused_server_side": [
+			"cell",
+			"item",
+			"map_index",
+			"player"
+		],
+		"impl_return_types": {
+			"scripts/gameapi/fake_api.gd": "RewardFlow.RewardResult",
+			"scripts/gameapi/legacy_v0_api.gd": "RewardFlow.RewardResult",
+			"scripts/gameapi/server_v1_api.gd": "ServerV1Reward.RewardAuthorityResult"
+		},
+		"operation_is_filtered_client_side": false,
+		"operations": [
+			"weekly",
+			"daily"
+		],
+		"protocol": "server-v1",
+		"request_fields": [
+			"player_id",
+			"operation"
+		],
+		"reward_path": "/v1/reward"
+	},
+	"limits": {
+		"bound_is_a_preserved_branch_literal": true,
+		"clamping_is_derived": false,
+		"client_input_replaced": "command.py:446 args[1] + 1",
+		"client_sees_a_before_state": false,
+		"daily_literal_is_a_coincidence": true,
+		"eligibility_is_derived": false,
+		"fixture_is_a_captured_legacy_oracle": false,
+		"fixtures_are_observed_v1_answers": true,
+		"grant_is_derived": false,
+		"legacy_backwards_wrap_reproduced": false,
+		"legacy_branches": "command.py:444-463 / command.py:345-363",
+		"legacy_commands": "win_daily_bonus / weekly_reward",
+		"live_phase_shipped": false,
+		"no_progressed_player_save_available": true,
+		"pixel_parity": false,
+		"price_is_derived": false,
+		"python_name_scan_over_counts_a_docstring": true,
+		"seed_cursor": 2,
+		"sibling_suites_pin_a_stale_refusal_table_row_count": true,
+		"successor_is_derived_server_side": true,
+		"v1_routes_delivered_total": 5,
+		"windowed_capture": false
+	},
+	"modules": {
+		"scripts/gameapi/server_v1_api.gd": {
+			"bytes": 26576,
+			"pure_lf": false,
+			"raw_sha256": "1bf3f085a199a44c399fc3a5d677a8f5f37f254533d4bec7244b4f3445f12a1f"
+		},
+		"scripts/gameapi/server_v1_reward_result.gd": {
+			"bytes": 25688,
+			"pure_lf": false,
+			"raw_sha256": "6c969bf3c32e352dd0746088faed185f05617257196511196cd752c24c243b50"
+		}
+	},
+	"modules_are_pure_lf": false,
+	"observations": {
+		"bound": 5,
+		"bound_provenances_differ_by_operation": true,
+		"captured_answer_carries_a_protocol_key": false,
+		"distinct_codes": [
+			"client_dictated_cell",
+			"client_dictated_cursor",
+			"client_dictated_item_grant",
+			"client_dictated_map_index",
+			"client_dictated_player",
+			"malformed_request",
+			"unknown_player"
+		],
+		"fixture_is_a_captured_legacy_oracle": false,
+		"fixtures_are_observed_v1_answers": true,
+		"leaf_paths_changed_by_operation": {
+			"daily": [
+				"/privateState/bonusNextId",
+				"/privateState/timestampLastBonus"
+			],
+			"weekly": [
+				"/privateState/timeStampMondayBonus",
+				"/privateState/weeklyRewardIndex"
+			]
+		},
+		"protocol_stamp_is_the_parsers_own_default": true,
+		"refusal_condition_count": 7,
+		"refusal_conditions": [
+			"client-dictated cell",
+			"client-dictated cursor",
+			"client-dictated item grant",
+			"client-dictated map index",
+			"client-dictated player",
+			"operation outside the closed set",
+			"unknown player"
+		],
+		"success_operations": [
+			"daily",
+			"weekly"
+		]
+	},
+	"refusals": {
+		"client_local_codes_are_server_codes": false,
+		"declared_by_the_committed_table": 25,
+		"domain_named_codes": [
+			"CLIENT_DICTATED_CELL",
+			"CLIENT_DICTATED_CURSOR",
+			"CLIENT_DICTATED_ITEM_GRANT",
+			"CLIENT_DICTATED_MAP_INDEX",
+			"CLIENT_DICTATED_PLAYER",
+			"MALFORMED_REQUEST",
+			"UNREADABLE_CONTENT"
+		],
+		"expected_codes": [
+			"client_dictated_cell",
+			"client_dictated_cursor",
+			"client_dictated_item_grant",
+			"client_dictated_map_index",
+			"client_dictated_player",
+			"malformed_request",
+			"unknown_player"
+		],
+		"unknown_player_has_no_dotted_spelling": true
+	},
+	"report": "reward-v1-report-v1",
+	"reserved_stems": {
+		"match_against": "declared function names, folded, substring, both directions",
+		"reporting_name_exceptions": [
+			"_schedules"
+		],
+		"stems": [
+			"price",
+			"cost",
+			"afford",
+			"charge",
+			"payout",
+			"level_gate",
+			"gated",
+			"clamp",
+			"floor",
+			"decrement",
+			"decrease",
+			"schedule"
+		]
+	},
+	"typed_result": {
+		"behaviour_key_count": 9,
+		"declared_functions": [
+			"_addressability",
+			"_behaviour",
+			"_bound",
+			"_cursor",
+			"_detail",
+			"_integer_list",
+			"_proof",
+			"_refusal",
+			"_rejected_derivation",
+			"_resources",
+			"_schedules",
+			"_string_list",
+			"_success",
+			"_whole_number",
+			"parse_reward_cursor",
+			"reward_failure"
+		],
+		"fail_closed_cases": 85,
+		"required_success_keys": [
+			"action",
+			"instant",
+			"reward",
+			"resources_after",
+			"proof"
+		],
+		"stored_resource_count": 7,
+		"stored_resource_names": [
+			"xp",
+			"gold",
+			"wood",
+			"oil",
+			"steel",
+			"cash",
+			"mana"
+		],
+		"three_no_payout_fields_come_from_the_wire": false
+	}
+}

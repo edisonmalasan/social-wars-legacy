@@ -113,6 +113,12 @@ MAGIC_PATH = "/v1/magic"
 #: identity, reports both ``push_dead_unit`` gates and destroys nothing. It has no
 #: ``--expect-save-mutation`` phase because there is no save to expect to move.
 COMBAT_PATH = "/v1/combat"
+#: The reward route ships with **no phase of its own**, by the same decision as
+#: ``godot-darts``: a live phase would first have to deliver a client reward
+#: transport, and a client able to fire ``next_reward_cursor`` is exactly the
+#: surface that line exists to refuse. It is still a served route, so the two
+#: sets below must name it -- see ``KNOWN_ROUTE_PATHS``.
+REWARD_PATH = "/v1/reward"
 #: The only route paths this harness will write into a summary. A closed set
 #: rather than a free string, because a typo in ``--route-path`` would
 #: otherwise produce a passing phase whose evidence file names a route that
@@ -124,15 +130,35 @@ COMBAT_PATH = "/v1/combat"
 #: routes are named wrongly or reported out of order, and this harness has
 #: already shipped one summary that named the wrong route for a passing phase,
 #: which is the whole reason ``--route-path`` exists in the first place.
-KNOWN_ROUTE_PATHS = (COLLECT_PATH, COLLECTION_PATH, COMBAT_PATH, MAGIC_PATH)
+#:
+#: ``/v1/reward`` joined this set on the same reasoning, and the reason it is
+#: named here with **no phase using it** is the point worth keeping: the set is
+#: a statement about the *service*, not about this file's phases. Leaving a
+#: served route out would make the closed set reject a real path as a typo, so
+#: the correction is to widen the set, not to narrow what the service serves.
+#:
+#: **This tuple must stay on ONE line, and that is a pinned property rather
+#: than a style preference.** ``test_combat_v1.gd`` pins its exact spelling
+#: with a substring search over the file text, and ``FileAccess
+#: .get_file_as_string`` does not normalise line endings -- so a needle that
+#: spanned a wrap would match on an LF checkout and fail on this CRLF one.
+#: That is the same defect class as the CRLF-sensitive byte-count guards this
+#: repository has already recorded and fixed, reached here by the opposite
+#: route: the guard was right and the *formatting* was the bug. A first attempt
+#: at this amendment wrapped the tuple across two lines and the pin went red
+#: immediately, which is how the line-ending dependency was found.
+KNOWN_ROUTE_PATHS = (COLLECT_PATH, COLLECTION_PATH, COMBAT_PATH, MAGIC_PATH, REWARD_PATH)
 #: The route list the service must print in its startup banner, **in this exact
 #: order**. Named once so the banner check below and a reader of this file
 #: cannot disagree about how many routes v1 serves or what they are called.
+#: **Amended in place, 4 -> 5**, when ``POST /v1/reward`` landed; the order is
+#: the service's own declared ``ROUTES`` order and is re-measured every run.
 EXPECTED_BANNER_ROUTES = [
     "POST %s" % COLLECT_PATH,
     "POST %s" % COLLECTION_PATH,
     "POST %s" % COMBAT_PATH,
     "POST %s" % MAGIC_PATH,
+    "POST %s" % REWARD_PATH,
 ]
 STARTUP_DEADLINE_SECONDS = 90
 GODOT_TIMEOUT_SECONDS = 600

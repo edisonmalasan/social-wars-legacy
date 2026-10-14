@@ -209,7 +209,7 @@ const OWNERSHIP := [
 ## The recorded registered counts, asserted against the battery's OWN source so a
 ## silent edit to either registered array fails here rather than only at the end
 ## of a five-minute run.
-const RECORDED_HERMETIC_COUNT := 54
+const RECORDED_HERMETIC_COUNT := 55
 const RECORDED_LIVE_PHASE_COUNT := 27
 ##
 ## **Amended 52 -> 53 and 25 -> 26 by the magic line**, which is what moved
@@ -1559,7 +1559,7 @@ func _check_route_boundary() -> void:
 			found = id_expression.search(hermetic_match.get_string(1),
 				found.get_end())
 	check_eq(hermetic_names.size(), RECORDED_HERMETIC_COUNT,
-		"the battery registers exactly fifty-four hermetic suites")
+		"the battery registers exactly fifty-five hermetic suites")
 	check(hermetic_names.has("test_market_trade"), "and this suite is one of them")
 
 	var live := RegEx.new()

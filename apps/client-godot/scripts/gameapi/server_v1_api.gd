@@ -15,10 +15,17 @@ extends Node
 ## therefore cannot be one of v1's codes.
 ##
 ## Those refusals still return each intent's **own** declared typed result (a
-## `BootData.SellResult` for a sell, a `RewardFlow.RewardResult` for a reward
-## action, and so on), built by that type's own `_failure` factory, so the
-## facade's declared return type keeps holding and a caller that ignores the
-## error code still gets a well-formed object rather than `null`.
+## `BootData.SellResult` for a sell, a `MagicFlow.MagicResult` for a magic
+## action, and so on), built by that type's own `_failure` factory, so a caller
+## that ignores the error code still gets a well-formed object rather than
+## `null`.
+##
+## **The reward intent is no longer one of them.** It was refused here until
+## this line routed it, so its name has moved out of the examples above and
+## `RewardFlow` is no longer preloaded by this module at all - a preload the
+## module no longer uses is dead weight, and leaving one would make the file
+## look like it still answers a reward intent with a client projection when it
+## answers with a transaction proof.
 ##
 ## ## The refusal is not an excuse to widen the client's model
 ##
@@ -59,7 +66,6 @@ const BootData = preload("res://scripts/gameapi/boot_data.gd")
 const BehaviorFlow = preload("res://scripts/units/behavior_flow.gd")
 const ResearchFlow = preload("res://scripts/units/research_flow.gd")
 const QuestFlow = preload("res://scripts/units/quest_flow.gd")
-const RewardFlow = preload("res://scripts/rewards/reward_flow.gd")
 const TutorialFlow = preload("res://scripts/progression/tutorial_flow.gd")
 const ServerV1Collect = preload(
 	"res://scripts/gameapi/server_v1_collect_result.gd")
@@ -69,6 +75,8 @@ const ServerV1Combat = preload(
 	"res://scripts/gameapi/server_v1_combat_result.gd")
 const ServerV1Magic = preload(
 	"res://scripts/gameapi/server_v1_magic_result.gd")
+const ServerV1Reward = preload(
+	"res://scripts/gameapi/server_v1_reward_result.gd")
 
 ## Loopback default: v1 binds `127.0.0.1` only and its own port, 5057
 ## (design D7; `apps/server-v1/server_v1_settings.py`).
@@ -77,6 +85,7 @@ const COLLECT_PATH := "/v1/collect"
 const COLLECTION_PATH := "/v1/collection"
 const COMBAT_PATH := "/v1/combat"
 const MAGIC_PATH := "/v1/magic"
+const REWARD_PATH := "/v1/reward"
 const REQUEST_TIMEOUT_SECONDS := 30.0
 
 ## Endpoint override from the `gameapi/endpoint` setting or the
@@ -290,11 +299,15 @@ static func _combat_intent_body(user_id: String, unit_id: Variant) -> Dictionary
 # Each answers `unsupported_by_server_v1` through its OWN typed result's
 # `_failure` factory, and none of them touches `_call`. They are grouped rather
 # than interleaved because they are uniform on purpose: there is one decision
-# (v1 exposes **four** routes) and twenty identical consequences. The count moved
-# from twenty-two when `POST /v1/magic` landed and again when `POST /v1/combat`
-# landed: `magic_town` and then `combat_town` joined the implemented intents above
-# and left this section, and `tests/test_server_v1.gd` pins the remaining twenty
-# by name so each move is measured rather than assumed.
+# (v1 exposes **five** routes) and nineteen identical consequences. The count
+# moved from twenty-two when `POST /v1/magic` landed, again when
+# `POST /v1/combat` landed, and again a third time when `POST /v1/reward`
+# landed: `magic_town`, then `combat_town`, then `reward_town` joined the
+# implemented intents above and left this section, and `tests/test_server_v1.gd`
+# pins the remaining nineteen by name so each move is measured rather than
+# assumed. Three moves now, each of them recorded here in the same paragraph,
+# because the prose is the only place the history survives: the count itself
+# lives in `UNSUPPORTED_INTENTS` and would show no sign of having moved.
 
 
 func list_sessions() -> BootData.SaveListResult:
@@ -426,11 +439,45 @@ func sell_stored_item_town(user_id: String,
 		"Server v1 exposes no stored-sale route; this client sends no request."))
 
 
+## The fifth implemented intent: a **reward cursor**, as intent only.
+##
+## ## What this sends, and what it deliberately does not
+##
+## Two fields: the save identity and the closed `operation`. The body carries
+## **no next id, no offset, and no successor** of any kind, because the successor
+## is the server's to derive - `command.py:446` computes `args[1] + 1`, so the
+## arithmetic was always the server's and only its input was the client's, and
+## this route replaces the input while keeping the arithmetic.
+##
+## It also sends **no grant channel**: no item id, no cell, no player, and no
+## map index. The preserved branches grant through a client-sent value, so v1
+## refuses those four channels by name rather than accepting one (design D4).
+## Nothing here could smuggle one even by accident: the body is a literal
+## two-key dictionary, and `tests/test_reward_v1.gd` asserts its exact key set.
+##
+## `operation` is sent **verbatim** as `str(action)`, including a string the
+## closed set does not contain, because v1 refuses an unknown operation by name
+## and a client that validated it first would turn that specific answer into a
+## different one. Every other v1 intent on this implementation follows the same
+## rule for the same reason.
 func reward_town(user_id: String,
-		action: Variant) -> RewardFlow.RewardResult:
-	return _unsupported(RewardFlow.reward_failure(
-		ServerV1Collect.CODE_UNSUPPORTED,
-		"Server v1 exposes no reward route; this client sends no request."))
+		action: Variant) -> ServerV1Reward.RewardAuthorityResult:
+	var outcome := await _call(REWARD_PATH, JSON.stringify(
+		_reward_intent_body(user_id, str(action))))
+	if not outcome.get("ok", false):
+		return ServerV1Reward.reward_failure(
+			str(outcome.get("code", ServerV1Collect.CODE_BAD_REQUEST)),
+			str(outcome.get("message", "")))
+	return ServerV1Reward.parse_reward_cursor(outcome.get("payload"))
+
+
+## The v1 reward intent: two fields, verbatim. This is the whole request.
+static func _reward_intent_body(user_id: String,
+		operation: String) -> Dictionary:
+	return {
+		"player_id": user_id,
+		"operation": operation,
+	}
 
 
 ## Counts one locally-refused intent and returns the caller's own typed result.

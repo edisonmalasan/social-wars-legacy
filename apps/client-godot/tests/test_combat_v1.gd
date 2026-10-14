@@ -215,7 +215,7 @@ const DOMAIN_NAMED_CODES := [
 ]
 
 ## The closed status table v1 declares, one code per line, measured every run.
-const DECLARED_REFUSAL_CODE_COUNT := 20
+const DECLARED_REFUSAL_CODE_COUNT := 25
 
 ## The stored balances of the disposable corpus the observed answers were taken
 ## against. Every one of the seven is **unchanged** by this route, and the observed
@@ -2693,7 +2693,7 @@ func _check_combat_codes_live_in_the_combat_modules() -> void:
 	var source := _repo_text(REFUSALS_MODULE)
 	var statuses := _refusal_statuses(source)
 	check_eq(statuses.size(), DECLARED_REFUSAL_CODE_COUNT,
-		"the shared refusal table still declares twenty codes")
+		"the shared refusal table still declares twenty-five codes")
 	for member in DOMAIN_NAMED_CODES:
 		check(statuses.has(str(member)),
 			"every code the domain names is declared: %s" % str(member))
@@ -2798,9 +2798,9 @@ func _check_unsupported_intent_left_the_table() -> void:
 			returned.append(str(entry[0]))
 	check_eq(returned, [],
 		"this line's intent is not in the locally-refused table any more")
-	check_eq(unsupported.size(), 20,
-		"and twenty intents remain locally refused, one fewer than before the"
-		+ " combat route landed")
+	check_eq(unsupported.size(), 19,
+		"and nineteen intents remain locally refused, one fewer than before"
+		+ " the reward route landed")
 	var handed: Array = CollectSuite.HANDED_OFF_INTENTS
 	check(handed.has(INTENT_METHOD),
 		"the intent is named in the hand-off table instead")
@@ -2833,8 +2833,25 @@ func _check_transport_token_placement() -> void:
 	var harness := _repo_text(LIVE_PHASE_SCRIPT)
 	check(harness.contains("COMBAT_PATH = \"" + ServerV1Api.COMBAT_PATH + "\""),
 		"the live harness declares the route path it may register")
+	# **Amended in place, 4 -> 5 routes, when `POST /v1/reward` landed.**
+	# This pin asserts the harness's closed set SPELLING, not merely that
+	# the set contains this route, so it must be restated whenever the set
+	# gains an element. The brittleness is recorded rather than fixed:
+	# weakening the assertion to "the set contains COMBAT_PATH" would pass
+	# on a set that had dropped a route the banner still promises, which
+	# is the defect the banner check one line below already exists to
+	# catch.
+	#
+	# **The needle deliberately contains NO line ending**, and that is why the
+	# harness side is pinned to a single line. `_repo_text` reads the file
+	# through `FileAccess.get_file_as_string`, which does not normalise line
+	# endings, so a needle spanning a wrap would pass on an LF checkout and
+	# fail on this CRLF one. An earlier attempt at this amendment wrapped the
+	# tuple across two lines and the check went red immediately; the harness
+	# carries the same note at the tuple. One-line is the property; the
+	# spelling below is what makes it enforced rather than requested.
 	check(harness.contains("KNOWN_ROUTE_PATHS = (COLLECT_PATH, COLLECTION_PATH,"
-		+ " COMBAT_PATH, MAGIC_PATH)"),
+		+ " COMBAT_PATH, MAGIC_PATH, REWARD_PATH)"),
 		"and adds it to the closed set of registerable routes")
 	check(harness.contains("\"POST %s\" % COMBAT_PATH"),
 		"and names it in the expected startup banner")

@@ -489,18 +489,25 @@ class VocabularyIsClosedTests(unittest.TestCase):
         """A closed vocabulary that grew to v0's 104 would not be the decision."""
         from server_v1_refusals import RefusalCode
 
-        # **Why 21, and why the ceiling is a decision prompt rather than a
+        # **Why 26, and why the ceiling is a decision prompt rather than a
         # constant that happened to be written down.**  The table held **19**
         # codes when the first v1 line delivered it; the combat line adds
-        # **exactly one** (``client_dictated_destruction``) and the table now
-        # holds **20**.  This bound was previously ``< 20``, which meant the
-        # nineteenth-to-twentieth addition could not land without a reviewer
-        # reading a *failing test* — that is the point of the assertion, and it
-        # is why the number moved deliberately rather than being weakened to
-        # ``<=``, which would have removed the prompt while leaving the intent.
-        # At 20 codes the next addition trips this again, so the vocabulary
-        # cannot keep growing without someone deciding that it should.
-        self.assertLess(len(list(RefusalCode)), 21)
+        # **exactly one** (``client_dictated_destruction``) and the magic line
+        # adds **none**, for **20**; the reward line adds **five**
+        # (``client_dictated_cursor``, ``client_dictated_item_grant``,
+        # ``client_dictated_cell``, ``client_dictated_player``,
+        # ``client_dictated_map_index``), for **25**.  Every earlier bound was
+        # tripped deliberately for the same reason: the nineteenth-to-twentieth
+        # addition could not land without a reviewer reading a *failing test* —
+        # that is the point of the assertion, and it is why the number moves
+        # deliberately rather than being weakened to ``<=``, which would remove
+        # the prompt while leaving the intent.
+        # At 25 codes the next addition trips this again, so the vocabulary
+        # cannot keep growing without someone deciding that it should.  The
+        # reward line's own addition is the **first** one that adds more than
+        # one code in a single step, and that is visible here for the next
+        # reviewer to weigh rather than being spread across five commits.
+        self.assertLess(len(list(RefusalCode)), 26)
         self.assertGreater(len(list(RefusalCode)), 0)
 
     def test_every_code_maps_to_exactly_one_status(self) -> None:

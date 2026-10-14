@@ -159,10 +159,14 @@ const OBSERVED_REFUSALS := {
 ## handed something it did not ask for; the runtime check below then confirms
 ## answer really carries a code under the name that class uses.
 ##
-## The fourth column is NOT uniform, and that is a measured fact about two
-## already-delivered lines rather than a choice made here: 21 of the 22 result
-## classes store `error_code`/`error_message`, while `MagicFlow.MagicResult` and
-## `RewardFlow.RewardResult` store `reason`/`error`.
+## The fourth column is NOT uniform, and that is a measured fact about the
+## already-delivered lines rather than a choice made here.  It read "21 of the 22
+## result classes store `error_code`/`error_message`, while `MagicFlow.MagicResult`
+## and `RewardFlow.RewardResult` store `reason`/`error`" and was correct when the
+## reward intent was still refused locally.  It is **now 18 of the 19**, because
+## `RewardFlow.RewardResult` left this table when the reward route landed, and
+## `MagicFlow.MagicResult` is the **last** intent here that spells its refusal
+## `reason`/`error` rather than `error_code`/`error_message`.
 ## `_check_unsupported_intents` asserts that count so the divergence stays
 ## visible instead of being normalised away, and nothing in the v1 client adapts
 ## to it - the client only ever reads the facade's declared type.
@@ -179,6 +183,16 @@ const OBSERVED_REFUSALS := {
 ## set and its own suite is `tests/test_combat_v1.gd`. The count therefore fell
 ## from twenty-one to twenty, measured by the size assertion below rather than
 ## assumed from the arithmetic.
+##
+## **`reward_town` is NOT in this table for the same reason a third time**, when
+## the fifth v1 route landed, and its own suite is `tests/test_reward_v1.gd`.
+## The count falls from twenty to **nineteen**, measured by that same size
+## assertion. Recorded here because the repetition is the point: **three lines
+## have now each removed a row from this table**, and each time the removal was
+## the correct response to a newly routed intent rather than a weakening of the
+## invariant. The invariant this table enforces - the facade and the
+## implementation declare the SAME type for every intent the implementation
+## refuses - is unchanged by a row leaving it.
 const UNSUPPORTED_INTENTS := [
 	["list_sessions", "BootData.SaveListResult", "error_code", "error_message"],
 	["get_bootstrap", "BootData.BootstrapResult", "error_code", "error_message"],
@@ -199,7 +213,6 @@ const UNSUPPORTED_INTENTS := [
 	["complete_tutorial_town", "TutorialFlow.TutorialResult", "error_code", "error_message"],
 	["place_stored_item_town", "BootData.StoredPlacementResult", "error_code", "error_message"],
 	["sell_stored_item_town", "BootData.StoredSaleResult", "error_code", "error_message"],
-	["reward_town", "RewardFlow.RewardResult", "reason", "error"],
 ]
 
 ## The one implemented intent, and the concrete type each implementation
@@ -477,9 +490,26 @@ func _check_unsupported_intents() -> void:
 			"%s explains itself rather than answering with a bare code" % method)
 		check(not answer.ok, "%s is a failure" % method)
 		answered += 1
-	check_eq(divergent, 1,
-		"exactly one delivered result class names its refusal code differently"
-		+ " from the other 20")
+	## **This read `1` and is now `0`, and the change is not a normalisation.**
+	## The divergent class was `RewardFlow.RewardResult` (`reason`/`error`), and
+	## it left this table when the reward route landed -- so every intent v1 still
+	## refuses locally answers under `error_code`/`error_message`.  The check
+	## stays rather than being deleted, because it is the assertion that the
+	## spelling is *uniform*, and a future line that adds an intent with a
+	## different spelling must fail here.
+	##
+	## **Correction, 2026-10-14.**  The docstring above this table claimed the
+	## divergence was `MagicFlow.MagicResult`'s **and** `RewardFlow.RewardResult`'s.
+	## That was already false: `magic_town` had left this table when the magic
+	## route landed, so `MagicFlow.MagicResult` was never in it.  The measured
+	## count was 1 and the named pair was 2 -- the names were inherited rather
+	## than counted, which is the same defect class as a hand-maintained
+	## inventory that nothing checks.  It is recorded here rather than quietly
+	## fixed because "the divergence was never where the prose said" is the part
+	## worth keeping.
+	check_eq(divergent, 0,
+		"no locally-refused intent names its refusal code differently from"
+		+ " the other 18")
 	info("result classes with a divergent refusal field name: %s"
 		% ", ".join(PackedStringArray(divergent_names)))
 	check_eq(answered, UNSUPPORTED_INTENTS.size(),
@@ -513,8 +543,9 @@ func _check_unsupported_intents() -> void:
 const HANDED_OFF_SUITES := {
 	"magic_town": "res://tests/test_magic_v1.gd",
 	"combat_town": "res://tests/test_combat_v1.gd",
+	"reward_town": "res://tests/test_reward_v1.gd",
 }
-const HANDED_OFF_INTENTS := ["magic_town", "combat_town"]
+const HANDED_OFF_INTENTS := ["magic_town", "combat_town", "reward_town"]
 
 
 func _check_magic_intent_hand_off() -> void:
@@ -524,9 +555,9 @@ func _check_magic_intent_hand_off() -> void:
 	for intent in HANDED_OFF_INTENTS:
 		check(ResourceLoader.exists(str(HANDED_OFF_SUITES[intent])),
 			"the suite that took %s over exists" % intent)
-	check_eq(UNSUPPORTED_INTENTS.size(), 20,
-		"twenty intents remain locally refused, one fewer than before the"
-		+ " combat route landed")
+	check_eq(UNSUPPORTED_INTENTS.size(), 19,
+		"nineteen intents remain locally refused, one fewer than before the"
+		+ " reward route landed")
 	info("intents handed off: %s" % ", ".join(HANDED_OFF_INTENTS))
 
 

@@ -389,6 +389,27 @@ class SaveDocument:
     #: collection ids, appended by ``complete_collection`` at
     #: ``command.py:517-518``.
     LEDGER_PATH: Tuple[str, ...] = ("privateState", "collections")
+    #: The two reward cursors and the two instants each preserved branch stamps
+    #: beside them, as ``operation -> (cursor key, instant key)``.
+    #:
+    #: **One closed table, and the two halves are not symmetric.**  Both cursors
+    #: and both stamps live directly under ``privateState``, so both paths are
+    #: one segment deep -- but they are kept as a **pair** per operation because
+    #: that is how the preserved branches use them: ``weekly_reward`` writes
+    #: ``weeklyRewardIndex`` and ``timeStampMondayBonus`` together
+    #: (``command.py:345-363``), and ``win_daily_bonus`` writes ``bonusNextId``
+    #: and ``timestampLastBonus`` together (``command.py:444-463``).  A domain
+    #: that could name the cursor without the instant would be able to write one
+    #: half of a pair the oracle always writes whole.
+    #:
+    #: **The key names are transcribed, not derived.**  They are the stored
+    #: field names recorded by ``apps/compat-api/rewards_envelope.py`` and
+    #: present in all **33** committed save documents, which is what makes a
+    #: derivation from content unnecessary and would make one an invention.
+    REWARD_CURSOR_PATHS: Dict[str, Tuple[str, str]] = {
+        "weekly": ("weeklyRewardIndex", "timeStampMondayBonus"),
+        "daily": ("bonusNextId", "timestampLastBonus"),
+    }
 
     def private_state(self) -> Dict[str, Any]:
         """``privateState``, or :class:`RepositoryError`.
@@ -636,6 +657,162 @@ class SaveDocument:
                 "refusing to write a negative magic counter %r" % (value,),
             )
         self.magic_ledger()[str(magic_id)] = int(value)
+
+    # ------------------------------------------------------------- rewards --
+    def reward_cursor_key(self, operation: str) -> str:
+        """The stored field name holding ``operation``'s cursor.
+
+        A **reader** of :data:`REWARD_CURSOR_PATHS` rather than a second
+        declaration: the two field names are recorded once, as data beside the
+        two instants they are paired with, and a copy here would be a place the
+        slice and the store could drift on the single value this line exists to
+        move correctly.
+
+        An undeclared operation raises :class:`KeyError` **rather than**
+        :class:`RepositoryError`, and that is deliberate: an operation outside
+        this table is a caller bug inside v1, not a client-visible state fault,
+        and the reward line's own intent layer refuses an undeclared operation
+        as ``malformed_request`` before a document is ever consulted.
+        """
+        return self.REWARD_CURSOR_PATHS[operation][0]
+
+    def reward_cursor(self, operation: str) -> int:
+        """The recorded cursor for one reward operation, or :class:`RepositoryError`.
+
+        **An absent key is refused, not read as zero**, and the reason is
+        recorded rather than assumed.  A cursor's zero is a real position: the
+        weekly arm's preserved arithmetic is ``(stored + 1) % length``, so a
+        cursor of zero produces position one, and the committed corpus records
+        ``bonusNextId`` as ``0`` in **7 of 33** documents.  Defaulting an absent
+        key to zero would therefore not be a harmless convenience -- it would
+        silently answer "you are at position zero" about a document that never
+        recorded a position, and the derived successor would be indistinguishable
+        from a real one.
+
+        A **non-integer** value is refused for the reason
+        :meth:`magic_counter` records: ``bool`` is an ``int`` in Python, so a
+        recorded ``True`` would advance the cursor as if it were ``1``.
+
+        **This refusal is unreachable through the committed corpus**: all **33**
+        save documents carry both cursors as integers, so it is exercised over
+        an in-memory row instead -- the pattern the collection line's
+        ``no_build_time`` refusal established on line 1.
+        """
+        key = self.reward_cursor_key(operation)
+        state = self.private_state()
+        if key not in state:
+            raise RepositoryError(
+                "unreadable_state",
+                "save %r has no %s reward cursor at /privateState/%s"
+                % (self.player_id, operation, key),
+            )
+        value = state[key]
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise RepositoryError(
+                "unreadable_state",
+                "save %r %s reward cursor is not an integer: %r"
+                % (self.player_id, operation, value),
+            )
+        return int(value)
+
+    def set_reward_cursor(self, operation: str, value: int) -> None:
+        """Write the derived cursor for one reward operation.
+
+        **No clamping and no creation happen here**, on purpose.  Clamping is a
+        rule about a *bound*, and the bound is the slice's to derive and report;
+        a store that clamped would make that rule invisible and would make the
+        stored value disagree with the reported one.  Creating the key is
+        likewise refused by omission: :meth:`reward_cursor` refuses an absent
+        key, so a slice that wanted to create one would have to write through a
+        different method, and this line has no case where a document that lacks
+        a cursor should gain one.
+
+        A non-integer or negative value is refused here rather than reaching the
+        document: ``weeklyRewardIndex`` of ``-1`` would be a cursor below the
+        first position, and ``(stored + 1)`` on it is a position the weekly bound
+        cannot address -- a state the oracle never produces and one this line
+        has no rule to report.
+        """
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise RepositoryError(
+                "unreadable_state",
+                "refusing to write a non-integer %s reward cursor %r"
+                % (operation, value),
+            )
+        if value < 0:
+            raise RepositoryError(
+                "unreadable_state",
+                "refusing to write a negative %s reward cursor %r" % (operation, value),
+            )
+        self.private_state()[self.reward_cursor_key(operation)] = int(value)
+
+    def reward_stamp_key(self, operation: str) -> str:
+        """The stored field name holding ``operation``'s stamped instant.
+
+        A **reader** of the same closed table, for the reason recorded on
+        :meth:`reward_cursor_key`.
+        """
+        return self.REWARD_CURSOR_PATHS[operation][1]
+
+    def reward_stamp(self, operation: str) -> int:
+        """The recorded stamped instant for one reward operation, or :class:`RepositoryError`.
+
+        An absent key is refused for the reason :meth:`reward_cursor` records,
+        and there is a second one here: the whole line's claim that **this
+        instant has no reader in the preserved server** would be untestable
+        against a default.  A default would let a test pass without ever
+        establishing that the corpus records the field.
+
+        **The value is read and nothing more.**  It is not compared against a
+        clock, not tested for elapsed time, and not used to decide whether a
+        transaction may proceed -- the spec forbids deriving a cooldown,
+        daily-window, weekly-period, or already-claimed rule, and this accessor
+        is the seam where such a rule would have to enter.
+        """
+        key = self.reward_stamp_key(operation)
+        state = self.private_state()
+        if key not in state:
+            raise RepositoryError(
+                "unreadable_state",
+                "save %r has no %s reward instant at /privateState/%s"
+                % (self.player_id, operation, key),
+            )
+        value = state[key]
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise RepositoryError(
+                "unreadable_state",
+                "save %r %s reward instant is not an integer: %r"
+                % (self.player_id, operation, value),
+            )
+        return int(value)
+
+    def set_reward_stamp(self, operation: str, value: int) -> None:
+        """Write the stamped instant for one reward operation.
+
+        The caller supplies the instant; this store does not read a clock.  That
+        is the same seam the preserved branch has (``command.py:352`` and
+        ``:457`` both stamp ``engine.timestamp_now()``), and it is why the
+        transaction's own clock arrives as an argument rather than being
+        fetched here -- so a test can pin it and a second implementation cannot
+        disagree about when "now" was.
+
+        A non-integer or negative value is refused for the reason
+        :meth:`set_reward_cursor` records.  ``0`` is **allowed**: it is a real
+        recorded value (the corpus carries it on the daily stamp) and the
+        preserved branch can write it.
+        """
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise RepositoryError(
+                "unreadable_state",
+                "refusing to write a non-integer %s reward instant %r"
+                % (operation, value),
+            )
+        if value < 0:
+            raise RepositoryError(
+                "unreadable_state",
+                "refusing to write a negative %s reward instant %r" % (operation, value),
+            )
+        self.private_state()[self.reward_stamp_key(operation)] = int(value)
 
     # ---------------------------------------------------------------- helpers --
     def _row_int(self, row: List[Any], position: int, label: str) -> int:

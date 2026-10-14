@@ -151,8 +151,9 @@ class TransportStructureTests(unittest.TestCase):
 
         The set is exact and is **extended**, never loosened, when a route is
         added: ``POST /v1/magic`` was appended by the third deliver line and
-        ``POST /v1/combat`` by the fourth, and the assertion stayed an equality
-        both times, so a fifth route still has to be added here deliberately.
+        ``POST /v1/combat`` by the fourth, and ``POST /v1/reward`` by the
+        fifth; the assertion stayed an equality every time, so a sixth route
+        still has to be added here deliberately.
         """
         self.assertIsInstance(transport_source(), ast.Module)
         self.assertEqual(
@@ -161,6 +162,7 @@ class TransportStructureTests(unittest.TestCase):
                 "POST /v1/collection",
                 "POST /v1/combat",
                 "POST /v1/magic",
+                "POST /v1/reward",
             },
             set(ROUTES),
         )
@@ -294,7 +296,13 @@ class TransportStructureTests(unittest.TestCase):
             shapes[node.name] = ast.dump(ast.Module(body=list(body), type_ignores=[]))
 
         self.assertEqual(
-            {"post_collect", "post_collection", "post_combat", "post_magic"},
+            {
+                "post_collect",
+                "post_collection",
+                "post_combat",
+                "post_magic",
+                "post_reward",
+            },
             set(shapes),
             "every POST route must be a handler this guard compares",
         )
