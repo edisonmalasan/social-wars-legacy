@@ -2,6 +2,11 @@
 
 ## MODIFIED Requirements
 
+> **The two scenarios at the end are carried forward unchanged.** A MODIFIED
+> block replaces the whole requirement, so omitting them would silently drop
+> them from the main spec; `openspec validate` refuses that, and it caught a
+> first attempt at this sync that had already dropped them.
+
 ### Requirement: `collect` demonstrates the boundary end to end
 
 The collection transaction SHALL be implemented on the v1 boundary as the first vertical
@@ -138,3 +143,15 @@ bought-unit list byte-identical.
 - **WHEN** a worked transaction grants no item because the preserved server's grant was a client-sent value and no committed content establishes a prize
 - **THEN** the absence of the grant is a specified property with a proof that asserts every stored resource, storage, and the bought-unit list are byte-identical
 - **AND** a grant of any size into storage or into the bought-unit list fails that proof
+
+#### Scenario: The Compatibility API is unchanged by this capability
+
+- **WHEN** the v0 test suite runs against this capability's final state
+- **THEN** every v0 route behaves and answers exactly as it did before
+- **AND** no v0 route, envelope module, or fixture was edited
+
+#### Scenario: The two surfaces are separately addressable
+
+- **WHEN** a client is configured for v0 and one for v1
+- **THEN** each reaches only its own surface
+- **AND** neither surface reads the other's response shape
