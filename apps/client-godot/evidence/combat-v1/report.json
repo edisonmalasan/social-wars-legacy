@@ -186,14 +186,14 @@
 	},
 	"modules": {
 		"scripts/gameapi/server_v1_api.gd": {
-			"bytes": 24135,
+			"bytes": 26576,
 			"pure_lf": false,
-			"raw_sha256": "2b189df82fae74ca734f4ece4841a6f30604543227467d7453785137cfa0ee1f"
+			"raw_sha256": "1bf3f085a199a44c399fc3a5d677a8f5f37f254533d4bec7244b4f3445f12a1f"
 		},
 		"scripts/gameapi/server_v1_combat_result.gd": {
-			"bytes": 29142,
-			"pure_lf": true,
-			"raw_sha256": "b3f8694dbc2f60e2309150efa4bba31754b138a0dbb86e5261d411e30fb419c7"
+			"bytes": 29829,
+			"pure_lf": false,
+			"raw_sha256": "68901b8aef95bad02e21b2befea5529c3eac8ecdea5aedefbaf52847cc99f2a7"
 		}
 	},
 	"modules_are_pure_lf": false,
@@ -250,7 +250,7 @@
 	},
 	"refusals": {
 		"client_local_codes_are_server_codes": false,
-		"declared_by_the_shared_table": 20,
+		"declared_by_the_shared_table": 25,
 		"domain_named_codes": [
 			"CLIENT_DICTATED_DESTRUCTION",
 			"MALFORMED_REQUEST",

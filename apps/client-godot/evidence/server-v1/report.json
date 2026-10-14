@@ -58,7 +58,7 @@
 			"cash",
 			"mana"
 		],
-		"unsupported_intent_count": 22,
+		"unsupported_intent_count": 19,
 		"unsupported_intent_fields": {
 			"advance_quest_town": [
 				"error_code",
@@ -69,10 +69,6 @@
 				"error_message"
 			],
 			"build_construction": [
-				"error_code",
-				"error_message"
-			],
-			"combat_town": [
 				"error_code",
 				"error_message"
 			],
@@ -95,10 +91,6 @@
 			"list_sessions": [
 				"error_code",
 				"error_message"
-			],
-			"magic_town": [
-				"reason",
-				"error"
 			],
 			"move_building": [
 				"error_code",
@@ -127,10 +119,6 @@
 			"resurrect_hero_town": [
 				"error_code",
 				"error_message"
-			],
-			"reward_town": [
-				"reason",
-				"error"
 			],
 			"sell_building": [
 				"error_code",
@@ -168,10 +156,7 @@
 			"advance_quest_town",
 			"complete_tutorial_town",
 			"place_stored_item_town",
-			"sell_stored_item_town",
-			"combat_town",
-			"magic_town",
-			"reward_town"
+			"sell_stored_item_town"
 		]
 	},
 	"limits": {

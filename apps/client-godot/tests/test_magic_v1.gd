@@ -1548,8 +1548,14 @@ func _check_magic_codes_live_in_the_magic_modules() -> void:
 	for line in refusals.split("\n"):
 		if _looks_like_status_row(str(line)):
 			declared += 1
-	check_eq(declared, 20,
-		"the committed refusal table maps exactly nineteen codes")
+	# **Both halves were wrong before this amendment, in opposite directions.**
+	# The assertion said 20 and the message said "nineteen", so the file had
+	# asserted one number and claimed another for as long as it existed. The
+	# assertion is now 25 -- the real measured size of the committed table
+	# after this line's five client-dictated codes joined it -- and the message
+	# says twenty-five.
+	check_eq(declared, 25,
+		"the committed refusal table maps exactly twenty-five codes")
 	check_eq(EXPECTED_MAGIC_REFUSALS.size(), 6,
 		"and this route answers exactly six distinct codes")
 	for code in EXPECTED_MAGIC_REFUSALS:
@@ -1721,8 +1727,9 @@ func _check_unsupported_intent_left_the_table() -> void:
 			names.append(candidate.substr(2, candidate.find("\",") - 2))
 	check(closed, "the unsupported table's closing bracket was found, so the"
 		+ " read is bounded by it rather than by the end of the file")
-	check_eq(names.size(), 20,
-		"the collect suite pins exactly the twenty-one intents v1 still lacks")
+	# Assertion said 20, message said twenty-one, for the same reason as above.
+	check_eq(names.size(), 19,
+		"the collect suite pins exactly the nineteen intents v1 still lacks")
 	check(not names.has(INTENT_METHOD),
 		"magic_town left the unsupported table, because v1 implements it now")
 	check(not names.has("collect_income"),
@@ -2135,7 +2142,7 @@ func _write_report() -> void:
 			"observed_condition_count": OBSERVED_REFUSALS.size(),
 			"distinct_codes": _sorted_set(
 				_string_list(_observed_codes())),
-			"declared_by_the_committed_table": 20,
+			"declared_by_the_committed_table": 25,
 			"client_local_codes_are_server_codes": false,
 		},
 		"committed_table": {
@@ -2295,6 +2302,7 @@ func _api_function_inventory() -> Array:
 		"_ready", "_call", "_failure", "_transport_message",
 		"resolved_endpoint", "_unsupported", "_intent_body",
 		"_collection_intent_body", "_combat_intent_body", "_magic_intent_body",
+		"_reward_intent_body",
 		"collect_income", "complete_collection_town", "magic_town",
 		"list_sessions", "get_bootstrap", "place_building",
 		"purchase_item", "move_building", "sell_building", "store_building",

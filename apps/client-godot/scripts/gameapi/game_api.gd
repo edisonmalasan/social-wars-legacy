@@ -43,10 +43,25 @@ extends Node
 ##               the documented v0 port).
 ##   server_v1 - JSON over loopback HTTP to Server v1 through the built-in HTTP
 ##               request client, on **its own** loopback port (design D7). v1
-##               exposes exactly one route, so this implementation implements
-##               exactly one intent (`collect_income`); every other intent
+##               exposes five routes, so this implementation implements five
+##               intents (`collect_income`, `complete_collection_town`,
+##               `combat_town`, `magic_town`, `reward_town`); every other intent
 ##               answers the client-local `unsupported_by_server_v1` **without
 ##               touching the transport**.
+##
+##               **Correction, 2026-10-14.** This sentence read "exactly one
+##               route ... exactly one intent (`collect_income`)" and was already
+##               false when this change found it: the collection, combat, and
+##               magic lines had routed three more intents without touching the
+##               count, so four lines each shipped a stale number. It is recorded
+##               here rather than quietly corrected because the useful part of the
+##               defect is *that four lines each did it* - a count next to a
+##               name is not a count anything maintains, and the name is now
+##               spelled out beside it so a reader can check it against the
+##               server's own route table.
+##               `tests/test_reward_v1.gd` asserts the five names against this
+##               file's own text **and** against `apps/server-v1`'s declared
+##               routes, so the two cannot drift apart silently again.
 ##
 ## Runtime overrides for verification (user arguments after `--`):
 ##
@@ -861,11 +876,20 @@ func magic_town(user_id: String, action: Variant,
 ## position 0. Those are measured facts about the preserved server's own
 ## arithmetic, not defects introduced here, and the answer never resolves them
 ## into a selection.
-func reward_town(user_id: String, action: Variant) \
-		-> RewardFlow.RewardResult:
+## ## The declared return type is `Variant`, and that is the one widening in
+## this facade.
+##
+## It was `RewardFlow.RewardResult`, which is correct for the fake and the v0
+## implementation and **cannot** be correct for Server v1, whose answer carries a
+## transaction proof and a cursor transition the client projection has no place
+## for.  The same widening was made for `combat_town` and `magic_town` when
+## those two became routed, and `collect_income`'s was widened for the first
+## slice; this is the fourth, and the reason is identical each time.  A caller
+## that wants a concrete type narrows it itself, which is a decision a caller can
+## make and a facade cannot.
+func reward_town(user_id: String, action: Variant) -> Variant:
 	reward_requests += 1
-	var result: RewardFlow.RewardResult = await _impl.reward_town(
-		user_id, action)
+	var result: Variant = await _impl.reward_town(user_id, action)
 	return result
 
 

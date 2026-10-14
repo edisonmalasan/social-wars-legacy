@@ -162,7 +162,7 @@ const RESOURCE_TOKENS := ["gold", "coins", "cash", "wood", "steel", "oil",
 ## intended behaviour, so it is amended rather than relaxed. `test_market_trade` was
 ## added at 50 and deliberately does NOT add a second pin of its own, so the next line
 ## meets this one constant and not two.
-const RECORDED_HERMETIC_COUNT := 54
+const RECORDED_HERMETIC_COUNT := 55
 const RECORDED_LIVE_PHASE_COUNT := 27
 ##
 ## **Amended 52 -> 53 and 25 -> 26 by the magic line**, which is what moved
