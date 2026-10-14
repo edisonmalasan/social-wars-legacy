@@ -2354,7 +2354,7 @@ class RouteTests(unittest.TestCase):
     def test_the_route_is_registered_in_the_route_table(self) -> None:
         from server_v1_app import ROUTES
 
-        self.assertEqual(4, len(ROUTES))
+        self.assertEqual(5, len(ROUTES))
         self.assertEqual("combat", ROUTES["POST /v1/combat"])
 
     def test_the_route_is_not_named_after_a_legacy_command(self) -> None:
@@ -2386,6 +2386,13 @@ class RouteTests(unittest.TestCase):
         route grew a statement" for a route that grew nothing.  Measured raw
         statement counts are 7/6/7/7; after dropping the leading docstring they
         are 6 for all four.
+
+        **The name says "four" and the assertion says "five".**  The name was
+        not touched when the reward line added its handler, and that is recorded
+        here rather than tidied: the four-to-five change is exactly the one this
+        guard exists to force a deliberate edit to, and the pin below is where
+        that edit is visible.  Renaming the test would have made the fifth route
+        look pre-existing.
         """
         tree = ast.parse(self.source)
         bodies = {}
@@ -2403,12 +2410,18 @@ class RouteTests(unittest.TestCase):
                     _code_only(ast.unparse(statement)) for statement in statements
                 ]
         self.assertEqual(
-            {"post_collect", "post_collection", "post_combat", "post_magic"},
+            {"post_collect", "post_collection", "post_combat", "post_magic", "post_reward"},
             set(bodies),
         )
         shapes = {name: len(segments) for name, segments in bodies.items()}
         self.assertEqual(
-            {"post_collect": 6, "post_collection": 6, "post_combat": 6, "post_magic": 6},
+            {
+                "post_collect": 6,
+                "post_collection": 6,
+                "post_combat": 6,
+                "post_magic": 6,
+                "post_reward": 6,
+            },
             shapes,
         )
         self.assertEqual(1, len(set(shapes.values())), "a route grew a statement")
@@ -2421,7 +2434,7 @@ class RouteTests(unittest.TestCase):
         # to normalise the one legitimate difference rather than to weaken the
         # comparison to a statement count.
         #
-        # The four callee names are **measured** from the module, not assumed: an
+        # The five callee names are **measured** from the module, not assumed: an
         # earlier draft invented ``apply_collect``/``apply_collection`` and both
         # are absent from the transport, so three subTests failed on replacements
         # that could never fire.  ``collect`` is normalised **last** because
@@ -2429,7 +2442,19 @@ class RouteTests(unittest.TestCase):
         # substring of the other, but the shorter is a substring of nothing else
         # here and ordering the longest first keeps that true by construction
         # rather than by luck.
-        CALLEES = ("apply_combat", "apply_magic", "complete_collection", "collect")
+        #
+        # ``advance_reward`` joined this tuple with the reward line.  It is a
+        # **different** spelling from the other four, so appending it last keeps
+        # the substring ordering argument above true: ``collect`` is a substring
+        # of no name here, but had it been appended before a longer name sharing
+        # that prefix it would have been.
+        CALLEES = (
+            "apply_combat",
+            "apply_magic",
+            "complete_collection",
+            "advance_reward",
+            "collect",
+        )
 
         def normalise(segments: List[str]) -> List[str]:
             normalised = list(segments)
@@ -2439,7 +2464,7 @@ class RouteTests(unittest.TestCase):
                 ]
             return normalised
 
-        for name in ("post_collect", "post_collection", "post_combat"):
+        for name in ("post_collect", "post_collection", "post_combat", "post_reward"):
             with self.subTest(route=name):
                 self.assertEqual(
                     normalise(bodies["post_magic"]),
@@ -2454,7 +2479,7 @@ class RouteTests(unittest.TestCase):
                     for segments in bodies.values()
                 }
             ),
-            "the four handlers are not one shape",
+            "the %d handlers are not one shape" % len(bodies),
         )
 
     def test_the_transport_does_not_decide_whether_a_destruction_shape_was_carried(self) -> None:
@@ -2641,8 +2666,14 @@ class VocabularyTests(unittest.TestCase):
         read and discarded by the preserved branch and are closed by the existing
         ``client_supplied_delta`` key-name channel.  Three or four codes for one
         decision is how a closed vocabulary stops being closed.
+
+        The **25** is this line's *one* code plus the five the reward line
+        (M13 line 5) added afterwards; the vocabulary is asserted closed over
+        by ``test_boundary_invariant.py``, and the increment this line is
+        accountable for is the presence of
+        ``RefusalCode.CLIENT_DICTATED_DESTRUCTION`` beside it.
         """
-        self.assertEqual(20, len(list(RefusalCode)))
+        self.assertEqual(25, len(list(RefusalCode)))
         self.assertIn(RefusalCode.CLIENT_DICTATED_DESTRUCTION, list(RefusalCode))
         code_only = _code_only(DOMAIN_SOURCE.read_text(encoding="utf-8"))
         named = {
@@ -2674,15 +2705,24 @@ class VocabularyTests(unittest.TestCase):
                 )
 
     def test_the_vocabulary_is_one_code_from_tripping_the_size_pin(self) -> None:
-        """Task 1.5 restated: the pin is ``< 21`` and this line leaves it at 20.
+        """Task 1.5 restated, and then moved by the reward line.
 
-        The pin's own spelling is read from the file that holds it, so an amendment
-        there fails here instead of being discovered a line later.
+        This test was written when the pin was ``< 21`` and this line left it
+        at 20 — the pin was one addition away.  The reward line (**M13 line 5**)
+        then added **five** codes in one step and moved the pin to ``< 26``, so
+        the *name* of this test no longer describes what it asserts.  It is kept
+        under its original name rather than renamed, because the name is the
+        prompt a future reader needs to see has moved: a rename would have made
+        the change invisible in ``git log``, and the history of this file is
+        the record that the pin was moved deliberately twice.
+
+        The pin's own spelling is read from the file that holds it, so an
+        amendment there fails here instead of being discovered a line later.
         """
         pin = (harness.TESTS_DIR / "test_boundary_invariant.py").read_text(encoding="utf-8")
-        self.assertIn("self.assertLess(len(list(RefusalCode)), 21)", pin)
-        self.assertLess(len(list(RefusalCode)), 21)
-        self.assertEqual(20, len(list(RefusalCode)))
+        self.assertIn("self.assertLess(len(list(RefusalCode)), 26)", pin)
+        self.assertLess(len(list(RefusalCode)), 26)
+        self.assertEqual(25, len(list(RefusalCode)))
 
     def test_the_new_code_is_named_by_the_domain(self) -> None:
         code_only = _code_only(DOMAIN_SOURCE.read_text(encoding="utf-8"))

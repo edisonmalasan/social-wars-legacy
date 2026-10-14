@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""The HTTP surface: four routes, and no arithmetic (design D2).
+"""The HTTP surface: five routes, and no arithmetic (design D2).
 
-``create_app`` returns a FastAPI application with exactly four delivered routes,
-``POST /v1/collect``, ``POST /v1/collection``, ``POST /v1/combat``, and
-``POST /v1/magic``.  Each route's entire job, per design D2, is:
+``create_app`` returns a FastAPI application with exactly five delivered routes,
+``POST /v1/collect``, ``POST /v1/collection``, ``POST /v1/combat``,
+``POST /v1/magic``, and ``POST /v1/reward``.  Each route's entire job, per
+design D2, is:
 
 1. hand the request bytes to :mod:`server_v1_intent`, which turns them into an
    intent or refuses;
@@ -29,17 +30,22 @@ transport never has to name ``malformed_request``.
 The success status is the one thing the transport is allowed to know without
 asking: :data:`~server_v1_outcomes.SUCCESS_HTTP_STATUS`, ``200``.
 
-All three response bodies come from the domain value's own ``payload()``, with
+All response bodies come from the domain value's own ``payload()``, with
 the protocol name added and nothing else.  A refusal therefore carries the reason
 the domain chose, never a per-route rewording, and the client can distinguish the
-three surfaces by their ``result`` field — the spec's "the client can
-distinguish it from a transport failure" scenario.
+surfaces by their ``result`` field — the spec's "the client can distinguish it
+from a transport failure" scenario.
 
-**All three handler bodies are identical but for three tokens**: the path
+**All five handler bodies are identical but for three tokens**: the path
 constant, the action string, and the domain function.  The magic surface carries
 **two** preserved operations and they travel inside the parsed intent rather than
 as a route parameter, which is what keeps a single handler total instead of
-growing a per-operation branch here.
+growing a per-operation branch here.  The reward surface carries **two** as well,
+and it adds a third reason the identical-body guard is load-bearing rather than
+merely tidy: reward is the first action with **no addressing field**
+(:data:`server_v1_intent.NO_ADDRESSING_FIELD_ACTIONS`), so a handler that grew a
+per-action branch to read a cursor would be a transport inventing an address the
+request never gave.
 """
 
 from __future__ import annotations
@@ -58,9 +64,10 @@ from server_v1_magic import apply_magic
 from server_v1_outcomes import SUCCESS_HTTP_STATUS, Outcome
 from server_v1_refusals import Refusal
 from server_v1_repository import SaveRepository
+from server_v1_reward import advance_reward
 from server_v1_settings import PROTOCOL
 
-#: The four delivered routes, named so a test enumerates routes from a
+#: The five delivered routes, named so a test enumerates routes from a
 #: declaration rather than from a regex over the source.  One row per route:
 #: adding a route adds a row, and ``test_app.py`` asserts this mapping agrees
 #: with the paths declared below.
@@ -69,6 +76,7 @@ ROUTES: Dict[str, str] = {
     "POST /v1/collection": "collection",
     "POST /v1/combat": "combat",
     "POST /v1/magic": "magic",
+    "POST /v1/reward": "reward",
 }
 
 ROUTE_PREFIX = "/v1"
@@ -125,6 +133,29 @@ MAGIC_PATH = "/v1/magic"
 #: branch's own name for a transaction that destroys rows is not something this
 #: route can do, because it destroys nothing.
 COMBAT_PATH = "/v1/combat"
+
+#: The fifth route this line delivers, and a literal for the same reason as the
+#: other four.
+#:
+#: The path is ``/v1/reward``, and **not** ``/v1/win_daily_bonus`` and not
+#: ``/v1/weekly_reward``.  Both rejected spellings name **one** of the two
+#: preserved arms, and the route carries both -- as ``/v1/magic`` carries
+#: ``buy_magic`` and ``use_magic`` -- so no single legacy branch name would
+#: describe it.  ``reward`` is the surface, for the reason
+#: :data:`COLLECTION_PATH` records.
+#:
+#: **The declaration order here is a pinned property, not an accident.**  The
+#: route is declared **last**, after ``MAGIC_PATH``, because a test in
+#: ``apps/client-godot/tests/test_reward_v1.gd`` asserts both that this literal
+#: is the final ``*_PATH`` declaration in this module and that no delivered v1
+#: test reaches forward across it.  The second half is the shape that has bitten
+#: this repository twice -- ``apps/compat-api``'s envelope modules slice a route
+#: out of its service file between markers, and two suites there cut at
+#: ``@app.post("/v0/level_up")``, which reached across every route declared
+#: between them -- so a new route landed in a forbidden slot and broke four
+#: delivered guards at once.  Declaring last, and asserting it, makes the
+#: placement a checked property rather than something a future line discovers.
+REWARD_PATH = "/v1/reward"
 
 
 def create_app(
@@ -210,11 +241,11 @@ def create_app(
     async def post_magic(request: Request) -> JSONResponse:
         """Adapt one magic intent, call the domain, translate the outcome.
 
-        Deliberately identical to the other three handlers, body for body.  The
-        four routes have nothing to distinguish them: the operation the client
+        Deliberately identical to the other handlers, body for body.  The routes
+        have nothing to distinguish them: the operation the client
         asked for is **inside the parsed intent**, not a second parameter here,
-        so a fifth route cannot grow a per-route branch without failing the
-        structural guard that compares these four function bodies
+        so a new route cannot grow a per-route branch without failing the
+        structural guard that compares these function bodies
         (``tests/test_app.py::test_every_route_handler_has_the_same_body_shape``,
         which is what makes this claim true rather than asserted).
         """
@@ -226,6 +257,32 @@ def create_app(
             )
 
         outcome: Outcome = apply_magic(parsed, content, repository, clock())
+        if isinstance(outcome, Refusal):
+            return JSONResponse(
+                status_code=outcome.http_status, content=_envelope(outcome)
+            )
+        return JSONResponse(status_code=SUCCESS_HTTP_STATUS, content=_envelope(outcome))
+
+    @app.post(REWARD_PATH)
+    async def post_reward(request: Request) -> JSONResponse:
+        """Adapt one reward intent, call the domain, translate the outcome.
+
+        The fifth identical handler, and the one whose shape the identical-body
+        guard most needs to hold: a reward request carries **no addressing
+        field** and an **operation**, so the two things a handler is most
+        tempted to read -- a row and an action-specific parameter -- are exactly
+        the two this surface does not have.  The operation travels inside the
+        parsed intent, the cursor is derived by the domain from the recorded
+        document, and this handler has nothing to do with either.
+        """
+        body = await request.body()
+        parsed = intent_from_json("reward", body)
+        if isinstance(parsed, Refusal):
+            return JSONResponse(
+                status_code=parsed.http_status, content=_envelope(parsed)
+            )
+
+        outcome: Outcome = advance_reward(parsed, content, repository, clock())
         if isinstance(outcome, Refusal):
             return JSONResponse(
                 status_code=outcome.http_status, content=_envelope(outcome)
@@ -253,6 +310,7 @@ __all__ = [
     "COMBAT_PATH",
     "COLLECTION_PATH",
     "MAGIC_PATH",
+    "REWARD_PATH",
     "ROUTES",
     "ROUTE_PREFIX",
     "create_app",

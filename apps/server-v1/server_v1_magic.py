@@ -902,8 +902,15 @@ def declared_operations() -> Tuple[str, ...]:
     A reader rather than a second declaration: the operation set is data in
     :data:`server_v1_intent.INTENT_OPERATION_VALUES` (design D1), and a second
     copy here would be a place the two could drift.
+
+    **Keyed by this slice's own action**, not by the field's name.  The reward
+    line (M13 line 5) added a second action declaring a field literally named
+    ``operation`` over a **disjoint** value set, and rekeyed that table by
+    action so the disjointness is structural.  This lookup follows the rekey;
+    the old ``INTENT_OPERATION_VALUES["operation"]`` spelling is gone, so the
+    keying is enforced by a ``KeyError`` rather than by a comment.
     """
-    return tuple(sorted(INTENT_OPERATION_VALUES["operation"]))
+    return tuple(sorted(INTENT_OPERATION_VALUES[ACTION]))
 
 
 __all__ = [

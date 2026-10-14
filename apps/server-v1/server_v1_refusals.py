@@ -112,6 +112,36 @@ class RefusalCode(str, Enum):
     #: being closed.
     CLIENT_DICTATED_DESTRUCTION = "client_dictated_destruction"
 
+    # -- reward cursors (godot-rewards): five separate client-dictated inputs -
+    #
+    # **Why five codes and not one.**  The line's spec requires that "a request
+    # carrying a next id, an offset, or any other cursor contribution ... SHALL
+    # be refused as a structural input error" *and* that a request carrying "an
+    # item id, a cell, a player identity, or a map index" has "each ... refused
+    # with its own named reason".  A single code would satisfy the first
+    # sentence and fail the second, so the four grant shapes are separate.  The
+    # cursor is **one** code because the spec groups every cursor key into one
+    # reason, and ``apps/compat-api/rewards_envelope.py``'s
+    # ``CLIENT_KEY_REFUSALS`` has exactly one cursor row
+    # (``client_supplied_next_id``) among its seven.
+    #
+    # **All five are 400, which diverges from two recorded precedents, and that
+    # is deliberate.**  ``apps/compat-api`` answers all five with **409**
+    # (``compat_service.py:1753-1766``), and v1's own
+    # :data:`CLIENT_DICTATED_DESTRUCTION` answers its structurally identical
+    # "you may not say how many" case with **409**.  v1 chooses **400** because
+    # the deciding question is never about stored state: each refusal is
+    # resolved by inspecting the *request body alone*, before the player, the
+    # document, or the cursor is consulted, and the spec's own wording for the
+    # cursor case is "a structural input error".  A status that implied
+    # "well-formed request, conflicting state" would be untrue of all five.
+    # ``tests/test_reward.py`` asserts the split rather than the set.
+    CLIENT_DICTATED_CURSOR = "client_dictated_cursor"
+    CLIENT_DICTATED_ITEM_GRANT = "client_dictated_item_grant"
+    CLIENT_DICTATED_CELL = "client_dictated_cell"
+    CLIENT_DICTATED_PLAYER = "client_dictated_player"
+    CLIENT_DICTATED_MAP_INDEX = "client_dictated_map_index"
+
     # -- server-side integrity: never a client-visible gameplay answer -------
     UNREADABLE_STATE = "unreadable_state"
     UNREADABLE_CONTENT = "unreadable_content"
@@ -129,6 +159,14 @@ REFUSAL_HTTP_STATUS: Dict[RefusalCode, int] = {
     RefusalCode.MALFORMED_REQUEST: 400,
     RefusalCode.CLIENT_SUPPLIED_DELTA: 400,
     RefusalCode.UNKNOWN_REQUEST_FIELD: 400,
+    # Decided from the request body alone; see the enum's comment for why these
+    # five are 400 where v0 says 409 and where v1's own destruction code says
+    # 409.
+    RefusalCode.CLIENT_DICTATED_CURSOR: 400,
+    RefusalCode.CLIENT_DICTATED_ITEM_GRANT: 400,
+    RefusalCode.CLIENT_DICTATED_CELL: 400,
+    RefusalCode.CLIENT_DICTATED_PLAYER: 400,
+    RefusalCode.CLIENT_DICTATED_MAP_INDEX: 400,
     # No such save in this repository.
     RefusalCode.UNKNOWN_PLAYER: 404,
     # The request is well formed and the player exists, but the requested
@@ -215,6 +253,26 @@ REFUSAL_CODE_PURPOSE: Dict[RefusalCode, str] = {
         "the request carried a destruction count, which v1 refuses rather than "
         "applies or narrows to a v1-derived figure"
     ),
+    RefusalCode.CLIENT_DICTATED_CURSOR: (
+        "the request carried a next id, offset, or successor for a reward "
+        "cursor, whose successor v1 derives from the recorded cursor alone"
+    ),
+    RefusalCode.CLIENT_DICTATED_ITEM_GRANT: (
+        "the request carried an item id, which the preserved daily branch would "
+        "write into storage and v1 refuses rather than grants"
+    ),
+    RefusalCode.CLIENT_DICTATED_CELL: (
+        "the request carried a placement cell, whose coordinates the preserved "
+        "weekly branch would read from the client"
+    ),
+    RefusalCode.CLIENT_DICTATED_PLAYER: (
+        "the request carried a player identity beyond the one the save document "
+        "is addressed by"
+    ),
+    RefusalCode.CLIENT_DICTATED_MAP_INDEX: (
+        "the request carried a map index, which the preserved branch would read "
+        "from the client when it writes a granted item"
+    ),
     RefusalCode.UNREADABLE_STATE: "stored state this service cannot read",
     RefusalCode.UNREADABLE_CONTENT: "committed content this service cannot read",
     RefusalCode.POST_CONDITION_VIOLATION: (
@@ -260,6 +318,16 @@ V0_EQUIVALENT_CODES: Dict[RefusalCode, str] = {
     # conflicts with what the client is allowed to decide.  The codes agree; the
     # statuses do not, and deliberately so.
     RefusalCode.CLIENT_DICTATED_DESTRUCTION: "client_dictated_destruction",
+    # The five reward counterparts, all ``client_supplied_*`` in v0's vocabulary
+    # and all **409** there (see ``compat_service.py:1753-1766``).  The code
+    # names correspond one-for-one; the statuses deliberately do not, and the
+    # reason is recorded at the enum member rather than left to be found as an
+    # inconsistency.
+    RefusalCode.CLIENT_DICTATED_CURSOR: "client_supplied_next_id",
+    RefusalCode.CLIENT_DICTATED_ITEM_GRANT: "client_supplied_item",
+    RefusalCode.CLIENT_DICTATED_CELL: "client_supplied_cell",
+    RefusalCode.CLIENT_DICTATED_PLAYER: "client_supplied_player",
+    RefusalCode.CLIENT_DICTATED_MAP_INDEX: "client_supplied_item_index",
     RefusalCode.UNREADABLE_STATE: "internal_error",
     RefusalCode.UNREADABLE_CONTENT: "internal_error",
     RefusalCode.POST_CONDITION_VIOLATION: "internal_error",

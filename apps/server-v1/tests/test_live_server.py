@@ -466,24 +466,33 @@ class CorpusContainmentTests(unittest.TestCase):
         # tested the temp root instead, and passed for any path under it.
         self.assertTrue(Path(banner["corpus"]).name.startswith(TEMP_PREFIX))
         self.assertEqual(port, banner["port"])
-        # A count pin two routes legitimately moved: the banner lists the
-        # served inventory verbatim, the magic line added one row to it, and the
-        # combat line added another.  The pin is amended in place with its
-        # **order** asserted too, because a sorted or set-derived banner would
-        # satisfy a subset test and not this one -- and the order is the
-        # declaration order in ``server_v1_app.ROUTES``, which is what makes the
-        # banner a report rather than a rendering.  The count is asserted
-        # separately so a banner that grew *and* lost a row cannot pass.
+        # A count pin three routes legitimately moved: the banner lists the
+        # served inventory verbatim, the magic line added one row to it, the
+        # combat line added another, and the reward line a fifth.  The pin is
+        # amended in place with its **order** asserted too, because a sorted or
+        # set-derived banner would satisfy a subset test and not this one -- and
+        # the order is the declaration order in ``server_v1_app.ROUTES``, which
+        # is what makes the banner a report rather than a rendering.  The count
+        # is asserted separately so a banner that grew *and* lost a row cannot
+        # pass.
+        #
+        # ``/v1/reward`` is declared **last**, and that position is a pinned
+        # property rather than an accident: three earlier suites slice the route
+        # table by source span and two reach forward across every route declared
+        # between them, so a route dropped into the middle would move their
+        # spans.  ``test_reward.py`` owns asserting that property; this test owns
+        # only the order the banner reports.
         self.assertEqual(
             [
                 "POST /v1/collect",
                 "POST /v1/collection",
                 "POST /v1/combat",
                 "POST /v1/magic",
+                "POST /v1/reward",
             ],
             banner["routes"],
         )
-        self.assertEqual(4, len(banner["routes"]))
+        self.assertEqual(5, len(banner["routes"]))
         self.assertEqual(FIXTURE_INSTANT, banner["fixed_now"])
 
     def test_no_corpus_directory_survives_a_graceful_stop(self) -> None:

@@ -1213,7 +1213,13 @@ class SameTransitionTests(SeededFixture):
 
     def test_the_declared_operation_set_is_the_closed_set(self) -> None:
         self.assertEqual(("buy", "use"), declared_operations())
-        self.assertEqual(frozenset({"buy", "use"}), INTENT_OPERATION_VALUES["operation"])
+        # **Per action since the reward line.**  This table used to hold one
+        # action's values directly and is now keyed by action, because ``reward``
+        # declares its own operation set and one unkeyed table could not hold two.
+        # The magic row is pinned by value rather than by the whole mapping, so a
+        # new action with a legitimately different set cannot pass by rewriting
+        # this line -- it has to be added here on purpose.
+        self.assertEqual(frozenset({"buy", "use"}), INTENT_OPERATION_VALUES["magic"])
 
     def test_the_payload_states_the_sameness_explicitly(self) -> None:
         outcome = apply_magic(self._intent(), self.content, self.repository, SERVICE_INSTANT)
@@ -1873,12 +1879,25 @@ class IntentTests(unittest.TestCase):
         self.assertEqual("/privateState/magics/%d" % MAGIC_ONE, outcome.addressed_path())
 
     def test_the_operation_field_is_declared_separately_from_the_address(self) -> None:
-        """Design D1: ``allowed == required`` no longer holds, and that is stated."""
-        self.assertEqual({"magic": "operation"}, INTENT_OPERATION_FIELDS)
+        """Design D1: ``allowed == required`` no longer holds, and that is stated.
+
+        **Amended by the reward line**, which is the second action to declare an
+        operation.  The assertion was an equality against a one-action mapping and
+        is now an equality against a two-action one, with the magic row still
+        pinned by value: the point of D1 is that *every* action's operation is
+        declared apart from its addressing, so a mapping that grew a row is the
+        claim being made true rather than a loosening.
+        """
+        self.assertEqual({"magic": "operation", "reward": "operation"}, INTENT_OPERATION_FIELDS)
         self.assertNotIn("operation", ADDRESSING_FIELDS.values())
+        # The second half is now **stronger** than it was: with two actions, no
+        # action's operation may double as any action's address, so the check
+        # covers both rows rather than the one this test used to own.
+        for field in INTENT_OPERATION_FIELDS.values():
+            self.assertNotIn(field, ADDRESSING_FIELDS.values())
 
     def test_every_declared_operation_is_accepted(self) -> None:
-        for operation in sorted(INTENT_OPERATION_VALUES["operation"]):
+        for operation in sorted(INTENT_OPERATION_VALUES[ACTION]):
             with self.subTest(operation=operation):
                 outcome = self._parse(operation=operation)
                 self.assertIsInstance(outcome, Intent)
@@ -2020,22 +2039,29 @@ class IntentTests(unittest.TestCase):
 class VocabularyTests(unittest.TestCase):
     """Task 1: the two new codes, and the pin one step from tripping.
 
-    **Amended by the combat line (M13 line 4), which added a twentieth code.**
+    **Amended by the combat line (M13 line 4), which added a twentieth code, and
+    then again by the reward line (M13 line 5), which added five more for 25.**
     The rationale is the same one recorded at the pin itself in
     ``test_boundary_invariant.py``: the table held 19, this line adds exactly
-    one, and the bound exists so that a reviewer must read a *failing test*
+    two, and the bound exists so that a reviewer must read a *failing test*
     before the vocabulary grows.  A guard that pins its own text is unusual and
     is kept, precisely so that a quiet amendment to the number here cannot
     outlive the number it describes.
     """
 
     def test_exactly_two_codes_were_added(self) -> None:
-        self.assertEqual(20, len(list(RefusalCode)))
+        self.assertEqual(25, len(list(RefusalCode)))
         self.assertIn(RefusalCode.UNKNOWN_MAGIC_ID, list(RefusalCode))
         self.assertIn(RefusalCode.COUNTER_ABOVE_CAP, list(RefusalCode))
 
     def test_the_vocabulary_is_one_code_from_tripping_the_size_pin(self) -> None:
-        """Task 10.3, restated: the pin is ``< 21`` and this line leaves it at 20.
+        """Task 10.3 restated, and then moved by the reward line.
+
+        Written when the pin was ``< 21`` and this line left it at 20.  The
+        reward line (**M13 line 5**) then added **five** codes and moved the pin
+        to ``< 26``.  The name is kept so the two deliberate moves stay visible
+        in this file's history rather than being flattened into one silent
+        amendment; what it asserts moved with the pin.
 
         Asserted rather than left as a note, so the next line to need a code
         cannot pass the pin by not knowing how close it is.  The pin's own
@@ -2043,9 +2069,9 @@ class VocabularyTests(unittest.TestCase):
         fails here instead of being discovered a line later.
         """
         pin = (harness.TESTS_DIR / "test_boundary_invariant.py").read_text(encoding="utf-8")
-        self.assertIn("self.assertLess(len(list(RefusalCode)), 21)", pin)
-        self.assertLess(len(list(RefusalCode)), 21)
-        self.assertEqual(20, len(list(RefusalCode)))
+        self.assertIn("self.assertLess(len(list(RefusalCode)), 26)", pin)
+        self.assertLess(len(list(RefusalCode)), 26)
+        self.assertEqual(25, len(list(RefusalCode)))
 
     def test_both_new_codes_are_named_by_the_domain(self) -> None:
         source = _code_only(DOMAIN_SOURCE.read_text(encoding="utf-8"))

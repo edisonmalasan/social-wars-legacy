@@ -80,23 +80,67 @@ The allowed keys for the three delivered actions:
     **no** third key: the route carries exactly one action, so there is no
     ``operation`` row for it in :data:`INTENT_OPERATION_FIELDS`.
 
+``reward``
+    ``player_id`` — the save this intent is about, a non-empty string.
+    ``operation`` — one of ``weekly`` or ``daily``, the two reward cursors the
+    preserved server keeps (design D1 of the reward line).  Both required.
+
+    **This is the first delivered action with no addressing field.**  Every
+    other action names the row, ledger, or content row it is about; a reward
+    transaction names a *cursor*, and the cursor's position is what v1 must
+    **derive** from recorded state — so accepting it from the client is the one
+    thing this line exists to prevent.  Declared in
+    :data:`NO_ADDRESSING_FIELD_ACTIONS` rather than inferred from the schema's
+    length, and :meth:`Intent.addressed_path` reports ``/privateState`` — the
+    container, truthfully, because the specific key is the domain's to resolve
+    and report.
+
+``combat`` — ``player_id``, ``unit_id``.  See above.
+    ``reward`` — ``player_id``, ``operation``.  See above; the first action with
+    no addressing field.
+
 Each action's schema is closed over its own keys, so a ``collect`` request
 that carries ``collection_id`` is an ``unknown_request_field`` and vice versa.
 Nothing else is accepted.  Notably absent and deliberately *not* accepted:
 ``amount``, ``resource``, ``tier``, ``time``, ``now``, ``price``, ``cash``,
 ``prize``, ``item_ids`` and any of the delta keys.
 
-**One shape is recognised rather than merely unknown.**  ``attacker_units`` is
-the preserved ``end_attack`` branch's *actual* destruction wire shape — the list
-whose ``unit[2] - unit[3]`` is the count it destroys (``command.py:866-872``) —
-so a request carrying it is refused by name, through
-:data:`DESTRUCTION_KEYS`, rather than being treated as an arbitrary unknown key.
-The refusal is the **domain's** (``client_dictated_destruction``, 409), because a
-decision about what a transaction would have destroyed belongs to the domain and
-not to a layer that only reads key names; this module carries the figure
-**verbatim** in :attr:`Intent.destruction_request` and computes nothing from it.
-The sibling spellings ``victim`` and ``victim_units`` are **not** in that set:
-neither is a destruction, so both remain ``unknown_request_field`` (400).
+**Two shapes are recognised rather than merely unknown, and both are decided by
+the domain.**  Recognition is a request-layer act; the *reason* is not, because
+a layer that only reads key names has no rule about what the transaction would
+have done.
+
+``attacker_units``
+    The preserved ``end_attack`` branch's *actual* destruction wire shape — the
+    list whose ``unit[2] - unit[3]`` is the count it destroys
+    (``command.py:866-872``) — so a request carrying it is refused by name,
+    through :data:`DESTRUCTION_KEYS`, rather than being treated as an arbitrary
+    unknown key.  The refusal is the **domain's**
+    (``client_dictated_destruction``, 409), and this module carries the figure
+    **verbatim** in :attr:`Intent.destruction_request` and computes nothing from
+    it.  The sibling spellings ``victim`` and ``victim_units`` are **not** in
+    that set: neither is a destruction, so both remain
+    ``unknown_request_field`` (400).
+
+``next_id``, ``offset``, ``successor``, and the grant shapes
+    The reward line's five channels (design D5): a client-sent cursor
+    contribution (:data:`REWARD_CURSOR_KEYS`, carried verbatim in
+    :attr:`Intent.cursor_request`) and a client-sent grant
+    (:data:`REWARD_GRANT_KEYS`, carried in :attr:`Intent.grant_request`).
+    Recognised here, refused **by the domain by name** — the spec requires each
+    grant shape to be "refused with its own named reason", which a single
+    ``unknown_request_field`` cannot express.  This module carries the **channel
+    name**, never a refusal code, for the reason recorded on
+    :func:`parse_intent`.
+
+**The cursor channel is resolved before the grant channels**, which is a
+deliberate, recorded **difference from v0**: ``apps/compat-api``'s
+``CLIENT_KEY_REFUSALS`` is ordered item, item_index, cell, player, next_id,
+amount, price (``rewards_envelope.py:830-838``), so a v0-shaped request naming
+both a cursor and a grant is answered about the grant.  v1 answers about the
+cursor first because the cursor is the one input this line exists to make
+impossible, and naming the cursor says the more important thing about the
+request.
 """
 
 from __future__ import annotations
@@ -105,7 +149,7 @@ import json
 from collections.abc import Mapping
 from typing import Any, Dict, FrozenSet, Optional, Tuple, Union
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from server_v1_refusals import Refusal, RefusalCode
 
@@ -117,6 +161,7 @@ INTENT_SCHEMAS: Dict[str, FrozenSet[str]] = {
     "collection": frozenset({"player_id", "collection_id"}),
     "magic": frozenset({"player_id", "magic_id", "operation"}),
     "combat": frozenset({"player_id", "unit_id"}),
+    "reward": frozenset({"player_id", "operation"}),
 }
 
 #: The one addressing field each action requires, and therefore the one field
@@ -130,12 +175,30 @@ INTENT_SCHEMAS: Dict[str, FrozenSet[str]] = {
 #: contract that does hold is stated by :data:`ADDRESSING_FIELDS` on its own, and
 #: the extra key is declared beside it in :data:`INTENT_OPERATION_FIELDS` rather
 #: than being inferred from a schema's length.
+#:
+#: **``reward`` is the one action with no row here**, and the exception is
+#: declared in :data:`NO_ADDRESSING_FIELD_ACTIONS` so that
+#: ``ADDRESSING_FIELDS[action]`` is never reached for it.  It is not a gap: a
+#: reward transaction addresses a **cursor**, and the cursor's successor is the
+#: one value this line derives rather than accepts (design D5).
 ADDRESSING_FIELDS: Dict[str, str] = {
     "collect": "row",
     "collection": "collection_id",
     "magic": "magic_id",
     "combat": "unit_id",
 }
+
+#: The delivered actions that declare **no** addressing field.
+#:
+#: ``reward`` is the only member.  A reward request names a player and an
+#: operation and nothing else: the cursor it would advance is derived from the
+#: recorded document, so there is no address for the client to supply, and
+#: :meth:`Intent.addressed_path` reports the container ``/privateState`` — where
+#: both cursors live — rather than inventing a pointer to a key the domain has
+#: not yet read.  Declared rather than inferred, so the parse site's
+#: ``ADDRESSING_FIELDS[action]`` lookup is total over the delivered actions and
+#: a sixth action cannot join the reward shape by accident.
+NO_ADDRESSING_FIELD_ACTIONS: FrozenSet[str] = frozenset({"reward"})
 
 #: The one action that declares no operation field, named as data.
 #:
@@ -166,6 +229,106 @@ DESTRUCTION_KEYS: Dict[str, FrozenSet[str]] = {
     "combat": frozenset({"attacker_units"}),
 }
 
+#: Client-sent **reward-cursor** keys, recognised per action and carried
+#: verbatim into :attr:`Intent.cursor_request` (design D5).
+#:
+#: **The only action that has a row is ``reward``,** and it is the only place in
+#: the repository where a cursor may be sent at all: every other action's target
+#: is an address, and an address the client may name.  A reward cursor is the
+#: opposite — it is the value v1 derives — so recognising its spellings lets the
+#: domain refuse them **by name** instead of answering a v0-shaped request as an
+#: arbitrary unknown field.
+#:
+#: **Every entry is anchored, and the three kinds of anchor are labelled.**
+#:
+#: ``next_id``
+#:     **Measured.**  It is the preserved branch's own argument name: the daily
+#:     branch computes ``next_id = args[1] + 1`` (``command.py:445``), and
+#:     ``apps/compat-api/rewards_envelope.py:835`` refuses exactly this spelling
+#:     as ``client_supplied_next_id``.
+#: ``offset``, ``successor``
+#:     **Quoted from the line's own spec**, which names "a next id, an offset, or
+#:     any other cursor contribution" as the things a request must not carry.
+#:     ``offset`` and ``successor`` are the two additional words it spells, and
+#:     neither is a v0 spelling — they are here because the spec promises the
+#:     refusal covers "any other cursor contribution", and a rule that only knew
+#:     ``next_id`` would not.
+#: ``bonus_next_id``, ``weekly_reward_index``
+#:     **Derived** from the two stored field names in snake_case
+#:     (``bonusNextId`` and ``weeklyRewardIndex``, per
+#:     ``apps/compat-api/rewards_envelope.py``).  A client holding a save, or one
+#:     built from the stored shape, names the field it knows; refusing that by
+#:     name is the difference between "you may not dictate the cursor" and "that
+#:     key does not exist".
+#:
+#: **Deliberately not widened** to ``cursor``, ``next_cursor``, ``new_cursor`` or
+#: ``index``: none of those is a preserved spelling, a spec word, or a stored
+#: field name, and adding them would be the substring-matching mistake
+#: :func:`_is_delta_key` records and rejected.  A key outside this set is
+#: ``unknown_request_field`` (400) — a *different* and equally correct answer
+#: for a key that is not a cursor contribution.
+REWARD_CURSOR_KEYS: Dict[str, FrozenSet[str]] = {
+    "reward": frozenset(
+        {
+            "next_id",
+            "offset",
+            "successor",
+            "bonus_next_id",
+            "weekly_reward_index",
+        }
+    ),
+}
+
+#: Client-sent **reward-grant** keys, recognised per action and carried into
+#: :attr:`Intent.grant_request` **keyed by channel**, never by value
+#: (design D5).
+#:
+#: The spec requires that a request carrying "an item id, a cell, a player
+#: identity, or a map index" has "each ... refused with its own named reason", so
+#: the *channel* — not the refusal code — is what crosses the layer boundary:
+#: this module names ``"item"``, and ``server_v1_reward.py`` owns the mapping from
+#: channel to reason.  A layer that only reads key names has no rule about what a
+#: transaction would have granted, which is the same division the destruction
+#: channel records.
+#:
+#: **Every channel and every spelling is anchored.**
+#:
+#: ``item``, ``item_index``, ``cell``, ``player``
+#:     **Measured** — these are four of the seven rows of v0's
+#:     ``CLIENT_KEY_REFUSALS`` (``rewards_envelope.py:830-838``), each refused
+#:     there by its own code, and each read by the preserved branches: the daily
+#:     arm writes the client's item id into storage and a deduplicating unit list
+#:     (``command.py:444-463``), and the weekly arm reads a cell and a player
+#:     from the client (``command.py:345-363``).
+#: ``x``, ``y``
+#:     **Measured** — v0's own aliases for ``cell``
+#:     (``rewards_envelope.py:847-848``).  Both map to the ``cell`` channel, so
+#:     a request sending ``x`` and ``y`` is still one refusal about one cell.
+#:
+#: ``amount`` and ``price`` are **not** here: they are already declared delta
+#: words, so they are refused earlier and by a different code
+#: (``client_supplied_delta``), and duplicating them would make which of the two
+#: answers depends on the order of two tables.
+REWARD_GRANT_KEYS: Dict[str, Dict[str, str]] = {
+    "reward": {
+        "item": "item",
+        "item_index": "map_index",
+        "cell": "cell",
+        "x": "cell",
+        "y": "cell",
+        "player": "player",
+    },
+}
+
+#: The four grant channels, closed, in the order the domain resolves them.
+#:
+#: Closed so the domain's channel-to-reason mapping is total over the carried
+#: set: a request naming a channel outside this list could not be answered, so
+#: ``tests/test_intent.py`` asserts :data:`REWARD_GRANT_KEYS` is closed over it.
+#: **The order is v1's, not v0's** — see the module docstring's note on the
+#: cursor channel.
+REWARD_GRANT_CHANNELS: Tuple[str, ...] = ("item", "map_index", "cell", "player")
+
 #: The one **non-addressing** required key each action declares, and therefore
 #: the one field whose *value* is a closed vocabulary rather than an address.
 #:
@@ -178,15 +341,38 @@ DESTRUCTION_KEYS: Dict[str, FrozenSet[str]] = {
 #: of the magic line records: a closed set that lives in a table cannot be
 #: extended by editing a branch, and ``tests/test_intent.py`` asserts every
 #: declared action with a value set closes over exactly the values it declares.
-INTENT_OPERATION_FIELDS: Dict[str, str] = {"magic": "operation"}
+#:
+#: The reward line adds ``reward`` here, which is what makes
+#: :data:`NO_OPERATION_FIELD_ACTIONS` a one-member set rather than the whole
+#: complement: the preserved reward surface distinguishes **two** arms
+#: (``weekly_reward``/``win_daily_bonus``) over one cursor field each, so it has
+#: exactly the structure the magic line introduced ``operation`` for.
+INTENT_OPERATION_FIELDS: Dict[str, str] = {
+    "magic": "operation",
+    "reward": "operation",
+}
 
-#: The closed value set for each declared operation field, keyed by the field's
-#: name so a second action reusing ``operation`` cannot silently share or
-#: override the first's vocabulary.  A value outside the set is
-#: ``malformed_request`` — a request-shape error, decided here, in the one
-#: module that owns request shape.
+#: The closed value set for each declared operation field, keyed by the **action**
+#: rather than by the field's name.
+#:
+#: **Rekeyed from the field name by the reward line, and the old keying was a
+#: latent defect.**  The first version was keyed ``"operation"``, with the
+#: comment above it promising that "a second action reusing ``operation`` cannot
+#: silently share or override the first's vocabulary" — but a mapping with one
+#: key has exactly one row, so a second action *could* not be added at all, and
+#: the promise was kept by the type rather than by the rule.  The reward line is
+#: the first real collision: both ``magic`` and ``reward`` declare a field
+#: literally named ``operation`` over **disjoint** value sets
+#: (``{"buy", "use"}`` and ``{"weekly", "daily"}``).  Keying by action makes
+#: the disjointness a structural property that
+#: :func:`parse_intent` can enforce, instead of one of the two sets quietly
+#: winning.
+#:
+#: A value outside an action's set is ``malformed_request`` — a request-shape
+#: error, decided here, in the one module that owns request shape.
 INTENT_OPERATION_VALUES: Dict[str, FrozenSet[str]] = {
-    "operation": frozenset({"buy", "use"}),
+    "magic": frozenset({"buy", "use"}),
+    "reward": frozenset({"weekly", "daily"}),
 }
 
 #: Actions whose addressing field may legally be **negative**.
@@ -303,7 +489,9 @@ class Intent(BaseModel):
     :data:`INTENT_OPERATION_FIELDS` and the transport never builds an ``Intent``
     itself — so the "which one is set" question is answered at construction
     rather than at every use, and :meth:`addressed_path` reports the address that
-    is.
+    is.  A reward intent sets **no** addressing field, by
+    :data:`NO_ADDRESSING_FIELD_ACTIONS`, and carries its client-sent cursor and
+    grant inputs instead.
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
@@ -345,6 +533,22 @@ class Intent(BaseModel):
     #: be an invitation to read it as one.  The domain reports it beside the code
     #: that refused it and derives nothing from it.
     destruction_request: Optional[Any] = None
+    #: A reward cursor the client tried to send, carried **verbatim**, or
+    #: ``None``.
+    #:
+    #: ``Any`` for the same reason :attr:`destruction_request` is: the value is
+    #: never read, incremented, clamped, or compared here.  It exists so the
+    #: domain can refuse the request **by name** with the offending spelling
+    #: beside the code, rather than the request layer reporting a key that
+    #: happens to be one of several.
+    cursor_request: Optional[Any] = None
+    #: Client-sent reward-grant inputs, keyed by **channel** (see
+    #: :data:`REWARD_GRANT_KEYS`), valued verbatim.  Empty — not ``None`` — when
+    #: the request carried none, so "no grant" is one testable value rather than
+    #: two spellings of absence.  Keyed by channel rather than by the literal
+    #: spelling because the domain's rule is about *what was granted*, and
+    #: ``x``/``y`` must reach it as the one cell they are.
+    grant_request: Dict[str, Any] = Field(default_factory=dict)
 
     def addressed_path(self) -> str:
         """A JSON-pointer-ish description of what this intent addresses.
@@ -359,6 +563,13 @@ class Intent(BaseModel):
         none, one, or several, and which no JSON pointer can express.  Naming the
         container is the honest address; the domain reports the actual matching
         keys beside it.
+
+        ``reward`` resolves to ``/privateState``, the **container** and not a
+        key inside it, for the same reason and a second one: the two cursors
+        live under two different keys of that object, and which one is addressed
+        is the *operation's* answer, not the request's.  A pointer to a key here
+        would assert a resolution this layer has not made; the domain reports the
+        real :func:`server_v1_reward.reward_cursor_path` beside this one.
         """
         if self.collection_id is not None:
             return "/privateState/collections"
@@ -366,6 +577,8 @@ class Intent(BaseModel):
             return "/privateState/magics/%d" % self.magic_id
         if self.unit_id is not None:
             return "/maps/0/items"
+        if self.action in NO_ADDRESSING_FIELD_ACTIONS:
+            return "/privateState"
         return "/maps/0/items/%d" % self.row
 
 
@@ -414,6 +627,10 @@ def parse_intent(action: str, body: Any) -> IntentOutcome:
     3. the preserved branch's own destruction shape is recognised and carried
        rather than answered as an unknown key -- **not a refusal here**, see
        :data:`DESTRUCTION_KEYS`;
+    3b. the reward line's two channels are recognised and carried for the same
+       reason: a client-sent cursor (:data:`REWARD_CURSOR_KEYS`) and the four
+       client-sent grant shapes (:data:`REWARD_GRANT_KEYS`).  **The cursor is
+       recognised first**, which is a recorded difference from v0's order;
     4. no key is outside the action's schema (``unknown_request_field``);
     5. the required keys are present and correctly typed
        (``malformed_request``);
@@ -425,7 +642,10 @@ def parse_intent(action: str, body: Any) -> IntentOutcome:
     the domain then refuses the request **by name**.  A layer that only reads key
     names has no rule about what a transaction would have destroyed, so naming
     ``client_dictated_destruction`` here would be this module deciding a
-    question it cannot see.
+    question it cannot see.  Step 3b is the same rule applied to the reward
+    channels, and carries the **channel name** rather than the request's literal
+    spelling, so ``x`` and ``y`` reach the domain as the one cell they are and
+    the domain answers about the cell rather than about a coordinate.
 
     Order matters for a client: a request carrying both a delta and an unknown
     key is reported as a delta attempt, because that is the security-relevant
@@ -435,8 +655,9 @@ def parse_intent(action: str, body: Any) -> IntentOutcome:
 
     No value from ``body`` ever reaches a balance.  The only values that leave
     this function are the action name, the player id, the one addressing value
-    the action declares, its declared operation, and the recognised destruction
-    shape carried verbatim.
+    the action declares (**or none**, for an action in
+    :data:`NO_ADDRESSING_FIELD_ACTIONS`), its declared operation, and the
+    recognised destruction, cursor, and grant shapes carried verbatim.
     """
     if action not in INTENT_SCHEMAS:
         # Not reachable through the delivered route; a fail-closed answer rather
@@ -484,16 +705,39 @@ def parse_intent(action: str, body: Any) -> IntentOutcome:
     destruction_keys = DESTRUCTION_KEYS.get(action, frozenset())
     carried = sorted(str(key) for key in body if str(key) in destruction_keys)
 
-    # (3) closed key set, over the keys this action neither defines nor
-    # recognises.  The recognised destruction shapes are excluded **here** and
-    # only here: including them would answer a preserved-dialect request as an
-    # arbitrary unknown field and the domain's named refusal would be
-    # unreachable.
-    unknown = sorted(
-        str(key)
-        for key in body
-        if str(key) not in allowed and str(key) not in destruction_keys
-    )
+    # (3b) the reward line's two channels, recognised and carried exactly as the
+    # destruction shape above is -- and **decided by the domain**, for the same
+    # reason: whether a request's item id would have been granted, or whether its
+    # cursor would have moved, is a rule about the transaction, and this module
+    # has no transaction.
+    #
+    # The cursor is resolved **before** the grants.  v0's order is the reverse
+    # for this pair (``rewards_envelope.py:830-838``: item, item_index, cell,
+    # player, next_id), so this is a recorded difference and not an accident: the
+    # cursor is the one input the reward line exists to make impossible, so a
+    # request naming both is answered about that first.
+    cursor_keys = REWARD_CURSOR_KEYS.get(action, frozenset())
+    carried_cursor = sorted(str(key) for key in body if str(key) in cursor_keys)
+
+    grant_table = REWARD_GRANT_KEYS.get(action, {})
+    #: Keyed by **channel**, so two spellings of one channel (``x`` and ``y``)
+    #: collapse to one entry -- last write wins deterministically because the
+    #: loop is over ``sorted(body)`` -- and the domain answers about the cell
+    #: once.  The literal spelling is not carried: the domain reports the
+    #: channel, which is the thing it can act on, and this layer has no reason
+    #: to prefer one coordinate name over the other.
+    carried_grants: Dict[str, Any] = {}
+    for key in sorted(str(key) for key in body):
+        channel = grant_table.get(key)
+        if channel is not None:
+            carried_grants[channel] = body[key]
+
+    # (3c) everything this action neither defines nor recognises.  The
+    # recognised shapes are excluded **here** and only here: including them
+    # would answer a preserved-dialect request as an arbitrary unknown field
+    # and the domain's named refusal would be unreachable.
+    recognised = allowed | destruction_keys | cursor_keys | frozenset(grant_table)
+    unknown = sorted(str(key) for key in body if str(key) not in recognised)
     if unknown:
         return _refuse(
             RefusalCode.UNKNOWN_REQUEST_FIELD,
@@ -511,23 +755,31 @@ def parse_intent(action: str, body: Any) -> IntentOutcome:
             {"received": type(player_id).__name__},
         )
 
-    addressing = ADDRESSING_FIELDS[action]
-    target = body.get(addressing)
-    # ``bool`` is an ``int`` in Python, so ``True`` would address row 1.
-    if isinstance(target, bool) or not isinstance(target, int):
-        return _refuse(
-            RefusalCode.MALFORMED_REQUEST,
-            "%s must be an integer" % addressing,
-            {"addressing_field": addressing, "received": type(target).__name__},
-        )
-    if addressing in NON_NEGATIVE_ADDRESSING and target < 0:
-        return _refuse(
-            RefusalCode.MALFORMED_REQUEST,
-            "%s must be a non-negative integer" % addressing,
-            {"addressing_field": addressing, "received": target},
-        )
+    # (5b) the addressing value, for an action that declares one.  An action in
+    # :data:`NO_ADDRESSING_FIELD_ACTIONS` has no addressing step at all, so
+    # ``target`` stays ``None`` and every addressing field below stays ``None``
+    # -- which is the truthful state, not a default: the request named no
+    # address, and the domain reports the container.
+    addressing: Optional[str] = None
+    target: Optional[int] = None
+    if action not in NO_ADDRESSING_FIELD_ACTIONS:
+        addressing = ADDRESSING_FIELDS[action]
+        target = body.get(addressing)
+        # ``bool`` is an ``int`` in Python, so ``True`` would address row 1.
+        if isinstance(target, bool) or not isinstance(target, int):
+            return _refuse(
+                RefusalCode.MALFORMED_REQUEST,
+                "%s must be an integer" % addressing,
+                {"addressing_field": addressing, "received": type(target).__name__},
+            )
+        if addressing in NON_NEGATIVE_ADDRESSING and target < 0:
+            return _refuse(
+                RefusalCode.MALFORMED_REQUEST,
+                "%s must be a non-negative integer" % addressing,
+                {"addressing_field": addressing, "received": target},
+            )
 
-    # (4b) the action's declared operation, from its closed value set.
+    # (5c) the action's declared operation, from its closed value set.
     #
     # Declared as data (:data:`INTENT_OPERATION_VALUES`) rather than as a branch
     # here or in the transport, so a fourth operation can only be added by
@@ -537,10 +789,15 @@ def parse_intent(action: str, body: Any) -> IntentOutcome:
     # are one refusal with three different ``received`` spellings rather than
     # three refusals, because they are one fact: the request does not name an
     # operation this action declares.
+    #
+    # The lookup is keyed by **action**, not by the field's name: ``magic`` and
+    # ``reward`` both declare a field literally named ``operation`` over
+    # disjoint value sets, and keying by field would have let one set answer for
+    # the other.
     operation_field = INTENT_OPERATION_FIELDS.get(action)
     operation: Optional[str] = None
     if operation_field is not None:
-        operation_values = INTENT_OPERATION_VALUES[operation_field]
+        operation_values = INTENT_OPERATION_VALUES[action]
         raw_operation = body.get(operation_field)
         if not isinstance(raw_operation, str) or raw_operation not in operation_values:
             return _refuse(
@@ -575,6 +832,8 @@ def parse_intent(action: str, body: Any) -> IntentOutcome:
         # shape per action, and why the domain reports the carried key beside
         # the value rather than reporting a value alone.
         destruction_request=body[carried[0]] if carried else None,
+        cursor_request=body[carried_cursor[0]] if carried_cursor else None,
+        grant_request=carried_grants,
     )
 
 
@@ -690,8 +949,12 @@ __all__ = [
     "INTENT_OPERATION_FIELDS",
     "INTENT_OPERATION_VALUES",
     "INTENT_SCHEMAS",
+    "NO_ADDRESSING_FIELD_ACTIONS",
     "NO_OPERATION_FIELD_ACTIONS",
     "NON_NEGATIVE_ADDRESSING",
+    "REWARD_CURSOR_KEYS",
+    "REWARD_GRANT_CHANNELS",
+    "REWARD_GRANT_KEYS",
     "Intent",
     "IntentOutcome",
     "intent_from_json",
