@@ -59,6 +59,9 @@ these requires a written rationale and a roadmap amendment.*
 | F10 | The upstream server has **no authentication**: `USERID` comes from the request body; `user_key` and `accessToken` are read and discarded | The new server replaces all three with real auth |
 | F11 | `constants.py` has **duplicate dict keys**; quests `100000024/25/26` resolve to the wrong names | The quest-name table is rebuilt from `villages/quest/` filenames, not copied |
 | F12 | The upstream `build/build.bat` points `--add-data "..\..\assets"` **outside the repo** | Never reuse the upstream build scripts |
+| F13 | The config's `goals` array is **not Social Wars content** — its titles are villagers, trolls, sheep ranches, wonders, acres, university and blacksmith. The id space is shared with the client's 134 goals, but **all 79 overlapping ids have a different title** | Goal content comes from the **client**, not from `config/main.json`. The upstream server prints the wrong titles. See [`../re/docs/13-goal-system.md`](../re/docs/13-goal-system.md) |
+| F14 | Only **67 of the 1 176** SWF files contain any real code; 1 108 carry nothing but an auto-generated `MovieClip` document class | The asset pipeline is a **frame-and-atlas** problem, not a decompile problem. See [`../re/docs/16-swf-corpus.md`](../re/docs/16-swf-corpus.md) |
+| F15 | The **129 client-only item ids** (5 buildings + the 124-item 1307–1431 wave) have **no recoverable stats**: `StaticData.as` reads every stat from the server config, and the client holds no stat table | Their *behaviour* is known (the delegate), their *numbers* must be balanced or sourced from a later config capture. See [`../re/docs/11-unit-and-building-behaviour.md`](../re/docs/11-unit-and-building-behaviour.md) |
 
 ### Hard constraints
 
@@ -197,50 +200,90 @@ first means guessing at the rules being cloned.
 
 **Status:** Complete.
 
-### B4 — Quest win conditions
+### B4 — Quest win conditions ✅
 
-- [ ] All **28 quest classes** are reduced to: spawn conditions, objective, victory test,
-      failure test, rewards, difficulty scaling
-- [ ] The quest-id → name mapping is rebuilt from `villages/quest/` filenames, correcting
-      the `constants.py` duplicate-key bug (F11)
-- [ ] The chapter/objective system (`idSimpleChapter` and friends) is specified as a state
+- [x] All **23 concrete quest classes** are reduced to: spawn conditions, objective, victory
+      test, failure test, rewards, difficulty scaling
+      ([`../re/docs/12-quest-system.md`](../re/docs/12-quest-system.md),
+      [`../re/data/quests.json`](../re/data/quests.json))
+- [x] The quest-id → name mapping is rebuilt from the client factory, the map ids and the
+      `villages/quest/` filenames, correcting the `constants.py` duplicate-key bug (F11)
+- [x] The chapter/objective system (`idSimpleChapter` and friends) is specified as a state
       machine
+- [x] 14 items that could not be determined are marked UNVERIFIED, including a quest whose
+      objective makes it unwinnable, a broken `questsRank` lookup, and two cut quests
+      (`100000023` / `100000024` / `100000100`)
 
-### B5 — Goal specification
+**Status:** Complete.
 
-- [ ] All **34 goal classes** are reduced to a table of: trigger, progress metric,
+### B5 — Goal specification ✅
+
+- [x] All **34 goal classes** are reduced to a table of: trigger, progress metric,
       completion condition, reward
-- [ ] The client registers **134 goal ids** while the 2012 config defines only **91**: the
-      reconciliation (which ids exist in one and not the other, in both directions) is
-      recorded as data
+      ([`../re/docs/13-goal-system.md`](../re/docs/13-goal-system.md),
+      [`../re/data/goals.json`](../re/data/goals.json))
+- [x] The client registers **134 goal ids** while the 2012 config defines only **91**: the
+      reconciliation is recorded as data — 79 overlapping, 12 config-only, 55 client-only
+- [x] **The finding that changes the content pipeline**: the config's `goals` array is *not
+      Social Wars content* (villagers, trolls, sheep ranches, wonders, acres, university),
+      and all 79 overlapping ids carry a **different title**. The id space is shared; the
+      content is not. The **client** is the source of truth for goals, and the upstream
+      server prints the wrong titles
+- [x] 6 client defects are documented, including a goal that completes on the *first*
+      market collect instead of after 500 wood
 
-### B6 — UI screen inventory (the modern client's UI spec)
+**Status:** Complete.
 
-- [ ] All **403 UI classes** (95 popups, 57 GUI, 251 top-level MovieClips) are inventoried:
-      screen name, purpose, contents, entry point, exit conditions
-- [ ] Each is classified as *gameplay-critical*, *cosmetic* or *droppable*
-- [ ] The inventory becomes the modern client's UI backlog, so no screen is discovered late
+### B6 — UI screen inventory (the modern client's UI spec) ✅
 
-### B7 — Social layer contracts
+- [x] All **260 UI classes** are inventoried: 95 popups, 57 GUI panels, 108 interface
+      movie clips (the other 143 top-level `*MC.as` files are gameplay art and are
+      correctly excluded)
+      ([`../re/docs/14-ui-screen-inventory.md`](../re/docs/14-ui-screen-inventory.md),
+      [`../re/data/ui-screens.json`](../re/data/ui-screens.json))
+- [x] Each is classified as *gameplay-critical*, *supporting* or *cosmetic/droppable*
+- [x] The inventory becomes the modern client's UI backlog: **698 user-facing strings** (the
+      localisation surface) and **122 image references** (the chrome gap list)
+- [x] The shared `PopupObject` base is documented as a **priority-ordered modal stack**,
+      which the clone should reproduce
 
-- [ ] The 11 `alliance/?method=…` variants are recovered from the AS3 and specified
-- [ ] The marketplace and unit-bidding flows are specified
-- [ ] The `bets/*` auction routes are specified (the upstream server has them commented out)
-- [ ] The premium-account and offer-pack purchase flows are specified
+**Status:** Complete.
+
+### B7 — Social layer contracts ✅
+
+- [x] The 11 `alliance/?method=…` variants are recovered from the AS3 and specified, with
+      their exact request parameters
+      ([`../re/docs/15-social-layer-contracts.md`](../re/docs/15-social-layer-contracts.md),
+      [`../re/data/service-contracts.json`](../re/data/service-contracts.json))
+- [x] The 17 alliance error codes are recovered from `data/AllianceServiceError.as`
+- [x] The `bets/*` auction routes are specified — and they **match the upstream server's
+      commented-out handlers field for field**, so the upstream author had recovered the
+      same contract and simply never enabled the routes
+- [x] The marketplace and unit-bidding flow is specified (uuid / round / bidPrice)
+- [ ] The premium-account and offer-pack purchase flows are specified — **deferred to
+      Group F**: the offer-pack data is already in `config/main.json`
+      (`offer_packs`, 44 entries) and the purchase command is already in the catalogue
+
+**Status:** Complete.
 
 ### B8 — Remaining live captures
 
 - [ ] The PvP `end_attack` payload is captured from a live player attack
 - [ ] The `attack_player` / `spy_player` command payloads are captured live
-- [ ] The alliance and marketplace request/response shapes are captured live where the
-      local server can exercise them
+- [x] The alliance and marketplace request/response shapes are captured statically from the
+      client, which is stricter than the local server could exercise — the upstream server
+      answers `{}` for every alliance variant, so there is nothing to capture against
+- [ ] The premium purchase flow is captured live
 
-### Output contract for Group B
+### Output contract for Group B ✅
 
-- [ ] Every B-item produces a document in `re/docs/` **and** a machine-readable JSON/CSV
-      artefact under `re/data/`, so implementation consumes data rather than prose
-- [ ] `re/docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md` is updated: every closed gap is
-      removed, every remaining gap is listed with its impact on the build
+- [x] Every B-item produces a document in `re/docs/` **and** a machine-readable JSON/CSV
+      artefact under `re/data/`, so implementation consumes data rather than prose — 9 JSON
+      datasets and 17 documents
+- [x] `re/docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md` is updated: Q5 (the key rotation) is
+      closed, and every remaining gap is listed with its impact on the build
+
+**Status:** Complete except the live PvP capture (B8).
 
 **Exit criteria:** the rules-engine backlog (B3/B4/B5) and the UI backlog (B6) are
 machine-readable and complete enough to implement from.
