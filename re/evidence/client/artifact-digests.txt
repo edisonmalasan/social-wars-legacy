@@ -1,0 +1,22 @@
+SHA-256 of the key artefacts of the Social Wars preservation project
+Target root: the upstream 'socialwarriors' checkout
+==============================================================================
+
+sha256                                                                 bytes  path
+e4ce0218920a30fceee85ba750df3eedffa3f90e977bd117655704e297e0dc77     4542821  assets\flash\Basesec_1.5.4.swf
+e04f637da6fc8f333aa9ded961358f584304605f46e2a708eb7c7754eaa320ab      127786  assets\flash\SWLoader.swf
+44b9cd92923b43a4603c2dfff60b7eb1fd210a9049fc979198dc848966de6aff     4585198  assets\flash\Debug_1.5.4.swf
+8025118bd41fb26f519c95d7901a254af0f2b59c83b8d8c6c4bef011cf465cf2      492559  assets\swf\dynamic2.swf
+55ffd929372a4a31785cfd683982856324e2b73ba9a6624c53f09b68e4dd0ea5     1702871  config\main.json
+55ffd929372a4a31785cfd683982856324e2b73ba9a6624c53f09b68e4dd0ea5     1702871  config\get_game_config.php_29august2012_nohash.json
+924fc56f13199d9622444e8e1f16e6f6d19e3f378ed8545f98e2b4a76d98dd00      930791  config\get_game_config.php_23july2012.txt
+a31a49c31df07f91f0b5e7dde9c07452029cb3db4f53ac8e9b454aef05417eda      945531  config\get_game_config.php_29august2012.txt
+f09a7f490c96ae5798b158e67ff8e339a6337ffed81f0bd5683215aa6d28d5f2        8080  villages\initial.json
+0d9b4e124e6b1046dc9b6a01dee6e6e8f32ff010b3b497f33c294747d5f12cf4      183639  villages\Neutral.json
+d9c4fa89e630c5fd81da6e60379209bbd874c1c82dba4391b23b2927b7e5d411       11631  server.py
+90ebd5384513a757ad739df0b2e86d3fd56d9b6efc0b0bfeb704e3b55c12b6ca       31193  command.py
+1f95dde44d80dfcda2a7641cd7ff5f19631c133589e458a1887229b1f920b02a        9000  engine.py
+ad02bbea90c1eb119f60e065e635043317ef3682deed3b21924281498dd7dd9b        8261  sessions.py
+dd14dca1a99338268cd52460753fa8fafbf8e9a01724e7cf27b5a24ce81e2b4d       10726  get_game_config.py
+09d88cd24155053d655d211dc36a84dbdaccd22326c69ac3f77c1c3408ec0226        1478  get_player_info.py
+7357609428abcf8e5abcdcf39acb882eff47c024d7580f5a5d57ea4f771dcc98       38437  constants.py

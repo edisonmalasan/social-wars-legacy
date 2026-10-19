@@ -1,0 +1,103 @@
+Decoded command.php batches captured from a live Adobe Flash Player session
+==============================================================================
+
+--- batch #1  first_number=1 ts=1792434747 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = d8c21de8555a80b9087b2760d087ddf5dd183a5246a71063dd10f9ee881d2e94
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  complete_tutorial          args=[1]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #2  first_number=2 ts=1792434789 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = ffd6a78353097ca2e68ae5c1cca66ded2c0b0904f330bdcee370b0b67b3c6bfb
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  complete_tutorial          args=[2]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #3  first_number=3 ts=1792434813 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = ad9ab36c12217c6cc4463e4a5afb86aa2a64515a26ef77899e2da59933698018
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  complete_tutorial          args=[3]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  push_queue_unit            args=[1]  res=[0, 5, -10, 0, 0, 0, 0, 0]
+    cmd  rt_open_graph_unit         args=[1001]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[41, 1001, 52, 42, 1, 0, 0, 'u']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  pop_queue_unit             args=[1]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #4  first_number=8 ts=1792434831 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = f6843fa00a3422bbfec23c20f7c76f9beb0ae98e892b236f79abcb70dd3ab9a4
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  complete_tutorial          args=[4]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #5  first_number=9 ts=1792434849 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = 57ab6d9172bef6bcf1b588f677dab32011d1a18399e6565de9fb0634747c0e8f
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  complete_tutorial          args=[5]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #6  first_number=10 ts=1792434861 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = d040cad2f8331c9b61dc7df3da4469c3e0a648e55926d600034b2e5afecba32a
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  move                       args=[41, 43, 41, 0, 'Unitat 1001']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #7  first_number=11 ts=1792434981 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = f51d3e010cf15a36f2b1a3029fb83461d84eca1ad6febf44ef13d9d74bf77d32
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  complete_tutorial          args=[6]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #8  first_number=12 ts=1792434987 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = 4621581ed30bfb2813bf07e584903db529365f4bc81da8a1f1a4dabad4a78f16
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  collect                    args=[2]  res=[0, 2, 0, 20, 0, 0, 0, 0]
+    cmd  sell                       args=[2, 'HARV']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  complete_tutorial          args=[7]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #9  first_number=15 ts=1792434993 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = 080981ce6e1cb43aee4755fd5fcb9eae4f9a6675d5e7b66d07471cea2fc4e412
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  move                       args=[41, 52, 39, 0, 'Unitat 1001']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #10  first_number=16 ts=1792435264 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = 0e96538e03881508708ef9868e51ddf3ac213f51414a4d620607c22962debb47
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  complete_tutorial          args=[8]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #11  first_number=17 ts=1792435354 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = b59d8af1e73896afd9733550091ccee4991d3c75a34faa4ef1316e966cfc7a71
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  complete_tutorial          args=[9]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #12  first_number=18 ts=1792435391 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = 5dcc693d9c39ea63a1ca26c9ca91b1f9c57f69c4731151d08d32dbc4e5a8d8c6
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  complete_tutorial          args=[10]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #13  first_number=19 ts=1792435583 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = 1d57d13f327f605f74e171eb8fadf9aa0dc66f2f18e8d708427bf83d5c6e2923
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  complete_tutorial          args=[11]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[48, 30, 57, 39, 1, 0, 0, 'b']  res=[0, 13, 0, -125, 0, 0, 0, 0]
+    cmd  add_click                  args=[48]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  complete_tutorial          args=[12]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  activate_item_click        args=[48]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #14  first_number=24 ts=1792435667 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = 791e069e0f3375937c7244791ecc4168a6664206533a76c6610ecd1990159401
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  complete_tutorial          args=[13]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #15  first_number=25 ts=1792435709 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = fa2a49f743710c65adf4e726faf68007129b9cf45ac674270656e8c23aaebe66
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  push_queue_unit            args=[48]  res=[0, 3, -30, 0, 0, -60, 0, 0]
+    cmd  rt_open_graph_unit         args=[1007]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[49, 1007, 58, 40, 1, 0, 0, 'u']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  pop_queue_unit             args=[48]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #16  first_number=29 ts=1792435715 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = 7fcba7c29d1b33bf860c9d04048b6620417d572c0346d0cc315ac91696d4306a
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  push_queue_unit            args=[48]  res=[0, 3, -30, 0, 0, -60, 0, 0]
+    cmd  rt_open_graph_unit         args=[1007]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[50, 1007, 57, 40, 1, 0, 0, 'u']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  pop_queue_unit             args=[48]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  complete_tutorial          args=[14]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  push_queue_unit            args=[48]  res=[0, 3, -30, 0, 0, -60, 0, 0]
+    cmd  rt_open_graph_unit         args=[1007]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[51, 1007, 58, 39, 1, 0, 0, 'u']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  pop_queue_unit             args=[48]  res=[0, 0, 0, 0, 0, 0, 0, 0]

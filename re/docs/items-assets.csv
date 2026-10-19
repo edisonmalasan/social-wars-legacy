@@ -1,0 +1,779 @@
+id,name,type,category_id,subcategory_id,subcat_functional,img_name,sprite_files,thumb_files,sprite_ok,thumb_ok
+1,House I,b,1,11,111,0001_house_1_m,assets/sprites/0001_house_1_m.swf,assets/thumbs/0001_house_1_m.jpg,Y,Y
+2,Wood Factory I,b,1,12,129,0002_depot_wood_1_m,assets/sprites/0002_depot_wood_1_m.swf,assets/thumbs/0002_depot_wood_1_m.jpg,Y,Y
+3,Oil Factory I,b,1,12,129,0003_depot_oil_1_m,assets/sprites/0003_depot_oil_1_m.swf,assets/thumbs/0003_depot_oil_1_m.jpg,Y,Y
+4,Steel Factory I,b,1,12,129,0004_depot_steel_1_m,assets/sprites/0004_depot_steel_1_m.swf,assets/thumbs/0004_depot_steel_1_m.jpg,Y,Y
+5,Gold Factory I,b,1,12,129,0005_depot_gold_1_m,assets/sprites/0005_depot_gold_1_m.swf,assets/thumbs/0005_depot_gold_1_m.jpg,Y,Y
+6,Wood Factory II,b,1,12,129,0006_depot_wood_2_m,assets/sprites/0006_depot_wood_2_m.swf,assets/thumbs/0006_depot_wood_2_m.jpg,Y,Y
+7,Oil Factory II,b,1,12,129,0007_depot_oil_2_m,assets/sprites/0007_depot_oil_2_m.swf,assets/thumbs/0007_depot_oil_2_m.jpg,Y,Y
+8,Steel Factory II,b,1,12,129,0008_depot_steel_2_m,assets/sprites/0008_depot_steel_2_m.swf,assets/thumbs/0008_depot_steel_2_m.jpg,Y,Y
+9,Gold Factory II,b,1,12,129,0009_depot_gold_2_m,assets/sprites/0009_depot_gold_2_m.swf,assets/thumbs/0009_depot_gold_2_m.jpg,Y,Y
+10,Wood Factory III,b,1,12,129,0010_depot_wood_3_m,assets/sprites/0010_depot_wood_3_m.swf,assets/thumbs/0010_depot_wood_3_m.jpg,Y,Y
+11,Oil Factory III,b,1,12,129,0011_depot_oil_3_m,assets/sprites/0011_depot_oil_3_m.swf,assets/thumbs/0011_depot_oil_3_m.jpg,Y,Y
+12,Steel Factory III,b,1,12,129,0012_depot_steel_3_m,assets/sprites/0012_depot_steel_3_m.swf,assets/thumbs/0012_depot_steel_3_m.jpg,Y,Y
+13,Gold Factory III,b,1,12,129,0013_depot_gold_3_m,assets/sprites/0013_depot_gold_3_m.swf,assets/thumbs/0013_depot_gold_3_m.jpg,Y,Y
+14,Wood Factory IV,b,1,12,129,0014_depot_wood_4_m,assets/sprites/0014_depot_wood_4_m.swf,assets/thumbs/0014_depot_wood_4_m.jpg,Y,Y
+15,Oil Factory IV,b,1,12,129,0015_depot_oil_4_m,assets/sprites/0015_depot_oil_4_m.swf,assets/thumbs/0015_depot_oil_4_m.jpg,Y,Y
+16,Steel Factory IV,b,1,12,129,0016_depot_steel_4_m,assets/sprites/0016_depot_steel_4_m.swf,assets/thumbs/0016_depot_steel_4_m.jpg,Y,Y
+17,Gold Factory IV,b,1,12,129,0017_depot_gold_4_m,assets/sprites/0017_depot_gold_4_m.swf,assets/thumbs/0017_depot_gold_4_m.jpg,Y,Y
+18,Market I,b,1,17,132,0018_market_1_m,assets/sprites/0018_market_1_m.swf,assets/thumbs/0018_market_1_m.jpg,Y,Y
+19,Prison,b,8,81,812,0019_prision_m,assets/sprites/0019_prision_m.swf,assets/thumbs/0019_prision_m.jpg,Y,Y
+22,Turret I,b,2,21,211,0022_tower_1_m,assets/sprites/0022_tower_1_m.swf,assets/thumbs/0022_tower_1_m.jpg,Y,Y
+23,Wall I,b,2,22,221,0023_wall_1_m,assets/sprites/0023_wall_1_m.swf,assets/thumbs/0023_wall_1_m.jpg,Y,Y
+24,Wall II,b,2,22,221,0024_wall_2_m,assets/sprites/0024_wall_2_m.swf,assets/thumbs/0024_wall_2_m.jpg,Y,Y
+25,Wall III,b,2,22,221,0025_wall_3_m,assets/sprites/0025_wall_3_m.swf,assets/thumbs/0025_wall_3_m.jpg,Y,Y
+26,Command Center,b,1,17,135,0026_command_center_1_m,assets/sprites/0026_command_center_1_m.swf,assets/thumbs/0026_command_center_1_m.jpg,Y,Y
+28,Hospital,b,1,17,35,0028_hospital_1_m,assets/sprites/0028_hospital_1_m.swf,assets/thumbs/0028_hospital_1_m.jpg,Y,Y
+30,Academy I,b,3,31,111,0030_academy_1_m,assets/sprites/0030_academy_1_m.swf,assets/thumbs/0030_academy_1_m.jpg,Y,Y
+31,Bazooka Academy I,b,3,31,111,0031_bazooka_academy_1_m,assets/sprites/0031_bazooka_academy_1_m.swf,assets/thumbs/0031_bazooka_academy_1_m.jpg,Y,Y
+37,Hangar I,b,3,33,111,0037_hangar_1_m,assets/sprites/0037_hangar_1_m.swf,assets/thumbs/0037_hangar_1_m.jpg,Y,Y
+38,Tank Academy I,b,3,32,111,0038_cannon_academy_1_m,assets/sprites/0038_cannon_academy_1_m.swf,assets/thumbs/0038_cannon_academy_1_m.jpg,Y,Y
+39,Turret IV,b,2,21,211,0039_tower_2_m,assets/sprites/0039_tower_2_m.swf,assets/thumbs/0039_tower_2_m.jpg,Y,Y
+40,Jeep garage I,b,3,32,111,0040_workshop_1_m,assets/sprites/0040_workshop_1_m.swf,assets/thumbs/0040_workshop_1_m.jpg,Y,Y
+41,Academy II,b,3,31,111,0041_academy_2_m,assets/sprites/0041_academy_2_m.swf,assets/thumbs/0041_academy_2_m.jpg,Y,Y
+42,Academy III,b,3,31,111,0042_academy_3_m,assets/sprites/0042_academy_3_m.swf,assets/thumbs/0042_academy_3_m.jpg,Y,Y
+43,Bazooka Academy II,b,3,31,111,0043_bazooka_academy_2_m,assets/sprites/0043_bazooka_academy_2_m.swf,assets/thumbs/0043_bazooka_academy_2_m.jpg,Y,Y
+44,Bazooka Academy III,b,3,31,111,0044_bazooka_academy_3_m,assets/sprites/0044_bazooka_academy_3_m.swf,assets/thumbs/0044_bazooka_academy_3_m.jpg,Y,Y
+45,Dual-Rocket Turret,b,2,21,211,0045_tower_3_m,assets/sprites/0045_tower_3_m.swf,assets/thumbs/0045_tower_3_m.jpg,Y,Y
+46,Cannon Turret,b,2,21,211,0046_tower_4_m,assets/sprites/0046_tower_4_m.swf,assets/thumbs/0046_tower_4_m.jpg,Y,Y
+47,House II,b,1,11,111,0047_house_2_m,assets/sprites/0047_house_2_m.swf,assets/thumbs/0047_house_2_m.jpg,Y,Y
+48,House III,b,1,11,111,0048_house_3_m,assets/sprites/0048_house_3_m.swf,assets/thumbs/0048_house_3_m.jpg,Y,Y
+49,Turret III,b,2,21,211,0049_torreta_horacio_m,assets/sprites/0049_torreta_horacio_m.swf,assets/thumbs/0049_torreta_horacio_m.jpg,Y,Y
+50,Bunker I,b,2,24,211,0050_bunker_1_m,assets/sprites/0050_bunker_1_m.swf,assets/thumbs/0050_bunker_1_m.jpg,Y,Y
+51,Bunker II,b,2,24,211,0051_bunker_2_m,assets/sprites/0051_bunker_2_m.swf,assets/thumbs/0051_bunker_2_m.jpg,Y,Y
+52,Bunker III,b,2,24,211,0052_bunker_3_m,assets/sprites/0052_bunker_3_m.swf,assets/thumbs/0052_bunker_3_m.jpg,Y,Y
+53,Mega Bunker,b,2,24,211,0053_bunker_4_m,assets/sprites/0053_bunker_4_m.swf,assets/thumbs/0053_bunker_4_m.jpg,Y,Y
+54,Helicopter Hangar I,b,3,33,111,0054_copter_hangar_1_m,assets/sprites/0054_copter_hangar_1_m.swf,assets/thumbs/0054_copter_hangar_1_m.jpg,Y,Y
+55,Helicopter Hangar II,b,3,33,111,0055_copter_hangar_2_m,assets/sprites/0055_copter_hangar_2_m.swf,assets/thumbs/0055_copter_hangar_2_m.jpg,Y,Y
+56,Helicopter Hangar III,b,3,33,111,0056_copter_hangar_3_m,assets/sprites/0056_copter_hangar_3_m.swf,assets/thumbs/0056_copter_hangar_3_m.jpg,Y,Y
+57,Turret II,b,2,21,211,0057_torreta_ruben_m,assets/sprites/0057_torreta_ruben_m.swf,assets/thumbs/0057_torreta_ruben_m.jpg,Y,Y
+58,Command Center II,b,1,17,135,0058_command_center_2_m,assets/sprites/0058_command_center_2_m.swf,assets/thumbs/0058_command_center_2_m.jpg,Y,Y
+59,Command Center III,b,1,17,135,0059_command_center_3_m,assets/sprites/0059_command_center_3_m.swf,assets/thumbs/0059_command_center_3_m.jpg,Y,Y
+60,Command Center IV,b,1,17,135,0060_command_center_4_m,assets/sprites/0060_command_center_4_m.swf,assets/thumbs/0060_command_center_4_m.jpg,Y,Y
+61,Allies Building,b,1,17,111,0061_allies_building_m,assets/sprites/0061_allies_building_m.swf,assets/thumbs/0061_allies_building_m.jpg,Y,Y
+62,Tank Academy II,b,3,32,111,0062_cannon_academy_2_m,assets/sprites/0062_cannon_academy_2_m.swf,assets/thumbs/0062_cannon_academy_2_m.jpg,Y,Y
+63,Tank Academy III,b,3,32,111,0063_cannon_academy_3_m,assets/sprites/0063_cannon_academy_3_m.swf,assets/thumbs/0063_cannon_academy_3_m.jpg,Y,Y
+64,Jeep garage II,b,3,32,111,0064_workshop_2_m,assets/sprites/0064_workshop_2_m.swf,assets/thumbs/0064_workshop_2_m.jpg,Y,Y
+65,Jeep garage III,b,3,32,111,0065_workshop_3_m,assets/sprites/0065_workshop_3_m.swf,assets/thumbs/0065_workshop_3_m.jpg,Y,Y
+66,Stoneage,b,5,51,511,0066_stoneage_marvel_m,assets/sprites/0066_stoneage_marvel_m.swf,assets/thumbs/0066_stoneage_marvel_m.jpg,Y,Y
+67,Machu Picchu,b,5,51,511,0067_machupichu_m,assets/sprites/0067_machupichu_m.swf,assets/thumbs/0067_machupichu_m.jpg,Y,Y
+68,Iguazu,b,5,51,511,0068_iguazu_m,assets/sprites/0068_iguazu_m.swf,assets/thumbs/0068_iguazu_m.jpg,Y,Y
+69,Sphynx,b,5,51,511,0069_sfinx_m,assets/sprites/0069_sfinx_m.swf,assets/thumbs/0069_sfinx_m.jpg,Y,Y
+70,Inca God,b,5,51,511,0070_inca_god_m,assets/sprites/0070_inca_god_m.swf,assets/thumbs/0070_inca_god_m.jpg,Y,Y
+71,Chichenitza,b,5,51,511,0071_chichenitza_m,assets/sprites/0071_chichenitza_m.swf,assets/thumbs/0071_chichenitza_m.jpg,Y,Y
+72,Babilonia,b,5,51,511,0072_babilonia_m,assets/sprites/0072_babilonia_m.swf,assets/thumbs/0072_babilonia_m.jpg,Y,Y
+73,Ankor,b,5,51,511,0073_Ankor_m,assets/sprites/0073_Ankor_m.swf,assets/thumbs/0073_Ankor_m.jpg,Y,Y
+74,Allies Market,b,1,17,132,0074_Allies_market_m,assets/sprites/0074_Allies_market_m.swf,assets/thumbs/0074_Allies_market_m.jpg,Y,Y
+75,Recon center,b,1,17,132,0075_Spy_center_m,assets/sprites/0075_Spy_center_m.swf,assets/thumbs/0075_Spy_center_m.jpg,Y,Y
+76,Hangar II,b,3,33,111,0076_hangar_2_m,assets/sprites/0076_hangar_2_m.swf,assets/thumbs/0076_hangar_2_m.jpg,Y,Y
+77,Hangar III,b,3,33,111,0077_hangar_3_m,assets/sprites/0077_hangar_3_m.swf,assets/thumbs/0077_hangar_3_m.jpg,Y,Y
+78,Wall IV,b,2,22,221,0078_wall_4_m,assets/sprites/0078_wall_4_m.swf,assets/thumbs/0078_wall_4_m.jpg,Y,Y
+79,Wall V,b,2,22,221,0079_wall_5_m,assets/sprites/0079_wall_5_m.swf,assets/thumbs/0079_wall_5_m.jpg,Y,Y
+80,Fortress I,b,2,23,231,0080_fortress_1_m,assets/sprites/0080_fortress_1_m.swf,assets/thumbs/0080_fortress_1_m.jpg,Y,Y
+81,Fortress II,b,2,23,231,0081_fortress_2_m,assets/sprites/0081_fortress_2_m.swf,assets/thumbs/0081_fortress_2_m.jpg,Y,Y
+82,Rocket Fortress,b,2,23,231,0082_fortress_3_m,assets/sprites/0082_fortress_3_m.swf,assets/thumbs/0082_fortress_3_m.jpg,Y,Y
+83,Fortress III,b,2,23,231,0083_fortress_4_m,assets/sprites/0083_fortress_4_m.swf,assets/thumbs/0083_fortress_4_m.jpg,Y,Y
+84,Special Fortress,b,2,23,231,0084_fortress_5_m,assets/sprites/0084_fortress_5_m.swf,assets/thumbs/0084_fortress_5_m.jpg,Y,Y
+85,Mega Fortress,b,2,23,231,0085_fortress_6_m,assets/sprites/0085_fortress_6_m.swf,assets/thumbs/0085_fortress_6_m.jpg,Y,Y
+86,Robotic Center,b,1,17,111,0086_robotics_center,assets/sprites/0086_robotics_center.swf,assets/thumbs/0086_robotics_center.jpg,Y,Y
+87,Turret VI,b,2,21,211,0087_tower_7_m,assets/sprites/0087_tower_7_m.swf,assets/thumbs/0087_tower_7_m.jpg,Y,Y
+88,Turret V,b,2,21,211,0088_tower_8_m,assets/sprites/0088_tower_8_m.swf,assets/thumbs/0088_tower_8_m.jpg,Y,Y
+89,Nuclear Plant,b,1,11,111,0089_nuclear_plant_m,assets/sprites/0089_nuclear_plant_m.swf,assets/thumbs/0089_nuclear_plant_m.jpg,Y,Y
+90,Market II,b,1,17,132,0090_market_2_m,assets/sprites/0090_market_2_m.swf,assets/thumbs/0090_market_2_m.jpg,Y,Y
+91,Market III,b,1,17,132,0091_market_3_m,assets/sprites/0091_market_3_m.swf,assets/thumbs/0091_market_3_m.jpg,Y,Y
+92,Apple tree,b,4,41,411,0092_apple_tree_m,assets/sprites/0092_apple_tree_m.swf,assets/thumbs/0092_apple_tree_m.jpg,Y,Y
+93,Pear tree,b,4,41,411,0093_pear_tree_m,assets/sprites/0093_pear_tree_m.swf,assets/thumbs/0093_pear_tree_m.jpg,Y,Y
+94,Sponge bush,b,4,42,411,0094_sponge_bush_m,assets/sprites/0094_sponge_bush_m.swf,assets/thumbs/0094_sponge_bush_m.jpg,Y,Y
+95,Little fountain,b,4,45,411,0095_little_fountain_m,assets/sprites/0095_little_fountain_m.swf,assets/thumbs/0095_little_fountain_m.jpg,Y,Y
+96,White Flowers,b,4,42,411,0096_white_flowers_m,assets/sprites/0096_white_flowers_m.swf,assets/thumbs/0096_white_flowers_m.jpg,Y,Y
+97,Red flowers,b,4,42,411,0097_red_flowers_m,assets/sprites/0097_red_flowers_m.swf,assets/thumbs/0097_red_flowers_m.jpg,Y,Y
+98,Blue flowers,b,4,42,411,0098_blue_flowers_m,assets/sprites/0098_blue_flowers_m.swf,assets/thumbs/0098_blue_flowers_m.jpg,Y,Y
+100,Red Leaf flowers,b,4,42,411,0100_red_leaf_flowers_m,assets/sprites/0100_red_leaf_flowers_m.swf,assets/thumbs/0100_red_leaf_flowers_m.jpg,Y,Y
+101,Pink Leaf flowers,b,4,42,411,0101_pink_leaf_flowers_m,assets/sprites/0101_pink_leaf_flowers_m.swf,assets/thumbs/0101_pink_leaf_flowers_m.jpg,Y,Y
+102,Blue Leaf flowers,b,4,42,411,0102_blue_leaf_flowers_m,assets/sprites/0102_blue_leaf_flowers_m.swf,assets/thumbs/0102_blue_leaf_flowers_m.jpg,Y,Y
+103,Bush,b,4,42,411,0103_bush_m,assets/sprites/0103_bush_m.swf,assets/thumbs/0103_bush_m.jpg,Y,Y
+104,Lamp,b,4,45,411,0104_bancos_farolas_m,assets/sprites/0104_bancos_farolas_m.swf,assets/thumbs/0104_bancos_farolas_m.jpg,Y,Y
+105,Victory Arch,b,4,45,411,0105_victory_arch_m,assets/sprites/0105_victory_arch_m.swf,assets/thumbs/0105_victory_arch_m.jpg,Y,Y
+106,Fountain,b,4,45,411,0106_fountain_m,assets/sprites/0106_fountain_m.swf,assets/thumbs/0106_fountain_m.jpg,Y,Y
+107,Sculpture,b,4,44,411,0107_sculpture_m,assets/sprites/0107_sculpture_m.swf,assets/thumbs/0107_sculpture_m.jpg,Y,Y
+108,Grape field,b,1,13,129,0108_grape_field_m,assets/sprites/0108_grape_field_m.swf,assets/thumbs/0108_grape_field_m.jpg,Y,Y
+109,Corn field,b,1,13,129,0109_corn_field_m,assets/sprites/0109_corn_field_m.swf,assets/thumbs/0109_corn_field_m.jpg,Y,Y
+110,Cow farm,b,1,13,129,0110_cow_farm_m,assets/sprites/0110_cow_farm_m.swf,assets/thumbs/0110_cow_farm_m.jpg,Y,Y
+111,Max Security Prison,b,8,81,812,0111_prisoner_guile_m,assets/sprites/0111_prisoner_guile_m.swf,assets/thumbs/0111_prisoner_guile_m.jpg,Y,Y
+112,Stolen Bazookas,b,8,81,812,0112_stolen_bazookas_m,assets/sprites/0112_stolen_bazookas_m.swf,assets/thumbs/0112_stolen_bazookas_m.jpg,Y,Y
+113,Disabled Jeeps,b,8,81,812,0113_disabled_jeeps_m,assets/sprites/0113_disabled_jeeps_m.swf,assets/thumbs/0113_disabled_jeeps_m.jpg,Y,Y
+114,Jeep wheels,b,8,81,812,0114_jeep_weels_m,assets/sprites/0114_jeep_weels_m.swf,assets/thumbs/0114_jeep_weels_m.jpg,Y,Y
+115,Supertank ammo,b,8,81,812,0115_supertank_ammo_1_m,assets/sprites/0115_supertank_ammo_1_m.swf,assets/thumbs/0115_supertank_ammo_1_m.jpg,Y,Y
+116,Supertank ammo,b,8,81,812,0116_supertank_ammo_2_m,assets/sprites/0116_supertank_ammo_2_m.swf,assets/thumbs/0116_supertank_ammo_2_m.jpg,Y,Y
+117,Disabled Supertank,b,8,81,812,0117_disabled_supertank_m,assets/sprites/0117_disabled_supertank_m.swf,assets/thumbs/0117_disabled_supertank_m.jpg,Y,Y
+118,Mind Control Laboratory,b,2,23,231,0118_laboratory_m,assets/sprites/0118_laboratory_m.swf,assets/thumbs/0118_laboratory_m.jpg,Y,Y
+119,Tank wheels,b,8,81,812,0119_tank_wheels_m,assets/sprites/0119_tank_wheels_m.swf,assets/thumbs/0119_tank_wheels_m.jpg,Y,Y
+120,Stolen missiles,b,8,81,812,0120_stolen_missiles_m,assets/sprites/0120_stolen_missiles_m.swf,assets/thumbs/0120_stolen_missiles_m.jpg,Y,Y
+121,Radio,b,8,81,812,0121_radio_m,assets/sprites/0121_radio_m.swf,assets/thumbs/0121_radio_m.jpg,Y,Y
+122,Heliport,b,8,81,812,0122_helipuerto_m,assets/sprites/0122_helipuerto_m.swf,assets/thumbs/0122_helipuerto_m.jpg,Y,Y
+123,Red Fortress,b,8,81,812,0123_red_fortress_m,assets/sprites/0123_red_fortress_m.swf,assets/thumbs/0123_red_fortress_m.jpg,Y,Y
+124,Disabled Tanks,b,8,81,812,0124_disabled_tanks_m,assets/sprites/0124_disabled_tanks_m.swf,assets/thumbs/0124_disabled_tanks_m.jpg,Y,Y
+125,Laboratory,b,8,81,812,0125_laboratory_m,assets/sprites/0125_laboratory_m.swf,assets/thumbs/0125_laboratory_m.jpg,Y,Y
+126,Enemy's airport,b,8,81,812,0126_enemy_airport_m,assets/sprites/0126_enemy_airport_m.swf,assets/thumbs/0126_enemy_airport_m.jpg,Y,Y
+127,Enemy's harbour,b,8,81,812,0127_enemy_harbour_m,assets/sprites/0127_enemy_harbour_m.swf,,Y,N
+128,Rocket launcher,b,8,81,812,0128_rocket_launcher_m,assets/sprites/0128_rocket_launcher_m.swf,assets/thumbs/0128_rocket_launcher_m.jpg,Y,Y
+129,Flamethrower Academy,b,3,34,111,0129_fire_academy_m,assets/sprites/0129_fire_academy_m.swf,assets/thumbs/0129_fire_academy_m.jpg,Y,Y
+130,Dominion Tank Academy,b,3,34,111,0130_black_tank_academy_m,assets/sprites/0130_black_tank_academy_m.swf,assets/thumbs/0130_black_tank_academy_m.jpg,Y,Y
+131,Stealth Fighter Hangar,b,3,34,111,0131_black_aircraft_academy_m,assets/sprites/0131_black_aircraft_academy_m.swf,assets/thumbs/0131_black_aircraft_academy_m.jpg,Y,Y
+132,Troubled Traveller,b,4,45,411,0132_troubled_traveller_m,assets/sprites/0132_troubled_traveller_m.swf,,Y,N
+133,Injured Soldier,b,4,45,411,0133_injured_soldier_m,assets/sprites/0133_injured_soldier_m.swf,,Y,N
+134,Field Hospital,b,3,34,111,0134_field_hospital_m,assets/sprites/0134_field_hospital_m.swf,assets/thumbs/0134_field_hospital_m.jpg,Y,Y
+135,Mechanical Garage,b,3,34,111,0135_engineer_barrack_m,assets/sprites/0135_engineer_barrack_m.swf,assets/thumbs/0135_engineer_barrack_m.jpg,Y,Y
+136,General Sculpture,b,4,42,411,0136_general_sculpture_m,assets/sprites/0136_general_sculpture_m.swf,assets/thumbs/0136_general_sculpture_m.jpg,Y,Y
+137,Spy Academy,b,3,34,111,0137_spy_academy_m,,,N,N
+138,Mr T. Academy,b,12,121,111,0138_mr_t_academy_m,assets/sprites/0138_mr_t_academy_m.swf,assets/thumbs/0138_mr_t_academy_m.jpg,Y,Y
+139,Area 51,b,1,17,111,0139_area_51_m,assets/sprites/0139_area_51_m.swf,assets/thumbs/0139_area_51_m.jpg,Y,Y
+140,Recruitment Prize,b,1,17,111,0140_recruitment_m,assets/sprites/0140_recruitment_m.swf,assets/thumbs/0140_recruitment_m.jpg,Y,Y
+141,Bazooka Academy IV,b,3,31,111,0141_bazooka_academy_4_m,assets/sprites/0141_bazooka_academy_4_m.swf,assets/thumbs/0141_bazooka_academy_4_m.jpg,Y,Y
+142,Bazooka Academy V,b,3,31,111,0142_bazooka_academy_5_m,assets/sprites/0142_bazooka_academy_5_m.swf,assets/thumbs/0142_bazooka_academy_5_m.jpg,Y,Y
+143,Academy IV,b,3,31,111,0143_academy_4_m,assets/sprites/0143_academy_4_m.swf,assets/thumbs/0143_academy_4_m.jpg,Y,Y
+144,Academy V,b,3,31,111,0144_academy_5_m,assets/sprites/0144_academy_5_m.swf,assets/thumbs/0144_academy_5_m.jpg,Y,Y
+145,Mortar Academy,b,3,35,111,0145_mortar_academy_m,assets/sprites/0145_mortar_academy_m.swf,assets/thumbs/0145_mortar_academy_m.jpg,Y,Y
+146,Helicopter Hangar IV,b,3,33,111,0146_copter_hangar_4_m,assets/sprites/0146_copter_hangar_4_m.swf,assets/thumbs/0146_copter_hangar_4_m.jpg,Y,Y
+147,Helicopter Hangar V,b,3,33,111,0147_copter_hangar_5_m,assets/sprites/0147_copter_hangar_5_m.swf,assets/thumbs/0147_copter_hangar_5_m.jpg,Y,Y
+148,Demolition Tank Academy,b,3,35,111,0148_artillery_garage_m,assets/sprites/0148_artillery_garage_m.swf,assets/thumbs/0148_artillery_garage_m.jpg,Y,Y
+149,Antiaircraft garage,b,3,34,111,0149_antiaircraft_garage_m,assets/sprites/0149_antiaircraft_garage_m.swf,assets/thumbs/0149_antiaircraft_garage_m.jpg,Y,Y
+150,Tank Academy IV,b,3,32,111,0150_tank_academy_4_m,assets/sprites/0150_tank_academy_4_m.swf,assets/thumbs/0150_tank_academy_4_m.jpg,Y,Y
+151,Tank Academy V,b,3,32,111,0151_tank_academy_5_m,assets/sprites/0151_tank_academy_5_m.swf,assets/thumbs/0151_tank_academy_5_m.jpg,Y,Y
+152,Robo flag,b,12,121,411,0152_robo_flag_m,assets/sprites/0152_robo_flag_m.swf,assets/thumbs/0152_robo_flag_m.jpg,Y,Y
+153,Robo statue,b,12,121,411,0153_robo_statue_m,assets/sprites/0153_robo_statue_m.swf,assets/thumbs/0153_robo_statue_m.jpg,Y,Y
+154,Crusader Soldier Academy,b,12,121,111,0154_robo_soldier_academy_m,assets/sprites/0154_robo_soldier_academy_m.swf,assets/thumbs/0154_robo_soldier_academy_m.jpg,Y,Y
+155,Crusader Swordsman Academy,b,12,121,111,0155_robo_swordsman_academy_m,assets/sprites/0155_robo_swordsman_academy_m.swf,assets/thumbs/0155_robo_swordsman_academy_m.jpg,Y,Y
+156,Crusader Bazooka Academy,b,12,121,111,0156_robo_bazooka_academy_m,assets/sprites/0156_robo_bazooka_academy_m.swf,assets/thumbs/0156_robo_bazooka_academy_m.jpg,Y,Y
+157,Jet Soldier Academy,b,12,121,111,0157_jet_robosoldier_academy_m,assets/sprites/0157_jet_robosoldier_academy_m.swf,assets/thumbs/0157_jet_robosoldier_academy_m.jpg,Y,Y
+158,Motorized Soldier Academy,b,12,121,111,0158_motorized_robosoldier_academy_m,assets/sprites/0158_motorized_robosoldier_academy_m.swf,assets/thumbs/0158_motorized_robosoldier_academy_m.jpg,Y,Y
+159,Retaliator Academy,b,12,121,111,0159_retaliator_academy_m,assets/sprites/0159_retaliator_academy_m.swf,assets/thumbs/0159_retaliator_academy_m.jpg,Y,Y
+160,Megalancer Academy,b,12,121,111,0160_robo_lancer_academy_m,assets/sprites/0160_robo_lancer_academy_m.swf,assets/thumbs/0160_robo_lancer_academy_m.jpg,Y,Y
+161,Crusader Tank Academy,b,12,121,111,0161_demolisher_tank_academy_m,assets/sprites/0161_demolisher_tank_academy_m.swf,assets/thumbs/0161_demolisher_tank_academy_m.jpg,Y,Y
+162,Dreadnought Academy,b,12,121,111,0162_dreadnought_academy_m,assets/sprites/0162_dreadnought_academy_m.swf,assets/thumbs/0162_dreadnought_academy_m.jpg,Y,Y
+163,House,b,12,121,111,0163_robo_house_m,assets/sprites/0163_robo_house_m.swf,assets/thumbs/0163_robo_house_m.jpg,Y,Y
+164,Laser Turret,b,12,121,211,0164_robo_turret_1_m,assets/sprites/0164_robo_turret_1_m.swf,assets/thumbs/0164_robo_turret_1_m.jpg,Y,Y
+165,Tesla Turret,b,12,121,211,0165_robo_turret_2_m,assets/sprites/0165_robo_turret_2_m.swf,assets/thumbs/0165_robo_turret_2_m.jpg,Y,Y
+166,Wall,b,12,121,221,0166_robo_wall_m,assets/sprites/0166_robo_wall_m.swf,assets/thumbs/0166_robo_wall_m.jpg,Y,Y
+167,Field,b,12,121,129,0167_robo_farm_m,assets/sprites/0167_robo_farm_m.swf,assets/thumbs/0167_robo_farm_m.jpg,Y,Y
+168,Crusader Skylander Hangar,b,12,121,111,0168_skylander_hangar_m,assets/sprites/0168_skylander_hangar_m.swf,assets/thumbs/0168_skylander_hangar_m.jpg,Y,Y
+169,Mega-Axe Academy,b,12,121,111,0169_roboaxe_academy_m,assets/sprites/0169_roboaxe_academy_m.swf,assets/thumbs/0169_roboaxe_academy_m.jpg,Y,Y
+170,Giant Walker Factory,b,12,121,111,0170_giant_walker_factory_m,assets/sprites/0170_giant_walker_factory_m.swf,assets/thumbs/0170_giant_walker_factory_m.jpg,Y,Y
+171,Missile Tank Academy,b,12,121,111,0171_missile_tank_academy_m,assets/sprites/0171_missile_tank_academy_m.swf,assets/thumbs/0171_missile_tank_academy_m.jpg,Y,Y
+172,Steel Claws Academy,b,12,121,111,0172_steel_claws_academy_m,assets/sprites/0172_steel_claws_academy_m.swf,assets/thumbs/0172_steel_claws_academy_m.jpg,Y,Y
+173,Development Wall,b,12,121,111,0166_robo_wall_m,assets/sprites/0166_robo_wall_m.swf,assets/thumbs/0166_robo_wall_m.jpg,Y,Y
+174,Fireman Academy,b,3,34,111,0174_fireman_academy_m,assets/sprites/0174_fireman_academy_m.swf,assets/thumbs/0174_fireman_academy_m.jpg,Y,Y
+175,Babilonian Temple,b,5,51,511,0175_alejandria_m,assets/sprites/0175_alejandria_m.swf,assets/thumbs/0175_alejandria_m.jpg,Y,Y
+176,Cash Wonder,b,5,51,511,0176_maravilla_m,assets/sprites/0176_maravilla_m.swf,assets/thumbs/0176_maravilla_m.jpg,Y,Y
+177,Axe Zoldier Academy,b,12,121,111,0177_orc_soldier_academy_1_m,assets/sprites/0177_orc_soldier_academy_1_m.swf,assets/thumbs/0177_orc_soldier_academy_1_m.jpg,Y,Y
+178,Gun Zoldier Academy,b,12,121,111,0178_orc_soldier_academy_2_m,assets/sprites/0178_orc_soldier_academy_2_m.swf,assets/thumbs/0178_orc_soldier_academy_2_m.jpg,Y,Y
+179,Xplosive Ork Academy,b,12,121,111,0179_orc_boss_academy_m,assets/sprites/0179_orc_boss_academy_m.swf,assets/thumbs/0179_orc_boss_academy_m.jpg,Y,Y
+180,Bear Ridda Academy,b,12,121,111,0180_orc_rider_academy_m,assets/sprites/0180_orc_rider_academy_m.swf,assets/thumbs/0180_orc_rider_academy_m.jpg,Y,Y
+181,Horned Badass Factory,b,12,121,111,0181_orc_robot_factory_m,assets/sprites/0181_orc_robot_factory_m.swf,assets/thumbs/0181_orc_robot_factory_m.jpg,Y,Y
+182,Flamethrowa Academy,b,12,121,111,0182_orc_flamethrower_academy_m,assets/sprites/0182_orc_flamethrower_academy_m.swf,assets/thumbs/0182_orc_flamethrower_academy_m.jpg,Y,Y
+183,Ork House,b,12,121,111,0183_orc_house_m,assets/sprites/0183_orc_house_m.swf,assets/thumbs/0183_orc_house_m.jpg,Y,Y
+184,Ork Farm,b,12,121,129,0184_orc_farm_m,assets/sprites/0184_orc_farm_m.swf,assets/thumbs/0184_orc_farm_m.jpg,Y,Y
+185,Ork Turret II,b,12,121,211,0185_orc_turret_m,assets/sprites/0185_orc_turret_m.swf,assets/thumbs/0185_orc_turret_m.jpg,Y,Y
+186,Ork Wall,b,12,121,221,0186_orc_wall_m,assets/sprites/0186_orc_wall_m.swf,assets/thumbs/0186_orc_wall_m.jpg,Y,Y
+187,Krazy Monsta Statue,b,12,121,411,0187_orc_deco_1_m,assets/sprites/0187_orc_deco_1_m.swf,assets/thumbs/0187_orc_deco_1_m.jpg,Y,Y
+188,Powa Banna,b,12,121,411,0188_orc_deco_2_m,assets/sprites/0188_orc_deco_2_m.swf,assets/thumbs/0188_orc_deco_2_m.jpg,Y,Y
+189,Ork Turret I,b,12,121,211,0189_orc_turret_2_m,assets/sprites/0189_orc_turret_2_m.swf,assets/thumbs/0189_orc_turret_2_m.jpg,Y,Y
+190,Molotov Kopta Hangar,b,12,121,111,0190_helicopter_hangar2_m,assets/sprites/0190_helicopter_hangar2_m.swf,assets/thumbs/0190_helicopter_hangar2_m.jpg,Y,Y
+191,Ork Tank Academy,b,3,35,111,0191_camion_orco_academy_m,assets/sprites/0191_camion_orco_academy_m.swf,assets/thumbs/0191_camion_orco_academy_m.jpg,Y,Y
+192,Knife Throwa Academy,b,12,121,111,0192_orc_lanzamachetes_academy_m,assets/sprites/0192_orc_lanzamachetes_academy_m.swf,assets/thumbs/0192_orc_lanzamachetes_academy_m.jpg,Y,Y
+193,Kamikaze Bros Academy,b,12,121,111,0193_orc_mascota_kamikaze_academy_m,assets/sprites/0193_orc_mascota_kamikaze_academy_m.swf,assets/thumbs/0193_orc_mascota_kamikaze_academy_m.jpg,Y,Y
+194,Big Handsaw Ork Factory,b,12,121,111,0194_orc_robot_2_factory_m,assets/sprites/0194_orc_robot_2_factory_m.swf,assets/thumbs/0194_orc_robot_2_factory_m.jpg,Y,Y
+195,Orc Headquarters,b,1,17,135,0195_orc_headquarters,assets/sprites/0195_orc_headquarters.swf,assets/thumbs/0195_orc_headquarters.jpg,Y,Y
+196,Orc Sponge Bush,b,12,121,411,0196_orc_sponge_bush,assets/sprites/0196_orc_sponge_bush.swf,assets/thumbs/0196_orc_sponge_bush.jpg,Y,Y
+197,Orc Lamp,b,12,121,411,0197_orc_lamp,assets/sprites/0197_orc_lamp.swf,assets/thumbs/0197_orc_lamp.jpg,Y,Y
+198,Orc Bush,b,12,121,411,0198_orc_bush,assets/sprites/0198_orc_bush.swf,assets/thumbs/0198_orc_bush.jpg,Y,Y
+200,Silo II,b,1,14,0,0200_orc_silo,assets/sprites/0200_orc_silo.swf,assets/thumbs/0200_orc_silo.jpg,Y,Y
+201,Orc Bunker ,b,2,24,211,0201_orc_bunker,assets/sprites/0201_orc_bunker.swf,assets/thumbs/0201_orc_bunker.jpg,Y,Y
+202,Orc Resource Building,b,1,12,129,0202_orc_resource_building,assets/sprites/0202_orc_resource_building.swf,assets/thumbs/0202_orc_resource_building.jpg,Y,Y
+203,Orc Harbour,b,1,14,0,0203_orc_harbour,assets/sprites/0203_orc_harbour.swf,assets/thumbs/0203_orc_harbour.jpg,Y,Y
+204,Disabled Orc Supertank,b,8,81,812,0204_disabled_orc_supertank,assets/sprites/0204_disabled_orc_supertank.swf,assets/thumbs/0204_disabled_orc_supertank.jpg,Y,Y
+205,Orc Fortress,b,2,23,231,0205_orc_fortress,assets/sprites/0205_orc_fortress.swf,assets/thumbs/0205_orc_fortress.jpg,Y,Y
+206,Enemy Ork Wall,b,12,121,221,0186_orc_wall_m,assets/sprites/0186_orc_wall_m.swf,assets/thumbs/0186_orc_wall_m.jpg,Y,Y
+207,Enemy Ork Turret I,b,12,121,211,0189_orc_turret_2_m,assets/sprites/0189_orc_turret_2_m.swf,assets/thumbs/0189_orc_turret_2_m.jpg,Y,Y
+208,Enemy Ork Turret II,b,12,121,211,0185_orc_turret_m,assets/sprites/0185_orc_turret_m.swf,assets/thumbs/0185_orc_turret_m.jpg,Y,Y
+209,Crusader Priest Academy,b,12,121,111,209_crusader_priest_academy,assets/sprites/209_crusader_priest_academy.swf,assets/thumbs/209_crusader_priest_academy.jpg,Y,Y
+210,Crusader Bot Factory,b,12,121,111,210_crusader_bot_factory,assets/sprites/210_crusader_bot_factory.swf,assets/thumbs/210_crusader_bot_factory.jpg,Y,Y
+211,Viking Axe Academy,b,12,121,111,211_axeman_academy,assets/sprites/211_axeman_academy.swf,assets/thumbs/211_axeman_academy.jpg,Y,Y
+212,Viking Soldier Academy,b,12,121,111,212_dwarf_soldier_academy,assets/sprites/212_dwarf_soldier_academy.swf,assets/thumbs/212_dwarf_soldier_academy.jpg,Y,Y
+213,Bear Knight Academy,b,12,121,111,213_bear_knight_academy,assets/sprites/213_bear_knight_academy.swf,assets/thumbs/213_bear_knight_academy.jpg,Y,Y
+214,Viking Tank Academy,b,12,121,111,214_dwarf_tank_academy,assets/sprites/214_dwarf_tank_academy.swf,assets/thumbs/214_dwarf_tank_academy.jpg,Y,Y
+215,Viking Airship Hangar,b,12,121,111,215_viking_copter_II_hangar,assets/sprites/215_viking_copter_II_hangar.swf,assets/thumbs/215_viking_copter_II_hangar.jpg,Y,Y
+216,Viking Hammerer Factory,b,12,121,111,216_megahammer_dwarf_factory,assets/sprites/216_megahammer_dwarf_factory.swf,assets/thumbs/216_megahammer_dwarf_factory.jpg,Y,Y
+217,Viking Core Factory,b,12,121,111,217_dwarf_armored_core_factory,assets/sprites/217_dwarf_armored_core_factory.swf,assets/thumbs/217_dwarf_armored_core_factory.jpg,Y,Y
+218,Viking House,b,12,121,111,218_dwarf_house,assets/sprites/218_dwarf_house.swf,assets/thumbs/218_dwarf_house.jpg,Y,Y
+219,Viking Field,b,12,121,129,219_dwarf_farm,assets/sprites/219_dwarf_farm.swf,assets/thumbs/219_dwarf_farm.jpg,Y,Y
+220,Viking Turret I,b,12,121,211,220_dwarf_turret_1,assets/sprites/220_dwarf_turret_1.swf,assets/thumbs/220_dwarf_turret_1.jpg,Y,Y
+221,Viking Turret II,b,12,121,211,221_dwarf_turret_2,assets/sprites/221_dwarf_turret_2.swf,assets/thumbs/221_dwarf_turret_2.jpg,Y,Y
+222,Viking Wall,b,12,121,221,222_dwarf_wall,assets/sprites/222_dwarf_wall.swf,assets/thumbs/222_dwarf_wall.jpg,Y,Y
+223,Hammerer Statue,b,12,121,411,223_dwarf_deco_1,assets/sprites/223_dwarf_deco_1.swf,assets/thumbs/223_dwarf_deco_1.jpg,Y,Y
+224,Viking Fountain,b,12,121,411,224_dwarf_deco_2,assets/sprites/224_dwarf_deco_2.swf,assets/thumbs/224_dwarf_deco_2.jpg,Y,Y
+225,Alien Wall,b,12,121,221,225_alien_wall,assets/sprites/225_alien_wall.swf,assets/thumbs/225_alien_wall.jpg,Y,Y
+226,Alien Turret I,b,12,121,211,226_alien_turret_1,assets/sprites/226_alien_turret_1.swf,assets/thumbs/226_alien_turret_1.jpg,Y,Y
+227,Alien Turret II,b,12,121,211,227_alien_turret_2,assets/sprites/227_alien_turret_2.swf,assets/thumbs/227_alien_turret_2.jpg,Y,Y
+228,Spider Wall,b,12,121,221,228_spider_wall,assets/sprites/228_spider_wall.swf,assets/thumbs/228_spider_wall.jpg,Y,Y
+229,Spider Turret I,b,12,121,211,229_spider_turret_1,assets/sprites/229_spider_turret_1.swf,assets/thumbs/229_spider_turret_1.jpg,Y,Y
+230,Spider Turret II,b,12,121,211,230_spider_turret_2,assets/sprites/230_spider_turret_2.swf,assets/thumbs/230_spider_turret_2.jpg,Y,Y
+231,War Tree,b,12,121,411,231_dwarf_deco_3,assets/sprites/231_dwarf_deco_3.swf,assets/thumbs/231_dwarf_deco_3.jpg,Y,Y
+232,Magic Lake,b,12,121,411,232_dwarf_deco_4,assets/sprites/232_dwarf_deco_4.swf,assets/thumbs/232_dwarf_deco_4.jpg,Y,Y
+233,Viking Bazooka Academy,b,12,121,111,233_viking_bazooka_academy,assets/sprites/233_viking_bazooka_academy.swf,assets/thumbs/233_viking_bazooka_academy.jpg,Y,Y
+234,Viking MotoSquad Academy,b,12,121,111,234_viking_motosquad_academy,assets/sprites/234_viking_motosquad_academy.swf,assets/thumbs/234_viking_motosquad_academy.jpg,Y,Y
+235,Rune Golem Academy,b,12,121,111,235_viking_rune_golem_academy,assets/sprites/235_viking_rune_golem_academy.swf,assets/thumbs/235_viking_rune_golem_academy.jpg,Y,Y
+236,Viking Sniper Academy,b,12,121,111,236_viking_sniper_academy,assets/sprites/236_viking_sniper_academy.swf,assets/thumbs/236_viking_sniper_academy.jpg,Y,Y
+237,Viking Butcher Academy,b,12,121,111,237_viking_butcher_academy,assets/sprites/237_viking_butcher_academy.swf,assets/thumbs/237_viking_butcher_academy.jpg,Y,Y
+238,Kamikaze Academy,b,12,121,111,238_kamikaze_academy,assets/sprites/238_kamikaze_academy.swf,assets/thumbs/238_kamikaze_academy.jpg,Y,Y
+239,Laser Viking Academy,b,12,121,111,239_laser_viking_academy,assets/sprites/239_laser_viking_academy.swf,assets/thumbs/239_laser_viking_academy.jpg,Y,Y
+240,Nebular Spearman Academy,b,12,121,111,240_avatar_soldado_academy,assets/sprites/240_avatar_soldado_academy.swf,assets/thumbs/240_avatar_soldado_academy.jpg,Y,Y
+241,Nebular Archer Academy,b,12,121,111,241_avatar_arquero_academy,assets/sprites/241_avatar_arquero_academy.swf,assets/thumbs/241_avatar_arquero_academy.jpg,Y,Y
+242,Greatsword Warrior Academy,b,12,121,111,242_avatar_great_warrior_academy,assets/sprites/242_avatar_great_warrior_academy.swf,assets/thumbs/242_avatar_great_warrior_academy.jpg,Y,Y
+243,Nebular Rider Academy,b,12,121,111,243_avatar_jinete_academy,assets/sprites/243_avatar_jinete_academy.swf,assets/thumbs/243_avatar_jinete_academy.jpg,Y,Y
+244,Nebular Wall,b,12,121,221,244_avatar_wall,assets/sprites/244_avatar_wall.swf,assets/thumbs/244_avatar_wall.jpg,Y,Y
+245,Nebular Turret,b,12,121,211,245_avatar_turret,assets/sprites/245_avatar_turret.swf,assets/thumbs/245_avatar_turret.jpg,Y,Y
+246,Nebular House,b,12,121,111,246_avatar_house,assets/sprites/246_avatar_house.swf,assets/thumbs/246_avatar_house.jpg,Y,Y
+247,Nebular Field,b,12,121,129,247_avatar_farm,assets/sprites/247_avatar_farm.swf,assets/thumbs/247_avatar_farm.jpg,Y,Y
+248,Ancient Nebular Tree,b,12,121,411,248_avatar_deco,assets/sprites/248_avatar_deco.swf,assets/thumbs/248_avatar_deco.jpg,Y,Y
+249,Nebular Knight Academy,b,12,121,111,249_nebula_horse_rider_academy,assets/sprites/249_nebula_horse_rider_academy.swf,assets/thumbs/249_nebula_horse_rider_academy.jpg,Y,Y
+250,Nebular Dragon Rider Academy,b,12,121,111,250_nebula_dragon_nest,assets/sprites/250_nebula_dragon_nest.swf,assets/thumbs/250_nebula_dragon_nest.jpg,Y,Y
+251,Nebular Assault Quad Academy,b,12,121,111,251_nebula_motorized_academy,assets/sprites/251_nebula_motorized_academy.swf,assets/thumbs/251_nebula_motorized_academy.jpg,Y,Y
+252,Skyscraper,b,4,42,411,252_skyscraper,assets/sprites/252_skyscraper.swf,assets/thumbs/252_skyscraper.jpg,Y,Y
+253,Parliament,b,5,51,511,253_parliament,assets/sprites/253_parliament.swf,assets/thumbs/253_parliament.jpg,Y,Y
+254,Nebular Priest Academy,b,12,121,111,254_nebula_priest_academy,assets/sprites/254_nebula_priest_academy.swf,assets/thumbs/254_nebula_priest_academy.jpg,Y,Y
+255,Nebular Bicopter Hangar,b,12,121,111,255_nebula_blue_bicopter_hangar,assets/sprites/255_nebula_blue_bicopter_hangar.swf,assets/thumbs/255_nebula_blue_bicopter_hangar.jpg,Y,Y
+256,Research Lab,b,1,17,111,256_laboratory_tech,assets/sprites/256_laboratory_tech.swf,assets/thumbs/256_laboratory_tech.jpg,Y,Y
+257,Blazing Beast Rider Academy,b,12,121,111,257_nebula_monster_rider_academy,assets/sprites/257_nebula_monster_rider_academy.swf,assets/thumbs/257_nebula_monster_rider_academy.jpg,Y,Y
+258,Nebular Maze Warrior Academy,b,12,121,111,258_nebula_muze_warrior_academy,assets/sprites/258_nebula_muze_warrior_academy.swf,assets/thumbs/258_nebula_muze_warrior_academy.jpg,Y,Y
+259,Nebular Sniper Academy,b,12,121,111,259_nebula_sniper_academy,assets/sprites/259_nebula_sniper_academy.swf,assets/thumbs/259_nebula_sniper_academy.jpg,Y,Y
+260,Nebular Dragon Knight Academy,b,12,121,111,260_dragon_rider_2_academy,assets/sprites/260_dragon_rider_2_academy.swf,assets/thumbs/260_dragon_rider_2_academy.jpg,Y,Y
+261,Auction House,b,1,17,111,261_marketplace,assets/sprites/261_marketplace.swf,assets/thumbs/261_marketplace.jpg,Y,Y
+262,Poison Spider Hive,b,12,121,111,262_venom_spider_academy,assets/sprites/262_venom_spider_academy.swf,assets/thumbs/262_venom_spider_academy.jpg,Y,Y
+263,Shredder Alien Nest,b,12,121,111,266_tusk_alien_academy,assets/sprites/266_tusk_alien_academy.swf,assets/thumbs/266_tusk_alien_academy.jpg,Y,Y
+264,Acid Alien Nest,b,12,121,111,264_small_alien_academy,assets/sprites/264_small_alien_academy.swf,assets/thumbs/264_small_alien_academy.jpg,Y,Y
+265,Huge Spider Hive,b,12,121,111,265_big_spider_academy,assets/sprites/265_big_spider_academy.swf,assets/thumbs/265_big_spider_academy.jpg,Y,Y
+266,Horned Alien Nest,b,12,121,111,263_claw_alien_academy,assets/sprites/263_claw_alien_academy.swf,assets/thumbs/263_claw_alien_academy.jpg,Y,Y
+267,Claw Spider Hive,b,12,121,111,267_melee_spider_academy,assets/sprites/267_melee_spider_academy.swf,assets/thumbs/267_melee_spider_academy.jpg,Y,Y
+268,Swamp Monster Academy,b,12,121,111,268_nebula_monster_academy,assets/sprites/268_nebula_monster_academy.swf,assets/thumbs/268_nebula_monster_academy.jpg,Y,Y
+269,S.W.A.T. Soldier Academy,b,12,121,111,269_swat_soldier_academy,assets/sprites/269_swat_soldier_academy.swf,assets/thumbs/269_swat_soldier_academy.jpg,Y,Y
+270,Hercules Mech Academy,b,12,121,111,270_hercules_mech_academy,assets/sprites/270_hercules_mech_academy.swf,assets/thumbs/270_hercules_mech_academy.jpg,Y,Y
+271,Space Elf Wall,b,12,121,221,271_spatial_wall,assets/sprites/271_spatial_wall.swf,assets/thumbs/271_spatial_wall.jpg,Y,Y
+272,Space Elf Turret,b,12,121,211,272_spatial_turret,assets/sprites/272_spatial_turret.swf,assets/thumbs/272_spatial_turret.jpg,Y,Y
+273,Space Elf House,b,12,121,111,273_spatial_house,assets/sprites/273_spatial_house.swf,assets/thumbs/273_spatial_house.jpg,Y,Y
+274,Space Elf Field,b,12,121,129,274_spatial_farm,assets/sprites/274_spatial_farm.swf,assets/thumbs/274_spatial_farm.jpg,Y,Y
+275,Elf Eagle Deco,b,12,121,411,275_spatial_deco,assets/sprites/275_spatial_deco.swf,assets/thumbs/275_spatial_deco.jpg,Y,Y
+276,Space Sword Elf Academy,b,12,121,111,276_spatial_sward_academy,assets/sprites/276_spatial_sward_academy.swf,assets/thumbs/276_spatial_sward_academy.jpg,Y,Y
+277,Space Archer Elf Academy,b,12,121,111,277_spatial_archer_academy,assets/sprites/277_spatial_archer_academy.swf,assets/thumbs/277_spatial_archer_academy.jpg,Y,Y
+278,Space Knight Elf Academy,b,12,121,111,278_spatial_horseman_academy,assets/sprites/278_spatial_horseman_academy.swf,assets/thumbs/278_spatial_horseman_academy.jpg,Y,Y
+279,Elf Airship Hangar,b,12,121,111,279_spatial_airship_hangar,assets/sprites/279_spatial_airship_hangar.swf,assets/thumbs/279_spatial_airship_hangar.jpg,Y,Y
+280,Paladin Elf Academy,b,12,121,111,280_spatial_paladin_academy,assets/sprites/280_spatial_paladin_academy.swf,assets/thumbs/280_spatial_paladin_academy.jpg,Y,Y
+281,Priest Elf Academy,b,12,121,111,281_spatial_priest_academy,assets/sprites/281_spatial_priest_academy.swf,assets/thumbs/281_spatial_priest_academy.jpg,Y,Y
+282,Elven Cruiser Hangar,b,12,121,111,282_spatial_space_ship_hangar,assets/sprites/282_spatial_space_ship_hangar.swf,assets/thumbs/282_spatial_space_ship_hangar.jpg,Y,Y
+283,Reptile Gun Academy,b,12,121,111,283_reptile_gun_hangar,assets/sprites/283_reptile_gun_hangar.swf,assets/thumbs/283_reptile_gun_hangar.jpg,Y,Y
+284,MegaBot Academy,b,12,121,111,284_mega_bot_academy,assets/sprites/284_mega_bot_academy.swf,assets/thumbs/284_mega_bot_academy.jpg,Y,Y
+285,Space Healer Elf Academy,b,12,121,111,285_spatial_healer_academy,assets/sprites/285_spatial_healer_academy.swf,assets/thumbs/285_spatial_healer_academy.jpg,Y,Y
+286,Space Elf Scouter Hangar,b,12,121,111,286_spatial_exploration_module_hangar,assets/sprites/286_spatial_exploration_module_hangar.swf,assets/thumbs/286_spatial_exploration_module_hangar.jpg,Y,Y
+287,GunBot Academy,b,12,121,111,287_gun_bot_academy,assets/sprites/287_gun_bot_academy.swf,assets/thumbs/287_gun_bot_academy.jpg,Y,Y
+288,Silver Gunner Elf Academy,b,12,121,111,288_silver_elf_gunner_academy,assets/sprites/288_silver_elf_gunner_academy.swf,assets/thumbs/288_silver_elf_gunner_academy.jpg,Y,Y
+289,Dino Rider Elf Academy,b,12,121,111,289_elf_dino_rider_academy,assets/sprites/289_elf_dino_rider_academy.swf,assets/thumbs/289_elf_dino_rider_academy.jpg,Y,Y
+290,Destruction Wizard Elf Academy,b,12,121,111,290_destruction_wizard_academy,assets/sprites/290_destruction_wizard_academy.swf,assets/thumbs/290_destruction_wizard_academy.jpg,Y,Y
+291,Elf Siege Striker Academy,b,12,121,111,291_plasma_striker_academy,assets/sprites/291_plasma_striker_academy.swf,assets/thumbs/291_plasma_striker_academy.jpg,Y,Y
+292,Winged Paladin Academy,b,12,121,111,292_winged_paladin_academy,assets/sprites/292_winged_paladin_academy.swf,assets/thumbs/292_winged_paladin_academy.jpg,Y,Y
+293,Andromeda Wall,b,12,121,221,293_andromedaWall,assets/sprites/293_andromedaWall.swf,assets/thumbs/293_andromedaWall.jpg,Y,Y
+294,Andromeda Turret,b,12,121,211,294_andromedaTurret,assets/sprites/294_andromedaTurret.swf,assets/thumbs/294_andromedaTurret.jpg,Y,Y
+295,Andromeda House,b,12,121,111,295_andromedaHouse,assets/sprites/295_andromedaHouse.swf,assets/thumbs/295_andromedaHouse.jpg,Y,Y
+296,Andromeda Farm,b,12,121,129,296_andromedaFarm,assets/sprites/296_andromedaFarm.swf,assets/thumbs/296_andromedaFarm.jpg,Y,Y
+297,Andromeda Statue,b,12,121,411,297_andromedaDeco,assets/sprites/297_andromedaDeco.swf,assets/thumbs/297_andromedaDeco.jpg,Y,Y
+298,Andromeda Private Academy,b,12,121,111,298_andromedaPrivateAcademy,assets/sprites/298_andromedaPrivateAcademy.swf,assets/thumbs/298_andromedaPrivateAcademy.jpg,Y,Y
+299,Andromeda Droid Factory,b,12,121,111,299_andromedaDroidFactory,assets/sprites/299_andromedaDroidFactory.swf,assets/thumbs/299_andromedaDroidFactory.jpg,Y,Y
+300,Andromeda Spaceship Hangar,b,12,121,111,300_andromedaSpaceshipHangar,assets/sprites/300_andromedaSpaceshipHangar.swf,assets/thumbs/300_andromedaSpaceshipHangar.jpg,Y,Y
+301,Punisher Bot Factory,b,12,121,111,301_punisherBot_Factory,assets/sprites/301_punisherBot_Factory.swf,assets/thumbs/301_punisherBot_Factory.jpg,Y,Y
+901,Oil,b,1,12,123,10001_resource_oil_1,assets/sprites/10001_resource_oil_1.swf,assets/thumbs/10001_resource_oil_1.jpg,Y,Y
+902,Oil,b,1,12,123,10002_resource_oil_2,assets/sprites/10002_resource_oil_2.swf,assets/thumbs/10002_resource_oil_2.jpg,Y,Y
+903,Oil,b,1,12,123,10003_resource_oil_3,assets/sprites/10003_resource_oil_3.swf,assets/thumbs/10003_resource_oil_3.jpg,Y,Y
+904,Oil,b,1,12,123,10004_resource_oil_4,assets/sprites/10004_resource_oil_4.swf,assets/thumbs/10004_resource_oil_4.jpg,Y,Y
+905,Tree,b,1,12,125,10005_arbol1x1,assets/sprites/10005_arbol1x1.swf,assets/thumbs/10005_arbol1x1.jpg,Y,Y
+907,Small Harbour,b,1,14,0,10007_port_1,assets/sprites/10007_port_1.swf,assets/thumbs/10007_port_1.jpg,Y,Y
+908,Harbour,b,1,14,0,10008_harbour,assets/sprites/10008_harbour.swf,assets/thumbs/10008_harbour.jpg,Y,Y
+909,Space Station,b,1,14,0,0199_space_station,assets/sprites/0199_space_station.swf,assets/thumbs/0199_space_station.jpg,Y,Y
+910,Steel,b,1,12,126,10010_resource_steel_1,assets/sprites/10010_resource_steel_1.swf,assets/thumbs/10010_resource_steel_1.jpg,Y,Y
+911,Steel,b,1,12,126,10011_resource_steel_2,assets/sprites/10011_resource_steel_2.swf,assets/thumbs/10011_resource_steel_2.jpg,Y,Y
+912,Steel,b,1,12,126,10012_resource_steel_3,assets/sprites/10012_resource_steel_3.swf,assets/thumbs/10012_resource_steel_3.jpg,Y,Y
+913,Steel,b,1,12,126,10013_resource_steel_4,assets/sprites/10013_resource_steel_4.swf,assets/thumbs/10013_resource_steel_4.jpg,Y,Y
+914,Gold,b,1,12,127,10014_resource_gold_1,assets/sprites/10014_resource_gold_1.swf,assets/thumbs/10014_resource_gold_1.jpg,Y,Y
+915,Gold,b,1,12,127,10015_resource_gold_2,assets/sprites/10015_resource_gold_2.swf,assets/thumbs/10015_resource_gold_2.jpg,Y,Y
+916,Gold,b,1,12,127,10016_resource_gold_3,assets/sprites/10016_resource_gold_3.swf,assets/thumbs/10016_resource_gold_3.jpg,Y,Y
+917,Gold,b,1,12,127,10017_resource_gold_4,assets/sprites/10017_resource_gold_4.swf,assets/thumbs/10017_resource_gold_4.jpg,Y,Y
+918,Regenerating oil..,b,1,12,128,10018_resource_oil_regen,assets/sprites/10018_resource_oil_regen.swf,assets/thumbs/10018_resource_oil_regen.jpg,Y,Y
+919,Regenerating steel..,b,1,12,128,10019_resource_steel_regen,assets/sprites/10019_resource_steel_regen.swf,assets/thumbs/10019_resource_steel_regen.jpg,Y,Y
+920,Regenerating gold..,b,1,12,128,10020_resource_gold_regen,assets/sprites/10020_resource_gold_regen.swf,assets/thumbs/10020_resource_gold_regen.jpg,Y,Y
+921,Treasure Chest,b,8,81,811,treasure,,,N,N
+922,Dummy 9-91,b,9,91,911,vacaPerdida,,,N,N
+923,Gorilla,u,1,12,128,10023_gorilla,assets/sprites/10023_gorilla.swf,assets/thumbs/10023_gorilla.jpg,Y,Y
+924,Dummy 12-121,b,12,121,111,casachina,,,N,N
+925,Expandable Land,l,6,6,6,terreno,assets/sprites/terreno.swf,,Y,N
+926,Key,b,8,81,812,10026_key,assets/sprites/10026_key.swf,assets/thumbs/10026_key.jpg,Y,Y
+927,Prison,b,8,81,812,10027_prision,,,N,N
+928,Broken Bridge,b,12,121,0,10028_broken_bridge,assets/sprites/10028_broken_bridge.swf,,Y,N
+929,Bridge,b,12,121,1011,10029_bridge,assets/sprites/10029_bridge.swf,,Y,N
+930,Trees,b,1,12,125,10030_arbol2x2,assets/sprites/10030_arbol2x2.swf,assets/thumbs/10030_arbol2x2.jpg,Y,Y
+931,Small forest,b,1,12,125,10031_arbol3x3,assets/sprites/10031_arbol3x3.swf,assets/thumbs/10031_arbol3x3.jpg,Y,Y
+932,Silo,b,1,14,0,10032_silo_1,assets/sprites/10032_silo_1.swf,assets/thumbs/10032_silo_1.jpg,Y,Y
+933,Wild Elephant,u,1,12,128,10033_wild_elephant,assets/sprites/10033_wild_elephant.swf,assets/thumbs/10033_wild_elephant.jpg,Y,Y
+941,Silo II,b,1,14,0,10041_silo_2,assets/sprites/10041_silo_2.swf,assets/thumbs/10041_silo_2.jpg,Y,Y
+942,Silo III,b,1,14,0,10042_silo_3,assets/sprites/10042_silo_3.swf,assets/thumbs/10042_silo_3.jpg,Y,Y
+943,Destroyed building 1,b,12,121,1011,10043_destroyed_building_1,assets/sprites/10043_destroyed_building_1.swf,assets/thumbs/10043_destroyed_building_1.jpg,Y,Y
+944,Destroyed building 2,b,12,121,1011,10044_destroyed_building_2,assets/sprites/10044_destroyed_building_2.swf,assets/thumbs/10044_destroyed_building_2.jpg,Y,Y
+945,Destroyed building 3,b,12,121,1011,10045_destroyed_building_3,assets/sprites/10045_destroyed_building_3.swf,assets/thumbs/10045_destroyed_building_3.jpg,Y,Y
+946,Destroyed building 4,b,12,121,1011,10046_destroyed_building_4,assets/sprites/10046_destroyed_building_4.swf,assets/thumbs/10046_destroyed_building_4.jpg,Y,Y
+947,Destroyed building 5,b,12,121,1011,10047_destroyed_building_5_b,assets/sprites/10047_destroyed_building_5_b.swf,assets/thumbs/10047_destroyed_building_5_b.jpg,Y,Y
+948,Oil barrel,b,12,121,0,10048_oil_barrel,assets/sprites/10048_oil_barrel.swf,assets/thumbs/10048_oil_barrel.jpg,Y,Y
+949,Atrezzo Harbour,b,1,14,0,10049_harbour,assets/sprites/10049_harbour.swf,,Y,N
+950,Nice fountain,b,4,45,411,10050_nice_fountain,assets/sprites/10050_nice_fountain.swf,,Y,N
+951,Orange Tree,b,4,45,411,10051_orange_tree,assets/sprites/10051_orange_tree.swf,,Y,N
+952,Chickens,b,4,45,411,10052_chickens,assets/sprites/10052_chickens.swf,,Y,N
+953,Lost Rocket,b,4,45,411,10053_lost_rocket,assets/sprites/10053_lost_rocket.swf,,Y,N
+954,Astronaut Pack,b,4,45,411,10054_astronaut_pack,assets/sprites/10054_astronaut_pack.swf,,Y,N
+955,Destroyed Tank,b,4,45,411,10055_destroyed_tank,assets/sprites/10055_destroyed_tank.swf,,Y,N
+956,Lost Puppies,b,4,45,411,10056_lost_puppies,assets/sprites/10056_lost_puppies.swf,,Y,N
+957,Lost Oil Barrels,b,4,45,411,1005_oil_barrels,assets/sprites/1005_oil_barrels.swf,,Y,N
+958,Green T-Rex Cage,b,1,14,0,10058_trex_cage,assets/sprites/10058_trex_cage.swf,assets/thumbs/10058_trex_cage.jpg,Y,Y
+959,Red T-Rex Cage,b,1,14,0,10059_trex_cage,assets/sprites/10059_trex_cage.swf,assets/thumbs/10059_trex_cage.jpg,Y,Y
+960,Chest,b,12,121,0,10060_chest,assets/sprites/10060_chest.swf,,Y,N
+961,Chained Red Baron,b,4,45,411,10061_chained_red_baron,assets/sprites/10061_chained_red_baron.swf,assets/thumbs/10061_chained_red_baron.jpg,Y,Y
+962,Chained Metallic Dragon,b,4,45,411,10062_chained_metallic_dragon,assets/sprites/10062_chained_metallic_dragon.swf,assets/thumbs/10062_chained_metallic_dragon.jpg,Y,Y
+963,Chained Celestial Megamech,b,4,45,411,10063_chained_celestial_megamech,assets/sprites/10063_chained_celestial_megamech.swf,assets/thumbs/10063_chained_celestial_megamech.jpg,Y,Y
+964,Chained Metallic Dragon II,b,4,45,411,10064_chained_metallic_dragon2,assets/sprites/10064_chained_metallic_dragon2.swf,assets/thumbs/10064_chained_metallic_dragon2.jpg,Y,Y
+965,Chained Armored Core Alpha,b,4,45,411,965_chained_armored_core_alpha,assets/sprites/965_chained_armored_core_alpha.swf,assets/thumbs/965_chained_armored_core_alpha.jpg,Y,Y
+966,Chained Ultra-Mech,b,4,45,411,966_chained_transformer_gigante,assets/sprites/966_chained_transformer_gigante.swf,assets/thumbs/966_chained_transformer_gigante.jpg,Y,Y
+967,Chained Nemesis Core,b,4,45,411,967_chained_ultra_robot,assets/sprites/967_chained_ultra_robot.swf,assets/thumbs/967_chained_ultra_robot.jpg,Y,Y
+968,Chained F117,b,4,45,411,968_chained_f117,assets/sprites/968_chained_f117.swf,assets/thumbs/968_chained_f117.jpg,Y,Y
+969,Chained Mega Tank,b,4,45,411,969_chained_mega_tank,assets/sprites/969_chained_mega_tank.swf,assets/thumbs/969_chained_mega_tank.jpg,Y,Y
+970,Chained Blue Steel Bahamut,b,4,45,411,970_chained_bahamut_metalico,assets/sprites/970_chained_bahamut_metalico.swf,assets/thumbs/970_chained_bahamut_metalico.jpg,Y,Y
+971,Chained Alien Instigator,b,4,45,411,971_chained_alien_instigator,assets/sprites/971_chained_alien_instigator.swf,assets/thumbs/971_chained_alien_instigator.jpg,Y,Y
+972,Chained Hyper Blazer ,b,4,45,411,972_chained_mega_fire_bot,assets/sprites/972_chained_mega_fire_bot.swf,assets/thumbs/972_chained_mega_fire_bot.jpg,Y,Y
+973,Chained Ether Messiah,b,4,45,411,973_chained_ether_messiah,assets/sprites/973_chained_ether_messiah.swf,assets/thumbs/973_chained_ether_messiah.jpg,Y,Y
+974,Chained Combo Dragons,b,4,45,411,974_chained_combo_dragons,assets/sprites/974_chained_combo_dragons.swf,assets/thumbs/974_chained_combo_dragons.jpg,Y,Y
+975,Chained Golem Boss,b,4,45,411,975_chained_golem_boss,assets/sprites/975_chained_golem_boss.swf,assets/thumbs/975_chained_golem_boss.jpg,Y,Y
+976,Chained Crusader Bot,b,4,45,411,976_chained_crusader_bot,assets/sprites/976_chained_crusader_bot.swf,assets/thumbs/976_chained_crusader_bot.jpg,Y,Y
+977,Chained Samurai Bot,b,4,45,411,977_chained_samurai_bot,assets/sprites/977_chained_samurai_bot.swf,assets/thumbs/977_chained_samurai_bot.jpg,Y,Y
+978,Chained Magic Chest,b,4,45,411,978_chained_corfe_1,assets/sprites/978_chained_corfe_1.swf,assets/thumbs/978_chained_corfe_1.jpg,Y,Y
+979,Chained Mega Chest,b,4,45,411,979_chained_corfe_2,assets/sprites/979_chained_corfe_2.swf,assets/thumbs/979_chained_corfe_2.jpg,Y,Y
+980,Chained Camu Dragon,b,4,45,411,980_chained_camu_dragon,assets/sprites/980_chained_camu_dragon.swf,assets/thumbs/980_chained_camu_dragon.jpg,Y,Y
+981,Chained Skater,b,4,45,411,981_chained_skater,assets/sprites/981_chained_skater.swf,assets/thumbs/981_chained_skater.jpg,Y,Y
+982,Chained Red Spinner,b,4,45,411,982_chained_red_spinner,,,N,N
+983,Chained Golden Slayer,b,4,45,411,983_chained_transformer_sword,assets/sprites/983_chained_transformer_sword.swf,assets/thumbs/983_chained_transformer_sword.jpg,Y,Y
+984,Chained Gun Bot,b,4,45,411,984_chained_gun_bot_2,assets/sprites/984_chained_gun_bot_2.swf,assets/thumbs/984_chained_gun_bot_2.jpg,Y,Y
+985,Chained Robo Hunter,b,4,45,411,985_chained_robo_hunter,assets/sprites/985_chained_robo_hunter.swf,assets/thumbs/985_chained_robo_hunter.jpg,Y,Y
+986,Chained 50% Off,b,4,45,411,986_chained_50_off,assets/sprites/986_chained_50_off.swf,assets/thumbs/986_chained_50_off.jpg,Y,Y
+987,Chained Ufo,b,4,45,411,987_chained_ufo,assets/sprites/987_chained_ufo.swf,assets/thumbs/987_chained_ufo.jpg,Y,Y
+988,Chained MegaAxe&MegaLancer,b,4,45,411,988_chained_axe_lancer,assets/sprites/988_chained_axe_lancer.swf,assets/thumbs/988_chained_axe_lancer.jpg,Y,Y
+989,Chained Megafire T-Rex,b,4,45,411,989_chained_trex,assets/sprites/989_chained_trex.swf,assets/thumbs/989_chained_trex.jpg,Y,Y
+990,Chained Double Cash Offer,b,4,45,411,990_chained_double,assets/sprites/990_chained_double.swf,assets/thumbs/990_chained_double.jpg,Y,Y
+991,Chained Fire Karateka,b,4,45,411,991_chained_karateka,assets/sprites/991_chained_karateka.swf,assets/thumbs/991_chained_karateka.jpg,Y,Y
+992,Chained Gold Golem,b,4,45,411,992_chained_gold_golem,assets/sprites/992_chained_gold_golem.swf,assets/thumbs/992_chained_gold_golem.jpg,Y,Y
+993,Chained Double Cash Offer + F117,b,4,45,411,993_chained_double_f117,assets/sprites/993_chained_double_f117.swf,assets/thumbs/993_chained_double_f117.jpg,Y,Y
+994,Chained Black Dragon,b,4,45,411,994_chained_black_dragon,assets/sprites/994_chained_black_dragon.swf,assets/thumbs/994_chained_black_dragon.jpg,Y,Y
+995,Chained Electric Dragon,b,4,45,411,995_chained_electric_dragon,assets/sprites/995_chained_electric_dragon.swf,assets/thumbs/995_chained_electric_dragon.jpg,Y,Y
+996,Chained Dragonborn Mech,b,4,45,411,996_chained_dragon_mech,assets/sprites/996_chained_dragon_mech.swf,assets/thumbs/996_chained_dragon_mech.jpg,Y,Y
+997,Chained Silver Hercules,b,4,45,411,997_chained_herkules_matrix,assets/sprites/997_chained_herkules_matrix.swf,assets/thumbs/997_chained_herkules_matrix.jpg,Y,Y
+998,Chained Rune Golem,b,4,45,411,998_chained_rune_golem,assets/sprites/998_chained_rune_golem.swf,assets/thumbs/998_chained_rune_golem.jpg,Y,Y
+999,Chained Supreme Chest,b,4,45,411,999_chained_supreme_chest,assets/sprites/999_chained_supreme_chest.swf,assets/thumbs/999_chained_supreme_chest.jpg,Y,Y
+1001,Worker I,u,7,7,71,"1001_worker_m,1001_worker_w",assets/sprites/1001_worker_m.swf;assets/sprites/1001_worker_w.swf,assets/thumbs/1001_worker_m.jpg;assets/thumbs/1001_worker_w.jpg,Y,Y
+1002,Red Tank,u,7,7,80,1002_Red_Tank_m,assets/sprites/1002_Red_Tank_m.swf,assets/thumbs/1002_Red_Tank_m.jpg,Y,Y
+1003,Tank II,u,7,7,80,1003_cannon_2_m,assets/sprites/1003_cannon_2_m.swf,assets/thumbs/1003_cannon_2_m.jpg,Y,Y
+1004,Tank III,u,7,7,80,1004_cannon_3_m,assets/sprites/1004_cannon_3_m.swf,assets/thumbs/1004_cannon_3_m.jpg,Y,Y
+1005,Special Spy,u,7,7,80,1005_special_spy_m,assets/sprites/1005_special_spy_m.swf,assets/thumbs/1005_special_spy_m.jpg,Y,Y
+1006,Killer Bazooka Jeep,u,7,7,80,1006_red_bazooka_jeep_m,assets/sprites/1006_red_bazooka_jeep_m.swf,assets/thumbs/1006_red_bazooka_jeep_m.jpg,Y,Y
+1007,Soldier,u,7,7,80,"1007_soldier_1_m,1007_soldier_1_m,1007_soldier_1_m,1007_soldier_1_m,1007_soldier_1_w",assets/sprites/1007_soldier_1_m.swf;assets/sprites/1007_soldier_1_m.swf;assets/sprites/1007_soldier_1_m.swf;assets/sprites/1007_soldier_1_m.swf;assets/sprites/1007_soldier_1_w.swf,assets/thumbs/1007_soldier_1_m.jpg;assets/thumbs/1007_soldier_1_m.jpg;assets/thumbs/1007_soldier_1_m.jpg;assets/thumbs/1007_soldier_1_m.jpg;assets/thumbs/1007_soldier_1_w.jpg,Y,Y
+1008,Bazooka,u,7,7,80,"1008_bazooka_1_m,1008_bazooka_1_m,1008_bazooka_1_m,1008_bazooka_1_m,1008_bazooka_1_w",assets/sprites/1008_bazooka_1_m.swf;assets/sprites/1008_bazooka_1_m.swf;assets/sprites/1008_bazooka_1_m.swf;assets/sprites/1008_bazooka_1_m.swf;assets/sprites/1008_bazooka_1_w.swf,assets/thumbs/1008_bazooka_1_m.jpg;assets/thumbs/1008_bazooka_1_m.jpg;assets/thumbs/1008_bazooka_1_m.jpg;assets/thumbs/1008_bazooka_1_m.jpg;assets/thumbs/1008_bazooka_1_w.jpg,Y,Y
+1009,General Scarlett,u,7,7,80,1009_good_girl_m,assets/sprites/1009_good_girl_m.swf,assets/thumbs/1009_good_girl_m.jpg,Y,Y
+1010,APC,u,7,7,80,1010_apc_m,assets/sprites/1010_apc_m.swf,assets/thumbs/1010_apc_m.jpg,Y,Y
+1011,Ms. Evilia,u,7,7,80,1011_bad_girl_m,,,N,N
+1012,Evil Hannibal,u,7,7,80,1012_bad_boy,assets/sprites/1012_bad_boy.swf,assets/thumbs/1012_bad_boy.jpg,Y,Y
+1013,Truck,u,7,7,80,1013_truck_1_m,assets/sprites/1013_truck_1_m.swf,assets/thumbs/1013_truck_1_m.jpg,Y,Y
+1014,Machine Gun Jeep,u,7,7,80,"1014_machinegunjeep_1_m,1014_machinegunjeep_1_m,1014_machinegunjeep_1_m,1014_machinegunjeep_1_m,1014_machinegunjeep_1_w",assets/sprites/1014_machinegunjeep_1_m.swf;assets/sprites/1014_machinegunjeep_1_m.swf;assets/sprites/1014_machinegunjeep_1_m.swf;assets/sprites/1014_machinegunjeep_1_m.swf;assets/sprites/1014_machinegunjeep_1_w.swf,assets/thumbs/1014_machinegunjeep_1_m.jpg;assets/thumbs/1014_machinegunjeep_1_m.jpg;assets/thumbs/1014_machinegunjeep_1_m.jpg;assets/thumbs/1014_machinegunjeep_1_m.jpg;assets/thumbs/1014_machinegunjeep_1_w.jpg,Y,Y
+1015,Aircraft,u,7,7,83,1015_aircraft_1_m,assets/sprites/1015_aircraft_1_m.swf,assets/thumbs/1015_aircraft_1_m.jpg,Y,Y
+1016,Tank,u,7,7,80,1016_cannon_1_m,assets/sprites/1016_cannon_1_m.swf,assets/thumbs/1016_cannon_1_m.jpg,Y,Y
+1017,General Mike,u,7,7,80,1017_good_boy,assets/sprites/1017_good_boy.swf,assets/thumbs/1017_good_boy.jpg,Y,Y
+1018,Zodiac,u,7,7,80,1018_zodiac_m,assets/sprites/1018_zodiac_m.swf,assets/thumbs/1018_zodiac_m.jpg,Y,Y
+1019,Ship,u,7,7,80,1019_ship_m2,assets/sprites/1019_ship_m2.swf,assets/thumbs/1019_ship_m2.jpg,Y,Y
+1020,Soldier II,u,7,7,80,1020_soldier_2_m,assets/sprites/1020_soldier_2_m.swf,assets/thumbs/1020_soldier_2_m.jpg,Y,Y
+1021,Soldier III,u,7,7,80,1021_soldier_3_m,assets/sprites/1021_soldier_3_m.swf,assets/thumbs/1021_soldier_3_m.jpg,Y,Y
+1022,Bazooka II,u,7,7,80,1022_bazooka_2_m,assets/sprites/1022_bazooka_2_m.swf,assets/thumbs/1022_bazooka_2_m.jpg,Y,Y
+1023,Bazooka III,u,7,7,80,1023_bazooka_3_m,assets/sprites/1023_bazooka_3_m.swf,assets/thumbs/1023_bazooka_3_m.jpg,Y,Y
+1024,Sergeant Megan,u,7,7,80,1024_good_guillerma,assets/sprites/1024_good_guillerma.swf,assets/thumbs/1024_good_guillerma.jpg,Y,Y
+1025,Aircraft II,u,7,7,83,1025_aircraft_2_m,assets/sprites/1025_aircraft_2_m.swf,assets/thumbs/1025_aircraft_2_m.jpg,Y,Y
+1026,Aircraft III,u,7,7,83,1026_aircraft_3_m,assets/sprites/1026_aircraft_3_m.swf,assets/thumbs/1026_aircraft_3_m.jpg,Y,Y
+1027,Helicopter,u,7,7,83,1027_helicopter_1_m,assets/sprites/1027_helicopter_1_m.swf,assets/thumbs/1027_helicopter_1_m.jpg,Y,Y
+1028,Helicopter II,u,7,7,83,1028_helicopter_2_m,assets/sprites/1028_helicopter_2_m.swf,assets/thumbs/1028_helicopter_2_m.jpg,Y,Y
+1029,Helicopter III,u,7,7,83,1029_helicopter_3_m,assets/sprites/1029_helicopter_3_m.swf,assets/thumbs/1029_helicopter_3_m.jpg,Y,Y
+1030,Machine Gun Jeep II,u,7,7,80,1030_machinegunjeep_2_m,assets/sprites/1030_machinegunjeep_2_m.swf,assets/thumbs/1030_machinegunjeep_2_m.jpg,Y,Y
+1031,Machine Gun Jeep III,u,7,7,80,1031_machinegunjeep_3_m,assets/sprites/1031_machinegunjeep_3_m.swf,assets/thumbs/1031_machinegunjeep_3_m.jpg,Y,Y
+1032,Truck 3,u,7,7,80,1032_truck_3_m,assets/sprites/1032_truck_3_m.swf,assets/thumbs/1032_truck_3_m.jpg,Y,Y
+1033,Mr. Cigar,u,7,7,80,1033_mr_cigar,assets/sprites/1033_mr_cigar.swf,assets/thumbs/1033_mr_cigar.jpg,Y,Y
+1034,UN Allied,u,7,7,80,"1034_un_allied_1_m,1034_un_allied_1_m,1034_un_allied_1_m,1034_un_allied_1_m,1034_un_allied_1_w",assets/sprites/1034_un_allied_1_m.swf;assets/sprites/1034_un_allied_1_m.swf;assets/sprites/1034_un_allied_1_m.swf;assets/sprites/1034_un_allied_1_m.swf;assets/sprites/1034_un_allied_1_w.swf,assets/thumbs/1034_un_allied_1_m.jpg;assets/thumbs/1034_un_allied_1_m.jpg;assets/thumbs/1034_un_allied_1_m.jpg;assets/thumbs/1034_un_allied_1_m.jpg;assets/thumbs/1034_un_allied_1_w.jpg,Y,Y
+1035,Truck II,u,7,7,80,1035_truck_2_m,assets/sprites/1035_truck_2_m.swf,assets/thumbs/1035_truck_2_m.jpg,Y,Y
+1036,Double Bazooka,u,7,7,80,1036_double_bazooka_m,assets/sprites/1036_double_bazooka_m.swf,assets/thumbs/1036_double_bazooka_m.jpg,Y,Y
+1037,MegaTank,u,7,7,80,1037_megatank,assets/sprites/1037_megatank.swf,assets/thumbs/1037_megatank.jpg,Y,Y
+1038,Red chopper,u,7,7,83,1038_red_helicopter_m,assets/sprites/1038_red_helicopter_m.swf,assets/thumbs/1038_red_helicopter_m.jpg,Y,Y
+1039,Worker II,u,7,7,71,1001_worker_m,assets/sprites/1001_worker_m.swf,assets/thumbs/1001_worker_m.jpg,Y,Y
+1040,Worker III,u,7,7,71,1001_worker_m,assets/sprites/1001_worker_m.swf,assets/thumbs/1001_worker_m.jpg,Y,Y
+1041,Worker IV,u,7,7,71,1001_worker_m,assets/sprites/1001_worker_m.swf,assets/thumbs/1001_worker_m.jpg,Y,Y
+1042,Sergeant Jack,u,7,7,80,1042_good_guile,assets/sprites/1042_good_guile.swf,assets/thumbs/1042_good_guile.jpg,Y,Y
+1043,Air Strike,u,7,7,83,1043_air_strike_m,assets/sprites/1043_air_strike_m.swf,assets/thumbs/1043_air_strike_m.jpg,Y,Y
+1044,Double Bazooka Jeep,u,7,7,80,1044_double_bazooka_jeep_m,assets/sprites/1044_double_bazooka_jeep_m.swf,assets/thumbs/1044_double_bazooka_jeep_m.jpg,Y,Y
+1045,Double Gun Soldier,u,7,7,80,1045_double_gun_soldier_m,assets/sprites/1045_double_gun_soldier_m.swf,assets/thumbs/1045_double_gun_soldier_m.jpg,Y,Y
+1046,Flamethrower,u,7,7,80,1046_flamethrower_m,assets/sprites/1046_flamethrower_m.swf,assets/thumbs/1046_flamethrower_m.jpg,Y,Y
+1047,Dominion Tank,u,7,7,80,1047_black_tank_2_m,assets/sprites/1047_black_tank_2_m.swf,assets/thumbs/1047_black_tank_2_m.jpg,Y,Y
+1048,Stealth Fighter,u,7,7,83,1048_black_aircraft_2_m,assets/sprites/1048_black_aircraft_2_m.swf,assets/thumbs/1048_black_aircraft_2_m.jpg,Y,Y
+1049,TankBoss,u,7,7,80,1053_golem_boss_m,assets/sprites/1053_golem_boss_m.swf,assets/thumbs/1053_golem_boss_m.jpg,Y,Y
+1050,Medic,u,7,7,80,1050_medic_m,assets/sprites/1050_medic_m.swf,assets/thumbs/1050_medic_m.jpg,Y,Y
+1051,Engineer,u,7,7,80,1051_mechanic_m,assets/sprites/1051_mechanic_m.swf,assets/thumbs/1051_mechanic_m.jpg,Y,Y
+1052,Special Ops.,u,7,7,80,1052_special_ops_2_m,assets/sprites/1052_special_ops_2_m.swf,assets/thumbs/1052_special_ops_2_m.jpg,Y,Y
+1053,GolemBoss,u,7,7,80,1053_golem_boss_m,assets/sprites/1053_golem_boss_m.swf,assets/thumbs/1053_golem_boss_m.jpg,Y,Y
+1054,Scarface girl,u,7,7,80,1054_scarface_girl,assets/sprites/1054_scarface_girl.swf,assets/thumbs/1054_scarface_girl.jpg,Y,Y
+1055,Mr. Treat,u,7,7,80,1055_mr_t_m,assets/sprites/1055_mr_t_m.swf,assets/thumbs/1055_mr_t_m.jpg,Y,Y
+1056,Elephant rider,u,7,7,80,1056_elephant_rider_m,assets/sprites/1056_elephant_rider_m.swf,assets/thumbs/1056_elephant_rider_m.jpg,Y,Y
+1057,T-Rex Green,u,7,7,80,1057_t-rex_m,assets/sprites/1057_t-rex_m.swf,assets/thumbs/1057_t-rex_m.jpg,Y,Y
+1058,Soldier IV,u,7,7,80,1058_soldier_4_m,assets/sprites/1058_soldier_4_m.swf,assets/thumbs/1058_soldier_4_m.jpg,Y,Y
+1059,Soldier V,u,7,7,80,1059_soldier_5_m,assets/sprites/1059_soldier_5_m.swf,assets/thumbs/1059_soldier_5_m.jpg,Y,Y
+1060,Mortar Thrower,u,7,7,80,1060_mortar_m,assets/sprites/1060_mortar_m.swf,assets/thumbs/1060_mortar_m.jpg,Y,Y
+1061,GunBot,u,7,7,80,1061_baby_robot_m,assets/sprites/1061_baby_robot_m.swf,assets/thumbs/1061_baby_robot_m.jpg,Y,Y
+1062,MegaBot,u,7,7,80,1062_bumblebee_m,assets/sprites/1062_bumblebee_m.swf,assets/thumbs/1062_bumblebee_m.jpg,Y,Y
+1063,Bazooka IV,u,7,7,80,1063_bazooka_4_m,assets/sprites/1063_bazooka_4_m.swf,assets/thumbs/1063_bazooka_4_m.jpg,Y,Y
+1064,Bazooka V,u,7,7,80,1064_bazooka_5_m,assets/sprites/1064_bazooka_5_m.swf,assets/thumbs/1064_bazooka_5_m.jpg,Y,Y
+1065,Antiaircraft battery,u,7,7,80,1065_antiaircraft_battery_m,assets/sprites/1065_antiaircraft_battery_m.swf,assets/thumbs/1065_antiaircraft_battery_m.jpg,Y,Y
+1066,Helicopter IV,u,7,7,83,1066_helicopter_4_m,assets/sprites/1066_helicopter_4_m.swf,assets/thumbs/1066_helicopter_4_m.jpg,Y,Y
+1067,Helicopter V,u,7,7,83,1067_helicopter_5_m,assets/sprites/1067_helicopter_5_m.swf,assets/thumbs/1067_helicopter_5_m.jpg,Y,Y
+1068,B52,u,7,7,83,1068_b52_m,assets/sprites/1068_b52_m.swf,assets/thumbs/1068_b52_m.jpg,Y,Y
+1069,Demolition Tank,u,7,7,80,1069_bigheaded_tank_m,assets/sprites/1069_bigheaded_tank_m.swf,assets/thumbs/1069_bigheaded_tank_m.jpg,Y,Y
+1070,Tank IV,u,7,7,80,1070_cannon_4_m,assets/sprites/1070_cannon_4_m.swf,assets/thumbs/1070_cannon_4_m.jpg,Y,Y
+1071,Tank V,u,7,7,80,1071_cannon_5_m,assets/sprites/1071_cannon_5_m.swf,assets/thumbs/1071_cannon_5_m.jpg,Y,Y
+1072,Ranbo,u,7,7,80,1072_rambo_m,assets/sprites/1072_rambo_m.swf,assets/thumbs/1072_rambo_m.jpg,Y,Y
+1073,Erradicator,u,7,7,80,1073_erradicator_m,assets/sprites/1073_erradicator_m.swf,assets/thumbs/1073_erradicator_m.jpg,Y,Y
+1074,Punisher Bot,u,7,7,80,1074_punisher_m,assets/sprites/1074_punisher_m.swf,assets/thumbs/1074_punisher_m.jpg,Y,Y
+1075,Supreme Bot,u,7,7,80,1075_supreme_m,assets/sprites/1075_supreme_m.swf,assets/thumbs/1075_supreme_m.jpg,Y,Y
+1076,Crusader Soldier,u,7,7,80,1076_robo_soldier_m,assets/sprites/1076_robo_soldier_m.swf,assets/thumbs/1076_robo_soldier_m.jpg,Y,Y
+1077,Swordsman Soldier,u,7,7,80,1077_robo_swordsman_m,assets/sprites/1077_robo_swordsman_m.swf,assets/thumbs/1077_robo_swordsman_m.jpg,Y,Y
+1078,Bazooka Soldier,u,7,7,80,1078_robo_bazooka_m,assets/sprites/1078_robo_bazooka_m.swf,assets/thumbs/1078_robo_bazooka_m.jpg,Y,Y
+1079,Jet Soldier,u,7,7,80,1079_robo_jumper_m,assets/sprites/1079_robo_jumper_m.swf,assets/thumbs/1079_robo_jumper_m.jpg,Y,Y
+1080,Motorized Soldier,u,7,7,80,1080_robo_biker_m,assets/sprites/1080_robo_biker_m.swf,assets/thumbs/1080_robo_biker_m.jpg,Y,Y
+1081,Xtreme Retaliator,u,7,7,80,1081_xtreme_retaliator_m,assets/sprites/1081_xtreme_retaliator_m.swf,assets/thumbs/1081_xtreme_retaliator_m.jpg,Y,Y
+1082,Megalancer,u,7,7,80,1082_robo_lancer_m,assets/sprites/1082_robo_lancer_m.swf,assets/thumbs/1082_robo_lancer_m.jpg,Y,Y
+1083,Crusader Tank,u,7,7,80,1083_demlisher_tank_m,assets/sprites/1083_demlisher_tank_m.swf,assets/thumbs/1083_demlisher_tank_m.jpg,Y,Y
+1084,Dreadnought,u,7,7,80,1084_dreadnought_m,assets/sprites/1084_dreadnought_m.swf,assets/thumbs/1084_dreadnought_m.jpg,Y,Y
+1085,Metal Draggy,u,7,7,83,1085_metal_draggy_m,assets/sprites/1085_metal_draggy_m.swf,assets/thumbs/1085_metal_draggy_m.jpg,Y,Y
+1086,Mechanical Golem,u,7,7,80,1053_golem_boss_m,assets/sprites/1053_golem_boss_m.swf,assets/thumbs/1053_golem_boss_m.jpg,Y,Y
+1087,T-Rex,u,7,7,80,1057_t-rex_m,assets/sprites/1057_t-rex_m.swf,assets/thumbs/1057_t-rex_m.jpg,Y,Y
+1088,Skylander,u,7,7,80,1088_skylander_m,assets/sprites/1088_skylander_m.swf,assets/thumbs/1088_skylander_m.jpg,Y,Y
+1089,Mega-Axe,u,7,7,80,1089_robo_axe_m,assets/sprites/1089_robo_axe_m.swf,assets/thumbs/1089_robo_axe_m.jpg,Y,Y
+1090,Giant Walker,u,7,7,80,1090_giant_walker_m,assets/sprites/1090_giant_walker_m.swf,assets/thumbs/1090_giant_walker_m.jpg,Y,Y
+1091,Missile Tank,u,7,7,80,1091_missile_tank_m,assets/sprites/1091_missile_tank_m.swf,assets/thumbs/1091_missile_tank_m.jpg,Y,Y
+1092,Steel Claws,u,7,7,80,1092_steel_claws_m,assets/sprites/1092_steel_claws_m.swf,assets/thumbs/1092_steel_claws_m.jpg,Y,Y
+1093,Fire T-Rex,u,7,7,80,1093_trex_m,assets/sprites/1093_trex_m.swf,assets/thumbs/1093_trex_m.jpg,Y,Y
+1094,Aircraft IV,u,7,7,83,1094_aircraft_4_m,assets/sprites/1094_aircraft_4_m.swf,assets/thumbs/1094_aircraft_4_m.jpg,Y,Y
+1095,Aircraft V,u,7,7,83,1095_aircraft_5_m,assets/sprites/1095_aircraft_5_m.swf,assets/thumbs/1095_aircraft_5_m.jpg,Y,Y
+1096,F-117,u,7,7,83,1096_f117_m,assets/sprites/1096_f117_m.swf,assets/thumbs/1096_f117_m.jpg,Y,Y
+1097,Red Draggy,u,7,7,83,1097_red_draggy_m,assets/sprites/1097_red_draggy_m.swf,assets/thumbs/1097_red_draggy_m.jpg,Y,Y
+1098,Blue Draggy,u,7,7,83,1098_blue_draggy_m,assets/sprites/1098_blue_draggy_m.swf,assets/thumbs/1098_blue_draggy_m.jpg,Y,Y
+1099,Red Dragon,u,7,7,83,1099_red_dragon2_m,assets/sprites/1099_red_dragon2_m.swf,assets/thumbs/1099_red_dragon2_m.jpg,Y,Y
+1100,Blue Dragon,u,7,7,83,1100_blue_dragon2_m,assets/sprites/1100_blue_dragon2_m.swf,assets/thumbs/1100_blue_dragon2_m.jpg,Y,Y
+1101,Celestial Megamech,u,7,7,80,1101_celestial_megamech_m,assets/sprites/1101_celestial_megamech_m.swf,assets/thumbs/1101_celestial_megamech_m.jpg,Y,Y
+1102,Red Baron,u,7,7,83,1102_red_baron_m,assets/sprites/1102_red_baron_m.swf,assets/thumbs/1102_red_baron_m.jpg,Y,Y
+1103,Zeppelin,u,7,7,83,1103_zeppelin_m,assets/sprites/1103_zeppelin_m.swf,assets/thumbs/1103_zeppelin_m.jpg,Y,Y
+1104,Fireman,u,7,7,71,1104_fireman_1_m,assets/sprites/1104_fireman_1_m.swf,assets/thumbs/1104_fireman_1_m.jpg,Y,Y
+1105,Metal Dragon,u,7,7,83,1105_metalico_dragon3_m,assets/sprites/1105_metalico_dragon3_m.swf,assets/thumbs/1105_metalico_dragon3_m.jpg,Y,Y
+1106,Axe Zoldier,u,7,7,80,1106_hacha_m_2,assets/sprites/1106_hacha_m_2.swf,assets/thumbs/1106_hacha_m_2.jpg,Y,Y
+1107,Gun Zoldier,u,7,7,80,1107_metralleta_m_2,assets/sprites/1107_metralleta_m_2.swf,assets/thumbs/1107_metralleta_m_2.jpg,Y,Y
+1108,Xplosive Ork,u,7,7,80,1108_orc_boss_m_2,assets/sprites/1108_orc_boss_m_2.swf,assets/thumbs/1108_orc_boss_m_2.jpg,Y,Y
+1109,Bear Ridda,u,7,7,80,1109_orco_jinete_m_2,assets/sprites/1109_orco_jinete_m_2.swf,assets/thumbs/1109_orco_jinete_m_2.jpg,Y,Y
+1110,Molotov Kopta,u,7,7,80,1110_helicoptero_orco_m2,assets/sprites/1110_helicoptero_orco_m2.swf,assets/thumbs/1110_helicoptero_orco_m2.jpg,Y,Y
+1111,Horned Badass,u,7,7,80,1111_robot_orco_1_m,assets/sprites/1111_robot_orco_1_m.swf,assets/thumbs/1111_robot_orco_1_m.jpg,Y,Y
+1112,Red Spinner,u,7,7,80,1112_optimus_m,assets/sprites/1112_optimus_m.swf,assets/thumbs/1112_optimus_m.jpg,Y,Y
+1113,Flamethrowa Ork,u,7,7,80,1113_orc_flamethrower_m,assets/sprites/1113_orc_flamethrower_m.swf,assets/thumbs/1113_orc_flamethrower_m.jpg,Y,Y
+1114,Knife Throwa,u,7,7,80,1114_orc_knivethrower_m,assets/sprites/1114_orc_knivethrower_m.swf,assets/thumbs/1114_orc_knivethrower_m.jpg,Y,Y
+1115,Big Handsaw Ork,u,7,7,80,1115_orc_robot_22_m,assets/sprites/1115_orc_robot_22_m.swf,assets/thumbs/1115_orc_robot_22_m.jpg,Y,Y
+1116,Orc Tank,u,7,7,80,1116_orc_tank_m,assets/sprites/1116_orc_tank_m.swf,assets/thumbs/1116_orc_tank_m.jpg,Y,Y
+1117,Kamikaze team,u,7,7,80,1117_orc_kamikaze_team,assets/sprites/1117_orc_kamikaze_team.swf,assets/thumbs/1117_orc_kamikaze_team.jpg,Y,Y
+1118,Kamikaze critter,u,7,7,80,1118_squig_kamikaze,assets/sprites/1118_squig_kamikaze.swf,assets/thumbs/1118_squig_kamikaze.jpg,Y,Y
+1119,Camu Metal Dragon,u,7,7,83,1119_metal_dragon2_m,assets/sprites/1119_metal_dragon2_m.swf,assets/thumbs/1119_metal_dragon2_m.jpg,Y,Y
+1120,Camu Draggy,u,7,7,83,1120_metal_draggy_2_m,assets/sprites/1120_metal_draggy_2_m.swf,assets/thumbs/1120_metal_draggy_2_m.jpg,Y,Y
+1121,War Buggy,u,7,7,80,1121_buggy_2_m,assets/sprites/1121_buggy_2_m.swf,assets/thumbs/1121_buggy_2_m.jpg,Y,Y
+1122,Orc Zoldier,u,7,7,80,1122_orc_basic_gun_2,assets/sprites/1122_orc_basic_gun_2.swf,assets/thumbs/1122_orc_basic_gun_2.jpg,Y,Y
+1123,Orc Swordsman,u,7,7,80,1123_orc_basic_knife_2,assets/sprites/1123_orc_basic_knife_2.swf,assets/thumbs/1123_orc_basic_knife_2.jpg,Y,Y
+1124,Basic Ork Tank,u,7,7,80,1124_ork_tank_1,assets/sprites/1124_ork_tank_1.swf,assets/thumbs/1124_ork_tank_1.jpg,Y,Y
+1125,Orc Worker,u,7,7,71,1125_orc_worker,assets/sprites/1125_orc_worker.swf,assets/thumbs/1125_orc_worker.jpg,Y,Y
+1126,Samurai Bot,u,7,7,80,1126_samurai_bot_m,assets/sprites/1126_samurai_bot_m.swf,assets/thumbs/1126_samurai_bot_m.jpg,Y,Y
+1127,Armored Core Alpha,u,7,7,80,1127_huge_robot_m,assets/sprites/1127_huge_robot_m.swf,assets/thumbs/1127_huge_robot_m.jpg,Y,Y
+1128,Alpha Drone,u,7,7,83,1128_huge_draggy_m,assets/sprites/1128_huge_draggy_m.swf,assets/thumbs/1128_huge_draggy_m.jpg,Y,Y
+1129,Samurai Minibot,u,7,7,80,1129_samurai_minibot,assets/sprites/1129_samurai_minibot.swf,,Y,N
+1130,Xplosive Beast Boss,u,7,7,80,1130_xplosive_boss_2,assets/sprites/1130_xplosive_boss_2.swf,assets/thumbs/1130_xplosive_boss_2.jpg,Y,Y
+1131,Xplosive Beast ATP,u,7,7,80,1116_orc_tank_m_2,assets/sprites/1116_orc_tank_m_2.swf,assets/thumbs/1116_orc_tank_m_2.jpg,Y,Y
+1132,Xplosive Beast,u,7,7,80,1108_orc_boss_m_2,assets/sprites/1108_orc_boss_m_2.swf,assets/thumbs/1108_orc_boss_m_2.jpg,Y,Y
+1133,Ork Bear Knight,u,7,7,80,1109_orco_jinete_m_2,assets/sprites/1109_orco_jinete_m_2.swf,assets/thumbs/1109_orco_jinete_m_2.jpg,Y,Y
+1134,Ork Kopta,u,7,7,80,1110_helicoptero_orco_m2,assets/sprites/1110_helicoptero_orco_m2.swf,assets/thumbs/1110_helicoptero_orco_m2.jpg,Y,Y
+1135,Horned Beast Ork,u,7,7,80,1111_robot_orco_1_m,assets/sprites/1111_robot_orco_1_m.swf,assets/thumbs/1111_robot_orco_1_m.jpg,Y,Y
+1136,Red Flamethrowa Ork,u,7,7,80,1113_orc_flamethrower_m,assets/sprites/1113_orc_flamethrower_m.swf,assets/thumbs/1113_orc_flamethrower_m.jpg,Y,Y
+1137,Orc Knifethrower,u,7,7,80,1114_orc_knivethrower_m,assets/sprites/1114_orc_knivethrower_m.swf,assets/thumbs/1114_orc_knivethrower_m.jpg,Y,Y
+1138,Red Handsaw Ork,u,7,7,80,1115_orc_robot_22_m,assets/sprites/1115_orc_robot_22_m.swf,assets/thumbs/1115_orc_robot_22_m.jpg,Y,Y
+1139,Kamikaze Bros,u,7,7,80,1117_orc_kamikaze_team,assets/sprites/1117_orc_kamikaze_team.swf,assets/thumbs/1117_orc_kamikaze_team.jpg,Y,Y
+1140,Kamikaze Pet,u,7,7,80,1118_squig_kamikaze,assets/sprites/1118_squig_kamikaze.swf,assets/thumbs/1118_squig_kamikaze.jpg,Y,Y
+1141,Samurai Bot,u,7,7,80,1126_samurai_bot_m,assets/sprites/1126_samurai_bot_m.swf,assets/thumbs/1126_samurai_bot_m.jpg,Y,Y
+1142,Samurai Minibot,u,7,7,80,1129_samurai_minibot_m,assets/sprites/1129_samurai_minibot_m.swf,assets/thumbs/1129_samurai_minibot_m.jpg,Y,Y
+1143,Melee Spider,u,7,7,80,1143_melee_spider_s,assets/sprites/1143_melee_spider_s.swf,assets/thumbs/1143_melee_spider_s.jpg,Y,Y
+1144,Venom Spider,u,7,7,80,1144_ranged_spider_s,assets/sprites/1144_ranged_spider_s.swf,assets/thumbs/1144_ranged_spider_s.jpg,Y,Y
+1145,Big Spider,u,7,7,80,1145_spider_semi_boss_s_2,assets/sprites/1145_spider_semi_boss_s_2.swf,assets/thumbs/1145_spider_semi_boss_s_2.jpg,Y,Y
+1146,Small Alien,u,7,7,80,1146_basic_alien_s,assets/sprites/1146_basic_alien_s.swf,assets/thumbs/1146_basic_alien_s.jpg,Y,Y
+1147,Tusk Alien,u,7,7,80,1147_alien_bull_s,assets/sprites/1147_alien_bull_s.swf,assets/thumbs/1147_alien_bull_s.jpg,Y,Y
+1148,Claw Alien,u,7,7,80,1148_alien_claws_s,assets/sprites/1148_alien_claws_s.swf,assets/thumbs/1148_alien_claws_s.jpg,Y,Y
+1149,Orc Big Tank,u,7,7,80,1116_orc_tank_m,assets/sprites/1116_orc_tank_m.swf,assets/thumbs/1116_orc_tank_m.jpg,Y,Y
+1150,Crusader Bot,u,7,7,80,1150_crusader_bot,assets/sprites/1150_crusader_bot.swf,assets/thumbs/1150_crusader_bot.jpg,Y,Y
+1151,Crusader Priest,u,7,7,80,1151_crusader_priest,assets/sprites/1151_crusader_priest.swf,assets/thumbs/1151_crusader_priest.jpg,Y,Y
+1152,Ultra-Mech,u,7,7,80,1152_transformer_gigante,assets/sprites/1152_transformer_gigante.swf,assets/thumbs/1152_transformer_gigante.jpg,Y,Y
+1153,Ultra-Mech Drone,u,7,7,83,1153_transformer_gigante_drone,assets/sprites/1153_transformer_gigante_drone.swf,assets/thumbs/1153_transformer_gigante_drone.jpg,Y,Y
+1154,Viking Axeman,u,7,7,80,1154_axeman,assets/sprites/1154_axeman.swf,assets/thumbs/1154_axeman.jpg,Y,Y
+1155,Viking Soldier,u,7,7,80,1155_dwarf_soldier,assets/sprites/1155_dwarf_soldier.swf,assets/thumbs/1155_dwarf_soldier.jpg,Y,Y
+1156,Viking Bear Knight,u,7,7,80,1156_bear_knight,assets/sprites/1156_bear_knight.swf,assets/thumbs/1156_bear_knight.jpg,Y,Y
+1157,Viking Tank,u,7,7,80,1157_dwarf_tank,assets/sprites/1157_dwarf_tank.swf,assets/thumbs/1157_dwarf_tank.jpg,Y,Y
+1158,Viking Airship,u,7,7,80,1158_viking_copter_II,assets/sprites/1158_viking_copter_II.swf,assets/thumbs/1158_viking_copter_II.jpg,Y,Y
+1159,Viking Hammerer,u,7,7,80,1159_megahammer_dwarf,assets/sprites/1159_megahammer_dwarf.swf,assets/thumbs/1159_megahammer_dwarf.jpg,Y,Y
+1160,Viking Core Bot,u,7,7,80,1160_dwarf_armored_core,assets/sprites/1160_dwarf_armored_core.swf,assets/thumbs/1160_dwarf_armored_core.jpg,Y,Y
+1161,Rune Golem,u,7,7,80,1161_viking_rune_golem,assets/sprites/1161_viking_rune_golem.swf,,Y,N
+1162,Nemesis Core,u,7,7,80,1162_ultra_robot,assets/sprites/1162_ultra_robot.swf,assets/thumbs/1162_ultra_robot.jpg,Y,Y
+1163,Nemesis Drone,u,7,7,83,1163_ultra_robot_drone,assets/sprites/1163_ultra_robot_drone.swf,assets/thumbs/1163_ultra_robot_drone.jpg,Y,Y
+1164,Viking Core Bot Drone,u,7,7,83,1164_dwarf_armored_core_drone,assets/sprites/1164_dwarf_armored_core_drone.swf,assets/thumbs/1164_dwarf_armored_core_drone.jpg,Y,Y
+1165,Viking Bazooka,u,7,7,80,1165_bazooka_viking,assets/sprites/1165_bazooka_viking.swf,assets/thumbs/1165_bazooka_viking.jpg,Y,Y
+1166,Viking MotoSquad,u,7,7,80,1166_viking_motosquad,assets/sprites/1166_viking_motosquad.swf,assets/thumbs/1166_viking_motosquad.jpg,Y,Y
+1167,Blue Steel Bahamut,u,7,7,83,1167_bahamut_metalico,assets/sprites/1167_bahamut_metalico.swf,assets/thumbs/1167_bahamut_metalico.jpg,Y,Y
+1168,Blue Steel Draggy,u,7,7,83,1168_bahamut_metalico_draggy,assets/sprites/1168_bahamut_metalico_draggy.swf,assets/thumbs/1168_bahamut_metalico_draggy.jpg,Y,Y
+1169,Roller Skater,u,7,7,80,1169_transformer_skater,assets/sprites/1169_transformer_skater.swf,assets/thumbs/1169_transformer_skater.jpg,Y,Y
+1170,Alien Instigator,u,7,7,80,1170_alien_instigator,assets/sprites/1170_alien_instigator.swf,assets/thumbs/1170_alien_instigator.jpg,Y,Y
+1171,Rune Golem Drone,u,7,7,83,1171_viking_rune_golem_drone,assets/sprites/1171_viking_rune_golem_drone.swf,assets/thumbs/1171_viking_rune_golem_drone.jpg,Y,Y
+1172,Hyper Blazer,u,7,7,80,1172_mega_fire_bot,assets/sprites/1172_mega_fire_bot.swf,assets/thumbs/1172_mega_fire_bot.jpg,Y,Y
+1173,Hyper Blazer Drone,u,7,7,83,1173_mega_fire_bot_drone,assets/sprites/1173_mega_fire_bot_drone.swf,assets/thumbs/1173_mega_fire_bot_drone.jpg,Y,Y
+1174,Viking Sniper,u,7,7,80,1174_viking_sniper,assets/sprites/1174_viking_sniper.swf,assets/thumbs/1174_viking_sniper.jpg,Y,Y
+1175,Chainsaw Butcher,u,7,7,80,1175_viking_butcher,assets/sprites/1175_viking_butcher.swf,assets/thumbs/1175_viking_butcher.jpg,Y,Y
+1176,Kamikaze,u,7,7,80,1176_kamikaze,assets/sprites/1176_kamikaze.swf,assets/thumbs/1176_kamikaze.jpg,Y,Y
+1177,UFO,u,7,7,80,1177_ufo,assets/sprites/1177_ufo.swf,assets/thumbs/1177_ufo.jpg,Y,Y
+1178,Ether Messiah,u,7,7,80,1178_ether_messiah,assets/sprites/1178_ether_messiah.swf,assets/thumbs/1178_ether_messiah.jpg,Y,Y
+1179,Ether Messiah Drone,u,7,7,83,1179_ether_messiah_drone,assets/sprites/1179_ether_messiah_drone.swf,assets/thumbs/1179_ether_messiah_drone.jpg,Y,Y
+1180,Robot Hunter,u,7,7,80,1180_robot_hunter,assets/sprites/1180_robot_hunter.swf,assets/thumbs/1180_robot_hunter.jpg,Y,Y
+1181,Golden Slayer,u,7,7,80,1181_transformer_sword,assets/sprites/1181_transformer_sword.swf,assets/thumbs/1181_transformer_sword.jpg,Y,Y
+1182,Golden Slayer Drone,u,7,7,83,1182_transformer_sword_drone,assets/sprites/1182_transformer_sword_drone.swf,assets/thumbs/1182_transformer_sword_drone.jpg,Y,Y
+1183,Big Laser Viking,u,7,7,80,1183_laser_viking,assets/sprites/1183_laser_viking.swf,assets/thumbs/1183_laser_viking.jpg,Y,Y
+1184,Fire Karateka,u,7,7,80,1184_karateka,assets/sprites/1184_karateka.swf,assets/thumbs/1184_karateka.jpg,Y,Y
+1185,MegaFire T-Rex,u,7,7,80,1093_trex_m,assets/sprites/1093_trex_m.swf,assets/thumbs/1093_trex_m.jpg,Y,Y
+1186,Nebular Spearman,u,7,7,80,1186_avatar_soldado,assets/sprites/1186_avatar_soldado.swf,assets/thumbs/1186_avatar_soldado.jpg,Y,Y
+1187,Nebular Archer,u,7,7,80,1187_avatar_arquero,assets/sprites/1187_avatar_arquero.swf,assets/thumbs/1187_avatar_arquero.jpg,Y,Y
+1188,Greatsword Warrior,u,7,7,80,1188_avatar_great_warrior,assets/sprites/1188_avatar_great_warrior.swf,assets/thumbs/1188_avatar_great_warrior.jpg,Y,Y
+1189,Nebular Rider,u,7,7,80,1189_avatar_jinete,assets/sprites/1189_avatar_jinete.swf,assets/thumbs/1189_avatar_jinete.jpg,Y,Y
+1190,Golden Golem,u,7,7,80,1190_gold_golem,assets/sprites/1190_gold_golem.swf,assets/thumbs/1190_gold_golem.jpg,Y,Y
+1191,Black Dragon,u,7,7,83,1191_black_dragon,assets/sprites/1191_black_dragon.swf,assets/thumbs/1191_black_dragon.jpg,Y,Y
+1192,Dragonborn Mech,u,7,7,80,1192_dragon_mech,assets/sprites/1192_dragon_mech.swf,assets/thumbs/1192_dragon_mech.jpg,Y,Y
+1193,Dragonborn Drone,u,7,7,83,1193_dragon_mech_drone,assets/sprites/1193_dragon_mech_drone.swf,assets/thumbs/1193_dragon_mech_drone.jpg,Y,Y
+1194,Electric Dragon,u,7,7,80,1194_electric_dragon_2,assets/sprites/1194_electric_dragon_2.swf,assets/thumbs/1194_electric_dragon_2.jpg,Y,Y
+1195,Electric Draggy,u,7,7,83,1195_electric_draggy,assets/sprites/1195_electric_draggy.swf,assets/thumbs/1195_electric_draggy.jpg,Y,Y
+1196,Black Draggy,u,7,7,83,1196_black_draggy,assets/sprites/1196_black_draggy.swf,assets/thumbs/1196_black_draggy.jpg,Y,Y
+1197,Silver Hercules,u,7,7,80,1197_herkules_matrix,assets/sprites/1197_herkules_matrix.swf,assets/thumbs/1197_herkules_matrix.jpg,Y,Y
+1198,Nebular Knight,u,7,7,80,1198_nebular_horse_rider,assets/sprites/1198_nebular_horse_rider.swf,assets/thumbs/1198_nebular_horse_rider.jpg,Y,Y
+1199,Nebular Dragon Rider,u,7,7,83,1199_nebular_dragon_rider,assets/sprites/1199_nebular_dragon_rider.swf,assets/thumbs/1199_nebular_dragon_rider.jpg,Y,Y
+1200,Nebular Assault Quad,u,7,7,80,1200_nebular_motorized,assets/sprites/1200_nebular_motorized.swf,assets/thumbs/1200_nebular_motorized.jpg,Y,Y
+1201,Steel Collector,u,7,7,80,1201_junk_bot,assets/sprites/1201_junk_bot.swf,assets/thumbs/1201_junk_bot.jpg,Y,Y
+1202,Nebular Dragon Rider Draggy,u,7,7,83,1202_nebular_dragon_rider_draggy,assets/sprites/1202_nebular_dragon_rider_draggy.swf,assets/thumbs/1202_nebular_dragon_rider_draggy.jpg,Y,Y
+1203,Viking Airship Outsider,u,7,7,80,1158_viking_copter_II,assets/sprites/1158_viking_copter_II.swf,assets/thumbs/1158_viking_copter_II.jpg,Y,Y
+1204,Viking Hammerer Outsider,u,7,7,80,1159_megahammer_dwarf,assets/sprites/1159_megahammer_dwarf.swf,assets/thumbs/1159_megahammer_dwarf.jpg,Y,Y
+1205,Dual Blade Automech,u,7,7,80,1205_dual_blade_automech,assets/sprites/1205_dual_blade_automech.swf,assets/thumbs/1205_dual_blade_automech.jpg,Y,Y
+1206,Dual Blade Automech Drone,u,7,7,83,1206_dual_blade_automech_drone,assets/sprites/1206_dual_blade_automech_drone.swf,assets/thumbs/1206_dual_blade_automech_drone.jpg,Y,Y
+1207,Black Belt Archer,u,7,7,80,1207_transformer_archer,assets/sprites/1207_transformer_archer.swf,assets/thumbs/1207_transformer_archer.jpg,Y,Y
+1208,Nebular Priest,u,7,7,80,1208_nebula_priest,assets/sprites/1208_nebula_priest.swf,assets/thumbs/1208_nebula_priest.jpg,Y,Y
+1209,Nebular Bicopter,u,7,7,83,1209_nebular_blue_bicopter,assets/sprites/1209_nebular_blue_bicopter.swf,assets/thumbs/1209_nebular_blue_bicopter.jpg,Y,Y
+1210,Great Shogun Mech,u,7,7,80,1210_samurai_mech,assets/sprites/1210_samurai_mech.swf,assets/thumbs/1210_samurai_mech.jpg,Y,Y
+1211,Great Shogun Mech Drone,u,7,7,83,1211_samurai_mech_drone,assets/sprites/1211_samurai_mech_drone.swf,assets/thumbs/1211_samurai_mech_drone.jpg,Y,Y
+1212,ATP Mech,u,7,7,80,1212_tetrapod_mech,assets/sprites/1212_tetrapod_mech.swf,assets/thumbs/1212_tetrapod_mech.jpg,Y,Y
+1213,Blazing Beast Rider,u,7,7,80,1213_nebular_monster_rider,assets/sprites/1213_nebular_monster_rider.swf,assets/thumbs/1213_nebular_monster_rider.jpg,Y,Y
+1214,Nebular Maze Warrior,u,7,7,80,1214_nebular_maze_warrior,assets/sprites/1214_nebular_maze_warrior.swf,assets/thumbs/1214_nebular_maze_warrior.jpg,Y,Y
+1215,Massive Cannon Mech,u,7,7,80,1215_massive_cannon_mech,assets/sprites/1215_massive_cannon_mech.swf,assets/thumbs/1215_massive_cannon_mech.jpg,Y,Y
+1216,Massive Cannon Drone,u,7,7,83,1216_massive_cannon_drone,assets/sprites/1216_massive_cannon_drone.swf,assets/thumbs/1216_massive_cannon_drone.jpg,Y,Y
+1217,Brutus Mech,u,7,7,80,1217_brutus_mech,assets/sprites/1217_brutus_mech.swf,assets/thumbs/1217_brutus_mech.jpg,Y,Y
+1218,S.W.A.T. Soldier,u,7,7,80,1218_swat_soldier,assets/sprites/1218_swat_soldier.swf,assets/thumbs/1218_swat_soldier.jpg,Y,Y
+1219,Nebular Dragon Knight,u,7,7,80,1219_nebular_rider,assets/sprites/1219_nebular_rider.swf,assets/thumbs/1219_nebular_rider.jpg,Y,Y
+1220,Nebular Sniper,u,7,7,80,1220_nebular_sniper,assets/sprites/1220_nebular_sniper.swf,assets/thumbs/1220_nebular_sniper.jpg,Y,Y
+1221,Nebular Dragon Knight Draggy,u,7,7,83,1221_nebular_rider_draggy,assets/sprites/1221_nebular_rider_draggy.swf,assets/thumbs/1221_nebular_rider_draggy.jpg,Y,Y
+1222,Liquid Mech ,u,7,7,80,1222_liquid_mech,assets/sprites/1222_liquid_mech.swf,assets/thumbs/1222_liquid_mech.jpg,Y,Y
+1223,Killer Driller,u,7,7,80,1223_drill,assets/sprites/1223_drill.swf,assets/thumbs/1223_drill.jpg,Y,Y
+1224,Liquid Mech  Drone,u,7,7,83,1224_liquid_mech _drone,assets/sprites/1224_liquid_mech _drone.swf,assets/thumbs/1224_liquid_mech _drone.jpg,Y,Y
+1225,Doctor Shock,u,7,7,80,1225_doctor_shock,assets/sprites/1225_doctor_shock.swf,assets/thumbs/1225_doctor_shock.jpg,Y,Y
+1226,Red Mercury Dragon,u,7,7,80,1226_dragon_metalic,assets/sprites/1226_dragon_metalic.swf,assets/thumbs/1226_dragon_metalic.jpg,Y,Y
+1227,Red Mercury Draggy,u,7,7,83,1227_dragon_metalic_draggy,assets/sprites/1227_dragon_metalic_draggy.swf,assets/thumbs/1227_dragon_metalic_draggy.jpg,Y,Y
+1228,Swamp Monster,u,7,7,80,1228_nebula_monster,assets/sprites/1228_nebula_monster.swf,assets/thumbs/1228_nebula_monster.jpg,Y,Y
+1229,Poison Spider,u,7,7,80,1144_ranged_spider_s,assets/sprites/1144_ranged_spider_s.swf,assets/thumbs/1144_ranged_spider_s.jpg,Y,Y
+1230,Shredder Alien,u,7,7,80,1148_alien_claws_s,assets/sprites/1148_alien_claws_s.swf,assets/thumbs/1148_alien_claws_s.jpg,Y,Y
+1231,Swamp Minion,u,7,7,80,1231_nebula_monster_mini,assets/sprites/1231_nebula_monster_mini.swf,assets/thumbs/1231_nebula_monster_mini.jpg,Y,Y
+1232,Claw Spider,u,7,7,80,1143_melee_spider_s,assets/sprites/1143_melee_spider_s.swf,assets/thumbs/1143_melee_spider_s.jpg,Y,Y
+1233,Huge Spider,u,7,7,80,1145_spider_semi_boss_s_2,assets/sprites/1145_spider_semi_boss_s_2.swf,assets/thumbs/1145_spider_semi_boss_s_2.jpg,Y,Y
+1234,Acid Alien,u,7,7,80,1146_basic_alien_s,assets/sprites/1146_basic_alien_s.swf,assets/thumbs/1146_basic_alien_s.jpg,Y,Y
+1235,Horned Alien,u,7,7,80,1147_alien_bull_s,assets/sprites/1147_alien_bull_s.swf,assets/thumbs/1147_alien_bull_s.jpg,Y,Y
+1236,2-Gun Exobot,u,7,7,80,1236_2gun_exobot,assets/sprites/1236_2gun_exobot.swf,assets/thumbs/1236_2gun_exobot.jpg,Y,Y
+1237,Cyber Samurai Mech,u,7,7,80,1237_cyber_samurai_mech,assets/sprites/1237_cyber_samurai_mech.swf,assets/thumbs/1237_cyber_samurai_mech.jpg,Y,Y
+1238,Cyber Samurai  Drone,u,7,7,83,1238_cyber_samurai_mech_drone,assets/sprites/1238_cyber_samurai_mech_drone.swf,assets/thumbs/1238_cyber_samurai_mech_drone.jpg,Y,Y
+1239,Dark Ether Messiah,u,7,7,80,1239_dark_ether_messiah,assets/sprites/1239_dark_ether_messiah.swf,assets/thumbs/1239_dark_ether_messiah.jpg,Y,Y
+1240,Dark Ether Messiah Drone,u,7,7,83,1240_dark_ether_messiah_drone,assets/sprites/1240_dark_ether_messiah_drone.swf,assets/thumbs/1240_dark_ether_messiah_drone.jpg,Y,Y
+1241,Converter Wizard,u,7,7,80,1241_enemy_converter_priest,assets/sprites/1241_enemy_converter_priest.swf,assets/thumbs/1241_enemy_converter_priest.jpg,Y,Y
+1242,Hercules Mech,u,7,7,80,1242_herkules_mech,assets/sprites/1242_herkules_mech.swf,assets/thumbs/1242_herkules_mech.jpg,Y,Y
+1243,Forge Dragon,u,7,7,80,1243_forge_dragon,assets/sprites/1243_forge_dragon.swf,assets/thumbs/1243_forge_dragon.jpg,Y,Y
+1244,Forge Dragon Draggy,u,7,7,83,1244_forge_draggy,assets/sprites/1244_forge_draggy.swf,assets/thumbs/1244_forge_draggy.jpg,Y,Y
+1245,Reptile Gun,u,7,7,80,1245_reptile_gun,assets/sprites/1245_reptile_gun.swf,assets/thumbs/1245_reptile_gun.jpg,Y,Y
+1246,Double Cannon Mech,u,7,7,80,1246_double_cannon_mech,assets/sprites/1246_double_cannon_mech.swf,assets/thumbs/1246_double_cannon_mech.jpg,Y,Y
+1247,Double Cannon Drone,u,7,7,83,1247_double_cannon_drone,assets/sprites/1247_double_cannon_drone.swf,assets/thumbs/1247_double_cannon_drone.jpg,Y,Y
+1248,Laser Blade Automech,u,7,7,80,1248_laser_blade_automech,assets/sprites/1248_laser_blade_automech.swf,assets/thumbs/1248_laser_blade_automech.jpg,Y,Y
+1249,Laser Blade Automech Drone,u,7,7,83,1249_laser_blade_automech_drone,assets/sprites/1249_laser_blade_automech_drone.swf,assets/thumbs/1249_laser_blade_automech_drone.jpg,Y,Y
+1250,Burning Slayer,u,7,7,80,1250_red_slayer,assets/sprites/1250_red_slayer.swf,assets/thumbs/1250_red_slayer.jpg,Y,Y
+1251,Burning Slayer Drone,u,7,7,83,1251_red_slayer_drone,assets/sprites/1251_red_slayer_drone.swf,assets/thumbs/1251_red_slayer_drone.jpg,Y,Y
+1252,Karateka Gunner,u,7,7,80,1252_karateka_gunner,assets/sprites/1252_karateka_gunner.swf,assets/thumbs/1252_karateka_gunner.jpg,Y,Y
+1253,Swamp Monster,u,7,7,80,1228_nebula_monster,assets/sprites/1228_nebula_monster.swf,assets/thumbs/1228_nebula_monster.jpg,Y,Y
+1254,Prime Automech,u,7,7,80,1254_optimus_prime,assets/sprites/1254_optimus_prime.swf,assets/thumbs/1254_optimus_prime.jpg,Y,Y
+1255,Prime Automech Drone,u,7,7,83,1255_optimus_prime_drone,assets/sprites/1255_optimus_prime_drone.swf,assets/thumbs/1255_optimus_prime_drone.jpg,Y,Y
+1256,Big Razor Mech,u,7,7,80,1256_big_razor_mech,assets/sprites/1256_big_razor_mech.swf,assets/thumbs/1256_big_razor_mech.jpg,Y,Y
+1257,Big Razor Mech Drone,u,7,7,83,1257_big_razor_mech_drone,assets/sprites/1257_big_razor_mech_drone.swf,assets/thumbs/1257_big_razor_mech_drone.jpg,Y,Y
+1258,S.W.A.T. Soldier,u,7,7,80,1218_swat_soldier,assets/sprites/1218_swat_soldier.swf,assets/thumbs/1218_swat_soldier.jpg,Y,Y
+1259,Space Sword Elf,u,7,7,80,1259_spatial_sward,assets/sprites/1259_spatial_sward.swf,assets/thumbs/1259_spatial_sward.jpg,Y,Y
+1260,Space Archer Elf,u,7,7,80,1260_spatial_archer,assets/sprites/1260_spatial_archer.swf,assets/thumbs/1260_spatial_archer.jpg,Y,Y
+1261,Space Knight Elf,u,7,7,80,1261_spatial_horseman,assets/sprites/1261_spatial_horseman.swf,assets/thumbs/1261_spatial_horseman.jpg,Y,Y
+1262,Space Airship Elf,u,7,7,83,1262_spatial_airship,assets/sprites/1262_spatial_airship.swf,assets/thumbs/1262_spatial_airship.jpg,Y,Y
+1263,Spartan Warrior Mech,u,7,7,80,1263_spartan_warrior_mech,assets/sprites/1263_spartan_warrior_mech.swf,assets/thumbs/1263_spartan_warrior_mech.jpg,Y,Y
+1264,Spartan Warrior Drone,u,7,7,83,1264_spartan_warrior_drone,assets/sprites/1264_spartan_warrior_drone.swf,assets/thumbs/1264_spartan_warrior_drone.jpg,Y,Y
+1265,Space Priest Elf,u,7,7,80,1265_spatial_priest,assets/sprites/1265_spatial_priest.swf,assets/thumbs/1265_spatial_priest.jpg,Y,Y
+1266,Space Paladin Elf,u,7,7,80,1266_spatial_paladin,assets/sprites/1266_spatial_paladin.swf,assets/thumbs/1266_spatial_paladin.jpg,Y,Y
+1267,Space Elf Cruiser,u,7,7,83,1267_spatial_space_ship,assets/sprites/1267_spatial_space_ship.swf,assets/thumbs/1267_spatial_space_ship.jpg,Y,Y
+1268,Proto Winged Mech,u,7,7,80,1268_winged_transformer,assets/sprites/1268_winged_transformer.swf,assets/thumbs/1268_winged_transformer.jpg,Y,Y
+1269,Proto Winged Drone,u,7,7,83,1269_winged_transformer_drone,assets/sprites/1269_winged_transformer_drone.swf,assets/thumbs/1269_winged_transformer_drone.jpg,Y,Y
+1270,Spider Bot,u,7,7,80,1270_spider_bot,assets/sprites/1270_spider_bot.swf,assets/thumbs/1270_spider_bot.jpg,Y,Y
+1271,Pharaoh Warrior Mech,u,7,7,80,1271_egyptian_warrior_mech,assets/sprites/1271_egyptian_warrior_mech.swf,assets/thumbs/1271_egyptian_warrior_mech.jpg,Y,Y
+1272,Arachnid Mech,u,7,7,80,1272_transformer_aracnid,assets/sprites/1272_transformer_aracnid.swf,assets/thumbs/1272_transformer_aracnid.jpg,Y,Y
+1273,Arachnid Drone,u,7,7,83,1273_transformer_aracnid_drone,assets/sprites/1273_transformer_aracnid_drone.swf,assets/thumbs/1273_transformer_aracnid_drone.jpg,Y,Y
+1274,Multi Morpher,u,7,7,80,1274_multi_morph,assets/sprites/1274_multi_morph.swf,assets/thumbs/1274_multi_morph.jpg,Y,Y
+1275,Space Healer Elf,u,7,7,80,1275_spatial_elf_healer,assets/sprites/1275_spatial_elf_healer.swf,assets/thumbs/1275_spatial_elf_healer.jpg,Y,Y
+1276,Space Scouter Elf,u,7,7,80,1276_spatial_exploration_module,assets/sprites/1276_spatial_exploration_module.swf,assets/thumbs/1276_spatial_exploration_module.jpg,Y,Y
+1277,Pharaoh Mech Drone,u,7,7,83,1277_egyptian_warrior_drone,assets/sprites/1277_egyptian_warrior_drone.swf,assets/thumbs/1277_egyptian_warrior_drone.jpg,Y,Y
+1278,MegaBot,u,7,7,80,1062_bumblebee_m,assets/sprites/1062_bumblebee_m.swf,assets/thumbs/1062_bumblebee_m.jpg,Y,Y
+1279,Black Brutus Mech,u,7,7,80,1279_black_brutus_mech,assets/sprites/1279_black_brutus_mech.swf,assets/thumbs/1279_black_brutus_mech.jpg,Y,Y
+1280,2-Head Frostfire Dragon,u,7,7,80,1280_frost_fire_dragon,assets/sprites/1280_frost_fire_dragon.swf,assets/thumbs/1280_frost_fire_dragon.jpg,Y,Y
+1281,Silver Gunner Elf,u,7,7,80,1281_silver_elf_gunner,assets/sprites/1281_silver_elf_gunner.swf,assets/thumbs/1281_silver_elf_gunner.jpg,Y,Y
+1282,Dino Rider Elf,u,7,7,80,1282_elf_dino_rider,assets/sprites/1282_elf_dino_rider.swf,assets/thumbs/1282_elf_dino_rider.jpg,Y,Y
+1283,2-Head Frostfire Draggy,u,7,7,83,1283_frost_fire_draggy,assets/sprites/1283_frost_fire_draggy.swf,assets/thumbs/1283_frost_fire_draggy.jpg,Y,Y
+1284,Watcher Hero,u,7,7,80,1284_cyclop_soldier,assets/sprites/1284_cyclop_soldier.swf,assets/thumbs/1284_cyclop_soldier.jpg,Y,Y
+1285,Siege Striker,u,7,7,83,1285_plasma_striker,assets/sprites/1285_plasma_striker.swf,assets/thumbs/1285_plasma_striker.jpg,Y,Y
+1286,Avenger Mech Drone,u,7,7,83,1286_avenger_mech_draggy,assets/sprites/1286_avenger_mech_draggy.swf,assets/thumbs/1286_avenger_mech_draggy.jpg,Y,Y
+1287,Avenger Mech ,u,7,7,80,1287_avenger_mech,assets/sprites/1287_avenger_mech.swf,assets/thumbs/1287_avenger_mech.jpg,Y,Y
+1288,Destruction Wizard,u,7,7,80,1288_destruction_wizard,assets/sprites/1288_destruction_wizard.swf,assets/thumbs/1288_destruction_wizard.jpg,Y,Y
+1289,Executioner Mech Drone,u,7,7,83,1289_executioner_mech_draggy,assets/sprites/1289_executioner_mech_draggy.swf,assets/thumbs/1289_executioner_mech_draggy.jpg,Y,Y
+1290,Executioner Mech ,u,7,7,80,1290_executioner_mech,assets/sprites/1290_executioner_mech.swf,assets/thumbs/1290_executioner_mech.jpg,Y,Y
+1291,Winged Paladin,u,7,7,80,1291_winged_paladin,assets/sprites/1291_winged_paladin.swf,assets/thumbs/1291_winged_paladin.jpg,Y,Y
+1292,Andromeda Private,u,7,7,80,1292_andromeda_private,assets/sprites/1292_andromeda_private.swf,assets/thumbs/1292_andromeda_private.jpg,Y,Y
+1293,Godzilla Mech,u,7,7,80,1293_godzilla_mech,assets/sprites/1293_godzilla_mech.swf,assets/thumbs/1293_godzilla_mech.jpg,Y,Y
+1294,Godzilla Mech Drone,u,7,7,83,1294_godzilla_mech_drone,assets/sprites/1294_godzilla_mech_drone.swf,assets/thumbs/1294_godzilla_mech_drone.jpg,Y,Y
+1295,Andromeda Combat Droid,u,7,7,80,1295_andromeda_combat_droid,assets/sprites/1295_andromeda_combat_droid.swf,assets/thumbs/1295_andromeda_combat_droid.jpg,Y,Y
+1296,Andromeda Spaceship,u,7,7,80,1296_andromeda_combat_spaceship,assets/sprites/1296_andromeda_combat_spaceship.swf,assets/thumbs/1296_andromeda_combat_spaceship.jpg,Y,Y
+1297,King Kong Mech,u,7,7,80,1297_kingKongMech,assets/sprites/1297_kingKongMech.swf,assets/thumbs/1297_kingKongMech.jpg,Y,Y
+1298,King Kong Drone,u,7,7,83,1298_kingKongDrone,assets/sprites/1298_kingKongDrone.swf,assets/thumbs/1298_kingKongDrone.jpg,Y,Y
+1299,Gamera Mech,u,7,7,80,1299_gameraMech,assets/sprites/1299_gameraMech.swf,assets/thumbs/1299_gameraMech.jpg,Y,Y
+1300,Gamera Drone,u,7,7,83,1300_gameraDrone,assets/sprites/1300_gameraDrone.swf,assets/thumbs/1300_gameraDrone.jpg,Y,Y
+1301,Z Project Mech,u,7,7,80,1301_zProjectMech,assets/sprites/1301_zProjectMech.swf,assets/thumbs/1301_zProjectMech.jpg,Y,Y
+1302,Z Project Drone,u,7,7,83,1302_zProjectDrone,assets/sprites/1302_zProjectDrone.swf,assets/thumbs/1302_zProjectDrone.jpg,Y,Y
+1303,Massive Gunner Mech,u,7,7,80,1303_massiveGunnerMech,assets/sprites/1303_massiveGunnerMech.swf,assets/thumbs/1303_massiveGunnerMech.jpg,Y,Y
+1304,Massive Gunner Drone,u,7,7,83,1304_massiveGunnerDrone,assets/sprites/1304_massiveGunnerDrone.swf,assets/thumbs/1304_massiveGunnerDrone.jpg,Y,Y
+1305,Fire Godzilla Mech,u,7,7,80,1305_blackGodzilla_mech,assets/sprites/1305_blackGodzilla_mech.swf,assets/thumbs/1305_blackGodzilla_mech.jpg,Y,Y
+1306,Fire Godzilla Drone,u,7,7,83,1306_blackGodzilla_drone,assets/sprites/1306_blackGodzilla_drone.swf,assets/thumbs/1306_blackGodzilla_drone.jpg,Y,Y
+10000,Chained Bonus + Giant Walker,b,4,45,411,10000_chained_bonus_giant_walker,,,N,N
+10001,Chained Bonus + Red Baron,b,4,45,411,10001_chained_bonus_red_barron,assets/sprites/10001_chained_bonus_red_barron.swf,assets/thumbs/10001_chained_bonus_red_barron.jpg,Y,Y
+10002,Chained Steel Collector,b,4,45,411,10002_chained_junk_bot,assets/sprites/10002_chained_junk_bot.swf,assets/thumbs/10002_chained_junk_bot.jpg,Y,Y
+10003,Chained Dual Blade Automech,b,4,45,411,10003_chained_dual_blade_automech,assets/sprites/10003_chained_dual_blade_automech.swf,assets/thumbs/10003_chained_dual_blade_automech.jpg,Y,Y
+10004,Chained Black Belt Archer,b,4,45,411,10004_chained_transformer_archer,assets/sprites/10004_chained_transformer_archer.swf,assets/thumbs/10004_chained_transformer_archer.jpg,Y,Y
+10005,Chained 30% Off,b,4,45,411,10005_chained_30_off,assets/sprites/10005_chained_30_off.swf,assets/thumbs/10005_chained_30_off.jpg,Y,Y
+10006,Chained Great Shogun Mech,b,4,45,411,10006_chained_samurai_mech,assets/sprites/10006_chained_samurai_mech.swf,assets/thumbs/10006_chained_samurai_mech.jpg,Y,Y
+10007,Chained ATP Mech,b,4,45,411,10007_chained_tetrapod_mech,assets/sprites/10007_chained_tetrapod_mech.swf,assets/thumbs/10007_chained_tetrapod_mech.jpg,Y,Y
+10008,Chained Bonus + Electric Draggy,b,4,45,411,10008_chained_bonus_electric_draggy,assets/sprites/10008_chained_bonus_electric_draggy.swf,assets/thumbs/10008_chained_bonus_electric_draggy.jpg,Y,Y
+10009,Chained Stealth Chest,b,4,45,411,10009_chained_stealth_chest,assets/sprites/10009_chained_stealth_chest.swf,assets/thumbs/10009_chained_stealth_chest.jpg,Y,Y
+10010,Chained 35% Off,b,4,45,411,10010_chained_35_off,assets/sprites/10010_chained_35_off.swf,assets/thumbs/10010_chained_35_off.jpg,Y,Y
+10011,Chained Cannon Mech,b,4,45,411,10011_chained_cannon_mech,assets/sprites/10011_chained_cannon_mech.swf,assets/thumbs/10011_chained_cannon_mech.jpg,Y,Y
+10012,Chained Brutus Mech,b,4,45,411,10012_chained_brutus_mech,assets/sprites/10012_chained_brutus_mech.swf,assets/thumbs/10012_chained_brutus_mech.jpg,Y,Y
+10013,Chained S.W.A.T. Soldier,b,4,45,411,10013_chained_caballero_zodiac,assets/sprites/10013_chained_caballero_zodiac.swf,assets/thumbs/10013_chained_caballero_zodiac.jpg,Y,Y
+10014,Chained Bonus +  Ether Messiah Drone,b,4,45,411,10014_chained_bonus_ether_messiah_drone,assets/sprites/10014_chained_bonus_ether_messiah_drone.swf,assets/thumbs/10014_chained_bonus_ether_messiah_drone.jpg,Y,Y
+10015,Chained Advanced Chest,b,4,45,411,10015_chained_advance_chest,assets/sprites/10015_chained_advance_chest.swf,assets/thumbs/10015_chained_advance_chest.jpg,Y,Y
+10016,Chained 60% Off,b,4,45,411,10016_chained_60_off,assets/sprites/10016_chained_60_off.swf,assets/thumbs/10016_chained_60_off.jpg,Y,Y
+10017,Chained Liquid Mech,b,4,45,411,10017_chained_liquid_mech,assets/sprites/10017_chained_liquid_mech.swf,assets/thumbs/10017_chained_liquid_mech.jpg,Y,Y
+10018,Chained Killer Driller,b,4,45,411,10018_chained_drill,assets/sprites/10018_chained_drill.swf,assets/thumbs/10018_chained_drill.jpg,Y,Y
+10019,Chained Doctor Shock,b,4,45,411,10019_chained_doctor_shock,assets/sprites/10019_chained_doctor_shock.swf,assets/thumbs/10019_chained_doctor_shock.jpg,Y,Y
+10020,Play Social Empires,b,4,45,411,10020_cross_se,assets/sprites/10020_cross_se.swf,assets/thumbs/10020_cross_se.jpg,Y,Y
+10021,Chained Professional Chest,b,4,45,411,10021_chained_professional_pack,assets/sprites/10021_chained_professional_pack.swf,assets/thumbs/10021_chained_professional_pack.jpg,Y,Y
+10022,Chained Red Mercury Dragon,b,4,45,411,10022_chained_dragon_metalic_red,assets/sprites/10022_chained_dragon_metalic_red.swf,assets/thumbs/10022_chained_dragon_metalic_red.jpg,Y,Y
+10023,Chained 90% Bonus,b,4,45,411,10023_chained_90_bonus,assets/sprites/10023_chained_90_bonus.swf,assets/thumbs/10023_chained_90_bonus.jpg,Y,Y
+10024,Chained Super Pack,b,4,45,411,10024_chained_super_pack,assets/sprites/10024_chained_super_pack.swf,assets/thumbs/10024_chained_super_pack.jpg,Y,Y
+10025,Chained Cyber Samurai Mech,b,4,45,411,10025_chained_cyber_samurai_mech,assets/sprites/10025_chained_cyber_samurai_mech.swf,assets/thumbs/10025_chained_cyber_samurai_mech.jpg,Y,Y
+10026,Chained 2-Gun Exobot,b,4,45,411,10026_chained_2_gun_exobot,assets/sprites/10026_chained_2_gun_exobot.swf,assets/thumbs/10026_chained_2_gun_exobot.jpg,Y,Y
+10027,Chained Dark Ether Messiah,b,4,45,411,10027_chained_darck_ether_messiah,assets/sprites/10027_chained_darck_ether_messiah.swf,assets/thumbs/10027_chained_darck_ether_messiah.jpg,Y,Y
+10028,Chained 95% Bonus,b,4,45,411,10028_chained_95_bonus,assets/sprites/10028_chained_95_bonus.swf,assets/thumbs/10028_chained_95_bonus.jpg,Y,Y
+10029,Chained Attack Pack,b,4,45,411,10029_chained_attack_pack,assets/sprites/10029_chained_attack_pack.swf,assets/thumbs/10029_chained_attack_pack.jpg,Y,Y
+10030,Chained Forge Dragon,b,4,45,411,10030_chained_forge_dragon,assets/sprites/10030_chained_forge_dragon.swf,assets/thumbs/10030_chained_forge_dragon.jpg,Y,Y
+10031,Chained Converter Wizard,b,4,45,411,10031_chained_enemy_converter,assets/sprites/10031_chained_enemy_converter.swf,assets/thumbs/10031_chained_enemy_converter.jpg,Y,Y
+10032,Chained Bonus + Red Mercury Draggy,b,4,45,411,10032_chained_bonus_red_mercury_draggy,assets/sprites/10032_chained_bonus_red_mercury_draggy.swf,assets/thumbs/10032_chained_bonus_red_mercury_draggy.jpg,Y,Y
+10033,Chained Swamp Monster,b,4,45,411,10033_chained_nebula_monster,assets/sprites/10033_chained_nebula_monster.swf,assets/thumbs/10033_chained_nebula_monster.jpg,Y,Y
+10034,Chained Hercules Mech,b,4,45,411,10034_chained_hercules_mech,,,N,N
+10035,Chained Double Cannon Mech,b,4,45,411,10035_chained_double_cannon_mech,assets/sprites/10035_chained_double_cannon_mech.swf,assets/thumbs/10035_chained_double_cannon_mech.jpg,Y,Y
+10036,Chained Laser Blade Automech,b,4,45,411,10036_chained_laser_blade_automech,assets/sprites/10036_chained_laser_blade_automech.swf,assets/thumbs/10036_chained_laser_blade_automech.jpg,Y,Y
+10037,Chained Burning Slayer,b,4,45,411,10037_chained_red_slayer,assets/sprites/10037_chained_red_slayer.swf,assets/thumbs/10037_chained_red_slayer.jpg,Y,Y
+10038,Chained Karateka Gunner,b,4,45,411,10038_chained_karateka_gunner,assets/sprites/10038_chained_karateka_gunner.swf,assets/thumbs/10038_chained_karateka_gunner.jpg,Y,Y
+10039,Chained Demolition Pack,b,4,45,411,10039_chained_demolition_pack,assets/sprites/10039_chained_demolition_pack.swf,assets/thumbs/10039_chained_demolition_pack.jpg,Y,Y
+10040,Chained Half Price Party Weekend,b,4,45,411,10040_chained_half_party_price_party_weekend,assets/sprites/10040_chained_half_party_price_party_weekend.swf,,Y,N
+10041,Chained Prime Automech,b,4,45,411,10041_chained_optimus_prime,assets/sprites/10041_chained_optimus_prime.swf,assets/thumbs/10041_chained_optimus_prime.jpg,Y,Y
+10042,Chained Revolution Bonus 99,b,4,45,411,10042_chained_revolution_bonus_99,assets/sprites/10042_chained_revolution_bonus_99.swf,assets/thumbs/10042_chained_revolution_bonus_99.jpg,Y,Y
+10043,Chained Retaliator Pack,b,4,45,411,10043_chained_retaliator_pack,assets/sprites/10043_chained_retaliator_pack.swf,assets/thumbs/10043_chained_retaliator_pack.jpg,Y,Y
+10044,Chained Big Razor Mech,b,4,45,411,10044_chained_big_razor_mech,assets/sprites/10044_chained_big_razor_mech.swf,assets/thumbs/10044_chained_big_razor_mech.jpg,Y,Y
+10045,Chained 150% Extra Cash,b,4,45,411,10045_chained_150_extra_cash,assets/sprites/10045_chained_150_extra_cash.swf,assets/thumbs/10045_chained_150_extra_cash.jpg,Y,Y
+10046,Chained 40% Off,b,4,45,411,10046_chained_40_off,assets/sprites/10046_chained_40_off.swf,assets/thumbs/10046_chained_40_off.jpg,Y,Y
+10047,Chained Destruction Pack,b,4,45,411,10047_chained_destruction_pack,assets/sprites/10047_chained_destruction_pack.swf,assets/thumbs/10047_chained_destruction_pack.jpg,Y,Y
+10048,Play Dragon City,b,4,45,411,10048_cross_dc,,,N,N
+10049,Chained Dark Ether Messiah + Dual Blade Automech ,b,4,45,411,10049_chained_dark_ether_messiah_dual_blade_automech,assets/sprites/10049_chained_dark_ether_messiah_dual_blade_automech.swf,assets/thumbs/10049_chained_dark_ether_messiah_dual_blade_automech.jpg,Y,Y
+10050,Chained Spartan Warrior,b,4,45,411,10050_chained_spartan_warrior,assets/sprites/10050_chained_spartan_warrior.swf,assets/thumbs/10050_chained_spartan_warrior.jpg,Y,Y
+10051,Chained Assault Pack,b,4,45,411,10051_chained_assault_pack,assets/sprites/10051_chained_assault_pack.swf,assets/thumbs/10051_chained_assault_pack.jpg,Y,Y
+10052,Chained Proto Winged Mech,b,4,45,411,10052_chained_widged_transformer,assets/sprites/10052_chained_widged_transformer.swf,assets/thumbs/10052_chained_widged_transformer.jpg,Y,Y
+10053,Chained Spider Bot,b,4,45,411,10053_chained_spider_bot,assets/sprites/10053_chained_spider_bot.swf,assets/thumbs/10053_chained_spider_bot.jpg,Y,Y
+10054,Chained 100% Bonus + Draggy,b,4,45,411,10054_100_bonus_draggy,assets/sprites/10054_100_bonus_draggy.swf,assets/thumbs/10054_100_bonus_draggy.jpg,Y,Y
+10055,Chained Ambush Chest,b,4,45,411,10055_chained_ambush_chest,assets/sprites/10055_chained_ambush_chest.swf,assets/thumbs/10055_chained_ambush_chest.jpg,Y,Y
+10056,Chained Pharaoh Warrior Mech ,b,4,45,411,10056_chained_egyptian_warrior_mech,assets/sprites/10056_chained_egyptian_warrior_mech.swf,assets/thumbs/10056_chained_egyptian_warrior_mech.jpg,Y,Y
+10057,Chained Arachnid Mech,b,4,45,411,10057_chained_transformer_aracnid,assets/sprites/10057_chained_transformer_aracnid.swf,assets/thumbs/10057_chained_transformer_aracnid.jpg,Y,Y
+10058,Chained 95% Bonus Cash + Fire Karateka,b,4,45,411,10058_chained_95bonus_fire_karateka,assets/sprites/10058_chained_95bonus_fire_karateka.swf,assets/thumbs/10058_chained_95bonus_fire_karateka.jpg,Y,Y
+10059,Chained 35% Bonus Cash + Blue Steel Draggy,b,4,45,411,10059_chained_35bonus_blue_steel_draggy,assets/sprites/10059_chained_35bonus_blue_steel_draggy.swf,assets/thumbs/10059_chained_35bonus_blue_steel_draggy.jpg,Y,Y
+10060,Chained Storm Pack,b,4,45,411,10060_chained_storm_pack,assets/sprites/10060_chained_storm_pack.swf,assets/thumbs/10060_chained_storm_pack.jpg,Y,Y
+10061,Chained Black Brutus Mech,b,4,45,411,10061_chained_black_brutus_mech,assets/sprites/10061_chained_black_brutus_mech.swf,assets/thumbs/10061_chained_black_brutus_mech.jpg,Y,Y
+10062,Chained 2-Head Frostfire Dragon,b,4,45,411,10062_chained_2head_frostfire_dragon,assets/sprites/10062_chained_2head_frostfire_dragon.swf,assets/thumbs/10062_chained_2head_frostfire_dragon.jpg,Y,Y
+10063,Chained Multi Morpher,b,4,45,411,10063_chained_multi_morph,assets/sprites/10063_chained_multi_morph.swf,assets/thumbs/10063_chained_multi_morph.jpg,Y,Y
+10064,Chained Watcher Hero,b,4,45,411,10064_chained_cyclop_soldier,assets/sprites/10064_chained_cyclop_soldier.swf,assets/thumbs/10064_chained_cyclop_soldier.jpg,Y,Y
+10065,Chained Combat Chest,b,4,45,411,10065_chained_combat_chest,assets/sprites/10065_chained_combat_chest.swf,assets/thumbs/10065_chained_combat_chest.jpg,Y,Y
+10066,Chained Avenger Mech,b,4,45,411,10066_chained_avenger_mech,assets/sprites/10066_chained_avenger_mech.swf,assets/thumbs/10066_chained_avenger_mech.jpg,Y,Y
+10067,Chained 60% OFF + Electric Draggy,b,4,45,411,10067_chained_60off_electric_draggy,assets/sprites/10067_chained_60off_electric_draggy.swf,assets/thumbs/10067_chained_60off_electric_draggy.jpg,Y,Y
+10068,Chained 125% Bonus + Dark Ether Drone,b,4,45,411,10068_chained_125off_dark_messiah_drone,assets/sprites/10068_chained_125off_dark_messiah_drone.swf,assets/thumbs/10068_chained_125off_dark_messiah_drone.jpg,Y,Y
+10069,Chained Golden Slayer + M. Cannon Mech,b,4,45,411,10069_chained_goldenslayer_cannonmech,assets/sprites/10069_chained_goldenslayer_cannonmech.swf,assets/thumbs/10069_chained_goldenslayer_cannonmech.jpg,Y,Y
+10070,Chained 75% Bonus,b,4,45,411,10070_chained_75bonus,assets/sprites/10070_chained_75bonus.swf,assets/thumbs/10070_chained_75bonus.jpg,Y,Y
+10071,Chained Executioner Mech,b,4,45,411,10071_chained_executioner_mech,assets/sprites/10071_chained_executioner_mech.swf,assets/thumbs/10071_chained_executioner_mech.jpg,Y,Y
+10072,Chained Battle Chest,b,4,45,411,10072_chained_battle_chest,assets/sprites/10072_chained_battle_chest.swf,assets/thumbs/10072_chained_battle_chest.jpg,Y,Y
+10073,Chained 125% Extra Cash,b,4,45,411,10073_chained_125_extra_cash,assets/sprites/10073_chained_125_extra_cash.swf,assets/thumbs/10073_chained_125_extra_cash.jpg,Y,Y
+10074,Chained Killer Chest,b,4,45,411,10074_chained_killer_chest,assets/sprites/10074_chained_killer_chest.swf,assets/thumbs/10074_chained_killer_chest.jpg,Y,Y
+10075,Chained Godzilla Mech,b,4,45,411,10075_chained_godzillaMech,assets/sprites/10075_chained_godzillaMech.swf,assets/thumbs/10075_chained_godzillaMech.jpg,Y,Y
+10076,Chained 110% Bonus,b,4,45,411,10076_chained_110Bonus,assets/sprites/10076_chained_110Bonus.swf,assets/thumbs/10076_chained_110Bonus.jpg,Y,Y
+10077,Chained King Kong Mech,b,4,45,411,10077_chained_kingKongMech,assets/sprites/10077_chained_kingKongMech.swf,assets/thumbs/10077_chained_kingKongMech.jpg,Y,Y
+10078,Dragon City,b,4,45,411,10078_dragonCity_cross,assets/sprites/10078_dragonCity_cross.swf,assets/thumbs/10078_dragonCity_cross.jpg,Y,Y
+10079,Chained Power Bot Chest,b,4,45,411,10079_chained_powerBotChest,assets/sprites/10079_chained_powerBotChest.swf,assets/thumbs/10079_chained_powerBotChest.jpg,Y,Y
+10080,Chained Dark Ether M. + Laser B. Automech,b,4,45,411,10080_chained_darkEtherM_LaserBAutomech,assets/sprites/10080_chained_darkEtherM_LaserBAutomech.swf,assets/thumbs/10080_chained_darkEtherM_LaserBAutomech.jpg,Y,Y
+10081,Chained Gamera Mech,b,4,45,411,10081_chained_gameraMech,assets/sprites/10081_chained_gameraMech.swf,assets/thumbs/10081_chained_gameraMech.jpg,Y,Y
+10082,Chained Mecha Dragons Chest,b,4,45,411,10082_chained_mechaDragonsChest,assets/sprites/10082_chained_mechaDragonsChest.swf,assets/thumbs/10082_chained_mechaDragonsChest.jpg,Y,Y
+10083,Chained Double Cannon M. + Big Razor M.,b,4,45,411,10083_chained_doubleCannonM_bigRazorM,assets/sprites/10083_chained_doubleCannonM_bigRazorM.swf,assets/thumbs/10083_chained_doubleCannonM_bigRazorM.jpg,Y,Y
+10084,Chained 60% Bonus,b,4,45,411,10084_chained_60bonus,assets/sprites/10084_chained_60bonus.swf,assets/thumbs/10084_chained_60bonus.jpg,Y,Y
+10085,Chained Z Project Mech,b,4,45,411,10085_chained_zProjectMech,assets/sprites/10085_chained_zProjectMech.swf,assets/thumbs/10085_chained_zProjectMech.jpg,Y,Y
+10086,Chained Full Metal Chest,b,4,45,411,10086_chained_fullMetalChest,assets/sprites/10086_chained_fullMetalChest.swf,assets/thumbs/10086_chained_fullMetalChest.jpg,Y,Y
+10087,Chained Great Shogun Mech + Brutus Mech,b,4,45,411,10087_chained_greatShogunMech_brutusMech,assets/sprites/10087_chained_greatShogunMech_brutusMech.swf,assets/thumbs/10087_chained_greatShogunMech_brutusMech.jpg,Y,Y
+10088,Chained Massive Gunner Mech,b,4,45,411,10088_chained_massiveGunnerMech,assets/sprites/10088_chained_massiveGunnerMech.swf,assets/thumbs/10088_chained_massiveGunnerMech.jpg,Y,Y
+10089,"Chained x2,5 Cash Offer",b,4,45,411,10089_chained_x2_5CashOffer,assets/sprites/10089_chained_x2_5CashOffer.swf,assets/thumbs/10089_chained_x2_5CashOffer.jpg,Y,Y
+10090,Chained Fire Godzilla Mech,b,4,45,411,10090_chained_fireGodzillaMech,assets/sprites/10090_chained_fireGodzillaMech.swf,assets/thumbs/10090_chained_fireGodzillaMech.jpg,Y,Y
