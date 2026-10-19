@@ -1,0 +1,374 @@
+{
+ "note": "Service endpoints and their request/response contract, recovered from core/Config.as and every ServiceManager.callService() call site in the decompiled client.",
+ "counts": {
+  "endpoints": 25,
+  "endpointsWithCallSites": 13,
+  "totalCallSites": 18,
+  "allianceEndpoints": 11,
+  "betsEndpoints": 3,
+  "errorCodes": 17
+ },
+ "allianceErrorCodes": [
+  {
+   "constant": "ERR_SYS_UNKNOWN",
+   "code": 1
+  },
+  {
+   "constant": "ERR_SYS_MISSING_ARGS",
+   "code": 2
+  },
+  {
+   "constant": "ERR_SYS_INVALID_ARG",
+   "code": 3
+  },
+  {
+   "constant": "ERR_SYS_USER_NOT_EXIST",
+   "code": 4
+  },
+  {
+   "constant": "ERR_ALLIANCE_EXISTS",
+   "code": 100
+  },
+  {
+   "constant": "ERR_ALLIANCE_NOT_EXISTS",
+   "code": 101
+  },
+  {
+   "constant": "ERR_ALLIANCE_CREATE",
+   "code": 102
+  },
+  {
+   "constant": "ERR_ALLIANCE_OWNER_SWITCH",
+   "code": 103
+  },
+  {
+   "constant": "ERR_MEMBER_NOT_OWNER",
+   "code": 200
+  },
+  {
+   "constant": "ERR_MEMBER_BELONGS",
+   "code": 201
+  },
+  {
+   "constant": "ERR_MEMBER_NOT_BELONGS",
+   "code": 202
+  },
+  {
+   "constant": "ERR_MEMBER_KICK",
+   "code": 203
+  },
+  {
+   "constant": "ERR_MEMBER_LIMIT",
+   "code": 204
+  },
+  {
+   "constant": "ERR_WRONG_COUNTRY",
+   "code": 205
+  },
+  {
+   "constant": "ERR_JOIN_SEND",
+   "code": 300
+  },
+  {
+   "constant": "ERR_JOIN_PROCESS",
+   "code": 301
+  },
+  {
+   "constant": "ERR_JOIN_NOT_EXIST",
+   "code": 302
+  }
+ ],
+ "services": [
+  {
+   "constant": "SERVICE_GET_GAME_CONFIG",
+   "path": "get_game_config.php",
+   "callSites": []
+  },
+  {
+   "constant": "SERVICE_GET_PLAYER_INFO",
+   "path": "get_player_info.php",
+   "callSites": []
+  },
+  {
+   "constant": "SERVICE_REGISTER_FOUND_ITEM",
+   "path": "register_found_item.php",
+   "callSites": []
+  },
+  {
+   "constant": "SERVICE_LOAD_CONTINENT",
+   "path": "get_continent.php",
+   "callSites": []
+  },
+  {
+   "constant": "SERVICE_LOAD_CONTINENT_RANKING",
+   "path": "get_continent_ranking.php",
+   "callSites": []
+  },
+  {
+   "constant": "SERVICE_LOAD_FBID_WORLD",
+   "path": "get_user_world.php",
+   "callSites": []
+  },
+  {
+   "constant": "SERVICE_COMMAND",
+   "path": "command.php",
+   "callSites": []
+  },
+  {
+   "constant": "SERVICE_CLEAN_ASSAULTS",
+   "path": "clean_assaults.php",
+   "callSites": []
+  },
+  {
+   "constant": "SERVICE_GET_USER_PROFILE",
+   "path": "get_public_player_info.php",
+   "callSites": []
+  },
+  {
+   "constant": "SERVICE_GET_CHOSE_SEX",
+   "path": "set_sex_player.php",
+   "callSites": []
+  },
+  {
+   "constant": "SERVICE_REPORT_ERROR",
+   "path": "report_error_init.php",
+   "callSites": [
+    {
+     "file": "core/Base.as",
+     "requestParams": [
+      "user_id",
+      "message"
+     ],
+     "responseFields": [
+      "toString"
+     ]
+    },
+    {
+     "file": "core/Base.as",
+     "requestParams": [
+      "user_id",
+      "message",
+      "stacktrace"
+     ],
+     "responseFields": []
+    },
+    {
+     "file": "core/Base.as",
+     "requestParams": [
+      "user_id",
+      "message",
+      "stacktrace"
+     ],
+     "responseFields": [
+      "toString"
+     ]
+    }
+   ]
+  },
+  {
+   "constant": "SERVICE_ALLIANCE_CREATE",
+   "path": "alliance/?method=alliance-create",
+   "callSites": [
+    {
+     "file": "popups/alliances/PopupCreateAlliance.as",
+     "requestParams": [
+      "userId",
+      "title",
+      "description",
+      "bestUnit"
+     ],
+     "responseFields": []
+    }
+   ]
+  },
+  {
+   "constant": "SERVICE_ALLIANCE_UPDATE",
+   "path": "alliance/?method=alliance-update",
+   "callSites": [
+    {
+     "file": "popups/alliances/PopupCreateAlliance.as",
+     "requestParams": [
+      "userId",
+      "description"
+     ],
+     "responseFields": []
+    }
+   ]
+  },
+  {
+   "constant": "SERVICE_ALLIANCE_INFO",
+   "path": "alliance/?method=alliance-info",
+   "callSites": [
+    {
+     "file": "data/AllianceInfo.as",
+     "requestParams": [],
+     "responseFields": [
+      "success"
+     ]
+    }
+   ]
+  },
+  {
+   "constant": "SERVICE_ALLIANCE_LIST",
+   "path": "alliance/?method=alliance-list",
+   "callSites": []
+  },
+  {
+   "constant": "SERVICE_ALLIANCE_FIND",
+   "path": "alliance/?method=alliance-find",
+   "callSites": [
+    {
+     "file": "popups/alliances/JoinState.as",
+     "requestParams": [
+      "userId",
+      "pageNo",
+      "title",
+      "perPage",
+      "openOnly",
+      "userCountry"
+     ],
+     "responseFields": []
+    }
+   ]
+  },
+  {
+   "constant": "SERVICE_ALLIANCE_JOIN_SEND",
+   "path": "alliance/?method=join-request-send",
+   "callSites": [
+    {
+     "file": "popups/alliances/AllianceInfoRendererItem.as",
+     "requestParams": [
+      "userId",
+      "allianceId",
+      "bestUnit"
+     ],
+     "responseFields": []
+    }
+   ]
+  },
+  {
+   "constant": "SERVICE_ALLIANCE_JOIN_LIST",
+   "path": "alliance/?method=join-request-list",
+   "callSites": []
+  },
+  {
+   "constant": "SERVICE_ALLIANCE_JOIN_PROCESS",
+   "path": "alliance/?method=join-request-process",
+   "callSites": [
+    {
+     "file": "popups/alliances/AllianceState.as",
+     "requestParams": [
+      "userId",
+      "memberId",
+      "status"
+     ],
+     "responseFields": []
+    },
+    {
+     "file": "popups/alliances/AllianceState.as",
+     "requestParams": [
+      "userId",
+      "memberId",
+      "status"
+     ],
+     "responseFields": []
+    }
+   ]
+  },
+  {
+   "constant": "SERVICE_ALLIANCE_MEMBER_LIST",
+   "path": "alliance/?method=member-list",
+   "callSites": [
+    {
+     "file": "popups/alliances/PopupSendAllianceMessage.as",
+     "requestParams": [
+      "userId",
+      "idsOnly"
+     ],
+     "responseFields": []
+    }
+   ]
+  },
+  {
+   "constant": "SERVICE_ALLIANCE_MEMBER_LEAVE",
+   "path": "alliance/?method=member-leave",
+   "callSites": [
+    {
+     "file": "popups/alliances/AllianceState.as",
+     "requestParams": [
+      "userId"
+     ],
+     "responseFields": []
+    }
+   ]
+  },
+  {
+   "constant": "SERVICE_ALLIANCE_MEMBER_KICK",
+   "path": "alliance/?method=member-kick",
+   "callSites": [
+    {
+     "file": "popups/alliances/AllianceState.as",
+     "requestParams": [
+      "userId",
+      "memberId"
+     ],
+     "responseFields": []
+    }
+   ]
+  },
+  {
+   "constant": "SERVICE_BETS_GET_BETS_LIST",
+   "path": "bets/get_bets_list.php",
+   "callSites": [
+    {
+     "file": "data/MarketplaceInfo.as",
+     "requestParams": [
+      "user_id",
+      "level"
+     ],
+     "responseFields": []
+    },
+    {
+     "file": "data/MarketplaceUnitInfo.as",
+     "requestParams": [
+      "user_id",
+      "level"
+     ],
+     "responseFields": []
+    }
+   ]
+  },
+  {
+   "constant": "SERVICE_BETS_GET_BET_DETAIL",
+   "path": "bets/get_bet_detail.php",
+   "callSites": [
+    {
+     "file": "data/MarketplaceUnitInfo.as",
+     "requestParams": [
+      "uuid",
+      "checkFinish"
+     ],
+     "responseFields": []
+    },
+    {
+     "file": "popups/marketplace/PopupMarketplaceUnit.as",
+     "requestParams": [
+      "uuid"
+     ],
+     "responseFields": []
+    }
+   ]
+  },
+  {
+   "constant": "SERVICE_BETS_SET_BET",
+   "path": "bets/set_bet.php",
+   "callSites": [
+    {
+     "file": "popups/marketplace/PopupMarketplaceUnit.as",
+     "requestParams": [],
+     "responseFields": []
+    }
+   ]
+  }
+ ]
+}
