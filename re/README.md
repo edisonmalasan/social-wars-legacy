@@ -61,7 +61,8 @@
 | **13** | [Goal System](docs/13-goal-system.md) | 34 goal types, 134 goals — and the finding that the config's goal table is **not Social Wars content at all**. | 53 kB |
 | **14** | [UI Screen Inventory](docs/14-ui-screen-inventory.md) | The 260 UI classes as the modern client's rebuild backlog: 698 strings, 122 image gaps. | 7 kB |
 | **15** | [Social Layer Contracts](docs/15-social-layer-contracts.md) | All 11 alliance variants, 3 betting endpoints and 17 error codes, recovered from the client. | 8 kB |
-| **16** | [SWF Corpus](docs/16-swf-corpus.md) | All 1 176 SWFs characterised — and only **67** of them contain any real code. | 7 kB |
+| **16** | [SWF Corpus](docs/16-swf-corpus.md) | All 1 176 SWFs characterised - and only **67** of them contain any real code. | 7 kB |
+| **17** | [Asset Pipeline](docs/17-asset-pipeline.md) | How the Flash art becomes renderable frames: the export mode, the 93% duplicate rate, and the deduplicating converter. | 10 kB |
 
 ### 2.2 Machine-readable
 
