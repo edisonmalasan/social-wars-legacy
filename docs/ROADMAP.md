@@ -405,6 +405,11 @@ CI run. ✔ met
 **Status:** The conversion pipeline is built and measured. The full run, the trim, the
 atlas packing and the audio/font work remain.
 
+**Measured on a 30-file sample** (`node scripts/convert-assets.mjs --group sprites --limit 30
+--jobs 3`): 230 symbols, **8 245 PNG frames written, 2 024 unique images** — 75.4 % of the
+frames are duplicates of another frame, because an animation holds each drawing for many
+ticks. 414.5 MB of raw PNG becomes a **233.6 MB** content-addressed store, in 107 s.
+
 See [`../re/docs/17-asset-pipeline.md`](../re/docs/17-asset-pipeline.md).
 
 **Exit criteria:** every shippable item id renders in the viewer with no missing frame.
