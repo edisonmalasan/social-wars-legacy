@@ -357,12 +357,30 @@ CI run. ✔ met
 
 *Outcome: the game's art and audio exist as non-Flash, renderable, versioned artefacts.*
 
-- [ ] All **1 116 SWF files outside `assets/flash/`** (376.4 MB: 862 sprites, 205 FX, 26
-      character, 10 magic, 9 intro/image, 2 font, `dynamic2.swf`, 1 externalised) are
-      converted to PNG frame sequences with a frame table naming each (sprite, frame) pair —
-      `ffdec -export frame`, **not** `-export shape` (whose fills are base64 PNG patterns,
-      not paths)
-- [ ] Frames are packed into atlases with a manifest mapping sprite + frame → atlas region
+- [x] The corpus is characterised: every SWF parsed natively and classified as `real` (67),
+      `stub` (1 108) or `none` (1), with its SHA-256, frame rate, frame count and tag
+      composition — [`../re/data/swf-corpus.json`](../re/data/swf-corpus.json)
+- [x] The **export mode is settled by measurement**, not assumption: a sprite SWF is a
+      *library* of nested `DefineSprite` timelines (the 862 sprites have a **median of one**
+      top-level frame), so `ffdec -export frame` throws the art away — **1 PNG** where
+      `ffdec -export sprite` gives **170** across 4 symbol directories
+- [x] The frames are **deduplicated by content hash** before anything is packed: a 43 KB
+      sprite exports to 170 PNGs (7.3 MB) containing only **12** distinct images, because
+      an animation holds each drawing for many ticks
+- [x] The conversion is **batched**: FFDec accepts a *directory* of inputs, so the ~6 s JVM
+      start-up is amortised across a batch instead of being paid 1 116 times
+- [x] `scripts/convert-assets.mjs` converts, deduplicates and emits the frame manifest
+      (`re/data/frame-manifest.json`), mapping every (swf, symbol, frame) to a
+      content-addressed image
+- [x] The `DefineSprite` symbol names are preserved verbatim, because they encode the
+      game's own animation-state vocabulary (`…_fla.DG_andarTcopy_3` = "and attack, copy,
+      frame 3")
+- [ ] The full run over all **1 116 SWF files outside `assets/flash/`** is executed and the
+      complete manifest is committed — the converter is proven on a measured sample
+- [ ] Frames are **trimmed** to their alpha bounding box, and the bounding box is recorded,
+      so the renderer can place a sprite without transparent padding
+- [ ] The unique images are **packed into atlases**, with a manifest mapping
+      (sprite, animation state, frame) → atlas region
 - [ ] The 58 `Basesec_1.5.x.swf` builds (239.7 MB) are handled separately: `Basesec_1.5.4.swf`
       is the only one converted (it is the reference client, not game art)
 - [ ] The 1 314 thumbnails are indexed by item id and served as the inventory icon set
@@ -375,10 +393,19 @@ CI run. ✔ met
       resolved, or permanently documented as unavailable with a visual fallback
 - [ ] The 722 asset files unreferenced by the config are triaged: adopted, archived, or
       documented
+- [ ] The 4 sprites above the 4 KiB ABC threshold are audited — they may hold real
+      per-frame logic rather than `stop()` calls
+- [ ] `assets/swf/dynamic2.swf` is decompiled — it is the one remaining unanalysed code
+      artefact and the client loads it at runtime
 - [ ] A viewer exists that renders every item at 3 zoom levels, so missing art is visible
       immediately
 - [ ] The client can be built with a **content-hashed** asset bundle, so a stale cache is
       impossible
+
+**Status:** The conversion pipeline is built and measured. The full run, the trim, the
+atlas packing and the audio/font work remain.
+
+See [`../re/docs/17-asset-pipeline.md`](../re/docs/17-asset-pipeline.md).
 
 **Exit criteria:** every shippable item id renders in the viewer with no missing frame.
 

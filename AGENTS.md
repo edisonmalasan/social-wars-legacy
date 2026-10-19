@@ -104,8 +104,12 @@ full rationale is in `docs/ROADMAP.md` ("Locked Decisions & Non-Negotiables")._
 4. **The 8-slot resource vector is `[energy, xp, gold, wood, oil, steel, cash, mana]`.**
    Verified live against a real client session. Preserve this order in any wire format.
 5. **The `command.php` wire format is `<64 hex chars>;<JSON>`, where the hex is
-   `HMAC-SHA256("4vVSD8dftv6hdfb1Hnk9", payload)`.** Verified live. The compatibility
-   shim must reproduce it exactly; the native protocol does not need to use it.
+   `HMAC-SHA256(<server key>, payload)`.** Verified live. **The key rotated once**, at
+   client build 1.4.28: `3m0d3pwiupoetn7ysa02` for builds 1.4.5–1.4.27 and
+   `4vVSD8dftv6hdfb1Hnk9` for 1.4.28–1.5.4. The live-verified key is the **rotated** one.
+   The compatibility shim must reproduce the framing exactly **and accept both keys**,
+   because unmodified original clients span both eras. See
+   [`re/docs/10-client-version-history.md`](re/docs/10-client-version-history.md).
 6. **`flash_debug` must not exist** in the new server. It overwrites the whole wallet from
    client arguments.
 7. **No authentication may be inherited from upstream.** `USERID` came from the request
