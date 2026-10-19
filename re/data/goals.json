@@ -1,0 +1,5207 @@
+{
+  "note": "Goal specifications extracted from the decompiled AS3 client.",
+  "goalTypes": [
+    {
+      "class": "AbstractGoal",
+      "trigger": "Abstract base class. Every concrete goal is constructed with an integer goal id; the base constructor fetches the localized strings for that id from TranslationGoals and resets the progress counters (_currentStep = 0, _steps = 1).",
+      "progressMetric": "_currentStep (int) out of _steps (int). Subclasses override the getters or increment _currentStep from an event handler.",
+      "completionCondition": "isCompleted() returns _currentStep >= _steps. checkComplete() dispatches the 'complete' signal, persists the state and deactivates the goal. Progress is persisted by save(), which queues a 'set_goals' command carrying [visited ? 1 : 0, currentStep].",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "The reward is NOT decided here: GoalManager.addGoal() parses the third constructor argument of addGoal and assigns it through the rewards setter. Every goal registered in this client is registered with the literal 10, which parseReward() turns into RewardResource(COST_GOLD, 10) - i.e. 10 gold.",
+      "instanceCount": 0,
+      "goalIds": []
+    },
+    {
+      "class": "Goal",
+      "trigger": "Interface (core/goals/Goal.as). Declares the contract implemented by AbstractGoal; not instantiable.",
+      "progressMetric": "Declares get currentStep() and get numSteps().",
+      "completionCondition": "Declares isCompleted(), activate()/deactivate(), initialize(), save(), finish(), resetGoal(), deliverReward().",
+      "reward": {
+        "gold": 0,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": "Not a registered goal type - no reward is ever attached to it."
+      },
+      "configIds": [],
+      "notes": "Interface only - it is not a goal type that can be registered.",
+      "instanceCount": 0,
+      "goalIds": []
+    },
+    {
+      "class": "GoalLiterals",
+      "trigger": "Not a goal. Dynamic data holder for the six localized strings of one goal.",
+      "progressMetric": "n/a - holds TITLE(0), INTRO(1), DESCRIPTION(2), INSTRUCTIONS(3), HINT(4), COMPLETE(5).",
+      "completionCondition": "n/a.",
+      "reward": {
+        "gold": 0,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": "Not a registered goal type - no reward is ever attached to it."
+      },
+      "configIds": [],
+      "notes": "Every HINT literal in TranslationGoals.as is an empty string, so the 'hint' field of the goal UI is always blank; the playable instructions live in the INSTRUCTIONS literal.",
+      "instanceCount": 0,
+      "goalIds": []
+    },
+    {
+      "class": "TranslationGoals",
+      "trigger": "Not a goal. Static dictionary of goal texts keyed by goal id (140 entries).",
+      "progressMetric": "n/a.",
+      "completionCondition": "n/a.",
+      "reward": {
+        "gold": 0,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": "Not a registered goal type - no reward is ever attached to it."
+      },
+      "configIds": [],
+      "notes": "Contains 6 ids that are never registered as goals (98, 105, 114, 122, 128, 140) and lacks 12 ids that the config does contain (2, 7, 12, 15, 35, 38, 68, 75, 76, 77, 78, 83).",
+      "instanceCount": 0,
+      "goalIds": []
+    },
+    {
+      "class": "GoalAction",
+      "trigger": "The generic UI action signal Base.Main.actionTriggered (Signal(int)). Only ACTION_ZOOM (0) and ACTION_MULTISELECT (1) are ever dispatched (core/Base.as:2411, core/Base.as:6737).",
+      "progressMetric": "Count of actionTriggered events whose action id equals the goal's action id.",
+      "completionCondition": "_currentStep >= _steps. Goal 6 (LET'S ZOOM!) requires 8 zoom actions.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "The action id is matched client-side; the server has to know that zoom (action 0) and multi-select (action 1) are the only dispatched actions to reproduce the counter.",
+      "instanceCount": 1,
+      "goalIds": [
+        6
+      ]
+    },
+    {
+      "class": "GoalAddAllies",
+      "trigger": "Not an engine event: the goal fires when the player closes the goal-information popup (AbstractGoal.onPopupclosed, invoked from popups/PopupGoals.as:828, 846, 957).",
+      "progressMetric": "Binary - _currentStep is set to 1.",
+      "completionCondition": "Completes the moment the goal info popup is closed. The handler also calls Base.Main.gotoInvite(), which opens the FB invite flow.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "Goal 85 (CALL YOUR ALLIES!) is therefore completed by opening the invite dialog, not by an actual alliance being formed.",
+      "instanceCount": 1,
+      "goalIds": [
+        85
+      ]
+    },
+    {
+      "class": "GoalAlliesMarketTrade",
+      "trigger": "Base.Iso.alliesMarketTrade, dispatched by IsoBuilding.collect() when the player collects from the Allies Market (core/isoengine/IsoBuilding.as:1135).",
+      "progressMetric": "Per-resource cumulative amount received from the Allies Market, matched against the requested amounts (sign-consistent, |received| >= |requested|).",
+      "completionCondition": "Intended: all requested resource amounts collected. Actual code (GoalAlliesMarketTrade.as:62) computes _currentStep = (param1 < this.tradesLength) ? 0 : 1, comparing an Object to an int. The comparison is always false, so _currentStep is always 1 and the goal completes on the very first Allies-Market collection regardless of the requested amount.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "VERIFIED BUG in the original client. Goal 84 (OBTAIN WOOD IN THE ALLIES MARKET, {\"w\":500}) is therefore completed by a single collection. A faithful re-implementation should decide whether to reproduce the bug.",
+      "instanceCount": 1,
+      "goalIds": [
+        84
+      ]
+    },
+    {
+      "class": "GoalAssistNeighbourBuilding",
+      "trigger": "Base.Iso.neighbourBuildingAssisted, dispatched when the player helps a neighbour finish a building (core/isoengine/IsoInteractiveElement.as:818).",
+      "progressMetric": "Count of assist events.",
+      "completionCondition": "_currentStep >= _steps. Goal 81 (HELP A FRIEND!) requires 5 assists.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "The handler does not check that the assisted building belongs to a friend, nor that it is the player's own map.",
+      "instanceCount": 1,
+      "goalIds": [
+        81
+      ]
+    },
+    {
+      "class": "GoalAttackPlayer",
+      "trigger": "Assault.attackEnd, dispatched with {win, opponent, voluntary} when an assault finishes (battle/Assault.as:430-436).",
+      "progressMetric": "Count of qualifying assaults.",
+      "completionCondition": "_currentStep >= numAttacks. An event is discarded when param1.voluntary is true (the player aborted the assault - Assault.bVoluntaryEnd is set in popups/PopupAttackFinished.as:491), when victoryNeeded is set and the assault was not won, or when friends is set and the opponent is NOT in the friend list (Base.Main.getAllFriends()).",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "Goal 52 = attack any player once (any outcome, never an aborted assault). Goal 65 = defeat 3 players (victory required). Goal 57 = defeat 1 friend (victory required AND the opponent must be a friend). The friend test uses param1.opponent.fbid.",
+      "instanceCount": 3,
+      "goalIds": [
+        52,
+        57,
+        65
+      ]
+    },
+    {
+      "class": "GoalBuildId",
+      "trigger": "Base.Iso.elementBuilt, dispatched for every finished building (IsoEngine.buildingBuilt) and every finished unit (IsoEngine.unitBuilt) - core/isoengine/IsoEngine.as:571-579.",
+      "progressMetric": "Count of built elements whose item id is in the goal's id list and whose PlayerID is PLAYER_SELF.",
+      "completionCondition": "_currentStep >= steps.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        22,
+        23,
+        24,
+        25,
+        28,
+        31,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        62,
+        63,
+        64,
+        65,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        90,
+        91,
+        108,
+        110,
+        135,
+        140,
+        932,
+        1008,
+        1014,
+        1022
+      ],
+      "notes": "updateOnActivate: when true (or automatically when any of the ids is a depot, an HQ, or has a per-id building limit > 0 - GoalBuildId.as:50) the goal re-scans the buildings already on the map at activation time and counts them. The remaining constructor arguments (storeCategory, storeSubcategory, storePosition, eTrainBuilding) are pure UI hints used by PopupGoals to deep-link into the store or the training screen; they have no effect on completion.",
+      "instanceCount": 68,
+      "goalIds": [
+        1,
+        9,
+        18,
+        22,
+        24,
+        25,
+        30,
+        31,
+        33,
+        34,
+        36,
+        39,
+        41,
+        44,
+        46,
+        51,
+        59,
+        61,
+        67,
+        69,
+        70,
+        72,
+        73,
+        79,
+        82,
+        86,
+        89,
+        91,
+        92,
+        93,
+        95,
+        97,
+        99,
+        100,
+        102,
+        103,
+        104,
+        106,
+        107,
+        108,
+        109,
+        111,
+        112,
+        113,
+        115,
+        116,
+        117,
+        119,
+        120,
+        121,
+        123,
+        124,
+        125,
+        127,
+        129,
+        131,
+        132,
+        133,
+        135,
+        136,
+        137,
+        139,
+        141,
+        143,
+        144,
+        146,
+        147,
+        148
+      ]
+    },
+    {
+      "class": "GoalBuildProperty",
+      "trigger": "Base.Iso.elementBuilt.",
+      "progressMetric": "Count of built elements carrying a given item property (PropertyManager.WORKER, FARM, DECORATION, TOWER).",
+      "completionCondition": "_currentStep >= steps.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "updateOnActivate makes the goal re-scan the existing buildings at activation time (GoalBuildProperty.as:28-37). Used for goal 8 (train 2 workers), 19 (train 2 more workers), 3 (build 1 farm), 27 (build 3 decorations) and 80 (build 8 towers).",
+      "instanceCount": 5,
+      "goalIds": [
+        3,
+        8,
+        19,
+        27,
+        80
+      ]
+    },
+    {
+      "class": "GoalCollect",
+      "trigger": "Base.Iso.elemCollected, dispatched when the player collects from a building/resource node (core/isoengine/IsoEngine.as:566).",
+      "progressMetric": "Count of collect events on elements that have the given property (RESOURCE for veins and trees, DEPOT for factories) and whose building.collect_type equals the resource code.",
+      "completionCondition": "_currentStep >= steps.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "Resource codes come from Constants.COST_*: 'g' gold, 'w' wood, 'o' oil, 's' steel. Goal 5 = 1 wood, 28 = 7 wood, 23 = 3 gold, 50 = 10 gold, 29 = 10 oil, 14 = 3 steel; goals 21/54/53 = 1 collection from the gold/oil/steel factory.",
+      "instanceCount": 9,
+      "goalIds": [
+        5,
+        14,
+        21,
+        23,
+        28,
+        29,
+        50,
+        53,
+        54
+      ]
+    },
+    {
+      "class": "GoalCompleteChapter",
+      "trigger": "ChapterManager.chapterFinished (Signal(int)) or, at activation, the already-completed check Base.Main.currentQuestId > chapterId (core/goals/GoalCompleteChapter.as:32-40).",
+      "progressMetric": "Binary.",
+      "completionCondition": "The dispatched chapter id equals the goal's chapter id.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "Chapter ids come from ChapterManager: 1 = CHAPTER_01_KEY, 2 = CHAPTER_02_GUILLE, 3 = CHAPTER_03_BAZOOKA, 4 = CHAPTER_04_JEEPS, 5 = CHAPTER_05_SIEGE_CONVENTIONAL, 6 = CHAPTER_06_MEGATANK, 7 = CHAPTER_07_SIEGE_ELEPHANT, 8 = CHAPTER_08_LURKER, 9 = CHAPTER_09_SIMPLE. The client ships 9 chapters (Config.NUM_CHAPTERS = 9, core/Config.as:156) but the goal texts of ids 130/138/145/150 refer to chapters 9/10/11/12, and the texts for the real chapters 5-8 live under the six never-registered text ids 98/105/114/122/128/140. The spawnChapter flag (only goal 17) additionally opens the mission briefing when the goal popup is closed.",
+      "instanceCount": 8,
+      "goalIds": [
+        17,
+        74,
+        94,
+        130,
+        138,
+        145,
+        150,
+        152
+      ]
+    },
+    {
+      "class": "GoalCompleteQuest",
+      "trigger": "Quest.questEnd (Signal(Object)) or, at activation, the already-completed check Base.Player.questsRank[Quest.questIds.indexOf(questId)] != undefined (core/goals/GoalCompleteQuest.as:28-38).",
+      "progressMetric": "Binary.",
+      "completionCondition": "The quest that ended has the goal's quest id, its difficulty is >= minDifficulty, and (when winRequired) it was won.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "Quest ids are Quest.QUEST_* strings '100000001'..'100000012' (missions) plus the hardcore series. minDifficulty defaults to 1 and winRequired defaults to true; GoalManager never overrides them, so every registered quest goal requires a win at difficulty >= 1. The play order is Quest.questIds (quest/Quest.as:192): [WEEKLY_01, QUEST_01, QUEST_06, QUEST_03, QUEST_04, QUEST_05, QUEST_02, QUEST_07, QUEST_08, QUEST_09, QUEST_10, QUEST_11, QUEST_12, ...]. Quests 02 and 06 therefore carry constant names that do not match their play position, and the goal texts (which use the play position) look 'swapped' against the constant names - but are not.",
+      "instanceCount": 11,
+      "goalIds": [
+        66,
+        90,
+        96,
+        101,
+        110,
+        118,
+        126,
+        134,
+        142,
+        149,
+        151
+      ]
+    },
+    {
+      "class": "GoalContainer",
+      "trigger": "Composite goal: it owns a list of sub-goals and subscribes to their progress and complete signals.",
+      "progressMetric": "currentStep is the SUM of the sub-goals' currentStep; numSteps is the SUM of their numSteps.",
+      "completionCondition": "isCompleted() is true only when EVERY sub-goal is completed.",
+      "reward": {
+        "gold": 0,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": "Not a registered goal type - no reward is ever attached to it."
+      },
+      "configIds": [],
+      "notes": "Not instantiated anywhere in GoalManager (0 registered goals) - it exists for the tutorial/mission chain and is rendered by PopupGoals through the SubGoal1/2/3 movie clips.",
+      "instanceCount": 0,
+      "goalIds": []
+    },
+    {
+      "class": "GoalDailyBouns",
+      "trigger": "Base.Iso.dailyBounsWon (Signal(int, BuildingReference)) - the daily bonus bag was claimed.",
+      "progressMetric": "Count of daily-bonus claims.",
+      "completionCondition": "_currentStep >= day.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "The constructor sets _currentStep = 1, so goal 48 (GET DAILY BONUS!, day = 3) needs only 2 further claims after activation. The day count is NOT derived from a calendar in the client.",
+      "instanceCount": 1,
+      "goalIds": [
+        48
+      ]
+    },
+    {
+      "class": "GoalDoubleClick",
+      "trigger": "Base.Iso.doubleClick, dispatched from IsoInteractiveElement.doubleClickItem (core/isoengine/IsoInteractiveElement.as:733).",
+      "progressMetric": "Count of double-clicks on the map.",
+      "completionCondition": "_currentStep >= 1.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "Goal 16 (DOUBLE CLICK). No object-type filter: any double-click counts.",
+      "instanceCount": 1,
+      "goalIds": [
+        16
+      ]
+    },
+    {
+      "class": "GoalExpand",
+      "trigger": "Base.Iso.tilePurchased, dispatched by IsoTerrain when a map tile is bought (core/isoengine/IsoTerrain.as:563).",
+      "progressMetric": "Count of purchased tiles.",
+      "completionCondition": "_currentStep >= steps. Goal 63 (EXPAND 1 MORE ACRE) requires 1 purchase.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "The payload is the tile id, which the goal ignores.",
+      "instanceCount": 1,
+      "goalIds": [
+        63
+      ]
+    },
+    {
+      "class": "GoalHarbor",
+      "trigger": "Quest.questEnd, or the already-completed check Base.Player.questsRank[1] != undefined (core/goals/GoalHarbor.as:28).",
+      "progressMetric": "Binary.",
+      "completionCondition": "Any quest ending completes the goal (the handler does not look at the quest id).",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "Goal 26 (THE BAZOOKA KILLER (MISSION 1)). Side effect: when the goal popup is closed the goal spawns 12 'unallied' units next to the small harbour (queued as CmdBuy) and plays the first-mission cutscene.",
+      "instanceCount": 1,
+      "goalIds": [
+        26
+      ]
+    },
+    {
+      "class": "GoalMarketTrade",
+      "trigger": "Base.Iso.marketTrade, dispatched by PopupMarket.onTrade with the trade payload (popups/PopupMarket.as:101).",
+      "progressMetric": "Per-resource cumulative traded volume. A positive target means 'buy' and a negative target means 'sell'; a trade only counts when the sign matches and |traded| >= |target|, and the remaining target is decremented otherwise.",
+      "completionCondition": "tradesAlreadyMade == tradesLength, i.e. every requested resource amount has been traded in the right direction.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "Goal 55 = buy 200 steel ({\"s\":200}), 56 = buy 100 wood ({\"w\":100}), 62 = sell 100 wood ({\"w\":-100}).",
+      "instanceCount": 3,
+      "goalIds": [
+        55,
+        56,
+        62
+      ]
+    },
+    {
+      "class": "GoalModifyPlayerStats",
+      "trigger": "Base.Resources.playerStatsModified, dispatched by ResourceManager whenever the player's resource vector changes (managers/ResourceManager.as:175, 252, 298).",
+      "progressMetric": "Per-resource cumulative delta, matched against the requested deltas with the same sign/magnitude rule as GoalMarketTrade.",
+      "completionCondition": "statsAlreadyModified >= statsLength.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "Goal 45 (SPEND 1 CASH) uses {\"c\":-1}: the player must *lose* 1 cash. NOTE: the handler also executes this.stats[key] -= delta after the key was deleted (GoalModifyPlayerStats.as:56), which re-creates the key with the value NaN; the goal still completes, but the remaining-target bookkeeping is not clean.",
+      "instanceCount": 1,
+      "goalIds": [
+        45
+      ]
+    },
+    {
+      "class": "GoalMove",
+      "trigger": "Base.Iso.buildingMoved, dispatched by Base when a building is relocated with the move tool (core/Base.as:3980).",
+      "progressMetric": "Count of moved buildings carrying the given property.",
+      "completionCondition": "_currentStep >= steps. Goal 32 (MOVE A WALL) requires 1 wall move.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "The signal is dispatched for the selected building; the goal filters on property 'wall' and PLAYER_SELF.",
+      "instanceCount": 1,
+      "goalIds": [
+        32
+      ]
+    },
+    {
+      "class": "GoalOpenPopup",
+      "trigger": "Base.PopUp.popupOpened, dispatched whenever a popup is opened.",
+      "progressMetric": "Binary.",
+      "completionCondition": "The opened popup class equals the goal's popup class.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "Goal 47 = open the inventory popup (PopupInventory), goal 58 = open the assault history popup (PopupAssaultHistory).",
+      "instanceCount": 2,
+      "goalIds": [
+        47,
+        58
+      ]
+    },
+    {
+      "class": "GoalPopUnit",
+      "trigger": "Base.Iso.unitPopped, dispatched when a unit is removed from a building (core/isoengine/IsoEngine.as:551).",
+      "progressMetric": "Count of units taken out of a matching building.",
+      "completionCondition": "_currentStep >= steps. Goal 13 (GET WORKER OUT OF GOLD FACTORY) requires 1.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [
+        5,
+        9,
+        13,
+        17
+      ],
+      "notes": "The building filter accepts an id list, a delegate class or a property; the unit filter accepts an id list or a property. PLAYER_SELF is enforced for both.",
+      "instanceCount": 1,
+      "goalIds": [
+        13
+      ]
+    },
+    {
+      "class": "GoalPushUnit",
+      "trigger": "Base.Iso.unitPushed, dispatched when a unit enters a building (core/isoengine/IsoEngine.as:556).",
+      "progressMetric": "Count of units placed into a matching building.",
+      "completionCondition": "_currentStep >= steps. Every registered GoalPushUnit requires exactly 1.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "notes": "Goals 20/10/43/88 = put a worker into a wood/gold/steel/oil factory (all four levels of each factory count), 4 = put a worker into a farm, 37 = put a ground unit into a bunker.",
+      "instanceCount": 6,
+      "goalIds": [
+        4,
+        10,
+        20,
+        37,
+        43,
+        88
+      ]
+    },
+    {
+      "class": "GoalReachPopulation",
+      "trigger": "Base.Player.populationModified.",
+      "progressMetric": "The ABSOLUTE current population (Base.Player.iPopulationCurrent), not a counter. The constructor already seeds _currentStep with the current population.",
+      "completionCondition": "_currentStep >= target population. Goal 49 (REACH POPULATION 40) requires 40.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "The handler only updates the counter while Base.Main.gameMode == Constants.GAME_MODE_NORMAL (1), so population changes made while visiting a neighbour or during an assault do not count.",
+      "instanceCount": 1,
+      "goalIds": [
+        49
+      ]
+    },
+    {
+      "class": "GoalSelectTime",
+      "trigger": "Base.Iso.timeSelected, dispatched when the player picks a production time on a multi-collectable building (core/isoengine/IsoEngine.as:561).",
+      "progressMetric": "Count of time selections on a matching building.",
+      "completionCondition": "_currentStep >= steps. Every registered GoalSelectTime requires 1.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "A selection matches when the element has the building property, its collect_type equals the resource code, and the chosen slot index (loaded.attrs.cp) is >= timeIdx. timeIdx is 0 in every registered goal, so any slot qualifies.",
+      "instanceCount": 3,
+      "goalIds": [
+        11,
+        42,
+        87
+      ]
+    },
+    {
+      "class": "GoalSocialBuildingOpened",
+      "trigger": "Base.Iso.socialBuildingOpened, dispatched when a social building is opened (core/isoengine/IsoBuilding.as:1136 for the Allies Market, core/isoengine/delegates/buildings/AlliesBuildingDelegate.as:27 for the Allies Building).",
+      "progressMetric": "Binary.",
+      "completionCondition": "The opened building's item id equals the goal's building id.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [
+        61
+      ],
+      "notes": "Goal 71 (CALL FOR REINFORCEMENTS) targets ID_BUILDING_ALLIES_BUILDING (item id 61). The goal does not check PLAYER_SELF.",
+      "instanceCount": 1,
+      "goalIds": [
+        71
+      ]
+    },
+    {
+      "class": "GoalSpy",
+      "trigger": "Assault.spyEnd, dispatched with the spied player's profile object when the spy popup is closed (battle/Assault.as:667).",
+      "progressMetric": "Count of completed spy operations.",
+      "completionCondition": "_currentStep >= steps. Goal 64 (USE RECON CENTER) requires 1.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "The handler skips events whose payload has a truthy 'voluntary' field, but the spy payload (a player profile) has no such field, so every spy end counts.",
+      "instanceCount": 1,
+      "goalIds": [
+        64
+      ]
+    },
+    {
+      "class": "GoalStoreItem",
+      "trigger": "Base.Iso.itemStored, dispatched when a building is moved into storage (core/Base.as:4982).",
+      "progressMetric": "Count of stored items matching the property or the id list.",
+      "completionCondition": "_currentStep >= steps. Goal 60 (STORE A DECORATION) requires 1 decoration.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "VERIFIED BUG: deactivate() calls Base.Iso.itemStored.add(this.onItemStored) instead of .remove(...) (core/goals/GoalStoreItem.as:46), so the listener is never detached and a duplicate is registered on every deactivation.",
+      "instanceCount": 1,
+      "goalIds": [
+        60
+      ]
+    },
+    {
+      "class": "GoalVisitNeighbour",
+      "trigger": "Base.Iso.neighbourVisited, dispatched with the visited friend's id when the player enters a neighbour's map (core/Base.as:6887).",
+      "progressMetric": "Count of visited neighbours.",
+      "completionCondition": "If a friend-id list is supplied the visited id must be in the list; otherwise every visit counts. The step count is 1 when the third constructor argument is true, otherwise the length of the id list.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": ""
+      },
+      "configIds": [],
+      "notes": "Goal 40 (VISIT YOUR GENERAL!) supplies the list [100000030, 100000031] with steps = 1. The signal is declared Signal(String) and Base.as dispatches a String, but the handler parameter is typed int, so AS3 coerces the numeric string before the comparison.",
+      "instanceCount": 1,
+      "goalIds": [
+        40
+      ]
+    },
+    {
+      "class": "AbstractReward",
+      "trigger": "Not a goal. Base class of the reward objects; a Sprite that can be rendered in the goal-complete popup.",
+      "progressMetric": "n/a.",
+      "completionCondition": "n/a.",
+      "reward": {
+        "gold": 0,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": "Not a registered goal type - no reward is ever attached to it."
+      },
+      "configIds": [],
+      "notes": "deliver() is a no-op in the base class; info() returns an empty string. The concrete rewards are delivered by AbstractGoal.deliverReward(), which then queues the 'complete_goal' command.",
+      "instanceCount": 0,
+      "goalIds": []
+    },
+    {
+      "class": "RewardElement",
+      "trigger": "Not a goal. Reward that grants a building or a unit.",
+      "progressMetric": "n/a - it holds an item id and an amount.",
+      "completionCondition": "n/a.",
+      "reward": {
+        "gold": 0,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": "Not a registered goal type - no reward is ever attached to it."
+      },
+      "configIds": [],
+      "notes": "deliver() creates a BuildingReference for the item and calls Base.Main.storeItem(), i.e. the item is placed in the player's storage. Not used by any registered goal in this client - all 134 goals are registered with the integer 10, which parseReward() converts into a RewardResource.",
+      "instanceCount": 0,
+      "goalIds": []
+    },
+    {
+      "class": "RewardResource",
+      "trigger": "Not a goal. Reward that grants an amount of one resource.",
+      "progressMetric": "n/a - it holds a resource code (Constants.COST_*) and an amount.",
+      "completionCondition": "n/a.",
+      "reward": {
+        "gold": 0,
+        "cash": 0,
+        "xp": 0,
+        "items": [],
+        "notes": "Not a registered goal type - no reward is ever attached to it."
+      },
+      "configIds": [],
+      "notes": "deliver() shows a floating particle; the actual grant travels with the 'complete_goal' command (commands/CmdCompleteGoal.as), which forwards the amount and the resource code. All 134 goals use RewardResource(COST_GOLD, 10) = 10 gold.",
+      "instanceCount": 0,
+      "goalIds": []
+    }
+  ],
+  "goals": [
+    {
+      "id": 1,
+      "title": "BUILD A HOUSE",
+      "description": "Houses allow you to increase the max population (little black guy icon at the top-right of the screen) you can put on your camp. The more houses, the more soldiers you'll be able to train!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Houses' and click on 'House I'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Build a farm",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          1
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        1
+      ],
+      "source": "managers/GoalManager.as:49"
+    },
+    {
+      "id": 18,
+      "title": "BUILD A WOOD FACTORY",
+      "description": "You need wood to train soldiers and construct buildings. The wood factory will help you on this purpose!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Factories' and click on the 'Wood Factory I'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Build 5 farms",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          2
+        ],
+        "updateOnActivate": false,
+        "storeCategory": 1,
+        "storeSubcategory": 12,
+        "storePosition": 1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        2
+      ],
+      "source": "managers/GoalManager.as:51"
+    },
+    {
+      "id": 6,
+      "title": "LET'S ZOOM!",
+      "description": "Zoom is very useful to see what's on your map.",
+      "hint": "",
+      "instructions": "Move the wheel on the mouse or the slider on the botton right of the screen.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalAction",
+      "steps": 8,
+      "inConfig": true,
+      "notes": "Counts Base.Main.actionTriggered events with ACTION_ZOOM == 0.",
+      "configTitle": "Build another Farm",
+      "configTitleMatchesClient": false,
+      "params": {
+        "action": 0,
+        "actionName": "ACTION_ZOOM"
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:53"
+    },
+    {
+      "id": 8,
+      "title": "TRAIN 2 WORKERS",
+      "description": "You need workers to work on the factories. Let's train some of them!",
+      "hint": "",
+      "instructions": "Click on the Command Center and then click 2 times on the 'BUY FOR' button on the lower interface to train 2 of them.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildProperty",
+      "steps": 2,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Build a barracks",
+      "configTitleMatchesClient": false,
+      "params": {
+        "property": "worker",
+        "updateOnActivate": false
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:55"
+    },
+    {
+      "id": 20,
+      "title": "SEND 1 WORKER TO WOOD FACTORY",
+      "description": "Send the worker to the wood factory to start producing some wood!",
+      "hint": "",
+      "instructions": "Click on a worker and then click on the wood factory.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalPushUnit",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Build 1 gold mine",
+      "configTitleMatchesClient": false,
+      "params": {
+        "buildingIds": [
+          2,
+          6,
+          10,
+          14
+        ],
+        "unitProperty": "worker"
+      },
+      "configIds": [
+        2,
+        6,
+        10,
+        14
+      ],
+      "source": "managers/GoalManager.as:57"
+    },
+    {
+      "id": 11,
+      "title": "SELECT WORKING TIME",
+      "description": "You can set how long the working schedule of your workers will be.",
+      "hint": "",
+      "instructions": "Click on the Wood Factory and select one of the options displayed in the pop-up window to produce wood.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalSelectTime",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Bring a villager to the mill",
+      "configTitleMatchesClient": false,
+      "params": {
+        "buildingProperty": "depot",
+        "resource": "w",
+        "timeIdx": 0
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:59"
+    },
+    {
+      "id": 23,
+      "title": "EXTRACT 3 GOLD",
+      "description": "You need gold to train soldiers and construct buildings! Look for gold veins on the map and get more gold.",
+      "hint": "",
+      "instructions": "Select a worker and click on a gold vein on the map to mine it. Remember you can zoom in/out on the map using the mouse wheel.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCollect",
+      "steps": 3,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Train 3 light archers",
+      "configTitleMatchesClient": false,
+      "params": {
+        "property": "resource",
+        "resource": "g"
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:61"
+    },
+    {
+      "id": 9,
+      "title": "BUILD A GOLD FACTORY",
+      "description": "The Gold Factory will provide you with nice amounts of gold!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Factories' and click on the 'Gold Factory I'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Train 3 spearmen",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          5
+        ],
+        "updateOnActivate": false,
+        "storeCategory": 1,
+        "storeSubcategory": 12,
+        "storePosition": 2,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        5
+      ],
+      "source": "managers/GoalManager.as:63"
+    },
+    {
+      "id": 10,
+      "title": "SEND WORKER TO GOLD FACTORY",
+      "description": "To start making gold, we need to tell workers to go to the factory!",
+      "hint": "",
+      "instructions": "Click on a worker and then click on the gold factory.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalPushUnit",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Build a mill",
+      "configTitleMatchesClient": false,
+      "params": {
+        "buildingIds": [
+          5,
+          9,
+          13,
+          17
+        ],
+        "unitProperty": "worker"
+      },
+      "configIds": [
+        5,
+        9,
+        13,
+        17
+      ],
+      "source": "managers/GoalManager.as:65"
+    },
+    {
+      "id": 87,
+      "title": "SELECT WORKING TIME",
+      "description": "You can set how long the working schedule of your workers will be.",
+      "hint": "",
+      "instructions": "Click on the Gold Factory and select one of the options displayed in the pop-up window to produce gold.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalSelectTime",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Destroy 75 enemy buildings",
+      "configTitleMatchesClient": false,
+      "params": {
+        "buildingProperty": "depot",
+        "resource": "g",
+        "timeIdx": 0
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:67"
+    },
+    {
+      "id": 24,
+      "title": "BUILD BAZOOKA ACADEMY",
+      "description": "A Bazooka Academy will let you train Bazooka soldiers. This will greatly improve your army!!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Attack > Soldiers' and click on the 'Bazooka Academy I'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Kill 5 trolls",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          31
+        ],
+        "updateOnActivate": false,
+        "storeCategory": 4,
+        "storeSubcategory": 31,
+        "storePosition": 2,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        31
+      ],
+      "source": "managers/GoalManager.as:69"
+    },
+    {
+      "id": 25,
+      "title": "TRAIN 3 LIGHT BAZOOKA",
+      "description": "Let's train some light bazooka soldiers!",
+      "hint": "",
+      "instructions": "Click on the Bazooka Academy and then click 3 times on the 'BUY FOR' button at the lower interface.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 3,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Visit 1 friend's empire",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          1008
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": 31
+      },
+      "configIds": [
+        1008,
+        31
+      ],
+      "source": "managers/GoalManager.as:71"
+    },
+    {
+      "id": 16,
+      "title": "DOUBLE CLICK",
+      "description": "Double-clicking is super useful to select units at once.",
+      "hint": "",
+      "instructions": "Select the soldiers you just trained with a double click.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalDoubleClick",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Bring a sheep to the ranch",
+      "configTitleMatchesClient": false,
+      "params": {},
+      "configIds": [],
+      "source": "managers/GoalManager.as:73"
+    },
+    {
+      "id": 17,
+      "title": "RESCUE YOUR COMRADES!",
+      "description": "It's time to fight, soldier! Defeat all the enemies and free our soldiers who were taken hostage by the enemy!",
+      "hint": "",
+      "instructions": "Defeat all the enemies on the map to save your soldiers!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCompleteChapter",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Collect a sheep ranch",
+      "configTitleMatchesClient": false,
+      "params": {
+        "chapterId": 1,
+        "chapterConst": "CHAPTER_01_KEY",
+        "spawnChapter": true
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:75"
+    },
+    {
+      "id": 19,
+      "title": "TRAIN 2 MORE WORKERS",
+      "description": "Let's train some workers for coming tasks.",
+      "hint": "",
+      "instructions": "Click on the Command Center and then on the BUY FOR button on the lower interface to train a worker.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildProperty",
+      "steps": 2,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Build 8 houses",
+      "configTitleMatchesClient": false,
+      "params": {
+        "property": "worker",
+        "updateOnActivate": false
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:77"
+    },
+    {
+      "id": 5,
+      "title": "CUT TREES AND GET WOOD",
+      "description": "Wood is vital to construct buildings and train units!",
+      "hint": "",
+      "instructions": "Click on a worker and then on a tree. Then get the wood!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCollect",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Cut 7 trees and collect wood",
+      "configTitleMatchesClient": false,
+      "params": {
+        "property": "resource",
+        "resource": "w"
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:79"
+    },
+    {
+      "id": 41,
+      "title": "BUILD A STEEL FACTORY",
+      "description": "Steel is needed to construct buildings and units.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Factories' and click on the 'Steel Factory I'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Obtain Troll's Treasure",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          4
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        4
+      ],
+      "source": "managers/GoalManager.as:81"
+    },
+    {
+      "id": 43,
+      "title": "ADD WORKER TO STEEL FACTORY",
+      "description": "The steel factory needs a worker to start producing steel.",
+      "hint": "",
+      "instructions": "Select a worker and then click on the steel factory.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalPushUnit",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Expand to 2 acres",
+      "configTitleMatchesClient": false,
+      "params": {
+        "buildingIds": [
+          4,
+          8,
+          12,
+          16
+        ],
+        "unitProperty": "worker"
+      },
+      "configIds": [
+        4,
+        8,
+        12,
+        16
+      ],
+      "source": "managers/GoalManager.as:83"
+    },
+    {
+      "id": 42,
+      "title": "SELECT STEEL TO BUILD",
+      "description": "Choose how much steel you want at the set time.",
+      "hint": "",
+      "instructions": "Click on the Steel Factory and select one of the options to produce steel.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalSelectTime",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Extract 10 of stone",
+      "configTitleMatchesClient": false,
+      "params": {
+        "buildingProperty": "depot",
+        "resource": "s",
+        "timeIdx": 0
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:85"
+    },
+    {
+      "id": 85,
+      "title": "CALL YOUR ALLIES!",
+      "description": "If you have allies, you'll have more fun and it will be much easier for you to get resources, units or open buildings!",
+      "hint": "",
+      "instructions": "Select some of your friends and click on the 'SEND INVITE' button.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalAddAllies",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Reach 150 population",
+      "configTitleMatchesClient": false,
+      "params": {},
+      "configIds": [],
+      "source": "managers/GoalManager.as:87"
+    },
+    {
+      "id": 40,
+      "title": "VISIT YOUR GENERAL!",
+      "description": "Visit the General's portrait to see how it's going on his camp!",
+      "hint": "",
+      "instructions": "Click on the General portrait at the lower interface.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalVisitNeighbour",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "The friend-id list [100000030, 100000031] is compared against a String payload that AS3 coerces to int. UNVERIFIED: which friends those two ids are is not determinable from the client.",
+      "configTitle": "Destory 5 enemy buildings",
+      "configTitleMatchesClient": false,
+      "params": {
+        "friendIds": [
+          100000030,
+          100000031
+        ]
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:89"
+    },
+    {
+      "id": 30,
+      "title": "BUILD 2 TURRETS NEAR COMMAND CENTER",
+      "description": "Turrets are very effective defensive means against both ground and flying enemies!",
+      "hint": "If you click on a turret once it is put on the map, a dynamic radius will display its shooting range!",
+      "instructions": "Go to 'BUILD > Defense > Turrets' and click on the 'Turret I'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 2,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Kill 7 trolls",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          22
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        22
+      ],
+      "source": "managers/GoalManager.as:91"
+    },
+    {
+      "id": 31,
+      "title": "BUILD A WALL",
+      "description": "Walls are very effective to difficult ground units from entering your camp.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Defense > Walls and click on the 'Wall I'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Put a name to your Empire",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          23
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        23
+      ],
+      "source": "managers/GoalManager.as:93"
+    },
+    {
+      "id": 32,
+      "title": "MOVE A WALL",
+      "description": "Reallocating your buildings, decorations, turrets, etc is very easy!",
+      "hint": "",
+      "instructions": "Click on the MultiTool at the lower right interface to unfold different cursor options. Select the MOVE icon and then click on a Wall to move it.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalMove",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Harvest 10 trees",
+      "configTitleMatchesClient": false,
+      "params": {
+        "buildingProperty": "wall"
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:95"
+    },
+    {
+      "id": 3,
+      "title": "BUILD A CORN FIELD",
+      "description": "Field we'll provide you with gold quite easily!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Fields & Farms' and click on 'Corn Field'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildProperty",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Send a villager to the farm",
+      "configTitleMatchesClient": false,
+      "params": {
+        "property": "farm",
+        "updateOnActivate": false
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:97"
+    },
+    {
+      "id": 4,
+      "title": "SEND WORKER TO FIELD",
+      "description": "Don't let your workers be idle, otherwise they will become lazier and lazier!",
+      "hint": "",
+      "instructions": "Select a worker and then click on the Corn Field you built before.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalPushUnit",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Collect a farm",
+      "configTitleMatchesClient": false,
+      "params": {
+        "buildingProperty": "farm",
+        "unitProperty": "worker"
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:99"
+    },
+    {
+      "id": 13,
+      "title": "GET WORKER OUT OF GOLD FACTORY",
+      "description": "Sometimes you may need a worker to perform other tasks. That's why you can also get them out from factories.",
+      "hint": "",
+      "instructions": "Click on the Gold Factory, and click on the worker's portrait at the lower interface.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalPopUnit",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Kill 3 trolls",
+      "configTitleMatchesClient": false,
+      "params": {
+        "buildingIds": [
+          5,
+          9,
+          13,
+          17
+        ],
+        "unitProperty": "worker"
+      },
+      "configIds": [
+        5,
+        9,
+        13,
+        17
+      ],
+      "source": "managers/GoalManager.as:101"
+    },
+    {
+      "id": 14,
+      "title": "EXTRACT 3 STEEL",
+      "description": "Steel will allow you to construct Buildings, and this means more and better units to win the war!",
+      "hint": "",
+      "instructions": "Click on a worker and then click again on a steel vein on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCollect",
+      "steps": 3,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Build a sheep ranch",
+      "configTitleMatchesClient": false,
+      "params": {
+        "property": "resource",
+        "resource": "s"
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:103"
+    },
+    {
+      "id": 26,
+      "title": "THE BAZOOKA KILLER (MISSION 1)",
+      "description": "There's a nearby enemy that is plotting to attack us. Let's fight now before he reaches us!",
+      "hint": "",
+      "instructions": "Click on the World icon at the lower right and click on 'Missions World'. Now choose the first mission!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalHarbor",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "Side effect: closing the goal popup spawns 12 unallied units at the harbour and starts the first-mission cutscene (GoalHarbor.as:47-74).",
+      "configTitle": "Destroy an enemy building",
+      "configTitleMatchesClient": false,
+      "params": {},
+      "configIds": [],
+      "source": "managers/GoalManager.as:105"
+    },
+    {
+      "id": 36,
+      "title": "BUILD A BUNKER",
+      "description": "Bunkers are good deffensive means to protect your camp.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Defense > Bunkers' and click on 'Bunker I'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Collect 5 farms",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          50
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        50
+      ],
+      "source": "managers/GoalManager.as:107"
+    },
+    {
+      "id": 37,
+      "title": "MOVE UNIT TO BUNKER",
+      "description": "Bunkers are worth nothing unless you put soldiers inside them!",
+      "hint": "",
+      "instructions": "Select a soldier and click on the bunker to put him inside it.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalPushUnit",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Reach 25 population",
+      "configTitleMatchesClient": false,
+      "params": {
+        "buildingProperty": "bunker",
+        "unitProperty": "ft_ground"
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:109"
+    },
+    {
+      "id": 29,
+      "title": "COLLECT 10 OIL",
+      "description": "You need oil to construct buildings.",
+      "hint": "",
+      "instructions": "Check the map and find some oil veins. Click on a worker and then on an oil vein to mine it.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCollect",
+      "steps": 10,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Move multiple units at once",
+      "configTitleMatchesClient": false,
+      "params": {
+        "property": "resource",
+        "resource": "o"
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:111"
+    },
+    {
+      "id": 22,
+      "title": "BUILD 4 MORE HOUSES",
+      "description": "Build more houses so you can mak your army bigger.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Houses' and click on 'House I'. Then put the 4 houses on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 4,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Build an archery",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          1
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        1
+      ],
+      "source": "managers/GoalManager.as:113"
+    },
+    {
+      "id": 27,
+      "title": "BUILD 3 DECORATIONS",
+      "description": "Decorations will make your soldiers and workers happier and proud to be part of your army!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Decorations' and choose the decoration you like the most. Then put 3 of them on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildProperty",
+      "steps": 3,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Build an stable",
+      "configTitleMatchesClient": false,
+      "params": {
+        "property": "decoration",
+        "updateOnActivate": false
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:115"
+    },
+    {
+      "id": 28,
+      "title": "CHOP DOWN 7 MORE TREES",
+      "description": "Chop down more trees to get wood so that you can train more units!",
+      "hint": "",
+      "instructions": "Select a worker and then click on 7 trees. Then get the wood resources.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCollect",
+      "steps": 7,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Build 5 decorations",
+      "configTitleMatchesClient": false,
+      "params": {
+        "property": "resource",
+        "resource": "w"
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:117"
+    },
+    {
+      "id": 33,
+      "title": "BUILD A JEEP GARAGE",
+      "description": "Make your army more powerful building a Jeep Garage!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Attack > Vehicles' and click on the 'Jeep Garage I'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Capture a cow",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          40
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        40
+      ],
+      "source": "managers/GoalManager.as:119"
+    },
+    {
+      "id": 34,
+      "title": "TRAIN 3 MACHINE GUN JEEPS",
+      "description": "Let's build some Machine Gun Jeeps!",
+      "hint": "",
+      "instructions": "Click on the 'Jeep Garage I' and then click 3 times on the 'BUY FOR' button at the lower interface.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 3,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Build a cow ranch",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          1014
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        1014
+      ],
+      "source": "managers/GoalManager.as:121"
+    },
+    {
+      "id": 51,
+      "title": "BUILD AN OIL FACTORY",
+      "description": "The Oil Factory will allow you to produce oil in order to build vehicles.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Factories' and click on the 'Oil Factory I'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Capture 3 sheeps",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          3
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        3
+      ],
+      "source": "managers/GoalManager.as:123"
+    },
+    {
+      "id": 88,
+      "title": "SEND WORKER TO OIL FACTORY",
+      "description": "Don't let your workers to iddle, otherwise they will become lazier and lazier!",
+      "hint": "",
+      "instructions": "Select a worker and then click on the Oil Factory you built before.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalPushUnit",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Build a university",
+      "configTitleMatchesClient": false,
+      "params": {
+        "buildingIds": [
+          3,
+          7,
+          11,
+          15
+        ],
+        "unitProperty": "worker"
+      },
+      "configIds": [
+        3,
+        7,
+        11,
+        15
+      ],
+      "source": "managers/GoalManager.as:125"
+    },
+    {
+      "id": 21,
+      "title": "COLLECT GOLD FACTORY",
+      "description": "Pick up the gold produced on the gold factory.",
+      "hint": "",
+      "instructions": "Click on the gold icon on the Gold Factory once the production time you previously set is over.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCollect",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Put 1 villager into the mine",
+      "configTitleMatchesClient": false,
+      "params": {
+        "property": "depot",
+        "resource": "g"
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:127"
+    },
+    {
+      "id": 39,
+      "title": "MORE SHELTER!",
+      "description": "The more houses we build, the more your population cap will be, so you'll be able to train more soldiers!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Houses' and click on 'House I'. Then put your house on the map",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Kill 10 trolls",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          1
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        1
+      ],
+      "source": "managers/GoalManager.as:129"
+    },
+    {
+      "id": 44,
+      "title": "BUILD A MARKET",
+      "description": "The market is really useful to buy and sell resources!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Miscellaneous' and click on 'Market'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Harvest 15 trees",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          18
+        ],
+        "updateOnActivate": true,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        18
+      ],
+      "source": "managers/GoalManager.as:131"
+    },
+    {
+      "id": 55,
+      "title": "BUY 200 STEEL ON MARKET",
+      "description": "Do some business on the market. It will help you greatly to get more resources or gold!",
+      "hint": "",
+      "instructions": "Click on the market building and click again on the BUY steel option twice to get at least 200 steel.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalMarketTrade",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Harvest 20 trees",
+      "configTitleMatchesClient": false,
+      "params": {
+        "trades": {
+          "s": 200
+        }
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:133"
+    },
+    {
+      "id": 56,
+      "title": "BUY 100 WOOD ON MARKET",
+      "description": "Do some business on the market. It will help you greatly to get more resources or gold!",
+      "hint": "",
+      "instructions": "Click on the MMrket building and click again on the BUY wood option once to get 100 wood.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalMarketTrade",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Visit 3 friends",
+      "configTitleMatchesClient": false,
+      "params": {
+        "trades": {
+          "w": 100
+        }
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:135"
+    },
+    {
+      "id": 54,
+      "title": "COLLECT OIL FACTORY",
+      "description": "When ready, get the oil produced on the Oil Factory.",
+      "hint": "",
+      "instructions": "Click on the Oil Factory once the resource icon is displayed.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCollect",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Build a wonder",
+      "configTitleMatchesClient": false,
+      "params": {
+        "property": "depot",
+        "resource": "o"
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:137"
+    },
+    {
+      "id": 45,
+      "title": "SPEND 1 CASH",
+      "description": "Cash will allow you to have more powerful units, buildings and other cool things!",
+      "hint": "",
+      "instructions": "Spend 1 cash on what you want (1 decoration, 1 special turret...)",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalModifyPlayerStats",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "GoalModifyPlayerStats re-creates the deleted key with a NaN value (GoalModifyPlayerStats.as:56); harmless for this single-step goal.",
+      "configTitle": "Build 10 farms",
+      "configTitleMatchesClient": false,
+      "params": {
+        "stats": {
+          "c": -1
+        }
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:139"
+    },
+    {
+      "id": 74,
+      "title": "RESCUE YOUR FRIEND!! (CHAPTER 2)",
+      "description": "The enemy captured one of your best friends, and now he is in jail! Some allied troops have come to help you with this task!",
+      "hint": "",
+      "instructions": "Destroy the high-security prison at the East Island.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCompleteChapter",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Destroy 50 enemy buildings",
+      "configTitleMatchesClient": false,
+      "params": {
+        "chapterId": 2,
+        "chapterConst": "CHAPTER_02_GUILLE",
+        "spawnChapter": false
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:141"
+    },
+    {
+      "id": 69,
+      "title": "BUILD 2 TURRET II",
+      "description": "Increase your deffensive power building advanced towers!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Defense > Turrets' and click on the 'Turret II'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 2,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Build 50 farms",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          57
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        57
+      ],
+      "source": "managers/GoalManager.as:143"
+    },
+    {
+      "id": 46,
+      "title": "BUILD A SILO",
+      "description": "Silos increase your resources storage capacity.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Silos' and click on the 'Silo I'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Reach 40 population",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          932
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        932
+      ],
+      "source": "managers/GoalManager.as:145"
+    },
+    {
+      "id": 47,
+      "title": "CHECK COLLECTIONS",
+      "description": "Get the required items and you'll get cool things!",
+      "hint": "",
+      "instructions": "Click on the crate at the bottom right of the screen. Then click on the inventory icon and click again on the collections tab.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalOpenPopup",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Capture 3 cows",
+      "configTitleMatchesClient": false,
+      "params": {
+        "popup": "PopupInventory"
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:147"
+    },
+    {
+      "id": 48,
+      "title": "GET DAILY BONUS!",
+      "description": "The Daily bonus bag provides you with lots of gold and cool units.",
+      "hint": "",
+      "instructions": "Click the Daily Bonus bag (left of the screen) 3 days in a row",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalDailyBouns",
+      "steps": 3,
+      "inConfig": true,
+      "notes": "The constructor seeds _currentStep = 1, so only 2 further daily-bonus claims are needed after activation.",
+      "configTitle": "Kill 20 trolls",
+      "configTitleMatchesClient": false,
+      "params": {
+        "day": 3
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:149"
+    },
+    {
+      "id": 49,
+      "title": "REACH POPULATION 40",
+      "description": "The more population, the stronger your army will be!",
+      "hint": "",
+      "instructions": "Train soldiers, workers, vehicles, etc and increase your population to 40.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalReachPopulation",
+      "steps": 40,
+      "inConfig": true,
+      "notes": "The progress counter is the absolute population and is only updated while gameMode == GAME_MODE_NORMAL.",
+      "configTitle": "Extract 15 of gold",
+      "configTitleMatchesClient": false,
+      "params": {
+        "population": 40
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:151"
+    },
+    {
+      "id": 50,
+      "title": "HARVEST 10 GOLD VEINS",
+      "description": "Gold is necessary to build units and buildings.",
+      "hint": "",
+      "instructions": "Find 10 gold veins on the map and collect them.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCollect",
+      "steps": 10,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Destroy 15 enemy buildings",
+      "configTitleMatchesClient": false,
+      "params": {
+        "property": "resource",
+        "resource": "g"
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:153"
+    },
+    {
+      "id": 110,
+      "title": "CALL FOR AIR REINFORCEMENTS (MISSION 2)",
+      "description": "To destroy the Command Center, we must first get the radio to call an air strike. Let's do this!",
+      "hint": "",
+      "instructions": "Click on the world icon at the lower right and click on 'Missions World'. Now complete mission 2!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCompleteQuest",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "Text says '(MISSION 2)'. The goal is registered against QUEST_06_AIRSTRIKE, which is the 2nd quest in the play order Quest.questIds (quest/Quest.as:192) but is named after map 06. The text follows the play order, the constant name follows the map - not a defect.",
+      "params": {
+        "questId": "100000006",
+        "questConst": "QUEST_06_AIRSTRIKE",
+        "minDifficulty": 1,
+        "winRequired": true
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:155"
+    },
+    {
+      "id": 59,
+      "title": "BUILD HOUSE II",
+      "description": "Better houses allow you to increase your population limit.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Houses' and click on 'House II'. Then put your house on the map",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Capture 5 cows",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          47
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        47
+      ],
+      "source": "managers/GoalManager.as:157"
+    },
+    {
+      "id": 60,
+      "title": "STORE A DECORATION",
+      "description": "Sometimes you would like to have more room on your map or remove buildings without destroying them... follow this trick!",
+      "hint": "",
+      "instructions": "Select a decoration on your map and click on the 'STORE' icon at the lower interface.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalStoreItem",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "GoalStoreItem.deactivate() re-adds instead of removing its signal listener (GoalStoreItem.as:46) - VERIFIED BUG in the original client.",
+      "configTitle": "Kill 35 trolls",
+      "configTitleMatchesClient": false,
+      "params": {
+        "property": "decoration"
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:159"
+    },
+    {
+      "id": 53,
+      "title": "COLLECT STEEL FACTORY",
+      "description": "When ready, get the steel produced on the Steel Factory.",
+      "hint": "",
+      "instructions": "Click on the Steel Factory once the resource icon is displayed.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCollect",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Expand to 3 acres",
+      "configTitleMatchesClient": false,
+      "params": {
+        "property": "depot",
+        "resource": "s"
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:161"
+    },
+    {
+      "id": 67,
+      "title": "UPGRADE THE SOLDIER ACADEMY",
+      "description": "Now you'll be able to train better soldiers!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Attack > Soldiers' and click on the 'Soldier Academy II'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Harvest 50 trees",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          41
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        41
+      ],
+      "source": "managers/GoalManager.as:163"
+    },
+    {
+      "id": 61,
+      "title": "OPEN RECON CENTER",
+      "description": "The recon center is useful for spying your enemies before attacking them!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Miscellaneous' and click on 'Recon Center'. Put it on the map. Invite some friends and click on the 'Open Building' button. Click on the world icon, go to 'Players World' and click on the 'Spy' button of any player.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Extract 18 of gold",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          75
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        75
+      ],
+      "source": "managers/GoalManager.as:165"
+    },
+    {
+      "id": 152,
+      "title": "RESCUE THE BAZOOKA SOLDIERS! (CHAPTER 3)",
+      "description": "Enemies are trying to get info about our plans from our bazooka soldiers. Let's rescue them!",
+      "hint": "",
+      "instructions": "Get the bazooka soldiers out from the prison at the north of the West Island!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCompleteChapter",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "chapterId": 3,
+        "chapterConst": "CHAPTER_03_BAZOOKA",
+        "spawnChapter": false
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:167"
+    },
+    {
+      "id": 62,
+      "title": "SELL 100 WOOD ON MARKET",
+      "description": "Do some business on the market. It will help you greatly to get more resources or gold!",
+      "hint": "",
+      "instructions": "Click on the market building and click again on the SELL wood option.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalMarketTrade",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Destroy 30 enemy buildings",
+      "configTitleMatchesClient": false,
+      "params": {
+        "trades": {
+          "w": -100
+        }
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:169"
+    },
+    {
+      "id": 63,
+      "title": "EXPAND 1 MORE ACRE",
+      "description": "One of your main goals is to have a great camp to show your enemires who's the most powerful!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Expand' and buy a expansion. Then click what expansion you want to acquire on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalExpand",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Capture 5 sheeps",
+      "configTitleMatchesClient": false,
+      "params": {},
+      "configIds": [],
+      "source": "managers/GoalManager.as:171"
+    },
+    {
+      "id": 52,
+      "title": "ATTACK A PLAYER!",
+      "description": "Don't be shy! attacking players is a good way of getting lots of gold and XP.",
+      "hint": "",
+      "instructions": "Click on the world icon at the lower right and click on 'Players World'. Now attack a player!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalAttackPlayer",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Extract 15 of stone",
+      "configTitleMatchesClient": false,
+      "params": {
+        "numAttacks": 1,
+        "friends": false,
+        "victoryNeeded": false
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:173"
+    },
+    {
+      "id": 58,
+      "title": "CHECK ATTACKS!",
+      "description": "Do you know you can check who attacked you?",
+      "hint": "",
+      "instructions": "Click on the world icon at the lower right and click on Players World. Click on BATTLE RESULTS on the upper part to see the lists of attacks.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalOpenPopup",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Reach 75 population",
+      "configTitleMatchesClient": false,
+      "params": {
+        "popup": "PopupAssaultHistory"
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:175"
+    },
+    {
+      "id": 64,
+      "title": "USE RECON CENTER",
+      "description": "Now it's time to spy your enemy!",
+      "hint": "",
+      "instructions": "Click on the world icon at the right bottom of the screen and click again on 'Players World'. Hover the mouse pointer on any player and then click on the 'Spy' button!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalSpy",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Extract 18 of stone",
+      "configTitleMatchesClient": false,
+      "params": {},
+      "configIds": [],
+      "source": "managers/GoalManager.as:177"
+    },
+    {
+      "id": 89,
+      "title": "TURRET III",
+      "description": "Increase your deffensive power building advanced towers!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Defense > Turrets' and click on the 'Turret III'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Expand to 9 acres",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          49
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        49
+      ],
+      "source": "managers/GoalManager.as:179"
+    },
+    {
+      "id": 90,
+      "title": "PROTECT THE ALLIED CONVOY! (MISSION 3)",
+      "description": "Defeat our enemies before they destroy our allied convoy!",
+      "hint": "",
+      "instructions": "Click on the world icon at the lower right and click on 'Missions World'. Now complete mission 3!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCompleteQuest",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Build 5 wonders",
+      "configTitleMatchesClient": false,
+      "params": {
+        "questId": "100000003",
+        "questConst": "QUEST_03_DEFEND_CONVOY_AUTO",
+        "minDifficulty": 1,
+        "winRequired": true
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:181"
+    },
+    {
+      "id": 91,
+      "title": "GRAPE FIELD",
+      "description": "Grape Field will provide you with gold quite easily!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Fields & Farms' and click on 'Grape Field'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Visit 25 friend's empire",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          108
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        108
+      ],
+      "source": "managers/GoalManager.as:183"
+    },
+    {
+      "id": 92,
+      "title": "RECRUIMENT PRIZE",
+      "description": "Add a Recruitment Prize on your camp and get very powerful units for free!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Miscellaneous' and click on 'Recruitment Prize'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          140
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        140
+      ],
+      "source": "managers/GoalManager.as:185"
+    },
+    {
+      "id": 70,
+      "title": "BUILD 20 WALL II",
+      "description": "Walls are very effective to difficult ground units from entering your camp.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Defense > Walls' and click on the 'Wall II'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 20,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Reach 100 population",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          24
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        24
+      ],
+      "source": "managers/GoalManager.as:187"
+    },
+    {
+      "id": 93,
+      "title": "HOSPITAL",
+      "description": "We've discovered an amazing technology that allow us to resurrect our lost units!!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Miscelaneous' and click on 'Hospital'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          28
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        28
+      ],
+      "source": "managers/GoalManager.as:189"
+    },
+    {
+      "id": 65,
+      "title": "DEFEAT 3 PLAYERS!",
+      "description": "Show your enemies that you know how to wreak havoc!",
+      "hint": "",
+      "instructions": "Click on the world icon at the lower right and click on 'Players World'. Now defeat 3 players!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalAttackPlayer",
+      "steps": 3,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Expand to 4 acres",
+      "configTitleMatchesClient": false,
+      "params": {
+        "numAttacks": 3,
+        "friends": false,
+        "victoryNeeded": true
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:191"
+    },
+    {
+      "id": 72,
+      "title": "UPGRADE THE BAZOOKA ACADEMY",
+      "description": "A Bazooka Academy will let you train Bazooka soldiers. This will greatly improve your army!!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Attack > Soldier's and click on the 'Bazooka Academy II'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Kill 50 trolls",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          43
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        43
+      ],
+      "source": "managers/GoalManager.as:193"
+    },
+    {
+      "id": 94,
+      "title": "RETRIEVE OUR JEEPS (CHAPTER 4)",
+      "description": "Worst than that, the enemy has started disassembling the jeeps. We must retrieve their parts!",
+      "hint": "",
+      "instructions": "Retrieve the wheels at the south of the East Island, and then go to get the jeeps at the north of the same island!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCompleteChapter",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "chapterId": 4,
+        "chapterConst": "CHAPTER_04_JEEPS",
+        "spawnChapter": false
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:195"
+    },
+    {
+      "id": 73,
+      "title": "TRAIN 5 BAZOOKA SOLDIERS",
+      "description": "Let's train some light bazooka soldiers!",
+      "hint": "",
+      "instructions": "Click on the Bazooka Academy and then click 5 times on the 'BUY FOR' button at the lower interface.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 5,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Extract 20 of gold",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          1022
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        1022
+      ],
+      "source": "managers/GoalManager.as:197"
+    },
+    {
+      "id": 71,
+      "title": "CALL FOR REINFORCEMENTS",
+      "description": "Let's use our diplomatic contacts to get some help!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Miscellaneous' and click on 'Allies Building'. Then put it on the map",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalSocialBuildingOpened",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Capture 7 Cows",
+      "configTitleMatchesClient": false,
+      "params": {
+        "buildingId": 61
+      },
+      "configIds": [
+        61
+      ],
+      "source": "managers/GoalManager.as:199"
+    },
+    {
+      "id": 95,
+      "title": "UPGRADE YOUR WOOD FACTORY II",
+      "description": "You need wood to train soldiers and construct buildings. The wood factory will help you with this purpose!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Factories' and click on the 'Wood Factory II'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          6
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        6
+      ],
+      "source": "managers/GoalManager.as:201"
+    },
+    {
+      "id": 80,
+      "title": "BUILD 8 TURRETS",
+      "description": "The more towers you have on your empire, the more protected your camp will be against potential attacks.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Defense > Turrets' and click on 'Tower I'. Put 8 of them on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildProperty",
+      "steps": 8,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Harvest 100 trees",
+      "configTitleMatchesClient": false,
+      "params": {
+        "property": "tower",
+        "updateOnActivate": false
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:203"
+    },
+    {
+      "id": 96,
+      "title": "DESTROY THE MEGATANK (MISSION 4)",
+      "description": "We must prevent the enemy of building that megatank, otherwise they could harm us badly!",
+      "hint": "",
+      "instructions": "Click on the world icon at the lower right and click on 'Missions World'. Now complete mission 4!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCompleteQuest",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "questId": "100000004",
+        "questConst": "QUEST_04_SUPERTANK",
+        "minDifficulty": 1,
+        "winRequired": true
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:205"
+    },
+    {
+      "id": 79,
+      "title": "UPGRADE YOUR MARKET",
+      "description": "A better market means you can trade with more resources!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Miscellaneous' and click on the 'Market II'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Build 3 wonders",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          90
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        90
+      ],
+      "source": "managers/GoalManager.as:207"
+    },
+    {
+      "id": 97,
+      "title": "BUILD TANK ACADEMY I",
+      "description": "A Tank Academy will let you train tanks. This will greatly improve your army!!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Attack > Soldier's and click on the 'Tank Academy I'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          38
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        38
+      ],
+      "source": "managers/GoalManager.as:209"
+    },
+    {
+      "id": 81,
+      "title": "HELP A FRIEND!",
+      "description": "Help some of your friends and let them know you visited them!",
+      "hint": "",
+      "instructions": "Click on one of your friend's portrait at the lower interface. Then help him to collect some stuff on his map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalAssistNeighbourBuilding",
+      "steps": 5,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Build a market",
+      "configTitleMatchesClient": false,
+      "params": {},
+      "configIds": [],
+      "source": "managers/GoalManager.as:211"
+    },
+    {
+      "id": 86,
+      "title": "BUILD AN ALLIES MARKET",
+      "description": "The Allies Market is a good way to ask your friends to send you resources!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Miscellaneous' and click on the 'Allies Market'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Kill 75 trolls",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          74
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        74
+      ],
+      "source": "managers/GoalManager.as:213"
+    },
+    {
+      "id": 84,
+      "title": "OBTAIN WOOD IN THE ALLIES MARKET",
+      "description": "Wood is always needed to keep constructing new buildings and better units.",
+      "hint": "",
+      "instructions": "Select the Allies Market and then ask your friend to send you some wood!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalAlliesMarketTrade",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "GoalAlliesMarketTrade.as:62 compares an Object to an int, so the completion test is always true - VERIFIED BUG: the goal completes on the first Allies-Market collection, not after 500 wood.",
+      "configTitle": "Build 100 farms",
+      "configTitleMatchesClient": false,
+      "params": {
+        "trades": {
+          "w": 500
+        }
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:215"
+    },
+    {
+      "id": 99,
+      "title": "UPGRADE YOUR GOLD FACTORY",
+      "description": "Upgrading the Gold Factory will provide you with nice amounts of gold!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Factories' and click on the 'Gold Factory II'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          9
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        9
+      ],
+      "source": "managers/GoalManager.as:217"
+    },
+    {
+      "id": 57,
+      "title": "DEFEAT A FRIEND!",
+      "description": "Don't be shy! Attacking players is a good way of getting lots of gold and XP.",
+      "hint": "",
+      "instructions": "Click on one friend's portrait at the bottom and choose the attack option.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalAttackPlayer",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Build 20 farms",
+      "configTitleMatchesClient": false,
+      "params": {
+        "numAttacks": 1,
+        "friends": true,
+        "victoryNeeded": true
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:219"
+    },
+    {
+      "id": 100,
+      "title": "BUILD BUNKER II",
+      "description": "Bunkers are good deffensive means to protect your camp.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Defense > Bunkers' and click on 'Bunker II'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          51
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        51
+      ],
+      "source": "managers/GoalManager.as:221"
+    },
+    {
+      "id": 82,
+      "title": "UPGRADE THE CC",
+      "description": "Upgrading your Command Center will make your workers run and work faster!",
+      "hint": "",
+      "instructions": "Click on the Command Center and then click on the UPGRADE option at the lower interface.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "",
+      "configTitle": "Trade resources (market)",
+      "configTitleMatchesClient": false,
+      "params": {
+        "itemIds": [
+          58
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        58
+      ],
+      "source": "managers/GoalManager.as:223"
+    },
+    {
+      "id": 101,
+      "title": "DESTROY THE TRUCK (MISSION 5)",
+      "description": "The enemy wants to provide another base with weaponry. Let's destroy the truck where the cargo is hidden!",
+      "hint": "",
+      "instructions": "Click on the world icon at the lower right and click on 'Missions World'. Now complete mission 4!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCompleteQuest",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "questId": "100000005",
+        "questConst": "QUEST_05_ASSAULT_CONVOY",
+        "minDifficulty": 1,
+        "winRequired": true
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:225"
+    },
+    {
+      "id": 102,
+      "title": "COW FARM",
+      "description": "Building a cow farm will allow us to get some wood in exchange.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Fields & Farms' and click on the 'Cow Farm'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          110
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        110
+      ],
+      "source": "managers/GoalManager.as:227"
+    },
+    {
+      "id": 103,
+      "title": "JEEP GARAGE II",
+      "description": "Make your army more powerful building a Jeep Garage!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Attack > Vehicles' and click on the 'Jeep Garage II'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          64
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        64
+      ],
+      "source": "managers/GoalManager.as:229"
+    },
+    {
+      "id": 104,
+      "title": "UPGRADE YOUR STEEL FACTORY",
+      "description": "Steel is needed to construct buildings and units.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Factories' and click on the 'Steel Factory II'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          8
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        8
+      ],
+      "source": "managers/GoalManager.as:231"
+    },
+    {
+      "id": 106,
+      "title": "UPGRADE THE OIL FACTORY II",
+      "description": "The oil factory will allow you to produce oil in order to build vehicles.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Factories' and click on the 'Oil Factory II'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          7
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        7
+      ],
+      "source": "managers/GoalManager.as:233"
+    },
+    {
+      "id": 107,
+      "title": "UPGRADE TO WALL III",
+      "description": "Walls are very effective to difficult ground units from entering your camp.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Defense > Walls' and click on the 'Wall III'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 20,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          25
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        25
+      ],
+      "source": "managers/GoalManager.as:235"
+    },
+    {
+      "id": 108,
+      "title": "HELICOPTER HANGAR I",
+      "description": "Helicopters will help you to rule the skies!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Attack > Aircrafts' and click on the 'Helicopter Hangar I'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          54
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        54
+      ],
+      "source": "managers/GoalManager.as:237"
+    },
+    {
+      "id": 109,
+      "title": "HOUSE III",
+      "description": "Better houses allow you to increase your population limit.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Houses' and click on 'House III'. Then put your house on the map",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          48
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        48
+      ],
+      "source": "managers/GoalManager.as:239"
+    },
+    {
+      "id": 66,
+      "title": "BLOW UP THE NUCLEAR PLANT! (MISSION 6)",
+      "description": "The enemy is promptly producing a vast amount of resources. We must stop this.",
+      "hint": "",
+      "instructions": "Click on the world icon at the lower right and click on 'Missions World'. Now complete mission 6!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCompleteQuest",
+      "steps": 1,
+      "inConfig": true,
+      "notes": "Text says '(MISSION 6)'. The goal is registered against QUEST_02_CENTRAL_NUCLEAR, which is the 6th quest in the play order Quest.questIds (quest/Quest.as:192) but is named after map 02. The text follows the play order, the constant name follows the map - not a defect.",
+      "configTitle": "Build 2 wonders",
+      "configTitleMatchesClient": false,
+      "params": {
+        "questId": "100000002",
+        "questConst": "QUEST_02_CENTRAL_NUCLEAR",
+        "minDifficulty": 1,
+        "winRequired": true
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:241"
+    },
+    {
+      "id": 111,
+      "title": "BUNKER III",
+      "description": "Bunkers are good deffensive means to protect your camp.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Defense > Bunkers' and click on 'Bunker III'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          52
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        52
+      ],
+      "source": "managers/GoalManager.as:243"
+    },
+    {
+      "id": 112,
+      "title": "FORTRESS I",
+      "description": "Fortresses are the best deffensive means to protect your camp.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Defense > Fortresses' and click on 'Fortress I'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          80
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        80
+      ],
+      "source": "managers/GoalManager.as:245"
+    },
+    {
+      "id": 113,
+      "title": "Mechanical Garage",
+      "description": "An engineer will help you repair your damaged vehicles even while in combat!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Attack > Specials' and click on 'Mechanical Garage'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          135
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        135
+      ],
+      "source": "managers/GoalManager.as:247"
+    },
+    {
+      "id": 115,
+      "title": "UPGRADE THE SOLDIER ACADEMY",
+      "description": "Now you'll be able to train better soldiers!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Attack > Soldiers' and click on the 'Soldier Academy III'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          42
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        42
+      ],
+      "source": "managers/GoalManager.as:249"
+    },
+    {
+      "id": 116,
+      "title": "UPGRADE YOUR WOOD FACTORY",
+      "description": "You need wood to train soldiers and construct buildings. The wood factory will help you on this purpose!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Factories' and click on the 'Wood Factory III'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          10
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        10
+      ],
+      "source": "managers/GoalManager.as:251"
+    },
+    {
+      "id": 117,
+      "title": "UPGRADE THE BAZOOKA ACADEMY",
+      "description": "A Bazooka academy will let you train Bazooka soldiers. This will greatly improve your army!!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Attack > Soldier's and click on the 'Bazooka Academy III'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          44
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        44
+      ],
+      "source": "managers/GoalManager.as:253"
+    },
+    {
+      "id": 118,
+      "title": "STEAL THE SHIP! (MISSION 7)",
+      "description": "We must steal that ship and use it to destroy the Command Center where the enemy hides.",
+      "hint": "",
+      "instructions": "Click on the world icon at the lower right and click on 'Missions World'. Now complete mission 7!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCompleteQuest",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "questId": "100000007",
+        "questConst": "QUEST_07_SHIP",
+        "minDifficulty": 1,
+        "winRequired": true
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:255"
+    },
+    {
+      "id": 119,
+      "title": "UPGRADE YOUR GOLD FACTORY",
+      "description": "Upgrading the Gold Factory will provide you with nice amounts of gold!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Factories' and click on the 'Gold Factory III'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          13
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        13
+      ],
+      "source": "managers/GoalManager.as:257"
+    },
+    {
+      "id": 120,
+      "title": "UPGRADE YOUR WALLS",
+      "description": "Walls are very effective to difficult ground units from entering your camp.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Defense > Walls' and click on the 'Wall IV'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 20,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          78
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        78
+      ],
+      "source": "managers/GoalManager.as:259"
+    },
+    {
+      "id": 121,
+      "title": "Hangar I",
+      "description": "Aircrafts will greatly help you to achieve your goals!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Attack > Aircrafts' and click on the 'Hangar I'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          37
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        37
+      ],
+      "source": "managers/GoalManager.as:261"
+    },
+    {
+      "id": 123,
+      "title": "UPGRADE THE MARKET",
+      "description": "A better market means you can trade with more resources!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Miscellaneous' and click on the 'Market III'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          91
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        91
+      ],
+      "source": "managers/GoalManager.as:263"
+    },
+    {
+      "id": 124,
+      "title": "UPGRADE YOUR CC III",
+      "description": "Upgrading your Command Center will make your workers run and work faster!",
+      "hint": "",
+      "instructions": "Click on the Command Center and then click on the UPGRADE option at the lower interface.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          59
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        59
+      ],
+      "source": "managers/GoalManager.as:265"
+    },
+    {
+      "id": 125,
+      "title": "UPGRADE THE STEEL FACTORY",
+      "description": "Steel is needed to construct buildings and units.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Factories' and click on the 'Steel Factory III'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          12
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        12
+      ],
+      "source": "managers/GoalManager.as:267"
+    },
+    {
+      "id": 126,
+      "title": "STOP THE ROCKET LAUNCHING! (MISSION 8)",
+      "description": "We must prevent the enenmy from launching the rocket. This time there's a strong magnetic field that prevents us from taking vehicles with us!",
+      "hint": "",
+      "instructions": "Click on the world icon at the lower right and click on 'Missions World'. Now complete mission 8!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCompleteQuest",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "questId": "100000008",
+        "questConst": "QUEST_08_ROCKET",
+        "minDifficulty": 1,
+        "winRequired": true
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:269"
+    },
+    {
+      "id": 127,
+      "title": "UPGRADE YOUR TANK ACADEMY I",
+      "description": "A tank academy will let you train tanks. This will greatly improve your army!!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Attack > Soldier's and click on the 'Tank Academy II'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          62
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        62
+      ],
+      "source": "managers/GoalManager.as:271"
+    },
+    {
+      "id": 129,
+      "title": "UPGRADE YOUR HELICOPTER HANGAR",
+      "description": "Helicopters will help you to rule the skies!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Attack > Aircrafts' and click on the 'Helicopter Hangar II'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          55
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        55
+      ],
+      "source": "managers/GoalManager.as:273"
+    },
+    {
+      "id": 130,
+      "title": "DEFEND FROM ASSAULT! (CHAPTER 9)",
+      "description": "The enemy is preparing to assault our camp now! Prepare yourself.",
+      "hint": "",
+      "instructions": "Get your attack and defense units ready for the attack and end with the Captain!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCompleteChapter",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "Text says '(CHAPTER 9)' but the goal is registered against ChapterManager.CHAPTER_05_SIEGE_CONVENTIONAL (5). Config.NUM_CHAPTERS is 9, so the text refers to a chapter that does not exist in this client.",
+      "params": {
+        "chapterId": 5,
+        "chapterConst": "CHAPTER_05_SIEGE_CONVENTIONAL",
+        "spawnChapter": false
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:275"
+    },
+    {
+      "id": 131,
+      "title": "UPGRADE THE OIL FACTORY",
+      "description": "The oil factory will allow you to produce oil in order to build vehicles.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Factories' and click on the 'Oil Factory III'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          11
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        11
+      ],
+      "source": "managers/GoalManager.as:277"
+    },
+    {
+      "id": 132,
+      "title": "TURRET IV",
+      "description": "Increase your deffensive power building advanced towers!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Defense > Turrets' and click on the 'Turret IV'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          39
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        39
+      ],
+      "source": "managers/GoalManager.as:279"
+    },
+    {
+      "id": 133,
+      "title": "Jeep garage III",
+      "description": "Make your army more powerful building a Jeep Garage!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Attack > Vehicles' and click on the 'Jeep Garage III'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          65
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        65
+      ],
+      "source": "managers/GoalManager.as:281"
+    },
+    {
+      "id": 134,
+      "title": "DESTROY THE LABS (MISSION 9)",
+      "description": "The enemy has built more mental control laboratories. Pass through them and reach the radio to call for an aerial attack!",
+      "hint": "",
+      "instructions": "Click on the world icon at the lower right and click on 'Missions World'. Now complete mission 9!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCompleteQuest",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "questId": "100000009",
+        "questConst": "QUEST_09_LABORATORIES",
+        "minDifficulty": 1,
+        "winRequired": true
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:283"
+    },
+    {
+      "id": 135,
+      "title": "UPGRADE YOUR WALLS",
+      "description": "Walls are very effective to difficult ground units from entering your camp.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Defense > Walls' and click on the 'Wall V'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 20,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          79
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        79
+      ],
+      "source": "managers/GoalManager.as:285"
+    },
+    {
+      "id": 136,
+      "title": "UPGRADE YOUR HANGAR",
+      "description": "Aircrafts will greatly help you to achieve your goals!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Attack > Aircrafts' and click on the 'Hangar II'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          76
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        76
+      ],
+      "source": "managers/GoalManager.as:287"
+    },
+    {
+      "id": 137,
+      "title": "UPGRADE YOUR WOOD FACTORY",
+      "description": "You need wood to train soldiers and construct buildings. The wood factory will help you on this purpose!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Factories' and click on the 'Wood Factory IV'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          14
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        14
+      ],
+      "source": "managers/GoalManager.as:289"
+    },
+    {
+      "id": 138,
+      "title": "DESTROY THE MEGATANK (CHAPTER 10)",
+      "description": "The enemy will attack our camp with a megatank now! Let's strike them before since now that they don't suspect at all!",
+      "hint": "",
+      "instructions": "Destroy the Red Megatank on the West island.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCompleteChapter",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "Text says '(CHAPTER 10)' but the goal is registered against ChapterManager.CHAPTER_06_MEGATANK (6). Config.NUM_CHAPTERS is 9.",
+      "params": {
+        "chapterId": 6,
+        "chapterConst": "CHAPTER_06_MEGATANK",
+        "spawnChapter": false
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:291"
+    },
+    {
+      "id": 139,
+      "title": "UPGRADE THE COMMAND CENTER IV",
+      "description": "Upgrading your CC will make your workers run and work faster!",
+      "hint": "",
+      "instructions": "Click on the Command Center and then click on the UPGRADE option at the lower interface.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          60
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        60
+      ],
+      "source": "managers/GoalManager.as:293"
+    },
+    {
+      "id": 141,
+      "title": "UPGRADE YOUR TANK ACADEMY",
+      "description": "A tank academy will let you train tanks. This will greatly improve your army!!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Attack > Soldier's and click on the 'Tank Academy III'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          63
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        63
+      ],
+      "source": "managers/GoalManager.as:295"
+    },
+    {
+      "id": 142,
+      "title": "STEAL THE LAPTOP (MISSION 10)",
+      "description": "Our laptop is full of top secret info. Let's go into that bunker an retrieve it before it's too late!",
+      "hint": "",
+      "instructions": "Click on the world icon at the lower right and click on 'Missions World'. Now complete mission 10!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCompleteQuest",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "questId": "100000010",
+        "questConst": "QUEST_10_SPECIAL_OPS",
+        "minDifficulty": 1,
+        "winRequired": true
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:297"
+    },
+    {
+      "id": 143,
+      "title": "UPGRADE YOUR GOLD FACTORY",
+      "description": "Upgrading the Gold Factory will provide you with nice amounts of gold!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Factories' and click on the 'Gold Factory IV'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          17
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        17
+      ],
+      "source": "managers/GoalManager.as:299"
+    },
+    {
+      "id": 144,
+      "title": "UPGRADE YOUR HELICOPTER HANGAR",
+      "description": "Helicopters will help you to rule the skies!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Attack > Aircrafts' and click on the 'Helicopter Hangar III'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          56
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        56
+      ],
+      "source": "managers/GoalManager.as:301"
+    },
+    {
+      "id": 145,
+      "title": "ELEPHANTS COMING! (CHAPTER 11)",
+      "description": "There are war elephant riders preparing to attack our camp. Let's give them a lesson now!",
+      "hint": "",
+      "instructions": "Defeat the war elephants and it's Captain before they destroy your camp!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCompleteChapter",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "Text says '(CHAPTER 11)' but the goal is registered against ChapterManager.CHAPTER_07_SIEGE_ELEPHANT (7). Config.NUM_CHAPTERS is 9.",
+      "params": {
+        "chapterId": 7,
+        "chapterConst": "CHAPTER_07_SIEGE_ELEPHANT",
+        "spawnChapter": false
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:303"
+    },
+    {
+      "id": 146,
+      "title": "UPGRADE YOUR STEEL FACTORY",
+      "description": "Steel is needed to construct buildings and units.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Factories' and click on the 'Steel Factory IV'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          16
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        16
+      ],
+      "source": "managers/GoalManager.as:305"
+    },
+    {
+      "id": 147,
+      "title": "UPGRADE THE HANGAR",
+      "description": "Aircrafts will greatly help you to achieve your goals!",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Attack > Aircrafts' and click on the 'Hangar III'. Then put it on your map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          77
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        77
+      ],
+      "source": "managers/GoalManager.as:307"
+    },
+    {
+      "id": 148,
+      "title": "UPGRADE THE OIL FACTORY IV",
+      "description": "The Oil Factory will allow you to produce oil in order to build vehicles.",
+      "hint": "",
+      "instructions": "Go to 'BUILD > Buildings > Factories' and click on the 'Oil Factory IV'. Then put it on the map.",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalBuildId",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "itemIds": [
+          15
+        ],
+        "updateOnActivate": false,
+        "storeCategory": -1,
+        "storeSubcategory": -1,
+        "storePosition": -1,
+        "eTrainBuilding": -1
+      },
+      "configIds": [
+        15
+      ],
+      "source": "managers/GoalManager.as:309"
+    },
+    {
+      "id": 149,
+      "title": "RESCUE YOUR CITIZEN (MISSION 11)",
+      "description": "We must take our citizens to the other shore before the enemy aircrafts strike!",
+      "hint": "Steal the ships and use them to transport your citizens to the other shore before the timer expires!",
+      "instructions": "Click on the world icon at the lower right and click on 'Missions World'. Now complete mission 11!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCompleteQuest",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "questId": "100000011",
+        "questConst": "QUEST_11_SAVE_VILLAGES",
+        "minDifficulty": 1,
+        "winRequired": true
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:311"
+    },
+    {
+      "id": 150,
+      "title": "T-REX ASSAULT! (CHAPTER 12)",
+      "description": "Some T-Rex want to attack our camp!",
+      "hint": "",
+      "instructions": "Defeat the T-Rex roaming around your camp before they eat your soldiers!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCompleteChapter",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "Text says '(CHAPTER 12)' but the goal is registered against ChapterManager.CHAPTER_08_LURKER (8). Config.NUM_CHAPTERS is 9.",
+      "params": {
+        "chapterId": 8,
+        "chapterConst": "CHAPTER_08_LURKER",
+        "spawnChapter": false
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:313"
+    },
+    {
+      "id": 151,
+      "title": "THE KILLER ROBOT (MISSION 12)",
+      "description": "The enemy has built a huge robot to attack us! We must defeat him as soon as possible.",
+      "hint": "",
+      "instructions": "Click on the world icon at the lower right and click on 'Missions World'. Now complete mission 12!",
+      "reward": {
+        "gold": 10,
+        "cash": 0,
+        "xp": 0,
+        "items": []
+      },
+      "goalType": "GoalCompleteQuest",
+      "steps": 1,
+      "inConfig": false,
+      "notes": "",
+      "params": {
+        "questId": "100000012",
+        "questConst": "QUEST_12_TANKBOSS",
+        "minDifficulty": 1,
+        "winRequired": true
+      },
+      "configIds": [],
+      "source": "managers/GoalManager.as:315"
+    }
+  ],
+  "reconciliation": {
+    "configGoalIds": 91,
+    "clientRegisteredGoalIds": 134,
+    "configOnly": [
+      2,
+      7,
+      12,
+      15,
+      35,
+      38,
+      68,
+      75,
+      76,
+      77,
+      78,
+      83
+    ],
+    "clientOnly": [
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      121,
+      123,
+      124,
+      125,
+      126,
+      127,
+      129,
+      130,
+      131,
+      132,
+      133,
+      134,
+      135,
+      136,
+      137,
+      138,
+      139,
+      141,
+      142,
+      143,
+      144,
+      145,
+      146,
+      147,
+      148,
+      149,
+      150,
+      151,
+      152
+    ],
+    "notes": "The client registers 134 goals (managers/GoalManager.as:49-315); every id is unique. config/main.json contains 91 goals with ids 1..91 (contiguous). 79 ids exist in both places, 12 ids exist only in the config and 55 ids only in the client. IMPORTANT: the numeric overlap is coincidental. The config's goal table is NOT Social Wars content - its titles talk about villagers, trolls, sheep/cow ranches, wonders, acres, an archery range, a stable, a university and a blacksmith, none of which exist in the Social Wars client (whose goals are about workers, soldiers, factories, bunkers and turrets). The same file's items array IS Social Wars content (House I, Wood Factory I, ...), so the goals array is foreign/stale data in the upstream snapshot; it is byte-identical in all three captured config snapshots (get_game_config.php_23july2012.txt, ..._29august2012.txt, ..._29august2012_nohash.txt). The upstream Python server reads this table (get_game_config.py:139-150) and prints its title when a set_goals/complete_goal command arrives (command.py:68-79), so it prints unrelated titles. The id space itself IS shared, though: the 12 config-only ids (2, 7, 12, 15, 35, 38, 68, 75, 76, 77, 78, 83) are exactly the ids that are missing from BOTH the client registrations and TranslationGoals, which means the client simply never implemented those goals, and the config table does carry the same id space. All 91 config goals have reward = 10, which matches the client's uniform 10-gold reward."
+  },
+  "supplementary": {
+    "clientTranslationOnly": [
+      98,
+      105,
+      114,
+      122,
+      128,
+      140
+    ],
+    "clientTranslationCount": 140,
+    "configGoalIdRange": [
+      1,
+      91
+    ],
+    "clientGoalIdRange": [
+      1,
+      152
+    ],
+    "goalTypeCounts": {
+      "GoalAction": 1,
+      "GoalAddAllies": 1,
+      "GoalAlliesMarketTrade": 1,
+      "GoalAssistNeighbourBuilding": 1,
+      "GoalAttackPlayer": 3,
+      "GoalBuildId": 68,
+      "GoalBuildProperty": 5,
+      "GoalCollect": 9,
+      "GoalCompleteChapter": 8,
+      "GoalCompleteQuest": 11,
+      "GoalDailyBouns": 1,
+      "GoalDoubleClick": 1,
+      "GoalExpand": 1,
+      "GoalHarbor": 1,
+      "GoalMarketTrade": 3,
+      "GoalModifyPlayerStats": 1,
+      "GoalMove": 1,
+      "GoalOpenPopup": 2,
+      "GoalPopUnit": 1,
+      "GoalPushUnit": 6,
+      "GoalReachPopulation": 1,
+      "GoalSelectTime": 3,
+      "GoalSocialBuildingOpened": 1,
+      "GoalSpy": 1,
+      "GoalStoreItem": 1,
+      "GoalVisitNeighbour": 1
+    },
+    "perGoalConfigIds": {
+      "1": [
+        1
+      ],
+      "18": [
+        2
+      ],
+      "6": [],
+      "8": [],
+      "20": [
+        2,
+        6,
+        10,
+        14
+      ],
+      "11": [],
+      "23": [],
+      "9": [
+        5
+      ],
+      "10": [
+        5,
+        9,
+        13,
+        17
+      ],
+      "87": [],
+      "24": [
+        31
+      ],
+      "25": [
+        1008,
+        31
+      ],
+      "16": [],
+      "17": [],
+      "19": [],
+      "5": [],
+      "41": [
+        4
+      ],
+      "43": [
+        4,
+        8,
+        12,
+        16
+      ],
+      "42": [],
+      "85": [],
+      "40": [],
+      "30": [
+        22
+      ],
+      "31": [
+        23
+      ],
+      "32": [],
+      "3": [],
+      "4": [],
+      "13": [
+        5,
+        9,
+        13,
+        17
+      ],
+      "14": [],
+      "26": [],
+      "36": [
+        50
+      ],
+      "37": [],
+      "29": [],
+      "22": [
+        1
+      ],
+      "27": [],
+      "28": [],
+      "33": [
+        40
+      ],
+      "34": [
+        1014
+      ],
+      "51": [
+        3
+      ],
+      "88": [
+        3,
+        7,
+        11,
+        15
+      ],
+      "21": [],
+      "39": [
+        1
+      ],
+      "44": [
+        18
+      ],
+      "55": [],
+      "56": [],
+      "54": [],
+      "45": [],
+      "74": [],
+      "69": [
+        57
+      ],
+      "46": [
+        932
+      ],
+      "47": [],
+      "48": [],
+      "49": [],
+      "50": [],
+      "110": [],
+      "59": [
+        47
+      ],
+      "60": [],
+      "53": [],
+      "67": [
+        41
+      ],
+      "61": [
+        75
+      ],
+      "152": [],
+      "62": [],
+      "63": [],
+      "52": [],
+      "58": [],
+      "64": [],
+      "89": [
+        49
+      ],
+      "90": [],
+      "91": [
+        108
+      ],
+      "92": [
+        140
+      ],
+      "70": [
+        24
+      ],
+      "93": [
+        28
+      ],
+      "65": [],
+      "72": [
+        43
+      ],
+      "94": [],
+      "73": [
+        1022
+      ],
+      "71": [
+        61
+      ],
+      "95": [
+        6
+      ],
+      "80": [],
+      "96": [],
+      "79": [
+        90
+      ],
+      "97": [
+        38
+      ],
+      "81": [],
+      "86": [
+        74
+      ],
+      "84": [],
+      "99": [
+        9
+      ],
+      "57": [],
+      "100": [
+        51
+      ],
+      "82": [
+        58
+      ],
+      "101": [],
+      "102": [
+        110
+      ],
+      "103": [
+        64
+      ],
+      "104": [
+        8
+      ],
+      "106": [
+        7
+      ],
+      "107": [
+        25
+      ],
+      "108": [
+        54
+      ],
+      "109": [
+        48
+      ],
+      "66": [],
+      "111": [
+        52
+      ],
+      "112": [
+        80
+      ],
+      "113": [
+        135
+      ],
+      "115": [
+        42
+      ],
+      "116": [
+        10
+      ],
+      "117": [
+        44
+      ],
+      "118": [],
+      "119": [
+        13
+      ],
+      "120": [
+        78
+      ],
+      "121": [
+        37
+      ],
+      "123": [
+        91
+      ],
+      "124": [
+        59
+      ],
+      "125": [
+        12
+      ],
+      "126": [],
+      "127": [
+        62
+      ],
+      "129": [
+        55
+      ],
+      "130": [],
+      "131": [
+        11
+      ],
+      "132": [
+        39
+      ],
+      "133": [
+        65
+      ],
+      "134": [],
+      "135": [
+        79
+      ],
+      "136": [
+        76
+      ],
+      "137": [
+        14
+      ],
+      "138": [],
+      "139": [
+        60
+      ],
+      "141": [
+        63
+      ],
+      "142": [],
+      "143": [
+        17
+      ],
+      "144": [
+        56
+      ],
+      "145": [],
+      "146": [
+        16
+      ],
+      "147": [
+        77
+      ],
+      "148": [
+        15
+      ],
+      "149": [],
+      "150": [],
+      "151": []
+    },
+    "configGoalTitles": {
+      "1": "Build a farm",
+      "2": "Train another Villager",
+      "3": "Send a villager to the farm",
+      "4": "Collect a farm",
+      "5": "Cut 7 trees and collect wood",
+      "6": "Build another Farm",
+      "7": "Build another House",
+      "8": "Build a barracks",
+      "9": "Train 3 spearmen",
+      "10": "Build a mill",
+      "11": "Bring a villager to the mill",
+      "12": "Extract 3 of gold",
+      "13": "Kill 3 trolls",
+      "14": "Build a sheep ranch",
+      "15": "Capture a sheep",
+      "16": "Bring a sheep to the ranch",
+      "17": "Collect a sheep ranch",
+      "18": "Build 5 farms",
+      "19": "Build 8 houses",
+      "20": "Build 1 gold mine",
+      "21": "Put 1 villager into the mine",
+      "22": "Build an archery",
+      "23": "Train 3 light archers",
+      "24": "Kill 5 trolls",
+      "25": "Visit 1 friend's empire",
+      "26": "Destroy an enemy building",
+      "27": "Build an stable",
+      "28": "Build 5 decorations",
+      "29": "Move multiple units at once",
+      "30": "Kill 7 trolls",
+      "31": "Put a name to your Empire",
+      "32": "Harvest 10 trees",
+      "33": "Capture a cow",
+      "34": "Build a cow ranch",
+      "35": "Bring a cow to the ranch",
+      "36": "Collect 5 farms",
+      "37": "Reach 25 population",
+      "38": "Harvest 10 gold veins",
+      "39": "Kill 10 trolls",
+      "40": "Destory 5 enemy buildings",
+      "41": "Obtain Troll's Treasure",
+      "42": "Extract 10 of stone",
+      "43": "Expand to 2 acres",
+      "44": "Harvest 15 trees",
+      "45": "Build 10 farms",
+      "46": "Reach 40 population",
+      "47": "Capture 3 cows",
+      "48": "Kill 20 trolls",
+      "49": "Extract 15 of gold",
+      "50": "Destroy 15 enemy buildings",
+      "51": "Capture 3 sheeps",
+      "52": "Extract 15 of stone",
+      "53": "Expand to 3 acres",
+      "54": "Build a wonder",
+      "55": "Harvest 20 trees",
+      "56": "Visit 3 friends",
+      "57": "Build 20 farms",
+      "58": "Reach 75 population",
+      "59": "Capture 5 cows",
+      "60": "Kill 35 trolls",
+      "61": "Extract 18 of gold",
+      "62": "Destroy 30 enemy buildings",
+      "63": "Capture 5 sheeps",
+      "64": "Extract 18 of stone",
+      "65": "Expand to 4 acres",
+      "66": "Build 2 wonders",
+      "67": "Harvest 50 trees",
+      "68": "Visit 5 friend's empires",
+      "69": "Build 50 farms",
+      "70": "Reach 100 population",
+      "71": "Capture 7 Cows",
+      "72": "Kill 50 trolls",
+      "73": "Extract 20 of gold",
+      "74": "Destroy 50 enemy buildings",
+      "75": "Capture 7 sheeps",
+      "76": "Build a blacksmith",
+      "77": "Extract 20 of stone",
+      "78": "Expand to 6 acres",
+      "79": "Build 3 wonders",
+      "80": "Harvest 100 trees",
+      "81": "Build a market",
+      "82": "Trade resources (market)",
+      "83": "Visit 10 friend's empire",
+      "84": "Build 100 farms",
+      "85": "Reach 150 population",
+      "86": "Kill 75 trolls",
+      "87": "Destroy 75 enemy buildings",
+      "88": "Build a university",
+      "89": "Expand to 9 acres",
+      "90": "Build 5 wonders",
+      "91": "Visit 25 friend's empire"
+    }
+  }
+}

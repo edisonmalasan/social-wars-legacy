@@ -1,0 +1,5772 @@
+{
+ "note": "Inventory of every UI class in the decompiled client. The original Flash UI chrome is not in the asset tree, so the modern client must rebuild it; this is the backlog.",
+ "counts": {
+  "total": 260,
+  "byKind": {
+   "movieclip": 108,
+   "gui-panel": 57,
+   "popup": 95
+  }
+ },
+ "screens": [
+  {
+   "class": null,
+   "path": "ButtonMarketMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "ButtonMarketMC"
+   ],
+   "overrides": [],
+   "bytes": 546
+  },
+  {
+   "class": null,
+   "path": "ButtonResourceMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "ButtonResourceMC"
+   ],
+   "overrides": [],
+   "bytes": 459
+  },
+  {
+   "class": null,
+   "path": "ButtonSmallLargeTextWithIconResourcesMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "ButtonSmallLargeTextWithIconResourcesMC"
+   ],
+   "overrides": [],
+   "bytes": 616
+  },
+  {
+   "class": null,
+   "path": "ButtonSmallOnlyText.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "ButtonSmallOnlyText"
+   ],
+   "overrides": [],
+   "bytes": 528
+  },
+  {
+   "class": null,
+   "path": "ButtonSmallWithIconResourcesMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "ButtonSmallWithIconResourcesMC"
+   ],
+   "overrides": [],
+   "bytes": 597
+  },
+  {
+   "class": null,
+   "path": "ButtonSpeedUpNoIconAsset.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "ButtonSpeedUpNoIconAsset"
+   ],
+   "overrides": [],
+   "bytes": 538
+  },
+  {
+   "class": null,
+   "path": "ButtonSpeedUpWideAsset.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "ButtonSpeedUpWideAsset"
+   ],
+   "overrides": [],
+   "bytes": 631
+  },
+  {
+   "class": null,
+   "path": "ButtonTabAsset.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "ButtonTabAsset"
+   ],
+   "overrides": [],
+   "bytes": 594
+  },
+  {
+   "class": "AdminButton",
+   "path": "GUI/AdminButton.as",
+   "kind": "gui-panel",
+   "extends": "Sprite",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "AdminButton"
+   ],
+   "overrides": [],
+   "bytes": 1561
+  },
+  {
+   "class": "AdminPanel",
+   "path": "GUI/AdminPanel.as",
+   "kind": "gui-panel",
+   "extends": "AdminPanelMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "AdminPanel",
+    "addButton",
+    "resetGoals",
+    "onEndChapter",
+    "destroyTownHall",
+    "inputKeyUp",
+    "inputKeyDown",
+    "printAvailableCommands",
+    "saveMap",
+    "loadMap",
+    "camera",
+    "circle",
+    "giveResources",
+    "fastForward",
+    "killAt",
+    "removeAt",
+    "killAll",
+    "spawn",
+    "spawnEnemySoldiers",
+    "spawnArmy"
+   ],
+   "overrides": [],
+   "bytes": 67270
+  },
+  {
+   "class": "AnimatedUnit",
+   "path": "GUI/AnimatedUnit.as",
+   "kind": "gui-panel",
+   "extends": null,
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": true,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "AnimatedUnit",
+    "remove"
+   ],
+   "overrides": [],
+   "bytes": 6833
+  },
+  {
+   "class": "AnimatedUnitCentered",
+   "path": "GUI/AnimatedUnitCentered.as",
+   "kind": "gui-panel",
+   "extends": null,
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": true,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "AnimatedUnitCentered",
+    "remove"
+   ],
+   "overrides": [],
+   "bytes": 6359
+  },
+  {
+   "class": "ArmyUnitCell",
+   "path": "GUI/ArmyUnitCell.as",
+   "kind": "gui-panel",
+   "extends": "ArmyUnitCellMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "ArmyUnitCell"
+   ],
+   "overrides": [],
+   "bytes": 993
+  },
+  {
+   "class": "AssaultCountdown",
+   "path": "GUI/AssaultCountdown.as",
+   "kind": "gui-panel",
+   "extends": "AssaultCountdownMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "AssaultCountdown",
+    "init",
+    "finish",
+    "stopCountdown"
+   ],
+   "overrides": [],
+   "bytes": 2675
+  },
+  {
+   "class": "BuildingWindow",
+   "path": "GUI/BuildingWindow.as",
+   "kind": "gui-panel",
+   "extends": "BuildingWindowMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Are you sure?",
+    "All"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "BuildingWindow",
+    "destroy",
+    "closePopup",
+    "setItem",
+    "resetWindow",
+    "createButtons",
+    "ioErrorHandler"
+   ],
+   "overrides": [],
+   "bytes": 21554
+  },
+  {
+   "class": "CountdownTimer",
+   "path": "GUI/CountdownTimer.as",
+   "kind": "gui-panel",
+   "extends": "Sprite",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "1 Enemy alive"
+   ],
+   "literalCount": 1,
+   "images": [],
+   "functions": [
+    "CountdownTimer",
+    "setTimer",
+    "setTimerOgres",
+    "onCompleteOgres",
+    "setText",
+    "setTextOgres",
+    "setTextAssault",
+    "destroy",
+    "setTimerSingle",
+    "setTimerBasic",
+    "stop",
+    "setTitleText"
+   ],
+   "overrides": [],
+   "bytes": 15504
+  },
+  {
+   "class": "CrossDCiViralIcon",
+   "path": "GUI/CrossDCiViralIcon.as",
+   "kind": "gui-panel",
+   "extends": "Sprite",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "CrossDCiViralIcon",
+    "clickButton"
+   ],
+   "overrides": [],
+   "bytes": 1136
+  },
+  {
+   "class": "DealSpotNPPIcon",
+   "path": "GUI/DealSpotNPPIcon.as",
+   "kind": "gui-panel",
+   "extends": "Sprite",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "DealSpotNPPIcon",
+    "onSecError",
+    "onIOError",
+    "onError",
+    "onLoadComplete"
+   ],
+   "overrides": [],
+   "bytes": 2220
+  },
+  {
+   "class": "ExpandTabNew2",
+   "path": "GUI/ExpandTabNew2.as",
+   "kind": "gui-panel",
+   "extends": "BuildingWindowMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Buy expansion with Gold",
+    "Buy expansion with Cash",
+    "Don\\'t wait and buy an extra expansion right now!",
+    "Not enough Gold to expand",
+    "Not enough neighbours to expand",
+    "Not enough Cash to expand",
+    "Oh no! You don\\'t have enough cash! Would you like to get some more?",
+    "Choose an expansion slot"
+   ],
+   "literalCount": 8,
+   "images": [
+    "expansion_gold.jpg",
+    "expansion_cash.jpg"
+   ],
+   "functions": [
+    "ExpandTabNew2",
+    "createButtons",
+    "destroy",
+    "resetWindow"
+   ],
+   "overrides": [],
+   "bytes": 6386
+  },
+  {
+   "class": "ExtendedPortraitPopupButton",
+   "path": "GUI/ExtendedPortraitPopupButton.as",
+   "kind": "gui-panel",
+   "extends": "MovieClip",
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "ExtendedPortraitPopupButton",
+    "loadImage"
+   ],
+   "overrides": [],
+   "bytes": 1070
+  },
+  {
+   "class": "ExtendedPortraitPopupButtonEmbeded",
+   "path": "GUI/ExtendedPortraitPopupButtonEmbeded.as",
+   "kind": "gui-panel",
+   "extends": "MovieClip",
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "ExtendedPortraitPopupButtonEmbeded",
+    "loadInstance"
+   ],
+   "overrides": [],
+   "bytes": 960
+  },
+  {
+   "class": "FriendButton",
+   "path": "GUI/FriendButton.as",
+   "kind": "gui-panel",
+   "extends": "FriendButtonMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "ASSIST!",
+    "WORLD!",
+    "Add Friend",
+    "points"
+   ],
+   "literalCount": 4,
+   "images": [],
+   "functions": [
+    "FriendButton",
+    "closeWindow",
+    "destroy",
+    "setFriend",
+    "closePopup",
+    "ioErrorHandler",
+    "exploreWorld"
+   ],
+   "overrides": [],
+   "bytes": 10936
+  },
+  {
+   "class": "FriendsWindow",
+   "path": "GUI/FriendsWindow.as",
+   "kind": "gui-panel",
+   "extends": "MenuTabFriendsMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Are you sure?"
+   ],
+   "literalCount": 1,
+   "images": [],
+   "functions": [
+    "FriendsWindow",
+    "destroy",
+    "closePopup",
+    "resetWindow",
+    "setFriend",
+    "ioErrorHandler"
+   ],
+   "overrides": [],
+   "bytes": 8665
+  },
+  {
+   "class": "GiftButtonLarge",
+   "path": "GUI/GiftButtonLarge.as",
+   "kind": "gui-panel",
+   "extends": "GiftButtonMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "USE",
+    "SELL",
+    "Tower limit reached!",
+    "Wall limit reached!"
+   ],
+   "literalCount": 4,
+   "images": [],
+   "functions": [
+    "GiftButtonLarge",
+    "closeWindow",
+    "destroy",
+    "setItem",
+    "closePopup"
+   ],
+   "overrides": [],
+   "bytes": 6295
+  },
+  {
+   "class": "GiftWindow",
+   "path": "GUI/GiftWindow.as",
+   "kind": "gui-panel",
+   "extends": "BuildingWindowMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Are you sure?"
+   ],
+   "literalCount": 1,
+   "images": [],
+   "functions": [
+    "GiftWindow",
+    "closePopup",
+    "setItem",
+    "resetWindow",
+    "selectGift",
+    "createButtons",
+    "ioErrorHandler",
+    "destroy"
+   ],
+   "overrides": [],
+   "bytes": 9942
+  },
+  {
+   "class": "GuiManager",
+   "path": "GUI/GuiManager.as",
+   "kind": "gui-panel",
+   "extends": "GuiMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Neighbors",
+    "Houses and resources",
+    "Decorations",
+    "Defenses",
+    "Army",
+    "Expand",
+    "Gifts and Storage",
+    "Wonders",
+    "Gold",
+    "Cash",
+    "Trophies",
+    "Coming Soon"
+   ],
+   "literalCount": 77,
+   "images": [],
+   "functions": [
+    "GuiManager",
+    "updateGuiBackgrounds",
+    "addMagicBox",
+    "arrangeGoalBoxToMagicBoxPresence",
+    "removeMagicBox",
+    "hideMagicBox",
+    "showMagicBox",
+    "init",
+    "onOverFace",
+    "onOutFace",
+    "onClickFace",
+    "onClickOptions",
+    "togglePause",
+    "onUnrollOptions",
+    "onRollOptions",
+    "createButtonsHerramientas",
+    "blockButtonsHerramientas",
+    "createViralButtons",
+    "showDailybonusViralButtons",
+    "showMondayBonusViralButtons"
+   ],
+   "overrides": [],
+   "bytes": 105638
+  },
+  {
+   "class": "IconPanel",
+   "path": "GUI/IconPanel.as",
+   "kind": "gui-panel",
+   "extends": "Sprite",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "IconPanel",
+    "updateSize",
+    "addIcon",
+    "changeToolTipOffsets",
+    "removeIcon"
+   ],
+   "overrides": [],
+   "bytes": 6501
+  },
+  {
+   "class": "InfoPopup",
+   "path": "GUI/InfoPopup.as",
+   "kind": "gui-panel",
+   "extends": "InfoPopupMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "InfoPopup",
+    "destroy",
+    "update",
+    "hideTime",
+    "reposition"
+   ],
+   "overrides": [],
+   "bytes": 2671
+  },
+  {
+   "class": "InventoryItem",
+   "path": "GUI/InventoryItem.as",
+   "kind": "gui-panel",
+   "extends": "InventoryItemMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "InventoryItem",
+    "setPos"
+   ],
+   "overrides": [],
+   "bytes": 1616
+  },
+  {
+   "class": "ItemButtonLarge",
+   "path": "GUI/ItemButtonLarge.as",
+   "kind": "gui-panel",
+   "extends": "ItemButtonLargeMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Limited Offer",
+    "EARNINGS:",
+    "BUY FOR:",
+    "Building Time:",
+    "Depot limit reached!",
+    "Tower limit reached!",
+    "Wall limit reached!"
+   ],
+   "literalCount": 7,
+   "images": [],
+   "functions": [
+    "ItemButtonLarge",
+    "closeWindow",
+    "destroy",
+    "setItem",
+    "overUnlock",
+    "outUnlock",
+    "loadImage",
+    "closePopup"
+   ],
+   "overrides": [],
+   "bytes": 18467
+  },
+  {
+   "class": "ItemButtonLargeExpand2",
+   "path": "GUI/ItemButtonLargeExpand2.as",
+   "kind": "gui-panel",
+   "extends": "ItemButtonLarge2RowsMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "buy for",
+    "Oh no! You don\\'t have enough cash! Would you like to get some more?",
+    "You need more neighbours to expand your base.\\nWanna get some more?\\n Easy, invite your friends!",
+    "You need more gold to expand your base.\\n Wanna get some now?"
+   ],
+   "literalCount": 4,
+   "images": [],
+   "functions": [
+    "ItemButtonLargeExpand2"
+   ],
+   "overrides": [],
+   "bytes": 4901
+  },
+  {
+   "class": "ItemButtonLargeResources",
+   "path": "GUI/ItemButtonLargeResources.as",
+   "kind": "gui-panel",
+   "extends": "ItemButtonLargeMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "ItemButtonLargeResources"
+   ],
+   "overrides": [],
+   "bytes": 5529
+  },
+  {
+   "class": "MagicEntry",
+   "path": "GUI/MagicEntry.as",
+   "kind": "gui-panel",
+   "extends": "MagicentryMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Learned",
+    "Available",
+    "Blocked",
+    "unlock at level"
+   ],
+   "literalCount": 4,
+   "images": [],
+   "functions": [
+    "MagicEntry",
+    "unlock"
+   ],
+   "overrides": [],
+   "bytes": 1957
+  },
+  {
+   "class": "MondayBonusButton",
+   "path": "GUI/MondayBonusButton.as",
+   "kind": "gui-panel",
+   "extends": "MondayBonusButtonAsset",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "MondayBonusButton",
+    "update"
+   ],
+   "overrides": [],
+   "bytes": 607
+  },
+  {
+   "class": "Portrait",
+   "path": "GUI/Portrait.as",
+   "kind": "gui-panel",
+   "extends": "MovieClip",
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "Portrait",
+    "setElement",
+    "getElement",
+    "UpdateImage",
+    "loadImage",
+    "update",
+    "Refresh",
+    "overItem",
+    "outItem",
+    "clickItem",
+    "Visible"
+   ],
+   "overrides": [],
+   "bytes": 4976
+  },
+  {
+   "class": "PortraitAssault",
+   "path": "GUI/PortraitAssault.as",
+   "kind": "gui-panel",
+   "extends": "PortraitAssaultMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "PortraitAssault",
+    "UpdateImage",
+    "loadImage"
+   ],
+   "overrides": [],
+   "bytes": 1337
+  },
+  {
+   "class": "PortraitSpecialAttack",
+   "path": "GUI/PortraitSpecialAttack.as",
+   "kind": "gui-panel",
+   "extends": "Portrait",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Not ready yet!"
+   ],
+   "literalCount": 1,
+   "images": [],
+   "functions": [
+    "PortraitSpecialAttack",
+    "startCastingMask",
+    "updateState",
+    "setStateIdle"
+   ],
+   "overrides": [
+    "overItem",
+    "outItem",
+    "clickItem",
+    "loadImage",
+    "getElement",
+    "UpdateImage"
+   ],
+   "bytes": 9580
+  },
+  {
+   "class": "PortraitSpecialAttackLimit",
+   "path": "GUI/PortraitSpecialAttackLimit.as",
+   "kind": "gui-panel",
+   "extends": "PortraitSpecialAttack",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "not charged yet"
+   ],
+   "literalCount": 1,
+   "images": [],
+   "functions": [
+    "PortraitSpecialAttackLimit"
+   ],
+   "overrides": [
+    "overItem",
+    "outItem",
+    "clickItem",
+    "updateState",
+    "UpdateImage",
+    "setElement",
+    "update"
+   ],
+   "bytes": 4328
+  },
+  {
+   "class": "PortraitTrainQueue",
+   "path": "GUI/PortraitTrainQueue.as",
+   "kind": "gui-panel",
+   "extends": "MovieClip",
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "PortraitTrainQueue",
+    "startRefreshing",
+    "loadImage",
+    "update",
+    "overItem",
+    "outItem",
+    "clickItem",
+    "setVisible"
+   ],
+   "overrides": [],
+   "bytes": 4170
+  },
+  {
+   "class": "PremiumCollectPanel",
+   "path": "GUI/PremiumCollectPanel.as",
+   "kind": "gui-panel",
+   "extends": "Sprite",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Premium bonus!"
+   ],
+   "literalCount": 1,
+   "images": [],
+   "functions": [
+    "PremiumCollectPanel",
+    "showPanel",
+    "hidePanel"
+   ],
+   "overrides": [],
+   "bytes": 5440
+  },
+  {
+   "class": "RecuadroInfo",
+   "path": "GUI/RecuadroInfo.as",
+   "kind": "gui-panel",
+   "extends": "MovieClip",
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "SPEED UP",
+    "Train time",
+    "Instantly build the unit currently beign trained",
+    "Oh no! You don\\'t have enough cash! Would you like to get some more?",
+    "How hard the building attacks with each hit",
+    "How hard the unit attacks with each hit",
+    "How fast the building attacks",
+    "How fast the unit attacks",
+    "How far can the building attack",
+    "How far can the unit attack",
+    "How fast the unit is",
+    "How much population the building provides"
+   ],
+   "literalCount": 46,
+   "images": [],
+   "functions": [
+    "RecuadroInfo",
+    "addElementInRecuadro",
+    "addSpecialAttacksInRecuadro",
+    "castSpecialAttacks",
+    "updateSpecialAttackCooldown",
+    "addSpecialUnitSelectorPortrait",
+    "removeSpecialUnitSelectorPortrait",
+    "showSpecialUnitPortraits",
+    "hideSpecialUnitPortraits",
+    "drawSpecialAttacks",
+    "removeElementInRecuadro",
+    "clearElementsInRecuadro",
+    "clearSpecialUnitPortraits",
+    "refreshRecuadro",
+    "initPortraits",
+    "removeExtendedPortrait",
+    "initializeExtendedPortrait",
+    "createTrainingQueue",
+    "showPopOver",
+    "showTooltip"
+   ],
+   "overrides": [],
+   "bytes": 65370
+  },
+  {
+   "class": "ResourcesTab",
+   "path": "GUI/ResourcesTab.as",
+   "kind": "gui-panel",
+   "extends": "BuildingWindowMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "ResourcesTab",
+    "createButtons",
+    "destroy",
+    "resetWindow"
+   ],
+   "overrides": [],
+   "bytes": 4434
+  },
+  {
+   "class": "SelectedMagic",
+   "path": "GUI/SelectedMagic.as",
+   "kind": "gui-panel",
+   "extends": "SelectedMagicMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Dark Matter cost",
+    "Learn this spell:",
+    "Cost",
+    "unlock at level",
+    "Your spell level:",
+    "Next level:",
+    "Buy with gold",
+    "Buy NOW!"
+   ],
+   "literalCount": 8,
+   "images": [],
+   "functions": [
+    "SelectedMagic"
+   ],
+   "overrides": [],
+   "bytes": 9172
+  },
+  {
+   "class": "SpeakerBox",
+   "path": "GUI/SpeakerBox.as",
+   "kind": "gui-panel",
+   "extends": "SpeakerBoxMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "OK"
+   ],
+   "literalCount": 1,
+   "images": [],
+   "functions": [
+    "SpeakerBox"
+   ],
+   "overrides": [],
+   "bytes": 3487
+  },
+  {
+   "class": "SpellButton",
+   "path": "GUI/SpellButton.as",
+   "kind": "gui-panel",
+   "extends": "SpellButtonMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "SpellButton",
+    "glow",
+    "unGlow",
+    "disable",
+    "enable"
+   ],
+   "overrides": [],
+   "bytes": 3122
+  },
+  {
+   "class": "SubCategory",
+   "path": "GUI/SubCategory.as",
+   "kind": "gui-panel",
+   "extends": "Sprite",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "SubCategory",
+    "setTextColor",
+    "seleccionar",
+    "deseleccionar",
+    "overPastilla",
+    "outPastilla",
+    "setText"
+   ],
+   "overrides": [],
+   "bytes": 4442
+  },
+  {
+   "class": "Tab",
+   "path": "GUI/Tab.as",
+   "kind": "gui-panel",
+   "extends": "TabMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "Tab",
+    "mouseUsed",
+    "highlightTab",
+    "fadeTab",
+    "destroy"
+   ],
+   "overrides": [],
+   "bytes": 2783
+  },
+  {
+   "class": "UnitTooltip",
+   "path": "GUI/UnitTooltip.as",
+   "kind": "gui-panel",
+   "extends": "MovieClip",
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "UnitTooltip",
+    "faceUp",
+    "loadAnim",
+    "destroy"
+   ],
+   "overrides": [],
+   "bytes": 5946
+  },
+  {
+   "class": "UnitXPLevelInfoDisplay",
+   "path": "GUI/UnitXPLevelInfoDisplay.as",
+   "kind": "gui-panel",
+   "extends": null,
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "LEVEL UP",
+    "Unit Level",
+    "Defeat enemies to level up your unit!!"
+   ],
+   "literalCount": 3,
+   "images": [],
+   "functions": [
+    "UnitXPLevelInfoDisplay"
+   ],
+   "overrides": [],
+   "bytes": 7436
+  },
+  {
+   "class": "ZoomSlider",
+   "path": "GUI/ZoomSlider.as",
+   "kind": "gui-panel",
+   "extends": "ZoomSliderMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "ZoomSlider",
+    "destroy",
+    "empty",
+    "setItem",
+    "ioErrorHandler",
+    "setValue"
+   ],
+   "overrides": [],
+   "bytes": 4378
+  },
+  {
+   "class": "AttachableArrow",
+   "path": "GUI/attachables/AttachableArrow.as",
+   "kind": "gui-panel",
+   "extends": "AttachableVisualElement",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "AttachableArrow",
+    "attachArrowTo",
+    "Singleton"
+   ],
+   "overrides": [
+    "dettach"
+   ],
+   "bytes": 5825
+  },
+  {
+   "class": "AttachableVisualElement",
+   "path": "GUI/attachables/AttachableVisualElement.as",
+   "kind": "gui-panel",
+   "extends": null,
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "AttachableVisualElement",
+    "attachTo",
+    "dettach",
+    "isAttachedTo",
+    "isAttached"
+   ],
+   "overrides": [],
+   "bytes": 1857
+  },
+  {
+   "class": "InfoButtonBarrack",
+   "path": "GUI/infobuttons/InfoButtonBarrack.as",
+   "kind": "gui-panel",
+   "extends": "InfoButtonBarrackMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Allows you to train:"
+   ],
+   "literalCount": 1,
+   "images": [],
+   "functions": [
+    "InfoButtonBarrack"
+   ],
+   "overrides": [],
+   "bytes": 2233
+  },
+  {
+   "class": "InfoButtonDepot",
+   "path": "GUI/infobuttons/InfoButtonDepot.as",
+   "kind": "gui-panel",
+   "extends": "InfoButtonDepotMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Provides you with resources periodically.",
+    "Choose time to get more reward.",
+    "Earn"
+   ],
+   "literalCount": 3,
+   "images": [],
+   "functions": [
+    "InfoButtonDepot"
+   ],
+   "overrides": [],
+   "bytes": 847
+  },
+  {
+   "class": "InfoButtonFortressBarrack",
+   "path": "GUI/infobuttons/InfoButtonFortressBarrack.as",
+   "kind": "gui-panel",
+   "extends": "InfoButtonFortressBarrackMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Defensive Structure",
+    "Allows you to train:"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "InfoButtonFortressBarrack"
+   ],
+   "overrides": [],
+   "bytes": 2053
+  },
+  {
+   "class": "InfoButtonGarage",
+   "path": "GUI/infobuttons/InfoButtonGarage.as",
+   "kind": "gui-panel",
+   "extends": "InfoButtonGarageMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Allows you to train:"
+   ],
+   "literalCount": 1,
+   "images": [],
+   "functions": [
+    "InfoButtonGarage"
+   ],
+   "overrides": [],
+   "bytes": 1652
+  },
+  {
+   "class": "InfoButtonGeneric",
+   "path": "GUI/infobuttons/InfoButtonGeneric.as",
+   "kind": "gui-panel",
+   "extends": "InfoButtonGenericMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "InfoButtonGeneric"
+   ],
+   "overrides": [],
+   "bytes": 284
+  },
+  {
+   "class": "InfoButtonHealBarrack",
+   "path": "GUI/infobuttons/InfoButtonHealBarrack.as",
+   "kind": "gui-panel",
+   "extends": "InfoButtonHealBarrackMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "InfoButtonHealBarrack"
+   ],
+   "overrides": [],
+   "bytes": 1552
+  },
+  {
+   "class": "InfoButtonHouse",
+   "path": "GUI/infobuttons/InfoButtonHouse.as",
+   "kind": "gui-panel",
+   "extends": "InfoButtonHouseMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Increases your Population limit by"
+   ],
+   "literalCount": 1,
+   "images": [],
+   "functions": [
+    "InfoButtonHouse"
+   ],
+   "overrides": [],
+   "bytes": 592
+  },
+  {
+   "class": "InfoButtonSilo",
+   "path": "GUI/infobuttons/InfoButtonSilo.as",
+   "kind": "gui-panel",
+   "extends": "InfoButtonSiloMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "by:",
+    "Increases your resource limits:"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "InfoButtonSilo"
+   ],
+   "overrides": [],
+   "bytes": 618
+  },
+  {
+   "class": "InfoButtonText",
+   "path": "GUI/infobuttons/InfoButtonText.as",
+   "kind": "gui-panel",
+   "extends": "InfoButtonStore14MC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "InfoButtonText"
+   ],
+   "overrides": [],
+   "bytes": 439
+  },
+  {
+   "class": "InfoButtonTower",
+   "path": "GUI/infobuttons/InfoButtonTower.as",
+   "kind": "gui-panel",
+   "extends": "InfoButtonTowerMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Defensive building that attacks any approaching enemies with deadly power",
+    "Defensive Structure"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "InfoButtonTower"
+   ],
+   "overrides": [],
+   "bytes": 929
+  },
+  {
+   "class": "InfoButtonUnit",
+   "path": "GUI/infobuttons/InfoButtonUnit.as",
+   "kind": "gui-panel",
+   "extends": "InfoButtonBarrackMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "InfoButtonUnit"
+   ],
+   "overrides": [],
+   "bytes": 1731
+  },
+  {
+   "class": "InfoButtonWall",
+   "path": "GUI/infobuttons/InfoButtonWall.as",
+   "kind": "gui-panel",
+   "extends": "InfoButtonDefensiveMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Defensive Structure",
+    "Defensive structure that keeps enemies outside your base"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "InfoButtonWall"
+   ],
+   "overrides": [],
+   "bytes": 675
+  },
+  {
+   "class": "InfoButtonWonder",
+   "path": "GUI/infobuttons/InfoButtonWonder.as",
+   "kind": "gui-panel",
+   "extends": "InfoButtonWonderMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Wonders give you lots of resources to allow you growing up faster."
+   ],
+   "literalCount": 1,
+   "images": [],
+   "functions": [
+    "InfoButtonWonder"
+   ],
+   "overrides": [],
+   "bytes": 720
+  },
+  {
+   "class": null,
+   "path": "GuiCover.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "GuiCover"
+   ],
+   "overrides": [],
+   "bytes": 264
+  },
+  {
+   "class": null,
+   "path": "GuiCoverExplorationMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "GuiCoverExplorationMC"
+   ],
+   "overrides": [],
+   "bytes": 290
+  },
+  {
+   "class": null,
+   "path": "GuiMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "GuiMC"
+   ],
+   "overrides": [],
+   "bytes": 461
+  },
+  {
+   "class": null,
+   "path": "IconAssaultObjectivMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "IconAssaultObjectivMC"
+   ],
+   "overrides": [],
+   "bytes": 290
+  },
+  {
+   "class": null,
+   "path": "IconCollect.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "IconCollect"
+   ],
+   "overrides": [],
+   "bytes": 409
+  },
+  {
+   "class": null,
+   "path": "IconPlayerMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "IconPlayerMC"
+   ],
+   "overrides": [],
+   "bytes": 271
+  },
+  {
+   "class": null,
+   "path": "IconResourcesMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "IconResourcesMC"
+   ],
+   "overrides": [],
+   "bytes": 276
+  },
+  {
+   "class": null,
+   "path": "IconTutorialMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "IconTutorialMC"
+   ],
+   "overrides": [],
+   "bytes": 410
+  },
+  {
+   "class": null,
+   "path": "IconVideoMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "IconVideoMC"
+   ],
+   "overrides": [],
+   "bytes": 347
+  },
+  {
+   "class": null,
+   "path": "IconoCapturadoMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "IconoCapturadoMC"
+   ],
+   "overrides": [],
+   "bytes": 280
+  },
+  {
+   "class": null,
+   "path": "InfoButtonBarrackMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoButtonBarrackMC"
+   ],
+   "overrides": [],
+   "bytes": 824
+  },
+  {
+   "class": null,
+   "path": "InfoButtonBridgeMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoButtonBridgeMC"
+   ],
+   "overrides": [],
+   "bytes": 407
+  },
+  {
+   "class": null,
+   "path": "InfoButtonBuilding.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoButtonBuilding"
+   ],
+   "overrides": [],
+   "bytes": 406
+  },
+  {
+   "class": null,
+   "path": "InfoButtonDefensiveMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoButtonDefensiveMC"
+   ],
+   "overrides": [],
+   "bytes": 450
+  },
+  {
+   "class": null,
+   "path": "InfoButtonDepotMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoButtonDepotMC"
+   ],
+   "overrides": [],
+   "bytes": 461
+  },
+  {
+   "class": null,
+   "path": "InfoButtonDifficulty.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoButtonDifficulty"
+   ],
+   "overrides": [],
+   "bytes": 365
+  },
+  {
+   "class": null,
+   "path": "InfoButtonFortressBarrackMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoButtonFortressBarrackMC"
+   ],
+   "overrides": [],
+   "bytes": 969
+  },
+  {
+   "class": null,
+   "path": "InfoButtonGarageMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoButtonGarageMC"
+   ],
+   "overrides": [],
+   "bytes": 769
+  },
+  {
+   "class": null,
+   "path": "InfoButtonGenericMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoButtonGenericMC"
+   ],
+   "overrides": [],
+   "bytes": 360
+  },
+  {
+   "class": null,
+   "path": "InfoButtonHealBarrackMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoButtonHealBarrackMC"
+   ],
+   "overrides": [],
+   "bytes": 779
+  },
+  {
+   "class": null,
+   "path": "InfoButtonHouseMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoButtonHouseMC"
+   ],
+   "overrides": [],
+   "bytes": 404
+  },
+  {
+   "class": null,
+   "path": "InfoButtonSiloMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoButtonSiloMC"
+   ],
+   "overrides": [],
+   "bytes": 451
+  },
+  {
+   "class": null,
+   "path": "InfoButtonStore14MC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoButtonStore14MC"
+   ],
+   "overrides": [],
+   "bytes": 363
+  },
+  {
+   "class": null,
+   "path": "InfoButtonTowerMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoButtonTowerMC"
+   ],
+   "overrides": [],
+   "bytes": 577
+  },
+  {
+   "class": null,
+   "path": "InfoButtonUnitCollectionBuyMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoButtonUnitCollectionBuyMC"
+   ],
+   "overrides": [],
+   "bytes": 841
+  },
+  {
+   "class": null,
+   "path": "InfoButtonUnitCollectionMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoButtonUnitCollectionMC"
+   ],
+   "overrides": [],
+   "bytes": 790
+  },
+  {
+   "class": null,
+   "path": "InfoButtonUnitMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoButtonUnitMC"
+   ],
+   "overrides": [],
+   "bytes": 765
+  },
+  {
+   "class": null,
+   "path": "InfoButtonUpgradeMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoButtonUpgradeMC"
+   ],
+   "overrides": [],
+   "bytes": 635
+  },
+  {
+   "class": null,
+   "path": "InfoButtonWonderMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoButtonWonderMC"
+   ],
+   "overrides": [],
+   "bytes": 551
+  },
+  {
+   "class": null,
+   "path": "InfoPopupMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoPopupMC"
+   ],
+   "overrides": [],
+   "bytes": 542
+  },
+  {
+   "class": null,
+   "path": "InfoPopupManaMc.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "InfoPopupManaMc"
+   ],
+   "overrides": [],
+   "bytes": 358
+  },
+  {
+   "class": null,
+   "path": "MenuTabFriendsMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "MenuTabFriendsMC"
+   ],
+   "overrides": [],
+   "bytes": 371
+  },
+  {
+   "class": null,
+   "path": "PopOverMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopOverMC"
+   ],
+   "overrides": [],
+   "bytes": 631
+  },
+  {
+   "class": null,
+   "path": "PopupAlertMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupAlertMC"
+   ],
+   "overrides": [],
+   "bytes": 409
+  },
+  {
+   "class": null,
+   "path": "PopupAllUnitsMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupAllUnitsMC"
+   ],
+   "overrides": [],
+   "bytes": 688
+  },
+  {
+   "class": null,
+   "path": "PopupAllianceDailyBonusAsset.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupAllianceDailyBonusAsset"
+   ],
+   "overrides": [],
+   "bytes": 661
+  },
+  {
+   "class": null,
+   "path": "PopupAlliancesCenterAsset.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupAlliancesCenterAsset"
+   ],
+   "overrides": [],
+   "bytes": 766
+  },
+  {
+   "class": null,
+   "path": "PopupAssaultHistoryMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupAssaultHistoryMC"
+   ],
+   "overrides": [],
+   "bytes": 1244
+  },
+  {
+   "class": null,
+   "path": "PopupAttackFinishedMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupAttackFinishedMC"
+   ],
+   "overrides": [],
+   "bytes": 1649
+  },
+  {
+   "class": null,
+   "path": "PopupBreedingMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupBreedingMC"
+   ],
+   "overrides": [],
+   "bytes": 1425
+  },
+  {
+   "class": null,
+   "path": "PopupBuildingInventoryMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupBuildingInventoryMC"
+   ],
+   "overrides": [],
+   "bytes": 578
+  },
+  {
+   "class": null,
+   "path": "PopupBuildingMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupBuildingMC"
+   ],
+   "overrides": [],
+   "bytes": 580
+  },
+  {
+   "class": null,
+   "path": "PopupBuildinginventoryItemMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupBuildinginventoryItemMC"
+   ],
+   "overrides": [],
+   "bytes": 594
+  },
+  {
+   "class": null,
+   "path": "PopupBuyGoldMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupBuyGoldMC"
+   ],
+   "overrides": [],
+   "bytes": 628
+  },
+  {
+   "class": null,
+   "path": "PopupBuyManaMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupBuyManaMC"
+   ],
+   "overrides": [],
+   "bytes": 996
+  },
+  {
+   "class": null,
+   "path": "PopupChooseGenderMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupChooseGenderMC"
+   ],
+   "overrides": [],
+   "bytes": 450
+  },
+  {
+   "class": null,
+   "path": "PopupCollectMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupCollectMC"
+   ],
+   "overrides": [],
+   "bytes": 444
+  },
+  {
+   "class": null,
+   "path": "PopupConfirmMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupConfirmMC"
+   ],
+   "overrides": [],
+   "bytes": 478
+  },
+  {
+   "class": null,
+   "path": "PopupDartsMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupDartsMC"
+   ],
+   "overrides": [],
+   "bytes": 2382
+  },
+  {
+   "class": null,
+   "path": "PopupExpandMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupExpandMC"
+   ],
+   "overrides": [],
+   "bytes": 576
+  },
+  {
+   "class": null,
+   "path": "PopupGenericUnitSelectorMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupGenericUnitSelectorMC"
+   ],
+   "overrides": [],
+   "bytes": 529
+  },
+  {
+   "class": null,
+   "path": "PopupGetEnergyMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupGetEnergyMC"
+   ],
+   "overrides": [],
+   "bytes": 626
+  },
+  {
+   "class": null,
+   "path": "PopupGetPackMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupGetPackMC"
+   ],
+   "overrides": [],
+   "bytes": 647
+  },
+  {
+   "class": null,
+   "path": "PopupGoalCompleteMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupGoalCompleteMC"
+   ],
+   "overrides": [],
+   "bytes": 699
+  },
+  {
+   "class": null,
+   "path": "PopupGoalsMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupGoalsMC"
+   ],
+   "overrides": [],
+   "bytes": 891
+  },
+  {
+   "class": null,
+   "path": "PopupGotPackMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupGotPackMC"
+   ],
+   "overrides": [],
+   "bytes": 594
+  },
+  {
+   "class": null,
+   "path": "PopupHelpIslandMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupHelpIslandMC"
+   ],
+   "overrides": [],
+   "bytes": 506
+  },
+  {
+   "class": null,
+   "path": "PopupHireFriendsGenericMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupHireFriendsGenericMC"
+   ],
+   "overrides": [],
+   "bytes": 663
+  },
+  {
+   "class": null,
+   "path": "PopupHospitalMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupHospitalMC"
+   ],
+   "overrides": [],
+   "bytes": 1226
+  },
+  {
+   "class": null,
+   "path": "PopupHurryupMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupHurryupMC"
+   ],
+   "overrides": [],
+   "bytes": 941
+  },
+  {
+   "class": null,
+   "path": "PopupIntroMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupIntroMC"
+   ],
+   "overrides": [],
+   "bytes": 572
+  },
+  {
+   "class": null,
+   "path": "PopupInventoryMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupInventoryMC"
+   ],
+   "overrides": [],
+   "bytes": 619
+  },
+  {
+   "class": null,
+   "path": "PopupLevelMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupLevelMC"
+   ],
+   "overrides": [],
+   "bytes": 1005
+  },
+  {
+   "class": null,
+   "path": "PopupLoadingAssaultMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupLoadingAssaultMC"
+   ],
+   "overrides": [],
+   "bytes": 836
+  },
+  {
+   "class": null,
+   "path": "PopupLoadingQuestMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupLoadingQuestMC"
+   ],
+   "overrides": [],
+   "bytes": 849
+  },
+  {
+   "class": null,
+   "path": "PopupMagicMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupMagicMC"
+   ],
+   "overrides": [],
+   "bytes": 581
+  },
+  {
+   "class": null,
+   "path": "PopupMarketMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupMarketMC"
+   ],
+   "overrides": [],
+   "bytes": 495
+  },
+  {
+   "class": null,
+   "path": "PopupMarketplaceAsset.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupMarketplaceAsset"
+   ],
+   "overrides": [],
+   "bytes": 981
+  },
+  {
+   "class": null,
+   "path": "PopupMarketplaceUnitAsset.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupMarketplaceUnitAsset"
+   ],
+   "overrides": [],
+   "bytes": 1888
+  },
+  {
+   "class": null,
+   "path": "PopupMarketplaceUnitBidder.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupMarketplaceUnitBidder"
+   ],
+   "overrides": [],
+   "bytes": 511
+  },
+  {
+   "class": null,
+   "path": "PopupMissionInfoMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupMissionInfoMC"
+   ],
+   "overrides": [],
+   "bytes": 757
+  },
+  {
+   "class": null,
+   "path": "PopupMisteryMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupMisteryMC"
+   ],
+   "overrides": [],
+   "bytes": 1109
+  },
+  {
+   "class": null,
+   "path": "PopupMobileInfoMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupMobileInfoMC"
+   ],
+   "overrides": [],
+   "bytes": 717
+  },
+  {
+   "class": null,
+   "path": "PopupNeighborsMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupNeighborsMC"
+   ],
+   "overrides": [],
+   "bytes": 509
+  },
+  {
+   "class": null,
+   "path": "PopupNewDailyMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupNewDailyMC"
+   ],
+   "overrides": [],
+   "bytes": 1582
+  },
+  {
+   "class": null,
+   "path": "PopupNewsMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupNewsMC"
+   ],
+   "overrides": [],
+   "bytes": 1409
+  },
+  {
+   "class": null,
+   "path": "PopupNextIslandAttackMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupNextIslandAttackMC"
+   ],
+   "overrides": [],
+   "bytes": 756
+  },
+  {
+   "class": null,
+   "path": "PopupPlayerProfileMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupPlayerProfileMC"
+   ],
+   "overrides": [],
+   "bytes": 1499
+  },
+  {
+   "class": null,
+   "path": "PopupPremiumAccountCongratulationsAsset.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupPremiumAccountCongratulationsAsset"
+   ],
+   "overrides": [],
+   "bytes": 637
+  },
+  {
+   "class": null,
+   "path": "PopupPremiumAccountMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupPremiumAccountMC"
+   ],
+   "overrides": [],
+   "bytes": 593
+  },
+  {
+   "class": null,
+   "path": "PopupQuestFinishedMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupQuestFinishedMC"
+   ],
+   "overrides": [],
+   "bytes": 1116
+  },
+  {
+   "class": null,
+   "path": "PopupRecruitmentMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupRecruitmentMC"
+   ],
+   "overrides": [],
+   "bytes": 1044
+  },
+  {
+   "class": null,
+   "path": "PopupResearchCenterMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupResearchCenterMC"
+   ],
+   "overrides": [],
+   "bytes": 1425
+  },
+  {
+   "class": null,
+   "path": "PopupSelectResourceMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupSelectResourceMC"
+   ],
+   "overrides": [],
+   "bytes": 678
+  },
+  {
+   "class": null,
+   "path": "PopupSelectRobotMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupSelectRobotMC"
+   ],
+   "overrides": [],
+   "bytes": 802
+  },
+  {
+   "class": null,
+   "path": "PopupSelectRobotReminderMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupSelectRobotReminderMC"
+   ],
+   "overrides": [],
+   "bytes": 634
+  },
+  {
+   "class": null,
+   "path": "PopupSendMessageAsset.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupSendMessageAsset"
+   ],
+   "overrides": [],
+   "bytes": 611
+  },
+  {
+   "class": null,
+   "path": "PopupSocialBuildingMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupSocialBuildingMC"
+   ],
+   "overrides": [],
+   "bytes": 616
+  },
+  {
+   "class": null,
+   "path": "PopupSoulMixerHelpMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupSoulMixerHelpMC"
+   ],
+   "overrides": [],
+   "bytes": 450
+  },
+  {
+   "class": null,
+   "path": "PopupSuperMisteryBoxMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupSuperMisteryBoxMC"
+   ],
+   "overrides": [],
+   "bytes": 1451
+  },
+  {
+   "class": null,
+   "path": "PopupTutorialMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupTutorialMC"
+   ],
+   "overrides": [],
+   "bytes": 502
+  },
+  {
+   "class": null,
+   "path": "PopupUpgradeBuildingAsset.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupUpgradeBuildingAsset"
+   ],
+   "overrides": [],
+   "bytes": 749
+  },
+  {
+   "class": null,
+   "path": "PopupVisitMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupVisitMC"
+   ],
+   "overrides": [],
+   "bytes": 469
+  },
+  {
+   "class": null,
+   "path": "PopupWeeklyQuestFinishedMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupWeeklyQuestFinishedMC"
+   ],
+   "overrides": [],
+   "bytes": 790
+  },
+  {
+   "class": null,
+   "path": "PopupWeeklyQuestMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupWeeklyQuestMC"
+   ],
+   "overrides": [],
+   "bytes": 562
+  },
+  {
+   "class": null,
+   "path": "PopupWizardryMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "PopupWizardryMC"
+   ],
+   "overrides": [],
+   "bytes": 931
+  },
+  {
+   "class": null,
+   "path": "StoreMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "StoreMC"
+   ],
+   "overrides": [],
+   "bytes": 892
+  },
+  {
+   "class": null,
+   "path": "TabMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "TabMC"
+   ],
+   "overrides": [],
+   "bytes": 300
+  },
+  {
+   "class": null,
+   "path": "TooltipMultilineMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "TooltipMultilineMC"
+   ],
+   "overrides": [],
+   "bytes": 399
+  },
+  {
+   "class": null,
+   "path": "TooltipSimbolosAtaqueMC.as",
+   "kind": "movieclip",
+   "extends": null,
+   "isMovieClip": true,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [
+    "/_assets/assets.swf"
+   ],
+   "functions": [
+    "TooltipSimbolosAtaqueMC"
+   ],
+   "overrides": [],
+   "bytes": 367
+  },
+  {
+   "class": "ButtonMarket",
+   "path": "popups/ButtonMarket.as",
+   "kind": "popup",
+   "extends": "ButtonMarketMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Buy",
+    "sell",
+    "Market resources have been exhausted. Come back in 24 hours to trade more!",
+    "food",
+    "wood",
+    "stone"
+   ],
+   "literalCount": 6,
+   "images": [],
+   "functions": [
+    "ButtonMarket",
+    "setResourceAmount",
+    "setType",
+    "refreshCost"
+   ],
+   "overrides": [],
+   "bytes": 5793
+  },
+  {
+   "class": "InventoryTabCollections",
+   "path": "popups/InventoryTabCollections.as",
+   "kind": "popup",
+   "extends": "InventoryTabMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "InventoryTabCollections",
+    "reloadCollections"
+   ],
+   "overrides": [],
+   "bytes": 3353
+  },
+  {
+   "class": "InventoryTabItems",
+   "path": "popups/InventoryTabItems.as",
+   "kind": "popup",
+   "extends": "InventoryTabMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "InventoryTabItems"
+   ],
+   "overrides": [],
+   "bytes": 3548
+  },
+  {
+   "class": "MondayBonusPopUp",
+   "path": "popups/MondayBonusPopUp.as",
+   "kind": "popup",
+   "extends": "MondayBonusPopUpAsset",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Monday Bonus",
+    "Here is your monday reward!!\\nChoose a box and get your mystery reward!!",
+    "Come back every monday to get mysterious reward!",
+    "You will find your prizes in your storage!",
+    "Select",
+    "Your Reward!"
+   ],
+   "literalCount": 6,
+   "images": [],
+   "functions": [
+    "MondayBonusPopUp",
+    "closeWindow"
+   ],
+   "overrides": [],
+   "bytes": 6149
+  },
+  {
+   "class": "PopOver",
+   "path": "popups/PopOver.as",
+   "kind": "popup",
+   "extends": "PopOverMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "PopOver",
+    "setContents"
+   ],
+   "overrides": [],
+   "bytes": 5658
+  },
+  {
+   "class": "PopUpBattleOptions",
+   "path": "popups/PopUpBattleOptions.as",
+   "kind": "popup",
+   "extends": "PopUpBattleOptionsMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "OPTIONS",
+    "Select Your Defensive Strategy to defende your empire from others users attacks.",
+    "Defensive",
+    "Mid Defensive",
+    "Mid Aggressive",
+    "Aggressive",
+    "All your units will hold position until approached. They will stop chasing the enemy and return to their original position in a while after the clash.",
+    "All your units will hold position until a siege engine hits, then all ranged units will go and crush it.",
+    "All your units will hold positions until the enemy hits. Then part of your army that equals to the enemy troops will go and chase them.",
+    "All your units will attack the siege engines right from the start and will return to the empire only when all are destroyed.",
+    "Units",
+    "My Army"
+   ],
+   "literalCount": 13,
+   "images": [],
+   "functions": [
+    "PopUpBattleOptions",
+    "onClose",
+    "showArmy",
+    "showStrat",
+    "closeWindow",
+    "clickStrategy",
+    "overStrategy",
+    "outStrategy",
+    "initialisePortraits"
+   ],
+   "overrides": [],
+   "bytes": 7956
+  },
+  {
+   "class": "PopUpLost",
+   "path": "popups/PopUpLost.as",
+   "kind": "popup",
+   "extends": "PopUpLostMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "SHARE",
+    "Discovery!",
+    "You have found a",
+    "lost oil barrel!",
+    "Share some oil with your friends!",
+    "lost rocket!",
+    "Maybe your friends can help you make it work!",
+    "a nice fountain!",
+    "Share it with your friends!",
+    "You found some",
+    "lost puppies!",
+    "Help them asking your friends to take them to safety!"
+   ],
+   "literalCount": 23,
+   "images": [],
+   "functions": [
+    "PopUpLost",
+    "onYes",
+    "onNo",
+    "processFoundItem",
+    "closeWindow"
+   ],
+   "overrides": [],
+   "bytes": 7489
+  },
+  {
+   "class": "PopupAlert",
+   "path": "popups/PopupAlert.as",
+   "kind": "popup",
+   "extends": "PopupAlertMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "OK"
+   ],
+   "literalCount": 1,
+   "images": [],
+   "functions": [
+    "PopupAlert"
+   ],
+   "overrides": [],
+   "bytes": 1940
+  },
+  {
+   "class": "PopupAllUnits",
+   "path": "popups/PopupAllUnits.as",
+   "kind": "popup",
+   "extends": "PopupAllUnitsMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Obtained units",
+    "Unit Collection",
+    "Ok",
+    "Get reward",
+    "COMPLETED!",
+    "You need more cash to buy this unit.\\n Wanna get some now?",
+    "Collection Complete!",
+    "You have completed a collection and here is your reward!"
+   ],
+   "literalCount": 8,
+   "images": [
+    "soldado_regalos.png"
+   ],
+   "functions": [
+    "PopupAllUnits",
+    "init",
+    "refresh",
+    "prevPage",
+    "nextPage",
+    "loadAnim"
+   ],
+   "overrides": [],
+   "bytes": 18894
+  },
+  {
+   "class": "PopupAssaultHistory",
+   "path": "popups/PopupAssaultHistory.as",
+   "kind": "popup",
+   "extends": "PopupAssaultHistoryMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Battle Results",
+    "(showing only last 10 attacks)",
+    "Date",
+    "Opponent",
+    "Result",
+    "Gold",
+    "Attacks Sent",
+    "Attacks received",
+    "+INFO",
+    "OK",
+    "Attacked!",
+    "Someone attacked your empire while you where out!"
+   ],
+   "literalCount": 15,
+   "images": [
+    "POPUP_ASSAULT_HISTORY_MEN.jpg"
+   ],
+   "functions": [
+    "PopupAssaultHistory",
+    "refreshList",
+    "mostrarPopupAttacked",
+    "onRemovePopupAttacked",
+    "onShowInfoAssault",
+    "onSent",
+    "onReceived",
+    "onOk",
+    "closeWindow"
+   ],
+   "overrides": [],
+   "bytes": 7082
+  },
+  {
+   "class": "PopupAttackFinished",
+   "path": "popups/PopupAttackFinished.as",
+   "kind": "popup",
+   "extends": "PopupAttackFinishedMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Battle Result",
+    "Saving Results ...",
+    "Units Alive",
+    "Units Dead",
+    "You won:",
+    "Bonus:",
+    "- No units lost -",
+    "Attacker",
+    "Defender",
+    "Premium Bonus:",
+    "Results",
+    "Your Army"
+   ],
+   "literalCount": 36,
+   "images": [
+    "WIN_MEN.jpg",
+    "LOOSE_MEN.jpg",
+    "SLEEP_MEN.jpg"
+   ],
+   "functions": [
+    "PopupAttackFinished",
+    "realizarPeticion",
+    "initializeButtonsArmies",
+    "resultsClick",
+    "armyPlayerClick",
+    "enemyPlayerClick",
+    "btnUnitsSavedClick",
+    "initialisePortratits",
+    "setFrame",
+    "initialiseMessage1",
+    "message1OK",
+    "showFeedAndContinue",
+    "message1Share",
+    "initialiseMessage2",
+    "message2Yes",
+    "message2No",
+    "initialiseMessage3",
+    "message3OK",
+    "message3GoWorldEnemy",
+    "loadFBIDWorld"
+   ],
+   "overrides": [],
+   "bytes": 23865
+  },
+  {
+   "class": "PopupBuilding",
+   "path": "popups/PopupBuilding.as",
+   "kind": "popup",
+   "extends": "PopupBuildingMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Congratulations!",
+    "Share your new item with your friends!",
+    "Skip",
+    "Share!"
+   ],
+   "literalCount": 4,
+   "images": [],
+   "functions": [
+    "PopupBuilding"
+   ],
+   "overrides": [],
+   "bytes": 3872
+  },
+  {
+   "class": "PopupBuildingInventory",
+   "path": "popups/PopupBuildingInventory.as",
+   "kind": "popup",
+   "extends": "PopupBuildingInventoryMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Ask For It",
+    "Items needed",
+    "In order to finish this building, you need these items",
+    "Open building"
+   ],
+   "literalCount": 4,
+   "images": [],
+   "functions": [
+    "PopupBuildingInventory",
+    "onOpenBuilding",
+    "closeWindow",
+    "onAskForItem"
+   ],
+   "overrides": [],
+   "bytes": 5351
+  },
+  {
+   "class": "PopupBuildingInventoryItem",
+   "path": "popups/PopupBuildingInventoryItem.as",
+   "kind": "popup",
+   "extends": "PopupBuildinginventoryItemMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "PopupBuildingInventoryItem",
+    "buyItem"
+   ],
+   "overrides": [],
+   "bytes": 1776
+  },
+  {
+   "class": "PopupBuyGold",
+   "path": "popups/PopupBuyGold.as",
+   "kind": "popup",
+   "extends": "PopupBuyGoldMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "EXCHANGE",
+    "add\\ncash now!",
+    "SW   BANK",
+    "Exchange your cash for gold!",
+    "Not enough cash",
+    "Not enough space. Build more silos"
+   ],
+   "literalCount": 6,
+   "images": [],
+   "functions": [
+    "PopupBuyGold",
+    "onOver",
+    "onOut",
+    "onExchange"
+   ],
+   "overrides": [],
+   "bytes": 2740
+  },
+  {
+   "class": "PopupBuyMana",
+   "path": "popups/PopupBuyMana.as",
+   "kind": "popup",
+   "extends": "PopupBuyManaMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "gold",
+    "dark matter",
+    "cash",
+    "or",
+    "Buy Dark Matter",
+    "Get some Dark Matter to unleash your power!",
+    "Buy with Cash",
+    "Buy with Gold"
+   ],
+   "literalCount": 8,
+   "images": [],
+   "functions": [
+    "PopupBuyMana",
+    "closeWindow"
+   ],
+   "overrides": [],
+   "bytes": 4779
+  },
+  {
+   "class": "PopupChooseGender",
+   "path": "popups/PopupChooseGender.as",
+   "kind": "popup",
+   "extends": "PopupChooseGenderMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Are you man or woman?"
+   ],
+   "literalCount": 1,
+   "images": [],
+   "functions": [
+    "PopupChooseGender"
+   ],
+   "overrides": [],
+   "bytes": 1717
+  },
+  {
+   "class": "PopupCollect",
+   "path": "popups/PopupCollect.as",
+   "kind": "popup",
+   "extends": "PopupCollectMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Collect Time",
+    "Gold",
+    "wood",
+    "Oil",
+    "Steel",
+    "TIME:",
+    "COLLECT:",
+    "SELECT"
+   ],
+   "literalCount": 8,
+   "images": [],
+   "functions": [
+    "PopupCollect",
+    "onOver",
+    "onOut"
+   ],
+   "overrides": [],
+   "bytes": 7224
+  },
+  {
+   "class": "PopupConfirm",
+   "path": "popups/PopupConfirm.as",
+   "kind": "popup",
+   "extends": "PopupConfirmMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "NO",
+    "YES"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "PopupConfirm"
+   ],
+   "overrides": [],
+   "bytes": 2062
+  },
+  {
+   "class": "PopupCrossDCi",
+   "path": "popups/PopupCrossDCi.as",
+   "kind": "popup",
+   "extends": "PopupMobileInfoMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Play Dragon City on your iphone/ipad and get an awesome dragon for free!",
+    "Get It!",
+    ""
+   ],
+   "literalCount": 3,
+   "images": [
+    "PopupDCi/bg_mobile_info.jpg",
+    "PopupDCi/promo_DCi_bg.jpg"
+   ],
+   "functions": [
+    "PopupCrossDCi"
+   ],
+   "overrides": [],
+   "bytes": 3685
+  },
+  {
+   "class": "PopupDarts",
+   "path": "popups/PopupDarts.as",
+   "kind": "popup",
+   "extends": "PopupDartsMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "PLAY DAILY TARGETS!",
+    "Collect all units to get the Bonus Reward!",
+    "FREE!",
+    "Rare",
+    "Uncommon",
+    "Common",
+    "OK",
+    "You\\'ve won a daily FREE shot! Play Targets now and win amazing RARE prizes!",
+    "Hit the targets and win amazing RARE prizes!",
+    "Play",
+    "Aim at a target and click to shoot it!",
+    "Congratulations!\\nYou\\'ve won:"
+   ],
+   "literalCount": 15,
+   "images": [],
+   "functions": [
+    "PopupDarts",
+    "closeWindow"
+   ],
+   "overrides": [],
+   "bytes": 25433
+  },
+  {
+   "class": "PopupExpand",
+   "path": "popups/PopupExpand.as",
+   "kind": "popup",
+   "extends": "PopupExpandMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Congratulations!",
+    "Your empire has",
+    "GROWN!",
+    "Share your expansion with your friends !",
+    "Skip",
+    "Share!"
+   ],
+   "literalCount": 6,
+   "images": [
+    "largeexpansiongfx/expGen.png"
+   ],
+   "functions": [
+    "PopupExpand",
+    "ioErrorHandler"
+   ],
+   "overrides": [],
+   "bytes": 4890
+  },
+  {
+   "class": "PopupGenericUnitSelector",
+   "path": "popups/PopupGenericUnitSelector.as",
+   "kind": "popup",
+   "extends": "PopupGenericUnitSelectorMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "PopupGenericUnitSelector",
+    "init"
+   ],
+   "overrides": [],
+   "bytes": 4201
+  },
+  {
+   "class": "PopupGetEnergy",
+   "path": "popups/PopupGetEnergy.as",
+   "kind": "popup",
+   "extends": "PopupGetEnergyMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Ask friends",
+    "Get Now",
+    "Get more energy",
+    "you ran out of energy. Buy some at the store or ask your friends to send you ENERGY now"
+   ],
+   "literalCount": 4,
+   "images": [],
+   "functions": [
+    "PopupGetEnergy"
+   ],
+   "overrides": [],
+   "bytes": 2053
+  },
+  {
+   "class": "PopupGetPack",
+   "path": "popups/PopupGetPack.as",
+   "kind": "popup",
+   "extends": "PopupGetPackMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Purchase Pack",
+    "Purchase this pack?",
+    "Buy",
+    "Oh no! You don\\'t have enough cash! Would you like to get some more?"
+   ],
+   "literalCount": 4,
+   "images": [],
+   "functions": [
+    "PopupGetPack",
+    "onBuy"
+   ],
+   "overrides": [],
+   "bytes": 2216
+  },
+  {
+   "class": "PopupGoalComplete",
+   "path": "popups/PopupGoalComplete.as",
+   "kind": "popup",
+   "extends": "PopupGoalCompleteMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "OK",
+    "Goal achieved!",
+    "Reward"
+   ],
+   "literalCount": 3,
+   "images": [],
+   "functions": [
+    "PopupGoalComplete"
+   ],
+   "overrides": [],
+   "bytes": 2490
+  },
+  {
+   "class": "PopupGoals",
+   "path": "popups/PopupGoals.as",
+   "kind": "popup",
+   "extends": "PopupGoalsMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "CLICK HERE!",
+    "Reward",
+    "HELP!",
+    "OK",
+    "Goals",
+    "New Mission!",
+    "Get Reward!",
+    "+INFO",
+    "Go to Store",
+    "Goal info",
+    "PROGRESS!"
+   ],
+   "literalCount": 11,
+   "images": [],
+   "functions": [
+    "PopupGoals",
+    "replaceMayor",
+    "onScrollUp",
+    "onScrollDown",
+    "makeGoalsVisible",
+    "launchGoal",
+    "onClickGoal",
+    "visitPopupClose",
+    "refreshGoals",
+    "onOver",
+    "onOut",
+    "onOver1",
+    "onOut1",
+    "onOver2",
+    "onOut2",
+    "onMayorMouseOver",
+    "onMayorMouseOut",
+    "openPopupSelect",
+    "refreshGoalList",
+    "clickInfoMission"
+   ],
+   "overrides": [],
+   "bytes": 34868
+  },
+  {
+   "class": "PopupGotPack",
+   "path": "popups/PopupGotPack.as",
+   "kind": "popup",
+   "extends": "PopupGotPackMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Congratulations!",
+    "OK"
+   ],
+   "literalCount": 2,
+   "images": [
+    "soldado_regalos.png"
+   ],
+   "functions": [
+    "PopupGotPack"
+   ],
+   "overrides": [],
+   "bytes": 1576
+  },
+  {
+   "class": "PopupHelpIsland",
+   "path": "popups/PopupHelpIsland.as",
+   "kind": "popup",
+   "extends": "PopupHelpIslandMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "OK",
+    "HELP!",
+    "Conquer the rest of enemies\\' camps on your island to progress to the next island!\\n- You can also attack players from other islands to get lots of experience and gold!\\n- Try to make it to Island 1 and win amazing prizes along the way!",
+    "None"
+   ],
+   "literalCount": 4,
+   "images": [
+    "help_island_image.jpg"
+   ],
+   "functions": [
+    "PopupHelpIsland"
+   ],
+   "overrides": [],
+   "bytes": 3214
+  },
+  {
+   "class": "PopupHireFriendsGeneric",
+   "path": "popups/PopupHireFriendsGeneric.as",
+   "kind": "popup",
+   "extends": "PopupHireFriendsGenericMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Ok",
+    "Congratulations!!"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "PopupHireFriendsGeneric",
+    "onPhotoOk"
+   ],
+   "overrides": [],
+   "bytes": 4249
+  },
+  {
+   "class": "PopupHospital",
+   "path": "popups/PopupHospital.as",
+   "kind": "popup",
+   "extends": "PopupHospitalMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "OK",
+    "Hospital",
+    "This building allows you to recover units lost in battle",
+    "Available",
+    "Syringes",
+    "Ask for more",
+    "HELP!",
+    "If you lose units during a combat, you can resurrect them at the Graveyard!\\n\\n A portrait of your dead units and their number is displayed.\\n Resurrecting dead units costs half of their original price.\\n Click on the right button below the portrait of the unit to resurrect it using gold, food or cash.\\n You can also resurrect units with syringes.\\n Ask your friends to send you syringes using the \\'Ask For\\' button at the lower right!",
+    "Resurrect for",
+    "Resurrect",
+    "Max units reached"
+   ],
+   "literalCount": 11,
+   "images": [],
+   "functions": [
+    "PopupHospital",
+    "onClose",
+    "onOver",
+    "onOut",
+    "closeWindow"
+   ],
+   "overrides": [],
+   "bytes": 17590
+  },
+  {
+   "class": "PopupHurryup",
+   "path": "popups/PopupHurryup.as",
+   "kind": "popup",
+   "extends": "PopupHurryupMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "WORK IN PROGRESS",
+    "Ask your friends to help you speed up",
+    "Pay to finish the work instantly",
+    "OR"
+   ],
+   "literalCount": 4,
+   "images": [],
+   "functions": [
+    "PopupHurryup",
+    "onTick",
+    "onOver",
+    "onOut",
+    "onClose",
+    "closeWindow",
+    "onAsk",
+    "onYes"
+   ],
+   "overrides": [],
+   "bytes": 4137
+  },
+  {
+   "class": "PopupIntro",
+   "path": "popups/PopupIntro.as",
+   "kind": "popup",
+   "extends": "PopupIntroMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "PLAY NOW!",
+    "Skip",
+    "Welcome to Social Wars",
+    "WELCOME TO YOUR ARMY, FIGHT THE ALIEN MENACE",
+    "In a peaceful city where there was estabilished order and respect, nobody was prepared for a war...",
+    "ENEMIES CAME FROM OUTER SPACE AND WANT TO CONQUER OUR PLANET EARTH!!",
+    "WE MUST PROTECT OUR PEOPLE FROM A FATAL FATE BEFORE IT\\'S TOO LATE!!",
+    "EVOLVE YOUR ARMY INTO POWERFUL HIGH-TECH SOLDIERS TO DEFEAT YOUR SPACE ENEMIES!!"
+   ],
+   "literalCount": 8,
+   "images": [
+    "intro/intro4.swf"
+   ],
+   "functions": [
+    "PopupIntro"
+   ],
+   "overrides": [],
+   "bytes": 4225
+  },
+  {
+   "class": "PopupInventory",
+   "path": "popups/PopupInventory.as",
+   "kind": "popup",
+   "extends": "PopupInventoryMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Inventory",
+    "Use these items to complete buildings or collect them to earn rewards!",
+    "COLLECTIONS",
+    "ITEMS"
+   ],
+   "literalCount": 4,
+   "images": [],
+   "functions": [
+    "PopupInventory"
+   ],
+   "overrides": [],
+   "bytes": 3082
+  },
+  {
+   "class": "PopupLevel",
+   "path": "popups/PopupLevel.as",
+   "kind": "popup",
+   "extends": "PopupLevelMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "You can now buy:",
+    "Level reward:",
+    "YEAH! Share your success\\nwith your friends!",
+    "SHARE"
+   ],
+   "literalCount": 4,
+   "images": [],
+   "functions": [
+    "PopupLevel",
+    "showHint"
+   ],
+   "overrides": [],
+   "bytes": 6104
+  },
+  {
+   "class": "PopupLoadingQuest",
+   "path": "popups/PopupLoadingQuest.as",
+   "kind": "popup",
+   "extends": "PopupLoadingQuestMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Your Army is ready to start the battle!",
+    "Choose difficulty",
+    "Difficulty",
+    "START BATTLE",
+    "Coming soon"
+   ],
+   "literalCount": 5,
+   "images": [],
+   "functions": [
+    "PopupLoadingQuest",
+    "closeWindow",
+    "onTestIfLoaded",
+    "onLoaded",
+    "enableButtons",
+    "disableButtons",
+    "onStartBattle",
+    "setDifficulty",
+    "onStarOver",
+    "onStarOut"
+   ],
+   "overrides": [],
+   "bytes": 7434
+  },
+  {
+   "class": "PopupMagic",
+   "path": "popups/PopupMagic.as",
+   "kind": "popup",
+   "extends": "PopupMagicMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Your Dark Matter",
+    "Select attack",
+    "Cancel Attack",
+    "Launch Attack"
+   ],
+   "literalCount": 4,
+   "images": [],
+   "functions": [
+    "PopupMagic",
+    "onOver",
+    "onOut",
+    "onManaOver",
+    "onManaOut",
+    "onSBOver",
+    "onSBOut",
+    "hideSpells",
+    "onSpellDone",
+    "updateManaLeft",
+    "showCancelText",
+    "showCastText",
+    "hideCancelText",
+    "closeBook"
+   ],
+   "overrides": [],
+   "bytes": 10804
+  },
+  {
+   "class": "PopupMarket",
+   "path": "popups/PopupMarket.as",
+   "kind": "popup",
+   "extends": "PopupMarketMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Trades left today:"
+   ],
+   "literalCount": 1,
+   "images": [],
+   "functions": [
+    "PopupMarket",
+    "refreshTrades",
+    "onTrade"
+   ],
+   "overrides": [],
+   "bytes": 3326
+  },
+  {
+   "class": "PopupMissionInfo",
+   "path": "popups/PopupMissionInfo.as",
+   "kind": "popup",
+   "extends": "PopupMissionInfoMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "OK",
+    "COMPLETED!",
+    "Next chapter in",
+    "More enemies have been spotted in the surroundings. They should reach your base in 4 hours"
+   ],
+   "literalCount": 4,
+   "images": [
+    "next_chapter.jpg"
+   ],
+   "functions": [
+    "PopupMissionInfo",
+    "setStartLiterals",
+    "setEndLiterals",
+    "closeWindow"
+   ],
+   "overrides": [],
+   "bytes": 6912
+  },
+  {
+   "class": "PopupMistery",
+   "path": "popups/PopupMistery.as",
+   "kind": "popup",
+   "extends": "PopupMisteryMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Mistery Box Pack",
+    "You can get one of the following!\\nTest your luck!",
+    "Rare",
+    "Uncommon",
+    "Common",
+    "Buy"
+   ],
+   "literalCount": 6,
+   "images": [],
+   "functions": [
+    "PopupMistery",
+    "onBuy",
+    "onOver",
+    "onOut",
+    "closeWindow"
+   ],
+   "overrides": [],
+   "bytes": 3944
+  },
+  {
+   "class": "PopupNeighbors",
+   "path": "popups/PopupNeighbors.as",
+   "kind": "popup",
+   "extends": "PopupNeighborsMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "need allies?",
+    "Get more allies to earn gold and XP every day.\\n\\nGet allies now!",
+    "OK"
+   ],
+   "literalCount": 3,
+   "images": [],
+   "functions": [
+    "PopupNeighbors"
+   ],
+   "overrides": [],
+   "bytes": 2020
+  },
+  {
+   "class": "PopupNewDaily",
+   "path": "popups/PopupNewDaily.as",
+   "kind": "popup",
+   "extends": "PopupNewDailyMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Today",
+    "Tomorrow",
+    "If you play on consecutive days you get bigger prizes!",
+    "Share!",
+    "Daily bonus",
+    "1 Hero!",
+    "You won a hero!"
+   ],
+   "literalCount": 7,
+   "images": [],
+   "functions": [
+    "PopupNewDaily",
+    "onShare",
+    "onOver",
+    "onOut",
+    "onClose",
+    "closeWindow"
+   ],
+   "overrides": [],
+   "bytes": 10873
+  },
+  {
+   "class": "PopupNews",
+   "path": "popups/PopupNews.as",
+   "kind": "popup",
+   "extends": "PopupNewsMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Daily News",
+    "Hints & Tips:",
+    "Latest News",
+    "Specials Offers & Packs",
+    "Get cash",
+    "Go to Store"
+   ],
+   "literalCount": 6,
+   "images": [],
+   "functions": [
+    "PopupNews",
+    "refresh",
+    "onGoToStore",
+    "onOver",
+    "onOut",
+    "closeWindow"
+   ],
+   "overrides": [],
+   "bytes": 13436
+  },
+  {
+   "class": "PopupNextIslandAttack",
+   "path": "popups/PopupNextIslandAttack.as",
+   "kind": "popup",
+   "extends": "PopupNextIslandAttackMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "OK",
+    "KING OF THE WORLD!!!",
+    "Amazing!!! You did it!!! You are the King of Social Wars!!!\\n\\nYou deserve this amazing reward for such legendary victory!!! (Look at BUILD > Storage)",
+    "KING OF THE ISLAND!!!",
+    "Congratulations, you defeated all the players on your isle!! You progress to the next one!\\n\\nYour deed deserves a good prize! (Look at BUILD > Storage)"
+   ],
+   "literalCount": 5,
+   "images": [
+    "soldado_regalos.png"
+   ],
+   "functions": [
+    "PopupNextIslandAttack",
+    "closeWindow"
+   ],
+   "overrides": [],
+   "bytes": 5118
+  },
+  {
+   "class": "PopupNextMission",
+   "path": "popups/PopupNextMission.as",
+   "kind": "popup",
+   "extends": "PopUpNextMissionMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "OK"
+   ],
+   "literalCount": 1,
+   "images": [],
+   "functions": [
+    "PopupNextMission",
+    "onOver",
+    "onOut"
+   ],
+   "overrides": [],
+   "bytes": 1532
+  },
+  {
+   "class": "PopupObject",
+   "path": "popups/PopupObject.as",
+   "kind": "popup",
+   "extends": null,
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "PopupObject"
+   ],
+   "overrides": [],
+   "bytes": 2224
+  },
+  {
+   "class": "PopupPlayerProfile",
+   "path": "popups/PopupPlayerProfile.as",
+   "kind": "popup",
+   "extends": "PopupPlayerProfileMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Player Profile",
+    "Level:",
+    "Honor Points:",
+    "Rank:",
+    "Empire\\'s name:",
+    "Victories:",
+    "/  Defeats:",
+    "Last connected:",
+    "Country:",
+    "n/a"
+   ],
+   "literalCount": 10,
+   "images": [],
+   "functions": [
+    "PopupPlayerProfile",
+    "closeWindow",
+    "onOpenRanks",
+    "onCloseRanks",
+    "loadRanks"
+   ],
+   "overrides": [],
+   "bytes": 7928
+  },
+  {
+   "class": "PopupPremiumAccount",
+   "path": "popups/PopupPremiumAccount.as",
+   "kind": "popup",
+   "extends": "PopupPremiumAccountMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Become a Premium Member!",
+    "Subscribe:",
+    "You don\\'t have enough cash.\\n Do you want to get some now?"
+   ],
+   "literalCount": 3,
+   "images": [],
+   "functions": [
+    "PopupPremiumAccount"
+   ],
+   "overrides": [],
+   "bytes": 4020
+  },
+  {
+   "class": "PopupPremiumAccountCongratulations",
+   "path": "popups/PopupPremiumAccountCongratulations.as",
+   "kind": "popup",
+   "extends": "PopupPremiumAccountCongratulationsAsset",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Congratulations!",
+    "Okay"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "PopupPremiumAccountCongratulations"
+   ],
+   "overrides": [],
+   "bytes": 2618
+  },
+  {
+   "class": "PopupQuestFinished",
+   "path": "popups/PopupQuestFinished.as",
+   "kind": "popup",
+   "extends": "PopupQuestFinishedMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Mission result",
+    "good Job! No units lost!",
+    "Results",
+    "Your units lost",
+    "Reward:",
+    "You haven\\'t finished yet!",
+    "You win!",
+    "Premium bonus",
+    "You didn\\'t earn a reward, try harder next time!",
+    "Congratulations! Share it with your friends!",
+    "Sorry! Try it another time!",
+    "SHARE"
+   ],
+   "literalCount": 15,
+   "images": [
+    "WIN_MEN.jpg",
+    "LOOSE_MEN.jpg",
+    "SLEEP_MEN.jpg"
+   ],
+   "functions": [
+    "PopupQuestFinished",
+    "setFrame",
+    "realizarPeticion",
+    "initializeButtonsArmies",
+    "resultsClick",
+    "btnUnitsSavedClick",
+    "initialisePortraits",
+    "initialiseMessage1",
+    "message1OK",
+    "showFeedAndContinue",
+    "message1Share",
+    "initialiseMessage2",
+    "message2Yes",
+    "message2No",
+    "closeWindow"
+   ],
+   "overrides": [],
+   "bytes": 12392
+  },
+  {
+   "class": "PopupQuestsMap",
+   "path": "popups/PopupQuestsMap.as",
+   "kind": "popup",
+   "extends": "QuestsMapMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "SMALL HARBOUR MISSIONS",
+    "HARBOUR MISSIONS",
+    "SPACE MISSIONS",
+    "ENTER",
+    "Info mission",
+    "You can only play each quest every 4 hours",
+    "Enter",
+    "You need to open the Harbour to play this missions",
+    "COMPLETE PREVIOUS MISSION"
+   ],
+   "literalCount": 9,
+   "images": [],
+   "functions": [
+    "PopupQuestsMap",
+    "onClose"
+   ],
+   "overrides": [],
+   "bytes": 26151
+  },
+  {
+   "class": "PopupRecruitment",
+   "path": "popups/PopupRecruitment.as",
+   "kind": "popup",
+   "extends": "PopupRecruitmentMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Recruitment",
+    "Invite your enemies to their own BBQ!",
+    "Nobody messes with Mr. Teeth and his weapon!",
+    "Get one of the most deadly aircrafts known to date!",
+    "Heal your troops with that BIG syringe!",
+    "Repair your damaged units with the help of this good old man!",
+    "Get reward",
+    "All your new recruits are ready! Get your reward!",
+    "Recruit!",
+    "Invite 3 new friends and get Special Units for free!",
+    "Get a friend!",
+    "Villager"
+   ],
+   "literalCount": 12,
+   "images": [],
+   "functions": [
+    "PopupRecruitment",
+    "createFotos",
+    "refreshFotos",
+    "onFindFriend",
+    "onOpenBuilding",
+    "onOver",
+    "onOut",
+    "onClose",
+    "closeWindow",
+    "onPhotoOk"
+   ],
+   "overrides": [],
+   "bytes": 20641
+  },
+  {
+   "class": "PopupResearchCenter",
+   "path": "popups/PopupResearchCenter.as",
+   "kind": "popup",
+   "extends": "PopupResearchCenterMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "AREA 51",
+    "ROBOTIC CENTER",
+    "Progress",
+    "Finishes in:",
+    "Researching",
+    "Press research every 6 hours to get a powerful robot.",
+    "Hire new friends to progress faster",
+    "Hire friends",
+    "Get it!",
+    "Research",
+    "Oh no! You don\\'t have enough cash! Would you like to get some more?",
+    "Max units reached, your researched unit has been put in your store"
+   ],
+   "literalCount": 13,
+   "images": [
+    "popupResearchCenter_buildingProcess.swf",
+    "popupResearchCenter_buildingProcess_3.swf"
+   ],
+   "functions": [
+    "PopupResearchCenter",
+    "init",
+    "onOver",
+    "onOut",
+    "onOverHire",
+    "onOutHire",
+    "closeWindow"
+   ],
+   "overrides": [],
+   "bytes": 23945
+  },
+  {
+   "class": "PopupRewards",
+   "path": "popups/PopupRewards.as",
+   "kind": "popup",
+   "extends": "PopupNextIslandAttackMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "OK"
+   ],
+   "literalCount": 1,
+   "images": [],
+   "functions": [
+    "PopupRewards",
+    "closeWindow"
+   ],
+   "overrides": [],
+   "bytes": 3240
+  },
+  {
+   "class": "PopupSelectResource",
+   "path": "popups/PopupSelectResource.as",
+   "kind": "popup",
+   "extends": "PopupSelectResourceMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Allies Market",
+    "Select the resource you want to acquire"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "PopupSelectResource",
+    "onOver",
+    "onOut",
+    "onSelect",
+    "onClose",
+    "closeWindow"
+   ],
+   "overrides": [],
+   "bytes": 3221
+  },
+  {
+   "class": "PopupSelectRobot",
+   "path": "popups/PopupSelectRobot.as",
+   "kind": "popup",
+   "extends": "PopupSelectRobotMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Choose a robot",
+    "WELCOME TO SOCIAL WARS!",
+    "Choose the robot that will help you on your adventure!",
+    "Select"
+   ],
+   "literalCount": 4,
+   "images": [],
+   "functions": [
+    "PopupSelectRobot"
+   ],
+   "overrides": [],
+   "bytes": 4684
+  },
+  {
+   "class": "PopupSelectRobotReminder",
+   "path": "popups/PopupSelectRobotReminder.as",
+   "kind": "popup",
+   "extends": "PopupSelectRobotReminderMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Get more robots in the Robotic Center!\\nEnter Now!!",
+    "Goals"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "PopupSelectRobotReminder"
+   ],
+   "overrides": [],
+   "bytes": 2380
+  },
+  {
+   "class": "PopupSelectionTeamWindow",
+   "path": "popups/PopupSelectionTeamWindow.as",
+   "kind": "popup",
+   "extends": "SelectionTeamWindowMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "SELECT YOUR UNITS",
+    "Selected Units",
+    "Available Units",
+    "START",
+    "The untis you have selected do not match the available units!"
+   ],
+   "literalCount": 5,
+   "images": [],
+   "functions": [
+    "PopupSelectionTeamWindow"
+   ],
+   "overrides": [],
+   "bytes": 19944
+  },
+  {
+   "class": "PopupSocialBuilding",
+   "path": "popups/PopupSocialBuilding.as",
+   "kind": "popup",
+   "extends": "PopupSocialBuildingMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Hire Friends",
+    "Get allies",
+    "All your allies are ready! Get your reinforcements!",
+    "Open Building",
+    "Get a friend!",
+    "Fill for",
+    "Worker"
+   ],
+   "literalCount": 7,
+   "images": [],
+   "functions": [
+    "PopupSocialBuilding",
+    "refreshAlliedMarketTop",
+    "createFotos",
+    "refreshFotos",
+    "onBuyFriend",
+    "onFindFriend",
+    "onOpenBuilding",
+    "onOver",
+    "onOut",
+    "onPhotoOk"
+   ],
+   "overrides": [],
+   "bytes": 19908
+  },
+  {
+   "class": "PopupSoulMixer",
+   "path": "popups/PopupSoulMixer.as",
+   "kind": "popup",
+   "extends": "PopupBreedingMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "ATOM FUSION",
+    "Insert 2 units, powerUP the fusion and get a third stronger unit!",
+    "Start Fusion",
+    "GET UNIT",
+    "SELECT",
+    "Powerup",
+    "Remaining time:",
+    "Speedup",
+    "You will loose your powerups. Are you sure?",
+    "Neither Spartan Mech or Red Metallic Dragon can\\'t be mixed before you reach level 20",
+    "Something went wrong with the mixing... Let\\'s start over!",
+    "\\nYou can\\'t have more units of this kind."
+   ],
+   "literalCount": 14,
+   "images": [],
+   "functions": [
+    "PopupSoulMixer",
+    "init",
+    "hideAnimation",
+    "showAnimation",
+    "showPanel",
+    "SoulMixerItem",
+    "SoulMixerPoweredUnit"
+   ],
+   "overrides": [],
+   "bytes": 41931
+  },
+  {
+   "class": "PopupSoulMixerHelp",
+   "path": "popups/PopupSoulMixerHelp.as",
+   "kind": "popup",
+   "extends": "PopupSoulMixerHelpMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "1. Fuse two soldiers and create a new powerful unit.\\n2. Give a BOOST to the new unit with the POWERUP button.\\n3. Start the FUSION and press the SPEEDUP button to get your unit immediately.\\n4. Take out your three soldiers and continue exploring the unique combinations\\n."
+   ],
+   "literalCount": 1,
+   "images": [],
+   "functions": [
+    "PopupSoulMixerHelp",
+    "onClose",
+    "closeWindow"
+   ],
+   "overrides": [],
+   "bytes": 1303
+  },
+  {
+   "class": "PopupSuperMistery",
+   "path": "popups/PopupSuperMistery.as",
+   "kind": "popup",
+   "extends": "PopupSuperMisteryBoxMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Rare",
+    "Uncommon",
+    "Common",
+    "BEST\\nVALUE & RARE UNIT GUARANTEED",
+    "ONLY\\nTHIS WEEK",
+    "Super Mistery Box Pack",
+    "You will find your prizes in your storage!",
+    "Buy",
+    "OK",
+    "CONGRATULATIONS!, You won:"
+   ],
+   "literalCount": 10,
+   "images": [],
+   "functions": [
+    "PopupSuperMistery",
+    "onBuy",
+    "onOver",
+    "onOut",
+    "closeWindow"
+   ],
+   "overrides": [],
+   "bytes": 15384
+  },
+  {
+   "class": "PopupTutorial",
+   "path": "popups/PopupTutorial.as",
+   "kind": "popup",
+   "extends": "PopupTutorialMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Next"
+   ],
+   "literalCount": 1,
+   "images": [],
+   "functions": [
+    "PopupTutorial",
+    "closeWindow",
+    "activate"
+   ],
+   "overrides": [],
+   "bytes": 2747
+  },
+  {
+   "class": "PopupUpgradeBuilding",
+   "path": "popups/PopupUpgradeBuilding.as",
+   "kind": "popup",
+   "extends": "PopupUpgradeBuildingAsset",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Complete building?",
+    "Finish instantly for",
+    "Building Upgrade",
+    "Upgrade for",
+    "Upgrade instantly for"
+   ],
+   "literalCount": 5,
+   "images": [],
+   "functions": [
+    "PopupUpgradeBuilding"
+   ],
+   "overrides": [],
+   "bytes": 7179
+  },
+  {
+   "class": "PopupVisit",
+   "path": "popups/PopupVisit.as",
+   "kind": "popup",
+   "extends": "PopupVisitMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Visit",
+    "Send gift",
+    "ATTACK"
+   ],
+   "literalCount": 3,
+   "images": [],
+   "functions": [
+    "PopupVisit"
+   ],
+   "overrides": [],
+   "bytes": 3264
+  },
+  {
+   "class": "PopupWeeklyQuest",
+   "path": "popups/PopupWeeklyQuest.as",
+   "kind": "popup",
+   "extends": "PopupWeeklyQuestMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Weekly Mission!",
+    "Kill all Gun Bots before time expires and get 5 cash!",
+    "You can play the quest only on Sundays and only once per week."
+   ],
+   "literalCount": 3,
+   "images": [],
+   "functions": [
+    "PopupWeeklyQuest",
+    "onClose"
+   ],
+   "overrides": [],
+   "bytes": 1605
+  },
+  {
+   "class": "PopupWeeklyQuestFinished",
+   "path": "popups/PopupWeeklyQuestFinished.as",
+   "kind": "popup",
+   "extends": "PopupWeeklyQuestFinishedMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "MISSION RESULTS",
+    "Enemies defeated:",
+    "Cash earned:",
+    "Your army has been defeated!",
+    "Your have defeated all the enemies!",
+    "You have left the battle!"
+   ],
+   "literalCount": 6,
+   "images": [],
+   "functions": [
+    "PopupWeeklyQuestFinished",
+    "sendResults"
+   ],
+   "overrides": [],
+   "bytes": 4263
+  },
+  {
+   "class": "PopupWizardry",
+   "path": "popups/PopupWizardry.as",
+   "kind": "popup",
+   "extends": "PopupWizardryMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Research LAB",
+    "Your Dark Matter",
+    "Buy Dark Matter",
+    "1.  Click on the \\'Buy\\' button to learn a   spell. \\n\\n 2. Go to the battlefield and choose a spell to cast. If you have more than 3 spells available, click on the yellow arrows at the sides to browse them. \\n\\n3. Move the area-of-effect grid over a unit, enemy or building to unleash the power of spell!\\n\\n Tips:\\n All spells use Dark Matter. You can change cash for Dark Matter clicking on the Dark Matter button. You can also buy Dark Matter with gold. All spells have three levels of power (stars). The more you use the spells, the more the progress bar will fill out until reaching a new level of power. ",
+    "Spell Book guide"
+   ],
+   "literalCount": 5,
+   "images": [],
+   "functions": [
+    "PopupWizardry",
+    "closeWindow",
+    "updateMana",
+    "onClose"
+   ],
+   "overrides": [],
+   "bytes": 8789
+  },
+  {
+   "class": "SoulMixerTurbina",
+   "path": "popups/SoulMixer/SoulMixerTurbina.as",
+   "kind": "popup",
+   "extends": null,
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "SoulMixerTurbina",
+    "setState"
+   ],
+   "overrides": [],
+   "bytes": 4025
+  },
+  {
+   "class": "AllianceInfoRendererItem",
+   "path": "popups/alliances/AllianceInfoRendererItem.as",
+   "kind": "popup",
+   "extends": "AllianceInfoRendererItemAsset",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Pending..",
+    "Ask join"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "AllianceInfoRendererItem"
+   ],
+   "overrides": [],
+   "bytes": 3385
+  },
+  {
+   "class": "AllianceMemberInfoRendererItem",
+   "path": "popups/alliances/AllianceMemberInfoRendererItem.as",
+   "kind": "popup",
+   "extends": "AllianceMemberInfoRendererItemAsset",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Are you sure?",
+    "Accept",
+    "Ignore",
+    "Visit",
+    "Message",
+    "Kick out"
+   ],
+   "literalCount": 6,
+   "images": [],
+   "functions": [
+    "AllianceMemberInfoRendererItem"
+   ],
+   "overrides": [],
+   "bytes": 11152
+  },
+  {
+   "class": "AllianceMemberInfoTip",
+   "path": "popups/alliances/AllianceMemberInfoTip.as",
+   "kind": "popup",
+   "extends": "AllianceMemberInfoTipAsset",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "AllianceMemberInfoTip"
+   ],
+   "overrides": [],
+   "bytes": 1403
+  },
+  {
+   "class": "AllianceState",
+   "path": "popups/alliances/AllianceState.as",
+   "kind": "popup",
+   "extends": null,
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Yes",
+    "No",
+    "Search",
+    "Message All",
+    "Edit",
+    "You have no slots left",
+    "User already belongs to some other Alliance.",
+    "Do you really want to close this Alliance?\\nThe oldest member will become new general",
+    "Do you really want to abandon this Alliance?",
+    "There were some error. We\\'re working to fix this..we promise!",
+    "Members",
+    "Candidates"
+   ],
+   "literalCount": 15,
+   "images": [],
+   "functions": [
+    "AllianceState",
+    "reset"
+   ],
+   "overrides": [],
+   "bytes": 24142
+  },
+  {
+   "class": "JoinState",
+   "path": "popups/alliances/JoinState.as",
+   "kind": "popup",
+   "extends": null,
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "POS.",
+    "NAME",
+    "GENERAL",
+    "MEMBERS",
+    "POINTS",
+    "Join Alliance",
+    "Search",
+    "Show available only"
+   ],
+   "literalCount": 8,
+   "images": [],
+   "functions": [
+    "JoinState",
+    "refresh"
+   ],
+   "overrides": [],
+   "bytes": 8091
+  },
+  {
+   "class": "PopupAllianceDailyBonus",
+   "path": "popups/alliances/PopupAllianceDailyBonus.as",
+   "kind": "popup",
+   "extends": "PopupAllianceDailyBonusAsset",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Okay",
+    "Daily Bonus!"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "PopupAllianceDailyBonus"
+   ],
+   "overrides": [],
+   "bytes": 2417
+  },
+  {
+   "class": "PopupAllianceIntro",
+   "path": "popups/alliances/PopupAllianceIntro.as",
+   "kind": "popup",
+   "extends": "AllianceIntroPopupAsset",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Alliances",
+    "Okay"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "PopupAllianceIntro"
+   ],
+   "overrides": [],
+   "bytes": 4210
+  },
+  {
+   "class": "PopupAlliancesCenter",
+   "path": "popups/alliances/PopupAlliancesCenter.as",
+   "kind": "popup",
+   "extends": "PopupAlliancesCenterAsset",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": true,
+   "literals": [
+    "Server:",
+    "Alliances Center"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "PopupAlliancesCenter",
+    "setState",
+    "showLoading",
+    "hideLoading",
+    "close"
+   ],
+   "overrides": [],
+   "bytes": 3998
+  },
+  {
+   "class": "PopupChooseAlliance",
+   "path": "popups/alliances/PopupChooseAlliance.as",
+   "kind": "popup",
+   "extends": "AllianceChoosePopupAsset",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Alliances",
+    "Join",
+    "Create",
+    "Join alliances created\\nby other players!",
+    "Create your own alliance\\nand invite other players!"
+   ],
+   "literalCount": 5,
+   "images": [],
+   "functions": [
+    "PopupChooseAlliance"
+   ],
+   "overrides": [],
+   "bytes": 2858
+  },
+  {
+   "class": "PopupCreateAlliance",
+   "path": "popups/alliances/PopupCreateAlliance.as",
+   "kind": "popup",
+   "extends": "AllianceCreatePopupAsset",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Alliance Title",
+    "Alliance Description",
+    "Edit Alliance",
+    "Save",
+    "(Note: You won\\'t be able to change it later!)",
+    "(Note: You can edit the description whenever you want)",
+    "Create Alliance",
+    "Create!",
+    "Alliance with that name already exists. Please try different name.",
+    "You already belongs to an Alliance. Try again.",
+    "There were some error. We\\'re working to fix this..we promise!"
+   ],
+   "literalCount": 11,
+   "images": [],
+   "functions": [
+    "PopupCreateAlliance"
+   ],
+   "overrides": [],
+   "bytes": 10722
+  },
+  {
+   "class": "PopupSendAllianceMessage",
+   "path": "popups/alliances/PopupSendAllianceMessage.as",
+   "kind": "popup",
+   "extends": "PopupSendMessageAsset",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Send Message",
+    "Send"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "PopupSendAllianceMessage"
+   ],
+   "overrides": [],
+   "bytes": 4008
+  },
+  {
+   "class": "CrossViralIcon",
+   "path": "popups/cross/CrossViralIcon.as",
+   "kind": "popup",
+   "extends": "Sprite",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "CrossViralIcon"
+   ],
+   "overrides": [],
+   "bytes": 692
+  },
+  {
+   "class": "PopupCrossPromotion",
+   "path": "popups/cross/PopupCrossPromotion.as",
+   "kind": "popup",
+   "extends": "PopupCrossPromotionMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "FREE DRAGONS!",
+    "Get a free",
+    "from",
+    "Get it!",
+    "Claim!"
+   ],
+   "literalCount": 5,
+   "images": [],
+   "functions": [
+    "PopupCrossPromotion"
+   ],
+   "overrides": [],
+   "bytes": 5335
+  },
+  {
+   "class": "PopupPlayNow",
+   "path": "popups/cross/PopupPlayNow.as",
+   "kind": "popup",
+   "extends": "PopupPlayNowMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "GET YOUR DRAGON",
+    "Play now!"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "PopupPlayNow"
+   ],
+   "overrides": [],
+   "bytes": 2508
+  },
+  {
+   "class": "PopupRewardGiven",
+   "path": "popups/cross/PopupRewardGiven.as",
+   "kind": "popup",
+   "extends": "PopupRewardGivenMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Share!",
+    "Reward given!"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "PopupRewardGiven"
+   ],
+   "overrides": [],
+   "bytes": 2084
+  },
+  {
+   "class": "TargetBitmap",
+   "path": "popups/darts/TargetBitmap.as",
+   "kind": "popup",
+   "extends": null,
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "TargetBitmap",
+    "layDown",
+    "bitmapRemoved",
+    "destroy"
+   ],
+   "overrides": [],
+   "bytes": 3550
+  },
+  {
+   "class": "infoFriendAssistPopup",
+   "path": "popups/infoFriendAssistPopup.as",
+   "kind": "popup",
+   "extends": "infoButtonFriendAssistMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Wants to help you!",
+    "Accept"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "infoFriendAssistPopup",
+    "resmooth"
+   ],
+   "overrides": [],
+   "bytes": 3468
+  },
+  {
+   "class": "BidderRenderer",
+   "path": "popups/marketplace/BidderRenderer.as",
+   "kind": "popup",
+   "extends": "PopupMarketplaceUnitBidder",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "BidderRenderer"
+   ],
+   "overrides": [],
+   "bytes": 2117
+  },
+  {
+   "class": "MarketplaceUnitInfoTip",
+   "path": "popups/marketplace/MarketplaceUnitInfoTip.as",
+   "kind": "popup",
+   "extends": "MarketplaceUnitInfoTipAsset",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "MarketplaceUnitInfoTip"
+   ],
+   "overrides": [],
+   "bytes": 1247
+  },
+  {
+   "class": "PopupMarketplace",
+   "path": "popups/marketplace/PopupMarketplace.as",
+   "kind": "popup",
+   "extends": "PopupMarketplaceAsset",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": true,
+   "literals": [
+    "Auction House",
+    "There were some error. We\\'re working to fix this..we promise!"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "PopupMarketplace",
+    "setHeader",
+    "refresh",
+    "showLoading",
+    "hideLoading",
+    "close"
+   ],
+   "overrides": [],
+   "bytes": 12608
+  },
+  {
+   "class": "PopupMarketplaceHelp",
+   "path": "popups/marketplace/PopupMarketplaceHelp.as",
+   "kind": "popup",
+   "extends": "AllianceIntroPopupAsset",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Auction House",
+    "Okay"
+   ],
+   "literalCount": 2,
+   "images": [],
+   "functions": [
+    "PopupMarketplaceHelp"
+   ],
+   "overrides": [],
+   "bytes": 2503
+  },
+  {
+   "class": "PopupMarketplaceUnit",
+   "path": "popups/marketplace/PopupMarketplaceUnit.as",
+   "kind": "popup",
+   "extends": "PopupMarketplaceUnitAsset",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": true,
+   "literals": [
+    "Your bid:",
+    "Latest offers:",
+    "No offers so far.\\nBe the first one to bid!",
+    "BID",
+    "Go back to the auction house and keep bidding!",
+    "Qualified as a Leader!",
+    "Qualified for the next round.",
+    "Not qualified, but currently winning.",
+    "Not Qualified for the next round.\\nBid to qualify.",
+    "Bet finished.",
+    "Finished",
+    "You won the bet!"
+   ],
+   "literalCount": 22,
+   "images": [],
+   "functions": [
+    "PopupMarketplaceUnit",
+    "showLoading",
+    "hideLoading",
+    "refresh",
+    "close"
+   ],
+   "overrides": [],
+   "bytes": 19586
+  },
+  {
+   "class": "UnitRenderer",
+   "path": "popups/marketplace/UnitRenderer.as",
+   "kind": "popup",
+   "extends": "MarketplaceUnitAsset",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Processing..",
+    "Won!",
+    "Lost!",
+    "Finished"
+   ],
+   "literalCount": 4,
+   "images": [],
+   "functions": [
+    "UnitRenderer"
+   ],
+   "overrides": [],
+   "bytes": 7782
+  },
+  {
+   "class": "popupLoadingAssault",
+   "path": "popups/popupLoadingAssault.as",
+   "kind": "popup",
+   "extends": "PopupLoadingAssaultMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [
+    "Close",
+    "Start loading",
+    "Loading...",
+    "Preparing To SPY",
+    "Your Spy Device is ready to spy Enemy",
+    "Start Spying",
+    "Battle Help",
+    "GOING TO BATTLE",
+    "Your Army is ready!\\n\\n Destroy the Town Hall to WIN the battle!",
+    "Select the starting position of your army",
+    "Battle help",
+    "Start battle"
+   ],
+   "literalCount": 12,
+   "images": [
+    "GOING_TO_BATTLE.jpg",
+    "globo_spy.jpg"
+   ],
+   "functions": [
+    "popupLoadingAssault",
+    "closeWindow",
+    "onTestIfLoaded",
+    "onLoaded",
+    "enableButtons",
+    "disableButtons",
+    "onStartBattle",
+    "onBattleHelp",
+    "onCloseHelp"
+   ],
+   "overrides": [],
+   "bytes": 9245
+  },
+  {
+   "class": "ThumbSelectedUnit",
+   "path": "popups/teamSelection/ThumbSelectedUnit.as",
+   "kind": "popup",
+   "extends": "ThumbTeamMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "ThumbSelectedUnit",
+    "activate",
+    "deactivate"
+   ],
+   "overrides": [],
+   "bytes": 1988
+  },
+  {
+   "class": "ThumbUnit",
+   "path": "popups/teamSelection/ThumbUnit.as",
+   "kind": "popup",
+   "extends": "ThumbUnitMC",
+   "isMovieClip": false,
+   "hasOpen": false,
+   "hasClose": false,
+   "literals": [],
+   "literalCount": 0,
+   "images": [],
+   "functions": [
+    "ThumbUnit",
+    "activate",
+    "deactivate"
+   ],
+   "overrides": [],
+   "bytes": 3570
+  }
+ ]
+}
