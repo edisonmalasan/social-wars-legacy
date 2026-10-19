@@ -8,8 +8,11 @@ Python server that trusts the client for almost everything. This project rebuild
 properly: a modern client, an authoritative server, and a standalone desktop executable —
 with the original game's behaviour reproduced from the original client's own code.
 
-> **Status: investigation complete, build starting.** Everything needed to rebuild the game
-> is documented and evidenced in [`re/`](re/README.md). No product code exists yet.
+> **Status: investigation complete, build started.** Everything needed to rebuild the game
+> is documented and evidenced in [`re/`](re/README.md). The upstream project is vendored
+> and byte-for-byte verified, the pnpm workspace exists, and the content pipeline builds a
+> validated, hashed content bundle from the original 2012 config. The client, server and
+> desktop shells are next.
 
 ---
 
@@ -98,14 +101,40 @@ clean auto-update still win. WebView2 on Windows is Chromium 120+, so WebGL2 is 
 .
 ├── AGENTS.md              # how to work in this repository
 ├── README.md              # this file
+├── package.json           # the pnpm workspace root
+├── pnpm-workspace.yaml
+├── tsconfig.base.json
 ├── docs/
 │   ├── CONTEXT.md         # project router and constraints
 │   └── ROADMAP.md         # the production roadmap, Groups A–I
+├── packages/
+│   ├── protocol/          # @swl/protocol — the wire types, the resource vector, the save document
+│   ├── content/           # @swl/content — the content build: config + patches -> a hashed bundle
+│   └── rules/             # @swl/rules — the deterministic simulation core
 ├── re/                    # the reverse-engineering report set
 │   ├── README.md          # the document map
-│   ├── docs/              # 10 analysis documents + items-assets.csv
+│   ├── docs/              # 16 analysis documents + items-assets.csv
+│   ├── data/              # 9 machine-readable datasets
 │   └── evidence/          # raw captured traffic, digests, screenshots
-└── upstream/              # (Group A) the vendored upstream project, verbatim, GPL v3
+├── scripts/               # the analysis and build tooling
+│   ├── verify-upstream.mjs # the provenance check
+│   ├── pull-assets.mjs     # a targeted Git LFS pull
+│   ├── decompile-client.mjs
+│   └── analyze-*.mjs       # the B-group extractors
+└── upstream/              # the vendored upstream project, verbatim, GPL v3
+    ├── PROVENANCE.md
+    ├── MANIFEST.sha256
+    └── socialwarriors/
+```
+
+## Working on it
+
+```bash
+pnpm install          # install the workspace
+pnpm test             # run the test suite
+pnpm typecheck        # type-check everything
+pnpm build:content    # build the content bundle
+node scripts/verify-upstream.mjs   # prove the vendored upstream is unmodified
 ```
 
 ---
@@ -121,9 +150,9 @@ A ──► B ──► C ──► D ──┐
 | Group | Milestone |
 |---|---|
 | **0** | Investigation & documentation — ✅ complete |
-| **A** | Vendor the upstream project with provenance and Git LFS |
-| **B** | Complete the evidence sweep: 58-build diff, full SWF corpus, 229 unit delegates, 28 quests, 134 goals, 403 UI screens, social contracts, remaining live captures |
-| **C** | Monorepo, typed content pipeline, protocol types |
+| **A** | Vendor the upstream project with provenance and Git LFS — ✅ complete |
+| **B** | Complete the evidence sweep: 58-build diff, full SWF corpus, 229 unit delegates, 28 quests, 134 goals, 403 UI screens, social contracts — ✅ complete except the live PvP capture |
+| **C** | Monorepo, typed content pipeline, protocol types — ✅ complete |
 | **D** | Asset pipeline: 1 116 SWF → frame atlases, audio, fonts |
 | **E** | Rules engine: combat, economy, quests, goals — deterministic and golden-master verified |
 | **F** | Authoritative server: real auth, server-side economy and combat, Postgres, protocol shim |
