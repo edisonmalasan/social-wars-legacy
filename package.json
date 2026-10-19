@@ -1,0 +1,24 @@
+{
+  "name": "social-wars-legacy",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.6.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "pnpm --filter content build",
+    "build:content": "pnpm --filter content build",
+    "check:content": "pnpm --filter content check",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test \"packages/*/src/**/*.test.ts\"",
+    "verify:upstream": "node scripts/verify-upstream.mjs",
+    "verify:provenance": "node scripts/verify-provenance.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}

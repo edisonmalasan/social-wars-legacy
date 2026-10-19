@@ -171,12 +171,13 @@ upstream server prints those wrong titles to the player. Goal content must come 
 timeline scripts. **The asset pipeline is a frame-and-atlas problem, not a decompile
 problem** — which is where the effort should go. → [`16-swf-corpus.md`](16-swf-corpus.md)
 
-### 2.15 The 129 client-only items have no recoverable stats
+### 2.15 The content gap is 7 items, not 129 — and it needs no balancing
 
-The client knows 129 item ids the config does not (5 buildings plus the 124-item 1307–1431
-wave). Their *behaviour* is fully known from the 285 delegates, but `StaticData.as` reads
-every stat from the **server** config, and the client holds no stat table — so their
-numbers must be balanced or sourced from a later config capture.
+The client knows 129 item ids the **base** 2012 config does not, but the config that
+actually ships is the base **plus five JSON-Patch deltas** (900 items), and `unit_patch`
+**adds the whole 1307–1431 wave with full stats**. Against the shipped config the real
+gap is **7 item ids and 1 sprite id**. Their *behaviour* is known from the 285 delegates;
+only those 7 need their numbers supplied.
 → [`11-unit-and-building-behaviour.md`](11-unit-and-building-behaviour.md)
 
 ## 3. System map
