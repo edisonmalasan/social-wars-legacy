@@ -189,7 +189,7 @@ own `is_valid_village()` only checks that `items` is a dict.
 |---|---|---|
 | Q1 | What is the exact `end_attack` (PvP) payload shape? | Visit a neighbour island from the town strip, select the army, attack a building, and capture the trace. `end_quest` is already captured — see §2.5. |
 | Q2 | What are the 32 ignored commands' real semantics? | Read the `Cmd*.as` classes (already in report 03) and decide which the clone must implement. `set_help_map` is confirmed live as one of them. |
-| Q3 | Which of the 123 client-only item ids should the clone ship? | Diff the client's `items` handling against the config; the 1307–1431 wave is the obvious candidate |
+| Q3 | ~~Which of the 123 client-only item ids should the clone ship?~~ | **ANSWERED** — that figure was against the unpatched base config. The shipped config is 900 items and covers all but **7** client-known ids (and 1 sprite id, `199`). See [`11-unit-and-building-behaviour.md`](11-unit-and-building-behaviour.md) §4 |
 | Q4 | What was the original server's **response** hash scheme? | Recover from a 2012 capture, or from the original PHP if it is ever located |
 | Q5 | ~~Is `Config.SERVER_KEY` stable across all shipped `Basesec_1.5.x.swf` builds?~~ | **ANSWERED — see [`10-client-version-history.md`](10-client-version-history.md).** The key **rotated once**: `3m0d3pwiupoetn7ysa02` for builds 1.4.5–1.4.27 (22 builds), `4vVSD8dftv6hdfb1Hnk9` for 1.4.28–1.5.4 (36 builds). The live-verified key is the *rotated* one. The compatibility shim must accept both. |
 | Q6 | What are the 34 missing chapter/intro images? | Recover from an older asset dump or the original CDN |

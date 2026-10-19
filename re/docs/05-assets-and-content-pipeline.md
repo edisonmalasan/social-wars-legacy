@@ -106,7 +106,7 @@ the **numeric `items[].id` from `config/main.json`**, zero-padded to 4 digits fo
 Evidence and numbers:
 
 * `sprites/`: 861 of 862 files start with digits. For **738** of them the numeric prefix is exactly an existing
-  `items[].id`; for **123** it is *not* (see §2.7 — the assets are newer than the config snapshot).
+  `items[].id`; for **123** it is *not* (see §2.7 - the assets are newer than the config snapshot). *Corrected:* the shipped config (base + 5 JSON-Patch deltas) is 900 items and covers all but `199`.
   The single non-numeric sprite is `terreno.swf` (item id 925, “Expandable Land”).
 * `thumbs/`: 1 228 of 1 314 files start with digits; **869** of those match a real `items[].id`.
 * Examples: `0001_house_1_m` ↔ item `1` “House I”; `0022_tower_1_m` ↔ item `22` “Turret I”;
@@ -325,7 +325,7 @@ All 29 are pseudo/quest items (cross-promo, chained-offer, “lost/destroyed” 
 
 | Cause | Count | Detail |
 |---|---|---|
-| Id not present in `config['items']` at all | 123 | `199` (1 sprite), `302` (1 sprite) and **121** ids in the 1307–1431 range (gaps at 1359, 1405, 1426, 1427) |
+| Id not present in the **shipped** `config['items']` | **1** | `199` (1 sprite). *Corrected:* against the unpatched 778-item base config the figure was 123 (`199`, `302` and 121 ids in the 1307-1431 range) — but `unit_patch` **adds the 1307-1431 wave with full stats**, so the shipped 900-item config covers all but `199`. |
 
 The 121 post-config ids are the “Mech / drone” wave: `1307_glaivestorm_mech` … `1431_intruderDrone`.
 **Every one of the 122 unreferenced sprites belongs to a unit id the config does not define.**
@@ -565,9 +565,9 @@ The same `img_name` is *also* used as a **JPEG** for the spell button: `GUI/Spel
 | `magics[]` → `images/en/` (button icon) | 10 | 10 | 0 | — |
 | **Total config→asset references** | **2 322** | **2 249 (96.9 %)** | **73** | **722 asset files unreferenced** |
 
-**The dominant cause of the 122 unreferenced sprites and 123 unreferenced item ids is version drift:** the asset
+**The dominant cause of the 122 unreferenced sprites and the item ids the base config never heard of is version drift:** the asset
 tree is from a **later** game version than the `config/main.json` snapshot. The config contains 778 items with
-ids from 1 to 10090; the assets additionally contain **123 ids that the config has never heard of** — 199, 302
+ids from 1 to 10090; the assets additionally contain **ids the base config has never heard of** - 199, 302
 and the whole 1307–1431 “Mech / drone” wave (`glaivestorm`, `stampede`, `hellfire`, `splinter`, `anvilPattern`,
 `bladestorm`, `spectre`, `stalker`, `slaughterer`, `crusherMonarch`, `vortex`, `bombardier`, `forgelord`,
 `shredder`, `raven`, `cyclone`, `yamato`, `steelWanderer`, `tempest`, `servoworm`, `scarab`, `centaur`,

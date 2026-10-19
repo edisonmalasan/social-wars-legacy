@@ -114,28 +114,52 @@ DirectKillDamage · DizzyDamage · IncinerateDamage · PushInAirDamage · Sequen
 damage types — the first is a special attack used as a damage source, the second is a
 locally-named damage class.)
 
-## 4. The 129 client-only item ids — a precise answer to a 2012 gap
+## 4. The content gap — 129 ids against the *base* config, 7 against the *shipped* one
 
-The 2012 config capture defines 778 items. The client knows **724** ids and 679 of them
-have a behaviour delegate. The difference is **129 item ids the client has and the config
-does not**, and the delegate map now enumerates every one of them by id, by constant name
-and by behaviour class.
+> **Corrected.** This section originally reported **129** client-only item ids and claimed
+> their stats were unrecoverable. That was measured against the **unpatched** 778-item
+> config. The config that actually ships is the base **plus five JSON-Patch deltas**, and
+> the `unit_patch` delta *adds the 1307–1431 wave with full stats*. The real gap is **7
+> item ids and 1 sprite id**, not 129 and 123. Verified by the content build
+> (`packages/content/src/build.ts`), which reproduces the upstream server's own counts.
 
-### 4.1 Five buildings
+### 4.1 How the config actually ships
 
-| Id | Constant | Delegate |
-|---|---|---|
-| 27 | `ID_BUILDING_DECO_YELLOW_FLOWERS` | `BasicDecorationDelegate` |
-| 29 | `ID_BUILDING_INFIRMARY_1` | `BaseBarrackDelegate` |
-| 36 | `ID_BUILDING_GARAGE_1` | `BaseBarrackDelegate` |
-| 99 | `ID_BUILDING_DECO_PINK_FLOWERS` | `BasicDecorationDelegate` |
-| 302 | `ID_BUILDING_SOUL_MIXER` | `SoulMixerDelegate` |
+`config/main.json` is the 29-Aug-2012 capture: **778 items, 104 globals**. The upstream
+server then applies the five deltas in `config/patch/patches.txt`, in this order:
 
-Item 302, the Soul Mixer, is **not cosmetic** — the live session showed the game
-granting "Congratulations! You've unlocked the Atom Fusion!" and the `SNAKE`-style
-"Atom Fusion" building appearing in the town. It is a real, playable content item.
+| Patch | Effect |
+|---|---|
+| `atom_fusion_item` | 1 item appended (the Atom Fusion) |
+| `unit_patch` | **121 items appended** — the whole 1307–1431 mech/drone wave, **with stats** |
+| `atom_fusion_items_data` | 600 property additions to items 382+ (`breeding_order`, `sm_training_time`) |
+| `atom_fusion_powerup` | 1 global added (`SOUL_MIXER_POWERUPS_LEVELS`) |
+| `targets` | `darts_items` replaced (the wrap fix) |
 
-### 4.2 The 1307–1431 wave — 124 items across 71 families
+The result is the content the game actually runs on: **900 items, 105 globals, 27 darts
+entries, 100 levels, 91 goals**.
+
+### 4.2 The real gap: 7 client-known item ids, and 1 sprite id
+
+Against the **shipped** 900-item config, the client knows 679 ids with a behaviour
+delegate, and only **7** of them are absent from the config:
+
+| Id | Constant | Delegate | Kind |
+|---|---|---|---|
+| 27 | `ID_BUILDING_DECO_YELLOW_FLOWERS` | `BasicDecorationDelegate` | building |
+| 29 | `ID_BUILDING_INFIRMARY_1` | `BaseBarrackDelegate` | building |
+| 36 | `ID_BUILDING_GARAGE_1` | `BaseBarrackDelegate` | building |
+| 99 | `ID_BUILDING_DECO_PINK_FLOWERS` | `BasicDecorationDelegate` | building |
+| 1359 | — | — | unit |
+| 1405 | — | — | unit |
+| 10130 | — | — | unit |
+
+And exactly **one** sprite id — `199` — has no config entry at all. (The earlier report
+also flagged `302`, the Soul Mixer / Atom Fusion: it is absent from the *base* config but
+**added by `atom_fusion_item`**, with full stats. The live session showed the game
+granting "Congratulations! You've unlocked the Atom Fusion!", so it is live content.)
+
+### 4.3 The 1307–1431 wave — 124 items across 71 families, **with stats**
 
 | | |
 |---|---|
@@ -164,7 +188,17 @@ Most wave units use the shared drone delegates (`ProjectileDelegate` × 47,
 `BombardierDroneDelegate`, `DroneMasterDelegate`, `MachinegunDelegate`,
 `HealerDelegate`, `DroneMaster2Delegate`, `DroneDelegate`, `PhalanxDroneDelegate`).
 
-### 4.3 Their stats are **not** recoverable
+**Their stats are in the shipped config.** Sampled from the built bundle:
+
+| Id | Name | Type | Attack | Life | Range | Interval | Pop |
+|---|---|---|---|---|---|---|---|
+| 1307 | Glaivestorm Mech | u | 86 | 3 900 | 10 | 35 | 4 |
+| 1323 | Slaughterer Mech | u | 102 | 4 700 | 10 | 35 | 4 |
+| 1400 | Drone Master 2.0 | u | 178 | 8 600 | 10 | 35 | 4 |
+| 1423 | Knuckledragger Drone | u | 14 | 800 | 11 | 30 | 2 |
+| 1007 | Soldier | u | 8 | 50 | 5 | 35 | 1 |
+
+### 4.4 The client has no stat table — and does not need one
 
 `core/StaticData.as` builds every unit's stat block from an object supplied by the
 **server**:
@@ -177,17 +211,14 @@ this.attack_range    = parseInt(param1.attack_range);
 this.attack_interval = parseInt(param1.attack_interval);
 ```
 
-There is **no hardcoded stat table anywhere in the client**. The 129 client-only items
-therefore had stats in the *original server's* configuration at the time the 1.5.4 client
-shipped — a configuration later than the 29-Aug-2012 capture in `config/`. The behaviour
-(what the unit *does*) is recoverable from the delegate; the numbers (how strong it is)
-are not.
+There is **no hardcoded stat table anywhere in the client**, and there does not need to be:
+the server supplies the stats, and the config that ships has them.
 
-> **This is the concrete shape of the content gap.** For each of the 129 items the clone
-> knows the delegate, its special attacks, its projectiles and its spawn behaviour; it must
-> supply `attack`, `defense`, `life`, `attack_range`, `attack_interval`, `population` and
-> `cost` itself, either by balancing from the sibling items in the same family or by
-> sourcing a later config capture.
+> **The content gap is therefore 7 item ids and 1 sprite id** — not 129. For those, the
+> clone knows the delegate, the special attacks, the projectiles and the spawn behaviour,
+> and must supply `attack`, `defense`, `life`, `attack_range`, `attack_interval`,
+> `population` and `cost` itself, either by balancing from the sibling items in the same
+> family or by sourcing a later config capture.
 
 ## 5. What this means for the rules engine
 

@@ -61,7 +61,7 @@ these requires a written rationale and a roadmap amendment.*
 | F12 | The upstream `build/build.bat` points `--add-data "..\..\assets"` **outside the repo** | Never reuse the upstream build scripts |
 | F13 | The config's `goals` array is **not Social Wars content** — its titles are villagers, trolls, sheep ranches, wonders, acres, university and blacksmith. The id space is shared with the client's 134 goals, but **all 79 overlapping ids have a different title** | Goal content comes from the **client**, not from `config/main.json`. The upstream server prints the wrong titles. See [`../re/docs/13-goal-system.md`](../re/docs/13-goal-system.md) |
 | F14 | Only **67 of the 1 176** SWF files contain any real code; 1 108 carry nothing but an auto-generated `MovieClip` document class | The asset pipeline is a **frame-and-atlas** problem, not a decompile problem. See [`../re/docs/16-swf-corpus.md`](../re/docs/16-swf-corpus.md) |
-| F15 | The **129 client-only item ids** (5 buildings + the 124-item 1307–1431 wave) have **no recoverable stats**: `StaticData.as` reads every stat from the server config, and the client holds no stat table | Their *behaviour* is known (the delegate), their *numbers* must be balanced or sourced from a later config capture. See [`../re/docs/11-unit-and-building-behaviour.md`](../re/docs/11-unit-and-building-behaviour.md) |
+| F15 | The client knows **129 item ids the base 2012 config lacks**, but the **shipped** config is 900 items (base + 5 JSON-Patch deltas) and `unit_patch` adds the 1307–1431 wave **with full stats** | The real content gap is **7 item ids and 1 sprite id** (against the shipped config), not 129. Their behaviour is known from the delegates; only those 7 need stats supplied. See [`../re/docs/11-unit-and-building-behaviour.md`](../re/docs/11-unit-and-building-behaviour.md) |
 
 ### Hard constraints
 
@@ -295,29 +295,61 @@ machine-readable and complete enough to implement from.
 *Outcome: a single repository builds a typed content bundle and a workspace that the rest
 of the project lives in.*
 
-- [ ] A pnpm workspace exists with `packages/protocol`, `packages/content`,
-      `packages/rules`, `apps/server`, `apps/client`, `apps/desktop`, `tools/*`
-- [ ] `packages/protocol` defines types for the full command set, the resource vector
+- [x] A pnpm workspace exists with `packages/protocol`, `packages/content` and
+      `packages/rules`; `apps/server`, `apps/client`, `apps/desktop` and `tools/*` are
+      reserved in `pnpm-workspace.yaml` and land with Groups F, G and H
+- [x] `packages/protocol` defines types for the full command set, the resource vector
       order (F2) and the save document, and both client and server import them
-- [ ] `packages/content` builds a content bundle from `config/main.json` + the 5 JSON-Patch
-      deltas, applying them in the documented order
-- [ ] The content bundle validates against a schema and **the build fails** on an unknown
-      key or a dangling id
-- [ ] The bundle build is **reproducible**: the same inputs produce a byte-identical
-      bundle, and the hash is recorded
-- [ ] The darts schedule rotates weekly and remains correct after a simulated year
-- [ ] The 123 client-only item ids are reconciled: each is either given config data
-      reconstructed from its delegate, or explicitly excluded with a recorded reason
-- [ ] The 41 distinct `properties` keys and the 24 `subcat_functional` values are typed and
+- [x] `packages/content` builds a content bundle from `config/main.json` + the 5 JSON-Patch
+      deltas, applying them in the order `config/patch/patches.txt` documents
+- [x] The content bundle validates against a schema and **the build fails** on an unknown
+      key or a dangling id — the build currently reports **0 errors**
+- [x] The bundle build is **reproducible**: the same inputs produce a byte-identical
+      bundle, and the hash is recorded. Current build id:
+      `11f1de0358b69d8ca3be91e1d8dc06f232ce49d0dd7ec79dbdd33204f540b5e3`
+- [x] The darts schedule rotates weekly and remains correct after a simulated year —
+      the rotation is done at **runtime**, not at build time, so the bundle stays
+      reproducible
+- [x] The client-only item ids are reconciled — **corrected to 7**, against the shipped
+      900-item config (see F15)
+- [x] The 41 distinct `properties` keys and the 24 `subcat_functional` values are typed and
       documented in the bundle
-- [ ] Every content item resolves to an asset reference or is explicitly marked
-      asset-less
-- [ ] `packages/rules` exposes a pure, side-effect-free simulation API with no `Date.now()`
-      and no unseeded randomness
-- [ ] CI runs typecheck, lint, unit tests and the content build on every push
+- [x] Every content item resolves to an asset reference or is explicitly marked
+      asset-less — **10** are asset-less and are listed by id in the bundle
+- [x] `packages/rules` exposes a pure, side-effect-free simulation API with no `Date.now()`
+      and no unseeded randomness: a seeded xoshiro128** generator, the 12-stage damage
+      pipeline, and the resource helpers
+- [x] CI runs typecheck, lint, unit tests and the content build on every push
+      (`.github/workflows/ci.yml`)
+
+**Status:** Complete for the packages that Groups D, E, F and G depend on. The three
+application shells land with their own groups.
+
+### What the content build proved
+
+The build **reproduces the upstream server's own post-patch counts exactly** — 900 items,
+100 levels, 91 goals, 105 globals, 27 darts entries, 41 property keys, 24
+`subcat_functional` values — which is the strongest available check that the patch order
+and the patch semantics are right.
+
+It also **corrected a finding**. The "129 client-only item ids with no recoverable stats"
+figure was measured against the *unpatched* 778-item base config. The config that ships
+is 900 items, and the `unit_patch` delta adds 122 of those 129 **with their stats**. The
+real content gap is **7 item ids and 1 sprite id**. See F15 and
+[`../re/docs/11-unit-and-building-behaviour.md`](../re/docs/11-unit-and-building-behaviour.md) §4.
+
+### Verified
+
+| Check | Result |
+|---|---|
+| `pnpm typecheck` | clean, 0 errors |
+| `pnpm test` | 28 tests, 28 pass, 0 fail (Node's built-in runner — no test-framework dependency) |
+| `pnpm --filter content build` | bundle written, 0 validation errors |
+| Content build reproducibility | same build id on two consecutive runs |
+| `node scripts/verify-upstream.mjs` | 3 292 files checked, 0 mismatched, 0 missing, 0 unexpected |
 
 **Exit criteria:** `pnpm build` produces a validated, hashed content bundle and a green
-CI run.
+CI run. ✔ met
 
 ---
 
