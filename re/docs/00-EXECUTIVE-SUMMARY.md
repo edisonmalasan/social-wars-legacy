@@ -144,6 +144,41 @@ JPG/PNG/MP3 can be used as-is.
 repository** (`C:\Users\Edison\Desktop\assets`, which does not exist). The correct prefix is
 `..\`. The Windows release path has not built from source in years.
 
+### 2.12 The server signing key rotated once, mid-history
+
+Diffing all 58 shipped client builds shows the key is **not** constant:
+
+| Builds | Key |
+|---|---|
+| 1.4.5 – 1.4.27 (22 builds) | `3m0d3pwiupoetn7ysa02` |
+| 1.4.28 – 1.5.4 (36 builds) | `4vVSD8dftv6hdfb1Hnk9` |
+
+The key verified live is the **rotated** one. The original production key is recovered from
+the client's own binary. The compatibility shim must accept **both**, because unmodified
+original clients span both eras. → [`10-client-version-history.md`](10-client-version-history.md)
+
+### 2.13 The config's goal table is not Social Wars content
+
+`config/main.json`'s `goals` array holds **villagers, trolls, sheep and cow ranches, wonders,
+acres, a university and a blacksmith** — not Social Wars goals. The id space overlaps the
+client's 134 registered goals (79 ids in common), but **all 79 have a different title**. The
+upstream server prints those wrong titles to the player. Goal content must come from the
+**client**, not from the config. → [`13-goal-system.md`](13-goal-system.md)
+
+### 2.14 Only 67 of the 1 176 SWF files contain any real code
+
+1 108 of them carry nothing but an auto-generated `MovieClip` document class and per-frame
+timeline scripts. **The asset pipeline is a frame-and-atlas problem, not a decompile
+problem** — which is where the effort should go. → [`16-swf-corpus.md`](16-swf-corpus.md)
+
+### 2.15 The 129 client-only items have no recoverable stats
+
+The client knows 129 item ids the config does not (5 buildings plus the 124-item 1307–1431
+wave). Their *behaviour* is fully known from the 285 delegates, but `StaticData.as` reads
+every stat from the **server** config, and the client holds no stat table — so their
+numbers must be balanced or sourced from a later config capture.
+→ [`11-unit-and-building-behaviour.md`](11-unit-and-building-behaviour.md)
+
 ## 3. System map
 
 ```
