@@ -56,7 +56,12 @@
 | **08** | [Clone Roadmap](docs/08-CLONE-ROADMAP.md) | The actual rewrite plan: 6 workstreams, 10 milestones, the cheat battery the new server must pass, and the risks. | 17 kB |
 | **09** | [Limitations & Open Questions](docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md) | What we do **not** know, the upstream bugs found, and 9 open questions with the cheapest first. | 14 kB |
 | **10** | [Client Version History](docs/10-client-version-history.md) | All 58 client builds diffed: the server signing key **rotated once**, and the protocol's own timeline. | 14 kB |
-| **11** | [Unit & Building Behaviour](docs/11-unit-and-building-behaviour.md) | The 285 delegates reduced to data: 478 special attacks, 92 projectiles, and the exact 129 client-only item ids. | 16 kB |
+| **11** | [Unit & Building Behaviour](docs/11-unit-and-building-behaviour.md) | The 285 delegates reduced to data: 478 special attacks, 92 projectiles, and the exact 129 client-only item ids. | 11 kB |
+| **12** | [Quest System](docs/12-quest-system.md) | All 23 quests specified with their win conditions, and the quest-id mapping reconstructed past the upstream's duplicate-key bug. | 40 kB |
+| **13** | [Goal System](docs/13-goal-system.md) | 34 goal types, 134 goals — and the finding that the config's goal table is **not Social Wars content at all**. | 53 kB |
+| **14** | [UI Screen Inventory](docs/14-ui-screen-inventory.md) | The 260 UI classes as the modern client's rebuild backlog: 698 strings, 122 image gaps. | 7 kB |
+| **15** | [Social Layer Contracts](docs/15-social-layer-contracts.md) | All 11 alliance variants, 3 betting endpoints and 17 error codes, recovered from the client. | 8 kB |
+| **16** | [SWF Corpus](docs/16-swf-corpus.md) | All 1 176 SWFs characterised — and only **67** of them contain any real code. | 7 kB |
 
 ### 2.2 Machine-readable
 

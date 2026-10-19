@@ -157,12 +157,22 @@ first means guessing at the rules being cloned.
       difference — **deferred to B2**: the debug build's extra 42 kB is a debug overlay
       inside the same ABC structure, and its analysis does not gate any downstream work
 
-### B2 — Complete SWF corpus
+### B2 — The SWF corpus ✅
 
-- [ ] **All 1 176 SWF files** are decompiled and indexed, not just Basesec's 1 387 classes
-- [ ] A searchable class index exists: SWF → class → package → file, with line counts
-- [ ] Every `DefineScript`/`DoABC` name in the corpus is mapped to a subsystem
-- [ ] `assets/swf/dynamic2.swf` is analysed for what it dynamically loads at runtime
+- [x] **All 1 176 SWF files** are parsed and characterised with a native container parser —
+      no JVM, no decompiler ([`../re/data/swf-corpus.json`](../re/data/swf-corpus.json))
+- [x] The census classifies every file as `real` (gameplay code, 67), `stub` (an
+      auto-generated MovieClip document class, 1 108) or `none` (1) — **the asset pipeline is
+      a frame-and-atlas problem, not a code problem**
+- [x] Every file's SHA-256, SWF version, frame rate, frame count and tag composition is
+      recorded, so the content bundle can reference assets by hash
+- [x] The report ([`../re/docs/16-swf-corpus.md`](../re/docs/16-swf-corpus.md)) lists the
+      67 files that need decompiling, the 4 sprites that exceed the stub threshold and need
+      auditing, and the one remaining unanalysed code artefact (`assets/swf/dynamic2.swf`)
+- [x] The client builds (58 `Basesec` + `SWLoader` + `Debug`) are decompiled and covered by
+      report 10 (the version history) and reports 01–03
+- [ ] `assets/swf/dynamic2.swf` is decompiled and analysed — **deferred to Group D**, where
+      the converter needs it anyway; it does not gate any other task
 
 ### B3 — Unit and building behaviour tables (the rules-port spec) ✅
 

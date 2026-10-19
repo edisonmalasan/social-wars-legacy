@@ -1,0 +1,773 @@
+{
+  "note": "Quest specifications extracted from the decompiled AS3 client.",
+  "quests": [
+    {
+      "class": "QuestWeekly01",
+      "questId": "100000049",
+      "questIdConstant": "Constants.QUEST_WEEKLY_01",
+      "name": "Weekly Mission!",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1],
+        "default": 1,
+        "notes": "The weekly quest ignores difficulty: PopupWeeklyQuestFinished.sendResults always reports difficulty 1 and globals.REWARDS_QUESTS[0] is empty (quest/QuestWeekly01.as:88-103, popups/PopupWeeklyQuestFinished.as:88-104). The AbstractQuest.difficulty setter still runs (quest/AbstractQuest.as:382-423) and would duplicate enemy units at 2/3, but the value is never chosen in practice - see the report on the broken star2/star3 handler in popups/PopupLoadingQuest.as:138-150."
+      },
+      "victoryCondition": "Kill all 5 gun bots on the map. Each gun bot has a treasure chest next to it which opens when the bot dies. The quest ends with REASON_ALL_BOTS_KILLED as soon as the 5th bot dies (quest/QuestWeekly01.as:173-184).",
+      "failureCondition": "The 90 second timer expires (REASON_TIMER_END), the player's 4 spawned units all die (REASON_ARMY_KILLED), or the player leaves the map (REASON_PLAYER_LEFT) (quest/QuestWeekly01.as:32, 95-98, 119-126; GUI/GuiManager.as:1895-1897).",
+      "rewards": {
+        "gold": 0,
+        "xp": 0,
+        "items": [],
+        "cash": 1,
+        "notes": "No static reward (globals.REWARDS_QUESTS[0] = {}). The reward is 1 cash per gun bot killed (CASH_PER_KILL = 1), i.e. 5 cash max, granted as RewardResource(COST_CASH, botsKilled) (popups/PopupWeeklyQuestFinished.as:24, 100). The end_quest payload always reports win=1 and units=[]."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 40, "y": 74 },
+      "specialMechanics": [
+        "The player's real army is discarded: Quest.setPlayerUnits([]) is called in prepareInit (quest/QuestWeekly01.as:80).",
+        "The quest spawns its own army of 4 units in mapLoaded: 2x ID_UNIT_BUMBLEBEE (1062) + 2x ID_UNIT_DREADNOUGHT (1084) at the init tile (quest/QuestWeekly01.as:48, 100-117).",
+        "Quest.numPlayerUnitsNow is forced to 100 so the normal 'army wiped out' loss path never triggers (quest/QuestWeekly01.as:92).",
+        "5 fixed gun bot / treasure chest pairs: bots at (20,45) (38,19) (67,22) (63,56) (46,37), chests at (18,45) (37,18) (67,20) (63,58) (46,39) (quest/QuestWeekly01.as:128-171).",
+        "The chest is opened with OpenableChestDelegate.openChest() when its bot dies (quest/QuestWeekly01.as:173-178).",
+        "The end is a popup (PopupWeeklyQuestFinished) instead of the normal Quest.end() flow; the popup sets Quest.currentQuest = null (quest/QuestWeekly01.as:186-191, popups/PopupWeeklyQuestFinished.as:78-86).",
+        "Availability: Sundays only and at most once every 24 h (quest/Quest.as:507-525).",
+        "Air vehicles are NOT excluded; the army is hard-coded instead."
+      ],
+      "enemyUnits": ["ID_UNIT_GUNBOT (id 1063) - 5 map instances, position not named in code"],
+      "overrides": ["getInitTile", "prepareInit", "mapLoaded"],
+      "notes": "Base class AbstractQuest. The gun bot id is not referenced in the quest class; only the map positions are. The reward-table index of this quest in Quest.questIds is 0 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest01Bazooka",
+      "questId": "100000001",
+      "questIdConstant": "Constants.QUEST_01_BAZOOKA",
+      "name": "DEFEAT THE ENEMY",
+      "levelRequired": 1,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "The difficulty setter is re-implemented in the class but is behaviourally identical to AbstractQuest: difficulty 2 spawns 1 extra copy of every enemy unit, difficulty 3 spawns 2 extra copies, each on a free neighbouring tile (quest/Quest01Bazooka.as:278-319). The DIFFICULTY_MULT_2S_LIFE / DIFFICULTY_MULT_2S_ATCK / DIFFICULTY_MULT_3S_LIFE / DIFFICULTY_MULT_3S_ATCK constants (1.1 / 1.1 / 1.2 / 1.2) are declared but never used - dead code (quest/Quest01Bazooka.as:35-41)."
+      },
+      "victoryCondition": "Two-stage boss fight. Stage 1: reduce the Orc Commander (ID_UNIT_ORC_BOSS, id 1108) to near death; he flees to his parked jeep. Stage 2: a jeep (ID_UNIT_X_ORC_BOSS_II_JEEP, id 1131) spawns at (60,63), drives to (42,23) and is then reduced to near death. The second near-death triggers the victory cutscene which ends the quest with EndQuest(true) (quest/Quest01Bazooka.as:116-124, 166-234).",
+      "failureCondition": "Kill the friendly 'Good Boy' (ID_UNIT_GOOD_BOY, id 1017) - it is a key element, and killing a key element calls defeat() (quest/AbstractQuest.as:237-241). Loss by army wipe-out is DISABLED for this quest: AbstractQuest.prepareQuestEnd returns early whenever keyIds is non-empty and alwaysEndIfMyUnitsDie is false, and this quest has a key element (quest/AbstractQuest.as:284-304).",
+      "rewards": {
+        "gold": 1500,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[1] = {g:1500, w:400} -> 1500 gold + 400 wood, granted only on a win (quest/AbstractQuest.as:449-457). XP is not a static reward: it is earned per kill (5 gold and 1 XP per enemy unit or attackable building with attack > 0; walls give nothing) and is capped at half the gold gained (quest/AbstractQuest.as:252-265; quest/Quest.as:412-415). On a win an extra XP reward of min(round(gold/4), exp_required/3) is added (quest/AbstractQuest.as:452-456)."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 11, "y": 85 },
+      "specialMechanics": [
+        "Intro cutscene with 3 dialogue steps between the General (friend CHAR_1) and the Orc Commander (foe CHAR_11) (quest/Quest01Bazooka.as:145-164).",
+        "Stage transition: the boss's onNearDeath callback plays a scene in which he moves to the parked jeep (ID_BUILDING_ORC_RIDER_ACADEMY, id 180) and is replaced by a spawning jeep; the parked jeep only becomes killable after the move finishes (quest/Quest01Bazooka.as:166-205).",
+        "onNearDeath fires when an element's health crosses 10 % of maxLife (core/isoengine/IsoFightingElement.as:469-472); an element with an onNearDeath callback is forced to canDie = false, so it survives at 1 HP (chapters/Chapter.as:917-924).",
+        "The final scene moves the jeep onto the neutral ship (ID_UNIT_SHIP, id 1019) and removes both from the map (quest/Quest01Bazooka.as:212-234).",
+        "mapLoaded removes every enemy unit of type ID_UNIT_UN_ALLIED_1 (id 1034) from the map with the reason 'REMOVE PLAYER BOOST' (quest/Quest01Bazooka.as:326-349).",
+        "The friendly 'Good Boy' (chapter element 'general') is only allowed to die after mapLoaded has run (quest/Quest01Bazooka.as:331-332).",
+        "getTileIdForMapPosition returns 1 (land) - the whole map is walkable land (quest/Quest01Bazooka.as:273-276).",
+        "Dead code: the 'stages' array is never populated and the private cleanArea() method is never called (quest/Quest01Bazooka.as:88-112; quest/AbstractQuest.as:150)."
+      ],
+      "enemyUnits": ["1108 (ID_UNIT_ORC_BOSS)", "1131 (ID_UNIT_X_ORC_BOSS_II_JEEP, spawned during the quest)", "1034 (ID_UNIT_UN_ALLIED_1, removed at map load)"],
+      "overrides": ["levelRequired", "prepareInit", "defeat", "start", "getFreeUnits", "getInitTile", "getTileIdForMapPosition", "difficulty (setter)", "difficulty (getter)", "mapLoaded", "end"],
+      "notes": "Base class AbstractQuest. Victory is decided by the cutscene (EndQuest(true)), not by the standard remainingFoes/enableActivator path. The reward-table index in Quest.questIds is 1 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest06Airstrike",
+      "questId": "100000006",
+      "questIdConstant": "Constants.QUEST_06_AIRSTRIKE",
+      "name": "AIRSTRIKE!",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "Uses the AbstractQuest.difficulty setter unchanged: difficulty 2 adds 1 extra copy of every enemy unit, difficulty 3 adds 2 (quest/AbstractQuest.as:382-423)."
+      },
+      "victoryCondition": "Destroy the enemy Command Center (ID_BUILDING_ORC_HQ, id 195) after the airstrike has softened it. Its onKill callback plays the final scene which ends the quest with EndQuest(true) (quest/Quest06Airstrike.as:138-142, 270-279).",
+      "failureCondition": "The player's army is wiped out (Quest.numPlayerUnitsNow == 0) -> prepareQuestEnd(3) -> 3 s timer -> quest ends as a loss (quest/AbstractQuest.as:276-280, 284-304). This quest has no key elements, so the 'army wipe' loss path is active. defeat() is overridden for the cutscene but is never reached by elementKilled (no keyIds).",
+      "rewards": {
+        "gold": 2000,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[2] = {g:2000, w:600} -> 2000 gold + 600 wood (quest/AbstractQuest.as:449-457). Per-kill gold/XP as described in the base notes; the airstrike itself awards nothing because elementKilled returns [0,0] while _airstrikeRunning is true (quest/Quest06Airstrike.as:386-393)."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 70, "y": 80 },
+      "specialMechanics": [
+        "Two-step objective: (1) kill the defenders of the radio station (ID_BUILDING_RADIO_STATION, id 121, affiliation NEUTRAL) -> onKillDefenders -> airstrike scene; (2) destroy the enemy command centre (id 195) with ground units (quest/Quest06Airstrike.as:130-143, 168-176).",
+        "The radio station is on the West island, the command centre on the North island (quest/Quest06Airstrike.as:149-164).",
+        "Airstrike is fully scripted: 2 planes (ID_UNIT_DEFINITIVE_AIRPLANE) fly from x = airstrikePoint.x + 29 to airstrikePoint.x - 34 across the target area (airstrikePoint = 70,40) (quest/Quest06Airstrike.as:95-104, 228-251).",
+        "Bomb targets are hard-coded tile coordinate pairs: plane0 bomb x-thresholds [80,76,70,60] with 4 target groups, plane1 [78,75,70,67] with 4 target groups (quest/Quest06Airstrike.as:95-104).",
+        "A queued bomb applies int.MAX_VALUE >> 2 damage to the target element (instant kill) and plays the BAST_BAZOOKA blast effect (quest/Quest06Airstrike.as:298-318).",
+        "If a plane leaves the map, all of its remaining targets are hit with 1 000 000 damage (quest/Quest06Airstrike.as:330-341).",
+        "The pilot character is CharacterManager.getFriend(CHAR_11); the general is CHAR_1 (quest/Quest06Airstrike.as:89-91)."
+      ],
+      "enemyUnits": ["195 (ID_BUILDING_ORC_HQ - the objective building)"],
+      "overrides": ["prepareInit", "start", "defeat", "elementKilled", "getInitTile"],
+      "notes": "Base class AbstractQuest. The radio station (id 121) is neutral, not an enemy. The reward-table index in Quest.questIds is 2 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest03DefendConvoyAuto",
+      "questId": "100000003",
+      "questIdConstant": "Constants.QUEST_03_DEFEND_CONVOY_AUTO",
+      "name": "DEFEND THE CONVOY",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "AbstractQuest.difficulty setter unchanged (quest/AbstractQuest.as:382-423). It duplicates the map's enemy units, but the wave enemies spawned at runtime by spawnWave() are NOT affected because the setter only walks Base.Main.buildingArray once, at difficulty-assignment time."
+      },
+      "victoryCondition": "Get all 3 allied trucks (ID_UNIT_TRUCK_1, id 1013) to the far side of the map (x = 98, y = 86) alive. totalTrucksToSave = 3; when totalTrucksArrived reaches 3 the victory scene plays and ends the quest with EndQuest(true) (quest/Quest03DefendConvoyAuto.as:49-51, 175-189, 230-239).",
+      "failureCondition": "Let a truck be destroyed. The truck is a key element (keyIds[truckId]), so killing it calls defeat() -> playDeadScene -> EndQuest(false) (quest/Quest03DefendConvoyAuto.as:100-101, 166-173, 248-275). Loss by army wipe-out is disabled (keyIds is non-empty, alwaysEndIfMyUnitsDie is false).",
+      "rewards": {
+        "gold": 2500,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[3] = {g:2500, o:800} -> 2500 gold + 800 oil (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 52, "y": 80 },
+      "specialMechanics": [
+        "3 friendly trucks (ID_UNIT_TRUCK_1, id 1013) spawn from (0,86) and drive to (98,86) with IAConvoy behaviour; the first spawns immediately, the others every 10 s (timeBetweenTrucks) (quest/Quest03DefendConvoyAuto.as:45, 110-111, 144-164).",
+        "Trucks are reinforcementIds (affiliation PLAYER_SELF) and key elements; the truck's TruckDelegate.doorOpen is set to false and it is not selectable (quest/Quest03DefendConvoyAuto.as:101-108, 149-157).",
+        "Enemy waves spawn every 10 s (timeBetweenWaves) starting 10 s after the intro cutscene ends (timeBeforeFirstWave) (quest/Quest03DefendConvoyAuto.as:37-41, 223-228).",
+        "4 wave spawn points on the top edge - (23,11) (38,11) (53,11) (69,11) - chosen at random; the wave composition is also random from 4 predefined waves: [orc soldier I, orc swordman, orc swordman], [orc soldier I, orc soldier I], [orc swordman x3], [orc jockey x3] (quest/Quest03DefendConvoyAuto.as:112-117, 121-142).",
+        "Every spawned enemy gets IAConvoy/IAAttack behaviour targeting the trucks (battle/IAAttack.as:15-26, 49-70) so they attack the convoy instead of the player (quest/Quest03DefendConvoyAuto.as:135-138, 191-204).",
+        "The wave and truck timers are cancelled in end() (quest/Quest03DefendConvoyAuto.as:241-246).",
+        "The description claims 'No flying units allowed on this quest!' but this class does NOT set unitTypesExcluded - the restriction is not enforced client-side (quest/Quest03DefendConvoyAuto.as:91-119 has no unitTypesExcluded; compare quest/Quest07Ship.as:81-83).",
+        "Dead code: spawnPoint (21,94), escortUnits, convoyUnits and neutralArea Rectangle(96,84,3,5) are declared but never used (quest/Quest03DefendConvoyAuto.as:31-33, 35, 43)."
+      ],
+      "enemyUnits": ["1122 (ID_UNIT_ORC_SOLDIER_I)", "1123 (ID_UNIT_ORC_SWORDMAN)", "1109 (ID_UNIT_ORC_JOCKEY)"],
+      "overrides": ["prepareInit", "elementKilled", "start", "end", "defeat", "getInitTile"],
+      "notes": "Base class AbstractQuest. The in-game description ('Defeat all enemies before they destroy the allied convoy') does not match the implemented victory condition, which is 'get 3 trucks to the exit'. There is no explicit 'all enemies dead' check anywhere in the class. The reward-table index in Quest.questIds is 3 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest04Supertank",
+      "questId": "100000004",
+      "questIdConstant": "Constants.QUEST_04_SUPERTANK",
+      "name": "STOP THE BIG WEAPON",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "AbstractQuest.difficulty setter unchanged (quest/AbstractQuest.as:382-423)."
+      },
+      "victoryCondition": "Destroy both weapon parts (ID_BUILDING_DISABLED_AMMO_I id 115 and ID_BUILDING_DISABLED_AMMO_II id 116) - each triggers its own onNearDeath scene - and then destroy the assembled weapon. Once both parts are gone the disabled tank (ID_BUILDING_DISABLED_ORK_TANK, id 204) is removed and a Megatank (ID_UNIT_MEGATANK, id 1037) spawns at (48,7) as the chapter element 'boss'; reducing it to near death plays the victory scene, which ends the quest with EndQuest(true) (quest/Quest04Supertank.as:66-80, 223-261).",
+      "failureCondition": "Attack the disabled tank (id 204) before both parts are destroyed: its onNearDeath callback plays the 'it was a fake' trap scene and ends the quest with EndQuest(false) (quest/Quest04Supertank.as:76-80, 263-273). Loss by army wipe-out is also active (this quest has no key elements): prepareQuestEnd(3) -> 3 s timer -> loss (quest/AbstractQuest.as:276-280).",
+      "rewards": {
+        "gold": 3000,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[4] = {g:3000, s:1000} -> 3000 gold + 1000 steel (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 60, "y": 90 },
+      "specialMechanics": [
+        "Two-part objective with an explicit order: both ammo pieces must be destroyed before the weapon can be attacked; the disabled tank only becomes active after the second piece is gone (quest/Quest04Supertank.as:110-115, 223-249).",
+        "The 'activated' state is broadcast over the quest's own Signal (sigActivated) and received by DisabledSupertankDelegate.onPieceActivated (quest/Quest04Supertank.as:44, 184, 217-221; core/isoengine/delegates/buildings/DisabledSupertankDelegate.as:21-23).",
+        "A red Orc helicopter (ID_UNIT_ORC_HELICOPTER, id 1110) is neutral and not attackable; it flies to the destroyed part and carries it off - pure visual (quest/Quest04Supertank.as:81-86, 146-167, 186-206).",
+        "The megatank boss is spawned by a cutscene ChapterSegment with onNearDeath = endScene (quest/Quest04Supertank.as:225-247).",
+        "start() activates the two chapter elements piece_1 and piece_2 (quest/Quest04Supertank.as:110-115).",
+        "Dead code: the static arrays choppersPosition [[26,44],[72,44]] and bridgePositions_Array [[31,40],[72,40]] are declared but never used (quest/Quest04Supertank.as:28-30)."
+      ],
+      "enemyUnits": ["115 (ID_BUILDING_DISABLED_AMMO_I)", "116 (ID_BUILDING_DISABLED_AMMO_II)", "204 (ID_BUILDING_DISABLED_ORK_TANK)", "1037 (ID_UNIT_MEGATANK, spawned as the boss)", "1110 (ID_UNIT_ORC_HELICOPTER, neutral)"],
+      "overrides": ["prepareInit", "start"],
+      "notes": "Base class AbstractQuest. getInitTile is NOT overridden, so the AbstractQuest default (60,90) is used. The reward-table index in Quest.questIds is 4 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest05AssaultConvoy",
+      "questId": "100000005",
+      "questIdConstant": "Constants.QUEST_05_ASSAULT_CONVOY",
+      "name": "DESTROY THE TRUCK",
+      "levelRequired": 1,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "AbstractQuest.difficulty setter unchanged (quest/AbstractQuest.as:382-423). The DIFFICULTY_MULT_2S_LIFE / DIFFICULTY_MULT_2S_ATCK / DIFFICULTY_MULT_3S_LIFE / DIFFICULTY_MULT_3S_ATCK constants (1.1 / 1.1 / 1.2 / 1.2) are declared but never used - dead code (quest/Quest05AssaultConvoy.as:27-33)."
+      },
+      "victoryCondition": "Destroy the enemy truck (ID_UNIT_TRUCK_3, id 1032) before it leaves the zone. Its onKill callback starts the victory scene, which ends the quest with EndQuest(true) (quest/Quest05AssaultConvoy.as:117-123, 243-252).",
+      "failureCondition": "The 120 second countdown expires. The countdown is started by the intro cutscene's <callback>moveConvoy</callback> step and its 'finished' event calls defeat() -> defeat scene -> EndQuest(false) (quest/Quest05AssaultConvoy.as:273-284, 254-263). Loss by army wipe-out is also active (no key elements): prepareQuestEnd(3) -> 3 s timer -> loss.",
+      "rewards": {
+        "gold": 3500,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[5] = {g:3500, w:1200} -> 3500 gold + 1200 wood (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 15, "y": 40 },
+      "specialMechanics": [
+        "The whole cutscene script is an inline XML literal parsed at runtime by createCutSceneFromXML (camera / talk / callback / clean / end tags) (quest/Quest05AssaultConvoy.as:53-88, 131-236).",
+        "The truck only starts moving when the intro cutscene reaches the <callback>moveConvoy</callback> step; the 120 s countdown starts at the same moment (quest/Quest05AssaultConvoy.as:273-284).",
+        "The truck drives 60 tiles to the right, then to (truckX, 1) i.e. off the top of the map; the player's units are ordered to follow it (quest/Quest05AssaultConvoy.as:285-303, 336-357).",
+        "The HUD shows an AssaultCountdown with the title 'TRUCK LEAVING IN' (quest/Quest05AssaultConvoy.as:57, 276-284).",
+        "end() removes the countdown from the HUD (quest/Quest05AssaultConvoy.as:265-271)."
+      ],
+      "enemyUnits": ["1032 (ID_UNIT_TRUCK_3 - the objective unit)"],
+      "overrides": ["levelRequired", "prepareInit", "defeat", "end", "start", "getInitTile"],
+      "notes": "Base class AbstractQuest. The reward-table index in Quest.questIds is 5 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest02CentralNuclear",
+      "questId": "100000002",
+      "questIdConstant": "Constants.QUEST_02_CENTRAL_NUCLEAR",
+      "name": "BLOW THE POWER PLANT",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "AbstractQuest.difficulty setter unchanged (quest/AbstractQuest.as:382-423)."
+      },
+      "victoryCondition": "Destroy the Nuclear Plant (ID_BUILDING_NUCELAR_PLANT, id 89) and then the Orc Command Center (ID_BUILDING_ORC_HEADQUATERS / ID_BUILDING_ORC_HQ, id 195). The plant's onKill callback plays the 'no power' scene (which deactivates every tower) and the command centre's onKill callback plays the victory scene, ending the quest with EndQuest(true) (quest/Quest02CentralNuclear.as:156-165, 142-149).",
+      "failureCondition": "Kill the friendly 'Good Boy' (ID_UNIT_GOOD_BOY, id 1017) - it is a key element, so killing it calls defeat() -> game over scene -> EndQuest(false) (quest/Quest02CentralNuclear.as:170-171; quest/AbstractQuest.as:237-241). Loss by army wipe-out is disabled (keyIds is non-empty).",
+      "rewards": {
+        "gold": 4000,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[6] = {g:4000, o:1400} -> 4000 gold + 1400 oil (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 15, "y": 80 },
+      "specialMechanics": [
+        "Strictly ordered two-step objective: the plant must be destroyed before the command centre can be attacked (quest/Quest02CentralNuclear.as:156-165).",
+        "Destroying the plant deactivates every tower on the map: all IsoBuilding instances whose delegate is a TowerDelegate become PLAYER_NEUTRAL and get a resource-collection icon (quest/Quest02CentralNuclear.as:178-196).",
+        "A friendly 'stolen enemy truck' (ID_UNIT_TRUCK_2, id 1035) is a reinforcement (PLAYER_SELF) and is not attackable; the intro cutscene tells the player to put 6 units into it to sneak into the plant (quest/Quest02CentralNuclear.as:58-60, 166-174).",
+        "The nuclear plant is the only building whose death changes the map state (towers off); the command centre death is the actual win trigger.",
+        "Reference positions used by the cutscene: init (15,80), command centre (22,26), base entrance (21,59), nuclear plant (82,75), oil 1 (13,54), oil 2 (29,39) (quest/Quest02CentralNuclear.as:30-40)."
+      ],
+      "enemyUnits": ["89 (ID_BUILDING_NUCELAR_PLANT)", "195 (ID_BUILDING_ORC_HEADQUATERS / ID_BUILDING_ORC_HQ)"],
+      "overrides": ["prepareInit", "defeat", "getInitTile", "start"],
+      "notes": "Base class AbstractQuest. The reward-table index in Quest.questIds is 6 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest07Ship",
+      "questId": "100000007",
+      "questIdConstant": "Constants.QUEST_07_SHIP",
+      "name": "V.I.P ENEMY",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "AbstractQuest.difficulty setter unchanged (quest/AbstractQuest.as:382-423)."
+      },
+      "victoryCondition": "Destroy the enemy Command Center (ID_BUILDING_ORC_HQ, id 195) after taking the ship. The command centre's onKill callback plays the victory scene, which ends the quest with EndQuest(true) (quest/Quest07Ship.as:173-177, 122-136).",
+      "failureCondition": "Three distinct losses: (a) the ship (ID_UNIT_SHIP, id 1019) is destroyed - it is a key element, so its onKill plays the failure scene and ends the quest with EndQuest(false); (b) the friendly 'Good Boy' (ID_UNIT_GOOD_BOY, id 1017) is killed - also a key element, so defeat() is called; (c) the player's army is wiped out - this quest sets alwaysEndIfMyUnitsDie = true, so prepareQuestEnd(3) is NOT short-circuited and the 3 s timer runs (quest/Quest07Ship.as:168-182; quest/AbstractQuest.as:237-241, 284-304).",
+      "rewards": {
+        "gold": 4500,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[7] = {g:4500, s:1600} -> 4500 gold + 1600 steel (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 9, "y": 80 },
+      "specialMechanics": [
+        "Air vehicles are excluded from the player's army: unitTypesExcluded[GROUP_TYPE_AIR_VEHICLE] = true (quest/Quest07Ship.as:81-83).",
+        "Two-step objective: kill the defenders of the small harbour (ID_BUILDING_SMALL_HARBOUR, id 907, neutral) -> the ship becomes PLAYER_SELF and the 'we have the ship' scene plays -> use the ship to cross and destroy the command centre (quest/Quest07Ship.as:163-182, 184-189).",
+        "The ship is a key element: destroying it loses the quest (quest/Quest07Ship.as:168-172, 179-180).",
+        "alwaysEndIfMyUnitsDie = true so an army wipe-out really ends the quest (quest/Quest07Ship.as:178).",
+        "The 'general' chapter element is the friendly Good Boy with affiliation PLAYER_SELF (quest/Quest07Ship.as:159-162)."
+      ],
+      "enemyUnits": ["195 (ID_BUILDING_ORC_HQ - the objective building)"],
+      "overrides": ["prepareInit", "defeat", "getInitTile", "start"],
+      "notes": "Base class AbstractQuest. The harbour (907) and the ship (1019) start neutral; the ship becomes friendly. The reward-table index in Quest.questIds is 7 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest08Rocket",
+      "questId": "100000008",
+      "questIdConstant": "Constants.QUEST_08_ROCKET",
+      "name": "Dangerous rocket!",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "AbstractQuest.difficulty setter unchanged (quest/AbstractQuest.as:382-423)."
+      },
+      "victoryCondition": "Destroy the enemy rocket launcher (ID_BUILDING_ROCKET_LAUNCHER, id 128). Its onKill callback starts the victory scene, which ends the quest with EndQuest(true) (quest/Quest08Rocket.as:147-152, 119-127).",
+      "failureCondition": "The 600 second mission timer expires (_timeMission = 600). The countdown's 'finished' event calls defeat() -> game over scene (the rocket launches) -> EndQuest(false) (quest/Quest08Rocket.as:72, 86-100, 160-185). Loss by army wipe-out is also active (no key elements): prepareQuestEnd(3) -> loss.",
+      "rewards": {
+        "gold": 5000,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[8] = {g:5000, o:1800} -> 5000 gold + 1800 oil (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 14, "y": 85 },
+      "specialMechanics": [
+        "Air vehicles are excluded from the player's army: unitTypesExcluded[GROUP_TYPE_AIR_VEHICLE] = true (quest/Quest08Rocket.as:88-90).",
+        "The HUD shows an AssaultCountdown with the title 'Rocket launched in' and a 600 s duration, started by the intro cutscene's callback (quest/Quest08Rocket.as:72, 94-96, 115, 160-169).",
+        "The objective element is declared with canDie = false, which forces IsoFightingElement.canDie = false and therefore clamps its health to 1 instead of 0 - i.e. the launcher cannot actually be destroyed and its onKill victory callback cannot fire through the normal kill path (quest/Quest08Rocket.as:147-152; chapters/Chapter.as:922-925; core/isoengine/IsoFightingElement.as:508-518). Marked UNVERIFIED in the report: this looks like an authoring bug in the original client, but the shipped game may have relied on a different element or a different code path.",
+        "launchRocket() only plays a ghost-building animation (MovieClip.gotoAndStop(2)) as the loss feedback (quest/Quest08Rocket.as:187-196).",
+        "Dead code: the private startEndScene() stub is empty and the rocketLauncherIso field is never assigned (quest/Quest08Rocket.as:48, 156-158)."
+      ],
+      "enemyUnits": ["128 (ID_BUILDING_ROCKET_LAUNCHER - the objective building)"],
+      "overrides": ["prepareInit", "defeat", "end", "getInitTile", "start"],
+      "notes": "Base class AbstractQuest. The reward-table index in Quest.questIds is 8 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest09Laboratories",
+      "questId": "100000009",
+      "questIdConstant": "Constants.QUEST_09_LABORATORIES",
+      "name": "Destroy all the labs",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "AbstractQuest.difficulty setter unchanged (quest/AbstractQuest.as:382-423)."
+      },
+      "victoryCondition": "Clear the defenders of the radio station (ID_BUILDING_RADIO_STATION, id 121, neutral); the airstrike that follows destroys the 5 labs and the quest ends with EndQuest(true) (quest/Quest09Laboratories.as:173-187, 299-316).",
+      "failureCondition": "A bespoke 2 second polling timer started in mapLoaded checks Base.Iso.arPlayerUnits.length == 0; when the player has no units left the quest calls defeat() -> failure scene -> EndQuest(false) (quest/Quest09Laboratories.as:119-134, 189-202). The standard prepareQuestEnd(3) army-wipe path is also active because this quest has no key elements.",
+      "rewards": {
+        "gold": 5500,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[9] = {g:5500, s:2000} -> 5500 gold + 2000 steel (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes; the airstrike awards nothing (elementKilled returns [0,0] while _airstrikeRunning is true, quest/Quest09Laboratories.as:424-431)."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 17, "y": 79 },
+      "specialMechanics": [
+        "Air vehicles are excluded from the player's army: unitTypesExcluded[GROUP_TYPE_AIR_VEHICLE] = true (quest/Quest09Laboratories.as:95-97).",
+        "The 5 labs are NOT registered as important elements - they are identified only by hard-coded tile coordinates in the airstrike target list: (49,60) (52,35) (80,83) (86,53) (86,19) (quest/Quest09Laboratories.as:107-114).",
+        "The radio station (121) is neutral; killing its defenders triggers the airstrike scene (quest/Quest09Laboratories.as:176-187).",
+        "2 planes (ID_UNIT_DEFINITIVE_AIRPLANE) spawn at (85,60) and (85,35) and fly to (22,60) and (22,35); plane0 releases its bomb at x = 49, plane1 at x = 52 (quest/Quest09Laboratories.as:105-114, 280-298).",
+        "Queued bombs apply int.MAX_VALUE >> 2 damage to the target element; if a plane leaves the map, all of its remaining targets are hit with 1 000 000 damage (quest/Quest09Laboratories.as:336-356, 368-381).",
+        "The labs are destroyed by the airstrike, not by the player, so the player's own army never has to touch them."
+      ],
+      "enemyUnits": ["121 (ID_BUILDING_RADIO_STATION - neutral trigger, not an enemy)"],
+      "overrides": ["prepareInit", "mapLoaded", "defeat", "end", "getInitTile", "start", "elementKilled"],
+      "notes": "Base class AbstractQuest. The 5 lab buildings have no id in the quest code - only their map coordinates - so a server-side re-implementation must hard-code the same coordinates. The reward-table index in Quest.questIds is 9 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest10SpecialOps",
+      "questId": "100000010",
+      "questIdConstant": "Constants.QUEST_10_SPECIAL_OPS",
+      "name": "STEAL THE LAPTOP",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "AbstractQuest.difficulty setter unchanged (quest/AbstractQuest.as:382-423)."
+      },
+      "victoryCondition": "Steal the laptop with the friendly Special Ops commando (ID_UNIT_SPECIAL_OPS, id 1052) and kill every enemy 'bastard'. The win triggers when all enemy units whose group_type is LONG_RANGE, SHORT_RANGE or LAND_VEHICLE are dead and the commando has reached the computer area Rectangle(10,78,5,5); if the player confirms the 'grab the computer anyway' dialog first, the remaining enemies turn aggressive and the win happens when the last one dies (quest/Quest10SpecialOps.as:452-474, 520-534, 545-559, 603-618).",
+      "failureCondition": "The commando dies: the commando is a key element, so its death calls defeat() -> 'the commando is down' scene -> EndQuest(false) (quest/Quest10SpecialOps.as:620-632; quest/AbstractQuest.as:237-241). Loss by army wipe-out is disabled (keyIds is non-empty, alwaysEndIfMyUnitsDie is false).",
+      "rewards": {
+        "gold": 6000,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[10] = {g:6000, w:2200} -> 6000 gold + 2200 wood (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 14, "y": 85 },
+      "specialMechanics": [
+        "Stealth mission: the commando can hide (SpecialOpsDelegate.canHide) until the computer is grabbed; grabbing it sets canHide = false and makes every surviving enemy aggressive and target the commando (quest/Quest10SpecialOps.as:561-586).",
+        "24 patrol routes and 25 patrolling units are re-assigned IA.STATE_PATROL with their own route and starting patrolStep in mapLoaded (quest/Quest10SpecialOps.as:111-395, 475-488).",
+        "The bunker (ID_BUILDING_ORC_BUNKER, id 201) and the zodiac (ID_UNIT_ZODIAC, id 1018) are neutral; the commando is PLAYER_SELF (quest/Quest10SpecialOps.as:500-518).",
+        "Spells are disabled for the duration of the quest: MagicManager.disabledSpells = [1..19] in start() and reset to [] in end() (quest/Quest10SpecialOps.as:634-638, 648-652).",
+        "The oil area Rectangle(60,18,40,15) triggers a hint cutscene about explosive barrels (quest/Quest10SpecialOps.as:404-405, 536-543, 593-601).",
+        "A confirm popup is raised when the commando reaches the computer area while enemies are still alive (quest/Quest10SpecialOps.as:545-559).",
+        "Dead code: the _timeMission = 1800 field is never used (there is no timer in this quest) and the 'hinted' flag is never set (quest/Quest10SpecialOps.as:91, 107)."
+      ],
+      "enemyUnits": ["all enemy units on the map whose group_type is LONG_RANGE, SHORT_RANGE or LAND_VEHICLE (no concrete ids are named in the quest class)"],
+      "overrides": ["prepareInit", "mapLoaded", "defeat", "end", "getInitTile", "start"],
+      "notes": "Base class AbstractQuest. The set of 'bastards' is defined by group_type, not by id, so the server must classify enemies the same way. The reward-table index in Quest.questIds is 10 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest11SaveVillages",
+      "questId": "100000011",
+      "questIdConstant": "Constants.QUEST_11_SAVE_VILLAGES",
+      "name": "RESCUE THE ALLIES",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "AbstractQuest.difficulty setter unchanged (quest/AbstractQuest.as:382-423)."
+      },
+      "victoryCondition": "Get every ally civilian (ID_UNIT_WORKER_3) off both allied villages before the airstrike. A 15 second timer checks whether any worker unit is still inside friendlyAreas[0] Rectangle(10,70,33,28) or friendlyAreas[1] Rectangle(55,70,34,28); when both areas are empty the victory scene plays and the quest ends with EndQuest(true) (quest/Quest11SaveVillages.as:144, 617-627, 629-668).",
+      "failureCondition": "The 240 second mission timer (MISSION_TIME = 240) expires: the countdown's 'finished' event calls showAirstrikeScene, the airstrike kills the remaining workers, and the quest is resolved as a loss (failQuest -> defeat()) (quest/Quest11SaveVillages.as:46, 158-160, 288-386, 670-675). prepareQuestEnd is overridden to run the airstrike immediately, so the army-wipe case also ends in the airstrike resolution (quest/Quest11SaveVillages.as:388-391).",
+      "rewards": {
+        "gold": 6500,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[11] = {g:6500, o:2400} -> 6500 gold + 2400 oil (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 50, "y": 3 },
+      "specialMechanics": [
+        "The two allied villages are declared as friendly areas and converted to friendly territory at quest start (quest/Quest11SaveVillages.as:144, 230-234; quest/AbstractQuest.as:374-380).",
+        "Two enemy ports must be cleared: Orc Boss Academy (ID_BUILDING_ORC_BOSS_ACADEMY, id 179, west) and Orc Flamethrower Academy (ID_BUILDING_ORC_FLAMEWTHROWER_ACADEMY, id 182, east). Killing their defenders spawns a player ship (ID_UNIT_SHIP, id 1019) at (26,50) / (73,50) and hides the port's original ship (quest/Quest11SaveVillages.as:184-211, 219-226, 236-250).",
+        "The civilians (ID_UNIT_WORKER_3) are reinforcementIds, i.e. affiliation PLAYER_SELF, and must be loaded onto the ship and moved out of the two areas (quest/Quest11SaveVillages.as:227, 252-286).",
+        "At 240 s two planes (ID_UNIT_DEFINITIVE_AIRPLANE) bomb both villages; the bomb targets are hard-coded tile pairs in the island rectangles (quest/Quest11SaveVillages.as:146-156, 307-386).",
+        "Airstrike bombs apply int.MAX_VALUE >> 2 damage and every remaining worker on the hit island is killed with the dying animation (quest/Quest11SaveVillages.as:393-412, 425-471).",
+        "The HUD countdown title is 'Rocket launched in' - a copy/paste artefact from the rocket quest (quest/Quest11SaveVillages.as:160).",
+        "alwaysEndIfMyUnitsDie is explicitly set to false and prepareQuestEnd is overridden (quest/Quest11SaveVillages.as:145, 388-391)."
+      ],
+      "enemyUnits": ["179 (ID_BUILDING_ORC_BOSS_ACADEMY - west port)", "182 (ID_BUILDING_ORC_FLAMEWTHROWER_ACADEMY - east port)", "ID_UNIT_WORKER_3 - the civilians that must be rescued (affiliation PLAYER_SELF)"],
+      "overrides": ["getInitTile", "prepareInit", "start", "prepareQuestEnd", "end"],
+      "notes": "Base class AbstractQuest. The reward-table index in Quest.questIds is 11 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest12TankBoss",
+      "questId": "100000012",
+      "questIdConstant": "Constants.QUEST_12_TANKBOSS",
+      "name": "THE MECHANICAL MENACE",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "AbstractQuest.difficulty setter unchanged (quest/AbstractQuest.as:382-423)."
+      },
+      "victoryCondition": "Destroy the boss Golem (ID_UNIT_BOSS_GOLEM, id 1053). Its onKill callback plays the victory scene, which ends the quest with EndQuest(true) (quest/Quest12TankBoss.as:67-73, 130-141).",
+      "failureCondition": "The player's army is wiped out (no key elements in this quest, so prepareQuestEnd(3) is not short-circuited) -> 3 s timer -> the base AbstractQuest.defeat() calls Quest.end() immediately, i.e. the quest ends as a loss without a cutscene (quest/AbstractQuest.as:276-280, 331-334).",
+      "rewards": {
+        "gold": 7000,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[12] = {g:7000, s:2600} -> 7000 gold + 2600 steel (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 44, "y": 79 },
+      "specialMechanics": [
+        "Two-phase boss: TankBossDelegate.sigPhase2 fires playLegsScene when the golem loses its legs, after which it is vulnerable (quest/Quest12TankBoss.as:85-102, 104-110).",
+        "The golem is the only important element, declared canDie = true and affiliation PLAYER_ENEMY (quest/Quest12TankBoss.as:67-73).",
+        "The intro cutscene has 6 dialogue steps (introscene.01-06) between the Sergeant (friend CHAR_5), the General (friend CHAR_1) and the Golem (foe CHAR_5) (quest/Quest12TankBoss.as:60-63, 76-102, 112-128)."
+      ],
+      "enemyUnits": ["1053 (ID_UNIT_BOSS_GOLEM - the boss)"],
+      "overrides": ["getInitTile", "prepareInit", "start"],
+      "notes": "Base class AbstractQuest. The reward-table index in Quest.questIds is 12 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest13Tyrannosaurus",
+      "questId": "100000013",
+      "questIdConstant": "Constants.QUEST_13_TYRANNOSAURUS",
+      "name": "DEFEAT THE DINOSAURS",
+      "levelRequired": 1,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "The difficulty setter is overridden with a no-op: it only stores the value (_difficulty = param1) and never duplicates any enemy. Difficulty therefore has NO gameplay effect in this quest (quest/Quest13Tyrannosaurus.as:239-247). The getter is overridden as well."
+      },
+      "victoryCondition": "Two dinosaurs in sequence. Destroy the defenders of the green T-Rex cage (ID_BUILDING_TREX_CAGE_GREEN, id 958) to release a T-Rex (ID_UNIT_TREX, id 1057) and kill it; then destroy the defenders of the red cage (ID_BUILDING_TREX_CAGE_RED, id 959) to release the Fire-T-Rex (ID_UNIT_FIRETREX, id 1093) and kill it. The second kill plays the victory scene, which ends the quest with EndQuest(true) (quest/Quest13Tyrannosaurus.as:66-86, 124-224).",
+      "failureCondition": "The player's army is wiped out (no key elements, so prepareQuestEnd(3) is not short-circuited) -> 3 s timer -> loss (quest/AbstractQuest.as:276-280). defeat() is not overridden, so the base implementation ends the quest immediately without a cutscene.",
+      "rewards": {
+        "gold": 7500,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[13] = {g:7500, w:2800} -> 7500 gold + 2800 wood (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 32, "y": 90 },
+      "specialMechanics": [
+        "Strictly ordered: the Fire-T-Rex is only released after the first T-Rex has been killed - liberateTRex2 returns early while trex1killed is false (quest/Quest13Tyrannosaurus.as:173-180).",
+        "The cages are opened programmatically with CageDelegate.open() (quest/Quest13Tyrannosaurus.as:149-155, 203-209).",
+        "An enemy 'boss1' cutscene puppet (an Orc Swordman, ID_UNIT_ORC_SWORDMAN, id 1123) is spawned by the intro cutscene at (43,83); it has canDie = false, is hidden and moved off-map between cutscenes, and is removed at the end (quest/Quest13Tyrannosaurus.as:68, 94-122).",
+        "The neutral ship (ID_UNIT_SHIP, id 1019) is used as the boss's escape and leaves the map in the victory scene (quest/Quest13Tyrannosaurus.as:81-85, 211-224)."
+      ],
+      "enemyUnits": ["1057 (ID_UNIT_TREX)", "1093 (ID_UNIT_FIRETREX)", "1123 (ID_UNIT_ORC_SWORDMAN - cutscene puppet)"],
+      "overrides": ["levelRequired", "prepareInit", "getInitTile", "difficulty (setter)", "difficulty (getter)", "start"],
+      "notes": "Base class AbstractQuest. The reward-table index in Quest.questIds is 13 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest14Spy2",
+      "questId": "100000014",
+      "questIdConstant": "Constants.QUEST_14_SPY_2",
+      "name": "The River",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "AbstractQuest.difficulty setter unchanged (quest/AbstractQuest.as:382-423)."
+      },
+      "victoryCondition": "Open the prison (ID_BUILDING_PRISON, id 19): move the commando (ID_UNIT_SPECIAL_OPS, id 1052) into the prison area Rectangle(41,90,8,7) with every enemy 'bastard' (group_type LONG_RANGE / SHORT_RANGE / LAND_VEHICLE) dead. The end scene then plays and the quest ends with EndQuest(true) (quest/Quest14Spy2.as:418-441, 507-521, 589-606).",
+      "failureCondition": "The commando dies - it is a key element, so its death calls defeat() -> EndQuest(false) (quest/Quest14Spy2.as:608-621; quest/AbstractQuest.as:237-241). The ship (ID_UNIT_SHIP, id 1019) is also a key element: destroying it also loses the quest. Loss by army wipe-out is disabled (keyIds is non-empty).",
+      "rewards": {
+        "gold": 8000,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[14] = {g:8000, o:3000} -> 8000 gold + 3000 oil (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 1, "y": 2 },
+      "specialMechanics": [
+        "Stealth mission: the commando hides (SpecialOpsDelegate.canHide) until the prison is opened; opening it sets canHide = false and makes every surviving enemy aggressive and target the commando (quest/Quest14Spy2.as:534-559).",
+        "The ship can only be used after 12 enemies have been killed: NUM_BASTARDS_BEFORE_RIVER = 12, and makeShipUsable() flips the ship to PLAYER_SELF at that point (quest/Quest14Spy2.as:36, 473-485).",
+        "The ship is a key element; once the commando crosses the river (otherSideArea Rectangle(0,45,19,5)) the ship is removed from the map and the key element is unregistered (quest/Quest14Spy2.as:501-505, 523-532).",
+        "22 patrol routes and 21 patrolling units are re-assigned IA.STATE_PATROL in mapLoaded (quest/Quest14Spy2.as:86-325, 393-406).",
+        "The harbour (ID_BUILDING_SMALL_HARBOUR, id 907) and the prison (ID_BUILDING_PRISON, id 19) are neutral; the commando is PLAYER_SELF and the ship is neutral (quest/Quest14Spy2.as:418-441).",
+        "Spells are disabled for the duration of the quest and re-enabled in end() (quest/Quest14Spy2.as:623-627, 637-641).",
+        "The oil area Rectangle(0,62,24,20) triggers a hint cutscene about explosive barrels (quest/Quest14Spy2.as:336, 487-505, 566-575).",
+        "A confirm popup is raised when the commando reaches the prison while enemies are still alive (quest/Quest14Spy2.as:507-521)."
+      ],
+      "enemyUnits": ["all enemy units on the map whose group_type is LONG_RANGE, SHORT_RANGE or LAND_VEHICLE (no concrete ids are named in the quest class)"],
+      "overrides": ["prepareInit", "mapLoaded", "defeat", "end", "getInitTile", "start"],
+      "notes": "Base class AbstractQuest. The reward-table index in Quest.questIds is 14 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest15HCCrusaderBase1",
+      "questId": "100000017",
+      "questIdConstant": "Constants.QUEST_15_HARDCORE1",
+      "name": "VIKINGS BEACHHEAD",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "AbstractQuest.difficulty setter unchanged (quest/AbstractQuest.as:382-423). Difficulty 2 adds one extra copy of every enemy unit, difficulty 3 adds two, so the 'kill everything' objective gets proportionally harder."
+      },
+      "victoryCondition": "Kill every enemy unit on the map. QuestHardcore counts all enemy IsoUnit elements in mapLoaded, decrements the counter on every kill and when the counter reaches 0 it plays the end scene, which ends the quest with EndQuest(true) (quest/QuestHardcore.as:81-123, 135-142).",
+      "failureCondition": "The player's army is wiped out (the hardcore quests have no key elements, so prepareQuestEnd(3) is not short-circuited) -> 3 s timer -> the base defeat() ends the quest as a loss (quest/AbstractQuest.as:276-280, 331-334).",
+      "rewards": {
+        "gold": 10000,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[15] = {g:10000, s:3200} -> 10000 gold + 3200 steel (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes. This quest is one of the four with team selection (Config.QUESTS_WITH_TEAMS)."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 50, "y": 95 },
+      "specialMechanics": [
+        "An 'N enemies alive' counter is shown in the HUD for the whole quest (quest/QuestHardcore.as:84-86, 164-168).",
+        "QuestHardcore overrides the stats of 4 special units: ID_UNIT_X_HORNED_BEAST (1135) attack 44 / life 650, ID_UNIT_X_RED_HANDSAW (1138) attack 44 / life 750, ID_UNIT_X_ORC_BROS_BOSS (1130) attack 30 / life 850, ID_UNIT_X_ORC_BIG_TANK (1149) attack 32 / life 750 (quest/QuestHardcore.as:46-66, 99-103).",
+        "The objective is derived from Base.Iso.arEnemyIsoFightingElements, i.e. every enemy unit that exists on the map, not just the ones in the chapter (quest/QuestHardcore.as:87-106).",
+        "A generic intro cutscene is built from the threatOverture / villainAria / encouragementClosure strings and a generic end scene from finalSpeech (quest/QuestHardcore.as:32-38, 125-142).",
+        "The victory condition is evaluated purely by the kill counter; there is no activator, treasure or boss objective."
+      ],
+      "enemyUnits": ["every enemy unit on the map (the map roster is data-driven)"],
+      "overrides": ["prepareInit"],
+      "notes": "Base class QuestHardcore (which extends AbstractQuest). The constructor sets positionInit, the four speech strings and the enemy character; prepareInit only replaces the title/subtitle literals. The reward-table index in Quest.questIds is 15 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest16HCAliens",
+      "questId": "100000018",
+      "questIdConstant": "Constants.QUEST_16_HARDCORE2",
+      "name": "KILL THE ALIENS",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "AbstractQuest.difficulty setter unchanged (quest/AbstractQuest.as:382-423)."
+      },
+      "victoryCondition": "Kill every enemy unit on the map (QuestHardcore counter reaching 0 -> end scene -> EndQuest(true)) (quest/QuestHardcore.as:81-123, 135-142).",
+      "failureCondition": "The player's army is wiped out -> 3 s timer -> loss (quest/AbstractQuest.as:276-280, 331-334).",
+      "rewards": {
+        "gold": 12000,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[16] = {g:12000, w:3500} -> 12000 gold + 3500 wood (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes. This quest is one of the four with team selection (Config.QUESTS_WITH_TEAMS)."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 68, "y": 89 },
+      "specialMechanics": [
+        "The 'N enemies alive' HUD counter is shown (quest/QuestHardcore.as:84-86, 164-168).",
+        "QuestHardcore overrides the stats of 4 special units: ID_UNIT_X_HORNED_BEAST (1135) 44/650, ID_UNIT_X_RED_HANDSAW (1138) 44/750, ID_UNIT_X_ORC_BROS_BOSS (1130) 30/850, ID_UNIT_X_ORC_BIG_TANK (1149) 32/750 (quest/QuestHardcore.as:46-66, 99-103).",
+        "The objective is every enemy unit on the map (quest/QuestHardcore.as:87-106)."
+      ],
+      "enemyUnits": ["every enemy unit on the map (the map roster is data-driven)"],
+      "overrides": ["prepareInit"],
+      "notes": "Base class QuestHardcore. The reward-table index in Quest.questIds is 16 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest17HCArachnids",
+      "questId": "100000019",
+      "questIdConstant": "Constants.QUEST_17_HARDCORE3",
+      "name": "ARACHNID MENACE",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "AbstractQuest.difficulty setter unchanged (quest/AbstractQuest.as:382-423)."
+      },
+      "victoryCondition": "Kill every enemy unit on the map (QuestHardcore counter reaching 0 -> end scene -> EndQuest(true)) (quest/QuestHardcore.as:81-123, 135-142).",
+      "failureCondition": "The player's army is wiped out -> 3 s timer -> loss (quest/AbstractQuest.as:276-280, 331-334).",
+      "rewards": {
+        "gold": 14000,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[17] = {g:14000, o:3500} -> 14000 gold + 3500 oil (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes. This quest is one of the four with team selection (Config.QUESTS_WITH_TEAMS)."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 88, "y": 87 },
+      "specialMechanics": [
+        "The 'N enemies alive' HUD counter is shown (quest/QuestHardcore.as:84-86, 164-168).",
+        "QuestHardcore overrides the stats of 4 special units: ID_UNIT_X_HORNED_BEAST (1135) 44/650, ID_UNIT_X_RED_HANDSAW (1138) 44/750, ID_UNIT_X_ORC_BROS_BOSS (1130) 30/850, ID_UNIT_X_ORC_BIG_TANK (1149) 32/750 (quest/QuestHardcore.as:46-66, 99-103).",
+        "The objective is every enemy unit on the map (quest/QuestHardcore.as:87-106)."
+      ],
+      "enemyUnits": ["every enemy unit on the map (the map roster is data-driven)"],
+      "overrides": ["prepareInit"],
+      "notes": "Base class QuestHardcore. The reward-table index in Quest.questIds is 17 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest18HCDragons",
+      "questId": "100000020",
+      "questIdConstant": "Constants.QUEST_18_HARDCORE4",
+      "name": "ERRADICATE THE DRAGONS",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "AbstractQuest.difficulty setter unchanged (quest/AbstractQuest.as:382-423)."
+      },
+      "victoryCondition": "Kill every enemy unit on the map (QuestHardcore counter reaching 0 -> end scene -> EndQuest(true)) (quest/QuestHardcore.as:81-123, 135-142).",
+      "failureCondition": "The player's army is wiped out -> 3 s timer -> loss (quest/AbstractQuest.as:276-280, 331-334).",
+      "rewards": {
+        "gold": 16000,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[18] = {g:16000, s:3500} -> 16000 gold + 3500 steel (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes. This quest is one of the four with team selection (Config.QUESTS_WITH_TEAMS)."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 87, "y": 86 },
+      "specialMechanics": [
+        "The 'N enemies alive' HUD counter is shown (quest/QuestHardcore.as:84-86, 164-168).",
+        "QuestHardcore overrides the stats of 4 special units: ID_UNIT_X_HORNED_BEAST (1135) 44/650, ID_UNIT_X_RED_HANDSAW (1138) 44/750, ID_UNIT_X_ORC_BROS_BOSS (1130) 30/850, ID_UNIT_X_ORC_BIG_TANK (1149) 32/750 (quest/QuestHardcore.as:46-66, 99-103).",
+        "The objective is every enemy unit on the map (quest/QuestHardcore.as:87-106)."
+      ],
+      "enemyUnits": ["every enemy unit on the map (the map roster is data-driven)"],
+      "overrides": ["prepareInit"],
+      "notes": "Base class QuestHardcore. The reward-table index in Quest.questIds is 18 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest19HC",
+      "questId": "100000021",
+      "questIdConstant": "Constants.QUEST_19_HARDCORE5",
+      "name": "DR.SHOCK'S MECH ARMY",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "AbstractQuest.difficulty setter unchanged (quest/AbstractQuest.as:382-423)."
+      },
+      "victoryCondition": "Kill every enemy unit on the map (QuestHardcore counter reaching 0 -> end scene -> EndQuest(true)) (quest/QuestHardcore.as:81-123, 135-142).",
+      "failureCondition": "The player's army is wiped out -> 3 s timer -> loss (quest/AbstractQuest.as:276-280, 331-334).",
+      "rewards": {
+        "gold": 18000,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[19] = {g:18000, w:3800} -> 18000 gold + 3800 wood (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes. This quest is one of the four with team selection (Config.QUESTS_WITH_TEAMS) and requires level 40 (globals.QUESTS_MIN_LEVELS)."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 89, "y": 87 },
+      "specialMechanics": [
+        "The 'N enemies alive' HUD counter is shown (quest/QuestHardcore.as:84-86, 164-168).",
+        "QuestHardcore overrides the stats of 4 special units: ID_UNIT_X_HORNED_BEAST (1135) 44/650, ID_UNIT_X_RED_HANDSAW (1138) 44/750, ID_UNIT_X_ORC_BROS_BOSS (1130) 30/850, ID_UNIT_X_ORC_BIG_TANK (1149) 32/750 (quest/QuestHardcore.as:46-66, 99-103).",
+        "The objective is every enemy unit on the map (quest/QuestHardcore.as:87-106).",
+        "The player may pick a team before starting (Config.QUESTS_WITH_TEAMS)."
+      ],
+      "enemyUnits": ["every enemy unit on the map (the map roster is data-driven)"],
+      "overrides": ["prepareInit"],
+      "notes": "Base class QuestHardcore. The reward-table index in Quest.questIds is 19 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest20HC",
+      "questId": "100000022",
+      "questIdConstant": "Constants.QUEST_20_HARDCORE6",
+      "name": "DR.SHOCK'S MONSTERS",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "AbstractQuest.difficulty setter unchanged (quest/AbstractQuest.as:382-423)."
+      },
+      "victoryCondition": "Kill every enemy unit on the map (QuestHardcore counter reaching 0 -> end scene -> EndQuest(true)) (quest/QuestHardcore.as:81-123, 135-142).",
+      "failureCondition": "The player's army is wiped out -> 3 s timer -> loss (quest/AbstractQuest.as:276-280, 331-334).",
+      "rewards": {
+        "gold": 20000,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[20] = {g:20000, o:4000} -> 20000 gold + 4000 oil (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes. This quest is one of the four with team selection (Config.QUESTS_WITH_TEAMS) and requires level 40 (globals.QUESTS_MIN_LEVELS)."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 85, "y": 66 },
+      "specialMechanics": [
+        "4 'ATP mech' units at fixed positions (47,70) (72,43) (46,22) (24,43) are located in mapLoaded and each gets a kill listener (quest/Quest20HC.as:21, 53-78).",
+        "Killing an ATP mech activates a line of 18 kamikaze units (KamikazeDelegate) next to it: each one switches to IA.STATE_ATTACKING / IA.CONDITION_AGGRESSIVE and targets the nearest player unit within 50 tiles (quest/Quest20HC.as:23, 80-116, 118-176).",
+        "The kamikaze lines are generated programmatically: mech 0 and 2 spawn a horizontal line of 18 tiles, mechs 1 and 3 a vertical line (quest/Quest20HC.as:118-176).",
+        "The 'N enemies alive' HUD counter is shown (quest/QuestHardcore.as:84-86, 164-168).",
+        "QuestHardcore overrides the stats of 4 special units: ID_UNIT_X_HORNED_BEAST (1135) 44/650, ID_UNIT_X_RED_HANDSAW (1138) 44/750, ID_UNIT_X_ORC_BROS_BOSS (1130) 30/850, ID_UNIT_X_ORC_BIG_TANK (1149) 32/750 (quest/QuestHardcore.as:46-66, 99-103)."
+      ],
+      "enemyUnits": ["every enemy unit on the map (the map roster is data-driven)"],
+      "overrides": ["prepareInit", "mapLoaded"],
+      "notes": "Base class QuestHardcore. The reward-table index in Quest.questIds is 20 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest23HC",
+      "questId": "100000026",
+      "questIdConstant": "Constants.QUEST_22_HARDCORE9",
+      "name": "THE WICKED NEBULARS",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "AbstractQuest.difficulty setter unchanged (quest/AbstractQuest.as:382-423)."
+      },
+      "victoryCondition": "Kill every enemy unit on the map (QuestHardcore counter reaching 0 -> end scene -> EndQuest(true)) (quest/QuestHardcore.as:81-123, 135-142).",
+      "failureCondition": "The player's army is wiped out -> 3 s timer -> loss (quest/AbstractQuest.as:276-280, 331-334).",
+      "rewards": {
+        "gold": 22000,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[21] = {g:22000, s:4000} -> 22000 gold + 4000 steel (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes. This quest is one of the four with team selection (Config.QUESTS_WITH_TEAMS) and requires level 40 (globals.QUESTS_MIN_LEVELS)."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 34, "y": 91 },
+      "specialMechanics": [
+        "The 'N enemies alive' HUD counter is shown (quest/QuestHardcore.as:84-86, 164-168).",
+        "QuestHardcore overrides the stats of 4 special units: ID_UNIT_X_HORNED_BEAST (1135) 44/650, ID_UNIT_X_RED_HANDSAW (1138) 44/750, ID_UNIT_X_ORC_BROS_BOSS (1130) 30/850, ID_UNIT_X_ORC_BIG_TANK (1149) 32/750 (quest/QuestHardcore.as:46-66, 99-103).",
+        "The objective is every enemy unit on the map (quest/QuestHardcore.as:87-106).",
+        "The player may pick a team before starting (Config.QUESTS_WITH_TEAMS)."
+      ],
+      "enemyUnits": ["every enemy unit on the map (the map roster is data-driven)"],
+      "overrides": ["prepareInit"],
+      "notes": "Base class QuestHardcore. ID MAPPING DISCREPANCY: the AS3 constant is named QUEST_22_HARDCORE9 but the class is Quest23HC; upstream constants.py lists 100000026 twice (first 'QUEST 22: HARDCORE9', then 'QUEST: ISLA_EGG2' - the second one wins in Python). The id 100000026 is confirmed by the client factory (quest/Quest.as:165, 189), by the map id 126 (MapManager.MAP_23_HARDCORE9) and by the reward-table index 21. The reward-table index in Quest.questIds is 21 (quest/Quest.as:192)."
+    },
+    {
+      "class": "Quest24HC",
+      "questId": "100000025",
+      "questIdConstant": "Constants.QUEST_23_HARDCORE10",
+      "name": "DR. SHOCK STRIKES BACK",
+      "levelRequired": 0,
+      "difficulty": {
+        "supported": [1, 2, 3],
+        "default": 1,
+        "notes": "AbstractQuest.difficulty setter unchanged (quest/AbstractQuest.as:382-423)."
+      },
+      "victoryCondition": "Kill every enemy unit on the map (QuestHardcore counter reaching 0 -> end scene -> EndQuest(true)) (quest/QuestHardcore.as:81-123, 135-142).",
+      "failureCondition": "The player's army is wiped out -> 3 s timer -> loss (quest/AbstractQuest.as:276-280, 331-334).",
+      "rewards": {
+        "gold": 24000,
+        "xp": 0,
+        "items": [],
+        "cash": 0,
+        "notes": "Static win reward globals.REWARDS_QUESTS[22] = {g:24000, w:4200} -> 24000 gold + 4200 wood (quest/AbstractQuest.as:449-457). Per-kill gold/XP as in the base notes. This quest is one of the four with team selection (Config.QUESTS_WITH_TEAMS) and requires level 40 (globals.QUESTS_MIN_LEVELS)."
+      },
+      "freeUnits": [],
+      "initTile": { "x": 22, "y": 92 },
+      "specialMechanics": [
+        "Boss stat override: ID_UNIT_DOCTOR_SHOCK (1225) is given maxLife = 5000 and keeps its normal attack value (quest/Quest24HC.as:20-24).",
+        "The 'N enemies alive' HUD counter is shown (quest/QuestHardcore.as:84-86, 164-168).",
+        "QuestHardcore additionally overrides ID_UNIT_X_HORNED_BEAST (1135) 44/650, ID_UNIT_X_RED_HANDSAW (1138) 44/750, ID_UNIT_X_ORC_BROS_BOSS (1130) 30/850 and ID_UNIT_X_ORC_BIG_TANK (1149) 32/750 (quest/QuestHardcore.as:46-66, 99-103).",
+        "The objective is every enemy unit on the map (quest/QuestHardcore.as:87-106).",
+        "The player may pick a team before starting (Config.QUESTS_WITH_TEAMS)."
+      ],
+      "enemyUnits": ["1225 (ID_UNIT_DOCTOR_SHOCK - the boss, life forced to 5000)", "every other enemy unit on the map (the map roster is data-driven)"],
+      "overrides": ["prepareInit"],
+      "notes": "Base class QuestHardcore. ID MAPPING DISCREPANCY: the AS3 constant is named QUEST_23_HARDCORE10 but the class is Quest24HC; upstream constants.py lists 100000025 twice (first 'QUEST 23: HARDCORE10', then 'QUEST: ISLA_KASPAR' - the second one wins in Python). The id 100000025 is confirmed by the client factory (quest/Quest.as:166, 190), by the map id 125 (MapManager.MAP_24_HARDCORE10) and by the reward-table index 22. The reward-table index in Quest.questIds is 22 (quest/Quest.as:192)."
+    }
+  ]
+}
