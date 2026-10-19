@@ -1,12 +1,17 @@
 # AGENTS.md
 
-> **Reusable template.** Populate the `{{PLACEHOLDERS}}` only when asked to initialize this repository. Verify details against the code, manifests, and existing documentation; never guess. Remove this line once initialized.
-
 ## Project
 
-- **Name:** {{PROJECT_NAME}}
-- **Purpose:** {{SHORT_PURPOSE_AND_PRIMARY_USERS}}
-- **Current state:** {{VERIFIED_CURRENT_STATE}}
+- **Name:** Social Wars Legacy
+- **Purpose:** Re-implement the Flash game *Social Wars* (Zynga, client v1.5.4) as a
+  **cross-platform client-server application** — web, desktop and mobile — with no Flash
+  dependency, for players and for preservation. Primary users: players who want the game to
+  keep working, preservation archivists, and anyone studying the original client's rules.
+- **Current state:** **Investigation and documentation complete; no product code written
+  yet.** The repository contains the full reverse-engineering report set (`re/`), the
+  project router (`docs/`) and the production roadmap (`docs/ROADMAP.md`). The upstream
+  project under analysis (`C:\Users\Edison\Desktop\socialwarriors`) has **not** been
+  vendored into this repository yet — that is Group A of the roadmap.
 
 ## Source of Truth
 
@@ -16,6 +21,9 @@
 | --------------------------------------- | ------------------------------------------------------------ |
 | `docs/CONTEXT.md`                       | Locating context, constraints, and relevant documentation    |
 | `docs/ROADMAP.md`                       | Checking planned features, priorities, or verified progress  |
+| `re/README.md`                          | Navigating the reverse-engineering findings                  |
+| `re/docs/`                              | The detailed analysis of the original client, server and data |
+| `re/evidence/`                          | Raw captured traffic, digests and screenshots                |
 | `docs/ARCHITECTURE.md` _(if it exists)_ | Making changes to established boundaries or data flows       |
 | Source code and tests                   | Determining actual current behavior and verifying a change   |
 | `graphify-out/` _(if it exists)_        | Exploring code relationships; verify findings against source |
@@ -28,33 +36,80 @@
 
 _Fill from verified project files. Remove unused rows._
 
-| Layer              | Technology / version      | Evidence        |
-| ------------------ | ------------------------- | --------------- |
-| Frontend / UI      | {{FRONTEND_OR_NA}}        | {{SOURCE_PATH}} |
-| Backend / runtime  | {{BACKEND_OR_NA}}         | {{SOURCE_PATH}} |
-| Database / storage | {{DATABASE_OR_NA}}        | {{SOURCE_PATH}} |
-| Build / tooling    | {{BUILD_TOOLS}}           | {{SOURCE_PATH}} |
-| Tests              | {{TEST_FRAMEWORKS_OR_NA}} | {{SOURCE_PATH}} |
+**Decision status matters here: the stack below is *approved and locked* (see the "Locked
+Decisions" section of `docs/ROADMAP.md`) but is *not yet implemented*. Only rows marked
+"Present" exist in the repository today.**
+
+| Layer                | Technology / version                        | Status  | Evidence                        |
+| -------------------- | ------------------------------------------- | ------- | ------------------------------- |
+| Game client (web)    | TypeScript + PixiJS v8 (WebGL2) + React DOM | Planned | `docs/ROADMAP.md` Locked Decisions |
+| Desktop shell        | Tauri v2 (Rust) over the same web client     | Planned | `docs/ROADMAP.md` Group H        |
+| Mobile shell         | Capacitor over the same web client          | Planned | `docs/ROADMAP.md` Group G5       |
+| Server + rules engine| TypeScript on Node.js 26                     | Planned | `docs/ROADMAP.md` Locked Decisions |
+| Database             | PostgreSQL + Drizzle; PGlite for offline play| Planned | `docs/ROADMAP.md` Locked Decisions |
+| Package manager      | pnpm 12.6 workspaces                         | Planned | `docs/ROADMAP.md` Group C        |
+| Upstream reference   | Python 3.9 + Flask 2.2.5                    | Present (external, read-only) | `C:\Users\Edison\Desktop\socialwarriors` |
+| Asset tooling        | JPEXS FFDec 26.3.0 (Java 21), Git LFS 3.7.1 | Present | `re/docs/05-assets-and-content-pipeline.md` |
+| Reverse engineering  | REA MCP (Ghidra 12.1.4 headless)             | Present | `re/docs/07-REA-EVIDENCE.md`     |
+| Tests                | Vitest (unit/integration), Playwright (e2e), golden-master diff harness | Planned | `docs/ROADMAP.md` Group E4, I1 |
 
 ## Build, Test, and Development Commands
 
 _Use commands that really exist in this repository. Never invent a script._
 
-| Purpose              | Command                   | Evidence / notes |
-| -------------------- | ------------------------- | ---------------- |
-| Install dependencies | `{{INSTALL_COMMAND}}`     | {{EVIDENCE}}     |
-| Run locally          | `{{DEV_COMMAND}}`         | {{EVIDENCE}}     |
-| Build                | `{{BUILD_COMMAND}}`       | {{EVIDENCE}}     |
-| Test                 | `{{TEST_COMMAND}}`        | {{EVIDENCE}}     |
-| Lint / type-check    | `{{CHECK_COMMAND_OR_NA}}` | {{EVIDENCE}}     |
+**No build, test or run commands exist in this repository yet** — it currently holds only
+documentation, evidence and the project router. The table below is the **contracted
+interface that Group C of the roadmap must create**; treat it as the specification for
+those scripts, not as commands you can run today.
+
+| Purpose                     | Command                            | Status | Evidence / notes |
+| --------------------------- | ---------------------------------- | ------ | ---------------- |
+| Install dependencies        | `pnpm install`                     | Planned | Group C          |
+| Run the client (dev)        | `pnpm --filter client dev`         | Planned | Group G          |
+| Run the server (dev)        | `pnpm --filter server dev`         | Planned | Group F          |
+| Build everything            | `pnpm build`                       | Planned | Group C          |
+| Run all tests               | `pnpm test`                        | Planned | Group I1         |
+| Lint                        | `pnpm lint`                        | Planned | Group C          |
+| Type-check                  | `pnpm typecheck`                   | Planned | Group C          |
+| Build the content bundle    | `pnpm --filter content build`      | Planned | Group C          |
+| Verify vendored provenance  | `node scripts/verify-upstream.mjs`  | Planned | Group A          |
+| Golden-master rules diff    | `pnpm --filter rules test:golden`  | Planned | Group E4         |
 
 Run from the repository root unless a command explicitly requires another directory.
 
 ## Architecture Non-Negotiables
 
-_List only **verified** constraints from the repository or approved requirements. Reference `docs/ARCHITECTURE.md` if present. If none are documented, write `Not yet established`—do not manufacture rules._
+_These are **verified** constraints from the investigation and the approved roadmap. The
+full rationale is in `docs/ROADMAP.md` ("Locked Decisions & Non-Negotiables")._
 
-- {{VERIFIED_CONSTRAINT_OR_NOT_YET_ESTABLISHED}}
+1. **The upstream project is vendored, never edited.** It lives under `upstream/` at a
+   pinned commit with a SHA-256 manifest, and is GPL v3. It is a reference and a test
+   fixture — never a runtime dependency of the shipped product.
+2. **The client is the specification.** The decompiled ActionScript 3 (1 387 classes in
+   `Basesec_1.5.4.swf`) describes the real game. Where the Python upstream server and the
+   AS3 disagree, the AS3 wins. Port behaviour from the client, not from `command.py`.
+3. **The server is authoritative.** Combat outcomes, resource costs, goal completion and
+   reward grants are computed server-side from a server-issued seed. The client requests
+   and renders; it never decides.
+4. **The 8-slot resource vector is `[energy, xp, gold, wood, oil, steel, cash, mana]`.**
+   Verified live against a real client session. Preserve this order in any wire format.
+5. **The `command.php` wire format is `<64 hex chars>;<JSON>`, where the hex is
+   `HMAC-SHA256("4vVSD8dftv6hdfb1Hnk9", payload)`.** Verified live. The compatibility
+   shim must reproduce it exactly; the native protocol does not need to use it.
+6. **`flash_debug` must not exist** in the new server. It overwrites the whole wallet from
+   client arguments.
+7. **No authentication may be inherited from upstream.** `USERID` came from the request
+   body; the new server uses real credentials and revocable session tokens.
+8. **The rules engine is deterministic and pure.** No `Date.now()`, no unseeded randomness,
+   no I/O inside the simulation. Same seed + same inputs ⇒ same outcome on any machine.
+9. **Content is versioned and reproducible.** `config/main.json` plus the 5 JSON-Patch
+   deltas (778 → 900 items, 104 → 105 globals) produce a single hashed content bundle;
+   the build fails on an unknown key or a dangling id.
+10. **No Flash anywhere in the shipped product.** No SWF runtime, no Adobe Flash Player
+    component, no Flash browser dependency. The original client may be used *only* as a
+    test oracle.
+11. **The asset licence position must be settled before any public release.** The upstream
+    code is GPL v3; the sprites, audio and config are Zynga's.
 
 ## Working Method (Lightweight ICM)
 
@@ -71,13 +126,13 @@ Do not create extra ICM stage folders or permanent plan files unless the task be
 - Graphify is **derived project knowledge**, not the source of truth for code behavior.
 - When available and relevant, query the existing graph to find related symbols and dependencies; inspect source files before acting on results.
 - After meaningful structural changes, refresh the graph using the **installed** Graphify skill or CLI workflow. Do not presume Graphify is installed or that a graph exists.
-- If exporting to Obsidian, use only this project's generated area: `{{OBSIDIAN_VAULT_PATH}}/10 - Projects/{{PROJECT_NAME}}/_Graphify/`.
+- If exporting to Obsidian, use only this project's generated area: `C:\Users\Edison\Documents\Obsidian/10 - Projects/Social Wars Legacy/_Graphify/`.
 - Never export into the vault root or overwrite curated PARA notes. Refreshing the graph is **not** the same as saving session decisions.
 
 ## Obsidian / Cross-Project Knowledge
 
-- **Central vault:** `{{OBSIDIAN_VAULT_PATH_OR_NOT_CONFIGURED}}`
-- **Project notes:** `10 - Projects/{{PROJECT_NAME}}/`, if present.
+- **Central vault:** `C:\Users\Edison\Documents\Obsidian`
+- **Project notes:** `10 - Projects/Social Wars Legacy/`, if present.
 - Read only relevant notes, when the vault is configured and accessible; repository docs remain authoritative for project-specific requirements.
 - Propose meaningful updates after substantial work: project progress/decisions under `10 - Projects`, reusable lessons under `30 - Resources`, unverified ideas under `00 - Inbox`.
 - **Ask before editing curated vault notes.** Avoid duplicates, stale claims, secrets, and copying entire chat transcripts.
@@ -118,6 +173,13 @@ _Activate only when the user explicitly requests autonomous roadmap execution._
 5. **Blockers:** Attempt safe recovery. Pause only for unresolved errors, missing requirements, permissions, required approvals, or unsafe operations. Continue independent tasks when possible.
 6. **Completion:** Stop when all authorized tasks are finished, remaining tasks are deferred or blocked, or the user stops execution.
 7. **Knowledge:** Update relevant documentation, preserve reusable lessons in Obsidian, and refresh Graphify after significant changes.
+
+### Autonomous Mode Execution Order
+
+The roadmap's **critical path** is `A → B → C → D → E → F → G → H → I`, with `B1–B8`
+mutually independent and `D` ∥ `E`, and `G1` ∥ `G3`. Prefer work that unblocks the most
+downstream tasks, and record a checkmark in `docs/ROADMAP.md` only for outcomes that are
+**verified** by an executed check.
 
 ## Template Initialization (only when requested)
 
