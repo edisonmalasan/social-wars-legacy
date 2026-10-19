@@ -92,6 +92,28 @@ The converter therefore writes each distinct image **once**, named by its SHA-25
 manifest maps `(swf, symbol, frame)` to that hash. Two symbols in different files that
 draw the same picture share one stored image.
 
+### Measured on a sample
+
+A 30-file sample of `sprites/`, converted with 3 parallel FFDec processes:
+
+| | |
+|---|---|
+| SWF files | 30 |
+| Symbols (nested timelines) | **230** |
+| PNG frames written | **8 245** |
+| Unique images | **2 024** |
+| Duplicate rate | **75.4 %** |
+| Raw PNG bytes | 414.5 MB |
+| Store bytes (deduplicated) | **233.6 MB** |
+| Wall clock | 107 s |
+
+So 30 files → 7.7 symbols each, and the deduplication already halves the payload on this
+sample. The per-sprite figure above (93 %) is the worst case, for a file whose animation
+holds each drawing for a long time; the sample's 75 % is the realistic average.
+
+The manifest for the sample is
+[`../data/frame-manifest-sample.json`](../data/frame-manifest-sample.json).
+
 ## 4. FFDec's cost model, and how to make it bearable
 
 Measured on this machine (Java 21, JPEXS 26.3.0):
