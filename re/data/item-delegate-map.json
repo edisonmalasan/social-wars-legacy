@@ -1,0 +1,6617 @@
+{
+ "note": "Item id -> behaviour delegate, from core/isoengine/delegates/DelegatesManager.as and core/Constants.as. Names come from config/main.json.",
+ "counts": {
+  "itemIdsMapped": 679,
+  "unitDelegates": 229,
+  "buildingDelegates": 56,
+  "registrationsParsed": 401,
+  "idConstants": 724
+ },
+ "items": [
+  {
+   "itemId": 1,
+   "name": "House I",
+   "idConstant": "ID_BUILDING_HOUSE_1",
+   "delegate": "BasicHouseDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 2,
+   "name": "Wood Factory I",
+   "idConstant": "ID_BUILDING_DEPOT_WOOD",
+   "delegate": "FactoryDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 3,
+   "name": "Oil Factory I",
+   "idConstant": "ID_BUILDING_DEPOT_OIL",
+   "delegate": "FactoryDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 4,
+   "name": "Steel Factory I",
+   "idConstant": "ID_BUILDING_DEPOT_STEEL",
+   "delegate": "FactoryDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 5,
+   "name": "Gold Factory I",
+   "idConstant": "ID_BUILDING_DEPOT_GOLD",
+   "delegate": "FactoryDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 6,
+   "name": "Wood Factory II",
+   "idConstant": "ID_BUILDING_DEPOT_WOOD_2",
+   "delegate": "FactoryDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 7,
+   "name": "Oil Factory II",
+   "idConstant": "ID_BUILDING_DEPOT_OIL_2",
+   "delegate": "FactoryDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 8,
+   "name": "Steel Factory II",
+   "idConstant": "ID_BUILDING_DEPOT_STEEL_2",
+   "delegate": "FactoryDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 9,
+   "name": "Gold Factory II",
+   "idConstant": "ID_BUILDING_DEPOT_GOLD_2",
+   "delegate": "FactoryDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 10,
+   "name": "Wood Factory III",
+   "idConstant": "ID_BUILDING_DEPOT_WOOD_3",
+   "delegate": "FactoryDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 11,
+   "name": "Oil Factory III",
+   "idConstant": "ID_BUILDING_DEPOT_OIL_3",
+   "delegate": "FactoryDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 12,
+   "name": "Steel Factory III",
+   "idConstant": "ID_BUILDING_DEPOT_STEEL_3",
+   "delegate": "FactoryDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 13,
+   "name": "Gold Factory III",
+   "idConstant": "ID_BUILDING_DEPOT_GOLD_3",
+   "delegate": "FactoryDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 14,
+   "name": "Wood Factory IV",
+   "idConstant": "ID_BUILDING_DEPOT_WOOD_4",
+   "delegate": "FactoryDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 15,
+   "name": "Oil Factory IV",
+   "idConstant": "ID_BUILDING_DEPOT_OIL_4",
+   "delegate": "FactoryDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 16,
+   "name": "Steel Factory IV",
+   "idConstant": "ID_BUILDING_DEPOT_STEEL_4",
+   "delegate": "FactoryDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 17,
+   "name": "Gold Factory IV",
+   "idConstant": "ID_BUILDING_DEPOT_GOLD_4",
+   "delegate": "FactoryDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 18,
+   "name": "Market I",
+   "idConstant": "ID_BUILDING_MARKET_1",
+   "delegate": "MarketDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 22,
+   "name": "Turret I",
+   "idConstant": "ID_BUILDING_TOWER_1",
+   "delegate": "MachinegunTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN"
+   ]
+  },
+  {
+   "itemId": 23,
+   "name": "Wall I",
+   "idConstant": "ID_BUILDING_WALL_1",
+   "delegate": "BasicWallDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 24,
+   "name": "Wall II",
+   "idConstant": "ID_BUILDING_WALL_2",
+   "delegate": "BasicWallDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 25,
+   "name": "Wall III",
+   "idConstant": "ID_BUILDING_WALL_3",
+   "delegate": "BasicWallDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 27,
+   "name": null,
+   "idConstant": "ID_BUILDING_DECO_YELLOW_FLOWERS",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 28,
+   "name": "Hospital",
+   "idConstant": "ID_BUILDING_HOSPITAL_1",
+   "delegate": "SocialBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 29,
+   "name": null,
+   "idConstant": "ID_BUILDING_INFIRMARY_1",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 30,
+   "name": "Academy I",
+   "idConstant": "ID_BUILDING_ACADEMY_1",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 31,
+   "name": "Bazooka Academy I",
+   "idConstant": "ID_BUILDING_BAZOOKA_ACADEMY_1",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 36,
+   "name": null,
+   "idConstant": "ID_BUILDING_GARAGE_1",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 37,
+   "name": "Hangar I",
+   "idConstant": "ID_BUILDING_HANGAR_1",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 38,
+   "name": "Tank Academy I",
+   "idConstant": "ID_BUILDING_CANNON_ACADEMY_1",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 39,
+   "name": "Turret IV",
+   "idConstant": "ID_BUILDING_TOWER_4",
+   "delegate": "DoubleProjectileTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MISSILE",
+    "P_MISSILE_S"
+   ]
+  },
+  {
+   "itemId": 40,
+   "name": "Jeep garage I",
+   "idConstant": "ID_BUILDING_JEEP_GARAGE_1",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 41,
+   "name": "Academy II",
+   "idConstant": "ID_BUILDING_ACADEMY_2",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 42,
+   "name": "Academy III",
+   "idConstant": "ID_BUILDING_ACADEMY_3",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 43,
+   "name": "Bazooka Academy II",
+   "idConstant": "ID_BUILDING_BAZOOKA_ACADEMY_2",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 44,
+   "name": "Bazooka Academy III",
+   "idConstant": "ID_BUILDING_BAZOOKA_ACADEMY_3",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 45,
+   "name": "Dual-Rocket Turret",
+   "idConstant": "ID_BUILDING_TOWER_DUAL_ROCKET",
+   "delegate": "DoubleProjectileTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MISSILE"
+   ]
+  },
+  {
+   "itemId": 46,
+   "name": "Cannon Turret",
+   "idConstant": "ID_BUILDING_TOWER_CANNON",
+   "delegate": "MultiShotTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON"
+   ]
+  },
+  {
+   "itemId": 47,
+   "name": "House II",
+   "idConstant": "ID_BUILDING_HOUSE_II",
+   "delegate": "BasicHouseDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 48,
+   "name": "House III",
+   "idConstant": "ID_BUILDING_HOUSE_III",
+   "delegate": "BasicHouseDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 49,
+   "name": "Turret III",
+   "idConstant": "ID_BUILDING_TOWER_3",
+   "delegate": "DoubleMachinegunTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN"
+   ]
+  },
+  {
+   "itemId": 50,
+   "name": "Bunker I",
+   "idConstant": "ID_BUILDING_BUNKER_1",
+   "delegate": "SpecialBunkerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 51,
+   "name": "Bunker II",
+   "idConstant": "ID_BUILDING_BUNKER_2",
+   "delegate": "BunkerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 52,
+   "name": "Bunker III",
+   "idConstant": "ID_BUILDING_BUNKER_3",
+   "delegate": "BunkerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 53,
+   "name": "Mega Bunker",
+   "idConstant": "ID_BUILDING_BUNKER_4",
+   "delegate": "BunkerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 54,
+   "name": "Helicopter Hangar I",
+   "idConstant": "ID_BUILDING_COPTER_HANGAR_1",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 55,
+   "name": "Helicopter Hangar II",
+   "idConstant": "ID_BUILDING_COPTER_HANGAR_2",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 56,
+   "name": "Helicopter Hangar III",
+   "idConstant": "ID_BUILDING_COPTER_HANGAR_3",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 57,
+   "name": "Turret II",
+   "idConstant": "ID_BUILDING_TOWER_2",
+   "delegate": "MachinegunTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 61,
+   "name": "Allies Building",
+   "idConstant": "ID_BUILDING_ALLIES_BUILDING",
+   "delegate": "AlliesBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 62,
+   "name": "Tank Academy II",
+   "idConstant": "ID_BUILDING_CANNON_ACADEMY_2",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 63,
+   "name": "Tank Academy III",
+   "idConstant": "ID_BUILDING_CANNON_ACADEMY_3",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 64,
+   "name": "Jeep garage II",
+   "idConstant": "ID_BUILDING_JEEP_GARAGE_2",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 65,
+   "name": "Jeep garage III",
+   "idConstant": "ID_BUILDING_JEEP_GARAGE_3",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 66,
+   "name": "Stoneage",
+   "idConstant": "ID_BUILDING_WONDER_STONEAGE",
+   "delegate": "WonderDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 67,
+   "name": "Machu Picchu",
+   "idConstant": "ID_BUILDING_WONDER_MACHUPICHU",
+   "delegate": "WonderDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 68,
+   "name": "Iguazu",
+   "idConstant": "ID_BUILDING_WONDER_IGUAZU",
+   "delegate": "WonderDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 69,
+   "name": "Sphynx",
+   "idConstant": "ID_BUILDING_WONDER_SFINX",
+   "delegate": "WonderDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 70,
+   "name": "Inca God",
+   "idConstant": "ID_BUILDING_WONDER_INCAGOD",
+   "delegate": "WonderDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 71,
+   "name": "Chichenitza",
+   "idConstant": "ID_BUILDING_WONDER_CHICHENITZA",
+   "delegate": "WonderDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 72,
+   "name": "Babilonia",
+   "idConstant": "ID_BUILDING_WONDER_BABILONIA",
+   "delegate": "WonderDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 73,
+   "name": "Ankor",
+   "idConstant": "ID_BUILDING_WONDER_ANKOR",
+   "delegate": "WonderDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 74,
+   "name": "Allies Market",
+   "idConstant": "ID_BUILDING_ALLIES_MARKET",
+   "delegate": "SocialBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 75,
+   "name": "Recon center",
+   "idConstant": "ID_BUILDING_INTELLIGENCE_CENTER",
+   "delegate": "IntelligenceCenterDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 76,
+   "name": "Hangar II",
+   "idConstant": "ID_BUILDING_HANGAR_2",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 77,
+   "name": "Hangar III",
+   "idConstant": "ID_BUILDING_HANGAR_3",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 78,
+   "name": "Wall IV",
+   "idConstant": "ID_BUILDING_WALL_4",
+   "delegate": "BasicWallDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 79,
+   "name": "Wall V",
+   "idConstant": "ID_BUILDING_WALL_5",
+   "delegate": "BasicWallDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 80,
+   "name": "Fortress I",
+   "idConstant": "ID_BUILDING_FORTALEZA_1",
+   "delegate": "Fortress1Delegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 81,
+   "name": "Fortress II",
+   "idConstant": "ID_BUILDING_FORTALEZA_2",
+   "delegate": "Fortress2Delegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 82,
+   "name": "Rocket Fortress",
+   "idConstant": "ID_BUILDING_ROCKET_FORTRESS",
+   "delegate": "Fortress3Delegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 83,
+   "name": "Fortress III",
+   "idConstant": "ID_BUILDING_FORTALEZA_4",
+   "delegate": "Fortress4Delegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 84,
+   "name": "Special Fortress",
+   "idConstant": "ID_BUILDING_SPECIAL_FORTRESS",
+   "delegate": "Fortress5Delegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 85,
+   "name": "Mega Fortress",
+   "idConstant": "ID_BUILDING_MEGA_FORTRESS",
+   "delegate": "Fortress6Delegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 86,
+   "name": "Robotic Center",
+   "idConstant": "ID_BUILDING_ROBOTIC_CENTER",
+   "delegate": "ResearchCenterDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 87,
+   "name": "Turret VI",
+   "idConstant": "ID_BUILDING_TOWER_7",
+   "delegate": "DoubleMachinegunTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 88,
+   "name": "Turret V",
+   "idConstant": "ID_BUILDING_TOWER_8",
+   "delegate": "MultiShotTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON_SMALL"
+   ]
+  },
+  {
+   "itemId": 90,
+   "name": "Market II",
+   "idConstant": "ID_BUILDING_MARKET_2",
+   "delegate": "MarketDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 91,
+   "name": "Market III",
+   "idConstant": "ID_BUILDING_MARKET_3",
+   "delegate": "MarketDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 92,
+   "name": "Apple tree",
+   "idConstant": "ID_BUILDING_DECO_APPLE_TREE",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 93,
+   "name": "Pear tree",
+   "idConstant": "ID_BUILDING_DECO_PEAR_TREE",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 94,
+   "name": "Sponge bush",
+   "idConstant": "ID_BUILDING_DECO_SPONGE_BUSH",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 95,
+   "name": "Little fountain",
+   "idConstant": "ID_BUILDING_DECO_LITTLE_FOUNTAIN",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 96,
+   "name": "White Flowers",
+   "idConstant": "ID_BUILDING_DECO_WHITE_FLOWERS",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 97,
+   "name": "Red flowers",
+   "idConstant": "ID_BUILDING_DECO_RED_FLOWERS",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 98,
+   "name": "Blue flowers",
+   "idConstant": "ID_BUILDING_DECO_BLUE_FLOWERS",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 99,
+   "name": null,
+   "idConstant": "ID_BUILDING_DECO_PINK_FLOWERS",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 100,
+   "name": "Red Leaf flowers",
+   "idConstant": "ID_BUILDING_DECO_RED_L_FLOWERS",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 101,
+   "name": "Pink Leaf flowers",
+   "idConstant": "ID_BUILDING_DECO_PINK_L_FLOWERS",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 102,
+   "name": "Blue Leaf flowers",
+   "idConstant": "ID_BUILDING_DECO_BLUE_L_FLOWERS",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 103,
+   "name": "Bush",
+   "idConstant": "ID_BUILDING_DECO_BUSH",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 104,
+   "name": "Lamp",
+   "idConstant": "ID_BUILDING_DECO_LAMP",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 105,
+   "name": "Victory Arch",
+   "idConstant": "ID_BUILDING_DECO_VICTORY_ARCH",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 106,
+   "name": "Fountain",
+   "idConstant": "ID_BUILDING_DECO_FOUNTAIN",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 107,
+   "name": "Sculpture",
+   "idConstant": "ID_BUILDING_DECO_SCLUPTURE",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 108,
+   "name": "Grape field",
+   "idConstant": "ID_BUILDING_FARM_GRAPE",
+   "delegate": "FarmDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 109,
+   "name": "Corn field",
+   "idConstant": "ID_BUILDING_FARM_CORN",
+   "delegate": "FarmDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 110,
+   "name": "Cow farm",
+   "idConstant": "ID_BUILDING_FARM_COW",
+   "delegate": "FarmDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 117,
+   "name": "Disabled Supertank",
+   "idConstant": "ID_BUILDING_DISABLED_SUPERTANK",
+   "delegate": "DisabledSupertankDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 118,
+   "name": "Mind Control Laboratory",
+   "idConstant": "ID_BUILDING_LABORATORY",
+   "delegate": "LaboratoryDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MISSILE"
+   ]
+  },
+  {
+   "itemId": 123,
+   "name": "Red Fortress",
+   "idConstant": "ID_BUILDING_RED_FORTRESS",
+   "delegate": "AbstractBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 128,
+   "name": "Rocket launcher",
+   "idConstant": "ID_BUILDING_ROCKET_LAUNCHER",
+   "delegate": "RocketLauncherDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 129,
+   "name": "Flamethrower Academy",
+   "idConstant": "ID_BUILDING_FIRE_BARRACK",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": "Train Firethrowers and burn your enemies down",
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 130,
+   "name": "Dominion Tank Academy",
+   "idConstant": "ID_BUILDING_BLACK_TANK_BARRACK",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 131,
+   "name": "Stealth Fighter Hangar",
+   "idConstant": "ID_BUILDING_BLACK_AIRCRAFT_HANGAR",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 134,
+   "name": "Field Hospital",
+   "idConstant": "ID_BUILDING_FIELD_HOSPITAL",
+   "delegate": "FieldHospitalDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 135,
+   "name": "Mechanical Garage",
+   "idConstant": "ID_BUILDING_MECHANICAL_GARAGE",
+   "delegate": "GarageDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 136,
+   "name": "General Sculpture",
+   "idConstant": "ID_BUILDING_DECO_GENERAL_SCLUPTURE",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 138,
+   "name": "Mr T. Academy",
+   "idConstant": "ID_BUILDING_MR_T_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 139,
+   "name": "Area 51",
+   "idConstant": "ID_BUILDING_AREA_51",
+   "delegate": "ResearchCenterDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 140,
+   "name": "Recruitment Prize",
+   "idConstant": "ID_BUILDING_RECRUITMENT_CENTER",
+   "delegate": "RecruitmentCenterDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 141,
+   "name": "Bazooka Academy IV",
+   "idConstant": "ID_BUILDING_BAZOOKA_ACADEMY_4",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 142,
+   "name": "Bazooka Academy V",
+   "idConstant": "ID_BUILDING_BAZOOKA_ACADEMY_5",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 143,
+   "name": "Academy IV",
+   "idConstant": "ID_BUILDING_ACADEMY_4",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 144,
+   "name": "Academy V",
+   "idConstant": "ID_BUILDING_ACADEMY_5",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 145,
+   "name": "Mortar Academy",
+   "idConstant": "ID_BUILDING_MORTAR_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 146,
+   "name": "Helicopter Hangar IV",
+   "idConstant": "ID_BUILDING_COPTER_HANGAR_4",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 147,
+   "name": "Helicopter Hangar V",
+   "idConstant": "ID_BUILDING_COPTER_HANGAR_5",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 148,
+   "name": "Demolition Tank Academy",
+   "idConstant": "ID_BUILDING_ARTILLERY_GARAGE",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 149,
+   "name": "Antiaircraft garage",
+   "idConstant": "ID_BUILDING_ANTI_AIRCRAFT_GARAGE",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 150,
+   "name": "Tank Academy IV",
+   "idConstant": "ID_BUILDING_CANNON_ACADEMY_4",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 151,
+   "name": "Tank Academy V",
+   "idConstant": "ID_BUILDING_CANNON_ACADEMY_5",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 152,
+   "name": "Robo flag",
+   "idConstant": "ID_BUILDING_DECO_ROBO_FLAG",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 153,
+   "name": "Robo statue",
+   "idConstant": "ID_BUILDING_DECO_ROBO_STATUE",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 154,
+   "name": "Crusader Soldier Academy",
+   "idConstant": "ID_BUILDING_ROBO_ACADEMY_SOLDIER",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 155,
+   "name": "Crusader Swordsman Academy",
+   "idConstant": "ID_BUILDING_ROBO_ACADEMY_SWORDMAN",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 156,
+   "name": "Crusader Bazooka Academy",
+   "idConstant": "ID_BUILDING_ROBO_ACADEMY_BAZOOKA",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 157,
+   "name": "Jet Soldier Academy",
+   "idConstant": "ID_BUILDING_ROBO_ACADEMY_JET",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 158,
+   "name": "Motorized Soldier Academy",
+   "idConstant": "ID_BUILDING_ROBO_ACADEMY_MOTORIZED",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 159,
+   "name": "Retaliator Academy",
+   "idConstant": "ID_BUILDING_ROBO_ACADEMY_RETALIATOR",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 160,
+   "name": "Megalancer Academy",
+   "idConstant": "ID_BUILDING_ROBO_ACADEMY_LANCER",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 161,
+   "name": "Crusader Tank Academy",
+   "idConstant": "ID_BUILDING_ROBO_ACADEMY_DEMOLISHER",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 162,
+   "name": "Dreadnought Academy",
+   "idConstant": "ID_BUILDING_ROBO_ACADEMY_DREADNOUGHT",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 163,
+   "name": "House",
+   "idConstant": "ID_BUILDING_ROBO_HOUSE",
+   "delegate": "BasicHouseDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 164,
+   "name": "Laser Turret",
+   "idConstant": "ID_BUILDING_ROBO_TURRET_1",
+   "delegate": "DoubleProjectileTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER",
+    "BLAST_LASER"
+   ]
+  },
+  {
+   "itemId": 165,
+   "name": "Tesla Turret",
+   "idConstant": "ID_BUILDING_ROBO_TURRET_2",
+   "delegate": "ElectricTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_ELECTRIC_TESLA",
+    "BLAST_ELECTRICAL"
+   ]
+  },
+  {
+   "itemId": 166,
+   "name": "Wall",
+   "idConstant": "ID_BUILDING_ROBO_WALL",
+   "delegate": "BasicWallDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 167,
+   "name": "Field",
+   "idConstant": "ID_BUILDING_ROBO_FARM",
+   "delegate": "FarmDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 168,
+   "name": "Crusader Skylander Hangar",
+   "idConstant": "ID_BUILDING_SKYLANDER_HANGAR",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 169,
+   "name": "Mega-Axe Academy",
+   "idConstant": "ID_BUILDING_MEGA_AXE_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 170,
+   "name": "Giant Walker Factory",
+   "idConstant": "ID_BUILDING_GIANT_WALKER_FACTORY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 171,
+   "name": "Missile Tank Academy",
+   "idConstant": "ID_BUILDING_MISSILE_TANK_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 172,
+   "name": "Steel Claws Academy",
+   "idConstant": "ID_BUILDING_STEEL_CLAWS_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 173,
+   "name": "Development Wall",
+   "idConstant": "ID_BUILDING_DEVELOPMENT_WALL",
+   "delegate": "DevelopmentWallDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 174,
+   "name": "Fireman Academy",
+   "idConstant": "ID_BUILDING_FIREMAN_BARRACK",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": "Train Firemen to repair your buildings",
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 175,
+   "name": "Babilonian Temple",
+   "idConstant": "ID_BUILDING_BABYLONIAN_TEMPLE",
+   "delegate": "BabylonianTempleDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 176,
+   "name": "Cash Wonder",
+   "idConstant": "ID_BUILDING_WONDER_CASH",
+   "delegate": "WonderDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 177,
+   "name": "Axe Zoldier Academy",
+   "idConstant": "ID_BUILDING_ORC_SOLDIER_I_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 178,
+   "name": "Gun Zoldier Academy",
+   "idConstant": "ID_BUILDING_ORC_SOLDIER_II_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 179,
+   "name": "Xplosive Ork Academy",
+   "idConstant": "ID_BUILDING_ORC_BOSS_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 180,
+   "name": "Bear Ridda Academy",
+   "idConstant": "ID_BUILDING_ORC_RIDER_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 181,
+   "name": "Horned Badass Factory",
+   "idConstant": "ID_BUILDING_ORC_ROBOT_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 182,
+   "name": "Flamethrowa Academy",
+   "idConstant": "ID_BUILDING_ORC_FLAMEWTHROWER_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 183,
+   "name": "Ork House",
+   "idConstant": "ID_BUILDING_ORC_HOUSE",
+   "delegate": "BasicHouseDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 184,
+   "name": "Ork Farm",
+   "idConstant": "ID_BUILDING_ORC_FARM",
+   "delegate": "FarmDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 185,
+   "name": "Ork Turret II",
+   "idConstant": "ID_BUILDING_ORC_TOWER_I",
+   "delegate": "MachinegunTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 187,
+   "name": "Krazy Monsta Statue",
+   "idConstant": "ID_BUILDING_ORC_KRAZY_MONSTA",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 188,
+   "name": "Powa Banna",
+   "idConstant": "ID_BUILDING_ORC_POWA_BANNA",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 189,
+   "name": "Ork Turret I",
+   "idConstant": "ID_BUILDING_ORC_TOWER_II",
+   "delegate": "ThrowingTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "GRENADE",
+    "P_FUSE_BOMB",
+    "BLAST_EARTH",
+    "BLAST_SMOKE_SMALL"
+   ]
+  },
+  {
+   "itemId": 190,
+   "name": "Molotov Kopta Hangar",
+   "idConstant": "ID_BUILDING_ORC_COPTER_HANGAR",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 192,
+   "name": "Knife Throwa Academy",
+   "idConstant": "ID_BUILDING_ORC_KNIVETHROWER",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 194,
+   "name": "Big Handsaw Ork Factory",
+   "idConstant": "ID_BUILDING_ROBOT_II_FACTORY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 204,
+   "name": "Disabled Orc Supertank",
+   "idConstant": "ID_BUILDING_DISABLED_ORK_TANK",
+   "delegate": "DisabledSupertankDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 205,
+   "name": "Orc Fortress",
+   "idConstant": "ID_BUILDING_ORC_FORTRESS",
+   "delegate": "Fortress1Delegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 207,
+   "name": "Enemy Ork Turret I",
+   "idConstant": "ID_BUILDING_ENEMY_ORC_TOWER_1",
+   "delegate": "MachinegunTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 208,
+   "name": "Enemy Ork Turret II",
+   "idConstant": "ID_BUILDING_ENEMY_ORC_TOWER_2",
+   "delegate": "ThrowingTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "GRENADE",
+    "P_FUSE_BOMB",
+    "BLAST_EARTH",
+    "BLAST_SMOKE_SMALL"
+   ]
+  },
+  {
+   "itemId": 209,
+   "name": "Crusader Priest Academy",
+   "idConstant": "ID_BUILDING_CRUSADER_PRIEST_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 210,
+   "name": "Crusader Bot Factory",
+   "idConstant": "ID_BUILDING_CRUSADER_BOT_FACTORY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 211,
+   "name": "Viking Axe Academy",
+   "idConstant": "ID_BUILDING_VIKING_AXEMAN_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 212,
+   "name": "Viking Soldier Academy",
+   "idConstant": "ID_BUILDING_VIKING_SOLDIER_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 213,
+   "name": "Bear Knight Academy",
+   "idConstant": "ID_BUILDING_VIKING_BEAR_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 214,
+   "name": "Viking Tank Academy",
+   "idConstant": "ID_BUILDING_VIKING_TANK_BARRACK",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 215,
+   "name": "Viking Airship Hangar",
+   "idConstant": "ID_BUILDING_VIKING_COPTER_HANGAR",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 216,
+   "name": "Viking Hammerer Factory",
+   "idConstant": "ID_BUILDING_VIKING_HAMMERER_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 217,
+   "name": "Viking Core Factory",
+   "idConstant": "ID_BUILDING_VIKING_ACORE_FACTORY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 218,
+   "name": "Viking House",
+   "idConstant": "ID_BUILDING_VIKING_HOUSE",
+   "delegate": "BasicHouseDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 219,
+   "name": "Viking Field",
+   "idConstant": "ID_BUILDING_VIKING_FARM",
+   "delegate": "FarmDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 220,
+   "name": "Viking Turret I",
+   "idConstant": "ID_BUILDING_DWARF_TURRET_1",
+   "delegate": "MachinegunTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 221,
+   "name": "Viking Turret II",
+   "idConstant": "ID_BUILDING_DWARF_TURRET_2",
+   "delegate": "MachinegunTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_HEAVY"
+   ]
+  },
+  {
+   "itemId": 222,
+   "name": "Viking Wall",
+   "idConstant": "ID_BUILDING_DWARF_WALL",
+   "delegate": "BasicWallDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 223,
+   "name": "Hammerer Statue",
+   "idConstant": "ID_BUILDING_VIKING_DECO_1",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 224,
+   "name": "Viking Fountain",
+   "idConstant": "ID_BUILDING_VIKING_DECO_2",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 225,
+   "name": "Alien Wall",
+   "idConstant": "ID_BUILDING_ALIEN_WALL",
+   "delegate": "BasicWallDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 226,
+   "name": "Alien Turret I",
+   "idConstant": "ID_BUILDING_ALIEN_TURRET_1",
+   "delegate": "ProjectileTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ALIEN_FLEGMA"
+   ]
+  },
+  {
+   "itemId": 227,
+   "name": "Alien Turret II",
+   "idConstant": "ID_BUILDING_ALIEN_TURRET_2",
+   "delegate": "ProjectileTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ALIEN_FLEGMA"
+   ]
+  },
+  {
+   "itemId": 228,
+   "name": "Spider Wall",
+   "idConstant": "ID_BUILDING_ARACHNID_WALL",
+   "delegate": "BasicWallDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 229,
+   "name": "Spider Turret I",
+   "idConstant": "ID_BUILDING_ARACHNID_TURRET_1",
+   "delegate": "ProjectileTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ALIEN_FLEGMA"
+   ]
+  },
+  {
+   "itemId": 230,
+   "name": "Spider Turret II",
+   "idConstant": "ID_BUILDING_ARACHNID_TURRET_2",
+   "delegate": "ProjectileTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ALIEN_FLEGMA"
+   ]
+  },
+  {
+   "itemId": 231,
+   "name": "War Tree",
+   "idConstant": "ID_BUILDING_VIKING_DECO_3",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 232,
+   "name": "Magic Lake",
+   "idConstant": "ID_BUILDING_VIKING_DECO_4",
+   "delegate": "BasicDecorationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 233,
+   "name": "Viking Bazooka Academy",
+   "idConstant": "ID_BUILDING_VIKING_BAZOOKA_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 234,
+   "name": "Viking MotoSquad Academy",
+   "idConstant": "ID_BUILDING_VIKING_MOTOSQUAD_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 235,
+   "name": "Rune Golem Academy",
+   "idConstant": "ID_BUILDING_VIKING_RUNE_GOLEM_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 236,
+   "name": "Viking Sniper Academy",
+   "idConstant": "ID_BUILDING_VIKING_SNIPER_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 237,
+   "name": "Viking Butcher Academy",
+   "idConstant": "ID_BUILDING_VIKING_BUTCHER_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 238,
+   "name": "Kamikaze Academy",
+   "idConstant": "ID_BUILDING_KAMIKAZE_ACADEMY",
+   "delegate": "BaseBarrackDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 244,
+   "name": "Nebular Wall",
+   "idConstant": "ID_BUILDING_NEBULAR_WALL",
+   "delegate": "BasicWallDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 245,
+   "name": "Nebular Turret",
+   "idConstant": "ID_BUILDING_NEBULAR_TURRET",
+   "delegate": "DoubleMachinegunTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 246,
+   "name": "Nebular House",
+   "idConstant": "ID_BUILDING_NEBULAR_HOUSE",
+   "delegate": "BasicHouseDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 247,
+   "name": "Nebular Field",
+   "idConstant": "ID_BUILDING_NEBULAR_FARM",
+   "delegate": "FarmDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 253,
+   "name": "Parliament",
+   "idConstant": "ID_BUILDING_WONDER_PARLIAMENT",
+   "delegate": "BabylonianTempleDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 256,
+   "name": "Research Lab",
+   "idConstant": "ID_BUILDING_LABORATORY_TECH",
+   "delegate": "LaboratoryTechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 261,
+   "name": "Auction House",
+   "idConstant": "ID_BUILDING_MARKETPLACE",
+   "delegate": "MarketplaceDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 271,
+   "name": "Space Elf Wall",
+   "idConstant": "ID_BUILDING_SPATIAL_WALL",
+   "delegate": "BasicWallDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 272,
+   "name": "Space Elf Turret",
+   "idConstant": "ID_BUILDING_SPATIAL_TURRET",
+   "delegate": "ElectricTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_ELECTRIC_TESLA",
+    "BLAST_ELECTRICAL"
+   ]
+  },
+  {
+   "itemId": 274,
+   "name": "Space Elf Field",
+   "idConstant": "ID_BUILDING_SPATIAL_FARM",
+   "delegate": "FarmDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 294,
+   "name": "Andromeda Turret",
+   "idConstant": "ID_BUILDING_ANDROMEDA_TURRET",
+   "delegate": "DoubleProjectileTowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER",
+    "BLAST_LASER"
+   ]
+  },
+  {
+   "itemId": 296,
+   "name": "Andromeda Farm",
+   "idConstant": "ID_BUILDING_ANDROMEDA_FARM",
+   "delegate": "FarmDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 302,
+   "name": null,
+   "idConstant": "ID_BUILDING_SOUL_MIXER",
+   "delegate": "SoulMixerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 901,
+   "name": "Oil",
+   "idConstant": "ID_BUILDING_OIL_1",
+   "delegate": "ResourceDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 902,
+   "name": "Oil",
+   "idConstant": "ID_BUILDING_OIL_2",
+   "delegate": "ResourceDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 903,
+   "name": "Oil",
+   "idConstant": "ID_BUILDING_OIL_3",
+   "delegate": "ResourceDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 904,
+   "name": "Oil",
+   "idConstant": "ID_BUILDING_OIL_4",
+   "delegate": "ResourceDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 905,
+   "name": "Tree",
+   "idConstant": "ID_BUILDING_TREE_1",
+   "delegate": "ResourceDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 907,
+   "name": "Small Harbour",
+   "idConstant": "ID_BUILDING_SMALL_HARBOUR",
+   "delegate": "SmallHarbourDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 908,
+   "name": "Harbour",
+   "idConstant": "ID_BUILDING_HARBOUR",
+   "delegate": "HarbourDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 909,
+   "name": "Space Station",
+   "idConstant": "ID_BUILDING_SPACE_STATION",
+   "delegate": "SpaceStationDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 910,
+   "name": "Steel",
+   "idConstant": "ID_BUILDING_STEEL_1",
+   "delegate": "ResourceDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 911,
+   "name": "Steel",
+   "idConstant": "ID_BUILDING_STEEL_2",
+   "delegate": "ResourceDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 912,
+   "name": "Steel",
+   "idConstant": "ID_BUILDING_STEEL_3",
+   "delegate": "ResourceDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 913,
+   "name": "Steel",
+   "idConstant": "ID_BUILDING_STEEL_4",
+   "delegate": "ResourceDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 914,
+   "name": "Gold",
+   "idConstant": "ID_BUILDING_GOLD_1",
+   "delegate": "ResourceDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 915,
+   "name": "Gold",
+   "idConstant": "ID_BUILDING_GOLD_2",
+   "delegate": "ResourceDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 916,
+   "name": "Gold",
+   "idConstant": "ID_BUILDING_GOLD_3",
+   "delegate": "ResourceDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 917,
+   "name": "Gold",
+   "idConstant": "ID_BUILDING_GOLD_4",
+   "delegate": "ResourceDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 928,
+   "name": "Broken Bridge",
+   "idConstant": "ID_BUILDING_BROKEN_BRIDGE",
+   "delegate": "BrokenBridgeDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 929,
+   "name": "Bridge",
+   "idConstant": "ID_BUILDING_BRIDGE",
+   "delegate": "BridgeDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 930,
+   "name": "Trees",
+   "idConstant": "ID_BUILDING_TREE_2X2",
+   "delegate": "ResourceDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 931,
+   "name": "Small forest",
+   "idConstant": "ID_BUILDING_TREE_3X3",
+   "delegate": "ResourceDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 932,
+   "name": "Silo",
+   "idConstant": "ID_BUILDING_SILO_1",
+   "delegate": "SiloDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 941,
+   "name": "Silo II",
+   "idConstant": "ID_BUILDING_SILO_2",
+   "delegate": "SiloDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 942,
+   "name": "Silo III",
+   "idConstant": "ID_BUILDING_SILO_3",
+   "delegate": "SiloDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 958,
+   "name": "Green T-Rex Cage",
+   "idConstant": "ID_BUILDING_TREX_CAGE_GREEN",
+   "delegate": "CageDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 959,
+   "name": "Red T-Rex Cage",
+   "idConstant": "ID_BUILDING_TREX_CAGE_RED",
+   "delegate": "CageDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 960,
+   "name": "Chest",
+   "idConstant": "ID_BUILDING_OPENABLE_CHEST",
+   "delegate": "OpenableChestDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 961,
+   "name": "Chained Red Baron",
+   "idConstant": "ID_BUILDING_RED_BARON_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 962,
+   "name": "Chained Metallic Dragon",
+   "idConstant": "ID_BUILDING_METAL_DRAGON_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 963,
+   "name": "Chained Celestial Megamech",
+   "idConstant": "ID_BUILDING_CELES_MEGAMECH_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 964,
+   "name": "Chained Metallic Dragon II",
+   "idConstant": "ID_BUILDING_METAL_DRAGON_2_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 965,
+   "name": "Chained Armored Core Alpha",
+   "idConstant": "ID_BUILDING_ARMORED_CORE_ALPHA_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 966,
+   "name": "Chained Ultra-Mech",
+   "idConstant": "ID_BUILDING_GIANT_TRANSFORMER_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 967,
+   "name": "Chained Nemesis Core",
+   "idConstant": "ID_BUILDING_ULTRABOT_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 968,
+   "name": "Chained F117",
+   "idConstant": "ID_BUILDING_F117_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 969,
+   "name": "Chained Mega Tank",
+   "idConstant": "ID_BUILDING_MEGA_TANK_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 970,
+   "name": "Chained Blue Steel Bahamut",
+   "idConstant": "ID_BUILDING_BAHAMUT_METAL_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 971,
+   "name": "Chained Alien Instigator",
+   "idConstant": "ID_BUILDING_ALIEN_INSTIGATOR_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 972,
+   "name": "Chained Hyper Blazer ",
+   "idConstant": "ID_BUILDING_MEGA_FIRE_BOT_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 973,
+   "name": "Chained Ether Messiah",
+   "idConstant": "ID_BUILDING_MESSIAH_BOT_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 975,
+   "name": "Chained Golem Boss",
+   "idConstant": "ID_BUILDING_GOLEM_BOSS_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 976,
+   "name": "Chained Crusader Bot",
+   "idConstant": "ID_BUILDING_CRUSADER_BOT_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 977,
+   "name": "Chained Samurai Bot",
+   "idConstant": "ID_BUILDING_SAMURAI_BOT_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 978,
+   "name": "Chained Magic Chest",
+   "idConstant": "ID_BUILDING_CHEST_I_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 979,
+   "name": "Chained Mega Chest",
+   "idConstant": "ID_BUILDING_CHEST_II_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 980,
+   "name": "Chained Camu Dragon",
+   "idConstant": "ID_BUILDING_CAMU_DRAGON_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 984,
+   "name": "Chained Gun Bot",
+   "idConstant": "ID_BUILDING_GUNBOT_CHAINED",
+   "delegate": "OfferBuildingDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1001,
+   "name": "Worker I",
+   "idConstant": "ID_UNIT_WORKER_1",
+   "delegate": "BasicWorkerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1002,
+   "name": "Red Tank",
+   "idConstant": "ID_UNIT_RED_TANK",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MISSILE",
+    "P_ROCKET_M"
+   ]
+  },
+  {
+   "itemId": 1003,
+   "name": "Tank II",
+   "idConstant": "ID_UNIT_TANK_2",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MISSILE",
+    "P_ROCKET_M"
+   ]
+  },
+  {
+   "itemId": 1004,
+   "name": "Tank III",
+   "idConstant": "ID_UNIT_TANK_3",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MISSILE",
+    "P_ROCKET_M"
+   ]
+  },
+  {
+   "itemId": 1005,
+   "name": "Special Spy",
+   "idConstant": "ID_UNIT_SPY",
+   "delegate": "UnitSpyBalloonDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1006,
+   "name": "Killer Bazooka Jeep",
+   "idConstant": "ID_UNIT_RED_BAZOOKA_JEEP",
+   "delegate": "RedBazookaJeepDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1007,
+   "name": "Soldier",
+   "idConstant": "ID_UNIT_SOLDIER_1",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN"
+   ]
+  },
+  {
+   "itemId": 1008,
+   "name": "Bazooka",
+   "idConstant": "ID_UNIT_BAZOOKA_1",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON"
+   ]
+  },
+  {
+   "itemId": 1009,
+   "name": "General Scarlett",
+   "idConstant": "ID_UNIT_GOOD_GIRL",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1010,
+   "name": "APC",
+   "idConstant": "ID_UNIT_APC",
+   "delegate": "DoubleMachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN"
+   ]
+  },
+  {
+   "itemId": 1011,
+   "name": "Ms. Evilia",
+   "idConstant": "ID_UNIT_BAD_GIRL",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN"
+   ]
+  },
+  {
+   "itemId": 1012,
+   "name": "Evil Hannibal",
+   "idConstant": "ID_UNIT_BAD_BOY",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN"
+   ]
+  },
+  {
+   "itemId": 1013,
+   "name": "Truck",
+   "idConstant": "ID_UNIT_TRUCK_1",
+   "delegate": "TruckDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1014,
+   "name": "Machine Gun Jeep",
+   "idConstant": "ID_UNIT_MACHINEGUN_JEEP_1",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN"
+   ]
+  },
+  {
+   "itemId": 1015,
+   "name": "Aircraft",
+   "idConstant": "ID_UNIT_AIRCRAFT_1",
+   "delegate": "DoubleProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ROCKET"
+   ]
+  },
+  {
+   "itemId": 1016,
+   "name": "Tank",
+   "idConstant": "ID_UNIT_TANK_1",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MISSILE",
+    "P_ROCKET_M"
+   ]
+  },
+  {
+   "itemId": 1017,
+   "name": "General Mike",
+   "idConstant": "ID_UNIT_GOOD_BOY",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1019,
+   "name": "Ship",
+   "idConstant": "ID_UNIT_SHIP",
+   "delegate": "TruckDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1020,
+   "name": "Soldier II",
+   "idConstant": "ID_UNIT_SOLDIER_2",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN"
+   ]
+  },
+  {
+   "itemId": 1021,
+   "name": "Soldier III",
+   "idConstant": "ID_UNIT_SOLDIER_3",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1022,
+   "name": "Bazooka II",
+   "idConstant": "ID_UNIT_BAZOOKA_2",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON"
+   ]
+  },
+  {
+   "itemId": 1023,
+   "name": "Bazooka III",
+   "idConstant": "ID_UNIT_BAZOOKA_3",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON"
+   ]
+  },
+  {
+   "itemId": 1024,
+   "name": "Sergeant Megan",
+   "idConstant": "ID_UNIT_GUILLERMA",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1025,
+   "name": "Aircraft II",
+   "idConstant": "ID_UNIT_AIRCRAFT_2",
+   "delegate": "DoubleProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ROCKET"
+   ]
+  },
+  {
+   "itemId": 1026,
+   "name": "Aircraft III",
+   "idConstant": "ID_UNIT_AIRCRAFT_3",
+   "delegate": "DoubleProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ROCKET"
+   ]
+  },
+  {
+   "itemId": 1027,
+   "name": "Helicopter",
+   "idConstant": "ID_UNIT_HELICOPTER_1",
+   "delegate": "DoubleMachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1028,
+   "name": "Helicopter II",
+   "idConstant": "ID_UNIT_HELICOPTER_2",
+   "delegate": "DoubleMachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1029,
+   "name": "Helicopter III",
+   "idConstant": "ID_UNIT_HELICOPTER_3",
+   "delegate": "DoubleMachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1030,
+   "name": "Machine Gun Jeep II",
+   "idConstant": "ID_UNIT_MACHINEGUN_JEEP_2",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN"
+   ]
+  },
+  {
+   "itemId": 1031,
+   "name": "Machine Gun Jeep III",
+   "idConstant": "ID_UNIT_MACHINEGUN_JEEP_3",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1032,
+   "name": "Truck 3",
+   "idConstant": "ID_UNIT_TRUCK_3",
+   "delegate": "TruckDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1033,
+   "name": "Mr. Cigar",
+   "idConstant": "ID_UNIT_MR_CIGAR",
+   "delegate": "DoubleShotgunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_RIFLE"
+   ]
+  },
+  {
+   "itemId": 1034,
+   "name": "UN Allied",
+   "idConstant": "ID_UNIT_UN_ALLIED_1",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_RIFLE"
+   ]
+  },
+  {
+   "itemId": 1035,
+   "name": "Truck II",
+   "idConstant": "ID_UNIT_TRUCK_2",
+   "delegate": "TruckDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1036,
+   "name": "Double Bazooka",
+   "idConstant": "ID_UNIT_DOUBLE_BAZOOKA",
+   "delegate": "DoubleProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON"
+   ]
+  },
+  {
+   "itemId": 1037,
+   "name": "MegaTank",
+   "idConstant": "ID_UNIT_MEGATANK",
+   "delegate": "MegatankDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1038,
+   "name": "Red chopper",
+   "idConstant": "ID_UNIT_RED_HELICOPTER",
+   "delegate": "RedHelicopterDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1039,
+   "name": "Worker II",
+   "idConstant": "ID_UNIT_WORKER_2",
+   "delegate": "BasicWorkerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1040,
+   "name": "Worker III",
+   "idConstant": "ID_UNIT_WORKER_3",
+   "delegate": "BasicWorkerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1041,
+   "name": "Worker IV",
+   "idConstant": "ID_UNIT_WORKER_4",
+   "delegate": "BasicWorkerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1042,
+   "name": "Sergeant Jack",
+   "idConstant": "ID_UNIT_GUILE",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1044,
+   "name": "Double Bazooka Jeep",
+   "idConstant": "ID_UNIT_DOUBLE_BAZOOKA_JEEP",
+   "delegate": "DoubleProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON"
+   ]
+  },
+  {
+   "itemId": 1045,
+   "name": "Double Gun Soldier",
+   "idConstant": "ID_UNIT_DOUBLE_GUN_SOLDIER",
+   "delegate": "DoubleMachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1046,
+   "name": "Flamethrower",
+   "idConstant": "ID_UNIT_FLAMETHROWER",
+   "delegate": "FlamethrowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_FIRE"
+   ]
+  },
+  {
+   "itemId": 1047,
+   "name": "Dominion Tank",
+   "idConstant": "ID_UNIT_BLACK_TANK",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON",
+    "P_ROCKET_M"
+   ]
+  },
+  {
+   "itemId": 1048,
+   "name": "Stealth Fighter",
+   "idConstant": "ID_UNIT_BLACK_AIRCRAFT",
+   "delegate": "DoubleProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ROCKET"
+   ]
+  },
+  {
+   "itemId": 1050,
+   "name": "Medic",
+   "idConstant": "ID_UNIT_MEDIC",
+   "delegate": "MedicDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1051,
+   "name": "Engineer",
+   "idConstant": "ID_UNIT_MECHANIC",
+   "delegate": "MechanicDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1052,
+   "name": "Special Ops.",
+   "idConstant": "ID_UNIT_SPECIAL_OPS",
+   "delegate": "SpecialOpsDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1053,
+   "name": "GolemBoss",
+   "idConstant": "ID_UNIT_BOSS_GOLEM",
+   "delegate": "TankBossDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1054,
+   "name": "Scarface girl",
+   "idConstant": "ID_UNIT_SCARFACE",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN"
+   ]
+  },
+  {
+   "itemId": 1055,
+   "name": "Mr. Treat",
+   "idConstant": "ID_UNIT_MR_T",
+   "delegate": "DoubleMachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1056,
+   "name": "Elephant rider",
+   "idConstant": "ID_UNIT_ELEPHANT_RIDER",
+   "delegate": "ElephantRiderDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1057,
+   "name": "T-Rex Green",
+   "idConstant": "ID_UNIT_TREX",
+   "delegate": "TRexDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1058,
+   "name": "Soldier IV",
+   "idConstant": "ID_UNIT_SOLDIER_4",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1059,
+   "name": "Soldier V",
+   "idConstant": "ID_UNIT_SOLDIER_5",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_LASER_BLUE_BIG"
+   ]
+  },
+  {
+   "itemId": 1060,
+   "name": "Mortar Thrower",
+   "idConstant": "ID_UNIT_MORTAR",
+   "delegate": "MortarDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON"
+   ]
+  },
+  {
+   "itemId": 1061,
+   "name": "GunBot",
+   "idConstant": "ID_UNIT_GUNBOT",
+   "delegate": "GunBotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST"
+   ]
+  },
+  {
+   "itemId": 1062,
+   "name": "MegaBot",
+   "idConstant": "ID_UNIT_BUMBLEBEE",
+   "delegate": "BumblebeeDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1063,
+   "name": "Bazooka IV",
+   "idConstant": "ID_UNIT_BAZOOKA_4",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ROCKET",
+    "P_ROCKET_M"
+   ]
+  },
+  {
+   "itemId": 1064,
+   "name": "Bazooka V",
+   "idConstant": "ID_UNIT_BAZOOKA_5",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ROCKET",
+    "P_ROCKET_M"
+   ]
+  },
+  {
+   "itemId": 1065,
+   "name": "Antiaircraft battery",
+   "idConstant": "ID_UNIT_AA_BATTERY",
+   "delegate": "MultiShotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ROCKET",
+    "P_MISSILE_M"
+   ]
+  },
+  {
+   "itemId": 1066,
+   "name": "Helicopter IV",
+   "idConstant": "ID_UNIT_HELICOPTER_4",
+   "delegate": "DoubleMachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1067,
+   "name": "Helicopter V",
+   "idConstant": "ID_UNIT_HELICOPTER_5",
+   "delegate": "DoubleMachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_LASER_BLUE_BIG"
+   ]
+  },
+  {
+   "itemId": 1069,
+   "name": "Demolition Tank",
+   "idConstant": "ID_UNIT_BIGHEADED_TANK",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MISSILE_BIG",
+    "P_ROCKET_M"
+   ]
+  },
+  {
+   "itemId": 1070,
+   "name": "Tank IV",
+   "idConstant": "ID_UNIT_TANK_4",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_YELLOW",
+    "BLAST_YELLOW_LASER"
+   ]
+  },
+  {
+   "itemId": 1071,
+   "name": "Tank V",
+   "idConstant": "ID_UNIT_TANK_5",
+   "delegate": "DoubleProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_YELLOW",
+    "BLAST_YELLOW_LASER"
+   ]
+  },
+  {
+   "itemId": 1072,
+   "name": "Ranbo",
+   "idConstant": "ID_UNIT_RAMBO",
+   "delegate": "RamboDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1073,
+   "name": "Erradicator",
+   "idConstant": "ID_UNIT_ERRADICATOR",
+   "delegate": "ErradicatorDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1074,
+   "name": "Punisher Bot",
+   "idConstant": "ID_UNIT_PUNISHER",
+   "delegate": "PunisherDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_ENERGY_BALL",
+    "BLAST_LASER_YELLOW"
+   ]
+  },
+  {
+   "itemId": 1075,
+   "name": "Supreme Bot",
+   "idConstant": "ID_UNIT_SUPREME_BOT",
+   "delegate": "SupremeBotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1076,
+   "name": "Crusader Soldier",
+   "idConstant": "ID_UNIT_ROBO_SOLDIER",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_LASER_BLUE_SMALL"
+   ]
+  },
+  {
+   "itemId": 1077,
+   "name": "Swordsman Soldier",
+   "idConstant": "ID_UNIT_ROBO_SWORDSMAN",
+   "delegate": "MeleeDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1078,
+   "name": "Bazooka Soldier",
+   "idConstant": "ID_UNIT_ROBO_BAZOOKA",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON",
+    "P_ROCKET_M"
+   ]
+  },
+  {
+   "itemId": 1079,
+   "name": "Jet Soldier",
+   "idConstant": "ID_UNIT_ROBO_JUMPER",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_LASER_BLUE_SMALL"
+   ]
+  },
+  {
+   "itemId": 1080,
+   "name": "Motorized Soldier",
+   "idConstant": "ID_UNIT_ROBO_BIKER",
+   "delegate": "DoubleMachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_LASER_BLUE_SMALL"
+   ]
+  },
+  {
+   "itemId": 1081,
+   "name": "Xtreme Retaliator",
+   "idConstant": "ID_UNIT_ROBO_XTREME",
+   "delegate": "XtremeRetaliatorDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_LASER_BLUE_SMALL"
+   ]
+  },
+  {
+   "itemId": 1082,
+   "name": "Megalancer",
+   "idConstant": "ID_UNIT_ROBO_LANCER",
+   "delegate": "RoboLancerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1083,
+   "name": "Crusader Tank",
+   "idConstant": "ID_UNIT_DEMOLISHER",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MISSILE",
+    "P_BLUE_ROCKET"
+   ]
+  },
+  {
+   "itemId": 1084,
+   "name": "Dreadnought",
+   "idConstant": "ID_UNIT_DREADNOUGHT",
+   "delegate": "DreadnoughtDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1085,
+   "name": "Metal Draggy",
+   "idConstant": "ID_UNIT_METAL_DRAGGY",
+   "delegate": "MetalDraggyDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ROCKET",
+    "P_FIRE_BALL"
+   ]
+  },
+  {
+   "itemId": 1086,
+   "name": "Mechanical Golem",
+   "idConstant": "ID_UNIT_MECHANICAL_GOLEM",
+   "delegate": "GolemDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1087,
+   "name": "T-Rex",
+   "idConstant": "ID_UNIT_TREX2",
+   "delegate": "TRexDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1088,
+   "name": "Skylander",
+   "idConstant": "ID_UNIT_ROBO_SKYLANDER",
+   "delegate": "SkylanderDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1089,
+   "name": "Mega-Axe",
+   "idConstant": "ID_UNIT_ROBO_AXE",
+   "delegate": "RoboAxe",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1090,
+   "name": "Giant Walker",
+   "idConstant": "ID_UNIT_ROBO_GIANTWALKER",
+   "delegate": "GiantWalkerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_BULLET_BIG"
+   ]
+  },
+  {
+   "itemId": 1091,
+   "name": "Missile Tank",
+   "idConstant": "ID_UNIT_MISSILE_TANK",
+   "delegate": "MissileTankDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1092,
+   "name": "Steel Claws",
+   "idConstant": "ID_UNIT_ROBO_STEEL_CLAWS",
+   "delegate": "SteelClawsDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1093,
+   "name": "Fire T-Rex",
+   "idConstant": "ID_UNIT_FIRETREX",
+   "delegate": "FireTRexDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1094,
+   "name": "Aircraft IV",
+   "idConstant": "ID_UNIT_AIRCRAFT_4",
+   "delegate": "DoubleProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ROCKET"
+   ]
+  },
+  {
+   "itemId": 1095,
+   "name": "Aircraft V",
+   "idConstant": "ID_UNIT_AIRCRAFT_5",
+   "delegate": "DoubleProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ROCKET"
+   ]
+  },
+  {
+   "itemId": 1096,
+   "name": "F-117",
+   "idConstant": "ID_UNIT_STEALTH_PLANE",
+   "delegate": "DoubleRocketStealthDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ROCKET"
+   ]
+  },
+  {
+   "itemId": 1097,
+   "name": "Red Draggy",
+   "idConstant": "ID_UNIT_RED_DRAGGY",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_FIRE_BALL",
+    "BLAST_BAZOOKA_SMALL"
+   ]
+  },
+  {
+   "itemId": 1098,
+   "name": "Blue Draggy",
+   "idConstant": "ID_UNIT_BLUE_DRAGGY",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_LIGHTNING_BLUE"
+   ]
+  },
+  {
+   "itemId": 1099,
+   "name": "Red Dragon",
+   "idConstant": "ID_UNIT_RED_DRAGON",
+   "delegate": "RedDragonDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_RED_BEAM",
+    "BLAST_RED_BEAM"
+   ]
+  },
+  {
+   "itemId": 1100,
+   "name": "Blue Dragon",
+   "idConstant": "ID_UNIT_BLUE_DRAGON",
+   "delegate": "RedDragonDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_ELECTRIC_BEAM",
+    "BLAST_ELECTRICAL"
+   ]
+  },
+  {
+   "itemId": 1101,
+   "name": "Celestial Megamech",
+   "idConstant": "ID_UNIT_CELESTIAL_MEGA_MECH",
+   "delegate": "CelestialMegaMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1102,
+   "name": "Red Baron",
+   "idConstant": "ID_UNIT_RED_BARON",
+   "delegate": "RedBaronDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1104,
+   "name": "Fireman",
+   "idConstant": "ID_UNIT_FIREMAN",
+   "delegate": "FiremanDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_WATER"
+   ]
+  },
+  {
+   "itemId": 1105,
+   "name": "Metal Dragon",
+   "idConstant": "ID_UNIT_METALLIC_DRAGON",
+   "delegate": "MetallicDragonDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_RED_ELECTRIC_BEAM",
+    "BLAST_RED_BEAM"
+   ]
+  },
+  {
+   "itemId": 1106,
+   "name": "Axe Zoldier",
+   "idConstant": "ID_UNIT_AXE_ORC_SOLDIER",
+   "delegate": "AxeOrcSoldierDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1107,
+   "name": "Gun Zoldier",
+   "idConstant": "ID_UNIT_MACHINEGUN_ORC",
+   "delegate": "MachinegunOrcDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1108,
+   "name": "Xplosive Ork",
+   "idConstant": "ID_UNIT_ORC_BOSS",
+   "delegate": "XplosiveGuysDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1109,
+   "name": "Bear Ridda",
+   "idConstant": "ID_UNIT_ORC_JOCKEY",
+   "delegate": "OrcJockeyDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1110,
+   "name": "Molotov Kopta",
+   "idConstant": "ID_UNIT_ORC_HELICOPTER",
+   "delegate": "OrcoHelicopterDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON"
+   ]
+  },
+  {
+   "itemId": 1111,
+   "name": "Horned Badass",
+   "idConstant": "ID_UNIT_ORC_ROBOT_1",
+   "delegate": "OrcoRobotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON"
+   ]
+  },
+  {
+   "itemId": 1112,
+   "name": "Red Spinner",
+   "idConstant": "ID_UNIT_RED_SPINNER",
+   "delegate": "RedSpinnerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ROCKET"
+   ]
+  },
+  {
+   "itemId": 1113,
+   "name": "Flamethrowa Ork",
+   "idConstant": "ID_UNIT_ORC_FLAMETHROWER",
+   "delegate": "FlamethrowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_FIRE"
+   ]
+  },
+  {
+   "itemId": 1114,
+   "name": "Knife Throwa",
+   "idConstant": "ID_UNIT_ORC_KNIFETHROWER",
+   "delegate": "KnifeThrowerOrcDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_ORC_KNIFE"
+   ]
+  },
+  {
+   "itemId": 1115,
+   "name": "Big Handsaw Ork",
+   "idConstant": "ID_UNIT_ORC_ROBOT_2",
+   "delegate": "OrcRobot2Delegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_ORC_KNIFE"
+   ]
+  },
+  {
+   "itemId": 1116,
+   "name": "Orc Tank",
+   "idConstant": "ID_UNIT_ORC_TANK",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MISSILE",
+    "P_ROCKET_M"
+   ]
+  },
+  {
+   "itemId": 1117,
+   "name": "Kamikaze team",
+   "idConstant": "ID_UNIT_ORC_SQUIG_HERDER",
+   "delegate": "OrcSquigHerderDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1118,
+   "name": "Kamikaze critter",
+   "idConstant": "ID_UNIT_SQUIG_KAMIKAZE",
+   "delegate": "KamikazeSquigDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1119,
+   "name": "Camu Metal Dragon",
+   "idConstant": "ID_UNIT_METALLIC_DRAGON_2",
+   "delegate": "MetallicDragon2Delegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_YELLOW_METAL_BEAM",
+    "BLAST_YELLOW_METAL_BEAM",
+    "P_ORANGE_METAL_BEAM",
+    "BLAST_ORANGE_METAL_BEAM"
+   ]
+  },
+  {
+   "itemId": 1120,
+   "name": "Camu Draggy",
+   "idConstant": "ID_UNIT_METAL_DRAGGY_2",
+   "delegate": "MetalDraggyDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ROCKET",
+    "P_FIRE_BALL"
+   ]
+  },
+  {
+   "itemId": 1121,
+   "name": "War Buggy",
+   "idConstant": "ID_UNIT_BUGGY",
+   "delegate": "BuggyDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON",
+    "MISSILE"
+   ]
+  },
+  {
+   "itemId": 1122,
+   "name": "Orc Zoldier",
+   "idConstant": "ID_UNIT_ORC_SOLDIER_I",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN"
+   ]
+  },
+  {
+   "itemId": 1123,
+   "name": "Orc Swordsman",
+   "idConstant": "ID_UNIT_ORC_SWORDMAN",
+   "delegate": "MeleeDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1124,
+   "name": "Basic Ork Tank",
+   "idConstant": "ID_UNIT_ORC_TANK_I",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MISSILE",
+    "P_ROCKET_M"
+   ]
+  },
+  {
+   "itemId": 1125,
+   "name": "Orc Worker",
+   "idConstant": "ID_UNIT_ORC_WORKER",
+   "delegate": "BasicWorkerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1126,
+   "name": "Samurai Bot",
+   "idConstant": "ID_UNIT_SAMURAI_BOT_COPY",
+   "delegate": "SamuraiBotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1127,
+   "name": "Armored Core Alpha",
+   "idConstant": "ID_UNIT_HUGE_ROBOT",
+   "delegate": "HugeRobotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1128,
+   "name": "Alpha Drone",
+   "idConstant": "ID_UNIT_HUGE_DRAGGY",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1130,
+   "name": "Xplosive Beast Boss",
+   "idConstant": "ID_UNIT_X_ORC_BROS_BOSS",
+   "delegate": "XplosiveGuysDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1131,
+   "name": "Xplosive Beast ATP",
+   "idConstant": "ID_UNIT_X_ORC_BOSS_II_JEEP",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MISSILE",
+    "P_ROCKET_M"
+   ]
+  },
+  {
+   "itemId": 1132,
+   "name": "Xplosive Beast",
+   "idConstant": "ID_UNIT_X_ORC_BROS",
+   "delegate": "XplosiveGuysDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1133,
+   "name": "Ork Bear Knight",
+   "idConstant": "ID_UNIT_X_BOAR_RIDER",
+   "delegate": "OrcJockeyDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1134,
+   "name": "Ork Kopta",
+   "idConstant": "ID_UNIT_X_KOPTA",
+   "delegate": "OrcoHelicopterDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON"
+   ]
+  },
+  {
+   "itemId": 1135,
+   "name": "Horned Beast Ork",
+   "idConstant": "ID_UNIT_X_HORNED_BEAST",
+   "delegate": "OrcoRobotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON"
+   ]
+  },
+  {
+   "itemId": 1136,
+   "name": "Red Flamethrowa Ork",
+   "idConstant": "ID_UNIT_X_RED_FLAMETHROWA",
+   "delegate": "FlamethrowerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_FIRE"
+   ]
+  },
+  {
+   "itemId": 1137,
+   "name": "Orc Knifethrower",
+   "idConstant": "ID_UNIT_X_MACHETE_THROWA",
+   "delegate": "KnifeThrowerOrcDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_ORC_KNIFE"
+   ]
+  },
+  {
+   "itemId": 1138,
+   "name": "Red Handsaw Ork",
+   "idConstant": "ID_UNIT_X_RED_HANDSAW",
+   "delegate": "OrcRobot2Delegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_ORC_KNIFE"
+   ]
+  },
+  {
+   "itemId": 1139,
+   "name": "Kamikaze Bros",
+   "idConstant": "ID_UNIT_X_ORC_SQUIG_HERDER",
+   "delegate": "OrcSquigHerderDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1140,
+   "name": "Kamikaze Pet",
+   "idConstant": "ID_UNIT_X_SQUIG_KAMIKAZE",
+   "delegate": "KamikazeSquigDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1141,
+   "name": "Samurai Bot",
+   "idConstant": "ID_UNIT_SAMURAI_BOT",
+   "delegate": "SamuraiBotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1142,
+   "name": "Samurai Minibot",
+   "idConstant": "ID_UNIT_SAMURAI_MINIBOT",
+   "delegate": "MeleeDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1143,
+   "name": "Melee Spider",
+   "idConstant": "ID_UNIT_SPIDER_WHITE_CLAW",
+   "delegate": "MeleeDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1144,
+   "name": "Venom Spider",
+   "idConstant": "ID_UNIT_SPIDER_SPITTER",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ALIEN_FLEGMA"
+   ]
+  },
+  {
+   "itemId": 1145,
+   "name": "Big Spider",
+   "idConstant": "ID_UNIT_SPIDER_BIG",
+   "delegate": "BigSpiderDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1146,
+   "name": "Small Alien",
+   "idConstant": "ID_UNIT_ALIEN_SMALL",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ALIEN_FLEGMA"
+   ]
+  },
+  {
+   "itemId": 1147,
+   "name": "Tusk Alien",
+   "idConstant": "ID_UNIT_ALIEN_TUSK",
+   "delegate": "TuskAlienDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1148,
+   "name": "Claw Alien",
+   "idConstant": "ID_UNIT_ALIEN_CLAWS",
+   "delegate": "MeleeDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1149,
+   "name": "Orc Big Tank",
+   "idConstant": "ID_UNIT_X_ORC_BIG_TANK",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MISSILE",
+    "P_ROCKET_M"
+   ]
+  },
+  {
+   "itemId": 1150,
+   "name": "Crusader Bot",
+   "idConstant": "ID_UNIT_CRUSADER_BOT",
+   "delegate": "CrusaderBotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1151,
+   "name": "Crusader Priest",
+   "idConstant": "ID_UNIT_ROBO_PRIEST",
+   "delegate": "CrusaderPriestDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_LASER_BLUE_SMALL"
+   ]
+  },
+  {
+   "itemId": 1152,
+   "name": "Ultra-Mech",
+   "idConstant": "ID_UNIT_ULTRAMECH",
+   "delegate": "UltraMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1153,
+   "name": "Ultra-Mech Drone",
+   "idConstant": "ID_UNIT_ULTRAMECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_BEAM_BLUE",
+    "BLAST_BLUE_METAL_BEAM"
+   ]
+  },
+  {
+   "itemId": 1154,
+   "name": "Viking Axeman",
+   "idConstant": "ID_UNIT_DWARF_AXE",
+   "delegate": "MeleeDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1155,
+   "name": "Viking Soldier",
+   "idConstant": "ID_UNIT_DWARF_SOLDIER",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN"
+   ]
+  },
+  {
+   "itemId": 1156,
+   "name": "Viking Bear Knight",
+   "idConstant": "ID_UNIT_VIKING_BEAR_RIDER",
+   "delegate": "BearKnightDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1157,
+   "name": "Viking Tank",
+   "idConstant": "ID_UNIT_VIKING_TANK",
+   "delegate": "DoubleProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON"
+   ]
+  },
+  {
+   "itemId": 1158,
+   "name": "Viking Airship",
+   "idConstant": "ID_UNIT_VIKING_COPTER",
+   "delegate": "VikingCopterDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_LASER_BLUE_SMALL"
+   ]
+  },
+  {
+   "itemId": 1159,
+   "name": "Viking Hammerer",
+   "idConstant": "ID_UNIT_VIKING_MEGAHAMMER",
+   "delegate": "VikingMegahammerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1160,
+   "name": "Viking Core Bot",
+   "idConstant": "ID_UNIT_VIKING_CORE_BOT",
+   "delegate": "VikingCoreBotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1161,
+   "name": "Rune Golem",
+   "idConstant": "ID_UNIT_VIKING_RUNE_GOLEM",
+   "delegate": "VikingRuneGolemDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1162,
+   "name": "Nemesis Core",
+   "idConstant": "ID_UNIT_ULTRA_BOT",
+   "delegate": "UltraBotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_BLUE_PLASMA_BOLT",
+    "BLAST_BLUE_METAL_BEAM"
+   ]
+  },
+  {
+   "itemId": 1163,
+   "name": "Nemesis Drone",
+   "idConstant": "ID_UNIT_ULTRA_BOT_DRONE",
+   "delegate": "UltraBotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_BLUE_PLASMA_BOLT",
+    "BLAST_BLUE_METAL_BEAM"
+   ]
+  },
+  {
+   "itemId": 1164,
+   "name": "Viking Core Bot Drone",
+   "idConstant": "ID_UNIT_VIKING_CORE_BOT_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_BLUE_WAVES"
+   ]
+  },
+  {
+   "itemId": 1165,
+   "name": "Viking Bazooka",
+   "idConstant": "ID_UNIT_VIKING_BAZOOKA",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON"
+   ]
+  },
+  {
+   "itemId": 1166,
+   "name": "Viking MotoSquad",
+   "idConstant": "ID_UNIT_VIKING_MOTOSQUAD",
+   "delegate": "VikingMotoSquadDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON"
+   ]
+  },
+  {
+   "itemId": 1167,
+   "name": "Blue Steel Bahamut",
+   "idConstant": "ID_UNIT_BAHAMUT_METAL",
+   "delegate": "BahamutMetalDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_RED_ELECTRIC_BEAM",
+    "BLAST_RED_BEAM"
+   ]
+  },
+  {
+   "itemId": 1168,
+   "name": "Blue Steel Draggy",
+   "idConstant": "ID_UNIT_BAHAMUT_METAL_DRAGGY",
+   "delegate": "BahamutMetalDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_RED_ELECTRIC_BEAM",
+    "BLAST_RED_BEAM"
+   ]
+  },
+  {
+   "itemId": 1169,
+   "name": "Roller Skater",
+   "idConstant": "ID_UNIT_TRANSFORMER_SKATER",
+   "delegate": "TransformerSkaterDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1170,
+   "name": "Alien Instigator",
+   "idConstant": "ID_UNIT_ALIEN_INSTIGATOR",
+   "delegate": "TuskAlienDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1171,
+   "name": "Rune Golem Drone",
+   "idConstant": "ID_UNIT_VIKING_RUNE_GOLEM_DRONE",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_LASER_BLUE_BIG"
+   ]
+  },
+  {
+   "itemId": 1172,
+   "name": "Hyper Blazer",
+   "idConstant": "ID_UNIT_MEGA_FIRE_BOT",
+   "delegate": "MegaFireBotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "FIRE_BALL",
+    "P_FIRE_BALL",
+    "P_FIRE_BIG"
+   ]
+  },
+  {
+   "itemId": 1173,
+   "name": "Hyper Blazer Drone",
+   "idConstant": "ID_UNIT_MEGA_FIRE_BOT_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "FIRE_BALL",
+    "P_FIRE_BALL_SMALL"
+   ]
+  },
+  {
+   "itemId": 1174,
+   "name": "Viking Sniper",
+   "idConstant": "ID_UNIT_VIKING_SNIPER",
+   "delegate": "VikingSniperDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_HEAVY"
+   ]
+  },
+  {
+   "itemId": 1175,
+   "name": "Chainsaw Butcher",
+   "idConstant": "ID_UNIT_VIKING_BUTCHER",
+   "delegate": "VikingButcherDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1176,
+   "name": "Kamikaze",
+   "idConstant": "ID_UNIT_KAMIKAZE",
+   "delegate": "KamikazeDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1177,
+   "name": "UFO",
+   "idConstant": "ID_UNIT_UFO",
+   "delegate": "UfoDelegate",
+   "specialDesc": "It kidnaps units!",
+   "registeredProjectiles": [
+    "P_UFO_LASER",
+    "BLAST_ELECTRICAL"
+   ]
+  },
+  {
+   "itemId": 1178,
+   "name": "Ether Messiah",
+   "idConstant": "ID_UNIT_MESSIAH_BOT",
+   "delegate": "MessiahBotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1179,
+   "name": "Ether Messiah Drone",
+   "idConstant": "ID_UNIT_MESSIAH_BOT_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_LASER_BLUE_SMALL"
+   ]
+  },
+  {
+   "itemId": 1180,
+   "name": "Robot Hunter",
+   "idConstant": "ID_UNIT_ROBOT_HUNTER",
+   "delegate": "RobotHunterDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_ENERGY_BALL",
+    "BLAST_LASER_YELLOW",
+    "P_LASER_BEAM_BLUE_FAT",
+    "BLAST_BAZOOKA",
+    "MACHINEGUN",
+    "P_DRAGON_BALL",
+    "BLAST_BAZOOKA_SMALL"
+   ]
+  },
+  {
+   "itemId": 1181,
+   "name": "Golden Slayer",
+   "idConstant": "ID_UNIT_TRANSFORMER_SWORD",
+   "delegate": "TransformerSwordDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1182,
+   "name": "Golden Slayer Drone",
+   "idConstant": "ID_UNIT_TRANSFORMER_SWORD_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_DRONE"
+   ]
+  },
+  {
+   "itemId": 1183,
+   "name": "Big Laser Viking",
+   "idConstant": "ID_UNIT_VIKING_LASER",
+   "delegate": "VikingLaserDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_LASER_RED_VIKING"
+   ]
+  },
+  {
+   "itemId": 1184,
+   "name": "Fire Karateka",
+   "idConstant": "ID_UNIT_KARATEKA",
+   "delegate": "KaratekaDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_HADOKEN_KARATEKA"
+   ]
+  },
+  {
+   "itemId": 1185,
+   "name": "MegaFire T-Rex",
+   "idConstant": "ID_UNIT_FIRETREX_PLAYER",
+   "delegate": "FireTRexDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1186,
+   "name": "Nebular Spearman",
+   "idConstant": "ID_UNIT_AVATAR_LANCE",
+   "delegate": "AvatarSoldadoDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "FIRE_BALL",
+    "BLAST_LASER_BLUE",
+    "P_AVATAR_LANCE"
+   ]
+  },
+  {
+   "itemId": 1187,
+   "name": "Nebular Archer",
+   "idConstant": "ID_UNIT_AVATAR_ARCHER",
+   "delegate": "AvatarArcherDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "FIRE_BALL",
+    "BLAST_LASER_BLUE",
+    "P_AVATAR_ARROW"
+   ]
+  },
+  {
+   "itemId": 1188,
+   "name": "Greatsword Warrior",
+   "idConstant": "ID_UNIT_GREAT_WARRIOR",
+   "delegate": "GreatWarriorDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1189,
+   "name": "Nebular Rider",
+   "idConstant": "ID_UNIT_AVATAR_JINETE",
+   "delegate": "AvatarJineteDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1190,
+   "name": "Golden Golem",
+   "idConstant": "ID_UNIT_GOLD_GOLEM",
+   "delegate": "GoldenGolemDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1191,
+   "name": "Black Dragon",
+   "idConstant": "ID_UNIT_BLACK_DRAGON",
+   "delegate": "BlackDragonDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_BLACK_DRAGON_BEAM",
+    "BLAST_RED_BEAM",
+    "P_ORANGE_METAL_BEAM",
+    "BLAST_ORANGE_METAL_BEAM"
+   ]
+  },
+  {
+   "itemId": 1192,
+   "name": "Dragonborn Mech",
+   "idConstant": "ID_UNIT_DRAGON_MECH",
+   "delegate": "DragonMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_BLUE_LASER_BULLET",
+    "P_BLUE_LASER"
+   ]
+  },
+  {
+   "itemId": 1193,
+   "name": "Dragonborn Drone",
+   "idConstant": "ID_UNIT_DRAGON_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_BLUE_LASER_BULLET"
+   ]
+  },
+  {
+   "itemId": 1194,
+   "name": "Electric Dragon",
+   "idConstant": "ID_UNIT_ELECTRIC_DRAGON",
+   "delegate": "ElectricDragonDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_YELLOW_BEAM",
+    "BLAST_YELLOW_BEAM",
+    "P_ORANGE_METAL_BEAM",
+    "BLAST_ORANGE_METAL_BEAM"
+   ]
+  },
+  {
+   "itemId": 1195,
+   "name": "Electric Draggy",
+   "idConstant": "ID_UNIT_ELECTRIC_DRAGON_DRONE",
+   "delegate": "ElectricDragonDroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_BEAM_BLUE",
+    "BLAST_BLUE_METAL_BEAM"
+   ]
+  },
+  {
+   "itemId": 1196,
+   "name": "Black Draggy",
+   "idConstant": "ID_UNIT_BLACK_DRAGGY",
+   "delegate": "BlackDraggyDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ROCKET",
+    "P_FIRE_BALL"
+   ]
+  },
+  {
+   "itemId": 1197,
+   "name": "Silver Hercules",
+   "idConstant": "ID_UNIT_HERCULES_MATRIX",
+   "delegate": "HerculesMatrixDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_BULLET_AIR",
+    "MACHINEGUN_HEAVY",
+    "P_BULLET_AIR_BIG"
+   ]
+  },
+  {
+   "itemId": 1198,
+   "name": "Nebular Knight",
+   "idConstant": "ID_UNIT_NEBULAR_HORSE_RIDER",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_NEBULAR_SPEAR"
+   ]
+  },
+  {
+   "itemId": 1199,
+   "name": "Nebular Dragon Rider",
+   "idConstant": "ID_UNIT_NEBULAR_DRAGON_RIDER",
+   "delegate": "NebularDragonRider",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1200,
+   "name": "Nebular Assault Quad",
+   "idConstant": "ID_UNIT_NEBULAR_MOTORIZED",
+   "delegate": "NebularMotorizedDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1201,
+   "name": "Steel Collector",
+   "idConstant": "ID_UNIT_JUNK_BOT",
+   "delegate": "JunkBotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_RED",
+    "BLAST_RED_BEAM"
+   ]
+  },
+  {
+   "itemId": 1202,
+   "name": "Nebular Dragon Rider Draggy",
+   "idConstant": "ID_UNIT_NEBULAR_DRAGON_RIDER_DRAGGY",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "FIRE_BALL",
+    "P_FIRE_BALL_SMALL"
+   ]
+  },
+  {
+   "itemId": 1203,
+   "name": "Viking Airship Outsider",
+   "idConstant": "ID_UNIT_VIKING_COPTER_PLAYER",
+   "delegate": "VikingCopterDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_LASER_BLUE_SMALL"
+   ]
+  },
+  {
+   "itemId": 1204,
+   "name": "Viking Hammerer Outsider",
+   "idConstant": "ID_UNIT_VIKING_MEGAHAMMER_PLAYER",
+   "delegate": "VikingMegahammerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1205,
+   "name": "Dual Blade Automech",
+   "idConstant": "ID_UNIT_DUAL_BLADE_AUTOMECH",
+   "delegate": "DualBladeAutoMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1206,
+   "name": "Dual Blade Automech Drone",
+   "idConstant": "ID_UNIT_DUAL_BLADE_AUTOMECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_BLUE_LASER_BULLET"
+   ]
+  },
+  {
+   "itemId": 1207,
+   "name": "Black Belt Archer",
+   "idConstant": "ID_UNIT_TRANSFORMER_ARCHER",
+   "delegate": "TransformerArcherDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_ARROW",
+    "P_GREEN_ARROW"
+   ]
+  },
+  {
+   "itemId": 1208,
+   "name": "Nebular Priest",
+   "idConstant": "ID_UNIT_NEBULAR_PRIEST",
+   "delegate": "NebularPriestDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1209,
+   "name": "Nebular Bicopter",
+   "idConstant": "ID_UNIT_NEBULAR_BLUE_BICOPTER",
+   "delegate": "NebularBlueBicopterDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_HEAVY"
+   ]
+  },
+  {
+   "itemId": 1210,
+   "name": "Great Shogun Mech",
+   "idConstant": "ID_UNIT_SAMURAI_MECH",
+   "delegate": "SamuraiMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1211,
+   "name": "Great Shogun Mech Drone",
+   "idConstant": "ID_UNIT_SAMURAI_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_BLUE_LASER_BULLET"
+   ]
+  },
+  {
+   "itemId": 1212,
+   "name": "ATP Mech",
+   "idConstant": "ID_UNIT_TRETRAPOD_MECH",
+   "delegate": "TetrapodMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1213,
+   "name": "Blazing Beast Rider",
+   "idConstant": "ID_UNIT_NEBULAR_MONSTER_RIDER",
+   "delegate": "NebularMonsterRiderDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1214,
+   "name": "Nebular Maze Warrior",
+   "idConstant": "ID_UNIT_NEBULAR_MAZE_WARRIOR",
+   "delegate": "NebularMazeWarriorDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1215,
+   "name": "Massive Cannon Mech",
+   "idConstant": "ID_UNIT_MASSIVE_CANNON_MECH",
+   "delegate": "CannonMechBotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_ENERGY_BALL_BLUE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1216,
+   "name": "Massive Cannon Drone",
+   "idConstant": "ID_UNIT_MASSIVE_CANNON_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1217,
+   "name": "Brutus Mech",
+   "idConstant": "ID_UNIT_BRUTUS_MECH",
+   "delegate": "BrutusMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1218,
+   "name": "S.W.A.T. Soldier",
+   "idConstant": "ID_UNIT_SWAT_SOLDIER",
+   "delegate": "SwatSoldierDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_BLUE_PLASMA_BOLT",
+    "BLAST_BAZOOKA_SMALL",
+    "GRENADE",
+    "P_GRENADE_2",
+    "BLAST_GRENADE_2"
+   ]
+  },
+  {
+   "itemId": 1219,
+   "name": "Nebular Dragon Knight",
+   "idConstant": "ID_UNIT_NEBULAR_DRAGON_RIDER2",
+   "delegate": "NebularDragonRider2",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1220,
+   "name": "Nebular Sniper",
+   "idConstant": "ID_UNIT_NEBULAR_SNIPER",
+   "delegate": "NebularSniperDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_HEAVY"
+   ]
+  },
+  {
+   "itemId": 1221,
+   "name": "Nebular Dragon Knight Draggy",
+   "idConstant": "ID_UNIT_NEBULAR_DRAGON_RIDER_DRAGGY2",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "FIRE_BALL",
+    "P_FIRE_BALL_SMALL"
+   ]
+  },
+  {
+   "itemId": 1222,
+   "name": "Liquid Mech ",
+   "idConstant": "ID_UNIT_LIQUID_MECH",
+   "delegate": "LiquidMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1223,
+   "name": "Killer Driller",
+   "idConstant": "ID_UNIT_DRILL",
+   "delegate": "DrillDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_GREEN_BEAM"
+   ]
+  },
+  {
+   "itemId": 1224,
+   "name": "Liquid Mech  Drone",
+   "idConstant": "ID_UNIT_LIQUID_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1225,
+   "name": "Doctor Shock",
+   "idConstant": "ID_UNIT_DOCTOR_SHOCK",
+   "delegate": "DoctorShockDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_ELECTRIC_BEAM"
+   ]
+  },
+  {
+   "itemId": 1226,
+   "name": "Red Mercury Dragon",
+   "idConstant": "ID_UNIT_METALLIC_RED_DRAGON",
+   "delegate": "MetallicRedDragonDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_YELLOW_METALLIC_BEAM",
+    "BLAST_YELLOW_BEAM",
+    "GRENADE",
+    "P_GRENADE_2"
+   ]
+  },
+  {
+   "itemId": 1227,
+   "name": "Red Mercury Draggy",
+   "idConstant": "ID_UNIT_METALLIC_RED_DRAGGY",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_FIRE_BALL",
+    "BLAST_BAZOOKA_SMALL"
+   ]
+  },
+  {
+   "itemId": 1228,
+   "name": "Swamp Monster",
+   "idConstant": "ID_UNIT_NEBULAR_MONSTER",
+   "delegate": "NebularMonsterDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "EGG",
+    "P_NEBULAR_EGG"
+   ]
+  },
+  {
+   "itemId": 1229,
+   "name": "Poison Spider",
+   "idConstant": "ID_UNIT_SPIDER_SPITTER_PLAYER",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ALIEN_FLEGMA"
+   ]
+  },
+  {
+   "itemId": 1230,
+   "name": "Shredder Alien",
+   "idConstant": "ID_UNIT_ALIEN_CLAWS_PLAYER",
+   "delegate": "MeleeDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1231,
+   "name": "Swamp Minion",
+   "idConstant": "ID_UNIT_NEBULAR_MONSTER_MINI",
+   "delegate": "NebularMonsterDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "EGG",
+    "P_NEBULAR_EGG"
+   ]
+  },
+  {
+   "itemId": 1232,
+   "name": "Claw Spider",
+   "idConstant": "ID_UNIT_SPIDER_WHITE_CLAW_USER",
+   "delegate": "MeleeDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1233,
+   "name": "Huge Spider",
+   "idConstant": "ID_UNIT_SPIDER_BIG_USER",
+   "delegate": "BigSpiderDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1234,
+   "name": "Acid Alien",
+   "idConstant": "ID_UNIT_ALIEN_SMALL_USER",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ALIEN_FLEGMA"
+   ]
+  },
+  {
+   "itemId": 1235,
+   "name": "Horned Alien",
+   "idConstant": "ID_UNIT_ALIEN_TUSK_USER",
+   "delegate": "TuskAlienDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1236,
+   "name": "2-Gun Exobot",
+   "idConstant": "ID_UNIT_TWO_GUN_EXOBOT",
+   "delegate": "TwoGunExobotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_ENERGY_BALL_BLUE",
+    "BLAST_LASER_BLUE",
+    "P_BLUE_LASER"
+   ]
+  },
+  {
+   "itemId": 1237,
+   "name": "Cyber Samurai Mech",
+   "idConstant": "ID_UNIT_CYBER_SAMURAI_MECH",
+   "delegate": "CyberSamuraiMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1238,
+   "name": "Cyber Samurai  Drone",
+   "idConstant": "ID_UNIT_CYBER_SAMURAI_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1239,
+   "name": "Dark Ether Messiah",
+   "idConstant": "ID_UNIT_DARK_ETHER_MESSIAH_BOT",
+   "delegate": "DarkEtherMessiahBotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1240,
+   "name": "Dark Ether Messiah Drone",
+   "idConstant": "ID_UNIT_DARK_ETHER_MESSIAH_BOT_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_LASER_BLUE_SMALL"
+   ]
+  },
+  {
+   "itemId": 1241,
+   "name": "Converter Wizard",
+   "idConstant": "ID_UNIT_ENEMY_CONVERTER_PRIEST",
+   "delegate": "EnemyConverterPriestDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_BLUE_LASER_BULLET"
+   ]
+  },
+  {
+   "itemId": 1242,
+   "name": "Hercules Mech",
+   "idConstant": "ID_UNIT_HERCULES_MECH",
+   "delegate": "HerculesMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_ENERGY_BALL_BLUE",
+    "P_ENERGY_BALL_BLUE_BIG",
+    "BLAST_EARTH_BIG"
+   ]
+  },
+  {
+   "itemId": 1243,
+   "name": "Forge Dragon",
+   "idConstant": "ID_UNIT_FORGE_DRAGON",
+   "delegate": "ForgeDragonDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_FIRE"
+   ]
+  },
+  {
+   "itemId": 1244,
+   "name": "Forge Dragon Draggy",
+   "idConstant": "ID_UNIT_FORGE_DRAGON_DRAGGY",
+   "delegate": "DoubleProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON",
+    "P_FIRE",
+    "P_WATER",
+    "BLAST_ICE"
+   ]
+  },
+  {
+   "itemId": 1245,
+   "name": "Reptile Gun",
+   "idConstant": "ID_UNIT_REPTIL_GUN",
+   "delegate": "ReptileGunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN"
+   ]
+  },
+  {
+   "itemId": 1246,
+   "name": "Double Cannon Mech",
+   "idConstant": "ID_UNIT_DOUBLE_CANNON_MECH",
+   "delegate": "DoubleCannonMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_ENERGY_BALL_BLUE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1248,
+   "name": "Laser Blade Automech",
+   "idConstant": "ID_UNIT_LASER_BLADE_AUTOMECH",
+   "delegate": "LaserBladeAutoMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1249,
+   "name": "Laser Blade Automech Drone",
+   "idConstant": "ID_UNIT_LASER_BLADE_AUTOMECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_BLUE_LASER_BULLET"
+   ]
+  },
+  {
+   "itemId": 1250,
+   "name": "Burning Slayer",
+   "idConstant": "ID_UNIT_RED_SLAYER",
+   "delegate": "TransformerSwordDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1251,
+   "name": "Burning Slayer Drone",
+   "idConstant": "ID_UNIT_RED_SLAYER_DRONE",
+   "delegate": "TransformerSwordDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1252,
+   "name": "Karateka Gunner",
+   "idConstant": "ID_UNIT_KARATEKA_GUNNER",
+   "delegate": "KaratekaGunnerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_HEAVY",
+    "LASER_BURST"
+   ]
+  },
+  {
+   "itemId": 1254,
+   "name": "Prime Automech",
+   "idConstant": "ID_UNIT_OPTIMUS_PRIME_BOT",
+   "delegate": "OptimusPrimeBotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_ENERGY_BALL_BLUE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1255,
+   "name": "Prime Automech Drone",
+   "idConstant": "ID_UNIT_OPTIMUS_PRIME_BOT_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1256,
+   "name": "Big Razor Mech",
+   "idConstant": "ID_UNIT_BIG_RAZOR_MECH",
+   "delegate": "BigRazorMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1257,
+   "name": "Big Razor Mech Drone",
+   "idConstant": "ID_UNIT_BIG_RAZOR_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_BLUE_LASER_BULLET"
+   ]
+  },
+  {
+   "itemId": 1258,
+   "name": "S.W.A.T. Soldier",
+   "idConstant": "ID_UNIT_SWAT_SOLDIER_BARRACKED",
+   "delegate": "SwatSoldierDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_BLUE_PLASMA_BOLT",
+    "BLAST_BAZOOKA_SMALL",
+    "GRENADE",
+    "P_GRENADE_2",
+    "BLAST_GRENADE_2"
+   ]
+  },
+  {
+   "itemId": 1259,
+   "name": "Space Sword Elf",
+   "idConstant": "ID_UNIT_SPATIAL_SWORD",
+   "delegate": "SpatialSwordDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1260,
+   "name": "Space Archer Elf",
+   "idConstant": "ID_UNIT_SPATIAL_ARCHER",
+   "delegate": "SpatialArcherDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_ARROW",
+    "P_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1261,
+   "name": "Space Knight Elf",
+   "idConstant": "ID_UNIT_SPATIAL_HORSEMAN",
+   "delegate": "SpatialHorsemanDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "FIRE_BALL",
+    "BLAST_LASER_BLUE",
+    "P_SPATIAL_SPEAR"
+   ]
+  },
+  {
+   "itemId": 1262,
+   "name": "Space Airship Elf",
+   "idConstant": "ID_UNIT_SPATIAL_AIRSHIP",
+   "delegate": "SpatialAirshipDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_LASER_BLUE_SMALL"
+   ]
+  },
+  {
+   "itemId": 1263,
+   "name": "Spartan Warrior Mech",
+   "idConstant": "ID_UNIT_SPARTAN_MECH",
+   "delegate": "SpartanMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1264,
+   "name": "Spartan Warrior Drone",
+   "idConstant": "ID_UNIT_SPARTAN_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1265,
+   "name": "Space Priest Elf",
+   "idConstant": "ID_UNIT_SPACE_PRIEST",
+   "delegate": "SpatialPriestDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_SPATIAL_BIG_LASER",
+    "BLAST_SPATIAL_BIG_LASER"
+   ]
+  },
+  {
+   "itemId": 1266,
+   "name": "Space Paladin Elf",
+   "idConstant": "ID_UNIT_SPATIAL_PALADIN",
+   "delegate": "SpatialPaladinDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_SPATIAL_SWORD"
+   ]
+  },
+  {
+   "itemId": 1267,
+   "name": "Space Elf Cruiser",
+   "idConstant": "ID_UNIT_SPATIAL_CRUISER_AIRSHIP",
+   "delegate": "SpatialCruiserAirship",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_ENERGY_BALL_BLUE",
+    "P_ENERGY_BALL_BLUE_BIG",
+    "BLAST_EARTH_BIG",
+    "ROCKET"
+   ]
+  },
+  {
+   "itemId": 1268,
+   "name": "Proto Winged Mech",
+   "idConstant": "ID_UNIT_WINGED_TRANSFORMER",
+   "delegate": "WingedTransformerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_BLUE_PLASMA_BOLT",
+    "BLAST_LASER_BLUE",
+    "P_BLUE_BALL",
+    "BLAST_SPATIAL_BIG_LASER",
+    "MISSILE",
+    "P_ROCKET_M",
+    "BLAST_FIRE_BOMB"
+   ]
+  },
+  {
+   "itemId": 1269,
+   "name": "Proto Winged Drone",
+   "idConstant": "ID_UNIT_WINGED_TRANSFORMER_DRONE",
+   "delegate": "MultiShotDroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1270,
+   "name": "Spider Bot",
+   "idConstant": "ID_UNIT_SPIDER_BOT",
+   "delegate": "SpiderBotDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_ENERGY_BALL_BLUE",
+    "P_SPIDER_NET",
+    "BLAST_SPIDER_NET"
+   ]
+  },
+  {
+   "itemId": 1271,
+   "name": "Pharaoh Warrior Mech",
+   "idConstant": "ID_UNIT_EGYPTIAN_WARRIOR_MECH",
+   "delegate": "EgyptianWarriorMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1272,
+   "name": "Arachnid Mech",
+   "idConstant": "ID_UNIT_TRANSFORMER_ARACNID",
+   "delegate": "TransformerAracnidDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_BLUE_BEAM",
+    "BLAST_BEAM_SPATIAL",
+    "GRENADE",
+    "P_GRENADE_2",
+    "MISSILE",
+    "P_RED_MISSILE",
+    "BLAST_FIRE_BOMB"
+   ]
+  },
+  {
+   "itemId": 1273,
+   "name": "Arachnid Drone",
+   "idConstant": "ID_UNIT_TRANSFORMER_ARACNID_DRONE",
+   "delegate": "TransformerAracnidDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_BLUE_BEAM",
+    "BLAST_BEAM_SPATIAL",
+    "GRENADE",
+    "P_GRENADE_2",
+    "MISSILE",
+    "P_RED_MISSILE",
+    "BLAST_FIRE_BOMB"
+   ]
+  },
+  {
+   "itemId": 1274,
+   "name": "Multi Morpher",
+   "idConstant": "ID_UNIT_MULI_MORPH",
+   "delegate": "MultiMorphDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_LASER_BLUE",
+    "LASER_BURST",
+    "P_RED_ELECTRIC_BOMB",
+    "BLAST_MISSILE"
+   ]
+  },
+  {
+   "itemId": 1275,
+   "name": "Space Healer Elf",
+   "idConstant": "ID_UNIT_SPATIAL_ELF_HEALER",
+   "delegate": "SpatialElfHealerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_SUN_BALL"
+   ]
+  },
+  {
+   "itemId": 1276,
+   "name": "Space Scouter Elf",
+   "idConstant": "ID_UNIT_SPATIAL_EXPLORATION_MODULE",
+   "delegate": "SpatialExplorationModuleDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "MISSILE",
+    "P_RED_ELECTRIC_BOMB"
+   ]
+  },
+  {
+   "itemId": 1277,
+   "name": "Pharaoh Mech Drone",
+   "idConstant": "ID_UNIT_EGYPTIAN_WARRIOR_MECH_DRONE",
+   "delegate": "MultiShotDroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1278,
+   "name": "MegaBot",
+   "idConstant": "ID_UNIT_BUMBLEBEE_BARRACK",
+   "delegate": "BumblebeeDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1279,
+   "name": "Black Brutus Mech",
+   "idConstant": "ID_UNIT_BLACK_BRUTUS_MECH",
+   "delegate": "BlackBrutusMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1280,
+   "name": "2-Head Frostfire Dragon",
+   "idConstant": "ID_UNIT_FROST_FIRE_DRAGON",
+   "delegate": "FrostFireDragonDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_ICE_BEAM",
+    "P_FIRE_BEAM"
+   ]
+  },
+  {
+   "itemId": 1281,
+   "name": "Silver Gunner Elf",
+   "idConstant": "ID_UNIT_SILVER_ELF_GUNNER",
+   "delegate": "SpatialElfGunnerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_ENERGY_BALL_BLUE",
+    "P_BIG_ELECTRIC_BALL",
+    "BLAST_EARTH_BIG"
+   ]
+  },
+  {
+   "itemId": 1282,
+   "name": "Dino Rider Elf",
+   "idConstant": "ID_UNIT_SPATIAL_ELF_DINO_RIDER",
+   "delegate": "SpatialElfDinoRiderDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_LASER_BLUE_BIG"
+   ]
+  },
+  {
+   "itemId": 1283,
+   "name": "2-Head Frostfire Draggy",
+   "idConstant": "ID_UNIT_FROST_FIRE_DRAGGY",
+   "delegate": "FrostFireDragonDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_ICE_BEAM",
+    "P_FIRE_BEAM"
+   ]
+  },
+  {
+   "itemId": 1284,
+   "name": "Watcher Hero",
+   "idConstant": "ID_UNIT_CYCLOP_SOLDIER",
+   "delegate": "CyclopSoldierDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_READ_BEAM_LINE",
+    "BLAST_READ_BEAM_LINE"
+   ]
+  },
+  {
+   "itemId": 1285,
+   "name": "Siege Striker",
+   "idConstant": "ID_UNIT_SPATIAL_PLASMA_STRIKER",
+   "delegate": "SpatialPlasmaStrikerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MISSILE",
+    "P_RED_ELECTRIC_BOMB",
+    "BLAST_MISSILE"
+   ]
+  },
+  {
+   "itemId": 1286,
+   "name": "Avenger Mech Drone",
+   "idConstant": "ID_UNIT_AVENGER_MECH_DRONE",
+   "delegate": "MultiShotDroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_DRONE"
+   ]
+  },
+  {
+   "itemId": 1287,
+   "name": "Avenger Mech ",
+   "idConstant": "ID_UNIT_AVENGER_MECH",
+   "delegate": "AvengerMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_CURVES_BEAM",
+    "BLAST_RED_BEAM"
+   ]
+  },
+  {
+   "itemId": 1288,
+   "name": "Destruction Wizard",
+   "idConstant": "ID_UNIT_SPATIAL_DESTRUCTION_WIZARD",
+   "delegate": "SpatialDestructionWizardDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_RED_BEAM",
+    "BLAST_RED_BEAM"
+   ]
+  },
+  {
+   "itemId": 1289,
+   "name": "Executioner Mech Drone",
+   "idConstant": "ID_UNIT_EXECUTIONER_MECH_DRONE",
+   "delegate": "MultiShotDroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1290,
+   "name": "Executioner Mech ",
+   "idConstant": "ID_UNIT_EXECUTIONER_MECH",
+   "delegate": "ExecutionerMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_HEAVY",
+    "P_BULLET_AIR",
+    "P_BLUE_BEAM_ELECTRIC",
+    "BLAST_BEAM_SPATIAL",
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1291,
+   "name": "Winged Paladin",
+   "idConstant": "ID_UNIT_WINGED_PALADIN",
+   "delegate": "SpatialWingedElfPaladinDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_BULLET_AIR",
+    "P_BLUE_LASER_SHOT"
+   ]
+  },
+  {
+   "itemId": 1292,
+   "name": "Andromeda Private",
+   "idConstant": "ID_UNIT_ANDROMEDA_PRIVATE",
+   "delegate": "AndromedaPrivateDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_LASER_RED_VIKING",
+    "P_READ_BEAM_LINE",
+    "BLAST_READ_BEAM_LINE"
+   ]
+  },
+  {
+   "itemId": 1293,
+   "name": "Godzilla Mech",
+   "idConstant": "ID_UNIT_GODZILLA_MECH",
+   "delegate": "GodzillaMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_READ_UNFORMED_BEAM",
+    "BLAST_READ_BEAM_LINE"
+   ]
+  },
+  {
+   "itemId": 1294,
+   "name": "Godzilla Mech Drone",
+   "idConstant": "ID_UNIT_GODZILLA_MECH_DRONE",
+   "delegate": "MultiShotDroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1295,
+   "name": "Andromeda Combat Droid",
+   "idConstant": "ID_UNIT_ANDROMEDA_COMBAT_DROID",
+   "delegate": "AndromedaCombatDroidDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_YELLOW_LASER_BULLET"
+   ]
+  },
+  {
+   "itemId": 1296,
+   "name": "Andromeda Spaceship",
+   "idConstant": "ID_UNIT_ANDROMEDA_COMBAT_STARSTHIP",
+   "delegate": "AndromedaCombatStarShipDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_YELLOW_REDLASER_BULLET",
+    "MISSILE",
+    "P_YELLOW_LASER_BALL",
+    "BLAST_FIRE_BOMB",
+    "P_YELLOW_ELECTRIC_BEAM"
+   ]
+  },
+  {
+   "itemId": 1297,
+   "name": "King Kong Mech",
+   "idConstant": "ID_UNIT_KING_KONG_MECH",
+   "delegate": "KingKongMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1298,
+   "name": "King Kong Drone",
+   "idConstant": "ID_UNIT_KING_KONG_MECH_DRONE",
+   "delegate": "MultiShotDroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1299,
+   "name": "Gamera Mech",
+   "idConstant": "ID_UNIT_GAMERA_MECH",
+   "delegate": "GameraMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_RED_BEAM_LASER_CONE",
+    "BLAST_RED_BEAM_LASER_CONE"
+   ]
+  },
+  {
+   "itemId": 1300,
+   "name": "Gamera Drone",
+   "idConstant": "ID_UNIT_GAMERA_MECH_DRONE",
+   "delegate": "MultiShotDroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "LASER_BURST",
+    "P_YELLOW_RED_ELECTRIC_BALL",
+    "BLAST_BAZOOKA_SMALL"
+   ]
+  },
+  {
+   "itemId": 1301,
+   "name": "Z Project Mech",
+   "idConstant": "ID_UNIT_ZPROJECT_MECH",
+   "delegate": "ZProjectMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_BLUE_LASER_BEAM_THIN",
+    "P_YELLOW_ELECTRIC_LASER_BEAM",
+    "MISSILE",
+    "P_ZPROJECT_HAND",
+    "BLAST_FIRE_BOMB",
+    "P_ZPROJECT_HAND2"
+   ]
+  },
+  {
+   "itemId": 1302,
+   "name": "Z Project Drone",
+   "idConstant": "ID_UNIT_ZPROJECT_MECH_DRONE",
+   "delegate": "MultiShotDroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1303,
+   "name": "Massive Gunner Mech",
+   "idConstant": "ID_UNIT_MASSIVE_GUNNER_MECH",
+   "delegate": "MassiveGunnerMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_ENERGY_BALL",
+    "BLAST_LASER_YELLOW",
+    "MISSILE",
+    "P_GREEN_YELLOW_BALL",
+    "BLAST_FIRE_BOMB",
+    "P_ROCKET_M"
+   ]
+  },
+  {
+   "itemId": 1304,
+   "name": "Massive Gunner Drone",
+   "idConstant": "ID_UNIT_MASSIVE_GUNNER_MECH_DRONE",
+   "delegate": "MultiShotDroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1305,
+   "name": "Fire Godzilla Mech",
+   "idConstant": "ID_UNIT_FIRE_GODZILLA_MECH",
+   "delegate": "FireGodzillaMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_YELLOW_UNFORMED_BEAM"
+   ]
+  },
+  {
+   "itemId": 1306,
+   "name": "Fire Godzilla Drone",
+   "idConstant": "ID_UNIT_FIRE_GODZILLA_MECH_DRONE",
+   "delegate": "MultiShotDroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1307,
+   "name": null,
+   "idConstant": "ID_UNIT_GLAIVE_STORM_MECH",
+   "delegate": "GlaiveStormMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_RIFLE",
+    "P_ENERGY_BALL_BLUE",
+    "BLAST_LASER_YELLOW"
+   ]
+  },
+  {
+   "itemId": 1308,
+   "name": null,
+   "idConstant": "ID_UNIT_GLAIVE_STORM_MECH_DRONE",
+   "delegate": "MultiShotDroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1309,
+   "name": null,
+   "idConstant": "ID_UNIT_STAMPEDE_MECH",
+   "delegate": "StampedeMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_BULLET_BIG_RED"
+   ]
+  },
+  {
+   "itemId": 1310,
+   "name": null,
+   "idConstant": "ID_UNIT_STAMPEDE_MECH_DRONE",
+   "delegate": "MultiShotDroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1311,
+   "name": null,
+   "idConstant": "ID_UNIT_HELLFIRE_MECH",
+   "delegate": "HellFireMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_FIRE_BEAM_LARGE",
+    "BLAST_LARGE_FLAME",
+    "FIRE_BALL",
+    "P_FIRE_BALL",
+    "BLAST_EARTH_BIG"
+   ]
+  },
+  {
+   "itemId": 1312,
+   "name": null,
+   "idConstant": "ID_UNIT_HELLFIRE_MECH_DRONE",
+   "delegate": "MultiShotDroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1313,
+   "name": null,
+   "idConstant": "ID_UNIT_SPLINTER_MECH",
+   "delegate": "SplinterMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_RIFLE"
+   ]
+  },
+  {
+   "itemId": 1314,
+   "name": null,
+   "idConstant": "ID_UNIT_SPLINTER_MECH_DRONE",
+   "delegate": "MultiShotDroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1315,
+   "name": null,
+   "idConstant": "ID_UNIT_ANVIL_PATTERN_MECH",
+   "delegate": "AnvilPatternMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1316,
+   "name": null,
+   "idConstant": "ID_UNIT_ANVIL_PATTERN_MECH_DRONE",
+   "delegate": "MultiShotDroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1317,
+   "name": null,
+   "idConstant": "ID_UNIT_BLADE_STORM_MECH",
+   "delegate": "BladeStormMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_RIFLE",
+    "P_BLADESTORM_FIRE_BALL"
+   ]
+  },
+  {
+   "itemId": 1318,
+   "name": null,
+   "idConstant": "ID_UNIT_BLADE_STORM_MECH_DRONE",
+   "delegate": "MultiShotDroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_DRONE",
+    "BLAST_LASER"
+   ]
+  },
+  {
+   "itemId": 1319,
+   "name": null,
+   "idConstant": "ID_UNIT_SPECTRE_MECH",
+   "delegate": "SpectreMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_LASER_BLUE",
+    "P_SPECTRE_ELECTRIC_RAY",
+    "BLAST_ELECTRICAL_EXPLOSION"
+   ]
+  },
+  {
+   "itemId": 1320,
+   "name": null,
+   "idConstant": "ID_UNIT_SPECTRE_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1321,
+   "name": null,
+   "idConstant": "ID_UNIT_STALKER_MECH",
+   "delegate": "StalkerMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_LASER_BLUE",
+    "P_STALKER_BOMB",
+    "BLAST_BOMB",
+    "P_SPECTRE_ELECTRIC_RAY",
+    "MISSILE",
+    "P_ROCKET_M",
+    "BLAST_FIRE_BOMB"
+   ]
+  },
+  {
+   "itemId": 1322,
+   "name": null,
+   "idConstant": "ID_UNIT_STALKER_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1323,
+   "name": null,
+   "idConstant": "ID_UNIT_SLAUGHTERER_MECH",
+   "delegate": "SlaughtererMechDelagate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1324,
+   "name": null,
+   "idConstant": "ID_UNIT_SLAUGHTERER_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1325,
+   "name": null,
+   "idConstant": "ID_UNIT_CRUSHER_MONARCH_MECH",
+   "delegate": "CrusherMonarchDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_ELECTRIC_BEAM",
+    "BLAST_ELECTRICAL",
+    "MISSILE",
+    "P_ROCKET_M",
+    "BLAST_FIRE_BOMB"
+   ]
+  },
+  {
+   "itemId": 1326,
+   "name": null,
+   "idConstant": "ID_UNIT_CRUSHER_MONARCH_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1327,
+   "name": null,
+   "idConstant": "ID_UNIT_VORTEX_MECH",
+   "delegate": "VortexDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_HEAVY",
+    "P_LASER_MASSIVE_DRONE",
+    "MISSILE",
+    "P_ROCKET_M",
+    "BLAST_FIRE_BOMB",
+    "P_BLACK_DRAGON_BEAM"
+   ]
+  },
+  {
+   "itemId": 1328,
+   "name": null,
+   "idConstant": "ID_UNIT_VORTEX_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1329,
+   "name": null,
+   "idConstant": "ID_UNIT_BOMBARDIER_MECH",
+   "delegate": "BombardierMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_LASER_BLUE",
+    "CANNON",
+    "BLAST_EARTH",
+    "P_NUCLEAR_MISSILE",
+    "BLAST_NUCLEAR"
+   ]
+  },
+  {
+   "itemId": 1330,
+   "name": null,
+   "idConstant": "ID_UNIT_BOMBARDIER_MECH_DRONE",
+   "delegate": "BombardierDroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1331,
+   "name": null,
+   "idConstant": "ID_UNIT_FORGELORD_MECH",
+   "delegate": "ForgelordDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_FORGELORD_BEAM",
+    "BLAST_FORGELORD_ENERGY_BALL",
+    "ENERGY_BOMB"
+   ]
+  },
+  {
+   "itemId": 1332,
+   "name": null,
+   "idConstant": "ID_UNIT_FORGELORD_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1333,
+   "name": null,
+   "idConstant": "ID_UNIT_SHREDDER_MECH",
+   "delegate": "ShredderMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "CANNON",
+    "P_NUCLEAR_MISSILE",
+    "BLAST_NUCLEAR"
+   ]
+  },
+  {
+   "itemId": 1334,
+   "name": null,
+   "idConstant": "ID_UNIT_SHREDDER_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1335,
+   "name": null,
+   "idConstant": "ID_UNIT_RAVEN_MECH",
+   "delegate": "RavenMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "CANNON",
+    "P_NUCLEAR_MISSILE"
+   ]
+  },
+  {
+   "itemId": 1336,
+   "name": null,
+   "idConstant": "ID_UNIT_RAVEN_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1337,
+   "name": null,
+   "idConstant": "ID_UNIT_CYCLONE_MECH",
+   "delegate": "CycloneMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_BLUE_CYCLONE_BEAM",
+    "BLAST_BLUE_BEAM",
+    "ENERGY_BOMB",
+    "P_BLUE_CYCLONE_BALL"
+   ]
+  },
+  {
+   "itemId": 1338,
+   "name": null,
+   "idConstant": "ID_UNIT_CYCLONE_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1339,
+   "name": null,
+   "idConstant": "ID_UNIT_YAMATO_MECH",
+   "delegate": "YamatoMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_LASER_BLUE",
+    "FIRE_BALL",
+    "P_BLUE_YAMATO_BALL",
+    "BLAST_EARTH"
+   ]
+  },
+  {
+   "itemId": 1340,
+   "name": null,
+   "idConstant": "ID_UNIT_YAMATO_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1341,
+   "name": null,
+   "idConstant": "ID_UNIT_STEEL_WANDERER_MECH",
+   "delegate": "SteelWandererMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_HEAVY",
+    "CANNON",
+    "P_NUCLEAR_MISSILE",
+    "BLAST_EARTH",
+    "MISSILE",
+    "P_ROCKET_M",
+    "BLAST_FIRE_BOMB"
+   ]
+  },
+  {
+   "itemId": 1342,
+   "name": null,
+   "idConstant": "ID_UNIT_STEEL_WANDERER_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1343,
+   "name": null,
+   "idConstant": "ID_UNIT_TEMPEST_MECH",
+   "delegate": "TempestMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ENERGY_BOMB",
+    "P_BLUE_CYCLONE_BALL",
+    "BLAST_BLUE_BEAM",
+    "BLAST_TEMPEST",
+    "P_BLUE_ELECTRIC_RAY"
+   ]
+  },
+  {
+   "itemId": 1344,
+   "name": null,
+   "idConstant": "ID_UNIT_TEMPEST_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1345,
+   "name": null,
+   "idConstant": "ID_UNIT_SERVOWORM",
+   "delegate": "ServowormDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MISSILE",
+    "P_ROCKET_M",
+    "BLAST_FIRE_BOMB",
+    "BLAST_SERVOWORM"
+   ]
+  },
+  {
+   "itemId": 1346,
+   "name": null,
+   "idConstant": "ID_UNIT_SERVOWORM_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1347,
+   "name": null,
+   "idConstant": "ID_UNIT_SCARAB",
+   "delegate": "ScarabDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_BIG_ELECTRIC_BALL",
+    "ENERGY_BOMB",
+    "P_PURE_ENERGY_BALL",
+    "BLAST_PURE_ENERGY_BALL",
+    "MISSILE",
+    "BLAST_NUCLEAR_MUSHROOM"
+   ]
+  },
+  {
+   "itemId": 1348,
+   "name": null,
+   "idConstant": "ID_UNIT_SCARAB_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "ENERGY_BOMB",
+    "P_PURE_ENERGY_BALL",
+    "BLAST_PURE_ENERGY_BALL"
+   ]
+  },
+  {
+   "itemId": 1349,
+   "name": null,
+   "idConstant": "ID_UNIT_CENTAUR",
+   "delegate": "CentaurDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_LASER_BLUE",
+    "P_BLUE_CYCLONE_BEAM",
+    "MISSILE",
+    "BLAST_NUCLEAR_MUSHROOM"
+   ]
+  },
+  {
+   "itemId": 1350,
+   "name": null,
+   "idConstant": "ID_UNIT_CENTAUR_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1351,
+   "name": null,
+   "idConstant": "ID_UNIT_EVIL_SLAUGHTERER",
+   "delegate": "EvilSlaughtererDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MISSILE",
+    "BLAST_BAZOOKA"
+   ]
+  },
+  {
+   "itemId": 1352,
+   "name": null,
+   "idConstant": "ID_UNIT_EVIL_SLAUGHTERER_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_RED_MISSILE",
+    "BLAST_BAZOOKA"
+   ]
+  },
+  {
+   "itemId": 1353,
+   "name": null,
+   "idConstant": "ID_UNIT_BISMARK_MECH",
+   "delegate": "BismarkMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_BULLET_AIR_BIG",
+    "P_MISSILE_M",
+    "MISSILE"
+   ]
+  },
+  {
+   "itemId": 1354,
+   "name": null,
+   "idConstant": "ID_UNIT_BISMARK_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_RED_MISSILE",
+    "BLAST_BULLET2"
+   ]
+  },
+  {
+   "itemId": 1355,
+   "name": null,
+   "idConstant": "ID_UNIT_SUPERFULCRUM_ARMOR",
+   "delegate": "SuperfulcrumArmorDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_LASER_BLUE",
+    "P_LASER_BEAM_BLUE_FAT",
+    "BLAST_EARTH",
+    "MISSILE",
+    "MACHINEGUN",
+    "P_BIG_MISSILE",
+    "BLAST_BLUE_BEAM"
+   ]
+  },
+  {
+   "itemId": 1356,
+   "name": null,
+   "idConstant": "ID_UNIT_BONECRUSHA",
+   "delegate": "BonecrushaDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1357,
+   "name": null,
+   "idConstant": "ID_UNIT_BONECRUSHA_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1358,
+   "name": null,
+   "idConstant": "ID_UNIT_BUSHWACKER",
+   "delegate": "BushwackerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_BULLET_AIR_BIG",
+    "BLAST_BAZOOKA_SMALL",
+    "P_LASER_BEAM_BLUE_FAT",
+    "BLAST_EARTH",
+    "MISSILE",
+    "BLAST_BAZOOKA2"
+   ]
+  },
+  {
+   "itemId": 1359,
+   "name": null,
+   "idConstant": "ID_UNIT_BUSHWACKER_MINE",
+   "delegate": "ProximityMineDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "BLAST_ELECTRIC_MINE"
+   ]
+  },
+  {
+   "itemId": 1360,
+   "name": null,
+   "idConstant": "ID_UNIT_BRAWLER",
+   "delegate": "BrawlerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1361,
+   "name": null,
+   "idConstant": "ID_UNIT_BRAWLER_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_YELLOW"
+   ]
+  },
+  {
+   "itemId": 1362,
+   "name": null,
+   "idConstant": "ID_UNIT_HAVOC",
+   "delegate": "HavocDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_BULLET_AIR_BIG",
+    "P_BLUE_BEAM_ELECTRIC",
+    "BLAST_BLUE_BEAM",
+    "BLAST_TARGET_LETHAL_BEAM"
+   ]
+  },
+  {
+   "itemId": 1363,
+   "name": null,
+   "idConstant": "ID_UNIT_HAVOC_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "P_BULLET_AIR_BIG"
+   ]
+  },
+  {
+   "itemId": 1364,
+   "name": null,
+   "idConstant": "ID_UNIT_HAMMERHEAD",
+   "delegate": "HammerheadDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_BULLET_AIR_BIG",
+    "MISSILE",
+    "BLAST_BAZOOKA2"
+   ]
+  },
+  {
+   "itemId": 1365,
+   "name": null,
+   "idConstant": "ID_UNIT_HAMMERHEAD_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "P_BULLET_AIR_BIG"
+   ]
+  },
+  {
+   "itemId": 1366,
+   "name": null,
+   "idConstant": "ID_UNIT_TEMPLAR_EXOSUIT",
+   "delegate": "TemplarExosuitDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1367,
+   "name": null,
+   "idConstant": "ID_UNIT_MARAUDER_BATTLE_CHASIS",
+   "delegate": "MarauderBattleChasisDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_LASER_BLUE",
+    "P_ENERGY_BALL_2",
+    "BLAST_BLUE_EXPLOSION",
+    "P_BLUE_BEAM_ELECTRIC",
+    "BLAST_BLUE_BEAM"
+   ]
+  },
+  {
+   "itemId": 1368,
+   "name": null,
+   "idConstant": "ID_UNIT_ATOMIC_BONECRUSHA",
+   "delegate": "AtomicBonecrushaDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1369,
+   "name": null,
+   "idConstant": "ID_UNIT_ATOMIC_BONECRUSHA_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_YELLOW"
+   ]
+  },
+  {
+   "itemId": 1370,
+   "name": null,
+   "idConstant": "ID_UNIT_DRONE_MASTER",
+   "delegate": "DroneMasterDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_BULLET_AIR_BIG"
+   ]
+  },
+  {
+   "itemId": 1371,
+   "name": null,
+   "idConstant": "ID_UNIT_DRONE_MASTER_BOMBER_DRONE",
+   "delegate": "KamikazeDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1372,
+   "name": null,
+   "idConstant": "ID_UNIT_DRONE_MASTER_GUNNER_DRONE",
+   "delegate": "MachinegunDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_BULLET_AIR"
+   ]
+  },
+  {
+   "itemId": 1373,
+   "name": null,
+   "idConstant": "ID_UNIT_DRONE_MASTER_HEAL_DRONE",
+   "delegate": "HealerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_HEAL_BEAM"
+   ]
+  },
+  {
+   "itemId": 1374,
+   "name": null,
+   "idConstant": "ID_UNIT_DRONE_MASTER_CANNON_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_BEAM_SPATIAL",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1375,
+   "name": null,
+   "idConstant": "ID_UNIT_REAPER",
+   "delegate": "ReaperDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_LASER_BLUE",
+    "P_BLUE_BEAM_ELECTRIC",
+    "BLAST_BLUE_BEAM",
+    "MISSILE",
+    "P_RED_MISSILE",
+    "BLAST_FIRE_BOMB"
+   ]
+  },
+  {
+   "itemId": 1376,
+   "name": null,
+   "idConstant": "ID_UNIT_REAPER_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1377,
+   "name": null,
+   "idConstant": "ID_UNIT_BLACK_HOLE",
+   "delegate": "BlackHoleDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_RED",
+    "BLAST_LASER",
+    "P_BLACK_DRAGON_BEAM",
+    "BLAST_FIRE_BOMB",
+    "MISSILE",
+    "P_ROCKET_M"
+   ]
+  },
+  {
+   "itemId": 1378,
+   "name": null,
+   "idConstant": "ID_UNIT_BLACK_HOLE_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1379,
+   "name": null,
+   "idConstant": "ID_UNIT_IGNITION",
+   "delegate": "IgnitionDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1380,
+   "name": null,
+   "idConstant": "ID_UNIT_IGNITION_DRONE",
+   "delegate": "KamikazeDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1381,
+   "name": null,
+   "idConstant": "ID_UNIT_HARVESTER",
+   "delegate": "HarvesterDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1382,
+   "name": null,
+   "idConstant": "ID_UNIT_AGAMEMNON_FORTRESS",
+   "delegate": "AgamemnonFortressDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_LASER_BLUE",
+    "P_BLUE_BEAM",
+    "BLAST_BLUE_BEAM",
+    "P_BLUE_CYCLONE_BALL",
+    "BLAST_PLASMA_EXPLOSION"
+   ]
+  },
+  {
+   "itemId": 1383,
+   "name": null,
+   "idConstant": "ID_UNIT_TYPHOON_SERVODRAGON",
+   "delegate": "TyphoonServodragonDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_BLUE_BEAM",
+    "BLAST_BLUE_BEAM"
+   ]
+  },
+  {
+   "itemId": 1384,
+   "name": null,
+   "idConstant": "ID_UNIT_TYPHOON_SERVODRAGON_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_BLUE_BEAM",
+    "BLAST_BLUE_BEAM"
+   ]
+  },
+  {
+   "itemId": 1385,
+   "name": null,
+   "idConstant": "ID_UNIT_SCARLET_SUPERFULCRUM",
+   "delegate": "ScarletSuperfulcrumDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_LASER_BLUE",
+    "P_LASER_BEAM_BLUE_FAT",
+    "BLAST_EARTH",
+    "MISSILE"
+   ]
+  },
+  {
+   "itemId": 1386,
+   "name": null,
+   "idConstant": "ID_UNIT_SCARLET_SUPERFULCRUM_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1387,
+   "name": null,
+   "idConstant": "ID_UNIT_AGAMEMNON_FORTRESS_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1388,
+   "name": null,
+   "idConstant": "ID_UNIT_GUARDIAN",
+   "delegate": "GuardianDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_BLUE_CYCLONE_BALL",
+    "BLAST_ELECTRIC_MINE",
+    "P_LASER_BEAM_BLUE_FAT",
+    "P_MISSILE_M",
+    "BLAST_EARTH"
+   ]
+  },
+  {
+   "itemId": 1389,
+   "name": null,
+   "idConstant": "ID_UNIT_GUARDIAN_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1390,
+   "name": null,
+   "idConstant": "ID_UNIT_KNIGHT_EXOSUIT",
+   "delegate": "KnightExosuitDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1391,
+   "name": null,
+   "idConstant": "ID_UNIT_KNIGHT_EXOSUIT_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1392,
+   "name": null,
+   "idConstant": "ID_UNIT_FIRE_GAMERA",
+   "delegate": "FireGameraDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_FIRE_BEAM_LARGE",
+    "MACHINEGUN_BIG",
+    "P_BLUE_FLAMING_ROCK",
+    "BLAST_FIRE_EXPLOSION"
+   ]
+  },
+  {
+   "itemId": 1393,
+   "name": null,
+   "idConstant": "ID_UNIT_FIRE_GAMERA_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_FIRE_BALL"
+   ]
+  },
+  {
+   "itemId": 1394,
+   "name": null,
+   "idConstant": "ID_UNIT_CYCLONE_BATTLESUIT",
+   "delegate": "CycloneBattlesuitDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_LASER_BLUE",
+    "P_BLUE_RAY"
+   ]
+  },
+  {
+   "itemId": 1395,
+   "name": null,
+   "idConstant": "ID_UNIT_CYCLONE_BATTLESUIT_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1396,
+   "name": null,
+   "idConstant": "ID_UNIT_CHEMICAL_GUNNER",
+   "delegate": "ChemicalGunnerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_CHEM_LASER",
+    "BLAST_CHEMICAL",
+    "P_CHEM_LASER_BIG",
+    "BLAST_CHEMICAL_BIG"
+   ]
+  },
+  {
+   "itemId": 1397,
+   "name": null,
+   "idConstant": "ID_UNIT_CHEMICAL_GUNNER_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_CHEM_LASER",
+    "BLAST_CHEMICAL_BIG"
+   ]
+  },
+  {
+   "itemId": 1398,
+   "name": null,
+   "idConstant": "ID_UNIT_BLUE_ANVIL",
+   "delegate": "BlueAnvilDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_BlUE_ANVIL",
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1399,
+   "name": null,
+   "idConstant": "ID_UNIT_BLUE_ANVIL_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_LASER"
+   ]
+  },
+  {
+   "itemId": 1400,
+   "name": null,
+   "idConstant": "ID_UNIT_DRONE_MASTER_2",
+   "delegate": "DroneMaster2Delegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_LASER_BLUE_BIG"
+   ]
+  },
+  {
+   "itemId": 1401,
+   "name": null,
+   "idConstant": "ID_UNIT_DRONE_MASTER_2_SUPRESSOR_GUNNER_DRONE",
+   "delegate": "DroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1402,
+   "name": null,
+   "idConstant": "ID_UNIT_DRONE_MASTER_2_TESLA_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_TESLA_RAY"
+   ]
+  },
+  {
+   "itemId": 1403,
+   "name": null,
+   "idConstant": "ID_UNIT_DRONE_MASTER_2_IMMOLATOR_DRONE",
+   "delegate": "KamikazeDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1404,
+   "name": null,
+   "idConstant": "ID_UNIT_DRONE_MASTER_2_PHALANX_DRONE",
+   "delegate": "PhalanxDroneDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1405,
+   "name": null,
+   "idConstant": "ID_DUMMY_UNIT",
+   "delegate": "DummyDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 1406,
+   "name": null,
+   "idConstant": "ID_UNIT_OVERSEER",
+   "delegate": "OverseerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_OVERSEER_BEAM",
+    "P_OVERSEER_MISSILES",
+    "BLAST_OVERSEER_MISSILES"
+   ]
+  },
+  {
+   "itemId": 1407,
+   "name": null,
+   "idConstant": "ID_UNIT_OVERSEER_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_OVERSEER_BEAM"
+   ]
+  },
+  {
+   "itemId": 1408,
+   "name": null,
+   "idConstant": "ID_UNIT_URBAN_BUSTER",
+   "delegate": "UrbanBusterDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_BULLET_AIR_BIG",
+    "BLAST_BAZOOKA_SMALL",
+    "MACHINEGUN",
+    "P_GRENADE",
+    "BLAST_BOMB",
+    "P_URBAN_BEAM"
+   ]
+  },
+  {
+   "itemId": 1409,
+   "name": null,
+   "idConstant": "ID_UNIT_URBAN_BUSTER_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_RED",
+    "BLAST_RED_BEAM"
+   ]
+  },
+  {
+   "itemId": 1410,
+   "name": null,
+   "idConstant": "ID_UNIT_SKORPION_FORTRESS",
+   "delegate": "SkorpionFortressDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_BLUE_BEAM",
+    "BLAST_BLUE_BEAM",
+    "MACHINEGUN_BIG",
+    "BLAST_SKORPION"
+   ]
+  },
+  {
+   "itemId": 1411,
+   "name": null,
+   "idConstant": "ID_UNIT_SKORPION_FORTRESS_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1412,
+   "name": null,
+   "idConstant": "ID_UNIT_PAULDRON_MECH",
+   "delegate": "PauldronMechDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_YELLOW_REDLASER_BULLET",
+    "MACHINEGUN",
+    "P_SLIM_MISSILE",
+    "BLAST_BOMB",
+    "P_CHEM_LASER_BIG",
+    "BLAST_CHEMICAL_BIG"
+   ]
+  },
+  {
+   "itemId": 1413,
+   "name": null,
+   "idConstant": "ID_UNIT_PAULDRON_MECH_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_YELLOW_REDLASER_BULLET"
+   ]
+  },
+  {
+   "itemId": 1414,
+   "name": null,
+   "idConstant": "ID_UNIT_SHARKBITE",
+   "delegate": "SharkbiteDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1415,
+   "name": null,
+   "idConstant": "ID_UNIT_SHARKBITE_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1416,
+   "name": null,
+   "idConstant": "ID_UNIT_CRIMSON_CENTURION",
+   "delegate": "CrimsonCenturionDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_BULLET_AIR_BIG",
+    "MACHINEGUN",
+    "P_SLIM_MISSILE",
+    "BLAST_BOMB",
+    "P_READ_BEAM_LINE",
+    "BLAST_CHEMICAL_BIG"
+   ]
+  },
+  {
+   "itemId": 1417,
+   "name": null,
+   "idConstant": "ID_UNIT_CRIMSON_CENTURION_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_SLIM_MISSILE",
+    "BLAST_BOMB"
+   ]
+  },
+  {
+   "itemId": 1418,
+   "name": null,
+   "idConstant": "ID_UNIT_WARLORD",
+   "delegate": "WarlordDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1419,
+   "name": null,
+   "idConstant": "ID_UNIT_WARLORD_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "P_LASER"
+   ]
+  },
+  {
+   "itemId": 1420,
+   "name": null,
+   "idConstant": "ID_UNIT_CYBER_INQUISITOR",
+   "delegate": "CyberInquisitorDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_BLUE_BEAM_ELECTRIC",
+    "P_CYBER_BEAM"
+   ]
+  },
+  {
+   "itemId": 1421,
+   "name": null,
+   "idConstant": "ID_UNIT_CYBER_INQUISITOR_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_YELLOW_REDLASER_BULLET"
+   ]
+  },
+  {
+   "itemId": 1422,
+   "name": null,
+   "idConstant": "ID_UNIT_KNUCKLEDRAGGER",
+   "delegate": "KnuckledraggerDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "itemId": 1423,
+   "name": null,
+   "idConstant": "ID_UNIT_KNUCKLEDRAGGER_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1424,
+   "name": null,
+   "idConstant": "ID_UNIT_STEELGLADIATOR",
+   "delegate": "SteelgladiatorDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_YELLOW_RED_ELECTRIC_BALL",
+    "MISSILE",
+    "P_ROCKET_M",
+    "BLAST_FIRE_BOMB"
+   ]
+  },
+  {
+   "itemId": 1425,
+   "name": null,
+   "idConstant": "ID_UNIT_STEELGLADIATOR_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1428,
+   "name": null,
+   "idConstant": "ID_UNIT_TARANTULA",
+   "delegate": "TarantulaDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_LASER_BLUE",
+    "MISSILE",
+    "P_ROCKET_M",
+    "BLAST_FIRE_BOMB",
+    "P_CYBER_BEAM"
+   ]
+  },
+  {
+   "itemId": 1429,
+   "name": null,
+   "idConstant": "ID_UNIT_TARANTULA_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 1430,
+   "name": null,
+   "idConstant": "ID_UNIT_INTRUDER",
+   "delegate": "IntruderDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG",
+    "P_LASER_BLUE",
+    "MISSILE",
+    "P_ROCKET_M",
+    "BLAST_FIRE_BOMB"
+   ]
+  },
+  {
+   "itemId": 1431,
+   "name": null,
+   "idConstant": "ID_UNIT_INTRUDER_DRONE",
+   "delegate": "ProjectileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": [
+    "P_LASER_MASSIVE_DRONE",
+    "BLAST_LASER_BLUE"
+   ]
+  },
+  {
+   "itemId": 10020,
+   "name": "Play Social Empires",
+   "idConstant": "ID_BUILDING_SE",
+   "delegate": "CrossPromotionSEDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 10078,
+   "name": "Dragon City",
+   "idConstant": "ID_BUILDING_DC",
+   "delegate": "CrossPromotionDCDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  },
+  {
+   "itemId": 10130,
+   "name": null,
+   "idConstant": "ID_BUILDING_DC_MOBILE",
+   "delegate": "CrossPromotionDCMobileDelegate",
+   "specialDesc": null,
+   "registeredProjectiles": []
+  }
+ ]
+}

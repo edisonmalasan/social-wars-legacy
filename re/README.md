@@ -56,6 +56,7 @@
 | **08** | [Clone Roadmap](docs/08-CLONE-ROADMAP.md) | The actual rewrite plan: 6 workstreams, 10 milestones, the cheat battery the new server must pass, and the risks. | 17 kB |
 | **09** | [Limitations & Open Questions](docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md) | What we do **not** know, the upstream bugs found, and 9 open questions with the cheapest first. | 14 kB |
 | **10** | [Client Version History](docs/10-client-version-history.md) | All 58 client builds diffed: the server signing key **rotated once**, and the protocol's own timeline. | 14 kB |
+| **11** | [Unit & Building Behaviour](docs/11-unit-and-building-behaviour.md) | The 285 delegates reduced to data: 478 special attacks, 92 projectiles, and the exact 129 client-only item ids. | 16 kB |
 
 ### 2.2 Machine-readable
 

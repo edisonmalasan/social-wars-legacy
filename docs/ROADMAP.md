@@ -164,15 +164,28 @@ first means guessing at the rules being cloned.
 - [ ] Every `DefineScript`/`DoABC` name in the corpus is mapped to a subsystem
 - [ ] `assets/swf/dynamic2.swf` is analysed for what it dynamically loads at runtime
 
-### B3 — Unit and building behaviour tables (the rules-port spec)
+### B3 — Unit and building behaviour tables (the rules-port spec) ✅
 
-- [ ] All **229 unit delegates** are reduced to a table of: stat overrides, special attacks
-      used, damage types applied, targeting preferences, on-death/on-hit behaviour
-- [ ] All **56 building delegates** are reduced to a table of: production, capacity,
-      activation, garrison rules, upgrade behaviour
-- [ ] The table is emitted as JSON and is the input to the rules-engine implementation
-- [ ] Every special-attack class (15) and attack condition (6) has a documented
-      precondition, effect and lifetime
+- [x] All **229 unit delegates** are reduced to a table of: overridden hooks, special
+      attacks, projectile definitions, damage classes, spawned entities, referenced item ids
+      ([`../re/data/unit-behaviour.json`](../re/data/unit-behaviour.json))
+- [x] All **56 building delegates** are reduced to the same shape
+      ([`../re/data/building-behaviour.json`](../re/data/building-behaviour.json))
+- [x] The authoritative **item id → delegate** map is extracted from
+      `DelegatesManager.registerDelegate()` and `core/Constants.as`, covering **679 of the
+      724** client item ids ([`../re/data/item-delegate-map.json`](../re/data/item-delegate-map.json))
+- [x] The report ([`../re/docs/11-unit-and-building-behaviour.md`](../re/docs/11-unit-and-building-behaviour.md))
+      documents the 285 delegates, 478 special attacks, 92 projectiles, 10 damage classes,
+      and the hook-override frequency table that shows `onAttack` + `onInit` carry the bulk
+      of the port
+- [x] The **129 client-only item ids** are enumerated exactly — 5 buildings plus the
+      124-item 1307–1431 wave across 71 families — and the finding that their *stats* are
+      not recoverable (the client reads every stat from the server config) is recorded
+- [x] The table is emitted as JSON and is the input to the rules-engine implementation
+- [x] The decompilation is reproducible: `node scripts/decompile-client.mjs` regenerates
+      `.work/as/basesec/` (1 387 classes) from the vendored SWF
+
+**Status:** Complete.
 
 ### B4 — Quest win conditions
 

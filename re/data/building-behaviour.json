@@ -1,0 +1,3022 @@
+{
+ "note": "Per-building-delegate behaviour extracted from the decompiled AS3.",
+ "buildings": [
+  {
+   "delegate": "AlliesBuildingDelegate",
+   "bytes": 2398,
+   "overrides": [
+    "onInit"
+   ],
+   "ownFunctions": [
+    "AlliesBuildingDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [
+    "ID_UNIT_UN_ALLIED_1"
+   ],
+   "constants": [],
+   "literals": [
+    "You have reached the maximum population."
+   ],
+   "imports": [
+    "commands.CmdFinishSi",
+    "core.Base",
+    "core.Config",
+    "core.Constants",
+    "core.Language",
+    "core.MapInitializer",
+    "core.StaticData",
+    "core.isoengine.IsoBuilding",
+    "core.isoengine.IsoFightingElement",
+    "core.isoengine.IsoUnit",
+    "managers.PopupManager",
+    "popups.PopupAlert"
+   ],
+   "items": [
+    {
+     "itemId": 61,
+     "idConstant": "ID_BUILDING_ALLIES_BUILDING",
+     "name": "Allies Building"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "BabylonianTempleDelegate",
+   "bytes": 975,
+   "overrides": [
+    "getInfoButtonStore"
+   ],
+   "ownFunctions": [
+    "BabylonianTempleDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "GUI.infobuttons.InfoButtonGeneric",
+    "core.Base",
+    "core.Language",
+    "core.StaticData",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.display.MovieClip"
+   ],
+   "items": [
+    {
+     "itemId": 175,
+     "idConstant": "ID_BUILDING_BABYLONIAN_TEMPLE",
+     "name": "Babilonian Temple"
+    },
+    {
+     "itemId": 253,
+     "idConstant": "ID_BUILDING_WONDER_PARLIAMENT",
+     "name": "Parliament"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "BaseBarrackDelegate",
+   "bytes": 1092,
+   "overrides": [
+    "initializeExtendedPortrait",
+    "getInfoButtonStore"
+   ],
+   "ownFunctions": [
+    "BaseBarrackDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "GUI.RecuadroInfo",
+    "GUI.infobuttons.InfoButtonBarrack",
+    "core.Base",
+    "core.StaticData",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.display.MovieClip"
+   ],
+   "items": [
+    {
+     "itemId": 29,
+     "idConstant": "ID_BUILDING_INFIRMARY_1",
+     "name": null
+    },
+    {
+     "itemId": 30,
+     "idConstant": "ID_BUILDING_ACADEMY_1",
+     "name": "Academy I"
+    },
+    {
+     "itemId": 41,
+     "idConstant": "ID_BUILDING_ACADEMY_2",
+     "name": "Academy II"
+    },
+    {
+     "itemId": 42,
+     "idConstant": "ID_BUILDING_ACADEMY_3",
+     "name": "Academy III"
+    },
+    {
+     "itemId": 143,
+     "idConstant": "ID_BUILDING_ACADEMY_4",
+     "name": "Academy IV"
+    },
+    {
+     "itemId": 144,
+     "idConstant": "ID_BUILDING_ACADEMY_5",
+     "name": "Academy V"
+    },
+    {
+     "itemId": 31,
+     "idConstant": "ID_BUILDING_BAZOOKA_ACADEMY_1",
+     "name": "Bazooka Academy I"
+    },
+    {
+     "itemId": 43,
+     "idConstant": "ID_BUILDING_BAZOOKA_ACADEMY_2",
+     "name": "Bazooka Academy II"
+    },
+    {
+     "itemId": 44,
+     "idConstant": "ID_BUILDING_BAZOOKA_ACADEMY_3",
+     "name": "Bazooka Academy III"
+    },
+    {
+     "itemId": 141,
+     "idConstant": "ID_BUILDING_BAZOOKA_ACADEMY_4",
+     "name": "Bazooka Academy IV"
+    },
+    {
+     "itemId": 142,
+     "idConstant": "ID_BUILDING_BAZOOKA_ACADEMY_5",
+     "name": "Bazooka Academy V"
+    },
+    {
+     "itemId": 36,
+     "idConstant": "ID_BUILDING_GARAGE_1",
+     "name": null
+    },
+    {
+     "itemId": 37,
+     "idConstant": "ID_BUILDING_HANGAR_1",
+     "name": "Hangar I"
+    },
+    {
+     "itemId": 76,
+     "idConstant": "ID_BUILDING_HANGAR_2",
+     "name": "Hangar II"
+    },
+    {
+     "itemId": 77,
+     "idConstant": "ID_BUILDING_HANGAR_3",
+     "name": "Hangar III"
+    },
+    {
+     "itemId": 38,
+     "idConstant": "ID_BUILDING_CANNON_ACADEMY_1",
+     "name": "Tank Academy I"
+    },
+    {
+     "itemId": 62,
+     "idConstant": "ID_BUILDING_CANNON_ACADEMY_2",
+     "name": "Tank Academy II"
+    },
+    {
+     "itemId": 63,
+     "idConstant": "ID_BUILDING_CANNON_ACADEMY_3",
+     "name": "Tank Academy III"
+    },
+    {
+     "itemId": 40,
+     "idConstant": "ID_BUILDING_JEEP_GARAGE_1",
+     "name": "Jeep garage I"
+    },
+    {
+     "itemId": 64,
+     "idConstant": "ID_BUILDING_JEEP_GARAGE_2",
+     "name": "Jeep garage II"
+    },
+    {
+     "itemId": 65,
+     "idConstant": "ID_BUILDING_JEEP_GARAGE_3",
+     "name": "Jeep garage III"
+    },
+    {
+     "itemId": 54,
+     "idConstant": "ID_BUILDING_COPTER_HANGAR_1",
+     "name": "Helicopter Hangar I"
+    },
+    {
+     "itemId": 55,
+     "idConstant": "ID_BUILDING_COPTER_HANGAR_2",
+     "name": "Helicopter Hangar II"
+    },
+    {
+     "itemId": 56,
+     "idConstant": "ID_BUILDING_COPTER_HANGAR_3",
+     "name": "Helicopter Hangar III"
+    },
+    {
+     "itemId": 131,
+     "idConstant": "ID_BUILDING_BLACK_AIRCRAFT_HANGAR",
+     "name": "Stealth Fighter Hangar"
+    },
+    {
+     "itemId": 130,
+     "idConstant": "ID_BUILDING_BLACK_TANK_BARRACK",
+     "name": "Dominion Tank Academy"
+    },
+    {
+     "itemId": 138,
+     "idConstant": "ID_BUILDING_MR_T_ACADEMY",
+     "name": "Mr T. Academy"
+    },
+    {
+     "itemId": 145,
+     "idConstant": "ID_BUILDING_MORTAR_ACADEMY",
+     "name": "Mortar Academy"
+    },
+    {
+     "itemId": 146,
+     "idConstant": "ID_BUILDING_COPTER_HANGAR_4",
+     "name": "Helicopter Hangar IV"
+    },
+    {
+     "itemId": 147,
+     "idConstant": "ID_BUILDING_COPTER_HANGAR_5",
+     "name": "Helicopter Hangar V"
+    },
+    {
+     "itemId": 148,
+     "idConstant": "ID_BUILDING_ARTILLERY_GARAGE",
+     "name": "Demolition Tank Academy"
+    },
+    {
+     "itemId": 149,
+     "idConstant": "ID_BUILDING_ANTI_AIRCRAFT_GARAGE",
+     "name": "Antiaircraft garage"
+    },
+    {
+     "itemId": 150,
+     "idConstant": "ID_BUILDING_CANNON_ACADEMY_4",
+     "name": "Tank Academy IV"
+    },
+    {
+     "itemId": 151,
+     "idConstant": "ID_BUILDING_CANNON_ACADEMY_5",
+     "name": "Tank Academy V"
+    },
+    {
+     "itemId": 154,
+     "idConstant": "ID_BUILDING_ROBO_ACADEMY_SOLDIER",
+     "name": "Crusader Soldier Academy"
+    },
+    {
+     "itemId": 155,
+     "idConstant": "ID_BUILDING_ROBO_ACADEMY_SWORDMAN",
+     "name": "Crusader Swordsman Academy"
+    },
+    {
+     "itemId": 156,
+     "idConstant": "ID_BUILDING_ROBO_ACADEMY_BAZOOKA",
+     "name": "Crusader Bazooka Academy"
+    },
+    {
+     "itemId": 157,
+     "idConstant": "ID_BUILDING_ROBO_ACADEMY_JET",
+     "name": "Jet Soldier Academy"
+    },
+    {
+     "itemId": 158,
+     "idConstant": "ID_BUILDING_ROBO_ACADEMY_MOTORIZED",
+     "name": "Motorized Soldier Academy"
+    },
+    {
+     "itemId": 159,
+     "idConstant": "ID_BUILDING_ROBO_ACADEMY_RETALIATOR",
+     "name": "Retaliator Academy"
+    },
+    {
+     "itemId": 160,
+     "idConstant": "ID_BUILDING_ROBO_ACADEMY_LANCER",
+     "name": "Megalancer Academy"
+    },
+    {
+     "itemId": 161,
+     "idConstant": "ID_BUILDING_ROBO_ACADEMY_DEMOLISHER",
+     "name": "Crusader Tank Academy"
+    },
+    {
+     "itemId": 162,
+     "idConstant": "ID_BUILDING_ROBO_ACADEMY_DREADNOUGHT",
+     "name": "Dreadnought Academy"
+    },
+    {
+     "itemId": 168,
+     "idConstant": "ID_BUILDING_SKYLANDER_HANGAR",
+     "name": "Crusader Skylander Hangar"
+    },
+    {
+     "itemId": 169,
+     "idConstant": "ID_BUILDING_MEGA_AXE_ACADEMY",
+     "name": "Mega-Axe Academy"
+    },
+    {
+     "itemId": 170,
+     "idConstant": "ID_BUILDING_GIANT_WALKER_FACTORY",
+     "name": "Giant Walker Factory"
+    },
+    {
+     "itemId": 171,
+     "idConstant": "ID_BUILDING_MISSILE_TANK_ACADEMY",
+     "name": "Missile Tank Academy"
+    },
+    {
+     "itemId": 172,
+     "idConstant": "ID_BUILDING_STEEL_CLAWS_ACADEMY",
+     "name": "Steel Claws Academy"
+    },
+    {
+     "itemId": 177,
+     "idConstant": "ID_BUILDING_ORC_SOLDIER_I_ACADEMY",
+     "name": "Axe Zoldier Academy"
+    },
+    {
+     "itemId": 178,
+     "idConstant": "ID_BUILDING_ORC_SOLDIER_II_ACADEMY",
+     "name": "Gun Zoldier Academy"
+    },
+    {
+     "itemId": 179,
+     "idConstant": "ID_BUILDING_ORC_BOSS_ACADEMY",
+     "name": "Xplosive Ork Academy"
+    },
+    {
+     "itemId": 180,
+     "idConstant": "ID_BUILDING_ORC_RIDER_ACADEMY",
+     "name": "Bear Ridda Academy"
+    },
+    {
+     "itemId": 181,
+     "idConstant": "ID_BUILDING_ORC_ROBOT_ACADEMY",
+     "name": "Horned Badass Factory"
+    },
+    {
+     "itemId": 182,
+     "idConstant": "ID_BUILDING_ORC_FLAMEWTHROWER_ACADEMY",
+     "name": "Flamethrowa Academy"
+    },
+    {
+     "itemId": 190,
+     "idConstant": "ID_BUILDING_ORC_COPTER_HANGAR",
+     "name": "Molotov Kopta Hangar"
+    },
+    {
+     "itemId": 192,
+     "idConstant": "ID_BUILDING_ORC_KNIVETHROWER",
+     "name": "Knife Throwa Academy"
+    },
+    {
+     "itemId": 194,
+     "idConstant": "ID_BUILDING_ROBOT_II_FACTORY",
+     "name": "Big Handsaw Ork Factory"
+    },
+    {
+     "itemId": 209,
+     "idConstant": "ID_BUILDING_CRUSADER_PRIEST_ACADEMY",
+     "name": "Crusader Priest Academy"
+    },
+    {
+     "itemId": 210,
+     "idConstant": "ID_BUILDING_CRUSADER_BOT_FACTORY",
+     "name": "Crusader Bot Factory"
+    },
+    {
+     "itemId": 214,
+     "idConstant": "ID_BUILDING_VIKING_TANK_BARRACK",
+     "name": "Viking Tank Academy"
+    },
+    {
+     "itemId": 213,
+     "idConstant": "ID_BUILDING_VIKING_BEAR_ACADEMY",
+     "name": "Bear Knight Academy"
+    },
+    {
+     "itemId": 217,
+     "idConstant": "ID_BUILDING_VIKING_ACORE_FACTORY",
+     "name": "Viking Core Factory"
+    },
+    {
+     "itemId": 211,
+     "idConstant": "ID_BUILDING_VIKING_AXEMAN_ACADEMY",
+     "name": "Viking Axe Academy"
+    },
+    {
+     "itemId": 212,
+     "idConstant": "ID_BUILDING_VIKING_SOLDIER_ACADEMY",
+     "name": "Viking Soldier Academy"
+    },
+    {
+     "itemId": 216,
+     "idConstant": "ID_BUILDING_VIKING_HAMMERER_ACADEMY",
+     "name": "Viking Hammerer Factory"
+    },
+    {
+     "itemId": 233,
+     "idConstant": "ID_BUILDING_VIKING_BAZOOKA_ACADEMY",
+     "name": "Viking Bazooka Academy"
+    },
+    {
+     "itemId": 234,
+     "idConstant": "ID_BUILDING_VIKING_MOTOSQUAD_ACADEMY",
+     "name": "Viking MotoSquad Academy"
+    },
+    {
+     "itemId": 215,
+     "idConstant": "ID_BUILDING_VIKING_COPTER_HANGAR",
+     "name": "Viking Airship Hangar"
+    },
+    {
+     "itemId": 235,
+     "idConstant": "ID_BUILDING_VIKING_RUNE_GOLEM_ACADEMY",
+     "name": "Rune Golem Academy"
+    },
+    {
+     "itemId": 236,
+     "idConstant": "ID_BUILDING_VIKING_SNIPER_ACADEMY",
+     "name": "Viking Sniper Academy"
+    },
+    {
+     "itemId": 237,
+     "idConstant": "ID_BUILDING_VIKING_BUTCHER_ACADEMY",
+     "name": "Viking Butcher Academy"
+    },
+    {
+     "itemId": 238,
+     "idConstant": "ID_BUILDING_KAMIKAZE_ACADEMY",
+     "name": "Kamikaze Academy"
+    },
+    {
+     "itemId": 129,
+     "idConstant": "ID_BUILDING_FIRE_BARRACK",
+     "name": "Flamethrower Academy"
+    },
+    {
+     "itemId": 174,
+     "idConstant": "ID_BUILDING_FIREMAN_BARRACK",
+     "name": "Fireman Academy"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "BasicButtonDelegate",
+   "bytes": 2976,
+   "overrides": [
+    "getInfoButtonStore",
+    "initializeExtendedPortrait"
+   ],
+   "ownFunctions": [
+    "BasicButtonDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "GUI.ExtendedPortraitPopupButton",
+    "GUI.ExtendedPortraitPopupButtonEmbeded",
+    "GUI.RecuadroInfo",
+    "GUI.infobuttons.InfoButtonText",
+    "core.Base",
+    "core.Constants",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.display.DisplayObject",
+    "flash.display.MovieClip",
+    "flash.events.MouseEvent",
+    "managers.HelperManager",
+    "utils.TextFieldUtil"
+   ],
+   "items": [],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "BasicDecorationDelegate",
+   "bytes": 695,
+   "overrides": [
+    "getInfoButtonStore"
+   ],
+   "ownFunctions": [
+    "BasicDecorationDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [
+    "Decorations help your troops to feel more confortable at the base"
+   ],
+   "imports": [
+    "GUI.infobuttons.InfoButtonGeneric",
+    "core.Language",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.display.MovieClip"
+   ],
+   "items": [
+    {
+     "itemId": 27,
+     "idConstant": "ID_BUILDING_DECO_YELLOW_FLOWERS",
+     "name": null
+    },
+    {
+     "itemId": 92,
+     "idConstant": "ID_BUILDING_DECO_APPLE_TREE",
+     "name": "Apple tree"
+    },
+    {
+     "itemId": 93,
+     "idConstant": "ID_BUILDING_DECO_PEAR_TREE",
+     "name": "Pear tree"
+    },
+    {
+     "itemId": 94,
+     "idConstant": "ID_BUILDING_DECO_SPONGE_BUSH",
+     "name": "Sponge bush"
+    },
+    {
+     "itemId": 95,
+     "idConstant": "ID_BUILDING_DECO_LITTLE_FOUNTAIN",
+     "name": "Little fountain"
+    },
+    {
+     "itemId": 96,
+     "idConstant": "ID_BUILDING_DECO_WHITE_FLOWERS",
+     "name": "White Flowers"
+    },
+    {
+     "itemId": 97,
+     "idConstant": "ID_BUILDING_DECO_RED_FLOWERS",
+     "name": "Red flowers"
+    },
+    {
+     "itemId": 98,
+     "idConstant": "ID_BUILDING_DECO_BLUE_FLOWERS",
+     "name": "Blue flowers"
+    },
+    {
+     "itemId": 99,
+     "idConstant": "ID_BUILDING_DECO_PINK_FLOWERS",
+     "name": null
+    },
+    {
+     "itemId": 100,
+     "idConstant": "ID_BUILDING_DECO_RED_L_FLOWERS",
+     "name": "Red Leaf flowers"
+    },
+    {
+     "itemId": 101,
+     "idConstant": "ID_BUILDING_DECO_PINK_L_FLOWERS",
+     "name": "Pink Leaf flowers"
+    },
+    {
+     "itemId": 102,
+     "idConstant": "ID_BUILDING_DECO_BLUE_L_FLOWERS",
+     "name": "Blue Leaf flowers"
+    },
+    {
+     "itemId": 103,
+     "idConstant": "ID_BUILDING_DECO_BUSH",
+     "name": "Bush"
+    },
+    {
+     "itemId": 104,
+     "idConstant": "ID_BUILDING_DECO_LAMP",
+     "name": "Lamp"
+    },
+    {
+     "itemId": 105,
+     "idConstant": "ID_BUILDING_DECO_VICTORY_ARCH",
+     "name": "Victory Arch"
+    },
+    {
+     "itemId": 106,
+     "idConstant": "ID_BUILDING_DECO_FOUNTAIN",
+     "name": "Fountain"
+    },
+    {
+     "itemId": 107,
+     "idConstant": "ID_BUILDING_DECO_SCLUPTURE",
+     "name": "Sculpture"
+    },
+    {
+     "itemId": 136,
+     "idConstant": "ID_BUILDING_DECO_GENERAL_SCLUPTURE",
+     "name": "General Sculpture"
+    },
+    {
+     "itemId": 152,
+     "idConstant": "ID_BUILDING_DECO_ROBO_FLAG",
+     "name": "Robo flag"
+    },
+    {
+     "itemId": 153,
+     "idConstant": "ID_BUILDING_DECO_ROBO_STATUE",
+     "name": "Robo statue"
+    },
+    {
+     "itemId": 187,
+     "idConstant": "ID_BUILDING_ORC_KRAZY_MONSTA",
+     "name": "Krazy Monsta Statue"
+    },
+    {
+     "itemId": 188,
+     "idConstant": "ID_BUILDING_ORC_POWA_BANNA",
+     "name": "Powa Banna"
+    },
+    {
+     "itemId": 223,
+     "idConstant": "ID_BUILDING_VIKING_DECO_1",
+     "name": "Hammerer Statue"
+    },
+    {
+     "itemId": 224,
+     "idConstant": "ID_BUILDING_VIKING_DECO_2",
+     "name": "Viking Fountain"
+    },
+    {
+     "itemId": 231,
+     "idConstant": "ID_BUILDING_VIKING_DECO_3",
+     "name": "War Tree"
+    },
+    {
+     "itemId": 232,
+     "idConstant": "ID_BUILDING_VIKING_DECO_4",
+     "name": "Magic Lake"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "BasicFortressDelegate",
+   "bytes": 3189,
+   "overrides": [
+    "onAttack",
+    "onControlAnimation",
+    "hasReachedConstructionLimit"
+   ],
+   "ownFunctions": [
+    "BasicFortressDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "battle.projectiles.Machinegun",
+    "battle.projectiles.ProjectileDefinition",
+    "flash.utils.Dictionary",
+    "managers.ProjectileManager"
+   ],
+   "items": [],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "BasicHouseDelegate",
+   "bytes": 535,
+   "overrides": [
+    "getInfoButtonStore"
+   ],
+   "ownFunctions": [
+    "BasicHouseDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "GUI.infobuttons.InfoButtonHouse",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.display.MovieClip"
+   ],
+   "items": [
+    {
+     "itemId": 1,
+     "idConstant": "ID_BUILDING_HOUSE_1",
+     "name": "House I"
+    },
+    {
+     "itemId": 47,
+     "idConstant": "ID_BUILDING_HOUSE_II",
+     "name": "House II"
+    },
+    {
+     "itemId": 48,
+     "idConstant": "ID_BUILDING_HOUSE_III",
+     "name": "House III"
+    },
+    {
+     "itemId": 163,
+     "idConstant": "ID_BUILDING_ROBO_HOUSE",
+     "name": "House"
+    },
+    {
+     "itemId": 183,
+     "idConstant": "ID_BUILDING_ORC_HOUSE",
+     "name": "Ork House"
+    },
+    {
+     "itemId": 218,
+     "idConstant": "ID_BUILDING_VIKING_HOUSE",
+     "name": "Viking House"
+    },
+    {
+     "itemId": 246,
+     "idConstant": "ID_BUILDING_NEBULAR_HOUSE",
+     "name": "Nebular House"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "BasicTravelDelegate",
+   "bytes": 1284,
+   "overrides": [
+    "getInfoButtonStore"
+   ],
+   "ownFunctions": [
+    "BasicTravelDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "GUI.infobuttons.InfoButtonText",
+    "core.Base",
+    "core.Config",
+    "core.Language",
+    "flash.display.MovieClip",
+    "flash.events.MouseEvent",
+    "managers.PopupManager",
+    "popups.PopupAlert",
+    "popups.PopupQuestsMap"
+   ],
+   "items": [],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "BasicWallDelegate",
+   "bytes": 1273,
+   "overrides": [
+    "getInfoButtonStore",
+    "hasReachedConstructionLimit",
+    "onInit"
+   ],
+   "ownFunctions": [
+    "BasicWallDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "GUI.infobuttons.InfoButtonWall",
+    "core.Base",
+    "core.isoengine.IsoFightingElement",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.display.MovieClip"
+   ],
+   "items": [
+    {
+     "itemId": 23,
+     "idConstant": "ID_BUILDING_WALL_1",
+     "name": "Wall I"
+    },
+    {
+     "itemId": 24,
+     "idConstant": "ID_BUILDING_WALL_2",
+     "name": "Wall II"
+    },
+    {
+     "itemId": 25,
+     "idConstant": "ID_BUILDING_WALL_3",
+     "name": "Wall III"
+    },
+    {
+     "itemId": 78,
+     "idConstant": "ID_BUILDING_WALL_4",
+     "name": "Wall IV"
+    },
+    {
+     "itemId": 79,
+     "idConstant": "ID_BUILDING_WALL_5",
+     "name": "Wall V"
+    },
+    {
+     "itemId": 166,
+     "idConstant": "ID_BUILDING_ROBO_WALL",
+     "name": "Wall"
+    },
+    {
+     "itemId": 225,
+     "idConstant": "ID_BUILDING_ALIEN_WALL",
+     "name": "Alien Wall"
+    },
+    {
+     "itemId": 228,
+     "idConstant": "ID_BUILDING_ARACHNID_WALL",
+     "name": "Spider Wall"
+    },
+    {
+     "itemId": 222,
+     "idConstant": "ID_BUILDING_DWARF_WALL",
+     "name": "Viking Wall"
+    },
+    {
+     "itemId": 244,
+     "idConstant": "ID_BUILDING_NEBULAR_WALL",
+     "name": "Nebular Wall"
+    },
+    {
+     "itemId": 271,
+     "idConstant": "ID_BUILDING_SPATIAL_WALL",
+     "name": "Space Elf Wall"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "BridgeDelegate",
+   "bytes": 1366,
+   "overrides": [
+    "onInit"
+   ],
+   "ownFunctions": [
+    "BridgeDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "core.Base",
+    "core.BuildingReference",
+    "core.Constants",
+    "core.isoengine.IsoFightingElement",
+    "core.isoengine.delegates.AbstractBuildingDelegate"
+   ],
+   "items": [
+    {
+     "itemId": 929,
+     "idConstant": "ID_BUILDING_BRIDGE",
+     "name": "Bridge"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "BrokenBridgeDelegate",
+   "bytes": 4619,
+   "overrides": [
+    "onInit",
+    "highlight",
+    "unhighlight",
+    "click"
+   ],
+   "ownFunctions": [
+    "BrokenBridgeDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [
+    "ID_BUILDING_BRIDGE"
+   ],
+   "constants": [
+    {
+     "name": "LVL_ADDITIONAL_BRIDGE",
+     "value": 15
+    },
+    {
+     "name": "REQUIRED_CLICKS",
+     "value": 3
+    }
+   ],
+   "literals": [],
+   "imports": [
+    "com.socialpoint.debug.Tracing",
+    "core.Base",
+    "core.Config",
+    "core.Constants",
+    "core.Language",
+    "core.isoengine.IsoElement",
+    "core.isoengine.IsoFightingElement",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.display.Stage",
+    "org.osflash.signals.Signal",
+    "utils.TextFieldUtil"
+   ],
+   "items": [
+    {
+     "itemId": 928,
+     "idConstant": "ID_BUILDING_BROKEN_BRIDGE",
+     "name": "Broken Bridge"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "BunkerDelegate",
+   "bytes": 3669,
+   "overrides": [
+    "onInit",
+    "onControlAnimation",
+    "getInfoButtonStore",
+    "onAttack",
+    "initializeExtendedPortrait"
+   ],
+   "ownFunctions": [
+    "BunkerDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [
+    "Put soldiers inside to make the bunkers attack",
+    "Earns:"
+   ],
+   "imports": [
+    "GUI.RecuadroInfo",
+    "GUI.infobuttons.InfoButtonTower",
+    "core.Language",
+    "core.isoengine.IsoBuilding",
+    "core.isoengine.IsoFightingElement",
+    "core.isoengine.IsoUnit",
+    "flash.display.MovieClip",
+    "utils.TextFieldUtil"
+   ],
+   "items": [
+    {
+     "itemId": 51,
+     "idConstant": "ID_BUILDING_BUNKER_2",
+     "name": "Bunker II"
+    },
+    {
+     "itemId": 52,
+     "idConstant": "ID_BUILDING_BUNKER_3",
+     "name": "Bunker III"
+    },
+    {
+     "itemId": 53,
+     "idConstant": "ID_BUILDING_BUNKER_4",
+     "name": "Mega Bunker"
+    }
+   ],
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "delegate": "CageDelegate",
+   "bytes": 883,
+   "overrides": [
+    "onControlAnimation"
+   ],
+   "ownFunctions": [
+    "CageDelegate",
+    "open"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.display.MovieClip"
+   ],
+   "items": [
+    {
+     "itemId": 958,
+     "idConstant": "ID_BUILDING_TREX_CAGE_GREEN",
+     "name": "Green T-Rex Cage"
+    },
+    {
+     "itemId": 959,
+     "idConstant": "ID_BUILDING_TREX_CAGE_RED",
+     "name": "Red T-Rex Cage"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "CrossPromotionDCDelegate",
+   "bytes": 871,
+   "overrides": [
+    "onInit"
+   ],
+   "ownFunctions": [
+    "CrossPromotionDCDelegate",
+    "clickIt"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "core.isoengine.IsoFightingElement",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.events.MouseEvent",
+    "flash.external.ExternalInterface"
+   ],
+   "items": [
+    {
+     "itemId": 10078,
+     "idConstant": "ID_BUILDING_DC",
+     "name": "Dragon City"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "CrossPromotionDCMobileDelegate",
+   "bytes": 1306,
+   "overrides": [
+    "onInit"
+   ],
+   "ownFunctions": [
+    "CrossPromotionDCMobileDelegate",
+    "clickIt"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "core.Base",
+    "core.Utils",
+    "core.isoengine.IsoFightingElement",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.events.MouseEvent",
+    "flash.external.ExternalInterface",
+    "managers.PopupManager",
+    "popups.PopupCrossDCi"
+   ],
+   "items": [
+    {
+     "itemId": 10130,
+     "idConstant": "ID_BUILDING_DC_MOBILE",
+     "name": null
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "CrossPromotionSEDelegate",
+   "bytes": 871,
+   "overrides": [
+    "onInit"
+   ],
+   "ownFunctions": [
+    "CrossPromotionSEDelegate",
+    "clickIt"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "core.isoengine.IsoFightingElement",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.events.MouseEvent",
+    "flash.external.ExternalInterface"
+   ],
+   "items": [
+    {
+     "itemId": 10020,
+     "idConstant": "ID_BUILDING_SE",
+     "name": "Play Social Empires"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "DevelopmentWallDelegate",
+   "bytes": 534,
+   "overrides": [
+    "onInit"
+   ],
+   "ownFunctions": [
+    "DevelopmentWallDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "core.Constants",
+    "core.isoengine.IsoFightingElement"
+   ],
+   "items": [
+    {
+     "itemId": 173,
+     "idConstant": "ID_BUILDING_DEVELOPMENT_WALL",
+     "name": "Development Wall"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "DisabledSupertankDelegate",
+   "bytes": 1219,
+   "overrides": [
+    "onControlAnimation"
+   ],
+   "ownFunctions": [
+    "DisabledSupertankDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "core.Base",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "quest.Quest",
+    "quest.Quest04Supertank"
+   ],
+   "items": [
+    {
+     "itemId": 117,
+     "idConstant": "ID_BUILDING_DISABLED_SUPERTANK",
+     "name": "Disabled Supertank"
+    },
+    {
+     "itemId": 204,
+     "idConstant": "ID_BUILDING_DISABLED_ORK_TANK",
+     "name": "Disabled Orc Supertank"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "DoubleMachinegunTowerDelegate",
+   "bytes": 622,
+   "overrides": [
+    "onAttack"
+   ],
+   "ownFunctions": [
+    "DoubleMachinegunTowerDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "managers.ProjectileManager"
+   ],
+   "items": [
+    {
+     "itemId": 49,
+     "idConstant": "ID_BUILDING_TOWER_3",
+     "name": "Turret III"
+    },
+    {
+     "itemId": 87,
+     "idConstant": "ID_BUILDING_TOWER_7",
+     "name": "Turret VI"
+    },
+    {
+     "itemId": 245,
+     "idConstant": "ID_BUILDING_NEBULAR_TURRET",
+     "name": "Nebular Turret"
+    }
+   ],
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "delegate": "DoubleProjectileTowerDelegate",
+   "bytes": 516,
+   "overrides": [
+    "onAttack"
+   ],
+   "ownFunctions": [
+    "DoubleProjectileTowerDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [],
+   "items": [
+    {
+     "itemId": 39,
+     "idConstant": "ID_BUILDING_TOWER_4",
+     "name": "Turret IV"
+    },
+    {
+     "itemId": 45,
+     "idConstant": "ID_BUILDING_TOWER_DUAL_ROCKET",
+     "name": "Dual-Rocket Turret"
+    },
+    {
+     "itemId": 164,
+     "idConstant": "ID_BUILDING_ROBO_TURRET_1",
+     "name": "Laser Turret"
+    },
+    {
+     "itemId": 294,
+     "idConstant": "ID_BUILDING_ANDROMEDA_TURRET",
+     "name": "Andromeda Turret"
+    }
+   ],
+   "registeredProjectiles": [
+    "MISSILE",
+    "P_MISSILE_S",
+    "P_LASER",
+    "BLAST_LASER"
+   ]
+  },
+  {
+   "delegate": "ElectricTowerDelegate",
+   "bytes": 2162,
+   "overrides": [
+    "onAttack"
+   ],
+   "ownFunctions": [
+    "ElectricTowerDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "battle.projectiles.BeamDefinition",
+    "core.isoengine.IsoElement",
+    "core.isoengine.IsoUnit",
+    "flash.events.Event",
+    "flash.geom.ColorTransform"
+   ],
+   "items": [
+    {
+     "itemId": 165,
+     "idConstant": "ID_BUILDING_ROBO_TURRET_2",
+     "name": "Tesla Turret"
+    },
+    {
+     "itemId": 272,
+     "idConstant": "ID_BUILDING_SPATIAL_TURRET",
+     "name": "Space Elf Turret"
+    }
+   ],
+   "registeredProjectiles": [
+    "P_ELECTRIC_TESLA",
+    "BLAST_ELECTRICAL"
+   ]
+  },
+  {
+   "delegate": "FactoryDelegate",
+   "bytes": 3052,
+   "overrides": [
+    "onControlAnimation",
+    "selected",
+    "canGetInside",
+    "getInfoButtonStore",
+    "initializeExtendedPortrait"
+   ],
+   "ownFunctions": [
+    "FactoryDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [
+    "Put workers inside to produce resources",
+    "Earns:"
+   ],
+   "imports": [
+    "GUI.RecuadroInfo",
+    "GUI.infobuttons.InfoButtonDepot",
+    "core.Base",
+    "core.Language",
+    "core.isoengine.IsoUnit",
+    "core.isoengine.PropertyManager",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.display.MovieClip",
+    "utils.TextFieldUtil"
+   ],
+   "items": [
+    {
+     "itemId": 3,
+     "idConstant": "ID_BUILDING_DEPOT_OIL",
+     "name": "Oil Factory I"
+    },
+    {
+     "itemId": 2,
+     "idConstant": "ID_BUILDING_DEPOT_WOOD",
+     "name": "Wood Factory I"
+    },
+    {
+     "itemId": 4,
+     "idConstant": "ID_BUILDING_DEPOT_STEEL",
+     "name": "Steel Factory I"
+    },
+    {
+     "itemId": 5,
+     "idConstant": "ID_BUILDING_DEPOT_GOLD",
+     "name": "Gold Factory I"
+    },
+    {
+     "itemId": 7,
+     "idConstant": "ID_BUILDING_DEPOT_OIL_2",
+     "name": "Oil Factory II"
+    },
+    {
+     "itemId": 6,
+     "idConstant": "ID_BUILDING_DEPOT_WOOD_2",
+     "name": "Wood Factory II"
+    },
+    {
+     "itemId": 8,
+     "idConstant": "ID_BUILDING_DEPOT_STEEL_2",
+     "name": "Steel Factory II"
+    },
+    {
+     "itemId": 9,
+     "idConstant": "ID_BUILDING_DEPOT_GOLD_2",
+     "name": "Gold Factory II"
+    },
+    {
+     "itemId": 11,
+     "idConstant": "ID_BUILDING_DEPOT_OIL_3",
+     "name": "Oil Factory III"
+    },
+    {
+     "itemId": 10,
+     "idConstant": "ID_BUILDING_DEPOT_WOOD_3",
+     "name": "Wood Factory III"
+    },
+    {
+     "itemId": 12,
+     "idConstant": "ID_BUILDING_DEPOT_STEEL_3",
+     "name": "Steel Factory III"
+    },
+    {
+     "itemId": 13,
+     "idConstant": "ID_BUILDING_DEPOT_GOLD_3",
+     "name": "Gold Factory III"
+    },
+    {
+     "itemId": 15,
+     "idConstant": "ID_BUILDING_DEPOT_OIL_4",
+     "name": "Oil Factory IV"
+    },
+    {
+     "itemId": 14,
+     "idConstant": "ID_BUILDING_DEPOT_WOOD_4",
+     "name": "Wood Factory IV"
+    },
+    {
+     "itemId": 16,
+     "idConstant": "ID_BUILDING_DEPOT_STEEL_4",
+     "name": "Steel Factory IV"
+    },
+    {
+     "itemId": 17,
+     "idConstant": "ID_BUILDING_DEPOT_GOLD_4",
+     "name": "Gold Factory IV"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "FarmDelegate",
+   "bytes": 2724,
+   "overrides": [
+    "onControlAnimation",
+    "canGetInside",
+    "initializeExtendedPortrait",
+    "getInfoButtonStore"
+   ],
+   "ownFunctions": [
+    "FarmDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [
+    "Put workers inside to produce resources",
+    "Earns:"
+   ],
+   "imports": [
+    "GUI.RecuadroInfo",
+    "GUI.infobuttons.InfoButtonDepot",
+    "core.Base",
+    "core.Language",
+    "core.isoengine.IsoUnit",
+    "core.isoengine.PropertyManager",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.display.MovieClip",
+    "utils.TextFieldUtil"
+   ],
+   "items": [
+    {
+     "itemId": 109,
+     "idConstant": "ID_BUILDING_FARM_CORN",
+     "name": "Corn field"
+    },
+    {
+     "itemId": 110,
+     "idConstant": "ID_BUILDING_FARM_COW",
+     "name": "Cow farm"
+    },
+    {
+     "itemId": 108,
+     "idConstant": "ID_BUILDING_FARM_GRAPE",
+     "name": "Grape field"
+    },
+    {
+     "itemId": 167,
+     "idConstant": "ID_BUILDING_ROBO_FARM",
+     "name": "Field"
+    },
+    {
+     "itemId": 184,
+     "idConstant": "ID_BUILDING_ORC_FARM",
+     "name": "Ork Farm"
+    },
+    {
+     "itemId": 219,
+     "idConstant": "ID_BUILDING_VIKING_FARM",
+     "name": "Viking Field"
+    },
+    {
+     "itemId": 247,
+     "idConstant": "ID_BUILDING_NEBULAR_FARM",
+     "name": "Nebular Field"
+    },
+    {
+     "itemId": 274,
+     "idConstant": "ID_BUILDING_SPATIAL_FARM",
+     "name": "Space Elf Field"
+    },
+    {
+     "itemId": 296,
+     "idConstant": "ID_BUILDING_ANDROMEDA_FARM",
+     "name": "Andromeda Farm"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "FieldHospitalDelegate",
+   "bytes": 1967,
+   "overrides": [
+    "getInfoButtonStore",
+    "initializeExtendedPortrait"
+   ],
+   "ownFunctions": [
+    "FieldHospitalDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [
+    "Medics can restore the health of your units"
+   ],
+   "imports": [
+    "GUI.RecuadroInfo",
+    "GUI.infobuttons.InfoButtonHealBarrack",
+    "core.Base",
+    "core.Language",
+    "core.StaticData",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.display.MovieClip",
+    "utils.TextFieldUtil"
+   ],
+   "items": [
+    {
+     "itemId": 134,
+     "idConstant": "ID_BUILDING_FIELD_HOSPITAL",
+     "name": "Field Hospital"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "Fortress1Delegate",
+   "bytes": 1119,
+   "overrides": [
+    "onAttack"
+   ],
+   "ownFunctions": [
+    "Fortress1Delegate"
+   ],
+   "attacks": [],
+   "projectiles": [
+    "MACHINEGUN",
+    "CANNON"
+   ],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "battle.projectiles.ProjectileDefinition",
+    "managers.ProjectileManager"
+   ],
+   "items": [
+    {
+     "itemId": 80,
+     "idConstant": "ID_BUILDING_FORTALEZA_1",
+     "name": "Fortress I"
+    },
+    {
+     "itemId": 205,
+     "idConstant": "ID_BUILDING_ORC_FORTRESS",
+     "name": "Orc Fortress"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "Fortress2Delegate",
+   "bytes": 1759,
+   "overrides": [
+    "onAttack"
+   ],
+   "ownFunctions": [
+    "Fortress2Delegate"
+   ],
+   "attacks": [],
+   "projectiles": [
+    "MACHINEGUN",
+    "CANNON",
+    "MACHINEGUN_BIG"
+   ],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "battle.projectiles.ProjectileDefinition",
+    "managers.ProjectileManager"
+   ],
+   "items": [
+    {
+     "itemId": 81,
+     "idConstant": "ID_BUILDING_FORTALEZA_2",
+     "name": "Fortress II"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "Fortress3Delegate",
+   "bytes": 1920,
+   "overrides": [
+    "onAttack"
+   ],
+   "ownFunctions": [
+    "Fortress3Delegate"
+   ],
+   "attacks": [],
+   "projectiles": [
+    "MACHINEGUN",
+    "MACHINEGUN_BIG",
+    "ROCKET"
+   ],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "battle.projectiles.ProjectileDefinition",
+    "managers.ProjectileManager"
+   ],
+   "items": [
+    {
+     "itemId": 82,
+     "idConstant": "ID_BUILDING_ROCKET_FORTRESS",
+     "name": "Rocket Fortress"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "Fortress4Delegate",
+   "bytes": 1181,
+   "overrides": [
+    "onAttack"
+   ],
+   "ownFunctions": [
+    "Fortress4Delegate"
+   ],
+   "attacks": [],
+   "projectiles": [
+    "MACHINEGUN",
+    "CANNON"
+   ],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "battle.projectiles.ProjectileDefinition",
+    "managers.ProjectileManager"
+   ],
+   "items": [
+    {
+     "itemId": 83,
+     "idConstant": "ID_BUILDING_FORTALEZA_4",
+     "name": "Fortress III"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "Fortress5Delegate",
+   "bytes": 1761,
+   "overrides": [
+    "onAttack"
+   ],
+   "ownFunctions": [
+    "Fortress5Delegate"
+   ],
+   "attacks": [],
+   "projectiles": [
+    "MACHINEGUN",
+    "CANNON",
+    "MACHINEGUN_BIG"
+   ],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "battle.projectiles.ProjectileDefinition",
+    "managers.ProjectileManager"
+   ],
+   "items": [
+    {
+     "itemId": 84,
+     "idConstant": "ID_BUILDING_SPECIAL_FORTRESS",
+     "name": "Special Fortress"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "Fortress6Delegate",
+   "bytes": 1151,
+   "overrides": [
+    "onAttack"
+   ],
+   "ownFunctions": [
+    "Fortress6Delegate"
+   ],
+   "attacks": [],
+   "projectiles": [
+    "MACHINEGUN",
+    "CANNON",
+    "ROCKET"
+   ],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "battle.projectiles.ProjectileDefinition",
+    "managers.ProjectileManager"
+   ],
+   "items": [
+    {
+     "itemId": 85,
+     "idConstant": "ID_BUILDING_MEGA_FORTRESS",
+     "name": "Mega Fortress"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "FortressBarrackDelegate",
+   "bytes": 500,
+   "overrides": [
+    "getInfoButtonStore"
+   ],
+   "ownFunctions": [
+    "FortressBarrackDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "GUI.infobuttons.InfoButtonFortressBarrack",
+    "flash.display.MovieClip"
+   ],
+   "items": [],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "GarageDelegate",
+   "bytes": 1952,
+   "overrides": [
+    "getInfoButtonStore",
+    "initializeExtendedPortrait"
+   ],
+   "ownFunctions": [
+    "GarageDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [
+    "Engineer can restore the health of your equipment"
+   ],
+   "imports": [
+    "GUI.RecuadroInfo",
+    "GUI.infobuttons.InfoButtonGarage",
+    "core.Base",
+    "core.Language",
+    "core.StaticData",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.display.MovieClip",
+    "utils.TextFieldUtil"
+   ],
+   "items": [
+    {
+     "itemId": 135,
+     "idConstant": "ID_BUILDING_MECHANICAL_GARAGE",
+     "name": "Mechanical Garage"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "HarbourDelegate",
+   "bytes": 3748,
+   "overrides": [
+    "onInit",
+    "click",
+    "highlight",
+    "unhighlight",
+    "onControlAnimation"
+   ],
+   "ownFunctions": [
+    "HarbourDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [
+    "ID_BUILDING_BRIDGE"
+   ],
+   "constants": [
+    {
+     "name": "LVL_ADDITIONAL_BRIDGE",
+     "value": 5
+    }
+   ],
+   "literals": [
+    "The harbour is now closed. Build the nearby bridge to open it!"
+   ],
+   "imports": [
+    "com.socialpoint.debug.Tracing",
+    "core.Base",
+    "core.BuildingReference",
+    "core.Config",
+    "core.Constants",
+    "core.Language",
+    "core.isoengine.IsoBuilding",
+    "core.isoengine.IsoFightingElement",
+    "flash.display.MovieClip",
+    "flash.display.Stage",
+    "utils.TextFieldUtil"
+   ],
+   "items": [
+    {
+     "itemId": 908,
+     "idConstant": "ID_BUILDING_HARBOUR",
+     "name": "Harbour"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "IntelligenceCenterDelegate",
+   "bytes": 706,
+   "overrides": [
+    "getInfoButtonStore"
+   ],
+   "ownFunctions": [
+    "IntelligenceCenterDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [
+    "This building provides you with intelligence force to spy your enemies"
+   ],
+   "imports": [
+    "GUI.infobuttons.InfoButtonGeneric",
+    "core.Language",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.display.MovieClip"
+   ],
+   "items": [
+    {
+     "itemId": 75,
+     "idConstant": "ID_BUILDING_INTELLIGENCE_CENTER",
+     "name": "Recon center"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "LaboratoryDelegate",
+   "bytes": 3471,
+   "overrides": [
+    "onInit",
+    "onControlAnimation",
+    "onAttack"
+   ],
+   "ownFunctions": [
+    "LaboratoryDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [
+    "P_BEAMLAB",
+    "BLAST_ELECTRICAL_YELLOW"
+   ],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "managers.ProjectileManager"
+   ],
+   "items": [
+    {
+     "itemId": 118,
+     "idConstant": "ID_BUILDING_LABORATORY",
+     "name": "Mind Control Laboratory"
+    }
+   ],
+   "registeredProjectiles": [
+    "MISSILE"
+   ]
+  },
+  {
+   "delegate": "LaboratoryTechDelegate",
+   "bytes": 2250,
+   "overrides": [
+    "onInit",
+    "getInfoButtonStore",
+    "initializeExtendedPortrait"
+   ],
+   "ownFunctions": [
+    "LaboratoryTechDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [
+    "Click to get the most deadly techs against your enemy!",
+    "OPEN"
+   ],
+   "imports": [
+    "GUI.ExtendedPortraitPopupButtonEmbeded",
+    "GUI.RecuadroInfo",
+    "GUI.infobuttons.InfoButtonGeneric",
+    "core.Base",
+    "core.Constants",
+    "core.GameStatic",
+    "core.Language",
+    "core.MagicManager",
+    "core.isoengine.IsoFightingElement",
+    "flash.display.DisplayObjectContainer",
+    "flash.display.MovieClip",
+    "flash.events.MouseEvent",
+    "flash.text.TextField",
+    "popups.PopupWizardry"
+   ],
+   "items": [
+    {
+     "itemId": 256,
+     "idConstant": "ID_BUILDING_LABORATORY_TECH",
+     "name": "Research Lab"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "MachinegunTowerDelegate",
+   "bytes": 872,
+   "overrides": [
+    "onAttack"
+   ],
+   "ownFunctions": [
+    "MachinegunTowerDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "managers.ProjectileManager"
+   ],
+   "items": [
+    {
+     "itemId": 22,
+     "idConstant": "ID_BUILDING_TOWER_1",
+     "name": "Turret I"
+    },
+    {
+     "itemId": 57,
+     "idConstant": "ID_BUILDING_TOWER_2",
+     "name": "Turret II"
+    },
+    {
+     "itemId": 185,
+     "idConstant": "ID_BUILDING_ORC_TOWER_I",
+     "name": "Ork Turret II"
+    },
+    {
+     "itemId": 207,
+     "idConstant": "ID_BUILDING_ENEMY_ORC_TOWER_1",
+     "name": "Enemy Ork Turret I"
+    },
+    {
+     "itemId": 220,
+     "idConstant": "ID_BUILDING_DWARF_TURRET_1",
+     "name": "Viking Turret I"
+    },
+    {
+     "itemId": 221,
+     "idConstant": "ID_BUILDING_DWARF_TURRET_2",
+     "name": "Viking Turret II"
+    }
+   ],
+   "registeredProjectiles": [
+    "MACHINEGUN",
+    "MACHINEGUN_BIG",
+    "MACHINEGUN_HEAVY"
+   ]
+  },
+  {
+   "delegate": "MarketDelegate",
+   "bytes": 620,
+   "overrides": [
+    "getInfoButtonStore"
+   ],
+   "ownFunctions": [
+    "MarketDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [
+    "This building allows you to buy and sell goods to get resources you need"
+   ],
+   "imports": [
+    "GUI.infobuttons.InfoButtonGeneric",
+    "core.Language",
+    "flash.display.MovieClip"
+   ],
+   "items": [
+    {
+     "itemId": 18,
+     "idConstant": "ID_BUILDING_MARKET_1",
+     "name": "Market I"
+    },
+    {
+     "itemId": 90,
+     "idConstant": "ID_BUILDING_MARKET_2",
+     "name": "Market II"
+    },
+    {
+     "itemId": 91,
+     "idConstant": "ID_BUILDING_MARKET_3",
+     "name": "Market III"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "MarketplaceDelegate",
+   "bytes": 3973,
+   "overrides": [
+    "onInit",
+    "onSetGraphic",
+    "getInfoButtonStore",
+    "initializeExtendedPortrait"
+   ],
+   "ownFunctions": [
+    "MarketplaceDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [
+    "Auction House!\\n\\nPlay and get the most powerful units for really good prices!!",
+    "OPEN"
+   ],
+   "imports": [
+    "GUI.ExtendedPortraitPopupButtonEmbeded",
+    "GUI.RecuadroInfo",
+    "GUI.infobuttons.InfoButtonGeneric",
+    "core.Base",
+    "core.GameStatic",
+    "core.Language",
+    "core.isoengine.IsoFightingElement",
+    "data.MarketplaceInfo",
+    "data.MarketplaceUnitInfo",
+    "flash.display.DisplayObjectContainer",
+    "flash.display.MovieClip",
+    "flash.events.Event",
+    "flash.events.MouseEvent",
+    "flash.events.TimerEvent",
+    "flash.text.TextField",
+    "flash.utils.Timer",
+    "utils.ThumbManager"
+   ],
+   "items": [
+    {
+     "itemId": 261,
+     "idConstant": "ID_BUILDING_MARKETPLACE",
+     "name": "Auction House"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "MultiShotTowerDelegate",
+   "bytes": 1748,
+   "overrides": [
+    "onAttack"
+   ],
+   "ownFunctions": [
+    "MultiShotTowerDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "flash.display.MovieClip",
+    "flash.events.Event"
+   ],
+   "items": [
+    {
+     "itemId": 46,
+     "idConstant": "ID_BUILDING_TOWER_CANNON",
+     "name": "Cannon Turret"
+    },
+    {
+     "itemId": 88,
+     "idConstant": "ID_BUILDING_TOWER_8",
+     "name": "Turret V"
+    }
+   ],
+   "registeredProjectiles": [
+    "CANNON",
+    "CANNON_SMALL"
+   ]
+  },
+  {
+   "delegate": "OfferBuildingDelegate",
+   "bytes": 1715,
+   "overrides": [
+    "initializeExtendedPortrait"
+   ],
+   "ownFunctions": [
+    "OfferBuildingDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [
+    "SAVE ME"
+   ],
+   "imports": [
+    "GUI.ExtendedPortraitPopupButtonEmbeded",
+    "GUI.RecuadroInfo",
+    "com.socialpoint.debug.Tracing",
+    "core.Base",
+    "core.GameStatic",
+    "core.Language",
+    "flash.display.DisplayObjectContainer",
+    "flash.events.MouseEvent",
+    "flash.external.ExternalInterface",
+    "flash.text.TextField"
+   ],
+   "items": [
+    {
+     "itemId": 961,
+     "idConstant": "ID_BUILDING_RED_BARON_CHAINED",
+     "name": "Chained Red Baron"
+    },
+    {
+     "itemId": 962,
+     "idConstant": "ID_BUILDING_METAL_DRAGON_CHAINED",
+     "name": "Chained Metallic Dragon"
+    },
+    {
+     "itemId": 963,
+     "idConstant": "ID_BUILDING_CELES_MEGAMECH_CHAINED",
+     "name": "Chained Celestial Megamech"
+    },
+    {
+     "itemId": 964,
+     "idConstant": "ID_BUILDING_METAL_DRAGON_2_CHAINED",
+     "name": "Chained Metallic Dragon II"
+    },
+    {
+     "itemId": 965,
+     "idConstant": "ID_BUILDING_ARMORED_CORE_ALPHA_CHAINED",
+     "name": "Chained Armored Core Alpha"
+    },
+    {
+     "itemId": 966,
+     "idConstant": "ID_BUILDING_GIANT_TRANSFORMER_CHAINED",
+     "name": "Chained Ultra-Mech"
+    },
+    {
+     "itemId": 967,
+     "idConstant": "ID_BUILDING_ULTRABOT_CHAINED",
+     "name": "Chained Nemesis Core"
+    },
+    {
+     "itemId": 968,
+     "idConstant": "ID_BUILDING_F117_CHAINED",
+     "name": "Chained F117"
+    },
+    {
+     "itemId": 969,
+     "idConstant": "ID_BUILDING_MEGA_TANK_CHAINED",
+     "name": "Chained Mega Tank"
+    },
+    {
+     "itemId": 970,
+     "idConstant": "ID_BUILDING_BAHAMUT_METAL_CHAINED",
+     "name": "Chained Blue Steel Bahamut"
+    },
+    {
+     "itemId": 971,
+     "idConstant": "ID_BUILDING_ALIEN_INSTIGATOR_CHAINED",
+     "name": "Chained Alien Instigator"
+    },
+    {
+     "itemId": 972,
+     "idConstant": "ID_BUILDING_MEGA_FIRE_BOT_CHAINED",
+     "name": "Chained Hyper Blazer "
+    },
+    {
+     "itemId": 973,
+     "idConstant": "ID_BUILDING_MESSIAH_BOT_CHAINED",
+     "name": "Chained Ether Messiah"
+    },
+    {
+     "itemId": 975,
+     "idConstant": "ID_BUILDING_GOLEM_BOSS_CHAINED",
+     "name": "Chained Golem Boss"
+    },
+    {
+     "itemId": 976,
+     "idConstant": "ID_BUILDING_CRUSADER_BOT_CHAINED",
+     "name": "Chained Crusader Bot"
+    },
+    {
+     "itemId": 977,
+     "idConstant": "ID_BUILDING_SAMURAI_BOT_CHAINED",
+     "name": "Chained Samurai Bot"
+    },
+    {
+     "itemId": 978,
+     "idConstant": "ID_BUILDING_CHEST_I_CHAINED",
+     "name": "Chained Magic Chest"
+    },
+    {
+     "itemId": 979,
+     "idConstant": "ID_BUILDING_CHEST_II_CHAINED",
+     "name": "Chained Mega Chest"
+    },
+    {
+     "itemId": 980,
+     "idConstant": "ID_BUILDING_CAMU_DRAGON_CHAINED",
+     "name": "Chained Camu Dragon"
+    },
+    {
+     "itemId": 984,
+     "idConstant": "ID_BUILDING_GUNBOT_CHAINED",
+     "name": "Chained Gun Bot"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "OpenableChestDelegate",
+   "bytes": 839,
+   "overrides": [
+    "onControlAnimation"
+   ],
+   "ownFunctions": [
+    "OpenableChestDelegate",
+    "openChest"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.display.MovieClip"
+   ],
+   "items": [
+    {
+     "itemId": 960,
+     "idConstant": "ID_BUILDING_OPENABLE_CHEST",
+     "name": "Chest"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "ProjectileTowerDelegate",
+   "bytes": 425,
+   "overrides": [
+    "onAttack"
+   ],
+   "ownFunctions": [
+    "ProjectileTowerDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [],
+   "items": [
+    {
+     "itemId": 226,
+     "idConstant": "ID_BUILDING_ALIEN_TURRET_1",
+     "name": "Alien Turret I"
+    },
+    {
+     "itemId": 229,
+     "idConstant": "ID_BUILDING_ARACHNID_TURRET_1",
+     "name": "Spider Turret I"
+    },
+    {
+     "itemId": 227,
+     "idConstant": "ID_BUILDING_ALIEN_TURRET_2",
+     "name": "Alien Turret II"
+    },
+    {
+     "itemId": 230,
+     "idConstant": "ID_BUILDING_ARACHNID_TURRET_2",
+     "name": "Spider Turret II"
+    }
+   ],
+   "registeredProjectiles": [
+    "ALIEN_FLEGMA"
+   ]
+  },
+  {
+   "delegate": "RecruitmentCenterDelegate",
+   "bytes": 1258,
+   "overrides": [
+    "initializeExtendedPortrait",
+    "getInfoButtonStore"
+   ],
+   "ownFunctions": [
+    "RecruitmentCenterDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [
+    "Allows you to obtain powerful units through recruiting new friends!"
+   ],
+   "imports": [
+    "GUI.ExtendedPortraitPopupButton",
+    "GUI.RecuadroInfo",
+    "GUI.infobuttons.InfoButtonGeneric",
+    "core.Base",
+    "core.Language",
+    "flash.display.MovieClip",
+    "flash.events.MouseEvent",
+    "popups.PopupRecruitment"
+   ],
+   "items": [
+    {
+     "itemId": 140,
+     "idConstant": "ID_BUILDING_RECRUITMENT_CENTER",
+     "name": "Recruitment Prize"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "ResearchCenterDelegate",
+   "bytes": 1659,
+   "overrides": [
+    "getInfoButtonStore",
+    "initializeExtendedPortrait"
+   ],
+   "ownFunctions": [
+    "ResearchCenterDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [
+    "Research in cutting edge technology fields to get the most deadly weapons before your enemy!",
+    "OPEN"
+   ],
+   "imports": [
+    "GUI.ExtendedPortraitPopupButtonEmbeded",
+    "GUI.RecuadroInfo",
+    "GUI.infobuttons.InfoButtonGeneric",
+    "core.Base",
+    "core.GameStatic",
+    "core.Language",
+    "flash.display.DisplayObjectContainer",
+    "flash.display.MovieClip",
+    "flash.events.MouseEvent",
+    "flash.text.TextField",
+    "managers.PopupManager",
+    "popups.PopupResearchCenter"
+   ],
+   "items": [
+    {
+     "itemId": 139,
+     "idConstant": "ID_BUILDING_AREA_51",
+     "name": "Area 51"
+    },
+    {
+     "itemId": 86,
+     "idConstant": "ID_BUILDING_ROBOTIC_CENTER",
+     "name": "Robotic Center"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "RocketLauncherDelegate",
+   "bytes": 1515,
+   "overrides": [
+    "onInit",
+    "onControlAnimation"
+   ],
+   "ownFunctions": [
+    "RocketLauncherDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "com.greensock.TweenLite",
+    "core.isoengine.IsoFightingElement",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.display.MovieClip",
+    "flash.utils.setTimeout"
+   ],
+   "items": [
+    {
+     "itemId": 128,
+     "idConstant": "ID_BUILDING_ROCKET_LAUNCHER",
+     "name": "Rocket launcher"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "SiloDelegate",
+   "bytes": 4548,
+   "overrides": [
+    "onInit",
+    "onControlAnimation",
+    "getInfoButtonStore",
+    "initializeExtendedPortrait"
+   ],
+   "ownFunctions": [
+    "SiloDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "GUI.RecuadroInfo",
+    "GUI.infobuttons.InfoButtonSilo",
+    "core.Base",
+    "core.Constants",
+    "core.isoengine.IsoBuilding",
+    "core.isoengine.IsoFightingElement",
+    "core.isoengine.PropertyManager",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.display.MovieClip",
+    "utils.TextFieldUtil"
+   ],
+   "items": [
+    {
+     "itemId": 932,
+     "idConstant": "ID_BUILDING_SILO_1",
+     "name": "Silo"
+    },
+    {
+     "itemId": 941,
+     "idConstant": "ID_BUILDING_SILO_2",
+     "name": "Silo II"
+    },
+    {
+     "itemId": 942,
+     "idConstant": "ID_BUILDING_SILO_3",
+     "name": "Silo III"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "SmallHarbourDelegate",
+   "bytes": 2199,
+   "overrides": [
+    "initializeExtendedPortrait",
+    "onControlAnimation"
+   ],
+   "ownFunctions": [
+    "SmallHarbourDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [
+    "Enter Mission"
+   ],
+   "imports": [
+    "GUI.RecuadroInfo",
+    "core.Base",
+    "core.Constants",
+    "core.GameStatic",
+    "core.Language",
+    "flash.display.DisplayObject",
+    "flash.display.DisplayObjectContainer",
+    "flash.display.MovieClip",
+    "flash.events.MouseEvent",
+    "flash.text.TextField"
+   ],
+   "items": [
+    {
+     "itemId": 907,
+     "idConstant": "ID_BUILDING_SMALL_HARBOUR",
+     "name": "Small Harbour"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "SocialBuildingDelegate",
+   "bytes": 4553,
+   "overrides": [
+    "initializeExtendedPortrait",
+    "getInfoButtonStore"
+   ],
+   "ownFunctions": [
+    "SocialBuildingDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [
+    "ID_BUILDING_ALLIES_BUILDING",
+    "ID_BUILDING_MARKET_1",
+    "ID_BUILDING_MARKET_2",
+    "ID_BUILDING_MARKET_3",
+    "ID_BUILDING_ALLIES_MARKET",
+    "ID_BUILDING_HOSPITAL_1"
+   ],
+   "constants": [],
+   "literals": [
+    "Get Allies",
+    "Enter Market",
+    "Enter Hospital",
+    "Open Popup",
+    "An error has occurred while loading this description",
+    "Recruit your friends to get special units and fight against your enemies",
+    "Trade good with your allies to get ride of some extra goods and get some needed ones",
+    "Lets you heal and revive your lost and injured units from the battlefield"
+   ],
+   "imports": [
+    "GUI.RecuadroInfo",
+    "GUI.infobuttons.InfoButtonGeneric",
+    "core.Base",
+    "core.Constants",
+    "core.GameStatic",
+    "core.Language",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.display.MovieClip",
+    "flash.events.MouseEvent",
+    "popups.PopupSelectResource",
+    "utils.TextFieldUtil"
+   ],
+   "items": [
+    {
+     "itemId": 28,
+     "idConstant": "ID_BUILDING_HOSPITAL_1",
+     "name": "Hospital"
+    },
+    {
+     "itemId": 74,
+     "idConstant": "ID_BUILDING_ALLIES_MARKET",
+     "name": "Allies Market"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "SoulMixerDelegate",
+   "bytes": 4165,
+   "overrides": [
+    "onInit",
+    "onControlAnimation",
+    "getInfoButtonStore",
+    "initializeExtendedPortrait"
+   ],
+   "ownFunctions": [
+    "SoulMixerDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [
+    "",
+    "OPEN"
+   ],
+   "imports": [
+    "GUI.ExtendedPortraitPopupButton",
+    "GUI.ExtendedPortraitPopupButtonEmbeded",
+    "GUI.RecuadroInfo",
+    "GUI.infobuttons.InfoButtonTower",
+    "core.Base",
+    "core.GameStatic",
+    "core.Language",
+    "core.isoengine.IsoBuilding",
+    "core.isoengine.IsoFightingElement",
+    "core.isoengine.IsoUnit",
+    "flash.display.DisplayObjectContainer",
+    "flash.display.MovieClip",
+    "flash.events.MouseEvent",
+    "flash.text.TextField",
+    "utils.TextFieldUtil"
+   ],
+   "items": [
+    {
+     "itemId": 302,
+     "idConstant": "ID_BUILDING_SOUL_MIXER",
+     "name": null
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "SpaceStationDelegate",
+   "bytes": 3721,
+   "overrides": [
+    "onInit",
+    "click",
+    "highlight",
+    "unhighlight",
+    "onControlAnimation"
+   ],
+   "ownFunctions": [
+    "SpaceStationDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [
+    "ID_BUILDING_BRIDGE"
+   ],
+   "constants": [
+    {
+     "name": "LVL_ADDITIONAL_BRIDGE",
+     "value": 5
+    }
+   ],
+   "literals": [],
+   "imports": [
+    "com.socialpoint.debug.Tracing",
+    "core.Base",
+    "core.BuildingReference",
+    "core.Config",
+    "core.Constants",
+    "core.Language",
+    "core.isoengine.IsoBuilding",
+    "core.isoengine.IsoFightingElement",
+    "flash.display.MovieClip",
+    "flash.display.Stage",
+    "utils.TextFieldUtil"
+   ],
+   "items": [
+    {
+     "itemId": 909,
+     "idConstant": "ID_BUILDING_SPACE_STATION",
+     "name": "Space Station"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "SpecialBunkerDelegate",
+   "bytes": 2043,
+   "overrides": [
+    "onControlAnimation",
+    "onAttack"
+   ],
+   "ownFunctions": [
+    "SpecialBunkerDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "managers.ProjectileManager"
+   ],
+   "items": [
+    {
+     "itemId": 50,
+     "idConstant": "ID_BUILDING_BUNKER_1",
+     "name": "Bunker I"
+    }
+   ],
+   "registeredProjectiles": [
+    "MACHINEGUN_BIG"
+   ]
+  },
+  {
+   "delegate": "ThrowingTowerDelegate",
+   "bytes": 1684,
+   "overrides": [
+    "onInit",
+    "onAttack"
+   ],
+   "ownFunctions": [
+    "ThrowingTowerDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [
+    {
+     "name": "ATTACK_FRAME",
+     "value": 16
+    }
+   ],
+   "literals": [],
+   "imports": [
+    "core.isoengine.IsoElement",
+    "core.isoengine.IsoFightingElement",
+    "flash.display.MovieClip",
+    "flash.events.Event"
+   ],
+   "items": [
+    {
+     "itemId": 189,
+     "idConstant": "ID_BUILDING_ORC_TOWER_II",
+     "name": "Ork Turret I"
+    },
+    {
+     "itemId": 208,
+     "idConstant": "ID_BUILDING_ENEMY_ORC_TOWER_2",
+     "name": "Enemy Ork Turret II"
+    }
+   ],
+   "registeredProjectiles": [
+    "GRENADE",
+    "P_FUSE_BOMB",
+    "BLAST_EARTH",
+    "BLAST_SMOKE_SMALL"
+   ]
+  },
+  {
+   "delegate": "TowerDelegate",
+   "bytes": 5244,
+   "overrides": [
+    "onControlAnimation",
+    "getInfoButtonStore",
+    "hasReachedConstructionLimit",
+    "highlight",
+    "unhighlight",
+    "onAttack"
+   ],
+   "ownFunctions": [
+    "TowerDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [],
+   "imports": [
+    "GUI.infobuttons.InfoButtonTower",
+    "core.Base",
+    "core.isoengine.IsoInteractiveElement",
+    "core.isoengine.IsoTerrain",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.display.MovieClip"
+   ],
+   "items": [],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "TruckDelegate",
+   "bytes": 2414,
+   "overrides": [
+    "canGetInside",
+    "onInit",
+    "initializeExtendedPortrait"
+   ],
+   "ownFunctions": [
+    "TruckDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [
+    "Put units inside to transport them",
+    "Earns:"
+   ],
+   "imports": [
+    "GUI.RecuadroInfo",
+    "battle.IA",
+    "core.Language",
+    "core.isoengine.IsoFightingElement",
+    "core.isoengine.IsoUnit",
+    "core.isoengine.delegates.AbstractUnitDelegate",
+    "utils.TextFieldUtil"
+   ],
+   "items": [
+    {
+     "itemId": 1013,
+     "idConstant": "ID_UNIT_TRUCK_1",
+     "name": "Truck"
+    },
+    {
+     "itemId": 1035,
+     "idConstant": "ID_UNIT_TRUCK_2",
+     "name": "Truck II"
+    },
+    {
+     "itemId": 1032,
+     "idConstant": "ID_UNIT_TRUCK_3",
+     "name": "Truck 3"
+    },
+    {
+     "itemId": 1019,
+     "idConstant": "ID_UNIT_SHIP",
+     "name": "Ship"
+    }
+   ],
+   "registeredProjectiles": []
+  },
+  {
+   "delegate": "WonderDelegate",
+   "bytes": 5755,
+   "overrides": [
+    "getInfoButtonStore",
+    "onInit",
+    "highlight",
+    "unhighlight",
+    "click",
+    "initializeExtendedPortrait"
+   ],
+   "ownFunctions": [
+    "WonderDelegate"
+   ],
+   "attacks": [],
+   "projectiles": [],
+   "damageClasses": [],
+   "specialAttackTypes": [],
+   "spawnedIds": [],
+   "constants": [],
+   "literals": [
+    "Collects remaining:",
+    "Wonder exhausted"
+   ],
+   "imports": [
+    "GUI.RecuadroInfo",
+    "GUI.infobuttons.InfoButtonWonder",
+    "commands.CmdResetCollect",
+    "core.Base",
+    "core.BuildingReference",
+    "core.Constants",
+    "core.Language",
+    "core.StaticData",
+    "core.isoengine.IsoBuilding",
+    "core.isoengine.IsoFightingElement",
+    "core.isoengine.delegates.AbstractBuildingDelegate",
+    "flash.display.MovieClip",
+    "flash.display.Stage",
+    "popups.PopupBuyGold",
+    "popups.PopupConfirm",
+    "utils.TextFieldUtil"
+   ],
+   "items": [
+    {
+     "itemId": 73,
+     "idConstant": "ID_BUILDING_WONDER_ANKOR",
+     "name": "Ankor"
+    },
+    {
+     "itemId": 72,
+     "idConstant": "ID_BUILDING_WONDER_BABILONIA",
+     "name": "Babilonia"
+    },
+    {
+     "itemId": 71,
+     "idConstant": "ID_BUILDING_WONDER_CHICHENITZA",
+     "name": "Chichenitza"
+    },
+    {
+     "itemId": 68,
+     "idConstant": "ID_BUILDING_WONDER_IGUAZU",
+     "name": "Iguazu"
+    },
+    {
+     "itemId": 70,
+     "idConstant": "ID_BUILDING_WONDER_INCAGOD",
+     "name": "Inca God"
+    },
+    {
+     "itemId": 69,
+     "idConstant": "ID_BUILDING_WONDER_SFINX",
+     "name": "Sphynx"
+    },
+    {
+     "itemId": 67,
+     "idConstant": "ID_BUILDING_WONDER_MACHUPICHU",
+     "name": "Machu Picchu"
+    },
+    {
+     "itemId": 66,
+     "idConstant": "ID_BUILDING_WONDER_STONEAGE",
+     "name": "Stoneage"
+    },
+    {
+     "itemId": 176,
+     "idConstant": "ID_BUILDING_WONDER_CASH",
+     "name": "Cash Wonder"
+    }
+   ],
+   "registeredProjectiles": []
+  }
+ ]
+}
