@@ -7,11 +7,13 @@
   **cross-platform client-server application** — web, desktop and mobile — with no Flash
   dependency, for players and for preservation. Primary users: players who want the game to
   keep working, preservation archivists, and anyone studying the original client's rules.
-- **Current state:** **Investigation and documentation complete; no product code written
-  yet.** The repository contains the full reverse-engineering report set (`re/`), the
-  project router (`docs/`) and the production roadmap (`docs/ROADMAP.md`). The upstream
-  project under analysis (`C:\Users\Edison\Desktop\socialwarriors`) has **not** been
-  vendored into this repository yet — that is Group A of the roadmap.
+- **Current state:** **The investigation is complete and the build has started.** The
+  repository contains the full reverse-engineering report set (`re/`), the project router
+  (`docs/`) and the production roadmap (`docs/ROADMAP.md`). The upstream project under
+  analysis is vendored at `upstream/socialwarriors/` with a SHA-256 manifest. The pnpm
+  workspace exists with `packages/protocol`, `packages/content` and `packages/rules`; the
+  content pipeline builds a validated, hashed bundle from the upstream config. The client,
+  server and desktop shells land with roadmap Groups F, G and H.
 
 ## Source of Truth
 
@@ -42,40 +44,48 @@ Decisions" section of `docs/ROADMAP.md`) but is *not yet implemented*. Only rows
 
 | Layer                | Technology / version                        | Status  | Evidence                        |
 | -------------------- | ------------------------------------------- | ------- | ------------------------------- |
+| Workspace            | pnpm 12.6 workspaces, TypeScript 5.9        | **Present** | `pnpm-workspace.yaml`, `packages/*` |
+| Protocol types       | TypeScript, in `@swl/protocol`              | **Present** | `packages/protocol/src/index.ts` |
+| Content pipeline     | TypeScript + a dependency-free JSON Patch applier, in `@swl/content` | **Present** | `packages/content/src/` |
+| Rules engine core    | TypeScript, in `@swl/rules`                 | **Present** | `packages/rules/src/` — the seeded PRNG and the 12-stage damage pipeline |
 | Game client (web)    | TypeScript + PixiJS v8 (WebGL2) + React DOM | Planned | `docs/ROADMAP.md` Locked Decisions |
 | Desktop shell        | Tauri v2 (Rust) over the same web client     | Planned | `docs/ROADMAP.md` Group H        |
 | Mobile shell         | Capacitor over the same web client          | Planned | `docs/ROADMAP.md` Group G5       |
 | Server + rules engine| TypeScript on Node.js 26                     | Planned | `docs/ROADMAP.md` Locked Decisions |
 | Database             | PostgreSQL + Drizzle; PGlite for offline play| Planned | `docs/ROADMAP.md` Locked Decisions |
-| Package manager      | pnpm 12.6 workspaces                         | Planned | `docs/ROADMAP.md` Group C        |
-| Upstream reference   | Python 3.9 + Flask 2.2.5                    | Present (external, read-only) | `C:\Users\Edison\Desktop\socialwarriors` |
+| Upstream reference   | Python 3.9 + Flask 2.2.5                    | Present (vendored, read-only) | `upstream/socialwarriors/` |
 | Asset tooling        | JPEXS FFDec 26.3.0 (Java 21), Git LFS 3.7.1 | Present | `re/docs/05-assets-and-content-pipeline.md` |
 | Reverse engineering  | REA MCP (Ghidra 12.1.4 headless)             | Present | `re/docs/07-REA-EVIDENCE.md`     |
-| Tests                | Vitest (unit/integration), Playwright (e2e), golden-master diff harness | Planned | `docs/ROADMAP.md` Group E4, I1 |
+| Tests                | Node's built-in test runner (`node --test`) | **Present** | `pnpm test` — 28 tests, no test-framework dependency |
 
 ## Build, Test, and Development Commands
 
 _Use commands that really exist in this repository. Never invent a script._
 
-**No build, test or run commands exist in this repository yet** — it currently holds only
-documentation, evidence and the project router. The table below is the **contracted
-interface that Group C of the roadmap must create**; treat it as the specification for
-those scripts, not as commands you can run today.
+**The workspace and the content pipeline exist (roadmap Group C). The client, server and
+desktop shells do not — they land with Groups F, G and H.**
 
 | Purpose                     | Command                            | Status | Evidence / notes |
 | --------------------------- | ---------------------------------- | ------ | ---------------- |
-| Install dependencies        | `pnpm install`                     | Planned | Group C          |
-| Run the client (dev)        | `pnpm --filter client dev`         | Planned | Group G          |
-| Run the server (dev)        | `pnpm --filter server dev`         | Planned | Group F          |
-| Build everything            | `pnpm build`                       | Planned | Group C          |
-| Run all tests               | `pnpm test`                        | Planned | Group I1         |
-| Lint                        | `pnpm lint`                        | Planned | Group C          |
-| Type-check                  | `pnpm typecheck`                   | Planned | Group C          |
-| Build the content bundle    | `pnpm --filter content build`      | Planned | Group C          |
-| Verify vendored provenance  | `node scripts/verify-upstream.mjs`  | Planned | Group A          |
-| Golden-master rules diff    | `pnpm --filter rules test:golden`  | Planned | Group E4         |
+| Install dependencies        | `pnpm install`                     | Working | Group C |
+| Type-check everything       | `pnpm typecheck`                   | Working | Group C |
+| Run the tests               | `pnpm test`                        | Working | Group C — Node's built-in runner, no test-framework dependency |
+| Build the content bundle    | `pnpm build:content`               | Working | Group C |
+| Validate the content bundle | `pnpm check:content`               | Working | Group C — same checks, no write |
+| Build everything            | `pnpm build`                       | Working | Group C — currently the content build only |
+| Verify the vendored upstream | `node scripts/verify-upstream.mjs` | Working | Group A |
+| Fetch the vendored assets   | `node scripts/pull-assets.mjs`     | Working | Group A — targeted LFS pull |
+| Decompile the client        | `node scripts/decompile-client.mjs` | Working | Group B |
+| Run the client (dev)        | `pnpm --filter client dev`         | Planned | Group G |
+| Run the server (dev)        | `pnpm --filter server dev`         | Planned | Group F |
+| Golden-master rules diff    | `pnpm --filter rules test:golden`  | Planned | Group E4 |
 
 Run from the repository root unless a command explicitly requires another directory.
+
+The analysis scripts under `scripts/` are plain Node ES modules and run directly with
+`node`; they need no build step. The TypeScript under `packages/` is run by Node 26's
+native type stripping, so there is no compile step either — `tsc` is only used for
+type-checking.
 
 ## Architecture Non-Negotiables
 

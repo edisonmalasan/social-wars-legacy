@@ -11,9 +11,11 @@
   modern client (web/desktop/mobile) and an authoritative, authenticated server.
 - **Primary users / use cases:** Players who want the game to keep working; preservation
   archivists; anyone studying the original client's game rules.
-- **Current focus:** **Investigation and documentation are complete.** The production
-  roadmap is defined in [`ROADMAP.md`](ROADMAP.md) and **autonomous execution is active**.
-  No product code exists yet — Group A (vendoring the upstream project) is the first task.
+- **Current focus:** **The investigation is complete and the build has started.** The
+  production roadmap is in [`ROADMAP.md`](ROADMAP.md) and **autonomous execution is
+  active**. Groups A, B and C are done: the upstream project is vendored and verified, the
+  evidence sweep is complete, and the workspace with its content pipeline and rules core
+  exists. The client, server and desktop shells are next (Groups D–H).
 
 ## Where to Look
 
