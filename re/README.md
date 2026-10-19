@@ -55,6 +55,7 @@
 | **07** | [REA MCP Evidence Log](docs/07-REA-EVIDENCE.md) | What REA could and could not establish, the byte-pattern sweep over the client bytecode, and the Electron analysis of the browser that runs it. | 19 kB |
 | **08** | [Clone Roadmap](docs/08-CLONE-ROADMAP.md) | The actual rewrite plan: 6 workstreams, 10 milestones, the cheat battery the new server must pass, and the risks. | 17 kB |
 | **09** | [Limitations & Open Questions](docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md) | What we do **not** know, the upstream bugs found, and 9 open questions with the cheapest first. | 14 kB |
+| **10** | [Client Version History](docs/10-client-version-history.md) | All 58 client builds diffed: the server signing key **rotated once**, and the protocol's own timeline. | 14 kB |
 
 ### 2.2 Machine-readable
 
