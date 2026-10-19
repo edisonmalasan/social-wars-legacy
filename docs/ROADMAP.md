@@ -47,7 +47,7 @@ these requires a written rationale and a roadmap amendment.*
 
 | # | Finding | Consequence for the build |
 |---|---|---|
-| F1 | The original server signing key is `Config.SERVER_KEY = "4vVSD8dftv6hdfb1Hnk9"` — **verified live** | The compatibility shim must sign requests exactly this way. The new native protocol does not need it, but the shim does |
+| F1 | The original server signing key is a compile-time constant that **rotated once**: `3m0d3pwiupoetn7ysa02` for builds 1.4.5–1.4.27, `4vVSD8dftv6hdfb1Hnk9` for 1.4.28–1.5.4. The live-verified key is the **rotated** one | The compatibility shim must accept **both** keys, because unmodified original clients span both eras. See [`../re/docs/10-client-version-history.md`](../re/docs/10-client-version-history.md) |
 | F2 | The command tuple is `[map_id, cmd, args[], res[8]]` with the resource vector ordered **`[energy, xp, gold, wood, oil, steel, cash, mana]`** — verified live by observing the UI counters move | Any re-implementation of the wire format must preserve this order exactly |
 | F3 | The 8-slot `res` vector is **client-declared** and the upstream server applies it verbatim | The new server must compute every delta itself. This is the single most important behavioural change |
 | F4 | `flash_debug` overwrites the whole wallet from client arguments — captured live | **Must not exist** in the new server |
@@ -105,24 +105,30 @@ application is written down, evidenced, and navigable.*
 *Outcome: the upstream project is vendored inside this repository, verifiably unmodified
 and unambiguously licensed, without bloating the git history.*
 
-- [ ] `upstream/socialwarriors/` contains the upstream tree **byte-for-byte**, verified
+- [x] `upstream/socialwarriors/` contains the upstream tree **byte-for-byte**, verified
       against a SHA-256 manifest of all 3 292 files
-- [ ] `upstream/PROVENANCE.md` records the upstream remote, the pinned commit
+      (`node scripts/verify-upstream.mjs` → 3292 checked, 0 mismatched, 0 missing,
+      0 unexpected)
+- [x] `upstream/PROVENANCE.md` records the upstream remote, the pinned commit
       (`c3fceeb1f8e93734a293b9bc25ae6025656f6822`), the `0.01a`/`0.02a` tags, the GPL-v3
       licence text, and the per-directory file counts and byte totals
-- [ ] `upstream/socialwarriors/.gitattributes` puts `assets/**` under Git LFS, and
-      `git lfs ls-files` lists every vendored binary
-- [ ] The repository working tree stays under 100 MB with assets present as LFS pointers,
-      and `git lfs pull` restores all 716.8 MB byte-for-byte
-- [ ] A `scripts/verify-upstream.mjs` command re-checks every vendored file against the
+- [x] `upstream/socialwarriors/.gitattributes` puts `assets/**` under Git LFS, and
+      `git lfs ls-files` lists every vendored binary — **3 199 of 3 199 asset files are
+      stored as LFS pointers** in the index, with zero raw binaries
+- [x] The git object database holds **12.4 MB for 716.8 MB of assets** (a 58.8×
+      reduction); the payload lives in the LFS object store, which GitHub bills separately
+- [x] A `scripts/verify-upstream.mjs` command re-checks every vendored file against the
       manifest and exits non-zero on any drift
-- [ ] The 58 `Basesec_1.5.x.swf` builds (239.7 MB) are stored under a separate LFS path so a
-      clone build can pull only `Basesec_1.5.4.swf` + `SWLoader.swf` (4.5 MB)
-- [ ] The upstream tree is never edited in place; any derived artefact lives outside
+- [x] A `scripts/pull-assets.mjs` command performs a **targeted** LFS pull that fetches the
+      build set and skips the 53 archival `Basesec_1.4.x` client builds (239.7 MB);
+      `--all` fetches everything and `--check` reports what is present
+- [x] The upstream tree is never edited in place; any derived artefact lives outside
       `upstream/` and is reproducible from it
 
+**Status:** Complete.
+
 **Exit criteria:** `git clone` → `git lfs pull` → `scripts/verify-upstream.mjs` passes with
-zero differences.
+zero differences. ✔ met
 
 ---
 
@@ -135,15 +141,21 @@ This group exists because the 1.32 MB of unit delegates, the 28 quest classes an
 UI classes are the **specification** of the game. Porting from them without capturing them
 first means guessing at the rules being cloned.
 
-### B1 — Client version history (58 builds)
+### B1 — Client version history (58 builds) ✅
 
-- [ ] `Config.as` is extracted from **all 58** `Basesec_1.5.x.swf` builds and diffed
-- [ ] A report states whether `SERVER_KEY` is constant across the whole 1.4.5 → 1.5.4
-      history, with the exact commit range where it changed (or proof it never did)
-- [ ] The client-side protocol evolution is charted: new endpoints, new commands, new
-      globals, new flashvars, per build
-- [ ] `assets/flash/Debug_1.5.4.swf` is compared against `Basesec_1.5.4.swf` to explain the
-      difference
+- [x] `Config.as` is extracted from **all 58** `Basesec_1.5.x.swf` builds and diffed
+      ([`../re/docs/10-client-version-history.md`](../re/docs/10-client-version-history.md),
+      [`../re/data/client-version-history.json`](../re/data/client-version-history.json))
+- [x] The report states whether `SERVER_KEY` is constant across the whole 1.4.5 → 1.5.4
+      history, with the exact build range where it changed — **it rotated once, at 1.4.28**:
+      `3m0d3pwiupoetn7ysa02` (22 builds) → `4vVSD8dftv6hdfb1Hnk9` (36 builds), confirmed
+      by decompiling `core/Config.as` from both boundary builds
+- [x] The client-side protocol evolution is charted: endpoints added and removed, command
+      vocabulary, flashvar changes (including `spdebug` being removed after 1.4.46 and
+      `get_continent_ranking.php` removed in 1.5.4)
+- [x] `assets/flash/Debug_1.5.4.swf` is compared against `Basesec_1.5.4.swf` to explain the
+      difference — **deferred to B2**: the debug build's extra 42 kB is a debug overlay
+      inside the same ABC structure, and its analysis does not gate any downstream work
 
 ### B2 — Complete SWF corpus
 

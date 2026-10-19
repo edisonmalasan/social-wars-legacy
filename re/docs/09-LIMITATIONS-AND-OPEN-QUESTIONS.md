@@ -191,23 +191,30 @@ own `is_valid_village()` only checks that `items` is a dict.
 | Q2 | What are the 32 ignored commands' real semantics? | Read the `Cmd*.as` classes (already in report 03) and decide which the clone must implement. `set_help_map` is confirmed live as one of them. |
 | Q3 | Which of the 123 client-only item ids should the clone ship? | Diff the client's `items` handling against the config; the 1307–1431 wave is the obvious candidate |
 | Q4 | What was the original server's **response** hash scheme? | Recover from a 2012 capture, or from the original PHP if it is ever located |
-| Q5 | Is `Config.SERVER_KEY` stable across all shipped `Basesec_1.5.x.swf` builds? | Extract `Config.as` from each of the 59 shipped SWFs and diff — **the diff is cheap and worth doing** |
+| Q5 | ~~Is `Config.SERVER_KEY` stable across all shipped `Basesec_1.5.x.swf` builds?~~ | **ANSWERED — see [`10-client-version-history.md`](10-client-version-history.md).** The key **rotated once**: `3m0d3pwiupoetn7ysa02` for builds 1.4.5–1.4.27 (22 builds), `4vVSD8dftv6hdfb1Hnk9` for 1.4.28–1.5.4 (36 builds). The live-verified key is the *rotated* one. The compatibility shim must accept both. |
 | Q6 | What are the 34 missing chapter/intro images? | Recover from an older asset dump or the original CDN |
 | Q7 | What does `_m` actually mean in the 279 sprite names without a `_w`? | Inspect the original art pipeline or diff against another Socialpoint title |
 | Q8 | What is the `alliance/` endpoint contract? | The client sends 11 `alliance/?method=…` variants; the server answers `{}` for all of them. The real contract is in the AS3 `popups/alliances/**` classes |
 | Q9 | Does the original server enforce the `data` HMAC on requests? | Almost certainly yes — the client computes it. The upstream server simply does not. The original PHP would settle it |
 
-### Q5 is the cheapest high-value follow-up
+### Q5 was the cheapest high-value follow-up — and it paid off
 
-There are **58 `Basesec_1.5.x.swf` builds** in `assets/flash/` (1.4.5 → 1.5.4, with
-1.4.7 absent), plus `SWLoader.swf` and `Debug_1.5.4.swf` — 60 files in total. Each build
-embeds its own `Config.as`. Extracting and diffing them would:
+There are **58 `Basesec_1.5.x.swf` builds** in `assets/flash/`, spanning 1.4.5 → 1.5.4.
+Each embeds its own `Config.as`. Extracting and diffing them found that **the server
+signing key rotated once**, at build 1.4.28:
 
-* confirm whether `SERVER_KEY` is constant across the whole build history,
-* show the client-side evolution of the protocol (new endpoints, new commands, new globals),
-* give a version-by-version changelog of the *client*, which is the actual game history.
+```
+1.4.5  – 1.4.27   SERVER_KEY = "3m0d3pwiupoetn7ysa02"   (the original production key)
+1.4.28 – 1.5.4    SERVER_KEY = "4vVSD8dftv6hdfb1Hnk9"   (the rotated key we verified live)
+```
 
-That is a mechanical task with the same tooling already in use.
+Full analysis in [`10-client-version-history.md`](10-client-version-history.md); the
+machine-readable timeline is in
+[`../data/client-version-history.json`](../data/client-version-history.json).
+
+This closed the last open question about the protocol's identity, and it produced two
+consequences for the build: the compatibility shim must accept **both** keys, and the 58
+builds are now a free **differential-testing corpus** for the rules engine.
 
 ## 5. Confidence legend used across these documents
 

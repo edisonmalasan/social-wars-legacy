@@ -1,0 +1,31 @@
+# Attribute rules are evaluated top to bottom and the LAST matching rule wins,
+# so the general rules come first and the specific ones after.
+
+# 1. Default for the repository: let git detect text and use the platform's
+#    end-of-line convention.
+* text=auto
+
+# 2. Source and documentation files are normalised to LF so diffs are stable
+#    across platforms.
+*.md    text eol=lf
+*.mjs   text eol=lf
+*.ts    text eol=lf
+*.tsx   text eol=lf
+*.js    text eol=lf
+*.json  text eol=lf
+*.txt   text eol=lf
+*.csv   text eol=lf
+
+# 3. The vendored upstream tree must stay byte-for-byte identical, so line
+#    endings are NEVER rewritten inside it.
+upstream/** -text
+
+# 4. ...except the assets, which are 716.8 MB of pure binary (swf / jpg / png /
+#    mp3) and therefore go to Git LFS. This rule comes after rule 3 so that
+#    `-text` still applies to them.
+upstream/socialwarriors/assets/** filter=lfs diff=lfs merge=lfs -text
+
+# 5. The manifests are generated artefacts and must hash identically on every
+#    platform.
+upstream/MANIFEST.sha256 text eol=lf
+upstream/MANIFEST.json   text eol=lf
