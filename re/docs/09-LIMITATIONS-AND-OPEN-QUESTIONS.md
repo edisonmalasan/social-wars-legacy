@@ -95,19 +95,39 @@ the *current* client build. Whether the original production server used the same
 2012 is unknown. **Treat the recovered key as "the key this build signs with", not "the
 original server's key".**
 
-### 2.5 Combat was never observed live
+### 2.5 Combat was captured live — but only for quests
 
-The live session reached tutorial step 14 (training soldiers) but never entered a battle
-or a quest. Therefore:
+The live session reached tutorial step 14, then (after clearing the tutorial flag and the
+level-8 PvP gate in the scratch save file) entered **Mission 1**, fought an assault and
+finalised it. The **`end_quest`** payload was captured verbatim:
 
-* `end_attack` / `end_quest` payload shapes are **derived from the decompiled command
-  classes**, not observed.
-* The 94-command table in [`03-commands-quests-economy.md`](03-commands-quests-economy.md)
-  is static-analysis-derived for every command except the ten observed live.
-* The "32 commands the server ignores" list is static-analysis-derived too.
+```json
+{"difficulty":1,"map":0,"quest_id":"100000001","voluntary_end":1,"win":0,
+ "units":[[1007,3,0,0]],"duration":662}
+```
 
-**Next step if this matters:** drive the client to the world map, attack a neighbour, and
-run a quest, then re-run the trace capture. The harness already supports it.
+This confirms the server's parsing model exactly and closes the largest static-only gap.
+
+**Still not observed live:**
+
+* **`end_attack`** — the PvP battle report. The shape is documented from
+  `scripts/commands/CmdEndAttack.as` and is the same family as `end_quest` (both carry
+  `victim`/`attacker`, `win`, `voluntary_end`, `units` and `duration`), and the server
+  parses them with near-identical code, but the *PvP* variant was not captured. The
+  static-village neighbours are visitable but the client-side attack flow was not
+  completed inside the session.
+* **`attack_player` / `spy_player`** — the commands that *start* a PvP interaction.
+
+**Still derived from static analysis only:**
+
+* The **full** 94-command table in
+  [`03-commands-quests-economy.md`](03-commands-quests-economy.md). 17 of the 94 were
+  observed live; the other 77 come from the decompiled `Cmd*.as` classes.
+* The "32 client commands the server ignores" list — **one of them, `set_help_map`, was
+  confirmed live** as a command the client sends and the server drops.
+
+**Next step if this matters:** visit a neighbour island from the town strip, select the
+army, attack a building, and re-run the trace capture. The harness already supports it.
 
 ### 2.6 The ABC constant-pool parser did not complete
 
@@ -167,8 +187,8 @@ own `is_valid_village()` only checks that `items` is a dict.
 
 | # | Question | How to answer it |
 |---|---|---|
-| Q1 | What are the exact `end_attack` / `end_quest` payload shapes? | Drive the client to the world map, attack a neighbour, run a quest, capture the trace |
-| Q2 | What are the 32 ignored commands' real semantics? | Read the `Cmd*.as` classes (already in report 03) and decide which the clone must implement |
+| Q1 | What is the exact `end_attack` (PvP) payload shape? | Visit a neighbour island from the town strip, select the army, attack a building, and capture the trace. `end_quest` is already captured — see §2.5. |
+| Q2 | What are the 32 ignored commands' real semantics? | Read the `Cmd*.as` classes (already in report 03) and decide which the clone must implement. `set_help_map` is confirmed live as one of them. |
 | Q3 | Which of the 123 client-only item ids should the clone ship? | Diff the client's `items` handling against the config; the 1307–1431 wave is the obvious candidate |
 | Q4 | What was the original server's **response** hash scheme? | Recover from a 2012 capture, or from the original PHP if it is ever located |
 | Q5 | Is `Config.SERVER_KEY` stable across all shipped `Basesec_1.5.x.swf` builds? | Extract `Config.as` from each of the 59 shipped SWFs and diff — **the diff is cheap and worth doing** |
@@ -200,6 +220,8 @@ That is a mechanical task with the same tooling already in use.
 ## 6. What would change the conclusions
 
 * A capture of a real battle or quest would replace the last major static-only section.
+  **A quest battle has since been captured** (§2.5) — only the PvP `end_attack` variant
+  remains static-only.
 * The 59-build SWF diff could reveal an earlier protocol dialect (e.g. an older command
   framing) that the current build has migrated away from.
 * Finding the original PHP backend would settle the response-hash and alliance questions

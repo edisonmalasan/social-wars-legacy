@@ -1,7 +1,7 @@
-# Social Wars Legacy — Roadmap
+﻿# Social Wars Legacy — Roadmap
 
 > **Purpose:** an outcome-based guide to what gets built and in what order. Milestones are
-> defined in detail in [`re/docs/08-CLONE-ROADMAP.md`](re/docs/08-CLONE-ROADMAP.md); this
+> defined in detail in [`re/docs/08-CLONE-ROADMAP.md`](../re/docs/08-CLONE-ROADMAP.md); this
 > file is the short, checkable version.
 
 ## Status Rules
@@ -25,25 +25,27 @@
 application is written down, evidenced, and navigable.*
 
 - [x] The Flash client is fully decompiled and the 1 387 AS3 classes are analysed
-      ([`re/docs/02`](re/docs/02-combat-and-units.md), [`re/docs/03`](re/docs/03-commands-quests-economy.md))
+      ([`re/docs/02`](../re/docs/02-combat-and-units.md), [`re/docs/03`](../re/docs/03-commands-quests-economy.md))
 - [x] The network protocol is documented end to end, including the recovered HMAC key
-      ([`re/docs/01`](re/docs/01-network-protocol.md))
+      ([`re/docs/01`](../re/docs/01-network-protocol.md))
 - [x] The HMAC key is **verified against live traffic** from a real Adobe Flash Player
-      ([`re/evidence/live/hmac-verification.txt`](re/evidence/live/hmac-verification.txt))
+      ([`re/evidence/live/hmac-verification.txt`](../re/evidence/live/hmac-verification.txt))
 - [x] The save format and game-config pipeline are documented
-      ([`re/docs/04`](re/docs/04-python-server-and-data.md))
+      ([`re/docs/04`](../re/docs/04-python-server-and-data.md))
 - [x] The asset tree is inventoried and mapped to every config item
-      ([`re/docs/05`](re/docs/05-assets-and-content-pipeline.md))
-- [x] A live session is captured and reproducible (309 requests, 16 command batches)
-      ([`re/docs/06`](re/docs/06-LIVE-SESSION-PROTOCOL.md))
+      ([`re/docs/05`](../re/docs/05-assets-and-content-pipeline.md))
+- [x] A live session is captured and reproducible (1 664 requests, 34 command batches,
+      17 command names) ([`re/docs/06`](../re/docs/06-LIVE-SESSION-PROTOCOL.md))
+- [x] The `end_quest` battle report is captured from a live Mission 1 assault
+      ([`re/evidence/live/command-payloads.txt`](../re/evidence/live/command-payloads.txt))
 - [x] REA's contribution and its coverage limits are recorded
-      ([`re/docs/07`](re/docs/07-REA-EVIDENCE.md))
+      ([`re/docs/07`](../re/docs/07-REA-EVIDENCE.md))
 - [x] The rewrite plan, risks and open questions are written
-      ([`re/docs/08`](re/docs/08-CLONE-ROADMAP.md), [`re/docs/09`](re/docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md))
-- [ ] Combat (`end_attack`) and quest (`end_quest`) payloads are captured from a live
-      battle — the last static-only part of the protocol
+      ([`re/docs/08`](../re/docs/08-CLONE-ROADMAP.md), [`re/docs/09`](../re/docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md))
+- [ ] The PvP `end_attack` payload is captured from a live player attack — the only
+      remaining static-only part of the protocol
 
-**Status:** Complete, except the live battle capture.
+**Status:** Complete, except the PvP `end_attack` capture.
 
 ---
 
@@ -136,5 +138,5 @@ application is written down, evidenced, and navigable.*
 - Update statuses only after verification; distinguish untested from failed.
 - Keep implementation details in code, code review, or a task-specific plan — not here.
 - Preserve reasons for significant technical decisions in
-  [`re/docs/08-CLONE-ROADMAP.md`](re/docs/08-CLONE-ROADMAP.md) and
-  [`re/docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md`](re/docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md).
+  [`re/docs/08-CLONE-ROADMAP.md`](../re/docs/08-CLONE-ROADMAP.md) and
+  [`re/docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md`](../re/docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md).

@@ -101,3 +101,321 @@ Decoded command.php batches captured from a live Adobe Flash Player session
     cmd  rt_open_graph_unit         args=[1007]  res=[0, 0, 0, 0, 0, 0, 0, 0]
     cmd  buy                        args=[51, 1007, 58, 39, 1, 0, 0, 'u']  res=[0, 0, 0, 0, 0, 0, 0, 0]
     cmd  pop_queue_unit             args=[48]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #17  first_number=1 ts=1792437411 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = 9572a990392de954aa73cd0242ad41c9343fe4beead208f1aa7f3a944bfa4f0a
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  complete_tutorial          args=[1]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #18  first_number=2 ts=1792437417 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = d3580560c2796cb106363eeee75fd7dd4d3d0c8bfea9ba68cbcd51f62fdec42a
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  complete_tutorial          args=[2]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #19  first_number=3 ts=1792437478 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = 0e337818482b0e84e6fe0d926830a5a879154c592ac3b3e1d77fd21f543b5e0c
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  complete_tutorial          args=[3]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  push_queue_unit            args=[1]  res=[0, 5, -10, 0, 0, 0, 0, 0]
+    cmd  rt_open_graph_unit         args=[1001]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[52, 1001, 52, 42, 1, 0, 0, 'u']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  pop_queue_unit             args=[1]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #20  first_number=8 ts=1792437532 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = 74d56adaa6c3be2d0ca6e48d12ad50df2c47003cbcde9a04cf4d627bfef0f530
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  complete_tutorial          args=[4]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #21  first_number=9 ts=1792437592 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = 22a4c1283fbab06100e9fbec0c65164d5f5623e25773eba529bc4dd95e083bab
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  complete_tutorial          args=[5]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #22  first_number=1 ts=1792437858 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = c2228236ccffcdb898480bdce2268a146401cf35aba62857b45ca17186479e00
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  buy                        args=[57, 915, 43, 5, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[59, 916, 44, 6, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[61, 915, 43, 6, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[63, 915, 44, 5, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[65, 916, 42, 6, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[67, 916, 44, 4, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[69, 916, 59, 21, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[71, 916, 58, 21, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[73, 916, 57, 21, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[75, 917, 56, 21, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[77, 916, 55, 21, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[79, 914, 54, 21, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[81, 917, 86, 2, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[83, 916, 87, 3, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[85, 916, 86, 3, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[87, 917, 87, 2, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[89, 915, 85, 3, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[91, 915, 87, 1, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[93, 912, 36, 38, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[95, 912, 37, 39, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[97, 911, 37, 38, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[99, 911, 36, 39, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[101, 912, 37, 37, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[103, 911, 96, 9, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[105, 913, 97, 10, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[107, 910, 96, 10, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[109, 913, 97, 9, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[111, 911, 95, 10, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[113, 912, 1, 52, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[115, 912, 1, 51, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[117, 911, 1, 50, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[119, 911, 2, 53, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[121, 911, 2, 52, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[123, 904, 21, 43, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[125, 902, 22, 44, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[127, 902, 22, 43, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[129, 904, 21, 44, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[131, 904, 22, 42, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[133, 901, 20, 44, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[135, 902, 72, 53, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[137, 904, 73, 54, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[139, 901, 72, 54, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[141, 902, 73, 53, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[143, 904, 71, 54, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[145, 902, 73, 52, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[147, 902, 39, 13, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[149, 902, 40, 13, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[151, 903, 40, 12, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[153, 903, 38, 13, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[155, 902, 39, 12, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[157, 903, 38, 12, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[159, 931, 12, 92, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[161, 931, 12, 95, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[163, 931, 12, 89, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[165, 930, 14, 92, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[167, 931, 9, 92, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[169, 930, 14, 27, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[171, 931, 14, 18, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[173, 930, 12, 27, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[175, 930, 16, 27, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[177, 905, 17, 26, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[179, 930, 68, 22, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[181, 930, 68, 24, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[183, 930, 66, 22, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[185, 905, 68, 25, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[187, 930, 66, 24, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[188, 931, 36, 96, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[189, 930, 94, 24, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  batch_remove               args=['[]']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  batch_remove               args=['[91,81,87,89,85,83,103,109,111,107,105]']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  batch_remove               args=['[189]']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #23  first_number=1 ts=1792437864 tries=2 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = d87c8886c7a617385a0477c92985c5e2e1e9e95399b9eddad6b984315d4b007b
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  buy                        args=[57, 915, 43, 5, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[59, 916, 44, 6, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[61, 915, 43, 6, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[63, 915, 44, 5, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[65, 916, 42, 6, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[67, 916, 44, 4, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[69, 916, 59, 21, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[71, 916, 58, 21, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[73, 916, 57, 21, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[75, 917, 56, 21, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[77, 916, 55, 21, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[79, 914, 54, 21, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[81, 917, 86, 2, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[83, 916, 87, 3, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[85, 916, 86, 3, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[87, 917, 87, 2, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[89, 915, 85, 3, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[91, 915, 87, 1, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[93, 912, 36, 38, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[95, 912, 37, 39, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[97, 911, 37, 38, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[99, 911, 36, 39, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[101, 912, 37, 37, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[103, 911, 96, 9, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[105, 913, 97, 10, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[107, 910, 96, 10, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[109, 913, 97, 9, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[111, 911, 95, 10, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[113, 912, 1, 52, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[115, 912, 1, 51, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[117, 911, 1, 50, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[119, 911, 2, 53, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[121, 911, 2, 52, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[123, 904, 21, 43, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[125, 902, 22, 44, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[127, 902, 22, 43, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[129, 904, 21, 44, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[131, 904, 22, 42, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[133, 901, 20, 44, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[135, 902, 72, 53, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[137, 904, 73, 54, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[139, 901, 72, 54, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[141, 902, 73, 53, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[143, 904, 71, 54, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[145, 902, 73, 52, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[147, 902, 39, 13, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[149, 902, 40, 13, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[151, 903, 40, 12, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[153, 903, 38, 13, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[155, 902, 39, 12, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[157, 903, 38, 12, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[159, 931, 12, 92, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[161, 931, 12, 95, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[163, 931, 12, 89, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[165, 930, 14, 92, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[167, 931, 9, 92, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[169, 930, 14, 27, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[171, 931, 14, 18, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[173, 930, 12, 27, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[175, 930, 16, 27, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[177, 905, 17, 26, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[179, 930, 68, 22, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[181, 930, 68, 24, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[183, 930, 66, 22, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[185, 905, 68, 25, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[187, 930, 66, 24, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[188, 931, 36, 96, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[189, 930, 94, 24, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  batch_remove               args=['[]']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  batch_remove               args=['[91,81,87,89,85,83,103,109,111,107,105]']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  batch_remove               args=['[189]']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #24  first_number=72 ts=1792438050 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = 2d524d9601042f9b3b9f825f5ed781dc8cf6d5fccb65e5b16dc6a738383262c8
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  darts_reset                args=[198369]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[290, 302, 44, 41, 1, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  activate_item_click        args=[290]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #25  first_number=75 ts=1792438147 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = 467d7392a78dc9763a57f7e189b7c25336e994987106b8c4edd5d15addb10c09
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  set_quest_var              args=['spawned', 'true']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  set_quest_var              args=['id', '1']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #26  first_number=1 ts=1792438476 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = 73a4810032cb78b2f394cedbd2d1ff39cc55801df1ae13dfe1ca892611d42958
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  buy                        args=[295, 915, 65, 84, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[297, 914, 66, 85, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[299, 915, 66, 84, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[301, 916, 65, 85, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[303, 916, 66, 83, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[305, 915, 3, 87, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[307, 915, 4, 88, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[309, 917, 4, 87, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[311, 914, 3, 88, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[313, 914, 4, 86, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[315, 910, 65, 83, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[317, 912, 66, 82, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[319, 912, 64, 84, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[321, 911, 65, 82, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[323, 912, 64, 83, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[325, 911, 64, 82, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[327, 913, 51, 23, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[329, 912, 52, 24, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[331, 910, 51, 24, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  flash_debug                args=[5, 50, 3000, 1890, 2000, 1820, 1895]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[333, 912, 52, 23, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[335, 912, 50, 24, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[337, 911, 52, 22, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[339, 904, 23, 27, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[341, 901, 23, 26, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[343, 903, 23, 28, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[345, 903, 22, 28, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[347, 904, 22, 27, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[349, 901, 22, 26, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  batch_remove               args=['[]']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  batch_remove               args=['[]']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  batch_remove               args=['[]']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #27  first_number=1 ts=1792438496 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = b22e90d513864a84ad1195e90181e626bcabb2e1b9e8d351369b74f9df8ddd15
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  buy                        args=[296, 915, 68, 31, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[298, 915, 69, 32, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[300, 915, 68, 32, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[302, 914, 69, 31, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[304, 916, 67, 32, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[306, 916, 67, 31, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[308, 917, 66, 44, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[310, 916, 67, 45, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[312, 917, 66, 45, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[314, 915, 67, 44, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[316, 916, 65, 45, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[318, 915, 67, 43, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[320, 913, 7, 26, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[322, 913, 6, 26, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[324, 912, 5, 26, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[326, 912, 4, 26, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[328, 910, 3, 26, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[330, 911, 2, 26, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[332, 912, 87, 21, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  flash_debug                args=[5, 50, 3000, 1890, 2000, 1820, 1895]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[334, 911, 88, 22, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[336, 912, 87, 22, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[338, 911, 88, 21, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[340, 911, 86, 22, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[342, 910, 88, 20, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[344, 901, 79, 13, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[346, 904, 80, 14, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[348, 904, 79, 14, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[350, 902, 80, 13, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[352, 901, 78, 14, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[354, 902, 80, 12, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  batch_remove               args=['[]']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  batch_remove               args=['[354,344,350,352,348,346,342]']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  batch_remove               args=['[332,338,340,336,334]']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #28  first_number=35 ts=1792438683 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = 457781eec8f487e3db2e76b9511b2507f9c9aa2b1c97dd9be007198a7a7214cd
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  set_help_map               args=['helpExplorationManager']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #29  first_number=1 ts=1792439405 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = a8f4c30d0fa5361260fbca7fcb9ffa6dc2061d726cc10c5ffe20281abb2d6954
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  buy                        args=[335, 912, 6, 98, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[337, 911, 7, 98, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[339, 912, 7, 97, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[341, 910, 6, 97, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[343, 912, 5, 98, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[345, 912, 5, 97, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[347, 902, 2, 65, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[349, 903, 3, 66, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[351, 902, 3, 65, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[353, 902, 2, 66, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[355, 901, 3, 64, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  buy                        args=[357, 903, 1, 66, 3, 0, 0, 'n']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  batch_remove               args=['[]']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  batch_remove               args=['[]']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  batch_remove               args=['[]']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #30  first_number=16 ts=1792439706 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = b0f6672ac4d26fac229aa09be85cb9ed8ebf87c1568737cfcf7fecb0aa0db6c7
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  ping                       args=[]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #31  first_number=17 ts=1792440007 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = 0636140956cb5054836e4050abc610c2ca2ea1965174e149cd4e48b7d10a2c8a
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  ping                       args=[]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #32  first_number=18 ts=1792440308 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = 6e3beaabc025b165b7470583eb371f874557e70695973353ddbffceacf0f908a
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  ping                       args=[]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #33  first_number=19 ts=1792440331 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = f8f3e6768f4d0979d24b03ad1e275efce422ce9d65af3d2e7ed229148046b023
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  end_quest                  args=['{"difficulty":1,"map":0,"quest_id":"100000001","voluntary_end":1,"win":0,"units":[[1007,3,0,0]],"duration":662}']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+
+--- batch #34  first_number=1 ts=1792440339 tries=1 flashVersion=1.5.4 publishActions='0'
+    hmac_prefix = f94cc053fcbce4cdd18eda1880c05b2ec87161a05c06fa76803f07a2157040ff
+    query       = USERID=e53386db-e42c-43c4-8c5c-9ace9c81ad91&user_key=123456789&language=en
+    cmd  flash_debug                args=[5, 50, 3000, 1890, 2000, 1820, 1895]  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  batch_remove               args=['[]']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  batch_remove               args=['[]']  res=[0, 0, 0, 0, 0, 0, 0, 0]
+    cmd  batch_remove               args=['[]']  res=[0, 0, 0, 0, 0, 0, 0, 0]

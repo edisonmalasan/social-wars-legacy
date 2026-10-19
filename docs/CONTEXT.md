@@ -1,4 +1,4 @@
-# Project Context
+﻿# Project Context
 
 > This file is a **router**, not a duplicate of the README or an architecture specification.
 
@@ -12,24 +12,24 @@
 - **Primary users / use cases:** Players who want the game to keep working; preservation
   archivists; anyone studying the original client's game rules.
 - **Current focus:** Investigation and documentation are **complete**. The rewrite plan is
-  defined in [`re/docs/08-CLONE-ROADMAP.md`](re/docs/08-CLONE-ROADMAP.md) but **no
+  defined in [`re/docs/08-CLONE-ROADMAP.md`](../re/docs/08-CLONE-ROADMAP.md) but **no
   implementation code exists in this repository yet**.
 
 ## Where to Look
 
 | Need | Canonical source |
 |---|---|
-| **Start here** — the findings in one page | [`re/README.md`](re/README.md) |
-| Goals, features, and progress | [`docs/ROADMAP.md`](docs/ROADMAP.md) |
-| Full investigation report set | [`re/docs/`](re/docs/) |
-| Observed wire protocol (verified live) | [`re/docs/06-LIVE-SESSION-PROTOCOL.md`](re/docs/06-LIVE-SESSION-PROTOCOL.md) |
-| Command catalogue, economy, quests, goals | [`re/docs/03-commands-quests-economy.md`](re/docs/03-commands-quests-economy.md) |
-| Combat rules and unit stats | [`re/docs/02-combat-and-units.md`](re/docs/02-combat-and-units.md) |
-| Save format, config pipeline, server routes | [`re/docs/04-python-server-and-data.md`](re/docs/04-python-server-and-data.md) |
-| Asset inventory and conversion plan | [`re/docs/05-assets-and-content-pipeline.md`](re/docs/05-assets-and-content-pipeline.md) |
-| The rewrite plan (6 workstreams, 10 milestones) | [`re/docs/08-CLONE-ROADMAP.md`](re/docs/08-CLONE-ROADMAP.md) |
-| What is still unknown | [`re/docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md`](re/docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md) |
-| Raw evidence (traffic, digests, screenshots) | [`re/evidence/`](re/evidence/) |
+| **Start here** — the findings in one page | [`re/README.md`](../re/README.md) |
+| Goals, features, and progress | [`docs/ROADMAP.md`](../docs/ROADMAP.md) |
+| Full investigation report set | [`re/docs/`](../re/docs/) |
+| Observed wire protocol (verified live) | [`re/docs/06-LIVE-SESSION-PROTOCOL.md`](../re/docs/06-LIVE-SESSION-PROTOCOL.md) |
+| Command catalogue, economy, quests, goals | [`re/docs/03-commands-quests-economy.md`](../re/docs/03-commands-quests-economy.md) |
+| Combat rules and unit stats | [`re/docs/02-combat-and-units.md`](../re/docs/02-combat-and-units.md) |
+| Save format, config pipeline, server routes | [`re/docs/04-python-server-and-data.md`](../re/docs/04-python-server-and-data.md) |
+| Asset inventory and conversion plan | [`re/docs/05-assets-and-content-pipeline.md`](../re/docs/05-assets-and-content-pipeline.md) |
+| The rewrite plan (6 workstreams, 10 milestones) | [`re/docs/08-CLONE-ROADMAP.md`](../re/docs/08-CLONE-ROADMAP.md) |
+| What is still unknown | [`re/docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md`](../re/docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md) |
+| Raw evidence (traffic, digests, screenshots) | [`re/evidence/`](../re/evidence/) |
 | The upstream project under analysis | `C:\Users\Edison\Desktop\socialwarriors` (external, unmodified) |
 
 ## The Upstream Project Under Investigation
@@ -61,7 +61,7 @@
 1. Start with the user's task and this routing file.
 2. Open `re/README.md` for the document map, then only the specific report the task needs.
 3. Inspect the upstream checkout directly when a claim needs re-verification.
-4. Consult [`re/docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md`](re/docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md)
+4. Consult [`re/docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md`](../re/docs/09-LIMITATIONS-AND-OPEN-QUESTIONS.md)
    before promising certainty.
 5. If sources disagree, report the conflict; do not silently choose whichever is convenient.
 6. The upstream project is a **read-only reference**. Do not edit it — copy what is needed

@@ -86,10 +86,21 @@ exactly 125.
 ### 2.5 The live session proves the whole stack still runs
 
 A real **Adobe Flash Player** (bundled in Flashy Browser 1.2.4, `pepflashplayer.dll`) loaded
-`Basesec_1.5.4.swf` from the local Flask server, completed the tutorial, trained units and
-built an Academy, producing **309 HTTP requests across 212 distinct paths and 16
-`command.php` batches**. The game is fully playable today. See
-[`06-LIVE-SESSION-PROTOCOL.md`](06-LIVE-SESSION-PROTOCOL.md).
+`Basesec_1.5.4.swf` from the local Flask server, completed the tutorial, trained units,
+built an Academy, entered **Mission 1** and finalised a live assault — producing
+**1 664 HTTP requests across 294 distinct paths and 34 `command.php` batches** covering
+**17 distinct command names**, including the full `end_quest` battle report. The game is
+fully playable today. See [`06-LIVE-SESSION-PROTOCOL.md`](06-LIVE-SESSION-PROTOCOL.md).
+
+The `end_quest` payload, observed verbatim:
+
+```json
+{"difficulty":1,"map":0,"quest_id":"100000001","voluntary_end":1,"win":0,
+ "units":[[1007,3,0,0]],"duration":662}
+```
+
+`units` is `[item_id, sent_to_battle, A, B]` and the server computes `lost = max(0, A − B)`
+— confirming the whole battle outcome is client-declared.
 
 ### 2.6 The game data is a 2012 snapshot, but the client is newer
 
@@ -116,8 +127,9 @@ login page is not consulted by any dynamic endpoint.
 ### 2.9 `flash_debug` is a full wallet overwrite
 
 Sent automatically by the client roughly every 20 commands at level ≥ 10, it replaces cash,
-xp, gold, oil, steel and wood with client-supplied values. It is the single most exploitable
-command in the protocol.
+xp, gold, oil, steel and wood with client-supplied values. **Observed live** as
+`flash_debug 5,50,3000,1890,2000,1820,1895`. It is the single most exploitable command
+in the protocol.
 
 ### 2.10 The asset tree is 375 MB of SWF that must be converted
 

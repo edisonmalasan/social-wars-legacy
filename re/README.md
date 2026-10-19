@@ -19,6 +19,7 @@
 | **Content** | `config/main.json` (a **29-Aug-2012** live capture of the original config, plus 5 JSON-Patch patches) and **3 199 asset files / 716.77 MB** |
 | **The headline** | The original **server signing key is recovered and verified live**: `HMAC-SHA256("4vVSD8dftv6hdfb1Hnk9", payload)` reproduces the client's own 64-hex `data` prefix byte-for-byte |
 | **The trap** | The server **believes the client**: resource costs, combat outcomes, goal completion and daily rewards are all client-declared and never validated. A clone must fix this. |
+| **Live proof** | 1 664 HTTP requests, 294 distinct paths, 34 command batches, **17 command names**, and the `end_quest` battle report captured verbatim from the real Flash Player |
 | **Bottom line** | The game is **fully playable today** with a real Adobe Flash Player against the local server. The client — not the Python — is the game. Port the client, replace the server. |
 
 ### Ten findings you should not skip
@@ -60,11 +61,11 @@
 | Artefact | Contents |
 |---|---|
 | [`docs/items-assets.csv`](docs/items-assets.csv) | The 778 config items → resolved sprite / thumbnail / sound files. One row per item. |
-| [`evidence/live/requests.jsonl`](evidence/live/requests.jsonl) | Every HTTP request the real Flash client made (309 requests, static-asset noise trimmed). |
-| [`evidence/live/command-payloads.txt`](evidence/live/command-payloads.txt) | All 16 `command.php` batches, decoded: signature, query, and every command with its arguments and resource delta. |
+| [`evidence/live/requests.jsonl`](evidence/live/requests.jsonl) | Every HTTP request the real Flash client made (1 664 requests, 294 distinct paths). |
+| [`evidence/live/command-payloads.txt`](evidence/live/command-payloads.txt) | All 34 `command.php` batches, decoded: signature, query, and every command with its arguments and resource delta. |
 | [`evidence/live/endpoint-summary.txt`](evidence/live/endpoint-summary.txt) | Per-endpoint request counts and response statuses. |
 | [`evidence/live/hmac-verification.txt`](evidence/live/hmac-verification.txt) | 13 candidate signature constructions tested against a real payload; exactly one matches. |
-| [`evidence/live/screenshots/`](evidence/live/screenshots/) | Six screenshots of the live game: splash, town, tutorial, harvesting, building placement, Academy panel. |
+| [`evidence/live/screenshots/`](evidence/live/screenshots/) | 13 screenshots of the live game: splash, town, tutorial, harvesting, building, Academy panel, the missions world, the mission briefing, the quest cutscene, the assault, the island, and the mission result. |
 
 ---
 
@@ -116,8 +117,7 @@
 | Server analysis | Source reading + live HTTP probing | Report 04 |
 | Data analysis | Programmatic JSON analysis | Reports 03, 04, 05 |
 | Asset inventory | Filesystem analysis + FFDec frame export | Report 05 |
-| **Live session** | **Real Adobe Flash Player** (in Flashy Browser 1.2.4) + a purpose-built CDP driver | Reports 01, 06; `evidence/live/` |
-| Browser shell analysis | **REA MCP** `analyze_javascript_application` on the browser's `app.asar` | Report 07 |
+| **Live session** | **Real Adobe Flash Player** (in Flashy Browser 1.2.4) + a purpose-built CDP driver | Reports 01, 06; `evidence/live/` || Browser shell analysis | **REA MCP** `analyze_javascript_application` on the browser's `app.asar` | Report 07 |
 | Synthesis | Cross-checking every claim against a second call site or against live traffic | Reports 00, 08, 09 |
 
 **Reproduce the live session:** the harness is described in

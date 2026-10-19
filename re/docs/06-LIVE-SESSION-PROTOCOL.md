@@ -8,8 +8,8 @@ local preservation server and capturing every HTTP request.
 |---|---|
 | Client | Adobe Flash Player (PPAPI), bundled as `pepflashplayer.dll` in Flashy Browser 1.2.4 (MSIX, CEF/Electron 4.2.6, Chromium 69) |
 | Server | Upstream `server.py` (Flask 2.2.5) on `127.0.0.1:5055`, wrapped with a request-tracing `before_request` hook (the upstream code itself was **not** modified) |
-| Session | New empire created via `GET /new.html`, tutorial played through to step 14 |
-| Traffic | 309 HTTP requests, 212 distinct paths, 16 `command.php` batches |
+| Session | New empire created via `GET /new.html`; tutorial played through; Academy built; soldiers trained; **Mission 1 (quest 100000001) entered and finalized**; the exploration world map visited |
+| Traffic | **1 664 HTTP requests, 294 distinct paths, 34 `command.php` batches, 17 distinct command names** |
 | Raw artefacts | [`../evidence/live/`](../evidence/live/) |
 
 ---
@@ -199,20 +199,27 @@ raised by the static analysis of `core/Crypto.as` is *not* what the shipped clie
 
 ## 5. Commands observed live
 
-Ten distinct command names were captured with their real argument vectors:
+**Seventeen** distinct command names were captured with their real argument vectors.
 
 | Command | Args | Meaning | Server handling |
 |---|---|---|---|
 | `complete_tutorial` | `[step]` | tutorial progress marker; ≥25 or ==15 marks the tutorial done | sets `playerInfo.completed_tutorial` |
-| `push_queue_unit` | `[building_index]` | start queueing a unit in a production building | bumps `researchStepNumber`-style counters / sets `nu`,`ts` |
+| `push_queue_unit` | `[building_index]` | start queueing a unit in a production building | bumps the production counters, sets `nu`/`ts` |
 | `pop_queue_unit` | `[building_index]` | take the queued unit out of the building | decrements `nu`, clears `ts`/`ui` |
 | `rt_open_graph_unit` | `[item_id]` | "open graph" tracking for a unit (Facebook share) | appends to `privateState.publishedOpenGraphUnit` |
-| `buy` | `[index, item_id, x, y, player, orientation, ?, reason]` | place a building (`reason="b"`) or spawn a unit (`reason="u"`) | `map_add_item` + `bought_unit_add` |
+| `buy` | `[index, item_id, x, y, player, orientation, ?, reason]` | place a building (`reason="b"`), spawn a unit (`reason="u"`), or place a world-map decoration (`reason="n"`, `player=3`) | `map_add_item` + `bought_unit_add` |
 | `move` | `[index, x, y, frame, label]` | move an item to a map position | sets `item[1]`, `item[2]` |
 | `collect` | `[index]` | harvest a production building | resets the collect timer `item[3]` |
 | `sell` | `[index, reason]` | remove an item; `"HARV"` = harvested, `"KILL"` = combat death | deletes the item, pushes to `deadHeroes` if resurrectable |
 | `add_click` | `[index]` | "click to build" — add one construction click | `attr["nc"] += 1` |
 | `activate_item_click` | `[index]` | construction finished | removes `attr["nc"]` |
+| `batch_remove` | `[]` or `[index, ...]` | remove many items at once (world-map unload) | deletes each index |
+| `set_quest_var` | `["spawned","true"]`, `["id",1]` | quest state machine variables | writes `map["currentQuestVars"][key]` |
+| `darts_reset` | `[seed]` | start the darts minigame; **the argument is the RNG seed** | stores the seed, clears the shot list, sets `dartsHasFree` |
+| `flash_debug` | `[cash, xp, gold, oil, steel, wood]` | **overwrite the whole wallet from client arguments** | overwrites every resource |
+| `set_help_map` | `["helpExplorationManager"]` | which help/manager context is active | **not handled — silently ignored** |
+| `ping` | `[]` | keep-alive | no-op |
+| **`end_quest`** | `[json]` | **the battle/quest report** — see §5.2 | records losses, sets `questTimes[quest_id]` |
 
 `item_id` values seen: **1001** (Worker), **1007** (Soldier). `item_id 30` is **Academy I**.
 Item indices are small integers allocated by the client and stored in `map["items"]` keyed by
@@ -229,6 +236,51 @@ the stringified index.
 `attr_dict` uses exactly these keys: `si` (socially-in-construction help), `nc` (clicks
 needed to build), `cp` (activation point), `nu` (queue length), `ts` (queue timestamp),
 `ui` (queued unit id), `xp` (accumulated unit XP).
+
+The world-map (`player=3`) decorations use `reason="n"` and item ids in the 901–930 range —
+a distinct item-id band from the player's own buildings.
+
+### 5.2 `end_quest` — the battle report, captured live
+
+This is the payload the server's `end_quest` handler parses, observed verbatim from a
+finalised Mission 1 assault:
+
+```json
+{
+  "difficulty": 1,
+  "map": 0,
+  "quest_id": "100000001",
+  "voluntary_end": 1,
+  "win": 0,
+  "units": [[1007, 3, 0, 0]],
+  "duration": 662
+}
+```
+
+| Field | Type | Meaning |
+|---|---|---|
+| `difficulty` | 1–3 | quest difficulty; the server clamps it with `max(1, min(3, …))` |
+| `map` | int | map index the quest was played on |
+| `quest_id` | string | the quest village id — `"100000001"` matches `constants.py` `Quests.QUEST` **and** `villages/quest/100000001.json` |
+| `voluntary_end` | 1 | the player ended the quest early (here: "finalize the battle" without meeting the objective) |
+| `win` | 0/1 | whether the objective was met |
+| `units` | array | per-unit losses: `[item_id, sent_to_battle, A, B]`. The server computes `lost = max(0, A − B)` |
+| `duration` | int | seconds the battle lasted (662 s here) |
+
+`units: [[1007, 3, 0, 0]]` = one Soldier type, 3 committed to battle, `A − B = 0` losses.
+This **confirms the server's parsing model exactly** — and confirms that the *entire* battle
+outcome, including the win flag and the loot, is **client-declared**.
+
+The quest was loaded over the same `get_player_info.php` endpoint as everything else, with
+the quest id in the `user` parameter:
+
+```
+POST /dynamic/menvswomen/srvsexwars/get_player_info.php?USERID=…&user_key=…&language=en
+     client_id=…&user=100000001
+```
+
+which the server routes to `get_neighbor_info("100000001", map)` — i.e. the quest village
+from `villages/quest/`.
 
 ## 6. The boot sequence, end to end
 
@@ -285,6 +337,8 @@ The whole harness is reproducible and lives outside the upstream tree:
 |---|---|
 | `capture_server.py` | Imports the untouched `server.py`, adds a JSONL request tracer, serves on 5055 |
 | `cdp.js` | A ~120-line Chrome DevTools Protocol driver (Node ≥ 22, no npm deps) for `navigate`, `click`, `slowclick`, `hover`, `shot`, `seq` |
+| `drive.js` | A **persistent** CDP session with `Page.startScreencast`, so a capture always reflects the preceding action. Directives: `click`, `move`, `drag`, `wait`, `eval`, `shot`, `info` |
+| `crop.py` | Crops and zooms a screenshot region so exact pixel targets can be read |
 | `verify_hmac.py` | Tests 13 candidate signature constructions against a captured payload |
 
 The browser was launched with:
@@ -295,6 +349,24 @@ Flashy.exe --remote-debugging-port=9222 --user-data-dir=<tmp> http://127.0.0.1:5
 
 Because Flashy is an Electron/CEF app, the CDP endpoint exposes the page target directly,
 which is why the game could be driven programmatically rather than by coordinate-guessing.
+
+> **Note on `Page.captureScreenshot`:** against the CEF/Flash compositor it intermittently
+> times out. `Page.startScreencast` is the reliable alternative — it streams frames
+> continuously, and the frames are in viewport coordinates, so a click target read off a
+> frame can be clicked directly. This is what `drive.js` does.
+
+### 8.1 Reaching a battle without the tutorial
+
+The tutorial is a modal that blocks the world map, and its "click the tree" step is
+fiddly to hit programmatically. Two shortcuts were used, both **only** on the scratch copy
+of the save file (never on the upstream checkout):
+
+1. Set `playerInfo.completed_tutorial = 1` in `saves/<USERID>.save.json`, then hit
+   `GET /` — the upstream server calls `load_saves()` on every login-page request, so the
+   edited file is re-read into memory.
+2. Raise `maps[0].level` (PvP requires level ≥ 8) and `maps[0].xp`.
+
+After that, `WORLD → MISSIONS WORLD → ENTER → START BATTLE` reaches a live assault.
 
 ## 9. What the live session changed about the analysis
 
@@ -307,4 +379,15 @@ which is why the game could be driven programmatically rather than by coordinate
 6. **The 8-slot `res` vector is client-declared and the server applies it verbatim** —
    the single most important thing to fix in a clone.
 7. `sell` uses the reason codes `"HARV"` (harvested) and `"KILL"` (killed in combat);
-   `buy` uses `"u"` (unit) and `"b"` (building).
+   `buy` uses `"u"` (unit), `"b"` (building) and `"n"` (world-map decoration, with
+   `player = 3`).
+8. **`flash_debug` is confirmed live** — it really does ship the full wallet
+   (`[cash, xp, gold, oil, steel, wood]`) and the server really does overwrite it.
+9. **`end_quest` is confirmed live** — the exact JSON the server parses, including the
+   `units` loss-vector layout `[item_id, sent_to_battle, A, B]`.
+10. **`darts_reset` carries the RNG seed** as its single argument, and
+    **`set_quest_var`** carries `(key, value)` string pairs.
+11. **`set_help_map` is sent but not handled** — a live confirmation of the
+    "client sends commands the server drops" finding.
+12. The quest village is fetched through the *same* `get_player_info.php` endpoint, with
+    the quest id in the `user` parameter.
