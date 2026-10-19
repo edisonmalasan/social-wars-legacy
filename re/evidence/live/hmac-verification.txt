@@ -1,0 +1,24 @@
+HMAC-SHA256 key verification against a payload captured from the real client
+==============================================================================
+
+observed prefix : d8c21de8555a80b9087b2760d087ddf5dd183a5246a71063dd10f9ee881d2e94
+payload (first 120): {"ts":1792434747,"tries":1,"flashVersion":"1.5.4","first_number":1,"accessToken":"AAABbZAm0wdMUBALsOrR0Ho68CLjaOT8SV3vft
+payload length  : 281
+
+hmac(key, msg)                     d8c21de8555a80b9087b2760d087ddf5dd183a5246a71063dd10f9ee881d2e94  <== MATCH
+hmac(utf(key), utf(msg))           df23e7c9f8c6110b2dea5f736528f1a892ebe9b5e1baf67d74733f0a1055bb72
+hmac(utf(key), msg)                da0d678fab7ee6a598c3266b49b4591d65cebbf69c060e4d6d3b72ee9ea775c3
+hmac(key, utf(msg))                840388fe88972b209993d8e8959b0b29910c6c26f9758b44b54bbf5bf970f9c7
+sha256(key+msg)                    4abf811e74a34da67b26008c8137d81b2b5099124abc84bc1575f10823b4857d
+sha256(utf(key)+utf(msg))          4e50469b645fd3dd08a70f3ce6afe500ec80b91f9611399b195db103b964b80e
+sha256(msg+key)                    8bdd3b4ead5edf1c840d76fa843456e9d08aaf0a0f6b12c5dfd6f52066e3b48f
+sha256(utf(msg)+utf(key))          b6d7dccb01aac75f6015ba31435dcc2a9486bbd8a4d011dad50cef500af9dad0
+sha256(msg)                        c0e8c77ba6babd5c786d31e0fbf4f36470d3bb78d81a39105333e2d69c7d2248
+md5(key+msg)                       e5aad68f2c66a6f7a02f6397daa32de1
+sha1(key+msg)                      1a9ff036bfdc942bcc71594e765a2df9bd860195
+sha256(utf(key)+msg)               5fbef0f7f6963413826a2deb00302345a2468b7542ab59b2e80bd1575fc0c049
+
+MATCHING VARIANTS: ['hmac(key, msg)']
+
+Result: the recovered Config.SERVER_KEY reproduces the client's 64-hex
+data prefix byte-for-byte, so the original server signing key is confirmed.

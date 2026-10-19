@@ -1,1 +1,6 @@
-re
+# The reverse-engineering report set (re/) is intentionally tracked: it is this
+# project's primary content and is referenced from docs/CONTEXT.md and docs/ROADMAP.md.
+#
+# The upstream Social Wars checkout, the decompiled ActionScript and the tooling used
+# to produce the report are NOT stored here. They live outside this repository; see
+# re/docs/06-LIVE-SESSION-PROTOCOL.md for how to regenerate the evidence.
