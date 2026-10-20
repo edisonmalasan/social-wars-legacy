@@ -1,0 +1,322 @@
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+
+import { framePayload, SERVER_KEYS } from '@swl/protocol';
+import { COUNTERS } from '@swl/rules';
+
+import { LegacyIdentityBridge, SessionStore } from './session.ts';
+import {
+  applyBatch,
+  handleCommandPhp,
+  handleGetPlayerInfo,
+  type ShimContext,
+  type ShimWorld,
+} from './shim.ts';
+
+function repoRoot(): string {
+  let dir = process.cwd();
+  for (let i = 0; i < 8; i++) {
+    if (existsSync(path.join(dir, 'pnpm-workspace.yaml'))) return dir;
+    dir = path.dirname(dir);
+  }
+  return process.cwd();
+}
+
+async function costContent() {
+  const bundle = JSON.parse(
+    await readFile(path.join(repoRoot(), 'packages/content/dist/content-bundle.json'), 'utf8'),
+  ) as {
+    items: { id: number; name: string; costs: Record<string, number>; cost_unit_cash: number }[];
+    offerPacks: { id: number; name: string; cost_cash: number; gold: number; wood: number; oil: number; steel: number; mana: number; xp: number; items: number[] }[];
+    globals: Record<string, unknown>;
+    expansionPrices: { coins: number; cash: number }[];
+  };
+  return {
+    items: new Map(
+      bundle.items.map((i) => [
+        i.id,
+        { id: i.id, name: i.name, costs: i.costs, costUnitCash: i.cost_unit_cash },
+      ]),
+    ),
+    offerPacks: new Map(bundle.offerPacks.map((p) => [p.id, p])),
+    globals: bundle.globals,
+    expansionPrices: bundle.expansionPrices,
+    marketSellPercentage: bundle.globals['MARKET_SELL_PERCENTAGE'] as number,
+    marketMaxTrades: bundle.globals['MARKET_MAX_NUM_TRADES'] as number,
+    marketIncrement: bundle.globals['MARKET_INCREMENT'] as number,
+    marketBaseCosts: bundle.globals['MARKET_BASE_COSTS'] as Record<string, number>,
+  };
+}
+
+function world(over: Partial<ShimWorld> = {}): ShimWorld {
+  return {
+    save: { playerInfo: {}, maps: [{}], privateState: {} },
+    resources: { g: 1000, w: 1000, o: 1000, s: 1000, c: 1000, e: 100, x: 0, m: 0 },
+    nextCommandNumber: 1,
+    ...over,
+  };
+}
+
+async function context(over: Partial<ShimContext> = {}): Promise<ShimContext> {
+  const applied: string[] = [];
+  const base: ShimContext = {
+    world: world(),
+    content: await costContent(),
+    now: 1_700_000_000,
+    identity: new LegacyIdentityBridge(),
+    applyCommand: (w, command) => {
+      applied.push(command.name);
+      return { applied: true, world: w };
+    },
+    ...over,
+  };
+  return base;
+}
+
+describe('sessions', () => {
+  it('issues a token for a correct credential', () => {
+    const store = new SessionStore();
+    store.addPlayer('p1', 'correct horse');
+    const result = store.authenticate('p1', 'correct horse', 1000);
+    assert.equal(result.ok, true);
+    if (result.ok) {
+      assert.ok(result.session.token.length > 32);
+      assert.equal(result.session.playerId, 'p1');
+    }
+  });
+
+  it('refuses a wrong password', () => {
+    const store = new SessionStore();
+    store.addPlayer('p1', 'correct horse');
+    const result = store.authenticate('p1', 'wrong', 1000);
+    assert.equal(result.ok, false);
+    if (!result.ok) assert.equal(result.reason, 'bad-credential');
+  });
+
+  it('refuses an unknown player', () => {
+    const store = new SessionStore();
+    const result = store.authenticate('nobody', 'x', 1000);
+    assert.equal(result.ok, false);
+    if (!result.ok) assert.equal(result.reason, 'unknown-player');
+  });
+
+  it('resolves a live token and refuses an expired one', () => {
+    const store = new SessionStore();
+    store.addPlayer('p1', 'pw');
+    const issued = store.authenticate('p1', 'pw', 1000);
+    assert.equal(issued.ok, true);
+    if (!issued.ok) return;
+    assert.ok(store.resolve(issued.session.token, 1001));
+    assert.equal(store.resolve(issued.session.token, 99_999_999), null);
+  });
+
+  it('revokes a token immediately', () => {
+    const store = new SessionStore();
+    store.addPlayer('p1', 'pw');
+    const issued = store.authenticate('p1', 'pw', 1000);
+    assert.equal(issued.ok, true);
+    if (!issued.ok) return;
+    assert.ok(store.resolve(issued.session.token, 1001));
+    assert.equal(store.revoke(issued.session.token), true);
+    assert.equal(store.resolve(issued.session.token, 1001), null);
+  });
+
+  it('revokes every session of a player', () => {
+    const store = new SessionStore();
+    store.addPlayer('p1', 'pw');
+    store.authenticate('p1', 'pw', 1000);
+    store.authenticate('p1', 'pw', 1001);
+    assert.equal(store.size, 2);
+    assert.equal(store.revokeAllFor('p1'), 2);
+    assert.equal(store.size, 0);
+  });
+});
+
+describe('the legacy identity bridge', () => {
+  it('is off by default', () => {
+    const bridge = new LegacyIdentityBridge();
+    bridge.bind('legacy-1', 'p1');
+    assert.equal(bridge.resolve('legacy-1'), null);
+  });
+
+  it('resolves a bound value once it is enabled', () => {
+    const bridge = new LegacyIdentityBridge();
+    bridge.bind('legacy-1', 'p1');
+    bridge.allowLegacyIdentity();
+    assert.equal(bridge.resolve('legacy-1'), 'p1');
+  });
+
+  it('cannot invent a player', () => {
+    const bridge = new LegacyIdentityBridge();
+    bridge.allowLegacyIdentity();
+    assert.equal(bridge.resolve('never-bound'), null);
+  });
+});
+
+describe('the command.php shim', () => {
+  it('rejects a body that is not framed', async () => {
+    const ctx = await context();
+    const response = handleCommandPhp({ path: '/command.php', fields: { data: '{"commands":[]}' } }, ctx);
+    assert.equal(response.status, 400);
+    assert.match(response.body, /malformed-framing/);
+  });
+
+  it('rejects a body signed with the wrong key', async () => {
+    const ctx = await context();
+    const payload = JSON.stringify({ first_number: 1, commands: [] });
+    const frame = framePayload(payload, 'not-a-real-key');
+    const response = handleCommandPhp({ path: '/command.php', fields: { data: frame } }, ctx);
+    assert.equal(response.status, 403);
+    assert.match(response.body, /bad-signature/);
+  });
+
+  it('accepts a body signed with either key', async () => {
+    for (const key of [SERVER_KEYS.current, SERVER_KEYS.legacy]) {
+      const ctx = await context();
+      const payload = JSON.stringify({ first_number: 1, commands: [] });
+      const response = handleCommandPhp(
+        { path: '/command.php', fields: { data: framePayload(payload, key) } },
+        ctx,
+      );
+      assert.equal(response.status, 200);
+    }
+  });
+
+  it('answers with the shape the client expects', async () => {
+    const ctx = await context();
+    const payload = JSON.stringify({ first_number: 1, commands: [] });
+    const response = handleCommandPhp(
+      { path: '/command.php', fields: { data: framePayload(payload, SERVER_KEYS.current) } },
+      ctx,
+    );
+    assert.equal(response.status, 200);
+    assert.deepEqual(JSON.parse(response.body), { result: 'success' });
+  });
+
+  it('does not apply a replayed batch twice', async () => {
+    const applied: string[] = [];
+    const ctx = await context({
+      applyCommand: (w, command) => {
+        applied.push(command.name);
+        return { applied: true, world: w };
+      },
+    });
+    const payload = {
+      first_number: 1,
+      commands: [[1, 'move', [1, 2, 3], [0, 0, 0, 0, 0, 0, 0, 0]]],
+    };
+    const first = applyBatch(payload, ctx);
+    assert.equal(applied.length, 1);
+    assert.equal(first.replay, false);
+
+    // The client re-sends the SAME packet when it gets no answer.
+    const second = applyBatch(payload, { ...ctx, world: first.world });
+    assert.equal(applied.length, 1, 'the replay applied the command again');
+    assert.equal(second.replay, true);
+  });
+
+  it('tolerates a gap in the command index', async () => {
+    const ctx = await context();
+    const payload = {
+      first_number: 50,
+      commands: [[1, 'move', [1, 2, 3], [0, 0, 0, 0, 0, 0, 0, 0]]],
+    };
+    const outcome = applyBatch(payload, ctx);
+    assert.equal(outcome.gap, true);
+    assert.equal(outcome.world.nextCommandNumber, 51);
+  });
+
+  it('refuses flash_debug outright', async () => {
+    const ctx = await context();
+    const payload = {
+      first_number: 1,
+      commands: [[1, 'flash_debug', [1, 2, 3], [0, 0, 999999, 0, 0, 0, 0, 0]]],
+    };
+    const outcome = applyBatch(payload, ctx);
+    assert.equal(outcome.refused.length, 1);
+    assert.equal(outcome.refused[0]!.name, 'flash_debug');
+    // The wallet is untouched.
+    assert.equal(outcome.world.resources['g'], 1000);
+  });
+
+  it('computes the cost itself and ignores the declared delta', async () => {
+    const ctx = await context();
+    // A buy of a Soldier costs 30 gold and 60 steel. The client claims it
+    // cost nothing.
+    const payload = {
+      first_number: 1,
+      commands: [[1, 'buy', [1, 1007, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0]]],
+    };
+    const outcome = applyBatch(payload, ctx);
+    assert.equal(outcome.refused.length, 0);
+    assert.equal(outcome.world.resources['g'], 1000 - 30);
+    assert.equal(outcome.world.resources['s'], 1000 - 60);
+  });
+
+  it('refuses a purchase the player cannot afford', async () => {
+    const ctx = await context({ world: world({ resources: { g: 1, s: 1 } }) });
+    const payload = {
+      first_number: 1,
+      commands: [[1, 'buy', [1, 1007, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0]]],
+    };
+    const outcome = applyBatch(payload, ctx);
+    assert.equal(outcome.refused.length, 1);
+    assert.equal(outcome.refused[0]!.reason, 'insufficient-resources');
+  });
+
+  it('carries the four counters into the cost', async () => {
+    // The Antiaircraft battery is 20x against ft_flying.
+    assert.equal(COUNTERS.length, 4);
+    const antiaircraft = COUNTERS.find((c) => c.name === 'Antiaircraft battery');
+    assert.equal(antiaircraft?.multiplier, 20);
+    assert.equal(antiaircraft?.bestAgainst, 'ft_flying');
+  });
+});
+
+describe('get_player_info.php', () => {
+  const own = {
+    playerInfo: { name: 'me' },
+    map: { id: 1 },
+    privateState: { energy: 30 },
+    neighbors: [{ id: 2 }],
+  };
+  const neighbours = {
+    '100000030': {
+      playerInfo: { name: 'mike' },
+      maps: [{ id: 9 }],
+      privateState: {},
+    },
+  };
+
+  it('answers with the player own info when no user is given', async () => {
+    const response = handleGetPlayerInfo(
+      { path: '/get_player_info.php', fields: {} },
+      { own, neighbours, now: 1000 },
+    );
+    const body = JSON.parse(response.body);
+    assert.equal(body.result, 'ok');
+    assert.deepEqual(body.playerInfo, { name: 'me' });
+    assert.deepEqual(body.neighbors, [{ id: 2 }]);
+  });
+
+  it('answers with a neighbour for a quest or general mike', async () => {
+    const response = handleGetPlayerInfo(
+      { path: '/get_player_info.php', fields: { user: '100000030' } },
+      { own, neighbours, now: 1000 },
+    );
+    const body = JSON.parse(response.body);
+    assert.deepEqual(body.playerInfo, { name: 'mike' });
+    assert.deepEqual(body.map, { id: 9 });
+  });
+
+  it('answers with an empty body for an unknown neighbour', async () => {
+    const response = handleGetPlayerInfo(
+      { path: '/get_player_info.php', fields: { user: 'nobody' } },
+      { own, neighbours, now: 1000 },
+    );
+    assert.equal(response.body, '');
+  });
+});
