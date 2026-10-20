@@ -476,15 +476,25 @@ client's observable behaviour.*
 
 ### E2 — Economy and buildings
 
-- [ ] Resource caps, the 5/60/240/480-minute collect tiers with their multipliers, and the
-      peasant multiplier are enforced
-- [ ] Population, energy (max 30, +1 per 5 min), expansion unlocking and town-hall costs
-      are correct
+- [x] The **collection** formula is implemented (`packages/rules/src/economy.ts`): the base
+      amount, the 4 collect periods with their multipliers (**5 min ×0.25, 60 min ×1,
+      240 min ×2, 480 min ×3**), and the **20 % peasant bonus per extra worker** inside
+      the mill
+- [x] The **anti-hack guard** is implemented: a building holding more units than its
+      capacity collects **nothing**. In the original this check is client-side only; a
+      server-authoritative clone must make it server-side
+- [x] **Population** is implemented: the ceiling is
+      `min(START_MAX_POPULATION + Σ building grants, MAX_POPULATION_CAP + extra)`, the
+      current is `Σ unit population + units being trained`, and a unit that would exceed
+      the ceiling is refused
+- [x] **Energy** is implemented: the free maximum is **30**, it regenerates **+1 every
+      5 minutes**, and construction and friend assists each cost 1
+- [x] The **expansion, town and map price tables** are read from the content bundle, with
+      the first four expansions free and the level requirements enforced
 - [ ] Build costs, build times, upgrade chains and the "click to build" mechanic are correct
-- [ ] The market (20 trades / 20 h, +2 % per trade, 75 % sell rate), daily bonus cycle
-      and Monday-bonus cycle are correct
-- [ ] The darts minigame (25 targets, 20 cash per paid shot, weekly prize rotation) is
-      correct
+- [ ] The market (20 trades / 20 h, +2 % per trade, 75 % sell rate) and the daily bonus
+      cycle are correct
+- [ ] The Monday bonus cycle is correct
 
 ### E3 — Quests and goals
 
