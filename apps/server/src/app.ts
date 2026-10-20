@@ -41,7 +41,14 @@ import {
   type ShimRequest,
   type ShimResponse,
 } from '@swl/server';
-import type { CostContent } from '@swl/rules';
+import { applyCommandCost, computeCommandCost, type CostContent } from '@swl/rules';
+import {
+  PROTOCOL_VERSION,
+  successResponse,
+  validateRequest,
+  type CommandOutcome,
+  type NativeRequest,
+} from '@swl/protocol';
 
 import { DEFAULT_LIMITS, RateLimiter, parseForm, type Limits } from './limits.ts';
 import type { PlayerStore } from './store.ts';
@@ -245,6 +252,138 @@ export function createApp(options: AppOptions): (request: AppRequest) => AppResp
     return json(200, { revoked });
   }
 
+  /**
+   * The answers already given, by request id.
+   *
+   * The native protocol carries an **idempotency key**: a retry of a
+   * request that was lost in flight carries the same id, and the server
+   * answers with the stored response instead of applying the commands
+   * twice. A command that grants or spends depends on this.
+   *
+   * The answers are kept per player, and the oldest are dropped when the
+   * list grows past its bound, so a client cannot fill the server's memory
+   * by sending retries.
+   */
+  const answers = new Map<string, Map<string, unknown>>();
+
+  /** How many recent answers are kept per player. */
+  const MAX_REMEMBERED_ANSWERS = 256;
+
+  /** The answer already given for a request id, if there is one. */
+  function rememberedAnswer(playerId: string, id: string): unknown | undefined {
+    return answers.get(playerId)?.get(id);
+  }
+
+  /** Remember an answer, and drop the oldest when the list grows. */
+  function rememberAnswer(playerId: string, id: string, answer: unknown): void {
+    let playerAnswers = answers.get(playerId);
+    if (!playerAnswers) {
+      playerAnswers = new Map();
+      answers.set(playerId, playerAnswers);
+    }
+    playerAnswers.set(id, answer);
+    while (playerAnswers.size > MAX_REMEMBERED_ANSWERS) {
+      const oldest = playerAnswers.keys().next();
+      if (oldest.done) break;
+      playerAnswers.delete(oldest.value);
+    }
+  }
+
+  /**
+   * The native command endpoint.
+   *
+   * The envelope has four fields and no more: the protocol version, the
+   * idempotency key, the session token and the commands. There is no
+   * `USERID`, no client-declared resource vector and no client-claimed
+   * combat outcome, because the server computes all of them.
+   */
+  function handleNativeCommand(request: AppRequest): AppResponse {
+    const playerId = identify(request);
+    if (!playerId) return fail(401, 'unknown-player');
+
+    let body: unknown;
+    try {
+      body = JSON.parse(request.body) as unknown;
+    } catch {
+      return fail(400, 'malformed-json');
+    }
+
+    const validation = validateRequest(body, { role: 'player' });
+    if (!validation.ok || !validation.request) {
+      const id =
+        typeof (body as { id?: unknown })?.id === 'string'
+          ? (body as { id: string }).id
+          : '';
+      return json(400, {
+        v: PROTOCOL_VERSION,
+        id,
+        ok: false,
+        outcomes: [],
+        errors: validation.errors,
+      });
+    }
+
+    const native = validation.request;
+    const remembered = rememberedAnswer(playerId, native.id);
+    if (remembered !== undefined) {
+      // The retry of a request that was lost in flight. The commands were
+      // already applied, so the answer is replayed rather than recomputed.
+      return json(200, remembered);
+    }
+
+    const outcomes: CommandOutcome[] = [];
+    const stored = options.store.transact(playerId, (world) => {
+      let current = world;
+      native.commands.forEach((command, index) => {
+        // The cost is computed by the SERVER. The native envelope has no
+        // room for a client-declared delta at all.
+        const cost = computeCommandCost(options.content, command.name, command.args);
+        const settled = applyCommandCost(current.resources, cost);
+        if (!settled.ok) {
+          outcomes.push({
+            index,
+            ok: false,
+            error: {
+              code: 'insufficient-resources',
+              message: 'the player cannot afford the command',
+              status: 402,
+              commandIndex: index,
+              command: command.name,
+            },
+          });
+          return;
+        }
+        const outcome = options.applyCommand(
+          { ...current, resources: settled.resources },
+          { name: command.name, args: [...command.args] },
+        );
+        current = outcome.world;
+        if (outcome.applied) {
+          outcomes.push({ index, ok: true, result: { kind: 'none' } });
+        } else {
+          outcomes.push({
+            index,
+            ok: false,
+            error: {
+              code: 'command-failed',
+              message: outcome.refused ?? 'the command was refused',
+              status: 409,
+              commandIndex: index,
+              command: command.name,
+            },
+          });
+        }
+      });
+      return current;
+    });
+
+    if (!stored) return fail(401, 'unknown-player');
+
+    const response = successResponse(native.id, outcomes);
+    rememberAnswer(playerId, native.id, response);
+    return json(200, response);
+  }
+
   return function handle(request: AppRequest): AppResponse {
     // --- the limits, before anything else -------------------------------
     if (request.body.length > limits.maxBodyBytes) {
@@ -269,6 +408,11 @@ export function createApp(options: AppOptions): (request: AppRequest) => AppResp
         if (request.method === 'POST') return createSession(request);
         if (request.method === 'DELETE') return deleteSession(request);
         return fail(405, 'method-not-allowed');
+      }
+
+      if (path === '/api/command') {
+        if (request.method !== 'POST') return fail(405, 'method-not-allowed');
+        return handleNativeCommand(request);
       }
 
       // --- the legacy endpoints -----------------------------------------

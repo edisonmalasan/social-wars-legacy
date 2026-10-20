@@ -688,6 +688,14 @@ protocol and the original dialect.*
       the 94 commands**. Deliberately absent from the envelope: `USERID`, the
       client-declared resource vector, the client's `ts`, and any client-claimed combat
       outcome
+- [x] The server **serves** the native API (`POST /api/command`): the envelope is
+      validated against the command table, the costs are computed by the server, the
+      commands are applied atomically, and the answer is a typed response. A bad
+      envelope is a typed 4xx with the errors, never a 500
+- [x] The native protocol's **idempotency key** works: a retry of a request that was
+      lost in flight carries the same `id`, and the server replays the stored answer
+      instead of applying the commands twice. The answers are kept per player and
+      bounded, so a client cannot fill the server's memory by sending retries
 - [x] The **command list is correct**, and permanently checked. The client has **94**
       commands, and the report's catalogue transcribes them **exactly** — 94 = 94, with
       the catalogue's rows numbered 1 to 94 and no gaps, so the two sources
