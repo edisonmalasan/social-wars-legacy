@@ -4,16 +4,27 @@
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "rewriteRelativeImportExtensions": true,
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "paths": {
-      "@swl/protocol": ["./packages/protocol/src/index.ts"],
-      "@swl/rules": ["./packages/rules/src/index.ts"],
-      "@swl/content": ["./packages/content/src/index.ts"]
+      "@swl/protocol": [
+        "./packages/protocol/src/index.ts"
+      ],
+      "@swl/rules": [
+        "./packages/rules/src/index.ts"
+      ],
+      "@swl/content": [
+        "./packages/content/src/index.ts"
+      ]
     }
   },
   "include": [
     "packages/*/src/**/*.ts",
     "apps/*/src/**/*.ts",
     "scripts/**/*.mjs"
+  ],
+  "exclude": [
+    "apps/client/src"
   ]
 }

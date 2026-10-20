@@ -4,5 +4,8 @@ packages:
   - 'tools/*'
 
 # esbuild (a vitest dependency) needs its install script to run.
+allowBuilds:
+  esbuild: true
+
 onlyBuiltDependencies:
   - esbuild

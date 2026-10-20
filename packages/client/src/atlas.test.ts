@@ -4,7 +4,8 @@ import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { AtlasIndex, imageHash, type FrameManifest } from './atlas.ts';
+import { AtlasIndex, type FrameManifest } from './atlas.ts';
+import { imageHash } from './imagehash.ts';
 
 function repoRoot(): string {
   let dir = process.cwd();

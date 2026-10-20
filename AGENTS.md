@@ -96,7 +96,7 @@ desktop shells do not — they land with Groups F, G and H.**
 | Soak the server | `node --expose-gc scripts/soak-server.mjs` | Working | Group F4 — no memory growth, no state drift |
 | Check the command catalogue against the client | `node scripts/verify-command-catalogue.mjs` | Working | Group F2 — fails on any difference |
 | Refresh the code graph | `graphify extract . --code-only` | Working | Derived knowledge; run after a structural change |
-| Run the client (dev)        | `pnpm --filter @swl/client dev`        | Planned | Group G |
+| Run the client (dev)        | `pnpm --filter @swl/app-client dev`    | Working | Group G |
 | Run the server (dev)        | `pnpm --filter @swl/app-server dev`    | Working | Group F — `apps/server` |
 | Golden-master rules diff    | `pnpm --filter rules test:golden`  | Planned | Group E4 |
 
