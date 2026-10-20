@@ -492,9 +492,23 @@ client's observable behaviour.*
 - [x] The **expansion, town and map price tables** are read from the content bundle, with
       the first four expansions free and the level requirements enforced
 - [ ] Build costs, build times, upgrade chains and the "click to build" mechanic are correct
-- [ ] The market (20 trades / 20 h, +2 % per trade, 75 % sell rate) and the daily bonus
-      cycle are correct
-- [ ] The Monday bonus cycle is correct
+- [x] The **own market** is implemented (`packages/rules/src/market.ts`): the gold price of
+      100 units (wood 100, oil 100, steel 150), the three tradeable amounts, the **+2 % per
+      prior trade** increment, the **75 % sell rate**, and the limit of **20 trades per
+      20 hours** with the counter resetting after the period
+- [x] The **allies market** is implemented: 125 units for the first helper and 125 more for
+      each additional one
+- [x] The **daily bonus** is implemented: the 5-day cycle (100 / 250 / 500 / 1000 gold, then
+      a hero), the local-time-zone day boundary, and the streak reset
+- [x] The **weekly Monday bonus** is implemented: the 3-entry outer cycle, the 5 possible
+      units inside the unit reward, and the ready / collected / not-ready / hidden states
+- [x] The **alliance daily bonus** is implemented: the highest tier the member count
+      qualifies for (0 / 5 / 25 / 45 members)
+- [ ] The upstream's market period mismatch is resolved: the server resets the trade counter
+      **daily** while the client uses a **20-hour** period, so the two disagree on exactly
+      when a player may trade again
+- [ ] The darts minigame (25 targets, 20 cash per paid shot, weekly prize rotation) is
+      correct — the prize rotation is implemented, the board and the paid shot are not
 
 ### E3 — Quests and goals
 
