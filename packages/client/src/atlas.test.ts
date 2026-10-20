@@ -145,7 +145,19 @@ describe('the content hash', () => {
 describe('the real frame manifest', () => {
   it('has symbols and images', async () => {
     const file = path.join(repoRoot(), 're/data/frame-manifest.json');
-    const manifest = JSON.parse(await readFile(file, 'utf8')) as FrameManifest;
+    // The manifest is a large file that the asset pipeline rewrites, so it
+    // is read with a retry: the pipeline now writes it atomically, but a
+    // reader that starts mid-rename should not fail the suite.
+    let manifest: FrameManifest | undefined;
+    for (let attempt = 0; attempt < 3 && !manifest; attempt++) {
+      try {
+        manifest = JSON.parse(await readFile(file, 'utf8')) as FrameManifest;
+      } catch {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+    }
+    assert.ok(manifest, 'the frame manifest could not be read');
+
     const index = new AtlasIndex(manifest);
     assert.ok(index.symbolCount > 1000, `only ${index.symbolCount} symbols`);
     assert.ok(index.imageCount > 1000, `only ${index.imageCount} images`);
