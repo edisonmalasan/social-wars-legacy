@@ -1,3 +1,5 @@
+export * from './commandphp.ts';
+
 /**
  * The wire protocol, as a set of types.
  *
