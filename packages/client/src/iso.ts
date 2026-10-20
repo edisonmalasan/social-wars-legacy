@@ -69,8 +69,16 @@ export const WALKABLE_OFFSET = 20_000;
 export interface Viewport {
   /** The screen x of the map's left edge. `Base.Main.topX`. */
   topX: number;
-  /** The screen y of the map's top edge, less the build outline offset. */
+  /** The screen y of the map's top edge. `Base.Main.topY`. */
   topY: number;
+  /**
+   * The build outline offset. `Base.Main.offsetBuildOutlineY`.
+   *
+   * The client's projection uses `topY` **less** this, in both
+   * directions, so the offset belongs to the viewport rather than to
+   * whichever caller remembered to subtract it.
+   */
+  buildOutlineOffsetY: number;
 }
 
 /** A position on the map, in tiles. */
@@ -92,10 +100,11 @@ export interface ScreenPosition {
  */
 export function tileToPixel(tx: number, ty: number, viewport: Viewport): ScreenPosition {
   const height = TILE_HEIGHT_PIXELS;
+  const topY = viewport.topY - viewport.buildOutlineOffsetY;
   return {
     x: viewport.topX - height * ty + height * tx,
     y:
-      viewport.topY +
+      topY +
       height * 0.5 * ty +
       height * 0.5 * tx -
       TILE_HEIGHT_PIXELS / 2,
@@ -119,7 +128,8 @@ export function tileToPixel(tx: number, ty: number, viewport: Viewport): ScreenP
  */
 export function pixelToTile(x: number, y: number, viewport: Viewport): TilePosition {
   const height = TILE_HEIGHT_PIXELS;
-  const diagonal = (2 * (y - viewport.topY) - x + viewport.topX) / (2 * height);
+  const topY = viewport.topY - viewport.buildOutlineOffsetY;
+  const diagonal = (2 * (y - topY) - x + viewport.topX) / (2 * height);
   return {
     tx: Math.floor((x - viewport.topX + height * diagonal) / height + 1),
     ty: Math.floor(diagonal + 1),

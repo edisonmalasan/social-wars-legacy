@@ -166,11 +166,19 @@ describe('the slider zoom', () => {
 describe('the camera viewport', () => {
   it('is the camera position', () => {
     const camera = initialCamera();
-    assert.deepEqual(viewportOf(camera), { topX: INIT_POS_X, topY: INIT_POS_Y });
+    assert.deepEqual(viewportOf(camera), {
+      topX: INIT_POS_X,
+      topY: INIT_POS_Y,
+      buildOutlineOffsetY: 54,
+    });
   });
 
   it('takes the build outline offset off for the projection', () => {
     const camera = { topX: 100, topY: 200, zoom: 1 };
-    assert.deepEqual(projectionViewport(camera, 54), { topX: 100, topY: 146 });
+    assert.deepEqual(projectionViewport(camera, 54), {
+      topX: 100,
+      topY: 200,
+      buildOutlineOffsetY: 54,
+    });
   });
 });

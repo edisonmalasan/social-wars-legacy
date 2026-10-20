@@ -937,8 +937,23 @@ assault against the new server, and the cheat battery is fully rejected.
       its idle sub-clip, so the random source is a parameter rather than a call to
       `Math.random`
 - [ ] Projectiles, particles and the 205 FX assets render
-- [ ] Depth sorting and occlusion match the original engine
-- [x] The map pans, zooms and re-centres as the original does
+- [x] **Depth sorting and occlusion match the original engine.** The client's depth is
+      `Utils.assignZIndex` (`core/Utils.as:398-409`), and the clone's is a port of it:
+      `20 000 + 100 * tx + ty * 100 - width * 100`, less `20 000` for a walkable building.
+      The client sorts the building array by it **ascending**, so a larger depth is drawn
+      later and therefore in front. Two details matter and are easy to lose: a building's
+      own **width** shifts it back, so a wide building's art is drawn behind a narrow one
+      further up the map, and a **walkable** building goes 20 000 behind everything, so the
+      paths are always under the buildings standing on them
+- [x] The depth and the projection are **checked against the client's own code**
+      (`packages/client/src/depth.test.ts`): the decompiled ActionScript is transcribed
+      again in the test and the two are compared over a grid, not at a few points, so a
+      change to the port cannot quietly change the answer
+- [x] The **build outline offset is explicit** in the viewport rather than subtracted by
+      whichever caller remembered to. The client's projection uses `topY` less
+      `offsetBuildOutlineY` — 54 — in both directions, and the clone's viewport carried
+      the *reduced* value, so a caller who passed the raw `topY` got a 54-pixel shift
+      and nothing said so
 
 ### G2 - Interaction
 

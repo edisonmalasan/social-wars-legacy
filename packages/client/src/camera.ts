@@ -156,9 +156,17 @@ export function recenter(camera: CameraState): CameraState {
   return { ...camera, topX: INIT_POS_X, topY: INIT_POS_Y };
 }
 
+/**
+ * The build outline offset, which is the client's own default.
+ *
+ * `Base.Main.offsetBuildOutlineY` is 54, and the client's projection uses
+ * `topY` less it.
+ */
+export const BUILD_OUTLINE_OFFSET_Y = 54;
+
 /** The camera's viewport, for the projection. */
 export function viewportOf(camera: CameraState): Viewport {
-  return { topX: camera.topX, topY: camera.topY };
+  return projectionViewport(camera, BUILD_OUTLINE_OFFSET_Y);
 }
 
 /**
@@ -169,5 +177,9 @@ export function viewportOf(camera: CameraState): Viewport {
  * height.
  */
 export function projectionViewport(camera: CameraState, offsetBuildOutlineY: number): Viewport {
-  return { topX: camera.topX, topY: camera.topY - offsetBuildOutlineY };
+  return {
+    topX: camera.topX,
+    topY: camera.topY,
+    buildOutlineOffsetY: offsetBuildOutlineY,
+  };
 }
