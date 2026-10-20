@@ -22,6 +22,7 @@
  */
 import type { PlayerSave, PlayerStore } from './store.ts';
 import type { ShimWorld } from './shim.ts';
+import { migrateSave, type MigrationItem } from './migrate.ts';
 
 /** The database the store talks to. */
 export interface Database {
@@ -46,6 +47,14 @@ export interface PostgresStoreOptions {
   db: Database;
   /** The table to use. */
   table?: string;
+  /**
+   * The content items, for the migration's building defaults.
+   *
+   * Without them the migration cannot add a building's production
+   * state, so the migration is skipped and the document is stored as it
+   * is. With them, an upstream save becomes a versioned one.
+   */
+  items?: Map<number, MigrationItem>;
 }
 
 /**
@@ -54,6 +63,7 @@ export interface PostgresStoreOptions {
 export class PostgresPlayerStore implements PlayerStore {
   private readonly db: Database;
   private readonly table: string;
+  private readonly items?: Map<number, MigrationItem>;
   private count = 0;
   /**
    * The tail of each player's transaction queue.
@@ -66,6 +76,27 @@ export class PostgresPlayerStore implements PlayerStore {
   constructor(options: PostgresStoreOptions) {
     this.db = options.db;
     this.table = options.table ?? 'player_saves';
+    this.items = options.items;
+  }
+
+  /**
+   * Migrate a stored document to the current version.
+   *
+   * Returns null when the document is from a version this server does
+   * not understand, which the caller refuses rather than guessing at.
+   */
+  private migrate(doc: unknown): Record<string, unknown> | null {
+    if (!this.items) {
+      // Without the content the migration cannot do its work, so the
+      // document is stored as it is.
+      return doc as Record<string, unknown>;
+    }
+    try {
+      const result = migrateSave(doc, { items: this.items });
+      return result.save as unknown as Record<string, unknown>;
+    } catch {
+      return null;
+    }
   }
 
   /** Create the table if it is not there. */
@@ -91,7 +122,12 @@ export class PostgresPlayerStore implements PlayerStore {
     );
     const row = result.rows[0];
     if (!row) return null;
-    return { playerId: row.player_id, world: toWorld(row.doc) };
+    const migrated = this.migrate(row.doc);
+    if (migrated === null) {
+      // A save from a version this server does not understand.
+      return null;
+    }
+    return { playerId: row.player_id, world: toWorld(migrated) };
   }
 
   /** Whether the player exists. */
@@ -155,7 +191,12 @@ export class PostgresPlayerStore implements PlayerStore {
         return null;
       }
 
-      const next = await change(toWorld(row.doc));
+      const migrated = this.migrate(row.doc);
+      if (migrated === null) {
+        await this.db.exec('ROLLBACK');
+        return null;
+      }
+      const next = await change(toWorld(migrated));
 
       await this.db.query(
         `UPDATE ${this.table} SET doc = $2, updated = now() WHERE player_id = $1`,
@@ -171,10 +212,27 @@ export class PostgresPlayerStore implements PlayerStore {
 
   /** Add a player, if they are not there already. */
   async add(playerId: string, world: ShimWorld): Promise<void> {
+    const migrated = this.migrate(world);
     await this.db.query(
       `INSERT INTO ${this.table} (player_id, doc) VALUES ($1, $2)
        ON CONFLICT (player_id) DO UPDATE SET doc = EXCLUDED.doc, updated = now()`,
-      [playerId, JSON.stringify(world)],
+      [playerId, JSON.stringify(migrated ?? world)],
+    );
+    this.count += 1;
+  }
+
+  /**
+   * Store a document **without** migrating it.
+   *
+   * The tests need it, and so does importing an upstream save verbatim:
+   * an import should store exactly what it was given, and the migration
+   * should happen when it is read.
+   */
+  async addRaw(playerId: string, document: unknown): Promise<void> {
+    await this.db.query(
+      `INSERT INTO ${this.table} (player_id, doc) VALUES ($1, $2)
+       ON CONFLICT (player_id) DO UPDATE SET doc = EXCLUDED.doc, updated = now()`,
+      [playerId, JSON.stringify(document)],
     );
     this.count += 1;
   }
@@ -185,7 +243,14 @@ export class PostgresPlayerStore implements PlayerStore {
   }
 }
 
-/** The world's shape, as it comes back from the database. */
+/**
+ * The world's shape, as it comes back from the database.
+ *
+ * The database holds the WORLD, but an **imported upstream save** is the
+ * DOCUMENT - the upstream's shape, with `playerInfo`, `maps` and
+ * `privateState` at the top. Both are accepted, so an upstream save can
+ * be imported and read back without a conversion step.
+ */
 function toWorld(doc: unknown): ShimWorld {
   if (!doc || typeof doc !== 'object') {
     return {
@@ -195,14 +260,15 @@ function toWorld(doc: unknown): ShimWorld {
     };
   }
   const record = doc as Record<string, unknown>;
-  const save = (record['save'] ?? {}) as Record<string, unknown>;
+  const wrapped = 'save' in record && typeof record['save'] === 'object';
+  const save = (wrapped ? record['save'] : record) as Record<string, unknown>;
   return {
     save: {
       playerInfo: (save['playerInfo'] ?? {}) as Record<string, unknown>,
       maps: (save['maps'] ?? []) as Record<string, unknown>[],
       privateState: (save['privateState'] ?? {}) as Record<string, unknown>,
     },
-    resources: (record['resources'] ?? {}) as Record<string, number>,
+    resources: (wrapped ? (record['resources'] ?? {}) : {}) as Record<string, number>,
     nextCommandNumber: Number(record['nextCommandNumber'] ?? 1),
   };
 }

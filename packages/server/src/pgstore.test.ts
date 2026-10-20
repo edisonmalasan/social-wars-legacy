@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { PGlite } from '@electric-sql/pglite';
 
 import { PostgresPlayerStore } from './pgstore.ts';
+import { GOAL_STATE_KEY, QUEST_PROGRESS_KEY } from './apply.ts';
 import { cloneWorld, type PlayerSave } from './store.ts';
 import type { ShimWorld } from './shim.ts';
 
@@ -132,6 +133,76 @@ describe('the PostgreSQL store', () => {
       (save!.world.save.privateState['somethingOdd'] as unknown),
       { nested: [1, 2, { deep: true }] },
     );
+  });
+});
+
+describe('the store migration', () => {
+  /** The content items the migration needs. */
+  const items = new Map([
+    [
+      30,
+      {
+        id: 30,
+        name: 'Academy I',
+        costs: { w: 125 },
+        collect: 0,
+        collect_type: 'w',
+        unit_capacity: 0,
+      },
+    ],
+  ]);
+
+  /** A store that migrates. */
+  async function migrating(): Promise<PostgresPlayerStore> {
+    const db = await PGlite.create();
+    const created = new PostgresPlayerStore({ db, table: 'saves', items });
+    await created.init();
+    return created;
+  }
+
+  it('migrates an upstream save, which has no version', async () => {
+    const saves = await migrating();
+    // An upstream save: no version, and none of the server's additions.
+    const upstream = {
+      playerInfo: { name: 'Warrior' },
+      maps: [{ id: 0, items: {} }],
+      privateState: { energy: 50 },
+    };
+    // An upstream save is imported verbatim, and migrated when it is read.
+    await saves.addRaw('p1', upstream);
+
+    const save = await saves.get('p1');
+    assert.ok(save);
+    // The migrated document has the server's additions.
+    assert.ok(
+      GOAL_STATE_KEY in save.world.save.privateState,
+      'the goal state was not added',
+    );
+    assert.ok(
+      QUEST_PROGRESS_KEY in save.world.save.privateState,
+      'the quest progress was not added',
+    );
+  });
+
+  it('refuses a save from a version it does not understand', async () => {
+    const saves = await migrating();
+    await saves.addRaw('p1', {
+      version: 99,
+      playerInfo: {},
+      maps: [],
+      privateState: {},
+    });
+    // A save from the future is refused, not guessed at.
+    assert.equal(await saves.get('p1'), null);
+  });
+
+  it('leaves a current save alone', async () => {
+    const saves = await migrating();
+    await saves.add('p1', world());
+    const save = await saves.get('p1');
+    assert.ok(save);
+    assert.equal(save.world.resources['g'], 1000);
+    assert.equal(save.world.save.privateState['energy'], 30);
   });
 });
 

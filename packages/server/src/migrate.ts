@@ -179,7 +179,14 @@ export function migrateSave(input: unknown, options: MigrationOptions): Migratio
     throw new MigrationError('the save is not an object', 'not-an-object');
   }
   const raw = input as Record<string, unknown>;
-  const from = versionOf(raw);
+
+  // The store holds the WORLD, which wraps the save document under
+  // `save`. Both shapes are accepted, so the migration can be applied to
+  // whichever one the caller has.
+  const wrapped = 'save' in raw && typeof raw['save'] === 'object';
+  const document = (wrapped ? raw['save'] : raw) as Record<string, unknown>;
+
+  const from = versionOf(document);
 
   if (from > SAVE_VERSION) {
     throw new MigrationError(
@@ -192,7 +199,7 @@ export function migrateSave(input: unknown, options: MigrationOptions): Migratio
   let version = from;
 
   // --- the private state ------------------------------------------------
-  const rawPrivate = raw['privateState'];
+  const rawPrivate = document['privateState'];
   if (typeof rawPrivate !== 'object' || rawPrivate === null || Array.isArray(rawPrivate)) {
     throw new MigrationError('the save has no privateState', 'malformed-save');
   }
@@ -205,7 +212,7 @@ export function migrateSave(input: unknown, options: MigrationOptions): Migratio
   }
 
   // --- the maps ----------------------------------------------------------
-  const rawMaps = raw['maps'];
+  const rawMaps = document['maps'];
   if (!Array.isArray(rawMaps)) {
     throw new MigrationError('the save has no maps', 'malformed-save');
   }
@@ -284,10 +291,21 @@ export function migrateSave(input: unknown, options: MigrationOptions): Migratio
 
   const save: SaveDocument = {
     version,
-    playerInfo: (raw['playerInfo'] ?? {}) as Record<string, unknown>,
+    playerInfo: (document['playerInfo'] ?? {}) as Record<string, unknown>,
     maps,
     privateState,
   };
+
+  if (wrapped) {
+    // The world keeps its resources and its command index; only the
+    // document inside it is migrated.
+    return {
+      save: { ...raw, save } as unknown as SaveDocument,
+      from,
+      to: version,
+      notes,
+    };
+  }
 
   return { save, from, to: version, notes };
 }
