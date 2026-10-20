@@ -30,7 +30,8 @@ Python server can be run side by side with the new one.
 | | |
 |---|---|
 | **Vendored** | The complete upstream **working tree** — 3 292 files, 726.5 MB |
-| **Not vendored** | The upstream `.git` directory (655.9 MB of VCS history for *their* repository, not project content). Our pin is recorded in this file and in `MANIFEST.json` instead. |
+| **Not vendored** | The upstream `.git` directory (655.9 MB of VCS history for *their* repository, not project content). Our pin is recorded in this file and in `MANIFEST.json` instead. The history is public at the upstream remote, so it is fetchable rather than copied. |
+| **Vendored** | The two **release tags** as an overlay — see §3.1. |
 | **Not vendored** | Nothing else. No file was added, removed, renamed or edited inside `socialwarriors/`. |
 
 ### Tree breakdown
@@ -66,6 +67,35 @@ Two artefacts describe the vendored tree:
 
 Both cover the 3 292 working-tree files (the upstream `.git` directory is excluded, as
 stated above).
+
+### 3.1 The vendored releases
+
+The upstream has two **release tags**, and they are earlier builds of the game:
+
+| Tag | Commit | Subject | Files | Unique content |
+|---|---|---|---|---|
+| `0.01a` | `7846bf42992a472bbd7dd904bf23f5c73f67989c` | Change version, update starting map name | 2 705 | 17 files |
+| `0.02a` | `3a315b3df5ec85fedeee7dedb223664959934f12` | Fix AcidCaos static village | 3 291 | 5 files |
+
+The vendored **tree** is `main`, so their content is not in it. The upstream's `.git`
+is 655.9 MB — most of it the many versions of the game's art across 198 commits — and
+copying all of it would triple the repository for a history that is public.
+
+So the releases are captured as an **overlay**:
+
+| Path | Purpose |
+|---|---|
+| `releases/<tag>/` | The files that release has and `main` does not — the ones **modified** rather than added between the two. 22 files, 125 KB in total. |
+| `RELEASES.json` | Every release's **complete** record: each file in that release's tree, with its hash, and whether its bytes live in the overlay or are shared with `main`. |
+
+With both, **every release is reconstructible from this repository alone**: a file's
+bytes are in the overlay when it was modified between the release and `main`, and in
+`main` when it was not. The verifier proves it, from the repository, without the
+upstream's git history.
+
+The game **data** never changed between the releases — `config/main.json` is the same
+blob in all three refs (778 items, 104 globals). What changed was the art, the static
+villages, the patch files and the server code.
 
 ### Verifying
 

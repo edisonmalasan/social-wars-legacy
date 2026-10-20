@@ -115,6 +115,16 @@ and unambiguously licensed, without bloating the git history.*
 - [x] `upstream/PROVENANCE.md` records the upstream remote, the pinned commit
       (`c3fceeb1f8e93734a293b9bc25ae6025656f6822`), the `0.01a`/`0.02a` tags, the GPL-v3
       licence text, and the per-directory file counts and byte totals
+- [x] The **release tags are vendored too**, as an overlay: `upstream/releases/<tag>/`
+      holds the files that release has and `main` does not (22 files, 125 KB), and
+      `upstream/RELEASES.json` holds every release's **complete** record — each file in
+      that release's tree, with its hash, and whether its bytes live in the overlay or
+      are shared with `main`. So **every release of the game is reconstructible from
+      this repository alone**, and `node scripts/verify-upstream.mjs` proves it: 2 705
+      and 3 291 files checked, 0 mismatched, 0 missing
+- [x] The upstream's **history** is not copied — its `.git` is 655.9 MB, mostly the
+      many versions of the game's art across 198 commits, and it is public at the
+      upstream remote, so it is fetchable rather than copied
 - [x] `upstream/socialwarriors/.gitattributes` puts `assets/**` under Git LFS, and
       `git lfs ls-files` lists every vendored binary — **3 199 of 3 199 asset files are
       stored as LFS pointers** in the index, with zero raw binaries

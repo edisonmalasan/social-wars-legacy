@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Verify the vendored upstream tree against its manifest.
+ * Verify the vendored upstream tree against its manifest, and the vendored
+ * releases against theirs.
  *
  *   node scripts/verify-upstream.mjs            # verify only
  *   node scripts/verify-upstream.mjs --write    # regenerate the manifest, then verify
@@ -18,6 +19,7 @@ import {
   hashFile,
   listFiles,
   parseShaManifest,
+  verifyReleases,
   writeManifest,
 } from './lib/upstream-manifest.mjs';
 
@@ -84,3 +86,30 @@ if (mismatched || missing.length || extra.length) {
   process.exit(1);
 }
 console.log('\nOK: the vendored upstream tree matches its manifest byte for byte.');
+
+// --- the vendored releases --------------------------------------------------
+console.log('\n--- the vendored releases ---');
+let releasesOk = true;
+try {
+  const releases = await verifyReleases(root);
+  for (const release of releases) {
+    console.log(
+      `release ${release.tag} : ${release.files} files, ${release.unique} unique, ` +
+        `${release.checked} checked, ${release.mismatched} mismatched, ` +
+        `${release.missing} missing, ${release.stray} stray, ${release.absent} absent`,
+    );
+    for (const problem of release.problems) console.error(problem);
+    if (release.mismatched || release.missing || release.stray || release.absent) {
+      releasesOk = false;
+    }
+  }
+} catch (error) {
+  console.error(`cannot read the releases manifest: ${error.message}`);
+  releasesOk = false;
+}
+
+if (!releasesOk) {
+  console.error('\nFAIL: a vendored release has drifted from its manifest.');
+  process.exit(1);
+}
+console.log('\nOK: every vendored release is complete and matches its manifest.');

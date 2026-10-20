@@ -76,7 +76,8 @@ desktop shells do not — they land with Groups F, G and H.**
 | Build the content bundle    | `pnpm build:content`               | Working | Group C |
 | Validate the content bundle | `pnpm check:content`               | Working | Group C — same checks, no write |
 | Build everything            | `pnpm build`                       | Working | Group C — currently the content build only |
-| Verify the vendored upstream | `node scripts/verify-upstream.mjs` | Working | Group A |
+| Verify the vendored upstream | `node scripts/verify-upstream.mjs` | Working | Group A — fails on any drift |
+| Re-vendor the upstream releases | `node scripts/vendor-releases.mjs` | Working | Group A — needs the upstream checkout |
 | Fetch the vendored assets   | `node scripts/pull-assets.mjs`     | Working | Group A — targeted LFS pull |
 | Decompile the client        | `node scripts/decompile-client.mjs` | Working | Group B |
 | Convert the SWF art to frames | `node scripts/convert-assets.mjs` | Working | Group D — resumable |
