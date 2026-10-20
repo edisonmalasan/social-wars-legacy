@@ -411,8 +411,19 @@ CI run. ✔ met
 - [x] The unreferenced assets are **triaged**: every sprite is referenced by some item's
       `img_name`; 471 thumbnails, 5 images and 2 sounds are present but referenced by
       nothing
-- [ ] The 4 proprietary fonts are replaced with permissively-licensed equivalents and the
-      text metrics are tuned to match
+- [x] The client fonts are **extracted and measured**
+      (`scripts/extract-fonts.mjs`): the two SWF font libraries yield
+      "Arial Rounded MT Bold" (244 glyphs, 241 characters) and "Komika Axis" (228 glyphs,
+      215 characters), and the advance width of every printable ASCII character is recorded
+      in [`../re/data/fonts.json`](../re/data/fonts.json) — the numbers the substitutes
+      have to be tuned to
+- [x] The **open-licensed substitutes are chosen** and recorded per font: Nunito for the
+      rounded body text and Rubik Mono One for the display face, both SIL OFL 1.1
+- [ ] The substitutes are **substituted in the client** and their metrics are tuned to match
+      the originals, so the game's text fits the same boxes
+- [ ] The 4 proprietary font references in the client are removed — only 2 font *files* ship,
+      so the other 2 references are either the same faces loaded twice or the client's own
+      fallback stack
 - [x] `assets/swf/dynamic2.swf` is decompiled and analysed — it is the **runtime library**:
       it embeds **28 sounds the server's config never mentions** (all unique, none
       duplicating a standalone file) and the **building-construction animations**, which
