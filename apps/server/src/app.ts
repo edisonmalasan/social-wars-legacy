@@ -44,6 +44,8 @@ import {
 } from '@swl/server';
 import { applyCommandCost, computeCommandCost, type CostContent } from '@swl/rules';
 import { MemoryPlayerStore } from '@swl/server';
+
+import { handleSocialRequest, type SocialOptions } from './social.ts';
 import {
   PROTOCOL_VERSION,
   successResponse,
@@ -108,6 +110,8 @@ export interface AppOptions {
   limits?: Limits;
   /** The neighbours, for `get_player_info.php`. */
   neighbours?: Record<string, Record<string, unknown>>;
+  /** The alliance and betting services, for the social endpoints. */
+  social?: SocialOptions;
 }
 
 /** A JSON response. */
@@ -401,6 +405,13 @@ export function createApp(
     const path = request.path.split('?')[0] ?? request.path;
 
     try {
+      // The alliance and betting services use the same envelope as
+      // `command.php`, so they are dispatched before the router.
+      if (options.social) {
+        const social = handleSocialRequest(request, options.social);
+        if (social) return social;
+      }
+
       // --- the health check ---------------------------------------------
       if (path === '/health' || path === '/api/health') {
         if (request.method !== 'GET') return fail(405, 'method-not-allowed');

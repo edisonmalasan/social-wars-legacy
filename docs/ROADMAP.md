@@ -805,10 +805,14 @@ protocol and the original dialect.*
       ascending), the price ladder, the round logic, the tie rule and the settlement.
       The upstream's subsystem was **complete but disabled**; the client's semantics win
       where the two disagree, and there were eight such places
-- [ ] The alliance and marketplace services are **persisted** and **served over HTTP**
-      as the client service variants. Both services are pure — the state is passed in
-      and the new state is returned — so they need a persistence layer and the HTTP
-      endpoints, exactly as the player saves do
+- [x] The alliance and marketplace services are **served over HTTP** as the client service
+      variants (`apps/server/src/social.ts`): the alliance's 11 variants at
+      `alliance/?method=<variant>` and the three betting endpoints. The client calls
+      them with the **same envelope as `command.php`** — a `data` field holding
+      `<64 hex>;<json>` — so the HMAC is verified against both keys, and the answer is
+      `{ "success": true, "data": … }` or `{ "success": false, "error": <the client's
+      number> }`
+- [ ] The alliance and marketplace services are **persisted**
 
 **Exit criteria:** the original Flash client can complete the tutorial and a Mission 1
 assault against the new server, and the cheat battery is fully rejected.
