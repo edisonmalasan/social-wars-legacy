@@ -194,4 +194,26 @@ describe('the snapshot digest', () => {
       await rm(root, { recursive: true, force: true });
     }
   });
+
+  it('skips a table that is not there', async () => {
+    // A database that has not been migrated yet has no tables, and a
+    // digest of it is a digest of nothing rather than an error.
+    const db = await PGlite.create();
+    const digest = await snapshotDigest(db, ['player_saves', 'social']);
+    assert.match(digest, /^[0-9a-f]{64}$/);
+    await db.close();
+  });
+
+  it('is different when a table is absent and when it is empty', async () => {
+    const root = await scratch();
+    try {
+      const db = await populated(path.join(root, 'db'));
+      const absent = await snapshotDigest(db, ['player_saves', 'no_such_table']);
+      const present = await snapshotDigest(db, ['player_saves']);
+      assert.notEqual(absent, present);
+      await db.close();
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
 });

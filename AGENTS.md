@@ -89,6 +89,7 @@ desktop shells do not — they land with Groups F, G and H.**
 | Check nothing that ships needs Flash | `node scripts/check-no-flash.mjs` | Working | Group H — proves it rather than asserting it |
 | Run the cheat battery             | `node scripts/run-cheat-battery.mjs` | Working | Group I — the release gate |
 | Check the roadmap's item counts    | `node scripts/check-roadmap.mjs`  | Working | Group I — fails if a group lost an item |
+| Deploy the server               | `node scripts/deploy.mjs --data <dir>` | Working | Group I — `--rollback` undoes it |
 | Run the schema migrations        | `node scripts/migrate.mjs --data <dir>` | Working | Group F — `--status` and `--rollback` too |
 | Soak the server | `node --expose-gc scripts/soak-server.mjs` | Working | Group F4 — no memory growth, no state drift |
 | Check the command catalogue against the client | `node scripts/verify-command-catalogue.mjs` | Working | Group F2 — fails on any difference |

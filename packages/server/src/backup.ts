@@ -162,7 +162,17 @@ export async function snapshotDigest(
   ).query.bind(db);
   const hash = createHash('sha256');
   for (const table of [...tables].sort()) {
-    const result = await query(`SELECT * FROM ${table}`);
+    let result;
+    try {
+      result = await query(`SELECT * FROM ${table}`);
+    } catch {
+      // The table is not there: the database has not been migrated yet.
+      // It is **skipped**, not fatal, because a digest of a database
+      // that has no tables is a digest of nothing rather than an error.
+      hash.update(`${table}\\n`);
+      hash.update('(absent)\\n');
+      continue;
+    }
     hash.update(table);
     hash.update('\n');
     for (const row of result.rows) {
