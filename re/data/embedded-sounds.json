@@ -1,0 +1,326 @@
+{
+ "note": "The audio embedded in the client SWFs, extracted and compared with the standalone files in assets/sounds/. These sounds are NOT in the server config's sounds list, and they are not duplicates of the standalone files, so the audio set is larger than the config suggests.",
+ "counts": {
+  "standaloneSounds": 134,
+  "embeddedSounds": 28,
+  "embeddedUnique": 28,
+  "embeddedDuplicatingAStandaloneFile": 0,
+  "embeddedNotNamedInTheConfig": 28
+ },
+ "embedded": [
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "-1.wav",
+   "bytes": 44,
+   "sha256": "ae8cd4d87061de84b556826a36ea6e209689ff2bb3632b9ac121aa34a5338a6c",
+   "id": null,
+   "className": "-1",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "1_Sword5Sound.mp3",
+   "bytes": 1248,
+   "sha256": "6ff560313fb123bd26fb792046b5ed186678fc0148948a6eef02d679cd2ade30",
+   "id": 1,
+   "className": "Sword5Sound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "2_Sword2Sound.mp3",
+   "bytes": 1456,
+   "sha256": "6275307cefe5b13c1da90246ee90bf6fb346533f1529eb0bbec18a410b2ebff4",
+   "id": 2,
+   "className": "Sword2Sound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "3_RockdrillerSound.mp3",
+   "bytes": 5616,
+   "sha256": "c3dd5f5e7850a7033934b08146ee5daa51f5b232f6026add41f8438016e5b1aa",
+   "id": 3,
+   "className": "RockdrillerSound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "4_Rock6Sound.mp3",
+   "bytes": 12376,
+   "sha256": "fa83610a08293a89e5e52df153452dd5ea9e9a4a2d4b00597d46ccde503dc9a4",
+   "id": 4,
+   "className": "Rock6Sound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "5_RollOverSound.mp3",
+   "bytes": 1248,
+   "sha256": "afa2e0e25ea89dac32f25c7ce6fa770055d2e597fac826c0d76ca2b9e32961b9",
+   "id": 5,
+   "className": "RollOverSound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "6_NewTownSound.mp3",
+   "bytes": 20696,
+   "sha256": "ef8d104fc263a47153de89e88046ce8f63d8f4645babc1abd61d76b237d100db",
+   "id": 6,
+   "className": "NewTownSound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "7_MuerteTrol2Sound.mp3",
+   "bytes": 8864,
+   "sha256": "e4e74a8ce64ef5e5d4b644ae64b4daf55e72055d554ba33a510a790ec6f856ac",
+   "id": 7,
+   "className": "MuerteTrol2Sound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "8_Lumber3Sound.mp3",
+   "bytes": 6448,
+   "sha256": "8756a8a3011adb4a4e134c5e7d823d97a714142ba0810ad7c43b3a6a97057a89",
+   "id": 8,
+   "className": "Lumber3Sound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "9_LevelUpSound.mp3",
+   "bytes": 9776,
+   "sha256": "b5ef76a0f60927d70f2a87aac322e983f47805e12e1be0264e9e206e9cf0d7af",
+   "id": 9,
+   "className": "LevelUpSound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "10_FireballSound.mp3",
+   "bytes": 5928,
+   "sha256": "b51704788c839c2aa104b92a8a34a6efd711a10a5758a658655165a404a209be",
+   "id": 10,
+   "className": "FireballSound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "11_FinalConstruc1Sound.mp3",
+   "bytes": 7859,
+   "sha256": "6f4966191eca6a025f3833e295075606197ebd35cbf7a44798d91fe3222c1d9e",
+   "id": 11,
+   "className": "FinalConstruc1Sound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "12_FarmSound.mp3",
+   "bytes": 5978,
+   "sha256": "a41266c1937dbba196772bb22f5933b27abdf3e79347113c832b33889104fa20",
+   "id": 12,
+   "className": "FarmSound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "13_DieWomanSound.mp3",
+   "bytes": 5769,
+   "sha256": "3ace7a492838e5d3f6ce8d5c03e5ee0e9b4dcbe3b5922d42c1cd7178d6647768",
+   "id": 13,
+   "className": "DieWomanSound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "14_DieManSound.mp3",
+   "bytes": 3679,
+   "sha256": "ad70ca44f9c2a275779e9caa86de313c7cab3314309489508e28eaf92fe26442",
+   "id": 14,
+   "className": "DieManSound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "15_CurarSound.mp3",
+   "bytes": 4472,
+   "sha256": "aef7722af80e9ccef7fd2820a1c103947bf6ccbd9b6919704e6feed27c284745",
+   "id": 15,
+   "className": "CurarSound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "16_Collection2Sound.mp3",
+   "bytes": 9490,
+   "sha256": "ff705ab7c1b3a67e02b948f87592f92fef14e9151cd0a4699bdbb45bde14a250",
+   "id": 16,
+   "className": "Collection2Sound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "17_ButtonClickSound.mp3",
+   "bytes": 832,
+   "sha256": "a22602274578c5dbf271d67274917370fc5e98afb952cc25c11af5c5e5f52e2b",
+   "id": 17,
+   "className": "ButtonClickSound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "18_CatapMuerteSound.mp3",
+   "bytes": 2392,
+   "sha256": "2de1071374f8be0d7f6b32017d3c4f5be7ff35e80ffc2d7a8ef8b1c68862a117",
+   "id": 18,
+   "className": "CatapMuerteSound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "19_CanonSound.mp3",
+   "bytes": 6448,
+   "sha256": "5c322a12e11a28ab166b0e678e64c06050d7f4cf164ca3dc0879d500349e8548",
+   "id": 19,
+   "className": "CanonSound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "20_BuildingMenuSound.mp3",
+   "bytes": 5561,
+   "sha256": "41205f8d0b3bb827caca454eae467a0e6f56742729d1163ad537cc701cbcfb3f",
+   "id": 20,
+   "className": "BuildingMenuSound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "21_BuildSound.mp3",
+   "bytes": 16114,
+   "sha256": "222d16e149cc84308e682b105b299bea56f2787e8bcb8bec74036ed868a092cf",
+   "id": 21,
+   "className": "BuildSound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "22_Barco2Sound.mp3",
+   "bytes": 13936,
+   "sha256": "ea2bb6ff3a4f898043abec3bc75fa98f57f20f213cb6382720a6a5a0eddacbcb",
+   "id": 22,
+   "className": "Barco2Sound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "23_BallestaSound.mp3",
+   "bytes": 8864,
+   "sha256": "d0a34296dafd9ff457252cf361ff0ec498e431af2222c0fa261c95547b0206cc",
+   "id": 23,
+   "className": "BallestaSound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "24_BallSound.mp3",
+   "bytes": 6187,
+   "sha256": "56de55d0bfcaa5c87cdda8952c9afc1fc64894c838bdcc9adb5dbb47eb1779e7",
+   "id": 24,
+   "className": "BallSound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "25_Archer3Sound.mp3",
+   "bytes": 5952,
+   "sha256": "254c07e91ab63220c0f39b6aceb3d35c3a5bd79ad11008c83ab2cc7e71c44abc",
+   "id": 25,
+   "className": "Archer3Sound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "26_Aguila1Sound.mp3",
+   "bytes": 3848,
+   "sha256": "9a3960e5ae33091f63fd3824aa86f89f39fd2e0621e69d6cd24a569c648df965",
+   "id": 26,
+   "className": "Aguila1Sound",
+   "duplicatesStandalone": null
+  },
+  {
+   "source": "swf/dynamic2.swf",
+   "name": "27_AchievementSound.mp3",
+   "bytes": 8736,
+   "sha256": "1b752f7fdab99db8268d5069595b4e51f0e04d1429577f113fa6a5d2f2d08eb0",
+   "id": 27,
+   "className": "AchievementSound",
+   "duplicatesStandalone": null
+  }
+ ],
+ "summary": {
+  "uniqueNames": [
+   "-1",
+   "Sword5Sound",
+   "Sword2Sound",
+   "RockdrillerSound",
+   "Rock6Sound",
+   "RollOverSound",
+   "NewTownSound",
+   "MuerteTrol2Sound",
+   "Lumber3Sound",
+   "LevelUpSound",
+   "FireballSound",
+   "FinalConstruc1Sound",
+   "FarmSound",
+   "DieWomanSound",
+   "DieManSound",
+   "CurarSound",
+   "Collection2Sound",
+   "ButtonClickSound",
+   "CatapMuerteSound",
+   "CanonSound",
+   "BuildingMenuSound",
+   "BuildSound",
+   "Barco2Sound",
+   "BallestaSound",
+   "BallSound",
+   "Archer3Sound",
+   "Aguila1Sound",
+   "AchievementSound"
+  ],
+  "notInConfig": [
+   "-1",
+   "Sword5Sound",
+   "Sword2Sound",
+   "RockdrillerSound",
+   "Rock6Sound",
+   "RollOverSound",
+   "NewTownSound",
+   "MuerteTrol2Sound",
+   "Lumber3Sound",
+   "LevelUpSound",
+   "FireballSound",
+   "FinalConstruc1Sound",
+   "FarmSound",
+   "DieWomanSound",
+   "DieManSound",
+   "CurarSound",
+   "Collection2Sound",
+   "ButtonClickSound",
+   "CatapMuerteSound",
+   "CanonSound",
+   "BuildingMenuSound",
+   "BuildSound",
+   "Barco2Sound",
+   "BallestaSound",
+   "BallSound",
+   "Archer3Sound",
+   "Aguila1Sound",
+   "AchievementSound"
+  ]
+ }
+}

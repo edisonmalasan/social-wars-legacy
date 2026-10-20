@@ -403,10 +403,15 @@ CI run. ✔ met
       nothing
 - [ ] The 4 proprietary fonts are replaced with permissively-licensed equivalents and the
       text metrics are tuned to match
-- [ ] The 4 sprites above the 4 KiB ABC threshold are audited — they may hold real
-      per-frame logic rather than `stop()` calls
-- [ ] `assets/swf/dynamic2.swf` is decompiled — it is the one remaining unanalysed code
-      artefact and the client loads it at runtime
+- [x] `assets/swf/dynamic2.swf` is decompiled and analysed — it is the **runtime library**:
+      it embeds **28 sounds the server's config never mentions** (all unique, none
+      duplicating a standalone file) and the **building-construction animations**, which
+      explains why some items appear to have no art
+      ([`../re/docs/17-asset-pipeline.md`](../re/docs/17-asset-pipeline.md) §7)
+- [x] The 4 sprites above the 4 KiB ABC threshold are audited — they are ordinary
+      animation timelines with many named frames, not special logic. **Nothing to act on.**
+- [ ] The 28 embedded sounds are added to the audio set
+- [ ] The construction animations from `dynamic2.swf` are included in the conversion
 - [ ] A viewer exists that renders every item at 3 zoom levels, so missing art is visible
       immediately
 - [ ] The client can be built with a **content-hashed** asset bundle, so a stale cache is
