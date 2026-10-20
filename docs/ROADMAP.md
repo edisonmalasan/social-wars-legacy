@@ -453,7 +453,12 @@ CI run. ✔ met
       ([`../re/docs/17-asset-pipeline.md`](../re/docs/17-asset-pipeline.md) §7)
 - [x] The 4 sprites above the 4 KiB ABC threshold are audited — they are ordinary
       animation timelines with many named frames, not special logic. **Nothing to act on.**
-- [ ] The 28 embedded sounds are added to the audio set
+- [x] The 28 embedded sounds are added to the audio set — the runtime library
+      `dynamic2.swf` carries 28 sounds of its own (the construction animations' audio)
+      that are named nowhere in the config's sound list, and they are now **in the audio
+      set the client loads**, marked as embedded because their bytes live in a SWF
+      rather than in a standalone file. The set is **168 sounds**: 140 standalone and 28
+      embedded
 - [ ] The construction animations from `dynamic2.swf` are included in the conversion
 - [ ] A viewer exists that renders every item at 3 zoom levels, so missing art is visible
       immediately
