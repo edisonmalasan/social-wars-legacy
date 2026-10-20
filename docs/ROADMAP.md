@@ -861,14 +861,22 @@ assault against the new server, and the cheat battery is fully rejected.
 
 ### G2 - Interaction
 
-- [ ] Selection, movement, building placement, training queues, collecting and upgrading
-      all work through the command API
+- [x] Selection, movement, building placement, training queues, collecting and upgrading
+      all work through the command API — the **client's request builders**
+      (`packages/client/src/requests.ts`) cover all of them, and a test checks every
+      builder's **arity against the command table**, which is the authority. A builder
+      that drifted from the table would send a request the server refuses
 - [x] The client **never decides an outcome** — and that is a property of the code's
       *shape*, not a rule the renderer has to remember
       (`packages/client/src/predictions.ts`): the renderer asks the module what to draw,
       and the module answers with the server's confirmed state and the outstanding
       predictions as a **separate overlay**. A prediction can be drawn as an
       interpolation, and it can never be mistaken for something the server agreed to
+- [x] The native forms carry **no claimed outcomes**: `end_attack` names the attack the
+      server issued rather than sending the battle result, `collect` carries only the
+      element's id so the client cannot choose its own collect period, and
+      `win_daily_bonus` carries placeholders because the day and the reward are the
+      server's
 - [x] A **duplicate answer** — the same answer arriving twice — is reported as such
       rather than settled again, so it cannot undo a confirmed outcome, and the retry of
       a request that was lost in flight **replaces** its prediction rather than
