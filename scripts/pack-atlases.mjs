@@ -222,6 +222,30 @@ async function main() {
   const atlasInfo = [];
   for (let index = 0; index < sheets.length; index++) {
     const sheet = sheets[index];
+
+    // The sheet's placement is known before it is drawn, so the resume
+    // check comes FIRST. Checking it after the compositing saved the
+    // write but not the decode, and the decode is the expensive part.
+    const file = `atlas-${String(index).padStart(4, '0')}.png`;
+    const target = path.join(ATLAS_DIR, file);
+    if (existsSync(target)) {
+      // The sheet is already on disk. The packing is deterministic, so it
+      // is the right sheet, and drawing it again would cost an hour.
+      const info = await stat(target);
+      atlasInfo.push({
+        file,
+        width: args.size,
+        height: args.size,
+        images: sheet.images.length,
+        usedPixels: sheet.used,
+        bytes: info.size,
+      });
+      if ((index + 1) % 10 === 0 || index === sheets.length - 1) {
+        console.log(`  atlas ${index + 1}/${sheets.length}`);
+      }
+      continue;
+    }
+
     const canvas = { width: args.size, height: args.size, data: Buffer.alloc(args.size * args.size * 4) };
 
     for (const entry of sheet.images) {
@@ -242,25 +266,6 @@ async function main() {
       }
     }
 
-    const file = `atlas-${String(index).padStart(4, '0')}.png`;
-    const target = path.join(ATLAS_DIR, file);
-    if (existsSync(target)) {
-      // The sheet is already on disk. The packing is deterministic, so it
-      // is the right sheet, and rendering it again would cost an hour.
-      const info = await stat(target);
-      atlasInfo.push({
-        file,
-        width: args.size,
-        height: args.size,
-        images: sheet.images.length,
-        usedPixels: sheet.used,
-        bytes: info.size,
-      });
-      if ((index + 1) % 10 === 0 || index === sheets.length - 1) {
-        console.log(`  atlas ${index + 1}/${sheets.length}`);
-      }
-      continue;
-    }
     const bytes = encodePng(canvas);
     await writeFile(target, bytes);
     atlasInfo.push({
