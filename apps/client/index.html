@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Social Wars Legacy</title>
+    <style>
+      /*
+       * The game was built for a 760 by 600 stage, and the layout is not
+       * fluid. So the stage is a fixed size and it is **scaled** to fit
+       * the window, rather than being reflowed: the alternative is a
+       * game whose panels overlap.
+       */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background: #10131a;
+        overflow: hidden;
+        font-family: 'Nunito', system-ui, sans-serif;
+      }
+
+      #stage {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 760px;
+        height: 600px;
+        transform-origin: center center;
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      #game canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <div id="game"></div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

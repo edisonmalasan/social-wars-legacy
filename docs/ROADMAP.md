@@ -967,8 +967,20 @@ assault against the new server, and the cheat battery is fully rejected.
 
 ### G1 - World rendering
 
-- [ ] The isometric tile map renders with correct elevation, z-sorting and the
-      server-authoritative item positions
+- [x] The **isometric tile map** renders with the correct elevation, z-sorting and the
+      server-authoritative item positions. The **scene** is a separate, **pure** model
+      (`apps/client/src/scene.ts`): every item's screen position, depth and art are
+      decided without a GPU, so the rules can be tested without one, and the renderer
+      (`apps/client/src/renderer.ts`) only draws what the scene says. The scene is
+      **PixiJS v8** and the client is **one** client - the web build serves it, the
+      desktop shell wraps it in a web view and the mobile build wraps it in a WebView
+- [x] The **web client builds** (`pnpm --filter @swl/app-client build`), and the build
+      is in the CI
+- [x] The client package is **browser-safe**. It imported `node:crypto` for the art
+      hash, which broke the web build; the hash is a build-time utility, so it moved
+      into its own module that nothing at runtime imports
+- [ ] The renderer is **exercised**: the scene is tested, but the drawing itself needs
+      a browser, and nothing here drives one
 - [x] The **isometric projection and the depth sort** are ported exactly
       (`packages/client/src/iso.ts`): the tile is 108 by 54 pixels, the map is 100 by
       100, and the projection is `Utils.TileToPixel` (core/Utils.as:88-102) to the

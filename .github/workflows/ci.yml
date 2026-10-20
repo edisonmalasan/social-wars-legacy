@@ -139,6 +139,12 @@ jobs:
       - name: The desktop shell's build inputs
         run: node scripts/prepare-desktop.mjs
 
+      # The web client is **one** client: the web build serves it, the
+      # desktop shell wraps it in a web view, and the mobile build wraps
+      # it in a WebView. So it has to build.
+      - name: The web client builds
+        run: pnpm --filter @swl/app-client build
+
       - name: The desktop shell compiles
         working-directory: apps/desktop/src-tauri
         run: cargo check --locked
