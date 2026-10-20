@@ -16,7 +16,7 @@
  * (F3) and the PGlite one (offline play) can both satisfy it.
  */
 
-import type { ShimWorld } from '@swl/server';
+import type { ShimWorld } from './shim.ts';
 
 /** A player's save. */
 export interface PlayerSave {
@@ -25,13 +25,18 @@ export interface PlayerSave {
   world: ShimWorld;
 }
 
-/** The store's operations. */
+/**
+ * The store's operations.
+ *
+ * They are asynchronous because the store may be a database, and a
+ * database is asynchronous.
+ */
 export interface PlayerStore {
   /** A player's save, or null if there is none. */
-  get(playerId: string): PlayerSave | null;
+  get(playerId: string): Promise<PlayerSave | null>;
 
   /** Whether the player exists. */
-  has(playerId: string): boolean;
+  has(playerId: string): Promise<boolean>;
 
   /**
    * Apply a change to a player's save, atomically.
@@ -43,8 +48,8 @@ export interface PlayerStore {
    */
   transact(
     playerId: string,
-    change: (world: ShimWorld) => ShimWorld,
-  ): PlayerSave | null;
+    change: (world: ShimWorld) => ShimWorld | Promise<ShimWorld>,
+  ): Promise<PlayerSave | null>;
 
   /** How many players are stored. */
   readonly size: number;
@@ -78,7 +83,7 @@ export class MemoryPlayerStore implements PlayerStore {
     }
   }
 
-  get(playerId: string): PlayerSave | null {
+  async get(playerId: string): Promise<PlayerSave | null> {
     const save = this.saves.get(playerId);
     if (!save) return null;
     // A copy, so a caller cannot mutate the stored save behind the store's
@@ -86,16 +91,19 @@ export class MemoryPlayerStore implements PlayerStore {
     return { playerId: save.playerId, world: cloneWorld(save.world) };
   }
 
-  has(playerId: string): boolean {
+  async has(playerId: string): Promise<boolean> {
     return this.saves.has(playerId);
   }
 
-  transact(playerId: string, change: (world: ShimWorld) => ShimWorld): PlayerSave | null {
+  async transact(
+    playerId: string,
+    change: (world: ShimWorld) => ShimWorld | Promise<ShimWorld>,
+  ): Promise<PlayerSave | null> {
     const save = this.saves.get(playerId);
     if (!save) return null;
     // The change runs against a copy. If it throws, the stored save is
     // untouched and the player is not left half-written.
-    const next = change(cloneWorld(save.world));
+    const next = await change(cloneWorld(save.world));
     save.world = cloneWorld(next);
     return { playerId: save.playerId, world: cloneWorld(save.world) };
   }

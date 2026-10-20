@@ -731,19 +731,25 @@ protocol and the original dialect.*
 
 ### F3 - Persistence
 
-- [ ] State is stored in PostgreSQL with transactional command application; concurrent
-      commands cannot corrupt a player — the **transactional application** is implemented
-      (`apps/server/src/store.ts`): a command batch runs against a **copy** of the save
-      and the copy is committed only when the whole batch has been processed, so a
-      failure, a timeout or a disconnect leaves the save exactly as it was. The
-      PostgreSQL implementation is not
-- [ ] The save document format is migrated from the upstream schema (12 `playerInfo` +
+- [x] State is stored in **PostgreSQL** with transactional command application;
+      concurrent commands cannot corrupt a player —
+      `packages/server/src/pgstore.ts` locks the row `FOR UPDATE` inside a
+      transaction, **and** serialises the transactions on the same player inside the
+      store, because PGlite has one connection and two concurrent transactions on it
+      interleave in a way the database cannot separate. The save document is one
+      `JSONB` column: the game's queries are all by player id, and the document is a
+      tree of mixed types
+- [x] The **player store's interface is asynchronous**, because a database is
+      asynchronous, and the application and its tests await it. The in-memory store is
+      the reference implementation and the offline mode's
+- [ ] The **save document format** is migrated from the upstream schema (12 `playerInfo` +
       28 `maps[]` + 47 `privateState` fields) with a tested, versioned migration path —
       the **47 `privateState` fields are now known exactly** (from the upstream's
       `initial.json`), and the server's two additions are defined
       (`packages/server/src/apply.ts`): the production state of each building, which the
       upstream never kept because the client kept it, and the goal runtime state, which
-      the upstream never had. The migration itself is not written
+      the upstream never had. The migration itself is written
+      (`packages/server/src/migrate.ts`) and tested against the upstream's own save
 - [ ] Schema migrations are forward-only, reversible where safe, and run as part of deploy
 - [ ] A backup and restore procedure exists and has been exercised against a real snapshot
 

@@ -10,7 +10,7 @@ import { LegacyIdentityBridge, SessionStore } from '@swl/server';
 import { framePayload, SERVER_KEYS } from '@swl/protocol';
 
 import { createApp, ERROR_CODES, type AppOptions, type AppRequest } from './app.ts';
-import { MemoryPlayerStore, cloneWorld } from './store.ts';
+import { MemoryPlayerStore, cloneWorld } from '@swl/server';
 import { DEFAULT_LIMITS, RateLimiter, parseForm } from './limits.ts';
 
 function repoRoot(): string {
@@ -135,28 +135,28 @@ describe('the rate limiter', () => {
 });
 
 describe('the store', () => {
-  it('hands out copies, so a caller cannot mutate the save behind its back', () => {
+  it('hands out copies, so a caller cannot mutate the save behind its back', async () => {
     const store = new MemoryPlayerStore([{ playerId: 'p1', world: world() }]);
-    const first = store.get('p1')!;
+    const first = (await store.get('p1'))!;
     first.world.resources['g'] = 0;
-    assert.equal(store.get('p1')!.world.resources['g'], 1000);
+    assert.equal((await store.get('p1'))!.world.resources['g'], 1000);
   });
 
-  it('commits a transaction', () => {
+  it('commits a transaction', async () => {
     const store = new MemoryPlayerStore([{ playerId: 'p1', world: world() }]);
-    store.transact('p1', (w) => ({ ...w, resources: { ...w.resources, g: 5 } }));
-    assert.equal(store.get('p1')!.world.resources['g'], 5);
+    await store.transact('p1', (w) => ({ ...w, resources: { ...w.resources, g: 5 } }));
+    assert.equal((await store.get('p1'))!.world.resources['g'], 5);
   });
 
-  it('leaves the save untouched when a transaction throws', () => {
+  it('leaves the save untouched when a transaction throws', async () => {
     const store = new MemoryPlayerStore([{ playerId: 'p1', world: world() }]);
-    assert.throws(() =>
+    await assert.rejects(
       store.transact('p1', (w) => {
         w.resources['g'] = 0;
         throw new Error('boom');
       }),
     );
-    assert.equal(store.get('p1')!.world.resources['g'], 1000);
+    assert.equal((await store.get('p1'))!.world.resources['g'], 1000);
   });
 
   it('clones a world deeply enough', () => {
@@ -172,21 +172,21 @@ describe('the store', () => {
 describe('the health check', () => {
   it('answers', async () => {
     const { handle } = await app();
-    const response = handle(request('GET', '/health'));
+    const response = await handle(request('GET', '/health'));
     assert.equal(response.status, 200);
     assert.deepEqual(JSON.parse(response.body), { status: 'ok', protocol: 1 });
   });
 
   it('refuses a POST', async () => {
     const { handle } = await app();
-    assert.equal(handle(request('POST', '/health')).status, 405);
+    assert.equal((await handle(request('POST', '/health'))).status, 405);
   });
 });
 
 describe('the session endpoints', () => {
   it('issues a token for a correct credential', async () => {
     const { handle } = await app();
-    const response = handle(
+    const response = await handle(
       request('POST', '/api/session', JSON.stringify({ playerId: 'p1', password: 'correct horse' }), {
         'content-type': 'application/json',
       }),
@@ -199,7 +199,7 @@ describe('the session endpoints', () => {
 
   it('refuses a wrong password with a typed error, never a 500', async () => {
     const { handle } = await app();
-    const response = handle(
+    const response = await handle(
       request('POST', '/api/session', JSON.stringify({ playerId: 'p1', password: 'wrong' }), {
         'content-type': 'application/json',
       }),
@@ -210,7 +210,7 @@ describe('the session endpoints', () => {
 
   it('refuses a malformed body with a typed error', async () => {
     const { handle } = await app();
-    const response = handle(request('POST', '/api/session', 'not json', {
+    const response = await handle(request('POST', '/api/session', 'not json', {
       'content-type': 'application/json',
     }));
     assert.equal(response.status, 400);
@@ -219,7 +219,7 @@ describe('the session endpoints', () => {
 
   it('refuses missing credentials', async () => {
     const { handle } = await app();
-    const response = handle(request('POST', '/api/session', '{}', {
+    const response = await handle(request('POST', '/api/session', '{}', {
       'content-type': 'application/json',
     }));
     assert.equal(response.status, 400);
@@ -228,14 +228,14 @@ describe('the session endpoints', () => {
 
   it('revokes a token', async () => {
     const { handle, sessions } = await app();
-    const created = handle(
+    const created = await handle(
       request('POST', '/api/session', JSON.stringify({ playerId: 'p1', password: 'correct horse' }), {
         'content-type': 'application/json',
       }),
     );
     const token = JSON.parse(created.body).token;
     assert.ok(sessions.resolve(token, 1_700_000_000));
-    const deleted = handle(request('DELETE', '/api/session', '', { authorization: `Bearer ${token}` }));
+    const deleted = await handle(request('DELETE', '/api/session', '', { authorization: `Bearer ${token}` }));
     assert.equal(JSON.parse(deleted.body).revoked, true);
     assert.equal(sessions.resolve(token, 1_700_000_000), null);
   });
@@ -254,19 +254,19 @@ describe('the legacy command endpoint', () => {
   it('applies an authenticated batch', async () => {
     const { handle, store } = await app();
     const frame = framePayload(payload(1, []), SERVER_KEYS.current);
-    const response = handle(
+    const response = await handle(
       legacyRequest('/command.php', { USERID: LEGACY_USER_ID, data: frame }),
     );
     assert.equal(response.status, 200);
     // The client expects exactly {"result": "success"}, and nothing else.
     assert.deepEqual(JSON.parse(response.body), { result: 'success' });
-    assert.equal(store.get('p1')!.world.nextCommandNumber, 1);
+    assert.equal((await store.get('p1'))!.world.nextCommandNumber, 1);
   });
 
   it('refuses an unauthenticated batch with a typed error', async () => {
     const { handle } = await app();
     const frame = framePayload(payload(1, []), SERVER_KEYS.current);
-    const response = handle(legacyRequest('/command.php', { data: frame }));
+    const response = await handle(legacyRequest('/command.php', { data: frame }));
     assert.equal(response.status, 401);
     assert.equal(JSON.parse(response.body).error, 'unknown-player');
   });
@@ -274,7 +274,7 @@ describe('the legacy command endpoint', () => {
   it('refuses a body signed with the wrong key', async () => {
     const { handle } = await app();
     const frame = framePayload(payload(1, []), 'not-a-key');
-    const response = handle(
+    const response = await handle(
       legacyRequest('/command.php', { USERID: LEGACY_USER_ID, data: frame }),
     );
     assert.equal(response.status, 403);
@@ -282,7 +282,7 @@ describe('the legacy command endpoint', () => {
 
   it('refuses a malformed body', async () => {
     const { handle } = await app();
-    const response = handle(
+    const response = await handle(
       legacyRequest('/command.php', { USERID: LEGACY_USER_ID, data: 'notframed' }),
     );
     assert.equal(response.status, 400);
@@ -294,13 +294,13 @@ describe('the legacy command endpoint', () => {
       payload(1, [[1, 'buy', [1, 1007, 0, 0, 1, 0, 0], [0, 0, 999999, 0, 0, 0, 0, 0]]]),
       SERVER_KEYS.current,
     );
-    const response = handle(
+    const response = await handle(
       legacyRequest('/command.php', { USERID: LEGACY_USER_ID, data: frame }),
     );
     assert.equal(response.status, 200);
     // The Soldier costs 30 gold and 60 steel. The client claimed a million.
-    assert.equal(store.get('p1')!.world.resources['g'], 1000 - 30);
-    assert.equal(store.get('p1')!.world.resources['s'], 1000 - 60);
+    assert.equal((await store.get('p1'))!.world.resources['g'], 1000 - 30);
+    assert.equal((await store.get('p1'))!.world.resources['s'], 1000 - 60);
   });
 
   it('leaves the save untouched when a command throws', async () => {
@@ -313,18 +313,18 @@ describe('the legacy command endpoint', () => {
       payload(1, [[1, 'buy', [1, 1007, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0]]]),
       SERVER_KEYS.current,
     );
-    const response = handle(
+    const response = await handle(
       legacyRequest('/command.php', { USERID: LEGACY_USER_ID, data: frame }),
     );
     // The failure is caught at the edge, and the save is unchanged.
     assert.equal(response.status, 500);
-    assert.equal(store.get('p1')!.world.resources['g'], 1000);
+    assert.equal((await store.get('p1'))!.world.resources['g'], 1000);
   });
 
   it('refuses a body that is too large', async () => {
     const { handle } = await app({ limits: { ...DEFAULT_LIMITS, maxBodyBytes: 10 } });
     const frame = framePayload(payload(1, []), SERVER_KEYS.current);
-    const response = handle(
+    const response = await handle(
       legacyRequest('/command.php', { USERID: LEGACY_USER_ID, data: frame }),
     );
     assert.equal(response.status, 413);
@@ -338,9 +338,9 @@ describe('the legacy command endpoint', () => {
     const frame = framePayload(payload(1, []), SERVER_KEYS.current);
     const send = () =>
       handle(legacyRequest('/command.php', { USERID: LEGACY_USER_ID, data: frame }));
-    assert.equal(send().status, 200);
-    assert.equal(send().status, 200);
-    const limited = send();
+    assert.equal((await send()).status, 200);
+    assert.equal((await send()).status, 200);
+    const limited = await send();
     assert.equal(limited.status, 429);
     assert.equal(JSON.parse(limited.body).error, 'rate-limited');
     assert.ok(limited.headers['retry-after']);
@@ -360,7 +360,7 @@ describe('the native command endpoint', () => {
 
   it('applies a valid request', async () => {
     const { handle, token } = await app();
-    const response = handle(native(token, 'req-1', []));
+    const response = await handle(native(token, 'req-1', []));
     assert.equal(response.status, 200);
     const body = JSON.parse(response.body);
     assert.equal(body.v, 1);
@@ -371,7 +371,7 @@ describe('the native command endpoint', () => {
 
   it('refuses an unauthenticated request', async () => {
     const { handle } = await app();
-    const response = handle({
+    const response = await handle({
       method: 'POST',
       path: '/api/command',
       headers: { 'content-type': 'application/json' },
@@ -382,7 +382,7 @@ describe('the native command endpoint', () => {
 
   it('refuses a malformed body with a typed error', async () => {
     const { handle, token } = await app();
-    const response = handle({
+    const response = await handle({
       method: 'POST',
       path: '/api/command',
       headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
@@ -394,7 +394,7 @@ describe('the native command endpoint', () => {
 
   it('refuses an unsupported protocol version', async () => {
     const { handle, token } = await app();
-    const response = handle({
+    const response = await handle({
       method: 'POST',
       path: '/api/command',
       headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
@@ -409,7 +409,7 @@ describe('the native command endpoint', () => {
 
   it('refuses a command that is not in the vocabulary', async () => {
     const { handle, token } = await app();
-    const response = handle(native(token, 'req-1', [{ map: 0, name: 'not_a_command', args: [] }]));
+    const response = await handle(native(token, 'req-1', [{ map: 0, name: 'not_a_command', args: [] }]));
     assert.equal(response.status, 400);
     const body = JSON.parse(response.body);
     assert.equal(body.errors[0].code, 'unknown-command');
@@ -423,14 +423,14 @@ describe('the native command endpoint', () => {
         return { applied: true, world: w };
       },
     });
-    const first = handle(
+    const first = await handle(
       native(token, 'req-1', [{ map: 0, name: 'move', args: [1, 2, 3, 0, 'test'] }]),
     );
     assert.equal(first.status, 200);
     assert.equal(applied, 1);
 
     // The same request id: the retry of a request that was lost in flight.
-    const second = handle(
+    const second = await handle(
       native(token, 'req-1', [{ map: 0, name: 'move', args: [1, 2, 3, 0, 'test'] }]),
     );
     assert.equal(second.status, 200);
@@ -441,14 +441,14 @@ describe('the native command endpoint', () => {
 
   it('computes the cost itself', async () => {
     const { handle, store, token } = await app();
-    const response = handle(
+    const response = await handle(
       native(token, 'req-1', [{ map: 0, name: 'buy', args: [1, 1007, 0, 0, 1, 0, 0, 'u'] }]),
     );
     assert.equal(response.status, 200);
     // The Soldier costs 30 gold and 60 steel, and the native envelope has
     // nowhere to put a client's own figure.
-    assert.equal(store.get('p1')!.world.resources['g'], 1000 - 30);
-    assert.equal(store.get('p1')!.world.resources['s'], 1000 - 60);
+    assert.equal((await store.get('p1'))!.world.resources['g'], 1000 - 30);
+    assert.equal((await store.get('p1'))!.world.resources['s'], 1000 - 60);
   });
 
   it('refuses a command the player cannot afford, without touching the rest', async () => {
@@ -457,28 +457,28 @@ describe('the native command endpoint', () => {
         { playerId: 'p1', world: { ...world(), resources: { g: 1, w: 0, o: 0, s: 0, c: 0, e: 100, x: 0, m: 0 } } },
       ]),
     });
-    const response = handle(
+    const response = await handle(
       native(token, 'req-1', [{ map: 0, name: 'buy', args: [1, 1007, 0, 0, 1, 0, 0, 'u'] }]),
     );
     assert.equal(response.status, 200);
     const body = JSON.parse(response.body);
     assert.equal(body.ok, false);
     assert.equal(body.outcomes[0].error.code, 'insufficient-resources');
-    assert.equal(store.get('p1')!.world.resources['g'], 1);
+    assert.equal((await store.get('p1'))!.world.resources['g'], 1);
   });
 });
 
 describe('the legacy config and player endpoints', () => {
   it('serves the content bundle', async () => {
     const { handle } = await app({ contentBundle: { items: [1, 2, 3], globals: { a: 1 } } });
-    const response = handle(request('POST', '/get_game_config.php', ''));
+    const response = await handle(request('POST', '/get_game_config.php', ''));
     assert.equal(response.status, 200);
     assert.deepEqual(JSON.parse(response.body), { items: [1, 2, 3], globals: { a: 1 } });
   });
 
   it('serves the player own info', async () => {
     const { handle } = await app();
-    const response = handle(
+    const response = await handle(
       legacyRequest('/get_player_info.php', { USERID: LEGACY_USER_ID }),
     );
     assert.equal(response.status, 200);
@@ -489,20 +489,20 @@ describe('the legacy config and player endpoints', () => {
 
   it('refuses an unauthenticated player info request', async () => {
     const { handle } = await app();
-    assert.equal(handle(legacyRequest('/get_player_info.php', {})).status, 401);
+    assert.equal((await handle(legacyRequest('/get_player_info.php', {}))).status, 401);
   });
 });
 
 describe('the router', () => {
   it('answers 404 for an unknown endpoint', async () => {
     const { handle } = await app();
-    const response = handle(request('GET', '/nope'));
+    const response = await handle(request('GET', '/nope'));
     assert.equal(response.status, 404);
     assert.equal(JSON.parse(response.body).error, 'not-found');
   });
 
   it('answers 405 for the wrong method', async () => {
     const { handle } = await app();
-    assert.equal(handle(request('GET', '/command.php')).status, 405);
+    assert.equal((await handle(request('GET', '/command.php'))).status, 405);
   });
 });
