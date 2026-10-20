@@ -1,0 +1,458 @@
+{
+  "note": "The golden-master corpus. Each scenario is a fixed input and the recorded answer is in re/data/golden-master.json. Run scripts/golden-master.mjs to check, --record to re-record. The corpus covers the rules that are easy to get subtly wrong: the damage pipeline, the counters, the targeting, the cadence, the XP thresholds, the collection arithmetic, the market pricing and the bonus cycles.",
+  "xpTable": [
+    { "xpMultiplier": 0, "flatAttack": 0, "lifePercent": 0, "cashDivisor": 0 },
+    { "xpMultiplier": 5, "flatAttack": 2, "lifePercent": 20, "cashDivisor": 50 },
+    { "xpMultiplier": 10, "flatAttack": 2, "lifePercent": 20, "cashDivisor": 25 },
+    { "xpMultiplier": 20, "flatAttack": 3, "lifePercent": 20, "cashDivisor": 12 },
+    { "xpMultiplier": 40, "flatAttack": 3, "lifePercent": 20, "cashDivisor": 6 },
+    { "xpMultiplier": 65, "flatAttack": 4, "lifePercent": 20, "cashDivisor": 4 },
+    { "xpMultiplier": 95, "flatAttack": 4, "lifePercent": 25, "cashDivisor": 3 },
+    { "xpMultiplier": 125, "flatAttack": 4, "lifePercent": 25, "cashDivisor": 2.5 },
+    { "xpMultiplier": 160, "flatAttack": 4, "lifePercent": 25, "cashDivisor": 2 },
+    { "xpMultiplier": 200, "flatAttack": 4, "lifePercent": 25, "cashDivisor": 1.5 }
+  ],
+  "collectPeriods": {
+    "minutes": [5, 60, 240, 480],
+    "multiplier": [0.25, 1, 2, 3]
+  },
+  "marketRules": {
+    "baseCosts": { "o": 100, "s": 150, "w": 100 },
+    "amounts": [100, 200, 300],
+    "increment": 0.02,
+    "sellPercentage": 0.75,
+    "maxTrades": 20,
+    "periodHours": 20
+  },
+  "scenarios": [
+    {
+      "id": "combat-soldier-vs-soldier",
+      "kind": "combat-damage",
+      "input": {
+        "seed": "golden-1",
+        "variance": 0,
+        "attacker": {
+          "attack": 8, "defense": 1, "life": 50, "attack_range": 5, "attack_interval": 35,
+          "best_against": "ft_ground", "best_against_mult": 1,
+          "properties": { "ft_ground": 1 }
+        },
+        "defender": {
+          "attack": 8, "defense": 1, "life": 50, "attack_range": 5, "attack_interval": 35,
+          "best_against": "ft_ground", "best_against_mult": 1,
+          "properties": { "ft_ground": 1 }
+        }
+      }
+    },
+    {
+      "id": "combat-antiaircraft-vs-flying",
+      "kind": "combat-damage",
+      "input": {
+        "seed": "golden-2",
+        "variance": 0,
+        "attacker": {
+          "attack": 10, "defense": 1, "life": 50, "attack_range": 12, "attack_interval": 60,
+          "best_against": "ft_flying", "best_against_mult": 20,
+          "properties": { "ft_ground": 1 }
+        },
+        "defender": {
+          "attack": 6, "defense": 1, "life": 25, "attack_range": 1, "attack_interval": 35,
+          "best_against": "ft_ground", "best_against_mult": 1,
+          "properties": { "ft_flying": 1 }
+        }
+      }
+    },
+    {
+      "id": "combat-no-counter-match",
+      "kind": "combat-damage",
+      "input": {
+        "seed": "golden-3",
+        "variance": 0,
+        "attacker": {
+          "attack": 10, "defense": 1, "life": 50, "attack_range": 12, "attack_interval": 60,
+          "best_against": "ft_flying", "best_against_mult": 20,
+          "properties": { "ft_ground": 1 }
+        },
+        "defender": {
+          "attack": 6, "defense": 1, "life": 25, "attack_range": 1, "attack_interval": 35,
+          "best_against": "ft_ground", "best_against_mult": 1,
+          "properties": { "ft_ground": 1 }
+        }
+      }
+    },
+    {
+      "id": "combat-server-battle-1",
+      "kind": "combat-server",
+      "input": {
+        "seed": "battle-0001",
+        "attacker": {
+          "id": "a1", "itemId": 1007, "attack": 40, "defense": 1, "life": 50, "maxLife": 50,
+          "health": 50, "attack_range": 5, "attack_interval": 35, "phase": 0,
+          "properties": { "ft_ground": 1 }, "best_against": "ft_ground", "best_against_mult": 1,
+          "x": 0, "y": 0
+        },
+        "defender": {
+          "id": "d1", "itemId": 1007, "attack": 0, "defense": 1, "life": 200, "maxLife": 200,
+          "health": 200, "attack_range": 5, "attack_interval": 35, "phase": 0,
+          "properties": { "ft_ground": 1 }, "best_against": "ft_ground", "best_against_mult": 1,
+          "x": 3, "y": 0
+        }
+      }
+    },
+    {
+      "id": "combat-server-shared-across-3",
+      "kind": "combat-server",
+      "input": {
+        "seed": "battle-0002",
+        "numTargets": 3,
+        "attacker": {
+          "id": "a1", "itemId": 1007, "attack": 40, "defense": 1, "life": 50, "maxLife": 50,
+          "health": 50, "attack_range": 5, "attack_interval": 35, "phase": 0,
+          "properties": { "ft_ground": 1 }, "best_against": "ft_ground", "best_against_mult": 1,
+          "x": 0, "y": 0
+        },
+        "defender": {
+          "id": "d1", "itemId": 1007, "attack": 0, "defense": 1, "life": 200, "maxLife": 200,
+          "health": 200, "attack_range": 5, "attack_interval": 35, "phase": 0,
+          "properties": { "ft_ground": 1 }, "best_against": "ft_ground", "best_against_mult": 1,
+          "x": 3, "y": 0
+        }
+      }
+    },
+    {
+      "id": "target-score-unit",
+      "kind": "target-score",
+      "input": { "candidate": { "kind": "unit", "distance": 10 } }
+    },
+    {
+      "id": "target-score-town-hall",
+      "kind": "target-score",
+      "input": {
+        "candidate": { "kind": "building", "distance": 10, "subcatFunctional": 135 }
+      }
+    },
+    {
+      "id": "target-score-collectable",
+      "kind": "target-score",
+      "input": {
+        "candidate": { "kind": "building", "distance": 10, "collect": 500 }
+      }
+    },
+    {
+      "id": "target-score-untargetable",
+      "kind": "target-score",
+      "input": { "candidate": { "kind": "building", "distance": 10 } }
+    },
+    {
+      "id": "target-score-passive-building",
+      "kind": "target-score",
+      "input": {
+        "candidate": { "kind": "building", "distance": 10, "uiAttack": 3, "passive": true }
+      }
+    },
+    {
+      "id": "target-select-unit-wins",
+      "kind": "target-select",
+      "input": {
+        "candidates": [
+          { "kind": "building", "distance": 10, "subcatFunctional": 135, "handle": "hall" },
+          { "kind": "unit", "distance": 40, "handle": "unit" }
+        ]
+      }
+    },
+    {
+      "id": "target-select-skips-untargetable",
+      "kind": "target-select",
+      "input": {
+        "candidates": [
+          { "kind": "building", "distance": 1, "handle": "wall" },
+          { "kind": "unit", "distance": 90, "handle": "unit" }
+        ]
+      }
+    },
+    {
+      "id": "counter-antiaircraft-20x",
+      "kind": "counter",
+      "input": {
+        "attacker": { "bestAgainst": "ft_flying", "multiplier": 20 },
+        "targetProperties": { "ft_flying": 1 }
+      }
+    },
+    {
+      "id": "counter-demolition-tank-15x",
+      "kind": "counter",
+      "input": {
+        "attacker": { "bestAgainst": "ft_building", "multiplier": 15 },
+        "targetProperties": { "ft_building": 1 }
+      }
+    },
+    {
+      "id": "counter-b52-5x",
+      "kind": "counter",
+      "input": {
+        "attacker": { "bestAgainst": "ft_building", "multiplier": 5 },
+        "targetProperties": { "ft_building": 1 }
+      }
+    },
+    {
+      "id": "cadence-unit-phase-0",
+      "kind": "cadence",
+      "input": { "kind": "unit", "phase": 0, "interval": 35, "frameCount": 100, "random": 0.0 }
+    },
+    {
+      "id": "cadence-unit-phase-3",
+      "kind": "cadence",
+      "input": { "kind": "unit", "phase": 3, "interval": 35, "frameCount": 100, "random": 0.6 }
+    },
+    {
+      "id": "cadence-building-lockstep",
+      "kind": "cadence",
+      "input": { "kind": "building", "interval": 35, "frameCount": 100, "random": 0.0 }
+    },
+    {
+      "id": "shooters-bunker-with-3",
+      "kind": "shooters",
+      "input": { "building": { "attackPoints": 4, "garrison": 3, "isBunker": true } }
+    },
+    {
+      "id": "shooters-empty-bunker",
+      "kind": "shooters",
+      "input": { "building": { "attackPoints": 4, "garrison": 0, "isBunker": true } }
+    },
+    {
+      "id": "shooters-turret-all-points",
+      "kind": "shooters",
+      "input": { "building": { "attackPoints": 4, "garrison": 0, "isBunker": false } }
+    },
+    {
+      "id": "xp-level-at-threshold",
+      "kind": "xp-level",
+      "input": { "table": "xpTable", "life": 50, "xp": 250 }
+    },
+    {
+      "id": "xp-level-one-past-threshold",
+      "kind": "xp-level",
+      "input": { "table": "xpTable", "life": 50, "xp": 251 }
+    },
+    {
+      "id": "xp-level-max-reached-by-payment",
+      "kind": "xp-level",
+      "input": { "table": "xpTable", "life": 50, "xp": 10001 }
+    },
+    {
+      "id": "xp-cost-level-9",
+      "kind": "xp-cost",
+      "input": { "table": "xpTable", "life": 50, "level": 9 }
+    },
+    {
+      "id": "xp-earned-from-a-unit",
+      "kind": "xp-earned",
+      "input": { "damage": 37, "targetIsUnit": true }
+    },
+    {
+      "id": "xp-earned-from-a-building",
+      "kind": "xp-earned",
+      "input": { "damage": 37, "targetIsUnit": false }
+    },
+    {
+      "id": "collect-one-hour",
+      "kind": "collect",
+      "input": {
+        "periods": "collectPeriods",
+        "periodIndex": 2,
+        "producer": { "collect": 100, "unitCapacity": 5, "unitsInside": 0 }
+      }
+    },
+    {
+      "id": "collect-with-two-workers",
+      "kind": "collect",
+      "input": {
+        "periods": "collectPeriods",
+        "periodIndex": 2,
+        "producer": { "collect": 100, "unitCapacity": 5, "unitsInside": 2 }
+      }
+    },
+    {
+      "id": "collect-over-capacity",
+      "kind": "collect",
+      "input": {
+        "periods": "collectPeriods",
+        "periodIndex": 4,
+        "producer": { "collect": 100, "unitCapacity": 2, "unitsInside": 3 }
+      }
+    },
+    {
+      "id": "market-price-wood-100",
+      "kind": "market-price",
+      "input": { "rules": "marketRules", "resource": "w", "amount": 100, "tradesSoFar": 0 }
+    },
+    {
+      "id": "market-price-steel-after-5-trades",
+      "kind": "market-price",
+      "input": { "rules": "marketRules", "resource": "s", "amount": 100, "tradesSoFar": 5 }
+    },
+    {
+      "id": "market-price-selling",
+      "kind": "market-price",
+      "input": {
+        "rules": "marketRules", "resource": "s", "amount": 100, "tradesSoFar": 0, "selling": true
+      }
+    },
+    {
+      "id": "market-trade-past-the-limit",
+      "kind": "market-trade",
+      "input": {
+        "rules": "marketRules",
+        "current": { "trades": 20, "lastTradeAt": 0 },
+        "resource": "w",
+        "amount": 100
+      }
+    },
+    {
+      "id": "daily-bonus-same-day",
+      "kind": "daily-bonus",
+      "input": { "lastBonusAt": 1767438000, "now": 1767438000, "tzOffsetHours": 0 }
+    },
+    {
+      "id": "daily-bonus-next-day",
+      "kind": "daily-bonus",
+      "input": { "lastBonusAt": 1767438000, "now": 1767441600, "tzOffsetHours": 0 }
+    },
+    {
+      "id": "daily-bonus-behind-a-time-zone",
+      "kind": "daily-bonus",
+      "input": { "lastBonusAt": 1767438000, "now": 1767441600, "tzOffsetHours": -3 }
+    },
+    {
+      "id": "monday-bonus-ready",
+      "kind": "monday-bonus",
+      "input": { "dayOfWeek": 1, "lastCollectedDay": null, "today": 1 }
+    },
+    {
+      "id": "monday-bonus-collected",
+      "kind": "monday-bonus",
+      "input": { "dayOfWeek": 1, "lastCollectedDay": 1, "today": 1 }
+    },
+    {
+      "id": "monday-bonus-sunday",
+      "kind": "monday-bonus",
+      "input": { "dayOfWeek": 0, "lastCollectedDay": null, "today": 0 }
+    },
+    {
+      "id": "upgrade-academy-refund",
+      "kind": "upgrade-cost",
+      "input": {
+        "oldBuilding": {
+          "id": 30, "name": "Academy I", "costs": { "w": 125 }, "costUnitCash": 0,
+          "buildTime": 5, "trainingTime": 5, "clicksToBuild": 1, "minLevel": 1,
+          "upgradesTo": 41, "unitCapacity": 0, "population": 0,
+          "buildingLimitSameId": -1, "buildingLimitSameScf": -1, "premiumUpgradeCosts": {}
+        },
+        "newBuilding": {
+          "id": 41, "name": "Academy II", "costs": { "w": 300 }, "costUnitCash": 0,
+          "buildTime": 5, "trainingTime": 5, "clicksToBuild": 1, "minLevel": 1,
+          "upgradesTo": 42, "unitCapacity": 0, "population": 0,
+          "buildingLimitSameId": -1, "buildingLimitSameScf": -1, "premiumUpgradeCosts": {}
+        }
+      }
+    },
+    {
+      "id": "premium-upgrade-command-center",
+      "kind": "premium-upgrade",
+      "input": {
+        "building": {
+          "id": 60, "name": "Command Center IV", "costs": { "g": 15000 }, "costUnitCash": 0,
+          "buildTime": 32400, "trainingTime": 5, "clicksToBuild": 1, "minLevel": 35,
+          "upgradesTo": null, "unitCapacity": 0, "population": 5,
+          "buildingLimitSameId": -1, "buildingLimitSameScf": -1, "premiumUpgradeCosts": { "c": 20 }
+        },
+        "pricing": { "minutesPerUnit": 5, "cashPerUnit": 1 }
+      }
+    },
+    {
+      "id": "speed-up-refused-when-almost-done",
+      "kind": "speed-up",
+      "input": {
+        "remainingMs": 9999,
+        "rules": { "minRemainingMs": 10000, "cost": 2 }
+      }
+    },
+    {
+      "id": "damage-simple",
+      "kind": "damage-class",
+      "input": {
+        "class": "SimpleDamage",
+        "amount": 30,
+        "context": { "attackerId": "a1", "numTargets": 1 },
+        "target": {
+          "id": "d1", "isUnit": true, "isDead": false, "health": 100, "maxLife": 100,
+          "x": 0, "y": 0, "effects": []
+        }
+      }
+    },
+    {
+      "id": "damage-over-time",
+      "kind": "damage-class",
+      "input": {
+        "class": "DamageOverTime",
+        "total": 100,
+        "ticks": 10,
+        "intervalMs": 1000,
+        "context": { "attackerId": "a1", "numTargets": 1 },
+        "target": {
+          "id": "d1", "isUnit": true, "isDead": false, "health": 100, "maxLife": 100,
+          "x": 0, "y": 0, "effects": []
+        }
+      }
+    },
+    {
+      "id": "damage-direct-kill-below-threshold",
+      "kind": "damage-class",
+      "input": {
+        "class": "DirectKillDamage",
+        "maxLife": 50,
+        "context": { "attackerId": "a1", "numTargets": 1 },
+        "target": {
+          "id": "d1", "isUnit": true, "isDead": false, "health": 40, "maxLife": 100,
+          "x": 0, "y": 0, "effects": []
+        }
+      }
+    },
+    {
+      "id": "damage-direct-kill-above-threshold",
+      "kind": "damage-class",
+      "input": {
+        "class": "DirectKillDamage",
+        "maxLife": 50,
+        "context": { "attackerId": "a1", "numTargets": 1 },
+        "target": {
+          "id": "d1", "isUnit": true, "isDead": false, "health": 80, "maxLife": 100,
+          "x": 0, "y": 0, "effects": []
+        }
+      }
+    },
+    {
+      "id": "special-attack-regular-shoot",
+      "kind": "special-attack",
+      "input": {
+        "class": "RegularShootSpecialAttack",
+        "config": { "attack": 100, "frames": 4, "points": 2 }
+      }
+    },
+    {
+      "id": "special-attack-area",
+      "kind": "special-attack",
+      "input": {
+        "class": "AreaDamageSpecialAttack",
+        "config": { "attack": 100, "numUnits": 4 }
+      }
+    },
+    {
+      "id": "special-attack-vortex",
+      "kind": "special-attack",
+      "input": {
+        "class": "VortexSpecialAttack",
+        "config": { "attack": 100, "numKills": 2 }
+      }
+    }
+  ]
+}

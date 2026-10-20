@@ -36,6 +36,9 @@ jobs:
       - name: Unit tests
         run: pnpm test
 
+      - name: The golden-master corpus
+        run: node scripts/golden-master.mjs
+
       - name: Build and validate the content bundle
         run: pnpm build:content
 

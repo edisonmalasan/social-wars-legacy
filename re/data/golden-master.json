@@ -1,0 +1,307 @@
+{
+ "note": "The recorded answers of the golden-master corpus. Produced by scripts/golden-master.mjs --record. A difference here means the rules engine changed its mind.",
+ "corpus": 50,
+ "results": {
+  "combat-soldier-vs-soldier": {
+   "damage": 11,
+   "crit": true,
+   "counterMultiplier": 1,
+   "stages": [
+    {
+     "name": "attack",
+     "value": 8
+    },
+    {
+     "name": "afterCounter",
+     "value": 8
+    },
+    {
+     "name": "afterCrit",
+     "value": 12
+    },
+    {
+     "name": "afterDefense",
+     "value": 11
+    },
+    {
+     "name": "afterRound",
+     "value": 11
+    },
+    {
+     "name": "final",
+     "value": 11
+    }
+   ]
+  },
+  "combat-antiaircraft-vs-flying": {
+   "damage": 299,
+   "crit": true,
+   "counterMultiplier": 20,
+   "stages": [
+    {
+     "name": "attack",
+     "value": 10
+    },
+    {
+     "name": "afterCounter",
+     "value": 200
+    },
+    {
+     "name": "afterCrit",
+     "value": 300
+    },
+    {
+     "name": "afterDefense",
+     "value": 299
+    },
+    {
+     "name": "afterRound",
+     "value": 299
+    },
+    {
+     "name": "final",
+     "value": 299
+    }
+   ]
+  },
+  "combat-no-counter-match": {
+   "damage": 9,
+   "crit": false,
+   "counterMultiplier": 1,
+   "stages": [
+    {
+     "name": "attack",
+     "value": 10
+    },
+    {
+     "name": "afterCounter",
+     "value": 10
+    },
+    {
+     "name": "afterCrit",
+     "value": 10
+    },
+    {
+     "name": "afterDefense",
+     "value": 9
+    },
+    {
+     "name": "afterRound",
+     "value": 9
+    },
+    {
+     "name": "final",
+     "value": 9
+    }
+   ]
+  },
+  "combat-server-battle-1": {
+   "damage": 42,
+   "crit": false,
+   "variance": 3,
+   "defenderHealthAfter": 158,
+   "killed": false,
+   "counterMultiplier": 1
+  },
+  "combat-server-shared-across-3": {
+   "damage": 14,
+   "crit": false,
+   "variance": 2,
+   "defenderHealthAfter": 186,
+   "killed": false,
+   "counterMultiplier": 1
+  },
+  "target-score-unit": {
+   "score": 1140,
+   "effectiveDistance": 10
+  },
+  "target-score-town-hall": {
+   "score": 1090,
+   "effectiveDistance": 10
+  },
+  "target-score-collectable": {
+   "score": 1065,
+   "effectiveDistance": 10
+  },
+  "target-score-untargetable": {
+   "score": -1,
+   "effectiveDistance": 10
+  },
+  "target-score-passive-building": {
+   "score": 1030,
+   "effectiveDistance": 20
+  },
+  "target-select-unit-wins": {
+   "handle": "unit",
+   "score": 1110
+  },
+  "target-select-skips-untargetable": {
+   "handle": "unit",
+   "score": 1060
+  },
+  "counter-antiaircraft-20x": 20,
+  "counter-demolition-tank-15x": 15,
+  "counter-b52-5x": 5,
+  "cadence-unit-phase-0": {
+   "phase": 0,
+   "frames": [
+    0,
+    35,
+    70
+   ]
+  },
+  "cadence-unit-phase-3": {
+   "phase": 3,
+   "frames": [
+    32,
+    67
+   ]
+  },
+  "cadence-building-lockstep": {
+   "phase": 0,
+   "frames": [
+    0,
+    35,
+    70
+   ]
+  },
+  "shooters-bunker-with-3": 3,
+  "shooters-empty-bunker": 0,
+  "shooters-turret-all-points": 4,
+  "xp-level-at-threshold": {
+   "level": 0,
+   "bonuses": {
+    "level": 0,
+    "extraAttack": 0,
+    "extraLifePercent": 0,
+    "lifeMultiplier": 1
+   }
+  },
+  "xp-level-one-past-threshold": {
+   "level": 1,
+   "bonuses": {
+    "level": 1,
+    "extraAttack": 2,
+    "extraLifePercent": 20,
+    "lifeMultiplier": 1.2
+   }
+  },
+  "xp-level-max-reached-by-payment": {
+   "level": 9,
+   "bonuses": {
+    "level": 9,
+    "extraAttack": 30,
+    "extraLifePercent": 200,
+    "lifeMultiplier": 3
+   }
+  },
+  "xp-cost-level-9": {
+   "cost": 34,
+   "required": 10000
+  },
+  "xp-earned-from-a-unit": 37,
+  "xp-earned-from-a-building": 0,
+  "collect-one-hour": {
+   "amount": 100,
+   "hacked": false
+  },
+  "collect-with-two-workers": {
+   "amount": 120,
+   "hacked": false
+  },
+  "collect-over-capacity": {
+   "amount": 0,
+   "hacked": true
+  },
+  "market-price-wood-100": 100,
+  "market-price-steel-after-5-trades": 165,
+  "market-price-selling": 113,
+  "market-trade-past-the-limit": {
+   "ok": false,
+   "reason": "too-many-trades"
+  },
+  "daily-bonus-same-day": {
+   "ready": false,
+   "reset": false
+  },
+  "daily-bonus-next-day": {
+   "ready": false,
+   "reset": false
+  },
+  "daily-bonus-behind-a-time-zone": {
+   "ready": false,
+   "reset": false
+  },
+  "monday-bonus-ready": "ready",
+  "monday-bonus-collected": "collected",
+  "monday-bonus-sunday": "not-ready",
+  "upgrade-academy-refund": {
+   "w": 294
+  },
+  "premium-upgrade-command-center": 108,
+  "speed-up-refused-when-almost-done": null,
+  "damage-simple": {
+   "applied": true,
+   "damage": 30,
+   "health": 70,
+   "dead": false,
+   "effects": []
+  },
+  "damage-over-time": {
+   "applied": true,
+   "damage": 0,
+   "health": 100,
+   "dead": false,
+   "effects": [
+    {
+     "kind": "burn",
+     "damagePerTick": 10,
+     "ticksRemaining": 10,
+     "intervalMs": 1000
+    }
+   ]
+  },
+  "damage-direct-kill-below-threshold": {
+   "applied": true,
+   "damage": 40,
+   "health": 0,
+   "dead": true,
+   "effects": [
+    {
+     "kind": "incapacitated"
+    }
+   ]
+  },
+  "damage-direct-kill-above-threshold": {
+   "applied": false,
+   "damage": 0,
+   "health": 80,
+   "dead": false,
+   "effects": []
+  },
+  "special-attack-regular-shoot": {
+   "damagePerTarget": 12.5,
+   "targets": 2,
+   "totalDamage": 25,
+   "spawns": 0,
+   "attackerMovesTiles": 0,
+   "consumesTarget": false
+  },
+  "special-attack-area": {
+   "damagePerTarget": 25,
+   "targets": 4,
+   "totalDamage": 100,
+   "spawns": 0,
+   "attackerMovesTiles": 0,
+   "consumesTarget": false
+  },
+  "special-attack-vortex": {
+   "damagePerTarget": 30,
+   "targets": 2,
+   "totalDamage": 60,
+   "spawns": 0,
+   "attackerMovesTiles": 0,
+   "consumesTarget": false
+  }
+ }
+}
