@@ -1230,9 +1230,28 @@ product.*
 
 ### I4 — Observability
 
-- [ ] Structured logs with a request id that ties a client action to a server command
-- [ ] Metrics for latency, command throughput, error rate, simulation tick time and
-      active sessions
+- [x] **Structured logs with a request id that ties a client action to a server
+      command.** One JSON line per request (`packages/server/src/observability.ts`),
+      with a request id that travels back in the response's `x-request-id` header, so a
+      player can quote it and the exact request can be found. The client's own id is
+      **reused** when it sends one, so its correlation id survives into the log. The
+      line carries the path, the method, the status, the duration, the player and the
+      **names of the commands** the request applied and refused
+- [x] The lines are JSON rather than prose because prose cannot be queried: a log you
+      cannot filter by a player id or a command name is a log you only ever read with
+      your eyes
+- [x] **Metrics for latency, command throughput, error rate, simulation tick time and
+      active sessions.** Counters, gauges and histograms, with the labels a dashboard
+      needs, and served as JSON at **`/api/metrics`**:
+      - `http_request_duration_ms` — the latency, bucketed
+      - `http_requests_total` and `http_errors_total` — the throughput and the error
+        rate, by path, method and status
+      - `commands_total` and `command_duration_ms` — the command throughput, by the
+        command's name
+      - `simulation_tick_ms` — how long the rules engine took
+      - `active_sessions` — a **gauge**, because it goes up and down
+- [ ] The metrics are exported to a time-series database, so the alerts below can fire
+      on a regression rather than on a snapshot
 - [ ] Distributed tracing across the client, the API and the database
 - [ ] Error reporting captures crashes with build and content version attached
 - [ ] Alerts fire on error-rate, latency and tick-time regressions
