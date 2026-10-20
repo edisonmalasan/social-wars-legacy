@@ -189,6 +189,19 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  packages/client:
+    dependencies:
+      '@swl/protocol':
+        specifier: workspace:*
+        version: link:../protocol
+      '@swl/rules':
+        specifier: workspace:*
+        version: link:../rules
+    devDependencies:
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
   packages/content:
     devDependencies:
       typescript:

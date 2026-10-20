@@ -750,10 +750,21 @@ assault against the new server, and the cheat battery is fully rejected.
 
 *Outcome: the game is fully playable on desktop and mobile with no Flash anywhere.*
 
-### G1 — World rendering
+### G1 - World rendering
 
 - [ ] The isometric tile map renders with correct elevation, z-sorting and the
       server-authoritative item positions
+- [x] The **isometric projection and the depth sort** are ported exactly
+      (`packages/client/src/iso.ts`): the tile is 108 by 54 pixels, the map is 100 by
+      100, and the projection is `Utils.TileToPixel` (core/Utils.as:88-102) to the
+      letter — including the half-tile offset that puts the origin at a tile's top
+      corner
+- [x] The **depth sort** is `Utils.assignZIndex` (core/Utils.as:395-407): a building's
+      own **width** shifts it back, and a **walkable** building goes 20 000 behind
+      everything else, so the roads are always under the buildings standing on them
+- [x] The client's own quirk is preserved and documented: the projection and its
+      inverse are only inverses of each other at a tile's **top corner**, so the
+      client's own unit code passes a unit's top-corner position
 - [ ] Every unit and building animates from its atlas frames, with correct frame timing
 - [ ] Projectiles, particles and the 205 FX assets render
 - [ ] Depth sorting and occlusion match the original engine
