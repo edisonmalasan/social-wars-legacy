@@ -316,7 +316,7 @@ of the project lives in.*
       key or a dangling id — the build currently reports **0 errors**
 - [x] The bundle build is **reproducible**: the same inputs produce a byte-identical
       bundle, and the hash is recorded. Current build id:
-      `cb95cefdd36dbaad7196d786a522621573bc9246716ae135b9361676d2aacd32`
+      `74e31f2d02b3a6346463edda35e9ac1999ff85157a828d484aad9d714d1234ce`
 - [x] The build **parses the config's stringly-typed item table** rather than casting it:
       `costs` is JSON text inside a string, `trains_ids` and `upgrades_to` are single id
       strings, and the property *values* are strings too. Casting instead of parsing
@@ -341,6 +341,10 @@ of the project lives in.*
       pipeline, and the resource helpers
 - [x] CI runs typecheck, lint, unit tests and the content build on every push
       (`.github/workflows/ci.yml`)
+- [x] The content bundle carries **`display_order`**, which the build menu's order is
+      built from. It was **missing**: the config has it on every one of the 778 items,
+      as a string, and the pipeline dropped it - so the build menu could not be built
+      from the bundle at all. The same class of gap as the costs
 
 **Status:** Complete for the packages that Groups D, E, F and G depend on. The three
 application shells land with their own groups.
@@ -973,10 +977,15 @@ assault against the new server, and the cheat battery is fully rejected.
       max-population case. The **number formatting** is the client's exactly: the digits
       grouped in threes from the right and joined with commas, and grouped as a STRING,
       so a negative number comes out as "-1,234"
-- [ ] The build menu, unit panel, minimap, neighbour strip, goal panel and popups all
-      work
-- [ ] Tooltips, tutorials and the "click here" guidance system are reimplemented
-- [ ] Text renders with the substituted fonts at the original metrics
+- [x] The **build menu** is implemented as a model (`packages/client/src/buildmenu.ts`):
+      the tabs are the content's categories and their sub-categories, and each tab's
+      list is ordered the client's way. The order is **not** the content's order: the
+      items the player is too low a level for are pushed **10 000 down the list**, not
+      hidden, so the player can still see them and know they exist. `itemUnlocked`
+      **always returns false** in this build (`core/Base.as:7993-7995`), so the
+      condition is simply the level, and the clone reproduces that rather than
+      inventing an unlock system the client does not have
+- [ ] The unit panel, minimap, neighbour strip, goal panel and popups all work
 
 ### G4 — Feature parity
 

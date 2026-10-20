@@ -58,6 +58,14 @@ export interface ContentItem {
   height: number;
   /** The level the player must be at to build or buy it. */
   min_level: number;
+  /**
+   * Where the item sits in the build menu.
+   *
+   * The client sorts the menu by it, and pushes the items the player is
+   * too low a level for 10 000 further down the list
+   * (`GUI/BuildingWindow.as:331-340`).
+   */
+  display_order: number;
   /** Seconds to build. */
   build_time: number;
   /** How many clicks the build needs. 0 means instant. */
