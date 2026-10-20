@@ -97,6 +97,11 @@ jobs:
       - name: The licensing position holds
         run: node scripts/check-licensing.mjs
 
+      # A decision without a rationale is a decision somebody will
+      # quietly reverse.
+      - name: The decision records are well formed
+        run: node scripts/check-adrs.mjs
+
   desktop:
     name: The desktop shell
     runs-on: ubuntu-latest
