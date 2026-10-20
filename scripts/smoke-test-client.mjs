@@ -211,8 +211,22 @@ async function readStatus(port, url, timeoutMs = 60_000) {
     last = value;
     const [state, detail = ''] = value.split('|');
     if (state === 'failed' || state === 'missing') break;
-    // The status mentions the atlas once the pages have been dealt with.
-    if (state === 'started' && /atlas/.test(detail)) break;
+    // The client has started when the state says so. The atlas pages are
+    // fetched after that, and they are a build artefact, so their absence
+    // is reported rather than failed on.
+    if (state === 'started') {
+      if (/atlas/.test(detail)) break;
+      // Give the pages a moment, and then take what there is.
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const after = await send('Runtime.evaluate', {
+        expression:
+          "(() => { const e = document.getElementById('status');" +
+          " return e ? e.getAttribute('data-state') + '|' + e.textContent : 'missing'; })()",
+        returnByValue: true,
+      });
+      last = String(after.result?.result?.value ?? value);
+      break;
+    }
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
 

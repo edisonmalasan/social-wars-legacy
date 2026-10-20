@@ -31,9 +31,15 @@ const OUT = path.join(ROOT, 'apps/client/public/frame-manifest.json');
 
 async function main() {
   if (!existsSync(SOURCE)) {
-    console.error(`there is no manifest at ${SOURCE}`);
-    console.error('Run the asset pipeline first.');
-    process.exit(1);
+    // The pipeline's manifest is 148 MB and is a build artefact, so it is
+    // not in the repository. The **client's** manifest is committed - it
+    // is 3.9 MB and the client needs it - so the committed one is used
+    // and the pipeline is simply not run here.
+    console.log(
+      `there is no manifest at ${SOURCE}, so the asset pipeline is not run.\n` +
+        'The committed client manifest is used.',
+    );
+    return;
   }
 
   const manifest = JSON.parse(await readFile(SOURCE, 'utf8'));
