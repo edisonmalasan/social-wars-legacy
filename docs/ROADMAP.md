@@ -828,10 +828,17 @@ assault against the new server, and the cheat battery is fully rejected.
 - [x] The client's own quirk is preserved and documented: the projection and its
       inverse are only inverses of each other at a tile's **top corner**, so the
       client's own unit code passes a unit's top-corner position
+- [x] The **camera** is ported exactly (`packages/client/src/camera.ts`): where the map's
+      origin is on the screen and the zoom. The pan is refused **whole** when it would
+      pass a bound in the direction of the movement, so the camera stops dead at the
+      edge rather than sliding along it; the camera's own origin moves by the raw delta
+      while the map's contents move by the delta divided by the zoom; and the **mouse
+      wheel and the slider are different behaviours** — the wheel multiplies by 1.2 and
+      the slider adds 0.2
 - [ ] Every unit and building animates from its atlas frames, with correct frame timing
 - [ ] Projectiles, particles and the 205 FX assets render
 - [ ] Depth sorting and occlusion match the original engine
-- [ ] The map pans, zooms and re-centres as the original does
+- [x] The map pans, zooms and re-centres as the original does
 
 ### G2 — Interaction
 
