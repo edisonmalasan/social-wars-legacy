@@ -104,16 +104,79 @@ export type CommandApplier = (
 export interface ShimContext {
   /** The player's world. */
   world: ShimWorld;
+  /**
+   * Resolve the world of an identified player.
+   *
+   * When this is supplied, the shim uses **this** and never `world`: the
+   * player's identity decides which save is touched, not the request body.
+   * That is the whole point — the upstream server takes the `USERID` from
+   * the body and believes it, so any player can act on any other player's
+   * save.
+   */
+  worldFor?: (playerId: string) => ShimWorld;
   /** The content, for the server-computed costs. */
   content: CostContent;
   /** The current time, in seconds. */
   now: number;
   /** The legacy identity bridge. */
   identity: LegacyIdentityBridge;
+  /**
+   * Resolve a session token to a player.
+   *
+   * This is the **native** path, and it is preferred: a session token is
+   * revocable and identifies exactly one player, where a legacy `USERID` is
+   * a body value that only means something because the server bound it.
+   */
+  resolveToken?: (token: string) => string | null;
   /** Applies one command's semantics. */
   applyCommand: CommandApplier;
   /** Whether responses are framed with the HMAC. The upstream does not. */
   frameResponses?: boolean;
+}
+
+/** How a player was identified. */
+export type IdentitySource = 'session-token' | 'legacy-userid';
+
+/** The outcome of identifying the player. */
+export type IdentityResult =
+  | { ok: true; playerId: string; via: IdentitySource }
+  | { ok: false; reason: 'unauthenticated' | 'invalid-session' };
+
+/**
+ * Identify the player behind a request.
+ *
+ * The **session token** is tried first, because it is the native mechanism
+ * and it identifies exactly one player. The legacy `USERID` is the
+ * fallback, and it only resolves when the bridge has been enabled
+ * *and* the server has already bound that value to a player — the bridge
+ * can never invent one.
+ *
+ * Nothing else identifies a player. In particular, the body cannot.
+ */
+export function resolveIdentity(
+  request: ShimRequest,
+  context: ShimContext,
+): IdentityResult {
+  const token = request.fields['token'] ?? request.fields['session_token'];
+  if (token && context.resolveToken) {
+    const playerId = context.resolveToken(token);
+    if (playerId) return { ok: true, playerId, via: 'session-token' };
+    return { ok: false, reason: 'invalid-session' };
+  }
+  const legacy = context.identity.resolve(request.fields['USERID']);
+  if (legacy) return { ok: true, playerId: legacy, via: 'legacy-userid' };
+  return { ok: false, reason: 'unauthenticated' };
+}
+
+/**
+ * The world a request acts on.
+ *
+ * With a per-player resolver, the identity chooses the save. Without one,
+ * the context's single world is used, which is only correct when the
+ * caller has already established who the player is.
+ */
+export function worldForPlayer(playerId: string, context: ShimContext): ShimWorld {
+  return context.worldFor ? context.worldFor(playerId) : context.world;
 }
 
 /** A JSON response. */
@@ -234,11 +297,17 @@ export function applyBatch(
  *
  * The framing is verified against **both** server keys, because unmodified
  * clients of both eras exist.
+ *
+ * The player is identified **before** anything is applied, and the identity
+ * chooses whose save is touched. The body cannot.
  */
 export function handleCommandPhp(
   request: ShimRequest,
   context: ShimContext,
 ): ShimResponse {
+  // The envelope is checked first: a malformed or unsigned body is malformed
+  // whoever sent it, and refusing it before the identity is resolved keeps
+  // the two failures distinguishable.
   const data = request.fields['data'];
   if (!data) {
     return json(400, { result: 'error', error: 'missing-data' });
@@ -254,6 +323,13 @@ export function handleCommandPhp(
     return json(403, { result: 'error', error: 'bad-signature' });
   }
 
+  // Then the actor. The identity decides whose save is touched; the body
+  // cannot.
+  const identity = resolveIdentity(request, context);
+  if (!identity.ok) {
+    return json(401, { result: 'error', error: identity.reason });
+  }
+
   let payload: {
     first_number?: number;
     commands?: unknown[];
@@ -265,7 +341,10 @@ export function handleCommandPhp(
     return json(400, { result: 'error', error: 'malformed-payload' });
   }
 
-  const outcome = applyBatch(payload, context);
+  // The identity chooses the world. `context.world` is only a fallback for
+  // a caller that has already established who the player is.
+  const world = worldForPlayer(identity.playerId, context);
+  const outcome = applyBatch(payload, { ...context, world });
   // The world the caller must persist.
   context.world = outcome.world;
   return outcome.response;

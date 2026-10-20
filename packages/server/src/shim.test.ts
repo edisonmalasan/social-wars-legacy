@@ -60,13 +60,20 @@ function world(over: Partial<ShimWorld> = {}): ShimWorld {
   };
 }
 
+/** The legacy `USERID` the shim's bridge is bound to, and the player it means. */
+const LEGACY_USER_ID = 'e53386db-e42c-43c4-8c5c-9ace9c81ad91';
+const PLAYER_ID = 'player-1';
+
 async function context(over: Partial<ShimContext> = {}): Promise<ShimContext> {
   const applied: string[] = [];
+  const identity = new LegacyIdentityBridge();
+  identity.allowLegacyIdentity();
+  identity.bind(LEGACY_USER_ID, PLAYER_ID);
   const base: ShimContext = {
     world: world(),
     content: await costContent(),
     now: 1_700_000_000,
-    identity: new LegacyIdentityBridge(),
+    identity,
     applyCommand: (w, command) => {
       applied.push(command.name);
       return { applied: true, world: w };
@@ -75,6 +82,12 @@ async function context(over: Partial<ShimContext> = {}): Promise<ShimContext> {
   };
   return base;
 }
+
+/** An authenticated request. */
+const authed = (fields: Record<string, string | undefined> = {}) => ({
+  path: '/command.php',
+  fields: { USERID: LEGACY_USER_ID, ...fields },
+});
 
 describe('sessions', () => {
   it('issues a token for a correct credential', () => {
@@ -159,7 +172,7 @@ describe('the legacy identity bridge', () => {
 describe('the command.php shim', () => {
   it('rejects a body that is not framed', async () => {
     const ctx = await context();
-    const response = handleCommandPhp({ path: '/command.php', fields: { data: '{"commands":[]}' } }, ctx);
+    const response = handleCommandPhp(authed({ data: '{"commands":[]}' }), ctx);
     assert.equal(response.status, 400);
     assert.match(response.body, /malformed-framing/);
   });
@@ -168,7 +181,7 @@ describe('the command.php shim', () => {
     const ctx = await context();
     const payload = JSON.stringify({ first_number: 1, commands: [] });
     const frame = framePayload(payload, 'not-a-real-key');
-    const response = handleCommandPhp({ path: '/command.php', fields: { data: frame } }, ctx);
+    const response = handleCommandPhp(authed({ data: frame }), ctx);
     assert.equal(response.status, 403);
     assert.match(response.body, /bad-signature/);
   });
@@ -178,7 +191,7 @@ describe('the command.php shim', () => {
       const ctx = await context();
       const payload = JSON.stringify({ first_number: 1, commands: [] });
       const response = handleCommandPhp(
-        { path: '/command.php', fields: { data: framePayload(payload, key) } },
+        authed({ data: framePayload(payload, key) }),
         ctx,
       );
       assert.equal(response.status, 200);
@@ -189,7 +202,7 @@ describe('the command.php shim', () => {
     const ctx = await context();
     const payload = JSON.stringify({ first_number: 1, commands: [] });
     const response = handleCommandPhp(
-      { path: '/command.php', fields: { data: framePayload(payload, SERVER_KEYS.current) } },
+      authed({ data: framePayload(payload, SERVER_KEYS.current) }),
       ctx,
     );
     assert.equal(response.status, 200);
@@ -273,6 +286,104 @@ describe('the command.php shim', () => {
     const antiaircraft = COUNTERS.find((c) => c.name === 'Antiaircraft battery');
     assert.equal(antiaircraft?.multiplier, 20);
     assert.equal(antiaircraft?.bestAgainst, 'ft_flying');
+  });
+});
+
+describe('the shim identity', () => {
+  it('refuses a request with no identity at all', async () => {
+    const ctx = await context();
+    const payload = JSON.stringify({ first_number: 1, commands: [] });
+    const response = handleCommandPhp(
+      { path: '/command.php', fields: { data: framePayload(payload, SERVER_KEYS.current) } },
+      ctx,
+    );
+    assert.equal(response.status, 401);
+    assert.match(response.body, /unauthenticated/);
+  });
+
+  it('refuses a request whose legacy USERID is not bound', async () => {
+    const ctx = await context();
+    const payload = JSON.stringify({ first_number: 1, commands: [] });
+    const response = handleCommandPhp(
+      {
+        path: '/command.php',
+        fields: {
+          USERID: 'someone-elses-id',
+          data: framePayload(payload, SERVER_KEYS.current),
+        },
+      },
+      ctx,
+    );
+    assert.equal(response.status, 401);
+  });
+
+  it('refuses a request whose legacy bridge is off', async () => {
+    const identity = new LegacyIdentityBridge();
+    identity.bind(LEGACY_USER_ID, PLAYER_ID);
+    // The bridge is NOT enabled.
+    const ctx = await context({ identity });
+    const payload = JSON.stringify({ first_number: 1, commands: [] });
+    const response = handleCommandPhp(authed({ data: framePayload(payload, SERVER_KEYS.current) }), ctx);
+    assert.equal(response.status, 401);
+  });
+
+  it('accepts a request carrying a valid session token', async () => {
+    const ctx = await context({ resolveToken: (token) => (token === 'good' ? PLAYER_ID : null) });
+    const payload = JSON.stringify({ first_number: 1, commands: [] });
+    const response = handleCommandPhp(
+      {
+        path: '/command.php',
+        fields: { token: 'good', data: framePayload(payload, SERVER_KEYS.current) },
+      },
+      ctx,
+    );
+    assert.equal(response.status, 200);
+  });
+
+  it('refuses a request carrying an invalid session token', async () => {
+    const ctx = await context({ resolveToken: (token) => (token === 'good' ? PLAYER_ID : null) });
+    const payload = JSON.stringify({ first_number: 1, commands: [] });
+    const response = handleCommandPhp(
+      {
+        path: '/command.php',
+        fields: { token: 'bad', data: framePayload(payload, SERVER_KEYS.current) },
+      },
+      ctx,
+    );
+    assert.equal(response.status, 401);
+    assert.match(response.body, /invalid-session/);
+  });
+
+  it('uses the identity to choose which save is touched', async () => {
+    const victim = world({ resources: { g: 5 } });
+    const attacker = world({ resources: { g: 9999 } });
+    const ctx = await context({
+      worldFor: (playerId) => (playerId === 'player-victim' ? victim : attacker),
+    });
+    const payload = JSON.stringify({
+      first_number: 1,
+      commands: [[1, 'buy', [1, 1007, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0]]],
+    });
+    // The attacker claims to be the victim.
+    const identity = new LegacyIdentityBridge();
+    identity.allowLegacyIdentity();
+    identity.bind('attacker-id', 'player-attacker');
+    identity.bind('victim-id', 'player-victim');
+    ctx.identity = identity;
+
+    handleCommandPhp(
+      {
+        path: '/command.php',
+        fields: {
+          USERID: 'victim-id',
+          data: framePayload(payload, SERVER_KEYS.current),
+        },
+      },
+      ctx,
+    );
+    // The victim's save was touched, and it could not afford the Soldier.
+    assert.equal(victim.resources['g'], 5);
+    assert.equal(attacker.resources['g'], 9999);
   });
 });
 

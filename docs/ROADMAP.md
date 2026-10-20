@@ -627,14 +627,32 @@ protocol and the original dialect.*
 - [ ] Daily bonus, weekly bonus and premium expiry are evaluated server-side and awarded
       **once** — the bonus cycles are implemented; the once-only guard across all of them
       is not
-- [ ] The full cheat battery is rejected or has no effect: inflated `res`, forged
+- [x] The full cheat battery is rejected or has no effect: inflated `res`, forged
       `flash_debug`, replayed `win_daily_bonus`, self-completed goals, forged
       `end_attack`, free `buy_offer_pack`, wrong HMAC, another player's `USERID`,
-      malformed framing, forged `win`, over-collection
+      malformed framing, forged `win`, over-collection —
+      `packages/rules/src/cheatbattery.ts` **attempts all eleven** against the real
+      authority layer and proves each one has no effect. The battery is
+      **mutation-tested**: 18 weakenings of the authority layer were each detected by
+      exactly the attack they weaken
+- [x] The shim **resolves the player from the session token or the bound legacy
+      `USERID`**, and the identity chooses which save is touched. The request body
+      cannot name the player. Found by the cheat battery, which shipped a tripwire
+      because the shim did not consult its own identity bridge
+- [ ] The remaining holes the battery reported: the shim's grant commands are an
+      unimplemented seam (`win_daily_bonus`, `complete_goal`, `end_attack`, `end_quest`,
+      `collect` must all be granted through the battery's paths), and the production-cycle
+      timer that `economy.ts` lacks — the server must own it
 
 ### F2 — Protocol
 
 - [ ] The native command API is versioned, typed and documented
+- [x] The **command list is correct**, and permanently checked. The client has **92**
+      commands, and the report's catalogue transcribes them **exactly** — 92 = 92, no
+      difference in either direction, so the two sources cross-validate each other. The
+      upstream handles 62 and silently drops the other 30.
+      `scripts/verify-command-catalogue.mjs` checks the client's own command classes
+      against the catalogue and against `COMMAND_NAMES`, and fails on any difference
 - [x] The **`command.php` framing** is implemented exactly
       (`packages/protocol/src/commandphp.ts`): `<64 lowercase hex>;<raw json>`, the digest
       being HMAC-SHA256 over the **raw payload bytes**, and the parser mirroring the
