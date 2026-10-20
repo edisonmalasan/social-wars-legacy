@@ -788,9 +788,16 @@ protocol and the original dialect.*
       `USERID`**, and the identity chooses which save is touched. The request body
       cannot name the player. Found by the cheat battery, which shipped a tripwire
       because the shim did not consult its own identity bridge
-- [ ] The remaining holes the battery reported: the shim's grant commands are an
-      unimplemented seam (`win_daily_bonus`, `complete_goal`, `end_attack`, `end_quest`
-      and `collect` must all be granted through the battery's paths)
+- [x] The **remaining holes the battery reported** are closed: the shim's grant
+      commands are no longer an unimplemented seam. `win_daily_bonus`, `complete_goal`,
+      `end_attack`, `end_quest` and `collect` are all **granted through the battery's
+      paths** - the shim calls the same applier the native endpoint calls, and the
+      applier's own rules decide each one
+- [x] Each of the five has an **attack** that proves it: the replayed daily bonus, the
+      self-completed goal, the forged `end_attack`, the forged `win` and the
+      over-collection. The battery runs them against the **real** authority layer, and
+      it is **mutation-tested**: eighteen weakenings of that layer were each detected by
+      exactly the attack they weaken
 - [x] The **production-cycle timer** is implemented and the **server owns the clock**
       (`packages/rules/src/production.ts`): the collection is a period the **player
       chooses** - 5 minutes at 0.25, 60 at 1, 240 at 2 and 480 at 3, the client's own
