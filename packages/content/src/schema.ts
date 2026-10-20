@@ -22,7 +22,7 @@
 export interface ContentItem {
   id: number;
   name: string;
-  /** 'b' building, 'u' unit, 'l' other. */
+  /** 'b' building, 'u' unit. */
   type: string;
   category_id: number;
   subcategory_id: number;
@@ -35,19 +35,68 @@ export interface ContentItem {
   /** Attack interval in FRAMES at 30 fps, not seconds. */
   attack_interval: number;
   population: number;
+  /** The legacy single-resource cost. The config leaves it at 0; `costs` is real. */
   cost: number;
-  cost_type: string;
+  /** The legacy single-resource cost type. Always null in the shipped config. */
+  cost_type: string | null;
+  /** The build cost, by resource key: `{ w: 125 }`. */
   costs: Record<string, number>;
-  /** The raw `properties` JSON string, parsed into `properties` below. */
+  /** The `properties` JSON blob, parsed. */
   properties: Record<string, unknown>;
-  /** The `best_against` fighting-type key, if any. */
+  /** The `best_against` fighting-type key, or null. */
   best_against: string | null;
   best_against_mult: number;
+  /** The unit this building trains, if any. */
   trains_ids: number[];
+  /** The next tier of this building, if any. */
   upgrades_to: number | null;
   unit_capacity: number;
   building_limit_same_id: number;
   building_limit_same_scf: number;
+  /** The footprint, in tiles. */
+  width: number;
+  height: number;
+  /** The level the player must be at to build or buy it. */
+  min_level: number;
+  /** Seconds to build. */
+  build_time: number;
+  /** How many clicks the build needs. 0 means instant. */
+  clicks_to_build: number;
+  /** Seconds to train one unit. */
+  training_time: number;
+  /** The XP granted by building or training this. */
+  xp: number;
+  /** Seconds before a collectable building can be harvested. */
+  activation: number;
+  /** The base amount per collection cycle. */
+  collect: number;
+  /** The resource produced: g, w, o or s. */
+  collect_type: string;
+  /** The XP granted by a collection. */
+  collect_xp: number;
+  /** How many times the building can be harvested. */
+  max_collects: number;
+  /** The building group: ACADEMY, BUNKER, COMMAND_CENTER, WALL, ... */
+  group_type: string;
+  /** The faction: 'h' human, '-' neutral. */
+  race: string;
+  /** Whether it can be bought in the store. */
+  in_store: boolean;
+  /** Whether it can be gifted. */
+  giftable: boolean;
+  /** The gift level required. */
+  gift_level: number;
+  /** The cost of one unit in cash, for the units that cost cash. */
+  cost_unit_cash: number;
+  /** The volume a unit needs to enter a container. */
+  volume: number;
+  /** The maximum volume a container accepts. */
+  max_elem_vol: number;
+  /** The inventory items the building holds, by inventory id. */
+  inventory_ids: Record<string, number>;
+  /** The cash cost of a premium upgrade, if it has one. */
+  premium_upgrade_costs: Record<string, number>;
+  /** The raw `properties` string, preserved verbatim. */
   properties_raw: string;
   /** Everything else the config carried, preserved verbatim. */
   extra: Record<string, unknown>;
