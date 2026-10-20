@@ -536,8 +536,20 @@ client's observable behaviour.*
 ### E3 — Quests and goals
 
 - [ ] The quest state machine and all 28 quests' win/fail conditions are implemented
-- [ ] All 134 goals evaluate server-side, with at most 5 active
-- [ ] Daily bonus, weekly bonus, premium expiry and goal completion are each awarded **once**
+- [x] **All 134 goals evaluate server-side, with at most 5 active**
+      (`packages/rules/src/goals.ts`): the 26 registerable goal types, the **5-goal window**
+      (the first five *incomplete* goals in registration order), the activation sweep, and
+      the id reconciliation (91 in the config, 134 client-side, 79 shared, 12 config-only,
+      55 client-only, 6 translation-only)
+- [x] The goal reward is granted **once**, by the server — the client's `complete_goal`
+      command is never trusted
+- [x] The two **observable** client defects (the allies market completing on the first
+      collect instead of after 500 wood, and the harbour goal completing on any quest end)
+      are **fixed by default**, with a policy flag to reproduce the client's behaviour. A
+      faithful-but-buggy goal is a defensible choice; a silent divergence is not
+- [ ] Daily bonus, weekly bonus, premium expiry and goal completion are each awarded
+      **once** — the bonus cycles are implemented, the once-only guard across all four is
+      not
 
 ### E4 — Determinism and verification
 
