@@ -501,7 +501,11 @@ client's observable behaviour.*
       5 minutes**, and construction and friend assists each cost 1
 - [x] The **expansion, town and map price tables** are read from the content bundle, with
       the first four expansions free and the level requirements enforced
-- [ ] Build costs, build times, upgrade chains and the "click to build" mechanic are correct
+- [x] Build costs, build times, upgrade chains and the "click to build" mechanic are
+      correct (`packages/rules/src/building.ts`): the build cost, the build and training
+      durations, the click count, the upgrade chain with its **1/20** refund of the old
+      building, the premium upgrade price, the speed-up rules and the placement limits
+      (level, population, per-id and per-group limits, and a free tile)
 - [x] The **own market** is implemented (`packages/rules/src/market.ts`): the gold price of
       100 units (wood 100, oil 100, steel 150), the three tradeable amounts, the **+2 % per
       prior trade** increment, the **75 % sell rate**, and the limit of **20 trades per
