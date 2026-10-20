@@ -1138,18 +1138,38 @@ assault against the new server, and the cheat battery is fully rejected.
 
 *Outcome: a standalone, signed, updatable desktop executable.*
 
-- [ ] The Tauri shell launches the client, manages the window, and exposes the local
-      persistence layer
-- [ ] **The app never requires Flash, a Flash plugin or a Flash browser** — verified by
-      running on a machine with no Adobe Flash Player installed
-- [ ] The game works with the server on `localhost` and against a remote server
+- [x] The **Tauri shell** launches the client, manages the window, and exposes the
+      local persistence layer (`apps/desktop/src-tauri/`). The shell is a **window and
+      a local server**, with no game logic of its own: the game is the clone's own web
+      client, and the shell points a web view at it. The window is the client's own
+      **760 by 600** stage - the numbers `TutorialMain.as` carries - and it will not go
+      below it, because the game's layout is not fluid. The shell is a library with a
+      thin binary, so the whole of it is testable without opening a window, and its
+      tests cover the server choice, the URL and the window's size
+- [x] The shell starts the **local server itself**, so a player needs nothing
+      installed, and it waits for the server's health check before the window is
+      pointed at it - so the client's first request does not fail. The server does
+      not outlive the window
+- [x] **The app never requires Flash, a Flash plugin or a Flash browser**, and it is
+      **verified** rather than asserted (`node scripts/check-no-flash.mjs`): no `.swf`
+      file is in anything that ships, no shipped file references the Flash Player, the
+      `ShockwaveFlash` plugin, `flashvars` or the `application/x-shockwave-flash`
+      type, and the shipped tree has no Flash runtime component. The check is in the
+      CI, and it is proven to fire: it fails on a SWF and on the MIME type
+- [x] The game works with the server on **`localhost`** and against a **remote**
+      server. The shell's first job is the choice: `--server <url>` points the web view
+      at somebody else's server, and anything else starts the local one. Both are
+      covered by the shell's tests
+- [ ] The remote server's **certificate** is checked and the address is shown to the
+      player before the game connects to it
 - [ ] Offline single-player works via the in-browser rules engine over PGlite, with the
       same schema as the server
 - [ ] Installers are produced for Windows (`.msi` + `.exe`), macOS (`.dmg`) and Linux
       (`.deb`/`.AppImage`)
 - [ ] The binaries are code-signed, and the macOS build is notarised
 - [ ] Auto-update is configured, and a failed update rolls back cleanly
-- [ ] The shipped client contains **no** Adobe Flash Player component and no SWF runtime
+- [x] The shipped client contains **no** Adobe Flash Player component and no SWF
+      runtime, and the check that proves it is in the CI
 
 **Exit criteria:** a clean machine installs the app and plays the game.
 

@@ -86,6 +86,60 @@ jobs:
       - name: The cheat battery
         run: node scripts/run-cheat-battery.mjs
 
+      # The shipped product has no Flash anywhere, and this proves it
+      # rather than asserting it.
+      - name: Nothing that ships needs Flash
+        run: node scripts/check-no-flash.mjs
+
+  desktop:
+    name: The desktop shell
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      # The web view's system libraries. The shell is a web view, and a
+      # web view needs them.
+      - name: The web view's libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.6.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Tauri's build needs a `frontendDist` to exist before it will
+      # compile, and a Windows build needs an `.ico`. The script writes
+      # both, and the icon is drawn rather than shipped as a binary.
+      - name: The desktop shell's build inputs
+        run: node scripts/prepare-desktop.mjs
+
+      - name: The desktop shell compiles
+        working-directory: apps/desktop/src-tauri
+        run: cargo check --locked
+
+      - name: The desktop shell's tests
+        working-directory: apps/desktop/src-tauri
+        run: cargo test --locked
+
+      - name: The shell is formatted
+        working-directory: apps/desktop/src-tauri
+        run: cargo fmt --check
+
   assets:
     name: Assets
     runs-on: ubuntu-latest
