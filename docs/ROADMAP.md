@@ -464,8 +464,14 @@ client's observable behaviour.*
       garrisoned unit (capped by its attack points) and an empty bunker fires not at all.
       **The building's own `attack` is *not* scaled** — it comes straight from the config
       (`IsoElement.as:267`)
-- [ ] Unit XP accrues from effective damage to units only, with the documented thresholds
-      and the level-9 cap (+30 attack, 3× HP)
+- [x] Unit XP accrues from the **effective damage dealt to units only** — damage dealt to a
+      building earns nothing (`IsoFightingElement.as:477-480`). The level table is
+      `globals.UNIT_XP_LEVELS_MULTIPLIERS_10` and the bonuses are cumulative:
+      **+30 attack and 3× base HP at level 9**
+- [ ] The level-up thresholds behave exactly, including the client's off-by-one: the
+      comparison is `xp <= required` to *break*, so a unit needs one point more than the
+      threshold to advance — which is why a paid level-up grants "the missing XP plus 1"
+      (`CmdPlaceStoredItem.as:38`), and why **level 9 cannot be reached by XP alone**
 - [ ] All 10 damage classes and all 15 special attacks behave as documented
 
 ### E2 — Economy and buildings

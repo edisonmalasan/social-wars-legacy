@@ -947,12 +947,19 @@ The smallest set of rules a faithful re-implementation must get right, in priori
 
 22. XP thresholds are **multiples of the unit's base `life`**: 5, 10, 20, 40, 65, 95, 125, 160, 200
     (levels 1–9).
-23. XP is earned from **effective damage dealt to units only**.
+23. XP is earned from **effective damage dealt to units only** (`IsoFightingElement.as:477-480`
+    — the XP is only awarded when the *defender's* `building.type == TYPE_UNIT`, and it goes
+    to the *attacker*).
 24. Level bonuses: `+2, +2, +3, +3, +4, +4, +4, +4, +4` flat attack; `+20 %, +20 %, +20 %, +20 %,
     +20 %, +25 %, +25 %, +25 %, +25 %` of base life.
 25. Max level 9 ⇒ `+30` attack, `3×` base HP.
 26. Levelling up with cash costs `ceil(life / divisor)` with divisor `50, 25, 12, 6, 4, 3, 2.5, 2, 1.5`
     and grants exactly the missing XP plus 1.
+27. **The level comparison is `xp <= required` to _break_**, so a unit needs one point *more*
+    than the threshold to advance (`UnitXPLevelInfo._updateCurrentLevel`). Two consequences:
+    the "plus 1" in rule 26 is not a rounding allowance but the difference between reaching a
+    level and not, and **level 9 cannot be reached by XP alone** — plain XP tops out at
+    level 8, and only paying for it (which grants `required(9) + 1`) reaches level 9.
 
 ### G. Buildings
 
