@@ -87,6 +87,8 @@ export interface DamageResult {
   vetoed: boolean;
   /** Whether the hit was a critical hit. */
   crit: boolean;
+  /** The variance the roll used. */
+  variance: number;
   /** The counter multiplier that applied, if any. */
   counterMultiplier: number;
   /** The stages, in order, for the golden-master diff. */
@@ -131,7 +133,7 @@ export function resolveDamage(
   const vetoed = context.defenderVetoes === true;
   if (vetoed) {
     stages.push({ name: 'vetoed', value: 0 });
-    return { damage: 0, vetoed: true, crit: false, counterMultiplier: 1, stages };
+    return { damage: 0, vetoed: true, crit: false, variance: 0, counterMultiplier: 1, stages };
   }
 
   // 3. Counter. The attacker's `best_against` names a PROPERTY KEY; if the
@@ -190,7 +192,6 @@ export function resolveDamage(
     damage += variance;
   }
   stages.push({ name: 'afterCrit', value: damage });
-
   // 10. Defence.
   damage -= defender.defense;
   stages.push({ name: 'afterDefense', value: damage });
@@ -203,7 +204,7 @@ export function resolveDamage(
   if (damage < 1) damage = 1;
   stages.push({ name: 'final', value: damage });
 
-  return { damage, vetoed: false, crit, counterMultiplier, stages };
+  return { damage, vetoed: false, crit, variance, counterMultiplier, stages };
 }
 
 /**

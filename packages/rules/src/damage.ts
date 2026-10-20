@@ -69,7 +69,7 @@ export interface DamageContext {
 }
 
 /** The result of applying a damage. */
-export interface DamageResult {
+export interface DamageEffectResult {
   /** Whether the damage was applied at all. */
   applied: boolean;
   /** The immediate damage dealt. 0 for a pure effect. */
@@ -103,7 +103,7 @@ function result(
   target: DamageTarget,
   damage: number,
   effects: Effect[],
-): DamageResult {
+): DamageEffectResult {
   const health = Math.max(0, target.health - damage);
   return {
     applied,
@@ -124,7 +124,7 @@ export function simpleDamage(
   amount: number,
   context: DamageContext,
   filter?: (target: DamageTarget) => boolean,
-): DamageResult {
+): DamageEffectResult {
   if (!canApplyDamage(target, filter)) {
     return { applied: false, damage: 0, health: target?.health ?? 0, dead: target?.isDead ?? false, effects: target?.effects ?? [] };
   }
@@ -144,7 +144,7 @@ export function damageOverTime(
   tickIntervalMs: number,
   context: DamageContext,
   filter?: (target: DamageTarget) => boolean,
-): DamageResult {
+): DamageEffectResult {
   if (!canApplyDamage(target, filter)) {
     return { applied: false, damage: 0, health: target?.health ?? 0, dead: target?.isDead ?? false, effects: target?.effects ?? [] };
   }
@@ -171,7 +171,7 @@ export function bleedingDamage(
   timeMs: number,
   context: DamageContext,
   filter?: (target: DamageTarget) => boolean,
-): DamageResult {
+): DamageEffectResult {
   if (!canApplyDamage(target, filter)) {
     return { applied: false, damage: 0, health: target?.health ?? 0, dead: target?.isDead ?? false, effects: target?.effects ?? [] };
   }
@@ -197,7 +197,7 @@ export function incinerateDamage(
   tickIntervalMs: number,
   context: DamageContext,
   filter?: (target: DamageTarget) => boolean,
-): DamageResult {
+): DamageEffectResult {
   if (!canApplyDamage(target, filter)) {
     return { applied: false, damage: 0, health: target?.health ?? 0, dead: target?.isDead ?? false, effects: target?.effects ?? [] };
   }
@@ -223,7 +223,7 @@ export function dizzyDamage(
   numTicks: number,
   context: DamageContext,
   filter?: (target: DamageTarget) => boolean,
-): DamageResult {
+): DamageEffectResult {
   if (!canApplyDamage(target, filter)) {
     return { applied: false, damage: 0, health: target?.health ?? 0, dead: target?.isDead ?? false, effects: target?.effects ?? [] };
   }
@@ -248,7 +248,7 @@ export function pushInAirDamage(
   tiles: number,
   context: DamageContext,
   filter?: (target: DamageTarget) => boolean,
-): DamageResult {
+): DamageEffectResult {
   if (!canApplyDamage(target, filter)) {
     return { applied: false, damage: 0, health: target?.health ?? 0, dead: target?.isDead ?? false, effects: target?.effects ?? [] };
   }
@@ -269,7 +269,7 @@ export function directKillDamage(
   maxLife: number,
   context: DamageContext,
   filter?: (target: DamageTarget) => boolean,
-): DamageResult {
+): DamageEffectResult {
   if (!canApplyDamage(target, filter)) {
     return { applied: false, damage: 0, health: target?.health ?? 0, dead: target?.isDead ?? false, effects: target?.effects ?? [] };
   }
@@ -292,7 +292,7 @@ export function delayedDamage(
   delayMs: number,
   context: DamageContext,
   filter?: (target: DamageTarget) => boolean,
-): DamageResult {
+): DamageEffectResult {
   if (!canApplyDamage(target, filter)) {
     return { applied: false, damage: 0, health: target?.health ?? 0, dead: target?.isDead ?? false, effects: target?.effects ?? [] };
   }
@@ -316,7 +316,7 @@ export function sequencedDamage(
   damages: readonly number[],
   context: DamageContext,
   filter?: (target: DamageTarget) => boolean,
-): DamageResult {
+): DamageEffectResult {
   if (!canApplyDamage(target, filter)) {
     return { applied: false, damage: 0, health: target?.health ?? 0, dead: target?.isDead ?? false, effects: target?.effects ?? [] };
   }
@@ -337,7 +337,7 @@ export function areaDamage(
   numUnits: number,
   context: DamageContext,
   filter?: (target: DamageTarget) => boolean,
-): DamageResult {
+): DamageEffectResult {
   if (!canApplyDamage(target, filter)) {
     return { applied: false, damage: 0, health: target?.health ?? 0, dead: target?.isDead ?? false, effects: target?.effects ?? [] };
   }
