@@ -81,6 +81,11 @@ jobs:
       - name: The roadmap has not lost an item
         run: node scripts/check-roadmap.mjs
 
+      # The server's own check that it does not trust the client: eleven
+      # attacks, each run against the real authority layer.
+      - name: The cheat battery
+        run: node scripts/run-cheat-battery.mjs
+
   assets:
     name: Assets
     runs-on: ubuntu-latest

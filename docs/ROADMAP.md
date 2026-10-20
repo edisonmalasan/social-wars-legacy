@@ -1222,11 +1222,32 @@ product.*
       table name into the SQL, and the name came from a constructor option, so it is
       now checked as a plain identifier before it is used; and the backup's digest
       did the same
-- [ ] Rate limiting and abuse protection are in place on every mutating endpoint
-- [ ] Session tokens are scoped, revocable and expire
+- [x] **Rate limiting and abuse protection are in place on every mutating endpoint.**
+      The limiter runs **before the routing**, so it covers every endpoint rather than
+      the ones somebody remembered (`apps/server/src/limits.ts`), and a test proves
+      it for the three mutating ones: `POST /api/command`, `POST /command.php` and
+      `POST /api/session`. It is a fixed window, which is not the most precise limiter,
+      but it is exact enough to stop a runaway client and it needs no background timer
+- [ ] The limiter is **per account** rather than per address, so a player behind a
+      shared address is not punished for the others
+- [x] **Session tokens are scoped, revocable and expire**
+      (`packages/server/src/session.ts`, `packages/server/src/session.test.ts`):
+      - **scoped** - a token resolves to exactly the player it was issued to, and a
+        session never names another player
+      - **revocable** - one token or every session of a player, immediately, and the
+        revocation says whether there was one
+      - **expiring** - a session has a lifetime (thirty days by default), and an
+        expired one is refused **and forgotten** rather than kept
+      The password is not stored: the credential is a salt and a hash, and the test
+      checks that the store's own text does not contain the password
 - [ ] A security review of the auth, command and shim layers is completed
-- [ ] The **client is not trusted for anything** — the cheat battery is re-run on every
-      release
+- [x] The **client is not trusted for anything**, and the **cheat battery is re-run on
+      every release** (`node scripts/run-cheat-battery.mjs`, and it is in the release
+      workflow's gate). Eleven attacks, each run against the **real** authority layer,
+      each of which must have no effect
+- [x] The battery is **mutation-tested**: eighteen weakenings of the authority layer
+      were each detected by exactly the attack they weaken. That is what makes a
+      passing battery evidence rather than a formality
 
 ### I4 — Observability
 
