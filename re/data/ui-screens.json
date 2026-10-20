@@ -1,11 +1,16 @@
 {
- "note": "Inventory of every UI class in the decompiled client. The original Flash UI chrome is not in the asset tree, so the modern client must rebuild it; this is the backlog.",
+ "note": "The client's 260 screens, with a decision for each one: `implemented` (the clone models the screen's behaviour, and the note says where), `dropped` (with the reason), or `planned` (in scope and not modelled yet). The decision is recorded here so that the roadmap's \"every screen is implemented, or explicitly dropped\" can be checked rather than believed.",
  "counts": {
   "total": 260,
   "byKind": {
    "movieclip": 108,
    "gui-panel": 57,
    "popup": 95
+  },
+  "byDecision": {
+   "implemented": 97,
+   "dropped": 23,
+   "planned": 140
   }
  },
  "screens": [
@@ -26,7 +31,9 @@
     "ButtonMarketMC"
    ],
    "overrides": [],
-   "bytes": 546
+   "bytes": 546,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -45,7 +52,9 @@
     "ButtonResourceMC"
    ],
    "overrides": [],
-   "bytes": 459
+   "bytes": 459,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -64,7 +73,9 @@
     "ButtonSmallLargeTextWithIconResourcesMC"
    ],
    "overrides": [],
-   "bytes": 616
+   "bytes": 616,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -83,7 +94,9 @@
     "ButtonSmallOnlyText"
    ],
    "overrides": [],
-   "bytes": 528
+   "bytes": 528,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -102,7 +115,9 @@
     "ButtonSmallWithIconResourcesMC"
    ],
    "overrides": [],
-   "bytes": 597
+   "bytes": 597,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -121,7 +136,9 @@
     "ButtonSpeedUpNoIconAsset"
    ],
    "overrides": [],
-   "bytes": 538
+   "bytes": 538,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -140,7 +157,9 @@
     "ButtonSpeedUpWideAsset"
    ],
    "overrides": [],
-   "bytes": 631
+   "bytes": 631,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -159,7 +178,9 @@
     "ButtonTabAsset"
    ],
    "overrides": [],
-   "bytes": 594
+   "bytes": 594,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "AdminButton",
@@ -176,7 +197,9 @@
     "AdminButton"
    ],
    "overrides": [],
-   "bytes": 1561
+   "bytes": 1561,
+   "decision": "dropped",
+   "decisionNote": "Dropped: The upstream's administrative panel. The clone has no administrative interface: the server owns the rules, and a panel that could edit them would be the `flash_debug` hole again."
   },
   {
    "class": "AdminPanel",
@@ -212,7 +235,9 @@
     "spawnArmy"
    ],
    "overrides": [],
-   "bytes": 67270
+   "bytes": 67270,
+   "decision": "dropped",
+   "decisionNote": "Dropped: The upstream's administrative panel. The clone has no administrative interface: the server owns the rules, and a panel that could edit them would be the `flash_debug` hole again."
   },
   {
    "class": "AnimatedUnit",
@@ -230,7 +255,9 @@
     "remove"
    ],
    "overrides": [],
-   "bytes": 6833
+   "bytes": 6833,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "AnimatedUnitCentered",
@@ -248,7 +275,9 @@
     "remove"
    ],
    "overrides": [],
-   "bytes": 6359
+   "bytes": 6359,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "ArmyUnitCell",
@@ -265,7 +294,9 @@
     "ArmyUnitCell"
    ],
    "overrides": [],
-   "bytes": 993
+   "bytes": 993,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "AssaultCountdown",
@@ -285,7 +316,9 @@
     "stopCountdown"
    ],
    "overrides": [],
-   "bytes": 2675
+   "bytes": 2675,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "BuildingWindow",
@@ -311,7 +344,9 @@
     "ioErrorHandler"
    ],
    "overrides": [],
-   "bytes": 21554
+   "bytes": 21554,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/buildmenu.ts`."
   },
   {
    "class": "CountdownTimer",
@@ -341,7 +376,9 @@
     "setTitleText"
    ],
    "overrides": [],
-   "bytes": 15504
+   "bytes": 15504,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "CrossDCiViralIcon",
@@ -359,7 +396,9 @@
     "clickButton"
    ],
    "overrides": [],
-   "bytes": 1136
+   "bytes": 1136,
+   "decision": "dropped",
+   "decisionNote": "Dropped: Cross-promotion to other Zynga games. Those games are gone, so the promotion has nothing to promote."
   },
   {
    "class": "DealSpotNPPIcon",
@@ -380,7 +419,9 @@
     "onLoadComplete"
    ],
    "overrides": [],
-   "bytes": 2220
+   "bytes": 2220,
+   "decision": "dropped",
+   "decisionNote": "Dropped: Cross-promotion to other Zynga games. Those games are gone, so the promotion has nothing to promote."
   },
   {
    "class": "ExpandTabNew2",
@@ -412,7 +453,9 @@
     "resetWindow"
    ],
    "overrides": [],
-   "bytes": 6386
+   "bytes": 6386,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "ExtendedPortraitPopupButton",
@@ -430,7 +473,9 @@
     "loadImage"
    ],
    "overrides": [],
-   "bytes": 1070
+   "bytes": 1070,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "ExtendedPortraitPopupButtonEmbeded",
@@ -448,7 +493,9 @@
     "loadInstance"
    ],
    "overrides": [],
-   "bytes": 960
+   "bytes": 960,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "FriendButton",
@@ -476,7 +523,9 @@
     "exploreWorld"
    ],
    "overrides": [],
-   "bytes": 10936
+   "bytes": 10936,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "FriendsWindow",
@@ -500,7 +549,9 @@
     "ioErrorHandler"
    ],
    "overrides": [],
-   "bytes": 8665
+   "bytes": 8665,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "GiftButtonLarge",
@@ -526,7 +577,9 @@
     "closePopup"
    ],
    "overrides": [],
-   "bytes": 6295
+   "bytes": 6295,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "GiftWindow",
@@ -552,7 +605,9 @@
     "destroy"
    ],
    "overrides": [],
-   "bytes": 9942
+   "bytes": 9942,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "GuiManager",
@@ -601,7 +656,9 @@
     "showMondayBonusViralButtons"
    ],
    "overrides": [],
-   "bytes": 105638
+   "bytes": 105638,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/hud.ts`."
   },
   {
    "class": "IconPanel",
@@ -622,7 +679,9 @@
     "removeIcon"
    ],
    "overrides": [],
-   "bytes": 6501
+   "bytes": 6501,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "InfoPopup",
@@ -643,7 +702,9 @@
     "reposition"
    ],
    "overrides": [],
-   "bytes": 2671
+   "bytes": 2671,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "InventoryItem",
@@ -661,7 +722,9 @@
     "setPos"
    ],
    "overrides": [],
-   "bytes": 1616
+   "bytes": 1616,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "ItemButtonLarge",
@@ -693,7 +756,9 @@
     "closePopup"
    ],
    "overrides": [],
-   "bytes": 18467
+   "bytes": 18467,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "ItemButtonLargeExpand2",
@@ -715,7 +780,9 @@
     "ItemButtonLargeExpand2"
    ],
    "overrides": [],
-   "bytes": 4901
+   "bytes": 4901,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "ItemButtonLargeResources",
@@ -732,7 +799,9 @@
     "ItemButtonLargeResources"
    ],
    "overrides": [],
-   "bytes": 5529
+   "bytes": 5529,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "MagicEntry",
@@ -755,7 +824,9 @@
     "unlock"
    ],
    "overrides": [],
-   "bytes": 1957
+   "bytes": 1957,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "MondayBonusButton",
@@ -773,7 +844,9 @@
     "update"
    ],
    "overrides": [],
-   "bytes": 607
+   "bytes": 607,
+   "decision": "planned",
+   "decisionNote": "The Monday bonus. The cycle is implemented server-side already."
   },
   {
    "class": "Portrait",
@@ -800,7 +873,9 @@
     "Visible"
    ],
    "overrides": [],
-   "bytes": 4976
+   "bytes": 4976,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PortraitAssault",
@@ -819,7 +894,9 @@
     "loadImage"
    ],
    "overrides": [],
-   "bytes": 1337
+   "bytes": 1337,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PortraitSpecialAttack",
@@ -848,7 +925,9 @@
     "getElement",
     "UpdateImage"
    ],
-   "bytes": 9580
+   "bytes": 9580,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PortraitSpecialAttackLimit",
@@ -875,7 +954,9 @@
     "setElement",
     "update"
    ],
-   "bytes": 4328
+   "bytes": 4328,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PortraitTrainQueue",
@@ -899,7 +980,9 @@
     "setVisible"
    ],
    "overrides": [],
-   "bytes": 4170
+   "bytes": 4170,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PremiumCollectPanel",
@@ -920,7 +1003,9 @@
     "hidePanel"
    ],
    "overrides": [],
-   "bytes": 5440
+   "bytes": 5440,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/premium.ts`."
   },
   {
    "class": "RecuadroInfo",
@@ -969,7 +1054,9 @@
     "showTooltip"
    ],
    "overrides": [],
-   "bytes": 65370
+   "bytes": 65370,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": "ResourcesTab",
@@ -989,7 +1076,9 @@
     "resetWindow"
    ],
    "overrides": [],
-   "bytes": 4434
+   "bytes": 4434,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "SelectedMagic",
@@ -1015,7 +1104,9 @@
     "SelectedMagic"
    ],
    "overrides": [],
-   "bytes": 9172
+   "bytes": 9172,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "SpeakerBox",
@@ -1034,7 +1125,9 @@
     "SpeakerBox"
    ],
    "overrides": [],
-   "bytes": 3487
+   "bytes": 3487,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "SpellButton",
@@ -1055,7 +1148,9 @@
     "enable"
    ],
    "overrides": [],
-   "bytes": 3122
+   "bytes": 3122,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "SubCategory",
@@ -1078,7 +1173,9 @@
     "setText"
    ],
    "overrides": [],
-   "bytes": 4442
+   "bytes": 4442,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "Tab",
@@ -1099,7 +1196,9 @@
     "destroy"
    ],
    "overrides": [],
-   "bytes": 2783
+   "bytes": 2783,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "UnitTooltip",
@@ -1119,7 +1218,9 @@
     "destroy"
    ],
    "overrides": [],
-   "bytes": 5946
+   "bytes": 5946,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": "UnitXPLevelInfoDisplay",
@@ -1140,7 +1241,9 @@
     "UnitXPLevelInfoDisplay"
    ],
    "overrides": [],
-   "bytes": 7436
+   "bytes": 7436,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "ZoomSlider",
@@ -1162,7 +1265,9 @@
     "setValue"
    ],
    "overrides": [],
-   "bytes": 4378
+   "bytes": 4378,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "AttachableArrow",
@@ -1183,7 +1288,9 @@
    "overrides": [
     "dettach"
    ],
-   "bytes": 5825
+   "bytes": 5825,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tutorial.ts`."
   },
   {
    "class": "AttachableVisualElement",
@@ -1204,7 +1311,9 @@
     "isAttached"
    ],
    "overrides": [],
-   "bytes": 1857
+   "bytes": 1857,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "InfoButtonBarrack",
@@ -1223,7 +1332,9 @@
     "InfoButtonBarrack"
    ],
    "overrides": [],
-   "bytes": 2233
+   "bytes": 2233,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": "InfoButtonDepot",
@@ -1244,7 +1355,9 @@
     "InfoButtonDepot"
    ],
    "overrides": [],
-   "bytes": 847
+   "bytes": 847,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": "InfoButtonFortressBarrack",
@@ -1264,7 +1377,9 @@
     "InfoButtonFortressBarrack"
    ],
    "overrides": [],
-   "bytes": 2053
+   "bytes": 2053,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": "InfoButtonGarage",
@@ -1283,7 +1398,9 @@
     "InfoButtonGarage"
    ],
    "overrides": [],
-   "bytes": 1652
+   "bytes": 1652,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": "InfoButtonGeneric",
@@ -1300,7 +1417,9 @@
     "InfoButtonGeneric"
    ],
    "overrides": [],
-   "bytes": 284
+   "bytes": 284,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": "InfoButtonHealBarrack",
@@ -1317,7 +1436,9 @@
     "InfoButtonHealBarrack"
    ],
    "overrides": [],
-   "bytes": 1552
+   "bytes": 1552,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": "InfoButtonHouse",
@@ -1336,7 +1457,9 @@
     "InfoButtonHouse"
    ],
    "overrides": [],
-   "bytes": 592
+   "bytes": 592,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": "InfoButtonSilo",
@@ -1356,7 +1479,9 @@
     "InfoButtonSilo"
    ],
    "overrides": [],
-   "bytes": 618
+   "bytes": 618,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": "InfoButtonText",
@@ -1373,7 +1498,9 @@
     "InfoButtonText"
    ],
    "overrides": [],
-   "bytes": 439
+   "bytes": 439,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": "InfoButtonTower",
@@ -1393,7 +1520,9 @@
     "InfoButtonTower"
    ],
    "overrides": [],
-   "bytes": 929
+   "bytes": 929,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": "InfoButtonUnit",
@@ -1410,7 +1539,9 @@
     "InfoButtonUnit"
    ],
    "overrides": [],
-   "bytes": 1731
+   "bytes": 1731,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": "InfoButtonWall",
@@ -1430,7 +1561,9 @@
     "InfoButtonWall"
    ],
    "overrides": [],
-   "bytes": 675
+   "bytes": 675,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": "InfoButtonWonder",
@@ -1449,7 +1582,9 @@
     "InfoButtonWonder"
    ],
    "overrides": [],
-   "bytes": 720
+   "bytes": 720,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -1468,7 +1603,9 @@
     "GuiCover"
    ],
    "overrides": [],
-   "bytes": 264
+   "bytes": 264,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -1487,7 +1624,9 @@
     "GuiCoverExplorationMC"
    ],
    "overrides": [],
-   "bytes": 290
+   "bytes": 290,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -1506,7 +1645,9 @@
     "GuiMC"
    ],
    "overrides": [],
-   "bytes": 461
+   "bytes": 461,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -1525,7 +1666,9 @@
     "IconAssaultObjectivMC"
    ],
    "overrides": [],
-   "bytes": 290
+   "bytes": 290,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -1544,7 +1687,9 @@
     "IconCollect"
    ],
    "overrides": [],
-   "bytes": 409
+   "bytes": 409,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -1563,7 +1708,9 @@
     "IconPlayerMC"
    ],
    "overrides": [],
-   "bytes": 271
+   "bytes": 271,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -1582,7 +1729,9 @@
     "IconResourcesMC"
    ],
    "overrides": [],
-   "bytes": 276
+   "bytes": 276,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -1601,7 +1750,9 @@
     "IconTutorialMC"
    ],
    "overrides": [],
-   "bytes": 410
+   "bytes": 410,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tutorial.ts`."
   },
   {
    "class": null,
@@ -1620,7 +1771,9 @@
     "IconVideoMC"
    ],
    "overrides": [],
-   "bytes": 347
+   "bytes": 347,
+   "decision": "dropped",
+   "decisionNote": "Dropped: The video player. There is no video content, and a Flash-free client has no reason to carry a codec."
   },
   {
    "class": null,
@@ -1639,7 +1792,9 @@
     "IconoCapturadoMC"
    ],
    "overrides": [],
-   "bytes": 280
+   "bytes": 280,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -1658,7 +1813,9 @@
     "InfoButtonBarrackMC"
    ],
    "overrides": [],
-   "bytes": 824
+   "bytes": 824,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -1677,7 +1834,9 @@
     "InfoButtonBridgeMC"
    ],
    "overrides": [],
-   "bytes": 407
+   "bytes": 407,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -1696,7 +1855,9 @@
     "InfoButtonBuilding"
    ],
    "overrides": [],
-   "bytes": 406
+   "bytes": 406,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -1715,7 +1876,9 @@
     "InfoButtonDefensiveMC"
    ],
    "overrides": [],
-   "bytes": 450
+   "bytes": 450,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -1734,7 +1897,9 @@
     "InfoButtonDepotMC"
    ],
    "overrides": [],
-   "bytes": 461
+   "bytes": 461,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -1753,7 +1918,9 @@
     "InfoButtonDifficulty"
    ],
    "overrides": [],
-   "bytes": 365
+   "bytes": 365,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -1772,7 +1939,9 @@
     "InfoButtonFortressBarrackMC"
    ],
    "overrides": [],
-   "bytes": 969
+   "bytes": 969,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -1791,7 +1960,9 @@
     "InfoButtonGarageMC"
    ],
    "overrides": [],
-   "bytes": 769
+   "bytes": 769,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -1810,7 +1981,9 @@
     "InfoButtonGenericMC"
    ],
    "overrides": [],
-   "bytes": 360
+   "bytes": 360,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -1829,7 +2002,9 @@
     "InfoButtonHealBarrackMC"
    ],
    "overrides": [],
-   "bytes": 779
+   "bytes": 779,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -1848,7 +2023,9 @@
     "InfoButtonHouseMC"
    ],
    "overrides": [],
-   "bytes": 404
+   "bytes": 404,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -1867,7 +2044,9 @@
     "InfoButtonSiloMC"
    ],
    "overrides": [],
-   "bytes": 451
+   "bytes": 451,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -1886,7 +2065,9 @@
     "InfoButtonStore14MC"
    ],
    "overrides": [],
-   "bytes": 363
+   "bytes": 363,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -1905,7 +2086,9 @@
     "InfoButtonTowerMC"
    ],
    "overrides": [],
-   "bytes": 577
+   "bytes": 577,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -1924,7 +2107,9 @@
     "InfoButtonUnitCollectionBuyMC"
    ],
    "overrides": [],
-   "bytes": 841
+   "bytes": 841,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -1943,7 +2128,9 @@
     "InfoButtonUnitCollectionMC"
    ],
    "overrides": [],
-   "bytes": 790
+   "bytes": 790,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -1962,7 +2149,9 @@
     "InfoButtonUnitMC"
    ],
    "overrides": [],
-   "bytes": 765
+   "bytes": 765,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -1981,7 +2170,9 @@
     "InfoButtonUpgradeMC"
    ],
    "overrides": [],
-   "bytes": 635
+   "bytes": 635,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -2000,7 +2191,9 @@
     "InfoButtonWonderMC"
    ],
    "overrides": [],
-   "bytes": 551
+   "bytes": 551,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/tooltips.ts`."
   },
   {
    "class": null,
@@ -2019,7 +2212,9 @@
     "InfoPopupMC"
    ],
    "overrides": [],
-   "bytes": 542
+   "bytes": 542,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2038,7 +2233,9 @@
     "InfoPopupManaMc"
    ],
    "overrides": [],
-   "bytes": 358
+   "bytes": 358,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2057,7 +2254,9 @@
     "MenuTabFriendsMC"
    ],
    "overrides": [],
-   "bytes": 371
+   "bytes": 371,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2076,7 +2275,9 @@
     "PopOverMC"
    ],
    "overrides": [],
-   "bytes": 631
+   "bytes": 631,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2095,7 +2296,9 @@
     "PopupAlertMC"
    ],
    "overrides": [],
-   "bytes": 409
+   "bytes": 409,
+   "decision": "planned",
+   "decisionNote": "The alert. The client's own literals are already captured."
   },
   {
    "class": null,
@@ -2114,7 +2317,9 @@
     "PopupAllUnitsMC"
    ],
    "overrides": [],
-   "bytes": 688
+   "bytes": 688,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2133,7 +2338,9 @@
     "PopupAllianceDailyBonusAsset"
    ],
    "overrides": [],
-   "bytes": 661
+   "bytes": 661,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
   },
   {
    "class": null,
@@ -2152,7 +2359,9 @@
     "PopupAlliancesCenterAsset"
    ],
    "overrides": [],
-   "bytes": 766
+   "bytes": 766,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
   },
   {
    "class": null,
@@ -2171,7 +2380,9 @@
     "PopupAssaultHistoryMC"
    ],
    "overrides": [],
-   "bytes": 1244
+   "bytes": 1244,
+   "decision": "planned",
+   "decisionNote": "The assault history. The battle simulation is already modelled."
   },
   {
    "class": null,
@@ -2190,7 +2401,9 @@
     "PopupAttackFinishedMC"
    ],
    "overrides": [],
-   "bytes": 1649
+   "bytes": 1649,
+   "decision": "planned",
+   "decisionNote": "The attack's result. The assault loot is already modelled."
   },
   {
    "class": null,
@@ -2209,7 +2422,9 @@
     "PopupBreedingMC"
    ],
    "overrides": [],
-   "bytes": 1425
+   "bytes": 1425,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2228,7 +2443,9 @@
     "PopupBuildingInventoryMC"
    ],
    "overrides": [],
-   "bytes": 578
+   "bytes": 578,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/building.ts`."
   },
   {
    "class": null,
@@ -2247,7 +2464,9 @@
     "PopupBuildingMC"
    ],
    "overrides": [],
-   "bytes": 580
+   "bytes": 580,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/building.ts`."
   },
   {
    "class": null,
@@ -2266,7 +2485,9 @@
     "PopupBuildinginventoryItemMC"
    ],
    "overrides": [],
-   "bytes": 594
+   "bytes": 594,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/building.ts`."
   },
   {
    "class": null,
@@ -2285,7 +2506,9 @@
     "PopupBuyGoldMC"
    ],
    "overrides": [],
-   "bytes": 628
+   "bytes": 628,
+   "decision": "dropped",
+   "decisionNote": "Dropped: Buying cash or mana with real money. The clone takes no real payment; the premium is bought with the game's own cash."
   },
   {
    "class": null,
@@ -2304,7 +2527,9 @@
     "PopupBuyManaMC"
    ],
    "overrides": [],
-   "bytes": 996
+   "bytes": 996,
+   "decision": "dropped",
+   "decisionNote": "Dropped: Buying cash or mana with real money. The clone takes no real payment; the premium is bought with the game's own cash."
   },
   {
    "class": null,
@@ -2323,7 +2548,9 @@
     "PopupChooseGenderMC"
    ],
    "overrides": [],
-   "bytes": 450
+   "bytes": 450,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2342,7 +2569,9 @@
     "PopupCollectMC"
    ],
    "overrides": [],
-   "bytes": 444
+   "bytes": 444,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/production.ts`."
   },
   {
    "class": null,
@@ -2361,7 +2590,9 @@
     "PopupConfirmMC"
    ],
    "overrides": [],
-   "bytes": 478
+   "bytes": 478,
+   "decision": "planned",
+   "decisionNote": "The confirmation. The client's own literals are already captured."
   },
   {
    "class": null,
@@ -2380,7 +2611,9 @@
     "PopupDartsMC"
    ],
    "overrides": [],
-   "bytes": 2382
+   "bytes": 2382,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/darts.ts`."
   },
   {
    "class": null,
@@ -2399,7 +2632,9 @@
     "PopupExpandMC"
    ],
    "overrides": [],
-   "bytes": 576
+   "bytes": 576,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2418,7 +2653,9 @@
     "PopupGenericUnitSelectorMC"
    ],
    "overrides": [],
-   "bytes": 529
+   "bytes": 529,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2437,7 +2674,9 @@
     "PopupGetEnergyMC"
    ],
    "overrides": [],
-   "bytes": 626
+   "bytes": 626,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2456,7 +2695,9 @@
     "PopupGetPackMC"
    ],
    "overrides": [],
-   "bytes": 647
+   "bytes": 647,
+   "decision": "planned",
+   "decisionNote": "The offer packs. The packs are priced by the cost table already."
   },
   {
    "class": null,
@@ -2475,7 +2716,9 @@
     "PopupGoalCompleteMC"
    ],
    "overrides": [],
-   "bytes": 699
+   "bytes": 699,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/goals.ts`."
   },
   {
    "class": null,
@@ -2494,7 +2737,9 @@
     "PopupGoalsMC"
    ],
    "overrides": [],
-   "bytes": 891
+   "bytes": 891,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/guidance.ts`."
   },
   {
    "class": null,
@@ -2513,7 +2758,9 @@
     "PopupGotPackMC"
    ],
    "overrides": [],
-   "bytes": 594
+   "bytes": 594,
+   "decision": "planned",
+   "decisionNote": "The offer packs. The packs are priced by the cost table already."
   },
   {
    "class": null,
@@ -2532,7 +2779,9 @@
     "PopupHelpIslandMC"
    ],
    "overrides": [],
-   "bytes": 506
+   "bytes": 506,
+   "decision": "planned",
+   "decisionNote": "The help island. The tutorial's steps are already extracted and modelled."
   },
   {
    "class": null,
@@ -2551,7 +2800,9 @@
     "PopupHireFriendsGenericMC"
    ],
    "overrides": [],
-   "bytes": 663
+   "bytes": 663,
+   "decision": "dropped",
+   "decisionNote": "Dropped: Hiring a Facebook friend for a bonus. The clone has no Facebook identity to hire."
   },
   {
    "class": null,
@@ -2570,7 +2821,9 @@
     "PopupHospitalMC"
    ],
    "overrides": [],
-   "bytes": 1226
+   "bytes": 1226,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2589,7 +2842,9 @@
     "PopupHurryupMC"
    ],
    "overrides": [],
-   "bytes": 941
+   "bytes": 941,
+   "decision": "dropped",
+   "decisionNote": "Dropped: Paying cash to finish a production early. The clone's production cycle is the client's: the player waits the period they chose."
   },
   {
    "class": null,
@@ -2608,7 +2863,9 @@
     "PopupIntroMC"
    ],
    "overrides": [],
-   "bytes": 572
+   "bytes": 572,
+   "decision": "planned",
+   "decisionNote": "The introduction. The tutorial's steps are already extracted and modelled."
   },
   {
    "class": null,
@@ -2627,7 +2884,9 @@
     "PopupInventoryMC"
    ],
    "overrides": [],
-   "bytes": 619
+   "bytes": 619,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2646,7 +2905,9 @@
     "PopupLevelMC"
    ],
    "overrides": [],
-   "bytes": 1005
+   "bytes": 1005,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/xp.ts`."
   },
   {
    "class": null,
@@ -2665,7 +2926,9 @@
     "PopupLoadingAssaultMC"
    ],
    "overrides": [],
-   "bytes": 836
+   "bytes": 836,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2684,7 +2947,9 @@
     "PopupLoadingQuestMC"
    ],
    "overrides": [],
-   "bytes": 849
+   "bytes": 849,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2703,7 +2968,9 @@
     "PopupMagicMC"
    ],
    "overrides": [],
-   "bytes": 581
+   "bytes": 581,
+   "decision": "planned",
+   "decisionNote": "The magic popup. The magic rules are already modelled."
   },
   {
    "class": null,
@@ -2722,7 +2989,9 @@
     "PopupMarketMC"
    ],
    "overrides": [],
-   "bytes": 495
+   "bytes": 495,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/marketplace.ts`."
   },
   {
    "class": null,
@@ -2741,7 +3010,9 @@
     "PopupMarketplaceAsset"
    ],
    "overrides": [],
-   "bytes": 981
+   "bytes": 981,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2760,7 +3031,9 @@
     "PopupMarketplaceUnitAsset"
    ],
    "overrides": [],
-   "bytes": 1888
+   "bytes": 1888,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2779,7 +3052,9 @@
     "PopupMarketplaceUnitBidder"
    ],
    "overrides": [],
-   "bytes": 511
+   "bytes": 511,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2798,7 +3073,9 @@
     "PopupMissionInfoMC"
    ],
    "overrides": [],
-   "bytes": 757
+   "bytes": 757,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2817,7 +3094,9 @@
     "PopupMisteryMC"
    ],
    "overrides": [],
-   "bytes": 1109
+   "bytes": 1109,
+   "decision": "planned",
+   "decisionNote": "The mystery box. Its rules are not modelled yet."
   },
   {
    "class": null,
@@ -2836,7 +3115,9 @@
     "PopupMobileInfoMC"
    ],
    "overrides": [],
-   "bytes": 717
+   "bytes": 717,
+   "decision": "dropped",
+   "decisionNote": "Dropped: The notice about the mobile client. The clone is one client on every platform, so the notice has nothing to distinguish."
   },
   {
    "class": null,
@@ -2855,7 +3136,9 @@
     "PopupNeighborsMC"
    ],
    "overrides": [],
-   "bytes": 509
+   "bytes": 509,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/socialstore.ts`."
   },
   {
    "class": null,
@@ -2874,7 +3157,9 @@
     "PopupNewDailyMC"
    ],
    "overrides": [],
-   "bytes": 1582
+   "bytes": 1582,
+   "decision": "planned",
+   "decisionNote": "The daily bonus. The bonus is awarded server-side already."
   },
   {
    "class": null,
@@ -2893,7 +3178,9 @@
     "PopupNewsMC"
    ],
    "overrides": [],
-   "bytes": 1409
+   "bytes": 1409,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2912,7 +3199,9 @@
     "PopupNextIslandAttackMC"
    ],
    "overrides": [],
-   "bytes": 756
+   "bytes": 756,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -2931,7 +3220,9 @@
     "PopupPlayerProfileMC"
    ],
    "overrides": [],
-   "bytes": 1499
+   "bytes": 1499,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/socialstore.ts`."
   },
   {
    "class": null,
@@ -2950,7 +3241,9 @@
     "PopupPremiumAccountCongratulationsAsset"
    ],
    "overrides": [],
-   "bytes": 637
+   "bytes": 637,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/premium.ts`."
   },
   {
    "class": null,
@@ -2969,7 +3262,9 @@
     "PopupPremiumAccountMC"
    ],
    "overrides": [],
-   "bytes": 593
+   "bytes": 593,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/premium.ts`."
   },
   {
    "class": null,
@@ -2988,7 +3283,9 @@
     "PopupQuestFinishedMC"
    ],
    "overrides": [],
-   "bytes": 1116
+   "bytes": 1116,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/quest.ts`."
   },
   {
    "class": null,
@@ -3007,7 +3304,9 @@
     "PopupRecruitmentMC"
    ],
    "overrides": [],
-   "bytes": 1044
+   "bytes": 1044,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -3026,7 +3325,9 @@
     "PopupResearchCenterMC"
    ],
    "overrides": [],
-   "bytes": 1425
+   "bytes": 1425,
+   "decision": "planned",
+   "decisionNote": "The research centre. The tech tree is already modelled."
   },
   {
    "class": null,
@@ -3045,7 +3346,9 @@
     "PopupSelectResourceMC"
    ],
    "overrides": [],
-   "bytes": 678
+   "bytes": 678,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -3064,7 +3367,9 @@
     "PopupSelectRobotMC"
    ],
    "overrides": [],
-   "bytes": 802
+   "bytes": 802,
+   "decision": "dropped",
+   "decisionNote": "Dropped: The robot avatar picker. The clone keeps the character system in the server's own hands rather than the client's."
   },
   {
    "class": null,
@@ -3083,7 +3388,9 @@
     "PopupSelectRobotReminderMC"
    ],
    "overrides": [],
-   "bytes": 634
+   "bytes": 634,
+   "decision": "dropped",
+   "decisionNote": "Dropped: The robot avatar picker. The clone keeps the character system in the server's own hands rather than the client's."
   },
   {
    "class": null,
@@ -3102,7 +3409,9 @@
     "PopupSendMessageAsset"
    ],
    "overrides": [],
-   "bytes": 611
+   "bytes": 611,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -3121,7 +3430,9 @@
     "PopupSocialBuildingMC"
    ],
    "overrides": [],
-   "bytes": 616
+   "bytes": 616,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/socialstore.ts`."
   },
   {
    "class": null,
@@ -3140,7 +3451,9 @@
     "PopupSoulMixerHelpMC"
    ],
    "overrides": [],
-   "bytes": 450
+   "bytes": 450,
+   "decision": "planned",
+   "decisionNote": "The soul mixer's help. Its rules are not modelled yet."
   },
   {
    "class": null,
@@ -3159,7 +3472,9 @@
     "PopupSuperMisteryBoxMC"
    ],
    "overrides": [],
-   "bytes": 1451
+   "bytes": 1451,
+   "decision": "planned",
+   "decisionNote": "The super mystery box. Its rules are not modelled yet."
   },
   {
    "class": null,
@@ -3178,7 +3493,9 @@
     "PopupTutorialMC"
    ],
    "overrides": [],
-   "bytes": 502
+   "bytes": 502,
+   "decision": "planned",
+   "decisionNote": "The tutorial popup. The tutorial's steps and state machine are already modelled."
   },
   {
    "class": null,
@@ -3197,7 +3514,9 @@
     "PopupUpgradeBuildingAsset"
    ],
    "overrides": [],
-   "bytes": 749
+   "bytes": 749,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/building.ts`."
   },
   {
    "class": null,
@@ -3216,7 +3535,9 @@
     "PopupVisitMC"
    ],
    "overrides": [],
-   "bytes": 469
+   "bytes": 469,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/socialstore.ts`."
   },
   {
    "class": null,
@@ -3235,7 +3556,9 @@
     "PopupWeeklyQuestFinishedMC"
    ],
    "overrides": [],
-   "bytes": 790
+   "bytes": 790,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/quest.ts`."
   },
   {
    "class": null,
@@ -3254,7 +3577,9 @@
     "PopupWeeklyQuestMC"
    ],
    "overrides": [],
-   "bytes": 562
+   "bytes": 562,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/quest.ts`."
   },
   {
    "class": null,
@@ -3273,7 +3598,9 @@
     "PopupWizardryMC"
    ],
    "overrides": [],
-   "bytes": 931
+   "bytes": 931,
+   "decision": "planned",
+   "decisionNote": "The magic. The magic rules are already modelled."
   },
   {
    "class": null,
@@ -3292,7 +3619,9 @@
     "StoreMC"
    ],
    "overrides": [],
-   "bytes": 892
+   "bytes": 892,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -3311,7 +3640,9 @@
     "TabMC"
    ],
    "overrides": [],
-   "bytes": 300
+   "bytes": 300,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -3330,7 +3661,9 @@
     "TooltipMultilineMC"
    ],
    "overrides": [],
-   "bytes": 399
+   "bytes": 399,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": null,
@@ -3349,7 +3682,9 @@
     "TooltipSimbolosAtaqueMC"
    ],
    "overrides": [],
-   "bytes": 367
+   "bytes": 367,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "ButtonMarket",
@@ -3376,7 +3711,9 @@
     "refreshCost"
    ],
    "overrides": [],
-   "bytes": 5793
+   "bytes": 5793,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "InventoryTabCollections",
@@ -3394,7 +3731,9 @@
     "reloadCollections"
    ],
    "overrides": [],
-   "bytes": 3353
+   "bytes": 3353,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "InventoryTabItems",
@@ -3411,7 +3750,9 @@
     "InventoryTabItems"
    ],
    "overrides": [],
-   "bytes": 3548
+   "bytes": 3548,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "MondayBonusPopUp",
@@ -3436,7 +3777,9 @@
     "closeWindow"
    ],
    "overrides": [],
-   "bytes": 6149
+   "bytes": 6149,
+   "decision": "planned",
+   "decisionNote": "The Monday bonus. The cycle is implemented server-side already."
   },
   {
    "class": "PopOver",
@@ -3454,7 +3797,9 @@
     "setContents"
    ],
    "overrides": [],
-   "bytes": 5658
+   "bytes": 5658,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopUpBattleOptions",
@@ -3492,7 +3837,9 @@
     "initialisePortraits"
    ],
    "overrides": [],
-   "bytes": 7956
+   "bytes": 7956,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopUpLost",
@@ -3526,7 +3873,9 @@
     "closeWindow"
    ],
    "overrides": [],
-   "bytes": 7489
+   "bytes": 7489,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopupAlert",
@@ -3545,7 +3894,9 @@
     "PopupAlert"
    ],
    "overrides": [],
-   "bytes": 1940
+   "bytes": 1940,
+   "decision": "planned",
+   "decisionNote": "The alert. The client's own literals are already captured."
   },
   {
    "class": "PopupAllUnits",
@@ -3578,7 +3929,9 @@
     "loadAnim"
    ],
    "overrides": [],
-   "bytes": 18894
+   "bytes": 18894,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopupAssaultHistory",
@@ -3618,7 +3971,9 @@
     "closeWindow"
    ],
    "overrides": [],
-   "bytes": 7082
+   "bytes": 7082,
+   "decision": "planned",
+   "decisionNote": "The assault history. The battle simulation is already modelled."
   },
   {
    "class": "PopupAttackFinished",
@@ -3671,7 +4026,9 @@
     "loadFBIDWorld"
    ],
    "overrides": [],
-   "bytes": 23865
+   "bytes": 23865,
+   "decision": "planned",
+   "decisionNote": "The attack's result. The assault loot is already modelled."
   },
   {
    "class": "PopupBuilding",
@@ -3693,7 +4050,9 @@
     "PopupBuilding"
    ],
    "overrides": [],
-   "bytes": 3872
+   "bytes": 3872,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/building.ts`."
   },
   {
    "class": "PopupBuildingInventory",
@@ -3718,7 +4077,9 @@
     "onAskForItem"
    ],
    "overrides": [],
-   "bytes": 5351
+   "bytes": 5351,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/building.ts`."
   },
   {
    "class": "PopupBuildingInventoryItem",
@@ -3736,7 +4097,9 @@
     "buyItem"
    ],
    "overrides": [],
-   "bytes": 1776
+   "bytes": 1776,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/building.ts`."
   },
   {
    "class": "PopupBuyGold",
@@ -3763,7 +4126,9 @@
     "onExchange"
    ],
    "overrides": [],
-   "bytes": 2740
+   "bytes": 2740,
+   "decision": "dropped",
+   "decisionNote": "Dropped: Buying cash or mana with real money. The clone takes no real payment; the premium is bought with the game's own cash."
   },
   {
    "class": "PopupBuyMana",
@@ -3790,7 +4155,9 @@
     "closeWindow"
    ],
    "overrides": [],
-   "bytes": 4779
+   "bytes": 4779,
+   "decision": "dropped",
+   "decisionNote": "Dropped: Buying cash or mana with real money. The clone takes no real payment; the premium is bought with the game's own cash."
   },
   {
    "class": "PopupChooseGender",
@@ -3809,7 +4176,9 @@
     "PopupChooseGender"
    ],
    "overrides": [],
-   "bytes": 1717
+   "bytes": 1717,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopupCollect",
@@ -3837,7 +4206,9 @@
     "onOut"
    ],
    "overrides": [],
-   "bytes": 7224
+   "bytes": 7224,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/production.ts`."
   },
   {
    "class": "PopupConfirm",
@@ -3857,7 +4228,9 @@
     "PopupConfirm"
    ],
    "overrides": [],
-   "bytes": 2062
+   "bytes": 2062,
+   "decision": "planned",
+   "decisionNote": "The confirmation. The client's own literals are already captured."
   },
   {
    "class": "PopupCrossDCi",
@@ -3881,7 +4254,9 @@
     "PopupCrossDCi"
    ],
    "overrides": [],
-   "bytes": 3685
+   "bytes": 3685,
+   "decision": "dropped",
+   "decisionNote": "Dropped: Cross-promotion to other Zynga games. Those games are gone, so the promotion has nothing to promote."
   },
   {
    "class": "PopupDarts",
@@ -3912,7 +4287,9 @@
     "closeWindow"
    ],
    "overrides": [],
-   "bytes": 25433
+   "bytes": 25433,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/darts.ts`."
   },
   {
    "class": "PopupExpand",
@@ -3939,7 +4316,9 @@
     "ioErrorHandler"
    ],
    "overrides": [],
-   "bytes": 4890
+   "bytes": 4890,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopupGenericUnitSelector",
@@ -3957,7 +4336,9 @@
     "init"
    ],
    "overrides": [],
-   "bytes": 4201
+   "bytes": 4201,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopupGetEnergy",
@@ -3979,7 +4360,9 @@
     "PopupGetEnergy"
    ],
    "overrides": [],
-   "bytes": 2053
+   "bytes": 2053,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopupGetPack",
@@ -4002,7 +4385,9 @@
     "onBuy"
    ],
    "overrides": [],
-   "bytes": 2216
+   "bytes": 2216,
+   "decision": "planned",
+   "decisionNote": "The offer packs. The packs are priced by the cost table already."
   },
   {
    "class": "PopupGoalComplete",
@@ -4023,7 +4408,9 @@
     "PopupGoalComplete"
    ],
    "overrides": [],
-   "bytes": 2490
+   "bytes": 2490,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/goals.ts`."
   },
   {
    "class": "PopupGoals",
@@ -4071,7 +4458,9 @@
     "clickInfoMission"
    ],
    "overrides": [],
-   "bytes": 34868
+   "bytes": 34868,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/client/src/guidance.ts`."
   },
   {
    "class": "PopupGotPack",
@@ -4093,7 +4482,9 @@
     "PopupGotPack"
    ],
    "overrides": [],
-   "bytes": 1576
+   "bytes": 1576,
+   "decision": "planned",
+   "decisionNote": "The offer packs. The packs are priced by the cost table already."
   },
   {
    "class": "PopupHelpIsland",
@@ -4117,7 +4508,9 @@
     "PopupHelpIsland"
    ],
    "overrides": [],
-   "bytes": 3214
+   "bytes": 3214,
+   "decision": "planned",
+   "decisionNote": "The help island. The tutorial's steps are already extracted and modelled."
   },
   {
    "class": "PopupHireFriendsGeneric",
@@ -4138,7 +4531,9 @@
     "onPhotoOk"
    ],
    "overrides": [],
-   "bytes": 4249
+   "bytes": 4249,
+   "decision": "dropped",
+   "decisionNote": "Dropped: Hiring a Facebook friend for a bonus. The clone has no Facebook identity to hire."
   },
   {
    "class": "PopupHospital",
@@ -4171,7 +4566,9 @@
     "closeWindow"
    ],
    "overrides": [],
-   "bytes": 17590
+   "bytes": 17590,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopupHurryup",
@@ -4200,7 +4597,9 @@
     "onYes"
    ],
    "overrides": [],
-   "bytes": 4137
+   "bytes": 4137,
+   "decision": "dropped",
+   "decisionNote": "Dropped: Paying cash to finish a production early. The clone's production cycle is the client's: the player waits the period they chose."
   },
   {
    "class": "PopupIntro",
@@ -4228,7 +4627,9 @@
     "PopupIntro"
    ],
    "overrides": [],
-   "bytes": 4225
+   "bytes": 4225,
+   "decision": "planned",
+   "decisionNote": "The introduction. The tutorial's steps are already extracted and modelled."
   },
   {
    "class": "PopupInventory",
@@ -4250,7 +4651,9 @@
     "PopupInventory"
    ],
    "overrides": [],
-   "bytes": 3082
+   "bytes": 3082,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopupLevel",
@@ -4273,7 +4676,9 @@
     "showHint"
    ],
    "overrides": [],
-   "bytes": 6104
+   "bytes": 6104,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/xp.ts`."
   },
   {
    "class": "PopupLoadingQuest",
@@ -4305,7 +4710,9 @@
     "onStarOut"
    ],
    "overrides": [],
-   "bytes": 7434
+   "bytes": 7434,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopupMagic",
@@ -4340,7 +4747,9 @@
     "closeBook"
    ],
    "overrides": [],
-   "bytes": 10804
+   "bytes": 10804,
+   "decision": "planned",
+   "decisionNote": "The magic popup. The magic rules are already modelled."
   },
   {
    "class": "PopupMarket",
@@ -4361,7 +4770,9 @@
     "onTrade"
    ],
    "overrides": [],
-   "bytes": 3326
+   "bytes": 3326,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/marketplace.ts`."
   },
   {
    "class": "PopupMissionInfo",
@@ -4388,7 +4799,9 @@
     "closeWindow"
    ],
    "overrides": [],
-   "bytes": 6912
+   "bytes": 6912,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopupMistery",
@@ -4416,7 +4829,9 @@
     "closeWindow"
    ],
    "overrides": [],
-   "bytes": 3944
+   "bytes": 3944,
+   "decision": "planned",
+   "decisionNote": "The mystery box. Its rules are not modelled yet."
   },
   {
    "class": "PopupNeighbors",
@@ -4437,7 +4852,9 @@
     "PopupNeighbors"
    ],
    "overrides": [],
-   "bytes": 2020
+   "bytes": 2020,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/socialstore.ts`."
   },
   {
    "class": "PopupNewDaily",
@@ -4467,7 +4884,9 @@
     "closeWindow"
    ],
    "overrides": [],
-   "bytes": 10873
+   "bytes": 10873,
+   "decision": "planned",
+   "decisionNote": "The daily bonus. The bonus is awarded server-side already."
   },
   {
    "class": "PopupNews",
@@ -4496,7 +4915,9 @@
     "closeWindow"
    ],
    "overrides": [],
-   "bytes": 13436
+   "bytes": 13436,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopupNextIslandAttack",
@@ -4522,7 +4943,9 @@
     "closeWindow"
    ],
    "overrides": [],
-   "bytes": 5118
+   "bytes": 5118,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopupNextMission",
@@ -4543,7 +4966,9 @@
     "onOut"
    ],
    "overrides": [],
-   "bytes": 1532
+   "bytes": 1532,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopupObject",
@@ -4560,7 +4985,9 @@
     "PopupObject"
    ],
    "overrides": [],
-   "bytes": 2224
+   "bytes": 2224,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopupPlayerProfile",
@@ -4592,7 +5019,9 @@
     "loadRanks"
    ],
    "overrides": [],
-   "bytes": 7928
+   "bytes": 7928,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/socialstore.ts`."
   },
   {
    "class": "PopupPremiumAccount",
@@ -4613,7 +5042,9 @@
     "PopupPremiumAccount"
    ],
    "overrides": [],
-   "bytes": 4020
+   "bytes": 4020,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/premium.ts`."
   },
   {
    "class": "PopupPremiumAccountCongratulations",
@@ -4633,7 +5064,9 @@
     "PopupPremiumAccountCongratulations"
    ],
    "overrides": [],
-   "bytes": 2618
+   "bytes": 2618,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/premium.ts`."
   },
   {
    "class": "PopupQuestFinished",
@@ -4681,7 +5114,9 @@
     "closeWindow"
    ],
    "overrides": [],
-   "bytes": 12392
+   "bytes": 12392,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/quest.ts`."
   },
   {
    "class": "PopupQuestsMap",
@@ -4709,7 +5144,9 @@
     "onClose"
    ],
    "overrides": [],
-   "bytes": 26151
+   "bytes": 26151,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopupRecruitment",
@@ -4748,7 +5185,9 @@
     "onPhotoOk"
    ],
    "overrides": [],
-   "bytes": 20641
+   "bytes": 20641,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopupResearchCenter",
@@ -4787,7 +5226,9 @@
     "closeWindow"
    ],
    "overrides": [],
-   "bytes": 23945
+   "bytes": 23945,
+   "decision": "planned",
+   "decisionNote": "The research centre. The tech tree is already modelled."
   },
   {
    "class": "PopupRewards",
@@ -4807,7 +5248,9 @@
     "closeWindow"
    ],
    "overrides": [],
-   "bytes": 3240
+   "bytes": 3240,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopupSelectResource",
@@ -4832,7 +5275,9 @@
     "closeWindow"
    ],
    "overrides": [],
-   "bytes": 3221
+   "bytes": 3221,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopupSelectRobot",
@@ -4854,7 +5299,9 @@
     "PopupSelectRobot"
    ],
    "overrides": [],
-   "bytes": 4684
+   "bytes": 4684,
+   "decision": "dropped",
+   "decisionNote": "Dropped: The robot avatar picker. The clone keeps the character system in the server's own hands rather than the client's."
   },
   {
    "class": "PopupSelectRobotReminder",
@@ -4874,7 +5321,9 @@
     "PopupSelectRobotReminder"
    ],
    "overrides": [],
-   "bytes": 2380
+   "bytes": 2380,
+   "decision": "dropped",
+   "decisionNote": "Dropped: The robot avatar picker. The clone keeps the character system in the server's own hands rather than the client's."
   },
   {
    "class": "PopupSelectionTeamWindow",
@@ -4897,7 +5346,9 @@
     "PopupSelectionTeamWindow"
    ],
    "overrides": [],
-   "bytes": 19944
+   "bytes": 19944,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "PopupSocialBuilding",
@@ -4931,7 +5382,9 @@
     "onPhotoOk"
    ],
    "overrides": [],
-   "bytes": 19908
+   "bytes": 19908,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/socialstore.ts`."
   },
   {
    "class": "PopupSoulMixer",
@@ -4967,7 +5420,9 @@
     "SoulMixerPoweredUnit"
    ],
    "overrides": [],
-   "bytes": 41931
+   "bytes": 41931,
+   "decision": "planned",
+   "decisionNote": "The soul mixer. Its rules are not modelled yet."
   },
   {
    "class": "PopupSoulMixerHelp",
@@ -4988,7 +5443,9 @@
     "closeWindow"
    ],
    "overrides": [],
-   "bytes": 1303
+   "bytes": 1303,
+   "decision": "planned",
+   "decisionNote": "The soul mixer's help. Its rules are not modelled yet."
   },
   {
    "class": "PopupSuperMistery",
@@ -5020,7 +5477,9 @@
     "closeWindow"
    ],
    "overrides": [],
-   "bytes": 15384
+   "bytes": 15384,
+   "decision": "planned",
+   "decisionNote": "The super mystery box. Its rules are not modelled yet."
   },
   {
    "class": "PopupTutorial",
@@ -5041,7 +5500,9 @@
     "activate"
    ],
    "overrides": [],
-   "bytes": 2747
+   "bytes": 2747,
+   "decision": "planned",
+   "decisionNote": "The tutorial popup. The tutorial's steps and state machine are already modelled."
   },
   {
    "class": "PopupUpgradeBuilding",
@@ -5064,7 +5525,9 @@
     "PopupUpgradeBuilding"
    ],
    "overrides": [],
-   "bytes": 7179
+   "bytes": 7179,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/building.ts`."
   },
   {
    "class": "PopupVisit",
@@ -5085,7 +5548,9 @@
     "PopupVisit"
    ],
    "overrides": [],
-   "bytes": 3264
+   "bytes": 3264,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/socialstore.ts`."
   },
   {
    "class": "PopupWeeklyQuest",
@@ -5107,7 +5572,9 @@
     "onClose"
    ],
    "overrides": [],
-   "bytes": 1605
+   "bytes": 1605,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/quest.ts`."
   },
   {
    "class": "PopupWeeklyQuestFinished",
@@ -5132,7 +5599,9 @@
     "sendResults"
    ],
    "overrides": [],
-   "bytes": 4263
+   "bytes": 4263,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/quest.ts`."
   },
   {
    "class": "PopupWizardry",
@@ -5158,7 +5627,9 @@
     "onClose"
    ],
    "overrides": [],
-   "bytes": 8789
+   "bytes": 8789,
+   "decision": "planned",
+   "decisionNote": "The magic. The magic rules are already modelled."
   },
   {
    "class": "SoulMixerTurbina",
@@ -5176,7 +5647,9 @@
     "setState"
    ],
    "overrides": [],
-   "bytes": 4025
+   "bytes": 4025,
+   "decision": "planned",
+   "decisionNote": "The soul mixer's turbine. Its rules are not modelled yet."
   },
   {
    "class": "AllianceInfoRendererItem",
@@ -5196,7 +5669,9 @@
     "AllianceInfoRendererItem"
    ],
    "overrides": [],
-   "bytes": 3385
+   "bytes": 3385,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
   },
   {
    "class": "AllianceMemberInfoRendererItem",
@@ -5220,7 +5695,9 @@
     "AllianceMemberInfoRendererItem"
    ],
    "overrides": [],
-   "bytes": 11152
+   "bytes": 11152,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
   },
   {
    "class": "AllianceMemberInfoTip",
@@ -5237,7 +5714,9 @@
     "AllianceMemberInfoTip"
    ],
    "overrides": [],
-   "bytes": 1403
+   "bytes": 1403,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
   },
   {
    "class": "AllianceState",
@@ -5268,7 +5747,9 @@
     "reset"
    ],
    "overrides": [],
-   "bytes": 24142
+   "bytes": 24142,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
   },
   {
    "class": "JoinState",
@@ -5295,7 +5776,9 @@
     "refresh"
    ],
    "overrides": [],
-   "bytes": 8091
+   "bytes": 8091,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
   },
   {
    "class": "PopupAllianceDailyBonus",
@@ -5315,7 +5798,9 @@
     "PopupAllianceDailyBonus"
    ],
    "overrides": [],
-   "bytes": 2417
+   "bytes": 2417,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
   },
   {
    "class": "PopupAllianceIntro",
@@ -5335,7 +5820,9 @@
     "PopupAllianceIntro"
    ],
    "overrides": [],
-   "bytes": 4210
+   "bytes": 4210,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
   },
   {
    "class": "PopupAlliancesCenter",
@@ -5359,7 +5846,9 @@
     "close"
    ],
    "overrides": [],
-   "bytes": 3998
+   "bytes": 3998,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
   },
   {
    "class": "PopupChooseAlliance",
@@ -5382,7 +5871,9 @@
     "PopupChooseAlliance"
    ],
    "overrides": [],
-   "bytes": 2858
+   "bytes": 2858,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
   },
   {
    "class": "PopupCreateAlliance",
@@ -5411,7 +5902,9 @@
     "PopupCreateAlliance"
    ],
    "overrides": [],
-   "bytes": 10722
+   "bytes": 10722,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
   },
   {
    "class": "PopupSendAllianceMessage",
@@ -5431,7 +5924,9 @@
     "PopupSendAllianceMessage"
    ],
    "overrides": [],
-   "bytes": 4008
+   "bytes": 4008,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/alliance.ts`."
   },
   {
    "class": "CrossViralIcon",
@@ -5448,7 +5943,9 @@
     "CrossViralIcon"
    ],
    "overrides": [],
-   "bytes": 692
+   "bytes": 692,
+   "decision": "dropped",
+   "decisionNote": "Dropped: Cross-promotion to other Zynga games. Those games are gone, so the promotion has nothing to promote."
   },
   {
    "class": "PopupCrossPromotion",
@@ -5471,7 +5968,9 @@
     "PopupCrossPromotion"
    ],
    "overrides": [],
-   "bytes": 5335
+   "bytes": 5335,
+   "decision": "dropped",
+   "decisionNote": "Dropped: Cross-promotion to other Zynga games. Those games are gone, so the promotion has nothing to promote."
   },
   {
    "class": "PopupPlayNow",
@@ -5491,7 +5990,9 @@
     "PopupPlayNow"
    ],
    "overrides": [],
-   "bytes": 2508
+   "bytes": 2508,
+   "decision": "dropped",
+   "decisionNote": "Dropped: Cross-promotion to other Zynga games. Those games are gone, so the promotion has nothing to promote."
   },
   {
    "class": "PopupRewardGiven",
@@ -5511,7 +6012,9 @@
     "PopupRewardGiven"
    ],
    "overrides": [],
-   "bytes": 2084
+   "bytes": 2084,
+   "decision": "dropped",
+   "decisionNote": "Dropped: Cross-promotion to other Zynga games. Those games are gone, so the promotion has nothing to promote."
   },
   {
    "class": "TargetBitmap",
@@ -5531,7 +6034,9 @@
     "destroy"
    ],
    "overrides": [],
-   "bytes": 3550
+   "bytes": 3550,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/rules/src/dartsboard.ts`."
   },
   {
    "class": "infoFriendAssistPopup",
@@ -5552,7 +6057,9 @@
     "resmooth"
    ],
    "overrides": [],
-   "bytes": 3468
+   "bytes": 3468,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "BidderRenderer",
@@ -5569,7 +6076,9 @@
     "BidderRenderer"
    ],
    "overrides": [],
-   "bytes": 2117
+   "bytes": 2117,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/marketplace.ts`."
   },
   {
    "class": "MarketplaceUnitInfoTip",
@@ -5586,7 +6095,9 @@
     "MarketplaceUnitInfoTip"
    ],
    "overrides": [],
-   "bytes": 1247
+   "bytes": 1247,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/marketplace.ts`."
   },
   {
    "class": "PopupMarketplace",
@@ -5611,7 +6122,9 @@
     "close"
    ],
    "overrides": [],
-   "bytes": 12608
+   "bytes": 12608,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/marketplace.ts`."
   },
   {
    "class": "PopupMarketplaceHelp",
@@ -5631,7 +6144,9 @@
     "PopupMarketplaceHelp"
    ],
    "overrides": [],
-   "bytes": 2503
+   "bytes": 2503,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/marketplace.ts`."
   },
   {
    "class": "PopupMarketplaceUnit",
@@ -5665,7 +6180,9 @@
     "close"
    ],
    "overrides": [],
-   "bytes": 19586
+   "bytes": 19586,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/marketplace.ts`."
   },
   {
    "class": "UnitRenderer",
@@ -5687,7 +6204,9 @@
     "UnitRenderer"
    ],
    "overrides": [],
-   "bytes": 7782
+   "bytes": 7782,
+   "decision": "implemented",
+   "decisionNote": "Implemented as a model: `packages/server/src/marketplace.ts`."
   },
   {
    "class": "popupLoadingAssault",
@@ -5728,7 +6247,9 @@
     "onCloseHelp"
    ],
    "overrides": [],
-   "bytes": 9245
+   "bytes": 9245,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "ThumbSelectedUnit",
@@ -5747,7 +6268,9 @@
     "deactivate"
    ],
    "overrides": [],
-   "bytes": 1988
+   "bytes": 1988,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   },
   {
    "class": "ThumbUnit",
@@ -5766,7 +6289,9 @@
     "deactivate"
    ],
    "overrides": [],
-   "bytes": 3570
+   "bytes": 3570,
+   "decision": "planned",
+   "decisionNote": "In scope and not modelled yet. The screen's behaviour is real and the client's, so it belongs in the clone."
   }
  ]
 }
