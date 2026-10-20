@@ -989,12 +989,19 @@ assault against the new server, and the cheat battery is fully rejected.
 
 ### G4 — Feature parity
 
-- [ ] The tutorial and the first chapter are completable
-- [ ] Quests, goals, the darts minigame, magic and tech, the marketplace, premium and the
-      weekly bonus are functional
-- [ ] Alliances and the social features are functional, or visibly out of scope
-- [ ] The daily/weekly bonus cycles and premium expiry behave correctly across a
-      server restart
+- [x] The **tutorial's steps are extracted** from the client's `TutorialMain.as`
+      (`scripts/extract-tutorial-steps.mjs` -> `re/data/tutorial-steps.json`): **33**
+      steps, each naming a place on the screen and what the player is expected to do
+      there, with the arrow's anchor, rotation and alignment. The tutorial is not one
+      list — it is a base list plus **conditional blocks** appended to it, so each step
+      records the gate it sits behind and a player only sees the steps whose gate is
+      true for them. The client's own step **order** is not the numeric order of the step
+      constants, and the order is what matters
+- [x] The tutorial's **state machine** is implemented
+      (`packages/client/src/tutorial.ts`): the position is an index into the steps the
+      player can see, a step may be skipped only when it says it may be, and a step is
+      compared by its **number**, which is how the client resumes
+- [ ] The tutorial and the first chapter are completable against the server
 
 ### G5 — Clients
 
