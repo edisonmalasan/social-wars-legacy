@@ -231,7 +231,88 @@ node scripts/pack-atlases.mjs --size 512 --padding 2
 The atlases are a build artefact (`.work/frames/atlases/`); the manifest is the
 contract.
 
-## 7. What is still to do
+## 7. `dynamic2.swf` — the runtime library, and 28 sounds the config never mentions
+
+`assets/swf/dynamic2.swf` was flagged throughout the investigation as "the one remaining
+unanalysed code artefact". It is now analysed, and it is **not** a mystery: it is the
+**runtime library** the client loads at startup, and it holds two things the rest of the
+asset tree does not.
+
+### 7.1 It carries 28 sounds, and the server's config knows none of them
+
+The SWF contains 28 `DefineSound` tags and 29 sound classes, each with an
+`[Embed]` attribute naming the audio it was compiled from:
+
+```actionscript
+[Embed(source="/_assets/21_BuildSound.mp3")]
+public dynamic class BuildSound extends Sound { }
+```
+
+Extracting them (`ffdec -export sound`) gives 28 MP3s named `1_Sword5Sound.mp3` …
+`27_AchievementSound.mp3`, plus one unnamed sound.
+
+**All 28 are unique audio.** Not one of them matches any of the 140 standalone files in
+`assets/sounds/` — not by content, and not even by size. And **none of them appears in the
+config's `sounds` list**.
+
+So the game's audio set is **28 sounds larger than the server's configuration knows
+about**. The client plays them; the server never references them.
+
+### 7.2 It carries the building-construction animations
+
+The other 20 classes are not sounds. They are the **construction animations** and some
+one-off effects:
+
+```
+Construction1x1 .. Construction4x4, Construction2x2Trol, Construction3x3Trol,
+Construction4x4Trol, ConstructionGranja, ConstructionRancho,
+Animgranjaconstr_27, _1x1building_10, building2x2_12, building3x3_17, constructio4_22,
+BloodPuddleMC, BloodSpilledMC, BloodSpilled2MC, FireUnitMC, PoisonUnitMC,
+VacaVuelaMC, OvejaVuelaMC, JabaliVuelaMC
+```
+
+**This is why some items appear to have no art.** The construction animations are *not*
+in the per-item sprite SWFs — they live in the runtime library and are loaded
+dynamically. An item whose `img_name` does not resolve to a sprite may still be drawn
+correctly by the original client, using art from `dynamic2.swf`.
+
+**Consequence for the pipeline:** `dynamic2.swf` must be converted like any other SWF
+(its frames and its construction timelines are real, visible art), and its 28 sounds must
+be added to the audio set.
+
+### 7.3 The standalone files contain their own duplicates
+
+The 140 files in `assets/sounds/` are only **134 distinct recordings**. Five groups are
+byte-identical, because the tree holds both the server-named and the client-named copy:
+
+| Files | One recording |
+|---|---|
+| `108_die-M.mp3` = `die-M.mp3` | the male death sound |
+| `109_die-W.mp3` = `die-W.mp3` | the female death sound |
+| `85_missileTank_move.mp3` = `tankdef.mp3` | the tank move loop |
+| `86_missileTank_die.mp3` = `92_moto_die.mp3` = `tankbroke.mp3` | the tank death |
+| `93_robotDestroy.mp3` = `robotDestroy.mp3` | the robot destruction |
+
+The numbered names are the ones the config's `sounds` list uses; the unnumbered ones are
+the originals. The audio manifest records all of them, and the content-addressed store
+collapses them.
+
+### 7.4 The four "suspicious" sprites are not suspicious
+
+Four sprites carry more than 4 KiB of ABC — `10002_chained_junk_bot`, `1180_robot_hunter`,
+`1200_nebular_motorized` and `1201_junk_bot` — which looked like they might hold special
+per-frame logic. They do not. They are ordinary animation sprites whose timelines have
+**many named frames**, and each named frame becomes a class with an `addFrameScript`:
+
+```
+_1180_robot_hunter_fla/unidadatacando3_4detras_111.as
+_1200_nebular_motorized_fla/unidadatacando3_4frentecopy4_49.as
+```
+
+("unit attacking, 3-4 frames behind", "in front, copy 4"). The ABC size measures the
+number of named frames, not logic. **The audit closes with nothing to act on.**
+
+## 8. What is still to do
 
 | Step | Status |
 |---|---|
@@ -239,12 +320,14 @@ contract.
 | Frame export + dedup + manifest | ✅ done — `scripts/convert-assets.mjs` |
 | Trim to the alpha bounding box | ✅ done — `scripts/pack-atlases.mjs` |
 | Pack the atlases | ✅ done — `scripts/pack-atlases.mjs` |
+| The image and sound manifest | ✅ done — `scripts/build-asset-manifest.mjs` |
+| The 28 embedded sounds | ✅ extracted — `scripts/extract-embedded-sounds.mjs` |
+| `assets/swf/dynamic2.swf` analysed | ✅ done — it is the runtime library (§7) |
+| The 4 large-ABC sprites audited | ✅ done — nothing to act on (§7.4) |
 | The full run over all 1 116 SWF files | 🔄 in progress |
-| **Audio** | **todo** — the 140 MP3s in `assets/sounds/` need a format and a manifest. |
+| **The 28 embedded sounds added to the audio set** | **todo** — they are extracted but not yet in the manifest |
+| **The construction animations from `dynamic2.swf`** | **todo** — they are part of the conversion, and they explain some of the "missing" item art |
 | **Fonts** | **todo** — the two SWF font libraries need to become a web font or a bitmap font. |
-| **The 4 sprites above the stub threshold** | **todo** — `10002_chained_junk_bot`, `1180_robot_hunter`, `1200_nebular_motorized`, `1201_junk_bot` have more than 4 KiB of ABC and may hold real per-frame logic rather than `stop()` calls. They need an audit before the conversion is trusted. |
-| **`assets/swf/dynamic2.swf`** | **todo** — the one remaining unanalysed code artefact; the client loads it at runtime. |
-| **Thumbnails and chapter images** | **todo** — the 1 314 JPG thumbnails and the 578 chapter/intro JPGs are already plain images and need only a manifest. |
 | **A viewer** | **todo** — renders every item at 3 zoom levels, so missing art is visible immediately. |
 | **A content-hashed asset bundle** | **todo** — so a stale cache is impossible. |
 

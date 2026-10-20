@@ -2,3 +2,5 @@ re
 node_modules/
 dist/
 .work/
+# A JVM crash log from FFDec, if it ever crashes mid-export
+hs_err_pid*.log
