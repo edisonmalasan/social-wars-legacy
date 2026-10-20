@@ -12,3 +12,4 @@ export * from './random.js';
 export * from './resources.js';
 export * from './darts.js';
 export * from './combat.js';
+export * from './counters.js';

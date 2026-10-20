@@ -2,7 +2,14 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { Random } from './random.ts';
-import { resolveDamage, effectiveRange, targetScore } from './combat.ts';
+import {
+  resolveDamage,
+  effectiveRange,
+  scoreTarget,
+  selectTarget,
+  AGGRO_RANGE,
+  SUBCATFUNC_BUILDING_TOWNHALL,
+} from './combat.ts';
 import { applyDelta, describeResources } from './resources.ts';
 import { rotateDartsSchedule } from './darts.ts';
 
@@ -98,17 +105,53 @@ describe('range and targeting', () => {
     assert.equal(effectiveRange(stats, 4, 'unit'), 5);
   });
 
-  it('scores a target as 1000 minus its distance, plus the type bonuses', () => {
-    // The formula is verified; WHICH end of the range the client selects is NOT
-    // established from the decompiled source, so only the formula is asserted.
-    // See re/docs/02-combat-and-units.md.
-    assert.equal(targetScore({ distance: 10 }), 990);
-    assert.equal(targetScore({ distance: 10, isUnit: true }), 990 + 150);
-    assert.equal(targetScore({ distance: 10, isTownHall: true }), 990 + 100);
-    assert.equal(targetScore({ distance: 10, isCollectable: true }), 990 + 75);
-    assert.equal(targetScore({ distance: 10, isSelf: true }), 990 + 50);
-    // The distance term falls as the target gets further away.
-    assert.ok(targetScore({ distance: 900 }) < targetScore({ distance: 10 }));
+  it('scores a target as 1000 minus its distance, plus one bonus', () => {
+    // Ported from IsoEngine.getElementScore. The bonuses are an else-if
+    // chain, so a building gets AT MOST ONE of them.
+    assert.equal(scoreTarget({ kind: 'unit', distance: 10 }).score, 990 + 150);
+    assert.equal(
+      scoreTarget({ kind: 'building', distance: 10, subcatFunctional: SUBCATFUNC_BUILDING_TOWNHALL })
+        .score,
+      990 + 100,
+    );
+    assert.equal(scoreTarget({ kind: 'building', distance: 10, collect: 5 }).score, 990 + 75);
+    assert.equal(scoreTarget({ kind: 'building', distance: 10, uiAttack: 3 }).score, 990 + 50);
+  });
+
+  it('marks a target that is none of those as untargetable', () => {
+    const scored = scoreTarget({ kind: 'building', distance: 10 });
+    assert.equal(scored.score, -1);
+  });
+
+  it('treats a passive building as further away', () => {
+    const passive = scoreTarget({ kind: 'building', distance: 10, uiAttack: 3, passive: true });
+    const active = scoreTarget({ kind: 'building', distance: 10, uiAttack: 3 });
+    assert.equal(passive.effectiveDistance, 10 + AGGRO_RANGE);
+    assert.equal(active.effectiveDistance, 10);
+    assert.ok(passive.score < active.score);
+  });
+
+  it('prefers the highest score, and the closest on a tie', () => {
+    const unit = { kind: 'unit' as const, distance: 40, handle: 'unit' };
+    const hall = {
+      kind: 'building' as const,
+      distance: 10,
+      subcatFunctional: SUBCATFUNC_BUILDING_TOWNHALL,
+      handle: 'hall',
+    };
+    // The unit scores 1000-40+150 = 1110; the hall 1000-10+100 = 1090.
+    assert.equal(selectTarget([hall, unit])?.handle, 'unit');
+
+    const near = { kind: 'unit' as const, distance: 20, handle: 'near' };
+    const far = { kind: 'unit' as const, distance: 25, handle: 'far' };
+    assert.equal(selectTarget([far, near])?.handle, 'near');
+  });
+
+  it('skips untargetable candidates', () => {
+    const wall = { kind: 'building' as const, distance: 1, handle: 'wall' };
+    const unit = { kind: 'unit' as const, distance: 90, handle: 'unit' };
+    assert.equal(selectTarget([wall, unit])?.handle, 'unit');
+    assert.equal(selectTarget([wall]), null);
   });
 });
 

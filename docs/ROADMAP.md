@@ -428,11 +428,6 @@ ticks. 414.5 MB of raw PNG becomes a **233.6 MB** content-addressed store, in 10
 **Verified by the atlas packer:** every trimmed region was compared pixel by pixel against
 its source — **682 856 pixels, 0 mismatched**.
 
-**Measured on a 30-file sample** (`node scripts/convert-assets.mjs --group sprites --limit 30
---jobs 3`): 230 symbols, **8 245 PNG frames written, 2 024 unique images** — 75.4 % of the
-frames are duplicates of another frame, because an animation holds each drawing for many
-ticks. 414.5 MB of raw PNG becomes a **233.6 MB** content-addressed store, in 107 s.
-
 See [`../re/docs/17-asset-pipeline.md`](../re/docs/17-asset-pipeline.md).
 
 **Exit criteria:** every shippable item id renders in the viewer with no missing frame.
@@ -446,21 +441,30 @@ client's observable behaviour.*
 
 ### E1 — Combat
 
-- [ ] The 8-stage damage pipeline (shield → counter → attack modifier → global multiplier →
-      unit XP → siege → tutorial → crit/variance → defence → clamp) is implemented
-- [ ] Attack cadence matches: `attack_interval` is frames at 30 fps, units take a random
-      0–4 frame phase, buildings fire in global lockstep
-- [ ] Range rules match: units use `attack_range + max(0, targetWidth − 2·attack_range)`,
+- [x] The damage pipeline (shield → delegate veto → counter → attack modifier → global
+      multiplier → unit XP → siege → tutorial → crit/variance → defence → round → clamp) is
+      implemented in `packages/rules/src/combat.ts`, with **every stage recorded** so the
+      golden-master diff can compare stage by stage
+- [x] The **targeting rule** is implemented from `IsoEngine.getElementScore`: the bonuses are
+      a mutually exclusive `else if` chain, the score is `1000 − distance` plus one bonus,
+      **`−1` means untargetable**, a passive building is treated as `AGGRO_RANGE` (10) tiles
+      further away, and the candidates are sorted by **score descending, then distance
+      ascending**
+- [x] The **4 real counters** are confirmed against the shipped content and encoded in
+      `packages/rules/src/counters.ts`: Antiaircraft battery 20× vs `ft_flying`, Demolition
+      Tank 15×, Mortar Thrower 10×, B52 5× vs `ft_building`. **Exactly 4 of the 900 items**
+      have a multiplier above 1; the 138 offer packs carry the `best_against = "-1"`
+      sentinel, which never counters anything.
+- [x] Range rules match: units use `attack_range + max(0, targetWidth − 2·attack_range)`,
       buildings use the exact `attack_range`
-- [ ] Targeting matches the score (`1000−distance`, +150 unit, +100 town hall, +75
-      collectable, +50 attacker), including the untargetable rules
-- [ ] The 4 real counters reproduce exactly: Antiaircraft 20× vs `ft_flying`,
-      Demolition Tank 15×, Mortar Thrower 10×, B52 5× vs `ft_building`
-- [ ] All 10 damage classes and all 15 special attacks behave as documented
+- [ ] Attack cadence matches: `attack_interval` is frames at 30 fps, units take a random
+      0–4 frame phase, buildings fire in global lockstep — the primitives exist, the tick
+      loop does not
 - [ ] A building's own attack scales by `garrison / unit_capacity` — an empty bunker deals
       0, and a bunker fires once per garrisoned unit
 - [ ] Unit XP accrues from effective damage to units only, with the documented thresholds
       and the level-9 cap (+30 attack, 3× HP)
+- [ ] All 10 damage classes and all 15 special attacks behave as documented
 
 ### E2 — Economy and buildings
 
