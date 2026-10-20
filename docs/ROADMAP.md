@@ -1005,17 +1005,26 @@ assault against the new server, and the cheat battery is fully rejected.
       condition is simply the level, and the clone reproduces that rather than
       inventing an unlock system the client does not have
 - [ ] The unit panel, minimap, neighbour strip, goal panel and popups all work
-- [ ] Tooltips, tutorials and the "click here" guidance system are reimplemented
-- [x] The **text metrics** are implemented (`packages/client/src/fonts.ts`): the
-      original faces' advance widths, scaled, so the substituted face occupies the
-      same space and the game's boxes still fit. The scale is a **parameter**, not a
-      constant, because it depends on which font file is actually shipped - a scale of
-      1 means "not tuned yet", and the roadmap says so
-- [x] The **substitutes are named and served under the names the client asks for**,
-      and the languages are recorded: the client loads fonts for English, Turkish and
-      Greek, and only the English ones ship, so the clone ships one set and falls back
-      the same way
-- [ ] Text renders with the substituted fonts at the original metrics
+- [x] The **tooltips** are implemented as a model (`packages/client/src/tooltips.ts`):
+      the HUD's four resource sentences are the client's own literals, and the info
+      panel is built from the item's own statistics — the resource building shows its
+      name, its resource and the amount it earns, and the unit shows its effective
+      attack, range, velocity, life and population
+- [x] The client's **defence slot shows the attack interval**, in both the tooltip and
+      the info panel. That is the client's behaviour in *both* places, so it is not a
+      slip in one of them, and the clone reproduces it rather than "fixing" it — the
+      client is the specification
+- [x] The **"click here" guidance** is implemented (`packages/client/src/guidance.ts`):
+      the goals panel's up-to-three "CLICK HERE!" badges, one on each of the three
+      goal slots, marking the goals the player has not visited. The offset counts the
+      **incomplete** goals only, so a completed goal does not take up a slot
+- [x] The client's **quirk** in that guidance is reproduced and recorded: the check
+      reads the *first* marker's clicked flag for all three markers, even though the
+      client keeps three separate flags — so clicking the first badge suppresses all
+      three, while clicking the second or the third suppresses only that one. It is
+      recorded as a decision, not an accident
+- [ ] The remaining tooltip surfaces (the icon panel's dictionary, the special units'
+      attack tooltips and the market's) are reimplemented
 
 ### G4 — Feature parity
 
