@@ -306,7 +306,17 @@ of the project lives in.*
       key or a dangling id — the build currently reports **0 errors**
 - [x] The bundle build is **reproducible**: the same inputs produce a byte-identical
       bundle, and the hash is recorded. Current build id:
-      `11f1de0358b69d8ca3be91e1d8dc06f232ce49d0dd7ec79dbdd33204f540b5e3`
+      `cb95cefdd36dbaad7196d786a522621573bc9246716ae135b9361676d2aacd32`
+- [x] The build **parses the config's stringly-typed item table** rather than casting it:
+      `costs` is JSON text inside a string, `trains_ids` and `upgrades_to` are single id
+      strings, and the property *values* are strings too. Casting instead of parsing
+      silently produced **empty build costs for all 900 items**. Every item now has its
+      cost, 56 have an upgrade chain and 130 train a unit
+- [x] The build-time, footprint and building fields are typed: `width`, `height`,
+      `min_level`, `build_time`, `clicks_to_build`, `training_time`, `xp`, `activation`,
+      `collect`, `collect_type`, `collect_xp`, `max_collects`, `group_type`, `race`,
+      `in_store`, `giftable`, `gift_level`, `cost_unit_cash`, `volume`, `max_elem_vol`,
+      `inventory_ids` and `premium_upgrade_costs`
 - [x] The darts schedule rotates weekly and remains correct after a simulated year —
       the rotation is done at **runtime**, not at build time, so the bundle stays
       reproducible
