@@ -42,6 +42,9 @@ import {
   mondayBonusReward,
   mondayBonusState,
   isDue,
+  advanceTutorial,
+  tutorialState,
+  TUTORIAL_STATE_KEY,
   isPremiumActive,
   premiumExpiry,
   type ProductionCycle,
@@ -314,6 +317,8 @@ export function createApplier(deps: ApplierDeps): CommandApplier {
         return collectCommand(world, command.args, deps);
       case 'complete_goal':
         return completeGoalCommand(world, command.args, deps);
+      case 'complete_tutorial':
+        return completeTutorialCommand(world, command.args, deps);
       case 'win_daily_bonus':
         return dailyBonusCommand(world, command.args, deps);
       case 'weekly_reward':
@@ -1026,6 +1031,38 @@ function completeGoalCommand(
 }
 
 /** `win_daily_bonus` — the server computes the day and the reward. */
+/**
+ * `complete_tutorial` - record how far the player has got in the
+ * tutorial.
+ *
+ * The tutorial is a scripted sequence of pointers, and the client walks
+ * it. The server owns **which steps exist**, so a client cannot invent
+ * one, and **how far the player has got**, which is the furthest step
+ * reached - the tutorial can be walked backwards, and the furthest step
+ * is the one that counts.
+ *
+ * The order is the client's, because the tutorial grants nothing by
+ * itself: it points at the actions, and the actions are commands the
+ * server already checks.
+ */
+function completeTutorialCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const step = Number(args[0]);
+  if (!Number.isFinite(step)) {
+    return { applied: false, refused: 'bad-argument', world };
+  }
+  const privateState = world.save.privateState;
+  const advanced = advanceTutorial(tutorialState(privateState), step);
+  if (!advanced.ok) {
+    return { applied: false, refused: advanced.reason, world };
+  }
+  privateState[TUTORIAL_STATE_KEY] = advanced.state;
+  return { applied: true, world };
+}
+
 function dailyBonusCommand(
   world: ShimWorld,
   args: readonly unknown[],

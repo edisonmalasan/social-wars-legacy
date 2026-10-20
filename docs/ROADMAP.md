@@ -1160,6 +1160,15 @@ assault against the new server, and the cheat battery is fully rejected.
       player can see, a step may be skipped only when it says it may be, and a step is
       compared by its **number**, which is how the client resumes
 - [ ] The tutorial and the first chapter are completable against the server
+- [x] The **tutorial's progression is the server's**
+      (`packages/rules/src/tutorial.ts`). The server owns **which steps exist**, so a
+      client cannot invent one, and **how far the player has got**, which is the
+      furthest step reached - the tutorial can be walked backwards, and the furthest
+      step is the one that counts. The *order* is the client's, because the tutorial
+      grants nothing by itself: it points at the actions, and the actions are commands
+      the server already checks
+- [ ] The **first chapter** is completable: the quest's steps, the rewards and the
+      chapter's own unlocks are checked against the server
 - [ ] Quests, goals, the darts minigame, magic and tech, the marketplace, premium and the
       weekly bonus are functional
 - [ ] Alliances and the social features are functional, or visibly out of scope
