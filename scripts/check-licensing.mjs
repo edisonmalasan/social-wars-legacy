@@ -55,6 +55,12 @@ async function filesUnder(dir) {
 }
 
 async function main() {
+  const explicit = process.argv.indexOf('--path');
+  const trees =
+    explicit >= 0 && process.argv[explicit + 1]
+      ? [path.resolve(process.argv[explicit + 1])]
+      : SHIPPED.map((dir) => path.join(ROOT, dir));
+
   const offences = [];
 
   // --- 1. The upstream is GPL v3 and unmodified -----------------------------
@@ -95,8 +101,8 @@ async function main() {
   }
 
   // --- 3. The shipped tree carries no Zynga media --------------------------
-  for (const tree of SHIPPED) {
-    const dir = path.join(ROOT, tree);
+  for (const tree of trees) {
+    const dir = path.resolve(ROOT, tree);
     if (!existsSync(dir)) continue;
     for (const file of await filesUnder(dir)) {
       const name = path.basename(file);
@@ -110,14 +116,21 @@ async function main() {
   }
 
   // The fonts the project ships are open-licensed ones.
-  for (const tree of SHIPPED) {
-    const dir = path.join(ROOT, tree);
+  for (const tree of trees) {
+    const dir = path.resolve(ROOT, tree);
     if (!existsSync(dir)) continue;
     for (const file of await filesUnder(dir)) {
       if (!/\.(css|html|js|mjs|ts|json)$/i.test(file)) continue;
       const text = await readFile(file, 'utf8');
-      if (PROPRIETARY_FONTS.test(text)) {
-        offences.push(`${path.relative(ROOT, file)}: names a proprietary font`);
+      // The **identifier** the client uses for a face is not the face: the
+      // client has to know the original's name to map it to a substitute.
+      // What must not appear is a proprietary face being **asked for**.
+      for (const match of text.matchAll(/font-family\s*:\s*([^;}\n]*)/gi)) {
+        if (PROPRIETARY_FONTS.test(match[1])) {
+          offences.push(
+            `${path.relative(ROOT, file)}: asks for a proprietary font: ${match[1].trim()}`,
+          );
+        }
       }
     }
   }

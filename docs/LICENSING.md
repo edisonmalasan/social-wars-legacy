@@ -154,6 +154,27 @@ Until step 1 is done, this project is a **preservation and study**: the
 code is free, the analysis is published, and the game itself is not
 distributed.
 
+## How the position is checked
+
+`node scripts/check-licensing.mjs` checks the claims above, and it is
+in the CI:
+
+- the vendored upstream's licence **is** the GPL v3;
+- **no package imports from the upstream** — so the shipped product is
+  not a derivative work of it;
+- the shipped tree carries **no SWF, no sound** and **none of the
+  client's proprietary fonts**.
+
+The font check is precise about what it forbids. The **identifier** the
+client uses for a face — `ArialRoundedBold`, `KomikaAxis` — is not the
+face: the client has to know the original's name to map it to a
+substitute. What must not appear is a proprietary face being *asked for*,
+so the check looks for a `font-family` that names one, and for a file
+that *is* one.
+
+The check is proven to fire: it fails on a stylesheet that asks for
+Arial Rounded MT Bold, and on a `.swf` in a shipped tree.
+
 ## A note on what this document is not
 
 It is not legal advice, and it does not make the position safe in every
