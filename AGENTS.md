@@ -85,6 +85,7 @@ desktop shells do not — they land with Groups F, G and H.**
 | Catalogue the images and sounds | `node scripts/build-asset-manifest.mjs` | Working | Group D |
 | Extract and measure the client fonts | `node scripts/extract-fonts.mjs` | Working | Group D |
 | Check the golden-master corpus | `node scripts/golden-master.mjs` | Working | Group E4 — fails on any difference |
+| Run the cheat battery             | `node scripts/run-cheat-battery.mjs` | Working | Group I — the release gate |
 | Check the roadmap's item counts    | `node scripts/check-roadmap.mjs`  | Working | Group I — fails if a group lost an item |
 | Run the schema migrations        | `node scripts/migrate.mjs --data <dir>` | Working | Group F — `--status` and `--rollback` too |
 | Soak the server | `node --expose-gc scripts/soak-server.mjs` | Working | Group F4 — no memory growth, no state drift |

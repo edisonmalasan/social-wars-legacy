@@ -16,6 +16,7 @@ import {
 } from '@swl/server';
 
 import { createApp, type AppOptions, type AppRequest } from './app.ts';
+import { DEFAULT_LIMITS } from './limits.ts';
 import { MemoryPlayerStore } from '@swl/server';
 import { LegacyIdentityBridge, SessionStore } from '@swl/server';
 import { costContentFrom } from '@swl/rules';
@@ -270,5 +271,70 @@ describe('the application', () => {
       body: '',
     });
     assert.equal(response.status, 405);
+  });
+});
+
+describe('the rate limit', () => {
+  /** An application with a tiny limit, so the limit is reached quickly. */
+  async function limited(): Promise<(request: AppRequest) => Promise<{ status: number }>> {
+    const sessions = new SessionStore();
+    sessions.addPlayer('p1', 'correct horse');
+    const identity = new LegacyIdentityBridge();
+    const store = new MemoryPlayerStore([]);
+    const bundle = JSON.parse(
+      await readFile(
+        path.join(repoRoot(), 'packages/content/dist/content-bundle.json'),
+        'utf8',
+      ),
+    ) as Parameters<typeof costContentFrom>[0];
+
+    return createApp({
+      store,
+      sessions,
+      identity,
+      content: costContentFrom(bundle),
+      contentBundle: bundle,
+      now: () => 1_700_000_000,
+      nowMs: () => 1_700_000_000_000,
+      applyCommand: (world, command) => ({ applied: true, world }),
+      limits: {
+        ...DEFAULT_LIMITS,
+        requestsPerWindow: 2,
+        windowSeconds: 60,
+      },
+    });
+  }
+
+  it('refuses the mutating endpoints once the limit is reached', async () => {
+    const handle = await limited();
+
+    const mutating = [
+      { method: 'POST', path: '/api/command', body: '{}' },
+      { method: 'POST', path: '/command.php', body: '' },
+      { method: 'POST', path: '/api/session', body: '{}' },
+    ];
+
+    for (const request of mutating) {
+      // A fresh application per endpoint, so each one has the whole
+      // limit to itself.
+      const fresh = await limited();
+      // Two are allowed and the third is refused.
+      for (let attempt = 0; attempt < 2; attempt++) {
+        const response = await fresh({
+          method: request.method,
+          path: request.path,
+          headers: {},
+          body: request.body,
+        });
+        assert.notEqual(response.status, 429, `${request.path} was rate-limited too early`);
+      }
+      const refused = await fresh({
+        method: request.method,
+        path: request.path,
+        headers: {},
+        body: request.body,
+      });
+      assert.equal(refused.status, 429, `${request.path} was not rate-limited`);
+    }
   });
 });

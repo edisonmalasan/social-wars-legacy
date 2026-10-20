@@ -67,6 +67,12 @@ jobs:
       - name: The golden-master corpus
         run: node scripts/golden-master.mjs
 
+      # The gate. The battery is the server's own check that it does not
+      # trust the client: eleven attacks, each run against the real
+      # authority layer, each of which must have no effect.
+      - name: The cheat battery
+        run: node scripts/run-cheat-battery.mjs
+
       - name: The soak test
         run: node --expose-gc scripts/soak-server.mjs --batches 2000 --players 4
 
