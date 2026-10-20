@@ -9,6 +9,8 @@
  * The state lives in one table with a `kind` column, so the social
  * subsystem is a single row per kind rather than a table per service.
  */
+import { SCHEMA_MIGRATIONS, SOCIAL_TABLE } from './schema.ts';
+import { runMigrations } from './migrations.ts';
 import type { Database } from './pgstore.ts';
 import type { Alliance } from './alliance.ts';
 
@@ -31,15 +33,28 @@ export class SocialStore {
     this.table = options.table ?? 'social';
   }
 
-  /** Create the table if it is not there. */
+  /**
+   * Bring the schema up to date, and make sure the table is there.
+   *
+   * The schema is **versioned**: the table is created by a migration
+   * rather than by a `CREATE TABLE IF NOT EXISTS` here, so the schema's
+   * history says what happened to it.
+   *
+   * A store that was given a different table name is a customisation, so
+   * it creates that table itself.
+   */
   async init(): Promise<void> {
-    await this.db.exec(`
-      CREATE TABLE IF NOT EXISTS ${this.table} (
-        kind TEXT PRIMARY KEY,
-        doc  JSONB NOT NULL,
-        updated TIMESTAMPTZ NOT NULL DEFAULT now()
-      )
-    `);
+    if (this.table === SOCIAL_TABLE) {
+      await runMigrations(this.db, SCHEMA_MIGRATIONS);
+    } else {
+      await this.db.exec(`
+        CREATE TABLE IF NOT EXISTS ${this.table} (
+          kind TEXT PRIMARY KEY,
+          doc  JSONB NOT NULL,
+          updated TIMESTAMPTZ NOT NULL DEFAULT now()
+        )
+      `);
+    }
   }
 
   /** Read one kind's document. */

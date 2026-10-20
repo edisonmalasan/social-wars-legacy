@@ -832,13 +832,20 @@ protocol and the original dialect.*
       **wired into the store**: an upstream save is imported verbatim and migrated when
       it is read, and a save from a version this server does not understand is
       **refused** rather than guessed at
-- [ ] Schema migrations are forward-only, reversible where safe, and run as part of deploy
-- [x] A backup and restore procedure exists and has been **exercised against a real
-      snapshot** — the database is a directory in the offline mode, so a backup is a copy
-      of it and a restore is opening the copy (\packages/server/src/backup.ts\,
-      \scripts/backup-server.mjs\). The tests write a database, back it up, change the
-      live database, restore the snapshot and check that the snapshot still holds the
-      OLD state, and a digest of the tables is what proves the two match
+- [x] Schema migrations are **forward-only**, **reversible where safe**, and **run as part
+      of deploy**. The schema is **versioned** (`packages/server/src/schema.ts`): the
+      stores created their tables with `CREATE TABLE IF NOT EXISTS`, which can only ever
+      add a table and says nothing about what happened to the ones that were already
+      there — a column a new server needs would be added by hand, and the hand-added
+      column would be in no migration's history. Now every change is a migration, each of
+      which moves the schema one version forward, is recorded in the database, and may
+      declare a `down`. A migration that cannot be undone safely declares no `down`, and
+      the runner **refuses** to roll it back rather than pretending it can
+- [x] The migrations **run as part of deploy**: `node scripts/migrate.mjs --data <dir>`
+      brings the schema forward, `--status` says what version it is at, and `--rollback`
+      undoes what can be undone. The server itself runs them **before it serves**, so a
+      deploy cannot start a server against a schema it does not understand, and it keeps
+      its saves in the database when `SWL_DATA_DIR` names one
 
 ### F4 - Robustness
 

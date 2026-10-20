@@ -1,4 +1,4 @@
-﻿export * from './session.ts';
+export * from './session.ts';
 export * from './shim.ts';
 export * from './apply.ts';
 export * from './store.ts';
@@ -7,3 +7,5 @@ export * from './marketplace.ts';
 export * from './migrations.ts';
 export * from './backup.ts';
 export * from './socialstore.ts';
+export * from './pgstore.ts';
+export * from './schema.ts';
