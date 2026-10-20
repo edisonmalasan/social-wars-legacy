@@ -1205,7 +1205,18 @@ product.*
       corpus matches with no unexplained difference. The harness fails on any
       difference it cannot explain, so a release cannot carry a rules change nobody
       noticed
-- [ ] Integration tests cover the full command surface against a real database
+- [x] **Integration tests cover the full command surface against a real database**
+      (`apps/server/src/command-surface.test.ts`). Every one of the **94** commands in
+      the table is sent through the HTTP endpoint, over a **PGlite** database, with a
+      session, and the test asserts that:
+      - no command answers with a **5xx**: a command the server cannot make sense of is
+        a typed refusal, not a crash
+      - every refusal **says why**
+      - the commands whose argument shape the protocol knows reach the **applier** -
+        and most of them do, so the test is testing something
+      - the player's save is still **readable** after every command
+- [x] The arguments come from each command's **own specification** in the table, so
+      the test cannot drift from the catalogue
 - [ ] End-to-end tests drive the web client through a complete play session
 - [ ] A load test sustains the target concurrency with correct simulation timing
 - [ ] Test coverage is measured and a threshold is enforced
@@ -1222,7 +1233,9 @@ product.*
       manifest agrees with the tree in **both directions**
 - [ ] A real linter is configured. `pnpm lint` is currently the type-check, so the
       lint step in CI is the type-check wearing a different name
-- [ ] Every pull request runs the golden-master harness
+- [x] **Every pull request runs the golden-master harness.** The CI runs on every push
+      and every pull request, and the golden-master corpus is one of its steps - and
+      the harness fails on any difference it cannot explain
 - [ ] Branches are protected and require a green run plus review
 - [ ] Release artefacts are produced automatically and published to a release
 - [ ] The pipeline is reproducible and re-running it yields the same artefacts
