@@ -900,10 +900,16 @@ assault against the new server, and the cheat battery is fully rejected.
 ### G2 - Interaction
 
 - [x] Selection, movement, building placement, training queues, collecting and upgrading
-      all work through the command API — the **client's request builders**
+      all work through the command API - the **client's request builders**
       (`packages/client/src/requests.ts`) cover all of them, and a test checks every
       builder's **arity against the command table**, which is the authority. A builder
       that drifted from the table would send a request the server refuses
+- [x] The client's **interaction layer** (`packages/client/src/interaction.ts`) turns each
+      gesture into a request: selecting is local, and moving, placing, collecting,
+      training and upgrading all become commands. The client checks what it can — a
+      building still being constructed cannot be moved, and a unit cannot be upgraded —
+      and the server decides everything else. A refusal there is a refusal of the
+      **gesture**, not of the outcome
 - [x] The client **never decides an outcome** — and that is a property of the code's
       *shape*, not a rule the renderer has to remember
       (`packages/client/src/predictions.ts`): the renderer asks the module what to draw,
