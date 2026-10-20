@@ -33,6 +33,14 @@ const ROOT = process.cwd();
 const ASSETS = path.join(ROOT, 'upstream/socialwarriors/assets');
 const BUNDLE = path.join(ROOT, 'packages/content/dist/content-bundle.json');
 const OUT = path.join(ROOT, 're/data/asset-manifest.json');
+/**
+ * The sounds baked into the runtime library.
+ *
+ * `dynamic2.swf` carries 28 of its own - the construction animations'
+ * audio - and they are named nowhere in the config's sound list. The
+ * extractor writes them here.
+ */
+const EMBEDDED_SOUNDS = path.join(ROOT, '.work/sounds');
 
 async function listFiles(dir, ext, base = '') {
   const out = [];
@@ -117,10 +125,41 @@ async function main() {
       path: `sounds/${rel}`,
       bytes: buffer.length,
       sha256: createHash('sha256').update(buffer).digest('hex'),
+      embedded: false,
     });
   }
 
-  console.log(`  ${images.length} images, ${sounds.length} sounds`);
+  // The sounds baked into the runtime library. They are part of the audio
+  // set the client loads, so they are listed with it - marked as embedded,
+  // because their bytes live in a SWF rather than in a standalone file.
+  let embeddedSounds = 0;
+  for (const rel of await listFiles(EMBEDDED_SOUNDS, '.mp3')) {
+    const buffer = await readFile(path.join(EMBEDDED_SOUNDS, rel));
+    sounds.push({
+      path: `embedded/${rel}`,
+      bytes: buffer.length,
+      sha256: createHash('sha256').update(buffer).digest('hex'),
+      embedded: true,
+      source: 'swf/dynamic2.swf',
+    });
+    embeddedSounds += 1;
+  }
+  for (const rel of await listFiles(EMBEDDED_SOUNDS, '.wav')) {
+    const buffer = await readFile(path.join(EMBEDDED_SOUNDS, rel));
+    sounds.push({
+      path: `embedded/${rel}`,
+      bytes: buffer.length,
+      sha256: createHash('sha256').update(buffer).digest('hex'),
+      embedded: true,
+      source: 'swf/dynamic2.swf',
+    });
+    embeddedSounds += 1;
+  }
+
+  console.log(
+    `  ${images.length} images, ${sounds.length} sounds ` +
+      `(${embeddedSounds} embedded in the runtime library)`,
+  );
 
   // 2. The sprite names that exist, for the items' img_name.
   const spriteNames = new Set();
