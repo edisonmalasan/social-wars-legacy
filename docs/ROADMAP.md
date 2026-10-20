@@ -630,7 +630,23 @@ protocol and the original dialect.*
 - [x] `flash_debug` does not exist in the server (F4) — it is not in the priced command
       list, and the shim **refuses it outright** rather than pricing it at zero
 - [x] Combat outcomes are re-simulated server-side (F5) — `packages/rules/src/authority.ts`
-      resolves the hit from a server-issued seed
+      resolves the hit from a server-issued seed, and
+      `packages/rules/src/simulate.ts` simulates the **whole battle**: the 30 fps
+      cadence with each unit's random phase, the buildings' lockstep fire, the
+      targeting, the damage pipeline and the casualties. The distance metric is the
+      client's own (`IsoEngine.distance`): the euclidean distance between the
+      **centres**, offset by half the footprint and **truncated to an integer**
+- [x] The **assault loot** is computed by the server (`packages/rules/src/loot.ts`): the
+      gold comes from the victim's town hall, at a random 15–35 % of its gold, clamped
+      to the attacker's level band; the XP is 5 % of that, rounded up, and at least 1
+      for anything that is not a wall; and a win with no loot is worth a flat 25 gold.
+      Two client quirks are reproduced rather than "fixed": the client's
+      `MAX_GOLD_ASSAULT` cap **is not in the config's globals at all**, so the cap it
+      was meant to enforce never fires, and the band table has two rows at level 80,
+      which makes its 22 500 row unreachable
+- [x] The server's own `end_attack` grants the loot the **simulation** says
+      (`packages/server/src/apply.ts`); the client's claimed battle result is parsed
+      only so it can be compared, and a claim of a million gold changes nothing
 - [x] Goal completion is evaluated server-side — the 134 goals and the 5-goal window are
       implemented in `packages/rules/src/goals.ts`, and the reward is granted once by the
       server rather than trusted from the client's `complete_goal`

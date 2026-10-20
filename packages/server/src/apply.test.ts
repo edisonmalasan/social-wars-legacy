@@ -301,6 +301,127 @@ describe('the commands whose cost the server computes', () => {
   });
 });
 
+describe('the server own answer to a finished battle', () => {
+  it('refuses the claim when there is no server simulation', () => {
+    const applier = createApplier(deps());
+    const world = worldWithBuilding({});
+    const outcome = applier(world, {
+      name: 'end_attack',
+      args: [JSON.stringify({ win: 1, resources: { g: 100000 } }), '0'],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'not-implemented');
+    assert.equal(outcome.world.resources['g'], 0);
+  });
+
+  it('grants the loot the server simulation says, not the client claim', () => {
+    const applier = createApplier(
+      deps({
+        resolveBattle: () => ({
+          won: true,
+          victimTownHallGold: 1000,
+          victimLevel: 12,
+          attackerLevel: 40,
+          conquest: false,
+          xp: 50,
+        }),
+      }),
+    );
+    const world = worldWithBuilding({}, { resources: wallet(0) });
+    // The client claims a million gold and a win.
+    const outcome = applier(world, {
+      name: 'end_attack',
+      args: [JSON.stringify({ win: 1, resources: { g: 1000000, x: 999 } }), '0'],
+    });
+    assert.equal(outcome.applied, true);
+    // The server's own loot: 15 to 35 per cent of 1000, capped at the
+    // level-40 band of 10000, so between 150 and 350.
+    assert.ok(outcome.world.resources['g']! >= 150, `gold was ${outcome.world.resources['g']}`);
+    assert.ok(outcome.world.resources['g']! <= 350, `gold was ${outcome.world.resources['g']}`);
+    // The XP is the server's own, not the client's.
+    assert.equal(outcome.world.resources['x'], 50);
+  });
+
+  it('grants nothing when the server simulation says the attack was lost', () => {
+    const applier = createApplier(
+      deps({
+        resolveBattle: () => ({
+          won: false,
+          victimTownHallGold: 1000,
+          victimLevel: 12,
+          attackerLevel: 40,
+          conquest: false,
+          xp: 0,
+        }),
+      }),
+    );
+    const world = worldWithBuilding({}, { resources: wallet(0) });
+    const outcome = applier(world, {
+      name: 'end_attack',
+      args: [JSON.stringify({ win: 1, resources: { g: 1000000 } }), '0'],
+    });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['g'], 0);
+    assert.equal(outcome.world.resources['x'], 0);
+    assert.equal(outcome.world.save.privateState['lastAssaultWon'], false);
+  });
+
+  it('gives a conquest its fixed gold', () => {
+    const applier = createApplier(
+      deps({
+        resolveBattle: () => ({
+          won: true,
+          victimTownHallGold: 0,
+          victimLevel: 12,
+          attackerLevel: 40,
+          conquest: true,
+          xp: 5,
+        }),
+      }),
+    );
+    const world = worldWithBuilding({}, { resources: wallet(0) });
+    const outcome = applier(world, { name: 'end_attack', args: ['{}'] });
+    // The victim's level times 100.
+    assert.equal(outcome.world.resources['g'], 1200);
+  });
+
+  it('gives a win with no loot a flat 25 gold', () => {
+    const applier = createApplier(
+      deps({
+        resolveBattle: () => ({
+          won: true,
+          victimTownHallGold: 0,
+          victimLevel: 12,
+          attackerLevel: 40,
+          conquest: false,
+          xp: 1,
+        }),
+      }),
+    );
+    const world = worldWithBuilding({}, { resources: wallet(0) });
+    const outcome = applier(world, { name: 'end_attack', args: ['{}'] });
+    assert.equal(outcome.world.resources['g'], 25);
+  });
+
+  it('survives a malformed claim', () => {
+    const applier = createApplier(
+      deps({
+        resolveBattle: () => ({
+          won: true,
+          victimTownHallGold: 100,
+          victimLevel: 12,
+          attackerLevel: 10,
+          conquest: false,
+          xp: 1,
+        }),
+      }),
+    );
+    const world = worldWithBuilding({}, { resources: wallet(0) });
+    const outcome = applier(world, { name: 'end_attack', args: ['not json'] });
+    assert.equal(outcome.applied, true);
+  });
+});
+
 describe('the claims the server does not honour', () => {
   it('refuses a claimed end_attack', () => {
     const applier = createApplier(deps());

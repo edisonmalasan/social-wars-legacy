@@ -31,6 +31,7 @@
  * Those live in the item's own attribute bag and in `privateState`, under the
  * names this module defines. A migration adds them to an upstream save.
  */
+import { Random, hashSeed } from '@swl/rules';
 import {
   awardGoal,
   createGoalState,
@@ -39,6 +40,9 @@ import {
   collect as collectProduction,
   awardQuest,
   emptyQuestProgress,
+  assaultLoot,
+  conquestGold,
+  stolenGold,
   speedUpCost,
   type CollectPeriods,
   type DailyBonusRules,
@@ -105,6 +109,36 @@ export const GOAL_STATE_KEY = 'goalState';
 /** The private-state key the quest progress uses. */
 export const QUEST_PROGRESS_KEY = 'questProgress';
 
+/**
+ * What the server's own simulation of an attack says.
+ *
+ * The client sends its own battle result with the `end_attack` command, and
+ * the upstream believes it (finding F5). The server's answer comes from
+ * `simulateBattle`, and the client's claim is only ever *compared* with it.
+ */
+export interface BattleResolution {
+  /** Did the attackers win, by the server's own simulation? */
+  won: boolean;
+  /** The victim's town hall gold, which the loot percentage applies to. */
+  victimTownHallGold: number;
+  /** The victim's level, which a conquest's fixed gold is based on. */
+  victimLevel: number;
+  /** The attacker's level, which sets the gold band. */
+  attackerLevel: number;
+  /** Whether the attack was a conquest. */
+  conquest: boolean;
+  /** The XP the kills are worth. */
+  xp: number;
+}
+
+/**
+ * Resolves an attack from the server's own state.
+ *
+ * The claim is the client's battle result, and it is passed in only so the
+ * server can compare it. Nothing reads it to decide anything.
+ */
+export type BattleResolver = (world: ShimWorld, claim: unknown) => BattleResolution;
+
 /** What the applier needs. */
 export interface ApplierDeps {
   /** The clock, in seconds. */
@@ -123,6 +157,8 @@ export interface ApplierDeps {
   speedup?: { minRemainingMs: number; cost: number };
   /** The discount the reactivate-a-wonder price carries. */
   reactivateWonderDiscount?: number;
+  /** Resolves an attack from the server's own simulation. */
+  resolveBattle?: BattleResolver;
 }
 
 /** The map's items, keyed by iso id. */
@@ -200,6 +236,7 @@ export function createApplier(deps: ApplierDeps): CommandApplier {
       case 'finish_building':
         return finishBuildingCommand(world, command.args, deps);
       case 'end_attack':
+        return endAttackCommand(world, command.args, deps);
       case 'end_quest':
         // The client may claim a win. The server does not listen: these are
         // resolved from the server's own state by the battle and quest
@@ -210,6 +247,73 @@ export function createApplier(deps: ApplierDeps): CommandApplier {
         return { applied: false, refused: 'no-grant', world };
     }
   };
+}
+
+/**
+ * `end_attack` - the server's own answer to a finished battle.
+ *
+ * The client sends the whole battle result and the upstream believes it.
+ * The server re-simulates the fight from its own seed and computes the
+ * loot itself; the client's claim is only compared, never obeyed.
+ *
+ * The loot rules are the client's (core/battle/Assault.as): the gold
+ * comes from the victim's town hall, the XP is 5 per cent of it, and a
+ * win with no loot is worth a flat 25 gold.
+ */
+function endAttackCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  if (!deps.resolveBattle) {
+    // Without the server's own simulation there is no honest answer, and
+    // honouring the client's claim would be the cheat.
+    return { applied: false, refused: 'not-implemented', world };
+  }
+
+  // The client's claim, parsed only so it can be compared.
+  let claim: unknown = null;
+  const raw = args[0];
+  if (typeof raw === 'string') {
+    try {
+      claim = JSON.parse(raw) as unknown;
+    } catch {
+      claim = null;
+    }
+  }
+
+  const resolution = deps.resolveBattle(world, claim);
+
+  // A conquest takes the victim's level times 100
+  // (core/battle/Assault.as:252-254).
+  const townHallGold = resolution.conquest
+    ? conquestGold(resolution.victimLevel)
+    : stolenGold(
+        resolution.victimTownHallGold,
+        resolution.attackerLevel,
+        new Random(hashSeed(`${resolution.attackerLevel}:${resolution.victimTownHallGold}`)),
+      );
+
+  const loot = assaultLoot({
+    won: resolution.won,
+    townHallGold,
+    xp: resolution.xp,
+    attackerLevel: resolution.attackerLevel,
+  });
+
+  world.save.privateState['lastAssaultWon'] = resolution.won;
+
+  if (!resolution.won) {
+    // A loss earns nothing, but the attack is over.
+    return { applied: true, world };
+  }
+
+  world.resources = {
+    ...world.resources,
+    g: (world.resources['g'] ?? 0) + loot.gold,
+    x: (world.resources['x'] ?? 0) + loot.xp,
+  };
+  return { applied: true, world };
 }
 
 /** `collect` — the server computes the amount. */
