@@ -47,6 +47,11 @@ function wallet(cash: number): ShimWorld['resources'] {
   return { g: 0, w: 0, o: 0, s: 0, c: cash, e: 100, x: 0, m: 0 };
 }
 
+/** A wallet with the given resources. */
+function purse(resources: Partial<ShimWorld['resources']>): ShimWorld['resources'] {
+  return { g: 0, w: 0, o: 0, s: 0, c: 0, e: 100, x: 0, m: 0, ...resources };
+}
+
 /** A complete content item, for the applier. */
 function item(over: Partial<ApplierItem> = {}): ApplierItem {
   return {
@@ -65,6 +70,9 @@ function item(over: Partial<ApplierItem> = {}): ApplierItem {
     subcategoryId: 31,
     width: 1,
     height: 1,
+    trainsIds: [],
+    upgradesTo: null,
+    premiumUpgradeCosts: {},
     ...over,
   };
 }
@@ -450,6 +458,266 @@ describe('the commands whose cost the server computes', () => {
     assert.equal(outcome.applied, false);
     assert.equal(outcome.refused, 'too-late-to-speed-up');
     assert.equal(outcome.world.resources['c'], 1000);
+  });
+});
+
+describe('the training queue', () => {
+  const academy = () => item({ id: 30, trainsIds: [1007], trainingTime: 60 });
+  const soldier = () =>
+    item({ id: 1007, name: 'Soldier', costs: { g: 30, s: 60 }, trainingTime: 60 });
+
+  it('starts training a unit and charges for it', () => {
+    const applier = createApplier(
+      deps({
+        items: new Map([
+          [30, academy()],
+          [1007, soldier()],
+        ]),
+      }),
+    );
+    const world = worldWithBuilding({}, { resources: purse({ g: 1000, s: 1000 }) });
+    const outcome = applier(world, { name: 'push_queue_unit', args: ['7'] });
+    assert.equal(outcome.applied, true);
+    // The Soldier costs 30 gold and 60 steel.
+    assert.equal(outcome.world.resources['g'], 1000 - 30);
+    assert.equal(outcome.world.resources['s'], 1000 - 60);
+    // The queue holds one unit, and it started now.
+    const attrs = mapItems(outcome.world.save.maps[0] as Record<string, unknown>)[
+      '7'
+    ]![6] as Record<string, unknown>;
+    assert.equal(attrs['nu'], 1);
+    assert.equal(attrs['ts'], NOW);
+    assert.equal(attrs['ui'], 1007);
+  });
+
+  it('refuses a training the player cannot afford', () => {
+    const applier = createApplier(
+      deps({
+        items: new Map([
+          [30, academy()],
+          [1007, soldier()],
+        ]),
+      }),
+    );
+    const world = worldWithBuilding({}, { resources: wallet(0) });
+    const outcome = applier(world, { name: 'push_queue_unit', args: ['7'] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'insufficient-resources');
+  });
+
+  it('refuses a building that trains nothing', () => {
+    const applier = createApplier(deps({ items: new Map([[30, item()]]) }));
+    const world = worldWithBuilding({});
+    const outcome = applier(world, { name: 'push_queue_unit', args: ['7'] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'nothing-to-train');
+  });
+
+  it('trains the unit the client names', () => {
+    const applier = createApplier(
+      deps({
+        items: new Map([
+          [30, academy()],
+          [1007, soldier()],
+          [1008, item({ id: 1008, name: 'Worker', costs: { g: 10 }, trainingTime: 30 })],
+        ]),
+      }),
+    );
+    const world = worldWithBuilding({}, { resources: purse({ g: 1000, s: 1000 }) });
+    const outcome = applier(world, { name: 'push_queue_unit2', args: ['7', 1008] });
+    assert.equal(outcome.applied, true);
+    const attrs = mapItems(outcome.world.save.maps[0] as Record<string, unknown>)[
+      '7'
+    ]![6] as Record<string, unknown>;
+    assert.equal(attrs['ui'], 1008);
+    assert.equal(outcome.world.resources['g'], 1000 - 10);
+  });
+
+  it('refuses to pop a unit that is still training', () => {
+    const applier = createApplier(
+      deps({
+        items: new Map([
+          [30, academy()],
+          [1007, soldier()],
+        ]),
+      }),
+    );
+    const world = worldWithBuilding({}, { resources: purse({ g: 1000, s: 1000 }) });
+    const queued = applier(world, { name: 'push_queue_unit', args: ['7'] });
+    const popped = applier(queued.world, { name: 'pop_queue_unit', args: ['7'] });
+    assert.equal(popped.applied, false);
+    assert.equal(popped.refused, 'still-training');
+  });
+
+  it('pops a unit that has finished training', () => {
+    const applier = createApplier(
+      deps({
+        items: new Map([
+          [30, academy()],
+          [1007, soldier()],
+        ]),
+        now: () => NOW + 120,
+      }),
+    );
+    const world = worldWithBuilding({}, { resources: purse({ g: 1000, s: 1000 }) });
+    const queued = applier(world, { name: 'push_queue_unit', args: ['7'] });
+    // Two minutes later the unit is done.
+    const later = { ...queued.world };
+    const attrs = mapItems(later.save.maps[0] as Record<string, unknown>)[
+      '7'
+    ]![6] as Record<string, unknown>;
+    attrs['ts'] = NOW - 120;
+    const popped = applier(later, { name: 'pop_queue_unit', args: ['7'] });
+    assert.equal(popped.applied, true);
+    const after = mapItems(popped.world.save.maps[0] as Record<string, unknown>)[
+      '7'
+    ]![6] as Record<string, unknown>;
+    assert.equal(after['nu'], undefined);
+    assert.equal(after['ts'], undefined);
+  });
+
+  it('keeps the rest of the queue waiting', () => {
+    const applier = createApplier(
+      deps({
+        items: new Map([
+          [30, academy()],
+          [1007, soldier()],
+        ]),
+      }),
+    );
+    const world = worldWithBuilding({}, { resources: purse({ g: 1000, s: 1000 }) });
+    const first = applier(world, { name: 'push_queue_unit', args: ['7'] });
+    const second = applier(first.world, { name: 'push_queue_unit', args: ['7'] });
+    const attrs = mapItems(second.world.save.maps[0] as Record<string, unknown>)[
+      '7'
+    ]![6] as Record<string, unknown>;
+    assert.equal(attrs['nu'], 2);
+    // The first unit is still the one training.
+    assert.equal(attrs['ts'], NOW);
+  });
+
+  it('refuses to pop an empty queue', () => {
+    const applier = createApplier(deps({ items: new Map([[30, academy()]]) }));
+    const world = worldWithBuilding({});
+    const outcome = applier(world, { name: 'pop_queue_unit', args: ['7'] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'queue-empty');
+  });
+});
+
+describe('levelling the player up', () => {
+  const levels = [
+    { index: 0, exp_required: 0, reward_amount: 50, reward_type: 's' },
+    { index: 1, exp_required: 40, reward_amount: 250, reward_type: 'w' },
+    { index: 2, exp_required: 60, reward_amount: 250, reward_type: 's' },
+  ];
+
+  it('raises the level and grants the reward', () => {
+    const applier = createApplier(deps({ levels }));
+    const world = worldWithBuilding({});
+    const map = world.save.maps[0] as Record<string, unknown>;
+    map['level'] = 0;
+    map['xp'] = 100;
+    const outcome = applier(world, { name: 'level_up', args: [1] });
+    assert.equal(outcome.applied, true);
+    assert.equal(map['level'], 1);
+    // The reward for level 1 is 250 wood.
+    assert.equal(outcome.world.resources['w'], 250);
+  });
+
+  it('refuses a level the player has not the XP for', () => {
+    const applier = createApplier(deps({ levels }));
+    const world = worldWithBuilding({});
+    const map = world.save.maps[0] as Record<string, unknown>;
+    map['level'] = 0;
+    map['xp'] = 10;
+    const outcome = applier(world, { name: 'level_up', args: [1] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'not-enough-xp');
+    assert.equal(map['level'], 0);
+  });
+
+  it('refuses a level that is not the next one', () => {
+    const applier = createApplier(deps({ levels }));
+    const world = worldWithBuilding({});
+    const map = world.save.maps[0] as Record<string, unknown>;
+    map['level'] = 0;
+    map['xp'] = 1000;
+    const outcome = applier(world, { name: 'level_up', args: [2] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'not-the-next-level');
+  });
+
+  it('refuses a level that does not exist', () => {
+    const applier = createApplier(deps({ levels }));
+    const world = worldWithBuilding({});
+    const outcome = applier(world, { name: 'level_up', args: [99] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-such-level');
+  });
+});
+
+describe('upgrading a building', () => {
+  it('replaces it with the next tier and charges the difference', () => {
+    const applier = createApplier(
+      deps({
+        items: new Map([
+          [30, item({ id: 30, costs: { w: 125 }, upgradesTo: 41 })],
+          [41, item({ id: 41, costs: { w: 300 }, width: 2, height: 2 })],
+        ]),
+      }),
+    );
+    const world = worldWithBuilding({}, { resources: purse({ w: 1000 }) });
+    const outcome = applier(world, { name: 'upgrade', args: ['7'] });
+    assert.equal(outcome.applied, true);
+    // 300 wood for the new tier, less a twentieth of the old one's 125.
+    assert.equal(outcome.world.resources['w'], 1000 - 300 + Math.floor(125 / 20));
+    const tuple = mapItems(outcome.world.save.maps[0] as Record<string, unknown>)['7']!;
+    assert.equal(tuple[0], 41);
+  });
+
+  it('refuses a building with no next tier', () => {
+    const applier = createApplier(deps({ items: new Map([[30, item({ id: 30 })]]) }));
+    const world = worldWithBuilding({});
+    const outcome = applier(world, { name: 'upgrade', args: ['7'] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-upgrade');
+  });
+
+  it('refuses an upgrade the player cannot afford', () => {
+    const applier = createApplier(
+      deps({
+        items: new Map([
+          [30, item({ id: 30, costs: { w: 125 }, upgradesTo: 41 })],
+          [41, item({ id: 41, costs: { w: 300 } })],
+        ]),
+      }),
+    );
+    const world = worldWithBuilding({}, { resources: wallet(0) });
+    const outcome = applier(world, { name: 'upgrade', args: ['7'] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'insufficient-resources');
+  });
+
+  it('refuses an upgrade that would not fit', () => {
+    const applier = createApplier(
+      deps({
+        items: new Map([
+          [30, item({ id: 30, upgradesTo: 41 })],
+          [41, item({ id: 41, width: 3, height: 3 })],
+        ]),
+      }),
+    );
+    // The building to upgrade is at (0, 0) and is one tile square. A
+    // three-tile-square building already stands at (2, 2), so the upgrade
+    // would overlap it. The old building's own tiles are free for its own
+    // upgrade, but the neighbour's are not.
+    const world = worldWithBuilding({ width: 1, height: 1 });
+    const items = mapItems(world.save.maps[0] as Record<string, unknown>);
+    items['9'] = [30, 2, 2, 0, 0, [], { width: 1, height: 1 }, 1];
+    const outcome = applier(world, { name: 'upgrade', args: ['7'] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-free-tile');
   });
 });
 

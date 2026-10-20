@@ -40,8 +40,11 @@ import {
   collect as collectProduction,
   awardQuest,
   emptyQuestProgress,
+  applyCommandCost,
   assaultLoot,
   canPlaceBuilding,
+  canUpgrade,
+  upgradeCost,
   conquestGold,
   stolenGold,
   speedUpCost,
@@ -169,6 +172,12 @@ export interface ApplierItem {
   /** The footprint, in tiles. */
   width: number;
   height: number;
+  /** The units this building can train. */
+  trainsIds: number[];
+  /** The next tier, if any. */
+  upgradesTo: number | null;
+  /** The cash cost of a premium upgrade to this item, if it has one. */
+  premiumUpgradeCosts: Record<string, number>;
 }
 
 /** What the applier needs. */
@@ -197,6 +206,8 @@ export interface ApplierDeps {
   reactivateWonderDiscount?: number;
   /** Resolves an attack from the server's own simulation. */
   resolveBattle?: BattleResolver;
+  /** The player's level table: the XP each level needs and its reward. */
+  levels?: { index: number; exp_required: number; reward_amount: number; reward_type: string }[];
 }
 
 /** The map's items, keyed by iso id. */
@@ -265,6 +276,15 @@ export function createApplier(deps: ApplierDeps): CommandApplier {
     switch (command.name) {
       case 'place_stored_item':
         return placeCommand(world, command.args, deps);
+      case 'push_queue_unit':
+      case 'push_queue_unit2':
+        return pushQueueUnitCommand(world, command.args, deps);
+      case 'pop_queue_unit':
+        return popQueueUnitCommand(world, command.args, deps);
+      case 'level_up':
+        return levelUpCommand(world, command.args, deps);
+      case 'upgrade':
+        return upgradeCommand(world, command.args, deps);
       case 'buy':
         return buyCommand(world, command.args, deps);
       case 'collect':
@@ -562,6 +582,279 @@ function buyCommand(
   const orientation = Number(args[5] ?? 0);
   const placed = placeBuilding(world, item, tx, ty, orientation, deps);
   if (!placed.ok) return { applied: false, refused: placed.reason, world };
+  return { applied: true, world };
+}
+
+/**
+ * The training queue of a building.
+ *
+ * The upstream keeps it in the building's attribute bag: `nu` is how many
+ * units are queued, `ts` is when the current one started, and `ui` is
+ * which unit it is.
+ */
+interface TrainingQueue {
+  /** How many units are queued. */
+  queued: number;
+  /** When the current unit started, in seconds. 0 when the queue is empty. */
+  startedAt: number;
+  /** The unit being trained. */
+  unitItemId: number;
+}
+
+/** Read a building's training queue. */
+function readQueue(attrs: Record<string, unknown>): TrainingQueue {
+  const queued = Number(attrs['nu'] ?? 0);
+  return {
+    queued: Number.isFinite(queued) ? queued : 0,
+    startedAt: Number(attrs['ts'] ?? 0),
+    unitItemId: Number(attrs['ui'] ?? 0),
+  };
+}
+
+/** Write a building's training queue back. */
+function writeQueue(attrs: Record<string, unknown>, queue: TrainingQueue): void {
+  if (queue.queued > 0) {
+    attrs['nu'] = queue.queued;
+    attrs['ts'] = queue.startedAt;
+    attrs['ui'] = queue.unitItemId;
+  } else {
+    delete attrs['nu'];
+    delete attrs['ts'];
+    delete attrs['ui'];
+  }
+}
+
+/**
+ * `push_queue_unit` and `push_queue_unit2` - start training a unit.
+ *
+ * The cost is the trained unit's own cost plus the building's cash price
+ * for a unit. The client declares both; the server computes them.
+ */
+function pushQueueUnitCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const isoId = String(args[0] ?? '');
+  const tuple = mapItems(ownMap(world))[isoId];
+  if (!tuple) return { applied: false, refused: 'unknown-building', world };
+  const buildingId = tuple[0];
+  if (typeof buildingId !== 'number') {
+    return { applied: false, refused: 'unknown-building', world };
+  }
+  const building = deps.items?.get(buildingId);
+  if (!building) return { applied: false, refused: 'unknown-building', world };
+
+  // The unit being trained: the one the client named, or the building's
+  // first.
+  const named = Number(args[1]);
+  const unitId =
+    Number.isFinite(named) && named > 0 ? named : building.trainsIds[0] ?? 0;
+  if (!unitId) return { applied: false, refused: 'nothing-to-train', world };
+  const unit = deps.items?.get(unitId);
+  if (!unit) return { applied: false, refused: 'unknown-item', world };
+
+  // The cost: the unit's own, plus the building's cash price for a unit.
+  const cost: Record<string, number> = { ...unit.costs };
+  if (building.costUnitCash > 0) {
+    cost['c'] = (cost['c'] ?? 0) + building.costUnitCash;
+  }
+  const settled = applyCommandCost(world.resources, { cost, gain: {} });
+  if (!settled.ok) {
+    return { applied: false, refused: settled.reason ?? 'insufficient-resources', world };
+  }
+
+  const attrs = (tuple[6] ??= {}) as Record<string, unknown>;
+  const queue = readQueue(attrs);
+  queue.queued += 1;
+  // Only the FIRST unit in the queue is training; the rest wait.
+  if (queue.queued === 1) {
+    queue.startedAt = deps.now();
+    queue.unitItemId = unitId;
+  }
+  writeQueue(attrs, queue);
+
+  world.resources = settled.resources;
+  return { applied: true, world };
+}
+
+/**
+ * `pop_queue_unit` - take the finished unit out of the queue.
+ *
+ * The server checks that the unit is actually finished: the client decides
+ * when to pop, and the upstream does not check at all.
+ */
+function popQueueUnitCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const isoId = String(args[0] ?? '');
+  const tuple = mapItems(ownMap(world))[isoId];
+  if (!tuple) return { applied: false, refused: 'unknown-building', world };
+  const buildingId = tuple[0];
+  if (typeof buildingId !== 'number') {
+    return { applied: false, refused: 'unknown-building', world };
+  }
+  const building = deps.items?.get(buildingId);
+  const attrs = (tuple[6] ??= {}) as Record<string, unknown>;
+  const queue = readQueue(attrs);
+  if (queue.queued <= 0) return { applied: false, refused: 'queue-empty', world };
+
+  // The unit must have finished training.
+  const trained = deps.items?.get(queue.unitItemId);
+  const trainingTime = trained?.trainingTime ?? building?.trainingTime ?? 0;
+  if (deps.now() - queue.startedAt < trainingTime) {
+    return { applied: false, refused: 'still-training', world };
+  }
+
+  queue.queued -= 1;
+  if (queue.queued > 0) {
+    // The next one starts now.
+    queue.startedAt = deps.now();
+  }
+  writeQueue(attrs, queue);
+
+  return { applied: true, world };
+}
+
+/**
+ * `level_up` - the player's level rises.
+ *
+ * The server checks that the player has the XP for the level, and grants
+ * the level's reward from the level table.
+ */
+function levelUpCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const map = ownMap(world);
+  const newLevel = Number(args[0]);
+  if (!Number.isFinite(newLevel)) {
+    return { applied: false, refused: 'bad-argument', world };
+  }
+  const levels = deps.levels ?? [];
+  const row = levels.find((level) => level.index === newLevel);
+  if (!row) return { applied: false, refused: 'no-such-level', world };
+
+  const current = playerLevel(map);
+  if (newLevel !== current + 1) {
+    // The level rises one step at a time.
+    return { applied: false, refused: 'not-the-next-level', world };
+  }
+
+  const xp = Number(map?.['xp'] ?? 0);
+  if (xp < row.exp_required) {
+    return { applied: false, refused: 'not-enough-xp', world };
+  }
+
+  if (map) map['level'] = newLevel;
+  const rewardType = row.reward_type;
+  world.resources = {
+    ...world.resources,
+    [rewardType]: (world.resources[rewardType] ?? 0) + row.reward_amount,
+  };
+  return { applied: true, world };
+}
+
+/**
+ * `upgrade` - replace a building with its next tier.
+ *
+ * The cost is the new building's cost less the refund of the old one
+ * (the rules engine's `upgradeCost`), and the new building must fit on
+ * free tiles.
+ */
+function upgradeCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const isoId = String(args[0] ?? '');
+  const items = mapItems(ownMap(world));
+  const tuple = items[isoId];
+  if (!tuple) return { applied: false, refused: 'unknown-building', world };
+  const oldId = tuple[0];
+  if (typeof oldId !== 'number') {
+    return { applied: false, refused: 'unknown-building', world };
+  }
+  const oldBuilding = deps.items?.get(oldId);
+  if (!oldBuilding) return { applied: false, refused: 'unknown-building', world };
+
+  const newId = oldBuilding.upgradesTo;
+  if (newId === null || newId === undefined) {
+    return { applied: false, refused: 'no-upgrade', world };
+  }
+  const newBuilding = deps.items?.get(newId);
+  if (!newBuilding) return { applied: false, refused: 'unknown-item', world };
+
+  const map = ownMap(world);
+  const level = playerLevel(map);
+  const taken = occupiedTiles(items);
+  // The old building's own tiles are free for the upgrade.
+  for (const tile of coveredTiles(tuple)) {
+    taken.delete(`${tile.x},${tile.y}`);
+  }
+  let hasFreeTile = true;
+  for (let dx = 0; dx < newBuilding.width; dx++) {
+    for (let dy = 0; dy < newBuilding.height; dy++) {
+      if (taken.has(`${Number(tuple[1]) + dx},${Number(tuple[2]) + dy}`)) {
+        hasFreeTile = false;
+      }
+    }
+  }
+  const permitted = canUpgrade(newBuilding, level, hasFreeTile);
+  if (!permitted.ok) {
+    return { applied: false, refused: permitted.reason, world };
+  }
+
+  const cost = upgradeCost(
+    {
+      id: oldBuilding.id,
+      name: oldBuilding.name,
+      costs: oldBuilding.costs,
+      costUnitCash: oldBuilding.costUnitCash,
+      buildTime: oldBuilding.buildTime,
+      trainingTime: oldBuilding.trainingTime,
+      clicksToBuild: oldBuilding.clicksToBuild,
+      minLevel: oldBuilding.minLevel,
+      upgradesTo: oldBuilding.upgradesTo,
+      unitCapacity: oldBuilding.unitCapacity,
+      population: oldBuilding.population,
+      buildingLimitSameId: oldBuilding.buildingLimitSameId,
+      buildingLimitSameScf: oldBuilding.buildingLimitSameScf,
+      premiumUpgradeCosts: oldBuilding.premiumUpgradeCosts,
+    },
+    {
+      id: newBuilding.id,
+      name: newBuilding.name,
+      costs: newBuilding.costs,
+      costUnitCash: newBuilding.costUnitCash,
+      buildTime: newBuilding.buildTime,
+      trainingTime: newBuilding.trainingTime,
+      clicksToBuild: newBuilding.clicksToBuild,
+      minLevel: newBuilding.minLevel,
+      upgradesTo: newBuilding.upgradesTo,
+      unitCapacity: newBuilding.unitCapacity,
+      population: newBuilding.population,
+      buildingLimitSameId: newBuilding.buildingLimitSameId,
+      buildingLimitSameScf: newBuilding.buildingLimitSameScf,
+      premiumUpgradeCosts: newBuilding.premiumUpgradeCosts,
+    },
+  );
+  const settled = applyCommandCost(world.resources, { cost, gain: {} });
+  if (!settled.ok) {
+    return { applied: false, refused: settled.reason ?? 'insufficient-resources', world };
+  }
+
+  // The building becomes the new tier.
+  tuple[0] = newBuilding.id;
+  const attrs = (tuple[6] ??= {}) as Record<string, unknown>;
+  attrs['width'] = newBuilding.width;
+  attrs['height'] = newBuilding.height;
+  attrs['unitCapacity'] = newBuilding.unitCapacity;
+
+  world.resources = settled.resources;
   return { applied: true, world };
 }
 
