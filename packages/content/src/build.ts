@@ -171,9 +171,19 @@ function parseProperties(raw: unknown): Record<string, unknown> {
   if (typeof raw !== 'string' || raw === '') return {};
   try {
     const parsed: unknown = JSON.parse(raw);
-    return parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed)
-      ? (parsed as Record<string, unknown>)
-      : {};
+    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+    // The values are STRINGS too - the config writes `"ft_ground":"1"`, not
+    // `"ft_ground":1`. The client treats them as flags and quantities, so
+    // they are normalised to numbers here.
+    const out: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(parsed as Record<string, unknown>)) {
+      if (typeof value === 'string' && value.trim() !== '' && Number.isFinite(Number(value))) {
+        out[key] = Number(value);
+      } else {
+        out[key] = value;
+      }
+    }
+    return out;
   } catch {
     return {};
   }
@@ -198,6 +208,72 @@ function asArray(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
 }
 
+/**
+ * Parse a JSON object that the config stored as a string.
+ *
+ * The whole item table in `config/main.json` is **stringly-typed**: every
+ * value is a string, and the structured ones are JSON text inside a string.
+ * `costs` is `'{"c":10}'`, `properties` is `'{"ft_ground":1}'`, and
+ * `inventory_ids` is the string `'null'` or a JSON object.
+ *
+ * Getting this wrong is silent: a plain object cast on a string yields
+ * `{}`, so every build cost in the game would simply vanish.
+ */
+function parseJsonObject(raw: unknown): Record<string, number> {
+  if (typeof raw === 'object' && raw !== null && !Array.isArray(raw)) {
+    const out: Record<string, number> = {};
+    for (const [key, value] of Object.entries(raw)) out[key] = asInt(value);
+    return out;
+  }
+  if (typeof raw !== 'string') return {};
+  const trimmed = raw.trim();
+  if (trimmed === '' || trimmed === 'null') return {};
+  try {
+    const parsed: unknown = JSON.parse(trimmed);
+    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+    const out: Record<string, number> = {};
+    for (const [key, value] of Object.entries(parsed as Record<string, unknown>)) {
+      out[key] = asInt(value);
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Parse a single id that the config stored as a string.
+ *
+ * `-1` and `0` both mean "none".
+ */
+function parseId(raw: unknown): number | null {
+  const value = asInt(raw, -1);
+  return value > 0 ? value : null;
+}
+
+/**
+ * Parse the id list a config stored as a string.
+ *
+ * `trains_ids` is a single id (`'1007'`), or `'-1'` for none. It is
+ * occasionally a JSON array.
+ */
+function parseIdList(raw: unknown): number[] {
+  if (Array.isArray(raw)) return raw.map((v) => asInt(v)).filter((v) => v > 0);
+  if (typeof raw === 'string') {
+    const trimmed = raw.trim();
+    if (trimmed.startsWith('[')) {
+      try {
+        const parsed: unknown = JSON.parse(trimmed);
+        if (Array.isArray(parsed)) return parsed.map((v) => asInt(v)).filter((v) => v > 0);
+      } catch {
+        /* fall through to the single-id case */
+      }
+    }
+  }
+  const id = parseId(raw);
+  return id === null ? [] : [id];
+}
+
 /** Normalise one raw config item into the bundle's item shape. */
 function toContentItem(raw: JsonObject): ContentItem {
   const known = new Set([
@@ -205,13 +281,17 @@ function toContentItem(raw: JsonObject): ContentItem {
     'img_name', 'attack', 'defense', 'life', 'attack_range', 'attack_interval',
     'population', 'cost', 'cost_type', 'costs', 'properties', 'best_against',
     'best_against_mult', 'trains_ids', 'upgrades_to', 'unit_capacity',
-    'building_limit_same_id', 'building_limit_same_scf',
+    'building_limit_same_id', 'building_limit_same_scf', 'width', 'height',
+    'min_level', 'build_time', 'clicks_to_build', 'training_time', 'xp',
+    'activation', 'collect', 'collect_type', 'collect_xp', 'max_collects',
+    'group_type', 'race', 'in_store', 'giftable', 'gift_level',
+    'cost_unit_cash', 'volume', 'max_elem_vol', 'inventory_ids',
+    'premium_upgrade_costs',
   ]);
   const extra: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(raw)) {
     if (!known.has(key)) extra[key] = value;
   }
-  const trains = asArray(raw['trains_ids']).map((v) => asInt(v));
   return {
     id: asInt(raw['id']),
     name: asString(raw['name']),
@@ -227,18 +307,41 @@ function toContentItem(raw: JsonObject): ContentItem {
     attack_interval: asInt(raw['attack_interval']),
     population: asInt(raw['population']),
     cost: asInt(raw['cost']),
-    cost_type: asString(raw['cost_type']),
-    costs: asRecord(raw['costs']) as Record<string, number>,
+    cost_type: typeof raw['cost_type'] === 'string' ? raw['cost_type'] : null,
+    costs: parseJsonObject(raw['costs']),
     properties: parseProperties(raw['properties']),
     best_against:
-      typeof raw['best_against'] === 'string' ? (raw['best_against'] as string) : null,
+      typeof raw['best_against'] === 'string' && raw['best_against'] !== ''
+        ? (raw['best_against'] as string)
+        : null,
     best_against_mult: asInt(raw['best_against_mult'], 1),
-    trains_ids: trains,
-    upgrades_to:
-      typeof raw['upgrades_to'] === 'number' ? (raw['upgrades_to'] as number) : null,
+    trains_ids: parseIdList(raw['trains_ids']),
+    upgrades_to: parseId(raw['upgrades_to']),
     unit_capacity: asInt(raw['unit_capacity']),
-    building_limit_same_id: asInt(raw['building_limit_same_id']),
-    building_limit_same_scf: asInt(raw['building_limit_same_scf']),
+    building_limit_same_id: asInt(raw['building_limit_same_id'], -1),
+    building_limit_same_scf: asInt(raw['building_limit_same_scf'], -1),
+    width: asInt(raw['width'], 1),
+    height: asInt(raw['height'], 1),
+    min_level: asInt(raw['min_level']),
+    build_time: asInt(raw['build_time']),
+    clicks_to_build: asInt(raw['clicks_to_build']),
+    training_time: asInt(raw['training_time']),
+    xp: asInt(raw['xp']),
+    activation: asInt(raw['activation']),
+    collect: asInt(raw['collect']),
+    collect_type: asString(raw['collect_type'], 'g'),
+    collect_xp: asInt(raw['collect_xp']),
+    max_collects: asInt(raw['max_collects']),
+    group_type: asString(raw['group_type']),
+    race: asString(raw['race']),
+    in_store: asString(raw['in_store']) === '1',
+    giftable: asString(raw['giftable']) === '1',
+    gift_level: asInt(raw['gift_level']),
+    cost_unit_cash: asInt(raw['cost_unit_cash']),
+    volume: asInt(raw['volume']),
+    max_elem_vol: asInt(raw['max_elem_vol']),
+    inventory_ids: parseJsonObject(raw['inventory_ids']),
+    premium_upgrade_costs: parseJsonObject(raw['premium_upgrade_costs']),
     properties_raw: asString(raw['properties']),
     extra,
   };
