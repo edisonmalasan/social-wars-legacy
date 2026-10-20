@@ -2,3 +2,4 @@
 export * from './atlas.ts';
 export * from './camera.ts';
 export * from './animation.ts';
+export * from './predictions.ts';

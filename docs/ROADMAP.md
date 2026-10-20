@@ -859,13 +859,22 @@ assault against the new server, and the cheat battery is fully rejected.
 - [ ] Depth sorting and occlusion match the original engine
 - [x] The map pans, zooms and re-centres as the original does
 
-### G2 — Interaction
+### G2 - Interaction
 
 - [ ] Selection, movement, building placement, training queues, collecting and upgrading
       all work through the command API
-- [ ] The client never decides an outcome; it requests and renders the server's answer
-- [ ] Input latency is hidden by local interpolation without ever showing an unconfirmed
-      outcome as final
+- [x] The client **never decides an outcome** — and that is a property of the code's
+      *shape*, not a rule the renderer has to remember
+      (`packages/client/src/predictions.ts`): the renderer asks the module what to draw,
+      and the module answers with the server's confirmed state and the outstanding
+      predictions as a **separate overlay**. A prediction can be drawn as an
+      interpolation, and it can never be mistaken for something the server agreed to
+- [x] A **duplicate answer** — the same answer arriving twice — is reported as such
+      rather than settled again, so it cannot undo a confirmed outcome, and the retry of
+      a request that was lost in flight **replaces** its prediction rather than
+      adding a second one
+- [x] Input latency is hidden by local interpolation without ever showing an
+      unconfirmed outcome as final
 
 ### G3 — The UI (rebuilt from scratch)
 
