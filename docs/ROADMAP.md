@@ -1161,6 +1161,15 @@ assault against the new server, and the cheat battery is fully rejected.
 product.*
 
 ### I1 — Testing
+- [x] The **roadmap's item counts are checked**, so an item cannot be silently
+      swallowed. Each group has a **floor** - the number of items it had the last time
+      somebody looked - and a group with fewer items than its floor is a failure
+      (`packages/client/src/roadmap.ts`, `node scripts/check-roadmap.mjs`). The floor is
+      a file, so raising it is a deliberate act rather than a side effect of an edit
+- [x] The floor exists because a block-end rule that ended an item's block at the next
+      **blank line** ate fourteen items across two groups - the items are packed with
+      no blank line between them - and the road was only noticed because the counts
+      were compared. Every item that was ever in the roadmap is back
 
 - [ ] Unit tests cover the rules engine, the economy and the command handlers
 - [x] The **golden-master harness runs in CI and is a release gate**. It is in the

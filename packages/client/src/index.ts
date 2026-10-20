@@ -12,3 +12,4 @@ export * from './tutorial.ts';
 export * from './fonts.ts';
 export * from './tooltips.ts';
 export * from './guidance.ts';
+export * from './roadmap.ts';
