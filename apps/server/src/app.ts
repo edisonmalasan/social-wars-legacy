@@ -439,6 +439,9 @@ export function createApp(
       }
       if (path === '/get_game_config.php') {
         if (request.method !== 'POST') return fail(405, 'method-not-allowed');
+        // The content is the PATCHED bundle, and the darts schedule is
+        // rotated to the current week - the upstream does the same on every
+        // boot, and the client's board depends on it.
         return fromShim(
           handleGetGameConfig({ path: request.path, fields: fieldsOf(request) }, {
             content: options.contentBundle,
