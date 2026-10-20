@@ -763,14 +763,16 @@ protocol and the original dialect.*
 - [x] The **player store's interface is asynchronous**, because a database is
       asynchronous, and the application and its tests await it. The in-memory store is
       the reference implementation and the offline mode's
-- [ ] The **save document format** is migrated from the upstream schema (12 `playerInfo` +
-      28 `maps[]` + 47 `privateState` fields) with a tested, versioned migration path —
+- [x] The **save document format** is migrated from the upstream schema (12 `playerInfo` +
+      28 `maps[]` + 47 `privateState` fields) with a tested, versioned migration path -
       the **47 `privateState` fields are now known exactly** (from the upstream's
       `initial.json`), and the server's two additions are defined
       (`packages/server/src/apply.ts`): the production state of each building, which the
       upstream never kept because the client kept it, and the goal runtime state, which
-      the upstream never had. The migration itself is written
-      (`packages/server/src/migrate.ts`) and tested against the upstream's own save
+      the upstream never had. The migration (`packages/server/src/migrate.ts`) is
+      **wired into the store**: an upstream save is imported verbatim and migrated when
+      it is read, and a save from a version this server does not understand is
+      **refused** rather than guessed at
 - [ ] Schema migrations are forward-only, reversible where safe, and run as part of deploy
 - [ ] A backup and restore procedure exists and has been exercised against a real snapshot
 
