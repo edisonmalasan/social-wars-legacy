@@ -13,7 +13,7 @@
     "check:content": "pnpm --filter content check",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit",
-    "test": "node --test \"packages/*/src/**/*.test.ts\"",
+    "test": "node --test \"packages/*/src/**/*.test.ts\" \"apps/*/src/**/*.test.ts\"",
     "verify:upstream": "node scripts/verify-upstream.mjs",
     "verify:provenance": "node scripts/verify-provenance.mjs"
   },

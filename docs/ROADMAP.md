@@ -625,8 +625,17 @@ protocol and the original dialect.*
       implemented in `packages/rules/src/goals.ts`, and the reward is granted once by the
       server rather than trusted from the client's `complete_goal`
 - [ ] Daily bonus, weekly bonus and premium expiry are evaluated server-side and awarded
-      **once** — the bonus cycles are implemented; the once-only guard across all of them
-      is not
+      **once** — the **daily bonus is** (`packages/server/src/apply.ts`): the server
+      computes the day from its own clock and ignores the bonus index the client claims,
+      and a replay is refused. The weekly bonus and the premium expiry are not
+- [x] The commands that **grant** anything are answered by the server's own rules, not by
+      the client's claim (`packages/server/src/apply.ts`): `collect` computes the amount
+      from the building's own production state and refuses the over-capacity hack,
+      `complete_goal` checks the server's goal state and grants once, and `win_daily_bonus`
+      computes the day from the server's clock. The upstream grants **none** of these by
+      server-side rule: it resets the collection timer and lets the client declare the
+      amount, prints a line for `complete_goal`, and takes the daily bonus index *and the
+      item id* from the client
 - [x] The full cheat battery is rejected or has no effect: inflated `res`, forged
       `flash_debug`, replayed `win_daily_bonus`, self-completed goals, forged
       `end_attack`, free `buy_offer_pack`, wrong HMAC, another player's `USERID`,
@@ -677,20 +686,35 @@ protocol and the original dialect.*
       `get_player_info.php` flavours are implemented**; the HTTP layer that routes them,
       and the darts-rotated config response, are not
 
-### F3 — Persistence
+### F3 - Persistence
 
 - [ ] State is stored in PostgreSQL with transactional command application; concurrent
-      commands cannot corrupt a player
+      commands cannot corrupt a player — the **transactional application** is implemented
+      (`apps/server/src/store.ts`): a command batch runs against a **copy** of the save
+      and the copy is committed only when the whole batch has been processed, so a
+      failure, a timeout or a disconnect leaves the save exactly as it was. The
+      PostgreSQL implementation is not
 - [ ] The save document format is migrated from the upstream schema (12 `playerInfo` +
-      28 `maps[]` + 47 `privateState` fields) with a tested, versioned migration path
+      28 `maps[]` + 47 `privateState` fields) with a tested, versioned migration path —
+      the **47 `privateState` fields are now known exactly** (from the upstream's
+      `initial.json`), and the server's two additions are defined
+      (`packages/server/src/apply.ts`): the production state of each building, which the
+      upstream never kept because the client kept it, and the goal runtime state, which
+      the upstream never had. The migration itself is not written
 - [ ] Schema migrations are forward-only, reversible where safe, and run as part of deploy
 - [ ] A backup and restore procedure exists and has been exercised against a real snapshot
 
-### F4 — Robustness
+### F4 - Robustness
 
-- [ ] Bad input returns typed 4xx responses, never a 500
-- [ ] Every endpoint has request-size limits, rate limits and timeouts
-- [ ] The server survives a client disconnect mid-command without partial state
+- [x] Bad input returns typed 4xx responses, never a 500 — `apps/server/src/app.ts`
+      returns a typed error code and message for every failure, and an unexpected
+      exception is caught at the edge
+- [x] Every endpoint has request-size limits, rate limits and timeouts — the body is
+      capped while it is **read** and again before it is **parsed**, the rate limit is a
+      fixed window per client, and the command batch has a deadline that is checked
+      *between* commands, so a command is never interrupted half way
+- [x] The server survives a client disconnect mid-command without partial state — the
+      batch is applied to a copy and committed atomically
 - [ ] A soak test of sustained play shows no memory growth and no state drift
 
 ### F5 — Social layer
