@@ -5,3 +5,4 @@ export * from './store.ts';
 export * from './alliance.ts';
 export * from './marketplace.ts';
 export * from './migrations.ts';
+export * from './backup.ts';

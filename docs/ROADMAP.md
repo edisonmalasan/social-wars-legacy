@@ -788,7 +788,12 @@ protocol and the original dialect.*
       it is read, and a save from a version this server does not understand is
       **refused** rather than guessed at
 - [ ] Schema migrations are forward-only, reversible where safe, and run as part of deploy
-- [ ] A backup and restore procedure exists and has been exercised against a real snapshot
+- [x] A backup and restore procedure exists and has been **exercised against a real
+      snapshot** — the database is a directory in the offline mode, so a backup is a copy
+      of it and a restore is opening the copy (\packages/server/src/backup.ts\,
+      \scripts/backup-server.mjs\). The tests write a database, back it up, change the
+      live database, restore the snapshot and check that the snapshot still holds the
+      OLD state, and a digest of the tables is what proves the two match
 
 ### F4 - Robustness
 
