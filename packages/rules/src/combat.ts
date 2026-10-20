@@ -207,6 +207,108 @@ export function resolveDamage(
 }
 
 /**
+ * A passive building is treated as `AGGRO_RANGE` tiles further away.
+ *
+ * A building with `attack == 0` cannot shoot back, so it is a less attractive
+ * target than its position suggests.
+ */
+export const AGGRO_RANGE = 10;
+
+/** The `subcat_functional` of the town hall, the +100 target. */
+export const SUBCATFUNC_BUILDING_TOWNHALL = 135;
+
+/** A candidate for the attacker's target. */
+export interface TargetCandidate {
+  /** A unit, or a building. */
+  kind: 'unit' | 'building';
+  /** The distance in tiles. */
+  distance: number;
+  /** For a building: its `subcat_functional`. */
+  subcatFunctional?: number;
+  /** For a building: its remaining collect. */
+  collect?: number;
+  /** For a building: the attack of its garrison. */
+  uiAttack?: number;
+  /** For a building: true when its own `attack` is 0, so it cannot shoot back. */
+  passive?: boolean;
+  /** An opaque handle, so the caller can identify what it picked. */
+  readonly handle?: unknown;
+}
+
+export interface TargetScore {
+  /** The score. **-1 means untargetable.** */
+  score: number;
+  /** The distance used for the score, with the aggro adjustment applied. */
+  effectiveDistance: number;
+}
+
+/**
+ * Score a target.
+ *
+ * Ported from `IsoEngine.getElementScore`:
+ *
+ *   score = 1000 - distance
+ *         + 150  if the target is a unit
+ *         + 100  else if it is the town hall
+ *         +  75  else if it has something to collect
+ *         +  50  else if its garrison can shoot back
+ *         - 1    otherwise, which means untargetable
+ *
+ * The bonuses are **mutually exclusive**: it is an `else if` chain, so a
+ * building gets at most one of them. A unit always gets the +150.
+ *
+ * A passive building (`attack == 0`) is treated as `AGGRO_RANGE` tiles
+ * further away, both here and in the distance the caller is told.
+ */
+export function scoreTarget(candidate: TargetCandidate): TargetScore {
+  const effectiveDistance = candidate.distance + (candidate.passive ? AGGRO_RANGE : 0);
+  let score = 1000 - effectiveDistance;
+
+  if (candidate.kind === 'unit') {
+    score += 150;
+  } else if (candidate.subcatFunctional === SUBCATFUNC_BUILDING_TOWNHALL) {
+    score += 100;
+  } else if ((candidate.collect ?? 0) > 0) {
+    score += 75;
+  } else if ((candidate.uiAttack ?? 0) > 0) {
+    score += 50;
+  } else {
+    // Not a unit, not the town hall, nothing to collect, cannot shoot back.
+    return { score: -1, effectiveDistance };
+  }
+
+  return { score, effectiveDistance };
+}
+
+/**
+ * Choose the target.
+ *
+ * The candidates are sorted by **score descending**, then by **distance
+ * ascending**, and the first one whose score is greater than -1 is taken.
+ *
+ * So: the best target is the closest unit, but a town hall two tiles further
+ * away still beats a far-off unit only if it scores higher — and the +150 for
+ * being a unit means units are strongly preferred over buildings.
+ */
+export function selectTarget<T extends TargetCandidate>(
+  candidates: readonly T[],
+  filter?: (candidate: T) => boolean,
+): T | null {
+  const scored = candidates
+    .map((candidate) => ({ candidate, ...scoreTarget(candidate) }))
+    .filter((entry) => entry.score > -1 && (filter ? filter(entry.candidate) : true));
+
+  if (scored.length === 0) return null;
+
+  scored.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score; // score descending
+    return a.effectiveDistance - b.effectiveDistance; // then distance ascending
+  });
+
+  return scored[0]!.candidate;
+}
+
+/**
  * The attack range rule, which differs between units and buildings.
  *
  * A unit can reach `attack_range + max(0, targetWidth - 2 * attack_range)`.
@@ -219,32 +321,6 @@ export function effectiveRange(
 ): number {
   if (kind === 'building') return attacker.attack_range;
   return attacker.attack_range + Math.max(0, targetWidth - 2 * attacker.attack_range);
-}
-
-/**
- * The target-selection score.
- *
- * Lower is better. From `IsoFightingElement`:
- *
- *   score = 1000 - distance
- *         + 150 if the target is a unit
- *         + 100 if the target is the town hall
- *         +  75 if the target is collectable
- *         +  50 if the target is the attacker itself
- */
-export function targetScore(options: {
-  distance: number;
-  isUnit?: boolean;
-  isTownHall?: boolean;
-  isCollectable?: boolean;
-  isSelf?: boolean;
-}): number {
-  let score = 1000 - options.distance;
-  if (options.isUnit) score += 150;
-  if (options.isTownHall) score += 100;
-  if (options.isCollectable) score += 75;
-  if (options.isSelf) score += 50;
-  return score;
 }
 
 /**
