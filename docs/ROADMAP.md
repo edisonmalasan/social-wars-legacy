@@ -635,7 +635,12 @@ client's observable behaviour.*
 - [x] The **Monday reward cycle** is the client's: `MONDAY_BONUS_REWARDS` has **3**
       entries and the cycle wraps at 3, while the upstream wraps its index at 5. The client
       is the specification, so the cycle is 3
-- [ ] **Premium expiry** is evaluated server-side and awarded once
+- [x] **Premium expiry** is evaluated server-side: the premium is a **timestamp** in
+      the private state, not a flag, and the server owns it
+      (`packages/rules/src/premium.ts`). Buying while it is still running **extends**
+      it and buying after it has lapsed **starts it fresh** — the upstream's rule and
+      the client's. The perks are the client's: three attacks a day instead of one, and
+      a share of the rewards in cash
 
 ### E4 — Determinism and verification
 
@@ -723,47 +728,12 @@ protocol and the original dialect.*
       the player's **local** week day (`Utils.getWeekDayFromTimeStamp` reads
       `Date.getDay()`), not UTC's, or the bonus moves by a day for everybody east or
       west of Greenwich
-- [ ] **Premium expiry** is evaluated server-side and awarded once
-- [x] The commands that **grant** anything are answered by the server's own rules, not by
-      the client's claim (`packages/server/src/apply.ts`): `collect`, `complete_goal`,
-      `win_daily_bonus`, `reset_collect`, `finish_building`, `place_stored_item`,
-      `buy`, `push_queue_unit`, `pop_queue_unit`, `level_up`, `upgrade` and
-      `end_attack`. The upstream grants **none** of these by server-side rule: it resets
-      the collection timer and lets the client declare the amount, prints a line for
-      `complete_goal`, takes the daily bonus index *and the item id* from the client,
-      and lets the client pop a unit that is still training
-- [x] The **training queue** is the server's own: the building's attribute bag holds
-      `nu` (how many are queued), `ts` (when the current one started) and `ui` (which
-      unit it is), exactly as the upstream's `engine.py` does. The server checks that a
-      unit has actually finished training before it is popped, which the upstream does
-      not
-- [x] The **level-up** checks that the player has the XP for the next level and grants
-      that level's reward from the level table, and the **upgrade** charges the new
-      building's cost less the refund of the old one and refuses an upgrade that would
-      not fit
-- [x] The full cheat battery is rejected or has no effect: inflated `res`, forged
-      `flash_debug`, replayed `win_daily_bonus`, self-completed goals, forged
-      `end_attack`, free `buy_offer_pack`, wrong HMAC, another player's `USERID`,
-      malformed framing, forged `win`, over-collection —
-      `packages/rules/src/cheatbattery.ts` **attempts all eleven** against the real
-      authority layer and proves each one has no effect. The battery is
-      **mutation-tested**: 18 weakenings of the authority layer were each detected by
-      exactly the attack they weaken
-- [x] The shim **resolves the player from the session token or the bound legacy
-      `USERID`**, and the identity chooses which save is touched. The request body
-      cannot name the player. Found by the cheat battery, which shipped a tripwire
-      because the shim did not consult its own identity bridge
-- [x] The shim's grant commands are **no longer an unimplemented seam**: `collect`,
-      `complete_goal`, `win_daily_bonus`, `weekly_reward`, `win_alliance_daily_bonus`,
-      `end_attack`, `end_quest`, `place_stored_item`, `buy`, `push_queue_unit`,
-      `pop_queue_unit`, `level_up`, `upgrade`, `reset_collect` and `finish_building`
-      are all granted through the server's own rules
-- [x] The **production-cycle timer** is implemented and the **server owns the clock**
-      (`packages/rules/src/production.ts`): the collection is a period the **player
-      chooses** - 5 minutes at 0.25, 60 at 1, 240 at 2 and 480 at 3, the client's own
-      four - and the server refuses a collection until the period has elapsed. The
-      upstream never checks this: its `collect` handler resets the timestamp and
-      believes whatever the client sends
+- [x] **Premium expiry** is evaluated server-side: the premium is a **timestamp** in
+      the private state, not a flag, and the server owns it
+      (`packages/rules/src/premium.ts`). Buying while it is still running **extends**
+      it and buying after it has lapsed **starts it fresh** — the upstream's rule and
+      the client's. The perks are the client's: three attacks a day instead of one, and
+      a share of the rewards in cash
 
 ### F2 — Protocol
 

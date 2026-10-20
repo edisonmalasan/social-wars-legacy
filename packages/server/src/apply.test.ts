@@ -8,6 +8,7 @@ import {
   BUILDING_STATE_KEYS,
   GOAL_STATE_KEY,
   createApplier,
+  hasActivePremium,
   mapItems,
   type ApplierDeps,
   type MapItemTuple,
@@ -293,6 +294,66 @@ describe('collecting', () => {
     assert.equal(BUILDING_STATE_KEYS.length, 6);
     assert.ok(BUILDING_STATE_KEYS.includes('collect'));
     assert.ok(BUILDING_STATE_KEYS.includes('unitCapacity'));
+  });
+});
+
+describe('the premium account', () => {
+  const PACKAGES = [
+    { price: 800, time: 360 },
+    { price: 450, time: 180 },
+    { price: 80, time: 30 },
+    { price: 40, time: 7 },
+    { price: 20, time: 3 },
+    { price: 8, time: 1 },
+  ];
+
+  it('starts the premium fresh when it has lapsed', () => {
+    const applier = createApplier(
+      deps({ premiumPackages: PACKAGES, now: () => 1_700_000_000 }),
+    );
+    const world = worldWithBuilding({});
+    const outcome = applier(world, { name: 'buy_premium_account', args: [5] });
+    assert.equal(outcome.applied, true);
+    // One day from now.
+    assert.equal(
+      outcome.world.save.privateState['timeStampEndPremium'],
+      1_700_000_000 + 86_400,
+    );
+  });
+
+  it('EXTENDS a running premium', () => {
+    const applier = createApplier(
+      deps({ premiumPackages: PACKAGES, now: () => 1_700_000_000 }),
+    );
+    const world = worldWithBuilding({});
+    world.save.privateState['timeStampEndPremium'] = 1_700_000_000 + 1000;
+    const outcome = applier(world, { name: 'buy_premium_account', args: [3] });
+    assert.equal(outcome.applied, true);
+    // Seven more days on top of what was left.
+    assert.equal(
+      outcome.world.save.privateState['timeStampEndPremium'],
+      1_700_000_000 + 1000 + 7 * 86_400,
+    );
+  });
+
+  it('refuses a package that does not exist', () => {
+    const applier = createApplier(
+      deps({ premiumPackages: PACKAGES, now: () => 1_700_000_000 }),
+    );
+    const world = worldWithBuilding({});
+    const outcome = applier(world, { name: 'buy_premium_account', args: [99] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'no-such-package');
+  });
+
+  it('knows whether the premium is running', () => {
+    const applier = createApplier(
+      deps({ premiumPackages: PACKAGES, now: () => 1_700_000_000 }),
+    );
+    const world = worldWithBuilding({});
+    world.save.privateState['timeStampEndPremium'] = 1_700_000_000 + 1000;
+    assert.equal(hasActivePremium(world, 1_700_000_000), true);
+    assert.equal(hasActivePremium(world, 1_700_000_000 + 2000), false);
   });
 });
 
