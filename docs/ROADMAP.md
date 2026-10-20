@@ -197,6 +197,23 @@ first means guessing at the rules being cloned.
 - [ ] The remaining tooltip surfaces (the icon panel's dictionary, the special units'
       attack tooltips and the market's) are reimplemented
 - [ ] The unit panel, minimap, neighbour strip, goal panel and popups all work
+- [x] There is **no minimap** in the original client. The closest thing is the
+      **chapter map** - the goal panel's map - and that is implemented as a model
+      (`packages/client/src/chapters.ts`): four chapters of six quests, the client's
+      own titles, and the client's own rule for which quests are open
+- [x] The **neighbour strip** is implemented as a model
+      (`packages/client/src/neighbours.ts`): the order is the **server's** - the
+      static villages first, then the other players - the general is not a neighbour
+      anybody can hurry up, and the portrait is a **placeholder**, because the clone
+      has no Facebook photo to show
+- [x] The **hurry-up** rule is the client's own: a building's production is ready when
+      its countdown has **finished**, and those buildings show the neighbours' hurry-up
+      icons
+- [x] The **unit panel** - the info panel - is implemented as a model
+      (`packages/client/src/tooltips.ts`): the name, the effective attack, the range, the
+      attack interval, the velocity, the life and the population
+- [ ] The panels and the popups are **rendered**, and the popups that are not
+      implemented are recorded as dropped
 - [x] The authoritative **item id → delegate** map is extracted from
       `DelegatesManager.registerDelegate()` and `core/Constants.as`, covering **679 of the
       724** client item ids ([`../re/data/item-delegate-map.json`](../re/data/item-delegate-map.json))
