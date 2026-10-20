@@ -42,6 +42,8 @@ import {
   mondayBonusReward,
   mondayBonusState,
   isDue,
+  isPremiumActive,
+  premiumExpiry,
   type ProductionCycle,
   collect as collectProduction,
   awardQuest,
@@ -225,6 +227,8 @@ export interface ApplierDeps {
   allianceBonus?: { rewards: { members?: number; type: string; value: number }[] };
   /** How many members the player's alliance has. */
   allianceMemberCount?: number;
+  /** The premium packages, for the purchase and the expiry. */
+  premiumPackages?: { price: number; time: number }[];
   /** The player's level table: the XP each level needs and its reward. */
   levels?: { index: number; exp_required: number; reward_amount: number; reward_type: string }[];
 }
@@ -318,6 +322,8 @@ export function createApplier(deps: ApplierDeps): CommandApplier {
         return allianceBonusCommand(world, command.args, deps);
       case 'reset_collect':
         return resetCollectCommand(world, command.args, deps);
+      case 'buy_premium_account':
+        return buyPremiumCommand(world, command.args, deps);
       case 'finish_building':
         return finishBuildingCommand(world, command.args, deps);
       case 'end_attack':
@@ -345,6 +351,54 @@ export function createApplier(deps: ApplierDeps): CommandApplier {
  * comes from the victim's town hall, the XP is 5 per cent of it, and a
  * win with no loot is worth a flat 25 gold.
  */
+/**
+ * `buy_premium_account` - buy a premium package.
+ *
+ * The premium is a timestamp in the private state, and the server owns
+ * it. Buying while the premium is still running **extends** it, and
+ * buying after it has lapsed **starts it fresh** - the upstream's rule,
+ * and the client's.
+ *
+ * The cash cost is computed by the cost table, from the content's
+ * `PREMIUM_ACCOUNTS`, so the client cannot name its own price.
+ */
+function buyPremiumCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const packages = deps.premiumPackages;
+  if (!packages || packages.length === 0) {
+    return { applied: false, refused: 'not-implemented', world };
+  }
+  const index = Number(args[0]);
+  if (!Number.isInteger(index) || index < 0 || index >= packages.length) {
+    return { applied: false, refused: 'no-such-package', world };
+  }
+
+  const privateState = world.save.privateState;
+  const now = deps.now();
+  const current = Number(privateState['timeStampEndPremium'] ?? 0);
+  const expiry = premiumExpiry(packages, index, now, current);
+
+  privateState['timeStampEndPremium'] = expiry;
+  return { applied: true, world };
+}
+
+/**
+ * Whether the player has an active premium.
+ *
+ * The perks are the client's: three attacks a day instead of one, and a
+ * share of the rewards in cash.
+ */
+export function hasActivePremium(
+  world: ShimWorld,
+  now: number,
+): boolean {
+  const expiry = Number(world.save.privateState['timeStampEndPremium'] ?? 0);
+  return isPremiumActive(expiry, now);
+}
+
 function endAttackCommand(
   world: ShimWorld,
   args: readonly unknown[],

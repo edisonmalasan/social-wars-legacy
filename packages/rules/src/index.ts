@@ -28,3 +28,4 @@ export * from './simulate.ts';
 export * from './loot.ts';
 export * from './dartsboard.ts';
 export * from './production.ts';
+export * from './premium.ts';
