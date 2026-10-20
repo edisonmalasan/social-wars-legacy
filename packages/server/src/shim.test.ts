@@ -13,6 +13,7 @@ import { LegacyIdentityBridge, SessionStore } from './session.ts';
 import {
   applyBatch,
   handleCommandPhp,
+  handleGetGameConfig,
   handleGetPlayerInfo,
   type ShimContext,
   type ShimWorld,
@@ -367,6 +368,59 @@ describe('the shim identity', () => {
     // The victim's save was touched, and it could not afford the Soldier.
     assert.equal(victim.resources['g'], 5);
     assert.equal(attacker.resources['g'], 9999);
+  });
+});
+
+describe('get_game_config.php', () => {
+  const GAMES = [
+    { id: 1, start_date: '2012-03-02 23:00:00', extra_item: 1152, items: [1, 2, 3, 4, 5, 6] },
+    { id: 2, start_date: '2012-03-09 23:00:00', extra_item: 1150, items: [1, 2, 3, 4, 5, 6] },
+  ];
+
+  it('serves the darts schedule rotated to the current week', () => {
+    // The upstream rotates the schedule on every boot, because the
+    // client's board is built from it: a player who loads the config on a
+    // different day must not see a different board.
+    const before = handleGetGameConfig(
+      { path: '/get_game_config.php', fields: {} },
+      { content: { dartsItems: GAMES }, now: Date.UTC(2026, 9, 20) / 1000 },
+    );
+    const body = JSON.parse(before.body);
+    assert.ok(Array.isArray(body.dartsItems));
+    assert.equal(body.dartsItems.length, 2);
+    // The dates are NOT the 2012 ones any more.
+    assert.ok(
+      !body.dartsItems[0].start_date.startsWith('2012-03-02'),
+      `the schedule was not rotated: ${body.dartsItems[0].start_date}`,
+    );
+    // The second game is still a week after the first.
+    assert.notEqual(body.dartsItems[0].start_date, body.dartsItems[1].start_date);
+    // And the prizes are untouched.
+    assert.deepEqual(body.dartsItems[0].items, [1, 2, 3, 4, 5, 6]);
+  });
+
+  it('serves the same schedule within one week', () => {
+    const monday = Date.UTC(2026, 9, 19) / 1000;
+    const first = handleGetGameConfig(
+      { path: '/get_game_config.php', fields: {} },
+      { content: { dartsItems: GAMES }, now: monday },
+    );
+    const later = handleGetGameConfig(
+      { path: '/get_game_config.php', fields: {} },
+      { content: { dartsItems: GAMES }, now: monday + 3 * 86400 },
+    );
+    assert.deepEqual(
+      JSON.parse(first.body).dartsItems,
+      JSON.parse(later.body).dartsItems,
+    );
+  });
+
+  it('leaves the content alone when there are no darts', () => {
+    const response = handleGetGameConfig(
+      { path: '/get_game_config.php', fields: {} },
+      { content: { items: [] }, now: 1_700_000_000 },
+    );
+    assert.deepEqual(JSON.parse(response.body), { items: [] });
   });
 });
 

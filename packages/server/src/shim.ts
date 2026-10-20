@@ -36,7 +36,14 @@ import {
   type ServerKey,
 } from '@swl/protocol';
 
-import { applyCommandCost, computeCommandCost, type CostContent, type Resources } from '@swl/rules';
+import {
+  applyCommandCost,
+  computeCommandCost,
+  rotateDartsSchedule,
+  type CostContent,
+  type DartsGame,
+  type Resources,
+} from '@swl/rules';
 import { LegacyIdentityBridge } from './session.ts';
 
 /** A request, as the shim sees it. */
@@ -396,8 +403,13 @@ export function handleCommandPhp(
  * Handle `get_game_config.php`.
  *
  * The content is the **patched** bundle — the base config plus the five
- * JSON-Patch deltas — and the darts schedule is rotated to the current week,
- * because the upstream rewrites the darts dates on every boot.
+ * JSON-Patch deltas — and the darts schedule is **rotated to the current
+ * week**.
+ *
+ * The rotation is not decoration: the client's board is built from the
+ * schedule, so a player who loads the config on a different day than the
+ * one it was built on would see a different board. The upstream rotates
+ * the schedule on every boot for exactly this reason.
  */
 export function handleGetGameConfig(
   request: ShimRequest,
@@ -405,7 +417,14 @@ export function handleGetGameConfig(
 ): ShimResponse {
   // The client asks for a language; the shipped content is English only.
   void request;
-  return json(200, context.content);
+
+  const games = context.content['dartsItems'];
+  if (!Array.isArray(games) || games.length === 0) {
+    return json(200, context.content);
+  }
+
+  const rotated = rotateDartsSchedule(games as DartsGame[], new Date(context.now * 1000));
+  return json(200, { ...context.content, dartsItems: rotated });
 }
 
 /**
