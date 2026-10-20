@@ -10,6 +10,7 @@
  * subsystem is a single row per kind rather than a table per service.
  */
 import { SCHEMA_MIGRATIONS, SOCIAL_TABLE } from './schema.ts';
+import { isSafeIdentifier } from './backup.ts';
 import { runMigrations } from './migrations.ts';
 import type { Database } from './pgstore.ts';
 import type { Alliance } from './alliance.ts';
@@ -30,7 +31,13 @@ export class SocialStore {
 
   constructor(options: { db: Database; table?: string }) {
     this.db = options.db;
-    this.table = options.table ?? 'social';
+    this.table = options.table ?? SOCIAL_TABLE;
+    // The table name goes into the SQL, because SQL has no placeholder
+    // for an identifier, so it is checked: a table name must be a plain
+    // identifier and nothing else.
+    if (!isSafeIdentifier(this.table)) {
+      throw new Error(`the table name "${this.table}" is not a plain identifier`);
+    }
   }
 
   /**

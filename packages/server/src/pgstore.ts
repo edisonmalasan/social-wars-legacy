@@ -23,6 +23,7 @@
 import type { PlayerSave, PlayerStore } from './store.ts';
 import type { ShimWorld } from './shim.ts';
 import { migrateSave, type MigrationItem } from './migrate.ts';
+import { isSafeIdentifier } from './backup.ts';
 import { PLAYERS_TABLE, SCHEMA_MIGRATIONS } from './schema.ts';
 import { runMigrations } from './migrations.ts';
 
@@ -77,7 +78,13 @@ export class PostgresPlayerStore implements PlayerStore {
 
   constructor(options: PostgresStoreOptions) {
     this.db = options.db;
-    this.table = options.table ?? 'player_saves';
+    this.table = options.table ?? PLAYERS_TABLE;
+    // The table name goes into the SQL, because SQL has no placeholder
+    // for an identifier, so it is checked: a table name must be a plain
+    // identifier and nothing else.
+    if (!isSafeIdentifier(this.table)) {
+      throw new Error(`the table name "${this.table}" is not a plain identifier`);
+    }
     this.items = options.items;
   }
 

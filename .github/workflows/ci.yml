@@ -1,9 +1,22 @@
 name: CI
 
+# Every push and every pull request.
+#
+# The push trigger used to be `main` only, which meant a branch's own
+# pipeline did not run until it was merged. Every push runs the whole
+# gate now, so a branch is never green only because nobody looked.
 on:
   push:
-    branches: [main]
   pull_request:
+  workflow_dispatch:
+
+# One run at a time per branch: a second push supersedes the first.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   verify:
@@ -33,8 +46,14 @@ jobs:
       - name: Type-check
         run: pnpm typecheck
 
+      - name: Lint
+        run: pnpm lint
+
       - name: Unit tests
         run: pnpm test
+
+      - name: Integration tests
+        run: pnpm test:integration
 
       - name: The golden-master corpus
         run: node scripts/golden-master.mjs
@@ -52,3 +71,68 @@ jobs:
           second=$(node packages/content/src/cli.ts | grep 'build id' | awk '{print $NF}')
           test "$first" = "$second"
           echo "content build is reproducible: $first"
+
+      - name: The command catalogue agrees with the client
+        run: node scripts/verify-command-catalogue.mjs
+
+  assets:
+    name: Assets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.6.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build the content bundle
+        run: pnpm build:content
+
+      # The manifest reports both directions: what is referenced but
+      # missing, and what is present but unreferenced. Either is a
+      # failure, because the first is a broken image and the second is
+      # weight the player downloads for nothing.
+      - name: The asset manifest agrees with the tree
+        run: node scripts/build-asset-manifest.mjs
+
+  scan:
+    name: Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.6.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The policy: a **high** or **critical** advisory fails the run, and
+      # a moderate one does not. The rule is written down rather than
+      # left to whatever the tool defaults to, because the default
+      # changes.
+      - name: The dependencies have no known vulnerability
+        run: |
+          pnpm audit --audit-level=high
+          echo "the dependency scan passed: no high or critical advisory"
+
+      - name: No credential is committed
+        run: node --test packages/server/src/security.test.ts
