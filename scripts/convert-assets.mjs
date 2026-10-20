@@ -170,30 +170,36 @@ async function main() {
     }
   }
 
-  // 1. Build the chunk list: each chunk is a directory of SWFs that one JVM
-  //    invocation will convert.
-  const jobs = [];
+  // 1. Build the work list: ONE flat list of the files that still need
+  //    converting, then split it into even batches.
+  //
+  //    Batching per GROUP would give the first group all the parallelism
+  //    and leave the last group with a single slow batch, and the old
+  //    per-group slice used a running `skipped` counter, so a group could
+  //    be skipped entirely once that counter passed the limit. A batch can
+  //    span groups here, so each entry carries its own (group, name).
+  const pending = [];
   let skipped = 0;
   for (const group of args.groups) {
     const dir = path.join(ASSETS, group);
-    const all = await listSwf(dir);
-    const names = [];
-    for (const name of all) {
+    for (const name of await listSwf(dir)) {
       if (doneSwf.has(`${group}/${name}`)) {
         skipped += 1;
         continue;
       }
-      names.push(name);
-    }
-    const limited = names.slice(0, Math.max(0, args.limit - skipped));
-    const perChunk = Math.max(1, Math.ceil(limited.length / args.jobs));
-    for (let i = 0; i < limited.length; i += perChunk) {
-      jobs.push({ group, names: limited.slice(i, i + perChunk) });
+      pending.push({ group, name });
     }
   }
-  const todo = jobs.reduce((n, j) => n + j.names.length, 0);
+  const limit = args.limit === Infinity ? pending.length : Math.max(0, args.limit - skipped);
+  const selected = pending.slice(0, limit);
+
+  const perChunk = Math.max(1, Math.ceil(selected.length / args.jobs));
+  const jobs = [];
+  for (let i = 0; i < selected.length; i += perChunk) {
+    jobs.push({ files: selected.slice(i, i + perChunk) });
+  }
   console.log(
-    `converting ${todo} SWF files in ${jobs.length} batches` +
+    `converting ${selected.length} SWF files in ${jobs.length} batches` +
       (skipped ? ` (${skipped} already done)` : ''),
   );
   console.log(`FFDec: ${DEFAULT_FFDEC}`);
@@ -246,18 +252,22 @@ async function main() {
     // Copy the chunk in, because FFDec takes a directory of inputs. A file that
     // is still locked by a previous run is skipped rather than failing the batch.
     const copied = [];
-    for (const name of job.names) {
+    for (const file of job.files) {
       try {
-        await copyFile(path.join(ASSETS, job.group, name), path.join(chunkDir, name));
-        copied.push(name);
+        await copyFile(path.join(ASSETS, file.group, file.name), path.join(chunkDir, file.name));
+        copied.push(file);
       } catch (error) {
-        console.warn(`  ! could not stage ${name}: ${error.code ?? error.message}`);
+        console.warn(`  ! could not stage ${file.name}: ${error.code ?? error.message}`);
       }
     }
     if (copied.length === 0) {
       console.warn(`  ! batch ${index}: nothing to convert`);
       return;
     }
+
+    // A batch can span groups, so the group of each staged file is
+    // remembered here: the symbol records need it.
+    const groupOf = new Map(copied.map((f) => [f.name, f.group]));
 
     const outDir = path.join(runDir, `out-${index}`);
     await removeDir(outDir);
@@ -330,7 +340,7 @@ async function main() {
         }
         frames.sort((a, b) => a.frame - b.frame);
         symbols.push({
-          swf: `${job.group}/${swfName}`,
+          swf: `${groupOf.get(swfName) ?? ''}/${swfName}`,
           symbol,
           frameCount: frames.length,
           uniqueFrames: new Set(frames.map((f) => f.image)).size,
