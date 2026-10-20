@@ -1307,9 +1307,34 @@ product.*
 
 ### I5 — Operations
 
-- [ ] Deployment is scripted, repeatable and reversible
-- [ ] Database migration runs as a gated deploy step, with a tested rollback
-- [ ] Backups run automatically, are verified, and a restore has been rehearsed
+- [x] **Deployment is scripted, repeatable and reversible**
+      (`node scripts/deploy.mjs --data <dir>`). The steps are in one order, with no step
+      depending on what somebody remembered to run first:
+      1. **verify** the tree - the vendored upstream is unmodified, the content bundle
+         builds and is **reproducible**, the type-check and the tests pass, and the
+         cheat battery catches nothing
+      2. **back up**, and **verify the backup** by comparing the digest of the
+         snapshot with the digest of the live database. A backup that was not verified
+         is not a backup, and the deploy does not go ahead if the two differ
+      3. **migrate** the schema forward
+      4. report the version and how to undo it
+- [x] The deploy is **reversible**: `--rollback` restores the most recent snapshot, and
+      the digest of the restored database is printed so the restore can be checked
+- [x] **Database migration runs as a gated deploy step, with a tested rollback.** It is
+      the third step of the deployment, and it runs in its own transaction, so a
+      failure leaves the schema at a version the server understands. The rollback is
+      **tested**: the schema's tests roll a migration back, roll it back again, and
+      check that the history says so
+- [x] The deployment **rolls back by itself** when a step fails, and the digest of a
+      database that has not been migrated yet is a digest of nothing rather than an
+      error - so a first deploy does not fail on a table that is not there yet
+- [x] **Backups are verified**, and the deploy does not go ahead if the snapshot's
+      digest differs from the live database's. A backup that was not verified is not a
+      backup
+- [x] **A restore has been rehearsed**: the tests write a database, back it up,
+      change the live database, restore the snapshot and check that the snapshot
+      still holds the **old** state - and the digest is what proves the two match
+- [ ] Backups **run automatically** on a schedule, and the schedule is monitored
 - [ ] A runbook covers: stalled deployment, database failure, corrupted player state,
       content-bundle rollback and emergency player reset
 - [ ] A documented procedure exists for pushing a hotfix to the rules engine
