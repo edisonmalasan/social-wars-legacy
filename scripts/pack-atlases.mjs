@@ -102,6 +102,7 @@ async function main() {
   let trimmedPixels = 0;
   let fullyTransparent = 0;
   let missing = 0;
+  let oversize = 0;
 
   for (const [hash, image] of images) {
     const file = path.join(STORE, image.file);
@@ -114,16 +115,25 @@ async function main() {
     const bounds = alphaBounds(decoded);
     if (!bounds) {
       fullyTransparent += 1;
-      measured.push({ hash, image, width: 0, height: 0, bounds: null, decoded });
+      // The PIXELS ARE THROWN AWAY here. Keeping every decoded image is
+      // what ran the packer out of memory; the pixels are decoded again,
+      // one atlas at a time, in the render pass below.
+      measured.push({ hash, image, width: 0, height: 0, bounds: null });
       continue;
     }
     trimmedPixels += bounds.width * bounds.height;
-    measured.push({ hash, image, width: bounds.width, height: bounds.height, bounds, decoded });
+    measured.push({ hash, image, width: bounds.width, height: bounds.height, bounds });
   }
 
   console.log(
     `  ${measured.length} images, ${fullyTransparent} fully transparent, ${missing} missing from the store`,
   );
+  if (oversize > 0) {
+    console.warn(
+      `  ! ${oversize} image(s) are bigger than a whole ${args.size}x${args.size} atlas ` +
+        'and could not be given a region. They are recorded with a null atlas.',
+    );
+  }
   console.log(
     `  pixels: ${(rawPixels / 1e6).toFixed(1)}M raw -> ${(trimmedPixels / 1e6).toFixed(1)}M trimmed ` +
       `(${((1 - trimmedPixels / Math.max(1, rawPixels)) * 100).toFixed(1)}% was padding)`,
@@ -154,12 +164,10 @@ async function main() {
       packer.rowHeight = 0;
       spot = packer.place(entry.width, entry.height);
       if (!spot) {
-        // An image bigger than the whole atlas: it gets an atlas of its own.
-        sheets.push({
-          images: [],
-          used: 0,
-          oversize: { entry, spot: { x: 0, y: 0 } },
-        });
+        // An image bigger than the whole atlas cannot be given a region.
+        // It is counted and reported rather than dropped silently, and the
+        // manifest records it with a null atlas.
+        oversize += 1;
         entry.atlas = null;
         entry.oversize = true;
         continue;
@@ -178,7 +186,12 @@ async function main() {
     const canvas = { width: args.size, height: args.size, data: Buffer.alloc(args.size * args.size * 4) };
 
     for (const entry of sheet.images) {
-      const trimmed = crop(entry.decoded, entry.bounds);
+      // The image is decoded AGAIN, here, so that only one atlas's worth of
+      // pixels is ever in memory.
+      const file = path.join(STORE, entry.image.file);
+      if (!existsSync(file)) continue;
+      const decoded = decodePng(await readFile(file));
+      const trimmed = crop(decoded, entry.bounds);
       for (let y = 0; y < trimmed.height; y++) {
         const from = y * trimmed.width * 4;
         trimmed.data.copy(
