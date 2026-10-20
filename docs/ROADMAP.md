@@ -605,7 +605,12 @@ protocol and the original dialect.*
 ### F1 — Identity and authority
 
 - [ ] Players authenticate with a real credential; a session token replaces the
-      `USERID`-in-the-body model (F10)
+      `USERID`-in-the-body model (F10) — **the session model is implemented**
+      (`packages/server/src/session.ts`): a salted, hashed credential compared in constant
+      time, and a **revocable** session token. The legacy `USERID` path exists for the
+      untouched client, but the bridge is **off by default** and can only map a value the
+      server has already bound to a player. The HTTP layer that issues the token is not
+      built yet
 - [x] Every command's resource cost is computed by the server, never accepted from the
       client (F3) — `packages/rules/src/commandcost.ts` derives each cost from the
       content bundle and the command's own arguments. **The API has no parameter for the
@@ -613,7 +618,7 @@ protocol and the original dialect.*
       the table does not price is treated as *free* rather than as "whatever the client
       says"
 - [x] `flash_debug` does not exist in the server (F4) — it is not in the priced command
-      list, and `computeCommandCost` returns `null` for it, which costs nothing
+      list, and the shim **refuses it outright** rather than pricing it at zero
 - [x] Combat outcomes are re-simulated server-side (F5) — `packages/rules/src/authority.ts`
       resolves the hit from a server-issued seed
 - [x] Goal completion is evaluated server-side — the 134 goals and the 5-goal window are
@@ -641,12 +646,18 @@ protocol and the original dialect.*
       captured digest — produced by the original Flash client — is reproduced exactly
 - [x] **Both server keys are accepted**, because unmodified clients of both eras exist,
       and the shim reports which era a request came from
-- [ ] A **compatibility shim** serves the original `command.php` dialect, so the untouched
-      `Basesec_1.5.4.swf` plays against this server with no client change
-- [ ] The shim tolerates `first_number` gaps (F6) and the `skiphash12341` response-hash
-      bypass — the bypass is already handled by the parser; the gap tolerance is not
+- [x] A **compatibility shim** serves the original `command.php` dialect
+      (`packages/server/src/shim.ts`), so the untouched `Basesec_1.5.4.swf` can play
+      against this server with no client change. It does four things the upstream server
+      does **not**: it verifies the HMAC, it computes the resource costs, it **survives a
+      replayed packet** without applying the commands twice, and it **tolerates a gap** in
+      the global command index
+- [x] The shim tolerates the `skiphash12341` response-hash bypass — the parser's
+      unframed fallback already handles it
 - [ ] The shim serves `get_game_config.php` with the patched, darts-rotated content and
-      `get_player_info.php` with own/neighbour/quest map flavours
+      `get_player_info.php` with own/neighbour/quest map flavours — **the four
+      `get_player_info.php` flavours are implemented**; the HTTP layer that routes them,
+      and the darts-rotated config response, are not
 
 ### F3 — Persistence
 
