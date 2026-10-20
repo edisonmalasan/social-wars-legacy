@@ -956,8 +956,10 @@ The smallest set of rules a faithful re-implementation must get right, in priori
 
 ### G. Buildings
 
-27. A building's own `attack` is scaled by `garrisonedUnits / unit_capacity` — an empty bunker deals
-    **0** damage.
+27. A building's own `attack` is **not** scaled by the garrison — it comes straight from the
+    config (`IsoElement.as:267`: `uiAttack = building.attack`). What the garrison limits is
+    the **number of shots** (rule 28), so an empty bunker deals **0** damage because it
+    fires no shots at all, not because its per-shot damage is reduced.
 28. A bunker fires once per garrisoned unit (capped by its attack points).
 29. Only `scf ∈ {211 tower, 231 castle, 135 town hall}` buildings ever attack; the Command Center I
     (`id 26`) is excluded.
