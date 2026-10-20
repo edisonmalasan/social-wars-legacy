@@ -16,6 +16,8 @@
  */
 import type { CommandName, NativeCommand } from '@swl/protocol';
 
+export type { CommandName, NativeCommand };
+
 /** The client's own town. */
 export const OWN_TOWN = 0;
 
