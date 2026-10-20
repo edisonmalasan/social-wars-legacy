@@ -44,14 +44,17 @@ Decisions" section of `docs/ROADMAP.md`) but is *not yet implemented*. Only rows
 
 | Layer                | Technology / version                        | Status  | Evidence                        |
 | -------------------- | ------------------------------------------- | ------- | ------------------------------- |
-| Workspace            | pnpm 12.6 workspaces, TypeScript 5.9        | **Present** | `pnpm-workspace.yaml`, `packages/*` |
-| Protocol types       | TypeScript, in `@swl/protocol`              | **Present** | `packages/protocol/src/index.ts` |
+| Workspace            | pnpm 12.6 workspaces, TypeScript 5.9        | **Present** | `pnpm-workspace.yaml`, `packages/*`, `apps/*` |
+| Protocol types       | TypeScript, in `@swl/protocol`              | **Present** | `packages/protocol/src/` — the wire types, the `command.php` framing, the 94-command table |
 | Content pipeline     | TypeScript + a dependency-free JSON Patch applier, in `@swl/content` | **Present** | `packages/content/src/` |
-| Rules engine core    | TypeScript, in `@swl/rules`                 | **Present** | `packages/rules/src/` — the seeded PRNG and the 12-stage damage pipeline |
+| Rules engine core    | TypeScript, in `@swl/rules`                 | **Present** | `packages/rules/src/` — the seeded PRNG, the 12-stage damage pipeline, the battle simulation, the quests, the goals, the loot |
+| Server core          | TypeScript, in `@swl/server`                | **Present** | `packages/server/src/` — the sessions, the compatibility shim, the command applier, the save migration |
+| Server application   | TypeScript on `node:http`, in `apps/server` | **Present** | `apps/server/src/` — the routing, the limits, the native and legacy endpoints |
+| Client core          | TypeScript, in `@swl/client`                | **Present** | `packages/client/src/` — the isometric projection, the depth sort, the atlas index |
 | Game client (web)    | TypeScript + PixiJS v8 (WebGL2) + React DOM | Planned | `docs/ROADMAP.md` Locked Decisions |
 | Desktop shell        | Tauri v2 (Rust) over the same web client     | Planned | `docs/ROADMAP.md` Group H        |
 | Mobile shell         | Capacitor over the same web client          | Planned | `docs/ROADMAP.md` Group G5       |
-| Server + rules engine| TypeScript on Node.js 26                     | Planned | `docs/ROADMAP.md` Locked Decisions |
+| Server + rules engine| TypeScript on Node.js 26                     | **Present** | `apps/server` and `packages/rules` |
 | Database             | PostgreSQL + Drizzle; PGlite for offline play| Planned | `docs/ROADMAP.md` Locked Decisions |
 | Upstream reference   | Python 3.9 + Flask 2.2.5                    | Present (vendored, read-only) | `upstream/socialwarriors/` |
 | Asset tooling        | JPEXS FFDec 26.3.0 (Java 21), Git LFS 3.7.1 | Present | `re/docs/05-assets-and-content-pipeline.md` |
@@ -79,10 +82,12 @@ desktop shells do not — they land with Groups F, G and H.**
 | Convert the SWF art to frames | `node scripts/convert-assets.mjs` | Working | Group D — resumable |
 | Pack the frames into atlases | `node scripts/pack-atlases.mjs`   | Working | Group D — trims and packs |
 | Catalogue the images and sounds | `node scripts/build-asset-manifest.mjs` | Working | Group D |
+| Extract and measure the client fonts | `node scripts/extract-fonts.mjs` | Working | Group D |
 | Check the golden-master corpus | `node scripts/golden-master.mjs` | Working | Group E4 — fails on any difference |
+| Check the command catalogue against the client | `node scripts/verify-command-catalogue.mjs` | Working | Group F2 — fails on any difference |
 | Refresh the code graph | `graphify extract . --code-only` | Working | Derived knowledge; run after a structural change |
-| Run the client (dev)        | `pnpm --filter client dev`         | Planned | Group G |
-| Run the server (dev)        | `pnpm --filter server dev`         | Planned | Group F |
+| Run the client (dev)        | `pnpm --filter @swl/client dev`        | Planned | Group G |
+| Run the server (dev)        | `pnpm --filter @swl/app-server dev`    | Working | Group F — `apps/server` |
 | Golden-master rules diff    | `pnpm --filter rules test:golden`  | Planned | Group E4 |
 
 Run from the repository root unless a command explicitly requires another directory.
