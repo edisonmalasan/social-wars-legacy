@@ -296,6 +296,87 @@ describe('collecting', () => {
   });
 });
 
+describe('the production clock', () => {
+  it('refuses a collection that is not due yet', () => {
+    // The building started its countdown a moment ago, on the one-hour
+    // period, so collecting now is too early.
+    const applier = createApplier(deps({ now: () => 1_700_000_000 }));
+    const world = worldWithBuilding({
+      cp: 2,
+      lastAccruedAt: 1_700_000_000,
+      collectType: 'w',
+      collect: 100,
+    });
+    const outcome = applier(world, { name: 'collect', args: ['7'] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'not-due');
+    assert.equal(outcome.world.resources['w'], 0);
+  });
+
+  it('allows a collection once the period has elapsed', () => {
+    const applier = createApplier(deps({ now: () => 1_700_000_000 + 60 * 60 }));
+    const world = worldWithBuilding({
+      cp: 2,
+      lastAccruedAt: 1_700_000_000,
+      collectType: 'w',
+      collect: 100,
+    });
+    const outcome = applier(world, { name: 'collect', args: ['7'] });
+    assert.equal(outcome.applied, true);
+    // The one-hour period is worth the base amount.
+    assert.equal(outcome.world.resources['w'], 100);
+  });
+
+  it('starts the countdown again after a collection', () => {
+    const applier = createApplier(deps({ now: () => 1_700_000_000 + 60 * 60 }));
+    const world = worldWithBuilding({
+      cp: 2,
+      lastAccruedAt: 1_700_000_000,
+      collectType: 'w',
+      collect: 100,
+    });
+    const outcome = applier(world, { name: 'collect', args: ['7'] });
+    assert.equal(outcome.applied, true);
+    // The next collection is another hour away.
+    const attrs = mapItems(outcome.world.save.maps[0] as Record<string, unknown>)[
+      '7'
+    ]![6] as Record<string, unknown>;
+    assert.equal(attrs['lastAccruedAt'], 1_700_000_000 + 60 * 60);
+  });
+
+  it('collects a fresh building at once', () => {
+    // A building that has never been collected from is due immediately.
+    const applier = createApplier(deps({ now: () => 1_700_000_000 }));
+    const world = worldWithBuilding({
+      cp: 2,
+      lastAccruedAt: 0,
+      collectType: 'w',
+      collect: 100,
+    });
+    const outcome = applier(world, { name: 'collect', args: ['7'] });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['w'], 100);
+  });
+
+  it('uses the one-hour period for a building with no choice', () => {
+    // The client's own multiplier for a building that is not
+    // "multi-collectable" is 1, which is the one-hour period.
+    const applier = createApplier(deps({ now: () => 1_700_000_000 }));
+    const world = worldWithBuilding({
+      cp: 0,
+      lastAccruedAt: 1_700_000_000,
+      collectType: 'w',
+      collect: 100,
+    });
+    const early = applier(world, { name: 'collect', args: ['7'] });
+    assert.equal(early.refused, 'not-due');
+
+    const later = createApplier(deps({ now: () => 1_700_000_000 + 60 * 60 }));
+    const outcome = later(world, { name: 'collect', args: ['7'] });
+    assert.equal(outcome.applied, true);
+  });
+});
+
 describe('completing a goal', () => {
   it('refuses a goal the server has not completed', () => {
     const applier = createApplier(deps());
