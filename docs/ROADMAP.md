@@ -630,11 +630,21 @@ protocol and the original dialect.*
 ### F2 — Protocol
 
 - [ ] The native command API is versioned, typed and documented
-- [ ] A **compatibility shim** speaks the original `command.php` dialect — including the
-      64-hex HMAC framing (F1) — so the untouched `Basesec_1.5.4.swf` plays against this
-      server with no client change
+- [x] The **`command.php` framing** is implemented exactly
+      (`packages/protocol/src/commandphp.ts`): `<64 lowercase hex>;<raw json>`, the digest
+      being HMAC-SHA256 over the **raw payload bytes**, and the parser mirroring the
+      client's own regex *and its fallback* — an unframed body is taken whole with a null
+      hash, which is what makes the `skiphash12341` bypass work. The digest comparison is
+      constant-time
+- [x] The framing is **verified against the real captured traffic**: every framed request
+      in `re/evidence/live/requests.jsonl` reproduces against a known key, and the
+      captured digest — produced by the original Flash client — is reproduced exactly
+- [x] **Both server keys are accepted**, because unmodified clients of both eras exist,
+      and the shim reports which era a request came from
+- [ ] A **compatibility shim** serves the original `command.php` dialect, so the untouched
+      `Basesec_1.5.4.swf` plays against this server with no client change
 - [ ] The shim tolerates `first_number` gaps (F6) and the `skiphash12341` response-hash
-      bypass
+      bypass — the bypass is already handled by the parser; the gap tolerance is not
 - [ ] The shim serves `get_game_config.php` with the patched, darts-rotated content and
       `get_player_info.php` with own/neighbour/quest map flavours
 
