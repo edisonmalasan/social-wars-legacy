@@ -37,11 +37,13 @@ import {
   LegacyIdentityBridge,
   SessionStore,
   type CommandApplier,
+  type PlayerStore,
   type Session,
   type ShimRequest,
   type ShimResponse,
 } from '@swl/server';
 import { applyCommandCost, computeCommandCost, type CostContent } from '@swl/rules';
+import { MemoryPlayerStore } from '@swl/server';
 import {
   PROTOCOL_VERSION,
   successResponse,
@@ -51,7 +53,7 @@ import {
 } from '@swl/protocol';
 
 import { DEFAULT_LIMITS, RateLimiter, parseForm, type Limits } from './limits.ts';
-import type { PlayerStore } from './store.ts';
+
 
 /** A request, as the application sees it. */
 export interface AppRequest {
@@ -144,7 +146,9 @@ function fromShim(response: ShimResponse): AppResponse {
  *
  * The returned function is the whole server, minus the socket.
  */
-export function createApp(options: AppOptions): (request: AppRequest) => AppResponse {
+export function createApp(
+  options: AppOptions,
+): (request: AppRequest) => Promise<AppResponse> {
   const limits = options.limits ?? DEFAULT_LIMITS;
   const limiter = new RateLimiter(limits);
 
@@ -186,7 +190,7 @@ export function createApp(options: AppOptions): (request: AppRequest) => AppResp
   }
 
   /** The legacy `command.php`. */
-  function handleLegacyCommand(request: AppRequest): AppResponse {
+  async function handleLegacyCommand(request: AppRequest): Promise<AppResponse> {
     const playerId = identify(request);
     if (!playerId) return fail(401, 'unknown-player');
 
@@ -196,7 +200,7 @@ export function createApp(options: AppOptions): (request: AppRequest) => AppResp
     // The transaction runs against a COPY of the save. The copy is committed
     // only when the whole batch has been processed, so a disconnect or a
     // timeout leaves the save exactly as it was.
-    const stored = options.store.transact(playerId, (world) => {
+    const stored = await options.store.transact(playerId, (world) => {
       const shimContext = {
         world,
         // The identity has already been resolved, and it is the only thing
@@ -297,7 +301,7 @@ export function createApp(options: AppOptions): (request: AppRequest) => AppResp
    * `USERID`, no client-declared resource vector and no client-claimed
    * combat outcome, because the server computes all of them.
    */
-  function handleNativeCommand(request: AppRequest): AppResponse {
+  async function handleNativeCommand(request: AppRequest): Promise<AppResponse> {
     const playerId = identify(request);
     if (!playerId) return fail(401, 'unknown-player');
 
@@ -332,7 +336,7 @@ export function createApp(options: AppOptions): (request: AppRequest) => AppResp
     }
 
     const outcomes: CommandOutcome[] = [];
-    const stored = options.store.transact(playerId, (world) => {
+    const stored = await options.store.transact(playerId, (world) => {
       let current = world;
       native.commands.forEach((command, index) => {
         // The cost is computed by the SERVER. The native envelope has no
@@ -384,7 +388,7 @@ export function createApp(options: AppOptions): (request: AppRequest) => AppResp
     return json(200, response);
   }
 
-  return function handle(request: AppRequest): AppResponse {
+  return async function handle(request: AppRequest): Promise<AppResponse> {
     // --- the limits, before anything else -------------------------------
     if (request.body.length > limits.maxBodyBytes) {
       return fail(413, 'body-too-large');
@@ -412,13 +416,15 @@ export function createApp(options: AppOptions): (request: AppRequest) => AppResp
 
       if (path === '/api/command') {
         if (request.method !== 'POST') return fail(405, 'method-not-allowed');
-        return handleNativeCommand(request);
+        return await handleNativeCommand(request);
       }
 
       // --- the legacy endpoints -----------------------------------------
       if (path === '/command.php') {
         if (request.method !== 'POST') return fail(405, 'method-not-allowed');
-        return handleLegacyCommand(request);
+        // `return await`, not `return`: a returned promise escapes the
+        // try block, and the rejection would not be caught.
+        return await handleLegacyCommand(request);
       }
       if (path === '/get_game_config.php') {
         if (request.method !== 'POST') return fail(405, 'method-not-allowed');
@@ -433,7 +439,7 @@ export function createApp(options: AppOptions): (request: AppRequest) => AppResp
         if (request.method !== 'POST') return fail(405, 'method-not-allowed');
         const playerId = identify(request);
         if (!playerId) return fail(401, 'unknown-player');
-        const own = options.store.get(playerId);
+        const own = await options.store.get(playerId);
         if (!own) return fail(401, 'unknown-player');
         return fromShim(
           handleGetPlayerInfo({ path: request.path, fields: fieldsOf(request) }, {

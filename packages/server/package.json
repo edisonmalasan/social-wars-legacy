@@ -14,6 +14,7 @@
     "test": "node --test src/**/*.test.ts"
   },
   "dependencies": {
+    "@electric-sql/pglite": "^0.5.10",
     "@swl/protocol": "workspace:*",
     "@swl/rules": "workspace:*"
   },

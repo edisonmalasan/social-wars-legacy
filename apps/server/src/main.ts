@@ -22,7 +22,7 @@ import type { CostContent } from '@swl/rules';
 
 import { createApp, type AppRequest } from './app.ts';
 import { DEFAULT_LIMITS } from './limits.ts';
-import { MemoryPlayerStore } from './store.ts';
+import { MemoryPlayerStore } from '@swl/server';
 import { createApplier } from '@swl/server';
 
 /** The port to listen on. */
@@ -99,7 +99,7 @@ async function main(): Promise<void> {
         headers: request.headers as Record<string, string | undefined>,
         body: body ?? '',
       };
-      const result = handle(appRequest);
+      const result = await handle(appRequest);
       response.writeHead(result.status, result.headers);
       response.end(result.body);
     })().catch((error) => {
