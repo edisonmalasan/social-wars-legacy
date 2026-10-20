@@ -443,13 +443,44 @@ CI run. ✔ met
       rounded body text and Rubik Mono One for the display face, both SIL OFL 1.1
 - [ ] The substitutes are **substituted in the client** and their metrics are tuned to match
       the originals, so the game's text fits the same boxes
-- [x] The **4 proprietary font references are identified**: the client loads **two**
-      fonts (`ArialRoundedBold` and `KomikaAxis`) in **three** languages (English,
-      Turkish and Greek), so it looks for **six** font files. Only the two English
-      ones ship, and the four missing ones are the **Turkish and Greek variants of
-      the same two faces**. The client's own `FontsLoader` has an IO-error handler
-      that retries and then falls back, so a Turkish or Greek player sees the default
-      font rather than a broken one
+- [x] The **4 proprietary font references are identified**: the client loads **two** fonts
+      (`ArialRoundedBold` and `KomikaAxis`) in **three** languages (English, Turkish and
+      Greek), so it looks for **six** font files. Only the two English ones ship, and the
+      four missing ones are the **Turkish and Greek variants of the same two faces**. The
+      client's own `FontsLoader` has an IO-error handler that retries and then falls
+      back, so a Turkish or Greek player sees the default font rather than a broken one
+- [x] `assets/swf/dynamic2.swf` is decompiled and analysed — it is the **runtime library**:
+      it embeds **28 sounds the server's config never mentions** (all unique, none
+      duplicating a standalone file) and the **building-construction animations**, which
+      explains why some items appear to have no art
+      ([`../re/docs/17-asset-pipeline.md`](../re/docs/17-asset-pipeline.md) §7)
+- [x] The 4 sprites above the 4 KiB ABC threshold are audited — they are ordinary
+      animation timelines with many named frames, not special logic. **Nothing to act on.**
+- [x] The 28 embedded sounds are added to the audio set — the runtime library
+      `dynamic2.swf` carries 28 sounds of its own (the construction animations' audio)
+      that are named nowhere in the config's sound list, and they are now **in the audio
+      set the client loads**, marked as embedded because their bytes live in a SWF
+      rather than in a standalone file. The set is **168 sounds**: 140 standalone and 28
+      embedded
+- [x] The construction animations from `dynamic2.swf` are included in the conversion —
+      the runtime library contributes **34 symbols**, among them
+      `Animgranjaconstr_27` with 129 frames, `ConstructionGranja` and
+      `Construction4x4Trol`. The 205 FX assets contribute **1 234 symbols** across all
+      205 files
+- [x] A viewer exists that renders every item at 3 zoom levels, so missing art is
+      visible — `scripts/build-asset-viewer.mjs` generates a single self-contained page
+      from the repository's own records: every one of the **900 content items**, its
+      sprite and its thumbnail, the art at 0.5x, 1x and 2x, and the **10 items missing
+      a sprite marked in red**. The art columns read from the atlas regions, so the page
+      is regenerated once the packer has run
+      immediately
+- [x] The client can be built with a **content-hashed** asset bundle, so a stale cache is
+      impossible — `scripts/build-asset-bundle.mjs` records every asset's content hash
+      and derives **one build id** over the whole set, and the client appends that id
+      to every asset URL (`packages/client/src/assets.ts`). A changed asset means a
+      changed URL, so the cache cannot be stale. The bundle is also the client's
+      **index**: which atlas page each sprite is on, and where in it, so the renderer
+      does not have to know how the atlases are laid out
 
 **Status:** The conversion pipeline, the trim and the atlas packer are built and verified.
 The full run, the audio, the fonts and the viewer remain.
@@ -503,10 +534,20 @@ client's observable behaviour.*
       `globals.UNIT_XP_LEVELS_MULTIPLIERS_10` and the bonuses are cumulative:
       **+30 attack and 3× base HP at level 9**
 - [x] The level-up thresholds behave exactly, including the client's off-by-one: the
-      client walks up from level 1 and **breaks** when `xp <= required`, so a unit needs
-      one point *more* than the threshold to advance - which is why level 9 cannot be
-      reached by XP alone. A paid level-up grants exactly the missing XP plus 1
+      comparison is `xp <= required` to *break*, so a unit needs one point more than the
+      threshold to advance — which is why a paid level-up grants "the missing XP plus 1"
+      (`CmdPlaceStoredItem.as:38`), and why **level 9 cannot be reached by XP alone**
       (`packages/rules/src/xp.ts`)
+- [x] All **10 damage classes** are implemented as pure state transitions
+      (`packages/rules/src/damage.ts`): `SimpleDamage`, `DamageOverTime`, `BleedingDamage`,
+      `DelayedDamage`, `DirectKillDamage`, `DizzyDamage`, `IncinerateDamage`,
+      `PushInAirDamage`, `SequencedDamage` and `AreaDamageSpecialAttack` — including the
+      shared-damage division, the bleed's damage-per-second, and the conditional kill
+- [x] All **15 special-attack classes** are specified
+      (`packages/rules/src/specialattacks.ts`) with the damage outcome a server has to
+      reproduce: the per-shot fallbacks (`attack / frames / points`, `attack / frames`),
+      the area sharing, the spawn counts, the consume attacks, the vortex's 30 % bleed, and
+      the whirlwind's per-tick division
 
 ### E2 — Economy and buildings
 
@@ -542,20 +583,23 @@ client's observable behaviour.*
       units inside the unit reward, and the ready / collected / not-ready / hidden states
 - [x] The **alliance daily bonus** is implemented: the highest tier the member count
       qualifies for (0 / 5 / 25 / 45 members)
-- [x] The upstream's market period mismatch is **resolved**: the upstream resets the
-      trade counter **daily** while the client uses a **20-hour** period, so the two
-      disagree on exactly when a player may trade again. The **client's** period is
-      the rule, because the client is the specification and the player's experience is
-      the client's. The upstream's daily reset is an upstream bug: it makes the limit
-      24 trades per calendar day rather than 20 trades per 20 hours, and it disagrees
-      with the counter the client shows. The rules engine implements the 20-hour
-      period (`packages/rules/src/market.ts`)
+- [x] The upstream's market period mismatch is **resolved**: the upstream resets the trade
+      counter **daily** while the client uses a **20-hour** period, so the two disagree on
+      exactly when a player may trade again. The **client's** period is the rule, because
+      the client is the specification and the player's experience is the client's. The
+      upstream's daily reset is an upstream bug: it makes the limit 24 trades per
+      calendar day rather than 20 trades per 20 hours, and it disagrees with the counter
+      the client shows. The rules engine implements the 20-hour period
+      (`packages/rules/src/market.ts`)
+- [x] The darts minigame (25 targets, 20 cash per paid shot, weekly prize rotation) is
+      correct — the board of **25 balloons** with the six prizes spread **1, 1, 4, 4, 7,
+      8** over them (the client's own `initTargetItems`), the board **shuffled from the
+      server's seed** so every player sees the same board that week, the first shot of
+      the day **free** and every shot after it at **20 cash**, and the **extra prize**
+      won by discovering all six — once (`packages/rules/src/dartsboard.ts`)
 
 ### E3 — Quests and goals
 
-- [x] The **Monday reward cycle** is the client's: `MONDAY_BONUS_REWARDS` has
-      **3** entries and the cycle wraps at 3, while the upstream wraps its index at
-      5. The client is the specification, so the cycle is 3
 - [x] The quest state machine and all 23 concrete quests' win/fail conditions are
       implemented (`packages/rules/src/quest.ts`): the lifecycle, the per-kill economy
       (5 gold and `ceil(gold × 0.05)` xp), the army-wipe rule, the mission timers, the
@@ -578,9 +622,15 @@ client's observable behaviour.*
       collect instead of after 500 wood, and the harbour goal completing on any quest end)
       are **fixed by default**, with a policy flag to reproduce the client's behaviour. A
       faithful-but-buggy goal is a defensible choice; a silent divergence is not
-- [x] Daily bonus, weekly bonus and goal completion are each awarded **once**, and so
-      is the **alliance daily bonus** - which the upstream is not: it credits the bonus
-      and never sets the timer, so the upstream pays it over and over
+- [x] Daily bonus, weekly bonus and goal completion are each awarded **once**, and so is
+      the **alliance daily bonus** - which the upstream is not: it credits the bonus and
+      never sets the timer, so the upstream pays it over and over. The weekly bonus uses
+      the player's **local** week day (`Utils.getWeekDayFromTimeStamp` reads
+      `Date.getDay()`), not UTC's, or the bonus moves by a day for everybody east or
+      west of Greenwich
+- [x] The **Monday reward cycle** is the client's: `MONDAY_BONUS_REWARDS` has **3**
+      entries and the cycle wraps at 3, while the upstream wraps its index at 5. The client
+      is the specification, so the cycle is 3
 - [ ] **Premium expiry** is evaluated server-side and awarded once
 
 ### E4 — Determinism and verification
@@ -917,14 +967,16 @@ assault against the new server, and the cheat battery is fully rejected.
 
 - [ ] Every screen in the B6 inventory is implemented, or explicitly dropped with a
       recorded decision
-- [x] The **HUD's model** is implemented (`packages/client/src/hud.ts`): the resources,
-      the level, the population and the energy, and every popover's text — the
-      client's own literals, including the "Build more Silos to get more space"
-      warning and the max-population case. The **number formatting** is the client's
-      exactly: the digits grouped in threes from the right and joined with commas, and
-      grouped as a STRING, so a negative number comes out as "-1,234"
+- [x] The **HUD's model** is implemented (`packages/client/src/hud.ts`): the resources, the
+      level, the population and the energy, and every popover's text - the client's own
+      literals, including the "Build more Silos to get more space" warning and the
+      max-population case. The **number formatting** is the client's exactly: the digits
+      grouped in threes from the right and joined with commas, and grouped as a STRING,
+      so a negative number comes out as "-1,234"
 - [ ] The build menu, unit panel, minimap, neighbour strip, goal panel and popups all
       work
+- [ ] Tooltips, tutorials and the "click here" guidance system are reimplemented
+- [ ] Text renders with the substituted fonts at the original metrics
 
 ### G4 — Feature parity
 
