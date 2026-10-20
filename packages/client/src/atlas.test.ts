@@ -127,19 +127,35 @@ describe('the atlas index', () => {
 
 describe('the content hash', () => {
   it('is stable', () => {
-    const pixels = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]);
-    assert.equal(imageHash(2, 1, pixels), imageHash(2, 1, pixels));
+    const bytes = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]);
+    assert.equal(imageHash(bytes), imageHash(bytes));
   });
 
-  it('changes when the pixels change', () => {
+  it('changes when the bytes change', () => {
     const a = new Uint8Array([1, 2, 3, 4]);
     const b = new Uint8Array([1, 2, 3, 5]);
-    assert.notEqual(imageHash(1, 1, a), imageHash(1, 1, b));
+    assert.notEqual(imageHash(a), imageHash(b));
   });
 
-  it('changes when the dimensions change', () => {
-    const pixels = new Uint8Array([1, 2, 3, 4]);
-    assert.notEqual(imageHash(2, 1, pixels), imageHash(1, 2, pixels));
+  it('reproduces the ASSET PIPELINE hash, which is the one that matters', async () => {
+    // The pipeline keys the store by the SHA-256 of the image's **file
+    // bytes**. The client's hash has to be the same one, or the client
+    // cannot find the art.
+    //
+    // It used to hash the *pixels*, and it did not match: the comment
+    // described a design the pipeline never had.
+    const manifest = JSON.parse(
+      await readFile(path.join(repoRoot(), 're/data/frame-manifest.json'), 'utf8'),
+    ) as { images: Record<string, { file: string }> };
+
+    const [key, entry] = Object.entries(manifest.images)[0]!;
+    const file = path.join(repoRoot(), '.work/frames/store', entry.file);
+    if (!existsSync(file)) {
+      // The store is a build artefact, and it may not be here.
+      return;
+    }
+    const bytes = await readFile(file);
+    assert.equal(imageHash(bytes), key);
   });
 });
 

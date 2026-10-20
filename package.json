@@ -10,6 +10,7 @@
   "scripts": {
     "build": "pnpm --filter content build",
     "build:content": "pnpm --filter content build",
+    "build:client": "node scripts/build-client-manifest.mjs",
     "check:content": "pnpm --filter content check",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p apps/client/tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit && tsc -p apps/client/tsconfig.json --noEmit",

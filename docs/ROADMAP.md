@@ -1437,7 +1437,20 @@ product.*
 - [ ] Performance budgets are defined and met: input-to-render latency, simulation tick
       time, memory and client frame rate
 - [ ] The client holds a stable frame rate on the largest documented battle
-- [ ] The asset bundle size is measured and minimised
+- [x] The **asset bundle size is measured and minimised**
+      (`node scripts/build-client-manifest.mjs`). The asset pipeline's manifest holds
+      **every** image the client's SWFs contain - 254 155 images and 41 198 symbols,
+      **118 MB** of JSON - and the browser cannot be sent that
+- [x] The client gets its **own** manifest, holding only the symbols the content's
+      items refer to, and only the images those symbols use: **853 symbols, 4 639
+      images and 3.9 MB** - a **31 times** reduction
+- [x] The trimming is at the right level because the client instantiates the SWF's
+      **root** and picks the drawing by its frame number
+      (`IsoElement.setGraphic`: `new sheetDictionary[img_name]()` and
+      `gotoAndStop(frame + 1)`), so the sheet is the only symbol it needs
+- [x] The reduction is **checked**, not asserted: the client's manifest has to be
+      under a tenth of the pipeline's, to hold only the symbols the items ask for, to
+      hold one symbol per SWF, and to have an image for every frame it names
 - [ ] A release checklist is followed for the first production release
 - [ ] The first production release is published, monitored for a full cycle, and any
       rollback path is proven
