@@ -39,6 +39,9 @@ jobs:
       - name: The golden-master corpus
         run: node scripts/golden-master.mjs
 
+      - name: The soak test
+        run: node --expose-gc scripts/soak-server.mjs --batches 2000 --players 4
+
       - name: Build and validate the content bundle
         run: pnpm build:content
 

@@ -19,6 +19,10 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.10",
+    "@swl/client": "workspace:*",
+    "@swl/protocol": "workspace:*",
+    "@swl/rules": "workspace:*",
+    "@swl/server": "workspace:*",
     "@types/node": "^22.10.2",
     "typescript": "^5.7.2"
   }
