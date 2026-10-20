@@ -986,6 +986,17 @@ assault against the new server, and the cheat battery is fully rejected.
       condition is simply the level, and the clone reproduces that rather than
       inventing an unlock system the client does not have
 - [ ] The unit panel, minimap, neighbour strip, goal panel and popups all work
+- [ ] Tooltips, tutorials and the "click here" guidance system are reimplemented
+- [x] The **text metrics** are implemented (`packages/client/src/fonts.ts`): the
+      original faces' advance widths, scaled, so the substituted face occupies the
+      same space and the game's boxes still fit. The scale is a **parameter**, not a
+      constant, because it depends on which font file is actually shipped - a scale of
+      1 means "not tuned yet", and the roadmap says so
+- [x] The **substitutes are named and served under the names the client asks for**,
+      and the languages are recorded: the client loads fonts for English, Turkish and
+      Greek, and only the English ones ship, so the clone ships one set and falls back
+      the same way
+- [ ] Text renders with the substituted fonts at the original metrics
 
 ### G4 — Feature parity
 
