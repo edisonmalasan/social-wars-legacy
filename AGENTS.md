@@ -79,6 +79,7 @@ desktop shells do not — they land with Groups F, G and H.**
 | Convert the SWF art to frames | `node scripts/convert-assets.mjs` | Working | Group D — resumable |
 | Pack the frames into atlases | `node scripts/pack-atlases.mjs`   | Working | Group D — trims and packs |
 | Catalogue the images and sounds | `node scripts/build-asset-manifest.mjs` | Working | Group D |
+| Check the golden-master corpus | `node scripts/golden-master.mjs` | Working | Group E4 — fails on any difference |
 | Run the client (dev)        | `pnpm --filter client dev`         | Planned | Group G |
 | Run the server (dev)        | `pnpm --filter server dev`         | Planned | Group F |
 | Golden-master rules diff    | `pnpm --filter rules test:golden`  | Planned | Group E4 |

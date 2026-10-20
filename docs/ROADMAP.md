@@ -541,13 +541,24 @@ client's observable behaviour.*
 
 ### E4 — Determinism and verification
 
+- [x] Combat is resolved **server-side from a server-issued seed**
+      (`packages/rules/src/authority.ts`): the API has no parameter for a client-claimed
+      result, so the client cannot influence the outcome even by accident. The seed comes
+      from the battle id, so the client can replay the battle and get the same result —
+      auditable rather than arbitrary
+- [x] A **golden-master harness** diffs the rules engine against itself
+      (`scripts/golden-master.mjs`): **50 scenarios** over the damage pipeline, the
+      counters, the targeting, the cadence, the garrison, the XP thresholds, the
+      collection arithmetic, the market pricing, the bonus cycles, the build costs and
+      the special attacks. The corpus is `re/data/golden-corpus.json` and the recorded
+      answers are `re/data/golden-master.json`
+- [x] The harness **runs in CI** on every push, and fails with a non-zero exit on any
+      difference. Verified: perturbing one recorded value is detected and reported
+- [ ] The harness diffs the rules engine against the **original Flash client** — the
+      differential test needs the client to be driven through the same scenarios, which
+      is the last part of E4
 - [ ] The simulation is deterministic given a seed; the same seed and inputs produce the
-      same outcome on any machine
-- [ ] A **golden-master harness** diffs the rules engine against the original Flash client:
-      the same action produces the same state change
-- [ ] The harness runs in CI on a fixed corpus of scenarios
-- [ ] Combat is resolved server-side from a server-issued seed; the client's claimed outcome
-      is ignored and cannot change the result
+      same outcome on any machine — verified within a process, not yet across platforms
 
 **Exit criteria:** the golden-master corpus passes with zero unexplained differences.
 
