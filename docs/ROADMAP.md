@@ -460,7 +460,12 @@ CI run. ✔ met
       rather than in a standalone file. The set is **168 sounds**: 140 standalone and 28
       embedded
 - [ ] The construction animations from `dynamic2.swf` are included in the conversion
-- [ ] A viewer exists that renders every item at 3 zoom levels, so missing art is visible
+- [x] A viewer exists that renders every item at 3 zoom levels, so missing art is
+      visible — `scripts/build-asset-viewer.mjs` generates a single self-contained page
+      from the repository's own records: every one of the **900 content items**, its
+      sprite and its thumbnail, the art at 0.5x, 1x and 2x, and the **10 items missing
+      a sprite marked in red**. The art columns read from the atlas regions, so the page
+      is regenerated once the packer has run
       immediately
 - [ ] The client can be built with a **content-hashed** asset bundle, so a stale cache is
       impossible
