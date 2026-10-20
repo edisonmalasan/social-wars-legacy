@@ -21,3 +21,4 @@ export * from './damage.ts';
 export * from './specialattacks.ts';
 export * from './authority.ts';
 export * from './goals.ts';
+export * from './commandcost.ts';
