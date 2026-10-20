@@ -60,7 +60,18 @@ async function app(over: Partial<AppOptions> = {}) {
     applyCommand: (w, command) => ({ applied: true, world: w }),
     ...over,
   };
-  return { handle: createApp(options), options, store, sessions };
+  // A real session, so the token in the request is a real token.
+  const issued = sessions.authenticate('p1', 'correct horse', 1_700_000_000);
+  if (!issued.ok) throw new Error('the test player could not authenticate');
+  return {
+    handle: createApp(options),
+    options,
+    // The store the application actually uses, which a caller may have
+    // replaced through `over`.
+    store: options.store,
+    sessions,
+    token: issued.session.token,
+  };
 }
 
 function request(
@@ -333,6 +344,127 @@ describe('the legacy command endpoint', () => {
     assert.equal(limited.status, 429);
     assert.equal(JSON.parse(limited.body).error, 'rate-limited');
     assert.ok(limited.headers['retry-after']);
+  });
+});
+
+describe('the native command endpoint', () => {
+  const native = (token: string, id: string, commands: unknown[]) => ({
+    method: 'POST',
+    path: '/api/command',
+    headers: {
+      'content-type': 'application/json',
+      authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ v: 1, id, token, commands }),
+  });
+
+  it('applies a valid request', async () => {
+    const { handle, token } = await app();
+    const response = handle(native(token, 'req-1', []));
+    assert.equal(response.status, 200);
+    const body = JSON.parse(response.body);
+    assert.equal(body.v, 1);
+    assert.equal(body.id, 'req-1');
+    assert.equal(body.ok, true);
+    assert.deepEqual(body.outcomes, []);
+  });
+
+  it('refuses an unauthenticated request', async () => {
+    const { handle } = await app();
+    const response = handle({
+      method: 'POST',
+      path: '/api/command',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ v: 1, id: 'req-1', token: 'good', commands: [] }),
+    });
+    assert.equal(response.status, 401);
+  });
+
+  it('refuses a malformed body with a typed error', async () => {
+    const { handle, token } = await app();
+    const response = handle({
+      method: 'POST',
+      path: '/api/command',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
+      body: 'not json',
+    });
+    assert.equal(response.status, 400);
+    assert.equal(JSON.parse(response.body).error, 'malformed-json');
+  });
+
+  it('refuses an unsupported protocol version', async () => {
+    const { handle, token } = await app();
+    const response = handle({
+      method: 'POST',
+      path: '/api/command',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
+      body: JSON.stringify({ v: 99, id: 'req-1', token, commands: [] }),
+    });
+    assert.equal(response.status, 400);
+    const body = JSON.parse(response.body);
+    assert.equal(body.ok, false);
+    assert.ok(body.errors.length > 0);
+    assert.equal(body.errors[0].code, 'unsupported-protocol-version');
+  });
+
+  it('refuses a command that is not in the vocabulary', async () => {
+    const { handle, token } = await app();
+    const response = handle(native(token, 'req-1', [{ map: 0, name: 'not_a_command', args: [] }]));
+    assert.equal(response.status, 400);
+    const body = JSON.parse(response.body);
+    assert.equal(body.errors[0].code, 'unknown-command');
+  });
+
+  it('does not apply a retried request twice', async () => {
+    let applied = 0;
+    const { handle, token } = await app({
+      applyCommand: (w) => {
+        applied += 1;
+        return { applied: true, world: w };
+      },
+    });
+    const first = handle(
+      native(token, 'req-1', [{ map: 0, name: 'move', args: [1, 2, 3, 0, 'test'] }]),
+    );
+    assert.equal(first.status, 200);
+    assert.equal(applied, 1);
+
+    // The same request id: the retry of a request that was lost in flight.
+    const second = handle(
+      native(token, 'req-1', [{ map: 0, name: 'move', args: [1, 2, 3, 0, 'test'] }]),
+    );
+    assert.equal(second.status, 200);
+    assert.equal(applied, 1, 'the retried request was applied again');
+    // The answer is the same one.
+    assert.deepEqual(JSON.parse(second.body), JSON.parse(first.body));
+  });
+
+  it('computes the cost itself', async () => {
+    const { handle, store, token } = await app();
+    const response = handle(
+      native(token, 'req-1', [{ map: 0, name: 'buy', args: [1, 1007, 0, 0, 1, 0, 0, 'u'] }]),
+    );
+    assert.equal(response.status, 200);
+    // The Soldier costs 30 gold and 60 steel, and the native envelope has
+    // nowhere to put a client's own figure.
+    assert.equal(store.get('p1')!.world.resources['g'], 1000 - 30);
+    assert.equal(store.get('p1')!.world.resources['s'], 1000 - 60);
+  });
+
+  it('refuses a command the player cannot afford, without touching the rest', async () => {
+    const { handle, store, token } = await app({
+      store: new MemoryPlayerStore([
+        { playerId: 'p1', world: { ...world(), resources: { g: 1, w: 0, o: 0, s: 0, c: 0, e: 100, x: 0, m: 0 } } },
+      ]),
+    });
+    const response = handle(
+      native(token, 'req-1', [{ map: 0, name: 'buy', args: [1, 1007, 0, 0, 1, 0, 0, 'u'] }]),
+    );
+    assert.equal(response.status, 200);
+    const body = JSON.parse(response.body);
+    assert.equal(body.ok, false);
+    assert.equal(body.outcomes[0].error.code, 'insufficient-resources');
+    assert.equal(store.get('p1')!.world.resources['g'], 1);
   });
 });
 
