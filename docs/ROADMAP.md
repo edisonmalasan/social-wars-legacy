@@ -758,7 +758,12 @@ protocol and the original dialect.*
       `end_attack`, `end_quest`, `place_stored_item`, `buy`, `push_queue_unit`,
       `pop_queue_unit`, `level_up`, `upgrade`, `reset_collect` and `finish_building`
       are all granted through the server's own rules
-- [ ] The production-cycle timer that `economy.ts` lacks - the server must own it
+- [x] The **production-cycle timer** is implemented and the **server owns the clock**
+      (`packages/rules/src/production.ts`): the collection is a period the **player
+      chooses** - 5 minutes at 0.25, 60 at 1, 240 at 2 and 480 at 3, the client's own
+      four - and the server refuses a collection until the period has elapsed. The
+      upstream never checks this: its `collect` handler resets the timestamp and
+      believes whatever the client sends
 
 ### F2 — Protocol
 

@@ -41,6 +41,8 @@ import {
   dailyBonusReward,
   mondayBonusReward,
   mondayBonusState,
+  isDue,
+  type ProductionCycle,
   collect as collectProduction,
   awardQuest,
   emptyQuestProgress,
@@ -112,8 +114,15 @@ export const BUILDING_STATE_KEYS = [
 ] as const;
 
 /** The private-state key the goal runtime state uses. */
-export const GOAL_STATE_KEY = 'goalState';
+/**
+ * The period a building collects on when it does not offer the choice.
+ *
+ * The client's own multiplier for a building that is not
+ * "multi-collectable" is 1, and that is the **one hour** period.
+ */
+export const DEFAULT_COLLECT_PERIOD = 2;
 
+export const GOAL_STATE_KEY = 'goalState';
 /** The private-state key the quest progress uses. */
 export const QUEST_PROGRESS_KEY = 'questProgress';
 
@@ -886,6 +895,22 @@ function collectCommand(
   const attrs = (tuple[6] ??= {}) as Record<string, unknown>;
   const state = buildingState(attrs);
 
+  // The production cycle. The player chose a period, the countdown started
+  // then, and the collection is due once it has elapsed. The upstream never
+  // checks this.
+  const period = state.cp > 0 ? state.cp : DEFAULT_COLLECT_PERIOD;
+  const cycle: ProductionCycle = {
+    period,
+    startedAt: state.lastAccruedAt,
+  };
+  if (!isDue(cycle, deps.collectPeriods, deps.now())) {
+    return {
+      applied: false,
+      refused: 'not-due',
+      world,
+    };
+  }
+
   // The amount comes from the building's own production state, through the
   // rules engine. The client declares nothing.
   const result = collectProduction(
@@ -894,7 +919,7 @@ function collectCommand(
       unitCapacity: state.unitCapacity,
       unitsInside: state.unitsInside,
     },
-    state.cp,
+    period,
     deps.collectPeriods,
   );
 
@@ -910,8 +935,13 @@ function collectCommand(
     [resource]: (world.resources[resource] ?? 0) + result.amount,
   };
 
-  // The production is reset and the timer restamped.
-  writeBuildingState(attrs, { ...state, collect: 0, lastAccruedAt: deps.now() });
+  // The production is reset and the countdown restarts.
+  writeBuildingState(attrs, {
+    ...state,
+    collect: 0,
+    cp: period,
+    lastAccruedAt: deps.now(),
+  });
   tuple[3] = deps.now();
 
   return { applied: true, world };
