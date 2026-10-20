@@ -12,6 +12,7 @@ import { AtlasIndex, type FrameManifest } from '@swl/client';
 
 import { buildScene, type SceneItem } from './scene.ts';
 import { WorldRenderer } from './renderer.ts';
+import { clientCss } from './fonts.ts';
 
 const STAGE = document.getElementById('stage');
 const GAME = document.getElementById('game');
@@ -20,6 +21,19 @@ const GAME = document.getElementById('game');
 const CONTENT_URL = '/content-bundle.json';
 const MANIFEST_URL = '/frame-manifest.json';
 const ATLAS_BASE = '/atlases';
+
+/**
+ * The stylesheet.
+ *
+ * It is **injected** rather than linked, so the fonts' base URL is the
+ * client's own configuration and the sheet is built from the same
+ * module the tests check.
+ */
+function installStyles(): void {
+  const style = document.createElement('style');
+  style.textContent = clientCss('/fonts');
+  document.head.appendChild(style);
+}
 
 /** The player's world, as the server sends it. */
 interface ServerWorld {
@@ -72,6 +86,8 @@ function sceneItems(
 
 async function main(): Promise<void> {
   if (!STAGE || !GAME) throw new Error('the page has no stage');
+
+  installStyles();
 
   const manifest = await json<FrameManifest>(MANIFEST_URL);
   const content = await json<{ items: Record<string, never> }>(CONTENT_URL);
