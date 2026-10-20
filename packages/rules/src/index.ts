@@ -8,8 +8,15 @@
  * claims it won.
  */
 
-export * from './random.js';
-export * from './resources.js';
-export * from './darts.js';
-export * from './combat.js';
-export * from './counters.js';
+export * from './random.ts';
+export * from './resources.ts';
+export * from './darts.ts';
+export * from './combat.ts';
+export * from './counters.ts';
+export * from './economy.ts';
+export * from './market.ts';
+export * from './bonuses.ts';
+export * from './building.ts';
+export * from './damage.ts';
+export * from './specialattacks.ts';
+export * from './authority.ts';
