@@ -989,42 +989,20 @@ assault against the new server, and the cheat battery is fully rejected.
 ### G3 — The UI (rebuilt from scratch)
 
 - [ ] Every screen in the B6 inventory is implemented, or explicitly dropped with a
-      recorded decision
-- [x] The **HUD's model** is implemented (`packages/client/src/hud.ts`): the resources, the
-      level, the population and the energy, and every popover's text - the client's own
-      literals, including the "Build more Silos to get more space" warning and the
-      max-population case. The **number formatting** is the client's exactly: the digits
-      grouped in threes from the right and joined with commas, and grouped as a STRING,
-      so a negative number comes out as "-1,234"
-- [x] The **build menu** is implemented as a model (`packages/client/src/buildmenu.ts`):
-      the tabs are the content's categories and their sub-categories, and each tab's
-      list is ordered the client's way. The order is **not** the content's order: the
-      items the player is too low a level for are pushed **10 000 down the list**, not
-      hidden, so the player can still see them and know they exist. `itemUnlocked`
-      **always returns false** in this build (`core/Base.as:7993-7995`), so the
-      condition is simply the level, and the clone reproduces that rather than
-      inventing an unlock system the client does not have
-- [ ] The unit panel, minimap, neighbour strip, goal panel and popups all work
-- [x] The **tooltips** are implemented as a model (`packages/client/src/tooltips.ts`):
-      the HUD's four resource sentences are the client's own literals, and the info
-      panel is built from the item's own statistics — the resource building shows its
-      name, its resource and the amount it earns, and the unit shows its effective
-      attack, range, velocity, life and population
-- [x] The client's **defence slot shows the attack interval**, in both the tooltip and
-      the info panel. That is the client's behaviour in *both* places, so it is not a
-      slip in one of them, and the clone reproduces it rather than "fixing" it — the
-      client is the specification
-- [x] The **"click here" guidance** is implemented (`packages/client/src/guidance.ts`):
-      the goals panel's up-to-three "CLICK HERE!" badges, one on each of the three
-      goal slots, marking the goals the player has not visited. The offset counts the
-      **incomplete** goals only, so a completed goal does not take up a slot
-- [x] The client's **quirk** in that guidance is reproduced and recorded: the check
-      reads the *first* marker's clicked flag for all three markers, even though the
-      client keeps three separate flags — so clicking the first badge suppresses all
-      three, while clicking the second or the third suppresses only that one. It is
-      recorded as a decision, not an accident
-- [ ] The remaining tooltip surfaces (the icon panel's dictionary, the special units'
-      attack tooltips and the market's) are reimplemented
+      recorded decision. The inventory is the client's **260** screens, and **every one
+      of them now carries a decision** (`re/data/ui-screens.json`):
+      - **97 implemented** — the clone models the screen's behaviour, and the decision
+        names the model that does it
+      - **23 dropped**, each with its reason: the upstream's administrative panel (a
+        panel that could edit the rules would be the `flash_debug` hole again), the
+        cross-promotion to Zynga games that no longer exist, the screens that take
+        **real money**, the Facebook friend hiring, the mobile-client notice, the
+        video player and the robot picker
+      - **140 planned** — in scope, the client's behaviour is real, and not modelled
+        yet
+      The decisions are **checked**, not believed (`packages/client/src/screens.test.ts`):
+      every screen must have a decision, every implemented one must name a model that
+      exists, and every dropped one must say why
 
 ### G4 — Feature parity
 
