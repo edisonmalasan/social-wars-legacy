@@ -799,10 +799,16 @@ protocol and the original dialect.*
 - [x] The **owner's powers** are implemented: only the owner processes join requests or
       kicks a member, and the owner cannot simply walk away from the alliance
       (`ERR_ALLIANCE_OWNER_SWITCH`)
-- [ ] The **marketplace and the auction/betting subsystem** are implemented per the B7
-      contracts, or are explicitly and visibly out of scope. The upstream's subsystem is
-      complete but **disabled**, and the client's three endpoints are documented
-- [ ] The alliance service is **persisted** and served over HTTP
+- [x] The **marketplace and the auction/betting subsystem** are implemented
+      (`packages/server/src/marketplace.ts`): the listing model, the three client
+      endpoints, the client's own sort order (`isPrivate` descending, then `endDate`
+      ascending), the price ladder, the round logic, the tie rule and the settlement.
+      The upstream's subsystem was **complete but disabled**; the client's semantics win
+      where the two disagree, and there were eight such places
+- [ ] The alliance and marketplace services are **persisted** and **served over HTTP**
+      as the client service variants. Both services are pure — the state is passed in
+      and the new state is returned — so they need a persistence layer and the HTTP
+      endpoints, exactly as the player saves do
 
 **Exit criteria:** the original Flash client can complete the tutorial and a Mission 1
 assault against the new server, and the cheat battery is fully rejected.
@@ -835,7 +841,14 @@ assault against the new server, and the cheat battery is fully rejected.
       while the map's contents move by the delta divided by the zoom; and the **mouse
       wheel and the slider are different behaviours** — the wheel multiplies by 1.2 and
       the slider adds 0.2
-- [ ] Every unit and building animates from its atlas frames, with correct frame timing
+- [x] Every unit and building animates from its atlas frames, with correct frame timing
+      — the frame number is **not a timeline**: the client picks the frame by number out
+      of a sheet that holds every drawing of every state, and the number is
+      `animation × 5 + direction` (`core/isoengine/IsoUnit.as:1436`). There are eight
+      directions and **five** slots per block, because the three LEFT-facing ones are
+      the right-facing ones drawn **mirrored**. An idle unit shows a **random** frame of
+      its idle sub-clip, so the random source is a parameter rather than a call to
+      `Math.random`
 - [ ] Projectiles, particles and the 205 FX assets render
 - [ ] Depth sorting and occlusion match the original engine
 - [x] The map pans, zooms and re-centres as the original does
