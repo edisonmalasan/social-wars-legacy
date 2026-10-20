@@ -80,6 +80,7 @@ desktop shells do not — they land with Groups F, G and H.**
 | Pack the frames into atlases | `node scripts/pack-atlases.mjs`   | Working | Group D — trims and packs |
 | Catalogue the images and sounds | `node scripts/build-asset-manifest.mjs` | Working | Group D |
 | Check the golden-master corpus | `node scripts/golden-master.mjs` | Working | Group E4 — fails on any difference |
+| Refresh the code graph | `graphify extract . --code-only` | Working | Derived knowledge; run after a structural change |
 | Run the client (dev)        | `pnpm --filter client dev`         | Planned | Group G |
 | Run the server (dev)        | `pnpm --filter server dev`         | Planned | Group F |
 | Golden-master rules diff    | `pnpm --filter rules test:golden`  | Planned | Group E4 |
