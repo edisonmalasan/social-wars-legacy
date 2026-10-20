@@ -18,7 +18,9 @@ import { costContentFrom } from '@swl/rules';
 import process from 'node:process';
 
 import {
+  JsonLogger,
   LegacyIdentityBridge,
+  Metrics,
   PostgresPlayerStore,
   SCHEMA_MIGRATIONS,
   SessionStore,
@@ -138,12 +140,24 @@ async function main(): Promise<void> {
     }
   }
 
+  // The structured log: one JSON line per request, on stdout. The sink
+  // is injected, so a deployment can send it somewhere else without
+  // touching the application.
+  const logger = new JsonLogger({
+    sink: (record) => {
+      process.stdout.write(`${JSON.stringify(record)}\n`);
+    },
+  });
+  const metrics = new Metrics();
+
   const handle = createApp({
     store,
     sessions,
     identity,
     content,
     contentBundle: bundle,
+    logger,
+    metrics,
     now: () => Math.floor(Date.now() / 1000),
     nowMs: () => Date.now(),
     applyCommand: createApplier({

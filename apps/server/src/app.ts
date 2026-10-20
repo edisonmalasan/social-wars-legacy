@@ -55,6 +55,15 @@ import {
 } from '@swl/protocol';
 
 import { DEFAULT_LIMITS, RateLimiter, parseForm, type Limits } from './limits.ts';
+import {
+  Metrics,
+  REQUEST_ID_HEADER,
+  SILENT_LOGGER,
+  newRequestId,
+  seriesKey,
+  snapshot,
+  type Logger,
+} from '@swl/server';
 
 
 /** A request, as the application sees it. */
@@ -112,6 +121,12 @@ export interface AppOptions {
   neighbours?: Record<string, Record<string, unknown>>;
   /** The alliance and betting services, for the social endpoints. */
   social?: SocialOptions;
+  /** Where the structured log goes. */
+  logger?: Logger;
+  /** The metrics registry. */
+  metrics?: Metrics;
+  /** The request id source. */
+  requestId?: () => string;
 }
 
 /** A JSON response. */
@@ -153,6 +168,16 @@ function fromShim(response: ShimResponse): AppResponse {
 export function createApp(
   options: AppOptions,
 ): (request: AppRequest) => Promise<AppResponse> {
+  const logger = options.logger ?? SILENT_LOGGER;
+  const metrics = options.metrics ?? new Metrics();
+
+  /**
+   * What the request is about, for the log.
+   *
+   * The command handler fills it in, and the log line picks it up, so the
+   * line says what the request did and not only that it happened.
+   */
+  const requestContext: Record<string, unknown> = {};
   const limits = options.limits ?? DEFAULT_LIMITS;
   const limiter = new RateLimiter(limits);
 
@@ -340,9 +365,18 @@ export function createApp(
     }
 
     const outcomes: CommandOutcome[] = [];
+    const applied: string[] = [];
+    const refused: string[] = [];
+    const commandStartedAt = options.nowMs?.() ?? Date.now();
+
     const stored = await options.store.transact(playerId, (world) => {
       let current = world;
       native.commands.forEach((command, index) => {
+        // The command's name, its duration and whether it was applied:
+        // the metrics and the log line both need them, and the request id
+        // is what ties them to the client's action.
+        const startedAt = options.nowMs?.() ?? Date.now();
+        metrics.increment('commands_total', { name: command.name });
         // The cost is computed by the SERVER. The native envelope has no
         // room for a client-declared delta at all.
         const cost = computeCommandCost(options.content, command.name, command.args);
@@ -366,9 +400,14 @@ export function createApp(
           { name: command.name, args: [...command.args] },
         );
         current = outcome.world;
+        const durationMs = (options.nowMs?.() ?? Date.now()) - startedAt;
+        metrics.observe('command_duration_ms', durationMs, { name: command.name });
+        metrics.observe('simulation_tick_ms', durationMs, { name: command.name });
         if (outcome.applied) {
+          applied.push(command.name);
           outcomes.push({ index, ok: true, result: { kind: 'none' } });
         } else {
+          refused.push(command.name);
           outcomes.push({
             index,
             ok: false,
@@ -389,10 +428,25 @@ export function createApp(
 
     const response = successResponse(native.id, outcomes);
     rememberAnswer(playerId, native.id, response);
+
+    requestContext['player'] = playerId;
+    requestContext['commands'] = native.commands.map((command) => command.name);
+    requestContext['applied'] = applied;
+    requestContext['refused'] = refused;
+    requestContext['commandDurationMs'] =
+      (options.nowMs?.() ?? Date.now()) - commandStartedAt;
+
     return json(200, response);
   }
 
-  return async function handle(request: AppRequest): Promise<AppResponse> {
+  /**
+   * The route.
+   *
+   * The work: the limits, the routing and the dialects. It is separate
+   * from the wrapper below so that **every** response goes through the
+   * observation, and not only the early returns.
+   */
+  async function route(request: AppRequest): Promise<AppResponse> {
     // --- the limits, before anything else -------------------------------
     if (request.body.length > limits.maxBodyBytes) {
       return fail(413, 'body-too-large');
@@ -405,6 +459,7 @@ export function createApp(
     const path = request.path.split('?')[0] ?? request.path;
 
     try {
+
       // The alliance and betting services use the same envelope as
       // `command.php`, so they are dispatched before the router.
       if (options.social) {
@@ -423,6 +478,14 @@ export function createApp(
         if (request.method === 'POST') return createSession(request);
         if (request.method === 'DELETE') return deleteSession(request);
         return fail(405, 'method-not-allowed');
+      }
+
+      if (path === '/api/metrics') {
+        if (request.method !== 'GET') return fail(405, 'method-not-allowed');
+        // The active sessions, as a gauge rather than a counter: it goes
+        // up and down.
+        metrics.gauge('active_sessions', options.sessions.size);
+        return json(200, snapshot(metrics));
       }
 
       if (path === '/api/command') {
@@ -472,8 +535,61 @@ export function createApp(
       return fail(404, 'not-found');
     } catch (error) {
       // An unexpected failure is a 500, but the details stay here.
-      console.error('[server] unhandled error:', error);
+      logger.error('unhandled error', { error: String(error) });
       return fail(500, 'internal-error');
     }
+  }
+
+  /**
+   * The wrapper.
+   *
+   * Every request gets a request id, and every response goes through the
+   * observation: the log line, the metrics and the `x-request-id`
+   * header.
+   */
+  return async function handle(request: AppRequest): Promise<AppResponse> {
+    // The request id. The client's own is reused when it sends one, so
+    // its correlation id survives into the log; otherwise one is made.
+    // It travels back in the response, so a player can quote it.
+    const requestId =
+      request.headers[REQUEST_ID_HEADER] ?? (options.requestId ?? newRequestId)();
+    const startedAt = options.nowMs?.() ?? Date.now();
+
+    let response: AppResponse;
+    try {
+      response = await route(request);
+    } catch (error) {
+      // The route catches its own errors, so this is a failure in the
+      // observation itself. It is still a 500 with a typed body.
+      logger.error('unhandled error', { error: String(error), requestId });
+      response = fail(500, 'internal-error');
+    }
+
+    const durationMs = (options.nowMs?.() ?? Date.now()) - startedAt;
+    const path = request.path.split('?')[0] ?? request.path;
+
+    metrics.observe('http_request_duration_ms', durationMs, { path, method: request.method });
+    metrics.increment('http_requests_total', {
+      path,
+      method: request.method,
+      status: String(response.status),
+    });
+    if (response.status >= 400) {
+      metrics.increment('http_errors_total', { path, status: String(response.status) });
+    }
+
+    logger.log(response.status >= 500 ? 'error' : 'info', 'request', {
+      requestId,
+      path,
+      method: request.method,
+      status: response.status,
+      durationMs,
+      ...requestContext,
+    });
+
+    return {
+      ...response,
+      headers: { ...response.headers, [REQUEST_ID_HEADER]: requestId },
+    };
   };
 }
