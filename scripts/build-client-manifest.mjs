@@ -53,6 +53,9 @@ async function main() {
   let keptImages = 0;
   const seen = new Set();
 
+  /** The item id -> the art it uses. */
+  const itemArt = {};
+
   for (const symbol of manifest.symbols ?? []) {
     const swf = String(symbol.swf ?? '');
     const name = swf.slice(swf.lastIndexOf('/') + 1).replace(/\.swf$/, '');
@@ -93,6 +96,12 @@ async function main() {
       uniqueFrames: symbol.uniqueFrames,
       frames,
     });
+
+    // The items that use this SWF are drawn with this symbol.
+    for (const item of content.items ?? []) {
+      if (item.img_name !== name) continue;
+      itemArt[String(item.id)] = { swf: symbol.swf, symbol: symbol.symbol };
+    }
   }
 
   const trimmed = {
@@ -103,9 +112,11 @@ async function main() {
     counts: {
       symbols: symbols.length,
       images: keptImages,
+      items: Object.keys(itemArt).length,
     },
     images,
     symbols,
+    itemArt,
     atlases: manifest.atlases ?? null,
   };
 

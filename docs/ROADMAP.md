@@ -986,6 +986,18 @@ assault against the new server, and the cheat battery is fully rejected.
       (`apps/client/src/renderer.ts`) only draws what the scene says. The scene is
       **PixiJS v8** and the client is **one** client - the web build serves it, the
       desktop shell wraps it in a web view and the mobile build wraps it in a WebView
+- [x] The **atlas pages are fetched on demand**, at most a few at a time. There are
+      3 590 of them and 31.8 GB, and a scene of a few hundred sprites touches a few
+      dozen - loading them all up front would fetch 31.8 GB to draw a village
+- [x] The **web client builds** (`pnpm --filter @swl/app-client build`), the build is
+      in the CI, and the client **starts in a real browser**
+- [x] The client package is **browser-safe**. It imported `node:crypto` for the art
+      hash, which broke the web build; the hash is a build-time utility, so it moved
+      into its own module that nothing at runtime imports
+- [x] The client's **art lookup** is right: the manifest carries an **item** map, so the
+      client does not have to guess the SWF's group or the symbol's name, and the frame
+      is looked up **one higher** than the animation chose, because the manifest's frames
+      are one-based and the client picks the drawing with `gotoAndStop(frame + 1)`
 - [x] The **web client builds** (`pnpm --filter @swl/app-client build`), and the build
       is in the CI
 - [x] The client package is **browser-safe**. It imported `node:crypto` for the art

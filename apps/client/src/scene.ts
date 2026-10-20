@@ -27,6 +27,8 @@ import type { AtlasIndex, FrameLocation } from '@swl/client';
 export interface SceneItem {
   /** The item's reference id. */
   id: string;
+  /** The content item's id, for the art. */
+  itemId?: number;
   /** The tile x. */
   tx: number;
   /** The tile y. */
@@ -37,10 +39,6 @@ export interface SceneItem {
   walkable: boolean;
   /** The item's elevation, in pixels. */
   elevation: number;
-  /** The SWF the art is in. */
-  swf: string;
-  /** The symbol within that SWF. */
-  symbol: string;
   /** The orientation, for the frame choice. */
   orientation: number;
   /** The animation, for the frame choice. */
@@ -82,7 +80,21 @@ export function buildScene(
     const position = tileToPixel(item.tx, item.ty, viewport);
     const depth = zIndex(item.tx, item.ty, item.width, item.walkable);
     const frame = animationFrame(item.animation, item.orientation);
-    const art = atlas.lookup(item.swf, item.symbol, frame.frame);
+
+    // The art comes from the manifest's **item** map, which names the
+    // SWF and the symbol within it. The content's item gives the image's
+    // name and the id, and the manifest resolves them - so the client
+    // does not have to guess the SWF's group or the symbol's name.
+    const art = item.itemId
+      ? (() => {
+          const entry = atlas.itemArt(item.itemId);
+          if (!entry) return null;
+          // The manifest's frames are **one-based**, and the client
+          // picks the drawing with `gotoAndStop(frame + 1)`, so the
+          // lookup is one higher than the frame the animation chose.
+          return atlas.lookup(entry.swf, entry.symbol, frame.frame + 1);
+        })()
+      : null;
 
     sprites.push({
       id: item.id,
