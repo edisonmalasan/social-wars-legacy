@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 /**
  * Group D â€” the asset converter.
  *
@@ -62,12 +62,14 @@ function parseArgs(argv) {
     limit: Infinity,
     jobs: 6,
     out: path.join(ROOT, 're/data/frame-manifest.json'),
+    noResume: false,
   };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--group') args.groups = [argv[++i]];
     else if (argv[i] === '--limit') args.limit = Number(argv[++i]);
     else if (argv[i] === '--jobs') args.jobs = Number(argv[++i]);
     else if (argv[i] === '--out') args.out = path.resolve(argv[++i]);
+    else if (argv[i] === '--no-resume') args.noResume = true;
   }
   return args;
 }
@@ -138,26 +140,96 @@ async function main() {
   await mkdir(CHUNKS, { recursive: true });
   await mkdir(path.dirname(args.out), { recursive: true });
 
-  // 1. Build the chunk list: each chunk is a directory of SWFs that one JVM
-  //    invocation will convert.
-  const jobs = [];
-  for (const group of args.groups) {
-    const dir = path.join(ASSETS, group);
-    const names = (await listSwf(dir)).slice(0, args.limit);
-    const perChunk = Math.max(1, Math.ceil(names.length / args.jobs));
-    for (let i = 0; i < names.length; i += perChunk) {
-      jobs.push({ group, names: names.slice(i, i + perChunk) });
-    }
-  }
-  console.log(`converting ${jobs.reduce((n, j) => n + j.names.length, 0)} SWF files in ${jobs.length} batches`);
-  console.log(`FFDec: ${DEFAULT_FFDEC}`);
-
+  // 0. Resume. A conversion of the whole corpus takes a while, and it may be
+  //    interrupted. The manifest is the record of what has been done, so an
+  //    existing manifest is loaded and the SWFs it already covers are skipped.
+  //    The store is content-addressed, so re-running is cheap and safe.
   const symbols = [];
   const uniqueStore = new Map();
   let pngTotal = 0;
   let bytesTotal = 0;
+  const doneSwf = new Set();
+
+  if (!args.noResume && existsSync(args.out)) {
+    try {
+      const previous = JSON.parse(await readFile(args.out, 'utf8'));
+      for (const symbol of previous.symbols ?? []) {
+        symbols.push(symbol);
+        doneSwf.add(symbol.swf);
+      }
+      for (const [hash, image] of Object.entries(previous.images ?? {})) {
+        uniqueStore.set(hash, image);
+        bytesTotal += image.bytes ?? 0;
+      }
+      pngTotal = previous.counts?.pngFrames ?? 0;
+      console.log(
+        `resuming: ${doneSwf.size} SWF files and ${uniqueStore.size} images already in ${args.out}`,
+      );
+    } catch (error) {
+      console.warn(`  ! could not read the existing manifest, starting fresh: ${error.message}`);
+    }
+  }
+
+  // 1. Build the chunk list: each chunk is a directory of SWFs that one JVM
+  //    invocation will convert.
+  const jobs = [];
+  let skipped = 0;
+  for (const group of args.groups) {
+    const dir = path.join(ASSETS, group);
+    const all = await listSwf(dir);
+    const names = [];
+    for (const name of all) {
+      if (doneSwf.has(`${group}/${name}`)) {
+        skipped += 1;
+        continue;
+      }
+      names.push(name);
+    }
+    const limited = names.slice(0, Math.max(0, args.limit - skipped));
+    const perChunk = Math.max(1, Math.ceil(limited.length / args.jobs));
+    for (let i = 0; i < limited.length; i += perChunk) {
+      jobs.push({ group, names: limited.slice(i, i + perChunk) });
+    }
+  }
+  const todo = jobs.reduce((n, j) => n + j.names.length, 0);
+  console.log(
+    `converting ${todo} SWF files in ${jobs.length} batches` +
+      (skipped ? ` (${skipped} already done)` : ''),
+  );
+  console.log(`FFDec: ${DEFAULT_FFDEC}`);
+
   let done = 0;
   const started = Date.now();
+
+  /**
+   * Write the manifest. Called after every batch, so an interrupted run keeps
+   * everything it has already converted and the next run resumes from there.
+   */
+  const writeManifest = async () => {
+    symbols.sort((a, b) =>
+      a.swf === b.swf ? a.symbol.localeCompare(b.symbol) : a.swf.localeCompare(b.swf),
+    );
+    const manifest = {
+      note:
+        'The asset conversion manifest. Every (swf, symbol, frame) maps to a ' +
+        'content-addressed image in the frame store. Produced by ' +
+        'scripts/convert-assets.mjs. The store itself is a build artefact.',
+      groups: args.groups,
+      counts: {
+        swfFiles: new Set(symbols.map((s) => s.swf)).size,
+        symbols: symbols.length,
+        pngFrames: pngTotal,
+        uniqueImages: uniqueStore.size,
+        deduplicationRatio: pngTotal ? Number((uniqueStore.size / pngTotal).toFixed(4)) : 0,
+        rawPngBytes: bytesTotal,
+        storeBytes: [...uniqueStore.values()].reduce((n, u) => n + u.bytes, 0),
+      },
+      images: Object.fromEntries(uniqueStore),
+      symbols,
+    };
+    await writeFile(args.out, JSON.stringify(manifest, null, 1) + '\n', 'utf8');
+    return manifest;
+  };
 
   // 2. Convert each batch. Every batch gets its own directory under a
   //    run-scoped path, so a directory left behind by an interrupted run (and
@@ -276,30 +348,13 @@ async function main() {
       `  batch ${done}/${jobs.length}  ${pngTotal} frames  ${uniqueStore.size} unique  ` +
         `${(bytesTotal / 1048576).toFixed(1)} MB png  ${elapsed.toFixed(0)}s`,
     );
+
+    // Write the manifest after every batch, so an interrupted run keeps
+    // everything it has already converted and the next run resumes from here.
+    await writeManifest();
   });
 
-  symbols.sort((a, b) => (a.swf === b.swf ? a.symbol.localeCompare(b.symbol) : a.swf.localeCompare(b.swf)));
-
-  const manifest = {
-    note:
-      'The asset conversion manifest. Every (swf, symbol, frame) maps to a ' +
-      'content-addressed image in the frame store. Produced by ' +
-      'scripts/convert-assets.mjs. The store itself is a build artefact.',
-    groups: args.groups,
-    counts: {
-      swfFiles: new Set(symbols.map((s) => s.swf)).size,
-      symbols: symbols.length,
-      pngFrames: pngTotal,
-      uniqueImages: uniqueStore.size,
-      deduplicationRatio: pngTotal ? Number((uniqueStore.size / pngTotal).toFixed(4)) : 0,
-      rawPngBytes: bytesTotal,
-      storeBytes: [...uniqueStore.values()].reduce((n, u) => n + u.bytes, 0),
-    },
-    images: Object.fromEntries(uniqueStore),
-    symbols,
-  };
-
-  await writeFile(args.out, JSON.stringify(manifest, null, 1) + '\n', 'utf8');
+  const manifest = await writeManifest();
 
   console.log('');
   console.log(`swf files converted : ${manifest.counts.swfFiles}`);
