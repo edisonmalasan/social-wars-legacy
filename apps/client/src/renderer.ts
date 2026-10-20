@@ -23,10 +23,10 @@ import { Application, Assets, Container, Rectangle, Sprite, Texture } from 'pixi
 import type { FrameManifest, Viewport } from '@swl/client';
 
 import type { SceneSprite } from './scene.ts';
+import { STAGE_HEIGHT, STAGE_WIDTH } from '@swl/client';
+import { stageLayout, type StageLayout } from '@swl/client';
 
-/** The stage's size, in the client's own terms. */
-export const STAGE_WIDTH = 760;
-export const STAGE_HEIGHT = 600;
+export { STAGE_HEIGHT, STAGE_WIDTH } from '@swl/client';
 
 /** How many atlas pages are fetched at once. */
 export const MAX_CONCURRENT_PAGES = 8;
@@ -180,14 +180,13 @@ export class WorldRenderer {
    * would put the panels on top of each other. The scale is a **whole
    * number** where it can be, so the pixel art stays sharp.
    */
-  fit(element: HTMLElement): number {
-    const available = Math.min(
-      element.clientWidth / STAGE_WIDTH,
-      element.clientHeight / STAGE_HEIGHT,
-    );
-    const scale = Math.max(1, Math.floor(available * 100) / 100);
-    element.style.transform = `translate(-50%, -50%) scale(${scale})`;
-    return scale;
+  fit(element: HTMLElement): StageLayout {
+    const layout = stageLayout({
+      width: element.clientWidth || window.innerWidth,
+      height: element.clientHeight || window.innerHeight,
+    });
+    element.style.transform = `translate(-50%, -50%) scale(${layout.scale})`;
+    return layout;
   }
 
   /** The viewport the scene is drawn in. */
