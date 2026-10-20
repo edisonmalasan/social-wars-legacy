@@ -20,3 +20,4 @@ export * from './building.ts';
 export * from './damage.ts';
 export * from './specialattacks.ts';
 export * from './authority.ts';
+export * from './goals.ts';
