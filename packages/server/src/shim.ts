@@ -132,6 +132,31 @@ export interface ShimContext {
   applyCommand: CommandApplier;
   /** Whether responses are framed with the HMAC. The upstream does not. */
   frameResponses?: boolean;
+  /**
+   * The deadline for the batch, in milliseconds since the epoch.
+   *
+   * The batch is checked between commands, so a batch that runs long is
+   * stopped rather than allowed to hold the server. A command that has
+   * already started is not interrupted — the check happens between them,
+   * because a half-applied command is worse than a slow one.
+   */
+  deadline?: number;
+  /**
+   * The clock, in milliseconds since the epoch.
+   *
+   * `now` is the request's timestamp in **seconds**, which is fixed for the
+   * whole request; the deadline needs a clock that *moves*, or it would
+   * never fire.
+   */
+  clock?: () => number;
+  /**
+   * The player, when the caller has already identified them.
+   *
+   * The HTTP layer has to identify the player *before* it can load their
+   * save, so it resolves the identity itself and hands the answer down.
+   * This is the seam for that: it is never taken from the request body.
+   */
+  identifiedPlayerId?: string;
 }
 
 /** How a player was identified. */
@@ -157,6 +182,11 @@ export function resolveIdentity(
   request: ShimRequest,
   context: ShimContext,
 ): IdentityResult {
+  // The caller may have identified the player already. The HTTP layer has
+  // to, because it needs the identity to load the right save.
+  if (context.identifiedPlayerId) {
+    return { ok: true, playerId: context.identifiedPlayerId, via: 'session-token' };
+  }
   const token = request.fields['token'] ?? request.fields['session_token'];
   if (token && context.resolveToken) {
     const playerId = context.resolveToken(token);
@@ -250,6 +280,18 @@ export function applyBatch(
   const gap = first > world.nextCommandNumber;
 
   for (const command of commands) {
+    // The deadline is checked BETWEEN commands. A command that has already
+    // started is not interrupted, because a half-applied command is worse
+    // than a slow one.
+    if (
+      context.deadline !== undefined &&
+      context.clock !== undefined &&
+      context.clock() > context.deadline
+    ) {
+      refused.push({ name: command.name, reason: 'deadline-exceeded' });
+      break;
+    }
+
     // flash_debug does not exist in the new server (non-negotiable 6).
     if (command.name === 'flash_debug') {
       refused.push({ name: command.name, reason: 'unknown-command' });
