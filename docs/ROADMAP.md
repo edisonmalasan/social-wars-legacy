@@ -457,11 +457,13 @@ client's observable behaviour.*
       sentinel, which never counters anything.
 - [x] Range rules match: units use `attack_range + max(0, targetWidth − 2·attack_range)`,
       buildings use the exact `attack_range`
-- [ ] Attack cadence matches: `attack_interval` is frames at 30 fps, units take a random
-      0–4 frame phase, buildings fire in global lockstep — the primitives exist, the tick
-      loop does not
-- [ ] A building's own attack scales by `garrison / unit_capacity` — an empty bunker deals
-      0, and a bunker fires once per garrisoned unit
+- [x] Attack cadence matches: `attack_interval` is frames at 30 fps, units take a random
+      0–4 frame phase (`Math.floor(Math.random() * 5)`), buildings fire in global lockstep
+      with no phase — implemented in `packages/rules/src/battle.ts`
+- [x] A building's **shot count** is limited by its garrison: a bunker fires once per
+      garrisoned unit (capped by its attack points) and an empty bunker fires not at all.
+      **The building's own `attack` is *not* scaled** — it comes straight from the config
+      (`IsoElement.as:267`)
 - [ ] Unit XP accrues from effective damage to units only, with the documented thresholds
       and the level-9 cap (+30 attack, 3× HP)
 - [ ] All 10 damage classes and all 15 special attacks behave as documented
