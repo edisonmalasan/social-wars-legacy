@@ -6,3 +6,4 @@ export * from './alliance.ts';
 export * from './marketplace.ts';
 export * from './migrations.ts';
 export * from './backup.ts';
+export * from './socialstore.ts';

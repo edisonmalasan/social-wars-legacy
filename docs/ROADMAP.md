@@ -861,7 +861,11 @@ protocol and the original dialect.*
       `<64 hex>;<json>` — so the HMAC is verified against both keys, and the answer is
       `{ "success": true, "data": … }` or `{ "success": false, "error": <the client's
       number> }`
-- [ ] The alliance and marketplace services are **persisted**
+- [x] The alliance and marketplace services are **persisted**
+      (`packages/server/src/socialstore.ts`): both are pure, so the whole state is one
+      document, and a restart cannot half-apply a change. The state lives in one table
+      with a `kind` column, so the social subsystem is a row per kind rather than a
+      table per service
 
 **Exit criteria:** the original Flash client can complete the tutorial and a Mission 1
 assault against the new server, and the cheat battery is fully rejected.
