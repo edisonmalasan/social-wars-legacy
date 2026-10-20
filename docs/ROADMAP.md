@@ -422,9 +422,14 @@ CI run. ✔ met
 - [x] The frame manifest is written **atomically** — to a temporary file and renamed over
       the target — so a reader never sees a half-written hundred-megabyte file. The
       client's atlas test found the problem by reading it mid-write
-- [ ] The manifest itself is **not committed**: at 99 MB it is a build artefact of the
-      asset pipeline, like the atlases, and the client build generates it. The client's
-      atlas index (`packages/client/src/atlas.ts`) consumes it
+- [x] The manifest itself is **not committed**: at **148 MB** it is a build artefact of
+      the asset pipeline, and it is written into the ignored `re/` tree. The **atlas
+      pages** are build artefacts too - **11 865** of them, 31.8 GB, at 71.8 % occupancy -
+      and the manifest records where every image ended up in them, so the client looks
+      the art up without knowing how the atlases are laid out
+- [x] The **atlas packer is resumable**: the measurements are cached, and a sheet that
+      is already on disk is not drawn again. It died once at sheet 3 780 of 11 865, and
+      the restart skipped the 3 780 in under a minute
 - [x] The 58 `Basesec_1.5.x.swf` builds (239.7 MB) are handled separately: `Basesec_1.5.4.swf`
       is the only one converted (it is the reference client, not game art)
 - [x] The 1 314 thumbnails are indexed by item id and served as the inventory icon set —
@@ -448,8 +453,15 @@ CI run. ✔ met
       have to be tuned to
 - [x] The **open-licensed substitutes are chosen** and recorded per font: Nunito for the
       rounded body text and Rubik Mono One for the display face, both SIL OFL 1.1
-- [ ] The substitutes are **substituted in the client** and their metrics are tuned to match
-      the originals, so the game's text fits the same boxes
+- [x] The substitutes are **substituted in the client** (`apps/client/src/fonts.ts`):
+      the stylesheet declares a `@font-face` for each, with a `local()` source and a
+      fetched one, and the two **stacks** the game uses. The **proprietary** faces are
+      never named - the test checks that - and `font-display: swap` means the text
+      appears with the fallback rather than the page being invisible until the face
+      arrives
+- [ ] The substitutes' **metrics are tuned** to match the originals', which needs the
+      real font files: the scale is a parameter, measured against the files, and a scale
+      of 1 means "not tuned yet"
 - [x] The **4 proprietary font references are identified**: the client loads **two** fonts
       (`ArialRoundedBold` and `KomikaAxis`) in **three** languages (English, Turkish and
       Greek), so it looks for **six** font files. Only the two English ones ship, and the
