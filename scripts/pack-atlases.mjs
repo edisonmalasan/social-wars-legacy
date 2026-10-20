@@ -25,7 +25,7 @@
  * Requires the frame manifest (run scripts/convert-assets.mjs first).
  */
 import { existsSync } from 'node:fs';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
@@ -97,6 +97,9 @@ async function main() {
   console.log(`packing ${images.length} distinct images into ${args.size}x${args.size} atlases`);
 
   // 1. Decode and trim every image, and measure it.
+  /** The measurement cache: each image's trimmed size and bounds. */
+  const BOUNDS_CACHE = path.join(ROOT, '.work/frames/bounds.json');
+
   const measured = [];
   let rawPixels = 0;
   let trimmedPixels = 0;
@@ -104,26 +107,62 @@ async function main() {
   let missing = 0;
   let oversize = 0;
 
+  // The measurement cache. The measuring pass is the expensive one - it
+  // decodes every image - and it is pure, so its result is worth keeping.
+  let cache = {};
+  try {
+    cache = JSON.parse(await readFile(BOUNDS_CACHE, 'utf8'));
+  } catch {
+    cache = {};
+  }
+  let measuredNow = 0;
+
   for (const [hash, image] of images) {
     const file = path.join(STORE, image.file);
     if (!existsSync(file)) {
       missing += 1;
       continue;
     }
+    const known = cache[hash];
+    if (known) {
+      // Already measured: the bounds do not change.
+      if (known.b) {
+        trimmedPixels += known.w * known.h;
+        measured.push({
+          hash,
+          image,
+          width: known.w,
+          height: known.h,
+          bounds: known.b,
+        });
+      } else {
+        fullyTransparent += 1;
+        measured.push({ hash, image, width: 0, height: 0, bounds: null });
+      }
+      continue;
+    }
     const decoded = decodePng(await readFile(file));
     rawPixels += decoded.width * decoded.height;
     const bounds = alphaBounds(decoded);
+    measuredNow += 1;
     if (!bounds) {
       fullyTransparent += 1;
       // The PIXELS ARE THROWN AWAY here. Keeping every decoded image is
       // what ran the packer out of memory; the pixels are decoded again,
       // one atlas at a time, in the render pass below.
+      cache[hash] = { w: 0, h: 0, b: null };
       measured.push({ hash, image, width: 0, height: 0, bounds: null });
       continue;
     }
     trimmedPixels += bounds.width * bounds.height;
+    cache[hash] = { w: bounds.width, h: bounds.height, b: bounds };
     measured.push({ hash, image, width: bounds.width, height: bounds.height, bounds });
   }
+
+  // The cache is written before the long render, so a death in the render
+  // does not cost the measuring again.
+  await writeFile(BOUNDS_CACHE, JSON.stringify(cache), 'utf8');
+  console.log(`  ${measuredNow} images measured, ${measured.length - measuredNow} from the cache`);
 
   console.log(
     `  ${measured.length} images, ${fullyTransparent} fully transparent, ${missing} missing from the store`,
@@ -204,8 +243,26 @@ async function main() {
     }
 
     const file = `atlas-${String(index).padStart(4, '0')}.png`;
+    const target = path.join(ATLAS_DIR, file);
+    if (existsSync(target)) {
+      // The sheet is already on disk. The packing is deterministic, so it
+      // is the right sheet, and rendering it again would cost an hour.
+      const info = await stat(target);
+      atlasInfo.push({
+        file,
+        width: args.size,
+        height: args.size,
+        images: sheet.images.length,
+        usedPixels: sheet.used,
+        bytes: info.size,
+      });
+      if ((index + 1) % 10 === 0 || index === sheets.length - 1) {
+        console.log(`  atlas ${index + 1}/${sheets.length}`);
+      }
+      continue;
+    }
     const bytes = encodePng(canvas);
-    await writeFile(path.join(ATLAS_DIR, file), bytes);
+    await writeFile(target, bytes);
     atlasInfo.push({
       file,
       width: args.size,
