@@ -76,6 +76,8 @@ desktop shells do not — they land with Groups F, G and H.**
 | Verify the vendored upstream | `node scripts/verify-upstream.mjs` | Working | Group A |
 | Fetch the vendored assets   | `node scripts/pull-assets.mjs`     | Working | Group A — targeted LFS pull |
 | Decompile the client        | `node scripts/decompile-client.mjs` | Working | Group B |
+| Convert the SWF art to frames | `node scripts/convert-assets.mjs` | Working | Group D — resumable |
+| Pack the frames into atlases | `node scripts/pack-atlases.mjs`   | Working | Group D — trims and packs |
 | Run the client (dev)        | `pnpm --filter client dev`         | Planned | Group G |
 | Run the server (dev)        | `pnpm --filter server dev`         | Planned | Group F |
 | Golden-master rules diff    | `pnpm --filter rules test:golden`  | Planned | Group E4 |
