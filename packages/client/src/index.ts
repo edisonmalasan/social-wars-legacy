@@ -4,3 +4,4 @@ export * from './camera.ts';
 export * from './animation.ts';
 export * from './predictions.ts';
 export * from './requests.ts';
+export * from './assets.ts';

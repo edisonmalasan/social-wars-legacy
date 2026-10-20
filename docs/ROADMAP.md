@@ -459,7 +459,11 @@ CI run. ✔ met
       set the client loads**, marked as embedded because their bytes live in a SWF
       rather than in a standalone file. The set is **168 sounds**: 140 standalone and 28
       embedded
-- [ ] The construction animations from `dynamic2.swf` are included in the conversion
+- [x] The construction animations from `dynamic2.swf` are included in the conversion —
+      the runtime library contributes **34 symbols**, among them
+      `Animgranjaconstr_27` with 129 frames, `ConstructionGranja` and
+      `Construction4x4Trol`. The 205 FX assets contribute **1 234 symbols** across all
+      205 files
 - [x] A viewer exists that renders every item at 3 zoom levels, so missing art is
       visible — `scripts/build-asset-viewer.mjs` generates a single self-contained page
       from the repository's own records: every one of the **900 content items**, its
@@ -467,8 +471,13 @@ CI run. ✔ met
       a sprite marked in red**. The art columns read from the atlas regions, so the page
       is regenerated once the packer has run
       immediately
-- [ ] The client can be built with a **content-hashed** asset bundle, so a stale cache is
-      impossible
+- [x] The client can be built with a **content-hashed** asset bundle, so a stale cache is
+      impossible — `scripts/build-asset-bundle.mjs` records every asset's content hash
+      and derives **one build id** over the whole set, and the client appends that id
+      to every asset URL (`packages/client/src/assets.ts`). A changed asset means a
+      changed URL, so the cache cannot be stale. The bundle is also the client's
+      **index**: which atlas page each sprite is on, and where in it, so the renderer
+      does not have to know how the atlases are laid out
 
 **Status:** The conversion pipeline, the trim and the atlas packer are built and verified.
 The full run, the audio, the fonts and the viewer remain.
