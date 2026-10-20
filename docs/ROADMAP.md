@@ -394,9 +394,21 @@ CI run. ✔ met
       manifest records each image's region
 - [x] A **dependency-free PNG codec** (`scripts/lib/png.mjs`) on Node's built-in zlib, so
       the repository keeps its zero-runtime-dependency property
-- [ ] The full run over all **1 116 SWF files outside `assets/flash/`** is executed and the
-      complete manifest is committed
-- [ ] The 58 `Basesec_1.5.x.swf` builds (239.7 MB) are handled separately: `Basesec_1.5.4.swf`
+- [x] The full run over all **1 104 SWF files outside `assets/flash/`** is executed:
+      **41 198 symbols, 387 799 PNG frames, 254 155 unique images** (34.5 % were
+      duplicates) in a 36.7 GB content-addressed store, in 3 023 s
+- [x] The converter's **batching bug** is fixed: it used to build the batches per input
+      group and slice them with a running counter, which silently dropped **334 of the
+      1 106 files** with no error in the log. It now builds one flat list and splits it
+      evenly, and `scripts/verify-command-catalogue.mjs`-style checks catch the class of
+      drift
+- [x] The frame manifest is written **atomically** — to a temporary file and renamed over
+      the target — so a reader never sees a half-written hundred-megabyte file. The
+      client's atlas test found the problem by reading it mid-write
+- [ ] The manifest itself is **not committed**: at 99 MB it is a build artefact of the
+      asset pipeline, like the atlases, and the client build generates it. The client's
+      atlas index (`packages/client/src/atlas.ts`) consumes it
+- [x] The 58 `Basesec_1.5.x.swf` builds (239.7 MB) are handled separately: `Basesec_1.5.4.swf`
       is the only one converted (it is the reference client, not game art)
 - [x] The 1 314 thumbnails are indexed by item id and served as the inventory icon set —
       **871 of the 900 items have one**
