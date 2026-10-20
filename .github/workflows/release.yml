@@ -1,0 +1,117 @@
+name: Release
+
+# A release is a **gate**, not a formality: the golden-master corpus has
+# to match with no unexplained difference, or the release stops.
+#
+# The trigger is a tag, so the tag is the release's identity, and the
+# artefacts are published against it.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'The tag to release under'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: The release gate
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.identify.outputs.tag }}
+    steps:
+      - id: identify
+        run: |
+          tag="${{ github.event.inputs.tag }}"
+          if [ -z "$tag" ]; then tag="${GITHUB_REF#refs/tags/}"; fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "releasing $tag"
+
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.6.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify the vendored upstream tree
+        run: node scripts/verify-upstream.mjs
+
+      - name: Type-check
+        run: pnpm typecheck
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Integration tests
+        run: pnpm test:integration
+
+      # The gate. The harness fails on any difference it cannot explain,
+      # so a release cannot carry a rules change nobody noticed.
+      - name: The golden-master corpus
+        run: node scripts/golden-master.mjs
+
+      - name: The soak test
+        run: node --expose-gc scripts/soak-server.mjs --batches 2000 --players 4
+
+      - name: Build the content bundle
+        run: pnpm build:content
+
+      - name: The content build is reproducible
+        run: |
+          first=$(node packages/content/src/cli.ts | grep 'build id' | awk '{print $NF}')
+          second=$(node packages/content/src/cli.ts | grep 'build id' | awk '{print $NF}')
+          test "$first" = "$second"
+          echo "content build is reproducible: $first"
+
+      - name: Collect the artefacts
+        run: |
+          mkdir -p out
+          cp packages/content/dist/content-bundle.json out/
+          echo "${{ steps.identify.outputs.tag }}" > out/VERSION
+          node packages/content/src/cli.ts | grep 'build id' > out/CONTENT_BUILD_ID
+          ls -la out
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-artefacts
+          path: out/
+
+  publish:
+    name: Publish
+    needs: gate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-artefacts
+          path: out
+
+      - name: Publish the release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.gate.outputs.tag }}
+          files: out/*
+          body: |
+            The content bundle and the version.
+
+            The golden-master corpus matched with no unexplained
+            difference, and the pipeline is reproducible.

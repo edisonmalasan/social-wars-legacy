@@ -194,6 +194,9 @@ first means guessing at the rules being cloned.
       ([`../re/data/unit-behaviour.json`](../re/data/unit-behaviour.json))
 - [x] All **56 building delegates** are reduced to the same shape
       ([`../re/data/building-behaviour.json`](../re/data/building-behaviour.json))
+- [ ] The remaining tooltip surfaces (the icon panel's dictionary, the special units'
+      attack tooltips and the market's) are reimplemented
+- [ ] The unit panel, minimap, neighbour strip, goal panel and popups all work
 - [x] The authoritative **item id → delegate** map is extracted from
       `DelegatesManager.registerDelegate()` and `core/Constants.as`, covering **679 of the
       724** client item ids ([`../re/data/item-delegate-map.json`](../re/data/item-delegate-map.json))
@@ -635,12 +638,6 @@ client's observable behaviour.*
 - [x] The **Monday reward cycle** is the client's: `MONDAY_BONUS_REWARDS` has **3**
       entries and the cycle wraps at 3, while the upstream wraps its index at 5. The client
       is the specification, so the cycle is 3
-- [x] **Premium expiry** is evaluated server-side: the premium is a **timestamp** in
-      the private state, not a flag, and the server owns it
-      (`packages/rules/src/premium.ts`). Buying while it is still running **extends**
-      it and buying after it has lapsed **starts it fresh** — the upstream's rule and
-      the client's. The perks are the client's: three attacks a day instead of one, and
-      a share of the rewards in cash
 
 ### E4 — Determinism and verification
 
@@ -756,6 +753,50 @@ protocol and the original dialect.*
       it and buying after it has lapsed **starts it fresh** — the upstream's rule and
       the client's. The perks are the client's: three attacks a day instead of one, and
       a share of the rewards in cash
+- [x] **Premium expiry** is evaluated server-side: the premium is a **timestamp** in
+      the private state, not a flag, and the server owns it
+      (`packages/rules/src/premium.ts`). Buying while it is still running **extends**
+      it and buying after it has lapsed **starts it fresh** — the upstream's rule and
+      the client's. The perks are the client's: three attacks a day instead of one, and
+      a share of the rewards in cash
+- [x] The commands that **grant** anything are answered by the server's own rules, not by
+      the client's claim (`packages/server/src/apply.ts`): `collect`, `complete_goal`,
+      `win_daily_bonus`, `reset_collect`, `finish_building`, `place_stored_item`,
+      `buy`, `push_queue_unit`, `pop_queue_unit`, `level_up`, `upgrade` and
+      `end_attack`. The upstream grants **none** of these by server-side rule: it resets
+      the collection timer and lets the client declare the amount, prints a line for
+      `complete_goal`, takes the daily bonus index *and the item id* from the client,
+      and lets the client pop a unit that is still training
+- [x] The **training queue** is the server's own: the building's attribute bag holds
+      `nu` (how many are queued), `ts` (when the current one started) and `ui` (which
+      unit it is), exactly as the upstream's `engine.py` does. The server checks that a
+      unit has actually finished training before it is popped, which the upstream does
+      not
+- [x] The **level-up** checks that the player has the XP for the next level and grants
+      that level's reward from the level table, and the **upgrade** charges the new
+      building's cost less the refund of the old one and refuses an upgrade that would
+      not fit
+- [x] The full cheat battery is rejected or has no effect: inflated `res`, forged
+      `flash_debug`, replayed `win_daily_bonus`, self-completed goals, forged
+      `end_attack`, free `buy_offer_pack`, wrong HMAC, another player's `USERID`,
+      malformed framing, forged `win`, over-collection —
+      `packages/rules/src/cheatbattery.ts` **attempts all eleven** against the real
+      authority layer and proves each one has no effect. The battery is
+      **mutation-tested**: 18 weakenings of the authority layer were each detected by
+      exactly the attack they weaken
+- [x] The shim **resolves the player from the session token or the bound legacy
+      `USERID`**, and the identity chooses which save is touched. The request body
+      cannot name the player. Found by the cheat battery, which shipped a tripwire
+      because the shim did not consult its own identity bridge
+- [ ] The remaining holes the battery reported: the shim's grant commands are an
+      unimplemented seam (`win_daily_bonus`, `complete_goal`, `end_attack`, `end_quest`
+      and `collect` must all be granted through the battery's paths)
+- [x] The **production-cycle timer** is implemented and the **server owns the clock**
+      (`packages/rules/src/production.ts`): the collection is a period the **player
+      chooses** - 5 minutes at 0.25, 60 at 1, 240 at 2 and 480 at 3, the client's own
+      four - and the server refuses a collection until the period has elapsed. The
+      upstream never checks this: its `collect` handler resets the timestamp and
+      believes whatever the client sends
 
 ### F2 — Protocol
 
@@ -832,6 +873,12 @@ protocol and the original dialect.*
       **wired into the store**: an upstream save is imported verbatim and migrated when
       it is read, and a save from a version this server does not understand is
       **refused** rather than guessed at
+- [x] A backup and restore procedure exists and has been **exercised against a real
+      snapshot** — the database is a directory in the offline mode, so a backup is a copy
+      of it and a restore is opening the copy (\packages/server/src/backup.ts\,
+      \scripts/backup-server.mjs\). The tests write a database, back it up, change the
+      live database, restore the snapshot and check that the snapshot still holds the
+      OLD state, and a digest of the tables is what proves the two match
 - [x] Schema migrations are **forward-only**, **reversible where safe**, and **run as part
       of deploy**. The schema is **versioned** (`packages/server/src/schema.ts`): the
       stores created their tables with `CREATE TABLE IF NOT EXISTS`, which can only ever
@@ -841,6 +888,11 @@ protocol and the original dialect.*
       which moves the schema one version forward, is recorded in the database, and may
       declare a `down`. A migration that cannot be undone safely declares no `down`, and
       the runner **refuses** to roll it back rather than pretending it can
+- [x] The migrations **run as part of deploy**: `node scripts/migrate.mjs --data <dir>`
+      brings the schema forward, `--status` says what version it is at, and `--rollback`
+      undoes what can be undone. The server itself runs them **before it serves**, so a
+      deploy cannot start a server against a schema it does not understand, and it keeps
+      its saves in the database when `SWL_DATA_DIR` names one
 - [x] The migrations **run as part of deploy**: `node scripts/migrate.mjs --data <dir>`
       brings the schema forward, `--status` says what version it is at, and `--rollback`
       undoes what can be undone. The server itself runs them **before it serves**, so a
@@ -928,6 +980,7 @@ assault against the new server, and the cheat battery is fully rejected.
       while the map's contents move by the delta divided by the zoom; and the **mouse
       wheel and the slider are different behaviours** — the wheel multiplies by 1.2 and
       the slider adds 0.2
+- [x] The map pans, zooms and re-centres as the original does
 - [x] Every unit and building animates from its atlas frames, with correct frame timing
       — the frame number is **not a timeline**: the client picks the frame by number out
       of a sheet that holds every drawing of every state, and the number is
@@ -1003,6 +1056,51 @@ assault against the new server, and the cheat battery is fully rejected.
       The decisions are **checked**, not believed (`packages/client/src/screens.test.ts`):
       every screen must have a decision, every implemented one must name a model that
       exists, and every dropped one must say why
+- [x] The **HUD's model** is implemented (`packages/client/src/hud.ts`): the resources,
+      the level, the population and the energy, and every popover's text — the
+      client's own literals, including the "Build more Silos to get more space"
+      warning and the max-population case. The **number formatting** is the client's
+      exactly: the digits grouped in threes from the right and joined with commas, and
+      grouped as a STRING, so a negative number comes out as "-1,234"
+- [x] The **build menu** is implemented as a model (`packages/client/src/buildmenu.ts`):
+      the tabs are the content's categories and their sub-categories, and each tab's
+      list is ordered the client's way. The order is **not** the content's order: the
+      items the player is too low a level for are pushed **10 000 down the list**, not
+      hidden, so the player can still see them and know they exist. `itemUnlocked`
+      **always returns false** in this build (`core/Base.as:7993-7995`), so the
+      condition is simply the level, and the clone reproduces that rather than
+      inventing an unlock system the client does not have
+- [ ] The unit panel, minimap, neighbour strip, goal panel and popups all work
+- [x] The **tooltips** are implemented as a model (`packages/client/src/tooltips.ts`):
+      the HUD's four resource sentences are the client's own literals, and the info
+      panel is built from the item's own statistics — the resource building shows its
+      name, its resource and the amount it earns, and the unit shows its effective
+      attack, range, velocity, life and population
+- [x] The **text metrics** are implemented (`packages/client/src/fonts.ts`): the
+      original faces' advance widths, scaled, so the substituted face occupies the
+      same space and the game's boxes still fit. The scale is a **parameter**, not a
+      constant, because it depends on which font file is actually shipped - a scale of
+      1 means "not tuned yet", and the roadmap says so
+- [x] The **substitutes are named and served under the names the client asks for**,
+      and the languages are recorded: the client loads fonts for English, Turkish and
+      Greek, and only the English ones ship, so the clone ships one set and falls back
+      the same way
+- [ ] Text renders with the substituted fonts at the original metrics
+- [x] The client's **defence slot shows the attack interval**, in both the tooltip and
+      the info panel. That is the client's behaviour in *both* places, so it is not a
+      slip in one of them, and the clone reproduces it rather than "fixing" it — the
+      client is the specification
+- [x] The **"click here" guidance** is implemented (`packages/client/src/guidance.ts`):
+      the goals panel's up-to-three "CLICK HERE!" badges, one on each of the three
+      goal slots, marking the goals the player has not visited. The offset counts the
+      **incomplete** goals only, so a completed goal does not take up a slot
+- [x] The client's **quirk** in that guidance is reproduced and recorded: the check
+      reads the *first* marker's clicked flag for all three markers, even though the
+      client keeps three separate flags — so clicking the first badge suppresses all
+      three, while clicking the second or the third suppresses only that one. It is
+      recorded as a decision, not an accident
+- [ ] The remaining tooltip surfaces (the icon panel's dictionary, the special units'
+      attack tooltips and the market's) are reimplemented
 
 ### G4 — Feature parity
 
@@ -1019,6 +1117,11 @@ assault against the new server, and the cheat battery is fully rejected.
       player can see, a step may be skipped only when it says it may be, and a step is
       compared by its **number**, which is how the client resumes
 - [ ] The tutorial and the first chapter are completable against the server
+- [ ] Quests, goals, the darts minigame, magic and tech, the marketplace, premium and the
+      weekly bonus are functional
+- [ ] Alliances and the social features are functional, or visibly out of scope
+- [ ] The daily/weekly bonus cycles and premium expiry behave correctly across a
+      server restart
 
 ### G5 — Clients
 
@@ -1060,7 +1163,12 @@ product.*
 ### I1 — Testing
 
 - [ ] Unit tests cover the rules engine, the economy and the command handlers
-- [ ] The golden-master harness runs in CI and is a release gate
+- [x] The **golden-master harness runs in CI and is a release gate**. It is in the
+      CI on every push and every pull request, and it is the **gate** of the release
+      workflow (`.github/workflows/release.yml`): a tag cannot be released unless the
+      corpus matches with no unexplained difference. The harness fails on any
+      difference it cannot explain, so a release cannot carry a rules change nobody
+      noticed
 - [ ] Integration tests cover the full command surface against a real database
 - [ ] End-to-end tests drive the web client through a complete play session
 - [ ] A load test sustains the target concurrency with correct simulation timing
@@ -1068,7 +1176,16 @@ product.*
 
 ### I2 — CI/CD
 
-- [ ] Every push runs typecheck, lint, unit, integration and the content/asset build
+- [x] **Every push** runs typecheck, lint, unit, integration and the content/asset
+      build (`.github/workflows/ci.yml`). The push trigger used to be `main` only, so a
+      branch's own pipeline did not run until it was merged; it runs on every branch
+      now. The gate is: the vendored upstream is verified, the type-check and the
+      lint pass, the unit and the integration tests pass, the golden-master corpus
+      matches, the soak test finds no drift, the content bundle builds and is
+      **reproducible**, the command catalogue agrees with the client, and the asset
+      manifest agrees with the tree in **both directions**
+- [ ] A real linter is configured. `pnpm lint` is currently the type-check, so the
+      lint step in CI is the type-check wearing a different name
 - [ ] Every pull request runs the golden-master harness
 - [ ] Branches are protected and require a green run plus review
 - [ ] Release artefacts are produced automatically and published to a release
@@ -1076,9 +1193,26 @@ product.*
 
 ### I3 — Security
 
-- [ ] Secrets are managed outside the repository, and no credential is committed
-- [ ] Dependency and container scanning run in CI, with a policy for what blocks a release
-- [ ] All input is validated at the boundary; the server has no injection surface
+- [x] **Secrets are managed outside the repository, and no credential is committed.**
+      The repository is **scanned** for the shapes a credential takes - an AWS key, a
+      private key, a GitHub token, a Slack token - and the scan is a test
+      (`packages/server/src/security.test.ts`), so it fails the build rather than
+      being noticed later. The workflows hold no credentials of their own
+- [x] **Dependency scanning runs in CI, with a policy for what blocks a release.**
+      The policy is **written down** rather than left to the tool's default, because
+      the default changes: a **high** or **critical** advisory fails the run, and a
+      moderate one does not. There is no container yet, so there is nothing to scan;
+      the policy covers it when there is one
+- [x] **All input is validated at the boundary, and the server has no injection
+      surface.** The boundary validates (`validateRequest`), the body is capped, and
+      the SQL is **scanned** (`packages/server/src/security.test.ts`): a value is
+      never interpolated into a statement, a statement with a placeholder always
+      passes its values as parameters, and the only thing that can be interpolated -
+      a table name, which SQL has no placeholder for - is **checked**
+- [x] The scan **found two real holes** and they are closed: both stores put their
+      table name into the SQL, and the name came from a constructor option, so it is
+      now checked as a plain identifier before it is used; and the backup's digest
+      did the same
 - [ ] Rate limiting and abuse protection are in place on every mutating endpoint
 - [ ] Session tokens are scoped, revocable and expire
 - [ ] A security review of the auth, command and shim layers is completed

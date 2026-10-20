@@ -32,9 +32,12 @@ export interface BackupInfo {
 
 /** The error a backup or restore can fail with. */
 export class BackupError extends Error {
-  readonly reason: 'no-source' | 'no-target' | 'not-a-directory';
+  readonly reason: 'no-source' | 'no-target' | 'not-a-directory' | 'bad-table-name';
 
-  constructor(message: string, reason: 'no-source' | 'no-target' | 'not-a-directory') {
+  constructor(
+    message: string,
+    reason: 'no-source' | 'no-target' | 'not-a-directory' | 'bad-table-name',
+  ) {
     super(message);
     this.name = 'BackupError';
     this.reason = reason;
@@ -116,16 +119,42 @@ export async function restoreDatabase<T>(dataDir: string, create: (options: unkn
 }
 
 /**
+ * Whether a name is a plain SQL identifier.
+ *
+ * A table name cannot be a query parameter — SQL has no placeholder for
+ * one — so it has to go into the statement as text. That makes it the one
+ * place in the server where a name is interpolated, and it is therefore
+ * the one place that can be injected into.
+ *
+ * So the name is **checked**: letters, digits and underscores, and
+ * nothing else. A name that fails the check never reaches the database.
+ */
+export function isSafeIdentifier(name: string): boolean {
+  return /^[A-Za-z_][A-Za-z0-9_]*$/.test(name);
+}
+
+/**
  * A digest of a database's tables.
  *
  * It is how a restored snapshot is compared with the original: the same
  * rows in the same tables give the same digest.
+ *
+ * The table names are interpolated, because SQL has no placeholder for an
+ * identifier, so they are **validated** first.
  */
 export async function snapshotDigest(
   db: unknown,
   tables: readonly string[],
 ): Promise<string> {
   const { createHash } = await import('node:crypto');
+  for (const table of tables) {
+    if (!isSafeIdentifier(table)) {
+      throw new BackupError(
+        `the table name "${table}" is not a plain identifier`,
+        'bad-table-name',
+      );
+    }
+  }
   // The database is taken loosely and narrowed once, here: PGlite's `query`
   // has a generic signature that satisfies no structural type.
   const query = (
