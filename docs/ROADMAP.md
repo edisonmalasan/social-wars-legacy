@@ -667,13 +667,22 @@ protocol and the original dialect.*
       computes the day from its own clock and ignores the bonus index the client claims,
       and a replay is refused. The weekly bonus and the premium expiry are not
 - [x] The commands that **grant** anything are answered by the server's own rules, not by
-      the client's claim (`packages/server/src/apply.ts`): `collect` computes the amount
-      from the building's own production state and refuses the over-capacity hack,
-      `complete_goal` checks the server's goal state and grants once, and `win_daily_bonus`
-      computes the day from the server's clock. The upstream grants **none** of these by
-      server-side rule: it resets the collection timer and lets the client declare the
-      amount, prints a line for `complete_goal`, and takes the daily bonus index *and the
-      item id* from the client
+      the client's claim (`packages/server/src/apply.ts`): `collect`, `complete_goal`,
+      `win_daily_bonus`, `reset_collect`, `finish_building`, `place_stored_item`,
+      `buy`, `push_queue_unit`, `pop_queue_unit`, `level_up`, `upgrade` and
+      `end_attack`. The upstream grants **none** of these by server-side rule: it resets
+      the collection timer and lets the client declare the amount, prints a line for
+      `complete_goal`, takes the daily bonus index *and the item id* from the client,
+      and lets the client pop a unit that is still training
+- [x] The **training queue** is the server's own: the building's attribute bag holds
+      `nu` (how many are queued), `ts` (when the current one started) and `ui` (which
+      unit it is), exactly as the upstream's `engine.py` does. The server checks that a
+      unit has actually finished training before it is popped, which the upstream does
+      not
+- [x] The **level-up** checks that the player has the XP for the next level and grants
+      that level's reward from the level table, and the **upgrade** charges the new
+      building's cost less the refund of the old one and refuses an upgrade that would
+      not fit
 - [x] The full cheat battery is rejected or has no effect: inflated `res`, forged
       `flash_debug`, replayed `win_daily_bonus`, self-completed goals, forged
       `end_attack`, free `buy_offer_pack`, wrong HMAC, another player's `USERID`,
