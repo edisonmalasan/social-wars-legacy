@@ -721,6 +721,136 @@ describe('upgrading a building', () => {
   });
 });
 
+describe('the weekly bonus', () => {
+  // 2026-10-19 is a Monday.
+  const MONDAY = Date.UTC(2026, 9, 19) / 1000;
+  const TUESDAY = MONDAY + 86400;
+  const NEXT_MONDAY = MONDAY + 7 * 86400;
+
+  const RULES = {
+    rewards: [
+      { type: 'g', value: 1000 },
+      { type: 'g', value: 2000 },
+      { type: 'g', value: 3000 },
+    ],
+  };
+
+  it('is granted on a Monday', () => {
+    const applier = createApplier(deps({ mondayBonus: RULES, now: () => MONDAY }));
+    const world = worldWithBuilding({}, { resources: wallet(0) });
+    const outcome = applier(world, { name: 'weekly_reward', args: [] });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['g'], 1000);
+    // The index advances, so the next week is a different reward.
+    assert.equal(outcome.world.save.privateState['weeklyRewardIndex'], 1);
+  });
+
+  it('is refused on any day but Monday', () => {
+    const applier = createApplier(deps({ mondayBonus: RULES, now: () => TUESDAY }));
+    const world = worldWithBuilding({}, { resources: wallet(0) });
+    const outcome = applier(world, { name: 'weekly_reward', args: [] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.world.resources['g'], 0);
+  });
+
+  it('is granted only once a week', () => {
+    const applier = createApplier(deps({ mondayBonus: RULES, now: () => MONDAY }));
+    const world = worldWithBuilding({}, { resources: wallet(0) });
+    const first = applier(world, { name: 'weekly_reward', args: [] });
+    assert.equal(first.applied, true);
+    // The same Monday, again.
+    const second = applier(first.world, { name: 'weekly_reward', args: [] });
+    assert.equal(second.applied, false);
+    assert.equal(second.world.resources['g'], 1000);
+  });
+
+  it('is granted again the next Monday', () => {
+    const applier = createApplier(deps({ mondayBonus: RULES, now: () => MONDAY }));
+    const world = worldWithBuilding({}, { resources: wallet(0) });
+    const first = applier(world, { name: 'weekly_reward', args: [] });
+    // The next week: the applier's clock has moved on.
+    const next = createApplier(deps({ mondayBonus: RULES, now: () => NEXT_MONDAY }));
+    const second = next(first.world, { name: 'weekly_reward', args: [] });
+    assert.equal(second.applied, true);
+    // The second week's reward: the cycle's next entry.
+    assert.equal(second.world.resources['g'], 1000 + 2000);
+  });
+
+  it('uses the player local day, not UTC', () => {
+    // 2026-10-19 23:30 UTC is already Tuesday in Auckland, and still
+    // Monday in London. The client's week day is the LOCAL one.
+    const lateMonday = Date.UTC(2026, 9, 19, 23, 30) / 1000;
+    const london = createApplier(deps({ mondayBonus: RULES, now: () => lateMonday, tzOffsetHours: 0 }));
+    const auckland = createApplier(
+      deps({ mondayBonus: RULES, now: () => lateMonday, tzOffsetHours: 12 }),
+    );
+    const world = worldWithBuilding({}, { resources: wallet(0) });
+    assert.equal(london(world, { name: 'weekly_reward', args: [] }).applied, true);
+    assert.equal(auckland(world, { name: 'weekly_reward', args: [] }).applied, false);
+  });
+});
+
+describe('the alliance daily bonus', () => {
+  const MONDAY = Date.UTC(2026, 9, 19) / 1000;
+  const RULES = {
+    rewards: [
+      { members: 0, type: 'g', value: 150 },
+      { members: 5, type: 'g', value: 1500 },
+      { members: 25, type: 'g', value: 5000 },
+      { members: 45, type: 'c', value: 1 },
+    ],
+  };
+
+  it('grants the tier the member count qualifies for', () => {
+    const applier = createApplier(
+      deps({ allianceBonus: RULES, allianceMemberCount: 6, now: () => MONDAY }),
+    );
+    const world = worldWithBuilding({}, { resources: wallet(0) });
+    const outcome = applier(world, { name: 'win_alliance_daily_bonus', args: [] });
+    assert.equal(outcome.applied, true);
+    // Six members qualifies for the five-member tier, and not the 25 one.
+    assert.equal(outcome.world.resources['g'], 1500);
+  });
+
+  it('grants the cash tier at the top', () => {
+    const applier = createApplier(
+      deps({ allianceBonus: RULES, allianceMemberCount: 50, now: () => MONDAY }),
+    );
+    const world = worldWithBuilding({}, { resources: wallet(0) });
+    const outcome = applier(world, { name: 'win_alliance_daily_bonus', args: [] });
+    assert.equal(outcome.world.resources['c'], 1);
+    assert.equal(outcome.world.resources['g'], 0);
+  });
+
+  it('is granted only once a day', () => {
+    const applier = createApplier(
+      deps({ allianceBonus: RULES, allianceMemberCount: 6, now: () => MONDAY }),
+    );
+    const world = worldWithBuilding({}, { resources: wallet(0) });
+    const first = applier(world, { name: 'win_alliance_daily_bonus', args: [] });
+    assert.equal(first.applied, true);
+    // The upstream credits the bonus but never sets the timer, so the
+    // upstream pays it over and over. The server does not.
+    const second = applier(first.world, { name: 'win_alliance_daily_bonus', args: [] });
+    assert.equal(second.applied, false);
+    assert.equal(second.world.resources['g'], 1500);
+  });
+
+  it('is granted again the next day', () => {
+    const applier = createApplier(
+      deps({ allianceBonus: RULES, allianceMemberCount: 6, now: () => MONDAY }),
+    );
+    const world = worldWithBuilding({}, { resources: wallet(0) });
+    const first = applier(world, { name: 'win_alliance_daily_bonus', args: [] });
+    const next = createApplier(
+      deps({ allianceBonus: RULES, allianceMemberCount: 6, now: () => MONDAY + 86400 }),
+    );
+    const second = next(first.world, { name: 'win_alliance_daily_bonus', args: [] });
+    assert.equal(second.applied, true);
+    assert.equal(second.world.resources['g'], 3000);
+  });
+});
+
 describe('the server own answer to a finished battle', () => {
   it('refuses the claim when there is no server simulation', () => {
     const applier = createApplier(deps());
