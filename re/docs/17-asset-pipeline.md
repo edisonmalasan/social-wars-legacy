@@ -175,19 +175,78 @@ re/data/frame-manifest.json
 The manifest is the contract between the asset pipeline and the client: the renderer asks
 for *(sprite, animation state, frame)* and gets a region of an atlas.
 
-## 6. What is still to do
+## 6. Trimming and packing
+
+The converter produces a *content-addressed store* of distinct frames. The client
+cannot ship that, because a WebGL texture is one image. So there is a second step.
+
+### 6.1 Trim
+
+A frame exported from a SWF is the **whole stage**, so most of it is transparent
+padding. Every image is cut to its alpha bounding box, and the offset is recorded,
+so the renderer can place the sprite and the atlas holds no empty space.
+
+On the 32-image sample the trim removed **24.1 %** of the pixels.
+
+### 6.2 Pack
+
+The trimmed images are packed into square atlases with a **shelf packer**: rows of
+images, sorted by height first so the rows are uniform and the wasted space is
+small. The manifest records, for every image, the trim offset and the region it
+occupies in its atlas.
+
+The sample packed 32 images into four 512×512 atlases at **65.1 % occupancy**.
+
+### 6.3 The PNG codec
+
+Both steps need to read and write PNGs, and the repository has **no runtime
+dependencies** by design, so `scripts/lib/png.mjs` is a minimal PNG codec on top
+of Node's built-in zlib:
+
+* decode: 8-bit, non-interlaced, colour types 0 (grey), 2 (RGB), 3 (palette),
+  4 (grey+alpha) and 6 (RGBA) — which is what JPEXS writes
+* encode: RGBA, filter type 0, `zlib` level 9
+
+### 6.4 The verification
+
+The packer is checked by comparing **every trimmed region, pixel by pixel, against
+its source image**:
+
+```
+pixels compared : 682 856
+opaque pixels   : 323 257
+mismatched      : 0
+```
+
+and the PNG codec by a round-trip test (decode → encode → decode is byte-identical),
+an exact alpha-bounding-box test, and a decode of a real exported frame.
+
+### 6.5 Using it
+
+```bash
+node scripts/pack-atlases.mjs                      # the default 2048px atlases
+node scripts/pack-atlases.mjs --size 512 --padding 2
+```
+
+The atlases are a build artefact (`.work/frames/atlases/`); the manifest is the
+contract.
+
+## 7. What is still to do
 
 | Step | Status |
 |---|---|
 | Corpus census (every SWF characterised) | ✅ done — `re/data/swf-corpus.json` |
-| Frame export + dedup + manifest | ✅ done — `scripts/convert-assets.mjs` → `re/data/frame-manifest.json` |
-| **Trim the frames** | **todo** — the exported PNGs are the full stage, so a building's frame is mostly transparent padding. The atlas packer needs the alpha bounding box, and the manifest needs it too, so the renderer can place the sprite. |
-| **Pack the atlases** | **todo** — pack the unique images into texture atlases and record each image's region. |
+| Frame export + dedup + manifest | ✅ done — `scripts/convert-assets.mjs` |
+| Trim to the alpha bounding box | ✅ done — `scripts/pack-atlases.mjs` |
+| Pack the atlases | ✅ done — `scripts/pack-atlases.mjs` |
+| The full run over all 1 116 SWF files | 🔄 in progress |
 | **Audio** | **todo** — the 140 MP3s in `assets/sounds/` need a format and a manifest. |
 | **Fonts** | **todo** — the two SWF font libraries need to become a web font or a bitmap font. |
 | **The 4 sprites above the stub threshold** | **todo** — `10002_chained_junk_bot`, `1180_robot_hunter`, `1200_nebular_motorized`, `1201_junk_bot` have more than 4 KiB of ABC and may hold real per-frame logic rather than `stop()` calls. They need an audit before the conversion is trusted. |
 | **`assets/swf/dynamic2.swf`** | **todo** — the one remaining unanalysed code artefact; the client loads it at runtime. |
 | **Thumbnails and chapter images** | **todo** — the 1 314 JPG thumbnails and the 578 chapter/intro JPGs are already plain images and need only a manifest. |
+| **A viewer** | **todo** — renders every item at 3 zoom levels, so missing art is visible immediately. |
+| **A content-hashed asset bundle** | **todo** — so a stale cache is impossible. |
 
 ### Two things the measurements changed about the plan
 

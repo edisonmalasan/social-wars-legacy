@@ -369,18 +369,23 @@ CI run. ✔ met
       an animation holds each drawing for many ticks
 - [x] The conversion is **batched**: FFDec accepts a *directory* of inputs, so the ~6 s JVM
       start-up is amortised across a batch instead of being paid 1 116 times
+- [x] The converter is **resumable**: the manifest is loaded on start and the SWFs it already
+      covers are skipped, and it is written after *every* batch — so an interrupted run keeps
+      everything it has already converted
 - [x] `scripts/convert-assets.mjs` converts, deduplicates and emits the frame manifest
       (`re/data/frame-manifest.json`), mapping every (swf, symbol, frame) to a
       content-addressed image
 - [x] The `DefineSprite` symbol names are preserved verbatim, because they encode the
       game's own animation-state vocabulary (`…_fla.DG_andarTcopy_3` = "and attack, copy,
       frame 3")
+- [x] Every frame is **trimmed to its alpha bounding box**, and the offset is recorded, so
+      the renderer can place the sprite and the atlas holds no empty space
+- [x] The trimmed images are **packed into texture atlases** with a shelf packer, and the
+      manifest records each image's region
+- [x] A **dependency-free PNG codec** (`scripts/lib/png.mjs`) on Node's built-in zlib, so
+      the repository keeps its zero-runtime-dependency property
 - [ ] The full run over all **1 116 SWF files outside `assets/flash/`** is executed and the
-      complete manifest is committed — the converter is proven on a measured sample
-- [ ] Frames are **trimmed** to their alpha bounding box, and the bounding box is recorded,
-      so the renderer can place a sprite without transparent padding
-- [ ] The unique images are **packed into atlases**, with a manifest mapping
-      (sprite, animation state, frame) → atlas region
+      complete manifest is committed
 - [ ] The 58 `Basesec_1.5.x.swf` builds (239.7 MB) are handled separately: `Basesec_1.5.4.swf`
       is the only one converted (it is the reference client, not game art)
 - [ ] The 1 314 thumbnails are indexed by item id and served as the inventory icon set
@@ -402,8 +407,16 @@ CI run. ✔ met
 - [ ] The client can be built with a **content-hashed** asset bundle, so a stale cache is
       impossible
 
-**Status:** The conversion pipeline is built and measured. The full run, the trim, the
-atlas packing and the audio/font work remain.
+**Status:** The conversion pipeline, the trim and the atlas packer are built and verified.
+The full run, the audio, the fonts and the viewer remain.
+
+**Measured on a 30-file sample** (`node scripts/convert-assets.mjs --group sprites --limit 30
+--jobs 3`): 230 symbols, **8 245 PNG frames written, 2 024 unique images** — 75.4 % of the
+frames are duplicates of another frame, because an animation holds each drawing for many
+ticks. 414.5 MB of raw PNG becomes a **233.6 MB** content-addressed store, in 107 s.
+
+**Verified by the atlas packer:** every trimmed region was compared pixel by pixel against
+its source — **682 856 pixels, 0 mismatched**.
 
 **Measured on a 30-file sample** (`node scripts/convert-assets.mjs --group sprites --limit 30
 --jobs 3`): 230 symbols, **8 245 PNG frames written, 2 024 unique images** — 75.4 % of the
