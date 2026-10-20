@@ -1210,7 +1210,12 @@ product.*
       no blank line between them - and the road was only noticed because the counts
       were compared. Every item that was ever in the roadmap is back
 
-- [ ] Unit tests cover the rules engine, the economy and the command handlers
+- [x] **Unit tests cover the rules engine, the economy and the command handlers.** The
+      rules engine's own files are at 89 % and above, the economy at **100 %** of its
+      lines, and the applier's command handlers at **97 %** - and the whole
+      **command surface** is exercised end to end against a real database
+      (`apps/server/src/command-surface.test.ts`)
+- [x] The coverage is **measured** and a **threshold is enforced** - see the item below
 - [x] The **golden-master harness runs in CI and is a release gate**. It is in the
       CI on every push and every pull request, and it is the **gate** of the release
       workflow (`.github/workflows/release.yml`): a tag cannot be released unless the
@@ -1231,7 +1236,14 @@ product.*
       the test cannot drift from the catalogue
 - [ ] End-to-end tests drive the web client through a complete play session
 - [ ] A load test sustains the target concurrency with correct simulation timing
-- [ ] Test coverage is measured and a threshold is enforced
+- [x] **Test coverage is measured and a threshold is enforced**
+      (`node scripts/check-coverage.mjs`). The floors are **85 %** of the lines, **80 %**
+      of the functions and **70 %** of the branches, and the measurement is Node's own
+      - so there is no extra dependency and no second opinion to reconcile. The
+      branches are lower than the lines because a branch is a *decision*, and one that
+      is not taken is often one that **cannot** be taken
+- [x] The gate is in the CI, and it **fails** below the floors - which is the point: a
+      coverage number that is only reported is a number that quietly goes down
 
 ### I2 — CI/CD
 
