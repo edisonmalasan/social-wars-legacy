@@ -69,7 +69,7 @@
  * a fixture, and the content bundle is injected by the caller.
  */
 
-import assert from 'node:assert/strict';
+import { assert } from './assert.ts';
 
 import {
   ACCEPTED_KEYS,
