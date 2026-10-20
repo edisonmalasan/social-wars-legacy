@@ -4,6 +4,8 @@ import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import { costContentFrom } from '@swl/rules';
+
 import {
   CONFIG,
   PRICED_COMMANDS,
@@ -48,31 +50,8 @@ interface RawPack {
 async function content(): Promise<CostContent> {
   const bundle = JSON.parse(
     await readFile(path.join(repoRoot(), 'packages/content/dist/content-bundle.json'), 'utf8'),
-  ) as {
-    items: RawItem[];
-    offerPacks: RawPack[];
-    globals: Record<string, unknown>;
-    expansionPrices: { coins: number; cash: number }[];
-  };
-  const items = new Map<number, CostItem>(
-    bundle.items.map((i) => [
-      i.id,
-      { id: i.id, name: i.name, costs: i.costs, costUnitCash: i.cost_unit_cash },
-    ]),
-  );
-  const offerPacks = new Map<number, CostOfferPack>(
-    bundle.offerPacks.map((p) => [p.id, p]),
-  );
-  return {
-    items,
-    offerPacks,
-    globals: bundle.globals,
-    expansionPrices: bundle.expansionPrices,
-    marketSellPercentage: bundle.globals['MARKET_SELL_PERCENTAGE'] as number,
-    marketMaxTrades: bundle.globals['MARKET_MAX_NUM_TRADES'] as number,
-    marketIncrement: bundle.globals['MARKET_INCREMENT'] as number,
-    marketBaseCosts: bundle.globals['MARKET_BASE_COSTS'] as Record<string, number>,
-  };
+  ) as Parameters<typeof costContentFrom>[0];
+  return costContentFrom(bundle);
 }
 
 describe('the priced commands', () => {
@@ -158,6 +137,31 @@ describe('computing a cost', () => {
     assert.deepEqual(computeCommandCost(c, 'spy_player', [])?.cost, { e: 15 });
     assert.equal(CONFIG.costBuyAttack, 30);
     assert.equal(CONFIG.costBuySpyings, 15);
+  });
+
+  it('prices a resource pack from the store own table', async () => {
+    const c = await content();
+    // The first gold pack gives 5000 gold for 10 cash.
+    const cost = computeCommandCost(c, 'buy_resources', ['g', 5000, 'c']);
+    assert.deepEqual(cost?.cost, { c: 10 });
+    assert.deepEqual(cost?.gain, { g: 5000 });
+  });
+
+  it('refuses a resource pack that is not in the table', async () => {
+    const c = await content();
+    assert.equal(computeCommandCost(c, 'buy_resources', ['g', 7, 'c']), null);
+  });
+
+  it('prices a premium upgrade from the new building own price', async () => {
+    const c = await content();
+    // Tank Academy V costs 20 cash as a premium upgrade.
+    const cost = computeCommandCost(c, 'premium_upgrade', [1, 2, 151, -1]);
+    assert.deepEqual(cost?.cost, { c: 20 });
+  });
+
+  it('refuses a premium upgrade to a building that has no price', async () => {
+    const c = await content();
+    assert.equal(computeCommandCost(c, 'premium_upgrade', [1, 2, 1007, -1]), null);
   });
 
   it('returns null for a command it does not price', async () => {

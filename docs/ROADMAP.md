@@ -613,10 +613,20 @@ protocol and the original dialect.*
       built yet
 - [x] Every command's resource cost is computed by the server, never accepted from the
       client (F3) — `packages/rules/src/commandcost.ts` derives each cost from the
-      content bundle and the command's own arguments. **The API has no parameter for the
-      client's claimed delta**, so it cannot be supplied even by accident, and a command
-      the table does not price is treated as *free* rather than as "whatever the client
-      says"
+      content bundle and the command's own arguments, through **one shared loader**
+      (`costContentFrom`) so the five callers cannot drift apart. **The API has no
+      parameter for the client's claimed delta**, so it cannot be supplied even by
+      accident, and a command the table does not price is treated as *free* rather than
+      as "whatever the client says"
+- [x] **17 commands are priced** from the content: `buy`, `place_stored_item`,
+      `sell_stored_item`, `exchange_cash`, `buy_offer_pack`, `buy_premium_account`,
+      `buy_resources`, `buy_powerups`, `darts_shoot_balloon`, `expand`,
+      `premium_upgrade`, `trade_resource`, `level_up`, `attack_player` and `spy_player`
+- [x] The two commands whose cost depends on the **building's own state** are charged by
+      the server instead: `reset_collect` (the reactivation price is
+      `building.costs.c × REACTIVATE_WONDER_DISCOUNT` — the client computes it and
+      *declares* it) and `finish_building` (the speed-up price, from the time that is
+      left)
 - [x] `flash_debug` does not exist in the server (F4) — it is not in the priced command
       list, and the shim **refuses it outright** rather than pricing it at zero
 - [x] Combat outcomes are re-simulated server-side (F5) — `packages/rules/src/authority.ts`
@@ -655,13 +665,22 @@ protocol and the original dialect.*
 
 ### F2 — Protocol
 
-- [ ] The native command API is versioned, typed and documented
-- [x] The **command list is correct**, and permanently checked. The client has **92**
-      commands, and the report's catalogue transcribes them **exactly** — 92 = 92, no
-      difference in either direction, so the two sources cross-validate each other. The
-      upstream handles 62 and silently drops the other 30.
+- [x] The native command API is **versioned, typed and documented**
+      (`packages/protocol/src/commands.ts`): a version constant with a supported range, a
+      request envelope of exactly four fields (`v`, `id`, `token`, `commands`), a typed
+      response with typed errors, and a **command table with an entry for every one of
+      the 94 commands**. Deliberately absent from the envelope: `USERID`, the
+      client-declared resource vector, the client's `ts`, and any client-claimed combat
+      outcome
+- [x] The **command list is correct**, and permanently checked. The client has **94**
+      commands, and the report's catalogue transcribes them **exactly** — 94 = 94, with
+      the catalogue's rows numbered 1 to 94 and no gaps, so the two sources
+      cross-validate each other rather than merely agreeing in total. The upstream
+      handles 63 and silently drops the other 31.
       `scripts/verify-command-catalogue.mjs` checks the client's own command classes
       against the catalogue and against `COMMAND_NAMES`, and fails on any difference
+- [x] The catalogue's rows are checked for **gaps in their numbering**, so a row
+      dropped in transcription cannot pass unnoticed
 - [x] The **`command.php` framing** is implemented exactly
       (`packages/protocol/src/commandphp.ts`): `<64 lowercase hex>;<raw json>`, the digest
       being HMAC-SHA256 over the **raw payload bytes**, and the parser mirroring the
