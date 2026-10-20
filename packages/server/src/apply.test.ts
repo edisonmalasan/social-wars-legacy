@@ -41,6 +41,11 @@ function worldWithBuilding(
   };
 }
 
+/** A wallet with the given amount of cash. */
+function wallet(cash: number): ShimWorld['resources'] {
+  return { g: 0, w: 0, o: 0, s: 0, c: cash, e: 100, x: 0, m: 0 };
+}
+
 describe('the map item accessor', () => {
   it('reads the items out of a map', () => {
     const items = mapItems({ items: { '7': [30, 0, 0, 0, 0, [], {}, 1] } });
@@ -226,6 +231,73 @@ describe('the daily bonus', () => {
     world.save.privateState['timestampLastBonus'] = NOW - 86_400;
     const outcome = applier(world, { name: 'win_daily_bonus', args: [] });
     assert.equal(outcome.world.save.privateState['bonusNextId'], 1);
+  });
+});
+
+describe('the commands whose cost the server computes', () => {
+  it('charges the reactivation price, not the one the client declares', () => {
+    const applier = createApplier(
+      deps({
+        items: new Map([[30, { costs: { c: 20 }, buildTime: 60 }]]),
+        reactivateWonderDiscount: 0.5,
+      }),
+    );
+    const world = worldWithBuilding({}, { resources: wallet(1000) });
+    const outcome = applier(world, { name: 'reset_collect', args: ['7'] });
+    assert.equal(outcome.applied, true);
+    // 20 cash, halved by the discount: 10.
+    assert.equal(outcome.world.resources['c'], 1000 - 10);
+  });
+
+  it('refuses a reactivation the player cannot afford', () => {
+    const applier = createApplier(
+      deps({
+        items: new Map([[30, { costs: { c: 20 }, buildTime: 60 }]]),
+        reactivateWonderDiscount: 0.5,
+      }),
+    );
+    const world = worldWithBuilding({}, { resources: wallet(1) });
+    const outcome = applier(world, { name: 'reset_collect', args: ['7'] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'insufficient-resources');
+    assert.equal(outcome.world.resources['c'], 1);
+  });
+
+  it('charges the speed-up price for hurrying a build up', () => {
+    const applier = createApplier(
+      deps({
+        items: new Map([[30, { costs: {}, buildTime: 600 }]]),
+        speedup: { minRemainingMs: 10_000, cost: 2 },
+      }),
+    );
+    // The build started now, so ten minutes remain: a speed-up is allowed.
+    const world = worldWithBuilding({}, { resources: wallet(1000) });
+    const tuple = (world.save.maps[0] as Record<string, unknown>)[
+      'items'
+    ] as Record<string, unknown[]>;
+    tuple['7']![3] = NOW;
+    const outcome = applier(world, { name: 'finish_building', args: ['7', -1] });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['c'], 1000 - 2);
+  });
+
+  it('refuses a speed-up when the build is nearly done', () => {
+    const applier = createApplier(
+      deps({
+        items: new Map([[30, { costs: {}, buildTime: 600 }]]),
+        speedup: { minRemainingMs: 10_000, cost: 2 },
+      }),
+    );
+    const world = worldWithBuilding({});
+    // The build started five minutes ago, so five minutes remain - which is
+    // more than the minimum, so this one IS allowed. Start it later.
+    const late = worldWithBuilding({}, { resources: wallet(1000) });
+    const tuple = (late.save.maps[0] as Record<string, unknown>)['items'] as Record<string, unknown[]>;
+    tuple['7']![3] = NOW - 599;
+    const outcome = applier(late, { name: 'finish_building', args: ['7', -1] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'too-late-to-speed-up');
+    assert.equal(outcome.world.resources['c'], 1000);
   });
 });
 

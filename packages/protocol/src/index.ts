@@ -1,4 +1,5 @@
 export * from './commandphp.ts';
+export * from './commands.ts';
 
 /**
  * The wire protocol, as a set of types.
@@ -72,13 +73,18 @@ export function addResources(a: ResourceVector, b: ResourceVector): ResourceVect
  *
  * The authority is the decompiled client's own command classes: every
  * `Cmd*.as`, `AdminCmd*.as` and `SystemCmd*.as` under
- * `.work/as/basesec/scripts/commands` that calls `super("<name>")`. The
- * report's catalogue in `re/docs/03-commands-quests-economy.md` agrees with
- * it **exactly** - 92 names, no difference in either direction - so the two
- * sources cross-validate each other.
+ * `.work/as/basesec/scripts/commands`. A class names itself in **two**
+ * ways - `super("<name>")`, and `commandID = "<name>"` for a subclass
+ * that overrides its parent's name - and a name may contain a **digit**:
+ * `push_queue_unit2` is a real command.
  *
- * The upstream server handles 62 of the 92 and silently drops the other
- * 30. A new server must implement every name the client can send, because
+ * The report's catalogue in `re/docs/03-commands-quests-economy.md` agrees
+ * with it **exactly**: 94 names on both sides, and the catalogue's rows
+ * are numbered 1 to 94 with no gaps, so the two sources cross-validate
+ * each other rather than merely agreeing in total.
+ *
+ * The upstream server handles 63 of the 94 and silently drops the other
+ * 31. A new server must implement every name the client can send, because
  * the client assumes the ones it sends are honoured.
  *
  * Verified by `scripts/verify-command-catalogue.mjs`.
@@ -143,6 +149,7 @@ export const COMMAND_NAMES = [
   'pop_unit',
   'premium_upgrade',
   'push_queue_unit',
+  'push_queue_unit2',
   'push_unit',
   'remove_inventory_item',
   'research_buy_step_cash',
@@ -175,8 +182,10 @@ export const COMMAND_NAMES = [
   'upgrade',
   'use_magic',
   'weekly_reward',
+  'win_alliance_daily_bonus',
   'win_daily_bonus',
 ] as const;
+
 
 
 export type CommandName = (typeof COMMAND_NAMES)[number];

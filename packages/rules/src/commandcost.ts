@@ -41,6 +41,8 @@ export interface CostItem {
   costs: Resources;
   /** The cash price of one unit trained in this building. */
   costUnitCash: number;
+  /** The cash price of a premium upgrade to this item. */
+  premiumUpgradeCosts: Resources;
 }
 
 /** An offer pack. */
@@ -57,10 +59,22 @@ export interface CostOfferPack {
   items: number[];
 }
 
+/** A resource pack from the store. */
+export interface CostResourcePack {
+  /** The resource the pack gives, by key: `g`, `w`, `o` or `s`. */
+  resource: string;
+  /** How much of it the pack gives. */
+  amount: number;
+  /** What the pack costs, by resource key. */
+  price: Resources;
+}
+
 /** The content the cost table reads. */
 export interface CostContent {
   items: Map<number, CostItem>;
   offerPacks: Map<number, CostOfferPack>;
+  /** The store's resource packs. */
+  resourcePacks: CostResourcePack[];
   globals: Record<string, unknown>;
   expansionPrices: { coins: number; cash: number }[];
   /** The market's sell percentage. */
@@ -97,9 +111,11 @@ export const PRICED_COMMANDS = [
   'exchange_cash',
   'buy_offer_pack',
   'buy_premium_account',
+  'buy_resources',
   'buy_powerups',
   'darts_shoot_balloon',
   'expand',
+  'premium_upgrade',
   'trade_resource',
   'level_up',
   'attack_player',
@@ -114,6 +130,63 @@ function add(target: Resources, source: Resources): Resources {
     out[key] = (out[key] ?? 0) + value;
   }
   return out;
+}
+
+/**
+ * Build the cost content from a built content bundle.
+ *
+ * Every caller that needs the cost table needs the same view of the
+ * bundle, and building it by hand in five places is how they drift apart.
+ * This is the one way to make it.
+ */
+export function costContentFrom(bundle: {
+  items: {
+    id: number;
+    name: string;
+    costs: Record<string, number>;
+    cost_unit_cash: number;
+    premium_upgrade_costs: Record<string, number>;
+  }[];
+  offerPacks: CostOfferPack[];
+  globals: Record<string, unknown>;
+  expansionPrices: { coins: number; cash: number }[];
+}): CostContent {
+  const globals = bundle.globals;
+
+  // The store's resource packs name the resource by its own key.
+  const packs = (globals['RESOURCE_PACKS'] ?? []) as Record<string, unknown>[];
+  const resourcePacks: CostResourcePack[] = [];
+  for (const pack of packs) {
+    const price = (pack['price'] ?? {}) as Record<string, number>;
+    for (const [resource, amount] of Object.entries(pack)) {
+      if (resource === 'price' || resource === 'img') continue;
+      if (typeof amount !== 'number') continue;
+      resourcePacks.push({ resource, amount, price: { ...price } });
+    }
+  }
+
+  return {
+    items: new Map(
+      bundle.items.map((item) => [
+        item.id,
+        {
+          id: item.id,
+          name: item.name,
+          costs: item.costs,
+          costUnitCash: item.cost_unit_cash,
+          premiumUpgradeCosts: item.premium_upgrade_costs ?? {},
+        },
+      ]),
+    ),
+    offerPacks: new Map(bundle.offerPacks.map((pack) => [pack.id, pack])),
+    resourcePacks,
+    globals,
+    expansionPrices: bundle.expansionPrices,
+    marketSellPercentage: globals['MARKET_SELL_PERCENTAGE'] as number,
+    marketMaxTrades: globals['MARKET_MAX_NUM_TRADES'] as number,
+    marketIncrement: globals['MARKET_INCREMENT'] as number,
+    marketBaseCosts: globals['MARKET_BASE_COSTS'] as Record<string, number>,
+  };
 }
 
 /**
@@ -186,6 +259,28 @@ export function computeCommandCost(
       const pack = packages?.[Number(args[0])];
       if (!pack) return null;
       return { cost: { c: pack.price }, gain: {} };
+    }
+
+    case 'buy_resources': {
+      // The native form carries the resource and the amount; the price
+      // comes from the store's own pack table, never from the client.
+      const resource = String(args[0] ?? '');
+      const amount = Number(args[1]);
+      const pack = content.resourcePacks.find(
+        (candidate) => candidate.resource === resource && candidate.amount === amount,
+      );
+      if (!pack) return null;
+      return { cost: { ...pack.price }, gain: { [resource]: amount } };
+    }
+
+    case 'premium_upgrade': {
+      // args: the old iso id, the new iso id, the new building's item id,
+      // and the click count (-1 when the building needs none).
+      const item = content.items.get(Number(args[2]));
+      if (!item) return null;
+      const costs = item.premiumUpgradeCosts ?? {};
+      if (Object.keys(costs).length === 0) return null;
+      return { cost: { ...costs }, gain: {} };
     }
 
     case 'buy_powerups': {

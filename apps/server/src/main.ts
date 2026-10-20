@@ -13,6 +13,8 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+
+import { costContentFrom } from '@swl/rules';
 import process from 'node:process';
 
 import { LegacyIdentityBridge, SessionStore } from '@swl/server';
@@ -47,29 +49,10 @@ async function readBody(request: IncomingMessage, limit: number): Promise<string
 }
 
 async function main(): Promise<void> {
-  const bundle = JSON.parse(await readFile(CONTENT_PATH, 'utf8')) as Record<string, unknown>;
-  const items = new Map(
-    (bundle['items'] as { id: number; name: string; costs: Record<string, number>; cost_unit_cash: number }[]).map(
-      (item) => [
-        item.id,
-        { id: item.id, name: item.name, costs: item.costs, costUnitCash: item.cost_unit_cash },
-      ],
-    ),
-  );
-  const content: CostContent = {
-    items,
-    offerPacks: new Map(
-      (bundle['offerPacks'] as { id: number; name: string; cost_cash: number; gold: number; wood: number; oil: number; steel: number; mana: number; xp: number; items: number[] }[]).map(
-        (pack) => [pack.id, pack],
-      ),
-    ),
-    globals: bundle['globals'] as Record<string, unknown>,
-    expansionPrices: bundle['expansionPrices'] as { coins: number; cash: number }[],
-    marketSellPercentage: (bundle['globals'] as Record<string, unknown>)['MARKET_SELL_PERCENTAGE'] as number,
-    marketMaxTrades: (bundle['globals'] as Record<string, unknown>)['MARKET_MAX_NUM_TRADES'] as number,
-    marketIncrement: (bundle['globals'] as Record<string, unknown>)['MARKET_INCREMENT'] as number,
-    marketBaseCosts: (bundle['globals'] as Record<string, unknown>)['MARKET_BASE_COSTS'] as Record<string, number>,
-  };
+  const bundle = JSON.parse(await readFile(CONTENT_PATH, 'utf8')) as Parameters<
+    typeof costContentFrom
+  >[0];
+  const content = costContentFrom(bundle);
 
   const sessions = new SessionStore();
   const identity = new LegacyIdentityBridge();

@@ -35,7 +35,17 @@ const REPORT = path.join(ROOT, 're/docs/03-commands-quests-economy.md');
 const PROTOCOL = path.join(ROOT, 'packages/protocol/src/index.ts');
 const UPSTREAM = path.join(ROOT, 'upstream/socialwarriors/command.py');
 
-/** The client's own command classes. */
+/**
+ * The client's own command classes.
+ *
+ * A class names itself in **two** ways: `super("<name>")`, and
+ * `commandID = "<name>"` for a subclass that overrides its parent's name
+ * (`CmdCollectAlliancesBonus` does the second, and it is how
+ * `win_alliance_daily_bonus` exists at all).
+ *
+ * And a name may contain a **digit**: `push_queue_unit2` is a real
+ * command. A regex that allows neither misses two commands, silently.
+ */
 async function clientCommands() {
   const names = new Map();
   let files;
@@ -47,9 +57,11 @@ async function clientCommands() {
   for (const file of files) {
     if (!file.endsWith('.as')) continue;
     const body = await readFile(path.join(COMMANDS_DIR, file), 'utf8');
-    for (const match of body.matchAll(/super\(\s*"([a-z_]+)"\s*\)/g)) {
-      names.set(match[1], file);
-    }
+    const found = new Set([
+      ...[...body.matchAll(/super\(\s*"([a-z_0-9]+)"\s*\)/g)].map((m) => m[1]),
+      ...[...body.matchAll(/commandID\s*=\s*"([a-z_0-9]+)"/g)].map((m) => m[1]),
+    ]);
+    for (const name of found) names.set(name, file);
   }
   return names;
 }
@@ -59,8 +71,8 @@ async function catalogueCommands() {
   const report = await readFile(REPORT, 'utf8');
   const names = new Map();
   for (const line of report.split('\n')) {
-    const match = line.match(/^\|\s*(\d+)\s*\|\s*`([a-z_]+)`\s*\|\s*`?(\w+)`?\s*\|/);
-    if (match) names.set(match[2], { row: Number(match[1]), class: match[3] });
+    const match = line.match(/^\|\s*(\d+)\s*\|\s*`([a-z_0-9]+)`\s*\|/);
+    if (match) names.set(match[2], { row: Number(match[1]), class: match[2] });
   }
   return names;
 }
@@ -82,7 +94,7 @@ async function protocolCommands() {
 async function upstreamCommands() {
   try {
     const source = await readFile(UPSTREAM, 'utf8');
-    return new Set([...source.matchAll(/cmd\s*==\s*["']([a-z_]+)["']/g)].map((m) => m[1]));
+    return new Set([...source.matchAll(/cmd\s*==\s*["']([a-z_0-9]+)["']/g)].map((m) => m[1]));
   } catch {
     return null;
   }
@@ -125,6 +137,19 @@ async function main() {
     console.log('DIFFERS: the catalogue and the client disagree.');
     for (const name of clientOnly) console.log(`  only in the client  : ${name}`);
     for (const name of catalogueOnly) console.log(`  only in the catalogue: ${name}`);
+  }
+  console.log('');
+
+  // The catalogue's rows must be numbered 1..n with no gaps, or a row was
+  // dropped when it was transcribed.
+  const rows = [...catalogue.values()].map((entry) => entry.row).sort((a, b) => a - b);
+  const expected = rows.map((_, index) => index + 1);
+  if (rows.length === expected.length && rows.every((row, index) => row === expected[index])) {
+    console.log(`OK: the catalogue's rows are numbered 1..${rows.length} with no gaps.`);
+  } else {
+    failures += 1;
+    console.log('DIFFERS: the catalogue has a gap in its row numbers.');
+    console.log(`  rows found: ${rows.join(', ')}`);
   }
   console.log('');
 

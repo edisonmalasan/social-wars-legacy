@@ -4,6 +4,8 @@ import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import { costContentFrom } from '@swl/rules';
+
 import { framePayload, SERVER_KEYS } from '@swl/protocol';
 import { COUNTERS } from '@swl/rules';
 
@@ -28,27 +30,8 @@ function repoRoot(): string {
 async function costContent() {
   const bundle = JSON.parse(
     await readFile(path.join(repoRoot(), 'packages/content/dist/content-bundle.json'), 'utf8'),
-  ) as {
-    items: { id: number; name: string; costs: Record<string, number>; cost_unit_cash: number }[];
-    offerPacks: { id: number; name: string; cost_cash: number; gold: number; wood: number; oil: number; steel: number; mana: number; xp: number; items: number[] }[];
-    globals: Record<string, unknown>;
-    expansionPrices: { coins: number; cash: number }[];
-  };
-  return {
-    items: new Map(
-      bundle.items.map((i) => [
-        i.id,
-        { id: i.id, name: i.name, costs: i.costs, costUnitCash: i.cost_unit_cash },
-      ]),
-    ),
-    offerPacks: new Map(bundle.offerPacks.map((p) => [p.id, p])),
-    globals: bundle.globals,
-    expansionPrices: bundle.expansionPrices,
-    marketSellPercentage: bundle.globals['MARKET_SELL_PERCENTAGE'] as number,
-    marketMaxTrades: bundle.globals['MARKET_MAX_NUM_TRADES'] as number,
-    marketIncrement: bundle.globals['MARKET_INCREMENT'] as number,
-    marketBaseCosts: bundle.globals['MARKET_BASE_COSTS'] as Record<string, number>,
-  };
+  ) as Parameters<typeof costContentFrom>[0];
+  return costContentFrom(bundle);
 }
 
 function world(over: Partial<ShimWorld> = {}): ShimWorld {

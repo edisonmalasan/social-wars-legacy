@@ -39,6 +39,7 @@ import {
   collect as collectProduction,
   awardQuest,
   emptyQuestProgress,
+  speedUpCost,
   type CollectPeriods,
   type DailyBonusRules,
   type GoalRuntimeState,
@@ -116,6 +117,12 @@ export interface ApplierDeps {
   dailyBonus: DailyBonusRules;
   /** How much a goal's reward is worth. */
   goalRewardGold?: number;
+  /** The content items, by id, for the costs the content drives. */
+  items?: Map<number, { costs: Record<string, number>; buildTime: number }>;
+  /** The hurry-up rules, for finishing a building early. */
+  speedup?: { minRemainingMs: number; cost: number };
+  /** The discount the reactivate-a-wonder price carries. */
+  reactivateWonderDiscount?: number;
 }
 
 /** The map's items, keyed by iso id. */
@@ -188,6 +195,10 @@ export function createApplier(deps: ApplierDeps): CommandApplier {
         return completeGoalCommand(world, command.args, deps);
       case 'win_daily_bonus':
         return dailyBonusCommand(world, command.args, deps);
+      case 'reset_collect':
+        return resetCollectCommand(world, command.args, deps);
+      case 'finish_building':
+        return finishBuildingCommand(world, command.args, deps);
       case 'end_attack':
       case 'end_quest':
         // The client may claim a win. The server does not listen: these are
@@ -299,5 +310,100 @@ function dailyBonusCommand(
       g: (world.resources['g'] ?? 0) + reward.gold,
     };
   }
+  return { applied: true, world };
+}
+
+/**
+ * `reset_collect` — re-activating a depleted wonder.
+ *
+ * The client computes the price and **declares** it: `CmdResetCollect` takes
+ * the cash amount as a constructor argument and puts it in the delta
+ * (commands/CmdResetCollect.as:12-14). The server computes it instead:
+ *
+ * ```
+ * cashToReactivate = building.costs["c"] * REACTIVATE_WONDER_DISCOUNT
+ * ```
+ *
+ * (core/isoengine/delegates/buildings/WonderDelegate.as:50-51)
+ */
+function resetCollectCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const isoId = String(args[0] ?? '');
+  const tuple = mapItems(ownMap(world))[isoId];
+  if (!tuple) return { applied: false, refused: 'unknown-building', world };
+  const itemId = tuple[0];
+  if (typeof itemId !== 'number') return { applied: false, refused: 'unknown-building', world };
+
+  const item = deps.items?.get(itemId);
+  const base = item?.costs?.['c'] ?? 0;
+  const discount = deps.reactivateWonderDiscount ?? 0.5;
+  const cash = Math.ceil(base * discount);
+  if (cash <= 0) return { applied: false, refused: 'not-reactivatable', world };
+
+  const available = world.resources['c'] ?? 0;
+  if (available < cash) {
+    return { applied: false, refused: 'insufficient-resources', world };
+  }
+  world.resources = { ...world.resources, c: available - cash };
+
+  // The collection is emptied and the timer restamped.
+  const attrs = (tuple[6] ??= {}) as Record<string, unknown>;
+  const state = buildingState(attrs);
+  writeBuildingState(attrs, { ...state, collect: 0, lastAccruedAt: deps.now() });
+  tuple[3] = deps.now();
+
+  return { applied: true, world };
+}
+
+/**
+ * `finish_building` — hurrying a build up.
+ *
+ * The cost is the speed-up price, which the rules engine computes from the
+ * time that is left. It is charged here rather than in the cost table,
+ * because it depends on the building's own state and not on the content.
+ */
+function finishBuildingCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const isoId = String(args[0] ?? '');
+  const tuple = mapItems(ownMap(world))[isoId];
+  if (!tuple) return { applied: false, refused: 'unknown-building', world };
+  const itemId = tuple[0];
+  if (typeof itemId !== 'number') return { applied: false, refused: 'unknown-building', world };
+
+  const item = deps.items?.get(itemId);
+  if (!item) return { applied: false, refused: 'unknown-building', world };
+
+  const startedAt = tuple[3];
+  if (typeof startedAt !== 'number') {
+    return { applied: false, refused: 'not-building', world };
+  }
+  const elapsedMs = Math.max(0, (deps.now() - startedAt) * 1000);
+  const remainingMs = Math.max(0, item.buildTime * 1000 - elapsedMs);
+
+  const rules = deps.speedup ?? { minRemainingMs: 10_000, cost: 2 };
+  const cost = speedUpCost(remainingMs, rules);
+  if (cost === null) {
+    // The build is already too far along to hurry. The client offers a
+    // speed-up only when more than `minRemainingMs` is left.
+    return { applied: false, refused: 'too-late-to-speed-up', world };
+  }
+
+  const available = world.resources['c'] ?? 0;
+  if (available < cost) {
+    return { applied: false, refused: 'insufficient-resources', world };
+  }
+  world.resources = { ...world.resources, c: available - cost };
+
+  // The build is finished now.
+  tuple[3] = deps.now();
+  const attrs = (tuple[6] ??= {}) as Record<string, unknown>;
+  attrs['clicked'] = (Number(attrs['clicked'] ?? 0) + 1);
+
   return { applied: true, world };
 }
