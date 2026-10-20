@@ -1198,6 +1198,16 @@ assault against the new server, and the cheat battery is fully rejected.
 - [ ] The desktop build (Tauri) runs on Windows, macOS and Linux
 - [ ] The mobile build (Capacitor) runs on Android and iOS
 - [ ] The game is playable at the original resolutions and scales cleanly to phone screens
+- [x] The **stage's layout is a model** (`packages/client/src/stage.ts`): the stage is the
+      client's own **760 by 600**, and it is **scaled** to fit rather than reflowed,
+      because the game's layout is not fluid and reflowing it would put the panels on
+      top of each other. The scale is the largest that fits, **capped at 1** - a bigger
+      window does not make the game bigger - and a **whole number** where it can be, so
+      the pixel art stays sharp
+- [x] The layout knows when the window is in **portrait**, and when the text is **too
+      small to read**: the scale that *fits* is judged separately from the one that is
+      *used*, because the used one is floored and asking about it would find nothing
+- [ ] The game is played on an **actual phone**, and the touch controls are there
 
 **Exit criteria:** a new player completes the tutorial and a quest in every shipped client.
 
