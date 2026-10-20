@@ -546,7 +546,17 @@ client's observable behaviour.*
 
 ### E3 — Quests and goals
 
-- [ ] The quest state machine and all 28 quests' win/fail conditions are implemented
+- [x] The quest state machine and all 23 concrete quests' win/fail conditions are
+      implemented (`packages/rules/src/quest.ts`): the lifecycle, the per-kill economy
+      (5 gold and `ceil(gold × 0.05)` xp), the army-wipe rule, the mission timers, the
+      difficulty scaling, the air-vehicle exclusion, the weekly quest, the chapter system
+      and the rewards — with the play order and reward rows **pinned by id**, not by index
+- [x] Three things `re/data/quests.json` gets **wrong** were found by reading the client
+      and corrected: `Quest10SpecialOps` and `Quest14Spy2` do *not* win on "all bastards
+      dead", `Quest02CentralNuclear` has no plant-then-HQ gate, and
+      `Quest06Airstrike`'s radio station is not a gate
+- [x] `Quest08Rocket`'s win is **unreachable** (`canDie` is false), and that is flagged
+      rather than papered over
 - [x] **All 134 goals evaluate server-side, with at most 5 active**
       (`packages/rules/src/goals.ts`): the 26 registerable goal types, the **5-goal window**
       (the first five *incomplete* goals in registration order), the activation sweep, and
