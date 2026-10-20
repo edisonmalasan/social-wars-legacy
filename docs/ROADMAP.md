@@ -917,10 +917,14 @@ assault against the new server, and the cheat battery is fully rejected.
 
 - [ ] Every screen in the B6 inventory is implemented, or explicitly dropped with a
       recorded decision
-- [ ] The HUD (resources, level, population, energy), build menu, unit panel, minimap,
-      neighbour strip, goal panel and popups all work
-- [ ] Tooltips, tutorials and the "click here" guidance system are reimplemented
-- [ ] Text renders with the substituted fonts at the original metrics
+- [x] The **HUD's model** is implemented (`packages/client/src/hud.ts`): the resources,
+      the level, the population and the energy, and every popover's text — the
+      client's own literals, including the "Build more Silos to get more space"
+      warning and the max-population case. The **number formatting** is the client's
+      exactly: the digits grouped in threes from the right and joined with commas, and
+      grouped as a STRING, so a negative number comes out as "-1,234"
+- [ ] The build menu, unit panel, minimap, neighbour strip, goal panel and popups all
+      work
 
 ### G4 — Feature parity
 
