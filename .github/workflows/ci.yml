@@ -55,6 +55,11 @@ jobs:
       - name: Integration tests
         run: pnpm test:integration
 
+      # The coverage is **enforced**, not only reported: a number that
+      # is only read is a number that quietly goes down.
+      - name: The test coverage is above the floors
+        run: node scripts/check-coverage.mjs
+
       - name: The golden-master corpus
         run: node scripts/golden-master.mjs
 

@@ -84,6 +84,7 @@ desktop shells do not — they land with Groups F, G and H.**
 | Pack the frames into atlases | `node scripts/pack-atlases.mjs`   | Working | Group D — trims and packs |
 | Catalogue the images and sounds | `node scripts/build-asset-manifest.mjs` | Working | Group D |
 | Extract and measure the client fonts | `node scripts/extract-fonts.mjs` | Working | Group D |
+| Check the test coverage          | `node scripts/check-coverage.mjs` | Working | Group I — fails below the floors |
 | Check the golden-master corpus | `node scripts/golden-master.mjs` | Working | Group E4 — fails on any difference |
 | Prepare the desktop shell's inputs | `node scripts/prepare-desktop.mjs` | Working | Group H — the icons and the placeholder |
 | Check the decision records         | `node scripts/check-adrs.mjs` | Working | Group I — `--index` rewrites it |
