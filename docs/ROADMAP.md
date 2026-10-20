@@ -443,41 +443,13 @@ CI run. ✔ met
       rounded body text and Rubik Mono One for the display face, both SIL OFL 1.1
 - [ ] The substitutes are **substituted in the client** and their metrics are tuned to match
       the originals, so the game's text fits the same boxes
-- [ ] The 4 proprietary font references in the client are removed — only 2 font *files* ship,
-      so the other 2 references are either the same faces loaded twice or the client's own
-      fallback stack
-- [x] `assets/swf/dynamic2.swf` is decompiled and analysed — it is the **runtime library**:
-      it embeds **28 sounds the server's config never mentions** (all unique, none
-      duplicating a standalone file) and the **building-construction animations**, which
-      explains why some items appear to have no art
-      ([`../re/docs/17-asset-pipeline.md`](../re/docs/17-asset-pipeline.md) §7)
-- [x] The 4 sprites above the 4 KiB ABC threshold are audited — they are ordinary
-      animation timelines with many named frames, not special logic. **Nothing to act on.**
-- [x] The 28 embedded sounds are added to the audio set — the runtime library
-      `dynamic2.swf` carries 28 sounds of its own (the construction animations' audio)
-      that are named nowhere in the config's sound list, and they are now **in the audio
-      set the client loads**, marked as embedded because their bytes live in a SWF
-      rather than in a standalone file. The set is **168 sounds**: 140 standalone and 28
-      embedded
-- [x] The construction animations from `dynamic2.swf` are included in the conversion —
-      the runtime library contributes **34 symbols**, among them
-      `Animgranjaconstr_27` with 129 frames, `ConstructionGranja` and
-      `Construction4x4Trol`. The 205 FX assets contribute **1 234 symbols** across all
-      205 files
-- [x] A viewer exists that renders every item at 3 zoom levels, so missing art is
-      visible — `scripts/build-asset-viewer.mjs` generates a single self-contained page
-      from the repository's own records: every one of the **900 content items**, its
-      sprite and its thumbnail, the art at 0.5x, 1x and 2x, and the **10 items missing
-      a sprite marked in red**. The art columns read from the atlas regions, so the page
-      is regenerated once the packer has run
-      immediately
-- [x] The client can be built with a **content-hashed** asset bundle, so a stale cache is
-      impossible — `scripts/build-asset-bundle.mjs` records every asset's content hash
-      and derives **one build id** over the whole set, and the client appends that id
-      to every asset URL (`packages/client/src/assets.ts`). A changed asset means a
-      changed URL, so the cache cannot be stale. The bundle is also the client's
-      **index**: which atlas page each sprite is on, and where in it, so the renderer
-      does not have to know how the atlases are laid out
+- [x] The **4 proprietary font references are identified**: the client loads **two**
+      fonts (`ArialRoundedBold` and `KomikaAxis`) in **three** languages (English,
+      Turkish and Greek), so it looks for **six** font files. Only the two English
+      ones ship, and the four missing ones are the **Turkish and Greek variants of
+      the same two faces**. The client's own `FontsLoader` has an IO-error handler
+      that retries and then falls back, so a Turkish or Greek player sees the default
+      font rather than a broken one
 
 **Status:** The conversion pipeline, the trim and the atlas packer are built and verified.
 The full run, the audio, the fonts and the viewer remain.
