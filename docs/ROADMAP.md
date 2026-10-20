@@ -530,20 +530,11 @@ client's observable behaviour.*
       building earns nothing (`IsoFightingElement.as:477-480`). The level table is
       `globals.UNIT_XP_LEVELS_MULTIPLIERS_10` and the bonuses are cumulative:
       **+30 attack and 3× base HP at level 9**
-- [ ] The level-up thresholds behave exactly, including the client's off-by-one: the
-      comparison is `xp <= required` to *break*, so a unit needs one point more than the
-      threshold to advance — which is why a paid level-up grants "the missing XP plus 1"
-      (`CmdPlaceStoredItem.as:38`), and why **level 9 cannot be reached by XP alone**
-- [x] All **10 damage classes** are implemented as pure state transitions
-      (`packages/rules/src/damage.ts`): `SimpleDamage`, `DamageOverTime`, `BleedingDamage`,
-      `DelayedDamage`, `DirectKillDamage`, `DizzyDamage`, `IncinerateDamage`,
-      `PushInAirDamage`, `SequencedDamage` and `AreaDamageSpecialAttack` — including the
-      shared-damage division, the bleed's damage-per-second, and the conditional kill
-- [x] All **15 special-attack classes** are specified
-      (`packages/rules/src/specialattacks.ts`) with the damage outcome a server has to
-      reproduce: the per-shot fallbacks (`attack / frames / points`, `attack / frames`),
-      the area sharing, the spawn counts, the consume attacks, the vortex's 30 % bleed, and
-      the whirlwind's per-tick division
+- [x] The level-up thresholds behave exactly, including the client's off-by-one: the
+      client walks up from level 1 and **breaks** when `xp <= required`, so a unit needs
+      one point *more* than the threshold to advance - which is why level 9 cannot be
+      reached by XP alone. A paid level-up grants exactly the missing XP plus 1
+      (`packages/rules/src/xp.ts`)
 
 ### E2 — Economy and buildings
 
@@ -579,18 +570,20 @@ client's observable behaviour.*
       units inside the unit reward, and the ready / collected / not-ready / hidden states
 - [x] The **alliance daily bonus** is implemented: the highest tier the member count
       qualifies for (0 / 5 / 25 / 45 members)
-- [ ] The upstream's market period mismatch is resolved: the server resets the trade counter
-      **daily** while the client uses a **20-hour** period, so the two disagree on exactly
-      when a player may trade again
-- [x] The darts minigame (25 targets, 20 cash per paid shot, weekly prize rotation) is
-      correct — the board of **25 balloons** with the six prizes spread **1, 1, 4, 4, 7,
-      8** over them (the client's own `initTargetItems`), the board **shuffled from the
-      server's seed** so every player sees the same board that week, the first shot of
-      the day **free** and every shot after it at **20 cash**, and the **extra prize**
-      won by discovering all six — once (`packages/rules/src/dartsboard.ts`)
+- [x] The upstream's market period mismatch is **resolved**: the upstream resets the
+      trade counter **daily** while the client uses a **20-hour** period, so the two
+      disagree on exactly when a player may trade again. The **client's** period is
+      the rule, because the client is the specification and the player's experience is
+      the client's. The upstream's daily reset is an upstream bug: it makes the limit
+      24 trades per calendar day rather than 20 trades per 20 hours, and it disagrees
+      with the counter the client shows. The rules engine implements the 20-hour
+      period (`packages/rules/src/market.ts`)
 
 ### E3 — Quests and goals
 
+- [x] The **Monday reward cycle** is the client's: `MONDAY_BONUS_REWARDS` has
+      **3** entries and the cycle wraps at 3, while the upstream wraps its index at
+      5. The client is the specification, so the cycle is 3
 - [x] The quest state machine and all 23 concrete quests' win/fail conditions are
       implemented (`packages/rules/src/quest.ts`): the lifecycle, the per-kill economy
       (5 gold and `ceil(gold × 0.05)` xp), the army-wipe rule, the mission timers, the
