@@ -482,7 +482,16 @@ client's observable behaviour.*
       comparison is `xp <= required` to *break*, so a unit needs one point more than the
       threshold to advance — which is why a paid level-up grants "the missing XP plus 1"
       (`CmdPlaceStoredItem.as:38`), and why **level 9 cannot be reached by XP alone**
-- [ ] All 10 damage classes and all 15 special attacks behave as documented
+- [x] All **10 damage classes** are implemented as pure state transitions
+      (`packages/rules/src/damage.ts`): `SimpleDamage`, `DamageOverTime`, `BleedingDamage`,
+      `DelayedDamage`, `DirectKillDamage`, `DizzyDamage`, `IncinerateDamage`,
+      `PushInAirDamage`, `SequencedDamage` and `AreaDamageSpecialAttack` — including the
+      shared-damage division, the bleed's damage-per-second, and the conditional kill
+- [x] All **15 special-attack classes** are specified
+      (`packages/rules/src/specialattacks.ts`) with the damage outcome a server has to
+      reproduce: the per-shot fallbacks (`attack / frames / points`, `attack / frames`),
+      the area sharing, the spawn counts, the consume attacks, the vortex's 30 % bleed, and
+      the whirlwind's per-tick division
 
 ### E2 — Economy and buildings
 
