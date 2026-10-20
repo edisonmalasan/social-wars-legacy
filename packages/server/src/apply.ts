@@ -1,3 +1,4 @@
+
 /**
  * The command applier — the server's own answer to a command.
  *
@@ -34,9 +35,12 @@
 import { Random, hashSeed } from '@swl/rules';
 import {
   awardGoal,
+  allianceDailyBonus,
   createGoalState,
   dailyBonusReadiness,
   dailyBonusReward,
+  mondayBonusReward,
+  mondayBonusState,
   collect as collectProduction,
   awardQuest,
   emptyQuestProgress,
@@ -206,6 +210,12 @@ export interface ApplierDeps {
   reactivateWonderDiscount?: number;
   /** Resolves an attack from the server's own simulation. */
   resolveBattle?: BattleResolver;
+  /** The weekly bonus's three rewards. */
+  mondayBonus?: { rewards: { type: string; value: number | number[] }[] };
+  /** The alliance daily bonus's tiers. */
+  allianceBonus?: { rewards: { members?: number; type: string; value: number }[] };
+  /** How many members the player's alliance has. */
+  allianceMemberCount?: number;
   /** The player's level table: the XP each level needs and its reward. */
   levels?: { index: number; exp_required: number; reward_amount: number; reward_type: string }[];
 }
@@ -293,6 +303,10 @@ export function createApplier(deps: ApplierDeps): CommandApplier {
         return completeGoalCommand(world, command.args, deps);
       case 'win_daily_bonus':
         return dailyBonusCommand(world, command.args, deps);
+      case 'weekly_reward':
+        return weeklyRewardCommand(world, command.args, deps);
+      case 'win_alliance_daily_bonus':
+        return allianceBonusCommand(world, command.args, deps);
       case 'reset_collect':
         return resetCollectCommand(world, command.args, deps);
       case 'finish_building':
@@ -1049,6 +1063,109 @@ function finishBuildingCommand(
   tuple[3] = deps.now();
   const attrs = (tuple[6] ??= {}) as Record<string, unknown>;
   attrs['clicked'] = (Number(attrs['clicked'] ?? 0) + 1);
+
+  return { applied: true, world };
+}
+
+/**
+ * The player's LOCAL day of the week, 0 for Sunday.
+ *
+ * The client reads `Date.getDay()`, so the week day is the player's
+ * local one and not UTC's. The server has to shift by the player's
+ * offset to agree with it.
+ */
+export function localDayOfWeek(now: number, tzOffsetHours: number): number {
+  return new Date((now + tzOffsetHours * 3600) * 1000).getUTCDay();
+}
+
+/** The player's LOCAL day number, so a day can be compared. */
+export function localDayNumber(now: number, tzOffsetHours: number): number {
+  return Math.floor((now + tzOffsetHours * 3600) / 86400);
+}
+
+/**
+ * `weekly_reward` - the Monday bonus.
+ *
+ * It is only ready on a Monday, and only once: the private state's
+ * `timeStampMondayBonus` records when it was last collected.
+ */
+function weeklyRewardCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const rules = deps.mondayBonus;
+  if (!rules) return { applied: false, refused: 'not-implemented', world };
+
+  const privateState = world.save.privateState;
+  const now = deps.now();
+  const today = localDayNumber(now, deps.tzOffsetHours);
+  const lastCollected = privateState['timeStampMondayBonus'];
+  const lastDay =
+    typeof lastCollected === 'number' && lastCollected > 0
+      ? localDayNumber(lastCollected, deps.tzOffsetHours)
+      : null;
+
+  const state = mondayBonusState(localDayOfWeek(now, deps.tzOffsetHours), lastDay, today);
+  if (state !== 'ready') {
+    // Either it is not Monday, or it was already collected.
+    return { applied: false, refused: state, world };
+  }
+
+  const index = Number(privateState['weeklyRewardIndex'] ?? 0);
+  const reward = mondayBonusReward(rules, index);
+
+  privateState['timeStampMondayBonus'] = now;
+  privateState['weeklyRewardIndex'] = index + 1;
+
+  if (reward.type === 'g' && typeof reward.value === 'number') {
+    world.resources = { ...world.resources, g: (world.resources['g'] ?? 0) + reward.value };
+  } else if (reward.type === 'c' && typeof reward.value === 'number') {
+    world.resources = { ...world.resources, c: (world.resources['c'] ?? 0) + reward.value };
+  }
+  // A unit reward goes into the store, which the store's own state holds.
+
+  return { applied: true, world };
+}
+
+/**
+ * `win_alliance_daily_bonus` - the alliance's daily bonus.
+ *
+ * The tier comes from the member count, and it is granted once a day.
+ * The upstream credits the bonus but never sets the timer, so the
+ * upstream pays it over and over.
+ */
+function allianceBonusCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const rules = deps.allianceBonus;
+  if (!rules) return { applied: false, refused: 'not-implemented', world };
+
+  const privateState = world.save.privateState;
+  const now = deps.now();
+  const today = localDayNumber(now, deps.tzOffsetHours);
+  const lastBonus = privateState['timestampLastAllianceBonus'];
+  const lastDay =
+    typeof lastBonus === 'number' && lastBonus > 0
+      ? localDayNumber(lastBonus, deps.tzOffsetHours)
+      : null;
+  if (lastDay === today) {
+    // Already collected today.
+    return { applied: false, refused: 'not-ready', world };
+  }
+
+  const reward = allianceDailyBonus(rules, deps.allianceMemberCount ?? 0);
+  if (!reward) return { applied: false, refused: 'no-tier', world };
+
+  privateState['timestampLastAllianceBonus'] = now;
+
+  if (reward.type === 'g' && typeof reward.value === 'number') {
+    world.resources = { ...world.resources, g: (world.resources['g'] ?? 0) + reward.value };
+  } else if (reward.type === 'c' && typeof reward.value === 'number') {
+    world.resources = { ...world.resources, c: (world.resources['c'] ?? 0) + reward.value };
+  }
 
   return { applied: true, world };
 }
