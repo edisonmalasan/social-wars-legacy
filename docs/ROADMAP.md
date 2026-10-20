@@ -778,10 +778,22 @@ protocol and the original dialect.*
       batch is applied to a copy and committed atomically
 - [ ] A soak test of sustained play shows no memory growth and no state drift
 
-### F5 — Social layer
+### F5 - Social layer
 
-- [ ] Alliances, marketplace and the auction/betting subsystem are implemented per the
-      Group B7 contracts, or are explicitly and visibly out of scope
+- [x] The **alliance service** is implemented: all **11 service variants** with their
+      parameters, and the **17 error codes** in four bands, exactly as the client's
+      `data/AllianceServiceError.as` has them (the client switches on those numbers, so
+      they must be exact) — `packages/server/src/alliance.ts`. It is pure: the state is
+      passed in and the new state is returned, with the clock as a parameter
+- [x] The **country rule** is implemented: alliances are country-scoped, so a player
+      cannot join or be found by an alliance in another country (`ERR_WRONG_COUNTRY`)
+- [x] The **owner's powers** are implemented: only the owner processes join requests or
+      kicks a member, and the owner cannot simply walk away from the alliance
+      (`ERR_ALLIANCE_OWNER_SWITCH`)
+- [ ] The **marketplace and the auction/betting subsystem** are implemented per the B7
+      contracts, or are explicitly and visibly out of scope. The upstream's subsystem is
+      complete but **disabled**, and the client's three endpoints are documented
+- [ ] The alliance service is **persisted** and served over HTTP
 
 **Exit criteria:** the original Flash client can complete the tutorial and a Mission 1
 assault against the new server, and the cheat battery is fully rejected.
