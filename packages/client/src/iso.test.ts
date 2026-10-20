@@ -17,7 +17,7 @@ import {
 } from './iso.ts';
 
 /** The viewport the client's own tests would use: the map's origin. */
-const VIEWPORT = { topX: 0, topY: 0 };
+const VIEWPORT = { topX: 0, topY: 0, buildOutlineOffsetY: 0 };
 
 describe('the tile constants', () => {
   it('are the client own', () => {
@@ -51,7 +51,7 @@ describe('the projection', () => {
   });
 
   it('follows the viewport', () => {
-    const viewport = { topX: 500, topY: 300 };
+    const viewport = { topX: 500, topY: 300, buildOutlineOffsetY: 0 };
     const point = tileToPixel(3, 4, viewport);
     assert.equal(point.x, 500 + TILE_HEIGHT_PIXELS * 3 - TILE_HEIGHT_PIXELS * 4);
     assert.equal(point.y, 300 + (TILE_HEIGHT_PIXELS / 2) * 4 + (TILE_HEIGHT_PIXELS / 2) * 3 - 27);
@@ -88,7 +88,7 @@ describe('the projection', () => {
   });
 
   it('inverts a shifted viewport too', () => {
-    const viewport = { topX: 640, topY: 480 };
+    const viewport = { topX: 640, topY: 480, buildOutlineOffsetY: 0 };
     const point = tileToPixel(11, 23, viewport);
     const back = pixelToTile(point.x, point.y, viewport);
     assert.equal(back.tx, 11);
