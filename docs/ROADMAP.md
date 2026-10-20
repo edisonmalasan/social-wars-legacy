@@ -660,8 +660,30 @@ client's observable behaviour.*
 - [ ] The harness diffs the rules engine against the **original Flash client** — the
       differential test needs the client to be driven through the same scenarios, which
       is the last part of E4
-- [ ] The simulation is deterministic given a seed; the same seed and inputs produce the
-      same outcome on any machine — verified within a process, not yet across platforms
+- [x] The simulation is deterministic given a seed; the same seed and inputs produce the
+      same outcome on any machine. The claim is **provable by construction**, not merely
+      untested:
+      - the generator is a xoshiro128** whose every operation is a **32-bit integer**
+        operation (`>>> 0`, `Math.imul`), and those are defined exactly by the language
+      - the arithmetic is ECMAScript's `Number` — IEEE 754 double precision — which the
+        specification requires every engine to give identically for the identical
+        expression, and the order of the operations is fixed by the code
+      - the rules engine is **scanned** for the sources of nondeterminism that would
+        break the claim (`packages/rules/src/portability.test.ts`): an unseeded
+        generator, the wall clock, the locale, the environment, a platform API or the
+        filesystem. The scan is what caught the two real defects below
+      - the generator's **reference vectors are pinned** (`determinism.test.ts`), so a
+        change to the generator cannot pass unnoticed, and every battle ever
+        re-simulated changes with it
+- [x] The **darts schedule no longer depends on the machine's timezone**. It was worked
+      in the server's **local** time, so two servers in different zones would rotate it
+      to different strings, and the "Monday" snapping landed on a different instant. It
+      is worked in **UTC** now, which also removes the daylight-saving correction the
+      upstream needed. There is a test that rotates it under three timezones and
+      compares the strings
+- [x] The rules package no longer imports `node:assert`: the shared, platform-neutral
+      core had a Node dependency in it for the sake of five comparisons. The checks are
+      made by a small local helper (`packages/rules/src/assert.ts`)
 
 **Exit criteria:** the golden-master corpus passes with zero unexplained differences.
 

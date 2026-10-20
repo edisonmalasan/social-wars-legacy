@@ -10,8 +10,14 @@
  *
  * The rotation is the upstream's `make_dynamic` / `update_darts`, ported:
  * the schedule advances in whole weeks, each game lasts exactly 7 days from
- * the first one, and the dates are snapped to Mondays (with a daylight-saving
- * correction).
+ * the first one, and the dates are snapped to Mondays.
+ *
+ * **The schedule is worked in UTC.** The upstream does it in the server's
+ * local time, which makes the result depend on the machine's timezone: two
+ * servers in different zones would rotate to different strings. The strings
+ * are what the client shows, so they have to be the same everywhere, and UTC
+ * is what makes them so. It also removes the daylight-saving correction the
+ * upstream needed, because UTC has no daylight saving.
  */
 
 const WEEK_SECONDS = 604800;
@@ -28,34 +34,43 @@ export interface DartsGame {
 /** The date format the config uses. */
 const DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
+/**
+ * Parse a schedule date.
+ *
+ * The string is a **UTC** wall clock, not a local one. The local-time
+ * constructor is what made the schedule depend on the machine's timezone.
+ */
 function parseDate(value: string): Date {
   const match = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})$/.exec(value);
   if (!match) throw new Error(`unparsable darts date: ${value}`);
   return new Date(
-    Number(match[1]),
-    Number(match[2]) - 1,
-    Number(match[3]),
-    Number(match[4]),
-    Number(match[5]),
-    Number(match[6]),
+    Date.UTC(
+      Number(match[1]),
+      Number(match[2]) - 1,
+      Number(match[3]),
+      Number(match[4]),
+      Number(match[5]),
+      Number(match[6]),
+    ),
   );
 }
 
+/** Format a schedule date, as a UTC wall clock. */
 function formatDate(date: Date): string {
   const pad = (n: number): string => String(n).padStart(2, '0');
   return (
-    `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ` +
-    `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+    `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())} ` +
+    `${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}:${pad(date.getUTCSeconds())}`
   );
 }
 
 /** The Monday of the week containing `date`, at midnight. */
 function mondayOf(date: Date): Date {
-  const day = date.getDay(); // 0 = Sunday
+  const day = date.getUTCDay(); // 0 = Sunday
   const delta = day === 0 ? -6 : 1 - day;
   const monday = new Date(date);
-  monday.setDate(monday.getDate() + delta);
-  monday.setHours(0, 0, 0, 0);
+  monday.setUTCDate(monday.getUTCDate() + delta);
+  monday.setUTCHours(0, 0, 0, 0);
   return monday;
 }
 
@@ -69,7 +84,7 @@ function mondayOf(date: Date): Date {
  */
 export function rotateDartsSchedule(
   games: readonly DartsGame[],
-  now: Date = new Date(),
+  now: Date,
 ): DartsGame[] {
   if (games.length === 0) return [];
 
@@ -94,7 +109,7 @@ export function rotateDartsSchedule(
  */
 export function currentDartsGame(
   games: readonly DartsGame[],
-  now: Date = new Date(),
+  now: Date,
 ): DartsGame | null {
   if (games.length === 0) return null;
   const rotated = rotateDartsSchedule(games, now);
