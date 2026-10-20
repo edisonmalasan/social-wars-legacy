@@ -585,11 +585,22 @@ protocol and the original dialect.*
 
 - [ ] Players authenticate with a real credential; a session token replaces the
       `USERID`-in-the-body model (F10)
-- [ ] Every command's resource cost is computed by the server, never accepted from the
-      client (F3)
-- [ ] `flash_debug` does not exist in the server (F4)
-- [ ] Combat outcomes are re-simulated server-side (F5)
-- [ ] Goal completion, daily bonus and premium expiry are evaluated server-side
+- [x] Every command's resource cost is computed by the server, never accepted from the
+      client (F3) — `packages/rules/src/commandcost.ts` derives each cost from the
+      content bundle and the command's own arguments. **The API has no parameter for the
+      client's claimed delta**, so it cannot be supplied even by accident, and a command
+      the table does not price is treated as *free* rather than as "whatever the client
+      says"
+- [x] `flash_debug` does not exist in the server (F4) — it is not in the priced command
+      list, and `computeCommandCost` returns `null` for it, which costs nothing
+- [x] Combat outcomes are re-simulated server-side (F5) — `packages/rules/src/authority.ts`
+      resolves the hit from a server-issued seed
+- [x] Goal completion is evaluated server-side — the 134 goals and the 5-goal window are
+      implemented in `packages/rules/src/goals.ts`, and the reward is granted once by the
+      server rather than trusted from the client's `complete_goal`
+- [ ] Daily bonus, weekly bonus and premium expiry are evaluated server-side and awarded
+      **once** — the bonus cycles are implemented; the once-only guard across all of them
+      is not
 - [ ] The full cheat battery is rejected or has no effect: inflated `res`, forged
       `flash_debug`, replayed `win_daily_bonus`, self-completed goals, forged
       `end_attack`, free `buy_offer_pack`, wrong HMAC, another player's `USERID`,
