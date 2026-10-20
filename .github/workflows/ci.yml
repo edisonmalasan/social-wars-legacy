@@ -75,6 +75,12 @@ jobs:
       - name: The command catalogue agrees with the client
         run: node scripts/verify-command-catalogue.mjs
 
+      # The roadmap is a list of items, and an item that is silently
+      # swallowed is worse than one that is visibly unfinished. That
+      # happened, so each group's item count is checked against a floor.
+      - name: The roadmap has not lost an item
+        run: node scripts/check-roadmap.mjs
+
   assets:
     name: Assets
     runs-on: ubuntu-latest
