@@ -9,6 +9,14 @@
  * without a GPU is decided in `scene.ts` — the projection, the depth
  * sort and the frame choice — so that the rules can be tested without
  * one. What is left here is the drawing.
+ *
+ * ## The atlas pages are loaded on demand
+ *
+ * There are 3 590 atlas pages, 31.8 GB of them, and a scene of a few
+ * hundred sprites touches a few dozen. So a page is fetched when a
+ * sprite needs it and not before, and no more than a few are fetched at
+ * once. Loading them all up front would fetch 31.8 GB to draw a
+ * village.
  */
 import { Application, Assets, Container, Rectangle, Sprite, Texture } from 'pixi.js';
 
@@ -19,6 +27,9 @@ import type { SceneSprite } from './scene.ts';
 /** The stage's size, in the client's own terms. */
 export const STAGE_WIDTH = 760;
 export const STAGE_HEIGHT = 600;
+
+/** How many atlas pages are fetched at once. */
+export const MAX_CONCURRENT_PAGES = 8;
 
 /** What the renderer needs to start. */
 export interface RendererOptions {
@@ -35,14 +46,21 @@ export class WorldRenderer {
   private readonly app: Application;
   private readonly world = new Container();
   private readonly pages = new Map<string, Texture>();
+  private readonly pending = new Map<string, Promise<void>>();
+  private readonly missing = new Set<string>();
   private readonly options: RendererOptions;
+  private readonly queue: string[] = [];
+  private scene: readonly SceneSprite[] = [];
+
+  /** Called when a page arrives, so the scene can be drawn again. */
+  onPageLoaded: (() => void) | null = null;
 
   private constructor(app: Application, options: RendererOptions) {
     this.app = app;
     this.options = options;
   }
 
-  /** Start the renderer and load the atlas. */
+  /** Start the renderer. */
   static async start(options: RendererOptions): Promise<WorldRenderer> {
     const app = new Application();
     await app.init({
@@ -59,23 +77,7 @@ export class WorldRenderer {
     });
 
     options.element.appendChild(app.canvas);
-
-    const renderer = new WorldRenderer(app, options);
-    await renderer.loadAtlas();
-    return renderer;
-  }
-
-  /** Load the atlas pages and build the textures for the regions. */
-  private async loadAtlas(): Promise<void> {
-    const files = new Set<string>();
-    for (const image of Object.values(this.options.manifest.images ?? {})) {
-      if (image.atlas) files.add(image.atlas.file);
-    }
-
-    for (const file of files) {
-      const texture = await Assets.load(`${this.options.atlasBase}/${file}`);
-      this.pages.set(file, texture as Texture);
-    }
+    return new WorldRenderer(app, options);
   }
 
   /**
@@ -86,8 +88,12 @@ export class WorldRenderer {
    * depth is **not** given to PixiJS as a `zIndex`, because the scene
    * has already sorted them, and sorting twice would be sorting once too
    * many.
+   *
+   * A sprite whose page has not arrived yet is not drawn, and the page
+   * is fetched. When it arrives the scene is drawn again.
    */
   draw(scene: readonly SceneSprite[]): void {
+    this.scene = scene;
     this.world.removeChildren();
 
     for (const sprite of scene) {
@@ -96,13 +102,16 @@ export class WorldRenderer {
     }
   }
 
-  /** One sprite, or null when the art is not in the atlas. */
+  /** One sprite, or null when its page has not arrived. */
   private spriteFor(scene: SceneSprite): Sprite | null {
     if (!scene.art) return null;
-    const page = this.pages.get(scene.art.atlas.file);
-    if (!page) return null;
-
     const region = scene.art.atlas;
+    const page = this.pages.get(region.file);
+    if (!page) {
+      this.requestPage(region.file);
+      return null;
+    }
+
     const texture = new Texture({
       source: page.source,
       frame: new Rectangle(region.x, region.y, region.width, region.height),
@@ -116,6 +125,46 @@ export class WorldRenderer {
     sprite.x = scene.x + (trim ? trim.x : 0);
     sprite.y = scene.y + (trim ? trim.y : 0) - scene.elevation;
     return sprite;
+  }
+
+  /** Fetch a page, at most a few at a time. */
+  private requestPage(file: string): void {
+    if (this.pages.has(file) || this.pending.has(file) || this.missing.has(file)) return;
+    if (!this.queue.includes(file)) this.queue.push(file);
+    this.pump();
+  }
+
+  /** Start as many queued fetches as the limit allows. */
+  private pump(): void {
+    while (this.pending.size < MAX_CONCURRENT_PAGES && this.queue.length > 0) {
+      const file = this.queue.shift()!;
+      const promise = Assets.load(`${this.options.atlasBase}/${file}`)
+        .then((texture) => {
+          this.pages.set(file, texture as Texture);
+        })
+        .catch(() => {
+          this.missing.add(file);
+        })
+        .then(() => {
+          this.pending.delete(file);
+          // The scene is drawn again, so the sprites that were waiting for
+          // this page appear.
+          this.draw(this.scene);
+          this.onPageLoaded?.();
+          this.pump();
+        });
+      this.pending.set(file, promise);
+    }
+  }
+
+  /** The atlas pages that could not be loaded. */
+  get missingAtlasPages(): string[] {
+    return [...this.missing];
+  }
+
+  /** How many pages have been fetched. */
+  get loadedPages(): number {
+    return this.pages.size;
   }
 
   /** The canvas, for the interface to sit over. */

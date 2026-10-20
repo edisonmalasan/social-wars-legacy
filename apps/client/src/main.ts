@@ -68,15 +68,12 @@ function sceneItems(
 
     items.push({
       id,
+      itemId,
       tx,
       ty,
       width: definition.width ?? 1,
       walkable: definition.properties?.['walkable'] !== undefined,
       elevation: definition.elevation ?? 0,
-      // The client's art is named `img_name`, and the symbol within the
-      // SWF is the item's own id.
-      swf: definition.img_name ?? '',
-      symbol: String(itemId),
       orientation: orientation ?? 0,
       animation: 0,
     });
@@ -84,10 +81,24 @@ function sceneItems(
   return items;
 }
 
+/**
+ * The client's status.
+ *
+ * It is written into the page, so that a **headless** run can check it:
+ * the smoke test reads the DOM and sees whether the client started.
+ */
+function status(state: string, detail = ''): void {
+  const element = document.getElementById('status');
+  if (!element) return;
+  element.textContent = detail ? `${state}: ${detail}` : state;
+  element.setAttribute('data-state', state);
+}
+
 async function main(): Promise<void> {
   if (!STAGE || !GAME) throw new Error('the page has no stage');
 
   installStyles();
+  status('starting');
 
   const manifest = await json<FrameManifest>(MANIFEST_URL);
   const content = await json<{ items: Record<string, never> }>(CONTENT_URL);
@@ -99,6 +110,12 @@ async function main(): Promise<void> {
   });
   const atlas = new AtlasIndex(manifest);
 
+  // The atlas pages are fetched as the scene needs them, so the scene is
+  // drawn again when a page arrives.
+  renderer.onPageLoaded = () => {
+    status('started', `${renderer.loadedPages} atlas page(s)`);
+  };
+
   const world = await json<ServerWorld>('/api/world');
   const scene = buildScene(sceneItems(world, content), renderer.viewport, atlas);
   renderer.draw(scene);
@@ -108,10 +125,20 @@ async function main(): Promise<void> {
   const fit = () => renderer.fit(STAGE!);
   fit();
   window.addEventListener('resize', fit);
+
+  if (renderer.missingAtlasPages.length > 0) {
+    status(
+      'started',
+      `${renderer.missingAtlasPages.length} atlas page(s) could not be loaded`,
+    );
+  } else {
+    status('started', `${scene.length} sprites`);
+  }
 }
 
 main().catch((error) => {
   console.error('[client] could not start:', error);
+  status('failed', String(error));
   const element = document.getElementById('game');
   if (element) {
     element.textContent = `The client could not start: ${String(error)}`;

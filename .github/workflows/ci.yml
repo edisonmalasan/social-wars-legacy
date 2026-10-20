@@ -155,6 +155,12 @@ jobs:
       - name: The web client builds
         run: pnpm --filter @swl/app-client build
 
+      # The client has to **run**, not merely build. The built client is
+      # served and loaded in a real browser, and the page's own status is
+      # read back over the DevTools protocol.
+      - name: The web client starts in a browser
+        run: node scripts/smoke-test-client.mjs
+
       - name: The desktop shell compiles
         working-directory: apps/desktop/src-tauri
         run: cargo check --locked

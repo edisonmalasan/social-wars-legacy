@@ -18,23 +18,25 @@ const MANIFEST: FrameManifest = {
   symbols: [
     {
       swf: 'assets.swf',
-      symbol: '1',
+      symbol: 'DefineSprite_4',
       frameCount: 40,
-      frames: [{ frame: 0, image: 'art0' }],
+      frames: [{ frame: 1, image: 'art0' }],
     },
   ],
+  itemArt: {
+    '1': { swf: 'assets.swf', symbol: 'DefineSprite_4' },
+  },
 } as unknown as FrameManifest;
 
 function item(over: Partial<SceneItem> = {}): SceneItem {
   return {
     id: '7',
+    itemId: 1,
     tx: 10,
     ty: 20,
     width: 1,
     walkable: false,
     elevation: 0,
-    swf: 'assets.swf',
-    symbol: '1',
     orientation: 0,
     animation: 0,
     ...over,
@@ -104,7 +106,7 @@ describe('the scene', () => {
   });
 
   it('has no art for a frame the atlas does not have', () => {
-    // The symbol has one frame, so frame 5 is not in it.
+    // The symbol has one frame, so frame 6 is not in it.
     const scene = buildScene(
       [item({ orientation: 5 })],
       VIEWPORT,
@@ -113,6 +115,14 @@ describe('the scene', () => {
     assert.equal(scene[0]!.art, null);
     // The frame is still chosen, so the scene knows what it wanted.
     assert.equal(scene[0]!.frame?.frame, 5);
+  });
+
+  it('looks the frame up ONE higher, because the manifest is one-based', () => {
+    // The client picks the drawing with `gotoAndStop(frame + 1)`, and the
+    // manifest's frames are one-based, so the lookup is one higher than
+    // the frame the animation chose.
+    const scene = buildScene([item()], VIEWPORT, new AtlasIndex(MANIFEST));
+    assert.ok(scene[0]!.art, 'the art was not found');
   });
 
   it('mirrors the three left-facing directions', () => {

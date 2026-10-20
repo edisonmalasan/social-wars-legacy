@@ -488,6 +488,21 @@ export function createApp(
         return json(200, snapshot(metrics));
       }
 
+      if (path === '/api/world') {
+        if (request.method !== 'GET') return fail(405, 'method-not-allowed');
+        // The player's world, as the client draws it. The positions are
+        // the **server's**, and the client never decides them.
+        const playerId = identify(request);
+        if (!playerId) return fail(401, 'unknown-player');
+        const own = await options.store.get(playerId);
+        if (!own) return fail(401, 'unknown-player');
+        return json(200, {
+          maps: own.world.save.maps,
+          privateState: own.world.save.privateState,
+          resources: own.world.resources,
+        });
+      }
+
       if (path === '/api/command') {
         if (request.method !== 'POST') return fail(405, 'method-not-allowed');
         return await handleNativeCommand(request);
