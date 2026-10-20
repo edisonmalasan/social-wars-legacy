@@ -17,7 +17,15 @@ import path from 'node:path';
 import { costContentFrom } from '@swl/rules';
 import process from 'node:process';
 
-import { LegacyIdentityBridge, SessionStore } from '@swl/server';
+import {
+  LegacyIdentityBridge,
+  PostgresPlayerStore,
+  SCHEMA_MIGRATIONS,
+  SessionStore,
+  runMigrations,
+  type PlayerStore,
+} from '@swl/server';
+import { PGlite } from '@electric-sql/pglite';
 import type { CostContent } from '@swl/rules';
 
 import { createApp, type AppRequest } from './app.ts';
@@ -48,6 +56,37 @@ async function readBody(request: IncomingMessage, limit: number): Promise<string
   return Buffer.concat(chunks).toString('utf8');
 }
 
+/**
+ * The content items the save migration needs.
+ *
+ * The migration gives a building its production state, and it needs the
+ * content to know what that state is: the base amount, the resource and
+ * the capacity.
+ */
+function migrationItems(bundle: {
+  items?: unknown[];
+}): Map<number, { id: number; collect: number; collect_type: string; unit_capacity: number }> {
+  const items = new Map<
+    number,
+    { id: number; collect: number; collect_type: string; unit_capacity: number }
+  >();
+  for (const raw of bundle.items ?? []) {
+    const item = raw as {
+      id: number;
+      collect?: number;
+      collect_type?: string;
+      unit_capacity?: number;
+    };
+    items.set(item.id, {
+      id: item.id,
+      collect: item.collect ?? 0,
+      collect_type: item.collect_type ?? 'w',
+      unit_capacity: item.unit_capacity ?? 0,
+    });
+  }
+  return items;
+}
+
 async function main(): Promise<void> {
   const bundle = JSON.parse(await readFile(CONTENT_PATH, 'utf8')) as Parameters<
     typeof costContentFrom
@@ -56,7 +95,23 @@ async function main(): Promise<void> {
 
   const sessions = new SessionStore();
   const identity = new LegacyIdentityBridge();
-  const store = new MemoryPlayerStore();
+
+  // The store. Without SWL_DATA_DIR the server keeps its saves in memory,
+  // which is the local-play convenience. With it, the saves live in a
+  // PostgreSQL database - a PGlite one, which is a directory - and the
+  // **schema is brought forward before anything is served**, so a deploy
+  // cannot start a server against a schema it does not understand.
+  let store: PlayerStore = new MemoryPlayerStore();
+  const dataDir = process.env['SWL_DATA_DIR'];
+  if (dataDir) {
+    const db = await PGlite.create({ dataDir: path.resolve(dataDir) });
+    const report = await runMigrations(db, SCHEMA_MIGRATIONS);
+    console.log(
+      `[server] the schema is at version ${report.to} ` +
+        `(${report.applied.length} migration(s) applied)`,
+    );
+    store = new PostgresPlayerStore({ db, items: migrationItems(bundle) });
+  }
 
   // A development player. The real server creates players through the
   // account flow; this is the local-play convenience, and it is enabled
@@ -66,12 +121,21 @@ async function main(): Promise<void> {
     sessions.addPlayer('dev', devPassword);
     identity.allowLegacyIdentity();
     identity.bind('dev', 'dev');
-    store.add('dev', {
-      save: { playerInfo: { pid: 'dev', name: 'Developer' }, maps: [{ id: 0, items: {} }], privateState: {} },
-      resources: { g: 2000, w: 2000, o: 2000, s: 2000, c: 2000, e: 50, x: 0, m: 0 },
-      nextCommandNumber: 1,
-    });
-    console.log('[server] development player "dev" is ready.');
+    if (store instanceof MemoryPlayerStore) {
+      store.add('dev', {
+        save: { playerInfo: { pid: 'dev', name: 'Developer' }, maps: [{ id: 0, items: {} }], privateState: {} },
+        resources: { g: 2000, w: 2000, o: 2000, s: 2000, c: 2000, e: 50, x: 0, m: 0 },
+        nextCommandNumber: 1,
+      });
+      console.log('[server] development player "dev" is ready.');
+    } else {
+      // The database creates its players through the account flow, so the
+      // development player is not created behind its back.
+      console.log(
+        '[server] a development password is set, but the database mode creates ' +
+          'its players through the account flow.',
+      );
+    }
   }
 
   const handle = createApp({

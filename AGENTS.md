@@ -85,6 +85,7 @@ desktop shells do not — they land with Groups F, G and H.**
 | Catalogue the images and sounds | `node scripts/build-asset-manifest.mjs` | Working | Group D |
 | Extract and measure the client fonts | `node scripts/extract-fonts.mjs` | Working | Group D |
 | Check the golden-master corpus | `node scripts/golden-master.mjs` | Working | Group E4 — fails on any difference |
+| Run the schema migrations        | `node scripts/migrate.mjs --data <dir>` | Working | Group F — `--status` and `--rollback` too |
 | Soak the server | `node --expose-gc scripts/soak-server.mjs` | Working | Group F4 — no memory growth, no state drift |
 | Check the command catalogue against the client | `node scripts/verify-command-catalogue.mjs` | Working | Group F2 — fails on any difference |
 | Refresh the code graph | `graphify extract . --code-only` | Working | Derived knowledge; run after a structural change |

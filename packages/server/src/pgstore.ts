@@ -23,6 +23,8 @@
 import type { PlayerSave, PlayerStore } from './store.ts';
 import type { ShimWorld } from './shim.ts';
 import { migrateSave, type MigrationItem } from './migrate.ts';
+import { PLAYERS_TABLE, SCHEMA_MIGRATIONS } from './schema.ts';
+import { runMigrations } from './migrations.ts';
 
 /** The database the store talks to. */
 export interface Database {
@@ -99,15 +101,30 @@ export class PostgresPlayerStore implements PlayerStore {
     }
   }
 
-  /** Create the table if it is not there. */
+  /**
+   * Bring the schema up to date, and make sure the table is there.
+   *
+   * The schema is **versioned**, so the table is created by a migration
+   * rather than by a `CREATE TABLE IF NOT EXISTS` here: that form can only
+   * ever add a table, and it says nothing about what happened to the ones
+   * that were already there.
+   *
+   * A store that was given a different table name is a customisation -
+   * a test, or a deployment that keeps its saves elsewhere - so it creates
+   * that table itself.
+   */
   async init(): Promise<void> {
-    await this.db.exec(`
-      CREATE TABLE IF NOT EXISTS ${this.table} (
-        player_id TEXT PRIMARY KEY,
-        doc       JSONB NOT NULL,
-        updated   TIMESTAMPTZ NOT NULL DEFAULT now()
-      )
-    `);
+    if (this.table === PLAYERS_TABLE) {
+      await runMigrations(this.db, SCHEMA_MIGRATIONS);
+    } else {
+      await this.db.exec(`
+        CREATE TABLE IF NOT EXISTS ${this.table} (
+          player_id TEXT PRIMARY KEY,
+          doc       JSONB NOT NULL,
+          updated   TIMESTAMPTZ NOT NULL DEFAULT now()
+        )
+      `);
+    }
     const counted = await this.db.query<{ n: number }>(
       `SELECT count(*)::int AS n FROM ${this.table}`,
     );
