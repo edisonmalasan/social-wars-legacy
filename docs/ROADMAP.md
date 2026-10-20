@@ -613,9 +613,10 @@ client's observable behaviour.*
       collect instead of after 500 wood, and the harbour goal completing on any quest end)
       are **fixed by default**, with a policy flag to reproduce the client's behaviour. A
       faithful-but-buggy goal is a defensible choice; a silent divergence is not
-- [ ] Daily bonus, weekly bonus, premium expiry and goal completion are each awarded
-      **once** — the bonus cycles are implemented, the once-only guard across all four is
-      not
+- [x] Daily bonus, weekly bonus and goal completion are each awarded **once**, and so
+      is the **alliance daily bonus** - which the upstream is not: it credits the bonus
+      and never sets the timer, so the upstream pays it over and over
+- [ ] **Premium expiry** is evaluated server-side and awarded once
 
 ### E4 — Determinism and verification
 
@@ -649,13 +650,13 @@ protocol and the original dialect.*
 
 ### F1 — Identity and authority
 
-- [ ] Players authenticate with a real credential; a session token replaces the
-      `USERID`-in-the-body model (F10) — **the session model is implemented**
+- [x] Players authenticate with a real credential; a session token replaces the
+      `USERID`-in-the-body model (F10) — the session model is implemented
       (`packages/server/src/session.ts`): a salted, hashed credential compared in constant
-      time, and a **revocable** session token. The legacy `USERID` path exists for the
-      untouched client, but the bridge is **off by default** and can only map a value the
-      server has already bound to a player. The HTTP layer that issues the token is not
-      built yet
+      time, and a **revocable** session token, and the **HTTP layer issues it**
+      (`POST /api/session`, `DELETE /api/session`). The legacy `USERID` path exists for
+      the untouched client, but the bridge is **off by default** and can only map a value
+      the server has already bound to a player
 - [x] Every command's resource cost is computed by the server, never accepted from the
       client (F3) — `packages/rules/src/commandcost.ts` derives each cost from the
       content bundle and the command's own arguments, through **one shared loader**
@@ -695,10 +696,15 @@ protocol and the original dialect.*
 - [x] Goal completion is evaluated server-side — the 134 goals and the 5-goal window are
       implemented in `packages/rules/src/goals.ts`, and the reward is granted once by the
       server rather than trusted from the client's `complete_goal`
-- [ ] Daily bonus, weekly bonus and premium expiry are evaluated server-side and awarded
-      **once** — the **daily bonus is** (`packages/server/src/apply.ts`): the server
-      computes the day from its own clock and ignores the bonus index the client claims,
-      and a replay is refused. The weekly bonus and the premium expiry are not
+- [x] Daily bonus, weekly bonus and the alliance daily bonus are evaluated **server-side**
+      and awarded **once** (`packages/server/src/apply.ts`). The daily one computes the
+      day from its own clock and ignores the bonus index the client claims; the weekly
+      one is only ready on a Monday and only once a week; the alliance one takes the
+      tier the member count qualifies for, and only once a day. The weekly bonus uses
+      the player's **local** week day (`Utils.getWeekDayFromTimeStamp` reads
+      `Date.getDay()`), not UTC's, or the bonus moves by a day for everybody east or
+      west of Greenwich
+- [ ] **Premium expiry** is evaluated server-side and awarded once
 - [x] The commands that **grant** anything are answered by the server's own rules, not by
       the client's claim (`packages/server/src/apply.ts`): `collect`, `complete_goal`,
       `win_daily_bonus`, `reset_collect`, `finish_building`, `place_stored_item`,
@@ -728,10 +734,12 @@ protocol and the original dialect.*
       `USERID`**, and the identity chooses which save is touched. The request body
       cannot name the player. Found by the cheat battery, which shipped a tripwire
       because the shim did not consult its own identity bridge
-- [ ] The remaining holes the battery reported: the shim's grant commands are an
-      unimplemented seam (`win_daily_bonus`, `complete_goal`, `end_attack`, `end_quest`,
-      `collect` must all be granted through the battery's paths), and the production-cycle
-      timer that `economy.ts` lacks — the server must own it
+- [x] The shim's grant commands are **no longer an unimplemented seam**: `collect`,
+      `complete_goal`, `win_daily_bonus`, `weekly_reward`, `win_alliance_daily_bonus`,
+      `end_attack`, `end_quest`, `place_stored_item`, `buy`, `push_queue_unit`,
+      `pop_queue_unit`, `level_up`, `upgrade`, `reset_collect` and `finish_building`
+      are all granted through the server's own rules
+- [ ] The production-cycle timer that `economy.ts` lacks - the server must own it
 
 ### F2 — Protocol
 
