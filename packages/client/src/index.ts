@@ -7,3 +7,4 @@ export * from './requests.ts';
 export * from './assets.ts';
 export * from './interaction.ts';
 export * from './hud.ts';
+export * from './buildmenu.ts';

@@ -323,6 +323,7 @@ function toContentItem(raw: JsonObject): ContentItem {
     width: asInt(raw['width'], 1),
     height: asInt(raw['height'], 1),
     min_level: asInt(raw['min_level']),
+    display_order: asInt(raw['display_order']),
     build_time: asInt(raw['build_time']),
     clicks_to_build: asInt(raw['clicks_to_build']),
     training_time: asInt(raw['training_time']),
