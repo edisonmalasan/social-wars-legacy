@@ -553,8 +553,12 @@ client's observable behaviour.*
 - [ ] The upstream's market period mismatch is resolved: the server resets the trade counter
       **daily** while the client uses a **20-hour** period, so the two disagree on exactly
       when a player may trade again
-- [ ] The darts minigame (25 targets, 20 cash per paid shot, weekly prize rotation) is
-      correct — the prize rotation is implemented, the board and the paid shot are not
+- [x] The darts minigame (25 targets, 20 cash per paid shot, weekly prize rotation) is
+      correct — the board of **25 balloons** with the six prizes spread **1, 1, 4, 4, 7,
+      8** over them (the client's own `initTargetItems`), the board **shuffled from the
+      server's seed** so every player sees the same board that week, the first shot of
+      the day **free** and every shot after it at **20 cash**, and the **extra prize**
+      won by discovering all six — once (`packages/rules/src/dartsboard.ts`)
 
 ### E3 — Quests and goals
 
