@@ -86,6 +86,7 @@ desktop shells do not — they land with Groups F, G and H.**
 | Extract and measure the client fonts | `node scripts/extract-fonts.mjs` | Working | Group D |
 | Check the golden-master corpus | `node scripts/golden-master.mjs` | Working | Group E4 — fails on any difference |
 | Prepare the desktop shell's inputs | `node scripts/prepare-desktop.mjs` | Working | Group H — the icons and the placeholder |
+| Check the licensing position        | `node scripts/check-licensing.mjs` | Working | Group I — the claims in `docs/LICENSING.md` |
 | Check nothing that ships needs Flash | `node scripts/check-no-flash.mjs` | Working | Group H — proves it rather than asserting it |
 | Run the cheat battery             | `node scripts/run-cheat-battery.mjs` | Working | Group I — the release gate |
 | Check the roadmap's item counts    | `node scripts/check-roadmap.mjs`  | Working | Group I — fails if a group lost an item |
