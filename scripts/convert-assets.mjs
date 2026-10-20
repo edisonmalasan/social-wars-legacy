@@ -34,7 +34,7 @@
  */
 import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { copyFile, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
@@ -233,7 +233,14 @@ async function main() {
       images: Object.fromEntries(uniqueStore),
       symbols,
     };
-    await writeFile(args.out, JSON.stringify(manifest, null, 1) + '\n', 'utf8');
+    // The manifest is written **atomically**: to a temporary file beside
+    // it, and then renamed over the target. A reader - the client's atlas
+    // index, a test, another converter run - therefore never sees a
+    // half-written manifest, which on a hundred-megabyte file is a real
+    // window rather than a theoretical one.
+    const temporary = `${args.out}.tmp`;
+    await writeFile(temporary, JSON.stringify(manifest, null, 1) + '\n', 'utf8');
+    await rename(temporary, args.out);
     return manifest;
   };
 

@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { GOALS, getGoalDefinition, createGoalState } from '@swl/rules';
 
 import {
+  type ApplierItem,
   BUILDING_STATE_KEYS,
   GOAL_STATE_KEY,
   createApplier,
@@ -46,6 +47,28 @@ function wallet(cash: number): ShimWorld['resources'] {
   return { g: 0, w: 0, o: 0, s: 0, c: cash, e: 100, x: 0, m: 0 };
 }
 
+/** A complete content item, for the applier. */
+function item(over: Partial<ApplierItem> = {}): ApplierItem {
+  return {
+    id: 30,
+    name: 'Academy I',
+    costs: {},
+    costUnitCash: 0,
+    buildTime: 60,
+    trainingTime: 60,
+    clicksToBuild: 0,
+    minLevel: 1,
+    unitCapacity: 0,
+    population: 0,
+    buildingLimitSameId: -1,
+    buildingLimitSameScf: -1,
+    subcategoryId: 31,
+    width: 1,
+    height: 1,
+    ...over,
+  };
+}
+
 describe('the map item accessor', () => {
   it('reads the items out of a map', () => {
     const items = mapItems({ items: { '7': [30, 0, 0, 0, 0, [], {}, 1] } });
@@ -55,6 +78,135 @@ describe('the map item accessor', () => {
   it('returns nothing for a map with no items', () => {
     assert.deepEqual(mapItems(undefined), {});
     assert.deepEqual(mapItems({}), {});
+  });
+});
+
+describe('placing a building', () => {
+  it('places a building on a free tile', () => {
+    const applier = createApplier(deps({ items: new Map([[30, item()]]) }));
+    const world = worldWithBuilding({});
+    const outcome = applier(world, {
+      name: 'place_stored_item',
+      args: [1, 30, 5, 6, 1, 0, 0],
+    });
+    assert.equal(outcome.applied, true);
+    const items = mapItems(outcome.world.save.maps[0] as Record<string, unknown>);
+    // The building is on the map at the tile it was placed on.
+    const placed = Object.values(items).filter(
+      (tuple) => tuple[0] === 30 && tuple[1] === 5 && tuple[2] === 6,
+    );
+    assert.equal(placed.length, 1);
+    assert.equal(placed[0]![1], 5);
+    assert.equal(placed[0]![2], 6);
+  });
+
+  it('refuses a building the player is too low a level for', () => {
+    const applier = createApplier(
+      deps({ items: new Map([[30, item({ minLevel: 10 })]]) }),
+    );
+    const world = worldWithBuilding({});
+    const outcome = applier(world, {
+      name: 'place_stored_item',
+      args: [1, 30, 5, 6, 1, 0, 0],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'level');
+  });
+
+  it('refuses a tile that is already taken', () => {
+    const applier = createApplier(deps({ items: new Map([[30, item()]]) }));
+    // The map already has a building at (0, 0).
+    const world = worldWithBuilding({ width: 1, height: 1 });
+    const outcome = applier(world, {
+      name: 'place_stored_item',
+      args: [1, 30, 0, 0, 1, 0, 0],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'tile-taken');
+  });
+
+  it('refuses a building whose whole footprint is free only in part', () => {
+    const applier = createApplier(
+      deps({ items: new Map([[30, item({ width: 2, height: 2 })]]) }),
+    );
+    const world = worldWithBuilding({ width: 1, height: 1 });
+    // The existing building is at (0, 0); the new one is two tiles square
+    // and starts at (0, 0), so it would cover the existing one.
+    const outcome = applier(world, {
+      name: 'place_stored_item',
+      args: [1, 30, 0, 0, 1, 0, 0],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'tile-taken');
+  });
+
+  it('refuses a building the player has too many of', () => {
+    const applier = createApplier(
+      deps({ items: new Map([[30, item({ buildingLimitSameId: 1 })]]) }),
+    );
+    const world = worldWithBuilding({});
+    // There is already one Academy.
+    const outcome = applier(world, {
+      name: 'place_stored_item',
+      args: [1, 30, 5, 6, 1, 0, 0],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'same-id-limit');
+  });
+
+  it('refuses a building that would break the population ceiling', () => {
+    const applier = createApplier(
+      deps({
+        items: new Map([[30, item({ population: 50 })]]),
+        populationRules: {
+          startMaxPopulation: 20,
+          maxPopulationCap: 175,
+          maxPopulationPerLevel: 3,
+        },
+      }),
+    );
+    const world = worldWithBuilding({});
+    const outcome = applier(world, {
+      name: 'place_stored_item',
+      args: [1, 30, 5, 6, 1, 0, 0],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'population');
+  });
+
+  it('refuses an item the content does not have', () => {
+    const applier = createApplier(deps({ items: new Map([[30, item()]]) }));
+    const world = worldWithBuilding({});
+    const outcome = applier(world, {
+      name: 'place_stored_item',
+      args: [1, 999999, 5, 6, 1, 0, 0],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'unknown-item');
+  });
+
+  it('buys and places a building', () => {
+    const applier = createApplier(deps({ items: new Map([[30, item()]]) }));
+    const world = worldWithBuilding({});
+    const outcome = applier(world, {
+      name: 'buy',
+      args: [1, 30, 5, 6, 1, 0, 0, 'b'],
+    });
+    assert.equal(outcome.applied, true);
+    const items = mapItems(outcome.world.save.maps[0] as Record<string, unknown>);
+    assert.equal(
+      Object.values(items).filter((tuple) => tuple[0] === 30 && tuple[1] === 5).length,
+      1,
+    );
+  });
+
+  it('gives each placement its own iso id', () => {
+    const applier = createApplier(deps({ items: new Map([[30, item()]]) }));
+    const world = worldWithBuilding({});
+    const first = applier(world, { name: 'place_stored_item', args: [1, 30, 5, 6, 1, 0, 0] });
+    const second = applier(first.world, { name: 'place_stored_item', args: [1, 30, 8, 9, 1, 0, 0] });
+    const items = mapItems(second.world.save.maps[0] as Record<string, unknown>);
+    assert.equal(Object.keys(items).length, 3);
   });
 });
 
@@ -238,7 +390,7 @@ describe('the commands whose cost the server computes', () => {
   it('charges the reactivation price, not the one the client declares', () => {
     const applier = createApplier(
       deps({
-        items: new Map([[30, { costs: { c: 20 }, buildTime: 60 }]]),
+        items: new Map([[30, item({ costs: { c: 20 } })]]),
         reactivateWonderDiscount: 0.5,
       }),
     );
@@ -252,7 +404,7 @@ describe('the commands whose cost the server computes', () => {
   it('refuses a reactivation the player cannot afford', () => {
     const applier = createApplier(
       deps({
-        items: new Map([[30, { costs: { c: 20 }, buildTime: 60 }]]),
+        items: new Map([[30, item({ costs: { c: 20 } })]]),
         reactivateWonderDiscount: 0.5,
       }),
     );
@@ -266,7 +418,7 @@ describe('the commands whose cost the server computes', () => {
   it('charges the speed-up price for hurrying a build up', () => {
     const applier = createApplier(
       deps({
-        items: new Map([[30, { costs: {}, buildTime: 600 }]]),
+        items: new Map([[30, item({ buildTime: 600 })]]),
         speedup: { minRemainingMs: 10_000, cost: 2 },
       }),
     );
@@ -284,7 +436,7 @@ describe('the commands whose cost the server computes', () => {
   it('refuses a speed-up when the build is nearly done', () => {
     const applier = createApplier(
       deps({
-        items: new Map([[30, { costs: {}, buildTime: 600 }]]),
+        items: new Map([[30, item({ buildTime: 600 })]]),
         speedup: { minRemainingMs: 10_000, cost: 2 },
       }),
     );

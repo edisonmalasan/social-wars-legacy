@@ -41,6 +41,7 @@ import {
   awardQuest,
   emptyQuestProgress,
   assaultLoot,
+  canPlaceBuilding,
   conquestGold,
   stolenGold,
   speedUpCost,
@@ -139,6 +140,37 @@ export interface BattleResolution {
  */
 export type BattleResolver = (world: ShimWorld, claim: unknown) => BattleResolution;
 
+/** What the applier needs to know about a content item. */
+export interface ApplierItem {
+  id: number;
+  name: string;
+  /** The build cost, by resource key. */
+  costs: Record<string, number>;
+  /** The cash price of one unit trained in this building. */
+  costUnitCash: number;
+  /** Seconds to construct. */
+  buildTime: number;
+  /** Seconds to train one unit. */
+  trainingTime: number;
+  /** How many friend clicks the build needs. */
+  clicksToBuild: number;
+  /** The minimum player level. */
+  minLevel: number;
+  /** How many units fit inside. */
+  unitCapacity: number;
+  /** The population it costs. */
+  population: number;
+  /** The maximum copies of this exact building. -1 means unlimited. */
+  buildingLimitSameId: number;
+  /** The maximum copies per sub-category. -1 means unlimited. */
+  buildingLimitSameScf: number;
+  /** The sub-category, for the per-sub-category limit. */
+  subcategoryId: number;
+  /** The footprint, in tiles. */
+  width: number;
+  height: number;
+}
+
 /** What the applier needs. */
 export interface ApplierDeps {
   /** The clock, in seconds. */
@@ -151,8 +183,14 @@ export interface ApplierDeps {
   dailyBonus: DailyBonusRules;
   /** How much a goal's reward is worth. */
   goalRewardGold?: number;
-  /** The content items, by id, for the costs the content drives. */
-  items?: Map<number, { costs: Record<string, number>; buildTime: number }>;
+  /** The content items, by id, for the costs and the placement rules. */
+  items?: Map<number, ApplierItem>;
+  /** The population rules, for the population check. */
+  populationRules?: {
+    startMaxPopulation: number;
+    maxPopulationCap: number;
+    maxPopulationPerLevel: number;
+  };
   /** The hurry-up rules, for finishing a building early. */
   speedup?: { minRemainingMs: number; cost: number };
   /** The discount the reactivate-a-wonder price carries. */
@@ -225,6 +263,10 @@ function ownMap(world: ShimWorld): Record<string, unknown> | undefined {
 export function createApplier(deps: ApplierDeps): CommandApplier {
   return (world, command): CommandOutcome => {
     switch (command.name) {
+      case 'place_stored_item':
+        return placeCommand(world, command.args, deps);
+      case 'buy':
+        return buyCommand(world, command.args, deps);
       case 'collect':
         return collectCommand(world, command.args, deps);
       case 'complete_goal':
@@ -317,6 +359,212 @@ function endAttackCommand(
 }
 
 /** `collect` — the server computes the amount. */
+/** The tiles a placed item covers. */
+function coveredTiles(tuple: MapItemTuple): { x: number; y: number }[] {
+  const tiles: { x: number; y: number }[] = [];
+  const width = Number(tuple[6]?.['width'] ?? 1);
+  const height = Number(tuple[6]?.['height'] ?? 1);
+  for (let dx = 0; dx < width; dx++) {
+    for (let dy = 0; dy < height; dy++) {
+      tiles.push({ x: Number(tuple[1]) + dx, y: Number(tuple[2]) + dy });
+    }
+  }
+  return tiles;
+}
+
+/** The tiles that are already taken. */
+function occupiedTiles(items: Record<string, MapItemTuple>): Set<string> {
+  const taken = new Set<string>();
+  for (const tuple of Object.values(items)) {
+    for (const tile of coveredTiles(tuple)) {
+      taken.add(`${tile.x},${tile.y}`);
+    }
+  }
+  return taken;
+}
+
+/** The player's level. */
+function playerLevel(map: Record<string, unknown> | undefined): number {
+  const level = map?.['level'];
+  return typeof level === 'number' ? level : 1;
+}
+
+/**
+ * The player's population.
+ *
+ * The used population is the sum of the placed items' population, and the
+ * ceiling grows with the level (packages/rules/src/economy.ts).
+ */
+function populationOf(
+  items: Record<string, MapItemTuple>,
+  level: number,
+  deps: ApplierDeps,
+): { used: number; max: number } {
+  let used = 0;
+  for (const tuple of Object.values(items)) {
+    const item = deps.items?.get(Number(tuple[0]));
+    used += item?.population ?? 0;
+  }
+  const rules = deps.populationRules ?? {
+    startMaxPopulation: 20,
+    maxPopulationCap: 175,
+    maxPopulationPerLevel: 3,
+  };
+  const max = Math.min(
+    rules.maxPopulationCap,
+    rules.startMaxPopulation + rules.maxPopulationPerLevel * level,
+  );
+  return { used, max };
+}
+
+/** The next free iso id for the map. */
+function nextIsoId(world: ShimWorld): number {
+  const items = mapItems(ownMap(world));
+  let highest = 0;
+  for (const key of Object.keys(items)) {
+    const id = Number(key);
+    if (Number.isFinite(id) && id > highest) highest = id;
+  }
+  const privateState = world.save.privateState;
+  const remembered = Number(privateState['nextIsoId'] ?? 0);
+  const next = Math.max(highest + 1, remembered || 0);
+  privateState['nextIsoId'] = next + 1;
+  return next;
+}
+
+/** The outcome of trying to place something. */
+type PlacementResult =
+  | { ok: true; tuple: MapItemTuple }
+  | { ok: false; reason: string };
+
+/**
+ * Place a building on the map, if the rules allow it.
+ *
+ * The rules are the rules engine's `canPlaceBuilding`, plus a free tile.
+ */
+function placeBuilding(
+  world: ShimWorld,
+  item: ApplierItem,
+  tx: number,
+  ty: number,
+  orientation: number,
+  deps: ApplierDeps,
+): PlacementResult {
+  const map = ownMap(world);
+  const items = mapItems(map);
+  const level = playerLevel(map);
+
+  const sameIdCounts: Record<string, number> = {};
+  const sameGroupCounts: Record<string, number> = {};
+  for (const tuple of Object.values(items)) {
+    const placed = deps.items?.get(Number(tuple[0]));
+    if (!placed) continue;
+    sameIdCounts[String(placed.id)] = (sameIdCounts[String(placed.id)] ?? 0) + 1;
+    sameGroupCounts[String(placed.subcategoryId)] =
+      (sameGroupCounts[String(placed.subcategoryId)] ?? 0) + 1;
+  }
+
+  const population = populationOf(items, level, deps);
+  const placement = canPlaceBuilding(
+    {
+      id: item.id,
+      name: item.name,
+      costs: item.costs,
+      costUnitCash: item.costUnitCash,
+      buildTime: item.buildTime,
+      trainingTime: item.trainingTime,
+      clicksToBuild: item.clicksToBuild,
+      minLevel: item.minLevel,
+      upgradesTo: null,
+      unitCapacity: item.unitCapacity,
+      population: item.population,
+      buildingLimitSameId: item.buildingLimitSameId,
+      buildingLimitSameScf: item.buildingLimitSameScf,
+      premiumUpgradeCosts: {},
+    },
+    {
+      level,
+      populationUsed: population.used,
+      populationMax: population.max,
+      sameIdCounts,
+      sameGroupCounts,
+      subcategoryId: item.subcategoryId,
+      hasFreeTile: true,
+    },
+  );
+  if (!placement.ok) {
+    return { ok: false, reason: placement.reason };
+  }
+
+  // The tile must be free.
+  const taken = occupiedTiles(items);
+  for (let dx = 0; dx < item.width; dx++) {
+    for (let dy = 0; dy < item.height; dy++) {
+      if (taken.has(`${tx + dx},${ty + dy}`)) {
+        return { ok: false, reason: 'tile-taken' };
+      }
+    }
+  }
+
+  const isoId = nextIsoId(world);
+  const attrs: Record<string, unknown> = {
+    width: item.width,
+    height: item.height,
+    collect: 0,
+    unitCapacity: item.unitCapacity,
+    unitsInside: 0,
+    collectType: '',
+    cp: 1,
+    lastAccruedAt: deps.now(),
+    clicked: 0,
+  };
+  const tuple: MapItemTuple = [item.id, tx, ty, deps.now(), orientation, [], attrs, 1];
+  items[String(isoId)] = tuple;
+  if (map) map['items'] = items;
+
+  return { ok: true, tuple };
+}
+
+/** `place_stored_item` — put a stored building on the map. */
+function placeCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const itemId = Number(args[1]);
+  const item = deps.items?.get(itemId);
+  if (!item) return { applied: false, refused: 'unknown-item', world };
+  const tx = Number(args[2]);
+  const ty = Number(args[3]);
+  if (!Number.isFinite(tx) || !Number.isFinite(ty)) {
+    return { applied: false, refused: 'bad-argument', world };
+  }
+  const orientation = Number(args[6] ?? 0);
+  const placed = placeBuilding(world, item, tx, ty, orientation, deps);
+  if (!placed.ok) return { applied: false, refused: placed.reason, world };
+  return { applied: true, world };
+}
+
+/** `buy` — buy a building or a unit and place it. */
+function buyCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const itemId = Number(args[1]);
+  const item = deps.items?.get(itemId);
+  if (!item) return { applied: false, refused: 'unknown-item', world };
+  const tx = Number(args[2]);
+  const ty = Number(args[3]);
+  if (!Number.isFinite(tx) || !Number.isFinite(ty)) {
+    return { applied: false, refused: 'bad-argument', world };
+  }
+  const orientation = Number(args[5] ?? 0);
+  const placed = placeBuilding(world, item, tx, ty, orientation, deps);
+  if (!placed.ok) return { applied: false, refused: placed.reason, world };
+  return { applied: true, world };
+}
+
 function collectCommand(
   world: ShimWorld,
   args: readonly unknown[],
