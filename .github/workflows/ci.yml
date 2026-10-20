@@ -144,6 +144,11 @@ jobs:
       - name: The desktop shell's build inputs
         run: node scripts/prepare-desktop.mjs
 
+      # The client's manifest is **measured and minimised**: the asset
+      # pipeline's is 118 MB, and the browser cannot be sent that.
+      - name: The client's manifest
+        run: pnpm build:client
+
       # The web client is **one** client: the web build serves it, the
       # desktop shell wraps it in a web view, and the mobile build wraps
       # it in a WebView. So it has to build.
