@@ -357,6 +357,48 @@ describe('the premium account', () => {
   });
 });
 
+describe("the tutorial's progression", () => {
+  it('records the step the client reached', () => {
+    const applier = createApplier(deps({}));
+    const world = worldWithBuilding({});
+    const outcome = applier(world, { name: 'complete_tutorial', args: [101] });
+    assert.equal(outcome.applied, true);
+    const state = outcome.world.save.privateState['tutorial'] as {
+      step: number;
+      complete: boolean;
+    };
+    assert.equal(state.step, 101);
+    assert.equal(state.complete, false);
+  });
+
+  it('refuses a step the tutorial does not have', () => {
+    const applier = createApplier(deps({}));
+    const world = worldWithBuilding({});
+    const outcome = applier(world, { name: 'complete_tutorial', args: [999] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'unknown-step');
+  });
+
+  it('refuses a step that is not a number', () => {
+    const applier = createApplier(deps({}));
+    const world = worldWithBuilding({});
+    const outcome = applier(world, { name: 'complete_tutorial', args: ['lots'] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'bad-argument');
+  });
+
+  it('only ever goes FORWARDS', () => {
+    // The client can walk back through the tutorial, and the furthest
+    // step is the one that counts.
+    const applier = createApplier(deps({}));
+    let world = worldWithBuilding({});
+    world = applier(world, { name: 'complete_tutorial', args: [105] }).world;
+    world = applier(world, { name: 'complete_tutorial', args: [102] }).world;
+    const state = world.save.privateState['tutorial'] as { step: number };
+    assert.equal(state.step, 105);
+  });
+});
+
 describe('the production clock', () => {
   it('refuses a collection that is not due yet', () => {
     // The building started its countdown a moment ago, on the one-hour

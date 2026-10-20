@@ -29,3 +29,4 @@ export * from './loot.ts';
 export * from './dartsboard.ts';
 export * from './production.ts';
 export * from './premium.ts';
+export * from './tutorial.ts';
