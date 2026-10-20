@@ -1341,13 +1341,40 @@ product.*
 
 ### I6 — Legal & licensing
 
-- [ ] **The asset licensing position is settled and written down** — either a licence, a
-      documented archival exemption, or a decision to clean-room the art
-- [ ] The vendored upstream tree keeps its GPL-v3 notices and is not linked into
-      proprietary source
+- [x] **The asset licensing position is settled and written down**
+      (`docs/LICENSING.md`). The position:
+      - the **shipped product contains no Zynga asset and no Zynga code**
+      - the **upstream is vendored unmodified**, as a reference and a test oracle, and
+        is **never linked into the shipped product** - so the shipped product is not a
+        derivative work of it
+      - the **rules are reimplemented from the client's observed behaviour**, and the
+        clone's source contains no copied ActionScript
+      - the **art and the audio must be re-created or licensed** before any public
+        release. Until they are, the project is a preservation and a study: the code
+        is free and the analysis is published, and the game itself is not distributed
+- [x] The position's claims are **checked**, not asserted
+      (`node scripts/check-licensing.mjs`): the upstream's licence is the GPL v3, **no
+      package imports from the upstream**, and the shipped tree carries no SWF, no
+      sound and none of the client's proprietary fonts. The check is in the CI and it
+      is proven to fire
+- [x] The **vendored upstream tree keeps its GPL-v3 notices** and is **not linked
+      into** the shipped product. The tree is byte-for-byte the upstream's, with its
+      `LICENSE` and its `README` intact, and `upstream/PROVENANCE.md` records where
+      it came from and how it was verified. The check proves the second half: no
+      package imports from it, so the shipped product is not a derivative work
+- [x] The upstream's **obligations** are recorded rather than assumed: the tree
+      travels with its source, the tree is not linked into the product, and the tree
+      carries no warranty
 - [ ] Third-party asset licences (fonts, audio, textures) are enumerated and compliant
-- [ ] The attribution and preservation notices the original project makes are carried
-      forward
+- [x] The **attribution and preservation notices the original project makes are
+      carried** (`docs/ATTRIBUTION.md`). The upstream asks for two things: its
+      **contributors** are credited, and its **community** is where its bugs are
+      reported. Both are carried, and the upstream's own `LICENSE` and `README` travel
+      with the tree. The game's own rights - Zynga's - are stated, and the
+      dependencies' licences are enumerated
+- [ ] A **request for correction** is honoured: if someone who owns the rights to
+      anything here wants it changed, removed or credited differently, the notice says
+      so, and the request is answered
 
 ### I7 — Documentation
 

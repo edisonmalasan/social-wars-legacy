@@ -91,6 +91,12 @@ jobs:
       - name: Nothing that ships needs Flash
         run: node scripts/check-no-flash.mjs
 
+      # The licensing position's claims: the upstream is GPL v3 and
+      # unmodified, no package imports from it, and the shipped tree
+      # carries no Zynga media.
+      - name: The licensing position holds
+        run: node scripts/check-licensing.mjs
+
   desktop:
     name: The desktop shell
     runs-on: ubuntu-latest
