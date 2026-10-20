@@ -778,10 +778,12 @@ protocol and the original dialect.*
       the global command index
 - [x] The shim tolerates the `skiphash12341` response-hash bypass — the parser's
       unframed fallback already handles it
-- [ ] The shim serves `get_game_config.php` with the patched, darts-rotated content and
-      `get_player_info.php` with own/neighbour/quest map flavours — **the four
-      `get_player_info.php` flavours are implemented**; the HTTP layer that routes them,
-      and the darts-rotated config response, are not
+- [x] The shim serves `get_game_config.php` with the patched, darts-rotated content and
+      `get_player_info.php` with own/neighbour/quest map flavours — the four
+      `get_player_info.php` flavours are implemented, and the **darts schedule is rotated
+      to the current week**. The rotation is not decoration: the client's board is built
+      from the schedule, so a player who loaded the config on a different day would see a
+      different board. The upstream rotates it on every boot for exactly this reason
 
 ### F3 - Persistence
 
