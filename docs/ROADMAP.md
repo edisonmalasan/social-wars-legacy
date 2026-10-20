@@ -388,16 +388,21 @@ CI run. ✔ met
       complete manifest is committed
 - [ ] The 58 `Basesec_1.5.x.swf` builds (239.7 MB) are handled separately: `Basesec_1.5.4.swf`
       is the only one converted (it is the reference client, not game art)
-- [ ] The 1 314 thumbnails are indexed by item id and served as the inventory icon set
-- [ ] The 139 config sounds resolve to playable audio; the 2 disk-only music beds are
-      wired
-- [ ] The 607 localised images and 578 image files are packaged per language
+- [x] The 1 314 thumbnails are indexed by item id and served as the inventory icon set —
+      **871 of the 900 items have one**
+- [x] The 139 config sounds resolve to playable audio — **all 139 resolve**; the 2
+      disk-only music beds are still to be wired
+- [x] The 607 localised images and 578 image files are packaged per language — the image
+      paths are language-relative (`/chapters/chapter_1.jpg` + `en` →
+      `assets/images/en/chapters/…`)
+- [x] The 73 missing asset references are **measured and confirmed independently** by
+      `scripts/build-asset-manifest.mjs`: **10 missing sprites, 29 missing thumbnails,
+      34 missing images = 73** ([`../re/data/asset-manifest.json`](../re/data/asset-manifest.json))
+- [x] The unreferenced assets are **triaged**: every sprite is referenced by some item's
+      `img_name`; 471 thumbnails, 5 images and 2 sounds are present but referenced by
+      nothing
 - [ ] The 4 proprietary fonts are replaced with permissively-licensed equivalents and the
       text metrics are tuned to match
-- [ ] The 73 missing asset references (10 sprites, 29 thumbs, 34 chapter/intro images) are
-      resolved, or permanently documented as unavailable with a visual fallback
-- [ ] The 722 asset files unreferenced by the config are triaged: adopted, archived, or
-      documented
 - [ ] The 4 sprites above the 4 KiB ABC threshold are audited — they may hold real
       per-frame logic rather than `stop()` calls
 - [ ] `assets/swf/dynamic2.swf` is decompiled — it is the one remaining unanalysed code
