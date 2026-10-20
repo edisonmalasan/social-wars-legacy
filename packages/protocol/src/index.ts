@@ -70,32 +70,50 @@ export function addResources(a: ResourceVector, b: ResourceVector): ResourceVect
 /**
  * The command names the client can send.
  *
- * 94 names, from `scripts/commands/Cmd*.as` plus `SystemCmd*.as`. 63 are
- * handled by the upstream server; the other 31 are silently dropped. A new
- * server must implement every name the client can send, because the client
- * assumes the ones it sends are honoured.
+ * The authority is the decompiled client's own command classes: every
+ * `Cmd*.as`, `AdminCmd*.as` and `SystemCmd*.as` under
+ * `.work/as/basesec/scripts/commands` that calls `super("<name>")`. The
+ * report's catalogue in `re/docs/03-commands-quests-economy.md` agrees with
+ * it **exactly** - 92 names, no difference in either direction - so the two
+ * sources cross-validate each other.
+ *
+ * The upstream server handles 62 of the 92 and silently drops the other
+ * 30. A new server must implement every name the client can send, because
+ * the client assumes the ones it sends are honoured.
+ *
+ * Verified by `scripts/verify-command-catalogue.mjs`.
  */
 export const COMMAND_NAMES = [
+  'accept_collect_help',
   'activate',
   'activate_item_click',
   'add_click',
   'add_inventory_item',
   'add_xp_unit',
   'admin_set_quest_rank',
+  'apply_rewards_ranking',
+  'assist_neighbor',
+  'assist_receive',
+  'attack_player',
   'batch_remove',
-  'build',
   'buy',
-  'buy_mana_new',
   'buy_magic',
+  'buy_mana_new',
   'buy_offer_pack',
   'buy_powerups',
+  'buy_premium_account',
+  'buy_resources',
   'buy_si_help',
   'buy_stored_item_cash',
+  'clean_attacks',
+  'clean_received_assists',
+  'clear_message',
   'collect',
   'collect_mission',
   'complete_collection',
   'complete_goal',
   'complete_tutorial',
+  'cross_promotion_finished',
   'darts_new_free',
   'darts_reset',
   'darts_shoot_balloon',
@@ -104,38 +122,62 @@ export const COMMAND_NAMES = [
   'exchange_cash',
   'expand',
   'fast_forward',
+  'finish_building',
+  'finish_robotic_help',
   'finish_si',
   'flash_debug',
   'kill',
   'kill_iid',
   'level_up',
+  'load_map',
+  'modify_energy',
+  'modify_position_universe',
   'move',
+  'next_research_item',
+  'next_research_step',
+  'orient',
   'ping',
+  'place_gift',
   'place_stored_item',
   'pop_queue_unit',
   'pop_unit',
+  'premium_upgrade',
   'push_queue_unit',
   'push_unit',
   'remove_inventory_item',
   'research_buy_step_cash',
+  'reset',
+  'reset_collect',
+  'reset_position_univers',
   'reset_research_item',
+  'reset_world_change',
   'resurrect_hero',
+  'rt_open_graph_unit',
+  'save_map',
   'sell',
+  'sell_gift',
   'sell_stored_item',
   'set_goals',
   'set_help_map',
   'set_quest_var',
   'set_resource_allies',
+  'set_strategy',
   'set_variables',
   'soulmixer_speedup',
+  'spy_player',
   'store_add_items',
   'store_item',
+  'system_receive_mana',
+  'system_receive_si_help',
+  'system_reset_quest',
   'trade_resource',
-  'unit_collection_completed',
+  'unit_collections_completed',
+  'upgrade',
   'use_magic',
-  'win_daily_bonus',
   'weekly_reward',
+  'win_daily_bonus',
 ] as const;
+
 
 export type CommandName = (typeof COMMAND_NAMES)[number];
 
