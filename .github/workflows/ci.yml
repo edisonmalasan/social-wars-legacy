@@ -125,6 +125,12 @@ jobs:
       - name: The decision records are well formed
         run: node scripts/check-adrs.mjs
 
+      # The report set is the project's account of the original game, and
+      # a number that has changed in the code but not in the report is a
+      # lie waiting to be believed.
+      - name: The report set agrees with the implementation
+        run: node scripts/check-report-sync.mjs
+
   desktop:
     name: The desktop shell
     runs-on: ubuntu-latest

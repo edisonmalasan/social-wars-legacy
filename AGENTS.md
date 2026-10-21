@@ -91,6 +91,7 @@ desktop shells do not — they land with Groups F, G and H.**
 | Check the golden-master corpus | `node scripts/golden-master.mjs` | Working | Group E4 — fails on any difference |
 | Prepare the desktop shell's inputs | `node scripts/prepare-desktop.mjs` | Working | Group H — the icons and the placeholder |
 | Check the backups are current    | `node scripts/check-backups.mjs --out <dir>` | Working | Group I — fails when the newest is too old |
+| Check the report set               | `node scripts/check-report-sync.mjs` | Working | Group I — the report against the code |
 | Check the decision records         | `node scripts/check-adrs.mjs` | Working | Group I — `--index` rewrites it |
 | Build the licence report          | `node scripts/build-licence-report.mjs` | Working | Group I — `--check` fails on an unclassified dependency |
 | Check the licensing position        | `node scripts/check-licensing.mjs` | Working | Group I — the claims in `docs/LICENSING.md` |

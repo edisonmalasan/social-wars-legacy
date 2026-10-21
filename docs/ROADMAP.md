@@ -1579,8 +1579,15 @@ product.*
 - [x] A **runbook** covers operating the server and the desktop build
       (`docs/RUNBOOK.md`), and a **user guide** covers installing and playing
       (`docs/PLAYING.md`)
-- [ ] A user guide covers installing and playing
-- [ ] The `re/` report set is kept in sync with the implementation
+- [x] A **user guide** covers installing and playing (`docs/PLAYING.md`): what you
+      need, how to register, how the game plays, and **what is different** from the
+      original - no Facebook, no Zynga's art, some assets missing, and small servers
+- [x] The **`re/` report set is kept in sync with the implementation**
+      (`node scripts/check-report-sync.mjs`). The report set states **numbers** - how
+      many commands, items, goals and unit delegates - and those are facts about the
+      code as well as about the analysis, so they are **checked**: a number that has
+      changed in one and not the other fails the build. A report set that has drifted is
+      worse than none, because it is the thing somebody trusts
 - [x] **Every architectural decision has a written rationale** (`docs/adr/`). Eighteen
       records, each with a **context**, a **decision**, the **alternatives** that were
       considered and the **consequences** - because a decision without a rationale is a
