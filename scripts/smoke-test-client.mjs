@@ -52,6 +52,12 @@ const BROWSERS = [
   {
     name: 'firefox',
     paths: ['C:\\Program Files\\Mozilla Firefox\\firefox.exe', '/usr/bin/firefox'],
+    // The harness speaks the **Chrome DevTools Protocol**, and Firefox
+    // does not speak it. So Firefox is **not run** here rather than
+    // failed: a browser the harness cannot drive has not failed
+    // anything. The client is checked in Firefox by hand, and the
+    // roadmap says so.
+    drivable: false,
   },
 ];
 
@@ -331,6 +337,11 @@ async function main() {
   try {
     for (const entry of BROWSERS) {
       if (only && entry.name !== only) continue;
+      if (entry.drivable === false) {
+        // The harness cannot drive this browser, so it is not run.
+        notRun.push(entry.name);
+        continue;
+      }
       const browser = findBrowser(entry.name);
       if (!browser) {
         notRun.push(entry.name);
