@@ -794,12 +794,6 @@ protocol and the original dialect.*
       it and buying after it has lapsed **starts it fresh** — the upstream's rule and
       the client's. The perks are the client's: three attacks a day instead of one, and
       a share of the rewards in cash
-- [x] **Premium expiry** is evaluated server-side: the premium is a **timestamp** in
-      the private state, not a flag, and the server owns it
-      (`packages/rules/src/premium.ts`). Buying while it is still running **extends**
-      it and buying after it has lapsed **starts it fresh** — the upstream's rule and
-      the client's. The perks are the client's: three attacks a day instead of one, and
-      a share of the rewards in cash
 - [x] The commands that **grant** anything are answered by the server's own rules, not by
       the client's claim (`packages/server/src/apply.ts`): `collect`, `complete_goal`,
       `win_daily_bonus`, `reset_collect`, `finish_building`, `place_stored_item`,
@@ -808,6 +802,18 @@ protocol and the original dialect.*
       the collection timer and lets the client declare the amount, prints a line for
       `complete_goal`, takes the daily bonus index *and the item id* from the client,
       and lets the client pop a unit that is still training
+- [x] The applier **has the content**: the items' costs, durations, limits and
+      population are the game's own configuration, and without them the server could
+      not place a building at all — every `buy` and every `place_stored_item` was
+      refused as an unknown item. The mapping is `packages/server/src/contentitems.ts`,
+      and the **end-to-end test** now buys a House and proves it is on the map
+- [x] The server's **population** follows the client's rule and the rules engine's
+      (`packages/rules/src/economy.ts`): the ceiling is
+      `min(START_MAX_POPULATION + Σ the population the buildings grant,
+      MAX_POPULATION_CAP + the map's extra)`, the used population is the **units'**,
+      and a unit uses population while a building grants it. The level does **not**
+      raise the ceiling — the original's HUD shows `0/20` for a first-level player
+      with only a Command Center
 - [x] The **training queue** is the server's own: the building's attribute bag holds
       `nu` (how many are queued), `ts` (when the current one started) and `ui` (which
       unit it is), exactly as the upstream's `engine.py` does. The server checks that a

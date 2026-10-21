@@ -55,6 +55,7 @@ import {
   assaultLoot,
   canPlaceBuilding,
   canUpgrade,
+  maxPopulation,
   upgradeCost,
   conquestGold,
   stolenGold,
@@ -198,6 +199,20 @@ export interface ApplierItem {
   upgradesTo: number | null;
   /** The cash cost of a premium upgrade to this item, if it has one. */
   premiumUpgradeCosts: Record<string, number>;
+  /**
+   * The item's kind: `'b'` is a building and `'u'` is a unit.
+   *
+   * The population rule needs it: a unit **uses** population and a
+   * building **grants** it.
+   */
+  type: string;
+  /**
+   * Whether the building grants population.
+   *
+   * The flag is the content's own, and it is what says which buildings
+   * count towards the ceiling.
+   */
+  grantsPopulation: boolean;
 }
 
 /** What the applier needs. */
@@ -496,29 +511,57 @@ function playerLevel(map: Record<string, unknown> | undefined): number {
 /**
  * The player's population.
  *
- * The used population is the sum of the placed items' population, and the
- * ceiling grows with the level (packages/rules/src/economy.ts).
+ * The **used** population is the units' — a building grants population
+ * rather than using it — and the ceiling is the rules engine's own
+ * rule (`packages/rules/src/economy.ts`):
+ *
+ * ```
+ * maxCurrent = min( START_MAX_POPULATION + Σ(population granted by buildings),
+ *                    MAX_POPULATION_CAP + additionalPopulation )
+ * ```
+ *
+ * The level does **not** raise the ceiling: the buildings do. The
+ * original's HUD shows `0/20` for a first-level player with only a
+ * Command Center, and 20 is `START_MAX_POPULATION` on its own.
  */
 function populationOf(
   items: Record<string, MapItemTuple>,
-  level: number,
+  map: Record<string, unknown> | undefined,
   deps: ApplierDeps,
 ): { used: number; max: number } {
   let used = 0;
+  let granted = 0;
   for (const tuple of Object.values(items)) {
     const item = deps.items?.get(Number(tuple[0]));
-    used += item?.population ?? 0;
+    if (!item) continue;
+    if (item.type === 'u') {
+      used += item.population;
+    } else if (item.grantsPopulation) {
+      granted += item.population;
+    }
   }
   const rules = deps.populationRules ?? {
     startMaxPopulation: 20,
     maxPopulationCap: 175,
     maxPopulationPerLevel: 3,
   };
-  const max = Math.min(
-    rules.maxPopulationCap,
-    rules.startMaxPopulation + rules.maxPopulationPerLevel * level,
+  const max = maxPopulation(
+    {
+      grantedByBuildings: granted,
+      unitsOnMap: used,
+      beingTrained: 0,
+      additionalPopulation: additionalPopulation(map),
+      level: playerLevel(map),
+    },
+    rules,
   );
   return { used, max };
+}
+
+/** The extra population the map's expansions grant. */
+function additionalPopulation(map: Record<string, unknown> | undefined): number {
+  const value = Number(map?.['increasedPopulation'] ?? 0);
+  return Number.isFinite(value) ? value : 0;
 }
 
 /** The next free iso id for the map. */
@@ -568,7 +611,7 @@ function placeBuilding(
       (sameGroupCounts[String(placed.subcategoryId)] ?? 0) + 1;
   }
 
-  const population = populationOf(items, level, deps);
+  const population = populationOf(items, map, deps);
   const placement = canPlaceBuilding(
     {
       id: item.id,

@@ -13,7 +13,13 @@
  * It is a `.ts` module and not a `.tsx` one, so it can be tested
  * without a browser: the tests are in `state.test.ts`.
  */
-import type { BuildMenuItem, HudInput, HudRules, WorldSnapshot } from '@swl/client';
+import type {
+  BuildMenuItem,
+  HudInput,
+  HudRules,
+  ItemPopulation,
+  WorldSnapshot,
+} from '@swl/client';
 import type { ContentBundle, ContentItem } from '@swl/content';
 
 /** The categories, as the build menu's tabs read them. */
@@ -61,10 +67,17 @@ export function hudRules(bundle: ContentBundle): HudRules {
   };
 }
 
-/** The population each item costs, by item id. */
-export function populationByItem(bundle: ContentBundle): Map<number, number> {
-  const out = new Map<number, number>();
-  for (const item of bundle.items) out.set(item.id, item.population ?? 0);
+/** What each item does to the population, by item id. */
+export function populationItems(bundle: ContentBundle): Map<number, ItemPopulation> {
+  const out = new Map<number, ItemPopulation>();
+  for (const item of bundle.items) {
+    const properties = item.properties ?? {};
+    out.set(item.id, {
+      population: item.population ?? 0,
+      type: item.type,
+      grants: properties['grants_population'] !== undefined,
+    });
+  }
   return out;
 }
 
@@ -79,7 +92,7 @@ export function expRequiredByLevel(bundle: ContentBundle): Map<number, number> {
 export function hudInput(bundle: ContentBundle, world: WorldSnapshot): HudInput {
   return {
     world,
-    populationByItem: populationByItem(bundle),
+    items: populationItems(bundle),
     rules: hudRules(bundle),
     expRequiredByLevel: expRequiredByLevel(bundle),
   };

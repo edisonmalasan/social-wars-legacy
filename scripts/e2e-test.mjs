@@ -539,6 +539,33 @@ async function main() {
           `  the substitute font is scaled by ${scale.applied} (the file says ${scale.measured})`,
         );
 
+        // The player can **build**. The server owns the rules, so the
+        // command has to be checked against the content and the map:
+        // a House I on a free tile, paid for in wood.
+        const built = await page.evaluate(
+          `(async () => {
+             const handle = window.__swl;
+             if (!handle) return { error: 'the client has no handle' };
+             const result = await handle.run([handle.buy(1, 60, 60, 'b')]);
+             return { ok: result.ok, sprites: result.sprites };
+           })()`,
+        );
+        if (!built || built.error || !built.ok) {
+          failures.push(
+            `${entry.name}: the server refused the building (${built?.error ?? 'not ok'})`,
+          );
+          console.log('FAILED (the server refused the building)');
+          continue;
+        }
+        if (built.sprites < 2) {
+          failures.push(
+            `${entry.name}: the house was not placed (${built.sprites} sprite(s) drawn)`,
+          );
+          console.log('FAILED (the house was not placed)');
+          continue;
+        }
+        console.log(`  the house was placed (${built.sprites} sprites drawn)`);
+
         // The render loop's rate. In a **headless** browser this is not
         // the game's real frame rate - there is no GPU and the frames are
         // throttled - but it does prove the loop is running. The rate is

@@ -17,4 +17,5 @@ export * from './backups.ts';
 export * from './observability.ts';
 export * from './prometheus.ts';
 export * from './starttown.ts';
+export * from './contentitems.ts';
 export * from './tracing.ts';
