@@ -1321,7 +1321,20 @@ product.*
       - the player's save is still **readable** after every command
 - [x] The arguments come from each command's **own specification** in the table, so
       the test cannot drift from the catalogue
-- [ ] End-to-end tests drive the web client through a complete play session
+- [x] **End-to-end tests drive the web client through a complete play session**
+      (`node scripts/e2e-test.mjs`). Nothing in it is a stand-in:
+      - the **real server** is started, with a real database
+      - a player is **registered** through `POST /api/account`, and the credential is
+        **persisted**
+      - the **real client** is served and loaded in a **real browser**
+      - the client **signs in** and fetches its world
+      - the client sends a command - **its own request builder** and **its own
+        transport** - and the **server's own rules** decide the outcome
+      - the player signs in **again**, in a fresh server over the same database, from
+        the persisted credential
+- [x] The client's **transport** is implemented (`packages/client/src/transport.ts`):
+      the envelope has the protocol version, the idempotency key and the session
+      token, and **no room for a claimed outcome**
 - [ ] A load test sustains the target concurrency with correct simulation timing
 - [x] **Test coverage is measured and a threshold is enforced**
       (`node scripts/check-coverage.mjs`). The floors are **85 %** of the lines, **80 %**

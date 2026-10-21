@@ -161,6 +161,12 @@ jobs:
       - name: The web client starts in a browser
         run: node scripts/smoke-test-client.mjs
 
+      # A **complete play session**, end to end: the real server, the real
+      # client, a real browser. A player registers, signs in, plays, and
+      # signs in again after a restart.
+      - name: The end-to-end session
+        run: node scripts/e2e-test.mjs
+
       - name: The desktop shell compiles
         working-directory: apps/desktop/src-tauri
         run: cargo check --locked

@@ -84,6 +84,7 @@ desktop shells do not — they land with Groups F, G and H.**
 | Pack the frames into atlases | `node scripts/pack-atlases.mjs`   | Working | Group D — trims and packs |
 | Catalogue the images and sounds | `node scripts/build-asset-manifest.mjs` | Working | Group D |
 | Extract and measure the client fonts | `node scripts/extract-fonts.mjs` | Working | Group D |
+| Run the end-to-end session        | `node scripts/e2e-test.mjs` | Working | Group I — the real server, client and browser |
 | Smoke-test the web client        | `node scripts/smoke-test-client.mjs` | Working | Group G — loads it in Chrome and Edge |
 | Build the client's manifest        | `node scripts/build-client-manifest.mjs` | Working | Group I — 118 MB becomes 3.9 MB |
 | Check the test coverage          | `node scripts/check-coverage.mjs` | Working | Group I — fails below the floors |
