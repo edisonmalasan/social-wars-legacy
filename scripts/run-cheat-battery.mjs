@@ -19,7 +19,7 @@ import path from 'node:path';
 import process from 'node:process';
 
 import { costContentFrom } from '@swl/rules';
-import { createCheatContext, runCheatBattery } from '@swl/rules';
+import { createCheatContext, runCheatBattery } from '@swl/rules/cheatbattery';
 
 const ROOT = process.cwd();
 const BUNDLE = path.join(ROOT, 'packages/content/dist/content-bundle.json');

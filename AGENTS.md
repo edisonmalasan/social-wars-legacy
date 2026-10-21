@@ -55,7 +55,7 @@ Decisions" section of `docs/ROADMAP.md`) but is *not yet implemented*. Only rows
 | Desktop shell        | Tauri v2 (Rust) over the same web client     | Planned | `docs/ROADMAP.md` Group H        |
 | Mobile shell         | Capacitor over the same web client          | Planned | `docs/ROADMAP.md` Group G5       |
 | Server + rules engine| TypeScript on Node.js 26                     | **Present** | `apps/server` and `packages/rules` |
-| Database             | PostgreSQL + Drizzle; PGlite for offline play| Planned | `docs/ROADMAP.md` Locked Decisions |
+| Database             | PostgreSQL (server), PGlite (offline), one schema | **Present** | `packages/server/src/pgstore.ts`, `apps/client/src/offline.ts` |
 | Upstream reference   | Python 3.9 + Flask 2.2.5                    | Present (vendored, read-only) | `upstream/socialwarriors/` |
 | Asset tooling        | JPEXS FFDec 26.3.0 (Java 21), Git LFS 3.7.1 | Present | `re/docs/05-assets-and-content-pipeline.md` |
 | Reverse engineering  | REA MCP (Ghidra 12.1.4 headless)             | Present | `re/docs/07-REA-EVIDENCE.md`     |

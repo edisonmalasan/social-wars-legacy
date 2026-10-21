@@ -1268,8 +1268,22 @@ assault against the new server, and the cheat battery is fully rejected.
       covered by the shell's tests
 - [ ] The remote server's **certificate** is checked and the address is shown to the
       player before the game connects to it
-- [ ] Offline single-player works via the in-browser rules engine over PGlite, with the
-      same schema as the server
+- [x] **Offline single-player works** via the in-browser rules engine over **PGlite**,
+      with the **same schema** as the server (`apps/client/src/offline.ts`). It is not a
+      second implementation: the **same applier** runs, over the **same migrations**, so
+      the offline game makes the same decisions the server does
+- [x] The database is **PostgreSQL compiled to WebAssembly**, stored in IndexedDB, and it
+      is **loaded on demand** - a player who is online does not pay for it
+- [x] The offline mode is **proved in a real browser**: the end-to-end test opens it in
+      Chrome and Edge, plays a command through it, and checks that the world changed and
+      that the schema is the server's
+- [x] It is **single-player**, and that is stated: there is no account and no password,
+      because the credential hashing is the one part of the authentication that needs the
+      platform, and an offline player has nobody to authenticate to
+- [x] Running the server's applier in the browser **forced the packages apart**: the
+      applier, the migrations, the schema and the legacy framing each have their **own**
+      entry point, so the browser's graph reaches the authority without the sessions,
+      the credentials or the backups - which need the platform
 - [ ] Installers are produced for Windows (`.msi` + `.exe`), macOS (`.dmg`) and Linux
       (`.deb`/`.AppImage`)
 - [ ] The binaries are code-signed, and the macOS build is notarised
@@ -1374,8 +1388,10 @@ product.*
       - the **rules engine must not import `node:`**, because it runs in a browser worker
         for the offline mode (ADR 2)
 - [x] The first rule is a **reachability** check, not a grep: a module that imports `node:`
-      is fine if nothing the browser loads reaches it, and the check says so. It reaches
-      **26** modules from the client's entry point
+      is fine if nothing the browser loads reaches it, and the check says so. It follows the
+      static imports, the re-exports and the **dynamic** imports, and it resolves the
+      workspace's **subpath** exports - `@swl/server/apply` is the applier and not the
+      package's index, which is the whole point of the subpath. It reaches **106** modules
 - [x] **Every pull request runs the golden-master harness.** The CI runs on every push
       and every pull request, and the golden-master corpus is one of its steps - and
       the harness fails on any difference it cannot explain

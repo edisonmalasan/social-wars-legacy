@@ -23,7 +23,6 @@ export * from './authority.ts';
 export * from './goals.ts';
 export * from './commandcost.ts';
 export * from './quest.ts';
-export * from './cheatbattery.ts';
 export * from './simulate.ts';
 export * from './loot.ts';
 export * from './dartsboard.ts';
