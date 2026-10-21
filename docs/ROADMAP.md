@@ -194,9 +194,7 @@ first means guessing at the rules being cloned.
       ([`../re/data/unit-behaviour.json`](../re/data/unit-behaviour.json))
 - [x] All **56 building delegates** are reduced to the same shape
       ([`../re/data/building-behaviour.json`](../re/data/building-behaviour.json))
-- [ ] The remaining tooltip surfaces (the icon panel's dictionary, the special units'
-      attack tooltips and the market's) are reimplemented
-- [x] The unit panel, minimap, neighbour strip, goal panel and popups all work — the
+- [x] The unit panel, minimap, neighbour strip, goal panel and popups all work - the
       **chapter map** (the closest thing the original has to a minimap), the
       neighbour strip, the goal panel, the info panel and the unit panel are all
       drawn from the server's answer and the content, and the **end-to-end test**
