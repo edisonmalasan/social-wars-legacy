@@ -15,7 +15,7 @@ import { Root } from './root.tsx';
 /** The mounted interface. */
 export interface UiHandle {
   /** Draw the interface from the server's answer. */
-  draw: (world: WorldSnapshot, placing?: number | null) => void;
+  draw: (world: WorldSnapshot, placing?: number | null, selected?: number | null) => void;
 }
 
 /** Mount the interface into an element. */
@@ -23,10 +23,20 @@ export function mountUi(
   element: HTMLElement,
   bundle: ContentBundle,
   onPick?: (itemId: number) => void,
+  onCollect?: () => void,
 ): UiHandle {
   const root = createRoot(element);
   return {
-    draw: (world, placing = null) =>
-      root.render(<Root world={world} bundle={bundle} placing={placing} onPick={onPick} />),
+    draw: (world, placing = null, selected = null) =>
+      root.render(
+        <Root
+          world={world}
+          bundle={bundle}
+          placing={placing}
+          selected={selected}
+          onPick={onPick}
+          onCollect={onCollect}
+        />,
+      ),
   };
 }

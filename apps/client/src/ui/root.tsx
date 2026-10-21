@@ -20,11 +20,13 @@ import { BuildMenu } from './buildmenu.tsx';
 import { Chapters } from './chapters.tsx';
 import { Goals } from './goals.tsx';
 import { Hud } from './hud.tsx';
+import { InfoPanel } from './info.tsx';
 import {
   buildItems,
   categories,
   goalList,
   hudInput,
+  infoPanel,
   questMinLevels,
   questRanks,
 } from './state.ts';
@@ -37,6 +39,10 @@ export interface RootProps {
   bundle: ContentBundle;
   /** The item the player is about to place, or null. */
   placing?: number | null;
+  /** The item the player selected on the map, or null. */
+  selected?: number | null;
+  /** The player asked to collect the selected building's production. */
+  onCollect?: () => void;
   /** The player picked something to build. */
   onPick?: (itemId: number) => void;
 }
@@ -48,7 +54,14 @@ export interface RootProps {
  * changes, and the build menu's items are derived from the content
  * **once**: the content does not change while the game is running.
  */
-export function Root({ world, bundle, placing, onPick }: RootProps): React.JSX.Element {
+export function Root({
+  world,
+  bundle,
+  placing,
+  selected,
+  onCollect,
+  onPick,
+}: RootProps): React.JSX.Element {
   const state = hudState(hudInput(bundle, world));
   const items = useMemo(() => buildItems(bundle), [bundle]);
   const tabs = useMemo(() => categories(bundle), [bundle]);
@@ -59,12 +72,14 @@ export function Root({ world, bundle, placing, onPick }: RootProps): React.JSX.E
   const goals = useMemo(() => goalList(bundle, world), [bundle, world]);
   const ranks = useMemo(() => questRanks(world), [world]);
   const minLevels = useMemo(() => questMinLevels(bundle), [bundle]);
+  const panel = useMemo(() => infoPanel(bundle, selected ?? null), [bundle, selected]);
 
   return (
     <div className="swl-ui">
       <Hud state={state} placing={placingName} />
       <Goals goals={goals} />
       <Chapters ranks={ranks} minLevels={minLevels} />
+      <InfoPanel panel={panel} onCollect={onCollect} />
       <BuildMenu
         items={items}
         categories={tabs}

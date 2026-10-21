@@ -73,6 +73,25 @@ async function json<T>(url: string, init?: RequestInit): Promise<T> {
 }
 
 /**
+ * The items on the map, by tile.
+ *
+ * A click has to find what is under it, and the tiles are the
+ * **server's** — the client looks them up rather than guessing.
+ */
+function itemsByTile(
+  world: WorldSnapshot,
+): Map<string, { isoId: number; itemId: number }> {
+  const out = new Map<string, { isoId: number; itemId: number }>();
+  for (const [isoId, tuple] of Object.entries(world.maps[0]?.items ?? {})) {
+    const tx = Number(tuple[1]);
+    const ty = Number(tuple[2]);
+    if (!Number.isFinite(tx) || !Number.isFinite(ty)) continue;
+    out.set(`${tx},${ty}`, { isoId: Number(isoId), itemId: Number(tuple[0]) });
+  }
+  return out;
+}
+
+/**
  * The camera's first position.
  *
  * The camera opens on the player's own town: the **first** building on
@@ -179,6 +198,13 @@ export interface ClientHandle {
   buy: typeof buy;
   /** The frames per second the render loop is running at. */
   framesPerSecond: () => number;
+  /**
+   * The item the player selected on the map, or null.
+   *
+   * The selection is the client's own: it knows what the player
+   * clicked, and the server decides what happens to it.
+   */
+  selectedItem: () => number | null;
   /**
    * How many sprites are on the stage.
    *
@@ -322,10 +348,11 @@ async function main(): Promise<void> {
    */
   const interaction = new Interaction();
   let placing: number | null = null;
+  let selected: number | null = null;
 
-  /** The interface is redrawn when the placement changes. */
+  /** The interface is redrawn when the placement or the selection changes. */
   function drawInterface(): void {
-    ui?.draw(world, placing);
+    ui?.draw(world, placing, selected);
   }
 
   /**
@@ -336,7 +363,20 @@ async function main(): Promise<void> {
   function onPick(itemId: number): void {
     interaction.beginPlacement(itemId, 'b');
     placing = itemId;
+    selected = null;
     drawInterface();
+  }
+
+  /**
+   * The selected building's production.
+   *
+   * The server decides what is collected and how much: the client's
+   * request names the building and nothing else.
+   */
+  function onCollect(): void {
+    const gesture = interaction.collectSelected();
+    if (!gesture.ok) return;
+    void run([gesture.command]);
   }
 
   /**
@@ -345,21 +385,33 @@ async function main(): Promise<void> {
    * It is drawn from the **same** world the scene is: one answer, one
    * drawing. The interface asks the server for nothing of its own.
    */
-  const ui = UI ? mountUi(UI, content, onPick) : null;
-  ui?.draw(world, placing);
+  const ui = UI ? mountUi(UI, content, onPick, onCollect) : null;
+  ui?.draw(world, placing, selected);
 
   // The map's click. The click is a **gesture**: the client turns it
   // into a command and the server decides the outcome.
   renderer.onClick = (x, y) => {
     const tile = pixelToTile(x, y, renderer.viewport);
-    const gesture = interaction.placeTo(tile.tx, tile.ty);
-    if (!gesture.ok) {
-      // Nothing was being placed, so the click was not a build.
+
+    if (interaction.selection.kind === 'placement') {
+      const gesture = interaction.placeTo(tile.tx, tile.ty);
+      if (!gesture.ok) return;
+      interaction.clear();
+      placing = null;
+      void run([gesture.command]);
       return;
     }
-    interaction.clear();
-    placing = null;
-    void run([gesture.command]);
+
+    // Otherwise the click selects what is under it.
+    const found = itemsByTile(world).get(`${tile.tx},${tile.ty}`);
+    if (!found) {
+      interaction.clear();
+      selected = null;
+    } else {
+      interaction.selectElement(found.isoId, found.itemId, 'building');
+      selected = found.itemId;
+    }
+    drawInterface();
   };
 
   /**
@@ -392,6 +444,7 @@ async function main(): Promise<void> {
     claimDailyBonus,
     buy,
     framesPerSecond: () => framesPerSecond,
+    selectedItem: () => selected,
     visibleSprites: () =>
       scene.filter(
         (sprite) =>

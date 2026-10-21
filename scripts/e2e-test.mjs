@@ -579,6 +579,36 @@ async function main() {
         }
         console.log(`  the town is on the screen (${visible} sprite(s) visible)`);
 
+        // A **click on the map** selects what is under it. The click
+        // is a gesture: the client looks the tile up and selects the
+        // building there.
+        const picked = await page.evaluate(
+          `(() => {
+             const canvas = document.querySelector('#game canvas');
+             if (!canvas) return { error: 'the client has no canvas' };
+             const rect = canvas.getBoundingClientRect();
+             const event = new PointerEvent('pointerdown', {
+               clientX: rect.left + rect.width / 2,
+               clientY: rect.top + rect.height / 2,
+               bubbles: true,
+             });
+             canvas.dispatchEvent(event);
+             const handle = window.__swl;
+             return { selected: handle ? handle.selectedItem() : null };
+           })()`,
+        );
+        if (!picked || picked.error) {
+          failures.push(`${entry.name}: ${picked?.error ?? 'the click did not answer'}`);
+          console.log('FAILED (the click did not answer)');
+          continue;
+        }
+        if (!picked.selected) {
+          failures.push(`${entry.name}: the click selected nothing`);
+          console.log('FAILED (the click selected nothing)');
+          continue;
+        }
+        console.log(`  the click selected the building (item ${picked.selected})`);
+
         // The **build menu** is wired to the placement. Picking an item
         // begins a placement; it does not build anything, and the
         // server still decides the outcome.
