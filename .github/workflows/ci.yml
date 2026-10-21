@@ -125,6 +125,11 @@ jobs:
       - name: The decision records are well formed
         run: node scripts/check-adrs.mjs
 
+      # A review that points at a test which is not there is a review
+      # that has drifted.
+      - name: The security review's claims are covered
+        run: node scripts/check-security-review.mjs
+
       # The report set is the project's account of the original game, and
       # a number that has changed in the code but not in the report is a
       # lie waiting to be believed.
