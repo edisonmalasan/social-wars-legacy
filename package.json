@@ -15,7 +15,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p apps/client/tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit && tsc -p apps/client/tsconfig.json --noEmit && node scripts/lint-project.mjs",
     "test": "node --test \"packages/*/src/**/*.test.ts\" \"apps/*/src/**/*.test.ts\"",
-    "test:integration": "node --test packages/server/src/pgstore.test.ts packages/server/src/socialstore.test.ts packages/server/src/schema.test.ts packages/server/src/migrations.test.ts packages/server/src/backup.test.ts packages/server/src/security.test.ts",
+    "test:integration": "node --test packages/server/src/pgstore.test.ts packages/server/src/socialstore.test.ts packages/server/src/schema.test.ts packages/server/src/migrations.test.ts packages/server/src/backup.test.ts packages/server/src/security.test.ts packages/server/src/restart.test.ts",
     "verify:upstream": "node scripts/verify-upstream.mjs",
     "verify:provenance": "node scripts/verify-provenance.mjs",
     "test:coverage": "node scripts/check-coverage.mjs"

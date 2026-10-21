@@ -1227,8 +1227,16 @@ assault against the new server, and the cheat battery is fully rejected.
 - [ ] Quests, goals, the darts minigame, magic and tech, the marketplace, premium and the
       weekly bonus are functional
 - [ ] Alliances and the social features are functional, or visibly out of scope
-- [ ] The daily/weekly bonus cycles and premium expiry behave correctly across a
-      server restart
+- [x] The daily/weekly bonus cycles and premium expiry behave correctly across a **server
+      restart** (`packages/server/src/restart.test.ts`). The server's state is
+      **timestamps** - when the bonus was last claimed, when the premium runs out - and a
+      timestamp that is not persisted is a bonus a player can claim twice by restarting the
+      server, and a premium that comes back from the dead
+- [x] The test is a **real restart**: the database is a directory, the server is stopped,
+      the directory is opened again, and the state is checked. The daily bonus is refused,
+      the weekly one is refused, and the premium's expiry is the same
+- [x] And the cycle is not **frozen** by the restart: the daily bonus is claimable again
+      the next day
 
 ### G5 — Clients
 
@@ -1790,8 +1798,6 @@ product.*
       mention. It is proven to fire
 - [x] The **licence gate** is in the checklist, and it is the one that can stop everything:
       a public release is blocked until the art and the audio are licensed or re-created
-- [ ] The first production release is published, monitored for a full cycle, and any
-      rollback path is proven
 - [ ] The first production release is published, monitored for a full cycle, and any
       rollback path is proven
 
