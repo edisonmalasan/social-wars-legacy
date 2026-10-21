@@ -8,6 +8,10 @@ state is at **`/api/health`** and **`/dashboard`** — open the dashboard
 first; it carries the versions in use, the measurements and the alerts
 that are firing.
 
+The metrics are at **`/metrics`**, in the Prometheus text format, so a
+scraper or a time-series database can read them; the JSON is at
+`/api/metrics`.
+
 ## Before anything else
 
 ```bash
