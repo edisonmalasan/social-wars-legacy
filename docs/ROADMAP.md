@@ -1518,7 +1518,24 @@ product.*
       `/api/metrics`
 - [x] The export is **tested**: the counters, the gauges and the histograms, the label
       values that need escaping, and the empty case
-- [ ] Distributed tracing across the client, the API and the database
+- [x] **Distributed tracing** across the client, the API and the database
+      (`packages/server/src/tracing.ts`, `packages/client/src/trace.ts`). A **request id**
+      says which log lines belong together; a **trace** says how the request got there,
+      and it crosses a process boundary. The context is carried in the standard
+      **`traceparent`** header, so an ordinary tracing library can read what this writes
+      and this can read what they write
+- [x] The **client starts the trace** and the server continues it as a child span, and
+      the server's context comes back in the answer, so a player can quote the span that
+      served them
+- [x] The **database's statements are spans** under the request that made them, so a slow
+      request can be **attributed** - to the database or to the rules engine - rather than
+      merely observed. A statement is reduced to its **shape** (the verb and the table), so
+      that no value from a player's save is written to the log
+- [x] The log line carries the **trace id and the span id**, so a log line can be joined
+      to the rest of the request's work
+- [x] A **malformed** trace context is ignored rather than being an error: a trace is an
+      aid and not a requirement, and a client that sends nonsense must not be able to
+      break the request
 - [x] **Error reporting captures crashes with the build and content version attached.**
       The server's own crash handler records the error with the **server's version**, the
       **content bundle's build id** and the **asset bundle's build id**, so a crash

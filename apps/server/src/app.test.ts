@@ -169,6 +169,41 @@ describe('the store', () => {
   });
 });
 
+describe('the trace', () => {
+  it('continues the client\'s trace and says so in the answer', async () => {
+    const { handle } = await app();
+    const response = await handle(
+      request('GET', '/api/health', '', {
+        traceparent: '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01',
+      }),
+    );
+
+    // The trace is the client's.
+    const header = response.headers['traceparent'];
+    assert.ok(header, 'the answer has no trace context');
+    assert.match(header!, /^00-4bf92f3577b34da6a3ce929d0e0e4736-[0-9a-f]{16}-01$/);
+  });
+
+  it('starts a trace of its own when the client sends none', async () => {
+    const { handle } = await app();
+    const response = await handle(request('GET', '/api/health'));
+    const header = response.headers['traceparent'];
+    assert.ok(header);
+    assert.match(header!, /^00-[0-9a-f]{32}-[0-9a-f]{16}-01$/);
+  });
+
+  it('ignores a malformed trace context, because a trace is not a requirement', async () => {
+    const { handle } = await app();
+    const response = await handle(
+      request('GET', '/api/health', '', { traceparent: 'nonsense' }),
+    );
+    assert.equal(response.status, 200);
+    const header = response.headers['traceparent'];
+    assert.ok(header);
+    assert.match(header!, /^00-[0-9a-f]{32}-[0-9a-f]{16}-01$/);
+  });
+});
+
 describe('the health check', () => {
   it('answers', async () => {
     const { handle } = await app();

@@ -80,10 +80,16 @@ import {
   Metrics,
   REQUEST_ID_HEADER,
   SILENT_LOGGER,
+  TRACEPARENT_HEADER,
+  endSpan,
+  formatTraceparent,
   initialWorld,
   newRequestId,
+  parseTraceparent,
+  runInSpan,
   seriesKey,
   snapshot,
+  startSpan,
   type Logger,
 } from '@swl/server';
 
@@ -769,16 +775,25 @@ export function createApp(
     const requestId =
       request.headers[REQUEST_ID_HEADER] ?? (options.requestId ?? newRequestId)();
     const startedAt = options.nowMs?.() ?? Date.now();
+    const nowMs = () => options.nowMs?.() ?? Date.now();
+
+    // The **trace**. The client's context is continued when it sends
+    // one, and a trace of its own is started when it does not. A
+    // malformed header is ignored, because a trace is an aid and not a
+    // requirement.
+    const parent = parseTraceparent(request.headers[TRACEPARENT_HEADER]);
+    const span = startSpan(parent, `http: ${request.method}`, nowMs);
 
     let response: AppResponse;
     try {
-      response = await route(request);
+      response = await runInSpan(span, () => route(request));
     } catch (error) {
       // The route catches its own errors, so this is a failure in the
       // observation itself. It is still a 500 with a typed body.
       logger.error('unhandled error', { error: String(error), requestId });
       response = fail(500, 'internal-error');
     }
+    endSpan(span, { 'http.status': response.status }, nowMs);
 
     const durationMs = (options.nowMs?.() ?? Date.now()) - startedAt;
     const path = request.path.split('?')[0] ?? request.path;
@@ -799,12 +814,22 @@ export function createApp(
       method: request.method,
       status: response.status,
       durationMs,
+      // The trace, so that a log line can be joined to the rest of the
+      // request's work - the database's statements included.
+      traceId: span.context.traceId,
+      spanId: span.context.spanId,
       ...requestContext,
     });
 
     return {
       ...response,
-      headers: { ...response.headers, [REQUEST_ID_HEADER]: requestId },
+      headers: {
+        ...response.headers,
+        [REQUEST_ID_HEADER]: requestId,
+        // The trace context goes back, so the client can quote the
+        // span that served it.
+        [TRACEPARENT_HEADER]: formatTraceparent(span.context),
+      },
     };
   };
 }

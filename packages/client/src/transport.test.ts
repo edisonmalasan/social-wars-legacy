@@ -51,6 +51,33 @@ describe('the transport', () => {
     assert.equal(headers['authorization'], 'Bearer the-token');
   });
 
+  it('sends a trace context, so the server\'s work can be joined to it', async () => {
+    let headers: Record<string, string> = {};
+    await sendCommands('the-token', [], {
+      fetchImpl: async (_url, init) => {
+        headers = (init?.headers ?? {}) as Record<string, string>;
+        return new Response(JSON.stringify({ v: 1, id: 'x', ok: true, outcomes: [] }), {
+          status: 200,
+        });
+      },
+    });
+    assert.match(headers['traceparent']!, /^00-[0-9a-f]{32}-[0-9a-f]{16}-01$/);
+  });
+
+  it('keeps the trace the server answered in', async () => {
+    const result = await sendCommands('the-token', [], {
+      fetchImpl: async () =>
+        new Response(JSON.stringify({ v: 1, id: 'x', ok: true, outcomes: [] }), {
+          status: 200,
+          headers: {
+            traceparent: '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01',
+          },
+        }),
+    });
+    assert.ok(result.ok);
+    assert.equal(result.traceId, '4bf92f3577b34da6a3ce929d0e0e4736');
+  });
+
   it('reports an expired session', async () => {
     const result = await sendCommands('stale', [], {
       fetchImpl: async () => new Response('{}', { status: 401 }),
