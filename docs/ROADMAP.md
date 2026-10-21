@@ -1032,8 +1032,20 @@ assault against the new server, and the cheat battery is fully rejected.
 - [x] The client package is **browser-safe**. It imported `node:crypto` for the art
       hash, which broke the web build; the hash is a build-time utility, so it moved
       into its own module that nothing at runtime imports
-- [ ] The renderer is **exercised**: the scene is tested, but the drawing itself needs
-      a browser, and nothing here drives one
+- [x] The renderer is **exercised**: the end-to-end test drives the client in a **real
+      browser** - Chrome and Edge - and the drawing is **checked**, not assumed. A player
+      with a town sees it, and the test fails if the client draws **nothing**
+- [x] The client read the content bundle's items as a **map**, and the bundle holds a
+      **list** - so every lookup missed and **nothing was ever drawn**. The items are
+      indexed by id once, and the bundle is typed as the content package's own
+      `ContentBundle`
+- [x] A new player gets a **town**, not an empty map: the Command Center stands in the
+      middle of it (`packages/server/src/starttown.ts`), and the perimeter is the
+      player's to build, from the same store the original used
+- [ ] The original's starting town also has a **ring of walls and a pair of turrets**.
+      That is a known difference and it is deliberate: the original's layout is recorded
+      only in the vendored upstream, which is GPL v3, and the shipped product carries no
+      GPL data
 - [x] The **isometric projection and the depth sort** are ported exactly
       (`packages/client/src/iso.ts`): the tile is 108 by 54 pixels, the map is 100 by
       100, and the projection is `Utils.TileToPixel` (core/Utils.as:88-102) to the

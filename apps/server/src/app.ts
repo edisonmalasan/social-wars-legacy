@@ -80,30 +80,13 @@ import {
   Metrics,
   REQUEST_ID_HEADER,
   SILENT_LOGGER,
+  initialWorld,
   newRequestId,
   seriesKey,
   snapshot,
   type Logger,
 } from '@swl/server';
 
-
-/**
- * A new player's world.
- *
- * The same shape the development player gets: an empty town, the
- * starting resources, and the command counter at the beginning.
- */
-export function initialWorld(playerId: string): ShimWorld {
-  return {
-    save: {
-      playerInfo: { pid: playerId, name: playerId },
-      maps: [{ id: 0, items: {} }],
-      privateState: {},
-    },
-    resources: { g: 2000, w: 2000, o: 2000, s: 2000, c: 2000, e: 50, x: 0, m: 0 },
-    nextCommandNumber: 1,
-  };
-}
 
 /** A request, as the application sees it. */
 export interface AppRequest {

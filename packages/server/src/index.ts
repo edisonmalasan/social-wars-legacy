@@ -16,3 +16,4 @@ export * from './alerts.ts';
 export * from './backups.ts';
 export * from './observability.ts';
 export * from './prometheus.ts';
+export * from './starttown.ts';
