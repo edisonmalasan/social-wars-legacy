@@ -192,6 +192,10 @@ was captured verbatim.
 
 ## Licensing
 
+If you own the rights to anything in this project and you would like it
+changed, removed or credited differently, see
+[`docs/CORRECTIONS.md`](docs/CORRECTIONS.md).
+
 Two separate licences apply, and the distinction matters:
 
 | | Licence |

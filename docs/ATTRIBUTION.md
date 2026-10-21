@@ -76,3 +76,10 @@ If you own the rights to anything here and you would like it changed,
 removed or credited differently, please say so. This project exists to
 preserve a game, and the people who made it deserve to be accurately
 credited.
+
+**Open a draft issue** in this repository, titled *Rights request*, and
+say what you would like changed and what you own. You will get an
+answer, and what was done is recorded.
+
+The policy is [`CORRECTIONS.md`](CORRECTIONS.md): what can be asked
+for, what happens next, and the log of every request and every answer.
