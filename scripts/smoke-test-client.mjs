@@ -108,6 +108,15 @@ const STUB_WORLD = {
   resources: { g: 2000, w: 2000, o: 2000, s: 2000, c: 2000, e: 50, x: 0, m: 0 },
 };
 
+/** The session the smoke test signs in with. */
+const STUB_SESSION = {
+  token: 'smoke-test-token',
+  playerId: 'smoke',
+  issuedAt: Math.floor(Date.now() / 1000),
+  // An hour ahead, so the client does not decide it has expired.
+  expiresAt: Math.floor(Date.now() / 1000) + 60 * 60,
+};
+
 /** A static server for the client's files. */
 async function serve(port) {
   const { createServer } = await import('node:http');
@@ -120,6 +129,12 @@ async function serve(port) {
     if (relative === 'api/world') {
       response.writeHead(200, { 'content-type': 'application/json' });
       response.end(JSON.stringify(STUB_WORLD));
+      return;
+    }
+
+    if (relative === 'api/session') {
+      response.writeHead(200, { 'content-type': 'application/json' });
+      response.end(JSON.stringify(STUB_SESSION));
       return;
     }
 
@@ -193,6 +208,22 @@ async function readStatus(port, url, timeoutMs = 60_000) {
     });
 
   await send('Runtime.enable', {});
+  await send('Page.enable', {});
+
+  // The client signs in, and it keeps the session between visits, so the
+  // session is put in the browser's storage and the page is reloaded.
+  // The client then starts without anybody typing anything.
+  await send('Runtime.evaluate', {
+    expression: `window.localStorage.setItem('swl.session', ${JSON.stringify(
+      JSON.stringify({
+        token: STUB_SESSION.token,
+        playerId: STUB_SESSION.playerId,
+        expiresAt: STUB_SESSION.expiresAt,
+      }),
+    )})`,
+    returnByValue: true,
+  });
+  await send('Page.reload', {});
 
   // The client is asynchronous: it fetches the content, starts the
   // renderer and asks the server for the world. The atlas pages are

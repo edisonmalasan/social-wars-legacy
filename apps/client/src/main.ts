@@ -13,6 +13,15 @@ import { AtlasIndex, type FrameManifest } from '@swl/client';
 import { buildScene, type SceneItem } from './scene.ts';
 import { WorldRenderer } from './renderer.ts';
 import { clientCss } from './fonts.ts';
+import {
+  authorizationHeader,
+  forgetSession,
+  isExpired,
+  readSession,
+  rememberSession,
+  signIn,
+  type ClientSession,
+} from '@swl/client';
 
 const STAGE = document.getElementById('stage');
 const GAME = document.getElementById('game');
@@ -42,8 +51,8 @@ interface ServerWorld {
 }
 
 /** Fetch and parse a JSON file. */
-async function json<T>(url: string): Promise<T> {
-  const response = await fetch(url);
+async function json<T>(url: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(url, init);
   if (!response.ok) {
     throw new Error(`${url} answered ${response.status}`);
   }
@@ -94,11 +103,85 @@ function status(state: string, detail = ''): void {
   element.setAttribute('data-state', state);
 }
 
+/** The browser's storage, or null when it refuses to be used. */
+function safeStorage(): Storage | null {
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Ask the player to sign in.
+ *
+ * The client signs in with a **credential** and the server issues a
+ * **session token**, so there is a name and a password and nothing else.
+ * The form is the plainest one that works, because the interface is not
+ * built yet.
+ */
+function askForSignIn(): Promise<ClientSession | null> {
+  return new Promise((resolve) => {
+    const form = document.createElement('form');
+    form.id = 'signin';
+    form.innerHTML = [
+      '<label>Name <input name="playerId" autocomplete="username" required></label>',
+      '<label>Password <input name="password" type="password" autocomplete="current-password" required></label>',
+      '<button type="submit">Play</button>',
+      '<p id="signin-error"></p>',
+    ].join('');
+    form.style.cssText = 'position:absolute;inset:0;display:grid;gap:8px;place-content:center;font:16px sans-serif;color:#eee;background:#10131a';
+    STAGE?.appendChild(form);
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      const playerId = String(data.get('playerId') ?? '');
+      const password = String(data.get('password') ?? '');
+      const error = form.querySelector('#signin-error');
+      void signIn('/api/session', playerId, password).then((result) => {
+        if (result.ok) {
+          form.remove();
+          resolve(result.session);
+          return;
+        }
+        if (error) {
+          error.textContent =
+            result.reason === 'unknown-player'
+              ? 'There is no player with that name.'
+              : result.reason === 'invalid-credentials'
+                ? 'That password is not right.'
+                : 'The server could not be reached.';
+        }
+        resolve(null);
+      });
+    });
+  });
+}
+
 async function main(): Promise<void> {
   if (!STAGE || !GAME) throw new Error('the page has no stage');
 
   installStyles();
   status('starting');
+
+  // The session. A stored one is used, and if there is none the player
+  // signs in.
+  const storage = safeStorage();
+  let session = readSession(storage);
+  if (session && isExpired(session, Math.floor(Date.now() / 1000))) {
+    // The token is no good any more, and there is no point sending it.
+    forgetSession(storage);
+    session = null;
+  }
+  if (!session) {
+    session = await askForSignIn();
+    if (!session) {
+      status('failed', 'not signed in');
+      return;
+    }
+    rememberSession(storage, session);
+  }
 
   const manifest = await json<FrameManifest>(MANIFEST_URL);
   const content = await json<{ items: Record<string, never> }>(CONTENT_URL);
@@ -116,7 +199,9 @@ async function main(): Promise<void> {
     status('started', `${renderer.loadedPages} atlas page(s)`);
   };
 
-  const world = await json<ServerWorld>('/api/world');
+  const world = await json<ServerWorld>('/api/world', {
+    headers: { authorization: authorizationHeader(session) },
+  });
   const scene = buildScene(sceneItems(world, content), renderer.viewport, atlas);
   renderer.draw(scene);
 
