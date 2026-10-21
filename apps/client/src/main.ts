@@ -121,6 +121,19 @@ export interface ClientHandle {
     response?: NativeResponse;
   }>;
   /**
+   * Send a batch of commands, then draw what the server said.
+   *
+   * This is the whole loop: the client asks, the server decides, and the
+   * client draws the answer. The answer carries the **outcomes** and not
+   * the world, so the world is fetched again.
+   *
+   * The elapsed time is the **input-to-render latency**: from the command
+   * leaving the client to the new world being on the screen.
+   */
+  run: (
+    commands: readonly NativeCommand[],
+  ) => Promise<{ ok: boolean; latencyMs: number; sprites: number }>;
+  /**
    * The client's own request builders.
    *
    * The end-to-end test drives them, so the test exercises the request
@@ -208,6 +221,9 @@ async function main(): Promise<void> {
     }
     rememberSession(storage, session);
   }
+  // The session is known to be there now, and the closures below need it
+  // to be a session rather than a session that might be null.
+  const signedIn: ClientSession = session;
 
   const manifest = await json<FrameManifest>(MANIFEST_URL);
   const content = await json<{ items: Record<string, never> }>(CONTENT_URL);
@@ -225,20 +241,50 @@ async function main(): Promise<void> {
     status('started', `${renderer.loadedPages} atlas page(s)`);
   };
 
-  const world = await json<ServerWorld>('/api/world', {
-    headers: { authorization: authorizationHeader(session) },
-  });
+  /**
+   * The world, and the scene that draws it.
+   *
+   * The world is fetched again after every command, because the answer
+   * carries the outcomes and not the world: the client asks, the server
+   * decides, and the client draws what the server said.
+   */
+  let world = await fetchWorld();
+  let scene = buildScene(sceneItems(world, content), renderer.viewport, atlas);
+  renderer.draw(scene);
+
+  async function fetchWorld(): Promise<ServerWorld> {
+    return json<ServerWorld>('/api/world', {
+      headers: { authorization: authorizationHeader(signedIn) },
+    });
+  }
+
+  /**
+   * Send a batch of commands and draw the answer.
+   *
+   * The elapsed time is the **input-to-render latency**.
+   */
+  async function run(commands: readonly NativeCommand[]) {
+    const started = performance.now();
+    const result = await sendCommands(signedIn.token, commands);
+    world = await fetchWorld();
+    scene = buildScene(sceneItems(world, content), renderer.viewport, atlas);
+    renderer.draw(scene);
+    return {
+      ok: result.ok,
+      latencyMs: performance.now() - started,
+      sprites: scene.length,
+    };
+  }
 
   // The debug handle. The end-to-end test drives the client through it,
   // and a developer can look at the client's own state in the console.
   const handle: ClientHandle = {
     session,
     send: (commands) => sendCommands(session.token, commands),
+    run,
     claimDailyBonus,
   };
   (window as unknown as { __swl?: ClientHandle }).__swl = handle;
-  const scene = buildScene(sceneItems(world, content), renderer.viewport, atlas);
-  renderer.draw(scene);
 
   // The stage is scaled to fit the window, and it is scaled again when
   // the window changes.

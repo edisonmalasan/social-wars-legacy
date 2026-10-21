@@ -30,6 +30,8 @@ import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
 
+import { brokenBudgets } from '../packages/server/src/budgets.ts';
+
 const ROOT = process.cwd();
 
 /** Where the browsers are looked for. */
@@ -430,15 +432,15 @@ async function main() {
 
         // --- 2. The client sends a command -------------------------------
         // The client's own request builder and its own transport, and the
-        // server's own rules decide the outcome.
+        // server's own rules decide the outcome. The client's `run` also
+        // draws the answer, so the elapsed time is the **input-to-render
+        // latency**: the time the player waits.
         const answer = await page.evaluate(
           `(async () => {
              const handle = window.__swl;
              if (!handle) return { error: 'the client has no handle' };
-             // The **client's own** request builder, so the test exercises
-             // the request the game really makes.
-             const result = await handle.send([handle.claimDailyBonus()]);
-             return { ok: result.ok, response: result.response };
+             const result = await handle.run([handle.claimDailyBonus()]);
+             return { ok: result.ok, latencyMs: result.latencyMs, sprites: result.sprites };
            })()`,
         );
 
@@ -452,13 +454,25 @@ async function main() {
           console.log('FAILED (the server refused the batch)');
           continue;
         }
-        const outcomes = answer.response?.outcomes ?? [];
-        if (outcomes.length !== 1) {
-          failures.push(`${entry.name}: the answer has ${outcomes.length} outcomes`);
-          console.log('FAILED (the answer is wrong)');
+
+        // The latency is measured against the budget.
+        const broken = brokenBudgets({
+          input_to_render_p95_ms: answer.latencyMs,
+        });
+        if (broken.length > 0) {
+          for (const entry of broken) {
+            failures.push(
+              `${entry.name}: ${entry.value.toFixed(1)} ms (the limit is ${entry.limit})`,
+            );
+          }
+          console.log(`FAILED (the latency was ${answer.latencyMs.toFixed(1)} ms)`);
           continue;
         }
-        console.log(`the command was answered (${outcomes[0].ok ? 'applied' : 'refused'})`);
+
+        console.log(
+          `the command was answered in ${answer.latencyMs.toFixed(1)} ms ` +
+            `(${answer.sprites} sprite(s) drawn)`,
+        );
         ran.push(entry.name);
       } catch (error) {
         failures.push(`${entry.name}: ${String(error)}`);

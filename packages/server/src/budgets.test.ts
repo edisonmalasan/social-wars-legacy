@@ -21,6 +21,15 @@ describe('the performance budgets', () => {
     assert.ok(names.includes('simulation_tick_p95_ms'));
     assert.ok(names.includes('command_throughput'));
     assert.ok(names.includes('error_rate'));
+    assert.ok(names.includes('input_to_render_p95_ms'));
+  });
+
+  it('budget the input-to-render latency', () => {
+    const budget = BUDGETS.find((entry) => entry.name === 'input_to_render_p95_ms');
+    assert.ok(budget);
+    assert.equal(budget!.measurement, 'input_to_render_p95_ms');
+    assert.equal(budget!.limit, 250);
+    assert.equal(budget!.comparison, 'below');
   });
 
   it('are not broken by a healthy server', () => {
@@ -54,6 +63,12 @@ describe('the performance budgets', () => {
   it('are broken by the errors', () => {
     const broken = brokenBudgets({ error_rate: 0.2 });
     assert.equal(broken[0]!.name, 'error_rate');
+  });
+
+  it('breaks on a slow input-to-render', () => {
+    const broken = brokenBudgets({ input_to_render_p95_ms: 900 });
+    assert.equal(broken[0]!.name, 'input_to_render_p95_ms');
+    assert.equal(broken[0]!.limit, 250);
   });
 
   it('ignore a measurement they do not watch', () => {
