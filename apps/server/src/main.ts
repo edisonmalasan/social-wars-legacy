@@ -20,11 +20,14 @@ import process from 'node:process';
 import {
   JsonLogger,
   LegacyIdentityBridge,
+  MemoryCredentialStore,
   Metrics,
+  PostgresCredentialStore,
   PostgresPlayerStore,
   SCHEMA_MIGRATIONS,
   SessionStore,
   runMigrations,
+  type CredentialStore,
   type PlayerStore,
 } from '@swl/server';
 import { PGlite } from '@electric-sql/pglite';
@@ -104,6 +107,7 @@ async function main(): Promise<void> {
   // **schema is brought forward before anything is served**, so a deploy
   // cannot start a server against a schema it does not understand.
   let store: PlayerStore = new MemoryPlayerStore();
+  let credentials: CredentialStore = new MemoryCredentialStore();
   const dataDir = process.env['SWL_DATA_DIR'];
   if (dataDir) {
     const db = await PGlite.create({ dataDir: path.resolve(dataDir) });
@@ -113,6 +117,16 @@ async function main(): Promise<void> {
         `(${report.applied.length} migration(s) applied)`,
     );
     store = new PostgresPlayerStore({ db, items: migrationItems(bundle) });
+    credentials = new PostgresCredentialStore({ db });
+
+    // The credentials are **loaded** at boot, so a player who registered
+    // before the restart can log in after it.
+    for (const credential of await credentials.all()) {
+      sessions.load(credential);
+    }
+    console.log(
+      `[server] ${sessions.allCredentials().length} player(s) can sign in.`,
+    );
   }
 
   // A development player. The real server creates players through the
@@ -120,7 +134,10 @@ async function main(): Promise<void> {
   // only when a password is supplied.
   const devPassword = process.env['SWL_DEV_PASSWORD'];
   if (devPassword) {
-    sessions.addPlayer('dev', devPassword);
+    const credential = sessions.addPlayer('dev', devPassword);
+    // The development player is persisted like any other, so it survives
+    // a restart too.
+    await credentials.put(credential);
     identity.allowLegacyIdentity();
     identity.bind('dev', 'dev');
     if (store instanceof MemoryPlayerStore) {
@@ -160,6 +177,7 @@ async function main(): Promise<void> {
     metrics,
     now: () => Math.floor(Date.now() / 1000),
     nowMs: () => Date.now(),
+    credentials,
     applyCommand: createApplier({
       now: () => Math.floor(Date.now() / 1000),
       tzOffsetHours: 0,

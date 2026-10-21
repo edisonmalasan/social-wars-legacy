@@ -23,6 +23,18 @@
  * Both share the same session model, the same authority layer and the same
  * limits.
  *
+ * ## The native endpoints
+ *
+ * | Endpoint | What it does |
+ * |---|---|
+ * | `POST /api/account` | create a player and sign them in |
+ * | `POST /api/session` | sign in |
+ * | `DELETE /api/session` | sign out - the token is revoked |
+ * | `POST /api/command` | apply a batch of commands |
+ * | `GET /api/world` | the player's world, for the client to draw |
+ * | `GET /api/metrics` | the metrics, as JSON |
+ * | `GET /health` | whether the server is alive |
+ *
  * ## Atomicity
  *
  * A command batch is applied to a **copy** of the player's save, and the
@@ -44,6 +56,7 @@ import {
 } from '@swl/server';
 import { applyCommandCost, computeCommandCost, type CostContent } from '@swl/rules';
 import { MemoryPlayerStore } from '@swl/server';
+import { makeCredential, type CredentialStore } from '@swl/server';
 
 import { handleSocialRequest, type SocialOptions } from './social.ts';
 import {
@@ -90,6 +103,9 @@ export const ERROR_CODES = {
   'rate-limited': 'too many requests',
   'malformed-json': 'the body is not valid JSON',
   'missing-credentials': 'the player id or the password is missing',
+  'bad-player-id': 'the player id is too long or not allowed',
+  'player-exists': 'there is already a player with that name',
+  'no-credential-store': 'the server has nowhere to keep the credentials',
   'invalid-credentials': 'the player id or the password is wrong',
   'unknown-player': 'no such player',
   'internal-error': 'the server failed to handle the request',
@@ -117,6 +133,13 @@ export interface AppOptions {
   applyCommand: CommandApplier;
   /** The limits. */
   limits?: Limits;
+  /**
+   * Where the players' credentials are kept.
+   *
+   * Without it the account endpoint cannot persist a player, and says
+   * so rather than pretending.
+   */
+  credentials?: CredentialStore;
   /** The neighbours, for `get_player_info.php`. */
   neighbours?: Record<string, Record<string, unknown>>;
   /** The alliance and betting services, for the social endpoints. */
@@ -254,6 +277,65 @@ export function createApp(
   }
 
   /** Create a session. */
+  /**
+   * `POST /api/account` - create a player and sign them in.
+   *
+   * The upstream server had no accounts at all: `USERID` came in the
+   * request body and anybody could be anybody (finding F10). So the
+   * clone has to be able to **create** a player, and the credential has
+   * to be **persisted** - a player who registers can log in after the
+   * server restarts.
+   *
+   * The password is never stored: the credential is a salt and a hash.
+   */
+  async function createAccount(request: AppRequest): Promise<AppResponse> {
+    const store = options.credentials;
+    if (!store) {
+      // Without somewhere to keep the credential, a player could not log
+      // in after a restart, so the account is refused rather than made.
+      return fail(503, 'no-credential-store');
+    }
+
+    let body: { playerId?: string; password?: string };
+    try {
+      body = JSON.parse(request.body) as { playerId?: string; password?: string };
+    } catch {
+      return fail(400, 'malformed-json');
+    }
+    const playerId = String(body.playerId ?? '').trim();
+    const password = String(body.password ?? '');
+    if (!playerId || !password) {
+      return fail(400, 'missing-credentials');
+    }
+    if (playerId.length > 64) {
+      return fail(400, 'bad-player-id');
+    }
+
+    const existing = await store.get(playerId);
+    if (existing) {
+      // The account exists. The password is not checked here: telling
+      // somebody that a name is taken is not a way in, and it is what
+      // the client needs to know.
+      return fail(409, 'player-exists');
+    }
+
+    const credential = makeCredential(playerId, password);
+    await store.put(credential);
+    options.sessions.load(credential);
+
+    const result = options.sessions.authenticate(playerId, password, options.now());
+    if (!result.ok) {
+      return fail(500, 'internal-error');
+    }
+    const session = result.session;
+    return json(201, {
+      token: session.token,
+      playerId: session.playerId,
+      issuedAt: session.issuedAt,
+      expiresAt: session.expiresAt,
+    });
+  }
+
   function createSession(request: AppRequest): AppResponse {
     let body: { playerId?: string; password?: string };
     try {
@@ -474,6 +556,11 @@ export function createApp(
       }
 
       // --- the native session endpoints ---------------------------------
+      if (path === '/api/account') {
+        if (request.method !== 'POST') return fail(405, 'method-not-allowed');
+        return await createAccount(request);
+      }
+
       if (path === '/api/session') {
         if (request.method === 'POST') return createSession(request);
         if (request.method === 'DELETE') return deleteSession(request);

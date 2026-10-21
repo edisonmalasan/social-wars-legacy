@@ -35,6 +35,9 @@ export const PLAYERS_TABLE = 'player_saves';
 /** The table the social documents live in. */
 export const SOCIAL_TABLE = 'social';
 
+/** The table the players' credentials live in. */
+export const CREDENTIALS_TABLE = 'credentials';
+
 /** The schema's migrations, in order. */
 export const SCHEMA_MIGRATIONS: readonly Migration[] = [
   {
@@ -67,6 +70,19 @@ export const SCHEMA_MIGRATIONS: readonly Migration[] = [
     up: [`CREATE INDEX IF NOT EXISTS ${PLAYERS_TABLE}_updated_idx
           ON ${PLAYERS_TABLE} (updated DESC)`],
     down: [`DROP INDEX IF EXISTS ${PLAYERS_TABLE}_updated_idx`],
+  },
+  {
+    version: 4,
+    name: 'create the credentials table',
+    up: [
+      `CREATE TABLE IF NOT EXISTS ${CREDENTIALS_TABLE} (
+        player_id     TEXT PRIMARY KEY,
+        salt          TEXT NOT NULL,
+        password_hash TEXT NOT NULL,
+        created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+      )`,
+    ],
+    down: [`DROP TABLE IF EXISTS ${CREDENTIALS_TABLE}`],
   },
 ];
 

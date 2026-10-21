@@ -20,15 +20,15 @@
  * `legacyIdentity` is therefore off by default and has to be turned on
  * deliberately, which is what `allowLegacyIdentity` is for.
  */
-import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
+import { randomBytes } from 'node:crypto';
 
-/** A player's credential. */
-export interface Credential {
-  readonly playerId: string;
-  /** The salted hash of the password. Never the password itself. */
-  readonly passwordHash: string;
-  readonly salt: string;
-}
+import {
+  hashPassword,
+  safeEqual,
+  type Credential,
+} from './credentials.ts';
+
+export type { Credential } from './credentials.ts';
 
 /** A live session. */
 export interface Session {
@@ -48,17 +48,9 @@ export type AuthenticationResult =
   | { ok: true; session: Session }
   | { ok: false; reason: 'unknown-player' | 'bad-credential' };
 
-/** Hash a password with a salt. */
-export function hashPassword(password: string, salt: string): string {
-  return createHash('sha256').update(`${salt}:${password}`).digest('hex');
-}
 
-/** Compare two secrets in constant time. */
-function safeEqual(a: string, b: string): boolean {
-  const ab = Buffer.from(a, 'utf8');
-  const bb = Buffer.from(b, 'utf8');
-  return ab.length === bb.length && timingSafeEqual(ab, bb);
-}
+
+
 
 /**
  * The session store.
@@ -69,7 +61,13 @@ export class SessionStore {
   private readonly sessions = new Map<string, Session>();
   private readonly credentials = new Map<string, Credential>();
 
-  /** Register a player and their credential. */
+  /**
+   * Register a player and their credential.
+   *
+   * The credential is **returned** so the caller can persist it: the
+   * store keeps it in memory for the authentication path, and the
+   * database is what survives a restart.
+   */
   addPlayer(playerId: string, password: string, salt = randomBytes(16).toString('hex')): Credential {
     const credential: Credential = {
       playerId,
@@ -78,6 +76,31 @@ export class SessionStore {
     };
     this.credentials.set(playerId, credential);
     return credential;
+  }
+
+  /**
+   * Load a credential, without hashing anything.
+   *
+   * This is how the **persisted** credentials get into the store at boot,
+   * and it is why a player can log in after the server restarts.
+   */
+  load(credential: Credential): void {
+    this.credentials.set(credential.playerId, credential);
+  }
+
+  /**
+   * Every credential the store holds.
+   *
+   * The server writes them back after a change, so the database and the
+   * store cannot drift.
+   */
+  allCredentials(): Credential[] {
+    return [...this.credentials.values()];
+  }
+
+  /** Whether a player is registered. */
+  has(playerId: string): boolean {
+    return this.credentials.has(playerId);
   }
 
   /**
