@@ -1508,7 +1508,14 @@ product.*
 - [x] **A restore has been rehearsed**: the tests write a database, back it up,
       change the live database, restore the snapshot and check that the snapshot
       still holds the **old** state - and the digest is what proves the two match
-- [ ] Backups **run automatically** on a schedule, and the schedule is monitored
+- [x] **Backups run automatically on a schedule**, and the schedule is **monitored**:
+      - `node scripts/backup-server.mjs --data <dir> --out <dir> --every <hours>` takes
+        the backup **repeatedly**, which is what a server does rather than what a person
+        does, and it **prunes** the old snapshots, because a backup nobody can delete is
+        a disk full rather than a backup
+      - `node scripts/check-backups.mjs --out <dir>` **fails** when the newest snapshot is
+        too old, or when there are none at all - a schedule that has stopped is invisible
+        until the day it is needed
 - [x] A **runbook** covers a stalled deployment, a database failure, corrupted player
       state, a content-bundle rollback and an emergency player reset
       (`docs/RUNBOOK.md`). It is organised by **failure** - what it looks like, and what

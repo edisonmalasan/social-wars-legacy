@@ -13,4 +13,5 @@ export * from './credentials.ts';
 export * from './health.ts';
 export * from './budgets.ts';
 export * from './alerts.ts';
+export * from './backups.ts';
 export * from './observability.ts';
