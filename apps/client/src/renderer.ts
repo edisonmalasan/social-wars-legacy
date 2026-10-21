@@ -20,11 +20,12 @@
  */
 import { Application, Assets, Container, Rectangle, Sprite, Texture } from 'pixi.js';
 
-import type { FrameManifest, Viewport } from '@swl/client';
+import type { CameraState, FrameManifest, Viewport } from '@swl/client';
 
 import type { SceneSprite } from './scene.ts';
 import { STAGE_HEIGHT, STAGE_WIDTH } from '@swl/client';
-import { stageLayout, type StageLayout } from '@swl/client';
+import { stageLayout, viewportOf, type StageLayout } from '@swl/client';
+import { initialCamera } from '@swl/client';
 
 export { STAGE_HEIGHT, STAGE_WIDTH } from '@swl/client';
 
@@ -51,6 +52,7 @@ export class WorldRenderer {
   private readonly options: RendererOptions;
   private readonly queue: string[] = [];
   private scene: readonly SceneSprite[] = [];
+  private state: CameraState = initialCamera();
 
   /** Called when a page arrives, so the scene can be drawn again. */
   onPageLoaded: (() => void) | null = null;
@@ -222,6 +224,22 @@ export class WorldRenderer {
 
   /** The viewport the scene is drawn in. */
   get viewport(): Viewport {
-    return { topX: 0, topY: 0, buildOutlineOffsetY: 0 };
+    return viewportOf(this.camera);
+  }
+
+  /**
+   * The camera.
+   *
+   * The scene is drawn in the camera's viewport, so moving the camera
+   * moves the map and the scene is drawn again.
+   */
+  get camera(): CameraState {
+    return this.state;
+  }
+
+  /** Move the camera, and draw the scene again. */
+  setCamera(camera: CameraState): void {
+    this.state = camera;
+    this.draw(this.scene);
   }
 }

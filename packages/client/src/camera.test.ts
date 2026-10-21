@@ -12,6 +12,7 @@ import {
   MIN_ZOOM,
   SLIDER_ZOOM_STEP,
   ZOOM_STEP,
+  cameraCentredOn,
   initialCamera,
   pan,
   projectionViewport,
@@ -22,6 +23,8 @@ import {
   wheelZoomIn,
   wheelZoomOut,
 } from './camera.ts';
+import { tileToPixel } from './iso.ts';
+import { STAGE_HEIGHT, STAGE_WIDTH } from './constants.ts';
 
 describe('the camera constants', () => {
   it('are the client own', () => {
@@ -180,5 +183,35 @@ describe('the camera viewport', () => {
       topY: 200,
       buildOutlineOffsetY: 54,
     });
+  });
+});
+
+describe('a camera centred on a tile', () => {
+  it('puts the tile in the middle of the stage', () => {
+    const camera = cameraCentredOn(48, 48);
+    const position = tileToPixel(48, 48, viewportOf(camera));
+    assert.equal(position.x, STAGE_WIDTH / 2);
+    assert.equal(position.y, STAGE_HEIGHT / 2);
+  });
+
+  it('works for any tile', () => {
+    for (const [tx, ty] of [
+      [0, 0],
+      [10, 40],
+      [99, 99],
+    ]) {
+      const camera = cameraCentredOn(tx, ty);
+      const position = tileToPixel(tx, ty, viewportOf(camera));
+      assert.equal(position.x, STAGE_WIDTH / 2);
+      assert.equal(position.y, STAGE_HEIGHT / 2);
+    }
+  });
+
+  it('stays inside the camera\'s own bounds', () => {
+    // The bounds are the original's, and the clone's town is at the
+    // middle of the map, so the camera has to be inside them.
+    const camera = cameraCentredOn(48, 48);
+    assert.ok(camera.topX >= MIN_TOP_X && camera.topX <= MAX_TOP_X);
+    assert.ok(camera.topY >= MIN_TOP_Y && camera.topY <= MAX_TOP_Y);
   });
 });

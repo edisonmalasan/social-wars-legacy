@@ -1071,6 +1071,12 @@ assault against the new server, and the cheat battery is fully rejected.
       wheel and the slider are different behaviours** — the wheel multiplies by 1.2 and
       the slider adds 0.2
 - [x] The map pans, zooms and re-centres as the original does
+- [x] The camera opens on the player's **own town**: the original opens on a fixed
+      position that frames the original's town, and the clone's town is wherever
+      the server put it, so the camera is **computed** from the projection
+      (`cameraCentredOn`). Without it the town was in the scene and off the screen —
+      the end-to-end test now counts the sprites that are **on the stage**, so a
+      client that draws an invisible town fails
 - [x] Every unit and building animates from its atlas frames, with correct frame timing
       — the frame number is **not a timeline**: the client picks the frame by number out
       of a sheet that holds every drawing of every state, and the number is

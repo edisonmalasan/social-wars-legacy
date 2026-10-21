@@ -37,6 +37,8 @@
  * Both are clamped to `[MIN_ZOOM, MAX_ZOOM]`.
  */
 import type { Viewport } from './iso.ts';
+import { TILE_HEIGHT_PIXELS } from './iso.ts';
+import { STAGE_HEIGHT, STAGE_WIDTH } from './constants.ts';
 
 /** The map's origin when the client opens. `Config.EI_INIT_POSX`. */
 export const INIT_POS_X = -844;
@@ -167,6 +169,37 @@ export const BUILD_OUTLINE_OFFSET_Y = 54;
 /** The camera's viewport, for the projection. */
 export function viewportOf(camera: CameraState): Viewport {
   return projectionViewport(camera, BUILD_OUTLINE_OFFSET_Y);
+}
+
+/**
+ * The camera that centres a tile.
+ *
+ * The original opens on a **fixed** position (`Config.EI_INIT_POSX`),
+ * which frames the original's starting town. The clone's town is
+ * wherever the server put it, so the camera is **computed**: the tile's
+ * top corner goes to the middle of the stage.
+ *
+ * The arithmetic is the projection's, inverted (`Utils.TileToPixel`):
+ *
+ * ```
+ * x = topX - h*ty + h*tx
+ * y = topY - offset + h/2*ty + h/2*tx - h/2
+ * ```
+ */
+export function cameraCentredOn(
+  tx: number,
+  ty: number,
+  stageWidth = STAGE_WIDTH,
+  stageHeight = STAGE_HEIGHT,
+): CameraState {
+  const height = TILE_HEIGHT_PIXELS;
+  const topX = stageWidth / 2 + height * (ty - tx);
+  const topY =
+    stageHeight / 2 +
+    BUILD_OUTLINE_OFFSET_Y -
+    (height / 2) * (tx + ty) +
+    height / 2;
+  return { topX, topY, zoom: 1 };
 }
 
 /**
