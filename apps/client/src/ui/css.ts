@@ -128,6 +128,50 @@ export function uiCss(): string {
   color: #e0a33c;
 }
 
+/* --- The goal panel --------------------------------------------------- */
+
+.swl-goals {
+  position: absolute;
+  left: 8px;
+  top: 44px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: auto;
+}
+
+.swl-goal-slot {
+  position: relative;
+}
+
+.swl-goal-title {
+  display: block;
+  width: 100%;
+  padding: 5px 8px;
+  border: 1px solid #38445a;
+  border-radius: 3px;
+  background: #131a24;
+  color: #e8e3d8;
+  font-size: calc(12px * var(--swl-font-scale-body, 1));
+  text-align: left;
+}
+
+.swl-goal-title:hover { background: #1b2432; }
+
+.swl-goal-badge {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: #f5c542;
+  color: #10151d;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+  font-weight: 700;
+}
+
 /* --- The build menu ---------------------------------------------------- */
 
 .swl-build-menu {

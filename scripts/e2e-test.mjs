@@ -606,6 +606,32 @@ async function main() {
         }
         console.log(`  picking ${menu.name} began a placement (${notice})`);
 
+        // The **goal panel** is drawn. The goals are the content's and
+        // the player's progress is the server's, so the panel shows
+        // three slots with the goals' own titles.
+        const goals = await page.evaluate(
+          `(() => {
+             const panel = document.querySelector('#ui .swl-goals');
+             if (!panel) return { error: 'the goal panel is missing' };
+             return {
+               slots: panel.querySelectorAll('.swl-goal-slot').length,
+               titles: Array.from(panel.querySelectorAll('.swl-goal-title'))
+                 .map((e) => e.textContent),
+             };
+           })()`,
+        );
+        if (!goals || goals.error) {
+          failures.push(`${entry.name}: ${goals?.error ?? 'the goal panel did not answer'}`);
+          console.log('FAILED (the goal panel did not answer)');
+          continue;
+        }
+        if (goals.slots !== 3) {
+          failures.push(`${entry.name}: the goal panel has ${goals.slots} slot(s), not 3`);
+          console.log('FAILED (the goal panel has the wrong number of slots)');
+          continue;
+        }
+        console.log(`  the goal panel shows ${goals.titles.filter(Boolean).length} goal(s)`);
+
         // The render loop's rate. In a **headless** browser this is not
         // the game's real frame rate - there is no GPU and the frames are
         // throttled - but it does prove the loop is running. The rate is

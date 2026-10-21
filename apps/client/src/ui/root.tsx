@@ -17,8 +17,9 @@ import { hudState, type WorldSnapshot } from '@swl/client';
 import type { ContentBundle } from '@swl/content';
 
 import { BuildMenu } from './buildmenu.tsx';
+import { Goals } from './goals.tsx';
 import { Hud } from './hud.tsx';
-import { buildItems, categories, hudInput } from './state.ts';
+import { buildItems, categories, goalList, hudInput } from './state.ts';
 
 /** The root's props. */
 export interface RootProps {
@@ -47,10 +48,12 @@ export function Root({ world, bundle, placing, onPick }: RootProps): React.JSX.E
     if (placing === null || placing === undefined) return null;
     return items.find((item) => item.id === placing)?.name ?? null;
   }, [items, placing]);
+  const goals = useMemo(() => goalList(bundle, world), [bundle, world]);
 
   return (
     <div className="swl-ui">
       <Hud state={state} placing={placingName} />
+      <Goals goals={goals} />
       <BuildMenu
         items={items}
         categories={tabs}

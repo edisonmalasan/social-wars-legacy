@@ -7,6 +7,7 @@ import {
   buildItems,
   categories,
   expRequiredByLevel,
+  goalList,
   hudInput,
   hudRules,
   populationItems,
@@ -164,6 +165,46 @@ describe('the categories', () => {
   it('leave out a category that is not one', () => {
     const tabs = categories(bundle({ categories: { '1': { name: 'No id' } } }));
     assert.deepEqual(tabs, {});
+  });
+});
+
+describe('the player\'s goals', () => {
+  it('are the content\'s goals, with the server\'s progress', () => {
+    const goals = goalList(
+      bundle({
+        goals: [
+          { id: 100000001, title: 'Build a house', description: '', hint: '', reward: {} },
+          { id: 100000002, title: 'Reach level 2', description: '', hint: '', reward: {} },
+        ],
+      }),
+      {
+        maps: [],
+        resources: {},
+        privateState: {
+          goalState: {
+            visited: { '100000001': true },
+            completed: { '100000002': true },
+          },
+        },
+      },
+    );
+    assert.equal(goals.length, 2);
+    assert.equal(goals[0]!.index, 0);
+    assert.equal(goals[0]!.title, 'Build a house');
+    assert.equal(goals[0]!.visited, true);
+    assert.equal(goals[0]!.completed, false);
+    assert.equal(goals[1]!.completed, true);
+  });
+
+  it('are all unvisited when the server has no goal state', () => {
+    const goals = goalList(
+      bundle({
+        goals: [{ id: 1, title: 'One', description: '', hint: '', reward: {} }],
+      }),
+      { maps: [], resources: {}, privateState: {} },
+    );
+    assert.equal(goals[0]!.visited, false);
+    assert.equal(goals[0]!.completed, false);
   });
 });
 
