@@ -11,7 +11,10 @@ import {
   hudInput,
   hudRules,
   populationItems,
+  questMinLevels,
+  questRanks,
 } from './state.ts';
+import { QUEST_IDS } from '@swl/rules';
 
 function item(overrides: Partial<ContentItem>): ContentItem {
   return {
@@ -205,6 +208,33 @@ describe('the player\'s goals', () => {
     );
     assert.equal(goals[0]!.visited, false);
     assert.equal(goals[0]!.completed, false);
+  });
+});
+
+describe('the quest progress', () => {
+  it('is the map\'s own field', () => {
+    const ranks = questRanks({
+      maps: [{ id: 0, items: {}, questsRank: { '1': 3, '2': 1 } }],
+      resources: {},
+      privateState: {},
+    });
+    assert.deepEqual(ranks, { 1: 3, 2: 1 });
+  });
+
+  it('is empty when the map has no ranks', () => {
+    assert.deepEqual(questRanks({ maps: [], resources: {}, privateState: {} }), {});
+  });
+
+  it('knows the level each quest unlocks at', () => {
+    // The global is keyed by the quest's id, and the levels are read by
+    // the quest's index.
+    const levels = questMinLevels(
+      bundle({ globals: { QUESTS_MIN_LEVELS: { '100000021': 40 } } }),
+    );
+    assert.equal(levels[QUEST_IDS.indexOf('100000021')], 40);
+    // The weekly quest is at the front of the list and is not a story
+    // quest, so it has no level.
+    assert.equal(levels[0], undefined);
   });
 });
 

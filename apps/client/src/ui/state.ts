@@ -21,6 +21,7 @@ import type {
   WorldSnapshot,
 } from '@swl/client';
 import type { ContentBundle, ContentItem } from '@swl/content';
+import { QUEST_IDS } from '@swl/rules';
 
 /** The categories, as the build menu's tabs read them. */
 export type Categories = Record<
@@ -177,6 +178,44 @@ export function goalList(bundle: ContentBundle, world: WorldSnapshot): GoalEntry
     visited: visited?.[String(goal.id)] === true,
     completed: completed?.[String(goal.id)] === true,
   }));
+}
+
+/**
+ * The player's quest ranks.
+ *
+ * The ranks are the **server's** — they are the map's own field, the
+ * way the original keeps them — and they are keyed by the quest's
+ * index, which is its position in the quest list.
+ */
+export function questRanks(world: WorldSnapshot): Record<number, number> {
+  const ranks = world.maps[0]?.questsRank;
+  if (typeof ranks !== 'object' || ranks === null) return {};
+  const out: Record<number, number> = {};
+  for (const [index, rank] of Object.entries(ranks)) {
+    const at = Number(index);
+    const value = Number(rank);
+    if (Number.isFinite(at) && Number.isFinite(value)) out[at] = value;
+  }
+  return out;
+}
+
+/**
+ * The level each quest unlocks at, by the quest's index.
+ *
+ * The content's global is keyed by the quest's **id**, so the ids are
+ * looked up in the quest list: the weekly quest is at the front of the
+ * list and the story quests follow it, one-based.
+ */
+export function questMinLevels(bundle: ContentBundle): Record<number, number> {
+  const raw = bundle.globals?.['QUESTS_MIN_LEVELS'];
+  if (typeof raw !== 'object' || raw === null) return {};
+  const out: Record<number, number> = {};
+  for (const [id, level] of Object.entries(raw as Record<string, unknown>)) {
+    const index = QUEST_IDS.indexOf(id);
+    if (index <= 0) continue;
+    if (typeof level === 'number' && Number.isFinite(level)) out[index] = level;
+  }
+  return out;
 }
 
 /**

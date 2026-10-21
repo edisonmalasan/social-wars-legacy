@@ -181,6 +181,8 @@ export interface WorldSnapshot {
     xp?: number;
     /** The extra population the map's expansions grant. */
     increasedPopulation?: number;
+    /** The rank each quest was reached at, by the quest's index. */
+    questsRank?: Record<string, number>;
   }[];
   privateState: Record<string, unknown>;
   resources: Resources;

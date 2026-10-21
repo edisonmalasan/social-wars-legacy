@@ -632,6 +632,32 @@ async function main() {
         }
         console.log(`  the goal panel shows ${goals.titles.filter(Boolean).length} goal(s)`);
 
+        // The **chapter map** is drawn: the four chapters and their
+        // quest slots, with the client's own titles.
+        const map = await page.evaluate(
+          `(() => {
+             const chapters = document.querySelectorAll('#ui .swl-chapter');
+             if (chapters.length === 0) return { error: 'the chapter map is missing' };
+             return {
+               chapters: chapters.length,
+               slots: document.querySelectorAll('#ui .swl-quest-slot').length,
+               titles: Array.from(document.querySelectorAll('#ui .swl-chapter-title'))
+                 .map((e) => e.textContent),
+             };
+           })()`,
+        );
+        if (!map || map.error) {
+          failures.push(`${entry.name}: ${map?.error ?? 'the chapter map did not answer'}`);
+          console.log('FAILED (the chapter map did not answer)');
+          continue;
+        }
+        if (map.chapters !== 4) {
+          failures.push(`${entry.name}: the chapter map has ${map.chapters} chapter(s), not 4`);
+          console.log('FAILED (the chapter map has the wrong number of chapters)');
+          continue;
+        }
+        console.log(`  the chapter map shows ${map.chapters} chapters (${map.slots} slots)`);
+
         // The render loop's rate. In a **headless** browser this is not
         // the game's real frame rate - there is no GPU and the frames are
         // throttled - but it does prove the loop is running. The rate is

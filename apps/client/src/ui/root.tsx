@@ -17,9 +17,17 @@ import { hudState, type WorldSnapshot } from '@swl/client';
 import type { ContentBundle } from '@swl/content';
 
 import { BuildMenu } from './buildmenu.tsx';
+import { Chapters } from './chapters.tsx';
 import { Goals } from './goals.tsx';
 import { Hud } from './hud.tsx';
-import { buildItems, categories, goalList, hudInput } from './state.ts';
+import {
+  buildItems,
+  categories,
+  goalList,
+  hudInput,
+  questMinLevels,
+  questRanks,
+} from './state.ts';
 
 /** The root's props. */
 export interface RootProps {
@@ -49,11 +57,14 @@ export function Root({ world, bundle, placing, onPick }: RootProps): React.JSX.E
     return items.find((item) => item.id === placing)?.name ?? null;
   }, [items, placing]);
   const goals = useMemo(() => goalList(bundle, world), [bundle, world]);
+  const ranks = useMemo(() => questRanks(world), [world]);
+  const minLevels = useMemo(() => questMinLevels(bundle), [bundle]);
 
   return (
     <div className="swl-ui">
       <Hud state={state} placing={placingName} />
       <Goals goals={goals} />
+      <Chapters ranks={ranks} minLevels={minLevels} />
       <BuildMenu
         items={items}
         categories={tabs}

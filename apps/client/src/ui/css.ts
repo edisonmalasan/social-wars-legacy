@@ -128,6 +128,54 @@ export function uiCss(): string {
   color: #e0a33c;
 }
 
+/* --- The chapter map --------------------------------------------------- */
+
+.swl-chapters {
+  position: absolute;
+  right: 8px;
+  top: 44px;
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid #38445a;
+  border-radius: 4px;
+  background: #131a24;
+  pointer-events: auto;
+}
+
+.swl-chapter-title {
+  margin-bottom: 4px;
+  color: #8d97a8;
+  font-size: calc(9px * var(--swl-font-scale-body, 1));
+  text-align: center;
+}
+
+.swl-chapter-quests {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 3px;
+}
+
+.swl-quest-slot {
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border-radius: 3px;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
+
+.swl-quest-open {
+  background: #f5c542;
+  color: #10151d;
+  font-weight: 700;
+}
+
+.swl-quest-locked {
+  background: #1d2430;
+  color: #5c6678;
+}
+
 /* --- The goal panel --------------------------------------------------- */
 
 .swl-goals {
