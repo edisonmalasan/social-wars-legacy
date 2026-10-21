@@ -487,6 +487,27 @@ async function main() {
           continue;
         }
 
+        // The **interface** has to have drawn itself too. The top bar
+        // shows the player's own resources, so a client that renders
+        // the world and not the numbers is not playing the game either.
+        const hud = await page.evaluate(
+          "(() => { const bar = document.querySelector('#ui .swl-hud');" +
+            " if (!bar) return { error: 'the interface drew no top bar' };" +
+            " const gold = bar.querySelector('.swl-resource-gold .swl-readout-value');" +
+            " return { gold: gold ? gold.textContent : '', text: bar.textContent ?? '' }; })()",
+        );
+        if (!hud || hud.error) {
+          failures.push(`${entry.name}: ${hud?.error ?? 'the interface drew nothing'}`);
+          console.log('FAILED (the interface drew nothing)');
+          continue;
+        }
+        if (!/[\d]/.test(String(hud.gold ?? ''))) {
+          failures.push(`${entry.name}: the top bar shows no gold ("${hud.gold}")`);
+          console.log('FAILED (the top bar shows no numbers)');
+          continue;
+        }
+        console.log(`  the top bar shows ${hud.gold} gold`);
+
         // The render loop's rate. In a **headless** browser this is not
         // the game's real frame rate - there is no GPU and the frames are
         // throttled - but it does prove the loop is running. The rate is

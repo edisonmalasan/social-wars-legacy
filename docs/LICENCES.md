@@ -15,7 +15,12 @@ original project asks for.
 |---|---|---|---|
 | `@electric-sql/pglite` | ^0.5.10 | Apache-2.0 | the database |
 | `@types/node` | ^22.10.2 | MIT | the type definitions |
+| `@types/react` | ^19.3.0 | MIT | the renderer types |
+| `@types/react-dom` | ^19.3.0 | MIT | the renderer types |
+| `@vitejs/plugin-react` | ^4.3.4 | MIT | the client's build |
 | `pixi.js` | ^8.22.0 | MIT | the client's renderer |
+| `react` | ^19.3.1 | MIT | the interface's renderer |
+| `react-dom` | ^19.3.1 | MIT | the interface's renderer |
 | `typescript` | ^5.7.2 | Apache-2.0 | the language |
 | `vite` | ^6.0.0 | MIT | the client's build |
 

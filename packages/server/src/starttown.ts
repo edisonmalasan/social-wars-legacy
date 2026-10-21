@@ -39,6 +39,25 @@ export const COMMAND_CENTER_ITEM_ID = 26;
 export const MAP_SIZE = 100;
 
 /**
+ * The most free energy a player may hold.
+ *
+ * It is the content's `globals.ENERGY_MAX_REGULAR_VALUE`, which is
+ * **30**. The original tops the energy up to that number when the player
+ * logs in (`PlayerStatus.load()`), so a fresh player holds the full
+ * amount and no more.
+ */
+export const MAX_FREE_ENERGY = 30;
+
+/**
+ * The XP a fresh player has.
+ *
+ * The original's initial map carries `xp = 4` and `level = 1`
+ * (`re/docs/04-python-server-and-data.md`, the map's own fields), and the
+ * client reads the level from the map.
+ */
+export const STARTING_XP = 4;
+
+/**
  * Where the Command Center stands.
  *
  * The middle of the map, so that the town has room around it in every
@@ -94,10 +113,29 @@ export function initialWorld(playerId: string): ShimWorld {
   return {
     save: {
       playerInfo: { pid: playerId, name: playerId },
-      maps: [{ id: 0, items: startingTown() }],
+      maps: [
+        {
+          id: 0,
+          items: startingTown(),
+          // The level and the XP are the **map's** own fields, the way
+          // the original keeps them, so the client reads the level from
+          // the map and the server's own rules read it from there too.
+          level: 1,
+          xp: STARTING_XP,
+        },
+      ],
       privateState: {},
     },
-    resources: { g: 2000, w: 2000, o: 2000, s: 2000, c: 2000, e: 50, x: 0, m: 0 },
+    resources: {
+      g: 2000,
+      w: 2000,
+      o: 2000,
+      s: 2000,
+      c: 2000,
+      e: MAX_FREE_ENERGY,
+      x: 0,
+      m: 0,
+    },
     nextCommandNumber: 1,
   };
 }

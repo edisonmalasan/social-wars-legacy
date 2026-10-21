@@ -34,11 +34,26 @@
       #game canvas {
         display: block;
       }
+
+      /*
+       * The interface is a layer above the game, and it is **sized by
+       * the stage**: the panels are placed for a 760 by 600 stage, so
+       * they scale with it.
+       */
+      #ui {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+      }
     </style>
   </head>
   <body>
     <div id="stage">
       <div id="game"></div>
+      <div id="ui"></div>
       <div id="status" data-state="loading">loading</div>
     </div>
     <script type="module" src="/src/main.ts"></script>

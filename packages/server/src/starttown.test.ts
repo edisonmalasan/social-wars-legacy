@@ -5,6 +5,8 @@ import {
   COMMAND_CENTER_ITEM_ID,
   COMMAND_CENTER_TILE,
   MAP_SIZE,
+  MAX_FREE_ENERGY,
+  STARTING_XP,
   initialWorld,
   startingTown,
 } from './starttown.ts';
@@ -58,7 +60,13 @@ describe('a new player', () => {
     const map = world.save.maps[0]!;
     assert.equal(Object.keys(map['items'] as object).length, 1);
     assert.equal(world.resources.g, 2000);
-    assert.equal(world.resources.e, 50);
+    assert.equal(world.resources.e, MAX_FREE_ENERGY);
     assert.equal(world.nextCommandNumber, 1);
+  });
+
+  it('starts at the first level, with the XP the original starts with', () => {
+    const map = initialWorld('somebody').save.maps[0]!;
+    assert.equal(map['level'], 1);
+    assert.equal(map['xp'], STARTING_XP);
   });
 });

@@ -1168,6 +1168,27 @@ assault against the new server, and the cheat battery is fully rejected.
       **always returns false** in this build (`core/Base.as:7993-7995`), so the
       condition is simply the level, and the clone reproduces that rather than
       inventing an unlock system the client does not have
+- [x] The **HUD is drawn** (`apps/client/src/ui/hud.tsx`): the top bar is the model's
+      HUD — the resources, the population, the level and the energy — and every number
+      opens the popover the model writes. The interface is **React DOM**, the renderer
+      the locked decisions name
+- [x] The **build menu is drawn** (`apps/client/src/ui/buildmenu.tsx`): the tabs are the
+      content's categories, and each tab's list is the model's order, so the entries the
+      player cannot build yet are further down the list rather than gone
+- [x] The **HUD's state is read from the server's answer** (`packages/client/src/hudstate.ts`):
+      the resources, the level, the XP and the population are the **server's**, and the
+      storage limits, the energy cap and the population rule are the **content's**. The
+      limits are the content's base ones — 20 000 of each of gold, oil, steel and wood —
+      which are the limits the original's client shows, because it never sees the silos'
+      larger cap
+- [x] The interface and the scene are **one answer, drawn twice**
+      (`apps/client/src/ui/mount.tsx`): the React tree is mounted once and redrawn from
+      each answer the server sends, so the numbers in the top bar and the buildings on
+      the map never disagree
+- [x] A new player starts with the **content's** energy cap (`ENERGY_MAX_REGULAR_VALUE`,
+      30) rather than more than the game allows, and the starting map carries the level
+      and the XP the original's initial map carries (`level = 1`, `xp = 4`), so the level
+      the client shows is the level the server's own rules use
 - [ ] The unit panel, minimap, neighbour strip, goal panel and popups all work
 - [x] The **tooltips** are implemented as a model (`packages/client/src/tooltips.ts`):
       the HUD's four resource sentences are the client's own literals, and the info

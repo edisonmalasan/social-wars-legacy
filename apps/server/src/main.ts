@@ -38,7 +38,7 @@ import type { CostContent } from '@swl/rules';
 import { createApp, type AppRequest } from './app.ts';
 import { DEFAULT_LIMITS } from './limits.ts';
 import { MemoryPlayerStore } from '@swl/server';
-import { createApplier, tracedDatabase } from '@swl/server';
+import { createApplier, initialWorld, tracedDatabase } from '@swl/server';
 
 /** The port to listen on. */
 const PORT = Number(process.env['PORT'] ?? 8080);
@@ -148,11 +148,11 @@ async function main(): Promise<void> {
     identity.allowLegacyIdentity();
     identity.bind('dev', 'dev');
     if (store instanceof MemoryPlayerStore) {
-      store.add('dev', {
-        save: { playerInfo: { pid: 'dev', name: 'Developer' }, maps: [{ id: 0, items: {} }], privateState: {} },
-        resources: { g: 2000, w: 2000, o: 2000, s: 2000, c: 2000, e: 50, x: 0, m: 0 },
-        nextCommandNumber: 1,
-      });
+      // The development player gets the **same** town a new player gets,
+      // so the local game is the real game.
+      const world = initialWorld('dev');
+      world.save.playerInfo['name'] = 'Developer';
+      store.add('dev', world);
       console.log('[server] development player "dev" is ready.');
     } else {
       // The database creates its players through the account flow, so the
