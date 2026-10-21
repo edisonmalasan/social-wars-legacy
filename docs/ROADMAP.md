@@ -1546,7 +1546,16 @@ product.*
 - [x] **Every pull request runs the golden-master harness.** The CI runs on every push
       and every pull request, and the golden-master corpus is one of its steps - and
       the harness fails on any difference it cannot explain
-- [ ] Branches are protected and require a green run plus review
+- [x] Branches are protected and require a green run: `main` is protected, the four
+      CI checks (**Verify**, **The desktop shell**, **Assets** and **Scan**) must
+      pass and be up to date, the conversations must be resolved, and there are no
+      force-pushes and no deletions. The protection is **enforced for the
+      administrators too**, so a direct push to `main` is refused and the work
+      arrives through a pull request
+- [x] The protection does **not** require a review. The repository has **one**
+      maintainer, so a required approval would leave nobody able to merge: the
+      review is a decision for a second pair of eyes, and the green run is the
+      gate that can be enforced today
 - [x] **Release artefacts are produced automatically and published to a release**
       (`.github/workflows/release.yml`). A tag starts the workflow, which runs the
       **whole gate** - the golden master, the cheat battery, the coverage and the
