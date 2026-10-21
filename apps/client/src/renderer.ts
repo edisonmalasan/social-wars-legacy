@@ -57,6 +57,14 @@ export class WorldRenderer {
   /** Called when a page arrives, so the scene can be drawn again. */
   onPageLoaded: (() => void) | null = null;
 
+  /**
+   * Called when the player clicks the map.
+   *
+   * The coordinates are the canvas's own, so the click is in the
+   * stage's pixels however the stage is scaled.
+   */
+  onClick: ((x: number, y: number) => void) | null = null;
+
   private constructor(app: Application, options: RendererOptions) {
     this.app = app;
     this.options = options;
@@ -79,7 +87,21 @@ export class WorldRenderer {
     });
 
     options.element.appendChild(app.canvas);
-    return new WorldRenderer(app, options);
+
+    const renderer = new WorldRenderer(app, options);
+
+    // The click, in the canvas's own pixels. The stage is scaled by a
+    // CSS transform, so the position is taken back into the canvas's
+    // coordinates rather than the window's.
+    app.canvas.addEventListener('pointerdown', (event) => {
+      const rect = app.canvas.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      const x = ((event.clientX - rect.left) / rect.width) * app.canvas.width;
+      const y = ((event.clientY - rect.top) / rect.height) * app.canvas.height;
+      renderer.onClick?.(x, y);
+    });
+
+    return renderer;
   }
 
   /**

@@ -579,6 +579,33 @@ async function main() {
         }
         console.log(`  the town is on the screen (${visible} sprite(s) visible)`);
 
+        // The **build menu** is wired to the placement. Picking an item
+        // begins a placement; it does not build anything, and the
+        // server still decides the outcome.
+        const menu = await page.evaluate(
+          `(() => {
+             const item = document.querySelector('#ui .swl-build-item:not(.swl-build-locked) button');
+             if (!item) return { error: 'the build menu has no items' };
+             const name = item.querySelector('.swl-build-name');
+             item.click();
+             return { name: name ? name.textContent : '' };
+           })()`,
+        );
+        if (!menu || menu.error) {
+          failures.push(`${entry.name}: ${menu?.error ?? 'the build menu did not answer'}`);
+          console.log('FAILED (the build menu did not answer)');
+          continue;
+        }
+        const notice = await page.evaluate(
+          "(() => { const e = document.querySelector('#ui .swl-placing'); return e ? e.textContent : ''; })()",
+        );
+        if (!notice) {
+          failures.push(`${entry.name}: picking an item began no placement`);
+          console.log('FAILED (picking an item began no placement)');
+          continue;
+        }
+        console.log(`  picking ${menu.name} began a placement (${notice})`);
+
         // The render loop's rate. In a **headless** browser this is not
         // the game's real frame rate - there is no GPU and the frames are
         // throttled - but it does prove the loop is running. The rate is

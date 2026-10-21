@@ -76,6 +76,8 @@ function Readout({
 export interface HudProps {
   /** The player's state. */
   state: HudState;
+  /** The item the player is about to place, or null. */
+  placing?: string | null;
 }
 
 /**
@@ -84,11 +86,14 @@ export interface HudProps {
  * The numbers are the model's, and the popovers are the model's too: the
  * texts are the client's, and they are tested where they live.
  */
-export function Hud({ state }: HudProps): React.JSX.Element {
+export function Hud({ state, placing }: HudProps): React.JSX.Element {
   const energy = energyDisplay(state);
   return (
     <div className="swl-hud">
       <div className="swl-hud-resources">
+        {placing ? (
+          <span className="swl-placing">Placing: {placing} — click a tile</span>
+        ) : null}
         {RESOURCES.map((resource) => (
           <Readout
             key={resource.key}

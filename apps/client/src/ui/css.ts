@@ -94,6 +94,14 @@ export function uiCss(): string {
   font-size: calc(11px * var(--swl-font-scale-body, 1));
 }
 
+.swl-placing {
+  align-self: center;
+  padding: 4px 8px;
+  color: #f5c542;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  white-space: nowrap;
+}
+
 /* --- The popovers ------------------------------------------------------ */
 
 .swl-popover {
@@ -178,6 +186,12 @@ export function uiCss(): string {
 }
 
 .swl-build-item button:hover { background: #233047; }
+
+.swl-build-item button:disabled {
+  cursor: not-allowed;
+}
+
+.swl-build-item button:disabled:hover { background: none; }
 
 .swl-build-name { flex: 1; }
 

@@ -84,7 +84,11 @@ export function BuildMenu({
             key={entry.id}
             className={entry.locked ? 'swl-build-item swl-build-locked' : 'swl-build-item'}
           >
-            <button type="button" onClick={() => onPick?.(entry)}>
+            <button
+              type="button"
+              disabled={entry.locked}
+              onClick={() => onPick?.(entry)}
+            >
               <span className="swl-build-name">{entry.name}</span>
               <span className="swl-build-cost">{costText(entry)}</span>
               {entry.locked ? (
