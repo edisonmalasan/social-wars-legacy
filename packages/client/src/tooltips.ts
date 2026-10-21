@@ -121,7 +121,7 @@ export interface UnitItem {
   attack: number;
   /** Its life. */
   life: number;
-  /** How long it waits between attacks, in seconds. */
+  /** How long it waits between attacks, in frames at 30 fps. */
   attack_interval: number;
   /** How far it can reach. */
   attack_range: number;

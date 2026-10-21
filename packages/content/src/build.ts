@@ -305,6 +305,10 @@ function toContentItem(raw: JsonObject): ContentItem {
     life: asInt(raw['life']),
     attack_range: asInt(raw['attack_range']),
     attack_interval: asInt(raw['attack_interval']),
+    // The unit's **movement speed**, in pixels per frame. The upstream
+    // keeps it as a string; the bundle carries the number, because a
+    // number is what the rules and the panel read.
+    velocity: asInt(raw['velocity']),
     population: asInt(raw['population']),
     cost: asInt(raw['cost']),
     cost_type: typeof raw['cost_type'] === 'string' ? raw['cost_type'] : null,

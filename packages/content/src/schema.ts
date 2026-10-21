@@ -34,6 +34,13 @@ export interface ContentItem {
   attack_range: number;
   /** Attack interval in FRAMES at 30 fps, not seconds. */
   attack_interval: number;
+  /**
+   * The unit's movement speed, in pixels per frame.
+   *
+   * It is not a combat stat: it is how fast the unit crosses the map,
+   * and the client's unit panel shows it.
+   */
+  velocity: number;
   population: number;
   /** The legacy single-resource cost. The config leaves it at 0; `costs` is real. */
   cost: number;
