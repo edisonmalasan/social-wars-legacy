@@ -220,6 +220,49 @@ export function uiCss(): string {
   font-weight: 700;
 }
 
+/* --- The info panel ---------------------------------------------------- */
+
+.swl-info {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 220px;
+  padding: 8px 10px;
+  border: 1px solid #38445a;
+  border-radius: 4px;
+  background: #131a24;
+  pointer-events: auto;
+}
+
+.swl-info-name {
+  color: #f2e6c8;
+  font-size: calc(13px * var(--swl-font-scale-body, 1));
+  font-weight: 700;
+}
+
+.swl-info-earns {
+  margin-top: 3px;
+  color: #8d97a8;
+  font-size: calc(12px * var(--swl-font-scale-body, 1));
+}
+
+.swl-info-hint {
+  margin-top: 5px;
+  color: #8d97a8;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+}
+
+.swl-info-collect {
+  margin-top: 8px;
+  padding: 4px 10px;
+  border: 1px solid #f5c542;
+  border-radius: 3px;
+  background: #f5c542;
+  color: #10151d;
+  font-size: calc(12px * var(--swl-font-scale-body, 1));
+  font-weight: 700;
+}
+
 /* --- The build menu ---------------------------------------------------- */
 
 .swl-build-menu {

@@ -18,8 +18,10 @@ import type {
   HudInput,
   HudRules,
   ItemPopulation,
+  ResourcePanel,
   WorldSnapshot,
 } from '@swl/client';
+import { resourcePanel } from '@swl/client';
 import type { ContentBundle, ContentItem } from '@swl/content';
 import { QUEST_IDS } from '@swl/rules';
 
@@ -216,6 +218,29 @@ export function questMinLevels(bundle: ContentBundle): Record<number, number> {
     if (typeof level === 'number' && Number.isFinite(level)) out[index] = level;
   }
   return out;
+}
+
+/**
+ * A building's info panel.
+ *
+ * The model is the client's own (`packages/client/src/tooltips.ts`), and
+ * the building is the content's — its name, the resource it produces
+ * and the amount it earns per cycle.
+ */
+export function infoPanel(
+  bundle: ContentBundle,
+  itemId: number | null,
+): ResourcePanel | null {
+  if (itemId === null) return null;
+  const item = bundle.items?.find((entry) => entry.id === itemId);
+  if (!item) return null;
+  // Only a building that produces something has the resource panel.
+  if (!item.collect_type || !item.collect) return null;
+  return resourcePanel({
+    name: item.name,
+    collect_type: item.collect_type,
+    collect: item.collect,
+  });
 }
 
 /**

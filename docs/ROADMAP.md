@@ -1189,6 +1189,13 @@ assault against the new server, and the cheat battery is fully rejected.
       the player has **not visited** — the client's rule, and its quirk, which the
       model's marker slots reproduce. The player's progress is the **server's** (the
       goal state in the private state), so the panel shows what the server says
+- [x] A **click on the map** selects what is under it, and the **info panel** opens
+      (`apps/client/src/ui/info.tsx`): the building's name, the resource it produces
+      and the amount it earns, with the client's own literals. The selection is the
+      client's own — it looks the **server's** tile up rather than guessing — and
+      the collect action names the building and nothing else, so the server decides
+      what is collected and how much. The **end-to-end test** clicks the map and
+      proves the building was selected
 - [x] The **chapter map** is drawn (`apps/client/src/ui/chapters.tsx`): the four
       chapters with the client's own titles and the model's slots — the quest the
       player is on is open, the ones they have not reached are locked, and the ones

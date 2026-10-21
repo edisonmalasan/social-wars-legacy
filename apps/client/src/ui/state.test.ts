@@ -10,6 +10,7 @@ import {
   goalList,
   hudInput,
   hudRules,
+  infoPanel,
   populationItems,
   questMinLevels,
   questRanks,
@@ -208,6 +209,31 @@ describe('the player\'s goals', () => {
     );
     assert.equal(goals[0]!.visited, false);
     assert.equal(goals[0]!.completed, false);
+  });
+});
+
+describe('the info panel', () => {
+  it('is the resource panel of the selected building', () => {
+    const panel = infoPanel(
+      bundle({
+        items: [
+          item({ id: 200, name: 'Farm', collect_type: 'w', collect: 5 }),
+          item({ id: 201, name: 'House I', collect_type: '', collect: 0 }),
+        ],
+      }),
+      200,
+    );
+    assert.equal(panel?.kind, 'resource');
+    assert.equal(panel?.name, 'Farm');
+    assert.equal(panel?.resource, 'w');
+    assert.equal(panel?.earns, 5);
+  });
+
+  it('is nothing when the building produces nothing', () => {
+    const items = bundle({ items: [item({ id: 201, name: 'House I' })] });
+    assert.equal(infoPanel(items, 201), null);
+    assert.equal(infoPanel(items, null), null);
+    assert.equal(infoPanel(items, 9999), null);
   });
 });
 
