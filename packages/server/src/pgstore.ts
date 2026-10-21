@@ -296,3 +296,4 @@ function toWorld(doc: unknown): ShimWorld {
     nextCommandNumber: Number(record['nextCommandNumber'] ?? 1),
   };
 }
+

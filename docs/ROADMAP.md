@@ -729,6 +729,18 @@ protocol and the original dialect.*
       (`POST /api/session`, `DELETE /api/session`). The legacy `USERID` path exists for
       the untouched client, but the bridge is **off by default** and can only map a value
       the server has already bound to a player
+- [x] The players' **credentials are persisted** (`packages/server/src/credentials.ts`),
+      so a player who registered can log in **after the server restarts**. The
+      credential is a **salt and a hash** - the password is never stored - and the
+      hash is compared in constant time
+- [x] A player can be **created**: `POST /api/account` makes one and signs them in.
+      The upstream had no accounts at all - `USERID` came in the request body and
+      anybody could be anybody - so without this nobody could play
+- [x] The hash is a salted SHA-256, which is **fast**, and that is a deliberate
+      trade: the server is a preservation of a 2012 game with a handful of players
+      rather than a bank, the threat is not an offline attack on a stolen table, and
+      a slow hash would make the server's own logins slow. A deployment that grows
+      players should move to a memory-hard hash, and that is a change in one module
 - [x] Every command's resource cost is computed by the server, never accepted from the
       client (F3) — `packages/rules/src/commandcost.ts` derives each cost from the
       content bundle and the command's own arguments, through **one shared loader**
