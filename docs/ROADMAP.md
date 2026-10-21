@@ -1613,6 +1613,14 @@ product.*
       | the simulation tick | 50 ms |
       | the command throughput | 50 a second |
       | the error rate | 1 in 100 |
+      | the **input-to-render** latency | 250 ms |
+- [x] The **input-to-render** latency is measured too: the client sends a command, the
+      server answers, the client fetches the world again and draws it, and the whole
+      round trip is timed. It is the number the **player** waits, and it is measured in a
+      **real browser** by the end-to-end test
+- [x] The client **draws the server's answer**: the native answer carries the outcomes and
+      not the world, so the world is fetched again and drawn. The client asks, the server
+      decides, and the client draws what the server said
 - [ ] The **input-to-render** latency is measured too: the client sends a command and the
       player sees the result, and that is a number the browser has to answer for
 - [ ] The client holds a **stable frame rate** on the largest documented battle

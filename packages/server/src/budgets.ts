@@ -74,6 +74,17 @@ export const BUDGETS: readonly Budget[] = [
     unit: 'ratio',
     why: 'One request in a hundred failing is already too many.',
   },
+  {
+    name: 'input_to_render_p95_ms',
+    measurement: 'input_to_render_p95_ms',
+    limit: 250,
+    comparison: 'below',
+    unit: 'ms',
+    why:
+      'This is the time the PLAYER waits: from the command leaving the ' +
+      'client to the answer being on the screen. The server is fast ' +
+      'enough; this is the number they feel.',
+  },
 ];
 
 /** A budget that was broken. */
