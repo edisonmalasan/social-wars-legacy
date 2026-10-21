@@ -36,3 +36,11 @@ The engine can be run in either place without a second implementation.
 The price is that the speed of the engine is the speed of a scripting
 language's arithmetic, which is adequate for the simulation and is the
 right trade for the iteration speed.
+
+**Note (2026-10-21).** The reason for running the engine in a browser
+has changed. There is no offline mode any more — see
+[ADR 19](./0019-pure-online.md) — but the engine is still free of the
+platform, because the client uses it to **predict** outcomes and to
+generate the projectiles' random scatter. That use decides nothing:
+the server decides every outcome, and the client's predictions are
+only what it draws while it waits for the answer.

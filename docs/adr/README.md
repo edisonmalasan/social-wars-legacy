@@ -15,7 +15,7 @@ reasoning.
 | 4 | [The client is a PixiJS v8 world with a React DOM interface](./0004-pixijs-and-react.md) | accepted |
 | 5 | [The desktop shell is Tauri v2](./0005-the-tauri-desktop-shell.md) | accepted |
 | 6 | [One web client, for the web, the desktop and the mobile](./0006-one-web-client.md) | accepted |
-| 7 | [PostgreSQL for the server, and the same schema over PGlite offline](./0007-postgres-and-pglite.md) | accepted |
+| 7 | [PostgreSQL for the server, and the same schema over PGlite offline](./0007-postgres-and-pglite.md) | superseded |
 | 8 | [Git LFS for the binary assets](./0008-git-lfs-for-the-assets.md) | accepted |
 | 9 | [The client is the specification](./0009-the-client-is-the-specification.md) | accepted |
 | 10 | [The compatibility shim accepts both server keys](./0010-both-server-keys.md) | accepted |
@@ -27,3 +27,4 @@ reasoning.
 | 16 | [The upstream is vendored unmodified, and never linked into the product](./0016-the-upstream-is-vendored-not-linked.md) | accepted |
 | 17 | [The substitute fonts are scaled to the original's metrics](./0017-the-substitute-fonts-are-scaled.md) | accepted |
 | 18 | [The roadmap's item counts are checked](./0018-the-roadmaps-item-counts-are-checked.md) | accepted |
+| 19 | [The product is pure online](./0019-pure-online.md) | accepted |

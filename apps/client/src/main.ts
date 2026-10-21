@@ -149,14 +149,6 @@ export interface ClientHandle {
   claimDailyBonus: typeof claimDailyBonus;
   /** The frames per second the render loop is running at. */
   framesPerSecond: () => number;
-  /**
-   * Open the **offline mode**: the same rules, the same decisions and the
-   * same schema, running in the browser against a local database.
-   *
-   * The database is loaded on demand, because a player who is online
-   * should not pay for it.
-   */
-  openOffline: () => Promise<import('./offline.ts').OfflineMode>;
 }
 
 /** The browser's storage, or null when it refuses to be used. */
@@ -301,10 +293,6 @@ async function main(): Promise<void> {
     run,
     claimDailyBonus,
     framesPerSecond: () => framesPerSecond,
-    openOffline: async () => {
-      const offline = await import('./offline.ts');
-      return offline.openOffline();
-    },
   };
   (window as unknown as { __swl?: ClientHandle }).__swl = handle;
 

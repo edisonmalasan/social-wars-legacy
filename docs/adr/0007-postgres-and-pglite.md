@@ -1,6 +1,12 @@
 # 7. PostgreSQL for the server, and the same schema over PGlite offline
 
-**Status:** accepted
+**Status:** superseded
+
+**Superseded by:** [ADR 19](./0019-pure-online.md) — the product is pure
+online, so there is no offline mode for PGlite to serve in the browser.
+The **database** decision stands: the server's database is PostgreSQL,
+and PGlite is PostgreSQL compiled to WebAssembly, which is what the
+development server and the integration tests use.
 
 ## Context
 

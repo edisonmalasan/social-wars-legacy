@@ -190,9 +190,6 @@ importers:
 
   apps/client:
     dependencies:
-      '@electric-sql/pglite':
-        specifier: ^0.5.10
-        version: 0.5.10
       '@swl/client':
         specifier: workspace:*
         version: link:../../packages/client
@@ -205,9 +202,6 @@ importers:
       '@swl/rules':
         specifier: workspace:*
         version: link:../../packages/rules
-      '@swl/server':
-        specifier: workspace:*
-        version: link:../../packages/server
       pixi.js:
         specifier: ^8.22.0
         version: 8.22.0
