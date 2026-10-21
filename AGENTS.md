@@ -92,6 +92,7 @@ desktop shells do not — they land with Groups F, G and H.**
 | Prepare the desktop shell's inputs | `node scripts/prepare-desktop.mjs` | Working | Group H — the icons and the placeholder |
 | Check the backups are current    | `node scripts/check-backups.mjs --out <dir>` | Working | Group I — fails when the newest is too old |
 | Check the decision records         | `node scripts/check-adrs.mjs` | Working | Group I — `--index` rewrites it |
+| Build the licence report          | `node scripts/build-licence-report.mjs` | Working | Group I — `--check` fails on an unclassified dependency |
 | Check the licensing position        | `node scripts/check-licensing.mjs` | Working | Group I — the claims in `docs/LICENSING.md` |
 | Check nothing that ships needs Flash | `node scripts/check-no-flash.mjs` | Working | Group H — proves it rather than asserting it |
 | Run the cheat battery             | `node scripts/run-cheat-battery.mjs` | Working | Group I — the release gate |

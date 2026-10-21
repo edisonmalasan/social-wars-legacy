@@ -114,6 +114,12 @@ jobs:
       - name: The licensing position holds
         run: node scripts/check-licensing.mjs
 
+      # Every dependency's licence is **classified**, and one that is not
+      # fails the build - so a new dependency has to be looked at before
+      # it can be used.
+      - name: The third-party licences are classified
+        run: node scripts/build-licence-report.mjs --check
+
       # A decision without a rationale is a decision somebody will
       # quietly reverse.
       - name: The decision records are well formed
