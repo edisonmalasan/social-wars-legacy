@@ -94,6 +94,7 @@ desktop shells do not — they land with Groups F, G and H.**
 | Check the report set               | `node scripts/check-report-sync.mjs` | Working | Group I — the report against the code |
 | Lint the project's own rules    | `node scripts/lint-project.mjs` | Working | Group I — the browser must not need node |
 | Check the build is reproducible    | `node scripts/check-reproducible-build.mjs` | Working | Group I — builds the client twice |
+| Check the release checklist        | `node scripts/check-release.mjs` | Working | Group I — the checklist covers the gate |
 | Check the corrections policy      | `node scripts/check-corrections.mjs` | Working | Group I — the notices point at it |
 | Check the security review          | `node scripts/check-security-review.mjs` | Working | Group I — the claims are covered |
 | Check the decision records         | `node scripts/check-adrs.mjs` | Working | Group I — `--index` rewrites it |
