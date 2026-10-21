@@ -7,13 +7,14 @@
   **cross-platform client-server application** — web, desktop and mobile — with no Flash
   dependency, for players and for preservation. Primary users: players who want the game to
   keep working, preservation archivists, and anyone studying the original client's rules.
-- **Current state:** **The investigation is complete and the build has started.** The
+- **Current state:** **The investigation is complete and the build is under way.** The
   repository contains the full reverse-engineering report set (`re/`), the project router
   (`docs/`) and the production roadmap (`docs/ROADMAP.md`). The upstream project under
   analysis is vendored at `upstream/socialwarriors/` with a SHA-256 manifest. The pnpm
   workspace exists with `packages/protocol`, `packages/content` and `packages/rules`; the
-  content pipeline builds a validated, hashed bundle from the upstream config. The client,
-  server and desktop shells land with roadmap Groups F, G and H.
+  content pipeline builds a validated, hashed bundle from the upstream config. The
+  **server** (Groups F), the **web client** (Group G) and the **desktop shell** (Group H)
+  exist; the mobile shell (Group G5) does not yet.
 
 ## Source of Truth
 
@@ -51,22 +52,23 @@ Decisions" section of `docs/ROADMAP.md`) but is *not yet implemented*. Only rows
 | Server core          | TypeScript, in `@swl/server`                | **Present** | `packages/server/src/` — the sessions, the compatibility shim, the command applier, the save migration |
 | Server application   | TypeScript on `node:http`, in `apps/server` | **Present** | `apps/server/src/` — the routing, the limits, the native and legacy endpoints |
 | Client core          | TypeScript, in `@swl/client`                | **Present** | `packages/client/src/` — the isometric projection, the depth sort, the atlas index |
-| Game client (web)    | TypeScript + PixiJS v8 (WebGL2) + React DOM | Planned | `docs/ROADMAP.md` Locked Decisions |
-| Desktop shell        | Tauri v2 (Rust) over the same web client     | Planned | `docs/ROADMAP.md` Group H        |
+| Game client (web)    | TypeScript + PixiJS v8 (WebGL2) + React DOM | **Present** | `apps/client/src/` — the renderer, the scene, the React interface |
+| Desktop shell        | Tauri v2 (Rust) over the same web client     | **Present** | `apps/desktop/src-tauri/` — the window, the remote server's certificate check |
 | Mobile shell         | Capacitor over the same web client          | Planned | `docs/ROADMAP.md` Group G5       |
 | Server + rules engine| TypeScript on Node.js 26                     | **Present** | `apps/server` and `packages/rules` |
 | Database             | PostgreSQL (server); PGlite for the development server and the tests | **Present** | `packages/server/src/pgstore.ts` |
 | Upstream reference   | Python 3.9 + Flask 2.2.5                    | Present (vendored, read-only) | `upstream/socialwarriors/` |
 | Asset tooling        | JPEXS FFDec 26.3.0 (Java 21), Git LFS 3.7.1 | Present | `re/docs/05-assets-and-content-pipeline.md` |
 | Reverse engineering  | REA MCP (Ghidra 12.1.4 headless)             | Present | `re/docs/07-REA-EVIDENCE.md`     |
-| Tests                | Node's built-in test runner (`node --test`) | **Present** | `pnpm test` — 28 tests, no test-framework dependency |
+| Tests                | Node's built-in test runner (`node --test`) | **Present** | `pnpm test` — 1260 tests, no test-framework dependency |
 
 ## Build, Test, and Development Commands
 
 _Use commands that really exist in this repository. Never invent a script._
 
-**The workspace and the content pipeline exist (roadmap Group C). The client, server and
-desktop shells do not — they land with Groups F, G and H.**
+**The workspace, the content pipeline, the server, the web client and the desktop shell
+exist (roadmap Groups C, F, G and H). The mobile shell does not — it lands with
+Group G5.**
 
 | Purpose                     | Command                            | Status | Evidence / notes |
 | --------------------------- | ---------------------------------- | ------ | ---------------- |
@@ -75,7 +77,7 @@ desktop shells do not — they land with Groups F, G and H.**
 | Run the tests               | `pnpm test`                        | Working | Group C — Node's built-in runner, no test-framework dependency |
 | Build the content bundle    | `pnpm build:content`               | Working | Group C |
 | Validate the content bundle | `pnpm check:content`               | Working | Group C — same checks, no write |
-| Build everything            | `pnpm build`                       | Working | Group C — currently the content build only |
+| Build everything            | `pnpm build`                       | Working | Group C — the content build; the client's is `pnpm --filter @swl/app-client build` |
 | Verify the vendored upstream | `node scripts/verify-upstream.mjs` | Working | Group A — fails on any drift |
 | Re-vendor the upstream releases | `node scripts/vendor-releases.mjs` | Working | Group A — needs the upstream checkout |
 | Fetch the vendored assets   | `node scripts/pull-assets.mjs`     | Working | Group A — targeted LFS pull |
@@ -109,7 +111,9 @@ desktop shells do not — they land with Groups F, G and H.**
 | Soak the server | `node --expose-gc scripts/soak-server.mjs` | Working | Group F4 — no memory growth, no state drift |
 | Check the command catalogue against the client | `node scripts/verify-command-catalogue.mjs` | Working | Group F2 — fails on any difference |
 | Refresh the code graph | `graphify extract . --code-only` | Working | Derived knowledge; run after a structural change |
+| Fetch and measure the substitute fonts | `node scripts/fetch-fonts.mjs` | Working | Group D — downloads them and measures the scale |
 | Run the client (dev)        | `pnpm --filter @swl/app-client dev`    | Working | Group G |
+| Build the client            | `pnpm --filter @swl/app-client build`  | Working | Group G — fetches the fonts, then builds |
 | Run the server (dev)        | `pnpm --filter @swl/app-server dev`    | Working | Group F — `apps/server` |
 | Golden-master rules diff    | `pnpm --filter rules test:golden`  | Planned | Group E4 |
 
