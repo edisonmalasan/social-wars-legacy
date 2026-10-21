@@ -44,9 +44,10 @@ const ROOT = process.cwd();
  * - the client application, because it is a browser application;
  * - the rules engine, because it runs in a browser worker for the
  *   offline mode;
- * - the applier, because the offline mode runs the **server's** applier
- *   in the browser, so that the offline game makes the same decisions
- *   the server does.
+ * - the applier, because it is the **authority**, and it is reachable
+ *   on its own: the server package's index pulls in the sessions and the
+ *   credentials, which need the platform, so the applier has its own
+ *   entry point and stays free of it.
  */
 const BROWSER_SAFE_ENTRIES = [
   'apps/client/src/main.ts',

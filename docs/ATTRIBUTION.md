@@ -51,7 +51,7 @@ that matter most to a user are:
 | [Rubik Mono One](https://fonts.google.com/specimen/Rubik+Mono+One) | SIL OFL 1.1 | The substitute for Komika Axis |
 | [Tauri](https://tauri.app) | MIT / Apache-2.0 | The desktop shell |
 | [PixiJS](https://pixijs.com) | MIT | The client's renderer |
-| [PGlite](https://pglite.dev) | Apache-2.0 | The offline database |
+| [PGlite](https://pglite.dev) | Apache-2.0 | The development server's database, and the tests' |
 | [TypeScript](https://www.typescriptlang.org) | Apache-2.0 | The language |
 
 The vendored upstream's own dependencies are listed in its

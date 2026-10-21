@@ -35,12 +35,12 @@ these requires a written rationale and a roadmap amendment.*
 | Decision | Rationale |
 |---|---|
 | **TypeScript monorepo** (pnpm workspaces) | One language for the rules engine, server and client; shared protocol types with zero drift |
-| **Rules engine in TypeScript, deterministic and seeded** | The 229 unit delegates (1.32 MB of bespoke AS3) must be iterated against the original client; iteration speed dominates. The same engine must run in Node (multiplayer) and in a browser worker (offline) |
+| **Rules engine in TypeScript, deterministic and seeded** | The 229 unit delegates (1.32 MB of bespoke AS3) must be iterated against the original client; iteration speed dominates. The same engine must run in Node (the server) and in the browser (the client's predictions), so it is free of the platform |
 | **Server-authoritative simulation** | Combat, resource costs and rewards must be decided by the server. The client renders and requests, never decides |
 | **Client = PixiJS v8 (WebGL2) world + React DOM UI** | Pixi batches thousands of sprites, filters and particles; React handles the ~60–80 text-heavy panels far better than a canvas |
 | **Tauri v2 desktop shell** wrapping the same web client | Native window/menus/tray, no Chromium version drift, small installer overhead. *Fallback: Electron if WebView2/WebGL2 proves problematic on a target platform* |
 | **One web client → web, desktop (Tauri) and mobile (Capacitor)** | The client is the single source of truth for presentation |
-| **PostgreSQL + Drizzle for the server; the same schema over PGlite for offline play** | One schema, one query layer, no second persistence dialect to maintain |
+| **PostgreSQL for the server; PGlite — the same PostgreSQL in WebAssembly — for the development server and the tests** | One schema, one query layer, no second persistence dialect to maintain. The product is **pure online** (ADR 19), so there is no offline database |
 | **Git LFS for binary assets** | `assets/` is 716.8 MB; LFS keeps the repository at pointers while `git lfs pull` restores content |
 
 ### Findings that constrain the implementation
@@ -910,7 +910,7 @@ protocol and the original dialect.*
       tree of mixed types
 - [x] The **player store's interface is asynchronous**, because a database is
       asynchronous, and the application and its tests await it. The in-memory store is
-      the reference implementation and the offline mode's
+      the reference implementation and the client's
 - [x] The **save document format** is migrated from the upstream schema (12 `playerInfo` +
       28 `maps[]` + 47 `privateState` fields) with a tested, versioned migration path -
       the **47 `privateState` fields are now known exactly** (from the upstream's
@@ -922,7 +922,7 @@ protocol and the original dialect.*
       it is read, and a save from a version this server does not understand is
       **refused** rather than guessed at
 - [x] A backup and restore procedure exists and has been **exercised against a real
-      snapshot** — the database is a directory in the offline mode, so a backup is a copy
+      snapshot** — the database is a directory on the server, so a backup is a copy
       of it and a restore is opening the copy (\packages/server/src/backup.ts\,
       \scripts/backup-server.mjs\). The tests write a database, back it up, change the
       live database, restore the snapshot and check that the snapshot still holds the
@@ -1294,22 +1294,27 @@ assault against the new server, and the cheat battery is fully rejected.
       covered by the shell's tests
 - [ ] The remote server's **certificate** is checked and the address is shown to the
       player before the game connects to it
-- [x] **Offline single-player works** via the in-browser rules engine over **PGlite**,
-      with the **same schema** as the server (`apps/client/src/offline.ts`). It is not a
-      second implementation: the **same applier** runs, over the **same migrations**, so
-      the offline game makes the same decisions the server does
-- [x] The database is **PostgreSQL compiled to WebAssembly**, stored in IndexedDB, and it
-      is **loaded on demand** - a player who is online does not pay for it
-- [x] The offline mode is **proved in a real browser**: the end-to-end test opens it in
-      Chrome and Edge, plays a command through it, and checks that the world changed and
-      that the schema is the server's
-- [x] It is **single-player**, and that is stated: there is no account and no password,
-      because the credential hashing is the one part of the authentication that needs the
-      platform, and an offline player has nobody to authenticate to
-- [x] Running the server's applier in the browser **forced the packages apart**: the
-      applier, the migrations, the schema and the legacy framing each have their **own**
-      entry point, so the browser's graph reaches the authority without the sessions,
-      the credentials or the backups - which need the platform
+- [x] The product is **pure online** (ADR 19). The client never decides an outcome, never
+      keeps a world of its own and never runs the rules engine to settle a battle: every
+      command goes to the server, and the server's answer is what is drawn. The original
+      game was a server game, and this one is too
+- [x] The **offline single-player mode is dropped**, with the reason recorded: it put the
+      whole authority in the browser, where the rules are readable and the save is a file
+      the player owns, and it was a second place for the rules to be right in. The mode was
+      built and proved, and then deliberately removed — the code is not in the tree and the
+      client's bundle carries no database
+- [x] The **rules engine stays free of the platform** all the same, because the client uses
+      it to **predict** outcomes and to generate the projectiles' random scatter. That use
+      decides nothing: the server decides every outcome, and the client's predictions are
+      only what it draws while it waits for the answer
+- [ ] A player with **no server** cannot play. That is the original game's position, and the
+      out-of-scope section below says so plainly
+- [x] The server's packages are **apart** anyway: the applier, the migrations, the schema
+      and the legacy framing each have their **own** entry point, so a caller that wants
+      only the authority reaches it without the sessions, the credentials or the backups -
+      which need the platform. The client's graph is checked for the same thing, and the
+      rule engine's own index no longer carries the cheat battery, which is the server's
+      check that it does not trust the client
 - [ ] Installers are produced for Windows (`.msi` + `.exe`), macOS (`.dmg`) and Linux
       (`.deb`/`.AppImage`)
 - [ ] The binaries are code-signed, and the macOS build is notarised
@@ -1412,7 +1417,7 @@ product.*
         application - the web build, the desktop shell's web view and the mobile build all
         run it in a web view - and a `node:` import in the graph is a build failure at best
       - the **rules engine must not import `node:`**, because it runs in a browser worker
-        for the offline mode (ADR 2)
+        for the client's predictions (ADR 2)
 - [x] The first rule is a **reachability** check, not a grep: a module that imports `node:`
       is fine if nothing the browser loads reaches it, and the check says so. It follows the
       static imports, the re-exports and the **dynamic** imports, and it resolves the

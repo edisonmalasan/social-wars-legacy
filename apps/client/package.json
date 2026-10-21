@@ -15,9 +15,7 @@
     "@swl/content": "workspace:*",
     "@swl/protocol": "workspace:*",
     "@swl/rules": "workspace:*",
-    "pixi.js": "^8.22.0",
-    "@electric-sql/pglite": "^0.5.10",
-    "@swl/server": "workspace:*"
+    "pixi.js": "^8.22.0"
   },
   "devDependencies": {
     "typescript": "^5.7.2",
