@@ -34,7 +34,7 @@ import {
   signPayload,
   verifyFrameAny,
   type ServerKey,
-} from '@swl/protocol';
+} from '@swl/protocol/commandphp';
 
 import {
   applyCommandCost,

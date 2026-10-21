@@ -67,6 +67,8 @@ import {
 
 import type { CommandApplier, CommandOutcome, ShimWorld } from './shim.ts';
 
+export type { CommandApplier, CommandOutcome, ShimWorld } from './shim.ts';
+
 /** The map item tuple, as the upstream stores it. */
 export type MapItemTuple = [
   /** The content item id. */
