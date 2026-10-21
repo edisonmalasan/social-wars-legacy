@@ -1418,7 +1418,21 @@ product.*
         expired one is refused **and forgotten** rather than kept
       The password is not stored: the credential is a salt and a hash, and the test
       checks that the store's own text does not contain the password
-- [ ] A security review of the auth, command and shim layers is completed
+- [x] A **security review** of the auth, command and shim layers is completed
+      (`docs/SECURITY.md`). It is a review rather than a checklist: the threat, what the
+      code does about it, **what is left**, and what would have to change to close it
+- [x] The review's claims are **covered**: every one of them names the test or script that
+      checks it, and `node scripts/check-security-review.mjs` fails if a file the review
+      names is **not there** - because a review that points at a test which is not there is
+      a review that has drifted
+- [x] The review records the **five findings that are left**, with their severity and their
+      status: the fast password hash (a deliberate trade, and recorded), the legacy
+      frame's lack of freshness (harmless, because the replay is caught by the command
+      index), the bridge as a bearer token (off by default), the unauthenticated request's
+      per-address limit, and the token's lack of scope
+- [x] The three properties that matter are **not** findings, because they are checked: the
+      server computes the costs, the server re-simulates the outcomes, and the client
+      declares nothing
 - [x] The **client is not trusted for anything**, and the **cheat battery is re-run on
       every release** (`node scripts/run-cheat-battery.mjs`, and it is in the release
       workflow's gate). Eleven attacks, each run against the **real** authority layer,
