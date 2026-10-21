@@ -37,6 +37,11 @@ export const LICENCES = {
   typescript: { licence: 'Apache-2.0', why: 'the language' },
   'pixi.js': { licence: 'MIT', why: "the client's renderer" },
   vite: { licence: 'MIT', why: "the client's build" },
+  react: { licence: 'MIT', why: "the interface's renderer" },
+  'react-dom': { licence: 'MIT', why: "the interface's renderer" },
+  '@types/react': { licence: 'MIT', why: 'the renderer types' },
+  '@types/react-dom': { licence: 'MIT', why: 'the renderer types' },
+  '@vitejs/plugin-react': { licence: 'MIT', why: "the client's build" },
 
   // The Rust.
   tauri: { licence: 'MIT OR Apache-2.0', why: 'the desktop shell' },

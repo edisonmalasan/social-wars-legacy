@@ -172,7 +172,14 @@ export async function signIn(
 
 /** The player's wallet, as the server sends it. */
 export interface WorldSnapshot {
-  maps: { id: number; items: Record<string, number[]> }[];
+  maps: {
+    id: number;
+    items: Record<string, number[]>;
+    /** The player's level. The original keeps it on the map. */
+    level?: number;
+    /** The XP the player has. */
+    xp?: number;
+  }[];
   privateState: Record<string, unknown>;
-  resources?: Resources;
+  resources: Resources;
 }

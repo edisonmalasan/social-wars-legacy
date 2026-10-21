@@ -8,7 +8,7 @@
  * resources and its buildings all come from the server's answer, and
  * the client draws them. It never decides an outcome.
  */
-import { AtlasIndex, type FrameManifest } from '@swl/client';
+import { AtlasIndex, type FrameManifest, type WorldSnapshot } from '@swl/client';
 
 import { buildScene, type SceneItem } from './scene.ts';
 import { WorldRenderer } from './renderer.ts';
@@ -27,8 +27,12 @@ import type { NativeCommand, NativeResponse } from '@swl/protocol';
 import type { ContentBundle, ContentItem } from '@swl/content';
 import { claimDailyBonus } from '@swl/client';
 
+import { mountUi } from './ui/mount.tsx';
+import { uiCss } from './ui/css.ts';
+
 const STAGE = document.getElementById('stage');
 const GAME = document.getElementById('game');
+const UI = document.getElementById('ui');
 
 /** Where the content and the atlas live. */
 const CONTENT_URL = '/content-bundle.json';
@@ -48,10 +52,11 @@ function installStyles(): void {
   document.head.appendChild(style);
 }
 
-/** The player's world, as the server sends it. */
-interface ServerWorld {
-  maps: { id: number; items: Record<string, number[]> }[];
-  privateState: Record<string, unknown>;
+/** The interface's stylesheet, the same way. */
+function installUiStyles(): void {
+  const style = document.createElement('style');
+  style.textContent = uiCss();
+  document.head.appendChild(style);
 }
 
 /** Fetch and parse a JSON file. */
@@ -64,7 +69,7 @@ async function json<T>(url: string, init?: RequestInit): Promise<T> {
 }
 
 /** The items of a map, as the scene sees them. */
-function sceneItems(world: ServerWorld, content: ContentBundle): SceneItem[] {
+function sceneItems(world: WorldSnapshot, content: ContentBundle): SceneItem[] {
   const map = world.maps[0];
   if (!map) return [];
 
@@ -211,6 +216,7 @@ async function main(): Promise<void> {
   if (!STAGE || !GAME) throw new Error('the page has no stage');
 
   installStyles();
+  installUiStyles();
   status('starting');
 
   // The session. A stored one is used, and if there is none the player
@@ -261,11 +267,20 @@ async function main(): Promise<void> {
   let scene = buildScene(sceneItems(world, content), renderer.viewport, atlas);
   renderer.draw(scene);
 
-  async function fetchWorld(): Promise<ServerWorld> {
-    return json<ServerWorld>('/api/world', {
+  async function fetchWorld(): Promise<WorldSnapshot> {
+    return json<WorldSnapshot>('/api/world', {
       headers: { authorization: authorizationHeader(signedIn) },
     });
   }
+
+  /**
+   * The interface.
+   *
+   * It is drawn from the **same** world the scene is: one answer, one
+   * drawing. The interface asks the server for nothing of its own.
+   */
+  const ui = UI ? mountUi(UI, content) : null;
+  ui?.draw(world);
 
   /**
    * Send a batch of commands and draw the answer.
@@ -278,6 +293,9 @@ async function main(): Promise<void> {
     world = await fetchWorld();
     scene = buildScene(sceneItems(world, content), renderer.viewport, atlas);
     renderer.draw(scene);
+    // The interface is redrawn from the same answer, so the numbers in
+    // the top bar and the buildings on the map never disagree.
+    ui?.draw(world);
     return {
       ok: result.ok,
       latencyMs: performance.now() - started,
