@@ -191,7 +191,7 @@ Do not create extra ICM stage folders or permanent plan files unless the task be
 2. Before modifying files, check `git status`, switch to `main`, pull the latest `origin/main`, create a task branch, and push it with upstream tracking.
 3. Commit at logical checkpoints and push changes to the remote.
 4. Use the `git` subagent when available; otherwise, use permitted Git tools.
-5. After implementation, run relevant tests, resolve issues, and **merge verified work into `main`**. Follow required CI checks and branch protections.
+5. After implementation, run relevant tests, resolve issues, and **merge verified work into `main` through a pull request**. `main` is **protected**: the CI's four checks must pass, the conversations must be resolved, and a direct push is refused — so the work arrives as a PR, the CI runs on it, and it is merged once it is green (`gh pr merge --merge`).
 6. Never discard existing changes, force-push, or commit temporary agent-generated plans unless explicitly authorized.
 7. **Do not consider a task complete until it is verified, merged, and reflected in `docs/ROADMAP.md`.**
 
@@ -203,6 +203,11 @@ git switch main
 git pull --ff-only origin main
 git switch -c <branch-name>
 git push -u origin <branch-name>
+gh pr create --base main --head <branch-name> --title "<title>" --body "<what and why>"
+gh pr checks          # the four CI checks
+gh pr merge --merge   # once they are green
+git switch main
+git pull --ff-only origin main
 ```
 
 If the working tree is dirty or Git operations are blocked, resolve safely without overwriting existing work.

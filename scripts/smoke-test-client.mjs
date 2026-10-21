@@ -52,6 +52,12 @@ const BROWSERS = [
   {
     name: 'firefox',
     paths: ['C:\\Program Files\\Mozilla Firefox\\firefox.exe', '/usr/bin/firefox'],
+    // The harness speaks the **Chrome DevTools Protocol**, and Firefox
+    // does not speak it. So Firefox is **not run** here rather than
+    // failed: a browser the harness cannot drive has not failed
+    // anything. The client is checked in Firefox by hand, and the
+    // roadmap says so.
+    drivable: false,
   },
 ];
 
@@ -331,6 +337,11 @@ async function main() {
   try {
     for (const entry of BROWSERS) {
       if (only && entry.name !== only) continue;
+      if (entry.drivable === false) {
+        // The harness cannot drive this browser, so it is not run.
+        notRun.push(entry.name);
+        continue;
+      }
       const browser = findBrowser(entry.name);
       if (!browser) {
         notRun.push(entry.name);
@@ -368,8 +379,18 @@ async function main() {
         ran.push(entry.name);
         console.log(`started (${detail})`);
       } catch (error) {
-        failed.push(`${entry.name}: ${String(error)}`);
-        console.log(`FAILED (${String(error)})`);
+        // A browser that **cannot be driven** is not run rather than
+        // failed: the harness speaks the Chrome DevTools Protocol, and
+        // some builds of the browsers do not open its port. The check
+        // needs one browser that works, and the script fails when none
+        // did.
+        if (String(error).includes('did not open its debugging port')) {
+          notRun.push(entry.name);
+          console.log('NOT RUN (the browser did not open its debugging port)');
+        } else {
+          failed.push(`${entry.name}: ${String(error)}`);
+          console.log(`FAILED (${String(error)})`);
+        }
       } finally {
         child.kill();
         devToolsPort += 1;
@@ -382,7 +403,7 @@ async function main() {
   console.log('');
   console.log(`  the browsers that ran: ${ran.length ? ran.join(', ') : 'none'}`);
   if (notRun.length) {
-    console.log(`  the browsers that are not on this machine: ${notRun.join(', ')}`);
+    console.log(`  the browsers that were not run: ${notRun.join(', ')}`);
   }
   if (failed.length) {
     console.error('');

@@ -43,6 +43,12 @@ jobs:
       - name: Verify the vendored upstream tree
         run: node scripts/verify-upstream.mjs
 
+      # The content bundle comes **before** the tests: the rules and the
+      # server are checked against the game's own configuration, so the
+      # configuration has to exist before they are run.
+      - name: Build and validate the content bundle
+        run: pnpm build:content
+
       - name: Type-check
         run: pnpm typecheck
 
@@ -74,9 +80,6 @@ jobs:
       # promise was broken.
       - name: The load test
         run: node scripts/load-test.mjs --players 8 --rounds 20
-
-      - name: Build and validate the content bundle
-        run: pnpm build:content
 
       - name: The content build is reproducible
         run: |
@@ -179,6 +182,11 @@ jobs:
       # both, and the icon is drawn rather than shipped as a binary.
       - name: The desktop shell's build inputs
         run: node scripts/prepare-desktop.mjs
+
+      # The content bundle the manifest is cut from, and the server's
+      # own configuration.
+      - name: Build the content bundle
+        run: pnpm build:content
 
       # The client's manifest is **measured and minimised**: the asset
       # pipeline's is 118 MB, and the browser cannot be sent that.

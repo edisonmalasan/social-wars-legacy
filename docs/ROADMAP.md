@@ -1350,7 +1350,8 @@ assault against the new server, and the cheat battery is fully rejected.
       forgotten rather than sent, and the token travels in the `Authorization` header
 - [x] A browser that is **not on the machine** is reported as *not run* rather than as a
       failure: a machine without Firefox has not failed anything. Firefox and Safari
-      are not on this machine, so they are **not run** here
+      are not on this machine, so they are **not run** here — and the harness
+      speaks the Chrome DevTools Protocol, so it could not drive them anyway
 - [ ] The client is run in **Firefox and Safari** as well, on a machine that has them
 - [ ] The client is driven through a **complete play session** end to end, from signing
       in to finishing the tutorial
@@ -1546,7 +1547,41 @@ product.*
 - [x] **Every pull request runs the golden-master harness.** The CI runs on every push
       and every pull request, and the golden-master corpus is one of its steps - and
       the harness fails on any difference it cannot explain
-- [ ] Branches are protected and require a green run plus review
+- [x] Branches are protected and require a green run: `main` is protected, the four
+      CI checks (**Verify**, **The desktop shell**, **Assets** and **Scan**) must
+      pass and be up to date, the conversations must be resolved, and there are no
+      force-pushes and no deletions. The protection is **enforced for the
+      administrators too**, so a direct push to `main` is refused and the work
+      arrives through a pull request
+- [x] The protection does **not** require a review. The repository has **one**
+      maintainer, so a required approval would leave nobody able to merge: the
+      review is a decision for a second pair of eyes, and the green run is the
+      gate that can be enforced today
+- [x] The **CI is green** again: the unit tests read the content bundle, and the
+      bundle is a **build output**, so the CI built it *after* the tests — the
+      tests failed on a file that did not exist yet, and every merge since was
+      red. The build now comes **before** the tests, and `pnpm test` builds it
+      itself, so a fresh clone's tests work too
+- [x] The **soak test** runs again: it asked the protocol's index for the legacy
+      framing, and that framing moved behind a **subpath export** so the browser's
+      graph never reaches it. The tool asks for the subpath now
+- [x] The **smoke test** no longer fails on Firefox: the harness speaks the
+      **Chrome DevTools Protocol**, and Firefox does not speak it, so Firefox is
+      reported as *not run* rather than as a failure — a browser the harness cannot
+      drive has not failed anything. The client is checked in Firefox by hand
+- [x] The tests that read the **asset pipeline's** manifest skip when it is not
+      there: it is a 154 MB build artefact and it is not committed, so the checks
+      that need it were failing on a machine that had never run the pipeline. The
+      client's own manifest is checked either way
+- [x] A browser the harness **cannot drive** is *not run* rather than *failed*:
+      the harness speaks the Chrome DevTools Protocol, and some builds of the
+      browsers do not open its port. The session needs one browser that works, and
+      both scripts fail when none did
+- [x] The **command catalogue's** check does not need the decompiled client to
+      run: the client's own command classes are the authority and they are not
+      there on a machine that has not decompiled the SWF, so the check compares
+      the report's catalogue with the protocol's list and says which comparison
+      it could not make
 - [x] **Release artefacts are produced automatically and published to a release**
       (`.github/workflows/release.yml`). A tag starts the workflow, which runs the
       **whole gate** - the golden master, the cheat battery, the coverage and the
