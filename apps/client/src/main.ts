@@ -12,7 +12,7 @@ import { AtlasIndex, type FrameManifest, type WorldSnapshot } from '@swl/client'
 
 import { buildScene, type SceneItem } from './scene.ts';
 import { WorldRenderer } from './renderer.ts';
-import { clientCss } from './fonts.ts';
+import { applyFontScales, clientCss, type FontScaleFile } from './fonts.ts';
 import {
   authorizationHeader,
   forgetSession,
@@ -38,6 +38,8 @@ const UI = document.getElementById('ui');
 const CONTENT_URL = '/content-bundle.json';
 const MANIFEST_URL = '/frame-manifest.json';
 const ATLAS_BASE = '/atlases';
+/** Where the measured font scale lives. */
+const FONT_SCALE_URL = '/font-scale.json';
 
 /**
  * The stylesheet.
@@ -242,6 +244,12 @@ async function main(): Promise<void> {
 
   const manifest = await json<FrameManifest>(MANIFEST_URL);
   const content = await json<ContentBundle>(CONTENT_URL);
+
+  // The substitute fonts' scale. It is measured against the file that
+  // ships, and it is **optional**: without it the text is a little
+  // narrower than the original's and the game still reads.
+  const scales = await json<FontScaleFile>(FONT_SCALE_URL).catch(() => null);
+  if (scales) applyFontScales(scales, document.documentElement);
 
   const renderer = await WorldRenderer.start({
     element: GAME,

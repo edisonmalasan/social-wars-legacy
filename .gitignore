@@ -16,3 +16,9 @@ apps/desktop/src-tauri/gen/
 # The client's manifest and the content bundle it travels with ARE
 # COMMITTED: the client needs them to build and to run, and the asset
 # pipeline's 148 MB manifest - which they are derived from - is not.
+
+# The substitute fonts are FETCHED at build time: they are open-licensed
+# and they are large, and the scale that goes with them is measured from
+# the file that actually ships.
+apps/client/public/fonts/
+apps/client/public/font-scale.json

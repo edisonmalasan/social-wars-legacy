@@ -1204,7 +1204,22 @@ assault against the new server, and the cheat battery is fully rejected.
       and the languages are recorded: the client loads fonts for English, Turkish and
       Greek, and only the English ones ship, so the clone ships one set and falls back
       the same way
-- [ ] Text renders with the substituted fonts at the original metrics
+- [x] The **substitutes are fetched and measured** (`scripts/fetch-fonts.mjs`): the
+      open-licensed faces are downloaded at build time, their advance widths are
+      read with the same parser the originals were measured with
+      (`scripts/lib/ttf.ts`), and the **scale** each one needs is computed against
+      the original's widths — **1.0183** for Nunito against Arial Rounded MT Bold,
+      and **0.7344** for Rubik Mono One against Komika Axis. The scale is written
+      where the client reads it, and the client's text is sized by it, so the
+      substitute occupies the width the original did
+- [x] The **failure is honest**: a failed download leaves the game playable with
+      the platform's own font — the layout shifts and the text still reads — and
+      the scale stays at the "not tuned yet" value of 1. The face that ships is
+      the face that is used, so the measured scale is the one that applies
+- [ ] Text renders with the substituted fonts at the original metrics — the **body**
+      face does, and the end-to-end test proves the scale is applied; the
+      **display** face has no use yet, because the headings that would use it are
+      not drawn
 - [x] The client's **defence slot shows the attack interval**, in both the tooltip and
       the info panel. That is the client's behaviour in *both* places, so it is not a
       slip in one of them, and the clone reproduces it rather than "fixing" it — the

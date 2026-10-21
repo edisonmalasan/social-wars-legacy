@@ -508,6 +508,37 @@ async function main() {
         }
         console.log(`  the top bar shows ${hud.gold} gold`);
 
+        // The substitute fonts' **scale**. The client applies the
+        // measured factor to the text, so the substitute occupies the
+        // same width as the original did. The factor is a number, and
+        // the file it comes from has to be served.
+        const scale = await page.evaluate(
+          `(async () => {
+             const applied = getComputedStyle(document.documentElement)
+               .getPropertyValue('--swl-font-scale-body').trim();
+             const response = await fetch('/font-scale.json');
+             const file = response.ok ? await response.json() : null;
+             return {
+               applied,
+               served: response.ok,
+               measured: file?.scales?.ArialRoundedBold ?? null,
+             };
+           })()`,
+        );
+        if (!scale || !Number.isFinite(Number(scale.applied))) {
+          failures.push(`${entry.name}: the font scale is not a number ("${scale?.applied}")`);
+          console.log('FAILED (the font scale is not a number)');
+          continue;
+        }
+        if (!scale.served || !Number.isFinite(Number(scale.measured))) {
+          failures.push(`${entry.name}: the measured font scale was not served`);
+          console.log('FAILED (the measured font scale was not served)');
+          continue;
+        }
+        console.log(
+          `  the substitute font is scaled by ${scale.applied} (the file says ${scale.measured})`,
+        );
+
         // The render loop's rate. In a **headless** browser this is not
         // the game's real frame rate - there is no GPU and the frames are
         // throttled - but it does prove the loop is running. The rate is
