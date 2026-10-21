@@ -1624,6 +1624,19 @@ product.*
 - [ ] The **input-to-render** latency is measured too: the client sends a command and the
       player sees the result, and that is a number the browser has to answer for
 - [ ] The client holds a **stable frame rate** on the largest documented battle
+- [x] The client **runs a render loop** (`apps/client/src/renderer.ts`): the game is
+      animated, so the client keeps drawing, and the loop is what advances the sprites and
+      what keeps the screen alive between the world's changes. The rate is measured over a
+      second, because a frame's own duration says nothing about the rate
+- [x] The **animation's frames are recoverable**. A sprite's sheet holds one frame per
+      (animation, direction) - the client picks them with `iAnimation * 5 + frameDirection`
+      - and each of those holds a **sub-clip**, the little movie of the animation. The
+      conversion **flattened** the sub-clips, because a sub-clip is a timeline rather than a
+      drawing, but the sub-clip's frames are the symbol's **distinct** drawings and they
+      appear in the sheet in the order the sub-clip plays them, so the order is recoverable
+      (`AtlasIndex.animationFrames`)
+- [ ] The frame rate is measured on a **real GPU** with the **largest documented battle**,
+      which is not the same thing as a headless browser's throttled frames
 - [ ] The client holds a stable frame rate on the largest documented battle
 - [x] The **asset bundle size is measured and minimised**
       (`node scripts/build-client-manifest.mjs`). The asset pipeline's manifest holds
