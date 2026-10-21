@@ -1196,6 +1196,17 @@ assault against the new server, and the cheat battery is fully rejected.
       the collect action names the building and nothing else, so the server decides
       what is collected and how much. The **end-to-end test** clicks the map and
       proves the building was selected
+- [x] The server can **list the players**, and the **neighbour strip** has an endpoint:
+      `GET /api/neighbours` answers the other players with their names, their levels
+      and their experience. The store's `list()` is the reference implementation and
+      the database's is the same query. The clone has no **static villages** — the
+      original's neutral towns are a fact about the game that only the vendored
+      upstream records — so the flag is false and the strip shows the players
+- [x] The **neighbour strip** is drawn (`apps/client/src/ui/neighbours.tsx`): the other
+      players with their names, their levels and their experience, in the **server's**
+      order. The client shows a neighbour's Facebook photo, which the clone does not
+      have — the original's `graph.facebook` calls are inert here — so the portrait
+      is a placeholder and the rest of the strip is the game's
 - [x] The **chapter map** is drawn (`apps/client/src/ui/chapters.tsx`): the four
       chapters with the client's own titles and the model's slots — the quest the
       player is on is open, the ones they have not reached are locked, and the ones

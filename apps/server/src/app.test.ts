@@ -99,6 +99,44 @@ function legacyRequest(path: string, fields: Record<string, string>): AppRequest
   return { method: 'POST', path, headers: form({}), body };
 }
 
+describe('the neighbour strip', () => {
+  it('lists the other players, and not the player asking', async () => {
+    const { handle, token } = await app({
+      store: new MemoryPlayerStore([
+        { playerId: 'p1', world: world() },
+        {
+          playerId: 'p2',
+          world: world({
+            save: {
+              playerInfo: { name: 'bob' },
+              maps: [{ id: 1, level: 4, xp: 120 }],
+              privateState: {},
+            },
+          }),
+        },
+      ]),
+    });
+    const response = await handle(
+      request('GET', '/api/neighbours', '', { authorization: `Bearer ${token}` }),
+    );
+    assert.equal(response.status, 200);
+    const body = JSON.parse(response.body) as {
+      neighbours: { id: string; name: string; level: number; xp: number }[];
+    };
+    assert.equal(body.neighbours.length, 1);
+    assert.equal(body.neighbours[0]!.id, 'p2');
+    assert.equal(body.neighbours[0]!.name, 'bob');
+    assert.equal(body.neighbours[0]!.level, 4);
+    assert.equal(body.neighbours[0]!.xp, 120);
+  });
+
+  it('refuses a request with no session', async () => {
+    const { handle } = await app();
+    const response = await handle(request('GET', '/api/neighbours'));
+    assert.equal(response.status, 401);
+  });
+});
+
 describe('the form parser', () => {
   it('decodes the fields', () => {
     assert.deepEqual(parseForm('a=1&b=two'), { a: '1', b: 'two' });

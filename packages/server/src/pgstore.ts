@@ -164,6 +164,28 @@ export class PostgresPlayerStore implements PlayerStore {
   }
 
   /**
+   * Every player's save.
+   *
+   * The rows are read in the id's order, so the neighbour strip is
+   * stable from one request to the next.
+   */
+  async list(): Promise<PlayerSave[]> {
+    const result = await this.db.query<SaveRow>(
+      `SELECT player_id, doc FROM ${this.table} ORDER BY player_id`,
+    );
+    const out: PlayerSave[] = [];
+    for (const row of result.rows) {
+      const migrated = this.migrate(row.doc);
+      if (migrated === null) {
+        // A save from a version this server does not understand.
+        continue;
+      }
+      out.push({ playerId: row.player_id, world: toWorld(migrated) });
+    }
+    return out;
+  }
+
+  /**
    * Apply a change to a player's save, atomically.
    *
    * The row is locked for the duration of the transaction, so a second

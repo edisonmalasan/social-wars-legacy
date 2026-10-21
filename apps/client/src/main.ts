@@ -11,6 +11,7 @@
 import { AtlasIndex, type FrameManifest, type WorldSnapshot } from '@swl/client';
 import { cameraCentredOn, MAP_HEIGHT, MAP_WIDTH, type CameraState } from '@swl/client';
 import { Interaction, pixelToTile } from '@swl/client';
+import { fetchNeighbours, type Neighbour } from '@swl/client';
 
 import { buildScene, type SceneItem } from './scene.ts';
 import { WorldRenderer, STAGE_HEIGHT, STAGE_WIDTH } from './renderer.ts';
@@ -349,10 +350,23 @@ async function main(): Promise<void> {
   const interaction = new Interaction();
   let placing: number | null = null;
   let selected: number | null = null;
+  let neighbours: Neighbour[] = [];
 
   /** The interface is redrawn when the placement or the selection changes. */
   function drawInterface(): void {
-    ui?.draw(world, placing, selected);
+    ui?.draw(world, placing, selected, neighbours);
+  }
+
+  /**
+   * The other players.
+   *
+   * The strip is the server's list, and it is fetched on its own: the
+   * strip does not have to be right to the millisecond, and the
+   * player's action should not wait for it.
+   */
+  async function refreshNeighbours(): Promise<void> {
+    neighbours = await fetchNeighbours(signedIn);
+    drawInterface();
   }
 
   /**
@@ -386,7 +400,8 @@ async function main(): Promise<void> {
    * drawing. The interface asks the server for nothing of its own.
    */
   const ui = UI ? mountUi(UI, content, onPick, onCollect) : null;
-  ui?.draw(world, placing, selected);
+  ui?.draw(world, placing, selected, neighbours);
+  void refreshNeighbours();
 
   // The map's click. The click is a **gesture**: the client turns it
   // into a command and the server decides the outcome.
@@ -427,10 +442,14 @@ async function main(): Promise<void> {
     renderer.draw(scene);
     // The interface is redrawn from the same answer, so the numbers in
     // the top bar and the buildings on the map never disagree.
-    ui?.draw(world);
+    ui?.draw(world, placing, selected, neighbours);
+    const latencyMs = performance.now() - started;
+    // The neighbour strip is refreshed on its own, outside the measured
+    // window: the player's action should not wait for the list.
+    void refreshNeighbours();
     return {
       ok: result.ok,
-      latencyMs: performance.now() - started,
+      latencyMs,
       sprites: scene.length,
     };
   }

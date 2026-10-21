@@ -362,6 +362,10 @@ async function main() {
     const session = await register(serverPort, 'e2e-player', 'correct horse');
     console.log(`  registered "e2e-player"`);
 
+    // A **second** player, so the neighbour strip has somebody in it.
+    await register(serverPort, 'e2e-neighbour', 'correct horse');
+    console.log('  registered "e2e-neighbour"');
+
     // The credential is persisted: a fresh server over the same database
     // can sign the player in.
     const second = await startServer(dataDir, serverPort + 1);
@@ -687,6 +691,26 @@ async function main() {
           continue;
         }
         console.log(`  the chapter map shows ${map.chapters} chapters (${map.slots} slots)`);
+
+        // The **neighbour strip** lists the other players. The strip is
+        // the server's list, and the client draws it.
+        const strip = await page.evaluate(
+          `(() => {
+             const entries = document.querySelectorAll('#ui .swl-neighbour');
+             return {
+               count: entries.length,
+               names: Array.from(entries)
+                 .map((e) => e.querySelector('.swl-neighbour-name'))
+                 .map((e) => (e ? e.textContent : '')),
+             };
+           })()`,
+        );
+        if (!strip || strip.count < 1) {
+          failures.push(`${entry.name}: the neighbour strip is empty (${strip?.count ?? 0})`);
+          console.log('FAILED (the neighbour strip is empty)');
+          continue;
+        }
+        console.log(`  the neighbour strip shows ${strip.names.join(', ')}`);
 
         // The render loop's rate. In a **headless** browser this is not
         // the game's real frame rate - there is no GPU and the frames are
