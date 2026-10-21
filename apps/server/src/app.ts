@@ -57,7 +57,12 @@ import {
 } from '@swl/server';
 import { applyCommandCost, computeCommandCost, type CostContent } from '@swl/rules';
 import { MemoryPlayerStore } from '@swl/server';
-import { makeCredential, type CredentialStore } from '@swl/server';
+import {
+  dashboardHtml,
+  healthReport,
+  makeCredential,
+  type CredentialStore,
+} from '@swl/server';
 
 import { handleSocialRequest, type SocialOptions } from './social.ts';
 import {
@@ -159,6 +164,10 @@ export interface AppOptions {
    * so rather than pretending.
    */
   credentials?: CredentialStore;
+  /** The server's version, for the health report. */
+  version?: string;
+  /** The asset bundle's build id, for the health report. */
+  assetBuildId?: string | null;
   /** The neighbours, for `get_player_info.php`. */
   neighbours?: Record<string, Record<string, unknown>>;
   /** The alliance and betting services, for the social endpoints. */
@@ -212,6 +221,8 @@ export function createApp(
 ): (request: AppRequest) => Promise<AppResponse> {
   const logger = options.logger ?? SILENT_LOGGER;
   const metrics = options.metrics ?? new Metrics();
+  // When the server started, for the uptime.
+  const startedAt = options.nowMs?.() ?? Date.now();
 
   /**
    * What the request is about, for the log.
@@ -357,6 +368,26 @@ export function createApp(
       playerId: session.playerId,
       issuedAt: session.issuedAt,
       expiresAt: session.expiresAt,
+    });
+  }
+
+  /**
+   * The server's health.
+   *
+   * It carries the **versions in use** - the server's, the content's and
+   * the assets' - so that a report says what was running, and the
+   * measurements the alerts watch.
+   */
+  function health() {
+    const bundle = options.contentBundle as { buildId?: unknown };
+    return healthReport({
+      metrics,
+      activeSessions: options.sessions.size,
+      elapsedSeconds: (options.nowMs?.() ?? Date.now() - startedAt) / 1000,
+      version: options.version ?? '0.0.0',
+      contentBuildId:
+        typeof bundle.buildId === 'string' ? bundle.buildId : 'unknown',
+      assetBuildId: options.assetBuildId ?? null,
     });
   }
 
@@ -574,7 +605,9 @@ export function createApp(
       }
 
       // --- the health check ---------------------------------------------
-      if (path === '/health' || path === '/api/health') {
+      // The liveness check: the smallest possible answer, for a load
+      // balancer or a monitor that only wants to know the process is up.
+      if (path === '/health') {
         if (request.method !== 'GET') return fail(405, 'method-not-allowed');
         return json(200, { status: 'ok', protocol: 1 });
       }
@@ -589,6 +622,20 @@ export function createApp(
         if (request.method === 'POST') return createSession(request);
         if (request.method === 'DELETE') return deleteSession(request);
         return fail(405, 'method-not-allowed');
+      }
+
+      if (path === '/api/health') {
+        if (request.method !== 'GET') return fail(405, 'method-not-allowed');
+        return json(200, health());
+      }
+
+      if (path === '/dashboard') {
+        if (request.method !== 'GET') return fail(405, 'method-not-allowed');
+        return {
+          status: 200,
+          headers: { 'content-type': 'text/html; charset=utf-8' },
+          body: dashboardHtml(health()),
+        };
       }
 
       if (path === '/api/metrics') {
@@ -660,8 +707,17 @@ export function createApp(
 
       return fail(404, 'not-found');
     } catch (error) {
-      // An unexpected failure is a 500, but the details stay here.
-      logger.error('unhandled error', { error: String(error) });
+      // An unexpected failure is a 500, but the details stay here - and
+      // they carry the **versions in use**, so a crash report says what
+      // was running when it happened.
+      const bundle = options.contentBundle as { buildId?: unknown };
+      logger.error('unhandled error', {
+        error: String(error),
+        version: options.version ?? '0.0.0',
+        contentBuildId:
+          typeof bundle.buildId === 'string' ? bundle.buildId : 'unknown',
+        assetBuildId: options.assetBuildId ?? null,
+      });
       return fail(500, 'internal-error');
     }
   }

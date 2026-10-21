@@ -10,4 +10,5 @@ export * from './socialstore.ts';
 export * from './pgstore.ts';
 export * from './schema.ts';
 export * from './credentials.ts';
+export * from './health.ts';
 export * from './observability.ts';

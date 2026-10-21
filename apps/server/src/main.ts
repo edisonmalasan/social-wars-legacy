@@ -173,6 +173,9 @@ async function main(): Promise<void> {
     identity,
     content,
     contentBundle: bundle,
+    // The versions in use, for the health report and the crash reports.
+    version: '0.1.0',
+    assetBuildId: process.env['SWL_ASSET_BUILD_ID'] ?? null,
     logger,
     metrics,
     now: () => Math.floor(Date.now() / 1000),

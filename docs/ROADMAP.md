@@ -1438,9 +1438,26 @@ product.*
 - [ ] The metrics are exported to a time-series database, so the alerts below can fire
       on a regression rather than on a snapshot
 - [ ] Distributed tracing across the client, the API and the database
-- [ ] Error reporting captures crashes with build and content version attached
-- [ ] Alerts fire on error-rate, latency and tick-time regressions
-- [ ] A dashboard shows live server health and the content/asset version in use
+- [x] **Error reporting captures crashes with the build and content version attached.**
+      The server's own crash handler records the error with the **server's version**, the
+      **content bundle's build id** and the **asset bundle's build id**, so a crash
+      report says what was running when it happened
+- [x] **Alerts fire** on error-rate, latency and tick-time regressions
+      (`packages/server/src/health.ts`). The thresholds are **written down** in
+      `ALERT_RULES` rather than being whatever the code happens to compare against, and
+      each rule says **what to do about it**. A critical alert makes the server
+      *unhealthy*, a warning makes it *degraded*
+- [ ] The alerts are **sent** somewhere - a webhook or a message - and the sending is
+      retried, so a server that is unhealthy says so rather than waiting to be asked
+- [x] A **dashboard** shows the live server health and the **content/asset version in
+      use** (`/dashboard`), and the machine-readable report is at `/api/health`
+      (`packages/server/src/health.ts`). The versions are at the top, because the first
+      question about a bad server is "what was running?"
+- [x] The **measurements** are the five an operator watches: the error rate, the
+      ninety-fifth percentile of the request time, the ninety-fifth percentile of the
+      simulation time, the active sessions and the command rate. The percentiles come
+      from the **bucketed** histograms, so they are the bucket the percentile falls in
+      and not an exact value - which is enough to alert on and honest about what it is
 
 ### I5 — Operations
 
