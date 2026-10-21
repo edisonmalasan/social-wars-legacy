@@ -1278,10 +1278,11 @@ assault against the new server, and the cheat battery is fully rejected.
       the platform's own font — the layout shifts and the text still reads — and
       the scale stays at the "not tuned yet" value of 1. The face that ships is
       the face that is used, so the measured scale is the one that applies
-- [ ] Text renders with the substituted fonts at the original metrics — the **body**
-      face does, and the end-to-end test proves the scale is applied; the
-      **display** face has no use yet, because the headings that would use it are
-      not drawn
+- [x] Text renders with the substituted fonts at the original metrics: the **body**
+      face is the interface's and the **display** face is the headings', the way
+      the original uses them, and each is scaled by its own measured factor —
+      1.0183 for Nunito and 0.7344 for Rubik Mono One. The end-to-end test proves
+      the scale is applied
 - [x] The client's **defence slot shows the attack interval**, in both the tooltip and
       the info panel. That is the client's behaviour in *both* places, so it is not a
       slip in one of them, and the clone reproduces it rather than "fixing" it — the
