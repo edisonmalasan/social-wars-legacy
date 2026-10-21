@@ -1335,7 +1335,17 @@ product.*
 - [x] The client's **transport** is implemented (`packages/client/src/transport.ts`):
       the envelope has the protocol version, the idempotency key and the session
       token, and **no room for a claimed outcome**
-- [ ] A load test sustains the target concurrency with correct simulation timing
+- [x] A **load test** sustains the target concurrency with correct simulation timing
+      (`node scripts/load-test.mjs`). The two halves are checked separately, because a
+      server that is fast and wrong is worse than one that is slow and right:
+      - **correctness**: every command that was sent was answered exactly once, and
+        the errors are counted
+      - **performance**: the ninety-fifth percentile of the request time, the
+        ninety-fifth percentile of the **simulation** time, the throughput and the error
+        rate are measured and compared against the **performance budgets**
+- [x] The simulation time is the **server's own** measurement, read from its metrics,
+      because the request's wall time includes the network and the database and the tick
+      is the part the player feels
 - [x] **Test coverage is measured and a threshold is enforced**
       (`node scripts/check-coverage.mjs`). The floors are **85 %** of the lines, **80 %**
       of the functions and **70 %** of the branches, and the measurement is Node's own
@@ -1551,8 +1561,20 @@ product.*
 
 ### I8 — Performance & release
 
-- [ ] Performance budgets are defined and met: input-to-render latency, simulation tick
-      time, memory and client frame rate
+- [x] **Performance budgets are defined and met**
+      (`packages/server/src/budgets.ts`). They are **written down**, so "fast enough" is a
+      decision rather than an impression, and they are stated at the **ninety-fifth
+      percentile**, because a budget on the mean says nothing about the players who are
+      having a bad time:
+      | Budget | The floor |
+      |---|---|
+      | the request latency | 200 ms |
+      | the simulation tick | 50 ms |
+      | the command throughput | 50 a second |
+      | the error rate | 1 in 100 |
+- [ ] The **input-to-render** latency is measured too: the client sends a command and the
+      player sees the result, and that is a number the browser has to answer for
+- [ ] The client holds a **stable frame rate** on the largest documented battle
 - [ ] The client holds a stable frame rate on the largest documented battle
 - [x] The **asset bundle size is measured and minimised**
       (`node scripts/build-client-manifest.mjs`). The asset pipeline's manifest holds
