@@ -1365,8 +1365,17 @@ product.*
       matches, the soak test finds no drift, the content bundle builds and is
       **reproducible**, the command catalogue agrees with the client, and the asset
       manifest agrees with the tree in **both directions**
-- [ ] A real linter is configured. `pnpm lint` is currently the type-check, so the
-      lint step in CI is the type-check wearing a different name
+- [x] A **real linter** is configured. `pnpm lint` is the type-check **and** the project's
+      own rules (`node scripts/lint-project.mjs`), because there are errors that are true of
+      **this repository** and not of TypeScript:
+      - the **browser bundle must not reach a `node:` import**. The client is a browser
+        application - the web build, the desktop shell's web view and the mobile build all
+        run it in a web view - and a `node:` import in the graph is a build failure at best
+      - the **rules engine must not import `node:`**, because it runs in a browser worker
+        for the offline mode (ADR 2)
+- [x] The first rule is a **reachability** check, not a grep: a module that imports `node:`
+      is fine if nothing the browser loads reaches it, and the check says so. It reaches
+      **26** modules from the client's entry point
 - [x] **Every pull request runs the golden-master harness.** The CI runs on every push
       and every pull request, and the golden-master corpus is one of its steps - and
       the harness fails on any difference it cannot explain
