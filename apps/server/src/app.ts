@@ -53,6 +53,7 @@ import {
   type Session,
   type ShimRequest,
   type ShimResponse,
+  type ShimWorld,
 } from '@swl/server';
 import { applyCommandCost, computeCommandCost, type CostContent } from '@swl/rules';
 import { MemoryPlayerStore } from '@swl/server';
@@ -78,6 +79,24 @@ import {
   type Logger,
 } from '@swl/server';
 
+
+/**
+ * A new player's world.
+ *
+ * The same shape the development player gets: an empty town, the
+ * starting resources, and the command counter at the beginning.
+ */
+export function initialWorld(playerId: string): ShimWorld {
+  return {
+    save: {
+      playerInfo: { pid: playerId, name: playerId },
+      maps: [{ id: 0, items: {} }],
+      privateState: {},
+    },
+    resources: { g: 2000, w: 2000, o: 2000, s: 2000, c: 2000, e: 50, x: 0, m: 0 },
+    nextCommandNumber: 1,
+  };
+}
 
 /** A request, as the application sees it. */
 export interface AppRequest {
@@ -322,6 +341,11 @@ export function createApp(
     const credential = makeCredential(playerId, password);
     await store.put(credential);
     options.sessions.load(credential);
+
+    // The player gets their **world** too. A player who has registered
+    // but has no save is not a player: the world endpoint would answer
+    // that there is no such player, which is true and useless.
+    await options.store.add(playerId, initialWorld(playerId));
 
     const result = options.sessions.authenticate(playerId, password, options.now());
     if (!result.ok) {

@@ -141,9 +141,16 @@ describe('the individual requests', () => {
   });
 
   it('the weekly bonus carries no arguments and the daily one carries the day', () => {
-    // The daily bonus's item and day are the server's, so the client sends
-    // placeholders.
-    assert.deepEqual(claimDailyBonus().args, [0, 0]);
+    // The day is the **client's** choice and it is **one-based**: the
+    // client queues `CmdWinBonus(1)`, `CmdWinBonus(2)` and so on, and the
+    // command reads `DAILY_GOLD_REWARDS[day - 1]`. A zero-based day would
+    // index before the start of the rewards, and the protocol would
+    // refuse the request - so the player could never claim the bonus.
+    assert.deepEqual(claimDailyBonus().args, [0, 1]);
+    assert.deepEqual(claimDailyBonus(3).args, [0, 3]);
+    assert.deepEqual(claimDailyBonus(5, 1001).args, [1001, 5]);
+    // The **reward** is the server's, and the item id is a placeholder
+    // on a gold day.
     assert.deepEqual(claimWeeklyBonus().args, []);
   });
 });

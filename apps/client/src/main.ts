@@ -20,8 +20,11 @@ import {
   readSession,
   rememberSession,
   signIn,
+  sendCommands,
   type ClientSession,
 } from '@swl/client';
+import type { NativeCommand, NativeResponse } from '@swl/protocol';
+import { claimDailyBonus } from '@swl/client';
 
 const STAGE = document.getElementById('stage');
 const GAME = document.getElementById('game');
@@ -101,6 +104,29 @@ function status(state: string, detail = ''): void {
   if (!element) return;
   element.textContent = detail ? `${state}: ${detail}` : state;
   element.setAttribute('data-state', state);
+}
+
+/**
+ * The client's debug handle.
+ *
+ * It is what the end-to-end test drives, and it is the client's own code
+ * rather than a test's imitation of it.
+ */
+export interface ClientHandle {
+  /** The session the client is playing with. */
+  session: ClientSession;
+  /** Send a batch of commands, the way the client does. */
+  send: (commands: readonly NativeCommand[]) => Promise<{
+    ok: boolean;
+    response?: NativeResponse;
+  }>;
+  /**
+   * The client's own request builders.
+   *
+   * The end-to-end test drives them, so the test exercises the request
+   * the game really makes and not a test's imitation of it.
+   */
+  claimDailyBonus: typeof claimDailyBonus;
 }
 
 /** The browser's storage, or null when it refuses to be used. */
@@ -202,6 +228,15 @@ async function main(): Promise<void> {
   const world = await json<ServerWorld>('/api/world', {
     headers: { authorization: authorizationHeader(session) },
   });
+
+  // The debug handle. The end-to-end test drives the client through it,
+  // and a developer can look at the client's own state in the console.
+  const handle: ClientHandle = {
+    session,
+    send: (commands) => sendCommands(session.token, commands),
+    claimDailyBonus,
+  };
+  (window as unknown as { __swl?: ClientHandle }).__swl = handle;
   const scene = buildScene(sceneItems(world, content), renderer.viewport, atlas);
   renderer.draw(scene);
 

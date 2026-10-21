@@ -39,6 +39,15 @@ export interface PlayerStore {
   has(playerId: string): Promise<boolean>;
 
   /**
+   * Give a player their world.
+   *
+   * A player who has registered but has no save is not a player: the
+   * world endpoint would answer that there is no such player, which is
+   * true and useless.
+   */
+  add(playerId: string, world: ShimWorld): void | Promise<void>;
+
+  /**
    * Apply a change to a player's save, atomically.
    *
    * The function is given the current world and returns the new one. If it

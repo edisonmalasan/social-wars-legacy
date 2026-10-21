@@ -116,11 +116,20 @@ export function completeGoal(goalId: number): NativeCommand {
 /**
  * Claim the daily bonus.
  *
- * The item id and the day index are both the **server's**: it computes the
- * day from its own clock, and it ignores what the client claims.
+ * The **day** is the client's choice and it is **one-based**: the client
+ * queues `CmdWinBonus(1)`, `CmdWinBonus(2)` and so on, and the command
+ * reads `DAILY_GOLD_REWARDS[day - 1]`. A zero-based day would index
+ * before the start of the rewards, and the protocol would refuse the
+ * request - so the player could never claim the bonus.
+ *
+ * The **reward** is the server's: it computes the day from its own clock
+ * and ignores what the client claims.
+ *
+ * @param day the day of the five-day cycle, 1 to 5
+ * @param itemId the hero item on the fifth day, or 0 on a gold day
  */
-export function claimDailyBonus(): NativeCommand {
-  return command('win_daily_bonus', [0, 0]);
+export function claimDailyBonus(day = 1, itemId = 0): NativeCommand {
+  return command('win_daily_bonus', [itemId, day]);
 }
 
 /** Claim the weekly bonus. */

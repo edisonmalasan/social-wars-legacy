@@ -47,6 +47,7 @@ async function app(
     store: {
       get: async () => null,
       has: async () => false,
+      add: async () => {},
       transact: async () => null,
       size: 0,
     },
