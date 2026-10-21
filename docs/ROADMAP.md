@@ -1402,8 +1402,12 @@ product.*
       it for the three mutating ones: `POST /api/command`, `POST /command.php` and
       `POST /api/session`. It is a fixed window, which is not the most precise limiter,
       but it is exact enough to stop a runaway client and it needs no background timer
-- [ ] The limiter is **per account** rather than per address, so a player behind a
-      shared address is not punished for the others
+- [x] The limiter is **per account** rather than per address, so a player behind a shared
+      address - a household, a school, a company network, a phone carrier's NAT - is not
+      punished for the other people behind it, and a player who changed address does not
+      lose their limit. The key is the **player**, taken from the session the request
+      carries, which is possible because the token is in the header rather than the body.
+      A request with no session falls back to its address, because that is all there is
 - [x] **Session tokens are scoped, revocable and expire**
       (`packages/server/src/session.ts`, `packages/server/src/session.test.ts`):
       - **scoped** - a token resolves to exactly the player it was issued to, and a
