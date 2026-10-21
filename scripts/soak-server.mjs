@@ -18,7 +18,11 @@
  */
 import process from 'node:process';
 
-import { framePayload, SERVER_KEYS } from '@swl/protocol';
+// The legacy framing lives behind a **subpath export**, so the browser's
+// import graph never reaches it: only the tools that speak the legacy
+// protocol ask for it.
+import { framePayload } from '@swl/protocol/commandphp';
+import { SERVER_KEYS } from '@swl/protocol';
 
 import { createApp } from '../apps/server/src/app.ts';
 import { LegacyIdentityBridge, SessionStore } from '../packages/server/src/index.ts';

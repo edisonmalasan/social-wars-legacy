@@ -1561,6 +1561,9 @@ product.*
       tests failed on a file that did not exist yet, and every merge since was
       red. The build now comes **before** the tests, and `pnpm test` builds it
       itself, so a fresh clone's tests work too
+- [x] The **soak test** runs again: it asked the protocol's index for the legacy
+      framing, and that framing moved behind a **subpath export** so the browser's
+      graph never reaches it. The tool asks for the subpath now
 - [x] **Release artefacts are produced automatically and published to a release**
       (`.github/workflows/release.yml`). A tag starts the workflow, which runs the
       **whole gate** - the golden master, the cheat battery, the coverage and the
