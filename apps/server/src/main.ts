@@ -18,6 +18,7 @@ import { costContentFrom } from '@swl/rules';
 import process from 'node:process';
 
 import {
+  ChangeOnlyAlertSender,
   JsonLogger,
   LegacyIdentityBridge,
   MemoryCredentialStore,
@@ -26,6 +27,7 @@ import {
   PostgresPlayerStore,
   SCHEMA_MIGRATIONS,
   SessionStore,
+  WebhookAlertSender,
   runMigrations,
   type CredentialStore,
   type PlayerStore,
@@ -167,6 +169,9 @@ async function main(): Promise<void> {
   });
   const metrics = new Metrics();
 
+  // Where the alerts go, when there is somewhere to send them.
+  const webhookUrl = process.env['SWL_ALERT_WEBHOOK'];
+
   const handle = createApp({
     store,
     sessions,
@@ -176,6 +181,14 @@ async function main(): Promise<void> {
     // The versions in use, for the health report and the crash reports.
     version: '0.1.0',
     assetBuildId: process.env['SWL_ASSET_BUILD_ID'] ?? null,
+    // Where the alerts go. Without a webhook the alerts are still in the
+    // report and on the dashboard, but nobody is **told** - and an alert
+    // that nobody is told about is not an alert.
+    alertSender: webhookUrl
+      ? new ChangeOnlyAlertSender(
+          new WebhookAlertSender({ target: { url: webhookUrl } }),
+        )
+      : undefined,
     logger,
     metrics,
     now: () => Math.floor(Date.now() / 1000),

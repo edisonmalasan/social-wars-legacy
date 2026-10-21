@@ -61,6 +61,7 @@ import {
   dashboardHtml,
   healthReport,
   makeCredential,
+  type AlertSender,
   type CredentialStore,
 } from '@swl/server';
 
@@ -168,6 +169,14 @@ export interface AppOptions {
   version?: string;
   /** The asset bundle's build id, for the health report. */
   assetBuildId?: string | null;
+  /**
+   * Where the alerts go.
+   *
+   * Without one the alerts are still in the report and on the
+   * dashboard, but nobody is **told** — and an alert that nobody is told
+   * about is not an alert.
+   */
+  alertSender?: AlertSender;
   /** The neighbours, for `get_player_info.php`. */
   neighbours?: Record<string, Record<string, unknown>>;
   /** The alliance and betting services, for the social endpoints. */
@@ -397,7 +406,7 @@ export function createApp(
    */
   function health() {
     const bundle = options.contentBundle as { buildId?: unknown };
-    return healthReport({
+    const report = healthReport({
       metrics,
       activeSessions: options.sessions.size,
       elapsedSeconds: (options.nowMs?.() ?? Date.now() - startedAt) / 1000,
@@ -406,6 +415,18 @@ export function createApp(
         typeof bundle.buildId === 'string' ? bundle.buildId : 'unknown',
       assetBuildId: options.assetBuildId ?? null,
     });
+
+    // The alerts are **sent**, and the sending is not allowed to hold up
+    // the answer: a server that cannot reach the alerting system must
+    // still serve its players.
+    if (options.alertSender) {
+      const sender = options.alertSender;
+      void sender.send(report).catch(() => {
+        // The sender records its own failures.
+      });
+    }
+
+    return report;
   }
 
   function createSession(request: AppRequest): AppResponse {
