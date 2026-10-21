@@ -54,6 +54,18 @@ export function uiCss(): string {
   padding: 0 6px;
 }
 
+/*
+ * The headings use the **display** face, the way the original does: the
+ * body face is for the interface and the display face is for the
+ * titles. The display face is scaled by its own factor, because the
+ * two faces do not share their widths.
+ */
+.swl-goal-title,
+.swl-chapter-title,
+.swl-info-name {
+  font-family: var(--swl-font-display, system-ui, sans-serif);
+}
+
 .swl-readout {
   position: relative;
   display: flex;
@@ -146,7 +158,7 @@ export function uiCss(): string {
 .swl-chapter-title {
   margin-bottom: 4px;
   color: #8d97a8;
-  font-size: calc(9px * var(--swl-font-scale-body, 1));
+  font-size: calc(9px * var(--swl-font-scale-display, 1));
   text-align: center;
 }
 
@@ -201,7 +213,7 @@ export function uiCss(): string {
   border-radius: 3px;
   background: #131a24;
   color: #e8e3d8;
-  font-size: calc(12px * var(--swl-font-scale-body, 1));
+  font-size: calc(12px * var(--swl-font-scale-display, 1));
   text-align: left;
 }
 
@@ -236,7 +248,7 @@ export function uiCss(): string {
 
 .swl-info-name {
   color: #f2e6c8;
-  font-size: calc(13px * var(--swl-font-scale-body, 1));
+  font-size: calc(13px * var(--swl-font-scale-display, 1));
   font-weight: 700;
 }
 
