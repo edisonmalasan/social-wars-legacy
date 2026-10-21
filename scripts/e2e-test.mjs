@@ -66,6 +66,10 @@ const TYPES = {
   '.json': 'application/json; charset=utf-8',
   '.png': 'image/png',
   '.woff2': 'font/woff2',
+  // The WebAssembly must be served as WebAssembly: a browser refuses to
+  // stream it as anything else, and the offline mode's database is
+  // PostgreSQL compiled to WebAssembly.
+  '.wasm': 'application/wasm',
 };
 
 /** The files the client is served from. */
@@ -484,6 +488,74 @@ async function main() {
           '(() => { const h = window.__swl; return h ? h.framesPerSecond() : 0; })()',
         );
         console.log(`  the render loop is running at ${Number(rate).toFixed(0)} frames a second`);
+
+        // --- 3. The offline mode -----------------------------------------
+        // The game can be played **without a server**: the same rules
+        // engine, the same applier and the same schema, running in the
+        // browser against a local database. This is where that is
+        // proved - in a real browser, not in a test's memory.
+        const offline = await page.evaluate(
+          `(async () => {
+             const handle = window.__swl;
+             if (!handle) return { error: 'the client has no handle' };
+             // The database is PostgreSQL compiled to WebAssembly, and it
+             // is a few megabytes, so it is given a moment. A promise
+             // that never settles must fail the test rather than hang
+             // it.
+             const settle = (promise, ms) => Promise.race([
+               promise,
+               new Promise((_, reject) =>
+                 setTimeout(() => reject(new Error('the offline mode did not settle')), ms)),
+             ]);
+             try {
+               const mode = await settle(handle.openOffline(), 120000);
+               const before = mode.world.resources.g ?? 0;
+               const answer = await settle(
+                 mode.apply([{ name: 'win_daily_bonus', args: [] }]),
+                 60000,
+               );
+               const rows = await settle(
+                 mode.db.query('SELECT count(*) AS n FROM player_saves'),
+                 30000,
+               );
+               return {
+                 ok: answer.ok,
+                 before,
+                 after: mode.world.resources.g ?? 0,
+                 rows: rows.rows[0].n,
+               };
+             } catch (error) {
+               return { error: String(error && error.message ? error.message : error) };
+             } finally {
+               // The mode is closed only if it opened.
+             }
+           })()`,
+        );
+
+        if (!offline || offline.error) {
+          failures.push(
+            `${entry.name}: the offline mode did not open (${offline?.error ?? 'no answer'})`,
+          );
+          console.log('FAILED (the offline mode did not open)');
+          continue;
+        }
+        if (!offline.ok) {
+          failures.push(`${entry.name}: the offline mode refused the command`);
+          console.log('FAILED (the offline mode refused the command)');
+          continue;
+        }
+        if (!(offline.after > offline.before)) {
+          failures.push(
+            `${entry.name}: the offline mode did not apply the bonus (${offline.before} -> ${offline.after})`,
+          );
+          console.log('FAILED (the offline mode did not apply the bonus)');
+          continue;
+        }
+
+        console.log(
+          `  the offline mode played without a server ` +
+            `(${offline.before} -> ${offline.after} gold, ${offline.rows} row(s))`,
+        );
 
         ran.push(entry.name);
       } catch (error) {

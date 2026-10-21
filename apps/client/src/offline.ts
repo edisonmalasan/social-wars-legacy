@@ -33,12 +33,37 @@ import { SCHEMA_MIGRATIONS } from '@swl/server/schema';
 
 /** How the offline mode is set up. */
 export interface OfflineOptions {
-  /** Where the database lives. It is IndexedDB, so it is a name. */
-  name?: string;
+  /**
+   * Where the database lives.
+   *
+   * It is a **scheme** and a name, because PGlite chooses its
+   * filesystem from the scheme:
+   *
+   * - `idb://name` — IndexedDB, and so it survives the browser being
+   *   closed. This is the one a browser wants.
+   * - `memory://` — in memory only, and so it does not. This is the one
+   *   a test wants.
+   */
+  dataDir?: string;
   /** The clock, in seconds. */
   now?: () => number;
   /** The clock, in milliseconds. */
   nowMs?: () => number;
+}
+
+/**
+ * The default database location.
+ *
+ * A browser has IndexedDB, and so the default is IndexedDB — the world
+ * is still there after the tab is closed. Anything else (a test, a
+ * script) gets the memory filesystem, because a node process has no
+ * IndexedDB and no reason to write a directory.
+ */
+export function defaultDataDir(): string {
+  const hasIndexedDb =
+    typeof globalThis !== 'undefined' &&
+    typeof (globalThis as { indexedDB?: unknown }).indexedDB !== 'undefined';
+  return hasIndexedDb ? 'idb://swl-offline' : 'memory://';
 }
 
 /** The offline mode. */
@@ -86,7 +111,9 @@ export async function openOffline(options: OfflineOptions = {}): Promise<Offline
   const now = options.now ?? (() => Math.floor(Date.now() / 1000));
   const nowMs = options.nowMs ?? (() => Date.now());
 
-  const db = await PGlite.create({ dataDir: options.name ?? 'swl-offline' });
+  const db = await PGlite.create({
+    dataDir: options.dataDir ?? defaultDataDir(),
+  });
   await runMigrations(db, SCHEMA_MIGRATIONS);
 
   // The world is stored in the same table the server uses, so the two
