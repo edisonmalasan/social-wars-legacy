@@ -278,7 +278,9 @@ async function main() {
     process.exit(2);
   }
 
-  const port = 5199;
+  // A **free** port: a stray server from an earlier run must not be able
+  // to answer this one's requests, or hold the port.
+  const port = 5200 + Math.floor(Math.random() * 400);
   const server = await serve(port);
   const url = `http://127.0.0.1:${port}/`;
 

@@ -337,8 +337,11 @@ async function main() {
   }
 
   const dataDir = await mkdtemp(path.join(os.tmpdir(), 'swl-e2e-'));
-  const serverPort = 8097;
-  const clientPort = 5198;
+  // **Free** ports: a stray server from an earlier run must not be able
+  // to answer this one's requests, or hold the port.
+  const base = 8100 + Math.floor(Math.random() * 200);
+  const serverPort = base;
+  const clientPort = base + 200;
   let devToolsPort = 9332;
 
   const server = await startServer(dataDir, serverPort);
