@@ -1736,8 +1736,6 @@ product.*
 - [x] The client **draws the server's answer**: the native answer carries the outcomes and
       not the world, so the world is fetched again and drawn. The client asks, the server
       decides, and the client draws what the server said
-- [ ] The **input-to-render** latency is measured too: the client sends a command and the
-      player sees the result, and that is a number the browser has to answer for
 - [ ] The client holds a **stable frame rate** on the largest documented battle
 - [x] The client **runs a render loop** (`apps/client/src/renderer.ts`): the game is
       animated, so the client keeps drawing, and the loop is what advances the sprites and
@@ -1767,7 +1765,19 @@ product.*
 - [x] The reduction is **checked**, not asserted: the client's manifest has to be
       under a tenth of the pipeline's, to hold only the symbols the items ask for, to
       hold one symbol per SWF, and to have an image for every frame it names
-- [ ] A release checklist is followed for the first production release
+- [x] A **release checklist** is written down (`docs/RELEASE.md`), and it is followed for
+      the first production release. Every step names the command that does it, so a step
+      cannot be done from memory and cannot be done differently each time
+- [x] The checklist covers the **whole gate** — every step of the CI's Verify job — and it
+      names the three things a release is not allowed to forget: the **licence** gate, the
+      **rollback** and the **backups**
+- [x] The checklist is **checked** (`node scripts/check-release.mjs`): a command it names
+      that does not exist fails the check, and so does a step of the gate it does not
+      mention. It is proven to fire
+- [x] The **licence gate** is in the checklist, and it is the one that can stop everything:
+      a public release is blocked until the art and the audio are licensed or re-created
+- [ ] The first production release is published, monitored for a full cycle, and any
+      rollback path is proven
 - [ ] The first production release is published, monitored for a full cycle, and any
       rollback path is proven
 

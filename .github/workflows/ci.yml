@@ -75,12 +75,6 @@ jobs:
       - name: The load test
         run: node scripts/load-test.mjs --players 8 --rounds 20
 
-      # The load test, and the **performance budgets** it is measured
-      # against. The budgets are written down, so a failure says which
-      # promise was broken.
-      - name: The load test
-        run: node scripts/load-test.mjs --players 8 --rounds 20
-
       - name: Build and validate the content bundle
         run: pnpm build:content
 
@@ -136,6 +130,12 @@ jobs:
       # A promise nobody checks is a wish.
       - name: The corrections policy is in order
         run: node scripts/check-corrections.mjs
+
+      # A checklist is a list of things to do at the worst possible
+      # moment, so it is checked: every command it names exists, and the
+      # whole gate is covered.
+      - name: The release checklist is in order
+        run: node scripts/check-release.mjs
 
       # The report set is the project's account of the original game, and
       # a number that has changed in the code but not in the report is a
