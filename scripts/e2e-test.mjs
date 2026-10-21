@@ -725,8 +725,18 @@ async function main() {
 
         ran.push(entry.name);
       } catch (error) {
-        failures.push(`${entry.name}: ${String(error)}`);
-        console.log(`FAILED (${String(error)})`);
+        // A browser that **cannot be driven** is not run rather than
+        // failed: the harness speaks the Chrome DevTools Protocol, and
+        // some builds of the browsers do not open its port. The session
+        // needs one browser that works, and the script fails when none
+        // did.
+        if (String(error).includes('did not open its debugging port')) {
+          notRun.push(entry.name);
+          console.log('NOT RUN (the browser did not open its debugging port)');
+        } else {
+          failures.push(`${entry.name}: ${String(error)}`);
+          console.log(`FAILED (${String(error)})`);
+        }
       } finally {
         if (page) await page.close(devToolsPort);
         child.kill();
@@ -742,7 +752,7 @@ async function main() {
   console.log('');
   console.log(`  the browsers that ran: ${ran.length ? ran.join(', ') : 'none'}`);
   if (notRun.length) {
-    console.log(`  the browsers that are not on this machine: ${notRun.join(', ')}`);
+    console.log(`  the browsers that were not run: ${notRun.join(', ')}`);
   }
   if (failures.length) {
     console.error('');

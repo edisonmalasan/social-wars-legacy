@@ -1573,6 +1573,15 @@ product.*
       there: it is a 154 MB build artefact and it is not committed, so the checks
       that need it were failing on a machine that had never run the pipeline. The
       client's own manifest is checked either way
+- [x] A browser the harness **cannot drive** is *not run* rather than *failed*:
+      the harness speaks the Chrome DevTools Protocol, and some builds of the
+      browsers do not open its port. The session needs one browser that works, and
+      both scripts fail when none did
+- [x] The **command catalogue's** check does not need the decompiled client to
+      run: the client's own command classes are the authority and they are not
+      there on a machine that has not decompiled the SWF, so the check compares
+      the report's catalogue with the protocol's list and says which comparison
+      it could not make
 - [x] **Release artefacts are produced automatically and published to a release**
       (`.github/workflows/release.yml`). A tag starts the workflow, which runs the
       **whole gate** - the golden master, the cheat battery, the coverage and the

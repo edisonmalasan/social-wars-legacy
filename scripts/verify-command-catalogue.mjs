@@ -107,9 +107,17 @@ function difference(a, b) {
 async function main() {
   const client = await clientCommands();
   if (!client) {
-    console.error('the decompiled client is not available at .work/as/basesec/scripts/commands');
-    console.error('run: node scripts/decompile-client.mjs');
-    process.exit(2);
+    // The decompiled client is a **working area**, and it is not there
+    // on a machine that has not decompiled the SWF. The check cannot
+    // run, and it has not failed: it is *not run*, and the other two
+    // sources are still compared with each other.
+    console.log(
+      'the decompiled client is not available at .work/as/basesec/scripts/commands;',
+    );
+    console.log('run: node scripts/decompile-client.mjs');
+    console.log('the catalogue and the protocol are still compared with each other.');
+    await compareWithoutTheClient();
+    return;
   }
 
   const catalogue = await catalogueCommands();
@@ -184,6 +192,59 @@ async function main() {
   }
   console.log('');
   console.log('Every source agrees.');
+}
+
+/**
+ * The comparison without the decompiled client.
+ *
+ * The client's own command classes are the **authority**, and they are
+ * not there, so the check that needs them cannot run. The other two
+ * sources are still compared with each other: the report's catalogue
+ * and the protocol's list are two transcriptions of the same thing, and
+ * they have to agree.
+ */
+async function compareWithoutTheClient() {
+  const catalogue = await catalogueCommands();
+  const protocol = await protocolCommands();
+  const catalogueSet = new Set(catalogue.keys());
+  const protocolSet = new Set(protocol.keys());
+
+  console.log(`the report's catalogue        : ${catalogueSet.size}`);
+  console.log(`the protocol's COMMAND_NAMES  : ${protocolSet.size}`);
+  console.log('');
+
+  let failures = 0;
+
+  const catalogueOnly = difference(catalogueSet, protocolSet);
+  const protocolOnly = difference(protocolSet, catalogueSet);
+  if (catalogueOnly.length === 0 && protocolOnly.length === 0) {
+    console.log('OK: the catalogue and COMMAND_NAMES are the same list.');
+  } else {
+    failures += 1;
+    console.log('DIFFERS: the catalogue and COMMAND_NAMES disagree.');
+    for (const name of catalogueOnly) console.log(`  only in the catalogue: ${name}`);
+    for (const name of protocolOnly) console.log(`  only in the protocol : ${name}`);
+  }
+  console.log('');
+
+  // The catalogue's rows must be numbered 1..n with no gaps, or a row was
+  // dropped when it was transcribed.
+  const rows = [...catalogue.values()].map((entry) => entry.row).sort((a, b) => a - b);
+  const expected = rows.map((_, index) => index + 1);
+  if (rows.length === expected.length && rows.every((row, index) => row === expected[index])) {
+    console.log(`OK: the catalogue's rows are numbered 1..${rows.length} with no gaps.`);
+  } else {
+    failures += 1;
+    console.log('DIFFERS: the catalogue has a gap in its row numbers.');
+    console.log(`  rows found: ${rows.join(', ')}`);
+  }
+  console.log('');
+
+  if (failures > 0) {
+    console.log(`${failures} check(s) failed.`);
+    process.exit(1);
+  }
+  console.log('The two sources that are here agree.');
 }
 
 main().catch((error) => {
