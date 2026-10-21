@@ -1073,7 +1073,21 @@ assault against the new server, and the cheat battery is fully rejected.
       the right-facing ones drawn **mirrored**. An idle unit shows a **random** frame of
       its idle sub-clip, so the random source is a parameter rather than a call to
       `Math.random`
-- [ ] Projectiles, particles and the 205 FX assets render
+- [x] The **projectile model** is ported exactly (`packages/client/src/projectile.ts`):
+      the client's own three models - the **parabolic**
+      (`battle/projectiles/models/ParabolicProjectile.as`), the **grenade**
+      (`Grenade.as`) and the **movie** (`MovieProjectile.as`) - with the flight, the arc,
+      the scatter, the easing, the turn and the landing
+- [x] The client's own **numbers** are the defaults: a speed of 10, no curve, a scatter of
+      20, a start offset of 0, a blast radius of 100 and three trails a step
+      (`battle/projectiles/ProjectileDefinition.as`)
+- [x] The **random source is a parameter** - the rules engine's own generator - so the same
+      seed gives the same flight and the port can be tested at all. The client's *order* of
+      the random calls is kept, because the order is part of the flight
+- [ ] The **particles** and the **205 FX assets** are not done, and cannot be yet: the
+      effect art is Zynga's, and the shipped product carries no Zynga art. The art has to
+      be re-created or licensed before a projectile can be **drawn**. The *flight* is here;
+      the drawing is the same open question as the rest of the art
 - [x] **Depth sorting and occlusion match the original engine.** The client's depth is
       `Utils.assignZIndex` (`core/Utils.as:398-409`), and the clone's is a port of it:
       `20 000 + 100 * tx + ty * 100 - width * 100`, less `20 000` for a walkable building.
