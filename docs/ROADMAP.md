@@ -1189,6 +1189,12 @@ assault against the new server, and the cheat battery is fully rejected.
       the player has **not visited** — the client's rule, and its quirk, which the
       model's marker slots reproduce. The player's progress is the **server's** (the
       goal state in the private state), so the panel shows what the server says
+- [x] The **chapter map** is drawn (`apps/client/src/ui/chapters.tsx`): the four
+      chapters with the client's own titles and the model's slots — the quest the
+      player is on is open, the ones they have not reached are locked, and the ones
+      they have finished carry the rank they finished at. The ranks are the
+      **server's** (the map's own `questsRank` field, the way the original keeps them)
+      and the unlock levels are the content's
 - [x] The player can **build from the interface**: picking an entry in the build menu
       **begins a placement** — the locked entries cannot be picked, so the menu says
       what the player cannot build yet — and clicking a tile turns the gesture into
