@@ -176,6 +176,38 @@ async function waitForDevTools(port, timeoutMs = 20_000) {
  * The page is opened in a tab, the expression is evaluated in it, and the
  * answer is read back.
  */
+/**
+ * Wait for the page to be the client's page, and to have loaded.
+ *
+ * The **address** is what matters, not the document's state: a blank
+ * page is already "complete", and it has no origin, and so it has no
+ * `localStorage`.
+ */
+async function waitForThePage(send, url, timeoutMs = 30_000) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    try {
+      const answer = await send('Runtime.evaluate', {
+        expression: 'location.href',
+        returnByValue: true,
+      });
+      const where = answer.result?.result?.value;
+      if (typeof where === 'string' && where.startsWith('http://127.0.0.1:')) {
+        const state = await send('Runtime.evaluate', {
+          expression: 'document.readyState',
+          returnByValue: true,
+        });
+        const ready = state.result?.result?.value;
+        if (ready === 'complete' || ready === 'interactive') return;
+      }
+    } catch {
+      // The document is not there yet.
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  throw new Error('the page did not load');
+}
+
 async function readStatus(port, url, timeoutMs = 60_000) {
   const target = await (
     await fetch(`http://127.0.0.1:${port}/json/new?${encodeURIComponent(url)}`, {
@@ -210,6 +242,12 @@ async function readStatus(port, url, timeoutMs = 60_000) {
   await send('Runtime.enable', {});
   await send('Page.enable', {});
 
+  // The page has to be **loaded** before it is touched. Without the
+  // wait, the test can evaluate its expression on the previous document,
+  // or on one with no origin - and a document with no origin has no
+  // `localStorage` at all.
+  await waitForThePage(send, url);
+
   // The client signs in, and it keeps the session between visits, so the
   // session is put in the browser's storage and the page is reloaded.
   // The client then starts without anybody typing anything.
@@ -224,6 +262,7 @@ async function readStatus(port, url, timeoutMs = 60_000) {
     returnByValue: true,
   });
   await send('Page.reload', {});
+  await waitForThePage(send, url);
 
   // The client is asynchronous: it fetches the content, starts the
   // renderer and asks the server for the world. The atlas pages are
