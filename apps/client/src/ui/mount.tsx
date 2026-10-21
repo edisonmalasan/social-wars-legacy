@@ -15,13 +15,18 @@ import { Root } from './root.tsx';
 /** The mounted interface. */
 export interface UiHandle {
   /** Draw the interface from the server's answer. */
-  draw: (world: WorldSnapshot) => void;
+  draw: (world: WorldSnapshot, placing?: number | null) => void;
 }
 
 /** Mount the interface into an element. */
-export function mountUi(element: HTMLElement, bundle: ContentBundle): UiHandle {
+export function mountUi(
+  element: HTMLElement,
+  bundle: ContentBundle,
+  onPick?: (itemId: number) => void,
+): UiHandle {
   const root = createRoot(element);
   return {
-    draw: (world) => root.render(<Root world={world} bundle={bundle} />),
+    draw: (world, placing = null) =>
+      root.render(<Root world={world} bundle={bundle} placing={placing} onPick={onPick} />),
   };
 }

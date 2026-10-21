@@ -26,6 +26,8 @@ export interface RootProps {
   world: WorldSnapshot;
   /** The content bundle. */
   bundle: ContentBundle;
+  /** The item the player is about to place, or null. */
+  placing?: number | null;
   /** The player picked something to build. */
   onPick?: (itemId: number) => void;
 }
@@ -37,14 +39,18 @@ export interface RootProps {
  * changes, and the build menu's items are derived from the content
  * **once**: the content does not change while the game is running.
  */
-export function Root({ world, bundle, onPick }: RootProps): React.JSX.Element {
+export function Root({ world, bundle, placing, onPick }: RootProps): React.JSX.Element {
   const state = hudState(hudInput(bundle, world));
   const items = useMemo(() => buildItems(bundle), [bundle]);
   const tabs = useMemo(() => categories(bundle), [bundle]);
+  const placingName = useMemo(() => {
+    if (placing === null || placing === undefined) return null;
+    return items.find((item) => item.id === placing)?.name ?? null;
+  }, [items, placing]);
 
   return (
     <div className="swl-ui">
-      <Hud state={state} />
+      <Hud state={state} placing={placingName} />
       <BuildMenu
         items={items}
         categories={tabs}

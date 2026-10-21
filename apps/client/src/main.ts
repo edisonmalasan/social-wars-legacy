@@ -10,6 +10,7 @@
  */
 import { AtlasIndex, type FrameManifest, type WorldSnapshot } from '@swl/client';
 import { cameraCentredOn, MAP_HEIGHT, MAP_WIDTH, type CameraState } from '@swl/client';
+import { Interaction, pixelToTile } from '@swl/client';
 
 import { buildScene, type SceneItem } from './scene.ts';
 import { WorldRenderer, STAGE_HEIGHT, STAGE_WIDTH } from './renderer.ts';
@@ -314,13 +315,52 @@ async function main(): Promise<void> {
   }
 
   /**
+   * The placement in progress.
+   *
+   * It is the client's own state — the client knows what the player is
+   * about to place, and the server decides whether it happens.
+   */
+  const interaction = new Interaction();
+  let placing: number | null = null;
+
+  /** The interface is redrawn when the placement changes. */
+  function drawInterface(): void {
+    ui?.draw(world, placing);
+  }
+
+  /**
+   * The build menu's item.
+   *
+   * Picking one **begins** a placement; it does not build anything.
+   */
+  function onPick(itemId: number): void {
+    interaction.beginPlacement(itemId, 'b');
+    placing = itemId;
+    drawInterface();
+  }
+
+  /**
    * The interface.
    *
    * It is drawn from the **same** world the scene is: one answer, one
    * drawing. The interface asks the server for nothing of its own.
    */
-  const ui = UI ? mountUi(UI, content) : null;
-  ui?.draw(world);
+  const ui = UI ? mountUi(UI, content, onPick) : null;
+  ui?.draw(world, placing);
+
+  // The map's click. The click is a **gesture**: the client turns it
+  // into a command and the server decides the outcome.
+  renderer.onClick = (x, y) => {
+    const tile = pixelToTile(x, y, renderer.viewport);
+    const gesture = interaction.placeTo(tile.tx, tile.ty);
+    if (!gesture.ok) {
+      // Nothing was being placed, so the click was not a build.
+      return;
+    }
+    interaction.clear();
+    placing = null;
+    void run([gesture.command]);
+  };
 
   /**
    * Send a batch of commands and draw the answer.

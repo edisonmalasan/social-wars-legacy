@@ -1184,6 +1184,13 @@ assault against the new server, and the cheat battery is fully rejected.
       HUD — the resources, the population, the level and the energy — and every number
       opens the popover the model writes. The interface is **React DOM**, the renderer
       the locked decisions name
+- [x] The player can **build from the interface**: picking an entry in the build menu
+      **begins a placement** — the locked entries cannot be picked, so the menu says
+      what the player cannot build yet — and clicking a tile turns the gesture into
+      the server's `buy` command. The client decides nothing: the server prices the
+      building, checks the level, the cost, the population and the limits, and places
+      it if the rules allow it. The **end-to-end test** picks an entry and proves the
+      placement began
 - [x] The **build menu is drawn** (`apps/client/src/ui/buildmenu.tsx`): the tabs are the
       content's categories, and each tab's list is the model's order, so the entries the
       player cannot build yet are further down the list rather than gone
