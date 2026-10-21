@@ -24,6 +24,7 @@ import {
   type ClientSession,
 } from '@swl/client';
 import type { NativeCommand, NativeResponse } from '@swl/protocol';
+import type { ContentBundle, ContentItem } from '@swl/content';
 import { claimDailyBonus } from '@swl/client';
 
 const STAGE = document.getElementById('stage');
@@ -63,19 +64,22 @@ async function json<T>(url: string, init?: RequestInit): Promise<T> {
 }
 
 /** The items of a map, as the scene sees them. */
-function sceneItems(
-  world: ServerWorld,
-  content: { items: Record<string, { width?: number; properties?: Record<string, unknown>; elevation?: number; img_name?: string }> },
-): SceneItem[] {
+function sceneItems(world: ServerWorld, content: ContentBundle): SceneItem[] {
   const map = world.maps[0];
   if (!map) return [];
+
+  // The bundle holds its items as a **list**, so they are indexed by
+  // id once. (They used to be looked up as if they were a map, which
+  // meant that no item was ever found and nothing was ever drawn.)
+  const definitions = new Map<number, ContentItem>();
+  for (const item of content.items) definitions.set(item.id, item);
 
   const items: SceneItem[] = [];
   for (const [id, tuple] of Object.entries(map.items ?? {})) {
     const [itemId, tx, ty, , orientation] = tuple as [
       number, number, number, number, number,
     ];
-    const definition = content.items[String(itemId)];
+    const definition = definitions.get(itemId);
     if (!definition) continue;
 
     items.push({
@@ -85,7 +89,10 @@ function sceneItems(
       ty,
       width: definition.width ?? 1,
       walkable: definition.properties?.['walkable'] !== undefined,
-      elevation: definition.elevation ?? 0,
+      // The elevation is not in the content: in the original it comes
+      // from the art's own anchor, and the trimmed frame already
+      // carries it.
+      elevation: 0,
       orientation: orientation ?? 0,
       animation: 0,
     });
@@ -236,7 +243,7 @@ async function main(): Promise<void> {
   const signedIn: ClientSession = session;
 
   const manifest = await json<FrameManifest>(MANIFEST_URL);
-  const content = await json<{ items: Record<string, never> }>(CONTENT_URL);
+  const content = await json<ContentBundle>(CONTENT_URL);
 
   const renderer = await WorldRenderer.start({
     element: GAME,

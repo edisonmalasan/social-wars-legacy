@@ -9,7 +9,8 @@
     ".": "./src/index.ts",
     "./apply": "./src/apply.ts",
     "./migrations": "./src/migrations.ts",
-    "./schema": "./src/schema.ts"
+    "./schema": "./src/schema.ts",
+    "./starttown": "./src/starttown.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit",

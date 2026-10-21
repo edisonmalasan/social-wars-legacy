@@ -27,6 +27,7 @@ import { PGlite } from '@electric-sql/pglite';
 
 import { createApplier } from '@swl/server/apply';
 import { runMigrations } from '@swl/server/migrations';
+import { startingTown } from '@swl/server/starttown';
 import type { ShimWorld } from '@swl/server/apply';
 
 import { SCHEMA_MIGRATIONS } from '@swl/server/schema';
@@ -80,20 +81,22 @@ export interface OfflineMode {
   close: () => Promise<void>;
 }
 
-/** The player the offline mode plays as. */
+/**
+ * The player the offline mode plays as. */
 export const OFFLINE_PLAYER = 'offline';
 
 /**
  * The offline mode's world.
  *
- * The same shape the server's development player gets: an empty town and
- * the starting resources.
+ * The same shape the server's new player gets — the same **starting
+ * town**, the same resources — because the offline mode is the same
+ * game without a server.
  */
 export function initialOfflineWorld(): ShimWorld {
   return {
     save: {
       playerInfo: { pid: OFFLINE_PLAYER, name: 'Offline' },
-      maps: [{ id: 0, items: {} }],
+      maps: [{ id: 0, items: startingTown() }],
       privateState: {},
     },
     resources: { g: 2000, w: 2000, o: 2000, s: 2000, c: 2000, e: 50, x: 0, m: 0 },

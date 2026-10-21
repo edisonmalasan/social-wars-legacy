@@ -478,6 +478,15 @@ async function main() {
             `(${answer.sprites} sprite(s) drawn)`,
         );
 
+        // The renderer has to have drawn something. A player with a town
+        // sees it, and a client that draws **nothing** is a client that
+        // is not playing the game.
+        if (answer.sprites < 1) {
+          failures.push(`${entry.name}: the client drew nothing (${answer.sprites} sprite(s))`);
+          console.log('FAILED (the client drew nothing)');
+          continue;
+        }
+
         // The render loop's rate. In a **headless** browser this is not
         // the game's real frame rate - there is no GPU and the frames are
         // throttled - but it does prove the loop is running. The rate is
