@@ -39,6 +39,15 @@ export interface PlayerStore {
   has(playerId: string): Promise<boolean>;
 
   /**
+   * Every player's save.
+   *
+   * The neighbour strip needs the other players, so the store has to
+   * be able to list them. The order is the store's, and the client
+   * decides what to show.
+   */
+  list(): Promise<PlayerSave[]>;
+
+  /**
    * Give a player their world.
    *
    * A player who has registered but has no save is not a player: the
@@ -102,6 +111,14 @@ export class MemoryPlayerStore implements PlayerStore {
 
   async has(playerId: string): Promise<boolean> {
     return this.saves.has(playerId);
+  }
+
+  async list(): Promise<PlayerSave[]> {
+    const out: PlayerSave[] = [];
+    for (const save of this.saves.values()) {
+      out.push({ playerId: save.playerId, world: cloneWorld(save.world) });
+    }
+    return out;
   }
 
   async transact(

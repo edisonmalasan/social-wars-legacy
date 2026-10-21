@@ -13,7 +13,7 @@
  */
 import { useMemo } from 'react';
 
-import { hudState, type WorldSnapshot } from '@swl/client';
+import { hudState, type Neighbour, type WorldSnapshot } from '@swl/client';
 import type { ContentBundle } from '@swl/content';
 
 import { BuildMenu } from './buildmenu.tsx';
@@ -21,6 +21,7 @@ import { Chapters } from './chapters.tsx';
 import { Goals } from './goals.tsx';
 import { Hud } from './hud.tsx';
 import { InfoPanel } from './info.tsx';
+import { Neighbours } from './neighbours.tsx';
 import {
   buildItems,
   categories,
@@ -41,6 +42,8 @@ export interface RootProps {
   placing?: number | null;
   /** The item the player selected on the map, or null. */
   selected?: number | null;
+  /** The other players, for the neighbour strip. */
+  neighbours?: readonly Neighbour[];
   /** The player asked to collect the selected building's production. */
   onCollect?: () => void;
   /** The player picked something to build. */
@@ -59,6 +62,7 @@ export function Root({
   bundle,
   placing,
   selected,
+  neighbours = [],
   onCollect,
   onPick,
 }: RootProps): React.JSX.Element {
@@ -80,6 +84,7 @@ export function Root({
       <Goals goals={goals} />
       <Chapters ranks={ranks} minLevels={minLevels} />
       <InfoPanel panel={panel} onCollect={onCollect} />
+      <Neighbours neighbours={neighbours} />
       <BuildMenu
         items={items}
         categories={tabs}

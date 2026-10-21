@@ -195,11 +195,12 @@ describe('a camera centred on a tile', () => {
   });
 
   it('works for any tile', () => {
-    for (const [tx, ty] of [
+    const tiles: [number, number][] = [
       [0, 0],
       [10, 40],
       [99, 99],
-    ]) {
+    ];
+    for (const [tx, ty] of tiles) {
       const camera = cameraCentredOn(tx, ty);
       const position = tileToPixel(tx, ty, viewportOf(camera));
       assert.equal(position.x, STAGE_WIDTH / 2);

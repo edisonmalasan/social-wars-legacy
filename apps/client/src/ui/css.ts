@@ -263,6 +263,47 @@ export function uiCss(): string {
   font-weight: 700;
 }
 
+/* --- The neighbour strip ----------------------------------------------- */
+
+.swl-neighbours {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  display: flex;
+  gap: 4px;
+  pointer-events: auto;
+}
+
+.swl-neighbour {
+  width: 74px;
+  padding: 4px;
+  border: 1px solid #38445a;
+  border-radius: 3px;
+  background: #131a24;
+  text-align: center;
+}
+
+.swl-neighbour-portrait {
+  height: 28px;
+  margin-bottom: 3px;
+  border-radius: 3px;
+  background: #1d2430;
+}
+
+.swl-neighbour-name {
+  color: #e8e3d8;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.swl-neighbour-level,
+.swl-neighbour-xp {
+  color: #8d97a8;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+}
+
 /* --- The build menu ---------------------------------------------------- */
 
 .swl-build-menu {

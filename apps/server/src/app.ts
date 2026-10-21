@@ -700,6 +700,36 @@ export function createApp(
         });
       }
 
+      if (path === '/api/neighbours') {
+        if (request.method !== 'GET') return fail(405, 'method-not-allowed');
+        // The **neighbour strip**: the other players, with their names,
+        // their levels and their experience. The order is the store's,
+        // and the client decides what to show.
+        const playerId = identify(request);
+        if (!playerId) return fail(401, 'unknown-player');
+        const saves = await options.store.list();
+        const neighbours = [];
+        for (const save of saves) {
+          if (save.playerId === playerId) continue;
+          const map = (save.world.save.maps[0] ?? {}) as Record<string, unknown>;
+          const info = (save.world.save.playerInfo ?? {}) as Record<string, unknown>;
+          const level = typeof map['level'] === 'number' ? map['level'] : 1;
+          const xp = typeof map['xp'] === 'number' ? map['xp'] : 0;
+          neighbours.push({
+            id: save.playerId,
+            name: typeof info['name'] === 'string' ? info['name'] : save.playerId,
+            level,
+            xp,
+            resources: save.world.resources,
+            // The clone has no static villages: the original's neutral
+            // towns are a fact about the game that only the vendored
+            // upstream records.
+            static: false,
+          });
+        }
+        return json(200, { neighbours });
+      }
+
       if (path === '/api/command') {
         if (request.method !== 'POST') return fail(405, 'method-not-allowed');
         return await handleNativeCommand(request);

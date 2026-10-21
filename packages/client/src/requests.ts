@@ -15,8 +15,34 @@
  * authority: `packages/protocol/src/commands.ts`.
  */
 import type { CommandName, NativeCommand } from '@swl/protocol';
+import type { Neighbour } from './neighbours.ts';
+import { authorizationHeader, type ClientSession } from './session.ts';
 
 export type { CommandName, NativeCommand };
+
+/**
+ * The other players, for the neighbour strip.
+ *
+ * The server's answer: the names, the levels and the experience are
+ * the **server's**, and the order is the store's.
+ */
+export async function fetchNeighbours(
+  session: ClientSession,
+  fetchImpl: typeof fetch = fetch,
+): Promise<Neighbour[]> {
+  try {
+    const response = await fetchImpl('/api/neighbours', {
+      headers: { authorization: authorizationHeader(session) },
+    });
+    if (!response.ok) return [];
+    const body = (await response.json()) as { neighbours?: Neighbour[] };
+    return body.neighbours ?? [];
+  } catch {
+    // The server could not be reached. The strip is empty, and the
+    // game is still playable.
+    return [];
+  }
+}
 
 /** The client's own town. */
 export const OWN_TOWN = 0;
