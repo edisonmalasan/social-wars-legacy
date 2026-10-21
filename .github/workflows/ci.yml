@@ -66,6 +66,18 @@ jobs:
       - name: The soak test
         run: node --expose-gc scripts/soak-server.mjs --batches 2000 --players 4
 
+      # The load test, and the **performance budgets** it is measured
+      # against. The budgets are written down, so a failure says which
+      # promise was broken.
+      - name: The load test
+        run: node scripts/load-test.mjs --players 8 --rounds 20
+
+      # The load test, and the **performance budgets** it is measured
+      # against. The budgets are written down, so a failure says which
+      # promise was broken.
+      - name: The load test
+        run: node scripts/load-test.mjs --players 8 --rounds 20
+
       - name: Build and validate the content bundle
         run: pnpm build:content
 
