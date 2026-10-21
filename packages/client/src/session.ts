@@ -179,6 +179,8 @@ export interface WorldSnapshot {
     level?: number;
     /** The XP the player has. */
     xp?: number;
+    /** The extra population the map's expansions grant. */
+    increasedPopulation?: number;
   }[];
   privateState: Record<string, unknown>;
   resources: Resources;

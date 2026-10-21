@@ -43,6 +43,19 @@ function worldWithBuilding(
   };
 }
 
+/** A map with the given items on it. */
+function worldWithItems(items: Record<string, MapItemTuple>): ShimWorld {
+  return {
+    save: {
+      playerInfo: {},
+      maps: [{ id: 0, items }],
+      privateState: {},
+    },
+    resources: { g: 0, w: 0, o: 0, s: 0, c: 0, e: 100, x: 0, m: 0 },
+    nextCommandNumber: 1,
+  };
+}
+
 /** A wallet with the given amount of cash. */
 function wallet(cash: number): ShimWorld['resources'] {
   return { g: 0, w: 0, o: 0, s: 0, c: cash, e: 100, x: 0, m: 0 };
@@ -74,6 +87,8 @@ function item(over: Partial<ApplierItem> = {}): ApplierItem {
     trainsIds: [],
     upgradesTo: null,
     premiumUpgradeCosts: {},
+    type: 'b',
+    grantsPopulation: false,
     ...over,
   };
 }
@@ -175,6 +190,64 @@ describe('placing a building', () => {
       }),
     );
     const world = worldWithBuilding({});
+    const outcome = applier(world, {
+      name: 'place_stored_item',
+      args: [1, 30, 5, 6, 1, 0, 0],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'population');
+  });
+
+  it('raises the ceiling with the population the buildings grant', () => {
+    // A House I grants 3 population, so the ceiling is 20 + 3 = 23.
+    const applier = createApplier(
+      deps({
+        items: new Map([
+          [1, item({ id: 1, population: 3, grantsPopulation: true })],
+          [30, item({ id: 30, population: 24, grantsPopulation: true })],
+        ]),
+        populationRules: {
+          startMaxPopulation: 20,
+          maxPopulationCap: 175,
+          maxPopulationPerLevel: 3,
+        },
+      }),
+    );
+    const world = worldWithItems({
+      '7': [1, 0, 0, 0, 0, [], {}, 1],
+    });
+    // The building costs 24 population and the ceiling is 23.
+    const outcome = applier(world, {
+      name: 'place_stored_item',
+      args: [1, 30, 5, 6, 1, 0, 0],
+    });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'population');
+  });
+
+  it('counts a unit\'s population as used, not as granted', () => {
+    // A unit uses population, so it lowers what is left rather than
+    // raising the ceiling.
+    const applier = createApplier(
+      deps({
+        items: new Map([
+          [1, item({ id: 1, population: 3, grantsPopulation: true })],
+          [1001, item({ id: 1001, type: 'u', population: 19, grantsPopulation: false })],
+          [30, item({ id: 30, population: 5, grantsPopulation: true })],
+        ]),
+        populationRules: {
+          startMaxPopulation: 20,
+          maxPopulationCap: 175,
+          maxPopulationPerLevel: 3,
+        },
+      }),
+    );
+    const world = worldWithItems({
+      '7': [1, 0, 0, 0, 0, [], {}, 1],
+      '8': [1001, 1, 1, 0, 0, [], {}, 1],
+    });
+    // The ceiling is 23 and 19 are used, so a building that costs 5
+    // does not fit.
     const outcome = applier(world, {
       name: 'place_stored_item',
       args: [1, 30, 5, 6, 1, 0, 0],

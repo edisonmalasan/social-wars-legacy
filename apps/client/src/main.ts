@@ -25,7 +25,7 @@ import {
 } from '@swl/client';
 import type { NativeCommand, NativeResponse } from '@swl/protocol';
 import type { ContentBundle, ContentItem } from '@swl/content';
-import { claimDailyBonus } from '@swl/client';
+import { buy, claimDailyBonus } from '@swl/client';
 
 import { mountUi } from './ui/mount.tsx';
 import { uiCss } from './ui/css.ts';
@@ -154,6 +154,13 @@ export interface ClientHandle {
    * the game really makes and not a test's imitation of it.
    */
   claimDailyBonus: typeof claimDailyBonus;
+  /**
+   * Buy a building and place it.
+   *
+   * The client asks; the server checks the level, the cost, the
+   * population and the limits, and places it if the rules allow it.
+   */
+  buy: typeof buy;
   /** The frames per second the render loop is running at. */
   framesPerSecond: () => number;
 }
@@ -318,6 +325,7 @@ async function main(): Promise<void> {
     send: (commands) => sendCommands(session.token, commands),
     run,
     claimDailyBonus,
+    buy,
     framesPerSecond: () => framesPerSecond,
   };
   (window as unknown as { __swl?: ClientHandle }).__swl = handle;

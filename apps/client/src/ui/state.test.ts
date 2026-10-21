@@ -9,7 +9,7 @@ import {
   expRequiredByLevel,
   hudInput,
   hudRules,
-  populationByItem,
+  populationItems,
 } from './state.ts';
 
 function item(overrides: Partial<ContentItem>): ContentItem {
@@ -91,9 +91,20 @@ describe('the HUD\'s rules', () => {
 });
 
 describe('the content\'s indexes', () => {
-  it('know what each item\'s population is', () => {
-    const map = populationByItem(bundle({ items: [item({ id: 26, population: 3 })] }));
-    assert.equal(map.get(26), 3);
+  it('know what each item does to the population', () => {
+    const map = populationItems(
+      bundle({
+        items: [
+          item({ id: 26, population: 3, properties: { grants_population: 1 } }),
+          item({ id: 1001, type: 'u', population: 1 }),
+        ],
+      }),
+    );
+    assert.equal(map.get(26)?.population, 3);
+    assert.equal(map.get(26)?.grants, true);
+    assert.equal(map.get(26)?.type, 'b');
+    assert.equal(map.get(1001)?.type, 'u');
+    assert.equal(map.get(1001)?.grants, false);
   });
 
   it('know what each level\'s experience is', () => {
@@ -171,7 +182,7 @@ describe('the HUD\'s input', () => {
       world,
     );
     assert.equal(input.world, world);
-    assert.equal(input.populationByItem.get(26), 3);
+    assert.equal(input.items.get(26)?.population, 3);
     assert.equal(input.rules.maxEnergy, 30);
   });
 });

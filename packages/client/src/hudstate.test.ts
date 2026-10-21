@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  additionalPopulation,
   expRequired,
   hudState,
   levelOf,
@@ -9,6 +10,7 @@ import {
   populationOf,
   type HudInput,
   type HudRules,
+  type ItemPopulation,
 } from './hudstate.ts';
 import type { WorldSnapshot } from './session.ts';
 
@@ -21,10 +23,13 @@ const RULES: HudRules = {
 };
 
 const CONTENT = {
-  populationByItem: new Map([
-    [26, 3],
-    [1, 3],
-    [932, 0],
+  items: new Map<number, ItemPopulation>([
+    // The Command Center grants nothing.
+    [26, { population: 0, type: 'b', grants: true }],
+    // A House I grants 3.
+    [1, { population: 3, type: 'b', grants: true }],
+    // A Soldier uses 1.
+    [1001, { population: 1, type: 'u', grants: false }],
   ]),
   rules: RULES,
   expRequiredByLevel: new Map([
@@ -79,23 +84,45 @@ describe('the level', () => {
 });
 
 describe('the population', () => {
-  it('is the sum of the placed items\' population', () => {
-    // The Command Center (3) and the House (3).
-    assert.equal(populationOf(world(), CONTENT.populationByItem), 6);
+  it('is used by the units and granted by the buildings', () => {
+    // The Command Center grants 0 and the House grants 3.
+    const population = populationOf(world(), CONTENT.items);
+    assert.equal(population.used, 0);
+    assert.equal(population.granted, 3);
+  });
+
+  it('counts a unit\'s population as used', () => {
+    const withUnit = world();
+    withUnit.maps[0]!.items['3'] = [1001, 20, 20, 0, 0, 0, 0, 1];
+    const population = populationOf(withUnit, CONTENT.items);
+    assert.equal(population.used, 1);
+    assert.equal(population.granted, 3);
   });
 
   it('is zero for an empty map', () => {
     const bare = world();
     bare.maps[0]!.items = {};
-    assert.equal(populationOf(bare, CONTENT.populationByItem), 0);
+    assert.deepEqual(populationOf(bare, CONTENT.items), { used: 0, granted: 0 });
   });
 
-  it('grows with the level, and stops at the cap', () => {
-    assert.equal(populationLimit(1, RULES), 23);
-    assert.equal(populationLimit(10, RULES), 50);
-    // The cap: 20 + 3 * level would be more than 175 from level 52.
-    assert.equal(populationLimit(52, RULES), 175);
-    assert.equal(populationLimit(100, RULES), 175);
+  it('is 20 for a player with no houses, whatever their level', () => {
+    // The level does not raise the ceiling: the buildings do.
+    assert.equal(populationLimit(0, RULES), 20);
+    assert.equal(populationLimit(0, RULES, 0), 20);
+    assert.equal(populationLimit(3, RULES), 23);
+  });
+
+  it('stops at the cap', () => {
+    assert.equal(populationLimit(200, RULES), 175);
+  });
+
+  it('counts the map\'s own extra population', () => {
+    const expanded = world();
+    expanded.maps[0]!.increasedPopulation = 10;
+    assert.equal(additionalPopulation(expanded), 10);
+    assert.equal(additionalPopulation(world()), 0);
+    // The extra population raises the hard cap, not the soft one.
+    assert.equal(populationLimit(0, RULES, 10), 20);
   });
 });
 
@@ -136,9 +163,17 @@ describe('the HUD\'s state', () => {
 
   it('counts the population and the limit', () => {
     const state = hudState(input());
-    assert.equal(state.population, 6);
+    assert.equal(state.population, 0);
     assert.equal(state.populationMaxCurrent, 23);
     assert.equal(state.populationMaxAllowed, 175);
+  });
+
+  it('shows 20 of 20 for a player with only a Command Center', () => {
+    const bare = world();
+    bare.maps[0]!.items = { '1': [26, 48, 48, 0, 0, 0, 0, 1] };
+    const state = hudState(input({ world: bare }));
+    assert.equal(state.population, 0);
+    assert.equal(state.populationMaxCurrent, 20);
   });
 
   it('carries the level and the experience', () => {

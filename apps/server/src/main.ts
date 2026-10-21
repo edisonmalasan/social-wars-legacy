@@ -38,6 +38,7 @@ import type { CostContent } from '@swl/rules';
 import { createApp, type AppRequest } from './app.ts';
 import { DEFAULT_LIMITS } from './limits.ts';
 import { MemoryPlayerStore } from '@swl/server';
+import { contentItems, populationRules } from '@swl/server';
 import { createApplier, initialWorld, tracedDatabase } from '@swl/server';
 
 /** The port to listen on. */
@@ -61,6 +62,18 @@ async function readBody(request: IncomingMessage, limit: number): Promise<string
     chunks.push(buffer);
   }
   return Buffer.concat(chunks).toString('utf8');
+}
+
+/**
+ * The content's globals.
+ *
+ * They are the game's own configuration, and the rules read them.
+ */
+function globalsOf(bundle: { globals?: unknown }): Record<string, unknown> {
+  const globals = bundle.globals;
+  return typeof globals === 'object' && globals !== null
+    ? (globals as Record<string, unknown>)
+    : {};
 }
 
 /**
@@ -204,6 +217,10 @@ async function main(): Promise<void> {
       tzOffsetHours: 0,
       collectPeriods: { minutes: [5, 60, 240, 480], multiplier: [0.25, 1, 2, 3] },
       dailyBonus: { goldRewards: [100, 250, 500, 1000, 0], heroItemId: 1001 },
+      // The content, so the applier can check the **rules**: the level,
+      // the population and the limits are all the game's own.
+      items: contentItems(bundle),
+      populationRules: populationRules(globalsOf(bundle)),
     }),
   });
 
