@@ -44,6 +44,13 @@ export const LICENCES = {
   serde: { licence: 'MIT OR Apache-2.0', why: 'the serialisation' },
   'serde_json': { licence: 'MIT OR Apache-2.0', why: 'the serialisation' },
   tempfile: { licence: 'MIT OR Apache-2.0', why: 'the tests' },
+  rustls: { licence: 'Apache-2.0 OR ISC OR MIT', why: "the shell's certificate check" },
+  'rustls-native-certs': {
+    licence: 'Apache-2.0 OR ISC OR MIT',
+    why: "the operating system's certificate roots",
+  },
+  'rustls-pki-types': { licence: 'MIT OR Apache-2.0', why: "the certificate's types" },
+  ring: { licence: 'Apache-2.0 AND ISC', why: "the certificate's fingerprint" },
 
   // The fonts, which are not a package but are shipped.
   nunito: {
@@ -61,6 +68,12 @@ export const PERMITTED = [
   'MIT',
   'Apache-2.0',
   'MIT OR Apache-2.0',
+  // A three-way choice, and it is *more* permissive than the two-way
+  // one: ISC joins the alternatives.
+  'Apache-2.0 OR ISC OR MIT',
+  // A conjunction, and it is *more* restrictive than Apache-2.0 alone:
+  // both licences apply.
+  'Apache-2.0 AND ISC',
   'SIL Open Font License 1.1',
   'BSD-2-Clause',
   'BSD-3-Clause',

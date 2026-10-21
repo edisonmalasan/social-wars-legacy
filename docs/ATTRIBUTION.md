@@ -50,6 +50,7 @@ that matter most to a user are:
 | [Nunito](https://fonts.google.com/specimen/Nunito) | SIL OFL 1.1 | The substitute for Arial Rounded MT Bold |
 | [Rubik Mono One](https://fonts.google.com/specimen/Rubik+Mono+One) | SIL OFL 1.1 | The substitute for Komika Axis |
 | [Tauri](https://tauri.app) | MIT / Apache-2.0 | The desktop shell |
+| [rustls](https://github.com/rustls/rustls) | MIT / ISC / Apache-2.0 | The shell's certificate check |
 | [PixiJS](https://pixijs.com) | MIT | The client's renderer |
 | [PGlite](https://pglite.dev) | Apache-2.0 | The development server's database, and the tests' |
 | [TypeScript](https://www.typescriptlang.org) | Apache-2.0 | The language |

@@ -1292,8 +1292,22 @@ assault against the new server, and the cheat battery is fully rejected.
       server. The shell's first job is the choice: `--server <url>` points the web view
       at somebody else's server, and anything else starts the local one. Both are
       covered by the shell's tests
-- [ ] The remote server's **certificate** is checked and the address is shown to the
+- [x] The remote server's **certificate** is checked and the address is shown to the
       player before the game connects to it
+      (`apps/desktop/src-tauri/src/certificate.rs`). The check is a **real TLS
+      handshake** against the **operating system's own roots**, so a certificate that
+      does not verify, that has expired, or that is for somebody else's host fails
+      here rather than in a web view - and the shell does **not** connect
+- [x] The **address** is in the window's **title** before the navigation, together with
+      what the check found, so the player knows which server they are playing against
+- [x] The certificate's **fingerprint** is read, in the shape OpenSSL prints it, because
+      it is the one thing a player can compare against the server operator's own answer
+- [x] A plain `http://` address **says so** rather than pretending: the traffic is in the
+      clear, and the shell says that instead of quietly connecting
+- [x] The check is **tested**: the URL is taken apart - the scheme, the host, the port,
+      the path, the credentials and an IPv6 address - a bad URL is refused, an
+      unreachable server is an error rather than a panic, and the fingerprint's shape is
+      checked
 - [x] The product is **pure online** (ADR 19). The client never decides an outcome, never
       keeps a world of its own and never runs the rules engine to settle a battle: every
       command goes to the server, and the server's answer is what is drawn. The original

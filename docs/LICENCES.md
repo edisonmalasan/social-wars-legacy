@@ -27,8 +27,12 @@ original project asks for.
 | `tauri` | 2 | MIT OR Apache-2.0 | the desktop shell |
 | `serde` | 1 | MIT OR Apache-2.0 | the serialisation |
 | `serde_json` | 1 | MIT OR Apache-2.0 | the serialisation |
+| `rustls` | 0.23 | Apache-2.0 OR ISC OR MIT | the shell's certificate check |
+| `rustls-native-certs` | 0.7 | Apache-2.0 OR ISC OR MIT | the operating system's certificate roots |
+| `rustls-pki-types` | 1 | MIT OR Apache-2.0 | the certificate's types |
+| `ring` | 0.17 | Apache-2.0 AND ISC | the certificate's fingerprint |
 
-The tree has **412** crates in total, pinned by
+The tree has **437** crates in total, pinned by
 `Cargo.lock`. The direct ones are above; the rest are Tauri's, and
 each carries its own licence.
 

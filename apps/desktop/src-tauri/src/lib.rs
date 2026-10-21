@@ -28,6 +28,8 @@
 //! `TutorialMain` carries those numbers. The window is that size, and
 //! it will not go below it.
 
+pub mod certificate;
+
 use std::io::{Read, Write};
 use std::net::TcpStream;
 use std::process::{Child, Command, Stdio};
@@ -75,7 +77,9 @@ pub fn resolve_server_target(args: &[String]) -> ServerTarget {
         match args[index].as_str() {
             "--server" | "-s" => {
                 if let Some(url) = args.get(index + 1) {
-                    return ServerTarget::Remote { url: normalise_url(url) };
+                    return ServerTarget::Remote {
+                        url: normalise_url(url),
+                    };
                 }
             }
             "--port" | "-p" => {
@@ -198,7 +202,10 @@ fn health_check(port: u16) -> bool {
     };
     let _ = socket.set_read_timeout(Some(Duration::from_millis(500)));
     let _ = socket.set_write_timeout(Some(Duration::from_millis(500)));
-    if socket.write_all(b"GET /health HTTP/1.0\r\nHost: localhost\r\n\r\n").is_err() {
+    if socket
+        .write_all(b"GET /health HTTP/1.0\r\nHost: localhost\r\n\r\n")
+        .is_err()
+    {
         return false;
     }
     let mut buffer = [0_u8; 256];
@@ -218,6 +225,10 @@ pub struct ShellState {
     pub server_url: String,
     /// Whether the shell started the server itself.
     pub local: bool,
+    /// What the shell found when it checked the remote server's
+    /// certificate. It is `None` for the local server, which has no
+    /// certificate.
+    pub certificate: Option<certificate::CertificateReport>,
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -225,9 +236,27 @@ pub fn run() {
     let args: Vec<String> = std::env::args().collect();
     let target = resolve_server_target(&args);
 
+    // The remote server's **certificate** is checked before the web
+    // view is pointed at it, and the address is shown to the player.
+    // A certificate that does not verify means the shell does not
+    // connect: it is better to say why than to fail in a web view.
+    let (report, failure) = match &target {
+        ServerTarget::Remote { url } => match certificate::parse_remote(url) {
+            Ok(server) => {
+                match certificate::check_certificate(&server, certificate::DEFAULT_TIMEOUT) {
+                    Ok(report) => (Some(report), None),
+                    Err(error) => (None, Some(error)),
+                }
+            }
+            Err(error) => (None, Some(error)),
+        },
+        ServerTarget::Local { .. } => (None, None),
+    };
+
     let state = ShellState {
         server_url: target.url(),
         local: target.is_local(),
+        certificate: report.clone(),
     };
     // The closure needs its own copy, because the state is managed with
     // the builder and the two cannot both take it.
@@ -254,15 +283,33 @@ pub fn run() {
         }
 
         if let Some(window) = app.get_webview_window("main") {
-            if let Ok(url) = tauri::Url::parse(server_url.as_str()) {
-                let _ = window.navigate(url);
+            // The title carries the address the player is about to play
+            // against, and what the check found. The title is set
+            // **before** the navigation, so the player sees the address
+            // before the game connects.
+            if let Some(report) = &report {
+                let _ = window.set_title(&format!("{} \u{2014} {}", report.address, report.note));
+            }
+            match &failure {
+                Some(error) => {
+                    // The certificate did not verify, so the shell does
+                    // not connect.
+                    let _ = window.set_title(&format!("The server was not checked: {error}"));
+                }
+                None => {
+                    if let Ok(url) = tauri::Url::parse(server_url.as_str()) {
+                        let _ = window.navigate(url);
+                    }
+                }
             }
         }
 
         Ok(())
     });
 
-    builder.run(tauri::generate_context!()).expect("the shell could not start");
+    builder
+        .run(tauri::generate_context!())
+        .expect("the shell could not start");
 }
 
 /// The command that starts the server in development.
@@ -290,7 +337,12 @@ mod tests {
     #[test]
     fn the_local_server_is_the_default() {
         let target = resolve_server_target(&args(&[]));
-        assert_eq!(target, ServerTarget::Local { port: DEFAULT_LOCAL_PORT });
+        assert_eq!(
+            target,
+            ServerTarget::Local {
+                port: DEFAULT_LOCAL_PORT
+            }
+        );
         assert!(target.is_local());
         assert_eq!(target.url(), "http://127.0.0.1:8080/");
     }
@@ -329,7 +381,12 @@ mod tests {
     #[test]
     fn a_missing_server_argument_falls_back_to_the_local_one() {
         let target = resolve_server_target(&args(&["--server"]));
-        assert_eq!(target, ServerTarget::Local { port: DEFAULT_LOCAL_PORT });
+        assert_eq!(
+            target,
+            ServerTarget::Local {
+                port: DEFAULT_LOCAL_PORT
+            }
+        );
     }
 
     #[test]
