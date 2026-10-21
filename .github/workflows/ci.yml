@@ -47,6 +47,9 @@ jobs:
         run: pnpm typecheck
 
       - name: Lint
+        # The type-check **and** the project's own rules: the client runs
+        # in a browser, and a node: import in the graph it reaches is a
+        # build failure at best.
         run: pnpm lint
 
       - name: Unit tests

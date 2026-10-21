@@ -92,6 +92,7 @@ desktop shells do not — they land with Groups F, G and H.**
 | Prepare the desktop shell's inputs | `node scripts/prepare-desktop.mjs` | Working | Group H — the icons and the placeholder |
 | Check the backups are current    | `node scripts/check-backups.mjs --out <dir>` | Working | Group I — fails when the newest is too old |
 | Check the report set               | `node scripts/check-report-sync.mjs` | Working | Group I — the report against the code |
+| Lint the project's own rules    | `node scripts/lint-project.mjs` | Working | Group I — the browser must not need node |
 | Check the build is reproducible    | `node scripts/check-reproducible-build.mjs` | Working | Group I — builds the client twice |
 | Check the security review          | `node scripts/check-security-review.mjs` | Working | Group I — the claims are covered |
 | Check the decision records         | `node scripts/check-adrs.mjs` | Working | Group I — `--index` rewrites it |
