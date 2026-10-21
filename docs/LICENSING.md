@@ -8,6 +8,13 @@ This is the document the roadmap's "the asset licensing position is
 settled and written down" asks for. It is written in terms of what the
 repository actually contains, so it can be checked rather than believed.
 
+## A request for correction
+
+If you own the rights to anything here and you would like it changed,
+removed or credited differently, the notice says where to write and the
+policy says what happens next: [`CORRECTIONS.md`](CORRECTIONS.md). Every
+request and every answer is recorded there.
+
 ## The short version
 
 1. The **shipped product contains no Zynga asset and no Zynga code.**

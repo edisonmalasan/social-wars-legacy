@@ -1651,9 +1651,21 @@ product.*
       reported. Both are carried, and the upstream's own `LICENSE` and `README` travel
       with the tree. The game's own rights - Zynga's - are stated, and the
       dependencies' licences are enumerated
-- [ ] A **request for correction** is honoured: if someone who owns the rights to
-      anything here wants it changed, removed or credited differently, the notice says
-      so, and the request is answered
+- [x] The **notice says so**: the attribution, the licensing position and the README all
+      say that a rights holder may ask for a change, a removal or different credit, and
+      **where to write** - a draft issue, so that a request need not be public while it is
+      being discussed
+- [x] The **policy** says what happens next (`docs/CORRECTIONS.md`): what can be asked
+      for, what is answered, and that a request that cannot be honoured is **still
+      answered** - because a rights holder who is told nothing has been told that they may
+      be ignored
+- [x] Every request and every answer is **recorded** in an append-only log, because the
+      record that a request was answered is part of the answer
+- [x] The policy is **checked** (`node scripts/check-corrections.mjs`): the notices must
+      point at it, it must say where to write, and the log's rows must each have a date, a
+      request and an answer
+- [ ] A request is **actually** received and honoured. The mechanism exists, but a policy
+      that has never been used is a policy that is only a claim
 
 ### I7 — Documentation
 

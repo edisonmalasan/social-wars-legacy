@@ -133,6 +133,10 @@ jobs:
       - name: The security review's claims are covered
         run: node scripts/check-security-review.mjs
 
+      # A promise nobody checks is a wish.
+      - name: The corrections policy is in order
+        run: node scripts/check-corrections.mjs
+
       # The report set is the project's account of the original game, and
       # a number that has changed in the code but not in the report is a
       # lie waiting to be believed.
