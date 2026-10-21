@@ -6,7 +6,7 @@ import path from 'node:path';
 
 import { costContentFrom } from '@swl/rules';
 
-import { framePayload, SERVER_KEYS } from '@swl/protocol';
+import { framePayload, SERVER_KEYS } from '@swl/protocol/commandphp';
 import { COUNTERS } from '@swl/rules';
 
 import { LegacyIdentityBridge, SessionStore } from './session.ts';

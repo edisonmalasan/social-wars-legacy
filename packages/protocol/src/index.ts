@@ -1,4 +1,3 @@
-export * from './commandphp.ts';
 export * from './commands.ts';
 
 /**

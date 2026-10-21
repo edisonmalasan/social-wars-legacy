@@ -30,7 +30,7 @@
  * The error is the client's **number**, because the client switches on
  * it.
  */
-import { ACCEPTED_KEYS, parseFrame, verifyFrameAny } from '@swl/protocol';
+import { ACCEPTED_KEYS, parseFrame, verifyFrameAny } from '@swl/protocol/commandphp';
 import type { AllianceService, MarketplaceResult, MarketplaceService } from '@swl/server';
 
 import type { AppRequest, AppResponse } from './app.ts';

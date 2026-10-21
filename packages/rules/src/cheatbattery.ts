@@ -72,20 +72,22 @@
 import { assert } from './assert.ts';
 
 import {
-  ACCEPTED_KEYS,
   RESOURCE_ORDER,
-  SERVER_KEYS,
-  framePayload,
-  parseFrame,
   readResource,
-  verifyFrame,
-  verifyFrameAny,
   type CommandName,
   type CommandPayload,
   type ResourceName,
   type ResourceVector,
-  type ServerKey,
 } from '@swl/protocol';
+import {
+  ACCEPTED_KEYS,
+  SERVER_KEYS,
+  framePayload,
+  parseFrame,
+  verifyFrame,
+  verifyFrameAny,
+  type ServerKey,
+} from '@swl/protocol/commandphp';
 
 import {
   PRICED_COMMANDS,

@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { framePayload, SERVER_KEYS } from '@swl/protocol';
+import { framePayload, SERVER_KEYS } from '@swl/protocol/commandphp';
 import { AllianceService, type AllianceUser } from '@swl/server';
 
 import { handleSocialRequest, type SocialOptions } from './social.ts';

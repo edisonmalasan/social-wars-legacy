@@ -7,7 +7,7 @@ import path from 'node:path';
 import { costContentFrom } from '@swl/rules';
 
 import { LegacyIdentityBridge, SessionStore } from '@swl/server';
-import { framePayload, SERVER_KEYS } from '@swl/protocol';
+import { framePayload, SERVER_KEYS } from '@swl/protocol/commandphp';
 
 import { createApp, ERROR_CODES, type AppOptions, type AppRequest } from './app.ts';
 import { MemoryPlayerStore, cloneWorld } from '@swl/server';
