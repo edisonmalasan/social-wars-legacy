@@ -236,9 +236,26 @@ export function createApp(
 
   /** The client a request came from, for the rate limit. */
   function clientKey(request: AppRequest): string {
+    // The limit is **per account**, not per address.
+    //
+    // A player behind a shared address - a household, a school, a
+    // company network, a phone carrier's NAT - would otherwise be
+    // punished for the other people behind that address, and a player
+    // who changed address would lose their limit. The session token
+    // identifies the *player*, so the player is the key.
+    //
+    // A request with no session is keyed by its address, because that is
+    // all there is, and a request whose token does not resolve falls
+    // back to the address too - it is not signed in, so it has no
+    // account to count against.
+    const token = request.headers['authorization']?.replace(/^Bearer\s+/i, '');
+    if (token) {
+      const session = options.sessions.resolve(token, options.now());
+      if (session) return `player:${session.playerId}`;
+    }
     const forwarded = request.headers['x-forwarded-for'];
-    if (forwarded) return forwarded.split(',')[0]?.trim() ?? 'unknown';
-    return request.headers['x-real-ip'] ?? 'local';
+    if (forwarded) return `address:${forwarded.split(',')[0]?.trim() ?? 'unknown'}`;
+    return `address:${request.headers['x-real-ip'] ?? 'local'}`;
   }
 
   /** The request's fields: the query string and a form body. */
@@ -588,8 +605,7 @@ export function createApp(
     if (request.body.length > limits.maxBodyBytes) {
       return fail(413, 'body-too-large');
     }
-    const wait = limiter.check(clientKey(request), options.now());
-    if (wait > 0) {
+    const wait = limiter.check(clientKey(request), options.now());    if (wait > 0) {
       return fail(429, 'rate-limited', { 'retry-after': String(wait) });
     }
 

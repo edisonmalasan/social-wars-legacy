@@ -276,9 +276,12 @@ describe('the application', () => {
 
 describe('the rate limit', () => {
   /** An application with a tiny limit, so the limit is reached quickly. */
-  async function limited(): Promise<(request: AppRequest) => Promise<{ status: number }>> {
+  async function limited(): Promise<
+    (request: AppRequest) => Promise<{ status: number; body: string }>
+  > {
     const sessions = new SessionStore();
     sessions.addPlayer('p1', 'correct horse');
+    sessions.addPlayer('p2', 'correct horse');
     const identity = new LegacyIdentityBridge();
     const store = new MemoryPlayerStore([]);
     const bundle = JSON.parse(
@@ -304,6 +307,70 @@ describe('the rate limit', () => {
       },
     });
   }
+
+  it('counts per ACCOUNT, not per address', async () => {
+    const handle = await limited();
+
+    // Two requests from the first player, and two from the second, and
+    // the second player's are **not** refused: the limit is per account,
+    // so the two do not share it. A player behind a shared address would
+    // otherwise be punished for the other people behind it.
+    const signIn = async (playerId: string): Promise<string> => {
+      const response = await handle({
+        method: 'POST',
+        path: '/api/session',
+        headers: {},
+        body: JSON.stringify({ playerId, password: 'correct horse' }),
+      });
+      assert.equal(response.status, 200);
+      return (JSON.parse(response.body) as { token: string }).token;
+    };
+
+    const first = await signIn('p1');
+    const second = await signIn('p2');
+
+    for (const token of [first, first, second, second]) {
+      const response = await handle({
+        method: 'GET',
+        path: '/health',
+        headers: { authorization: `Bearer ${token}` },
+        body: '',
+      });
+      assert.notEqual(
+        response.status,
+        429,
+        `a player behind the limit was refused: ${response.status}`,
+      );
+    }
+  });
+
+  it('refuses the same account when it goes over the limit', async () => {
+    const handle = await limited();
+    const response = await handle({
+      method: 'POST',
+      path: '/api/session',
+      headers: {},
+      body: JSON.stringify({ playerId: 'p1', password: 'correct horse' }),
+    });
+    const token = (JSON.parse(response.body) as { token: string }).token;
+
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const allowed = await handle({
+        method: 'GET',
+        path: '/health',
+        headers: { authorization: `Bearer ${token}` },
+        body: '',
+      });
+      assert.notEqual(allowed.status, 429);
+    }
+    const refused = await handle({
+      method: 'GET',
+      path: '/health',
+      headers: { authorization: `Bearer ${token}` },
+      body: '',
+    });
+    assert.equal(refused.status, 429);
+  });
 
   it('refuses the mutating endpoints once the limit is reached', async () => {
     const handle = await limited();
