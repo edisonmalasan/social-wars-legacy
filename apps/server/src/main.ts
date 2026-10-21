@@ -38,7 +38,7 @@ import type { CostContent } from '@swl/rules';
 import { createApp, type AppRequest } from './app.ts';
 import { DEFAULT_LIMITS } from './limits.ts';
 import { MemoryPlayerStore } from '@swl/server';
-import { createApplier } from '@swl/server';
+import { createApplier, tracedDatabase } from '@swl/server';
 
 /** The port to listen on. */
 const PORT = Number(process.env['PORT'] ?? 8080);
@@ -118,8 +118,13 @@ async function main(): Promise<void> {
       `[server] the schema is at version ${report.to} ` +
         `(${report.applied.length} migration(s) applied)`,
     );
-    store = new PostgresPlayerStore({ db, items: migrationItems(bundle) });
-    credentials = new PostgresCredentialStore({ db });
+    // The database is **traced**, so every statement becomes a span
+    // under the request that made it. A slow request can then be
+    // attributed - to the database or to the rules engine - rather than
+    // merely observed.
+    const traced = tracedDatabase(db);
+    store = new PostgresPlayerStore({ db: traced, items: migrationItems(bundle) });
+    credentials = new PostgresCredentialStore({ db: traced });
 
     // The credentials are **loaded** at boot, so a player who registered
     // before the restart can log in after it.

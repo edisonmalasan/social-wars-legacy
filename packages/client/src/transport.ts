@@ -20,6 +20,8 @@
  */
 import type { NativeCommand, NativeResponse } from '@swl/protocol';
 
+import { formatTraceparent, newTraceContext, parseTraceparent } from './trace.ts';
+
 /** The protocol version the client speaks. */
 export const PROTOCOL_VERSION = 1;
 
@@ -33,7 +35,17 @@ export interface TransportOptions {
 
 /** The outcome of a batch. */
 export type TransportResult =
-  | { ok: true; response: NativeResponse }
+  | {
+      ok: true;
+      response: NativeResponse;
+      /**
+       * The **trace** the server served the request in, when it said.
+       *
+       * It is what a player quotes when they report a problem, and it
+       * joins the server's log lines to the client's own.
+       */
+      traceId?: string;
+    }
   | { ok: false; reason: 'unauthorized' | 'network' | 'rejected'; detail?: string };
 
 /**
@@ -52,6 +64,10 @@ export async function sendCommands(
   const fetchImpl = options.fetchImpl ?? fetch;
   const id = requestId();
 
+  // The **trace**. The client starts one for the request and sends it,
+  // so the server's work can be joined to the client's own.
+  const trace = newTraceContext();
+
   let response: Response;
   try {
     response = await fetchImpl(`${base}/api/command`, {
@@ -59,6 +75,7 @@ export async function sendCommands(
       headers: {
         'content-type': 'application/json',
         authorization: `Bearer ${token}`,
+        traceparent: formatTraceparent(trace),
       },
       body: JSON.stringify({
         v: PROTOCOL_VERSION,
@@ -81,7 +98,15 @@ export async function sendCommands(
   }
 
   try {
-    return { ok: true, response: (await response.json()) as NativeResponse };
+    const answer = (await response.json()) as NativeResponse;
+    // The server's trace context comes back, so the client knows which
+    // trace served it.
+    const served = parseTraceparent(response.headers.get('traceparent'));
+    return {
+      ok: true,
+      response: answer,
+      ...(served ? { traceId: served.traceId } : {}),
+    };
   } catch {
     return { ok: false, reason: 'rejected', detail: 'the answer was not json' };
   }
