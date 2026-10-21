@@ -566,6 +566,19 @@ async function main() {
         }
         console.log(`  the house was placed (${built.sprites} sprites drawn)`);
 
+        // The town has to be **on the screen**. A sprite that is off
+        // the stage is in the scene but not on the display, and a player
+        // who cannot see their town cannot play.
+        const visible = await page.evaluate(
+          '(() => { const h = window.__swl; return h ? h.visibleSprites() : 0; })()',
+        );
+        if (!visible || visible < 1) {
+          failures.push(`${entry.name}: the town is not on the screen (${visible} sprite(s))`);
+          console.log('FAILED (the town is not on the screen)');
+          continue;
+        }
+        console.log(`  the town is on the screen (${visible} sprite(s) visible)`);
+
         // The render loop's rate. In a **headless** browser this is not
         // the game's real frame rate - there is no GPU and the frames are
         // throttled - but it does prove the loop is running. The rate is

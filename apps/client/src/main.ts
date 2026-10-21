@@ -9,9 +9,10 @@
  * the client draws them. It never decides an outcome.
  */
 import { AtlasIndex, type FrameManifest, type WorldSnapshot } from '@swl/client';
+import { cameraCentredOn, MAP_HEIGHT, MAP_WIDTH, type CameraState } from '@swl/client';
 
 import { buildScene, type SceneItem } from './scene.ts';
-import { WorldRenderer } from './renderer.ts';
+import { WorldRenderer, STAGE_HEIGHT, STAGE_WIDTH } from './renderer.ts';
 import { applyFontScales, clientCss, type FontScaleFile } from './fonts.ts';
 import {
   authorizationHeader,
@@ -70,8 +71,22 @@ async function json<T>(url: string, init?: RequestInit): Promise<T> {
   return (await response.json()) as T;
 }
 
-/** The items of a map, as the scene sees them. */
-function sceneItems(world: WorldSnapshot, content: ContentBundle): SceneItem[] {
+/**
+ * The camera's first position.
+ *
+ * The camera opens on the player's own town: the **first** building on
+ * the map, which is the Command Center the server gives every new
+ * player. The map's middle is the fallback, so a world with nothing on
+ * it still opens in the right place.
+ */
+function cameraFor(world: WorldSnapshot): CameraState {
+  const first = Object.values(world.maps[0]?.items ?? {})[0];
+  const tx = Number(first?.[1] ?? MAP_WIDTH / 2);
+  const ty = Number(first?.[2] ?? MAP_HEIGHT / 2);
+  return cameraCentredOn(tx, ty);
+}
+
+/** The items of a map, as the scene sees them. */function sceneItems(world: WorldSnapshot, content: ContentBundle): SceneItem[] {
   const map = world.maps[0];
   if (!map) return [];
 
@@ -163,6 +178,13 @@ export interface ClientHandle {
   buy: typeof buy;
   /** The frames per second the render loop is running at. */
   framesPerSecond: () => number;
+  /**
+   * How many sprites are on the stage.
+   *
+   * A sprite that is off the stage is in the scene but not on the
+   * screen, so this is what says the player can see their town.
+   */
+  visibleSprites: () => number;
 }
 
 /** The browser's storage, or null when it refuses to be used. */
@@ -279,6 +301,9 @@ async function main(): Promise<void> {
    * decides, and the client draws what the server said.
    */
   let world = await fetchWorld();
+  // The camera opens on the player's own town, so the town is on the
+  // screen rather than off in the corner of a hundred-tile map.
+  renderer.setCamera(cameraFor(world));
   let scene = buildScene(sceneItems(world, content), renderer.viewport, atlas);
   renderer.draw(scene);
 
@@ -327,6 +352,14 @@ async function main(): Promise<void> {
     claimDailyBonus,
     buy,
     framesPerSecond: () => framesPerSecond,
+    visibleSprites: () =>
+      scene.filter(
+        (sprite) =>
+          sprite.x >= 0 &&
+          sprite.x < STAGE_WIDTH &&
+          sprite.y >= 0 &&
+          sprite.y < STAGE_HEIGHT,
+      ).length,
   };
   (window as unknown as { __swl?: ClientHandle }).__swl = handle;
 
