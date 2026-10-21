@@ -1461,8 +1461,14 @@ product.*
       `ALERT_RULES` rather than being whatever the code happens to compare against, and
       each rule says **what to do about it**. A critical alert makes the server
       *unhealthy*, a warning makes it *degraded*
-- [ ] The alerts are **sent** somewhere - a webhook or a message - and the sending is
-      retried, so a server that is unhealthy says so rather than waiting to be asked
+- [x] The alerts are **sent** somewhere - a **webhook** - and the sending is **retried**
+      (`packages/server/src/alerts.ts`). The server is told with `SWL_ALERT_WEBHOOK`,
+      and a report that nobody reads is not an alert
+- [x] The sending is retried with a **growing wait**, so a webhook that is down is
+      not hammered, and a failure is **recorded rather than thrown**: a server that
+      cannot reach the alerting system must still serve its players
+- [x] A report is sent when the status **changes**, not every time it is checked - an
+      alert that repeats every second is an alert that gets muted
 - [x] A **dashboard** shows the live server health and the **content/asset version in
       use** (`/dashboard`), and the machine-readable report is at `/api/health`
       (`packages/server/src/health.ts`). The versions are at the top, because the first
@@ -1503,9 +1509,17 @@ product.*
       change the live database, restore the snapshot and check that the snapshot
       still holds the **old** state - and the digest is what proves the two match
 - [ ] Backups **run automatically** on a schedule, and the schedule is monitored
-- [ ] A runbook covers: stalled deployment, database failure, corrupted player state,
-      content-bundle rollback and emergency player reset
-- [ ] A documented procedure exists for pushing a hotfix to the rules engine
+- [x] A **runbook** covers a stalled deployment, a database failure, corrupted player
+      state, a content-bundle rollback and an emergency player reset
+      (`docs/RUNBOOK.md`). It is organised by **failure** - what it looks like, and what
+      to do about it - and it names the command for each step
+- [x] A **documented procedure** exists for pushing a hotfix to the rules engine
+      (`docs/HOTFIX.md`). It leans on the engine's **purity**: a rule takes its inputs
+      and a seed and returns an answer, so a hotfix cannot have a side effect, cannot
+      depend on when it runs, and can be **replayed** - which is what makes rolling one
+      back a redeploy rather than a migration
+- [x] The procedure names what must **never** be hotfixed: the content, the protocol, and
+      anything that weakens the authority layer
 
 ### I6 — Legal & licensing
 
@@ -1546,9 +1560,12 @@ product.*
 
 ### I7 — Documentation
 
-- [ ] A developer guide covers the architecture, the content pipeline, the asset pipeline
-      and the rules engine
-- [ ] A runbook covers operating the server and the desktop build
+- [x] A **developer guide** covers the architecture, the content pipeline, the asset
+      pipeline, how a command travels, how to write a rule, the tests and the rules of
+      the repository (`docs/DEVELOPING.md`)
+- [x] A **runbook** covers operating the server and the desktop build
+      (`docs/RUNBOOK.md`), and a **user guide** covers installing and playing
+      (`docs/PLAYING.md`)
 - [ ] A user guide covers installing and playing
 - [ ] The `re/` report set is kept in sync with the implementation
 - [x] **Every architectural decision has a written rationale** (`docs/adr/`). Eighteen
