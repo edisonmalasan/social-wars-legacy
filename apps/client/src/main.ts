@@ -140,6 +140,8 @@ export interface ClientHandle {
    * the game really makes and not a test's imitation of it.
    */
   claimDailyBonus: typeof claimDailyBonus;
+  /** The frames per second the render loop is running at. */
+  framesPerSecond: () => number;
 }
 
 /** The browser's storage, or null when it refuses to be used. */
@@ -283,8 +285,17 @@ async function main(): Promise<void> {
     send: (commands) => sendCommands(session.token, commands),
     run,
     claimDailyBonus,
+    framesPerSecond: () => framesPerSecond,
   };
   (window as unknown as { __swl?: ClientHandle }).__swl = handle;
+
+  // The render loop. The game is animated, so the client keeps drawing:
+  // the loop is what advances the sprites and what keeps the screen
+  // alive between the world's changes.
+  let framesPerSecond = 0;
+  renderer.run((rate) => {
+    framesPerSecond = rate;
+  });
 
   // The stage is scaled to fit the window, and it is scaled again when
   // the window changes.

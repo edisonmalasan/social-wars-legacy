@@ -125,6 +125,78 @@ describe('the atlas index', () => {
   });
 });
 
+describe('the animation frames', () => {
+  /**
+   * A sprite's sheet holds one frame per (animation, direction) - the
+   * client picks them with `iAnimation * 5 + frameDirection` - and each
+   * of those frames holds a **sub-clip**: the little movie of the
+   * animation itself.
+   *
+   * The conversion flattened the sub-clips, because a sub-clip is a
+   * timeline rather than a drawing. But the sub-clip's frames are the
+   * symbol's **distinct** drawings, and they appear in the sheet in the
+   * order the sub-clip plays them, so the order is recoverable from the
+   * order they first appear.
+   */
+  const ANIMATED: FrameManifest = {
+    symbols: [
+      {
+        swf: 'sprites/0004_depot_steel_1_m.swf',
+        symbol: 'DefineSprite_59',
+        // Nine animations, five directions.
+        frameCount: 45,
+        uniqueFrames: 12,
+        frames: [
+          { frame: 0, image: 'aaa' },
+          { frame: 1, image: 'bbb' },
+          { frame: 2, image: 'ccc' },
+          { frame: 3, image: 'aaa' },
+          { frame: 4, image: 'bbb' },
+          { frame: 5, image: 'ccc' },
+          { frame: 6, image: 'aaa' },
+          { frame: 7, image: 'bbb' },
+          { frame: 8, image: 'ccc' },
+          { frame: 9, image: 'aaa' },
+          { frame: 10, image: 'bbb' },
+          { frame: 11, image: 'ccc' },
+          // The second animation reuses the same drawings.
+          { frame: 12, image: 'aaa' },
+          { frame: 13, image: 'bbb' },
+        ],
+      },
+    ],
+    images: {
+      aaa: { trim: null, atlas: { file: 'atlas-0000.png', x: 0, y: 0, width: 10, height: 10 } },
+      bbb: { trim: null, atlas: { file: 'atlas-0000.png', x: 10, y: 0, width: 10, height: 10 } },
+      ccc: { trim: null, atlas: { file: 'atlas-0000.png', x: 20, y: 0, width: 10, height: 10 } },
+    },
+  } as unknown as FrameManifest;
+
+  it('are the distinct drawings, in the order they first appear', () => {
+    const index = new AtlasIndex(ANIMATED);
+    assert.deepEqual(
+      index.animationFrames('sprites/0004_depot_steel_1_m.swf', 'DefineSprite_59'),
+      [0, 1, 2],
+    );
+  });
+
+  it('are nothing for a symbol that is not there', () => {
+    const index = new AtlasIndex(ANIMATED);
+    assert.deepEqual(index.animationFrames('sprites/nope.swf', 'DefineSprite_1'), []);
+  });
+
+  it('are the frames the sheet holds', () => {
+    const index = new AtlasIndex(ANIMATED);
+    const sheet = index.symbol(
+      'sprites/0004_depot_steel_1_m.swf',
+      'DefineSprite_59',
+    );
+    assert.ok(sheet);
+    // Nine animations, five directions.
+    assert.equal(sheet!.frameCount, 9 * 5);
+  });
+});
+
 describe('the content hash', () => {
   it('is stable', () => {
     const bytes = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]);

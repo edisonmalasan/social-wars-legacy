@@ -473,6 +473,18 @@ async function main() {
           `the command was answered in ${answer.latencyMs.toFixed(1)} ms ` +
             `(${answer.sprites} sprite(s) drawn)`,
         );
+
+        // The render loop's rate. In a **headless** browser this is not
+        // the game's real frame rate - there is no GPU and the frames are
+        // throttled - but it does prove the loop is running. The rate is
+        // measured over a second, so the loop is given a moment to fill
+        // that window.
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        const rate = await page.evaluate(
+          '(() => { const h = window.__swl; return h ? h.framesPerSecond() : 0; })()',
+        );
+        console.log(`  the render loop is running at ${Number(rate).toFixed(0)} frames a second`);
+
         ran.push(entry.name);
       } catch (error) {
         failures.push(`${entry.name}: ${String(error)}`);

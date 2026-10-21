@@ -173,6 +173,37 @@ export class WorldRenderer {
   }
 
   /**
+   * Run the render loop.
+   *
+   * The game is animated, so the client has to keep drawing: the loop is
+   * what advances the sprites and what keeps the screen alive between
+   * the world's changes.
+   *
+   * The callback is given the **frames per second** the loop is
+   * running at, so the client can measure it and say whether the frame
+   * rate holds.
+   */
+  run(onTick: (framesPerSecond: number) => void): void {
+    let last = performance.now();
+    let frames = 0;
+    let elapsed = 0;
+
+    this.app.ticker.add(() => {
+      const now = performance.now();
+      frames += 1;
+      elapsed += now - last;
+      last = now;
+      // The rate is measured over a second, because a frame's own
+      // duration says nothing about the rate.
+      if (elapsed >= 1000) {
+        onTick((frames * 1000) / elapsed);
+        frames = 0;
+        elapsed = 0;
+      }
+    });
+  }
+
+  /**
    * Fit the stage to the window.
    *
    * The stage is a fixed 760 by 600 and it is **scaled** to fit, rather
