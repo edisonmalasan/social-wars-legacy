@@ -1371,8 +1371,20 @@ product.*
       and every pull request, and the golden-master corpus is one of its steps - and
       the harness fails on any difference it cannot explain
 - [ ] Branches are protected and require a green run plus review
-- [ ] Release artefacts are produced automatically and published to a release
-- [ ] The pipeline is reproducible and re-running it yields the same artefacts
+- [x] **Release artefacts are produced automatically and published to a release**
+      (`.github/workflows/release.yml`). A tag starts the workflow, which runs the
+      **whole gate** - the golden master, the cheat battery, the coverage and the
+      reproducibility check - and only then collects the artefacts: the content bundle,
+      the version and the content's build id. The release is published against the tag
+      with those artefacts attached
+- [x] The **pipeline is reproducible** and re-running it yields the same artefacts
+      (`node scripts/check-reproducible-build.mjs`). The client's build is done
+      **twice** and the two are compared file by file, byte for byte - because a build
+      that produces different bytes each time cannot be trusted: a release cannot be
+      rebuilt, and a change cannot be reviewed by comparing the artefacts
+- [x] The **content bundle** is reproducible by construction - the same inputs give a
+      byte-identical bundle and the same build id, and the id is recorded in the
+      roadmap
 
 ### I3 — Security
 

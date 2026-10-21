@@ -184,6 +184,12 @@ jobs:
       - name: The web client builds
         run: pnpm --filter @swl/app-client build
 
+      # A build that produces different bytes each time cannot be
+      # trusted: a release cannot be rebuilt and a change cannot be
+      # reviewed by comparing the artefacts.
+      - name: The web client's build is reproducible
+        run: node scripts/check-reproducible-build.mjs
+
       # The client has to **run**, not merely build. The built client is
       # served and loaded in a real browser, and the page's own status is
       # read back over the DevTools protocol.
