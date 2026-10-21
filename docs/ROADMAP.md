@@ -1194,7 +1194,22 @@ assault against the new server, and the cheat battery is fully rejected.
 
 ### G5 — Clients
 
-- [ ] The web build runs in Chrome, Edge, Firefox and Safari
+- [x] The web build **runs in Chrome and Edge**, and it is **verified** rather than
+      asserted: the built client is served and loaded in a real browser, and the page's
+      own status is read back over the **DevTools protocol**
+      (`node scripts/smoke-test-client.mjs`). The status is written by the client
+      itself, so the check is not "did the browser not crash" but "**did the client
+      start**" - and it says how many atlas pages it fetched
+- [x] The client **signs in**: it sends a credential to `POST /api/session` and keeps
+      the **session token** the server issues, in the browser's storage, so a player
+      does not sign in on every visit. A stored session that has **expired** is
+      forgotten rather than sent, and the token travels in the `Authorization` header
+- [x] A browser that is **not on the machine** is reported as *not run* rather than as a
+      failure: a machine without Firefox has not failed anything. Firefox and Safari
+      are not on this machine, so they are **not run** here
+- [ ] The client is run in **Firefox and Safari** as well, on a machine that has them
+- [ ] The client is driven through a **complete play session** end to end, from signing
+      in to finishing the tutorial
 - [ ] The desktop build (Tauri) runs on Windows, macOS and Linux
 - [ ] The mobile build (Capacitor) runs on Android and iOS
 - [ ] The game is playable at the original resolutions and scales cleanly to phone screens
