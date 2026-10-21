@@ -1184,6 +1184,11 @@ assault against the new server, and the cheat battery is fully rejected.
       HUD — the resources, the population, the level and the energy — and every number
       opens the popover the model writes. The interface is **React DOM**, the renderer
       the locked decisions name
+- [x] The **goal panel** is drawn (`apps/client/src/ui/goals.tsx`): the three slots, the
+      goals' own titles from the content, and the "CLICK HERE!" badge on the goals
+      the player has **not visited** — the client's rule, and its quirk, which the
+      model's marker slots reproduce. The player's progress is the **server's** (the
+      goal state in the private state), so the panel shows what the server says
 - [x] The player can **build from the interface**: picking an entry in the build menu
       **begins a placement** — the locked entries cannot be picked, so the menu says
       what the player cannot build yet — and clicking a tile turns the gesture into

@@ -137,6 +137,48 @@ function buildable(item: ContentItem): boolean {
   return item.type === 'b' || item.type === 'u';
 }
 
+/** A goal, as the goal panel reads it. */
+export interface GoalEntry {
+  /** The goal's index in the goal list. */
+  index: number;
+  /** The goal's id. */
+  id: number;
+  /** The goal's title. */
+  title: string;
+  /** Whether the player has opened the goal's popup. */
+  visited: boolean;
+  /** Whether the goal is completed. */
+  completed: boolean;
+}
+
+/** A record, or null. */
+function recordOrNull(value: unknown): Record<string, unknown> | null {
+  return typeof value === 'object' && value !== null
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+/**
+ * The player's goals.
+ *
+ * The goals themselves are the **content's** — the definitions and their
+ * titles — and the player's progress is the **server's**: the goal state
+ * in the private state says which goals have been visited and which are
+ * complete.
+ */
+export function goalList(bundle: ContentBundle, world: WorldSnapshot): GoalEntry[] {
+  const state = recordOrNull(world.privateState?.['goalState']);
+  const visited = recordOrNull(state?.['visited']);
+  const completed = recordOrNull(state?.['completed']);
+  return (bundle.goals ?? []).map((goal, index) => ({
+    index,
+    id: goal.id,
+    title: goal.title,
+    visited: visited?.[String(goal.id)] === true,
+    completed: completed?.[String(goal.id)] === true,
+  }));
+}
+
 /**
  * The categories, as the tabs read them.
  *
