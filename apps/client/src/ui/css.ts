@@ -252,6 +252,23 @@ export function uiCss(): string {
   font-size: calc(11px * var(--swl-font-scale-body, 1));
 }
 
+.swl-info-stats {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 8px;
+  margin: 5px 0 0;
+  color: #8d97a8;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+}
+
+.swl-info-stats dt { color: #8d97a8; }
+
+.swl-info-stats dd {
+  margin: 0;
+  color: #e8e3d8;
+  text-align: right;
+}
+
 .swl-info-collect {
   margin-top: 8px;
   padding: 4px 10px;

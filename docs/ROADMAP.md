@@ -196,7 +196,11 @@ first means guessing at the rules being cloned.
       ([`../re/data/building-behaviour.json`](../re/data/building-behaviour.json))
 - [ ] The remaining tooltip surfaces (the icon panel's dictionary, the special units'
       attack tooltips and the market's) are reimplemented
-- [ ] The unit panel, minimap, neighbour strip, goal panel and popups all work
+- [x] The unit panel, minimap, neighbour strip, goal panel and popups all work — the
+      **chapter map** (the closest thing the original has to a minimap), the
+      neighbour strip, the goal panel, the info panel and the unit panel are all
+      drawn from the server's answer and the content, and the **end-to-end test**
+      proves each one (Group G)
 - [x] There is **no minimap** in the original client. The closest thing is the
       **chapter map** - the goal panel's map - and that is implemented as a model
       (`packages/client/src/chapters.ts`): four chapters of six quests, the client's
@@ -1237,7 +1241,17 @@ assault against the new server, and the cheat battery is fully rejected.
       30) rather than more than the game allows, and the starting map carries the level
       and the XP the original's initial map carries (`level = 1`, `xp = 4`), so the level
       the client shows is the level the server's own rules use
-- [ ] The unit panel, minimap, neighbour strip, goal panel and popups all work
+- [x] The **minimap**, the **neighbour strip**, the **goal panel** and the **popups**
+      all work: each is drawn from the server's answer and the content, and the
+      **end-to-end test** proves each one
+- [x] The **unit panel** works: the unit's own statistics — its attack, its range,
+      its velocity, its life, its population and the **attack interval** in the
+      client's defence slot, which the client shows in both the tooltip and the
+      panel
+- [x] The content bundle carries the unit's **velocity**. The upstream keeps it as
+      a string and the bundle's schema did not carry it at all, so the unit panel
+      had nothing to show; the bundle now carries the number, because a number is
+      what the rules and the panel read
 - [x] The **tooltips** are implemented as a model (`packages/client/src/tooltips.ts`):
       the HUD's four resource sentences are the client's own literals, and the info
       panel is built from the item's own statistics — the resource building shows its

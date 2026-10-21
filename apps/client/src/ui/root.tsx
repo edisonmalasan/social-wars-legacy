@@ -30,6 +30,7 @@ import {
   infoPanel,
   questMinLevels,
   questRanks,
+  unitInfoPanel,
 } from './state.ts';
 
 /** The root's props. */
@@ -77,13 +78,14 @@ export function Root({
   const ranks = useMemo(() => questRanks(world), [world]);
   const minLevels = useMemo(() => questMinLevels(bundle), [bundle]);
   const panel = useMemo(() => infoPanel(bundle, selected ?? null), [bundle, selected]);
+  const unit = useMemo(() => unitInfoPanel(bundle, selected ?? null), [bundle, selected]);
 
   return (
     <div className="swl-ui">
       <Hud state={state} placing={placingName} />
       <Goals goals={goals} />
       <Chapters ranks={ranks} minLevels={minLevels} />
-      <InfoPanel panel={panel} onCollect={onCollect} />
+      <InfoPanel resource={panel} unit={unit} onCollect={onCollect} />
       <Neighbours neighbours={neighbours} />
       <BuildMenu
         items={items}

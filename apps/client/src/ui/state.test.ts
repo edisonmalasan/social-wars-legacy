@@ -14,6 +14,7 @@ import {
   populationItems,
   questMinLevels,
   questRanks,
+  unitInfoPanel,
 } from './state.ts';
 import { QUEST_IDS } from '@swl/rules';
 
@@ -234,6 +235,43 @@ describe('the info panel', () => {
     assert.equal(infoPanel(items, 201), null);
     assert.equal(infoPanel(items, null), null);
     assert.equal(infoPanel(items, 9999), null);
+  });
+});
+
+describe('the unit panel', () => {
+  it('is the unit\'s own statistics', () => {
+    const panel = unitInfoPanel(
+      bundle({
+        items: [
+          item({
+            id: 1001,
+            name: 'Worker I',
+            type: 'u',
+            attack: 6,
+            life: 25,
+            attack_interval: 35,
+            attack_range: 1,
+            velocity: 5,
+            population: 1,
+          }),
+        ],
+      }),
+      1001,
+    );
+    assert.equal(panel?.kind, 'unit');
+    assert.equal(panel?.name, 'Worker I');
+    assert.equal(panel?.attack, 6);
+    assert.equal(panel?.life, 25);
+    assert.equal(panel?.attackInterval, 35);
+    assert.equal(panel?.attackRange, 1);
+    assert.equal(panel?.velocity, 5);
+    assert.equal(panel?.population, 1);
+  });
+
+  it('is nothing for a building', () => {
+    const items = bundle({ items: [item({ id: 201, name: 'House I' })] });
+    assert.equal(unitInfoPanel(items, 201), null);
+    assert.equal(unitInfoPanel(items, null), null);
   });
 });
 

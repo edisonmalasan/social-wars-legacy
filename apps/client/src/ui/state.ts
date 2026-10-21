@@ -19,9 +19,10 @@ import type {
   HudRules,
   ItemPopulation,
   ResourcePanel,
+  UnitPanel,
   WorldSnapshot,
 } from '@swl/client';
-import { resourcePanel } from '@swl/client';
+import { resourcePanel, unitPanel } from '@swl/client';
 import type { ContentBundle, ContentItem } from '@swl/content';
 import { QUEST_IDS } from '@swl/rules';
 
@@ -240,6 +241,34 @@ export function infoPanel(
     name: item.name,
     collect_type: item.collect_type,
     collect: item.collect,
+  });
+}
+
+/**
+ * A unit's info panel.
+ *
+ * The model is the client's own (`packages/client/src/tooltips.ts`), and
+ * the unit is the content's — its statistics are the game's own. The
+ * client shows the unit's **effective** attack against what it is aimed
+ * at, and the clone has no target, so it shows the base attack: the
+ * model's own fallback.
+ */
+export function unitInfoPanel(
+  bundle: ContentBundle,
+  itemId: number | null,
+): UnitPanel | null {
+  if (itemId === null) return null;
+  const item = bundle.items?.find((entry) => entry.id === itemId);
+  if (!item || item.type !== 'u') return null;
+  return unitPanel({
+    name: item.name,
+    attack: item.attack,
+    life: item.life,
+    attack_interval: item.attack_interval,
+    attack_range: item.attack_range,
+    velocity: item.velocity,
+    population: item.population,
+    best_against_mult: item.best_against_mult,
   });
 }
 
