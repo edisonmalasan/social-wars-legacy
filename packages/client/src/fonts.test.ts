@@ -9,11 +9,13 @@ import {
   CLIENT_FONT_LANGUAGES,
   FONT_LANGUAGES,
   FONT_SUBSTITUTES,
+  fontScale,
   hasFontsFor,
   loadedFonts,
   measure,
   measurePixels,
   scaleFor,
+  type FontAdvanceTable,
   type OriginalFontMetrics,
 } from './fonts.ts';
 
@@ -147,5 +149,43 @@ describe('the real metrics', () => {
         `${name}'s widths look wrong`,
       );
     }
+  });
+});
+
+describe('the scale a substitute needs', () => {
+  function table(widths: Record<string, number>, unitsPerEm = 1000): FontAdvanceTable {
+    return { unitsPerEm, advances: new Map(Object.entries(widths)) };
+  }
+
+  it('is the ratio of the two faces\' widths over the em', () => {
+    // The substitute is 10% wider everywhere, so it has to be scaled
+    // down by 1/1.1 to occupy the same space.
+    const original = table({ A: 500, B: 500 });
+    const substitute = table({ A: 550, B: 550 });
+    assert.ok(Math.abs(fontScale(original, substitute) - 1 / 1.1) < 1e-9);
+  });
+
+  it('is 1 when the substitute is the same width', () => {
+    const widths = { A: 500, B: 400, ' ': 250 };
+    assert.equal(fontScale(table(widths), table(widths)), 1);
+  });
+
+  it('compares the characters both faces cover', () => {
+    // The substitute covers an extra character, and it is a wide one:
+    // it must not change the scale.
+    const original = table({ A: 500, B: 500 });
+    const substitute = table({ A: 500, B: 500, W: 900 });
+    assert.equal(fontScale(original, substitute), 1);
+  });
+
+  it('accounts for the faces\' own ems', () => {
+    // The same widths in a face with a bigger em are narrower.
+    const original = table({ A: 500 }, 1000);
+    const substitute = table({ A: 500 }, 2000);
+    assert.equal(fontScale(original, substitute), 2);
+  });
+
+  it('is 1 when the faces share nothing', () => {
+    assert.equal(fontScale(table({ A: 500 }), table({ B: 500 })), 1);
   });
 });

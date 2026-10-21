@@ -124,6 +124,61 @@ export function scaleFor(originalWidth: number, substituteWidth: number): number
 }
 
 /**
+ * A face's advance widths, in its own design units.
+ *
+ * The table is a **map**, because the substitute's widths come out of a
+ * font file and the original's out of a JSON object, and the two are
+ * compared the same way.
+ */
+export interface FontAdvanceTable {
+  /** The design units per em. */
+  unitsPerEm: number;
+  /** The advance width of each character, in design units. */
+  advances: ReadonlyMap<string, number>;
+}
+
+/**
+ * The scale a substitute needs, measured over the whole character range.
+ *
+ * The two faces are compared over the characters **both** of them
+ * cover, so the comparison is fair: the total width of the printable
+ * ASCII range is measured in each face's own em, and the ratio of the
+ * two is the scale.
+ *
+ * A single factor cannot match a proportional face with a monospaced
+ * one character for character — the widths differ per glyph — so the
+ * factor is the one that makes the **text** the same width, which is
+ * what the game's layout depends on.
+ */
+export function fontScale(
+  original: FontAdvanceTable,
+  substitute: FontAdvanceTable,
+): number {
+  let originalTotal = 0;
+  let substituteTotal = 0;
+  let shared = 0;
+
+  for (const [char, width] of original.advances) {
+    const other = substitute.advances.get(char);
+    if (other === undefined) continue;
+    originalTotal += width;
+    substituteTotal += other;
+    shared += 1;
+  }
+
+  // Nothing to compare: the substitute is not tuned.
+  if (shared === 0 || original.unitsPerEm === 0 || substitute.unitsPerEm === 0) return 1;
+
+  const originalEm = originalTotal / original.unitsPerEm;
+  const substituteEm = substituteTotal / substitute.unitsPerEm;
+  if (substituteEm === 0) return 1;
+
+  const scale = originalEm / substituteEm;
+  // A scale that is not a number is not a scale.
+  return Number.isFinite(scale) && scale > 0 ? scale : 1;
+}
+
+/**
  * The fonts the client loads, and where each one comes from.
  *
  * The client's own `FontsLoader` builds the URL as

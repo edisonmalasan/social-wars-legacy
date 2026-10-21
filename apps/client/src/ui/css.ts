@@ -17,7 +17,7 @@ export function uiCss(): string {
   pointer-events: none;
   font-family: var(--swl-font-body, "Nunito", system-ui, sans-serif);
   color: #e8e3d8;
-  font-size: 13px;
+  font-size: calc(13px * var(--swl-font-scale-body, 1));
   user-select: none;
 }
 
@@ -72,7 +72,7 @@ export function uiCss(): string {
 
 .swl-readout-label {
   color: #8d97a8;
-  font-size: 10px;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -91,7 +91,7 @@ export function uiCss(): string {
 .swl-army {
   padding: 4px 8px;
   color: #8d97a8;
-  font-size: 11px;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
 }
 
 /* --- The popovers ------------------------------------------------------ */
@@ -150,7 +150,7 @@ export function uiCss(): string {
   padding: 4px 8px;
   border-radius: 3px 3px 0 0;
   color: #8d97a8;
-  font-size: 11px;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
 }
 
 .swl-tab:hover { color: #e8e3d8; }
@@ -183,7 +183,7 @@ export function uiCss(): string {
 
 .swl-build-cost {
   color: #8d97a8;
-  font-size: 11px;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
 }
 
 .swl-build-locked .swl-build-name,
@@ -193,7 +193,7 @@ export function uiCss(): string {
 
 .swl-build-lock {
   color: #e0a33c;
-  font-size: 10px;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
 }
 `.trim();
 }

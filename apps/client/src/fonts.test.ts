@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 
 import { CLIENT_FONTS, FONT_SUBSTITUTES } from '@swl/client';
 
-import { clientCss, fontFaceCss, fontStack } from './fonts.ts';
+import { applyFontScales, clientCss, fontFaceCss, fontStack } from './fonts.ts';
 
 describe("the client's fonts", () => {
   it('uses the substitutes, never the proprietary faces', () => {
@@ -33,7 +33,12 @@ describe("the client's fonts", () => {
       const substitute = FONT_SUBSTITUTES[font];
       const file = substitute.name.replace(/\s+/g, '');
       assert.ok(css.includes(`font-family: "${file}"`), `no face for ${file}`);
-      assert.ok(css.includes(`url("/fonts/${file}.woff2")`), `no url for ${file}`);
+      // The file is named the way the client's own model names it, so
+      // the stylesheet and the model agree on what is fetched.
+      assert.ok(
+        css.includes(`url("/fonts/${file}-${font}.woff2")`),
+        `no url for ${file}`,
+      );
     }
   });
 
@@ -49,5 +54,51 @@ describe("the client's fonts", () => {
     const css = clientCss('/fonts');
     assert.ok(css.includes('--swl-font-body: "Nunito"'), css);
     assert.ok(css.includes('--swl-font-display: "RubikMonoOne"'), css);
+  });
+
+  it('starts the scales at the not-tuned-yet value', () => {
+    const css = clientCss('/fonts');
+    assert.ok(css.includes('--swl-font-scale-body: 1'), css);
+    assert.ok(css.includes('--swl-font-scale-display: 1'), css);
+  });
+});
+
+describe('the measured scale', () => {
+  function fakeElement() {
+    const set: Record<string, string> = {};
+    return {
+      set,
+      target: {
+        style: {
+          setProperty: (name: string, value: string) => {
+            set[name] = value;
+          },
+        },
+      },
+    };
+  }
+
+  it('is applied to the variable each face uses', () => {
+    const { set, target } = fakeElement();
+    applyFontScales({ scales: { ArialRoundedBold: 1.0183, KomikaAxis: 0.7344 } }, target);
+    assert.equal(set['--swl-font-scale-body'], '1.0183');
+    assert.equal(set['--swl-font-scale-display'], '0.7344');
+  });
+
+  it('leaves a face alone when it has no measured scale', () => {
+    const { set, target } = fakeElement();
+    applyFontScales({ scales: { ArialRoundedBold: 1.0183 } }, target);
+    assert.equal(set['--swl-font-scale-body'], '1.0183');
+    assert.equal(set['--swl-font-scale-display'], undefined);
+  });
+
+  it('leaves a scale that is not a number alone', () => {
+    const { set, target } = fakeElement();
+    applyFontScales(
+      { scales: { ArialRoundedBold: Number.NaN, KomikaAxis: 0 } },
+      target,
+    );
+    assert.equal(set['--swl-font-scale-body'], undefined);
+    assert.equal(set['--swl-font-scale-display'], undefined);
   });
 });
