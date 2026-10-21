@@ -1449,8 +1449,12 @@ product.*
         command's name
       - `simulation_tick_ms` — how long the rules engine took
       - `active_sessions` — a **gauge**, because it goes up and down
-- [ ] The metrics are exported to a time-series database, so the alerts below can fire
-      on a regression rather than on a snapshot
+- [x] The metrics are **exported to a time-series database**, so the alerts below can fire
+      on a regression rather than on a snapshot. The scrape endpoint is at **`/metrics`**,
+      in the Prometheus text format, so any scraper can read it; the JSON is at
+      `/api/metrics`
+- [x] The export is **tested**: the counters, the gauges and the histograms, the label
+      values that need escaping, and the empty case
 - [ ] Distributed tracing across the client, the API and the database
 - [x] **Error reporting captures crashes with the build and content version attached.**
       The server's own crash handler records the error with the **server's version**, the

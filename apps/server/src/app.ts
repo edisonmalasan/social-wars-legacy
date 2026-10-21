@@ -61,6 +61,7 @@ import {
   dashboardHtml,
   healthReport,
   makeCredential,
+  prometheusText,
   type AlertSender,
   type CredentialStore,
 } from '@swl/server';
@@ -681,6 +682,18 @@ export function createApp(
         // up and down.
         metrics.gauge('active_sessions', options.sessions.size);
         return json(200, snapshot(metrics));
+      }
+
+      if (path === '/metrics') {
+        if (request.method !== 'GET') return fail(405, 'method-not-allowed');
+        // The **scrape** format, so any time-series database can read the
+        // metrics. The JSON is at /api/metrics; this is the export.
+        metrics.gauge('active_sessions', options.sessions.size);
+        return {
+          status: 200,
+          headers: { 'content-type': 'text/plain; version=0.0.4; charset=utf-8' },
+          body: prometheusText(metrics),
+        };
       }
 
       if (path === '/api/world') {
