@@ -184,8 +184,8 @@ first means guessing at the rules being cloned.
       auditing, and the one remaining unanalysed code artefact (`assets/swf/dynamic2.swf`)
 - [x] The client builds (58 `Basesec` + `SWLoader` + `Debug`) are decompiled and covered by
       report 10 (the version history) and reports 01–03
-- [ ] `assets/swf/dynamic2.swf` is decompiled and analysed — **deferred to Group D**, where
-      the converter needs it anyway; it does not gate any other task
+- [x] `assets/swf/dynamic2.swf` is decompiled and analysed — **done in Group D**, where
+      the converter needed it; it did not gate any other task
 
 ### B3 — Unit and building behaviour tables (the rules-port spec) ✅
 
@@ -478,9 +478,12 @@ CI run. ✔ met
       never named - the test checks that - and `font-display: swap` means the text
       appears with the fallback rather than the page being invisible until the face
       arrives
-- [ ] The substitutes' **metrics are tuned** to match the originals', which needs the
+- [x] The substitutes' **metrics are tuned** to match the originals', which needs the
       real font files: the scale is a parameter, measured against the files, and a scale
-      of 1 means "not tuned yet"
+      of 1 means "not tuned yet". `scripts/fetch-fonts.mjs` measures the shipped files and
+      writes `apps/client/public/font-scale.json`; the body scale is 1.0183 and the display
+      scale is 0.7344, and the client applies them at startup
+      (`apps/client/src/main.ts`, `apps/client/src/fonts.ts`)
 - [x] The **4 proprietary font references are identified**: the client loads **two** fonts
       (`ArialRoundedBold` and `KomikaAxis`) in **three** languages (English, Turkish and
       Greek), so it looks for **six** font files. Only the two English ones ship, and the
