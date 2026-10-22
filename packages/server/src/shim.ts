@@ -13,6 +13,11 @@
  *   and throws the rest away; the digest is never checked.
  * - **It computes the resource costs.** The upstream applies the client's
  *   declared `res` vector verbatim.
+ * - **It translates the legacy magic payment.** `buy_magic` and
+ *   `buy_mana_new` name their payment resource only in the declared delta.
+ *   The shim reads the **sign** of the gold or cash slot to choose a
+ *   currency, never the amount, and the server prices the purchase from the
+ *   content.
  * - **It survives a replay.** The client re-sends the *same* packet when it
  *   does not get an answer (`processCommandsTimeout`), so a naive server
  *   applies the commands twice.
@@ -42,6 +47,7 @@ import {
   rotateDartsSchedule,
   type CostContent,
   type DartsGame,
+  type MagicPayment,
   type Resources,
 } from '@swl/rules';
 import { LegacyIdentityBridge } from './session.ts';
@@ -87,7 +93,12 @@ export interface ShimCommand {
   name: string;
   /** The command's arguments. */
   args: unknown[];
-  /** The client's declared resource delta. **Never used.** */
+  /**
+   * The client's declared resource delta.
+   *
+   * It is **not** a price. The only thing the shim reads from it is the
+   * payment resource of a legacy magic purchase, and only the sign.
+   */
   declaredResources: number[];
 }
 
@@ -241,6 +252,52 @@ export interface BatchOutcome {
 }
 
 /**
+ * The payment resource a legacy magic delta names, if exactly one is spent.
+ *
+ * The old `CmdBuyMagic` and `CmdBuyManaNew` put the price and the payment
+ * resource in the batch's declared `res` vector, not in the command's
+ * arguments. The server still prices the purchase from the content; all this
+ * function decides is **which** of the two prices to charge. The amount in
+ * the delta is never read. If the delta names both or neither, there is no
+ * honest answer and the command is left for the applier to refuse.
+ */
+function declaredPayment(declared: readonly number[]): MagicPayment | undefined {
+  const gold = Number(declared[2]);
+  const cash = Number(declared[6]);
+  const goldSpent = Number.isFinite(gold) && gold < 0;
+  const cashSpent = Number.isFinite(cash) && cash < 0;
+  if (cashSpent && !goldSpent) return 'c';
+  if (goldSpent && !cashSpent) return 'g';
+  return undefined;
+}
+
+/**
+ * Translate a legacy magic command into the native argument shape.
+ *
+ * The native forms are `buy_magic [spellId, payment]` and
+ * `buy_mana_new [amount, payment]`. The legacy forms carry only
+ * `[spellId]` and `[]`, with the rest in the declared delta. The shim adds
+ * the payment resource, taken from the delta's sign, and the server's pack
+ * size from the globals. Everything the server charges still comes from the
+ * content.
+ */
+function normaliseLegacyMagic(command: ShimCommand, content: CostContent): ShimCommand {
+  if (command.name !== 'buy_magic' && command.name !== 'buy_mana_new') return command;
+  if (command.args.length >= 2) return command;
+
+  const payment = declaredPayment(command.declaredResources);
+  if (!payment) return command;
+
+  if (command.name === 'buy_magic') {
+    if (command.args.length !== 1) return command;
+    return { ...command, args: [command.args[0], payment] };
+  }
+
+  const amount = Number(content.globals['MANA_PER_PURCHASE'] ?? 5);
+  return { ...command, args: [amount, payment] };
+}
+
+/**
  * Apply a command batch.
  *
  * The batch is the parsed `command.php` payload: `first_number`, `commands`, `tries`.
@@ -305,9 +362,12 @@ export function applyBatch(
       continue;
     }
 
-    // The cost is computed by the SERVER. The client's declared delta is
-    // never read (finding F3).
-    const cost = computeCommandCost(context.content, command.name, command.args);
+    // The cost is computed by the SERVER. The client's declared delta never
+    // supplies an amount (finding F3); the legacy magic commands are the one
+    // case where its sign chooses a payment resource.
+    const effective = normaliseLegacyMagic(command, context.content);
+    const beforeResources = world.resources;
+    const cost = computeCommandCost(context.content, effective.name, effective.args);
     const settled = applyCommandCost(world.resources, cost);
     if (!settled.ok) {
       refused.push({
@@ -319,10 +379,14 @@ export function applyBatch(
 
     const outcome = context.applyCommand(
       { ...world, resources: settled.resources },
-      { name: command.name, args: command.args },
+      { name: effective.name, args: effective.args },
     );
-    world = outcome.world;
-    if (!outcome.applied) {
+    if (outcome.applied) {
+      world = outcome.world;
+    } else {
+      // A refused command spends nothing. The applier validates before it
+      // mutates, so the settled wallet is the only thing to put back.
+      world = { ...outcome.world, resources: beforeResources };
       refused.push({
         name: command.name,
         reason: outcome.refused ?? 'refused',

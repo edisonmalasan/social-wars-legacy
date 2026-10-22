@@ -124,7 +124,7 @@ export function initialWorld(playerId: string): ShimWorld {
           xp: STARTING_XP,
         },
       ],
-      privateState: {},
+      privateState: { mana: 0, magics: {} },
     },
     resources: {
       g: 2000,

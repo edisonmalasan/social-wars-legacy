@@ -171,6 +171,47 @@ describe('computing a cost', () => {
   });
 });
 
+describe('computing a magic cost', () => {
+  it('prices a spell from the magics table, not from the argument', async () => {
+    const c = await content();
+    // AirStrike: 30 000 gold or 50 cash. The command's own amount is not
+    // even part of the native arguments.
+    assert.deepEqual(computeCommandCost(c, 'buy_magic', [1, 'g'])?.cost, { g: 30_000 });
+    assert.deepEqual(computeCommandCost(c, 'buy_magic', [1, 'c'])?.cost, { c: 50 });
+  });
+
+  it('refuses an unknown spell or an unknown payment resource', async () => {
+    const c = await content();
+    assert.equal(computeCommandCost(c, 'buy_magic', [999, 'g']), null);
+    assert.equal(computeCommandCost(c, 'buy_magic', [1, 'x']), null);
+    assert.equal(computeCommandCost(c, 'buy_magic', [1]), null);
+  });
+
+  it('prices the fixed mana pack from the globals', async () => {
+    const c = await content();
+    assert.deepEqual(computeCommandCost(c, 'buy_mana_new', [5, 'c'])?.cost, { c: 1 });
+    assert.deepEqual(computeCommandCost(c, 'buy_mana_new', [5, 'g'])?.cost, { g: 10_000 });
+  });
+
+  it('refuses a mana amount that is not the one pack', async () => {
+    const c = await content();
+    assert.equal(computeCommandCost(c, 'buy_mana_new', [4, 'c']), null);
+    assert.equal(computeCommandCost(c, 'buy_mana_new', [6, 'g']), null);
+  });
+
+  it('prices a cast at the spell mana cost', async () => {
+    const c = await content();
+    assert.deepEqual(computeCommandCost(c, 'use_magic', [1])?.cost, { m: 8 });
+    assert.equal(computeCommandCost(c, 'use_magic', [999]), null);
+  });
+
+  it('lists the magic commands as priced', () => {
+    assert.ok(PRICED_COMMANDS.includes('buy_magic'));
+    assert.ok(PRICED_COMMANDS.includes('buy_mana_new'));
+    assert.ok(PRICED_COMMANDS.includes('use_magic'));
+  });
+});
+
 describe('applying a cost', () => {
   it('subtracts the cost and adds the gain', async () => {
     const c = await content();

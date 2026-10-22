@@ -1326,8 +1326,21 @@ assault against the new server, and the cheat battery is fully rejected.
       the server already checks
 - [ ] The **first chapter** is completable: the quest's steps, the rewards and the
       chapter's own unlocks are checked against the server
-- [ ] Quests, goals, the darts minigame, magic and tech, the marketplace, premium and the
-      weekly bonus are functional
+- [ ] Quests, goals, the darts minigame, the marketplace, premium and the weekly bonus are
+      functional
+- [x] **Magic and tech are functional** (`packages/rules/src/magic.ts`,
+      `packages/server/src/apply.ts`, `packages/server/src/shim.ts`): the ten shipped spells
+      are indexed from the content bundle with their mana cost, area, unlock level and
+      gold/cash prices. Learning writes the client's zero-use state and grants the spell's
+      mana cost; **cash bypasses the unlock level and gold does not**, as `SelectedMagic.as`
+      does. Casting is refused until the spell is learned, charges the spell's mana and
+      raises its use counter, which stops at 50 — the third spell level is reached at 25
+      and 50 uses. The fixed five-mana pack is priced from `COST_MANA_CASH` /
+      `COST_MANA_GOLD`, and levelling up grants two mana. The legacy `buy_magic` /
+      `buy_mana_new` forms carry no payment argument, so the shim reads only the **sign**
+      of the gold or cash slot in the declared delta — never its amount — while the server
+      still prices the purchase from content. A refused priced command now spends nothing,
+      in both the legacy shim and the native endpoint
 - [ ] Alliances and the social features are functional, or visibly out of scope
 - [x] The daily/weekly bonus cycles and premium expiry behave correctly across a **server
       restart** (`packages/server/src/restart.test.ts`). The server's state is
