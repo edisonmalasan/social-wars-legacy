@@ -58,6 +58,31 @@ export interface TutorialStep {
 /** The flags that decide which variant a player sees. */
 export type TutorialGates = Record<string, boolean>;
 
+/** The client's literal wrapper: `Language.getLiteral("...")`. */
+const LITERAL = /^Language\.getLiteral\(\s*"((?:[^"\\]|\\.)*)"\s*\)$/s;
+
+/**
+ * The text of a tutorial literal.
+ *
+ * The extractor keeps the client's own expression - `Language
+ * .getLiteral("WELCOME, SOLDIER!")` - because that is the evidence, and
+ * the interface needs the string inside it. A missing literal, or the
+ * client's own `null`, is the empty string.
+ *
+ * The escapes are the ActionScript ones: `\n` is a line break, and `\'`
+ * and `\"` are the quotes themselves.
+ */
+export function tutorialLiteral(expression: unknown): string {
+  if (typeof expression !== 'string') return '';
+  const trimmed = expression.trim();
+  if (trimmed === '' || trimmed === 'null') return '';
+  const match = LITERAL.exec(trimmed);
+  if (!match) return trimmed;
+  return match[1]!.replace(/\\(.)/gs, (_match, character: string) =>
+    character === 'n' ? '\n' : character === 't' ? '\t' : character,
+  );
+}
+
 /**
  * The tutorial's state.
  *
@@ -110,6 +135,16 @@ export class Tutorial {
   /** Move back a step. */
   previous(): void {
     if (this.index > 0) this.index -= 1;
+  }
+
+  /** The last step this player sees, or null when there are none. */
+  get last(): TutorialStep | null {
+    return this.steps[this.steps.length - 1] ?? null;
+  }
+
+  /** Finish the tutorial outright, which is what skipping does. */
+  finish(): void {
+    this.index = this.steps.length;
   }
 
   /** Skip the tutorial, if the current step allows it. */

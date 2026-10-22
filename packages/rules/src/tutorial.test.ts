@@ -71,6 +71,14 @@ describe("the tutorial's progression", () => {
     assert.ok(result.ok && result.state.complete);
     assert.ok(result.ok && result.state.step === 138);
   });
+
+  it('is finished by reaching its last step', () => {
+    const last = TUTORIAL_STEPS[TUTORIAL_STEPS.length - 1]!;
+    const result = advanceTutorial(NO_TUTORIAL, last);
+    assert.equal(result.ok, true);
+    assert.ok(result.ok && result.state.complete);
+    assert.ok(result.ok && result.state.step === last);
+  });
 });
 
 describe("the tutorial's state", () => {

@@ -12,6 +12,11 @@ import { AtlasIndex, type FrameManifest, type WorldSnapshot } from '@swl/client'
 import { cameraCentredOn, MAP_HEIGHT, MAP_WIDTH, type CameraState } from '@swl/client';
 import { Interaction, pixelToTile } from '@swl/client';
 import { fetchNeighbours, type Neighbour } from '@swl/client';
+import {
+  Tutorial,
+  type TutorialStep,
+} from '@swl/client';
+import { tutorialState } from '@swl/rules';
 
 import { buildScene, type SceneItem } from './scene.ts';
 import { WorldRenderer, STAGE_HEIGHT, STAGE_WIDTH } from './renderer.ts';
@@ -28,10 +33,11 @@ import {
 } from '@swl/client';
 import type { NativeCommand, NativeResponse } from '@swl/protocol';
 import type { ContentBundle, ContentItem } from '@swl/content';
-import { buy, claimDailyBonus } from '@swl/client';
+import { buy, claimDailyBonus, completeTutorial } from '@swl/client';
 
 import { mountUi } from './ui/mount.tsx';
 import { uiCss } from './ui/css.ts';
+import type { TutorialOverlayProps } from './ui/tutorial.tsx';
 
 const STAGE = document.getElementById('stage');
 const GAME = document.getElementById('game');
@@ -43,6 +49,8 @@ const MANIFEST_URL = '/frame-manifest.json';
 const ATLAS_BASE = '/atlases';
 /** Where the measured font scale lives. */
 const FONT_SCALE_URL = '/font-scale.json';
+/** Where the tutorial's steps live. */
+const TUTORIAL_URL = '/tutorial-steps.json';
 
 /**
  * The stylesheet.
@@ -213,6 +221,16 @@ export interface ClientHandle {
    * screen, so this is what says the player can see their town.
    */
   visibleSprites: () => number;
+  /** The tutorial step the client is showing, or null when it is not. */
+  tutorialStep: () => number | null;
+  /**
+   * Walk the tutorial one step and record the reached step with the
+   * server. The answer says whether the server kept it and what step is
+   * showing next.
+   */
+  advanceTutorial: () => Promise<{ ok: boolean; step: number | null }>;
+  /** Skip the tutorial, recording it as finished. */
+  skipTutorial: () => Promise<{ ok: boolean }>;
 }
 
 /** The browser's storage, or null when it refuses to be used. */
@@ -301,6 +319,7 @@ async function main(): Promise<void> {
 
   const manifest = await json<FrameManifest>(MANIFEST_URL);
   const content = await json<ContentBundle>(CONTENT_URL);
+  const tutorialSteps = await json<{ steps: TutorialStep[] }>(TUTORIAL_URL);
 
   // The substitute fonts' scale. It is measured against the file that
   // ships, and it is **optional**: without it the text is a little
@@ -335,6 +354,21 @@ async function main(): Promise<void> {
   let scene = buildScene(sceneItems(world, content), renderer.viewport, atlas);
   renderer.draw(scene);
 
+  /**
+   * The tutorial.
+   *
+   * The steps are the client's own, and the **progression is the
+   * server's**: the furthest step the server recorded is where the
+   * tutorial resumes, and each step the player reaches is sent back. A
+   * finished tutorial is not shown again.
+   */
+  const tutorial = new Tutorial(tutorialSteps.steps);
+  const storedTutorial = tutorialState(world.privateState);
+  if (storedTutorial.step > 0 && !storedTutorial.complete) {
+    tutorial.jumpTo(storedTutorial.step);
+  }
+  let tutorialRunning = !storedTutorial.complete && tutorial.current !== null;
+
   async function fetchWorld(): Promise<WorldSnapshot> {
     return json<WorldSnapshot>('/api/world', {
       headers: { authorization: authorizationHeader(signedIn) },
@@ -354,7 +388,61 @@ async function main(): Promise<void> {
 
   /** The interface is redrawn when the placement or the selection changes. */
   function drawInterface(): void {
-    ui?.draw(world, placing, selected, neighbours);
+    ui?.draw(world, placing, selected, neighbours, tutorialProps());
+  }
+
+  /** The tutorial's drawing, or null when it is not running. */
+  function tutorialProps(): TutorialOverlayProps | null {
+    const step = tutorialRunning ? tutorial.current : null;
+    if (!step) return null;
+    return {
+      step,
+      position: tutorial.position + 1,
+      total: tutorial.length,
+      onNext: () => {
+        void advanceTutorial();
+      },
+      onSkip: () => {
+        void skipTutorial();
+      },
+    };
+  }
+
+  /**
+   * Walk the tutorial one step forward and tell the server.
+   *
+   * The step the player **reaches** is the one sent, so the server's
+   * furthest step is where a later session resumes. The last step has no
+   * next one, and reaching it is finishing the tutorial: the last step
+   * itself is sent, and the server marks it complete.
+   */
+  async function advanceTutorial(): Promise<{ ok: boolean; step: number | null }> {
+    const current = tutorial.current;
+    if (!current || !tutorialRunning) return { ok: false, step: null };
+    tutorial.next();
+    const next = tutorial.current;
+    if (!next) tutorialRunning = false;
+    const reached = next?.step ?? current.step;
+    const result = await run([completeTutorial(reached)]);
+    if (!result.ok) {
+      // The server refused the record, so the client does not keep a
+      // progress the server does not have.
+      tutorial.previous();
+      tutorialRunning = true;
+    }
+    drawInterface();
+    return { ok: result.ok, step: tutorial.current?.step ?? null };
+  }
+
+  /** Skip the tutorial, which is finishing it outright. */
+  async function skipTutorial(): Promise<{ ok: boolean }> {
+    const last = tutorial.last;
+    if (!last) return { ok: false };
+    tutorial.finish();
+    tutorialRunning = false;
+    const result = await run([completeTutorial(last.step)]);
+    drawInterface();
+    return { ok: result.ok };
   }
 
   /**
@@ -400,7 +488,7 @@ async function main(): Promise<void> {
    * drawing. The interface asks the server for nothing of its own.
    */
   const ui = UI ? mountUi(UI, content, onPick, onCollect) : null;
-  ui?.draw(world, placing, selected, neighbours);
+  drawInterface();
   void refreshNeighbours();
 
   // The map's click. The click is a **gesture**: the client turns it
@@ -442,7 +530,7 @@ async function main(): Promise<void> {
     renderer.draw(scene);
     // The interface is redrawn from the same answer, so the numbers in
     // the top bar and the buildings on the map never disagree.
-    ui?.draw(world, placing, selected, neighbours);
+    drawInterface();
     const latencyMs = performance.now() - started;
     // The neighbour strip is refreshed on its own, outside the measured
     // window: the player's action should not wait for the list.
@@ -464,6 +552,9 @@ async function main(): Promise<void> {
     buy,
     framesPerSecond: () => framesPerSecond,
     selectedItem: () => selected,
+    tutorialStep: () => (tutorialRunning ? tutorial.current?.step ?? null : null),
+    advanceTutorial,
+    skipTutorial,
     visibleSprites: () =>
       scene.filter(
         (sprite) =>

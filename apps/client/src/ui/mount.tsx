@@ -11,6 +11,7 @@ import type { Neighbour, WorldSnapshot } from '@swl/client';
 import type { ContentBundle } from '@swl/content';
 
 import { Root } from './root.tsx';
+import type { TutorialOverlayProps } from './tutorial.tsx';
 
 /** The mounted interface. */
 export interface UiHandle {
@@ -20,6 +21,7 @@ export interface UiHandle {
     placing?: number | null,
     selected?: number | null,
     neighbours?: readonly Neighbour[],
+    tutorial?: TutorialOverlayProps | null,
   ) => void;
 }
 
@@ -32,7 +34,7 @@ export function mountUi(
 ): UiHandle {
   const root = createRoot(element);
   return {
-    draw: (world, placing = null, selected = null, neighbours = []) =>
+    draw: (world, placing = null, selected = null, neighbours = [], tutorial = null) =>
       root.render(
         <Root
           world={world}
@@ -40,6 +42,7 @@ export function mountUi(
           placing={placing}
           selected={selected}
           neighbours={neighbours}
+          tutorial={tutorial}
           onPick={onPick}
           onCollect={onCollect}
         />,

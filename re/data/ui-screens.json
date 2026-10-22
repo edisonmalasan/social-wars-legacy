@@ -8,9 +8,9 @@
    "popup": 95
   },
   "byDecision": {
-   "implemented": 97,
+   "implemented": 99,
    "dropped": 23,
-   "planned": 140
+   "planned": 138
   }
  },
  "screens": [
@@ -3494,8 +3494,8 @@
    ],
    "overrides": [],
    "bytes": 502,
-   "decision": "planned",
-   "decisionNote": "The tutorial popup. The tutorial's steps and state machine are already modelled."
+   "decision": "implemented",
+   "decisionNote": "Implemented as `apps/client/src/ui/tutorial.tsx`, drawing the steps and the state machine in `packages/client/src/tutorial.ts`."
   },
   {
    "class": null,
@@ -5501,8 +5501,8 @@
    ],
    "overrides": [],
    "bytes": 2747,
-   "decision": "planned",
-   "decisionNote": "The tutorial popup. The tutorial's steps and state machine are already modelled."
+   "decision": "implemented",
+   "decisionNote": "Implemented as `apps/client/src/ui/tutorial.tsx`, drawing the steps and the state machine in `packages/client/src/tutorial.ts`."
   },
   {
    "class": "PopupUpgradeBuilding",

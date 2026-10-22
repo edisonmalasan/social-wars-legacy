@@ -64,9 +64,12 @@ export function advanceTutorial(
     // The tutorial is finished, and finishing it is final.
     return { ok: true, state };
   }
+  // The last step is the congratulation: reaching it is finishing the
+  // tutorial, and the client's own tutorial ends there.
+  const complete = step === TUTORIAL_STEPS[TUTORIAL_STEPS.length - 1];
   return {
     ok: true,
-    state: { step: Math.max(state.step, step), complete: false },
+    state: { step: Math.max(state.step, step), complete },
   };
 }
 

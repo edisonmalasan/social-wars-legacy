@@ -140,6 +140,17 @@ export function completeGoal(goalId: number): NativeCommand {
 }
 
 /**
+ * Report a tutorial step.
+ *
+ * The step is the one the player has **reached**, and the server keeps
+ * the furthest one. The tutorial grants nothing by itself, so this is a
+ * record and not a reward.
+ */
+export function completeTutorial(step: number): NativeCommand {
+  return command('complete_tutorial', [step]);
+}
+
+/**
  * Claim the daily bonus.
  *
  * The **day** is the client's choice and it is **one-based**: the client

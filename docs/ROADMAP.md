@@ -1156,14 +1156,14 @@ assault against the new server, and the cheat battery is fully rejected.
 - [ ] Every screen in the B6 inventory is implemented, or explicitly dropped with a
       recorded decision. The inventory is the client's **260** screens, and **every one
       of them now carries a decision** (`re/data/ui-screens.json`):
-      - **97 implemented** — the clone models the screen's behaviour, and the decision
+      - **99 implemented** - the clone models the screen's behaviour, and the decision
         names the model that does it
       - **23 dropped**, each with its reason: the upstream's administrative panel (a
         panel that could edit the rules would be the `flash_debug` hole again), the
         cross-promotion to Zynga games that no longer exist, the screens that take
         **real money**, the Facebook friend hiring, the mobile-client notice, the
         video player and the robot picker
-      - **140 planned** — in scope, the client's behaviour is real, and not modelled
+      - **138 planned** - in scope, the client's behaviour is real, and not modelled
         yet
       The decisions are **checked**, not believed (`packages/client/src/screens.test.ts`):
       every screen must have a decision, every implemented one must name a model that
@@ -1352,8 +1352,13 @@ assault against the new server, and the cheat battery is fully rejected.
       are not on this machine, so they are **not run** here — and the harness
       speaks the Chrome DevTools Protocol, so it could not drive them anyway
 - [ ] The client is run in **Firefox and Safari** as well, on a machine that has them
-- [ ] The client is driven through a **complete play session** end to end, from signing
-      in to finishing the tutorial
+- [x] The client is driven through a **complete play session** end to end, from signing
+      in to finishing the tutorial: the end-to-end test registers a player, signs in,
+      buys and places a building, sees the town on the stage, reads the goal and
+      chapter panels, then walks all **27** tutorial steps through the client's own
+      overlay. The server's record says the tutorial is complete and the overlay is
+      gone. Each browser gets a **fresh player**, because the tutorial is once per
+      player - a second browser over the same player would correctly see none
 - [ ] The desktop build (Tauri) runs on Windows, macOS and Linux
 - [ ] The mobile build (Capacitor) runs on Android and iOS
 - [ ] The game is playable at the original resolutions and scales cleanly to phone screens
