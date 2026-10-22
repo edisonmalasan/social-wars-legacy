@@ -22,6 +22,7 @@ import { Goals } from './goals.tsx';
 import { Hud } from './hud.tsx';
 import { InfoPanel } from './info.tsx';
 import { Neighbours } from './neighbours.tsx';
+import { TutorialOverlay, type TutorialOverlayProps } from './tutorial.tsx';
 import {
   buildItems,
   categories,
@@ -45,6 +46,8 @@ export interface RootProps {
   selected?: number | null;
   /** The other players, for the neighbour strip. */
   neighbours?: readonly Neighbour[];
+  /** The tutorial step to draw, or null when the tutorial is not running. */
+  tutorial?: TutorialOverlayProps | null;
   /** The player asked to collect the selected building's production. */
   onCollect?: () => void;
   /** The player picked something to build. */
@@ -64,6 +67,7 @@ export function Root({
   placing,
   selected,
   neighbours = [],
+  tutorial = null,
   onCollect,
   onPick,
 }: RootProps): React.JSX.Element {
@@ -87,6 +91,7 @@ export function Root({
       <Chapters ranks={ranks} minLevels={minLevels} />
       <InfoPanel resource={panel} unit={unit} onCollect={onCollect} />
       <Neighbours neighbours={neighbours} />
+      {tutorial ? <TutorialOverlay {...tutorial} /> : null}
       <BuildMenu
         items={items}
         categories={tabs}

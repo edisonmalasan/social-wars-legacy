@@ -414,5 +414,105 @@ export function uiCss(): string {
   color: #e0a33c;
   font-size: calc(10px * var(--swl-font-scale-body, 1));
 }
+
+/* --- The tutorial ------------------------------------------------------ */
+
+.swl-tutorial {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.swl-tutorial-ring {
+  position: absolute;
+  border: 3px solid #f5c542;
+  border-radius: 50%;
+  box-shadow: 0 0 0 9999px #0000, 0 0 18px #f5c542cc;
+  animation: swl-tutorial-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes swl-tutorial-pulse {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
+.swl-tutorial-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-top: 13px solid transparent;
+  border-bottom: 13px solid transparent;
+  border-left: 26px solid #f5c542;
+  filter: drop-shadow(0 0 4px #000c);
+  animation: swl-tutorial-nudge 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes swl-tutorial-nudge {
+  from { margin-left: 0; }
+  to { margin-left: 6px; }
+}
+
+.swl-tutorial-box {
+  position: absolute;
+  width: 286px;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #f5c542;
+  border-radius: 5px;
+  background: linear-gradient(#1d2430f2, #131a24f2);
+  box-shadow: 0 8px 24px #000b, inset 0 1px 0 #ffffff14;
+  pointer-events: auto;
+}
+
+.swl-tutorial-step {
+  margin: 0;
+  color: #8d97a8;
+  font-size: calc(10px * var(--swl-font-scale-body, 1));
+  letter-spacing: 0.08em;
+}
+
+.swl-tutorial-title {
+  margin: 2px 0 6px;
+  color: #f5c542;
+  font-family: var(--swl-font-display, system-ui, sans-serif);
+  font-size: calc(15px * var(--swl-font-scale-display, 1));
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.swl-tutorial-lesson {
+  margin: 0 0 4px;
+  color: #e8e3d8;
+  font-size: calc(12px * var(--swl-font-scale-body, 1));
+  line-height: 1.35;
+}
+
+.swl-tutorial-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.swl-tutorial-skip {
+  color: #8d97a8;
+  font-size: calc(11px * var(--swl-font-scale-body, 1));
+  text-decoration: underline;
+}
+
+.swl-tutorial-next {
+  padding: 4px 12px;
+  border: 1px solid #f5c542;
+  border-radius: 3px;
+  background: #f5c542;
+  color: #10151d;
+  font-size: calc(12px * var(--swl-font-scale-body, 1));
+  font-weight: 700;
+}
+
+.swl-tutorial-next:hover {
+  background: #ffd75e;
+}
 `.trim();
 }

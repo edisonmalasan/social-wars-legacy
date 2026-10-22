@@ -393,6 +393,15 @@ async function main() {
       }
       console.log(`  ${entry.name}: `);
 
+      // A **fresh player** for each browser: the tutorial is a
+      // once-per-player sequence, and a second browser over the same
+      // player would correctly see no tutorial at all.
+      const browserSession = await register(
+        serverPort,
+        `e2e-${entry.name.toLowerCase()}`,
+        'correct horse',
+      );
+
       const profile = await mkdtemp(path.join(os.tmpdir(), 'swl-e2e-'));
       const child = spawn(
         browser,
@@ -419,9 +428,9 @@ async function main() {
         await page.evaluate(
           `window.localStorage.setItem('swl.session', ${JSON.stringify(
             JSON.stringify({
-              token: session.token,
-              playerId: session.playerId,
-              expiresAt: session.expiresAt,
+              token: browserSession.token,
+              playerId: browserSession.playerId,
+              expiresAt: browserSession.expiresAt,
             }),
           )})`,
         );
@@ -691,6 +700,102 @@ async function main() {
           continue;
         }
         console.log(`  the chapter map shows ${map.chapters} chapters (${map.slots} slots)`);
+
+        // The **tutorial** is drawn from the client's own steps, and its
+        // progression is the server's. A new player sees the welcome,
+        // the step numbers are the client's own, and walking the
+        // sequence is recorded server-side rather than in the browser.
+        const tutorialStart = await page.evaluate(
+          `(() => {
+             const box = document.querySelector('#ui .swl-tutorial');
+             if (!box) return { error: 'the tutorial is missing' };
+             return {
+               step: window.__swl ? window.__swl.tutorialStep() : null,
+               title: box.querySelector('.swl-tutorial-title')?.textContent ?? '',
+               position: box.querySelector('.swl-tutorial-step')?.textContent ?? '',
+             };
+           })()`,
+        );
+        if (!tutorialStart || tutorialStart.error) {
+          failures.push(
+            `${entry.name}: ${tutorialStart?.error ?? 'the tutorial did not answer'}`,
+          );
+          console.log('FAILED (the tutorial is missing)');
+          continue;
+        }
+        if (tutorialStart.step !== 100) {
+          failures.push(
+            `${entry.name}: the tutorial starts at step ${tutorialStart.step}, not 100`,
+          );
+          console.log('FAILED (the tutorial starts at the wrong step)');
+          continue;
+        }
+        if (!String(tutorialStart.title).trim()) {
+          failures.push(`${entry.name}: the tutorial drew no title`);
+          console.log('FAILED (the tutorial drew no title)');
+          continue;
+        }
+        console.log(
+          `  the tutorial opens on "${tutorialStart.title}" (${tutorialStart.position})`,
+        );
+
+        // Walk the whole sequence. The client advances one step at a
+        // time and tells the server; the server keeps the furthest step.
+        const walked = await page.evaluate(
+          `(async () => {
+             const handle = window.__swl;
+             if (!handle) return { error: 'the client has no handle' };
+             const seen = [];
+             for (let guard = 0; guard < 60 && handle.tutorialStep() !== null; guard++) {
+               const before = handle.tutorialStep();
+               const result = await handle.advanceTutorial();
+               if (!result.ok) {
+                 return { error: 'the server refused step ' + before };
+               }
+               seen.push(before);
+             }
+             return { seen, step: handle.tutorialStep() };
+           })()`,
+        );
+        if (!walked || walked.error) {
+          failures.push(`${entry.name}: ${walked?.error ?? 'the tutorial did not walk'}`);
+          console.log('FAILED (the tutorial did not walk)');
+          continue;
+        }
+        if (walked.step !== null) {
+          failures.push(`${entry.name}: the tutorial stopped at step ${walked.step}`);
+          console.log('FAILED (the tutorial did not finish)');
+          continue;
+        }
+        if (!Array.isArray(walked.seen) || walked.seen.length < 27) {
+          failures.push(
+            `${entry.name}: the tutorial walked ${walked.seen?.length ?? 0} step(s), not 27`,
+          );
+          console.log('FAILED (the tutorial walked too few steps)');
+          continue;
+        }
+        // Finishing is the server's record, not the browser's.
+        const afterTutorial = await fetch(
+          `http://127.0.0.1:${serverPort}/api/world`,
+          { headers: { authorization: `Bearer ${browserSession.token}` } },
+        ).then((response) => response.json());
+        const record = afterTutorial?.privateState?.tutorial;
+        if (!record || record.complete !== true) {
+          failures.push(`${entry.name}: the server did not record the finished tutorial`);
+          console.log('FAILED (the server did not record the finished tutorial)');
+          continue;
+        }
+        const overlayGone = await page.evaluate(
+          "!document.querySelector('#ui .swl-tutorial')",
+        );
+        if (!overlayGone) {
+          failures.push(`${entry.name}: the tutorial is still drawn after finishing`);
+          console.log('FAILED (the tutorial is still drawn)');
+          continue;
+        }
+        console.log(
+          `  the tutorial walked ${walked.seen.length} steps and the server recorded it`,
+        );
 
         // The **neighbour strip** lists the other players. The strip is
         // the server's list, and the client draws it.

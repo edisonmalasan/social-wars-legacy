@@ -18,7 +18,7 @@
    "haveButton": true,
    "ef": "this.nextStep",
    "nf": "this.nextStep",
-   "title": "Language.getLiteral(\"WELCOME",
+   "title": "Language.getLiteral(\"WELCOME, SOLDIER!\")",
    "lesson": "Language.getLiteral(\"Welcome Soldier!\\nYou\\'ve been appointed to direct our camp and help us to defeat our enemy!\")",
    "skippable": true,
    "marcaSuelo": 3
@@ -250,7 +250,7 @@
    "ef": "this.nextStep",
    "nf": "this.prevStep",
    "title": "Language.getLiteral(\"TRAINING SOLDIERS\")",
-   "lesson": "Language.getLiteral(\"Great! To train soldiers",
+   "lesson": "Language.getLiteral(\"Great! To train soldiers, first click on the academy.\")",
    "skippable": false,
    "marcaSuelo": 3
   },
@@ -371,7 +371,7 @@
    "ef": "this.nextStep",
    "nf": "this.prevStep",
    "title": "Language.getLiteral(\"COMPLETING GOALS\")",
-   "lesson": "Language.getLiteral(\"Awesome! You\\'ll make it far soldier!\\nLet me assign you some goals now",
+   "lesson": "Language.getLiteral(\"Awesome! You\\'ll make it far soldier!\\nLet me assign you some goals now, that will make your life in the camp easier!\\nClick on me.\")",
    "skippable": false,
    "marcaSuelo": 3
   },

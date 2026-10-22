@@ -20,7 +20,7 @@
  *   node scripts/build-client-manifest.mjs
  */
 import { existsSync } from 'node:fs';
-import { readFile, writeFile } from 'node:fs/promises';
+import { copyFile, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
@@ -28,6 +28,8 @@ const ROOT = process.cwd();
 const SOURCE = path.join(ROOT, 're/data/frame-manifest.json');
 const CONTENT = path.join(ROOT, 'packages/content/dist/content-bundle.json');
 const OUT = path.join(ROOT, 'apps/client/public/frame-manifest.json');
+const TUTORIAL = path.join(ROOT, 're/data/tutorial-steps.json');
+const TUTORIAL_OUT = path.join(ROOT, 'apps/client/public/tutorial-steps.json');
 
 async function main() {
   if (!existsSync(SOURCE)) {
@@ -135,6 +137,10 @@ async function main() {
     JSON.stringify(content),
     'utf8',
   );
+
+  // The tutorial's steps travel with the client for the same reason: the
+  // overlay draws the client's own sequence, and it is small and static.
+  await copyFile(TUTORIAL, TUTORIAL_OUT);
 
   const before = JSON.stringify(manifest).length;
   const after = JSON.stringify(trimmed).length;

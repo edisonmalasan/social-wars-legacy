@@ -53,14 +53,50 @@ function skipStrings(source, start) {
   return source.length;
 }
 
+/**
+ * The end of a value.
+ *
+ * A value is everything up to the next comma or the object's closing
+ * brace **at depth zero**, with strings and brackets respected. The
+ * earlier pattern stopped at the first comma, so a title such as
+ * `Language.getLiteral("WELCOME, SOLDIER!")` was cut in half.
+ */
+function valueEnd(raw, start) {
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let index = start; index < raw.length; index++) {
+    const char = raw[index];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (char === '\\') escaped = true;
+      else if (char === '"') inString = false;
+      continue;
+    }
+    if (char === '"') inString = true;
+    else if (char === '(' || char === '[' || char === '{') depth += 1;
+    else if (char === ')' || char === ']' || char === '}') {
+      // The object's own closing brace is not part of a value.
+      if (depth === 0) return index;
+      depth -= 1;
+    } else if (char === ',' && depth === 0) return index;
+  }
+  return raw.length;
+}
+
 /** The fields of one step. */
 function parseFields(raw) {
   const fields = {};
-  const pattern = /"(\w+)"\s*:\s*("(?:[^"\\]|\\.)*"|[^,}]+)/g;
+  const pattern = /"(\w+)"\s*:/g;
   let match;
   while ((match = pattern.exec(raw)) !== null) {
     const key = match[1];
-    const value = match[2].trim();
+    const start = pattern.lastIndex;
+    const end = valueEnd(raw, start);
+    const value = raw.slice(start, end).trim();
+    // The next key is searched for after this value, so a key's name
+    // inside a string cannot be mistaken for a field.
+    pattern.lastIndex = end;
     if (ALIGNMENTS.includes(value)) {
       fields[key] = value;
     } else if (value.startsWith('"') && value.endsWith('"')) {
