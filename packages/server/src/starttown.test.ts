@@ -69,4 +69,10 @@ describe('a new player', () => {
     assert.equal(map['level'], 1);
     assert.equal(map['xp'], STARTING_XP);
   });
+
+  it('starts with no dark matter and no spells', () => {
+    const state = initialWorld('somebody').save.privateState;
+    assert.equal(state['mana'], 0);
+    assert.deepEqual(state['magics'], {});
+  });
 });

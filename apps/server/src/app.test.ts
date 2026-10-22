@@ -539,6 +539,22 @@ describe('the native command endpoint', () => {
     assert.equal(body.outcomes[0].error.code, 'insufficient-resources');
     assert.equal((await store.get('p1'))!.world.resources['g'], 1);
   });
+
+  it('refunds a refused priced command', async () => {
+    const { handle, store, token } = await app({
+      applyCommand: (w) => ({ applied: false, refused: 'deliberately-refused', world: w }),
+    });
+    const response = await handle(
+      native(token, 'req-1', [{ map: 0, name: 'buy', args: [1, 1007, 0, 0, 1, 0, 0, 'u'] }]),
+    );
+    assert.equal(response.status, 200);
+    const body = JSON.parse(response.body);
+    assert.equal(body.ok, false);
+    assert.equal(body.outcomes[0].error.message, 'deliberately-refused');
+    const stored = (await store.get('p1'))!.world;
+    assert.equal(stored.resources['g'], 1000);
+    assert.equal(stored.resources['s'], 1000);
+  });
 });
 
 describe('the legacy config and player endpoints', () => {

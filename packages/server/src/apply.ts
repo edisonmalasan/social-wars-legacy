@@ -64,6 +64,14 @@ import {
   type DailyBonusRules,
   type GoalRuntimeState,
   type QuestProgress,
+  type MagicSpellDefinition,
+  isMagicLearned,
+  magicUses,
+  magicUsesMap,
+  magicLevelGate,
+  manaPack,
+  manaRewardPerLevel,
+  spellUseCap,
 } from '@swl/rules';
 
 import type { CommandApplier, CommandOutcome, ShimWorld } from './shim.ts';
@@ -251,6 +259,11 @@ export interface ApplierDeps {
   premiumPackages?: { price: number; time: number }[];
   /** The player's level table: the XP each level needs and its reward. */
   levels?: { index: number; exp_required: number; reward_amount: number; reward_type: string }[];
+  /** The magic and tech spells and the globals their economy reads. */
+  magic?: {
+    spells: Map<number, MagicSpellDefinition>;
+    globals: Record<string, unknown>;
+  };
 }
 
 /** The map's items, keyed by iso id. */
@@ -346,6 +359,12 @@ export function createApplier(deps: ApplierDeps): CommandApplier {
         return resetCollectCommand(world, command.args, deps);
       case 'buy_premium_account':
         return buyPremiumCommand(world, command.args, deps);
+      case 'buy_magic':
+        return buyMagicCommand(world, command.args, deps);
+      case 'buy_mana_new':
+        return buyManaCommand(world, command.args, deps);
+      case 'use_magic':
+        return useMagicCommand(world, command.args, deps);
       case 'finish_building':
         return finishBuildingCommand(world, command.args, deps);
       case 'end_attack':
@@ -404,6 +423,160 @@ function buyPremiumCommand(
   const expiry = premiumExpiry(packages, index, now, current);
 
   privateState['timeStampEndPremium'] = expiry;
+  return { applied: true, world };
+}
+
+/** The mana in the server wallet, with a missing or malformed value as zero. */
+function manaOf(world: ShimWorld): number {
+  const mana = world.resources['m'];
+  return typeof mana === 'number' && Number.isFinite(mana) ? Math.max(0, mana) : 0;
+}
+
+/**
+ * Keep the client-visible mana in step with the server's wallet.
+ *
+ * The wallet is `world.resources.m`; the client reads
+ * `privateState.mana` (`managers/PlayerStatus.as:252`). The legacy save
+ * carries both, and the client's copy has to be refreshed after every
+ * server-owned change or the next `get_player_info` shows a stale number.
+ */
+function syncMana(world: ShimWorld): void {
+  world.save.privateState['mana'] = manaOf(world);
+}
+
+/**
+ * `buy_magic` - learn one of the ten spells.
+ *
+ * The cost table has already charged the spell's gold or cash price. This
+ * step owns the **state** the price buys:
+ *
+ * - the spell must exist and not already be learned;
+ * - **gold** respects the spell's unlock level, while **cash** does not
+ *   (`GUI/SelectedMagic.as:39-57` hides only the gold button when the level
+ *   is too low);
+ * - learning writes `0` uses, which is the client's "known, never cast"
+ *   state (`core/MagicManager.as:116-117`);
+ * - the purchase also grants the spell's mana cost, exactly as
+ *   `CmdBuyMagic` does (`commands/CmdBuyMagic.as:8-14`).
+ *
+ * The price and the mana grant come from the content, never from the
+ * command's arguments. A refused purchase must spend nothing; the shim and
+ * the native endpoint restore the wallet when the applier returns
+ * `applied: false`.
+ */
+function buyMagicCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const magic = deps.magic;
+  if (!magic) return { applied: false, refused: 'not-implemented', world };
+
+  const spellId = Number(args[0]);
+  if (!Number.isInteger(spellId)) {
+    return { applied: false, refused: 'bad-argument', world };
+  }
+  const spell = magic.spells.get(spellId);
+  if (!spell) return { applied: false, refused: 'unknown-spell', world };
+
+  const payment = args[1];
+  if (payment !== 'g' && payment !== 'c') {
+    return { applied: false, refused: 'bad-payment', world };
+  }
+
+  const privateState = world.save.privateState;
+  if (isMagicLearned(privateState['magics'], spell.id)) {
+    return { applied: false, refused: 'already-learned', world };
+  }
+  if (!magicLevelGate(spell, playerLevel(ownMap(world)), payment)) {
+    return { applied: false, refused: 'level', world };
+  }
+
+  const magics = magicUsesMap(privateState['magics']);
+  magics[String(spell.id)] = 0;
+  privateState['magics'] = magics;
+
+  world.resources = {
+    ...world.resources,
+    m: manaOf(world) + spell.mana,
+  };
+  syncMana(world);
+  return { applied: true, world };
+}
+
+/**
+ * `buy_mana_new` - buy the fixed dark-matter pack.
+ *
+ * The client sends a quantity, a price and a payment resource; only the
+ * payment resource is meaningful. The server prices the pack from the
+ * globals (`MANA_PER_PURCHASE`, `COST_MANA_CASH`, `COST_MANA_GOLD`), and
+ * the cost table has already charged it.
+ */
+function buyManaCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const magic = deps.magic;
+  if (!magic) return { applied: false, refused: 'not-implemented', world };
+
+  const pack = manaPack(magic.globals);
+  const amount = Number(args[0]);
+  if (!Number.isInteger(amount) || amount !== pack.amount) {
+    return { applied: false, refused: 'unknown-mana-pack', world };
+  }
+
+  const payment = args[1];
+  if (payment !== 'g' && payment !== 'c') {
+    return { applied: false, refused: 'bad-payment', world };
+  }
+  if (pack.price[payment] <= 0) {
+    return { applied: false, refused: 'bad-payment', world };
+  }
+
+  world.resources = {
+    ...world.resources,
+    m: manaOf(world) + pack.amount,
+  };
+  syncMana(world);
+  return { applied: true, world };
+}
+
+/**
+ * `use_magic` - cast a learned spell.
+ *
+ * The cost table has already deducted the spell's mana. The command carries
+ * no target, so the server cannot replay the spell's battle effect; it owns
+ * the two facts it can: the spell must be learned, and the use counter rises
+ * by one, capped where the third spell level is reached. The cap is the
+ * upstream server's own bound (`upstream/socialwarriors/command.py:664-672`)
+ * and changes nothing after level 3.
+ */
+function useMagicCommand(
+  world: ShimWorld,
+  args: readonly unknown[],
+  deps: ApplierDeps,
+): CommandOutcome {
+  const magic = deps.magic;
+  if (!magic) return { applied: false, refused: 'not-implemented', world };
+
+  const spellId = Number(args[0]);
+  if (!Number.isInteger(spellId)) {
+    return { applied: false, refused: 'bad-argument', world };
+  }
+  const spell = magic.spells.get(spellId);
+  if (!spell) return { applied: false, refused: 'unknown-spell', world };
+
+  const privateState = world.save.privateState;
+  const uses = magicUses(privateState['magics'], spell.id);
+  if (uses === null) {
+    return { applied: false, refused: 'not-learned', world };
+  }
+
+  const magics = magicUsesMap(privateState['magics']);
+  magics[String(spell.id)] = Math.min(spellUseCap(magic.globals), uses + 1);
+  privateState['magics'] = magics;
+  syncMana(world);
   return { applied: true, world };
 }
 
@@ -882,6 +1055,18 @@ function levelUpCommand(
     ...world.resources,
     [rewardType]: (world.resources[rewardType] ?? 0) + row.reward_amount,
   };
+  // The level-up also grants dark matter. The client's level popup is meant
+  // to show it (`popups/PopupLevel.as:75`), but the global that gates the
+  // display is missing from the shipped config; the grant itself is real
+  // (`globals.MANA_REWARD_PER_LEVEL`). The server owns it.
+  const mana = manaRewardPerLevel(deps.magic?.globals ?? {});
+  if (mana > 0) {
+    world.resources = {
+      ...world.resources,
+      m: (world.resources['m'] ?? 0) + mana,
+    };
+    syncMana(world);
+  }
   return { applied: true, world };
 }
 

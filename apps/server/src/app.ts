@@ -545,6 +545,7 @@ export function createApp(
         // The cost is computed by the SERVER. The native envelope has no
         // room for a client-declared delta at all.
         const cost = computeCommandCost(options.content, command.name, command.args);
+        const beforeResources = current.resources;
         const settled = applyCommandCost(current.resources, cost);
         if (!settled.ok) {
           outcomes.push({
@@ -564,14 +565,17 @@ export function createApp(
           { ...current, resources: settled.resources },
           { name: command.name, args: [...command.args] },
         );
-        current = outcome.world;
         const durationMs = (options.nowMs?.() ?? Date.now()) - startedAt;
         metrics.observe('command_duration_ms', durationMs, { name: command.name });
         metrics.observe('simulation_tick_ms', durationMs, { name: command.name });
         if (outcome.applied) {
+          current = outcome.world;
           applied.push(command.name);
           outcomes.push({ index, ok: true, result: { kind: 'none' } });
         } else {
+          // A refused command spends nothing. The applier validates before
+          // it mutates, so the settled price is the only change to undo.
+          current = { ...outcome.world, resources: beforeResources };
           refused.push(command.name);
           outcomes.push({
             index,

@@ -914,6 +914,161 @@ describe('levelling the player up', () => {
   });
 });
 
+describe('magic and tech', () => {
+  const MAGIC: NonNullable<ApplierDeps['magic']> = {
+    spells: new Map([
+      [
+        1,
+        {
+          id: 1,
+          name: 'AirStrike',
+          description: 'Aircraft bomb the zone.',
+          mana: 8,
+          level: 38,
+          gold: 30_000,
+          cash: 50,
+          area: [5, 7, 9],
+          target: 2,
+          imgName: 'tech_airstrike',
+        },
+      ],
+    ]),
+    globals: {
+      MANA_PER_PURCHASE: 5,
+      COST_MANA_CASH: 1,
+      COST_MANA_GOLD: 10_000,
+      NUM_SPELL_USES_LVL2: 25,
+      NUM_SPELL_USES_LVL3: 50,
+      MANA_REWARD_PER_LEVEL: 2,
+    },
+  };
+
+  /** A world at the given level, with the price already settled by the cost table. */
+  function magicWorld(level: number): ShimWorld {
+    const world = worldWithBuilding({}, { resources: purse({ m: 0 }) });
+    const map = world.save.maps[0] as Record<string, unknown>;
+    map['level'] = level;
+    return world;
+  }
+
+  it('learns a spell with gold and grants its mana cost', () => {
+    const applier = createApplier(deps({ magic: MAGIC }));
+    const world = magicWorld(38);
+    const outcome = applier(world, { name: 'buy_magic', args: [1, 'g'] });
+    assert.equal(outcome.applied, true);
+    assert.deepEqual(outcome.world.save.privateState['magics'], { '1': 0 });
+    assert.equal(outcome.world.resources['m'], 8);
+    assert.equal(outcome.world.save.privateState['mana'], 8);
+  });
+
+  it('lets cash buy a spell below its unlock level', () => {
+    const applier = createApplier(deps({ magic: MAGIC }));
+    const world = magicWorld(1);
+    const outcome = applier(world, { name: 'buy_magic', args: [1, 'c'] });
+    assert.equal(outcome.applied, true);
+    assert.deepEqual(outcome.world.save.privateState['magics'], { '1': 0 });
+    assert.equal(outcome.world.resources['m'], 8);
+  });
+
+  it('does not let gold buy a spell below its unlock level', () => {
+    const applier = createApplier(deps({ magic: MAGIC }));
+    const world = magicWorld(37);
+    const outcome = applier(world, { name: 'buy_magic', args: [1, 'g'] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'level');
+    assert.equal(outcome.world.save.privateState['magics'], undefined);
+    assert.equal(outcome.world.resources['m'], 0);
+  });
+
+  it('refuses a spell that is already learned', () => {
+    const applier = createApplier(deps({ magic: MAGIC }));
+    const world = magicWorld(38);
+    world.save.privateState['magics'] = { '1': 3 };
+    const outcome = applier(world, { name: 'buy_magic', args: [1, 'g'] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'already-learned');
+    assert.deepEqual(outcome.world.save.privateState['magics'], { '1': 3 });
+    assert.equal(outcome.world.resources['m'], 0);
+  });
+
+  it('refuses an unknown spell, a bad payment resource and a missing spell id', () => {
+    const applier = createApplier(deps({ magic: MAGIC }));
+    assert.equal(
+      applier(magicWorld(38), { name: 'buy_magic', args: [2, 'g'] }).refused,
+      'unknown-spell',
+    );
+    assert.equal(
+      applier(magicWorld(38), { name: 'buy_magic', args: [1, 'x'] }).refused,
+      'bad-payment',
+    );
+    assert.equal(
+      applier(magicWorld(38), { name: 'buy_magic', args: ['x', 'g'] }).refused,
+      'bad-argument',
+    );
+  });
+
+  it('buys the fixed mana pack and updates the client copy', () => {
+    const applier = createApplier(deps({ magic: MAGIC }));
+    const world = worldWithBuilding({}, { resources: purse({ m: 10 }) });
+    const outcome = applier(world, { name: 'buy_mana_new', args: [5, 'c'] });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['m'], 15);
+    assert.equal(outcome.world.save.privateState['mana'], 15);
+  });
+
+  it('refuses a mana amount that is not the fixed pack', () => {
+    const applier = createApplier(deps({ magic: MAGIC }));
+    const world = worldWithBuilding({});
+    const outcome = applier(world, { name: 'buy_mana_new', args: [10, 'c'] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'unknown-mana-pack');
+    assert.equal(outcome.world.resources['m'], 0);
+  });
+
+  it('uses a learned spell and raises its counter', () => {
+    const applier = createApplier(deps({ magic: MAGIC }));
+    const world = worldWithBuilding({}, { resources: purse({ m: 0 }) });
+    world.save.privateState['magics'] = { '1': 24 };
+    const outcome = applier(world, { name: 'use_magic', args: [1] });
+    assert.equal(outcome.applied, true);
+    assert.deepEqual(outcome.world.save.privateState['magics'], { '1': 25 });
+    assert.equal(outcome.world.save.privateState['mana'], 0);
+  });
+
+  it('refuses a spell the player has not learned', () => {
+    const applier = createApplier(deps({ magic: MAGIC }));
+    const world = worldWithBuilding({}, { resources: purse({ m: 0 }) });
+    const outcome = applier(world, { name: 'use_magic', args: [1] });
+    assert.equal(outcome.applied, false);
+    assert.equal(outcome.refused, 'not-learned');
+    assert.equal(outcome.world.save.privateState['magics'], undefined);
+  });
+
+  it('stops the counter at the third spell level', () => {
+    const applier = createApplier(deps({ magic: MAGIC }));
+    const world = worldWithBuilding({}, { resources: purse({ m: 0 }) });
+    world.save.privateState['magics'] = { '1': 50 };
+    const outcome = applier(world, { name: 'use_magic', args: [1] });
+    assert.equal(outcome.applied, true);
+    assert.deepEqual(outcome.world.save.privateState['magics'], { '1': 50 });
+  });
+
+  it('grants dark matter when the player levels up', () => {
+    const levels = [
+      { index: 0, exp_required: 0, reward_amount: 50, reward_type: 's' },
+      { index: 1, exp_required: 40, reward_amount: 250, reward_type: 'w' },
+    ];
+    const applier = createApplier(deps({ levels, magic: MAGIC }));
+    const world = magicWorld(0);
+    const map = world.save.maps[0] as Record<string, unknown>;
+    map['xp'] = 100;
+    const outcome = applier(world, { name: 'level_up', args: [1] });
+    assert.equal(outcome.applied, true);
+    assert.equal(outcome.world.resources['m'], 2);
+    assert.equal(outcome.world.save.privateState['mana'], 2);
+  });
+});
+
 describe('upgrading a building', () => {
   it('replaces it with the next tier and charges the difference', () => {
     const applier = createApplier(

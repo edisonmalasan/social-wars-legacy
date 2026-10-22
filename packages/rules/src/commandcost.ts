@@ -19,6 +19,14 @@
  * hand-written table, so the two cannot drift apart.
  */
 
+import {
+  magicCatalogFrom,
+  magicPrice,
+  manaPack,
+  type MagicPayment,
+  type MagicSpellDefinition,
+} from './magic.ts';
+
 /** The player's resources, by resource key: `g`, `w`, `o`, `s`, `c`, `e`, `x`, `m`. */
 export type Resources = Record<string, number>;
 
@@ -85,6 +93,8 @@ export interface CostContent {
   marketIncrement: number;
   /** The gold price of 100 units, by resource. */
   marketBaseCosts: Record<string, number>;
+  /** The magic and tech spells, by id. */
+  magics: Map<number, MagicSpellDefinition>;
 }
 
 /** The client-side constants the costs depend on. */
@@ -120,6 +130,9 @@ export const PRICED_COMMANDS = [
   'level_up',
   'attack_player',
   'spy_player',
+  'buy_magic',
+  'buy_mana_new',
+  'use_magic',
 ] as const;
 
 export type PricedCommand = (typeof PRICED_COMMANDS)[number];
@@ -130,6 +143,11 @@ function add(target: Resources, source: Resources): Resources {
     out[key] = (out[key] ?? 0) + value;
   }
   return out;
+}
+
+/** The payment resource a native magic command names, if it is valid. */
+function paymentOr(value: unknown): MagicPayment | null {
+  return value === 'g' || value === 'c' ? value : null;
 }
 
 /**
@@ -150,6 +168,7 @@ export function costContentFrom(bundle: {
   offerPacks: CostOfferPack[];
   globals: Record<string, unknown>;
   expansionPrices: { coins: number; cash: number }[];
+  magics?: unknown[];
 }): CostContent {
   const globals = bundle.globals;
 
@@ -186,6 +205,7 @@ export function costContentFrom(bundle: {
     marketMaxTrades: globals['MARKET_MAX_NUM_TRADES'] as number,
     marketIncrement: globals['MARKET_INCREMENT'] as number,
     marketBaseCosts: globals['MARKET_BASE_COSTS'] as Record<string, number>,
+    magics: magicCatalogFrom(Array.isArray(bundle.magics) ? bundle.magics : []),
   };
 }
 
@@ -335,6 +355,37 @@ export function computeCommandCost(
     case 'spy_player': {
       // Spying costs 15 energy.
       return { cost: { e: CONFIG.costBuySpyings }, gain: {} };
+    }
+
+    case 'buy_magic': {
+      // args: spell id, payment resource. The price is the spell's own, and
+      // the purchase's mana grant is applied by the applier only after the
+      // spell is actually learned.
+      const spell = content.magics.get(Number(args[0]));
+      if (!spell) return null;
+      const payment = paymentOr(args[1]);
+      if (!payment) return null;
+      const price = magicPrice(spell, payment);
+      if (!price) return null;
+      return { cost: { [price.resource]: price.amount }, gain: {} };
+    }
+
+    case 'buy_mana_new': {
+      // args: mana amount, payment resource. There is one pack; an amount
+      // that does not match it is not a purchase the server can price.
+      const pack = manaPack(content.globals);
+      if (Number(args[0]) !== pack.amount) return null;
+      const payment = paymentOr(args[1]);
+      if (!payment || pack.price[payment] <= 0) return null;
+      return { cost: { [payment]: pack.price[payment] }, gain: {} };
+    }
+
+    case 'use_magic': {
+      // args: spell id. The mana cost is the spell's own; whether the spell
+      // is learned is the applier's check, after the wallet is settled.
+      const spell = content.magics.get(Number(args[0]));
+      if (!spell) return null;
+      return { cost: { m: spell.mana }, gain: {} };
     }
 
     default:

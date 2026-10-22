@@ -531,7 +531,7 @@ export const COMMAND_TABLE: Readonly<Record<CommandName, CommandSpec>> = Object.
     idempotent: false,
     shapeKnown: true,
     notes:
-      'DIVERGENCE: the legacy args were [spellId] only (commands/CmdBuyMagic.as:11); the payment resource and the price travelled in the client-declared delta. The native form names the payment resource and the server prices the spell from the content bundle.',
+      'DIVERGENCE: the legacy args were [spellId] only (commands/CmdBuyMagic.as:11); the payment resource and the price travelled in the client-declared delta. The native form names the payment resource and the server prices the spell from the content bundle. A purchase also grants the spell’s mana cost, as the client does; cash may bypass the spell’s unlock level, gold may not.',
   },
 
   buy_mana_new: {
@@ -548,7 +548,7 @@ export const COMMAND_TABLE: Readonly<Record<CommandName, CommandSpec>> = Object.
     idempotent: false,
     shapeKnown: true,
     notes:
-      'DIVERGENCE: the legacy command sent no arguments at all (commands/CmdBuyManaNew.as:10) — the amount, the price and the payment resource were all in the client-declared delta. The native form carries the amount and the payment resource; the server prices it from COST_MANA_CASH / COST_MANA_GOLD.',
+      'DIVERGENCE: the legacy command sent no arguments at all (commands/CmdBuyManaNew.as:10) — the amount, the price and the payment resource were all in the client-declared delta. The native form carries the amount and the payment resource; the server prices it from COST_MANA_CASH / COST_MANA_GOLD. There is one pack, MANA_PER_PURCHASE (5); another amount is refused.',
   },
 
   buy_offer_pack: {
@@ -1676,7 +1676,8 @@ export const COMMAND_TABLE: Readonly<Record<CommandName, CommandSpec>> = Object.
     mutatesWorld: false,
     idempotent: false,
     shapeKnown: true,
-    notes: 'The mana cost is the spell’s `manaCost` in the content bundle.',
+    notes:
+      'The mana cost is the spell’s `manaCost` in the content bundle. The server checks that the spell is learned, deducts the mana and increments the use counter, which stops at `NUM_SPELL_USES_LVL3` (50). The protocol carries no target, so the battle effect itself is not server-simulated.',
   },
 
   win_daily_bonus: {

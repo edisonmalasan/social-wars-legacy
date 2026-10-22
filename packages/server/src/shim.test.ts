@@ -10,6 +10,7 @@ import { framePayload, SERVER_KEYS } from '@swl/protocol/commandphp';
 import { COUNTERS } from '@swl/rules';
 
 import { LegacyIdentityBridge, SessionStore } from './session.ts';
+import { createApplier } from './apply.ts';
 import {
   applyBatch,
   handleCommandPhp,
@@ -270,6 +271,157 @@ describe('the command.php shim', () => {
     const antiaircraft = COUNTERS.find((c) => c.name === 'Antiaircraft battery');
     assert.equal(antiaircraft?.multiplier, 20);
     assert.equal(antiaircraft?.bestAgainst, 'ft_flying');
+  });
+});
+
+describe('the legacy magic commands', () => {
+  const MAGIC = {
+    spells: new Map([
+      [
+        1,
+        {
+          id: 1,
+          name: 'AirStrike',
+          description: 'Aircraft bomb the zone.',
+          mana: 8,
+          level: 38,
+          gold: 30_000,
+          cash: 50,
+          area: [5, 7, 9],
+          target: 2,
+          imgName: 'tech_airstrike',
+        },
+      ],
+    ]),
+    globals: {
+      MANA_PER_PURCHASE: 5,
+      COST_MANA_CASH: 1,
+      COST_MANA_GOLD: 10_000,
+      NUM_SPELL_USES_LVL2: 25,
+      NUM_SPELL_USES_LVL3: 50,
+      MANA_REWARD_PER_LEVEL: 2,
+    },
+  };
+
+  function magicContext(over: Partial<ShimContext> = {}): Promise<ShimContext> {
+    return context({
+      applyCommand: createApplier({
+        now: () => 1_700_000_000,
+        tzOffsetHours: 0,
+        collectPeriods: { minutes: [5, 60, 240, 480], multiplier: [0.25, 1, 2, 3] },
+        dailyBonus: { goldRewards: [100, 250, 500, 1000, 0], heroItemId: 1001 },
+        magic: MAGIC,
+      }),
+      ...over,
+    });
+  }
+
+  function magicWorld(level: number, resources: Partial<ShimWorld['resources']>): ShimWorld {
+    const wallet: ShimWorld['resources'] = { ...world().resources };
+    for (const [key, value] of Object.entries(resources)) {
+      if (typeof value === 'number') wallet[key] = value;
+    }
+    const map = world({ resources: wallet });
+    (map.save.maps[0] as Record<string, unknown>)['level'] = level;
+    return map;
+  }
+
+  it('translates a legacy gold purchase and charges the content price', async () => {
+    const ctx = await magicContext({ world: magicWorld(38, { g: 30_000 }) });
+    const payload = {
+      first_number: 1,
+      commands: [[1, 'buy_magic', [1], [0, 0, -30_000, 0, 0, 0, 0, 8]]],
+    };
+    const outcome = applyBatch(payload, ctx);
+    assert.deepEqual(outcome.refused, []);
+    assert.equal(outcome.world.resources['g'], 0);
+    assert.equal(outcome.world.resources['m'], 8);
+    assert.deepEqual(outcome.world.save.privateState['magics'], { '1': 0 });
+    assert.equal(outcome.world.save.privateState['mana'], 8);
+  });
+
+  it('translates a legacy cash purchase from the delta sign', async () => {
+    const ctx = await magicContext({ world: magicWorld(1, { c: 50 }) });
+    const payload = {
+      first_number: 1,
+      commands: [[1, 'buy_magic', [1], [0, 0, 0, 0, 0, 0, -50, 8]]],
+    };
+    const outcome = applyBatch(payload, ctx);
+    assert.deepEqual(outcome.refused, []);
+    assert.equal(outcome.world.resources['c'], 0);
+    assert.equal(outcome.world.resources['m'], 8);
+  });
+
+  it('never trusts the amount in the declared delta', async () => {
+    const ctx = await magicContext({ world: magicWorld(38, { g: 30_000 }) });
+    // The client claims the spell cost one gold and grants a million mana.
+    const payload = {
+      first_number: 1,
+      commands: [[1, 'buy_magic', [1], [0, 0, -1, 0, 0, 0, 0, 1_000_000]]],
+    };
+    const outcome = applyBatch(payload, ctx);
+    assert.deepEqual(outcome.refused, []);
+    assert.equal(outcome.world.resources['g'], 0);
+    assert.equal(outcome.world.resources['m'], 8);
+  });
+
+  it('translates a legacy mana purchase and uses the fixed pack', async () => {
+    const ctx = await magicContext({ world: magicWorld(1, { g: 10_000 }) });
+    // The legacy command has no arguments; the delta claims a price of one
+    // gold and a quantity of 999 mana.
+    const payload = {
+      first_number: 1,
+      commands: [[1, 'buy_mana_new', [], [0, 0, -1, 0, 0, 0, 0, 999]]],
+    };
+    const outcome = applyBatch(payload, ctx);
+    assert.deepEqual(outcome.refused, []);
+    assert.equal(outcome.world.resources['g'], 0);
+    assert.equal(outcome.world.resources['m'], 5);
+    assert.equal(outcome.world.save.privateState['mana'], 5);
+  });
+
+  it('refuses a legacy cast of an unlearned spell and refunds the mana', async () => {
+    const ctx = await magicContext({ world: magicWorld(1, { m: 8 }) });
+    const payload = {
+      first_number: 1,
+      commands: [[1, 'use_magic', [1], [0, 0, 0, 0, 0, 0, 0, -8]]],
+    };
+    const outcome = applyBatch(payload, ctx);
+    assert.equal(outcome.refused.length, 1);
+    assert.equal(outcome.refused[0]!.reason, 'not-learned');
+    assert.equal(outcome.world.resources['m'], 8);
+  });
+
+  it('casts a learned legacy spell and raises its counter', async () => {
+    const worldWithSpell = magicWorld(1, { m: 8 });
+    worldWithSpell.save.privateState['magics'] = { '1': 24 };
+    const ctx = await magicContext({ world: worldWithSpell });
+    const payload = {
+      first_number: 1,
+      commands: [[1, 'use_magic', [1], [0, 0, 0, 0, 0, 0, 0, -8]]],
+    };
+    const outcome = applyBatch(payload, ctx);
+    assert.deepEqual(outcome.refused, []);
+    assert.equal(outcome.world.resources['m'], 0);
+    assert.deepEqual(outcome.world.save.privateState['magics'], { '1': 25 });
+    assert.equal(outcome.world.save.privateState['mana'], 0);
+  });
+
+  it('refunds a refused priced command', async () => {
+    // The applier refuses after the cost table has settled the price. A
+    // refusal must not spend the player's resources.
+    const ctx = await context({
+      applyCommand: (w) => ({ applied: false, refused: 'deliberately-refused', world: w }),
+    });
+    const payload = {
+      first_number: 1,
+      commands: [[1, 'buy', [1, 1007, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0]]],
+    };
+    const outcome = applyBatch(payload, ctx);
+    assert.equal(outcome.refused.length, 1);
+    assert.equal(outcome.refused[0]!.reason, 'deliberately-refused');
+    assert.equal(outcome.world.resources['g'], 1000);
+    assert.equal(outcome.world.resources['s'], 1000);
   });
 });
 

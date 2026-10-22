@@ -14,7 +14,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { costContentFrom } from '@swl/rules';
+import { costContentFrom, magicCatalogFrom } from '@swl/rules';
 import process from 'node:process';
 
 import {
@@ -221,6 +221,11 @@ async function main(): Promise<void> {
       // the population and the limits are all the game's own.
       items: contentItems(bundle),
       populationRules: populationRules(globalsOf(bundle)),
+      // Magic and tech: the ten spells and the globals their economy reads.
+      magic: {
+        spells: magicCatalogFrom(Array.isArray(bundle.magics) ? bundle.magics : []),
+        globals: globalsOf(bundle),
+      },
     }),
   });
 
