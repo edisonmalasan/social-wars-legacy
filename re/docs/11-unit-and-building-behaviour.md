@@ -76,16 +76,20 @@ that implements `onAttack` and `onInit` covers the large majority of the 1.32 MB
 
 Each attack records: the slot index (`arAttacks[n]`), the kind, the display name, the
 **button icon** (which maps to `assets/thumbs/btn_<id>_<ability>.jpg`), the handler
-method, and the "no target" message.
+method, the "cannot use" message, and the **hover tooltip** — the sentence
+`GUI/PortraitSpecialAttack.as:80-90` shows only when it is not empty. The 176
+factory-built attacks have no tooltip: `SpecialUnitAttackCreator` exposes no
+`withTooltip` and its `create()` passes nine arguments, so the constructor default
+(`""`) stands.
 
 ### Example — `LiquidMechDelegate` (item 1222, "Liquid Mech")
 
-| # | Kind | Name | Icon | Handler |
-|---|---|---|---|---|
-| 0 | `SpecialUnitAttack` | Acid Rain | `btn_liquid_mech_acid_rain` | `acidRainAttack` |
-| 1 | `SpecialUnitAttack` | Acid Balls | `btn_liquid_mech_acid_balls` | `acidBallsAttack` |
-| 2 | `SpecialUnitAttack` | Clone | `btn_liquid_mech_clone` | `cloneAttack` |
-| 3 | `SpecialUnitAttackSpawn` | Spawn Drone | `btn_liquid_mech_drone` | `doSpawn` (spawns `ID_UNIT_LIQUID_MECH_DRONE`) |
+| # | Kind | Name | Icon | Handler | Tooltip |
+|---|---|---|---|---|---|
+| 0 | `SpecialUnitAttack` | Acid Rain | `btn_liquid_mech_acid_rain` | `acidRainAttack` | Acid Rain |
+| 1 | `SpecialUnitAttack` | Acid Balls | `btn_liquid_mech_acid_balls` | `acidBallsAttack` | Acid Balls |
+| 2 | `SpecialUnitAttack` | Clone | `btn_liquid_mech_clone` | `cloneAttack` | Clone |
+| 3 | `SpecialUnitAttackSpawn` | Spawn Drone | `btn_liquid_mech_drone` | `doSpawn` (spawns `ID_UNIT_LIQUID_MECH_DRONE`) | Spawn Drone |
 
 Projectiles: `ALIEN_FLEGMA`, `P_ACID_BLUE`, `BLAST_ACID_BLUE`, `MISC_ACID_FLOOR`,
 `MISC_ACID_RAIN`.
